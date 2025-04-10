@@ -38,6 +38,8 @@ using TransportMotionTriggerTimeControlStruct = Structs::TransportMotionTriggerT
 using TransportOptionsStruct                  = Structs::TransportOptionsStruct::Type;
 using TransportConfigurationStruct            = Structs::TransportConfigurationStruct::Type;
 
+using TransportOptionsDecodeableStruct = Structs::TransportOptionsStruct::DecodableType;
+
 /** @brief
  *  Defines interfaces for implementing application-specific logic for various aspects of the PushAvStreamTransport Delegate.
  *  Specifically, it defines interfaces for the command handling and loading of the allocated streams.
@@ -52,19 +54,16 @@ public:
     /**
      *   @brief Handle Command Delegate for stream transport allocation with the provided transport configuration option.
      *
-     *   @param connectionID[in]       Indicates the connectionID to allocate.
-     *
      *   @param transportOptions[in]        represent the configuration options of the transport to be allocated
      *
-     *   @param outTransportStatus[out]        represent the status of the transport allocation
+     *   @param outTransporConfiguration[out]        represent the configuration of the transport to be allocated
      *
      *   @return Success if the allocation is successful and a PushTransportConnectionID was
      *   produced; otherwise, the command SHALL be rejected with an appropriate
      *   error.
      */
-    virtual Protocols::InteractionModel::Status AllocatePushTransport(uint16_t connectionID,
-                                                                      const TransportOptionsStruct & transportOptions,
-                                                                      TransportStatusEnum & outTransportStatus) = 0;
+    virtual Protocols::InteractionModel::Status AllocatePushTransport(const TransportOptionsDecodeableStruct & transportOptions,
+                                                                      TransportConfigurationStruct & outTransporConfiguration) = 0;
     /**
      *   @brief Handle Command Delegate for Stream transport deallocation for the
      *   provided connectionID.
@@ -81,27 +80,23 @@ public:
      *
      *   @param connectionID [in]           Indicates the connectionID of the stream transport to modify.
      *
-     *   @param outTransportOptions [out]      represents the Trigger Options to modify.
+     *   @param transportOptions [out]      represents the Trigger Options to modify.
      *
      *   @return Success if the stream transport modification is successful; otherwise, the command SHALL be rejected with an
      * appropriate error.
      */
     virtual Protocols::InteractionModel::Status ModifyPushTransport(const uint16_t connectionID,
-                                                                    const TransportOptionsStruct & outTransportOptions) = 0;
+                                                                    const TransportOptionsDecodeableStruct & transportOptions) = 0;
 
     /**
      *   @brief Handle Command Delegate for Stream transport modification.
      *
-     *   @param connectionID [in]          Indicates the connectionID of the stream transport to set status for.
-     *
-     *   @param transportStatus [in]       represent the new transport status to apply.
+     *   @param connectionIDList [in]       represent the list of connectionIDs for which new transport status to apply.
      *
      *   @return Success if the stream transport status is successfully set; otherwise, the command SHALL be rejected with an
      * appropriate error.
      */
-    virtual Protocols::InteractionModel::Status SetTransportStatus(const uint16_t connectionID,
-                                                                   TransportStatusEnum transportStatus) = 0;
-
+    virtual Protocols::InteractionModel::Status SetTransportStatus(const std::vector<uint16_t> connectionIDList) = 0;
     /**
      *   @brief Handle Command Delegate to request the Node to manually start the specified push transport.
      *
@@ -117,7 +112,7 @@ appropriate
      */
     virtual Protocols::InteractionModel::Status
     ManuallyTriggerTransport(const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
-                             const TransportMotionTriggerTimeControlStruct & timeControl) = 0;
+                             const Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> & timeControl) = 0;
 
     /**
      *   @brief Handle Command Delegate to get the Stream Options Configuration for the specified push transport.
@@ -133,7 +128,7 @@ appropriate
      */
     virtual Protocols::InteractionModel::Status
     FindTransport(const Optional<DataModel::Nullable<uint16_t>> & connectionID,
-                  DataModel::List<TransportConfigurationStruct> & outtransportConfigurations) = 0;
+                  DataModel::List<const TransportConfigurationStruct> & outtransportConfigurations) = 0;
 
     /**
      * @brief Validates the requested stream usage against the camera's resource management
@@ -166,7 +161,7 @@ appropriate
      * list, at initialization. Once loaded, the cluster server would be serving Reads on these attributes. The list is updatable
      * via the Add/Remove functions for the respective transport connections.
      */
-    virtual CHIP_ERROR LoadCurrentConnections(std::vector<uint16_t> & currentConnections) = 0;
+    virtual CHIP_ERROR LoadCurrentConnections(std::vector<TransportConfigurationStruct> & currentConnections) = 0;
 
     /**
      *  @brief Callback into the delegate once persistent attributes managed by
@@ -211,6 +206,12 @@ public:
     BitMask<SupportedIngestMethodsBitmap> GetSupportedIngestMethods() const { return mSupportedIngestMethods; }
 
 private:
+    enum class UpsertResultEnum : uint8_t
+    {
+        kInserted = 0x00,
+        kUpdated  = 0x01,
+    };
+
     PushAvStreamTransportDelegate & mDelegate;
 
     // Attributes
@@ -234,14 +235,12 @@ private:
     CHIP_ERROR ReadAndEncodeCurrentConnections(const AttributeValueEncoder::ListEncodeHelper & encoder);
 
     // Helper functions
-
-    bool FindStreamTransportConnection(const uint16_t connectionID);
     uint16_t GenerateConnectionID();
-
+    TransportConfigurationStruct * FindStreamTransportConnection(const uint16_t connectionID);
     // Add/Remove Management functions for transport
-    CHIP_ERROR AddStreamTransportConnection(const uint16_t transportConnectionId);
+    UpsertResultEnum UpsertStreamTransportConnection(const TransportConfigurationStruct & transportConfiguration);
 
-    CHIP_ERROR RemoveStreamTransportConnection(const uint16_t transportConnectionId);
+    void RemoveStreamTransportConnection(const uint16_t connectionID);
 
     /**
      * @brief Inherited from CommandHandlerInterface

@@ -79,28 +79,49 @@ CHIP_ERROR PushAvStreamTransportServer::ReadAndEncodeCurrentConnections(const At
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PushAvStreamTransportServer::AddStreamTransportConnection(const uint16_t transportConnectionId)
+PushAvStreamTransportServer::UpsertResultEnum
+PushAvStreamTransportServer::UpsertStreamTransportConnection(const TransportConfigurationStruct & transportConfiguration)
 {
-    mCurrentConnections.push_back(transportConnectionId);
-    auto path = ConcreteAttributePath(AttributeAccessInterface::GetEndpointId().Value(), PushAvStreamTransport::Id,
-                                      Attributes::CurrentConnections::Id);
-    mDelegate.OnAttributeChanged(Attributes::CurrentConnections::Id);
-    MatterReportingAttributeChangeCallback(path);
+    UpsertResultEnum result;
+    auto it =
+        std::find_if(mCurrentConnections.begin(), mCurrentConnections.end(),
+                     [id = transportConfiguration.connectionID](const auto & existing) { return existing.connectionID == id; });
 
-    return CHIP_NO_ERROR;
+    if (it != mCurrentConnections.end())
+    {
+        *it    = transportConfiguration;
+        result = UpsertResultEnum::kUpdated;
+    }
+    else
+    {
+        mCurrentConnections.push_back(transportConfiguration);
+        result = UpsertResultEnum::kInserted;
+    }
+
+    MatterReportingAttributeChangeCallback(AttributeAccessInterface::GetEndpointId().Value(), PushAvStreamTransport::Id,
+                                           PushAvStreamTransport::Attributes::CurrentConnections::Id);
+
+    return result;
 }
 
-CHIP_ERROR PushAvStreamTransportServer::RemoveStreamTransportConnection(const uint16_t transportConnectionId)
+void PushAvStreamTransportServer::RemoveStreamTransportConnection(const uint16_t transportConnectionId)
 {
-    mCurrentConnections.erase(std::remove_if(mCurrentConnections.begin(), mCurrentConnections.end(),
-                                             [&](const uint16_t connectionID) { return connectionID == transportConnectionId; }),
-                              mCurrentConnections.end());
-    auto path = ConcreteAttributePath(AttributeAccessInterface::GetEndpointId().Value(), PushAvStreamTransport::Id,
-                                      Attributes::CurrentConnections::Id);
-    mDelegate.OnAttributeChanged(Attributes::CurrentConnections::Id);
-    MatterReportingAttributeChangeCallback(path);
+    size_t originalSize = mCurrentConnections.size();
 
-    return CHIP_NO_ERROR;
+    // Erase-Remove idiom
+    mCurrentConnections.erase(std::remove_if(mCurrentConnections.begin(), mCurrentConnections.end(),
+                                             [transportConnectionId](const TransportConfigurationStruct & s) {
+                                                 return s.connectionID == transportConnectionId;
+                                             }),
+                              mCurrentConnections.end());
+
+    // If a connection was removed, the size will be smaller.
+    if (mCurrentConnections.size() < originalSize)
+    {
+        // Notify the stack that the CurrentConnections attribute has changed.
+        MatterReportingAttributeChangeCallback(AttributeAccessInterface::GetEndpointId().Value(), PushAvStreamTransport::Id,
+                                               PushAvStreamTransport::Attributes::CurrentConnections::Id);
+    }
 }
 
 CHIP_ERROR PushAvStreamTransportServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
@@ -197,14 +218,14 @@ void PushAvStreamTransportServer::InvokeCommand(HandlerContext & handlerContext)
     }
 }
 
-bool PushAvStreamTransportServer::FindStreamTransportConnection(const uint16_t connectionID)
+TransportConfigurationStruct * PushAvStreamTransportServer::FindStreamTransportConnection(const uint16_t connectionID)
 {
-    for (auto & connection : mCurrentConnections)
+    for (auto & transportConnection : mCurrentConnections)
     {
-        if (connection.connectionID == connectionID)
-            return true;
+        if (transportConnection.connectionID == connectionID)
+            return &transportConnection;
     }
-    return false;
+    return nullptr;
 }
 
 uint16_t PushAvStreamTransportServer::GenerateConnectionID()
@@ -236,7 +257,7 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
 
     if (ep == kEmberInvalidEndpointIndex)
     {
-        auto status = StatusCodeEnum::kInvalidTLSEndpoint;
+        auto status = static_cast<uint8_t>(StatusCodeEnum::kInvalidTLSEndpoint);
         ChipLogError(Zcl, "HandleAllocatePushTransport: Invalid TLSEndpointId not found");
         ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, status);
         return;
@@ -244,7 +265,7 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
 
     if (transportOptions.ingestMethod == IngestMethodsEnum::kUnknownEnumValue)
     {
-        auto status = StatusCodeEnum::kUnsupportedIngestMethod;
+        auto status = static_cast<uint8_t>(StatusCodeEnum::kUnsupportedIngestMethod);
         ChipLogError(Zcl, "HandleAllocatePushTransport: Ingest method not supported");
         ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, status);
         return;
@@ -252,7 +273,7 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
 
     if (transportOptions.containerFormat == ContainerFormatEnum::kUnknownEnumValue)
     {
-        auto status = StatusCodeEnum::kUnsupportedContainerFormat;
+        auto status = static_cast<uint8_t>(StatusCodeEnum::kUnsupportedContainerFormat);
         ChipLogError(Zcl, "HandleAllocatePushTransport: Container format not supported");
         ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, status);
         return;
@@ -260,7 +281,7 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
 
     if (transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kUnknownEnumValue)
     {
-        auto status = StatusCodeEnum::kInvalidTriggerType;
+        auto status = static_cast<uint8_t>(StatusCodeEnum::kInvalidTriggerType);
         ChipLogError(Zcl, "HandleAllocatePushTransport: Invalid Trigger type");
         ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, status);
         return;
@@ -273,30 +294,29 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
         mDelegate.ValidateStreamUsage(transportOptions.streamUsage, transportOptions.videoStreamID, transportOptions.audioStreamID);
     if (err != CHIP_NO_ERROR)
     {
-        auto status = StatusCodeEnum::kInvalidStream;
+        auto status = static_cast<uint8_t>(StatusCodeEnum::kInvalidStream);
         ChipLogError(Zcl, "HandleAllocatePushTransport: Invalid Stream");
         ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, status);
         return;
     }
 
-    uint16_t connectionID                  = GenerateConnectionID();
-    TransportStatusEnum outTransportStatus = TransportStatusEnum::kUnknownEnumValue;
-    TransportConfigurationStruct outTransportConfiguration;
-    outTransportConfiguration.connectionID = connectionID;
-    outTransportConfiguration.transportStatus = TransportStatusEnum::kInactive;
-    outTransportConfiguration.transportOptions = transportOptions;
+    uint16_t connectionID = GenerateConnectionID();
 
-    // call the delegate
+    TransportConfigurationStruct outTransportConfiguration;
+    outTransportConfiguration.connectionID    = connectionID;
+    outTransportConfiguration.transportStatus = TransportStatusEnum::kInactive;
+
+    /**
+     * delegate should set the TransportOptions fields to the new values.
+     * Persistently store the resulting TransportConfigurationStruct and map it to the ConnectionID
+     */
     Status status = mDelegate.AllocatePushTransport(transportOptions, outTransportConfiguration);
 
     if (status == Status::Success)
     {
-        response.connectionID     = connectionID;
-        response.transportOptions = transportOptions;
-        response.transportStatus  = outTransportStatus;
-
         // add connection to CurrentConnections
-        AddStreamTransportConnection(connectionID);
+        UpsertStreamTransportConnection(outTransportConfiguration);
+        response.transportConfiguration = outTransportConfiguration;
 
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
     }
@@ -332,9 +352,9 @@ void PushAvStreamTransportServer::HandleDeallocatePushTransport(
 void PushAvStreamTransportServer::HandleModifyPushTransport(HandlerContext & ctx,
                                                             const Commands::ModifyPushTransport::DecodableType & commandData)
 {
-    Status status              = Status::Success;
-    uint16_t connectionID      = commandData.connectionID;
-    auto & outTransportOptions = commandData.transportOptions;
+    Status status           = Status::Success;
+    uint16_t connectionID   = commandData.connectionID;
+    auto & transportOptions = commandData.transportOptions;
 
     if (!FindStreamTransportConnection(connectionID))
     {
@@ -344,7 +364,7 @@ void PushAvStreamTransportServer::HandleModifyPushTransport(HandlerContext & ctx
     }
 
     // Call the delegate
-    status = mDelegate.ModifyPushTransport(connectionID, outTransportOptions);
+    status = mDelegate.ModifyPushTransport(connectionID, transportOptions);
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
@@ -352,19 +372,31 @@ void PushAvStreamTransportServer::HandleModifyPushTransport(HandlerContext & ctx
 void PushAvStreamTransportServer::HandleSetTransportStatus(HandlerContext & ctx,
                                                            const Commands::SetTransportStatus::DecodableType & commandData)
 {
-    Status status          = Status::Success;
-    uint16_t connectionID  = commandData.connectionID;
-    auto & transportStatus = commandData.transportStatus;
+    Status status                              = Status::Success;
+    DataModel::Nullable<uint16_t> connectionID = commandData.connectionID;
+    auto & transportStatus                     = commandData.transportStatus;
+    std::vector<uint16_t> connectionIDList;
 
-    if (!FindStreamTransportConnection(connectionID))
+    if (connectionID.IsNull())
+    {
+        for (auto & transportConnection : mCurrentConnections)
+        {
+            connectionIDList.push_back(transportConnection.connectionID);
+        }
+    }
+    else if (!FindStreamTransportConnection(connectionID.Value()))
     {
         ChipLogError(Zcl, "HandleSetTransportStatus: ConnectionID Not Found.");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
         return;
     }
+    else
+    {
+        connectionIDList.push_back(connectionID.Value());
+    }
 
     // Call the delegate
-    status = mDelegate.SetTransportStatus(connectionID, transportStatus);
+    status = mDelegate.SetTransportStatus(connectionIDList);
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
@@ -377,11 +409,43 @@ void PushAvStreamTransportServer::HandleManuallyTriggerTransport(
     auto & activationReason = commandData.activationReason;
     auto & timeControl      = commandData.timeControl;
 
-    if (!FindStreamTransportConnection(connectionID))
+    TransportConfigurationStruct * transportConfiguration = FindStreamTransportConnection(connectionID);
+
+    if (!transportConfiguration)
     {
         ChipLogError(Zcl, "HandleManuallyTriggerTransport: ConnectionID Not Found.");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
         return;
+    }
+
+    if (transportConfiguration->transportStatus == TransportStatusEnum::kInactive)
+    {
+        auto status = static_cast<uint8_t>(StatusCodeEnum::kInvalidTransportStatus);
+        ChipLogError(Zcl, "HandleManuallyTriggerTransport: Invalid Transport status");
+        ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, status);
+        return;
+    }
+    if (transportConfiguration->transportOptions.HasValue())
+    {
+        if (transportConfiguration->transportOptions.Value().triggerOptions.triggerType == TransportTriggerTypeEnum::kContinuous)
+        {
+            {
+                auto status = static_cast<uint8_t>(StatusCodeEnum::kInvalidTriggerType);
+                ChipLogError(Zcl, "HandleManuallyTriggerTransport: Invalid Trigger type");
+                ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, status);
+                return;
+            }
+        }
+        else if (transportConfiguration->transportOptions.Value().triggerOptions.triggerType ==
+                     TransportTriggerTypeEnum::kCommand &&
+                 !timeControl.HasValue())
+        {
+            {
+                ChipLogError(Zcl, "HandleManuallyTriggerTransport: Time control field not present");
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+                return;
+            }
+        }
     }
 
     // Call the delegate
@@ -398,20 +462,29 @@ void PushAvStreamTransportServer::HandleFindTransport(HandlerContext & ctx,
 
     Optional<DataModel::Nullable<uint16_t>> connectionID = commandData.connectionID;
 
-    DataModel::List<TransportConfigurationStruct> outStreamConfigurations;
+    DataModel::List<const TransportConfigurationStruct> outTransportConfigurations;
 
-    // Call the delegate
-    status = mDelegate.FindTransport(connectionID, outStreamConfigurations);
-
-    if (connectionID.HasValue() && outStreamConfigurations.size() == 0)
+    if (connectionID.Value().IsNull())
     {
-        ChipLogError(Zcl, "HandleFindTransport: No allocated transport for connectionID.");
+        if (mCurrentConnections.size() == 0)
+        {
+            ChipLogError(Zcl, "HandleFindTransport: ConnectionID not found");
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
+            return;
+        }
+    }
+    else if (!FindStreamTransportConnection(connectionID.Value().Value()))
+    {
+        ChipLogError(Zcl, "HandleFindTransport: ConnectionID not found");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
         return;
     }
+
+    // Call the delegate
+    status = mDelegate.FindTransport(connectionID,outTransportConfigurations);
     if (status == Status::Success)
     {
-        response.streamConfigurations = outStreamConfigurations;
+        response.transportConfigurations = outTransportConfigurations;
 
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
     }
