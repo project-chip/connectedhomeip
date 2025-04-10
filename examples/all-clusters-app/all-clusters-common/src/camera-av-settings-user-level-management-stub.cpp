@@ -27,14 +27,14 @@ using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
 using chip::Protocols::InteractionModel::Status;
 
 std::unique_ptr<AVSettingsUserLevelManagementDelegate> gDelegate;
-std::unique_ptr<CameraAvSettingsUserLevelMgmtServer>   gAVSettingsUserLevelManagementCluster;
-static constexpr EndpointId kEndpointId                                            = 1;
+std::unique_ptr<CameraAvSettingsUserLevelMgmtServer> gAVSettingsUserLevelManagementCluster;
+static constexpr EndpointId kEndpointId = 1;
 
 void Shutdown()
 {
     if (gAVSettingsUserLevelManagementCluster != nullptr)
     {
-        gDelegate = nullptr;
+        gDelegate                             = nullptr;
         gAVSettingsUserLevelManagementCluster = nullptr;
     }
 }
@@ -146,8 +146,8 @@ void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::Endpoin
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMin,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMax);
 
-    gAVSettingsUserLevelManagementCluster =
-        std::make_unique<CameraAvSettingsUserLevelMgmtServer>(kEndpointId, *gDelegate.get(), avsumFeatures, avsumAttrs, appMaxPresets);
+    gAVSettingsUserLevelManagementCluster = std::make_unique<CameraAvSettingsUserLevelMgmtServer>(
+        kEndpointId, *gDelegate.get(), avsumFeatures, avsumAttrs, appMaxPresets);
     gAVSettingsUserLevelManagementCluster->Init();
 
     // Set app specific limits to pan, tilt, zoom

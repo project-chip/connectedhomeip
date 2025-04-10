@@ -46,8 +46,7 @@ bool CameraAVSettingsUserLevelManager::IsValidVideoStreamID(uint16_t aVideoStrea
     return true;
 }
 
-Status CameraAVSettingsUserLevelManager::MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                              Optional<uint8_t> aZoom)
+Status CameraAVSettingsUserLevelManager::MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom)
 {
     // The Cluster implementation has validated that the Feature Flags are set and the values themselves are in range. Do any needed
     // hardware interactions to actually set the camera to the new values of PTZ.  Then return a Status response. The server itself
@@ -56,8 +55,7 @@ Status CameraAVSettingsUserLevelManager::MPTZSetPosition(Optional<int16_t> aPan,
     return Status::Success;
 }
 
-Status CameraAVSettingsUserLevelManager::MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                               Optional<uint8_t> aZoom)
+Status CameraAVSettingsUserLevelManager::MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom)
 {
     // The Cluster implementation has validated that the Feature Flags are set and the values themselves are in range. Do any needed
     // hardware interactions to actually set the camera to the new values of PTZ.  Then return a Status response. The server itself
@@ -67,7 +65,7 @@ Status CameraAVSettingsUserLevelManager::MPTZRelativeMove(Optional<int16_t> aPan
 }
 
 Status CameraAVSettingsUserLevelManager::MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                               Optional<uint8_t> aZoom)
+                                                          Optional<uint8_t> aZoom)
 {
     // The Cluster implementation has validated the preset is valid, and provided the MPTZ values associated with that preset.
     // Do any needed hardware interactions to actually set the camera to the new values of PTZ.  Then return a Status response.
@@ -101,7 +99,7 @@ Status CameraAVSettingsUserLevelManager::DPTZSetViewport(uint16_t aVideoStreamID
 }
 
 Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX,
-                                                               Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta)
+                                                          Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta)
 {
     // The Cluster implementation has ensured that the videoStreamID represents a valid stream.
     // The application needs to interact with its instance of AVStreamManagement to access the stream, validate the viewport
