@@ -167,7 +167,7 @@ public:
     /**
      *  Encode a possibly-chunked list attribute value.  Will create a new chunk when necessary.
      *
-     * This method will Attempt to to encode as many list items as possible into a SingleAttributeDataIB, which will be handled by
+     * This method will attempt to to encode as many list items as possible into a SingleAttributeDataIB, which will be handled by
      * cluster server as a ReplaceAll Item operation.
      * If the list is too large, the WriteRequest will be chunked and remaining items will be encoded as AppendItem operations,
      chunking them as needed.

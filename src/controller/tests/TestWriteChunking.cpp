@@ -384,7 +384,7 @@ TEST_F(TestWriteChunking, TestListChunking_NonEmptyReplaceAllList)
 
         ChipLogDetail(DataManagement, "Running iteration %d\n", static_cast<int>(reservationReduction));
 
-        app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
+        app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, NullOptional,
                                      static_cast<uint16_t>(maxReservationSize - reservationReduction) /* reserved buffer size */);
 
         ByteSpan list[kTestListLength2];
@@ -546,7 +546,7 @@ TEST_F(TestWriteChunking, TestBadChunking_NonEmptyReplaceAllList)
 
         ChipLogDetail(DataManagement, "Running iteration with OCTET_STRING length = %d\n", bufferSize);
 
-        app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing());
+        app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, NullOptional);
 
         ByteSpan list[kTestListLengthBadChunking];
         for (auto & item : list)
@@ -706,12 +706,10 @@ TEST_F(TestWriteChunking, TestConflictWrite_NonEmptyReplaceAllList)
     ByteSpan list[kTestListLength2];
 
     TestWriteCallback writeCallback1;
-    app::WriteClient writeClient1(&GetExchangeManager(), &writeCallback1, Optional<uint16_t>::Missing(),
-                                  static_cast<uint16_t>(kReserveSize));
+    app::WriteClient writeClient1(&GetExchangeManager(), &writeCallback1, NullOptional, static_cast<uint16_t>(kReserveSize));
 
     TestWriteCallback writeCallback2;
-    app::WriteClient writeClient2(&GetExchangeManager(), &writeCallback2, Optional<uint16_t>::Missing(),
-                                  static_cast<uint16_t>(kReserveSize));
+    app::WriteClient writeClient2(&GetExchangeManager(), &writeCallback2, NullOptional, static_cast<uint16_t>(kReserveSize));
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -855,12 +853,10 @@ TEST_F(TestWriteChunking, TestNonConflictWrite_NonEmptyReplaceAllList)
     constexpr uint8_t kTestListLength2 = 10;
 
     TestWriteCallback writeCallback1;
-    app::WriteClient writeClient1(&GetExchangeManager(), &writeCallback1, Optional<uint16_t>::Missing(),
-                                  static_cast<uint16_t>(kReserveSize));
+    app::WriteClient writeClient1(&GetExchangeManager(), &writeCallback1, NullOptional, static_cast<uint16_t>(kReserveSize));
 
     TestWriteCallback writeCallback2;
-    app::WriteClient writeClient2(&GetExchangeManager(), &writeCallback2, Optional<uint16_t>::Missing(),
-                                  static_cast<uint16_t>(kReserveSize));
+    app::WriteClient writeClient2(&GetExchangeManager(), &writeCallback2, NullOptional, static_cast<uint16_t>(kReserveSize));
 
     ByteSpan list[kTestListLength2];
 
@@ -1104,7 +1100,7 @@ void TestWriteChunking::RunTest_NonEmptyReplaceAll(Instructions instructions)
 
     TestWriteCallback writeCallback;
     std::unique_ptr<WriteClient> writeClient = std::make_unique<WriteClient>(
-        &GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
+        &GetExchangeManager(), &writeCallback, NullOptional,
         static_cast<uint16_t>(kMaxSecureSduLengthBytes -
                               66) /* use a smaller chunk so we only need a few attributes in the write request. */);
 
