@@ -544,7 +544,7 @@ class TC_FAN_3_1(MatterBaseTest):
 
         if attr_to_verify_value_current is not None:
             # Scenario when the attribute to verify can be None:
-            # 
+            #
             # - When updating the PercentSetting attribute one by one, not every
             #   update will result in a change in the PercentSetting, FanMode, or
             #   SpeedSetting attributes. In such cases, no new report is placed
