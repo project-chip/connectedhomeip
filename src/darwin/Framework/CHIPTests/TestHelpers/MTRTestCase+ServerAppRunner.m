@@ -140,15 +140,24 @@ static const uint16_t kBasePort = 5542 - kMinDiscriminator;
     NSNumber * passcode = [MTRSetupPayload generateRandomSetupPasscode];
     XCTAssertNotNil(passcode);
 
-    NSNumber * discriminator = @(arc4random() % (1 << 12)); // Discriminator is 12 bits.
+    // Discriminator is 12 bits in general, but we only allow discriminators at
+    // least as big as kMinDiscriminator.  The distribution here is not exactly
+    // uniform, because (1<<12)-kMinDiscriminator is not a power of 2, but
+    // probably OK.
+    __auto_type discriminatorRange = (1 << 12) - kMinDiscriminator;
+    NSNumber * discriminator = @(kMinDiscriminator + arc4random() % discriminatorRange);
 
     __auto_type * payload = [[MTRSetupPayload alloc] initWithSetupPasscode:passcode discriminator:discriminator];
     XCTAssertNotNil(payload);
 
-    payload.version = @(1);
+    payload.version = @(0);
     payload.vendorID = @(0xFFF1);
     payload.productID = @(0x8001);
+    payload.commissioningFlow = MTRCommissioningFlowStandard;
     payload.discoveryCapabilities = MTRDiscoveryCapabilitiesOnNetwork;
+    payload.discriminator = discriminator;
+    payload.hasShortDiscriminator = NO;
+    payload.setupPasscode = passcode;
 
     NSString * payloadString = [payload qrCodeString];
     XCTAssertNotNil(payloadString);

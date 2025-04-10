@@ -9117,6 +9117,8 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _node = nil;
+
+        _fabricIndex = @(0);
     }
     return self;
 }
@@ -9126,13 +9128,14 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRAccountLoginClusterLoggedOutEvent alloc] init];
 
     other.node = self.node;
+    other.fabricIndex = self.fabricIndex;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: node:%@; >", NSStringFromClass([self class]), _node];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: node:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _node, _fabricIndex];
     return descriptionString;
 }
 

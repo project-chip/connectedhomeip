@@ -8799,6 +8799,14 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 chip::JniReferences::GetInstance().CreateOptional(value_nodeInsideOptional, value_node);
             }
 
+            jobject value_fabricIndex;
+            std::string value_fabricIndexClassName     = "java/lang/Integer";
+            std::string value_fabricIndexCtorSignature = "(I)V";
+            jint jnivalue_fabricIndex                  = static_cast<jint>(cppValue.fabricIndex);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(value_fabricIndexClassName.c_str(),
+                                                                       value_fabricIndexCtorSignature.c_str(), jnivalue_fabricIndex,
+                                                                       value_fabricIndex);
+
             jclass loggedOutStructClass;
             err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$AccountLoginClusterLoggedOutEvent", loggedOutStructClass);
@@ -8809,15 +8817,15 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jmethodID loggedOutStructCtor;
-            err = chip::JniReferences::GetInstance().FindMethod(env, loggedOutStructClass, "<init>", "(Ljava/util/Optional;)V",
-                                                                &loggedOutStructCtor);
+            err = chip::JniReferences::GetInstance().FindMethod(env, loggedOutStructClass, "<init>",
+                                                                "(Ljava/util/Optional;Ljava/lang/Integer;)V", &loggedOutStructCtor);
             if (err != CHIP_NO_ERROR || loggedOutStructCtor == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipEventStructs$AccountLoginClusterLoggedOutEvent constructor");
                 return nullptr;
             }
 
-            jobject value = env->NewObject(loggedOutStructClass, loggedOutStructCtor, value_node);
+            jobject value = env->NewObject(loggedOutStructClass, loggedOutStructCtor, value_node, value_fabricIndex);
 
             return value;
         }

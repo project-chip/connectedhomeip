@@ -152,8 +152,8 @@ void NetworkStreamSource::ListenForStreamOnSocket()
         }
         else
         {
-            // Timeout occurred, no data available within the timeout period
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            // Timeout occurred, no data available within the timeout period.
+            // Continue with waiting on the socket for data to arrive.
         }
     }
     close(serverSocket);
