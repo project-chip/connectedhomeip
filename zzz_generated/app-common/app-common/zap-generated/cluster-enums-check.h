@@ -2027,9 +2027,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadContr
     case EnumType::kLevel3:
     case EnumType::kLevel4:
     case EnumType::kLevel5:
-    case EnumType::kEmergency:
-    case EnumType::kPlannedOutage:
-    case EnumType::kServiceDisconnect:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -2043,18 +2040,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadContr
     case EnumType::kAny:
     case EnumType::kElectric:
     case EnumType::kNonElectric:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadControl::LoadControlEventChangeSourceEnum val)
-{
-    using EnumType = DemandResponseLoadControl::LoadControlEventChangeSourceEnum;
-    switch (val)
-    {
-    case EnumType::kAutomatic:
-    case EnumType::kUserAction:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
