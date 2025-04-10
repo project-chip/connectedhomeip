@@ -37,67 +37,59 @@ using Status = Protocols::InteractionModel::Status;
 using namespace Camera;
 
 Protocols::InteractionModel::Status PushAVTransportManager::AllocatePushTransport(uint16_t connectionID,
-                                                                      const TransportOptionsStruct & transportOptions,
-                                                                      TransportStatusEnum & outTransportStatus)
+                                                                                  const TransportOptionsStruct & transportOptions,
+                                                                                  TransportStatusEnum & outTransportStatus)
 {
-    ChipLogProgress(NotSpecified, "AllocatePushTransport manager called" );
-    // check valid tls endpoint
-    if (transportOptions.endpointID < 0 || connectionID < 0 || connectionID >= MAX_PUSH_TRANSPORT_CONNECTION_ID) {
-        return Status::ConstraintError;
-    }
+    ChipLogProgress(NotSpecified, "AllocatePushTransport manager called");
 
     // check if avpush-transport already exists. if not, create a new avpush-transport
-    if (Transports[connectionID] != nullptr || ConnectionsMap[connectionID].has_value()){
+    if (Transports[connectionID] != nullptr || ConnectionsMap[connectionID].has_value())
+    {
         return Status::ConstraintError;
     }
-    else {
-        Transports[connectionID] = new PushAVTransport(connectionID, 1);
-        Transports[connectionID]->TransportStatus = true;
+    else
+    {
+        Transports[connectionID]                        = new PushAVTransport(connectionID, 1);
+        Transports[connectionID]->TransportStatus       = true;
         Transports[connectionID]->mTransportTriggerType = transportOptions.triggerOptions.triggerType;
-        ConnectionsMap[connectionID] = transportOptions;
-        outTransportStatus = TransportStatusEnum::kActive;
+        ConnectionsMap[connectionID]                    = transportOptions;
+        outTransportStatus                              = TransportStatusEnum::kActive;
     }
-    
+
     return Status::Success;
 }
 
 Protocols::InteractionModel::Status PushAVTransportManager::DeallocatePushTransport(const uint16_t connectionID)
 {
-    ChipLogProgress(NotSpecified, "DeallocatePushTransport manager called" );
+    ChipLogProgress(NotSpecified, "DeallocatePushTransport manager called");
 
-    // check valid connectionID
-    if (connectionID < 0 || connectionID >= MAX_PUSH_TRANSPORT_CONNECTION_ID) {
-        return Status::ConstraintError;
-    }
-    
     // check if transport exists and not streaming. If so, delete transport. Otherwise, return error.
-    if (Transports[connectionID] == nullptr || !ConnectionsMap[connectionID].has_value()) {
+    if (Transports[connectionID] == nullptr || !ConnectionsMap[connectionID].has_value())
+    {
         return Status::NotFound;
     }
-    else {
+    else
+    {
         Transports[connectionID]->~PushAVTransport();
         Transports[connectionID] = nullptr;
         ConnectionsMap[connectionID].reset();
     }
-    
+
     return Status::Success;
 }
 
 Protocols::InteractionModel::Status PushAVTransportManager::ModifyPushTransport(const uint16_t connectionID,
-                                                                    const TransportOptionsStruct & outTransportOptions)
+                                                                                const TransportOptionsStruct & outTransportOptions)
 {
-    ChipLogProgress(NotSpecified, "ModifyPushTransport manager called" );
+    ChipLogProgress(NotSpecified, "ModifyPushTransport manager called");
 
-    // check valid connectionID
-    if (connectionID < 0 || connectionID >= MAX_PUSH_TRANSPORT_CONNECTION_ID) {
-        return Status::ConstraintError;
-    }
-    
     // check if transport exists and not streaming. If so, modify transport. Otherwise, return error.
-    if (Transports[connectionID] == nullptr || !ConnectionsMap[connectionID].has_value()) {
+    if (Transports[connectionID] == nullptr || !ConnectionsMap[connectionID].has_value())
+    {
         return Status::NotFound;
     }
-    else {
+    else
+    {
         Transports[connectionID]->mTransportTriggerType = outTransportOptions.triggerOptions.triggerType;
     }
 
@@ -105,28 +97,29 @@ Protocols::InteractionModel::Status PushAVTransportManager::ModifyPushTransport(
 }
 
 Protocols::InteractionModel::Status PushAVTransportManager::SetTransportStatus(const uint16_t connectionID,
-                                                                   TransportStatusEnum transportStatus)
+                                                                               TransportStatusEnum transportStatus)
 {
     // TODO: Implement allocation logic
-    ChipLogProgress(NotSpecified, "SetTransportStatus manager called" );
+    ChipLogProgress(NotSpecified, "SetTransportStatus manager called");
 
-    // check valid connectionID
-    if (connectionID < 0 || connectionID >= MAX_PUSH_TRANSPORT_CONNECTION_ID) {
-        return Status::ConstraintError;
-    }
-    
-    // check if transport exists. If so, set the transport status as specified to the transport object attribute. Otherwise, return error.
-    if (Transports[connectionID] == nullptr || !ConnectionsMap[connectionID].has_value()) {
+    // check if transport exists. If so, set the transport status as specified to the transport object attribute. Otherwise, return
+    // error.
+    if (Transports[connectionID] == nullptr || !ConnectionsMap[connectionID].has_value())
+    {
         return Status::NotFound;
     }
-    else {
-        if (transportStatus == TransportStatusEnum::kActive){
+    else
+    {
+        if (transportStatus == TransportStatusEnum::kActive)
+        {
             Transports[connectionID]->TransportStatus = true;
         }
-        else if (transportStatus == TransportStatusEnum::kInactive){
+        else if (transportStatus == TransportStatusEnum::kInactive)
+        {
             Transports[connectionID]->TransportStatus = false;
         }
-        else {
+        else
+        {
             return Status::ConstraintError; // invalid status value passed in. Return error.
         }
     }
@@ -134,43 +127,42 @@ Protocols::InteractionModel::Status PushAVTransportManager::SetTransportStatus(c
 }
 
 Protocols::InteractionModel::Status
-    PushAVTransportManager::ManuallyTriggerTransport(const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
-                             const TransportMotionTriggerTimeControlStruct & timeControl)
+PushAVTransportManager::ManuallyTriggerTransport(const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
+                                                 const TransportMotionTriggerTimeControlStruct & timeControl)
 {
     // TODO: Implement triggering logic
-    ChipLogProgress(NotSpecified, "ManuallyTriggerTransport manager called" );
+    ChipLogProgress(NotSpecified, "ManuallyTriggerTransport manager called");
     return Status::UnsupportedCluster;
 }
 
 Protocols::InteractionModel::Status
-    PushAVTransportManager::FindTransport(const Optional<DataModel::Nullable<uint16_t>> & connectionID,
-                  DataModel::List<TransportConfigurationStruct> & outtransportConfigurations)
+PushAVTransportManager::FindTransport(const Optional<DataModel::Nullable<uint16_t>> & connectionID,
+                                      DataModel::List<TransportConfigurationStruct> & outtransportConfigurations)
 {
     // TODO: Implement allocation logic
-    ChipLogProgress(NotSpecified, "FindTransport manager called" );
+    ChipLogProgress(NotSpecified, "FindTransport manager called");
     return Status::UnsupportedCluster;
-}   
+}
 
-void PushAVTransportManager::OnAttributeChanged(AttributeId attributeId) {
+void PushAVTransportManager::OnAttributeChanged(AttributeId attributeId)
+{
     // TODO: Implement attribute change logic
 }
 
-CHIP_ERROR PushAVTransportManager::LoadCurrentConnections(std::vector<uint16_t> & currentConnections){
-    
-    ChipLogError(Zcl, "LoadCurrentConnections called" );
+CHIP_ERROR PushAVTransportManager::LoadCurrentConnections(std::vector<uint16_t> & currentConnections)
+{
+    ChipLogError(Zcl, "LoadCurrentConnections called");
     mCurrentConnections = currentConnections;
-    for (auto it : mCurrentConnections) {
-        if (it > MAX_PUSH_TRANSPORT_CONNECTION_ID){
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
+    for (auto it : mCurrentConnections)
+    {
         Transports[it] = new PushAVTransport(it, 1);
         // TODO: complete implementation required
     }
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PushAVTransportManager::PersistentAttributesLoadedCallback() {
-
-    ChipLogError(Zcl, "PersistentAttributesLoadedCallback called" );
+CHIP_ERROR PushAVTransportManager::PersistentAttributesLoadedCallback()
+{
+    ChipLogError(Zcl, "PersistentAttributesLoadedCallback called");
     return CHIP_NO_ERROR;
 }

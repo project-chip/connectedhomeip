@@ -20,8 +20,8 @@
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-server.h>
 #include <transport/pushav-transport.h>
 
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/cluster-enums.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -48,24 +48,22 @@ namespace Camera {
 
 class PushAVTransportManager : public app::Clusters::PushAvStreamTransport::PushAvStreamTransportDelegate
 {
-    public:
-    PushAVTransportManager() {
-        std::fill_n(Transports, MAX_PUSH_TRANSPORT_CONNECTION_ID, nullptr);
-    }
+public:
+    PushAVTransportManager() { std::fill_n(Transports, MAX_PUSH_TRANSPORT_CONNECTION_ID, nullptr); }
 
     ~PushAVTransportManager() {}
 
     Protocols::InteractionModel::Status AllocatePushTransport(uint16_t connectionID,
-                                                                      const TransportOptionsStruct & transportOptions,
-                                                                      TransportStatusEnum & outTransportStatus) override;
+                                                              const TransportOptionsStruct & transportOptions,
+                                                              TransportStatusEnum & outTransportStatus) override;
 
     Protocols::InteractionModel::Status DeallocatePushTransport(const uint16_t connectionID) override;
 
     Protocols::InteractionModel::Status ModifyPushTransport(const uint16_t connectionID,
-                                                                    const TransportOptionsStruct & outTransportOptions) override;
+                                                            const TransportOptionsStruct & outTransportOptions) override;
 
     Protocols::InteractionModel::Status SetTransportStatus(const uint16_t connectionID,
-                                                                   TransportStatusEnum transportStatus) override;
+                                                           TransportStatusEnum transportStatus) override;
 
     Protocols::InteractionModel::Status
     ManuallyTriggerTransport(const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
@@ -79,14 +77,12 @@ class PushAVTransportManager : public app::Clusters::PushAvStreamTransport::Push
 
     CHIP_ERROR LoadCurrentConnections(std::vector<uint16_t> & currentConnections) override;
 
-    CHIP_ERROR PersistentAttributesLoadedCallback() override;  
+    CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
-    private:
-
-    PushAVTransport* Transports [MAX_PUSH_TRANSPORT_CONNECTION_ID]; // map for the transport objects
-    std::optional<TransportOptionsStruct> ConnectionsMap [MAX_PUSH_TRANSPORT_CONNECTION_ID]; // map for the transport options
+private:
+    PushAVTransport * Transports[MAX_PUSH_TRANSPORT_CONNECTION_ID];                         // map for the transport objects
+    std::optional<TransportOptionsStruct> ConnectionsMap[MAX_PUSH_TRANSPORT_CONNECTION_ID]; // map for the transport options
     std::vector<uint16_t> mCurrentConnections;
-                                                                    
 };
 
-}
+} // namespace Camera

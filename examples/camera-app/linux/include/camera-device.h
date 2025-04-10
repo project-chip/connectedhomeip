@@ -20,8 +20,8 @@
 #include "camera-av-stream-manager.h"
 #include "camera-device-interface.h"
 #include "chime-manager.h"
-#include "webrtc-provider-manager.h"
 #include "push-av-transport-manager.h"
+#include "webrtc-provider-manager.h"
 
 #include "media-controller.h"
 #include "network-stream-source.h"

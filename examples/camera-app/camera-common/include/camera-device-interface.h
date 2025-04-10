@@ -19,8 +19,8 @@
 #pragma once
 #include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
 #include <app/clusters/chime-server/chime-server.h>
-#include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-server.h>
+#include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
 
 #include "transport/transport.h"
 
