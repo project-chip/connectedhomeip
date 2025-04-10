@@ -243,15 +243,15 @@ class TestSpecParsingDeviceType(MatterBaseTest):
             asserts.assert_false(success, "Unexpected success running test that should fail")
 
     def test_spec_files(self):
-        one_three, _ = build_xml_device_types(PrebuiltDataModelDirectory.k1_3)
+        one_three, one_three_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_3)
         one_four, one_four_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_4)
         one_four_one, one_four_one_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_4_1)
         one_five, one_five_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_5)
-        # 1.3 has a couple of problems related to proxy clusters and a random file from the DM editor.
-        # Some of these should be fixed with the move to alchemy. For now, let's just make sure 1.4
-        # and the current pull don't introduce NEW problems.
+
+        asserts.assert_equal(len(one_three_problems, 0, "Problems found when parsing 1.3 spec"))
         asserts.assert_equal(len(one_four_problems), 0, "Problems found when parsing 1.4 spec")
         asserts.assert_equal(len(one_four_one_problems), 0, "Problems found when parsing 1.4.1 spec")
+
         # Current ballot has a bunch of problems related to IDs being allocated for closures and TBR. These should all
         # mention ID-TBD as the id, so let's pull those out for now and make sure there are no UNKNOWN problems.
         filtered_ballot_problems = [p for p in one_five_problems if 'ID-TBD' not in p.problem]
