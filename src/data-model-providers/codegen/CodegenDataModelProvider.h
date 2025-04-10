@@ -18,8 +18,7 @@
 
 #include <app/data-model-provider/Provider.h>
 
-#include <app/CommandHandlerInterface.h>
-#include <app/ConcreteCommandPath.h>
+#include <app/ConcreteClusterPath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/MetadataList.h>
 #include <app/util/af-types.h>

@@ -16,27 +16,18 @@
  */
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
-#include <access/AccessControl.h>
-#include <access/Privilege.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/EventPathParams.h>
-#include <app/GlobalAttributes.h>
-#include <app/RequiredPrivilege.h>
 #include <app/data-model-provider/MetadataList.h>
-#include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/Provider.h>
 #include <app/server-cluster/ServerClusterContext.h>
 #include <app/server-cluster/ServerClusterInterface.h>
 #include <app/util/AttributesChangedListener.h>
 #include <app/util/DataModelHandler.h>
 #include <app/util/IMClusterCommandHandler.h>
-#include <app/util/af-types.h>
-#include <app/util/attribute-metadata.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <app/util/persistence/AttributePersistenceProvider.h>
@@ -45,9 +36,6 @@
 #include <data-model-providers/codegen/EmberMetadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/ScopedBuffer.h>
-#include <lib/support/SpanSearchValue.h>
 
 #include <cstdint>
 #include <optional>
@@ -161,24 +149,7 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::InvokeCom
         return cluster->InvokeCommand(request, input_arguments, handler);
     }
 
-    CommandHandlerInterface * handler_interface =
-        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(request.path.mEndpointId, request.path.mClusterId);
-
-    if (handler_interface)
-    {
-        CommandHandlerInterface::HandlerContext context(*handler, request.path, input_arguments);
-        handler_interface->InvokeCommand(context);
-
-        // If the command was handled, don't proceed any further and return successfully.
-        if (context.mCommandHandled)
-        {
-            return std::nullopt;
-        }
-    }
-
-    // Ember always sets the return in the handler
-    DispatchSingleClusterCommand(request.path, input_arguments, handler);
-    return std::nullopt;
+    gCodegenServerCluster.InvokeCommand(request, input_arguments, handler);
 }
 
 CHIP_ERROR CodegenDataModelProvider::Endpoints(DataModel::ListBuilder<DataModel::EndpointEntry> & builder)
