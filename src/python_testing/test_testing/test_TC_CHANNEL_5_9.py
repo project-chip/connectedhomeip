@@ -1,4 +1,3 @@
-#
 #    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.
 #
@@ -143,5 +142,5 @@ class TC_CHANNEL_5_9(MatterBaseTest):
         else:
             self.skip_step("4")
             
-if __name__ == "__main__":
-    default_matter_test_main()
+       if __name__ == "__main__":
+        default_matter_test_main()
