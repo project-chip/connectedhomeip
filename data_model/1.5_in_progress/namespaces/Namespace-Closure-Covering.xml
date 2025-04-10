@@ -57,16 +57,22 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<namespace xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd namespace namespace.xsd" id="0x0001" name="Common Closure">
+<namespace xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd namespace namespace.xsd" id="0x0046" name="Closure Covering">
   <tags>
-    <tag id="0x0000" name="Opening">
-      <description>Move toward open position</description>
+    <tag id="0x0000" name="Blind">
+      <description>A covering made of horizontal or vertical slats that can be adjusted to control light, privacy, and airflow.</description>
     </tag>
-    <tag id="0x0001" name="Closing">
-      <description>Move toward closed position</description>
+    <tag id="0x0001" name="Awning">
+      <description>A protective covering, typically made of fabric or metal, that extends from a building&apos;s exterior to provide shade or shelter from the elements.</description>
     </tag>
-    <tag id="0x0002" name="Stop">
-      <description>Stop any movement</description>
+    <tag id="0x0002" name="Shutter">
+      <description>A hinged or sliding covering typically made of wood, metal, or vinyl, used to provide privacy, security, and light control.</description>
+    </tag>
+    <tag id="0x0003" name="Venetian">
+      <description>A type of covering consisting of horizontal slats that can be adjusted to control light, privacy, and airflow.</description>
+    </tag>
+    <tag id="0x0004" name="Curtain">
+      <description>A piece of fabric hung over a window to provide privacy, block light, or enhance the room’s embellishment.</description>
     </tag>
   </tags>
 </namespace>

@@ -57,53 +57,14 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" name="Thread Border Router Diagnostics Cluster" revision="1">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0231" name="Closure Panel" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
-  <clusterIds>
-    <clusterId name="Thread Border Router Diagnostics"/>
-  </clusterIds>
-  <classification hierarchy="base" role="application" picsCode="TBRD" scope="Endpoint"/>
-  <dataTypes>
-    <enum name="BorderRouterOperationalStatusEnum">
-      <item value="0" name="Running" summary="Border routing service is active and operational">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="Stopped" summary="Border routing service is not operational due to fault or error">
-        <mandatoryConform/>
-      </item>
-      <item value="2" name="Disabled" summary="Border routing service is not operational due to administrative configuration">
-        <mandatoryConform/>
-      </item>
-    </enum>
-    <enum name="ThreadBorderRouterFaultEnum">
-      <item value="0" name="BrGeneralFault" summary="Indicates a generic unspecified fault related to the Border Router function.">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="AdjacentInfraIfFault" summary="Indicates the adjacent infrastructure interface cannot be used for border routing.">
-        <mandatoryConform/>
-      </item>
-      <item value="2" name="ServicesAtCapacity" summary="Indicates that a service or function associated with border routing has reached its maximum capacity (e.g., SRP server table full).">
-        <mandatoryConform/>
-      </item>
-      <item value="3" name="ChildrenAtCapacity" summary="Indicates that the Thread Border Router has reached its maximum supported number of direct MTD children.">
-        <mandatoryConform/>
-      </item>
-    </enum>
-  </dataTypes>
-  <attributes>
-    <attribute id="0x0000" name="BrStatus" type="BorderRouterOperationalStatusEnum">
-      <access read="true" readPrivilege="view"/>
+  <classification class="simple" scope="endpoint"/>
+  <clusters>
+    <cluster id="0x0105" name="Closure Dimension" side="server">
       <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0001" name="ActiveTbrFaultsList" type="list">
-      <entry type="ThreadBorderRouterFaultEnum"/>
-      <access read="true" readPrivilege="view"/>
-      <mandatoryConform/>
-      <constraint>
-        <maxCount value="4"/>
-      </constraint>
-    </attribute>
-  </attributes>
-</cluster>
+    </cluster>
+  </clusters>
+</deviceType>

@@ -88,7 +88,7 @@ Davis, CA 95616, USA
     <feature bit="5" code="RAD" name="Radar" summary="Supports sensing using radar waves (microwave)">
       <optionalConform choice="a" more="true" min="1"/>
     </feature>
-    <feature bit="6" code="RFS" name="RFSensing" summary="Supports sensing based on RF signal analysis">
+    <feature bit="6" code="RFS" name="RFSensing" summary="Supports sensing using analysis of radio signals, e.g.: RSSI, CSI and/or any other metric from the signal">
       <optionalConform choice="a" more="true" min="1"/>
     </feature>
     <feature bit="7" code="VIS" name="Vision" summary="Supports sensing based on analyzing images">
@@ -137,11 +137,11 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint>
           <min>
-            <field name="HoldTimeMin"/>
+            <maxOf>
+              <field name="HoldTimeMin"/>
+              <value>10</value>
+            </maxOf>
           </min>
-        </constraint>
-        <constraint>
-          <min value="10"/>
         </constraint>
       </field>
       <field id="2" name="HoldTimeDefault" type="uint16">

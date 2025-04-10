@@ -57,61 +57,23 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="ID-TBD" name="ClosureBase Controller" revision="1">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x023E" name="Closure Controller" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
-  <conditions>
-    <condition name="AnyDimension" summary="Availability of at least one Closure Dimension Cluster"/>
-    <condition name="DimensionA" summary="Availability of the Closure 1^st^ Dimension Cluster"/>
-    <condition name="DimensionB" summary="Availability of the Closure 2^nd^ Dimension Cluster"/>
-    <condition name="DimensionC" summary="Availability of the Closure 3^rd^ Dimension Cluster"/>
-    <condition name="DimensionD" summary="Availability of the Closure 4^th^ Dimension Cluster"/>
-  </conditions>
   <clusters>
-    <cluster id="ID-TBD" name="Closure Control" side="client">
-      <mandatoryConform/>
-    </cluster>
-    <cluster id="ID-TBD" name="Closure 1st Dimension" side="client">
-      <optionalConform/>
-    </cluster>
-    <cluster id="ID-TBD" name="Closure 2nd Dimension" side="client">
-      <optionalConform>
-        <condition name="DimensionA"/>
-      </optionalConform>
-    </cluster>
-    <cluster id="ID-TBD" name="Closure 3rd Dimension" side="client">
-      <optionalConform>
-        <condition name="DimensionB"/>
-      </optionalConform>
-    </cluster>
-    <cluster id="ID-TBD" name="Closure 4th Dimension" side="client">
-      <optionalConform>
-        <condition name="DimensionC"/>
-      </optionalConform>
-    </cluster>
-    <cluster id="ID-TBD" name="Closure 5th Dimension" side="client">
-      <optionalConform>
-        <condition name="DimensionD"/>
-      </optionalConform>
-    </cluster>
-    <cluster id="0x0003" name="Identify" side="server">
-      <optionalConform/>
-    </cluster>
     <cluster id="0x0003" name="Identify" side="client">
       <optionalConform/>
     </cluster>
-    <cluster id="0x0004" name="Groups" side="server">
+    <cluster id="0x0004" name="Groups" side="client">
       <optionalConform/>
     </cluster>
-    <cluster id="0x0062" name="Scenes Management" side="server">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform>
-          <condition name="AnyDimension"/>
-        </optionalConform>
-      </otherwiseConform>
+    <cluster id="0x0104" name="Closure Control" side="client">
+      <mandatoryConform/>
+    </cluster>
+    <cluster id="0x0105" name="Closure Dimension" side="client">
+      <optionalConform/>
     </cluster>
   </clusters>
 </deviceType>

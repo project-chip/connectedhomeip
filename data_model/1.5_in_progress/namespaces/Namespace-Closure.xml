@@ -57,10 +57,28 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<namespace xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd namespace namespace.xsd" id="0x000D" name="Energy Tariff Commodity">
+<namespace xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd namespace namespace.xsd" id="0x0044" name="Closure">
   <tags>
-    <tag id="0x0000" name="ElectricalEnergy"/>
-    <tag id="0x0001" name="NaturalGas"/>
-    <tag id="0x0002" name="Water"/>
+    <tag id="0x0000" name="Covering">
+      <description>Any material or treatment used to cover a window for privacy, light control, insulation, or decoration.</description>
+    </tag>
+    <tag id="0x0001" name="Window">
+      <description>An opening in a wall, door, or roof fitted with glass or another transparent material to allow light, air, and views while providing insulation and security.</description>
+    </tag>
+    <tag id="0x0002" name="Barrier">
+      <description>A physical or conceptual obstruction that prevents movement, access, or progress that serve purposes such as security, safety, privacy, control, etc.</description>
+    </tag>
+    <tag id="0x0003" name="Cabinet">
+      <description>A storage unit with shelves, drawers, or doors, used for organizing and protecting items.</description>
+    </tag>
+    <tag id="0x0004" name="Gate">
+      <description>A movable barrier that controls entry or exit through an opening in a fence, wall, or enclosure.</description>
+    </tag>
+    <tag id="0x0005" name="Garage Door">
+      <description>A large, movable barrier that provides access to a garage.</description>
+    </tag>
+    <tag id="0x0006" name="Door">
+      <description>A movable barrier that allows entry and exit between spaces while providing security, privacy, and insulation.</description>
+    </tag>
   </tags>
 </namespace>

@@ -57,36 +57,115 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" name="Energy Metering Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" name="Ambient Context Sensing Cluster" revision="1">
   <revisionHistory>
-    <revision revision="1" summary="Initial Release"/>
+    <revision revision="1" summary="First release of this cluster"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId name="Energy Metering"/>
+    <clusterId name="Ambient Context Sensing"/>
   </clusterIds>
-  <classification hierarchy="base" role="application" picsCode="" scope="Endpoint"/>
+  <classification hierarchy="base" role="application" picsCode="TBD" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="HA" name="Human Activity" summary="Supports sensing various human actions and activities.">
+      <optionalConform/>
+    </feature>
+  </features>
   <dataTypes>
-    <struct name="MeteredEnergyStruct">
-      <field id="0" name="TariffComponentIDs" type="list">
-        <entry type="uint32"/>
+    <enum name="HumanActivityTypeEnum">
+      <item value="0" name="Other" summary="Other or unknown human activity is detected.">
         <mandatoryConform/>
+      </item>
+      <item value="1" name="Fall" summary="Human fall is detected.">
+        <optionalConform choice="a" more="true" min="1"/>
+      </item>
+      <item value="2" name="Sleep" summary="Human sleeping is detected.">
+        <optionalConform choice="a" more="true" min="1"/>
+      </item>
+      <item value="3" name="Walk" summary="Human walking is detected.">
+        <optionalConform choice="a" more="true" min="1"/>
+      </item>
+      <item value="4" name="Sit" summary="Human sitting is detected.">
+        <optionalConform choice="a" more="true" min="1"/>
+      </item>
+      <item value="5" name="Stand" summary="Human standing is detected.">
+        <optionalConform choice="a" more="true" min="1"/>
+      </item>
+      <item value="6" name="Run" summary="Human running is detected.">
+        <optionalConform choice="a" more="true" min="1"/>
+      </item>
+    </enum>
+    <struct name="HoldTimeLimitsStruct">
+      <field id="0" name="HoldTimeMin" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
       </field>
-      <field id="1" name="Energy" type="energy-mWh">
+      <field id="1" name="HoldTimeMax" type="uint16">
         <mandatoryConform/>
+        <constraint>
+          <min>
+            <maxOf>
+              <field name="HoldTimeMin"/>
+              <value>10</value>
+            </maxOf>
+          </min>
+        </constraint>
+      </field>
+      <field id="2" name="HoldTimeDefault" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <between>
+            <from>
+              <field name="HoldTimeMin"/>
+            </from>
+            <to>
+              <field name="HoldTimeMax"/>
+            </to>
+          </between>
+        </constraint>
       </field>
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="MeteredEnergy" type="list" default="null">
-      <entry type="MeteredEnergyStruct"/>
+    <attribute id="0x0000" name="HumanActivityDetected" type="bool">
       <access read="true" readPrivilege="view"/>
-      <quality nullable="true"/>
-      <mandatoryConform/>
+      <mandatoryConform>
+        <feature name="HA"/>
+      </mandatoryConform>
     </attribute>
-    <attribute id="0x0001" name="MeteredEnergyTimestamp" type="epoch-s" default="null">
+    <attribute id="0x0001" name="HumanActivityType" type="HumanActivityTypeEnum">
       <access read="true" readPrivilege="view"/>
-      <quality nullable="true"/>
-      <mandatoryConform/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="HA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0002" name="HoldTime" type="unit16">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform/>
+      <constraint>
+        <between>
+          <from>
+            <attribute name="HoldTimeLimits">
+              <field name="HoldTimeMin"/>
+            </attribute>
+          </from>
+          <to>
+            <attribute name="HoldTimeLimits">
+              <field name="HoldTimeMax"/>
+            </attribute>
+          </to>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0003" name="HoldTimeLimits" type="HoldTimeLimitsStruct">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <attribute name="HoldTime"/>
+      </mandatoryConform>
     </attribute>
   </attributes>
 </cluster>
