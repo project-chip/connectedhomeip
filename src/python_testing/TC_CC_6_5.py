@@ -15,9 +15,6 @@
 #    limitations under the License.
 #
 
-# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
-# for details about the block below.
-#
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
@@ -36,165 +33,308 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+# Standard library imports
 import asyncio
+
+# Third-party imports
+from mobly import asserts
+
+# Local/Matter imports
 import chip.clusters as Clusters
 from chip.interaction_model import Status
 from matter_testing_infrastructure.chip.testing.matter_testing import (
     MatterBaseTest,
     TestStep,
     async_test_body,
-    default_matter_test_main
+    default_matter_test_main,
 )
-from mobly import asserts
+
+# Constants
+BOOT_WAIT_TIME = 10  # seconds
+MIN_STARTUP_COLOR_TEMP = 1
+MAX_STARTUP_COLOR_TEMP = 0xfeff
 
 
 class TC_CC_6_5(MatterBaseTest):
+    """Test case for Color Control Cluster's StartUpColorTemperatureMireds functionality.
+    
+    This test verifies the Color Temperature StartUpColorTemperatureMireds functionality 
+    of the Color Control Cluster server as specified in section 4.2.18.
+    """
+
     def desc_TC_CC_6_5(self) -> str:
-        """Returns a description of this test"""
-        return "4.2.18.[TC_CC_6_5] This test case verifies Color Temperature StartUpColorTemperatureMireds functionality of the Color Control Cluster server."
+        """Return a description of this test case."""
+        return (
+            "4.2.18.[TC_CC_6_5] This test case verifies Color Temperature "
+            "StartUpColorTemperatureMireds functionality of the Color Control "
+            "Cluster server."
+        )
+
     def steps_TC_CC_6_5(self) -> list[TestStep]:
-        steps = [
+        """Define the test steps for TC_CC_6_5."""
+        return [
             TestStep("0", "Commissioning, already done", is_commissioning=True),
             TestStep("0a", "TH writes 0x00 to the Options attribute"),
             TestStep("0b", "TH sends On command to DUT"),
             TestStep("0c", "TH reads ColorTemperatureMireds attribute from DUT."),
             TestStep("0d", "TH reads ColorTempPhysicalMinMireds attribute from DUT."),
             TestStep("0e", "TH reads ColorTempPhysicalMaxMireds attribute from DUT."),
-            TestStep("1", "TH reads from the DUT the StartUpColorTemperatureMireds attribute"),
-            TestStep("2a", "TH writes to StartUpColorTemperatureMireds attribute with value StartUpColorTemperatureMireds"),
-            TestStep("2b", "TH reads from the DUT the StartUpColorTemperatureMireds attribute"),
+            TestStep(
+                "1",
+                "TH reads from the DUT the StartUpColorTemperatureMireds attribute"
+            ),
+            TestStep(
+                "2a",
+                "TH writes to StartUpColorTemperatureMireds attribute with value"
+            ),
+            TestStep(
+                "2b",
+                "TH reads from the DUT the StartUpColorTemperatureMireds attribute"
+            ),
             TestStep("3a", "Power off DUT"),
             TestStep("3b", "Power on DUT"),
-            TestStep("4a", "TH reads from the DUT the StartUpColorTemperatureMireds attribute"),
-            TestStep("4b", "TH reads from the DUT the ColorTemperatureMireds attribute from DUT."),
+            TestStep(
+                "4a",
+                "TH reads from the DUT the StartUpColorTemperatureMireds attribute"
+            ),
+            TestStep(
+                "4b",
+                "TH reads from the DUT the ColorTemperatureMireds attribute"
+            ),
             TestStep("5a", "TH reads ColorMode attribute from DUT."),
             TestStep("5b", "TH reads EnhancedColorMode attribute from DUT.")
         ]
-        return steps
+
     @async_test_body
     async def setup_test(self):
+        """Set up the test environment and establish secure connection with DUT."""
         super().setup_test()
-        # Pre-Condition: Commissioning
-        self.step("0")
         self.TH1 = self.default_controller
+        
         try:
             await self.TH1.ResolveNode(self.dut_node_id)
         except Exception as e:
-            self.logger.warning(f"Resolving node {self.dut_node_id} failed, continuing test anyway: {e}")
+            self.logger.warning(
+                f"Resolving node {self.dut_node_id} failed, continuing test: {e}"
+            )
         
         if not self.TH1.HasSecureSessionToNode(self.dut_node_id):
-            raise Exception(f"Secure session to node {self.dut_node_id} could not be established.")
+            raise Exception(
+                f"Secure session to node {self.dut_node_id} could not be established."
+            )
 
     @async_test_body
     async def test_TC_CC_6_5(self):
+        """Execute the main test steps for TC_CC_6_5.
+        
+        Tests the Color Control Cluster's StartUpColorTemperatureMireds functionality
+        through a series of read/write operations and power cycle verification.
+        """
         cluster = Clusters.Objects.ColorControl
         attributes = cluster.Attributes
+
         # Step 0a: Write 0x00 to Options attribute
         self.step("0a")
-        await self.TH1.WriteAttribute(self.dut_node_id, [(attributes.Options, attributes.Options.Type(0x00))])
+        try:
+            await self.TH1.WriteAttribute(
+                self.dut_node_id,
+                [(attributes.Options, attributes.Options.Type(0x00))]
+            )
+        except Exception as e:
+            self.logger.error(f"Failed to write Options attribute: {e}")
+            raise
 
-        # Step 0b: Send On command
+        # Step 0b: Send On command and verify response
         self.step("0b")
-        response = await self.TH1.WriteAttribute(self.dut_node_id, [(Clusters.Objects.OnOff.Attributes.OnOff, True)])
+        try:
+            response = await self.TH1.WriteAttribute(
+                self.dut_node_id,
+                [(Clusters.Objects.OnOff.Attributes.OnOff, True)]
+            )
+            asserts.assert_equal(
+                response.status,
+                Status.Success,
+                f"Expected status Success (0x00), got {response.status}"
+            )
+        except Exception as e:
+            self.logger.error(f"Failed to send On command: {e}")
+            raise
 
-        # Verify DUT responds with a successful (value 0x00) status response
-        asserts.assert_equal(response.status, Status.Success, "DUT did not respond with a successful status response")
-
-        # Step 0c: Read ColorTemperatureMireds
+        # Read and verify color temperature attributes
         self.step("0c")
-        color_temp = await self.TH1.ReadAttribute(self.dut_node_id, [(attributes.ColorTemperatureMireds)])
+        try:
+            current_color_temp = await self.TH1.ReadAttribute(
+                self.dut_node_id,
+                [(attributes.ColorTemperatureMireds)]
+            )
+            asserts.assert_true(
+                isinstance(current_color_temp.value, int),
+                "ColorTemperatureMireds must be an integer value"
+            )
+        except Exception as e:
+            self.logger.error(f"Failed to read ColorTemperatureMireds: {e}")
+            raise
 
-        # Verify that the DUT response contains with ColorTemperatureMireds attribute value.
-        asserts.assert_equal(color_temp.value, attributes.colorTemperatureMireds,
-                              "DUT responded with expected ColorTemperatureMireds attribute value")
-
-        # Step 0d: Read ColorTempPhysicalMinMireds
+        # Read physical limits
         self.step("0d")
-        min_mireds = await self.TH1.ReadAttribute(self.dut_node_id, [(attributes.ColorTempPhysicalMinMireds)])
+        try:
+            min_mireds = await self.TH1.ReadAttribute(
+                self.dut_node_id,
+                [(attributes.ColorTempPhysicalMinMireds)]
+            )
+        except Exception as e:
+            self.logger.error(f"Failed to read ColorTempPhysicalMinMireds: {e}")
+            raise
 
-        # Verify that the DUT response contains with ColorTempPhysicalMinMireds attribute value.
-        asserts.assert_equal(min_mireds.value, attributes.ColorTempPhysicalMinMireds,
-                              "DUT responded with expected ColorTempPhysicalMinMireds attribute value")
-
-        # Step 0e: Read ColorTempPhysicalMaxMireds
         self.step("0e")
-        max_mireds = await self.TH1.ReadAttribute(self.dut_node_id, [(attributes.ColorTempPhysicalMaxMireds)])
+        try:
+            max_mireds = await self.TH1.ReadAttribute(
+                self.dut_node_id,
+                [(attributes.ColorTempPhysicalMaxMireds)]
+            )
+        except Exception as e:
+            self.logger.error(f"Failed to read ColorTempPhysicalMaxMireds: {e}")
+            raise
 
-        # Verify that the DUT response contains with ColorTempPhysicalMaxMireds attribute value.
-        asserts.assert_equal(max_mireds.value, attributes.ColorTempPhysicalMaxMireds,
-                              "DUT responded with expected ColorTempPhysicalMaxMireds attribute value")
-
-        # Step 1: Read StartUpColorTemperatureMireds
+        # Read and verify StartUpColorTemperatureMireds
         self.step("1")
-        startup_color_temp = await self.TH1.ReadAttribute(self.dut_node_id, [(attributes.StartUpColorTemperatureMireds)])
-        
-        # Verify that the DUT response contains an uint16 [Min:1 Max:0xfeff or null]
-        asserts.assert_true(startup_color_temp.value is None or isinstance(startup_color_temp.value, int),
-                            "StartUpColorTemperatureMireds attribute value is not a valid uint16")
-        asserts.assert_in_range(startup_color_temp.value, 1, 0xfeff, 
-                                "StartUpColorTemperatureMireds attribute value is out of range")
+        try:
+            startup_color_temp = await self.TH1.ReadAttribute(
+                self.dut_node_id,
+                [(attributes.StartUpColorTemperatureMireds)]
+            )
+            
+            # Verify value constraints
+            if startup_color_temp.value is not None:
+                asserts.assert_true(
+                    isinstance(startup_color_temp.value, int),
+                    "StartUpColorTemperatureMireds must be an integer or null"
+                )
+                asserts.assert_in_range(
+                    startup_color_temp.value,
+                    MIN_STARTUP_COLOR_TEMP,
+                    MAX_STARTUP_COLOR_TEMP,
+                    "StartUpColorTemperatureMireds out of valid range"
+                )
+        except Exception as e:
+            self.logger.error(f"Failed to read StartUpColorTemperatureMireds: {e}")
+            raise
 
-        # Step 2a: Write StartUpColorTemperatureMireds
+        # Calculate target color temperature (midpoint)
+        target_color_temp = min_mireds.value + (
+            (max_mireds.value - min_mireds.value) // 2
+        )
+
+        # Write and verify StartUpColorTemperatureMireds
         self.step("2a")
-        test_value = min_mireds.value + ((max_mireds.value - min_mireds.value) // 2) # Use midpoint value
-        response = await self.TH1.WriteAttribute(self.dut_node_id, [(attributes.StartUpColorTemperatureMireds, test_value)])
+        try:
+            response = await self.TH1.WriteAttribute(
+                self.dut_node_id,
+                [(attributes.StartUpColorTemperatureMireds, target_color_temp)]
+            )
+            asserts.assert_equal(
+                response.status,
+                Status.Success,
+                f"Failed to write StartUpColorTemperatureMireds: {response.status}"
+            )
+        except Exception as e:
+            self.logger.error(
+                f"Failed to write StartUpColorTemperatureMireds: {e}"
+            )
+            raise
 
-        # Verify DUT responds with a successful (value 0x00) status response.
-        asserts.assert_equal(response.status, Status.Success, "DUT respondedwith a successful status response")
-
-
-        # Step 2b: Read StartUpColorTemperatureMireds to verify write
+        # Verify written value
         self.step("2b")
-        verify_startup = await self.TH1.ReadAttribute(self.dut_node_id, [(attributes.StartUpColorTemperatureMireds)])
-        
-        # Verify that the DUT response contains StartUpColorTemperatureMireds that matches the StartUpColorTemperatureMireds 
-        # set in Step 2a
-        asserts.assert_equal(verify_startup.value, test_value, "StartUpColorTemperatureMireds write verification failed")
+        try:
+            verify_startup = await self.TH1.ReadAttribute(
+                self.dut_node_id,
+                [(attributes.StartUpColorTemperatureMireds)]
+            )
+            asserts.assert_equal(
+                verify_startup.value,
+                target_color_temp,
+                "StartUpColorTemperatureMireds verification failed"
+            )
+        except Exception as e:
+            self.logger.error(
+                f"Failed to verify StartUpColorTemperatureMireds: {e}"
+            )
+            raise
 
-        # Step 3a & 3b: Power cycle handled by test harness
+        # Power cycle test
         self.step("3a")
         await self.TH1.PowerCycle()
 
-        # Step 3b: Wait for DUT to boot up  
+        # Allow sufficient time for DUT to complete boot sequence
         self.step("3b")
-        await asyncio.sleep(10)
+        await asyncio.sleep(BOOT_WAIT_TIME)
 
-        # Step 4a: Read StartUpColorTemperatureMireds after power cycle
+        # Verify attributes after power cycle
         self.step("4a")
-        post_cycle_startup = await self.TH1.ReadAttribute(self.dut_node_id, [(attributes.StartUpColorTemperatureMireds)])
+        try:
+            post_cycle_startup = await self.TH1.ReadAttribute(
+                self.dut_node_id,
+                [(attributes.StartUpColorTemperatureMireds)]
+            )
+            asserts.assert_equal(
+                post_cycle_startup.value,
+                target_color_temp,
+                "StartUpColorTemperatureMireds mismatch after power cycle"
+            )
+        except Exception as e:
+            self.logger.error(
+                f"Failed to read StartUpColorTemperatureMireds after power cycle: {e}"
+            )
+            raise
 
-        # Verify that the DUT response indicates that the StartUpColorTemperatureMireds
-        #  attribute matches the StartUpColorTemperatureMireds set in Step 2a
-        asserts.assert_equal(post_cycle_startup.value, test_value, 
-                             "StartUpColorTemperatureMireds matches StartUpColorTemperatureMireds after power cycle")
-
-        # Step 4b: TH reads from the DUT the ColorTemperatureMireds attribute from DUT.
         self.step("4b")
-        post_cycle_color = await self.TH1.ReadAttribute(self.dut_node_id, [(attributes.ColorTemperatureMireds)])
+        try:
+            post_cycle_color = await self.TH1.ReadAttribute(
+                self.dut_node_id,
+                [(attributes.ColorTemperatureMireds)]
+            )
+            asserts.assert_equal(
+                post_cycle_color.value,
+                target_color_temp,
+                "ColorTemperatureMireds mismatch after power cycle"
+            )
+        except Exception as e:
+            self.logger.error(
+                f"Failed to read ColorTemperatureMireds after power cycle: {e}"
+            )
+            raise
 
-        # Verify that the DUT response indicates that the ColorTemperatureMireds 
-        # attribute is StartUpColorTemperatureMireds
-        asserts.assert_equal(post_cycle_color.value, test_value, 
-                             "ColorTemperatureMireds matches StartUpColorTemperatureMireds after power cycle")
-
-        # Step 5a: Read ColorMode
+        # Verify color modes
         self.step("5a")
-        color_mode = await self.TH1.ReadAttribute(self.dut_node_id, [(attributes.ColorMode)])
+        try:
+            color_mode = await self.TH1.ReadAttribute(
+                self.dut_node_id,
+                [(attributes.ColorMode)]
+            )
+            asserts.assert_equal(
+                color_mode.value,
+                attributes.ColorMode.StartUpColorTemperatureMireds,
+                "Incorrect ColorMode value"
+            )
+        except Exception as e:
+            self.logger.error(f"Failed to read ColorMode: {e}")
+            raise
 
-        # Verify that the DUT response indicates that the ColorTemperatureMireds 
-        # attribute is StartUpColorTemperatureMireds
-        asserts.assert_equal(color_mode.value, attributes.ColorMode.StartUpColorTemperatureMireds,
-                             "ColorMode attribute is StartUpColorTemperatureMireds")
-
-        # Step 5b: Read EnhancedColorMode
         self.step("5b")
-        enhanced_mode = await self.TH1.ReadAttribute(self.dut_node_id, [(attributes.EnhancedColorMode)])
+        try:
+            enhanced_mode = await self.TH1.ReadAttribute(
+                self.dut_node_id,
+                [(attributes.EnhancedColorMode)]
+            )
+            asserts.assert_equal(
+                enhanced_mode.value,
+                attributes.EnhancedColorMode.ColorTemperatureMireds,
+                "Incorrect EnhancedColorMode value"
+            )
+        except Exception as e:
+            self.logger.error(f"Failed to read EnhancedColorMode: {e}")
+            raise
 
-        # Verify that the DUT response indicates that the EnhancedColorMode attribute
-        #  has the expected value 2 (ColorTemperatureMireds).
-        asserts.assert_equal(enhanced_mode.value, attributes.EnhancedColorMode.ColorTemperatureMireds,
-                             "EnhancedColorMode attribute is ColorTemperatureMireds")
 
 if __name__ == "__main__":
     default_matter_test_main()
-    
