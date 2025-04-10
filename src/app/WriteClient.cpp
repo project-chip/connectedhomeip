@@ -274,6 +274,8 @@ WriteClient::TryPutPreencodedAttributeWritePayloadIntoList(const chip::app::Conc
 
         if (err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL)
         {
+            // Rollback through the attributeDataIB, which also resets the Builder's error state.
+            // This returns the object to the state it was in before attempting to copy the element.
             attributeDataIB.Rollback(backupWriter);
             outChunkingNeeded = true;
             err               = CHIP_NO_ERROR;
