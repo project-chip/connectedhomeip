@@ -155,6 +155,7 @@
 		511913FB28C100EF009235E9 /* MTRBaseSubscriptionCallback.mm in Sources */ = {isa = PBXBuildFile; fileRef = 511913F928C100EF009235E9 /* MTRBaseSubscriptionCallback.mm */; };
 		511913FC28C100EF009235E9 /* MTRBaseSubscriptionCallback.h in Headers */ = {isa = PBXBuildFile; fileRef = 511913FA28C100EF009235E9 /* MTRBaseSubscriptionCallback.h */; };
 		511FAD1B2DA59A7000E75D18 /* MTRTestControllerDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 511FAD1A2DA59A7000E75D18 /* MTRTestControllerDelegate.mm */; };
+		511FAD1D2DA82E5900E75D18 /* MTRDiagnosticLogDownloadTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 511FAD1C2DA82E5900E75D18 /* MTRDiagnosticLogDownloadTests.m */; };
 		512431252BA0C8B7000BC136 /* Commands.h in Headers */ = {isa = PBXBuildFile; fileRef = 512431182BA0C09A000BC136 /* Commands.h */; };
 		512431262BA0C8BA000BC136 /* ResetMRPParametersCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 512431192BA0C09A000BC136 /* ResetMRPParametersCommand.h */; };
 		512431272BA0C8BF000BC136 /* SetMRPParametersCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 5124311B2BA0C09A000BC136 /* SetMRPParametersCommand.h */; };
@@ -754,6 +755,7 @@
 		511913FA28C100EF009235E9 /* MTRBaseSubscriptionCallback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRBaseSubscriptionCallback.h; sourceTree = "<group>"; };
 		511FAD192DA59A7000E75D18 /* MTRTestControllerDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRTestControllerDelegate.h; sourceTree = "<group>"; };
 		511FAD1A2DA59A7000E75D18 /* MTRTestControllerDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRTestControllerDelegate.mm; sourceTree = "<group>"; };
+		511FAD1C2DA82E5900E75D18 /* MTRDiagnosticLogDownloadTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRDiagnosticLogDownloadTests.m; sourceTree = "<group>"; };
 		512431182BA0C09A000BC136 /* Commands.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Commands.h; sourceTree = "<group>"; };
 		512431192BA0C09A000BC136 /* ResetMRPParametersCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ResetMRPParametersCommand.h; sourceTree = "<group>"; };
 		5124311A2BA0C09A000BC136 /* ResetMRPParametersCommand.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ResetMRPParametersCommand.mm; sourceTree = "<group>"; };
@@ -1869,6 +1871,7 @@
 				75B326A12BCF12E900E17C4E /* MTRDeviceConnectivityMonitorTests.m */,
 				5109E9B62CB8B83D0006884B /* MTRDeviceTypeTests.m */,
 				3D9F2FC22D10E207003CA2BB /* MTRDeviceTypeRevisionTests.m */,
+				511FAD1C2DA82E5900E75D18 /* MTRDiagnosticLogDownloadTests.m */,
 				51D9CB0A2BA37DCE0049D6DB /* MTRDSTOffsetTests.m */,
 				3D9F2FCF2D11FE90003CA2BB /* MTREndpointInfoTests.m */,
 				3D0C484A29DA4FA0006D811F /* MTRErrorTests.m */,
@@ -2689,6 +2692,7 @@
 				5109E9B72CB8B83D0006884B /* MTRDeviceTypeTests.m in Sources */,
 				51E24E73274E0DAC007CCF6E /* MTRErrorTestUtils.mm in Sources */,
 				519498322A25581C00B3BABE /* MTRSetupPayloadInitializationTests.m in Sources */,
+				511FAD1D2DA82E5900E75D18 /* MTRDiagnosticLogDownloadTests.m in Sources */,
 				51A2F1322A00402A00F03298 /* MTRDataValueParserTests.m in Sources */,
 				5165A4B32C5AB978002B9799 /* MTRClusterNamesTests.m in Sources */,
 				51E95DF82A78110900A434F0 /* MTRPerControllerStorageTests.m in Sources */,
