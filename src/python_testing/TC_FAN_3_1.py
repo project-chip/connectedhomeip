@@ -538,16 +538,28 @@ class TC_FAN_3_1(MatterBaseTest):
             attr_to_verify = init_settings.attr_to_update if self_verify else init_settings.attr_to_verify
             init_attr_to_verify_value = init_settings.init_attr_to_update_value if self_verify else init_settings.init_attr_to_verify_value
 
-        # Get the current attribute-to-verify value from the attribute report queue
+        # After the write operation, if a change in the attribute to verify is triggered,
+        # get the new value from the attribute report queue, if not triggered, return None
         attr_to_verify_value_current = await self.get_attribute_value_from_queue(attr_to_verify)
 
         if attr_to_verify_value_current is not None:
-            # Handle iteration 1 edge cases where:
-            #   - The fan can be in any initial state
-            #   - The attribute's previous-value becomes
-            #     the attributes initial-state value
-            #     (as opposed to the value written in the preceding iteration)
+            # Scenario when the attribute to verify can be None:
+            # 
+            # - When updating the PercentSetting attribute one by one, not every
+            #   update will result in a change in the PercentSetting, FanMode, or
+            #   SpeedSetting attributes. In such cases, no new report is placed
+            #   in the queue for that particular iteration, and is represented by
+            #   returning None.
+            #
+            # - In such a scenario, we skip the verification logic, and resume
+            #   it the next time a change is triggered a new report is placed in
+            #   the queue.
             if iteration == 1:
+                # Handle iteration 1 edge cases where:
+                #   - The fan can be in any initial state
+                #   - The attribute's previous-value becomes
+                #     the attributes initial-state value
+                #     (as opposed to the value written in the preceding iteration)
                 self.handle_iteration_one_edge_cases(init_settings, attr_to_verify_value_current)
             else:
                 # The attribute's previous-value may be None in some cases, defaulting to the attribute's initial state value if so
