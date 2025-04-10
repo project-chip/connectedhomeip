@@ -1,7 +1,40 @@
+#
+#    Copyright (c) 2024 Project CHIP Authors
+#    All rights reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at:
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: ${TV_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#     factory-reset: true
+#     quiet: true
+# === END CI TEST ARGUMENTS ===
 import logging
 from chip.interaction_model import Status
 from chip.clusters import Objects as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, pics
 from mobly import asserts
 
 
@@ -12,10 +45,10 @@ class TC_CHANNEL_5_9(MatterBaseTest):
     def steps_TC_CHANNEL_5_9(self) -> list[TestStep]:
         return [
             TestStep("0", "Commissioning, already done", is_commissioning=True),
-            TestStep("1", "Read the ChannelList attribute."),
-            TestStep("2", "Read the CurrentChannel attribute."),
-            TestStep("3", "Send ChangeChannel command with a different valid Match string."),
-            TestStep("4", "Verify CurrentChannel updated to the selected channel.")
+            TestStep("1", "Read the ChannelList attribute"),
+            TestStep("2", "Read the CurrentChannel attribute"),
+            TestStep("3", "Send ChangeChannel command with a different valid Match string"),
+            TestStep("4", "Verify CurrentChannel updated to the selected channel")
         ]
 
     def pics_TC_CHANNEL_5_9(self) -> list[str]:
@@ -44,7 +77,7 @@ class TC_CHANNEL_5_9(MatterBaseTest):
 
     def extract_channel_identifier(self, channel):
         """Returns a prioritized match string from the channel struct as per spec."""
-        # Priority: Identifier > AffiliateCallSign > CallSign > Name > Major.Minor
+        # Priority:NAME > Identifier > AffiliateCallSign > CallSign > Major.Minor
         if getattr(channel, "name", None):
             return channel.name
         if getattr(channel, "identifier", None):
@@ -61,39 +94,54 @@ class TC_CHANNEL_5_9(MatterBaseTest):
     async def test_TC_CHANNEL_5_9(self):
         endpoint = self.user_params.get("endpoint", 1)
 
+        # Step 0: Commissioning already done by test-runner setup
         self.step("0")
-        self.step("1")
-        channel_list = await self.read_channel_list(endpoint)
-        asserts.assert_is_instance(channel_list, list, "ChannelList must be a list.")
-        logging.info(f"Available channels: {channel_list}")
 
-        # Filter valid matchable entries
-        valid_channels = [ch for ch in channel_list if self.extract_channel_identifier(ch)]
-        asserts.assert_true(len(valid_channels) >= 2, "Need at least 2 valid channels for test.")
+        # Step 1: Read the ChannelList attribute and validate it's a list
+        if pics("CHANNEL.S.A0000"):
+            self.step("1")
+            channel_list = await self.read_channel_list(endpoint)
+            asserts.assert_is_instance(channel_list, list, "ChannelList must be a list.")
+            logging.info(f"Available channels: {channel_list}")
+         # Filter out channels that don't have any matchable identifiers
+            valid_channels = [ch for ch in channel_list if self.extract_channel_identifier(ch)]
+            asserts.assert_true(len(valid_channels) >= 2, "Need at least 2 valid channels for test.")
+        else:
+            self.skip_step("1")
 
-        self.step("2")
-        current_channel = await self.read_current_channel(endpoint)
-        logging.info(f"CurrentChannel: {current_channel}")
-        current_identifier = self.extract_channel_identifier(current_channel) if current_channel else None
-        logging.info(f"CurrentChannel: {current_identifier}")
+         # Step 2: Read the CurrentChannel attribute to store current state before switching
+        if pics("CHANNEL.S.A0002"):
+            self.step("2")
+            current_channel = await self.read_current_channel(endpoint)
+            logging.info(f"CurrentChannel: {current_channel}")
+            current_identifier = self.extract_channel_identifier(current_channel) if current_channel else None
+        else:
+            self.skip_step("2")
 
-        self.step("3")
-        # Select a different channel
-        selected_channel = next(
-            (ch for ch in valid_channels if self.extract_channel_identifier(ch) != current_identifier), None)
-        asserts.assert_is_not_none(selected_channel, "No different channel found for switching.")
+         # Step 3: Send ChangeChannel command with a different valid Match string than current
+        if pics("CHANNEL.S.C00.Rsp"):
+            self.step("3")
+            selected_channel = next(
+                (ch for ch in valid_channels if self.extract_channel_identifier(ch) != current_identifier), None)
+            asserts.assert_is_not_none(selected_channel, "No different channel found for switching.")
 
-        match_str = self.extract_channel_identifier(selected_channel)
-        logging.info(f"Selected match string for ChangeChannel: {match_str}")
+            match_str = self.extract_channel_identifier(selected_channel)
+            logging.info(f"Selected match string for ChangeChannel: {match_str}")
 
-        response = await self.send_change_channel_command(endpoint, match_str)
-        asserts.assert_equal(response.status, Status.Success, f"Expected Success status, got {response.status}")
+            response = await self.send_change_channel_command(endpoint, match_str)
+            asserts.assert_equal(response.status, Status.Success, f"Expected Success status, got {response.status}")
+        else:
+            self.skip_step("3")
 
-        self.step("4")
-        updated_channel = await self.read_current_channel(endpoint)
-        updated_identifier = self.extract_channel_identifier(updated_channel)
-        logging.info(f"Updated CurrentChannel: {updated_channel}")
-        asserts.assert_equal(updated_identifier.lower(), match_str.lower(), "Channel did not update to expected value")
+         # Step 4: Read CurrentChannel again to verify it has updated to the newly selected channel
+        if pics("CHANNEL.S.A0002"):
+            self.step("4")
+            updated_channel = await self.read_current_channel(endpoint)
+            updated_identifier = self.extract_channel_identifier(updated_channel)
+            logging.info(f"Updated CurrentChannel: {updated_channel}")
+            asserts.assert_equal(updated_identifier.lower(), match_str.lower(), "Channel did not update to expected value")
+        else:
+            self.skip_step("4")
 
 
 if __name__ == "__main__":
