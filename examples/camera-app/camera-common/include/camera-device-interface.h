@@ -27,6 +27,7 @@ using chip::app::Clusters::CameraAvStreamManagement::SnapshotStreamStruct;
 using chip::app::Clusters::CameraAvStreamManagement::VideoResolutionStruct;
 using chip::app::Clusters::CameraAvStreamManagement::VideoSensorParamsStruct;
 using chip::app::Clusters::CameraAvStreamManagement::VideoStreamStruct;
+using chip::app::Clusters::CameraAvStreamManagement::ViewportStruct;
 
 struct VideoStream
 {
@@ -154,19 +155,74 @@ public:
         // Stop snapshot stream
         virtual CameraError StopSnapshotStream(uint16_t streamID) = 0;
 
-        virtual VideoSensorParamsStruct & GetVideoSensorParams() = 0;
-
-        virtual bool GetNightVisionCapable() = 0;
-
-        virtual VideoResolutionStruct & GetMinViewport() = 0;
-
+        // Get the maximum number of concurrent encoders supported by camera.
         virtual uint8_t GetMaxConcurrentVideoEncoders() = 0;
 
+        // Get the maximum data rate in encoded pixels per second that the
+        // camera can produce given the hardware encoders it has.
         virtual uint32_t GetMaxEncodedPixelRate() = 0;
 
-        virtual uint16_t GetFrameRate() = 0;
+        // Get the Video sensor params(sensor dimensions, framerate, HDR
+        // capabilities)
+        virtual VideoSensorParamsStruct & GetVideoSensorParams() = 0;
 
-        virtual void SetHDRMode(bool hdrMode) = 0;
+        // Get indication whether camera supports night vision mode
+        virtual bool GetNightVisionCapable() = 0;
+
+        // Get indication of the min resolution(pixels) that camera allows for
+        // its viewport.
+        virtual VideoResolutionStruct & GetMinViewport() = 0;
+
+        // Get the maximum size of content buffer in bytes. This buffer holds
+        // compressed and/or raw audio/video content.
+        virtual uint32_t GetMaxContentBufferSize() = 0;
+
+        // Get the maximum network bandwidth(mbps) that the camera would consume
+        // for transmission of its media streams.
+        virtual uint32_t GetMaxNetworkBandwidth() = 0;
+
+        // Get the current frame rate of the camera sensor.
+        virtual uint16_t GetCurrentFrameRate() = 0;
+
+        // Enable/Disable High Dynamic Range mode.
+        virtual CameraError SetHDRMode(bool hdrMode) = 0;
+
+        // Get the current camera HDR mode.
+        virtual bool GetHDRMode() = 0;
+
+        // Does camera have a speaker
+        virtual bool HasSpeaker() = 0;
+
+        // Set the viewport for all streams
+        virtual CameraError SetViewport(const ViewportStruct & viewPort) = 0;
+
+        // Get the current camera viewport.
+        virtual const ViewportStruct & GetViewport() = 0;
+
+        // Mute/Unmute speaker.
+        virtual CameraError SetSpeakerMuted(bool muteSpeaker) = 0;
+
+        // Set speaker volume level.
+        virtual CameraError SetSpeakerVolume(uint8_t speakerVol) = 0;
+
+        // Get the speaker max and min levels.
+        virtual uint8_t GetSpeakerMaxLevel() = 0;
+        virtual uint8_t GetSpeakerMinLevel() = 0;
+
+        // Does camera have a microphone
+        virtual bool HasMicrophone() = 0;
+
+        // Mute/Unmute microphone.
+        virtual CameraError SetMicrophoneMuted(bool muteMicrophone) = 0;
+        virtual bool GetMicrophoneMuted()                           = 0;
+
+        // Set microphone volume level.
+        virtual CameraError SetMicrophoneVolume(uint8_t microphoneVol) = 0;
+        virtual uint8_t GetMicrophoneVolume()                          = 0;
+
+        // Get the microphone max and min levels.
+        virtual uint8_t GetMicrophoneMaxLevel() = 0;
+        virtual uint8_t GetMicrophoneMinLevel() = 0;
     };
 
     virtual CameraHALInterface & GetCameraHALInterface() = 0;
