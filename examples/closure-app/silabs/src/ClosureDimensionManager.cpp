@@ -28,8 +28,6 @@ using namespace chip::app::Clusters::ClosurDimesnion;
 
 using Protocols::InteractionModel::Status;
 
-ClosureDimensionManager ClosureDimensionManager::sManager();
-
 void ClosureDimensionManager::MoveToPosition(uint16_t position)
 {
     // Send command to actuator or update internal state
@@ -39,7 +37,7 @@ void ClosureDimensionManager::MoveToPosition(uint16_t position)
     currState.position.SetValue(position);
 
     // TODO : Update Cluster attribute
-    ClosureDimensionManager::GetManagerInstance().getLogic().SetCurrentState(currState);
+    //ClosureDimensionManager::GetManagerInstance().getLogic().SetCurrentState(currState);
 
     mCurrentPosition = position;
     // setcallback()
@@ -127,6 +125,12 @@ CHIP_ERROR ClosureDimensionManager::EndCurrentErrorListRead()
 CHIP_ERROR ClosureDimensionDelegate::HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
                                                 const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
+    ClosureDimensionManager * closureManager = reinterpret_cast<ClosureDimensionManager *>(this);
+    if (closureManager == nullptr)
+    {
+        ChipLogError(AppServer, "Invalid ClosureDimensionManager instance");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
     // Check if Direction is valid
     if (direction != StepDirectionEnum::kIncrease && direction != StepDirectionEnum::kDecrease)
     {
@@ -145,7 +149,7 @@ CHIP_ERROR ClosureDimensionDelegate::HandleStep(const StepDirectionEnum & direct
     VerifyOrReturnError(Clusters::EnsureKnownEnumValue(speed.Value()) != Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
                 CHIP_ERROR_INVALID_ARGUMENT);
 
-    ClusterState state = ClosureDimensionManager::GetManagerInstance().getLogic().GetState();  // mLogic.GetState();
+   ClusterState state = closureManager->getLogic().GetState();  // mLogic.GetState();
 
     // Convert step to position delta
     int32_t delta    = numberOfSteps * state.stepValue;
@@ -154,7 +158,7 @@ CHIP_ERROR ClosureDimensionDelegate::HandleStep(const StepDirectionEnum & direct
     // Get current position
     uint16_t currentPos = state.currentState.position.HasValue() ? static_cast<uint16_t>(state.currentState.position.Value()) : 0; // 0 - 10000
 
-    bool limitSupported = ClosureDimensionManager::GetManagerInstance().getConformance().HasFeature(Feature::kLimitation) ? true : false;
+   bool limitSupported = closureManager->getConformance().HasFeature(Feature::kLimitation) ? true : false;
 
     switch (direction)
     {
@@ -173,7 +177,7 @@ CHIP_ERROR ClosureDimensionDelegate::HandleStep(const StepDirectionEnum & direct
     }
 
     // Set new position
-    ClosureDimensionManager::GetManagerInstance().MoveToPosition(static_cast<uint16_t>(newPos));
+   closureManager->MoveToPosition(static_cast<uint16_t>(newPos));
 
     if (speed.HasValue())
     {

@@ -85,8 +85,10 @@ public:
     ClusterConformance getConformance(){
         return kConformance;
     }
-    static ClosureDimensionManager GetManagerInstance(){
-        return sManager;
+    CHIP_ERROR HandleStepCommand(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
+        const Optional<Globals::ThreeLevelAutoEnum> & speed){
+
+        return mDelegate.HandleStep(direction,numberOfSteps,speed);
     }
 
 private:
