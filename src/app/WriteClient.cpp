@@ -256,8 +256,10 @@ WriteClient::TryPutPreencodedAttributeWritePayloadIntoList(const chip::app::Conc
 
     ReturnErrorOnFailure(EnsureListStarted(attributePath));
 
-    chip::TLV::TLVWriter * writer = nullptr;
-    VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    chip::TLV::TLVWriter * attributeDataIBWriter = nullptr;
+    VerifyOrReturnError((attributeDataIBWriter = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    AttributeDataIB::Builder & attributeDataIB = mWriteRequestBuilder.GetWriteRequests().GetAttributeDataIBBuilder();
 
     TLV::TLVWriter backupWriter;
     CHIP_ERROR err      = CHIP_NO_ERROR;
@@ -265,12 +267,14 @@ WriteClient::TryPutPreencodedAttributeWritePayloadIntoList(const chip::app::Conc
 
     while ((err = valueReader.Next()) == CHIP_NO_ERROR)
     {
-        mWriteRequestBuilder.GetWriteRequests().Checkpoint(backupWriter);
-        err = writer->CopyElement(TLV::AnonymousTag(), valueReader);
+        // We essentially write List items to the Data Container within the first AttributeDataIB. We checkpoint the AttributeDataIB
+        // Builder in case there's not enough space to encode a list item.
+        attributeDataIB.Checkpoint(backupWriter);
+        err = attributeDataIBWriter->CopyElement(TLV::AnonymousTag(), valueReader);
 
         if (err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL)
         {
-            mWriteRequestBuilder.GetWriteRequests().Rollback(backupWriter);
+            attributeDataIB.Rollback(backupWriter);
             outChunkingNeeded = true;
             err               = CHIP_NO_ERROR;
             break;
@@ -304,8 +308,8 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
         // SOLUTION: we treat ACL as an exception and avoid encoding an empty ReplaceAll list. Instead, we pack as many ACL entries
         // as possible into the ReplaceAll list, and send  any remaining entries in subsequent chunks are part of the AppendItem
         // list operation.
-        // TODO (#38270): Generalize this behavior; send a non-empty ReplaceAll list for all clusters in Matter 1.5 and enforce all
-        // clusters to support it in testing and in certification.
+        // TODO (#38270): Generalize this behavior; send a non-empty ReplaceAll list for all clusters in a later Matter version and
+        // enforce all clusters to support it in testing and in certification.
         bool encodeEmptyListAsReplaceAll = !(path.mClusterId == Clusters::AccessControl::Id);
 
         if (encodeEmptyListAsReplaceAll)
