@@ -83,6 +83,6 @@ jobs:
             - name: clean output
               shell: bash
               run: |
-                rm -rf src/controller/python/test/unit_tests/coverage.xml
                 rm -rf src/controller/python/test/unit_tests/.coverage
                 rm -rf out pyenv
+                rm coverage.xml
