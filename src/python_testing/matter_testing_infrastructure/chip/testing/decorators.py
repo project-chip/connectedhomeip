@@ -23,13 +23,15 @@ and endpoint matching.
 
 import asyncio
 import logging
+import typing
 from enum import IntFlag
 from functools import partial
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any, Callable, ClassVar, Protocol, Type
 
 import chip.clusters as Clusters
 from chip.clusters import Attribute
 from chip.clusters import ClusterObjects as ClusterObjects
+from chip.clusters.ClusterObjects import ClusterAttributeDescriptor
 from chip.testing.global_attribute_ids import GlobalAttributeIds
 from mobly import asserts
 
@@ -41,7 +43,17 @@ EndpointCheckFunction = Callable[[
     Clusters.Attribute.AsyncReadTransaction.ReadResponse, int], bool]
 
 
-def _has_cluster(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse, endpoint: int, cluster: ClusterObjects.Cluster) -> bool:
+# Define a protocol for Cluster classes that are expected to have class-level Attributes
+class ClusterWithTypeAttributes(Protocol):
+    # This protocol describes the structure we expect from Cluster classes passed
+    # to functions like _has_feature. It ensures the nested Attributes class exists.
+    Attributes: ClassVar[Type[Any]]
+
+    # We also need the cluster id for dictionary lookups
+    id: ClassVar[int]
+
+
+def _has_cluster(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse, endpoint: int, cluster: Type[ClusterObjects.Cluster]) -> bool:
     """Check if a cluster exists on a specific endpoint.
 
     Args:
@@ -56,7 +68,7 @@ def _has_cluster(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse,
     return endpoint in wildcard.attributes and cluster in wildcard.attributes[endpoint]
 
 
-def has_cluster(cluster: ClusterObjects.ClusterObjectDescriptor) -> EndpointCheckFunction:
+def has_cluster(cluster: Type[ClusterObjects.Cluster]) -> EndpointCheckFunction:
     """" EndpointCheckFunction that can be passed as a parameter to the run_if_endpoint_matches decorator.
 
         Use this function with the run_if_endpoint_matches decorator to run this test on all endpoints with
@@ -197,17 +209,26 @@ def has_command(command: ClusterObjects.ClusterCommand) -> EndpointCheckFunction
     return partial(_has_command, command=command)
 
 
-def _has_feature(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse, endpoint: int, cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFlag) -> bool:
+def _has_feature(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse, endpoint: int, cluster: Type[ClusterWithTypeAttributes], feature: IntFlag) -> bool:
     if endpoint not in wildcard.attributes:
         return False
 
-    if cluster not in wildcard.attributes[endpoint]:
+    # Mypy needs help understanding the dictionary key type is compatible with the protocol.
+    # We know at runtime 'cluster' is a Type[Cluster] used as the key.
+    cluster_key: Type[ClusterObjects.Cluster] = cluster  # type: ignore [assignment]
+
+    if cluster_key not in wildcard.attributes[endpoint]:
         return False
 
-    if cluster.Attributes.FeatureMap not in wildcard.attributes[endpoint][cluster]:
+    # Get the FeatureMap attribute descriptor from the Cluster class (via Protocol)
+    feature_map_attr_descriptor = cluster.Attributes.FeatureMap
+
+    # Check if the FeatureMap attribute exists in the read results using the descriptor as the key
+    if feature_map_attr_descriptor not in wildcard.attributes[endpoint][cluster_key]:
         return False
 
-    feature_map = wildcard.attributes[endpoint][cluster][cluster.Attributes.FeatureMap]
+    # Get the actual feature map value using the descriptor as the key
+    feature_map = wildcard.attributes[endpoint][cluster_key][feature_map_attr_descriptor]
     if not isinstance(feature_map, int):
         raise ValueError(
             f"Failed to read mandatory FeatureMap attribute value for cluster {cluster} on endpoint {endpoint}: {feature_map}.")
@@ -215,7 +236,7 @@ def _has_feature(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse,
     return (feature & feature_map) != 0
 
 
-def has_feature(cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFlag) -> EndpointCheckFunction:
+def has_feature(cluster: Type[ClusterObjects.Cluster], feature: IntFlag) -> EndpointCheckFunction:
     """ EndpointCheckFunction that can be passed as a parameter to the run_if_endpoint_matches decorator.
 
         Use this function with the run_if_endpoint_matches decorator to run this test on all endpoints with
