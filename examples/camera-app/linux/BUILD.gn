@@ -25,6 +25,7 @@ config("config") {
   cflags = [
     "-Wconversion",
     "-Wno-shadow",
+    "-Wno-error",
   ]
 
   include_dirs = [
@@ -32,6 +33,7 @@ config("config") {
     "include/clusters/chime",
     "include/clusters/webrtc_provider",
     "include/clusters/camera-avstream-mgmt",
+    "include/clusters/push_av_transport",
     "include/media-controller",
     "include/network-stream-source",
     "include/transport",
@@ -56,10 +58,12 @@ executable("chip-camera-app") {
     "${chip_root}/examples/camera-app/linux/include/media-controller/media-controller.h",
     "${chip_root}/examples/camera-app/linux/src/camera-device.cpp",
     "${chip_root}/examples/camera-app/linux/src/clusters/camera-avstream-mgmt/camera-av-stream-manager.cpp",
+    "${chip_root}/examples/camera-app/linux/src/clusters/push_av_transport/push-av-transport-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/clusters/chime/chime-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/clusters/webrtc_provider/webrtc-provider-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/media-controller/media-controller.cpp",
     "${chip_root}/examples/camera-app/linux/src/network-stream-source/network-stream-source.cpp",
+    "${chip_root}/examples/camera-app/linux/src/pushav-transport.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
   ]

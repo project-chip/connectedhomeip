@@ -23,6 +23,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Chime;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
 using namespace chip::app::Clusters::CameraAvStreamManagement;
+using namespace chip::app::Clusters::PushAvStreamTransport;
 
 template <typename T>
 using List   = chip::app::DataModel::List<T>;
@@ -40,9 +41,14 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     mWebRTCTransportProviderPtr =
         std::make_unique<WebRTCTransportProviderServer>(mCameraDevice->GetWebRTCProviderDelegate(), mEndpoint);
 
+    mPushAvStreamTransportServerPtr = std::make_unique<PushAvStreamTransportServer>(mEndpoint, mCameraDevice->GetPushAVDelegate());
+
     // Fetch all initialization parameters for CameraAVStreamMgmt Server
-    BitFlags<Feature> features;
-    features.Set(Feature::kSnapshot);
+    BitFlags<CameraAvStreamManagement::Feature> features;
+    features.Set(CameraAvStreamManagement::Feature::kSnapshot);
+    features.Set(CameraAvStreamManagement::Feature::kAudio);
+    features.Set(CameraAvStreamManagement::Feature::kVideo);
+
     BitFlags<OptionalAttribute> optionalAttrs;
     optionalAttrs.Set(chip::app::Clusters::CameraAvStreamManagement::OptionalAttribute::kNightVision);
     optionalAttrs.Set(chip::app::Clusters::CameraAvStreamManagement::OptionalAttribute::kNightVisionIllum);
@@ -75,6 +81,8 @@ void CameraApp::InitCameraDeviceClusters()
     mChimeServerPtr->Init();
 
     mAVStreamMgmtServerPtr->Init();
+
+    mPushAvStreamTransportServerPtr->Init();
 }
 
 static constexpr EndpointId kCameraEndpointId = 1;
