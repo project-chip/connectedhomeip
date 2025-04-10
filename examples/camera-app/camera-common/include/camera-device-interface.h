@@ -18,6 +18,7 @@
 
 #pragma once
 #include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
+#include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h>
 #include <app/clusters/chime-server/chime-server.h>
 #include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
 
@@ -112,6 +113,9 @@ public:
     // Getter for CameraAVStreamManagement Delegate
     virtual chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate() = 0;
 
+    // Getter for CameraAVSettingsUserLevelManagement Delegate
+    virtual chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate & GetCameraAVSettingsUserLevelMgmtDelegate() = 0;
+
     // Class defining the Camera HAL interface
     class CameraHALInterface
     {
@@ -167,6 +171,16 @@ public:
         virtual uint16_t GetFrameRate() = 0;
 
         virtual void SetHDRMode(bool hdrMode) = 0;
+
+        virtual int16_t GetPanMin() = 0;
+
+        virtual int16_t GetPanMax() = 0;
+    
+        virtual int16_t GetTiltMin() = 0;
+    
+        virtual int16_t GetTiltMax() = 0;
+    
+        virtual uint8_t GetZoomMax() = 0;
     };
 
     virtual CameraHALInterface & GetCameraHALInterface() = 0;

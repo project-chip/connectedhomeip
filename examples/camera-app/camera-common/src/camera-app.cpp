@@ -23,6 +23,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Chime;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
 using namespace chip::app::Clusters::CameraAvStreamManagement;
+using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
 
 template <typename T>
 using List   = chip::app::DataModel::List<T>;
@@ -41,11 +42,11 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
         std::make_unique<WebRTCTransportProviderServer>(mCameraDevice->GetWebRTCProviderDelegate(), mEndpoint);
 
     // Fetch all initialization parameters for CameraAVStreamMgmt Server
-    BitFlags<Feature> features;
-    features.Set(Feature::kSnapshot);
-    BitFlags<OptionalAttribute> optionalAttrs;
-    optionalAttrs.Set(chip::app::Clusters::CameraAvStreamManagement::OptionalAttribute::kNightVision);
-    optionalAttrs.Set(chip::app::Clusters::CameraAvStreamManagement::OptionalAttribute::kNightVisionIllum);
+    BitFlags<CameraAvStreamManagement::Feature> features;
+    features.Set(CameraAvStreamManagement::Feature::kSnapshot);
+    BitFlags<CameraAvStreamManagement::OptionalAttribute> optionalAttrs;
+    optionalAttrs.Set(CameraAvStreamManagement::OptionalAttribute::kNightVision);
+    optionalAttrs.Set(CameraAvStreamManagement::OptionalAttribute::kNightVisionIllum);
     uint32_t maxConcurrentVideoEncoders  = mCameraDevice->GetCameraHALInterface().GetMaxConcurrentVideoEncoders();
     uint32_t maxEncodedPixelRate         = mCameraDevice->GetCameraHALInterface().GetMaxEncodedPixelRate();
     VideoSensorParamsStruct sensorParams = mCameraDevice->GetCameraHALInterface().GetVideoSensorParams();
@@ -86,14 +87,16 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
 
     // Instantiate the CameraAVSettingsUserLevelMgmt Server
     mAVSettingsUserLevelMgmtServerPtr = std::make_unique<CameraAvSettingsUserLevelMgmtServer>(
-        mCameraDevice->GetCameraAVSettingsUserLevelMgmtDelegate(), mEndpoint, features, optionalAttrs, appMaxPresets);
+        mEndpoint, mCameraDevice->GetCameraAVSettingsUserLevelMgmtDelegate(), avsumFeatures, avsumAttrs, appMaxPresets);
 
     // Set app specific limits to pan, tilt, zoom
+    /**
     mAVSettingsUserLevelMgmtServerPtr->SetPanMin(mCameraDevice->GetCameraHALInterface().GetPanMin());
     mAVSettingsUserLevelMgmtServerPtr->SetPanMax(mCameraDevice->GetCameraHALInterface().GetPanMax());
     mAVSettingsUserLevelMgmtServerPtr->SetTiltMin(mCameraDevice->GetCameraHALInterface().GetTiltMin());
     mAVSettingsUserLevelMgmtServerPtr->SetTiltMax(mCameraDevice->GetCameraHALInterface().GetTiltMax());
     mAVSettingsUserLevelMgmtServerPtr->SetZoomMax(mCameraDevice->GetCameraHALInterface().GetZoomMax());
+    */
 }
 
 void CameraApp::InitCameraDeviceClusters()
@@ -104,6 +107,8 @@ void CameraApp::InitCameraDeviceClusters()
     mChimeServerPtr->Init();
 
     mAVStreamMgmtServerPtr->Init();
+
+    mAVSettingsUserLevelMgmtServerPtr->Init();
 }
 
 static constexpr EndpointId kCameraEndpointId = 1;

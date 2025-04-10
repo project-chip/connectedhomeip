@@ -18,6 +18,7 @@
 
 #pragma once
 #include "camera-av-stream-manager.h"
+#include "camera-avsettingsuserlevel-manager.h"
 #include "camera-device-interface.h"
 #include "chime-manager.h"
 #include "webrtc-provider-manager.h"
@@ -87,15 +88,15 @@ public:
 
     void SetHDRMode(bool hdrMode);
 
-    int16_t CameraDevice::GetPanMin();
+    int16_t GetPanMin();
 
-    int16_t CameraDevice::GetPanMax();
+    int16_t GetPanMax();
 
-    int16_t CameraDevice::GetTiltMin();
+    int16_t GetTiltMin();
 
-    int16_t CameraDevice::GetTiltMax();
+    int16_t GetTiltMax();
 
-    uint8_t CameraDevice::GetZoomMax();
+    uint8_t GetZoomMax();
 
     std::vector<VideoStream> & GetAvailableVideoStreams() { return videoStreams; }
 

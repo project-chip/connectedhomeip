@@ -51,7 +51,7 @@ CameraDevice::CameraDevice()
 
     // Set the CameraHALInterface in CameraAVStreamManager and CameraAVsettingsUserLevelManager
     mCameraAVStreamManager.SetCameraDeviceHAL(this);
-    mCameraAVettingsUserLevelManager.SetCameraDeviceHAL(this);
+    mCameraAVSettingsUserLevelManager.SetCameraDeviceHAL(this);
 }
 
 CameraDevice::~CameraDevice()

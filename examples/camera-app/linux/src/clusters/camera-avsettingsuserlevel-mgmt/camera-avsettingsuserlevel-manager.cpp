@@ -16,7 +16,8 @@
  *    limitations under the License.
  */
 
-#include <camera-av-settings-user-level-management-instance.h>
+#include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h>
+#include <camera-avsettingsuserlevel-manager.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -24,10 +25,6 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
 
 using chip::Protocols::InteractionModel::Status;
-
-static AVSettingsUserLevelManagementDelegate * gDelegate                           = nullptr;
-static CameraAvSettingsUserLevelMgmtServer * gAVSettingsUserLevelManagementCluster = nullptr;
-static constexpr EndpointId kEndpointId                                            = 1;
 
 void CameraAVSettingsUserLevelManager::SetCameraDeviceHAL(CameraDeviceInterface::CameraHALInterface * aCameraDeviceHAL)
 {
@@ -111,44 +108,4 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
     // and set the new values for the viewpoort based on the pixel movement requested
     //
     return Status::Success;
-}
-
-void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::EndpointId aEndpointId)
-{
-    VerifyOrDie(aEndpointId == 1); // this cluster is only enabled for endpoint 1.
-    VerifyOrDie(gDelegate == nullptr && gAVSettingsUserLevelManagementCluster == nullptr);
-    const int16_t appPanMin     = -90;
-    const int16_t appPanMax     = 90;
-    const int16_t appTiltMin    = -45;
-    const int16_t appTiltMax    = 45;
-    const uint8_t appZoomMax    = 75;
-    const uint8_t appMaxPresets = 5;
-
-    gDelegate = new AVSettingsUserLevelManagementDelegate;
-    BitFlags<CameraAvSettingsUserLevelManagement::Feature, uint32_t> avsumFeatures(
-        CameraAvSettingsUserLevelManagement::Feature::kDigitalPTZ, CameraAvSettingsUserLevelManagement::Feature::kMechanicalPan,
-        CameraAvSettingsUserLevelManagement::Feature::kMechanicalTilt,
-        CameraAvSettingsUserLevelManagement::Feature::kMechanicalZoom,
-        CameraAvSettingsUserLevelManagement::Feature::kMechanicalPresets);
-    BitFlags<CameraAvSettingsUserLevelManagement::OptionalAttributes, uint32_t> avsumAttrs(
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kMptzPosition,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kMaxPresets,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kMptzPresets,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kDptzRelativeMove,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kZoomMax,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kTiltMin,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kTiltMax,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMin,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMax);
-
-    gAVSettingsUserLevelManagementCluster =
-        new CameraAvSettingsUserLevelMgmtServer(kEndpointId, gDelegate, avsumFeatures, avsumAttrs, appMaxPresets);
-    gAVSettingsUserLevelManagementCluster->Init();
-
-    // Set app specific limits to pan, tilt, zoom
-    gAVSettingsUserLevelManagementCluster->SetPanMin(appPanMin);
-    gAVSettingsUserLevelManagementCluster->SetPanMax(appPanMax);
-    gAVSettingsUserLevelManagementCluster->SetTiltMin(appTiltMin);
-    gAVSettingsUserLevelManagementCluster->SetTiltMax(appTiltMax);
-    gAVSettingsUserLevelManagementCluster->SetZoomMax(appZoomMax);
 }
