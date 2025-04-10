@@ -1,0 +1,115 @@
+# Copyright (c) 2025 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#TODO: Replace PIC
+name: 2.2.2 [TC-WEBRTC-1.1] Validate that setting an SDP Offer successfully initiates a new WebRTC session.
+
+config:
+    nodeId: 0x12344321
+    cluster: "WebRTC Transport Provider"
+    endpoint: 1
+
+tests:
+    - label: "Commission DUT to TH"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Run WebRTC connect to create peer connection"
+      cluster: "WebRTC"
+      command: "Connect"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Source WebRTC SDP Offer from TH Logs"
+      cluster: "LogCommands"
+      command: "PromptWithResponse"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter the SDP offer from the TH logs"
+              - name: "placeHolder"
+                value: "Enter SDP"
+      response:
+          values:
+              - name: "responseValue"
+                saveAs: OfferSdp
+
+    - label: "TH sends the ProvideOffer command with an SDP Offer and null WebRTCSessionID to the DUT."
+      command: "ProvideOffer"
+      arguments:
+          values:
+              - name: "WebRTCSessionID"
+                value: null
+              - name: "SDP"
+                value: OfferSdp
+              - name: "StreamUsage"
+                value: 0
+              - name: "OriginatingEndpointID"
+                value: 1
+              - name: "VideoStreamID"
+                value: 1
+              - name: "AudioStreamID"
+                value: 1
+
+    #TODO:  - label: "DUT sends Answer command to the TH/WEBRTCR."
+    # Currently It is not possible to verify reception of a command.
+
+    #TODO: - label: "TH sends the SUCCESS status code to the DUT."
+    # Controller imediately sends SUCCESS status and is not triggered by the test step.
+
+    - label: "Source ICECandidates from the TH Logs"
+      cluster: "LogCommands"
+      command: "PromptWithResponse"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter the ICECandidates from the TH logs"
+              - name: "placeHolder"
+                value: "Enter ICECandidates"
+              - name: "parseStr"
+                value: true
+      response:
+          values:
+              - name: "responseValue"
+                saveAs: ICECandidates
+
+    - label: "Step 6: TH sends ICE"
+      command: "ProvideICECandidates"
+      arguments:
+          values:
+              - name: "WebRTCSessionID"
+                value: 1
+              - name: "ICECandidates"
+                value: ICECandidates
+
+    #TODO: - label: "DUT sends ProvideICECandidates command to the TH/WEBRTCR."
+    #Currently It is not possible to verify reception of a command.
+
+    - label: "Wait 5s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label: "Confirm WebRTC session by verifying Video Stream"
+      cluster: "WebRTC"
+      command: "VerifyVideoStream"
