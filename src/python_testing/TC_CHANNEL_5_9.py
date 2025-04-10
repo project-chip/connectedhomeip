@@ -33,8 +33,9 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-from chip.interaction_model import Status
+
 from chip.clusters import Objects as Clusters
+from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, pics
 from mobly import asserts
 
