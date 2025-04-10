@@ -204,6 +204,7 @@ namespace Inet {
         CHIP_ERROR err = ConfigureProtocol(addressType, mParameters);
         VerifyOrReturnError(CHIP_NO_ERROR == err, err, ReleaseAll());
 
+#if INET_CONFIG_ENABLE_IPV4
         // Note: Network.framework does not provide an API to set the SO_REUSEPORT socket option.
         // This limitation is not an issue when the port is set to 0, as the platform will choose a random port.
         //
@@ -220,6 +221,7 @@ namespace Inet {
         if (IPAddressType::kIPv4 == addressType && port != 0) {
             port = 0;
         }
+#endif // INET_CONFIG_ENABLE_IPV4
 
         __auto_type endpoint = GetEndPoint(addressType, address, port);
         VerifyOrReturnError(nullptr != endpoint, CHIP_ERROR_INTERNAL, ReleaseAll());
