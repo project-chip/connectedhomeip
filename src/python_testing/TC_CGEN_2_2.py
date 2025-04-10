@@ -630,30 +630,15 @@ class TC_CGEN_2_2(MatterBaseTest):
         logger.info(f'Step #32: ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
 
         self.step(33)
-        # Set the failsafe expiration timeout to PIXIT.CGEN.FailsafeExpiryLengthSeconds seconds fpr CI or FAILSAFE_EXPIRATION_SECONDS constant for Cert, must be less than maxFailsafe (max_fail_safe).
+        # Set the failsafe expiration timeout to 1s, must be less than maxFailsafe (max_fail_safe).
         failsafe_timeout_less_than_max = failsafe_expiration_seconds
         # Verify that failsafe_timeout_less_than_max is less than max_fail_safe
         asserts.assert_less(failsafe_timeout_less_than_max, maxFailsafe)
 
-        if self.is_pics_sdk_ci_only:
-            # Step 33 - In CI environments avoiding the original wait time defined in PIXIT.CGEN.FailsafeExpiryLengthSeconds
-            # and speeding up test execution by setting the expiration time to 2 seconds.
-            logger.info(
-                f'Step 33: {run_type} - Bypassing failsafe expiration to avoid unnecessary delays in CI environment.')
-
-            logger.info(
-                f'Step #33: {run_type} - Waiting for the failsafe timer '
-                f'(PIXIT.CGEN.FailsafeExpiryLengthSeconds --adjusted time for CI) to approach expiration, '
-                f'but not allowing it to fully expire. Waiting for: {failsafe_timeout_less_than_max} seconds.')
-            # Wait PIXIT.CGEN.FailsafeExpiryLengthSeconds time, not allowing the fully exire (max_fail_safe).
-            await asyncio.sleep(failsafe_timeout_less_than_max)
-        else:
-            logger.info(
-                f'Step #33: {run_type} - Waiting for the failsafe timer '
-                f'(FAILSAFE_EXPIRATION_SECONDS constant) to approach expiration, '
-                f'but not allowing it to fully expire. Waiting for: {failsafe_timeout_less_than_max} seconds.')
-            # Wait FAILSAFE_EXPIRATION_SECONDS constant time, not allowing the fully exire (max_fail_safe).
-            await asyncio.sleep(failsafe_timeout_less_than_max)
+        logger.info(
+            f'Step #33: {run_type} - Waiting for the failsafe timer to approach expiration, '
+            f'but not allowing it to fully expire. Waiting for: {failsafe_timeout_less_than_max} seconds.')
+        await asyncio.sleep(failsafe_timeout_less_than_max)
 
         self.step(34)
         trusted_root_list_original_updated = await self.read_single_attribute_check_success(
