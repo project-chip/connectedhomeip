@@ -31,68 +31,105 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ClosureDimension {
+    
+using Protocols::InteractionModel::Status;
 
 // This is an application level delegate to handle Closure Dimension commands according to the specific business logic.
 class ClosureDimensionManager : public ClosureDimension::Delegate
 {
 public:
-    ClosureDimensionDelegate(EndpointId endpoint) : mEndpoint(endpoint) {}
-    CHIP_ERROR HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<TargetLatchEnum> & latch,
+    enum Action_t
+    {
+        MOVE_ACTION = 0,
+        MOVE_AND_LATCH_ACTION,
+        STEP_ACTION,
+        TARGET_CHANGE_ACTION,
+    
+        INVALID_ACTION
+    } Action;
+    
+    typedef void (*Callback_fn_initiated)(Action_t);
+    typedef void (*Callback_fn_completed)(Action_t);
+    void SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB);
+    
+    Callback_fn_initiated mActionInitiated_CB;
+    Callback_fn_completed mActionCompleted_CB;
+    
+    const uint32_t kExampleMotionCountDown     = 15;
+    const uint32_t kExampleStepCountDown       = 1000;
+    
+    ClosureDimensionDelegate(EndpointId endpoint) : mEndpoint(endpoint), gLogic(nullptr) {}
+    
+    Status HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<TargetLatchEnum> & latch,
                                const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
 
-    CHIP_ERROR HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
+    Status HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
                           const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
-
+                          
+    Status HandleMotion(bool latchNeeded, bool motionNeeded, bool newTarget);
+                          
+    void SetLogic(ClusterLogic* logic) 
+    {
+        gLogic = logic;
+    }
+    
+    ClusterLogic* getLogic() const
+    {
+        return gLogic;
+    }
+    
+    bool IsDeviceMoving() const
+    {
+        return isMoving;
+    }
+    
+    void SetDeviceMoving(bool moving)
+    {
+        isMoving = moving;
+    }
+    
+    Action_t GetAction() const
+    {
+        return mAction;
+    }
+    
+    void SetAction(Action_t action)
+    {
+        mAction = action;
+    }
+    
 private:
+    bool isMoving = false;
+    bool isManualLatch = false;
+    Action_t mAction = INVALID_ACTION;
     EndpointId mEndpoint;
+    ClusterLogic* gLogic;
 };
 
 class ClosureDimensionManager
 {
 public:
-    enum Action_t
-    {
-        LOCK_ACTION = 0,
-        UNLOCK_ACTION,
-        UNLATCH_ACTION,
-
-        INVALID_ACTION
-    } Action;
-
-    typedef void (*Callback_fn_initiated)(Action_t, int32_t aActor);
-    typedef void (*Callback_fn_completed)(Action_t);
-    void SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB);
+    
 
     ClosureDimensionManager(EndpointId endpoint) :
         mEndpoint(endpoint), mContext(mEndpoint), mDelegate(mEndpoint), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
-    {}
+    {
+        mDelegate.SetLogic(&mLogic); 
+    }
+    
     CHIP_ERROR Init()
     {
         ReturnErrorOnFailure(mLogic.Init(kConformance));
         ReturnErrorOnFailure(mInterface.Init());
         return CHIP_NO_ERROR;
     }
-
-    bool SupportsLimitMonitoring() const;
-    int32_t GetLimitRangeMin() const;
-    int32_t GetLimitRangeMax() const;
-    uint16_t GetCurrentPosition() const;
-    void MoveToPosition(uint16_t position);
-    void SetSpeed(Globals::ThreeLevelAutoEnum speedMode);
-    ClusterLogic getLogic(){
-        return mLogic;
-    }
-    ClusterConformance getConformance(){
-        return kConformance;
-    }
-    CHIP_ERROR HandleStepCommand(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
-        const Optional<Globals::ThreeLevelAutoEnum> & speed){
-
-        return mDelegate.HandleStep(direction,numberOfSteps,speed);
+    
+    ClosureDimensionDelegate& getDelegate() 
+    {
+        return mDelegate;
     }
 
 private:
-    static ClosureDimensionManager sManager;
     const ClusterConformance kConformance = { .featureMap = 0, .supportsOverflow = false };
 
     EndpointId mEndpoint;
@@ -100,13 +137,6 @@ private:
     ClosureDimensionDelegate mDelegate;
     ClusterLogic mLogic;
     Interface mInterface;
-
-    int32_t mLimitMin = 0;
-    int32_t mLimitMax = 10000;
-    uint16_t mCurrentPosition = 0;
-    Globals::ThreeLevelAutoEnum mCurrentSpeed = Globals::ThreeLevelAutoEnum::kAuto;
-    Callback_fn_initiated mActionInitiated_CB;
-    Callback_fn_completed mActionCompleted_CB;
 };
 
 inline ClosureDimensionManager & ClosureCtrlMgr()

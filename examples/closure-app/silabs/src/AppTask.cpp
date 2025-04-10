@@ -68,6 +68,7 @@ using namespace ::chip::DeviceLayer::Silabs;
 using namespace ::chip::DeviceLayer::Internal;
 using namespace chip::TLV;
 using chip::app::Clusters::ClosureDimension::ClosureDimensionManager;
+using chip::app::Clusters::ClosureDimension::ClosureDimensionDelegate;
 
 namespace chip {
 namespace app {
@@ -82,6 +83,8 @@ static chip::BitMask<Feature> sFeatureMap(Feature::kCalibration);
 } // namespace chip
 
 AppTask AppTask::sAppTask;
+ClosureDimensionManager ep2(2);
+ClosureDimensionManager ep3(3);
 constexpr const uint8_t kNamespaceClosurePanel = 0x45;
 constexpr const uint8_t kNamespaceLift         = 0x00;
 constexpr const uint8_t kNamespaceTilt         = 0x01;
@@ -100,8 +103,6 @@ void ApplicationInit()
     SILABS_LOG("==================================================");
 
     SILABS_LOG("Closure-app Dimesnion Manager updated starting");
-    ClosureDimensionManager ep2(2);
-    ClosureDimensionManager ep3(3);
 
     const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp2TagList[] = {
         { .namespaceID = kNamespaceClosurePanel,
@@ -117,8 +118,8 @@ void ApplicationInit()
     ep2.Init();
     ep3.Init();
 
-    ep2.SetCallbacks(AppTask::ActionInitiated, AppTask::ActionCompleted);
-    ep3.SetCallbacks(AppTask::ActionInitiated, AppTask::ActionCompleted);
+    ep2.getDelegate().SetCallbacks(AppTask::ActionInitiated, AppTask::ActionCompleted);
+    ep3.getDelegate().SetCallbacks(AppTask::ActionInitiated, AppTask::ActionCompleted);
 
     SetTagList(/* endpoint= */ 2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp2TagList));
     SetTagList(/* endpoint= */ 3, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp3TagList));
@@ -126,13 +127,61 @@ void ApplicationInit()
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 }
 
-void AppTask::ActionInitiated(ClosureDimensionManager::Action_t aAction, int32_t aActor)
+void AppTask::ActionInitiated(ClosureDimensionDelegate::Action_t action)
 {
+    SILABS_LOG("==================================================");
+    SILABS_LOG("ActionInitiated");
+    SILABS_LOG("==================================================");
+    // Action initiated,
+    if (action == ClosureDimensionDelegate::MOVE_ACTION)
+    {
+        SILABS_LOG("Starting Motion");
+    }
+    else if (action == ClosureDimensionDelegate::STEP_ACTION)
+    {
+        SILABS_LOG("Starting Step");
+    }
+    else if (action == ClosureDimensionDelegate::MOVE_AND_LATCH_ACTION)
+    {
+        SILABS_LOG("Starting Motion and Latch");
+    }
+    else if (action == ClosureDimensionDelegate::TARGET_CHANGE_ACTION)
+    {
+        SILABS_LOG("Starting Target Change");
+    }
+    else
+    {
+        SILABS_LOG("Invalid Action");
+    }
 
 }
 
-void AppTask::ActionCompleted(ClosureDimensionManager::Action_t aAction)
+void AppTask::ActionCompleted(ClosureDimensionDelegate::Action_t action)
 {
+    SILABS_LOG("==================================================");
+    SILABS_LOG("ActionCompleted");
+    SILABS_LOG("==================================================");
+    // Action initiated,
+    if (action == ClosureDimensionDelegate::MOVE_ACTION)
+    {
+        SILABS_LOG("Motion completed");
+    }
+    else if (action == ClosureDimensionDelegate::STEP_ACTION)
+    {
+        SILABS_LOG("Step completed");
+    }
+    else if (action == ClosureDimensionDelegate::MOVE_AND_LATCH_ACTION)
+    {
+        SILABS_LOG("Motion and Latch completed");
+    }
+    else if (action == ClosureDimensionDelegate::TARGET_CHANGE_ACTION)
+    {
+        SILABS_LOG("Target Change completed");
+    }
+    else
+    {
+        SILABS_LOG("Invalid Action");
+    }
 
 }
 

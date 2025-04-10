@@ -26,6 +26,8 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ClosureDimension {
+    
+using Protocols::InteractionModel::Status;
 
 /** @brief
  *    Defines methods for implementing application-specific logic for the Closure Dimension Cluster.
@@ -48,9 +50,8 @@ public:
      *         ConstraintError when arguments does not follow the constraints
      *         InvalidInState when device is in a non-compatible internal-state.
      */
-    virtual Protocols::InteractionModel::Status HandleSetTarget(const Optional<Percent100ths> & position,
-                                                                const Optional<TargetLatchEnum> & latch,
-                                                                const Optional<Globals::ThreeLevelAutoEnum> & speed) = 0;
+    virtual Status HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<TargetLatchEnum> & latch,
+                                       const Optional<Globals::ThreeLevelAutoEnum> & speed) = 0;
 
     /**
      * @brief This function handles Step command implementaion.
@@ -63,8 +64,8 @@ public:
      *         ConstraintError when arguments does not follow the constraints
      *         InvalidInState when device is in a non-compatible internal-state.
      */
-    virtual Protocols::InteractionModel::Status HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
-                                                           const Optional<Globals::ThreeLevelAutoEnum> & speed) = 0;
+    virtual Status HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
+                                  const Optional<Globals::ThreeLevelAutoEnum> & speed) = 0;
 };
 
 } // namespace ClosureDimension
