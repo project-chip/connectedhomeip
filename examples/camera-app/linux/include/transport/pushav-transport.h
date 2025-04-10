@@ -19,9 +19,10 @@
 #pragma once
 
 #include "transport.h"
+#include <app-common/zap-generated/cluster-enums.h>
 
 // Derived class for PushAV transport
-class PushAVTransport : public Transport
+class PushAVTransport : public camera::Transport
 {
 public:
     PushAVTransport(uint16_t sessionID, uint64_t nodeID);
@@ -41,10 +42,20 @@ public:
     // Indicates that the transport is ready to send audio data
     bool CanSendAudio() override;
 
+    // Dummy implementation to indicate whether the transport is streaming or not
+    bool IsStreaming();
+
+    // Dummy implementation to indicate the status of the transport stream
+    bool TransportStatus;
+
+    // Enum indicating the type of trigger used to start the transport
+    chip::app::Clusters::PushAvStreamTransport::TransportTriggerTypeEnum mTransportTriggerType;
+
 private:
     // Dummy implementation to indicate if video can be sent
     bool mCanSendVideo = true;
 
     // Dummy implementation to indicate if audio can be sent
     bool mCanSendAudio = true;
+
 };
