@@ -53,9 +53,13 @@ void WebRTCProviderManager::Init()
         ChipLogProgress(Camera, "%s", std::string(candidate).c_str());
     });
 
-    mPeerConnection->onStateChange([](rtc::PeerConnection::State state) {
+    mPeerConnection->onStateChange([this](rtc::PeerConnection::State state) {
         // Convert the enum to an integer or string as needed
         ChipLogProgress(Camera, "[State: %u]", static_cast<unsigned>(state));
+	 if (state == rtc::PeerConnection::State::Connected)
+         {
+             RegisterWebrtcTransport(mCurrentSessionId);
+         }
     });
 
     mPeerConnection->onGatheringStateChange([](rtc::PeerConnection::GatheringState state) {
@@ -162,7 +166,7 @@ void WebRTCProviderManager::RegisterWebrtcTransport(uint16_t sessionId)
         return;
     }
 
-    mCameraDeviceHAL->RegisterTransport(webrtcTransportMap[sessionId], 1, 0/*videoStreamID, audioStreamID*/);
+    mCameraDeviceHAL->RegisterTransport(webrtcTransportMap[sessionId], videoStreamID, audioStreamID);
 }
 
 CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession)
@@ -214,17 +218,17 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
         outSession.audioStreamID.SetNull();
     }
 
+    if (webrtcTransportMap.find(args.sessionId) == webrtcTransportMap.end())
+    {
+        webrtcTransportMap[args.sessionId] = new WebrtcTransport(args.sessionId, peerId.GetNodeId(), mPeerConnection);
+    }
+
     // Process the SDP Offer, begin the ICE Candidate gathering phase, create the SDP Answer, and invoke Answer.
     mPeerId                = ScopedNodeId(args.peerNodeId, args.fabricIndex);
     mOriginatingEndpointId = args.originatingEndpointId;
     mCurrentSessionId      = args.sessionId;
 
     mPeerConnection->setRemoteDescription(args.sdp);
-
-    if (webrtcTransportMap.find(args.sessionId) == webrtcTransportMap.end())
-    {
-        webrtcTransportMap[args.sessionId] = new WebrtcTransport(args.sessionId, peerId.GetNodeId(), mPeerConnection);
-    }
 
     return CHIP_NO_ERROR;
 }
