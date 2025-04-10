@@ -22,8 +22,10 @@
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/CASESessionManager.h>
 #include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
+#include <media-controller.h>
 #include <rtc/rtc.hpp>
 #include <transport/webrtc-transport.h>
+
 #include <unordered_map>
 
 namespace Camera {
@@ -41,7 +43,7 @@ public:
 
     void CloseConnection();
 
-    void SetCameraDeviceHAL(CameraDeviceInterface::CameraHALInterface * aCameraDeviceHAL);
+    void SetMediaController(MediaController * mediaController);
 
     CHIP_ERROR HandleSolicitOffer(const OfferRequestArgs & args,
                                   chip::app::Clusters::WebRTCTransportProvider::WebRTCSessionStruct & outSession,
@@ -100,7 +102,7 @@ private:
     uint16_t videoStreamID;
     uint16_t audioStreamID;
 
-    CameraDeviceInterface::CameraHALInterface * mCameraDeviceHAL = nullptr;
+    MediaController * mMediaController = nullptr;
 };
 
 } // namespace Camera

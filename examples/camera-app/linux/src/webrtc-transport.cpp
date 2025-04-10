@@ -31,10 +31,11 @@ WebrtcTransport::WebrtcTransport(uint16_t sessionID, uint64_t nodeID, std::share
     media.addH264Codec(96);
     media.setBitrate(3000);
     media.addSSRC(ssrc, "video-send");
-    track           = peerConnection->addTrack(media);
+    // TODO: role actpass in remote answer description, need to set as Active/Passive based on local offer description
+    // track           = peerConnection->addTrack(media);
     auto rtpConfig  = std::make_shared<rtc::RtpPacketizationConfig>(ssrc, "video-send", 96, rtc::H264RtpPacketizer::ClockRate);
     auto packetizer = std::make_shared<rtc::H264RtpPacketizer>(rtpConfig);
-    track->setMediaHandler(packetizer);
+    // track->setMediaHandler(packetizer);
 }
 
 WebrtcTransport::~WebrtcTransport()
@@ -52,7 +53,7 @@ void WebrtcTransport::SendVideo(const char * data, size_t size, uint16_t videoSt
     timestamp += sampleDuration_us;
     rtc::FrameInfo frameInfo(timestamp);
     frameInfo.payloadType = 96;
-    track->sendFrame(sample, frameInfo);
+    // track->sendFrame(sample, frameInfo);
 }
 
 // Dummy implementation of SendAudio method

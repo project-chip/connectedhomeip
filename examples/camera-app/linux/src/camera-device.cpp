@@ -56,8 +56,8 @@ CameraDevice::CameraDevice()
     mCameraAVStreamManager.SetCameraDeviceHAL(this);
     mCameraAVSettingsUserLevelManager.SetCameraDeviceHAL(this);
 
-    // Set the CameraHALInterface in WebRTCProviderManager.
-    mWebRTCProviderManager.SetCameraDeviceHAL(this);
+    // Set the MediaController in WebRTCProviderManager.
+    mWebRTCProviderManager.SetMediaController(&mMediaController);
 }
 
 CameraDevice::~CameraDevice()
@@ -66,12 +66,6 @@ CameraDevice::~CameraDevice()
     {
         close(videoDeviceFd);
     }
-}
-
-void CameraDevice::RegisterTransport(Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID)
-{
-    ChipLogProgress(Camera, "Register Transport, videoStreamID: %u, audioStreamID: %u", videoStreamID, audioStreamID);
-    mMediaController.RegisterTransport(transport, videoStreamID, audioStreamID);
 }
 
 CameraError CameraDevice::InitializeCameraDevice()
