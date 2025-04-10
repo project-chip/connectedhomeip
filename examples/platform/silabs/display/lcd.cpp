@@ -35,6 +35,8 @@
 
 #include "sl_board_control.h"
 
+#include <lib/support/logging/CHIPLogging.h>
+
 #define LCD_SIZE 128
 #define QR_CODE_VERSION 4
 #define QR_CODE_MODULE_SIZE 3
@@ -75,7 +77,7 @@ CHIP_ERROR SilabsLCD::Init(uint8_t * name, bool initialState)
         SILABS_LOG("Board Display enable fail %d", status);
         err = CHIP_ERROR_INTERNAL;
     }
-#endif
+#endif // SLI_SI91X_MCU_INTERFACE
 
     /* Initialize the DMD module for the DISPLAY device driver. */
     status = DMD_init(0);
@@ -126,7 +128,30 @@ int SilabsLCD::DrawPixel(void * pContext, int32_t x, int32_t y)
 
 int SilabsLCD::Update(void)
 {
-    return updateDisplay();
+    int status = 0;
+#ifdef SL_ENABLE_ICD_LCD
+    SilabsLCD::TurnOn();
+#endif // SL_ENABLE_ICD_LCD
+    status = updateDisplay();
+#ifdef SL_ENABLE_ICD_LCD
+    switch (mCurrentScreen)
+    {
+    case DemoScreen:
+        SilabsLCD::TurnOff(kActivityLCDTimeout);
+        break;
+    case StatusScreen:
+        SilabsLCD::TurnOff(kActivityLCDTimeout);
+        break;
+#ifdef QR_CODE_ENABLED
+    case QRCodeScreen:
+        SilabsLCD::TurnOff(kQRCodeScreenTimeout);
+        break;
+#endif // QR_CODE_ENABLED
+    default:
+        break;
+    }
+#endif // SL_ENABLE_ICD_LCD
+    return status;
 }
 
 void SilabsLCD::WriteDemoUI(bool state)
@@ -151,6 +176,7 @@ void SilabsLCD::WriteDemoUI()
         demoUIClearMainScreen(mName);
         demoUIDisplayApp(dState.mainState);
     }
+    SilabsLCD::Update();
 }
 
 void SilabsLCD::WriteStatus()
@@ -195,7 +221,7 @@ void SilabsLCD::WriteStatus()
         GLIB_drawStringOnLine(&glibContext, str, lineNb++, GLIB_ALIGN_LEFT, 0, 0, true);
     }
 
-    updateDisplay();
+    SilabsLCD::Update();
 }
 
 void SilabsLCD::SetCustomUI(customUICB cb)
@@ -214,7 +240,6 @@ void SilabsLCD::SetScreen(Screen_e screen)
     {
         return;
     }
-
     switch (screen)
     {
     case DemoScreen:
@@ -256,6 +281,64 @@ void SilabsLCD::SetStatus(DisplayStatus_t & status)
 {
     mStatus = status;
 }
+
+CHIP_ERROR SilabsLCD::TurnOn(void)
+{
+    sl_status_t status = SL_STATUS_OK;
+#if (SLI_SI91X_MCU_INTERFACE)
+    sl_memlcd_display_enable();
+    sl_memlcd_power_on(sl_memlcd_get(), true);
+    sl_memlcd_clear(sl_memlcd_get());
+#else
+    status = sl_board_enable_display();
+#endif // SLI_SI91X_MCU_INTERFACE
+    if (status != SL_STATUS_OK)
+    {
+        ChipLogError(DeviceLayer, "sl_board_enable_display failed: %ld", status);
+        return CHIP_ERROR_INTERNAL;
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SilabsLCD::TurnOff(void)
+{
+    sl_status_t status = SL_STATUS_OK;
+    status             = SilabsLCD::Clear();
+    if (status != SL_STATUS_OK)
+    {
+        ChipLogError(DeviceLayer, "SilabsLCD::Clear failed: %ld", status);
+        return CHIP_ERROR_INTERNAL;
+    }
+#if (SLI_SI91X_MCU_INTERFACE)
+    sl_memlcd_power_on(sl_memlcd_get(), false);
+    sl_memlcd_display_disable();
+#else
+    status = sl_board_disable_display();
+#endif // SLI_SI91X_MCU_INTERFACE
+    if (status != SL_STATUS_OK)
+    {
+        ChipLogError(DeviceLayer, "sl_board_disable_display failed: %ld", status);
+        return CHIP_ERROR_INTERNAL;
+    }
+    return CHIP_NO_ERROR;
+}
+
+#ifdef SL_ENABLE_ICD_LCD
+CHIP_ERROR SilabsLCD::TurnOff(uint32_t delayInMs)
+{
+    sl_sleeptimer_restart_timer(&lcdTimerHandle, sl_sleeptimer_ms_to_tick(delayInMs), LcdTimeoutCallback, this, 0,
+                                SL_SLEEPTIMER_NO_HIGH_PRECISION_HF_CLOCKS_REQUIRED_FLAG);
+    return CHIP_NO_ERROR;
+}
+
+void SilabsLCD::LcdTimeoutCallback(sl_sleeptimer_timer_handle_t * handle, void * data)
+{
+    // Perform the desired task when the timer expires
+    (void) handle;
+    SilabsLCD * sLCD = reinterpret_cast<SilabsLCD *>(data);
+    sLCD->TurnOff();
+}
+#endif // SL_ENABLE_ICD_LCD
 
 #ifdef QR_CODE_ENABLED
 void SilabsLCD::WriteQRCode()
