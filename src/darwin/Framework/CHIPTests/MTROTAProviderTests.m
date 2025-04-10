@@ -22,6 +22,7 @@
 #import "MTRErrorTestUtils.h"
 #import "MTRTestCase+ServerAppRunner.h"
 #import "MTRTestCase.h"
+#import "MTRTestControllerDelegate.h"
 #import "MTRTestKeys.h"
 #import "MTRTestStorage.h"
 
@@ -115,44 +116,6 @@ static NSString * kUpdatedSoftwareVersionString_10 = @"10.0";
     _downloadFilePath = downloadFilePath;
 
     return self;
-}
-
-@end
-
-@interface MTROTAProviderTestControllerDelegate : NSObject <MTRDeviceControllerDelegate>
-@property (nonatomic, readonly) XCTestExpectation * expectation;
-@property (nonatomic, readonly) NSNumber * commissioneeNodeID;
-@end
-
-@implementation MTROTAProviderTestControllerDelegate
-- (id)initWithExpectation:(XCTestExpectation *)expectation commissioneeNodeID:(NSNumber *)nodeID
-{
-    self = [super init];
-    if (self) {
-        _expectation = expectation;
-        _commissioneeNodeID = nodeID;
-    }
-    return self;
-}
-
-- (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error
-{
-    XCTAssertEqual(error.code, 0);
-
-    NSError * commissionError = nil;
-    [sController commissionNodeWithID:self.commissioneeNodeID
-                  commissioningParams:[[MTRCommissioningParameters alloc] init]
-                                error:&commissionError];
-    XCTAssertNil(commissionError);
-
-    // Keep waiting for onCommissioningComplete
-}
-
-- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError *)error
-{
-    XCTAssertEqual(error.code, 0);
-    [_expectation fulfill];
-    _expectation = nil;
 }
 
 @end
@@ -587,8 +550,8 @@ static BOOL sStackInitRan = NO;
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:[NSString stringWithFormat:@"Commissioning Complete for %@", nodeID]];
-    __auto_type * deviceControllerDelegate = [[MTROTAProviderTestControllerDelegate alloc] initWithExpectation:expectation
-                                                                                            commissioneeNodeID:nodeID];
+    __auto_type * deviceControllerDelegate = [[MTRTestControllerDelegate alloc] initWithExpectation:expectation
+                                                                                          newNodeID:nodeID];
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.device_controller_delegate", DISPATCH_QUEUE_SERIAL);
 
     [sController setDeviceControllerDelegate:deviceControllerDelegate queue:callbackQueue];

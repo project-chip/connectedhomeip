@@ -1,0 +1,454 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0104" name="Closure Control Cluster" revision="1">
+  <revisionHistory>
+    <revision revision="1" summary="Initial revision"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0104" name="Closure Control"/>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="CLCTRL" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="PS" name="Positioning" summary="Supports positioning with at least Fully Opened (0%) and Fully Closed (100%) discrete position">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="1" code="LT" name="MotionLatching" summary="Supports a latch (securing a position, a state ...)">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="2" code="IS" name="Instantaneous" summary="Supports the Instantaneous feature">
+      <optionalConform/>
+    </feature>
+    <feature bit="3" code="SP" name="Speed" summary="Supports speed motion throttling">
+      <optionalConform>
+        <andTerm>
+          <feature name="PS"/>
+          <notTerm>
+            <feature name="IS"/>
+          </notTerm>
+        </andTerm>
+      </optionalConform>
+    </feature>
+    <feature bit="4" code="VT" name="Ventilation" summary="Supports Ventilation discrete state">
+      <optionalConform>
+        <feature name="PS"/>
+      </optionalConform>
+    </feature>
+    <feature bit="5" code="PD" name="Pedestrian" summary="Supports Pedestrian discrete state">
+      <optionalConform>
+        <feature name="PS"/>
+      </optionalConform>
+    </feature>
+    <feature bit="6" code="CL" name="Calibration" summary="Supports the Calibration feature">
+      <optionalConform>
+        <feature name="PS"/>
+      </optionalConform>
+    </feature>
+    <feature bit="7" code="PT" name="Protection" summary="Supports the Protection feature">
+      <optionalConform/>
+    </feature>
+    <feature bit="8" code="MO" name="ManuallyOperable" summary="Supports the manual operation feature">
+      <optionalConform/>
+    </feature>
+    <feature bit="9" code="FB" name="Fallback" summary="Supports the fallback feature">
+      <optionalConform>
+        <feature name="PS"/>
+      </optionalConform>
+    </feature>
+  </features>
+  <dataTypes>
+    <enum name="ClosureErrorEnum">
+      <item value="0x00" name="Blocked" summary="An obstacle is blocking the closure movement">
+        <mandatoryConform/>
+      </item>
+      <item value="0x01" name="TemperatureLimited" summary="A warning raised by the device that indicates an over-temperature, e.g. due to excessive drive or stall current">
+        <mandatoryConform/>
+      </item>
+      <item value="0x02" name="MaintenanceRequired" summary="Some malfunctions that are not easily recoverable are detected, or urgent servicing is needed">
+        <mandatoryConform/>
+      </item>
+      <item value="0x03" name="InternalInterference" summary="An internal element is prohibiting motion, e.g. an integrated door within a bigger garage door is open and prevents motion.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="LatchingEnum">
+      <item value="0" name="LatchedAndSecured" summary="Fully latched state">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="LatchedButNotSecured" summary="Partially latched state">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="NotLatched" summary="Not latched state">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="MainStateEnum">
+      <item value="0x00" name="Stopped" summary="Device is stopped">
+        <mandatoryConform/>
+      </item>
+      <item value="0x01" name="Moving" summary="Device is moving (more broadly the active state)">
+        <mandatoryConform/>
+      </item>
+      <item value="0x02" name="WaitingForMotion" summary="Device is waiting before a motion (e.g. pre-heat, pre-check)">
+        <mandatoryConform/>
+      </item>
+      <item value="0x03" name="Error" summary="Device is in an error state">
+        <mandatoryConform/>
+      </item>
+      <item value="0x04" name="Calibrating" summary="Device is currently calibrating its Opened and Closed limits to determine effective physical range">
+        <mandatoryConform>
+          <feature name="CL"/>
+        </mandatoryConform>
+      </item>
+      <item value="0x05" name="Protected" summary="Some protective measures are activated to prevent device damage. Commands MAY be rejected.">
+        <mandatoryConform>
+          <feature name="PT"/>
+        </mandatoryConform>
+      </item>
+      <item value="0x06" name="Disengaged" summary="Device has a disengaged element preventing any actuator movements">
+        <mandatoryConform>
+          <feature name="MO"/>
+        </mandatoryConform>
+      </item>
+      <item value="0x07" name="SetupRequired" summary="Movement commands are ignored since the device is not operational and requires further setup and/or calibration">
+        <mandatoryConform/>
+      </item>
+      <item value="0x08" name="PendingFallback" summary="Device is currently waiting to go back to its fallback position">
+        <mandatoryConform>
+          <feature name="FB"/>
+        </mandatoryConform>
+      </item>
+    </enum>
+    <enum name="PositioningEnum">
+      <item value="0" name="FullyClosed" summary="Fully closed state">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="FullyOpened" summary="Fully opened state">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="PartiallyOpened" summary="Partially opened state (all other positioning states)">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="OpenedForPedestrian" summary="Device is in Pedestrian Position, the one accessible by Pedestrian tag">
+        <mandatoryConform>
+          <feature name="PD"/>
+        </mandatoryConform>
+      </item>
+      <item value="4" name="OpenedForVentilation" summary="Device is in Ventilation Position, the one accessible by Ventilation tag">
+        <mandatoryConform>
+          <feature name="VT"/>
+        </mandatoryConform>
+      </item>
+      <item value="5" name="OpenedAtSignature" summary="Device is at its signature&apos;s position">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="RestingProcedureEnum">
+      <item value="0x00" name="DoNothing" summary="Keep present state until a command is received">
+        <mandatoryConform/>
+      </item>
+      <item value="0x01" name="ReturnToFullyOpened" summary="Will go back to a FullyOpened state">
+        <mandatoryConform/>
+      </item>
+      <item value="0x02" name="ReturnToFullyClosed" summary="Will go back to a FullyClosed state">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="TagLatchEnum">
+      <item value="0" name="Latch" summary="Latch tag">
+        <optionalConform>
+          <feature name="LT"/>
+        </optionalConform>
+      </item>
+      <item value="1" name="Unlatch" summary="Unlatch tag">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="TagPositionEnum">
+      <item value="0" name="CloseInFull" summary="Closes in full (Deploy/UnFold) tag">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="OpenInFull" summary="Opens in full (Retract/Fold) tag">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Pedestrian" summary="Opens for Pedestrian tag">
+        <mandatoryConform>
+          <feature name="PD"/>
+        </mandatoryConform>
+      </item>
+      <item value="3" name="Ventilation" summary="Opens for Ventilation tag">
+        <mandatoryConform>
+          <feature name="VT"/>
+        </mandatoryConform>
+      </item>
+      <item value="4" name="Signature" summary="Device&apos;s signature state tag">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="SequenceNextStep" summary="Toggles Sequence steps tag">
+        <mandatoryConform/>
+      </item>
+      <item value="6" name="PedestrianNextStep" summary="Pedestrian Sequence steps tag">
+        <mandatoryConform>
+          <feature name="PD"/>
+        </mandatoryConform>
+      </item>
+    </enum>
+    <enum name="TriggerConditionEnum">
+      <item value="0" name="AfterDelay" summary="A delay is applied to trigger the automatic behavior">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="AfterApplicativeTrigger" summary="Applicative part can force automatic behavior before the delay, due to local conditions, It&apos;s up to the device manufacturer">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="AfterDelayOrApplicativeTrigger" summary="Both after delay or ApplicativeTrigger possible">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="TriggerPositionEnum"/>
+    <struct name="OverallStateStruct">
+      <field id="0" name="Positioning" type="PositioningEnum" default="PartiallyOpened">
+        <mandatoryConform>
+          <feature name="PS"/>
+        </mandatoryConform>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="Latching" type="LatchingEnum" default="NotLatched">
+        <mandatoryConform>
+          <feature name="LT"/>
+        </mandatoryConform>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="2" name="Speed" type="ThreeLevelAutoEnum" default="Auto">
+        <mandatoryConform>
+          <feature name="SP"/>
+        </mandatoryConform>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="3" name="ExtraInfo" type="map32" default="MS">
+        <optionalConform/>
+      </field>
+    </struct>
+    <struct name="OverallTargetStruct">
+      <field id="0" name="TagPosition" type="TagPositionEnum">
+        <mandatoryConform>
+          <feature name="PS"/>
+        </mandatoryConform>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="TagLatch" type="TagLatchEnum">
+        <mandatoryConform>
+          <feature name="LT"/>
+        </mandatoryConform>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="2" name="Speed" type="ThreeLevelAutoEnum">
+        <mandatoryConform>
+          <feature name="SP"/>
+        </mandatoryConform>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="CountdownTime" type="elapsed-s" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" quieterReporting="true"/>
+      <optionalConform/>
+      <constraint>
+        <max value="259200"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0001" name="MainState" type="MainStateEnum">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0002" name="CurrentErrorList" type="list">
+      <entry type="ClosureErrorEnum"/>
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0003" name="OverallState" type="OverallStateStruct" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0004" name="OverallTarget" type="OverallTargetStruct" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0005" name="RestingProcedure" type="RestingProcedureEnum">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="FB"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0006" name="TriggerCondition" type="TriggerConditionEnum">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="FB"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0007" name="TriggerPosition" type="TriggerPositionEnum">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="FB"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0008" name="WaitingDelay" type="elapsed-s" default="60">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="FB"/>
+      </mandatoryConform>
+      <constraint>
+        <max value="86400"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0009" name="KickoffTimer" type="elapsed-s" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality quieterReporting="true"/>
+      <mandatoryConform>
+        <feature name="FB"/>
+      </mandatoryConform>
+      <constraint>
+        <max value="86400"/>
+      </constraint>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="Stop" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <notTerm>
+          <feature name="IS"/>
+        </notTerm>
+      </mandatoryConform>
+    </command>
+    <command id="0x01" name="MoveTo" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+      <field id="0" name="Tag" type="TagPositionEnum">
+        <optionalConform choice="a" more="true" min="1"/>
+      </field>
+      <field id="1" name="Latch" type="TagLatchEnum">
+        <optionalConform choice="a" more="true" min="1"/>
+      </field>
+      <field id="2" name="Speed" type="ThreeLevelAutoEnum">
+        <optionalConform choice="a" more="true" min="1"/>
+      </field>
+    </command>
+    <command id="0x02" name="Calibrate" direction="commandToServer" response="Y">
+      <access invokePrivilege="manage"/>
+      <mandatoryConform>
+        <feature name="CL"/>
+      </mandatoryConform>
+    </command>
+    <command id="0x03" name="ConfigureFallback" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="FB"/>
+      </mandatoryConform>
+      <field id="0" name="RestingProcedure" type="RestingProcedureEnum">
+        <optionalConform choice="a" more="true" min="1"/>
+      </field>
+      <field id="1" name="TriggerCondition" type="TriggerConditionEnum">
+        <optionalConform choice="a" more="true" min="1"/>
+      </field>
+      <field id="2" name="TriggerPosition" type="TriggerPositionEnum">
+        <optionalConform choice="a" more="true" min="1"/>
+      </field>
+      <field id="3" name="WaitingDelay" type="elapsed-s">
+        <optionalConform choice="a" more="true" min="1"/>
+        <constraint>
+          <max value="86400"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x04" name="CancelFallback" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="FB"/>
+      </mandatoryConform>
+    </command>
+  </commands>
+</cluster>

@@ -1934,6 +1934,14 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"ActiveNetworkFaultsList";
             break;
 
+        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeExtAddressID:
+            result = @"ExtAddress";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRloc16ID:
+            result = @"Rloc16";
+            break;
+
         case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -5007,26 +5015,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterClosureControlAttributeOverallTargetID:
             result = @"OverallTarget";
-            break;
-
-        case MTRAttributeIDTypeClusterClosureControlAttributeRestingProcedureID:
-            result = @"RestingProcedure";
-            break;
-
-        case MTRAttributeIDTypeClusterClosureControlAttributeTriggerConditionID:
-            result = @"TriggerCondition";
-            break;
-
-        case MTRAttributeIDTypeClusterClosureControlAttributeTriggerPositionID:
-            result = @"TriggerPosition";
-            break;
-
-        case MTRAttributeIDTypeClusterClosureControlAttributeWaitingDelayID:
-            result = @"WaitingDelay";
-            break;
-
-        case MTRAttributeIDTypeClusterClosureControlAttributeKickoffTimerID:
-            result = @"KickoffTimer";
             break;
 
         case MTRAttributeIDTypeClusterClosureControlAttributeGeneratedCommandListID:
@@ -10618,14 +10606,6 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterClosureControlCommandCalibrateID:
             result = @"Calibrate";
-            break;
-
-        case MTRCommandIDTypeClusterClosureControlCommandConfigureFallbackID:
-            result = @"ConfigureFallback";
-            break;
-
-        case MTRCommandIDTypeClusterClosureControlCommandCancelFallbackID:
-            result = @"CancelFallback";
             break;
 
         default:

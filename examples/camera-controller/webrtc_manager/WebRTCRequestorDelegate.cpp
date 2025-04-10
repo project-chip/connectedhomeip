@@ -28,24 +28,24 @@ using namespace chip::app::Clusters::WebRTCTransportRequestor;
 
 CHIP_ERROR WebRTCRequestorDelegate::HandleOffer(uint16_t sessionId, const OfferArgs & args, WebRTCSessionTypeStruct & outSession)
 {
-    ChipLogProgress(NotSpecified, "WebRTCRequestorDelegate::HandleOffer");
+    ChipLogProgress(Camera, "WebRTCRequestorDelegate::HandleOffer");
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR WebRTCRequestorDelegate::HandleAnswer(uint16_t sessionId, const std::string & sdpAnswer)
 {
-    ChipLogProgress(NotSpecified, "WebRTCRequestorDelegate::HandleAnswer");
+    ChipLogProgress(Camera, "WebRTCRequestorDelegate::HandleAnswer");
     return WebRTCManager::Instance().SetRemoteDescription(sessionId, sdpAnswer);
 }
 
 CHIP_ERROR WebRTCRequestorDelegate::HandleICECandidates(uint16_t sessionId, const std::vector<std::string> & candidates)
 {
-    ChipLogProgress(NotSpecified, "WebRTCRequestorDelegate::HandleICECandidates");
+    ChipLogProgress(Camera, "WebRTCRequestorDelegate::HandleICECandidates");
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR WebRTCRequestorDelegate::HandleEnd(uint16_t sessionId, WebRTCEndReasonEnum reasonCode)
 {
-    ChipLogProgress(NotSpecified, "WebRTCRequestorDelegate::HandleEnd");
+    ChipLogProgress(Camera, "WebRTCRequestorDelegate::HandleEnd");
     return CHIP_NO_ERROR;
 }

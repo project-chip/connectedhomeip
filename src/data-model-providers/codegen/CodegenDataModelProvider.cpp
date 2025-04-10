@@ -31,6 +31,7 @@
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/Provider.h>
 #include <app/server-cluster/ServerClusterContext.h>
+#include <app/server-cluster/ServerClusterInterface.h>
 #include <app/util/DataModelHandler.h>
 #include <app/util/IMClusterCommandHandler.h>
 #include <app/util/af-types.h>
@@ -286,13 +287,18 @@ CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
 
     DataModel::ListBuilder<ClusterId> knownClustersBuilder;
     ReturnErrorOnFailure(knownClustersBuilder.EnsureAppendCapacity(registryClusterCount));
-    for (auto * cluster : mRegistry.ClustersOnEndpoint(endpointId))
+    for (const auto clusterId : mRegistry.ClustersOnEndpoint(endpointId))
     {
-        const ConcreteClusterPath path = cluster->GetPath();
+        ConcreteClusterPath path(endpointId, clusterId);
+        ServerClusterInterface * cluster = mRegistry.Get(path);
+
+        // path MUST be valid: we just got it from iterating our registrations...
+        VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_INTERNAL);
+
         ReturnErrorOnFailure(builder.Append({
             .clusterId   = path.mClusterId,
-            .dataVersion = cluster->GetDataVersion(),
-            .flags       = cluster->GetClusterFlags(),
+            .dataVersion = cluster->GetDataVersion(path),
+            .flags       = cluster->GetClusterFlags(path),
         }));
         ReturnErrorOnFailure(knownClustersBuilder.Append(path.mClusterId));
     }

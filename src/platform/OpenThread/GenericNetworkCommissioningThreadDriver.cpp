@@ -119,7 +119,9 @@ CHIP_ERROR GenericThreadDriver::RevertConfiguration()
     // since the fail-safe was armed, so return with no error.
     VerifyOrReturnError(error != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
     ThreadStackMgrImpl().ClearAllSrpHostAndServices();
+#endif
 
     if (!GetEnabled())
     {

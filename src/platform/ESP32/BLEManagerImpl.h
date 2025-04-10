@@ -25,6 +25,11 @@
 
 #pragma once
 #include <sdkconfig.h>
+#include <string>
+
+#if CONFIG_BT_NIMBLE_ENABLED
+#include <vector>
+#endif
 
 #include <lib/core/Optional.h>
 
