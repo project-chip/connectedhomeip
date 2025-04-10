@@ -65,6 +65,35 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
         mCameraDevice->GetCameraAVStreamMgmtDelegate(), mEndpoint, features, optionalAttrs, maxConcurrentVideoEncoders,
         maxEncodedPixelRate, sensorParams, nightVisionCapable, minViewport, rateDistortionTradeOffPoints, maxContentBufferSize,
         micCapabilities, spkrCapabilities, twowayTalkSupport, supportedSnapshotParams, maxNetworkBandwidth, supportedStreamUsages);
+
+    // Fetch all initialization parameters for CameraAVSettingsUserLevelMgmt Server
+    BitFlags<CameraAvSettingsUserLevelManagement::Feature, uint32_t> avsumFeatures(
+        CameraAvSettingsUserLevelManagement::Feature::kDigitalPTZ, CameraAvSettingsUserLevelManagement::Feature::kMechanicalPan,
+        CameraAvSettingsUserLevelManagement::Feature::kMechanicalTilt,
+        CameraAvSettingsUserLevelManagement::Feature::kMechanicalZoom,
+        CameraAvSettingsUserLevelManagement::Feature::kMechanicalPresets);
+    BitFlags<CameraAvSettingsUserLevelManagement::OptionalAttributes, uint32_t> avsumAttrs(
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kMptzPosition,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kMaxPresets,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kMptzPresets,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kDptzRelativeMove,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kZoomMax,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kTiltMin,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kTiltMax,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMin,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMax);
+    const uint8_t appMaxPresets = 5;
+
+    // Instantiate the CameraAVSettingsUserLevelMgmt Server
+    mAVSettingsUserLevelMgmtServerPtr = std::make_unique<CameraAvSettingsUserLevelMgmtServer>(
+        mCameraDevice->GetCameraAVSettingsUserLevelMgmtDelegate(), mEndpoint, features, optionalAttrs, appMaxPresets);
+
+    // Set app specific limits to pan, tilt, zoom
+    mAVSettingsUserLevelMgmtServerPtr->SetPanMin(mCameraDevice->GetCameraHALInterface().GetPanMin());
+    mAVSettingsUserLevelMgmtServerPtr->SetPanMax(mCameraDevice->GetCameraHALInterface().GetPanMax());
+    mAVSettingsUserLevelMgmtServerPtr->SetTiltMin(mCameraDevice->GetCameraHALInterface().GetTiltMin());
+    mAVSettingsUserLevelMgmtServerPtr->SetTiltMax(mCameraDevice->GetCameraHALInterface().GetTiltMax());
+    mAVSettingsUserLevelMgmtServerPtr->SetZoomMax(mCameraDevice->GetCameraHALInterface().GetZoomMax());
 }
 
 void CameraApp::InitCameraDeviceClusters()

@@ -40,6 +40,8 @@ public:
     chip::app::Clusters::ChimeDelegate & GetChimeDelegate();
     chip::app::Clusters::WebRTCTransportProvider::Delegate & GetWebRTCProviderDelegate();
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate();
+    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate & GetCameraAVSettingsUserLevelMgmtDelegate();
+
 
     CameraDevice();
     ~CameraDevice();
@@ -85,6 +87,16 @@ public:
 
     void SetHDRMode(bool hdrMode);
 
+    int16_t CameraDevice::GetPanMin();
+
+    int16_t CameraDevice::GetPanMax();
+
+    int16_t CameraDevice::GetTiltMin();
+
+    int16_t CameraDevice::GetTiltMax();
+
+    uint8_t CameraDevice::GetZoomMax();
+
     std::vector<VideoStream> & GetAvailableVideoStreams() { return videoStreams; }
 
     std::vector<AudioStream> & GetAvailableAudioStreams() { return audioStreams; }
@@ -112,6 +124,7 @@ private:
     WebRTCProviderManager mWebRTCProviderManager;
 
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManager mCameraAVStreamManager;
+    chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAVSettingsUserLevelManager mCameraAVSettingsUserLevelManager;
 
     NetworkStreamSource mNetworkVideoSource;
     NetworkStreamSource mNetworkAudioSource;
