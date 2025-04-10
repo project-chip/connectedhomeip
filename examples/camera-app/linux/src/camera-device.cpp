@@ -62,7 +62,7 @@ CameraDevice::~CameraDevice()
     }
 }
 
-void CameraDevice::RegisterTransport(Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID)
+void CameraDevice::RegisterTransport(camera::Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID)
 {
     mMediaController.RegisterTransport(transport, videoStreamID, audioStreamID);
 }
@@ -674,6 +674,11 @@ ChimeDelegate & CameraDevice::GetChimeDelegate()
 WebRTCTransportProvider::Delegate & CameraDevice::GetWebRTCProviderDelegate()
 {
     return mWebRTCProviderManager;
+}
+
+PushAvStreamTransport::PushAvStreamTransportDelegate & CameraDevice::GetPushAVDelegate()
+{
+    return mPushAVTransportManager;
 }
 
 CameraAVStreamMgmtDelegate & CameraDevice::GetCameraAVStreamMgmtDelegate()

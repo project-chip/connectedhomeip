@@ -20,6 +20,7 @@
 #include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
 #include <app/clusters/chime-server/chime-server.h>
 #include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
+#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-server.h>
 
 #include "transport/transport.h"
 
@@ -114,6 +115,9 @@ public:
     // Getter for CameraAVStreamManagement Delegate
     virtual chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate() = 0;
 
+    // Getter for PushAV Delegate
+    virtual chip::app::Clusters::PushAvStreamTransport::PushAvStreamTransportDelegate & GetPushAVDelegate() = 0;
+
     // Class defining the Camera HAL interface
     class CameraHALInterface
     {
@@ -170,7 +174,7 @@ public:
 
         virtual void SetHDRMode(bool hdrMode) = 0;
 
-        virtual void RegisterTransport(Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID) = 0;
+        virtual void RegisterTransport(camera::Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID) = 0;
     };
 
     virtual CameraHALInterface & GetCameraHALInterface() = 0;

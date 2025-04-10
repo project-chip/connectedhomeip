@@ -18,13 +18,13 @@
 #include "media-controller.h"
 #include <algorithm>
 
-void MediaController::RegisterTransport(Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID)
+void MediaController::RegisterTransport(camera::Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID)
 {
     std::lock_guard<std::mutex> lock(connectionsMutex);
     connections.push_back({ transport, videoStreamID, audioStreamID });
 }
 
-void MediaController::UnregisterTransport(Transport * transport)
+void MediaController::UnregisterTransport(camera::Transport * transport)
 {
     std::lock_guard<std::mutex> lock(connectionsMutex);
     connections.erase(std::remove_if(connections.begin(), connections.end(),
