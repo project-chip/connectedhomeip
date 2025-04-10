@@ -86,18 +86,21 @@ Davis, CA 95616, USA
     </bitmap>
     <struct name="CommodityPriceComponentStruct">
       <field id="0" name="Price" type="money">
+        <optionalConform choice="a" more="true" min="1"/>
+      </field>
+      <field id="1" name="PriceLevel" type="int16">
+        <optionalConform choice="a" more="true" min="1"/>
+      </field>
+      <field id="2" name="Source" type="TariffPriceTypeEnum">
         <mandatoryConform/>
       </field>
-      <field id="1" name="Source" type="TariffPriceTypeEnum">
-        <mandatoryConform/>
-      </field>
-      <field id="2" name="Description" type="string">
+      <field id="3" name="Description" type="string">
         <optionalConform/>
         <constraint>
           <maxLength value="32"/>
         </constraint>
       </field>
-      <field id="3" name="TariffComponentID" type="uint32">
+      <field id="4" name="TariffComponentID" type="uint32">
         <optionalConform/>
       </field>
     </struct>
@@ -110,15 +113,18 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
       <field id="2" name="Price" type="PriceStruct">
-        <mandatoryConform/>
+        <optionalConform choice="b" more="true" min="1"/>
       </field>
-      <field id="3" name="Description" type="string">
+      <field id="3" name="PriceLevel" type="int16">
+        <optionalConform choice="b" more="true" min="1"/>
+      </field>
+      <field id="4" name="Description" type="string">
         <optionalConform/>
         <constraint>
           <maxLength value="32"/>
         </constraint>
       </field>
-      <field id="4" name="Components" type="list" default="empty">
+      <field id="5" name="Components" type="list" default="empty">
         <entry type="CommodityPriceComponentStruct"/>
         <optionalConform/>
         <constraint>
@@ -191,6 +197,7 @@ Davis, CA 95616, USA
       <access readPrivilege="view"/>
       <optionalConform/>
       <field id="0" name="CurrentPrice" type="CommodityPriceStruct">
+        <quality nullable="true"/>
         <mandatoryConform/>
       </field>
     </event>
@@ -199,6 +206,7 @@ Davis, CA 95616, USA
       <optionalConform/>
       <field id="0" name="PriceForecast" type="list">
         <entry type="CommodityPriceStruct"/>
+        <quality nullable="true"/>
         <mandatoryConform/>
       </field>
     </event>

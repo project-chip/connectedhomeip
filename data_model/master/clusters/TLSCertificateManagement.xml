@@ -70,6 +70,14 @@ Davis, CA 95616, USA
   <dataTypes>
     <number name="TLSCAID" type="uint16"/>
     <number name="TLSCCDID" type="uint16"/>
+    <enum name="StatusCodeEnum">
+      <item value="0x02" name="CertificateAlreadyInstalled" summary="The certificate is already installed.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x03" name="DuplicateKey" summary="A key collision was detected when generating the CSR.">
+        <mandatoryConform/>
+      </item>
+    </enum>
     <struct name="TLSCertStruct">
       <field id="0" name="CAID" type="TLSCAID">
         <mandatoryConform/>

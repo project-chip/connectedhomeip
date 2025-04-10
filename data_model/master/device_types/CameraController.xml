@@ -66,7 +66,7 @@ Davis, CA 95616, USA
     <cluster id="0x0003" name="Identify" side="client">
       <optionalConform/>
     </cluster>
-    <cluster id="0x0011" name="Power Source" side="client">
+    <cluster id="0x002F" name="Power Source" side="client">
       <optionalConform/>
     </cluster>
     <cluster id="0x0038" name="Time Synchronization" side="client">

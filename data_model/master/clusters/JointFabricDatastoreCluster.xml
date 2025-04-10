@@ -183,29 +183,32 @@ Davis, CA 95616, USA
         </constraint>
       </field>
       <field id="2" name="GroupKeySetID" type="uint16">
+        <quality nullable="true"/>
         <mandatoryConform/>
         <constraint>
           <between>
             <from value="1"/>
-            <to value="65535"/>
+            <to value="65534"/>
           </between>
         </constraint>
       </field>
       <field id="3" name="GroupCAT" type="uint16">
+        <quality nullable="true"/>
         <mandatoryConform/>
         <constraint>
           <between>
             <from value="1"/>
-            <to value="65535"/>
+            <to value="65534"/>
           </between>
         </constraint>
       </field>
       <field id="4" name="GroupCATVersion" type="uint16">
+        <quality nullable="true"/>
         <mandatoryConform/>
         <constraint>
           <between>
             <from value="1"/>
-            <to value="65535"/>
+            <to value="65534"/>
           </between>
         </constraint>
       </field>
@@ -248,7 +251,7 @@ Davis, CA 95616, USA
       <field id="1" name="UpdateTimestamp" type="epoch-s" default="null">
         <mandatoryConform/>
       </field>
-      <field id="2" name="FailureCode" type="enum8" default="SUCCESS">
+      <field id="2" name="FailureCode" type="" default="SUCCESS">
         <mandatoryConform/>
       </field>
       <access fabricScoped="true"/>
@@ -359,29 +362,32 @@ Davis, CA 95616, USA
         </constraint>
       </field>
       <field id="2" name="GroupKeySetID" type="uint16">
+        <quality nullable="true"/>
         <mandatoryConform/>
         <constraint>
           <between>
             <from value="1"/>
-            <to value="65535"/>
+            <to value="65534"/>
           </between>
         </constraint>
       </field>
       <field id="3" name="GroupCAT" type="uint16">
+        <quality nullable="true"/>
         <mandatoryConform/>
         <constraint>
           <between>
             <from value="1"/>
-            <to value="65535"/>
+            <to value="65534"/>
           </between>
         </constraint>
       </field>
       <field id="4" name="GroupCATVersion" type="uint16">
+        <quality nullable="true"/>
         <mandatoryConform/>
         <constraint>
           <between>
             <from value="1"/>
-            <to value="65535"/>
+            <to value="65534"/>
           </between>
         </constraint>
       </field>

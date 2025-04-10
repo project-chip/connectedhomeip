@@ -69,6 +69,20 @@ Davis, CA 95616, USA
   <classification hierarchy="base" role="utility" picsCode="TLSCLIENT" scope="Node"/>
   <dataTypes>
     <number name="TLSEndpointID" type="uint16"/>
+    <enum name="StatusCodeEnum">
+      <item value="0x02" name="EndpointAlreadyInstalled" summary="The endpoint is already installed.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x03" name="RootCertificateNotFound" summary="No root certificate exists for this CAID.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x04" name="ClientCertificateNotFound" summary="No client certificate exists for this CCDID.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x05" name="EndpointInUse" summary="The endpoint is in use and cannot be removed.">
+        <mandatoryConform/>
+      </item>
+    </enum>
     <enum name="TLSEndpointStatusEnum">
       <item value="0" name="Provisioned" summary="The endpoint is provisioned but is not currently referenced by anything else">
         <mandatoryConform/>

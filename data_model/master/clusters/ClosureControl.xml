@@ -205,7 +205,7 @@ Davis, CA 95616, USA
       </item>
     </enum>
     <struct name="OverallStateStruct">
-      <field id="0" name="Positioning" type="PositioningEnum" default="MS">
+      <field id="0" name="Positioning" type="PositioningEnum" default="null">
         <quality nullable="true"/>
         <mandatoryConform>
           <feature name="PS"/>
@@ -214,7 +214,7 @@ Davis, CA 95616, USA
           <desc/>
         </constraint>
       </field>
-      <field id="1" name="Latch" type="bool" default="MS">
+      <field id="1" name="Latch" type="bool" default="false">
         <quality nullable="true"/>
         <mandatoryConform>
           <feature name="LT"/>
@@ -223,7 +223,7 @@ Davis, CA 95616, USA
           <desc/>
         </constraint>
       </field>
-      <field id="2" name="Speed" type="ThreeLevelAutoEnum" default="MS">
+      <field id="2" name="Speed" type="ThreeLevelAutoEnum" default="Auto">
         <quality nullable="true"/>
         <mandatoryConform>
           <feature name="SP"/>
@@ -234,7 +234,12 @@ Davis, CA 95616, USA
       </field>
       <field id="3" name="SecureState" type="bool" default="MS">
         <quality nullable="true"/>
-        <optionalConform/>
+        <mandatoryConform>
+          <orTerm>
+            <feature name="LT"/>
+            <feature name="PS"/>
+          </orTerm>
+        </mandatoryConform>
         <constraint>
           <desc/>
         </constraint>
@@ -246,12 +251,12 @@ Davis, CA 95616, USA
           <feature name="PS"/>
         </mandatoryConform>
       </field>
-      <field id="1" name="Latch" type="bool">
+      <field id="1" name="Latch" type="bool" default="false">
         <mandatoryConform>
           <feature name="LT"/>
         </mandatoryConform>
       </field>
-      <field id="2" name="Speed" type="ThreeLevelAutoEnum">
+      <field id="2" name="Speed" type="ThreeLevelAutoEnum" default="Auto">
         <mandatoryConform>
           <feature name="SP"/>
         </mandatoryConform>
@@ -305,10 +310,13 @@ Davis, CA 95616, USA
       <field id="0" name="Position" type="TargetPositionEnum">
         <optionalConform choice="a" more="true" min="1"/>
       </field>
-      <field id="1" name="Latch" type="bool">
+      <field id="1" name="Latch" type="bool" default="false">
         <optionalConform choice="a" more="true" min="1"/>
       </field>
       <field id="2" name="Speed" type="ThreeLevelAutoEnum">
+        <default>
+          <enum default="Auto"/>
+        </default>
         <optionalConform choice="a" more="true" min="1"/>
       </field>
     </command>
@@ -337,7 +345,12 @@ Davis, CA 95616, USA
     <event id="0x01" name="MovementCompleted" priority="info">
       <access readPrivilege="view"/>
       <mandatoryConform>
-        <feature name="PS"/>
+        <andTerm>
+          <feature name="PS"/>
+          <notTerm>
+            <feature name="IS"/>
+          </notTerm>
+        </andTerm>
       </mandatoryConform>
     </event>
     <event id="0x02" name="EngageStateChanged" priority="info">

@@ -224,20 +224,7 @@ Davis, CA 95616, USA
         </mandatoryConform>
       </otherwiseConform>
     </attribute>
-    <attribute id="0x000A" name="NFCConstrainedDataModel" type="bool" default="false">
-      <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
-      <otherwiseConform>
-        <mandatoryConform/>
-        <mandatoryConform>
-          <feature name="NFC"/>
-        </mandatoryConform>
-      </otherwiseConform>
-      <constraint>
-        <desc/>
-      </constraint>
-    </attribute>
-    <attribute id="0x000B" name="RecoveryIdentifier" type="octstr" default="0">
+    <attribute id="0x000A" name="RecoveryIdentifier" type="octstr" default="0">
       <access read="true" readPrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <otherwiseConform>
@@ -250,7 +237,7 @@ Davis, CA 95616, USA
         <allowed value="8"/>
       </constraint>
     </attribute>
-    <attribute id="0x000C" name="NetworkRecoveryReason" type="NetworkRecoveryReasonEnum" default="null">
+    <attribute id="0x000B" name="NetworkRecoveryReason" type="NetworkRecoveryReasonEnum" default="null">
       <access read="true" readPrivilege="manage"/>
       <quality nullable="true"/>
       <otherwiseConform>
