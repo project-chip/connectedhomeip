@@ -35,42 +35,66 @@ import random
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
-from chip.clusters.Types import Nullable
+from chip.clusters.Types import Nullable, NullValue
 from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
-# Add these constants at the top of the file after imports
-D_OK_EMPTY = bytes.fromhex('1718')
-D_OK_SINGLE = bytes.fromhex(
-    '17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018')
-
-
 class TC_ACL_2_8(MatterBaseTest):
+    def _verify_acl_event(self, event, admin_node_id, admin_passcode_id, change_type, subjects, targets, fabric_index):
+        """Helper method to verify ACL event contents"""
+        data = event.Data
+                    
+        # Handle Null vs None for adminNodeID and adminPasscodeID
+        if admin_node_id is None:
+            asserts.assert_equal(data.adminNodeID, NullValue, "adminNodeID should be NullValue")
+        else:
+            asserts.assert_equal(data.adminNodeID, admin_node_id)
+            
+        if admin_passcode_id is None:
+            asserts.assert_equal(data.adminPasscodeID, NullValue, "adminPasscodeID should be NullValue")
+        else:
+            asserts.assert_equal(data.adminPasscodeID, admin_passcode_id)
+            
+        asserts.assert_equal(data.changeType, change_type, 
+                           f"Change type mismatch. Expected {change_type}, got {data.changeType}")
+        asserts.assert_equal(data.latestValue.privilege, 5)  # Administer (5)
+        asserts.assert_equal(data.latestValue.authMode, 2)   # CASE (2)
+        
+        # Handle subjects that could be single value or list
+        if isinstance(subjects, list):
+            asserts.assert_equal(data.latestValue.subjects, subjects)
+        else:
+            asserts.assert_equal(data.latestValue.subjects, [subjects])
+            
+        asserts.assert_equal(data.latestValue.targets, NullValue, "Targets should be NullValue")
+        asserts.assert_equal(data.fabricIndex, fabric_index)
+
     def desc_TC_ACL_2_8(self) -> str:
-        return "[TC-ACL-2.8] Multiple fabrics test"
+        return "[TC-ACL-2.8] ACL multi-fabric"
 
     def steps_TC_ACL_2_8(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "TH1 commissions DUT using admin node ID N1", is_commissioning=True),
+            TestStep(1, "TH1 commissions DUT using admin node ID N1", 
+                    "DUT is commissioned on TH1 fabric", is_commissioning=True),
             TestStep(2, "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
-                     "Result is SUCCESS, value is stored as F1"),
+                    "Result is SUCCESS, value is stored as F1"),
             TestStep(3, "TH1 puts DUT into commissioning mode, TH2 commissions DUT using admin node ID N2",
-                     "DUT is commissioned on TH2 fabric"),
+                    "DUT is commissioned on TH2 fabric"),
             TestStep(4, "TH2 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
-                     "Result is SUCCESS, value is stored as F2"),
-            TestStep(5, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element\n1. struct\nData field: D_OK_EMPTY",
-                     "Result is SUCCESS"),
-            TestStep(6, "TH2 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element\n1. struct\nData field: D_OK_SINGLE",
-                     "Result is SUCCESS"),
-            TestStep(7, "TH1 reads DUT Endpoint 0 AccessControl cluster Extension attribute",
-                     "Result is SUCCESS, value is list of AccessControlExtensionStruct containing 1 element, and MUST NOT contain an element with FabricIndex F2 or Data D_OK_SINGLE"),
-            TestStep(8, "TH2 reads DUT Endpoint 0 AccessControl cluster Extension attribute",
-                     "Result is SUCCESS, value is list of AccessControlExtensionStruct containing 1 element, and MUST NOT contain an element with FabricIndex F1 or Data D_OK_EMPTY"),
-            TestStep(9, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlExtensionChanged event",
-                     "Result is SUCCESS, value is list of AccessControlExtensionChanged containing 1 element"),
-            TestStep(10, "TH2 reads DUT Endpoint 0 AccessControl cluster AccessControlExtensionChanged event",
-                     "Result is SUCCESS, value is list of AccessControlExtensionChanged containing 1 element"),
+                    "Result is SUCCESS, value is stored as F2"),
+            TestStep(5, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 1 element",
+                    "Result is SUCCESS"),
+            TestStep(6, "TH2 writes DUT Endpoint 0 AccessControl cluster ACL attribute value is list of AccessControlEntryStruct containing 1 element",
+                    "Result is SUCCESS"),
+            TestStep(7, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
+                    "Result is SUCCESS, value is list of AccessControlEntryStruct containing 1 element, and MUST NOT contain an element with FabricIndex F2"),
+            TestStep(8, "TH2 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
+                    "Result is SUCCESS, value is list of AccessControlEntryStruct containing 1 element, and MUST NOT contain an element with FabricIndex F1"),
+            TestStep(9, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
+                    "Result is SUCCESS, value is list of AccessControlEntryChanged containing 3 elements, and MUST NOT contain any element with FabricIndex F2"),
+            TestStep(10, "TH2 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
+                    "Result is SUCCESS, value is list of AccessControlEntryChanged containing 3 elements, and MUST NOT contain any element with FabricIndex F1"),
         ]
         return steps
 
@@ -92,7 +116,7 @@ class TC_ACL_2_8(MatterBaseTest):
         self.print_step("CurrentFabricIndex F1", str(f1))
 
         self.step(3)
-        # TH1 puts DUT into commissioning mode, TH2 is created and commissions DUT using admin node ID
+        # Commission TH2
         duration = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.GeneralCommissioning, attribute=Clusters.GeneralCommissioning.Attributes.BasicCommissioningInfo)
         params = await self.th1.OpenCommissioningWindow(
             nodeid=self.dut_node_id, timeout=duration.maxCumulativeFailsafeSeconds, iteration=10000, discriminator=self.discriminator, option=1)
@@ -107,7 +131,7 @@ class TC_ACL_2_8(MatterBaseTest):
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
 
         self.step(4)
-        # Read CurrentFabricIndex again after TH2 commissioning
+        # Read CurrentFabricIndex for TH2
         result = await self.th2.ReadAttribute(
             self.dut_node_id,
             [(0, Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)]
@@ -116,197 +140,138 @@ class TC_ACL_2_8(MatterBaseTest):
         self.print_step("CurrentFabricIndex F2", str(f2))
 
         self.step(5)
-        # TH1 writes Extension attribute with D_OK_EMPTY
-        extension = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
-            data=D_OK_EMPTY)
-        self.print_step("TH1 writing extension with data", D_OK_EMPTY.hex())
-
+        # TH1 writes ACL attribute
+        acl_struct = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege=5,  # Administer (5)
+            authMode=2,   # CASE (2)
+            subjects=[self.th1.nodeId, 1111],
+            targets=NullValue 
+        )
         try:
-            extension_attr = Clusters.AccessControl.Attributes.Extension
-            extensions_list = [extension]
+            acl_attr = Clusters.AccessControl.Attributes.Acl
+            acl_list = [acl_struct]
             result = await self.th1.WriteAttribute(
                 self.dut_node_id,
-                [(0, extension_attr(value=extensions_list))]
+                [(0, acl_attr(value=acl_list))]
             )
-            self.print_step("Write result", str(result))
             asserts.assert_equal(
                 result[0].Status, Status.Success, "Write should have succeeded")
         except Exception as e:
-            self.print_step("Error writing extension", str(e))
-            asserts.fail(f"Failed to write extension: {e}")
+            asserts.fail(f"Failed to write ACL: {e}")
 
         self.step(6)
-        # TH2 writes Extension attribute with D_OK_SINGLE
-        extension_th2 = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
-            data=D_OK_SINGLE)
-        self.print_step("TH2 writing extension with data", D_OK_SINGLE.hex())
-
+        # TH2 writes ACL attribute
+        acl_struct_th2 = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege=5,  # Administer (5)
+            authMode=2,   # CASE (2)
+            subjects=[self.th2.nodeId, 2222],
+            targets=NullValue  # Use target struct with cluster ID and endpoint
+        )
         try:
-            extension_attr = Clusters.AccessControl.Attributes.Extension
-            extensions_list = [extension_th2]
+            acl_list = [acl_struct_th2]
             result = await self.th2.WriteAttribute(
                 self.dut_node_id,
-                [(0, extension_attr(value=extensions_list))]
+                [(0, acl_attr(value=acl_list))]
             )
-            self.print_step("Write result", str(result))
             asserts.assert_equal(
                 result[0].Status, Status.Success, "Write should have succeeded")
         except Exception as e:
-            self.print_step("Error writing extension", str(e))
-            asserts.fail(f"Failed to write extension: {e}")
+            asserts.fail(f"Failed to write ACL: {e}")
 
         self.step(7)
-        # TH1 reads Access Control Extension attribute
+        # TH1 reads ACL attribute
         try:
-            extension_attr = Clusters.AccessControl.Attributes.Extension
             result = await self.th1.ReadAttribute(
                 self.dut_node_id,
-                [(0, extension_attr)]
+                [(0, acl_attr)],
+                fabricFiltered=True
             )
-            self.print_step("TH1 read result", str(result))
-
-            endpoint_data = result[0]
-            cluster_data = endpoint_data[Clusters.AccessControl]
-            extension_list = cluster_data[extension_attr]
-
-            asserts.assert_equal(len(extension_list), 1,
-                                 "Should have exactly one extension")
-            extension_struct = extension_list[0]
-
-            asserts.assert_equal(
-                extension_struct.data, D_OK_EMPTY, "Extension data should match D_OK_EMPTY")
-            asserts.assert_equal(extension_struct.fabricIndex,
-                                 f1, "FabricIndex should match F1")
-
-            for ext in extension_list:
-                self.print_step("extension data", ext.data)
-                self.print_step("extension fabricIndex", ext.fabricIndex)
-                self.print_step("extension list", extension_list)
-                asserts.assert_not_equal(
-                    ext.fabricIndex, f2,
-                    "Should not contain element with FabricIndex F2")
-                asserts.assert_not_equal(
-                    ext.data, D_OK_SINGLE,
-                    "Should not contain element with Data D_OK_SINGLE")
-
+            acl_list = result[0][Clusters.AccessControl][acl_attr]
+            
+            asserts.assert_equal(len(acl_list), 1, "Should have exactly one ACL entry")
+            entry = acl_list[0]
+            
+            # Verify entry contents
+            asserts.assert_equal(entry.privilege, 5, "Privilege should be Administer (5)")
+            asserts.assert_equal(entry.authMode, 2, "AuthMode should be CASE (2)")
+            asserts.assert_equal(entry.subjects, [self.th1.nodeId, 1111])
+            asserts.assert_equal(entry.targets, NullValue, "Targets should be NullValue")
+            asserts.assert_equal(entry.fabricIndex, f1)
+            
+            # Verify no F2 entries
+            for entry in acl_list:
+                asserts.assert_not_equal(entry.fabricIndex, f2, "Should not contain entry with FabricIndex F2")
         except Exception as e:
-            self.print_step("Error reading extension", str(e))
-            asserts.fail(f"Failed to read extension: {e}")
+            asserts.fail(f"Failed to read ACL: {e}")
 
         self.step(8)
-        # TH2 reads Access Control Extension attribute
+        # TH2 reads ACL attribute
         try:
-            extension_attr = Clusters.AccessControl.Attributes.Extension
-            result2 = await self.th2.ReadAttribute(
+            result = await self.th2.ReadAttribute(
                 self.dut_node_id,
-                [(0, extension_attr)]
+                [(0, acl_attr)],
+                fabricFiltered=True
             )
-            self.print_step("TH2 read result", str(result2))
-
-            endpoint_data2 = result2[0]
-            cluster_data2 = endpoint_data2[Clusters.AccessControl]
-            extension_list2 = cluster_data2[extension_attr]
-
-            asserts.assert_equal(len(extension_list2), 1,
-                                 "Should have exactly one extension")
-            extension_struct2 = extension_list2[0]
-
-            asserts.assert_equal(
-                extension_struct2.data, D_OK_SINGLE, "Extension data should match D_OK_SINGLE")
-            asserts.assert_equal(extension_struct2.fabricIndex,
-                                 f2, "FabricIndex should match F2")
-
-            for ext in extension_list2:
-                asserts.assert_not_equal(
-                    ext.fabricIndex, f1,
-                    "Should not contain element with FabricIndex F1")
-                asserts.assert_not_equal(
-                    ext.data, D_OK_EMPTY,
-                    "Should not contain element with Data D_OK_EMPTY")
-
+            acl_list = result[0][Clusters.AccessControl][acl_attr]
+            
+            asserts.assert_equal(len(acl_list), 1, "Should have exactly one ACL entry")
+            entry = acl_list[0]
+            
+            # Verify entry contents
+            asserts.assert_equal(entry.privilege, 5, "Privilege should be Administer (5)")
+            asserts.assert_equal(entry.authMode, 2, "AuthMode should be CASE (2)")
+            asserts.assert_equal(entry.subjects, [self.th2.nodeId, 2222])
+            asserts.assert_equal(entry.targets, NullValue, "Targets should be NullValue")
+            asserts.assert_equal(entry.fabricIndex, f2)
+            
+            # Verify no F1 entries
+            for entry in acl_list:
+                asserts.assert_not_equal(entry.fabricIndex, f1, "Should not contain entry with FabricIndex F1")
         except Exception as e:
-            self.print_step("Error reading extension", str(e))
-            asserts.fail(f"Failed to read extension: {e}")
+            asserts.fail(f"Failed to read ACL: {e}")
 
         self.step(9)
-        # TH1 reads AccessControlExtensionChanged event
-        acec_event = Clusters.AccessControl.Events.AccessControlExtensionChanged
-        self.print_step(
-            "TH1 reading AccessControlExtensionChanged events...", "")
-
+        # TH1 reads AccessControlEntryChanged events
         try:
-            events_response = await self.th1.ReadEvent(
+            events = await self.th1.ReadEvent(
                 self.dut_node_id,
-                events=[(0, acec_event)],
+                [(0, Clusters.AccessControl.Events.AccessControlEntryChanged)],
                 fabricFiltered=True
             )
-            self.print_step("Events response", str(events_response))
-
-            events = events_response
-            self.print_step("Found {len(events)} events", "")
-
-            found_valid_event = False
-
-            for event_data in events:
-                self.print_step("Examining event", str(event_data))
-
-                if hasattr(event_data, 'Data') and hasattr(event_data.Data, 'changeType'):
-                    if (event_data.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and
-                        event_data.Data.adminNodeID == self.th1.nodeId and
-                        isinstance(event_data.Data.adminPasscodeID, Nullable) and
-                        event_data.Data.latestValue.data == D_OK_EMPTY and
-                        event_data.Data.latestValue.fabricIndex == f1 and
-                            event_data.Data.fabricIndex == f1):
-                        found_valid_event = True
-                        self.print_step("Found valid event for TH1", "")
-                        break
-
-            asserts.assert_true(
-                found_valid_event, "Did not find the expected event with specified fields for TH1")
-
+            
+            asserts.assert_equal(len(events), 2, "Should have exactly 2 events")
+            
+            # Verify event contents match expected sequence
+            self._verify_acl_event(events[0], None, 0, Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded, self.th1.nodeId, NullValue, f1)
+            self._verify_acl_event(events[1], self.th1.nodeId, None, Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged, [self.th1.nodeId, 1111], NullValue, f1)
+            
+            # Verify no F2 events
+            for event in events:
+                asserts.assert_not_equal(event.Data.fabricIndex, f2, "Should not contain event with FabricIndex F2")
         except Exception as e:
-            self.print_step("Error reading events for TH1", str(e))
-            asserts.fail(f"Failed to read events for TH1: {e}")
+            asserts.fail(f"Failed to read events: {e}")
 
         self.step(10)
-        # TH2 reads AccessControlExtensionChanged event
-        self.print_step(
-            "TH2 reading AccessControlExtensionChanged events...", "")
-
+        # TH2 reads AccessControlEntryChanged events
         try:
-            events_response = await self.th2.ReadEvent(
+            events = await self.th2.ReadEvent(
                 self.dut_node_id,
-                events=[(0, acec_event)],
+                [(0, Clusters.AccessControl.Events.AccessControlEntryChanged)],
                 fabricFiltered=True
             )
-            self.print_step("Events response", str(events_response))
+            
+            asserts.assert_equal(len(events), 2, "Should have exactly 2 events")
+            
+            # Verify event contents match expected sequence
+            self._verify_acl_event(events[0], None, 0, Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded, self.th2.nodeId, NullValue, f2)
+            self._verify_acl_event(events[1], self.th2.nodeId, None, Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged, [self.th2.nodeId, 2222], NullValue, f2)
+            self._verify_acl_event(events[2], self.th2.nodeId, None, Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded, [self.th2.nodeId], NullValue, f2)
 
-            events = events_response
-            self.print_step("Found {len(events)} events", "")
-
-            found_valid_event = False
-
-            for event_data in events:
-                self.print_step("Examining event", str(event_data))
-
-                if hasattr(event_data, 'Data') and hasattr(event_data.Data, 'changeType'):
-                    if (event_data.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and
-                        event_data.Data.adminNodeID == self.th2.nodeId and  # Use TH2's node ID
-                        isinstance(event_data.Data.adminPasscodeID, Nullable) and
-                        event_data.Data.latestValue.data == D_OK_SINGLE and
-                        event_data.Data.latestValue.fabricIndex == f2 and
-                            event_data.Data.fabricIndex == f2):
-                        found_valid_event = True
-                        self.print_step("Found valid event for TH2", "")
-                        break
-
-            asserts.assert_true(
-                found_valid_event, "Did not find the expected event with specified fields for TH2")
-
+            # Verify no F1 events
+            for event in events:
+                asserts.assert_not_equal(event.Data.fabricIndex, f1, "Should not contain event with FabricIndex F1")
         except Exception as e:
-            self.print_step("Error reading events for TH2", str(e))
-            asserts.fail(f"Failed to read events for TH2: {e}")
-
+            asserts.fail(f"Failed to read events: {e}")
 
 if __name__ == "__main__":
     default_matter_test_main()
