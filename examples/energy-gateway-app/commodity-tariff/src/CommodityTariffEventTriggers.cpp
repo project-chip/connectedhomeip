@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
- #include "CommodityTariffMain.h"
- #include <app/clusters/commodity-tariff-server/commodityTariffTestEventTriggerHandler.h>
+ #include <CommodityTariffMain.h>
+ #include <app/clusters/commodity-tariff-server/CommodityTariffTestEventTriggerHandler.h>
  #include <app/util/af-types.h>
  
  using namespace chip;
@@ -55,11 +55,11 @@
      {
      case CommodityTariffTrigger::kTariffDataUpdated:
          ChipLogProgress(Support, "[CommodityTariff-Test-Event] => Tariff Data Updated");
-         SetTestEventTrigger_PriceUpdate();
+         SetTestEventTrigger_TariffDataUpdated();
          break;
      case CommodityTariffTrigger::kForcedOneDayForward:
          ChipLogProgress(Support, "[CommodityTariff-Test-Event] => Forced OneDay Forward");
-         SetTestEventTrigger_ForecastUpdate();
+         SetTestEventTrigger_ForcedOneDayForward();
          break;
  
      default:

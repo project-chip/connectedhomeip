@@ -16,8 +16,10 @@
  *    limitations under the License.
  */
 #pragma once
+
+#include <json/json.h>
+
 #include <app/clusters/commodity-tariff-server/commodity-tariff-server.h>
-#include <app/clusters/commodity-tariff-server/CommodityTariffAttrAccessors.h>
 #include <app/util/af-types.h>
 #include <lib/core/CHIPError.h>
 
@@ -39,14 +41,13 @@ public:
 
     CHIP_ERROR LoadJson(Json::Value & root);
 private:
-    using ValidationRule = std::function<bool(const auto&)>;
     CommodityTariffPrimaryData TariffData;
-    std::map<AttributeType, ValidationRule> validationRules;
     Callback callback;
-    
+
     template<typename T>
-    T JsonTo(const JSON& json) { /* Conversion logic */ }
-    
+    using ValidationRule = std::function<bool(const T&)>;
+    template<typename T>
+    T JsonTo(const Json::Value& json) { /* Conversion logic */ }
     template<typename T>
     bool Validate(const T& data) { /* Validation logic */ }
 };
@@ -58,9 +59,15 @@ class CommodityTariffDelegate : public CommodityTariff::Delegate
 public:
     CommodityTariffDelegate();
     ~CommodityTariffDelegate() = default;
-private:
-    // Attributes storage
 
+    Protocols::InteractionModel::Status GetDayEntryById(DataModel::Nullable<uint32_t> aDayEntryId,
+                                                        Structs::DayEntryStruct::Type & aDayEntry) override;
+
+    Protocols::InteractionModel::Status GetTariffComponentInfoById(DataModel::Nullable<uint32_t>  aTariffComponentId,
+                                                                   DataModel::Nullable<chip::CharSpan> & label,
+                                                                   DataModel::List<const uint32_t> & dayEntryIDs,
+                                                                   Structs::TariffComponentStruct::Type & aTariffComponent) override;
+private:
     // Tariff data Attributes
     //CHIP_ERROR SetTariffInfo(const DataModel::Nullable<Structs::TariffInformationStruct::Type>*);
     //CHIP_ERROR SetTariffUnit(Globals::TariffUnitEnum);
@@ -108,10 +115,12 @@ private:
     COMMODITY_TARIFF_CURRENT_ATTRIBUTES
     #undef X
 
+    void ReportAttributeChange(uint16_t attributeId) override {};
+
     void HandleNewTariffData(Json::Value & value)
     {
         auto cb = [this](const CommodityTariffPrimaryData& data) { this->TariffDataUpdaterCb(data); };
-        auto updater = std::make_unique<TariffDataUpdater>(cb);
+        updater = std::make_unique<TariffDataUpdater>(cb);
         updater->LoadJson(value);
     }
 

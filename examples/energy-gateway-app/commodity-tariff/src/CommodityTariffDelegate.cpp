@@ -16,11 +16,11 @@
  *    limitations under the License.
  */
 
- #include <../inc/CommodityTariffDelegate.h>
+ #include <CommodityTariffDelegate.h>
  #include <app/EventLogging.h>
  #include <app/reporting/reporting.h>
  
- #include <app/clusters/commodity-tariff-server/commodity-price-server.h>
+ #include <app/clusters/commodity-tariff-server/commodity-tariff-server.h>
  
  using namespace chip;
  using namespace chip::app;
@@ -43,7 +43,7 @@
  {
      Instance::Shutdown();
  }
- 
+ /*
  CommodityTariffDelegate::CommodityTariffDelegate()
  {
     // TODO - set default values for attributes 
@@ -53,9 +53,24 @@
  {
     // TODO - free allocated space
  }
+*/
+
+Status CommodityTariffDelegate::GetDayEntryById(DataModel::Nullable<uint32_t> aDayEntryId, Structs::DayEntryStruct::Type & aDayEntry)
+{
+    return Status::Success;
+}
+
+Status CommodityTariffDelegate::GetTariffComponentInfoById(DataModel::Nullable<uint32_t>  aTariffComponentId,
+                                                           DataModel::Nullable<chip::CharSpan> & label,
+                                                           DataModel::List<const uint32_t> & dayEntryIDs,
+                                                           Structs::TariffComponentStruct::Type & aTariffComponent)
+{
+    return Status::Success;
+}
 
  // --------------- Internal Attribute Set APIs
-CHIP_ERROR SetTariffInfo(const DataModel::Nullable<Structs::TariffInformationStruct::Type>* newValue)
+ /*
+ CHIP_ERROR SetTariffInfo(const DataModel::Nullable<Structs::TariffInformationStruct::Type>& newValue)
 {
     bool is_changed = false;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -164,3 +179,4 @@ CHIP_ERROR SetCurrentDayEntryDate(const DataModel::Nullable<epoch_s>);
 CHIP_ERROR SetNextDayEntryDate(const DataModel::Nullable<epoch_s>);
 CHIP_ERROR SetCurrentTariffComponents(const DataModel::List<Structs::TariffComponentStruct::Type>*);
 CHIP_ERROR SetNextTariffComponents(const DataModel::List<Structs::TariffComponentStruct::Type>*);
+*/

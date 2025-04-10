@@ -42,6 +42,9 @@ public:
     Delegate()          = default;
     virtual ~Delegate() = default;
 
+    CommodityTariffPrimaryData mTariffData;
+    CommodityTariffCurrentData mCurrentData;
+
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
 
 
@@ -69,7 +72,7 @@ public:
     //virtual DataModel::List<Structs::TariffPeriodStruct::Type> & GetTariffPeriods()              = 0;
     //virtual DataModel::List<Structs::TariffComponentStruct::Type> & GetTariffComponents()        = 0;
     #define X(attrName, attrType) \
-        virtual attrType& Get##attrName() { return mTariffData.attrName; }
+        attrType& Get##attrName() { return mTariffData.attrName; }
     COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
     #undef X    
 
@@ -83,14 +86,11 @@ public:
     //virtual DataModel::List<Structs::TariffComponentStruct::Type> & GetNextTariffComponents()    = 0;
     //Current 
     #define X(attrName, attrType) \
-        virtual attrType& Get##attrName() { return mCurrentData.attrName; }
+        attrType& Get##attrName() { return mCurrentData.attrName; }
     COMMODITY_TARIFF_CURRENT_ATTRIBUTES
     #undef X
 
 private:
-    CommodityTariffPrimaryData mTariffData;
-    CommodityTariffCurrentData mCurrentData;
-
     // Generate setters
     #define X(attrName, attrType) \
         virtual CHIP_ERROR Set##attrName(const attrType& newValue) { \

@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
- #include "CommodityTariffMain.h"
+ #include <CommodityTariffMain.h>
  #include "CommodityTariffDelegate.h"
  /*
   *  @brief  Creates a Delegate and Instance for Commodity Tariff cluster
@@ -59,7 +59,7 @@
      /* Manufacturer may optionally not support all features, commands & attributes */
      gCommodityTariffInstance =
          std::make_unique<CommodityTariffInstance>(EndpointId(endpointId), *gCommodityTariffDelegate,
-                                                  BitMask<CommodityTariff::Feature, uint32_t>(CommodityTariff::Feature::kForecasting));
+                                                  BitMask<CommodityTariff::Feature, uint32_t>(CommodityTariff::Feature::kRandomization));
  
      if (!gCommodityTariffInstance)
      {

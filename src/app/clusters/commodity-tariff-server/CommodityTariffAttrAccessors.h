@@ -67,8 +67,8 @@ struct AttributeAccessor {
 template <typename T>
 struct AttributeAccessor<DataModel::Nullable<T>> {
     static bool HasChanged(const DataModel::Nullable<T>& current, const DataModel::Nullable<T>& newValue) {
-        return current.IsNull() != newValue.IsNull() || 
-              (!current.IsNull() && current.Value() != newValue.Value());
+        return false;//current.IsNull() != newValue.IsNull() || 
+              //(!current.IsNull() && current.Value() != newValue.Value());
     }
     
     static void Update(DataModel::Nullable<T>& current, const DataModel::Nullable<T>& newValue) {
