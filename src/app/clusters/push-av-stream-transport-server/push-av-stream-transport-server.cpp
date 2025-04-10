@@ -481,7 +481,7 @@ void PushAvStreamTransportServer::HandleFindTransport(HandlerContext & ctx,
     }
 
     // Call the delegate
-    status = mDelegate.FindTransport(connectionID,outTransportConfigurations);
+    status = mDelegate.FindTransport(connectionID, outTransportConfigurations);
     if (status == Status::Success)
     {
         response.transportConfigurations = outTransportConfigurations;
