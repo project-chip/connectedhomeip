@@ -23,7 +23,6 @@ and endpoint matching.
 
 import asyncio
 import logging
-import typing
 from enum import IntFlag
 from functools import partial
 from typing import TYPE_CHECKING, Any, Callable, ClassVar, Protocol, Type
@@ -31,7 +30,6 @@ from typing import TYPE_CHECKING, Any, Callable, ClassVar, Protocol, Type
 import chip.clusters as Clusters
 from chip.clusters import Attribute
 from chip.clusters import ClusterObjects as ClusterObjects
-from chip.clusters.ClusterObjects import ClusterAttributeDescriptor
 from chip.testing.global_attribute_ids import GlobalAttributeIds
 from mobly import asserts
 
