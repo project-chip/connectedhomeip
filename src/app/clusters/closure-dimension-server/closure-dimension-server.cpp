@@ -137,7 +137,7 @@ CHIP_ERROR Interface::Init()
                        "Failed to register attribute access");
     VerifyOrDieWithMsg(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this) == CHIP_NO_ERROR, NotSpecified,
                        "Failed to register command handler");
-    
+
     return CHIP_NO_ERROR;
 }
 
@@ -146,7 +146,7 @@ CHIP_ERROR Interface::Shutdown()
     VerifyOrDieWithMsg(CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this) == CHIP_NO_ERROR, NotSpecified,
                        "Failed to unregister command handler");
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
-    
+
     return CHIP_NO_ERROR;
 }
 

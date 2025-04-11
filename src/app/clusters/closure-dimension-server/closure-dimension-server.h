@@ -39,13 +39,13 @@ public:
     {}
 
      // AttributeAccessInterface implementation
-     
+
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    
+
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
     // CommandHandlerInterface implementation
-    
+
     void InvokeCommand(HandlerContext & handlerContext) override;
 
     /**
@@ -57,7 +57,7 @@ public:
 
     /**
      * @brief This function unregisters attribute access and command handlers.
-     * @return CHIP_NO_ERROR when succesfully initialized 
+     * @return CHIP_NO_ERROR when succesfully initialized
      *          Aborts if attribute access unregistration fails.
      */
     CHIP_ERROR Shutdown();

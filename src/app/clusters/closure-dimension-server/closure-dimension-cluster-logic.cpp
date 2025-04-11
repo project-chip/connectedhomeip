@@ -24,13 +24,13 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ClosureDimension {
-    
+
 using namespace Protocols::InteractionModel;
-    
+
 namespace {
 
     static constexpr Percent100ths PERCENT100THS_MAX_VALUE = 10000;
-        
+
 } // namespace
 
 CHIP_ERROR ClusterLogic::Init(const ClusterConformance & conformance)
@@ -46,7 +46,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(GenericCurrentStateStruct & currentStat
 {
     // TODO : Q reporting for this attribute
     // TODO: To implement the impact of the MoveTo command from the Closure Control cluster
-    
+
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
 
     if (currentState.position.HasValue())
@@ -106,7 +106,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(GenericCurrentStateStruct & currentStat
 CHIP_ERROR ClusterLogic::SetTarget(GenericTargetStruct & target)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    
+
     if (target.position.HasValue())
     {
         if (mConformance.HasFeature(Feature::kPositioning))
@@ -161,7 +161,7 @@ CHIP_ERROR ClusterLogic::SetTarget(GenericTargetStruct & target)
 CHIP_ERROR ClusterLogic::SetResolution(const Percent100ths resolution)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    
+
     VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     VerifyOrReturnError(resolution <= PERCENT100THS_MAX_VALUE, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -177,7 +177,7 @@ CHIP_ERROR ClusterLogic::SetResolution(const Percent100ths resolution)
 CHIP_ERROR ClusterLogic::SetStepValue(const Percent100ths stepValue)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    
+
     VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     VerifyOrReturnError(stepValue <= PERCENT100THS_MAX_VALUE, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -196,7 +196,7 @@ CHIP_ERROR ClusterLogic::SetStepValue(const Percent100ths stepValue)
 CHIP_ERROR ClusterLogic::SetUnit(const ClosureUnitEnum unit)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    
+
     VerifyOrReturnError(mConformance.HasFeature(Feature::kUnit), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     VerifyOrReturnError(EnsureKnownEnumValue(unit) != ClosureUnitEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -212,7 +212,7 @@ CHIP_ERROR ClusterLogic::SetUnit(const ClosureUnitEnum unit)
 CHIP_ERROR ClusterLogic::SetUnitRange(const Structs::UnitRangeStruct::Type & unitRange)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    
+
     VerifyOrReturnError(mConformance.HasFeature(Feature::kUnit), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     if ((unitRange.min != mState.unitRange.min) || (unitRange.max != mState.unitRange.max))
@@ -228,7 +228,7 @@ CHIP_ERROR ClusterLogic::SetUnitRange(const Structs::UnitRangeStruct::Type & uni
 CHIP_ERROR ClusterLogic::SetLimitRange(const Structs::RangePercent100thsStruct::Type & limitRange)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    
+
     VerifyOrReturnError(mConformance.HasFeature(Feature::kLimitation), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     if ((limitRange.min != mState.limitRange.min) || (limitRange.max != mState.limitRange.max))
@@ -244,7 +244,7 @@ CHIP_ERROR ClusterLogic::SetLimitRange(const Structs::RangePercent100thsStruct::
 CHIP_ERROR ClusterLogic::SetTranslationDirection(const TranslationDirectionEnum translationDirection)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    
+
     VerifyOrReturnError(mConformance.HasFeature(Feature::kTranslation), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     VerifyOrReturnError(EnsureKnownEnumValue(translationDirection) != TranslationDirectionEnum::kUnknownEnumValue,
                         CHIP_ERROR_INVALID_ARGUMENT);
@@ -262,7 +262,7 @@ CHIP_ERROR ClusterLogic::SetTranslationDirection(const TranslationDirectionEnum 
 CHIP_ERROR ClusterLogic::SetRotationAxis(const RotationAxisEnum rotationAxis)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    
+
     VerifyOrReturnError(mConformance.HasFeature(Feature::kRotation), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     VerifyOrReturnError(EnsureKnownEnumValue(rotationAxis) != RotationAxisEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -279,7 +279,7 @@ CHIP_ERROR ClusterLogic::SetRotationAxis(const RotationAxisEnum rotationAxis)
 CHIP_ERROR ClusterLogic::SetOverflow(const OverflowEnum overflow)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    
+
     VerifyOrReturnError((mConformance.HasFeature(Feature::kRotation) || mConformance.HasFeature(Feature::kMotionLatching)),
                         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     VerifyOrReturnError(mConformance.supportsOverflow, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
@@ -300,7 +300,7 @@ CHIP_ERROR ClusterLogic::SetOverflow(const OverflowEnum overflow)
 CHIP_ERROR ClusterLogic::SetModulationType(const ModulationTypeEnum modulationType)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    
+
     VerifyOrReturnError(mConformance.HasFeature(Feature::kModulation), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     VerifyOrReturnError(EnsureKnownEnumValue(modulationType) != ModulationTypeEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -423,7 +423,7 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
     VerifyOrReturnError(mInitialized, Status::Failure);
     // TODO: If this command is sent while the device is in a non-compatible internal-state, a status code of INVALID_IN_STATE SHALL
     // be returned.
-    
+
     VerifyOrReturnError(!position.HasValue() && !latch.HasValue() && !speed.HasValue(), Status::InvalidCommand);
 
     if (position.HasValue())

@@ -28,7 +28,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ClosureDimension {
-    
+
 struct ClusterConformance
 {
     inline bool HasFeature(Feature feature) const { return featureMap & to_underlying(feature); }
