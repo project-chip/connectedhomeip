@@ -260,11 +260,12 @@ class TestSpecParsingSupport(MatterBaseTest):
     def test_build_xml_override(self):
         # checks that the 1.3 spec (default) does not contain in-progress clusters and the TOT does
         one_five_xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_5)
-        one_three_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_3)
+        one_three_clusters, one_three_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_3)
         one_four_clusters, one_four_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
         one_four_one_clusters, one_four_one_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_1)
 
-        # We know 1.4 and 1.4.1 are clear of errors, ensure it stays that way.
+        # We know 1.3, 1.4 and 1.4.1 are clear of errors, ensure it stays that way.
+        asserts.assert_equal(len(one_three_problems), 0, "Unexpected problems found on 1.3 cluster parsing")
         asserts.assert_equal(len(one_four_problems), 0, "Unexpected problems found on 1.4 cluster parsing")
         asserts.assert_equal(len(one_four_one_problems), 0, "Unexpected problems found on 1.4.1 cluster parsing")
 

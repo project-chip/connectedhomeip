@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0036" name="Wi-Fi Network Diagnostics Cluster" revision="1">
   <revisionHistory>
@@ -143,81 +145,88 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="BSSID" type="octstr" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
-      <constraint type="maxLength" value="6"/>
+      <constraint>
+        <allowed value="6"/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="SecurityType" type="SecurityTypeEnum" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0002" name="WiFiVersion" type="WiFiVersionEnum" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0003" name="ChannelNumber" type="uint16" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0004" name="RSSI" type="int8" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true" nullable="true"/>
       <mandatoryConform/>
-      <constraint type="between" from="-120" to="0"/>
+      <constraint>
+        <between>
+          <from value="-120"/>
+          <to value="0"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0005" name="BeaconLostCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true" nullable="true"/>
       <mandatoryConform>
         <feature name="ERRCNT"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0006" name="BeaconRxCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true" nullable="true"/>
       <mandatoryConform>
         <feature name="PKTCNT"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0007" name="PacketMulticastRxCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true" nullable="true"/>
       <mandatoryConform>
         <feature name="PKTCNT"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0008" name="PacketMulticastTxCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true" nullable="true"/>
       <mandatoryConform>
         <feature name="PKTCNT"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0009" name="PacketUnicastRxCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true" nullable="true"/>
       <mandatoryConform>
         <feature name="PKTCNT"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x000A" name="PacketUnicastTxCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true" nullable="true"/>
       <mandatoryConform>
         <feature name="PKTCNT"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x000B" name="CurrentMaxRate" type="uint64" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true" nullable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x000C" name="OverrunCount" type="uint64" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true" nullable="true"/>
       <mandatoryConform>
         <feature name="ERRCNT"/>
       </mandatoryConform>
