@@ -175,12 +175,15 @@ void DebugPrintConnection(const nw_connection_t aConnection)
     __auto_type dstEndPoint = nw_path_copy_effective_remote_endpoint(path);
     VerifyOrReturn(nil != dstEndPoint, ChipLogError(Inet, "%s", kNilPathDestinationEndPoint));
 
-    const __auto_type * srcAddress = nw_endpoint_copy_address_string(srcEndPoint);
-    const __auto_type srcPort = nw_endpoint_get_port(srcEndPoint);
-    const __auto_type * dstAddress = nw_endpoint_copy_address_string(dstEndPoint);
-    const __auto_type dstPort = nw_endpoint_get_port(dstEndPoint);
+    __auto_type * srcAddress = nw_endpoint_copy_address_string(srcEndPoint);
+    __auto_type srcPort = nw_endpoint_get_port(srcEndPoint);
+    __auto_type * dstAddress = nw_endpoint_copy_address_string(dstEndPoint);
+    __auto_type dstPort = nw_endpoint_get_port(dstEndPoint);
 
     ChipLogError(Inet, "Connection source: %s:%u destination: %s:%u", srcAddress, srcPort, dstAddress, dstPort);
+
+    free(srcAddress);
+    free(dstAddress);
 }
 #endif
 }
