@@ -892,7 +892,7 @@ class TC_ACL_2_4(MatterBaseTest):
         CAT1 = 0xFFFFFFFDABCD0001  # 'CAT1' in hex
         CAT2 = 0xFFFFFFFDFFFF0001  # 'CAT2' in hex
         CAT3 = 0xFFFFFFFD071C1074  # 'CAT3' in hex
-        CAT4 = 0xFFFFFFFD071C1074  # 'CAT4' in hex
+        CAT4 = 0xFFFFFFFDAB120003  # 'CAT4' in hex
 
         specific_subjects_acl = [
             # Admin entry (unchanged)
