@@ -259,10 +259,6 @@ class FactoryDataWriter:
             hwVersionByteArray = bytes(self._args.hw_version_str, 'utf-8').hex()
             cmd.extend(["--object", self.HW_VER_STR_NVM3_KEY + str(hwVersionByteArray)])
 
-        if self._args.sw_version_str:
-            swVersionByteArray = bytes(self._args.sw_version_str, 'utf-8').hex()
-            cmd.extend(["--object", self.SW_VER_STR_NVM3_KEY + str(swVersionByteArray)])
-
         if self._args.unique_id:
             cmd.extend(["--object", self.UNIQUE_ID_NVM3_KEY + self._args.unique_id])
 
@@ -335,8 +331,6 @@ def main():
                         help="[int | hex int] Provide the hardware version value[optional]")
     parser.add_argument("--hw_version_str", type=str,
                         help="[string] Provide the hardware version string[optional]")
-    parser.add_argument("--sw_version_str", type=str,
-                        help="[string] Provide the software version string[optional]")
     parser.add_argument("--product_label", type=str,
                         help="[string] Provide the product label [optional]")
     parser.add_argument("--product_url", type=str,
