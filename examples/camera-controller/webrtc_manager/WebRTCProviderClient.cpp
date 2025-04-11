@@ -76,7 +76,12 @@ CHIP_ERROR WebRTCProviderClient::ProvideOffer(
 
     MoveToState(State::Connecting);
 
-    caseSessionMgr->FindOrEstablishSession(mPeerId, &mOnConnectedCallback, &mOnConnectionFailureCallback);
+    // WebRTC ProvideOffer requires a large payload session establishment
+    caseSessionMgr->FindOrEstablishSession(mPeerId, &mOnConnectedCallback, &mOnConnectionFailureCallback,
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                           1, nullptr,
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                           TransportPayloadCapability::kLargePayload);
 
     return CHIP_NO_ERROR;
 }
@@ -105,7 +110,12 @@ CHIP_ERROR WebRTCProviderClient::ProvideICECandidates(uint16_t webRTCSessionID, 
 
     MoveToState(State::Connecting);
 
-    caseSessionMgr->FindOrEstablishSession(mPeerId, &mOnConnectedCallback, &mOnConnectionFailureCallback);
+    // WebRTC ProvideOffer requires a large payload session establishment
+    caseSessionMgr->FindOrEstablishSession(mPeerId, &mOnConnectedCallback, &mOnConnectionFailureCallback,
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                           1, nullptr,
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                           TransportPayloadCapability::kLargePayload);
 
     return CHIP_NO_ERROR;
 }
