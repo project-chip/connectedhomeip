@@ -1904,8 +1904,8 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                              help="PAA trust store path (default: %s)" % str(paa_path_default))
     basic_group.add_argument('--dac-revocation-set-path', action="store", type=pathlib.Path, metavar="PATH",
                              help="Path to JSON file containing the device attestation revocation set.")
-    basic_group.add_argument('--ble-interface-id', action="store", type=int,
-                             metavar="INTERFACE_ID", help="ID of BLE adapter (from hciconfig)")
+    basic_group.add_argument('--ble-controller', action="store", type=int,
+                             metavar="CONTROLLER_ID", help="BLE controller selector, see example or platform docs for details")
     basic_group.add_argument('-N', '--controller-node-id', type=int_decimal_or_hex,
                              metavar='NODE_ID',
                              default=_DEFAULT_CONTROLLER_NODE_ID,

@@ -111,7 +111,7 @@ def main():
     parser.add_argument(
         "-t", "--trust-store", help="Path to the PAA trust store.", action="store", default="./credentials/development/paa-root-certs")
     parser.add_argument(
-        "-b", "--ble-adapter", help="Set the Bluetooth adapter index.", type=int, default=None)
+        "-b", "--ble-controller", help="BLE controller selector, see example or platform docs for details", type=int, default=None)
     parser.add_argument(
         "-s", "--server-interactions", help="Enable server interactions.", action="store_true")
     args = parser.parse_args()

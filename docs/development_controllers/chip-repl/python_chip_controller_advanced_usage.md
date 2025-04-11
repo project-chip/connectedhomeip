@@ -7,9 +7,9 @@ tool or Matter accessories on Linux.
 
 <hr>
 
--   [Using Python CHIP Controller advanced features](#using-python-chip-controller-advanced-features)
-    -   [Bluetooth LE virtualization on Linux](#bluetooth-le-virtualization-on-linux)
-    -   [Debugging with gdb](#debugging-with-gdb)
+- [Using Python CHIP Controller advanced features](#using-python-chip-controller-advanced-features)
+  - [Bluetooth LE virtualization on Linux](#bluetooth-le-virtualization-on-linux)
+  - [Debugging with gdb](#debugging-with-gdb)
 
 <hr>
 
@@ -66,11 +66,11 @@ interfaces working as Bluetooth LE central and peripheral, respectively.
 4. Run the Python CHIP Controller REPL with Bluetooth LE adapter defined from a
    command line:
 
-    For example, add `--ble-adapter=2` to use the virtual interface `hci2`
+    For example, add `--ble-controller=2` to use the virtual interface `hci2`
     listed above.
 
     ```
-    chip-repl --ble-adapter=2
+    chip-repl --ble-controller=2
     ```
 
 <hr>
