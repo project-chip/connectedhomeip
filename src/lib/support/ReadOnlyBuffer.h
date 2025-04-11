@@ -135,7 +135,7 @@ public:
 };
 
 template <typename T>
-class ListBuilder : public detail::GenericAppendOnlyBuffer
+class ReadOnlyBufferBuilder : public detail::GenericAppendOnlyBuffer
 {
 public:
     using SpanType = Span<const T>;
@@ -148,14 +148,14 @@ public:
     //       implementation does not actually report that.
     static_assert(std::is_trivially_destructible_v<T>);
 
-    ListBuilder() : GenericAppendOnlyBuffer(sizeof(T)) {}
+    ReadOnlyBufferBuilder() : GenericAppendOnlyBuffer(sizeof(T)) {}
 
-    ListBuilder(const ListBuilder &)                   = delete;
-    ListBuilder & operator=(const ListBuilder & other) = delete;
+    ReadOnlyBufferBuilder(const ReadOnlyBufferBuilder &)                   = delete;
+    ReadOnlyBufferBuilder & operator=(const ReadOnlyBufferBuilder & other) = delete;
 
-    ListBuilder(ListBuilder && other) : GenericAppendOnlyBuffer{ std::move(other) } {}
+    ReadOnlyBufferBuilder(ReadOnlyBufferBuilder && other) : GenericAppendOnlyBuffer{ std::move(other) } {}
 
-    ListBuilder & operator=(ListBuilder && other)
+    ReadOnlyBufferBuilder & operator=(ReadOnlyBufferBuilder && other)
     {
         detail::GenericAppendOnlyBuffer::operator=(std::move(other));
         return *this;

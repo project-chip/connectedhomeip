@@ -16,7 +16,7 @@
  *
  */
 
-#include "app/data-model-provider/MetadataList.h"
+#include "lib/support/ReadOnlyBuffer.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
@@ -251,7 +251,7 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
     if (startAfterSetting.HasValue())
     {
 
-        DataModel::ListBuilder<DataModel::AcceptedCommandEntry> acceptedCommandsList;
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedCommandsList;
 
         InteractionModelEngine::GetInstance()->GetDataModelProvider()->AcceptedCommands(
             ConcreteClusterPath(mEndpointId, OperationalState::Id), acceptedCommandsList);
