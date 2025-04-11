@@ -39,22 +39,30 @@ public:
 
     /**
      * @brief This function handles SetTarget command implementaion.
-     * @param [in] pos Target position to be set
+     * 
+     * @param [in] position Target position to be set
      * @param [in] latch Target Latch to be set
      * @param [in] speed Target speed to be set
-     * @return CHIP_NO_ERROR when succesfully implemented or return error.
+     * 
+     * @return Success when succesfully handled.
+     *         ConstraintError when arguments does not follow the constraints
+     *         InvalidInState when device is in a non-compatible internal-state.
      */
-    virtual CHIP_ERROR HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<TargetLatchEnum> & latch,
+    virtual Protocols::InteractionModel::Status HandleSetTarget(const Optional<Percent100ths> & position, const Optional<TargetLatchEnum> & latch,
                                        const Optional<Globals::ThreeLevelAutoEnum> & speed) = 0;
 
     /**
      * @brief This function handles Step command implementaion.
+     * 
      * @param [in] direction step direction
      * @param [in] numberOfSteps total number of steps
      * @param [in] speed speed of each step
-     * @return CHIP_NO_ERROR when succesfully implemented or return error.
+     * 
+     * @return SUCCESS when succesfully handled..
+     *         ConstraintError when arguments does not follow the constraints
+     *         InvalidInState when device is in a non-compatible internal-state.
      */
-    virtual CHIP_ERROR HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
+    virtual Protocols::InteractionModel::Status HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
                                   const Optional<Globals::ThreeLevelAutoEnum> & speed) = 0;
 };
 

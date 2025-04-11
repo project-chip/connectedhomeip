@@ -36,7 +36,7 @@ public:
 
     /**
      * @brief calls the attribute change callback
-     * @param[in] attributeId Attribute ID whose value need to be marked dirty.
+     * @param[in] attributeId Attribute ID whose value needs to be marked dirty.
      */
     virtual void MarkDirty(AttributeId attributeId);
 

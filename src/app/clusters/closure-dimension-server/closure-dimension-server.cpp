@@ -25,6 +25,7 @@ namespace Clusters {
 namespace ClosureDimension {
 
 using namespace Protocols::InteractionModel;
+
 namespace {
 
 template <typename T, typename F>
@@ -47,6 +48,7 @@ CHIP_ERROR Interface::Read(const ConcreteReadAttributePath & aPath, AttributeVal
         return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetCurrentState(ret); });
     }
     case Attributes::Target::Id: {
+        //TODO: Each field SHALL be available following its respective feature. If the feature is not set the field SHALL NOT be present.
         typedef GenericTargetStruct T;
         return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetTarget(ret); });
     }
@@ -102,14 +104,9 @@ CHIP_ERROR Interface::Read(const ConcreteReadAttributePath & aPath, AttributeVal
 
 CHIP_ERROR Interface::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
-    switch (aPath.mAttributeId)
-    {
-    default:
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
-    }
+    return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
 }
 
-// CommandHandlerInterface
 void Interface::InvokeCommand(HandlerContext & handlerContext)
 {
     switch (handlerContext.mRequestPath.mCommandId)
@@ -128,6 +125,9 @@ void Interface::InvokeCommand(HandlerContext & handlerContext)
                 ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
             });
         return;
+    default:
+        handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
+        return;
     }
 }
 
@@ -137,6 +137,7 @@ CHIP_ERROR Interface::Init()
                        "Failed to register attribute access");
     VerifyOrDieWithMsg(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this) == CHIP_NO_ERROR, NotSpecified,
                        "Failed to register command handler");
+    
     return CHIP_NO_ERROR;
 }
 
@@ -145,6 +146,7 @@ CHIP_ERROR Interface::Shutdown()
     VerifyOrDieWithMsg(CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this) == CHIP_NO_ERROR, NotSpecified,
                        "Failed to unregister command handler");
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
+    
     return CHIP_NO_ERROR;
 }
 

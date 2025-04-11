@@ -28,9 +28,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ClosureDimension {
-
-static constexpr uint16_t PERCENT100THS_MAX_VALUE = 10000;
-
+    
 struct ClusterConformance
 {
     inline bool HasFeature(Feature feature) const { return featureMap & to_underlying(feature); }
@@ -66,15 +64,15 @@ struct ClusterState
 {
     GenericCurrentStateStruct currentState{};
     GenericTargetStruct target{};
-    Percent100ths resolution = 0;
-    Percent100ths stepValue  = 0;
-    ClosureUnitEnum unit     = ClosureUnitEnum::kMillimeter;
+    Percent100ths resolution = 1;
+    Percent100ths stepValue  = 1;
+    ClosureUnitEnum unit     = ClosureUnitEnum::kUnknownEnumValue;
     Structs::UnitRangeStruct::Type unitRange{};
     Structs::RangePercent100thsStruct::Type limitRange{};
-    TranslationDirectionEnum translationDirection = TranslationDirectionEnum::kBackward;
-    RotationAxisEnum rotationAxis                 = RotationAxisEnum::kBottom;
-    OverflowEnum overflow                         = OverflowEnum::kBottomInside;
-    ModulationTypeEnum modulationType             = ModulationTypeEnum::kOpacity;
+    TranslationDirectionEnum translationDirection = TranslationDirectionEnum::kUnknownEnumValue;
+    RotationAxisEnum rotationAxis                 = RotationAxisEnum::kUnknownEnumValue;
+    OverflowEnum overflow                         = OverflowEnum::kUnknownEnumValue;
+    ModulationTypeEnum modulationType             = ModulationTypeEnum::kUnknownEnumValue;
 };
 
 class ClusterLogic
@@ -105,7 +103,8 @@ public:
      * @brief Set Current State.
      * @param[in] currentState Current State Position, Latching and/or Speed.
      * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INVALID_ARGUMENT if arguments are not valid
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has already been initialized.
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      */
     CHIP_ERROR SetCurrentState(GenericCurrentStateStruct & currentState);
 
@@ -113,7 +112,8 @@ public:
      * @brief Set Target.
      * @param[in] target Target Position, Latching and/or Speed.
      * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INVALID_ARGUMENT if arguments are not valid
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has already been initialized.
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      */
     CHIP_ERROR SetTarget(GenericTargetStruct & target);
 
@@ -121,7 +121,8 @@ public:
      * @brief Set Resolution.
      * @param[in] resolution Minimal acceptable change of Position fields of attributes.
      * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INVALID_ARGUMENT if arguments are not valid
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has already been initialized
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetResolution(const Percent100ths resolution);
@@ -130,7 +131,8 @@ public:
      * @brief Set StepValue.
      * @param[in] stepValue One step value for Step command
      * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INVALID_ARGUMENT if arguments are not valid
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has already been initialized
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetStepValue(const Percent100ths stepValue);
@@ -139,7 +141,8 @@ public:
      * @brief Set Unit.
      * @param[in] unit Unit related to the Positioning.
      * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INVALID_ARGUMENT if arguments are not valid
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has already been initialized
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetUnit(const ClosureUnitEnum unit);
@@ -148,6 +151,7 @@ public:
      * @brief Set UnitRange.
      * @param[in] unitRange Minimum and Maximum values expressed by positioning following the unit.
      * @return CHIP_NO_ERROR if set was successful.
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has already been initialized
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetUnitRange(const Structs::UnitRangeStruct::Type & unitRange);
@@ -156,6 +160,7 @@ public:
      * @brief Set LimitRange.
      * @param[in] limitRange Range of possible values for the position field in Current attribute.
      * @return CHIP_NO_ERROR if set was successful.
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has already been initialized
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetLimitRange(const Structs::RangePercent100thsStruct::Type & limitRange);
@@ -164,7 +169,8 @@ public:
      * @brief Set TranslationDirection.
      * @param[in] translationDirection Direction of the translation.
      * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INVALID_ARGUMENT if arguments are not valid
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has already been initialized
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported
      */
     CHIP_ERROR SetTranslationDirection(const TranslationDirectionEnum translationDirection);
@@ -173,7 +179,8 @@ public:
      * @brief Set RotationAxis.
      * @param[in] rotationAxis Axis of the rotation.
      * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INVALID_ARGUMENT if arguments are not valid
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has already been initialized
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported
      */
     CHIP_ERROR SetRotationAxis(const RotationAxisEnum rotationAxis);
@@ -182,7 +189,8 @@ public:
      * @brief Set Overflow.
      * @param[in] overflow Overflow related to Rotation.
      * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INVALID_ARGUMENT if arguments are not valid
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has already been initialized
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetOverflow(const OverflowEnum overflow);
@@ -191,7 +199,8 @@ public:
      * @brief Set ModulationType.
      * @param[in] modulationType Modulation type.
      * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INVALID_ARGUMENT if arguments are not valid
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has already been initialized
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetModulationType(const ModulationTypeEnum modulationType);
@@ -215,27 +224,24 @@ public:
     CHIP_ERROR GetClusterRevision(Attributes::ClusterRevision::TypeInfo::Type & clusterRevision);
 
     /**
-     *  @brief Calls delegate HandleSetTarget function after validating the parameters
+     *  @brief Calls delegate HandleSetTarget function after validating the parameters and conformance.
      *  @param [in] position target position
      *  @param [in] latch Target latch
      *  @param [in] speed Target speed
-     *  @return Returns CHIP_ERROR_INCORRECT_STATE if the class has not been initialized.
-     *          Returns CHIP_ERROR_INVALID_ARGUMENT if the input values are out is out of range
-     *          Returns CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR if the conformance is incorrect.
-     *          Returns CHIP_NO_ERROR on succesful initialization.
+     *  @return Returns ConstraintError if the input values are out is out of range
+     *          Returns Success on succesful handling.
      */
     Protocols::InteractionModel::Status HandleSetTargetCommand(Optional<Percent100ths> position, Optional<TargetLatchEnum> latch,
                                                                Optional<Globals::ThreeLevelAutoEnum> speed);
 
     /**
-     *  @brief Calls delegate HandleStep function after validating the parameters
+     *  @brief Calls delegate HandleStep function after validating the parameters and confromance.
      *  @param [in] direction step direction
      *  @param [in] numberOfSteps Number of steps
      *  @param [in] speed step speed
-     *  @return Returns CHIP_ERROR_INCORRECT_STATE if the class has not been initialized.
-     *          Returns CHIP_ERROR_INVALID_ARGUMENT if the input values are out is out of range
-     *          Returns CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR if the conformance is incorrect.
-     *          Returns CHIP_NO_ERROR on succesful initialization.
+     *  @return Returns ConstraintError if the input values are out is out of range
+     *          Returns Failure if feature conformance is not valid
+     *          Returns Success on succesful handling.
      */
     Protocols::InteractionModel::Status HandleStepCommand(StepDirectionEnum direction, uint16_t numberOfSteps,
                                                           Optional<Globals::ThreeLevelAutoEnum> speed);

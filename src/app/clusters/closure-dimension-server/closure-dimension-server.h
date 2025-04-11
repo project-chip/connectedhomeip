@@ -27,7 +27,8 @@ namespace Clusters {
 namespace ClosureDimension {
 
 /**
- *  @brief App should instantiate and init one Interface per endpoint
+ *  @brief Class implements the client facing APIs to read, write and process incoming commands
+ *          App should instantiate and init one Interface per endpoint
  */
 class Interface : public AttributeAccessInterface, public CommandHandlerInterface
 {
@@ -37,47 +38,27 @@ public:
         mClusterLogic(clusterLogic)
     {}
 
-    /**
-     * @brief Overides the Callback for reading attributes.
-     *
-     * @param [in] aPath indicates which exact data is being read.
-     * @param [in] aEncoder the AttributeValueEncoder to use for encoding the
-     *             data.
-     * @return return error for failed read, return CHIP_NO_ERROR for succesful read.
-     */
+     // AttributeAccessInterface implementation
+     
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-
-    /**
-     * @brief  Callback for writing attributes.
-     *
-     * @param [in] aPath indicates which exact data is being written.
-     * @param [in] aDecoder the AttributeValueDecoder to use for decoding the
-     *             data.
-     *
-     *@return return error for failed write, return CHIP_NO_ERROR for succesful write.
-     */
+    
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
-    /**
-     * @brief This function overides callback that must be implemented to handle an invoke command request.
-     *
-     * @param [in] handlerContext Context that encapsulates the current invoke request.
-     *                            Handlers are responsible for correctly calling SetCommandHandled()
-     *                            on the context if they did handle the command.
-     *
-     *                            This is not necessary if the HandleCommand() method below is invoked.
-     */
+    // CommandHandlerInterface implementation
+    
     void InvokeCommand(HandlerContext & handlerContext) override;
 
     /**
-     * @brief This function registers attribute and command handlers.
-     * @return CHIP_NO_ERROR when succesfully initialized or return error.
+     * @brief This function registers attribute access and command handler.
+     * @return CHIP_NO_ERROR when succesfully initialized.
+     *          Aborts if registration fails.
      */
     CHIP_ERROR Init();
 
     /**
-     * @brief This function unregisters attribute and command handlers.
-     * @return CHIP_NO_ERROR when succesfully initialized or return error.
+     * @brief This function unregisters attribute access and command handlers.
+     * @return CHIP_NO_ERROR when succesfully initialized 
+     *          Aborts if attribute access unregistration fails.
      */
     CHIP_ERROR Shutdown();
 

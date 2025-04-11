@@ -33,7 +33,13 @@ struct GenericCurrentStateStruct : public Structs::CurrentStruct::Type
     GenericCurrentStateStruct(Optional<Percent100ths> positionValue            = NullOptional,
                               Optional<LatchingEnum> latchingValue             = NullOptional,
                               Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
-    {
+    { 
+        
+        // Set default values if no value is present
+        positionValue.SetValue(positionValue.ValueOr(0));
+        latchingValue.SetValue(latchingValue.ValueOr(LatchingEnum::kNotLatched));
+        speedValue.SetValue(speedValue.ValueOr(Globals::ThreeLevelAutoEnum::kAuto));
+ 
         Set(positionValue, latchingValue, speedValue);
     }
 
@@ -72,6 +78,10 @@ struct GenericTargetStruct : public Structs::TargetStruct::Type
     GenericTargetStruct(Optional<Percent100ths> positionValue = NullOptional, Optional<TargetLatchEnum> latchValue = NullOptional,
                         Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
     {
+        // Set default values if no value is present. Position has no default value.
+        latchValue.SetValue(latch.ValueOr(TargetLatchEnum::kUnlatch));
+        speedValue.SetValue(speedValue.ValueOr(Globals::ThreeLevelAutoEnum::kAuto));
+        
         Set(positionValue, latchValue, speedValue);
     }
 
