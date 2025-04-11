@@ -149,6 +149,9 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(),
                 endpoint=endpoint
             )
+
+            asserts.fail("Expected InvalidCommand for empty SetTarget command")
+
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.InvalidCommand, "Unexpected status returned")
 
@@ -205,6 +208,9 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(Position=10001),
                 endpoint=endpoint
             )
+
+            asserts.fail("Expected ConstraintError for Position exceeding 100%")
+
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected status returned")
 
@@ -305,6 +311,9 @@ class TC_CLDIM_3_3(MatterBaseTest):
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(Position=10001),
                     endpoint=endpoint
                 )
+
+                asserts.fail("Expected ConstraintError for invalid Position")
+                
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected status returned")
         else: 
@@ -431,6 +440,9 @@ class TC_CLDIM_3_3(MatterBaseTest):
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(Speed=4),  # Invalid speed
                     endpoint=endpoint
                 )
+
+                asserts.fail("Expected ConstraintError for invalid Speed")
+                
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected status returned")
         else:
@@ -444,6 +456,9 @@ class TC_CLDIM_3_3(MatterBaseTest):
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(Speed=4),  # Invalid speed
                     endpoint=endpoint
                 )
+
+                asserts.fail("Expected ConstraintError for invalid Speed")
+                
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected status returned")
         else:
