@@ -58,6 +58,8 @@ static_library("camera-controller-utils") {
     "commands/clusters/ModelCommand.h",
     "commands/clusters/ReportCommand.cpp",
     "commands/clusters/ReportCommand.h",
+    "commands/delay/SleepCommand.cpp",
+    "commands/delay/WaitForCommissioneeCommand.cpp",
     "commands/common/CHIPCommand.cpp",
     "commands/common/CHIPCommand.h",
     "commands/common/Command.cpp",
@@ -86,6 +88,7 @@ static_library("camera-controller-utils") {
 
   sources += [ "commands/interactive/InteractiveCommands.cpp" ]
   deps += [
+    "${chip_root}/examples/common/websocket-server",
     "${chip_root}/src/platform/logging:headers",
     "${editline_root}:editline",
   ]
