@@ -12,19 +12,19 @@ details.
 
 <hr>
 
-- [Matter Linux Energy Management Example](#matter-linux-energy-management-example)
-  - [Building](#building)
-  - [Commandline arguments](#commandline-arguments)
-  - [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
-  - [Device Tracing](#device-tracing)
-  - [Python Test Cases](#python-test-cases)
-    - [Running the test cases:](#running-the-test-cases)
-  - [CHIP-REPL Interaction](#chip-repl-interaction)
-    - [Building chip-repl:](#building-chip-repl)
-    - [Activating python virtual env](#activating-python-virtual-env)
-    - [Interacting with CHIP-REPL and the example app](#interacting-with-chip-repl-and-the-example-app)
-    - [Using chip-repl to Fake a charging session](#using-chip-repl-to-fake-a-charging-session)
-  - [Water Heater App: Interaction using the chip-tool and TestEventTriggers](#water-heater-app-interaction-using-the-chip-tool-and-testeventtriggers)
+-   [Matter Linux Energy Management Example](#matter-linux-energy-management-example)
+    -   [Building](#building)
+    -   [Commandline arguments](#commandline-arguments)
+    -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
+    -   [Device Tracing](#device-tracing)
+    -   [Python Test Cases](#python-test-cases)
+        -   [Running the test cases:](#running-the-test-cases)
+    -   [CHIP-REPL Interaction](#chip-repl-interaction)
+        -   [Building chip-repl:](#building-chip-repl)
+        -   [Activating python virtual env](#activating-python-virtual-env)
+        -   [Interacting with CHIP-REPL and the example app](#interacting-with-chip-repl-and-the-example-app)
+        -   [Using chip-repl to Fake a charging session](#using-chip-repl-to-fake-a-charging-session)
+    -   [Water Heater App: Interaction using the chip-tool and TestEventTriggers](#water-heater-app-interaction-using-the-chip-tool-and-testeventtriggers)
 
 <hr>
 

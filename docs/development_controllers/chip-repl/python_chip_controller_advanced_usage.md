@@ -7,9 +7,9 @@ tool or Matter accessories on Linux.
 
 <hr>
 
-- [Using Python CHIP Controller advanced features](#using-python-chip-controller-advanced-features)
-  - [Bluetooth LE virtualization on Linux](#bluetooth-le-virtualization-on-linux)
-  - [Debugging with gdb](#debugging-with-gdb)
+-   [Using Python CHIP Controller advanced features](#using-python-chip-controller-advanced-features)
+    -   [Bluetooth LE virtualization on Linux](#bluetooth-le-virtualization-on-linux)
+    -   [Debugging with gdb](#debugging-with-gdb)
 
 <hr>
 

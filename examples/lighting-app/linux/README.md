@@ -12,16 +12,16 @@ details.
 
 <hr>
 
-- [CHIP Linux Lighting Example](#chip-linux-lighting-example)
-  - [Building](#building)
-  - [Commandline arguments](#commandline-arguments)
-  - [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
-  - [Running RPC Console](#running-rpc-console)
-  - [Device Tracing](#device-tracing)
-  - [Trigger event using lighting-app event named pipe](#trigger-event-using-lighting-app-event-named-pipe)
-    - [Trigger `SoftwareFault` events](#trigger-softwarefault-events)
-    - [Trigger `HardwareFault` events](#trigger-hardwarefault-events)
-    - [Trigger Switch events](#trigger-switch-events)
+-   [CHIP Linux Lighting Example](#chip-linux-lighting-example)
+    -   [Building](#building)
+    -   [Commandline arguments](#commandline-arguments)
+    -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
+    -   [Running RPC Console](#running-rpc-console)
+    -   [Device Tracing](#device-tracing)
+    -   [Trigger event using lighting-app event named pipe](#trigger-event-using-lighting-app-event-named-pipe)
+        -   [Trigger `SoftwareFault` events](#trigger-softwarefault-events)
+        -   [Trigger `HardwareFault` events](#trigger-hardwarefault-events)
+        -   [Trigger Switch events](#trigger-switch-events)
 
 <hr>
 

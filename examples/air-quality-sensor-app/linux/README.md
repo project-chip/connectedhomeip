@@ -12,15 +12,15 @@ details.
 
 <hr>
 
-- [Matter Linux Air Quality Example](#matter-linux-air-quality-example)
-  - [Building](#building)
-  - [Commandline arguments](#commandline-arguments)
-  - [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
-  - [Trigger event using air-quality-sensor-app event named pipe](#trigger-event-using-air-quality-sensor-app-event-named-pipe)
-    - [Trigger air quality change event](#trigger-air-quality-change-event)
-    - [Trigger Temperature change event](#trigger-temperature-change-event)
-    - [Trigger Humidity change event](#trigger-humidity-change-event)
-    - [Trigger concentration change event](#trigger-concentration-change-event)
+-   [Matter Linux Air Quality Example](#matter-linux-air-quality-example)
+    -   [Building](#building)
+    -   [Commandline arguments](#commandline-arguments)
+    -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
+    -   [Trigger event using air-quality-sensor-app event named pipe](#trigger-event-using-air-quality-sensor-app-event-named-pipe)
+        -   [Trigger air quality change event](#trigger-air-quality-change-event)
+        -   [Trigger Temperature change event](#trigger-temperature-change-event)
+        -   [Trigger Humidity change event](#trigger-humidity-change-event)
+        -   [Trigger concentration change event](#trigger-concentration-change-event)
 
 <hr>
 

@@ -12,13 +12,13 @@ details.
 
 <hr>
 
-- [Matter Linux Dishwasher Example](#matter-linux-dishwasher-example)
-  - [Building](#building)
-  - [Commandline arguments](#commandline-arguments)
-  - [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
-  - [Control](#control)
-  - [Running RPC Console](#running-rpc-console)
-  - [Device Tracing](#device-tracing)
+-   [Matter Linux Dishwasher Example](#matter-linux-dishwasher-example)
+    -   [Building](#building)
+    -   [Commandline arguments](#commandline-arguments)
+    -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
+    -   [Control](#control)
+    -   [Running RPC Console](#running-rpc-console)
+    -   [Device Tracing](#device-tracing)
 
 <hr>
 

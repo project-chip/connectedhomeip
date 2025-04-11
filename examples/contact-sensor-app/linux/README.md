@@ -12,12 +12,12 @@ details.
 
 <hr>
 
-- [Matter Linux Contact Sensor Example](#matter-linux-contact-sensor-example)
-  - [Building](#building)
-  - [Commandline arguments](#commandline-arguments)
-  - [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
-  - [Running RPC Console](#running-rpc-console)
-  - [Device Tracing](#device-tracing)
+-   [Matter Linux Contact Sensor Example](#matter-linux-contact-sensor-example)
+    -   [Building](#building)
+    -   [Commandline arguments](#commandline-arguments)
+    -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
+    -   [Running RPC Console](#running-rpc-console)
+    -   [Device Tracing](#device-tracing)
 
 <hr>
 

@@ -12,12 +12,12 @@ details.
 
 <hr>
 
-- [CHIP Linux Refrigerator Example](#chip-linux-refrigerator-example)
-  - [Building](#building)
-  - [Commandline arguments](#commandline-arguments)
-  - [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
-  - [Running RPC Console](#running-rpc-console)
-  - [Device Tracing](#device-tracing)
+-   [CHIP Linux Refrigerator Example](#chip-linux-refrigerator-example)
+    -   [Building](#building)
+    -   [Commandline arguments](#commandline-arguments)
+    -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
+    -   [Running RPC Console](#running-rpc-console)
+    -   [Device Tracing](#device-tracing)
 
 <hr>
 

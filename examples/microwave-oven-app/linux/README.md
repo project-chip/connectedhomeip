@@ -7,12 +7,12 @@ doc is tested on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and
 
 <hr>
 
-- [Matter Linux Microwave Oven Example](#matter-linux-microwave-oven-example)
-  - [Building](#building)
-  - [Commandline arguments](#commandline-arguments)
-  - [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
-  - [Running RPC Console](#running-rpc-console)
-  - [Device Tracing](#device-tracing)
+-   [Matter Linux Microwave Oven Example](#matter-linux-microwave-oven-example)
+    -   [Building](#building)
+    -   [Commandline arguments](#commandline-arguments)
+    -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
+    -   [Running RPC Console](#running-rpc-console)
+    -   [Device Tracing](#device-tracing)
 
 <hr>
 

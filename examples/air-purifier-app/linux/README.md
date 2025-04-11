@@ -16,10 +16,10 @@ details.
 
 <hr>
 
-- [CHIP Linux Air Purifier Example](#chip-linux-air-purifier-example)
-  - [Building](#building)
-  - [Commandline arguments](#commandline-arguments)
-  - [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
+-   [CHIP Linux Air Purifier Example](#chip-linux-air-purifier-example)
+    -   [Building](#building)
+    -   [Commandline arguments](#commandline-arguments)
+    -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
 
 <hr>
 

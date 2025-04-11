@@ -23,10 +23,10 @@ Linux OS development. For more information about this project, see the
 
 <hr>
 
-- [Building and Running CHIP Linux Examples for i.MX 8M Mini EVK](#building-and-running-chip-linux-examples-for-imx-8m-mini-evk)
-  - [Building](#building)
-  - [Commandline arguments](#commandline-arguments)
-  - [Running the Examples on i.MX 8M Mini EVK](#running-the-examples-on-imx-8m-mini-evk)
+-   [Building and Running CHIP Linux Examples for i.MX 8M Mini EVK](#building-and-running-chip-linux-examples-for-imx-8m-mini-evk)
+    -   [Building](#building)
+    -   [Commandline arguments](#commandline-arguments)
+    -   [Running the Examples on i.MX 8M Mini EVK](#running-the-examples-on-imx-8m-mini-evk)
 
 <hr>
 
