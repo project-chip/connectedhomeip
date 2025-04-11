@@ -45,6 +45,9 @@ CHIP_ERROR ClusterLogic::Init(const ClusterConformance & conformance)
 
 CHIP_ERROR ClusterLogic::SetCurrentState(const GenericCurrentStateStruct & acurrentState)
 {
+    ChipLogError(Zcl, ">>>>>>>>>>>>>>>>>>>>>>");
+    ChipLogError(Zcl, "ClosureControlManager::SetCurrentState");
+    ChipLogError(Zcl, "<<<<<<<<<<<<<<<<<<<<<");
     // TODO : Q reporting for this attribute
     // TODO: To implement the impact of the MoveTo command from the Closure Control cluster
 
@@ -58,6 +61,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const GenericCurrentStateStruct & acurr
         if (mConformance.HasFeature(Feature::kPositioning))
         {
             VerifyOrReturnError(currentState.position.Value() <= PERCENT100THS_MAX_VALUE, CHIP_ERROR_INVALID_ARGUMENT);
+            ChipLogError(Zcl, "ClosureControlManager::SetCurrentState 2");
         }
         else
         {
@@ -66,12 +70,15 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const GenericCurrentStateStruct & acurr
             currentState.position.ClearValue();
         }
     }
+    
+    ChipLogError(Zcl, "ClosureControlManager::SetCurrentState 3");
 
     if (currentState.latching.HasValue())
     {
         // If MotionLatching feature is supported,CurrentState latching SHALL be available else latching SHALL NOT be present
         if (mConformance.HasFeature(Feature::kMotionLatching))
         {
+            ChipLogError(Zcl, "ClosureControlManager::SetCurrentState 4");
             VerifyOrReturnError(EnsureKnownEnumValue(currentState.latching.Value()) != LatchingEnum::kUnknownEnumValue,
                                 CHIP_ERROR_INVALID_ARGUMENT);
         }
@@ -82,7 +89,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const GenericCurrentStateStruct & acurr
             currentState.latching.ClearValue();
         }
     }
-
+    ChipLogError(Zcl, "ClosureControlManager::SetCurrentState 5");
     if (currentState.speed.HasValue())
     {
         // If Speed feature is supported,CurrentState speed SHALL be available else speed SHALL NOT be present
@@ -90,6 +97,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const GenericCurrentStateStruct & acurr
         {
             VerifyOrReturnError(EnsureKnownEnumValue(currentState.speed.Value()) != Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
                                 CHIP_ERROR_INVALID_ARGUMENT);
+                                ChipLogError(Zcl, "ClosureControlManager::SetCurrentState 6");
         }
         else
         {
@@ -97,6 +105,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const GenericCurrentStateStruct & acurr
             currentState.speed.ClearValue();
         }
     }
+    ChipLogError(Zcl, "ClosureControlManager::SetCurrentState 7");
 
     // TODO: currentState.Position value SHALL follow the scaling from "Resolution Attribute".
 
@@ -104,6 +113,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const GenericCurrentStateStruct & acurr
     {
         mState.currentState = currentState;
         mMatterContext.MarkDirty(Attributes::Current::Id);
+        ChipLogError(Zcl, "ClosureControlManager::SetCurrentState 8");
     }
 
     return CHIP_NO_ERROR;
@@ -121,6 +131,7 @@ CHIP_ERROR ClusterLogic::SetTarget(const GenericTargetStruct & atarget)
         if (mConformance.HasFeature(Feature::kPositioning))
         {
             VerifyOrReturnError(target.position.Value() <= PERCENT100THS_MAX_VALUE, CHIP_ERROR_INVALID_ARGUMENT);
+            
         }
         else
         {
@@ -501,9 +512,9 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
         target.speed = speed; 
     }
     
-    VerifyOrReturnError(SetTarget(target) == CHIP_NO_ERROR, Status::Failure);
-    // TODO: CHIP_ERROR err = mClusterDriver.HandleSetTarget(target.position, target.latch, target.speed);
-    return Status::Success;
+    auto status = mClusterDriver.HandleSetTarget(position,latch,speed);
+
+    return status;
 }
 
 Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t numberOfSteps,
@@ -584,9 +595,9 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
         stepTarget.speed = speed;
     }
 
-    VerifyOrReturnError(SetTarget(stepTarget) == CHIP_NO_ERROR, Status::Failure);
-    // TODO: CHIP_ERROR err = mClusterDriver.HandleStep(direction,numberOfSteps,speed);
-    return Status::Success;
+    auto status = mClusterDriver.HandleStep(direction,numberOfSteps,speed);
+
+    return status;
 }
 } // namespace ClosureDimension
 } // namespace Clusters

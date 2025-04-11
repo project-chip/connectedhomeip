@@ -67,6 +67,26 @@ public:
                           const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
                           
     Status HandleMotion(bool latchNeeded, bool motionNeeded, bool newTarget);
+    
+    CHIP_ERROR Init()
+    {
+        ChipLogError(Zcl, "ClosureDimensionDelegate::Init start");
+        GenericCurrentStateStruct current;
+        current.position.SetValue(0);
+        current.latching.SetValue(LatchingEnum::kNotLatched);
+        current.speed.SetValue(Globals::ThreeLevelAutoEnum::kAuto);
+        getLogic()->SetCurrentState(current);
+    
+        Structs::RangePercent100thsStruct::Type limitRange;
+        limitRange.min = 0;    
+        limitRange.max = 10000;
+        getLogic()->SetLimitRange(limitRange);
+        
+        Percent100ths step = 10;
+        getLogic()->SetStepValue(step);
+        ChipLogError(Zcl, "ClosureDimensionDelegate::Init done");
+        return CHIP_NO_ERROR;
+    }
                           
     void SetLogic(ClusterLogic* logic) 
     {
@@ -119,8 +139,11 @@ public:
     
     CHIP_ERROR Init()
     {
+        ChipLogError(Zcl, "ClosureDimensionManager::Init start");
         ReturnErrorOnFailure(mLogic.Init(kConformance));
         ReturnErrorOnFailure(mInterface.Init());
+        ReturnErrorOnFailure(mDelegate.Init());
+        ChipLogError(Zcl, "ClosureDimensionManager::Init end");
         return CHIP_NO_ERROR;
     }
     
@@ -130,7 +153,7 @@ public:
     }
 
 private:
-    const ClusterConformance kConformance = { .featureMap = 0, .supportsOverflow = false };
+    const ClusterConformance kConformance = { .featureMap = 255, .supportsOverflow = true };
 
     EndpointId mEndpoint;
     MatterContext mContext;
