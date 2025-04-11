@@ -189,6 +189,7 @@ from chip.testing.taglist_and_topology_test import (create_device_type_list_for_
                                                     find_tag_list_problems, find_tree_roots, flat_list_ok,
                                                     get_direct_children_of_root, parts_list_cycles, separate_endpoint_types)
 from chip.tlv import uint
+from mobly import asserts
 
 
 def get_vendor_id(mei: int) -> int:
@@ -940,6 +941,259 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
         log_structured_data('==== json: ', json_str)
         log_structured_data('==== txt: ', txt_str)
+
+    @async_test_body
+    async def test_TC_DESC_2_1(self):
+        asserts.assert_true('PIXIT.DESC.AGGREVISION' in self.matter_test_config.global_test_params,
+                            "PIXIT.DESC.AGGREVISION must be included on the command line in "
+                            "the --int-arg flag as PIXIT.DESC.AGGREVISION:<device_type_revision>")
+
+        unique_ids = []
+        ROOT_NODE_DEVICE_TYPE = 0x0016
+        server_conformance = 0x001D
+        OnOff_deviceType = 0x0100
+        BridgedNode_deviceType = 0x0013
+        Temperature_sensor_deviceType = 0x0302
+        PowerSource_deviceType = 0x0011
+        OTARequestor_deviceType = 0x0012
+        OTAProvider_deviceType = 0x0014
+        Aggregator_deviceType = 0x000E
+        CommonClosureNamespace_Namespace_id = 0x01
+        CommonCompassDirection_Namespace_id = 0x02
+        CommonCompassLocation_Namespace_id = 0x03
+        CommonDirectionNamespace_id = 0x04
+        CommonLevelNamespace_id = 0x05
+        CommonLocationNamespace_id = 0x06
+        CommonNumberNamespace_id = 0x07
+        CommonPositionNamespace_id = 0x08
+        ElectricalMeasurementNamespace_id = 0x0A
+        LaundryNamespace_id = 0x0E
+        PowerSourceNamespace_id = 0x0F
+        CommonAreaNamespace_id = 0x10
+        CommonLandmarkNamespace_id = 0x11
+        CommonRelativePosition_id = 0x12
+        RefrigeratorNamespace_id = 0x41
+        RoomAirConditionerNamespace_id = 0x42
+        SwitchesNamespace_id = 0x43
+
+        Aggregator_deviceType_revision = self.matter_test_config.global_test_params['PIXIT.DESC.AGGREVISION']
+        self.print_step("1a.1", "TH reads DeviceTypeList and PartsList attributes from DUT for Endpoint 0")
+        parts_list_ep_0 = self.endpoints[0][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
+        listed_device_types = [i.deviceType for i in self.endpoints[0]
+                               [Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]]
+        device_revision_ep_0 = [i.revision for i in self.endpoints[0]
+                                [Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]]
+        cluster_revision = self.endpoints[0][Clusters.Descriptor][Clusters.Descriptor.Attributes.ClusterRevision]
+        self.print_step("1a.5", "Verify that PartsList attribute is not empty and contains a list of all endpoints.")
+        if not parts_list_ep_0:
+            self.fail_current_test()
+        self.print_step("1a.6", "Verify that Revision should match the revision of that Device Type.")
+        if device_revision_ep_0[0] != Aggregator_deviceType_revision:
+            self.fail_current_test()
+        self.print_step("1a.7", "Verify that cluster Revision should not be less than 1")
+        if not cluster_revision:
+            self.fail_current_test()
+        self.print_step(
+            "1a.2", "Verify that the DeviceTypeList count is at least one.")
+
+        self.print_step(
+            "1a.3", "Verify that the DeviceTypeList contains one Root Node Device Type.")
+
+        if ROOT_NODE_DEVICE_TYPE not in listed_device_types:
+            self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
+                              problem="Root node device type not listed on endpoint 0", spec_location="Root node device type")
+
+            self.fail_current_test()
+        self.print_step(
+            "1a.4", "Verify that the DeviceTypeList may only contain other Node Device Types (device types with scope=node, it can be any of the following Power Source, OTA Requestor, OTA Provider) next to the Root Node Device Type.")
+
+        if listed_device_types:
+            if not all(x in {ROOT_NODE_DEVICE_TYPE, OTARequestor_deviceType, Aggregator_deviceType} for x in listed_device_types):
+                self.fail_current_test()
+        self.print_step(3, "TH reads PartsList attribute- covered in step 2")
+
+        for endpoint_id, endpoint in self.endpoints.items():
+
+            self.print_step(8, "TH reads ServerList attribute for endpoint :{endpoint_id}".format(endpoint_id=endpoint_id))
+
+            if endpoint_id != 0:
+                if Clusters.Descriptor not in endpoint:
+                    continue
+
+                self.print_step(
+                    "1b", "TH reads DeviceTypeList and PartsList attributes from DUT for Endpoint {endpoint_id} supported by DUT (except Endpoint 0).".format(endpoint_id=endpoint_id))
+                parts_list_per_ep_non_zero = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
+
+                listed_device_types_ep_non_zero = [i.deviceType for i in endpoint
+                                                   [Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]]
+                cluster_revision_ep_non_zero = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.ClusterRevision]
+
+                self.print_step(
+                    "1b.1", "Verify that the DeviceTypeList count is at least one for end point {endpoint_id}".format(endpoint_id=endpoint_id))
+
+                if not listed_device_types_ep_non_zero:
+                    self.fail_current_test()
+
+                self.print_step(
+                    "1b.2", "the DeviceTypeList contains more than one Application Device Type, verify that all the Application Device Types are part of the same superset for end point {endpoint_id}".format(endpoint_id=endpoint_id))
+                for item in listed_device_types_ep_non_zero:
+                    if item not in [Aggregator_deviceType, OnOff_deviceType, BridgedNode_deviceType, Temperature_sensor_deviceType, PowerSource_deviceType, OTARequestor_deviceType, OTAProvider_deviceType]:
+                        self.fail_current_test()
+
+                if cluster_revision_ep_non_zero <= 1:
+                    self.fail_current_test()
+
+                self.print_step(
+                    "1b.3", "Verify the DeviceTypeList does not contain the Root Node Device Type {endpoint_id}".format(endpoint_id=endpoint_id))
+                if ROOT_NODE_DEVICE_TYPE in listed_device_types_ep_non_zero:
+                    self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
+                                      problem="Root node device type is listed on non zero endpoints", spec_location="Root node device type")
+                    self.fail_current_test()
+
+                self.print_step(
+                    "1b.4", "Revision should match the revision of that Device Type for endpoint {endpoint_id}".format(endpoint_id=endpoint_id))
+                device_revision_ep_non_zero = [i.revision for i in endpoint[Clusters.Descriptor]
+                                               [Clusters.Descriptor.Attributes.DeviceTypeList]]
+                for device_revision in device_revision_ep_non_zero:
+                    if not device_revision:
+                        self.fail_current_test()
+
+                self.print_step(
+                    4, "TH reads PartsList attribute for each endpoint {endpoint_id}")
+
+                if parts_list_per_ep_non_zero:
+                    for ep in parts_list_per_ep_non_zero:
+                        self.print_step(
+                            "4.1", "Endpoint is in the range of 1 to 65534 for endpoint {endpoint_id}".format(endpoint_id=endpoint_id))
+
+                        if ep not in range(1, 65535):
+                            self.fail_current_test()
+                        self.print_step(
+                            "4.2", "Endpoint is not equal to the Endpoint of the Endpoint where this PartsList was read (i.e. no self-reference) for {endpoint_id}".format(endpoint_id=endpoint_id))
+
+                        if ep == endpoint_id:
+                            self.fail_current_test()
+
+        for endpoint_id, endpoint in self.endpoints.items():
+            self.print_step(2, "TH reads ServerList attribute for endpoint :{endpoint_id}")
+            serverlist = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList]
+            self.print_step(
+                2.1, "verify Each cluster marked as server and mandatory for endpoint :{endpoint_id} should present on the endpoint".format(endpoint_id=endpoint_id))
+            if serverlist:
+                if server_conformance not in serverlist:
+                    self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=endpoint_id),
+                                      problem="server type conformance for endpoints", spec_location="server type conformance")
+                    self.fail_current_test()
+
+        for endpoint_id, endpoint in self.endpoints.items():
+
+            if Clusters.Descriptor.Attributes.TagList not in endpoint[Clusters.Descriptor]:
+                continue
+            self.print_step(
+                5, "TH reads TagList attribute for endpoint {endpoint_id}.".format(endpoint_id=endpoint_id))
+            taglist_ep = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList]
+            self.print_step(
+                5.1, "verifying tagList is in the range of 1 to 6 for endpoint: {endpoint_id}".format(endpoint_id=endpoint_id))
+            if taglist_ep:
+                if len(taglist_ep) not in range(1, 7):
+                    self.fail_current_test()
+            no_duplicate_tag = []
+            for tag_struct in taglist_ep:
+                self.print_step(
+                    5.2, "verifying namespaceID field in the taglist struct for endpoint: {endpoint_id}".format(endpoint_id=endpoint_id))
+                if not tag_struct.namespaceID:
+                    self.fail_current_test()
+                self.print_step(
+                    5.3, "verifying tagID filed in the taglist struct for endpoint: {endpoint_id}".format(endpoint_id=endpoint_id))
+                if not tag_struct.tag:
+                    self.fail_current_test()
+                self.print_step(
+                    5.4, "verifying namespaceID value falls under defined namespaces for endpoint: {endpoint_id}".format(endpoint_id=endpoint_id))
+                if tag_struct.namespaceID not in [CommonClosureNamespace_Namespace_id, CommonCompassDirection_Namespace_id, CommonCompassLocation_Namespace_id, CommonDirectionNamespace_id,
+                                                  CommonLevelNamespace_id,
+                                                  CommonLocationNamespace_id,
+                                                  CommonNumberNamespace_id,
+                                                  CommonPositionNamespace_id,
+                                                  ElectricalMeasurementNamespace_id,
+                                                  LaundryNamespace_id,
+                                                  PowerSourceNamespace_id,
+                                                  CommonAreaNamespace_id,
+                                                  CommonLandmarkNamespace_id,
+                                                  CommonRelativePosition_id,
+                                                  RefrigeratorNamespace_id,
+                                                  RoomAirConditionerNamespace_id,
+                                                  SwitchesNamespace_id]:
+                    self.fail_current_test()
+                if tag_struct.tag in no_duplicate_tag:
+                    self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=endpoint_id),
+                                      problem="duplicate tagIDs found in taglist struct", spec_location="TagList")
+                    self.fail_current_test()
+                no_duplicate_tag.append(tag_struct.tag)
+                self.print_step(
+                    5.5, "verifying label field is not null in the tag list construct for end point {endpoint_id}".format(endpoint_id=endpoint_id))
+                if tag_struct.label is None:
+                    self.fail_current_test()
+
+        self.print_step(7, "Validate EndpointUniqueId attribute in Descriptor cluster")
+
+        for endpoint_id, endpoint in self.endpoints.items():
+            if endpoint_id == 0:
+                if Clusters.Descriptor not in endpoint:
+                    continue
+                parts_list = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
+
+            descriptor_cluster = endpoint[Clusters.Descriptor]
+
+            if parts_list:
+                if Clusters.Descriptor.Attributes.EndpointUniqueID in descriptor_cluster:
+                    value = descriptor_cluster[Clusters.Descriptor.Attributes.EndpointUniqueID]
+                    self.print_step(
+                        7.1, "Validate EndpointUniqueId attribute in Descriptor cluster is of string type for endpoint : {endpoint_id}".format(endpoint_id=endpoint_id))
+                    if isinstance(value, str):
+                        if not value:
+                            continue
+                        self.print_step(
+                            7.2, "Validate EndpointUniqueId attribute in Descriptor cluster is not more than 32 bytes for endpoint : {endpoint_id}".format(endpoint_id=endpoint_id))
+                        if len(value) > 32:
+                            location = AttributePathLocation(
+                                endpoint_id,
+                                Clusters.Descriptor.id,
+                                Clusters.Descriptor.Attributes.EndpointUniqueID.attribute_id
+                            )
+                            self.record_error(
+                                self.get_test_name(),
+                                location=location,
+                                problem=f"EndpointUniqueId attribute length is {len(value)} bytes which exceeds the maximum allowed 32 bytes",
+                                spec_location="EndpointUniqueId attribute"
+                            )
+                            self.fail_current_test()
+                        self.print_step(
+                            7.3, "Validate EndpointUniqueId attribute in Descriptor cluster is not a duplicate for endpoint : {endpoint_id}".format(endpoint_id=endpoint_id))
+
+                        if value in unique_ids:
+                            location = AttributePathLocation(endpoint_id, Clusters.Descriptor.id,
+                                                             Clusters.Descriptor.Attributes.EndpointUniqueID.attribute_id)
+                            self.record_error(
+                                self.get_test_name(),
+                                location=location,
+                                problem=f"Duplicate EndpointUniqueId found: {value}",
+                                spec_location="EndpointUniqueId attribute"
+                            )
+                            self.fail_current_test()
+                        unique_ids.append(value)
+                    else:
+                        location = AttributePathLocation(
+                            endpoint_id,
+                            Clusters.Descriptor.id,
+                            Clusters.Descriptor.Attributes.EndpointUniqueID.attribute_id
+                        )
+                        self.record_error(
+                            self.get_test_name(),
+                            location=location,
+                            problem="EndpointUniqueId attribute is present but not a string",
+                            spec_location="EndpointUniqueId attribute"
+                        )
+                        self.fail_current_test()
 
 
 if __name__ == "__main__":
