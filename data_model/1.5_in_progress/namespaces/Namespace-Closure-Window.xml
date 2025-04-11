@@ -57,9 +57,13 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<namespace xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd namespace namespace.xsd" name="Energy Tariff Flow">
+<namespace xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd namespace namespace.xsd" id="0x0047" name="Closure Window">
   <tags>
-    <tag id="0x0000" name="Import"/>
-    <tag id="0x0001" name="Export"/>
+    <tag id="0x0000" name="Roof">
+      <description>A window installed in a roof to provide natural light, ventilation, and sometimes access to the roof.</description>
+    </tag>
+    <tag id="0x0001" name="Facade">
+      <description>A window installed in the vertical exterior wall of a building. It allows natural light, ventilation, and views.</description>
+    </tag>
   </tags>
 </namespace>

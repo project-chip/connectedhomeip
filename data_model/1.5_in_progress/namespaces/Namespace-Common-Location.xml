@@ -69,7 +69,10 @@ Davis, CA 95616, USA
       <description>Element is located inside the equipment (e.g. a sensor &quot;inside&quot; a cabinet).</description>
     </tag>
     <tag id="0x0003" name="Outside">
-      <description>Element is located outside the equipment (e.g. a sensor &quot;outside&quot; a cabinet)</description>
+      <description>Element is located outside the equipment (e.g. a sensor &quot;outside&quot; a cabinet).</description>
+    </tag>
+    <tag id="0x0004" name="Zone">
+      <description>Element is a part of a location divided into zones (e.g. a yard irrigation zone).</description>
     </tag>
   </tags>
 </namespace>

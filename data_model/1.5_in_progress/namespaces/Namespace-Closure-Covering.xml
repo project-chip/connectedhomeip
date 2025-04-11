@@ -57,36 +57,22 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" name="Energy Metering Cluster" revision="1">
-  <revisionHistory>
-    <revision revision="1" summary="Initial Release"/>
-  </revisionHistory>
-  <clusterIds>
-    <clusterId name="Energy Metering"/>
-  </clusterIds>
-  <classification hierarchy="base" role="application" picsCode="" scope="Endpoint"/>
-  <dataTypes>
-    <struct name="MeteredEnergyStruct">
-      <field id="0" name="TariffComponentIDs" type="list">
-        <entry type="uint32"/>
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="Energy" type="energy-mWh">
-        <mandatoryConform/>
-      </field>
-    </struct>
-  </dataTypes>
-  <attributes>
-    <attribute id="0x0000" name="MeteredEnergy" type="list" default="null">
-      <entry type="MeteredEnergyStruct"/>
-      <access read="true" readPrivilege="view"/>
-      <quality nullable="true"/>
-      <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0001" name="MeteredEnergyTimestamp" type="epoch-s" default="null">
-      <access read="true" readPrivilege="view"/>
-      <quality nullable="true"/>
-      <mandatoryConform/>
-    </attribute>
-  </attributes>
-</cluster>
+<namespace xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd namespace namespace.xsd" id="0x0046" name="Closure Covering">
+  <tags>
+    <tag id="0x0000" name="Blind">
+      <description>A covering made of horizontal or vertical slats that can be adjusted to control light, privacy, and airflow.</description>
+    </tag>
+    <tag id="0x0001" name="Awning">
+      <description>A protective covering, typically made of fabric or metal, that extends from a building&apos;s exterior to provide shade or shelter from the elements.</description>
+    </tag>
+    <tag id="0x0002" name="Shutter">
+      <description>A hinged or sliding covering typically made of wood, metal, or vinyl, used to provide privacy, security, and light control.</description>
+    </tag>
+    <tag id="0x0003" name="Venetian">
+      <description>A type of covering consisting of horizontal slats that can be adjusted to control light, privacy, and airflow.</description>
+    </tag>
+    <tag id="0x0004" name="Curtain">
+      <description>A piece of fabric hung over a window to provide privacy, block light, or enhance the room’s embellishment.</description>
+    </tag>
+  </tags>
+</namespace>
