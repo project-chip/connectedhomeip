@@ -1919,6 +1919,23 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
 
 
 def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
+    """Runs an async function within the test's event loop with a timeout.
+
+    This helper function takes an awaitable (async function) and executes it
+    using the test's event loop (`self.event_loop.run_until_complete`).
+    It applies a timeout based on the test configuration (`self.matter_test_config.timeout`)
+    or the default timeout (`self.default_timeout`) if not specified.
+
+    Args:
+        body: The async function (coroutine) to execute. It will be called
+              with `self` as the first argument, followed by `*args` and `**kwargs`.
+        self: The instance of the MatterBaseTest class.
+        *args: Positional arguments to pass to the `body` function.
+        **kwargs: Keyword arguments to pass to the `body` function.
+
+    Returns:
+        The result returned by the awaited `body` function.
+    """
     timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
     return self.event_loop.run_until_complete(asyncio.wait_for(body(self, *args, **kwargs), timeout=timeout))
 
@@ -1927,10 +1944,12 @@ EndpointCheckFunction = typing.Callable[[Clusters.Attribute.AsyncReadTransaction
 
 
 def get_cluster_from_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> ClusterObjects.Cluster:
+    """Returns the cluster object for a given attribute descriptor."""
     return ClusterObjects.ALL_CLUSTERS[attribute.cluster_id]
 
 
 def get_cluster_from_command(command: ClusterObjects.ClusterCommand) -> ClusterObjects.Cluster:
+    """Returns the cluster object for a given command object."""
     return ClusterObjects.ALL_CLUSTERS[command.cluster_id]
 
 
