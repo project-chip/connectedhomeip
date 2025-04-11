@@ -97,6 +97,7 @@ template("chip_data_model") {
       "app/PluginApplicationCallbacks.h",
       "app/callback-stub.cpp",
       "app/cluster-callbacks.cpp",
+      "app/static-cluster-config/{{server_cluster_name}}.h",
     ]
 
     if (!defined(deps)) {
