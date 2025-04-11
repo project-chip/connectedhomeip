@@ -84,7 +84,7 @@ static chip::BitMask<Feature> sFeatureMap(Feature::kCalibration);
 
 AppTask AppTask::sAppTask;
 ClosureDimensionManager ep2(2);
-ClosureDimensionManager ep3(3);
+// ClosureDimensionManager ep3(3);
 constexpr const uint8_t kNamespaceClosurePanel = 0x45;
 constexpr const uint8_t kNamespaceLift         = 0x00;
 constexpr const uint8_t kNamespaceTilt         = 0x01;
@@ -109,20 +109,20 @@ void ApplicationInit()
           .tag         = kNamespaceLift,
           .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("ClosurePanel.Lift"_span)) },
     };
-    const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp3TagList[] = {
-        { .namespaceID = kNamespaceClosurePanel,
-          .tag         = kNamespaceTilt,
-          .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("ClosurePanel.Tilt"_span)) },
-    };
+    // const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp3TagList[] = {
+    //     { .namespaceID = kNamespaceClosurePanel,
+    //       .tag         = kNamespaceTilt,
+    //       .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("ClosurePanel.Tilt"_span)) },
+    // };
 
     ep2.Init();
-    ep3.Init();
+    // ep3.Init();
 
     ep2.getDelegate().SetCallbacks(AppTask::ActionInitiated, AppTask::ActionCompleted);
-    ep3.getDelegate().SetCallbacks(AppTask::ActionInitiated, AppTask::ActionCompleted);
+    // ep3.getDelegate().SetCallbacks(AppTask::ActionInitiated, AppTask::ActionCompleted);
 
     SetTagList(/* endpoint= */ 2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp2TagList));
-    SetTagList(/* endpoint= */ 3, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp3TagList));
+    // SetTagList(/* endpoint= */ 3, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp3TagList));
 
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 }

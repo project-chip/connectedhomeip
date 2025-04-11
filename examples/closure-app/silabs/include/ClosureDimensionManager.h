@@ -55,8 +55,8 @@ public:
     Callback_fn_initiated mActionInitiated_CB;
     Callback_fn_completed mActionCompleted_CB;
     
-    const uint32_t kExampleMotionCountDown     = 15;
-    const uint32_t kExampleStepCountDown       = 1000;
+    const uint32_t kExampleMotionCountDown     = 5;
+    const uint32_t kExampleStepCountDown       = 3000;
     
     ClosureDimensionDelegate(EndpointId endpoint) : mEndpoint(endpoint), gLogic(nullptr) {}
     
@@ -76,13 +76,19 @@ public:
         current.latching.SetValue(LatchingEnum::kNotLatched);
         current.speed.SetValue(Globals::ThreeLevelAutoEnum::kAuto);
         getLogic()->SetCurrentState(current);
+
+        GenericTargetStruct target;
+        target.position.SetValue(0);
+        // target.latching.SetValue(LatchingEnum::kNotLatched);
+        // target.speed.SetValue(Globals::ThreeLevelAutoEnum::kAuto);
+        getLogic()->SetTarget(target);
     
         Structs::RangePercent100thsStruct::Type limitRange;
         limitRange.min = 0;    
         limitRange.max = 10000;
         getLogic()->SetLimitRange(limitRange);
         
-        Percent100ths step = 10;
+        Percent100ths step = 1000;
         getLogic()->SetStepValue(step);
         ChipLogError(Zcl, "ClosureDimensionDelegate::Init done");
         return CHIP_NO_ERROR;

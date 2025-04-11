@@ -19,6 +19,8 @@
  */
 
 #include "closure-dimension-cluster-logic.h"
+#include <cmsis_os2.h>
+
 
 namespace chip {
 namespace app {
@@ -530,81 +532,31 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
 Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t numberOfSteps,
                                        Optional<Globals::ThreeLevelAutoEnum> speed)
 {
-    VerifyOrDieWithMsg(mInitialized, NotSpecified, "Unexpected command recieved when device is yet to be initialized");
-    
-    // Return UnsupportedCommand if Positioning feature is not supported.
-    VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), Status::UnsupportedCommand);
-    
-    // Return ConstraintError if command parameters are out of bounds
-    VerifyOrReturnError(direction != StepDirectionEnum::kUnknownEnumValue, Status::ConstraintError);
-    VerifyOrReturnError(numberOfSteps > 0, Status::ConstraintError);
-    if (speed.HasValue())
-    {
-        VerifyOrReturnError(speed.Value() != Globals::ThreeLevelAutoEnum::kUnknownEnumValue,Status::ConstraintError);
-    }
-    
+    VerifyOrReturnError(mInitialized, Status::Failure);
+    VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), Status::Failure);
+    // TODO: If any of the mandatory fields are missing then a status code of INVALID_COMMAND SHALL be returned and the Target
+    // attribute value SHALL remain unchanged.
+    VerifyOrReturnError(EnsureKnownEnumValue(direction) != StepDirectionEnum::kUnknownEnumValue, Status::ConstraintError);
+    // VerifyOrReturnError(EnsureKnownEnumValue(speed.Value()) != Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
+    //                     Status::ConstraintError);
     // TODO: If the server is in a state where it cannot support the command, the server SHALL respond with an INVALID_IN_STATE
     // response and the Target attribute value SHALL remain unchanged.
+    VerifyOrReturnError(numberOfSteps != 0, Status::Success);
     // TODO: , this SHALL update the Target.Position attribute value e.g. by sending multiple commands with short step by step or a
     // single command with multiple steps.
-
-    GenericCurrentStateStruct currentState;
-    VerifyOrReturnError(GetCurrentState(currentState) == CHIP_NO_ERROR, Status::Failure);
-    // Check if the current position is valid or else return InvalidInState 
-    VerifyOrReturnValue(currentState.position.HasValue(), Status::InvalidInState);
-    
-    GenericTargetStruct stepTarget;
-    VerifyOrReturnError(GetTarget(stepTarget) == CHIP_NO_ERROR, Status::Failure);
-    
-    Percent100ths stepValue;
-    VerifyOrReturnError(GetStepValue(stepValue) == CHIP_NO_ERROR, Status::Failure);
-
-    //Derive Target Position from StepValue and NumberOfSteps.
-    int32_t currentPosition = static_cast<uint32_t>(currentState.position.Value());
-    
-    // Convert step to position delta
-    int32_t delta    = numberOfSteps * stepValue;
-    int32_t newPosition   = 0;
-    
-    // check if device supports Limitation feature, if yes fetch the LimitRange values
-    bool limitSupported = mConformance.HasFeature(Feature::kLimitation) ? true : false;
-    
-    Structs::RangePercent100thsStruct::Type limitRange;
-    if (limitSupported)
-    {
-        VerifyOrReturnError(GetLimitRange(limitRange) == CHIP_NO_ERROR, Status::Failure);
-    }
-
-    //Position = Position - NumberOfSteps * StepValue
-    switch (direction)
-    {
-        
-        case StepDirectionEnum::kDecrease:
-            newPosition = currentPosition - delta;
-            //Position value SHALL be clamped to 0.00% if the LM feature is not supported or LimitRange.Min if the LM feature is supported.
-            newPosition = limitSupported ? std::max(newPosition, static_cast<int32_t>(limitRange.min)) : std::max(newPosition, (int32_t)0);
-            break;
-            
-        case StepDirectionEnum::kIncrease:
-            newPosition = currentPosition + delta;
-            //Position value SHALL be clamped to 0.00% if the LM feature is not supported or LimitRange.Max if the LM feature is supported.
-            newPosition = limitSupported ? std::min(newPosition, static_cast<int32_t>(limitRange.max)) : std::min(newPosition, (int32_t)10000);
-            break;
-            
-        default:
-            // Should never reach here due to earlier VerifyOrReturnError check
-            ChipLogError(AppServer, "Unhandled StepDirectionEnum value");
-            return Status::ConstraintError;
-    }
-    
-    //set the target position
-    stepTarget.position.SetValue(newPosition);
+    GenericTargetStruct step_target;
+    GetTarget(step_target);
+    // TODO: If the Direction field is set to Decrease, the Position field of the Target attribute SHALL be set to: Position =
+    // Position - NumberOfSteps * StepValue and the value SHALL be clamped to 0.00% if the LM feature is not supported or
+    // LimitRange.Min if the LM feature is supported.
+    // TODO: If the Direction field is set to Increase, the Position field of the Target attribute SHALL be set to: Position =
+    // Position + NumberOfSteps * StepValue and the value SHALL be clamped to 100.00% if the LM feature is not supported or
+    // LimitRange.Max if the LM feature is supported.
 
     if (speed.HasValue())
     {
         stepTarget.speed = speed;
     }
-
     auto status = mClusterDriver.HandleStep(direction,numberOfSteps,speed);
 
     return status;
