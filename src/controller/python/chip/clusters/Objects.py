@@ -551,6 +551,44 @@ class Globals:
             attributeID: 'uint' = 0
             statusCode: 'uint' = 0
 
+        @dataclass
+        class AttributionData(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="contextInformation", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sourceContext", Tag=1, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="nodeID", Tag=2, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="groupID", Tag=3, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="systemTimeStamp", Tag=4, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="epochTimeStamp", Tag=5, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
+                    ])
+
+            contextInformation: 'uint' = 0
+            sourceContext: 'typing.Optional[uint]' = None
+            nodeID: 'typing.Optional[uint]' = None
+            groupID: 'typing.Optional[uint]' = None
+            systemTimeStamp: 'typing.Optional[uint]' = None
+            epochTimeStamp: 'typing.Optional[uint]' = None
+            fabricIndex: 'uint' = 0
+
+        @dataclass
+        class SuppliedAttributionData(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="contextInformation", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sourceContext", Tag=1, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
+                    ])
+
+            contextInformation: 'uint' = 0
+            sourceContext: 'typing.Optional[uint]' = None
+            fabricIndex: 'uint' = 0
+
 
 
 @dataclass
@@ -3485,6 +3523,8 @@ class BasicInformation(Cluster):
                 ClusterObjectFieldDescriptor(Label="productAppearance", Tag=0x00000014, Type=typing.Optional[BasicInformation.Structs.ProductAppearanceStruct]),
                 ClusterObjectFieldDescriptor(Label="specificationVersion", Tag=0x00000015, Type=uint),
                 ClusterObjectFieldDescriptor(Label="maxPathsPerInvoke", Tag=0x00000016, Type=uint),
+                ClusterObjectFieldDescriptor(Label="deviceLocation", Tag=0x00000017, Type=typing.Union[None, Nullable, Globals.Structs.LocationDescriptorStruct]),
+                ClusterObjectFieldDescriptor(Label="configurationVersion", Tag=0x00000018, Type=uint),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -3515,6 +3555,8 @@ class BasicInformation(Cluster):
     productAppearance: typing.Optional[BasicInformation.Structs.ProductAppearanceStruct] = None
     specificationVersion: uint = 0
     maxPathsPerInvoke: uint = 0
+    deviceLocation: typing.Union[None, Nullable, Globals.Structs.LocationDescriptorStruct] = None
+    configurationVersion: uint = 0
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -3966,6 +4008,38 @@ class BasicInformation(Cluster):
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
                 return 0x00000016
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: uint = 0
+
+        @dataclass
+        class DeviceLocation(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000028
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000017
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, Globals.Structs.LocationDescriptorStruct])
+
+            value: typing.Union[None, Nullable, Globals.Structs.LocationDescriptorStruct] = None
+
+        @dataclass
+        class ConfigurationVersion(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000028
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000018
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
