@@ -22,7 +22,6 @@
 #include <platform/CHIPDeviceLayer.h>
 
 #ifdef USE_SPARKFUN_AIR_QUALITY_SENSOR
-#include "sl_i2cspm_instances.h"
 #include <sparkfun_sgp40.h>
 
 #ifdef SLI_SI91X_MCU_INTERFACE
