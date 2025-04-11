@@ -92,23 +92,27 @@ CHIP_ERROR ClusterLogic::SetCurrentState(GenericCurrentStateStruct & currentStat
     ChipLogError(Zcl, "ClosureControlManager::SetCurrentState 7");
 
     // TODO: currentState.Position value SHALL follow the scaling from "Resolution Attribute".
+    // TODO : Fix the current object comparision
 
-    if (currentState != mState.currentState)
-    {
+    // if (currentState != mState.currentState)
+    // {
         mState.currentState = currentState;
         mMatterContext.MarkDirty(Attributes::Current::Id);
         ChipLogError(Zcl, "ClosureControlManager::SetCurrentState 8");
-    }
+    // }
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ClusterLogic::SetTarget(GenericTargetStruct & target)
 {
+    ChipLogDetail(Zcl, "SetTarget started");
     if (target.position.HasValue())
     {
+        ChipLogDetail(Zcl, "target value incoming");
         if (mConformance.HasFeature(Feature::kPositioning))
         {
+
             VerifyOrReturnError(target.position.Value() <= PERCENT100THS_MAX_VALUE, CHIP_ERROR_INVALID_ARGUMENT);
             
         }
@@ -147,13 +151,24 @@ CHIP_ERROR ClusterLogic::SetTarget(GenericTargetStruct & target)
         }
     }
 
-    // TODO: Target.Position value SHALL follow the scaling from "Resolution Attribute".
-    if (target != mState.target)
+    if (mState.target.position.HasValue())
     {
-        mState.target = target;
-        mMatterContext.MarkDirty(Attributes::Target::Id);
+        ChipLogDetail(Zcl, "mstate has value");
+    }
+    else
+    {
+        ChipLogDetail(Zcl, "mstate null");
     }
 
+    // TODO: Target.Position value SHALL follow the scaling from "Resolution Attribute".
+    // TODO : Fix the target object comparision
+    // if (target != mState.target)
+    // {
+        ChipLogDetail(Zcl, "SetTarget setting target");
+        mState.target = target;
+        mMatterContext.MarkDirty(Attributes::Target::Id);
+    // }
+    ChipLogDetail(Zcl, "SetTarget done");
     return CHIP_NO_ERROR;
 }
 
