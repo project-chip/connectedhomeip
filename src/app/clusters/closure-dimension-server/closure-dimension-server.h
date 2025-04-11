@@ -38,7 +38,7 @@ public:
         mClusterLogic(clusterLogic)
     {}
 
-     // AttributeAccessInterface implementation
+    // AttributeAccessInterface implementation
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 

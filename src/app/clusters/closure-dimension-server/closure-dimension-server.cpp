@@ -48,7 +48,8 @@ CHIP_ERROR Interface::Read(const ConcreteReadAttributePath & aPath, AttributeVal
         return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetCurrentState(ret); });
     }
     case Attributes::Target::Id: {
-        //TODO: Each field SHALL be available following its respective feature. If the feature is not set the field SHALL NOT be present.
+        // TODO: Each field SHALL be available following its respective feature. If the feature is not set the field SHALL NOT be
+        // present.
         typedef GenericTargetStruct T;
         return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetTarget(ret); });
     }

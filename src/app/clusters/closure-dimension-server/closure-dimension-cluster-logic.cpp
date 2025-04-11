@@ -29,7 +29,7 @@ using namespace Protocols::InteractionModel;
 
 namespace {
 
-    static constexpr Percent100ths PERCENT100THS_MAX_VALUE = 10000;
+static constexpr Percent100ths PERCENT100THS_MAX_VALUE = 10000;
 
 } // namespace
 
