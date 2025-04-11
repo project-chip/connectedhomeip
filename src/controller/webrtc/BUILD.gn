@@ -39,7 +39,13 @@ static_library("chip_webrtc") {
     "${chip_root}/third_party/libdatachannel/repo/include",
   ]
 
-  deps = [ "${chip_root}/third_party/libdatachannel:libdatachannel", "${chip_root}/src/lib/support", ]
+  deps = [
+    "${chip_root}/src/lib/support",
+    "${chip_root}/third_party/libdatachannel:libdatachannel",
+  ]
 
-  libs = ["ssl", "crypto",]
+  libs = [
+    "ssl",
+    "crypto",
+  ]
 }
