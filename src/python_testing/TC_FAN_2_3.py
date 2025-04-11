@@ -36,9 +36,11 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+import random
 from typing import Any
 
 import chip.clusters as Clusters
+from chip.interaction_model import Status
 from chip.testing.matter_asserts import assert_valid_uint8
 from matter_testing_infrastructure.chip.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main,
                                                                        has_feature, run_if_endpoint_matches)
@@ -59,6 +61,10 @@ class TC_FAN_2_3(MatterBaseTest):
                          "Verify that the RockSetting attribute value is of uint8 type. Verify that the RockSetting attribute's value is between 0 and 3 inclusive"),
                 TestStep(4, "[FC] TH checks that RockSetting is conformant with RockSupport.",
                          "Verify that all bits set in RockSetting are also set in RockSupport."),
+                TestStep(5, "[FC] TH writes a valid bit from RockSupport to RockSetting.",
+                         "Device shall return SUCCESS."),
+                TestStep(6, "[FC] TH reads the RockSetting attribute.",
+                         "Verify that the proper bit was set from the previous step."),
                 ]
 
     async def read_setting(self, attribute: Any) -> Any:
@@ -77,6 +83,22 @@ class TC_FAN_2_3(MatterBaseTest):
         cluster = Clusters.Objects.FanControl
         return await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=cluster, attribute=attribute)
 
+    async def write_setting(self, attribute, value) -> Status:
+        result = await self.default_controller.WriteAttribute(self.dut_node_id, [(self.endpoint, attribute(value))])
+        write_status = result[0].Status
+        write_status_success = (write_status == Status.Success)
+        asserts.assert_true(write_status_success,
+                            f"[FC] {attribute.__name__} write did not return a result of SUCCESS ({write_status.name}), value: {value}")
+        return write_status
+
+    @staticmethod
+    def get_random_rock_setting(rock_support: int, rock_support_range: range) -> int:
+        """
+        Returns a random valid RockSetting based on the given RockSupport bitmask.
+        """
+        valid_rock_setting_values = [i for i in rock_support_range if (i & rock_support) == i]
+        return random.choice(valid_rock_setting_values)
+
     def pics_TC_FAN_2_3(self) -> list[str]:
         return ["FAN.S.F02"]
 
@@ -86,6 +108,8 @@ class TC_FAN_2_3(MatterBaseTest):
         self.endpoint = self.get_endpoint(default=1)
         cluster = Clusters.FanControl
         attr = cluster.Attributes
+        valid_rock_support_range = range(1, 8)
+        valid_rock_setting_range = range(0, 8)
 
         # *** STEP 1 ***
         # Commissioning already done
@@ -100,8 +124,8 @@ class TC_FAN_2_3(MatterBaseTest):
         assert_valid_uint8(rock_support, "RockSupport")
 
         # Verify that the RockSupport attribute's value is between 1 and 7 inclusive
-        asserts.assert_in(rock_support, range(
-            1, 8), f"[FC] RockSupport attribute value ({rock_support}) is not between 1 and 7 inclusive")
+        asserts.assert_in(rock_support, valid_rock_support_range,
+                          f"[FC] RockSupport attribute value ({rock_support}) is not between 1 and 7 inclusive")
 
         # *** STEP 3 ***
         # TH reads from the DUT the RockSetting attribute
@@ -112,8 +136,8 @@ class TC_FAN_2_3(MatterBaseTest):
         assert_valid_uint8(rock_setting, "RockSetting")
 
         # Verify that the RockSetting attribute's value is between 0 and 7 inclusive
-        asserts.assert_in(rock_setting, range(
-            0, 8), f"[FC] RockSetting attribute value ({rock_setting}) is not between 0 and 7 inclusive")
+        asserts.assert_in(rock_setting, valid_rock_setting_range,
+                          f"[FC] RockSetting attribute value ({rock_setting}) is not between 0 and 7 inclusive")
 
         # *** STEP 4 ***
         # TH checks that RockSetting is conformant with RockSupport
@@ -121,6 +145,21 @@ class TC_FAN_2_3(MatterBaseTest):
         self.step(4)
         is_rock_conformant = (rock_setting & rock_support) == rock_setting
         asserts.assert_true(is_rock_conformant, "[FC] RockSetting contains unsupported bits; it is not conformant with RockSupport")
+
+        # *** STEP 5 ***
+        # TH writes a valid bit from RockSupport to RockSetting
+        # Device shall return SUCCESS
+        self.step(5)
+        rock_setting_write = self.get_random_rock_setting(rock_support, valid_rock_support_range)
+        await self.write_setting(attr.RockSetting, rock_setting_write)
+
+        # *** STEP 6 ***
+        # TH reads the RockSetting attribute
+        # Verify that the proper bit was set from the previous step
+        self.step(6)
+        rock_setting_read = await self.read_setting(attr.RockSetting)
+        asserts.assert_equal(rock_setting_read, rock_setting_write,
+                             f"[FC] RockSetting attribute value ({rock_setting_read}) does not match the expected value ({rock_setting_write})")
 
 
 if __name__ == "__main__":
