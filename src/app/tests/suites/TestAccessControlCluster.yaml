@@ -215,6 +215,14 @@ tests:
                       Subjects: null,
                       Targets: null,
                   },
+                  # Since the writeAttribute failed, the entire list was rejected, and the previous ACL values remained unchanged
+                  {
+                      FabricIndex: 1,
+                      Privilege: 1, # view
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
               ]
 
     - label: "Write entry invalid auth mode"
@@ -248,6 +256,13 @@ tests:
                   {
                       FabricIndex: 1,
                       Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 1, # view
                       AuthMode: 2, # case
                       Subjects: null,
                       Targets: null,
@@ -289,6 +304,13 @@ tests:
                       Subjects: null,
                       Targets: null,
                   },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 1, # view
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
               ]
 
     - label: "Write entry invalid target"
@@ -323,6 +345,13 @@ tests:
                   {
                       FabricIndex: 1,
                       Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 1, # view
                       AuthMode: 2, # case
                       Subjects: null,
                       Targets: null,
@@ -386,6 +415,13 @@ tests:
                       Subjects: null,
                       Targets: null,
                   },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 1, # view
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
               ]
 
     - label: "Write entry too many targets"
@@ -441,6 +477,13 @@ tests:
                   {
                       FabricIndex: 1,
                       Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 1, # view
                       AuthMode: 2, # case
                       Subjects: null,
                       Targets: null,
@@ -520,54 +563,21 @@ tests:
       command: "readAttribute"
       attribute: "ACL"
       response:
-          value: [
+          value: # Since the writeAttribute failed, the entire list was rejected, and the previous ACL values remained unchanged
+              [
                   {
                       FabricIndex: 1,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
                       Subjects: null,
-                      Targets:
-                          [
-                              { Cluster: null, Endpoint: 0, DeviceType: null },
-                              { Cluster: 1, Endpoint: null, DeviceType: null },
-                              { Cluster: 2, Endpoint: 3, DeviceType: null },
-                          ],
+                      Targets: null,
                   },
                   {
                       FabricIndex: 1,
                       Privilege: 1, # view
                       AuthMode: 2, # case
-                      Subjects: [4, 5, 6, 7],
-                      Targets:
-                          [
-                              { Cluster: null, Endpoint: 8, DeviceType: null },
-                              { Cluster: 9, Endpoint: null, DeviceType: null },
-                              { Cluster: 10, Endpoint: 11, DeviceType: null },
-                          ],
-                  },
-                  {
-                      FabricIndex: 1,
-                      Privilege: 3, # operate
-                      AuthMode: 3, # group
-                      Subjects: [12, 13, 14, 15],
-                      Targets:
-                          [
-                              { Cluster: null, Endpoint: 16, DeviceType: null },
-                              { Cluster: 17, Endpoint: null, DeviceType: null },
-                              { Cluster: 18, Endpoint: 19, DeviceType: null },
-                          ],
-                  },
-                  {
-                      FabricIndex: 1,
-                      Privilege: 1, # view
-                      AuthMode: 2, # case
-                      Subjects: [20, 21, 22, 23],
-                      Targets:
-                          [
-                              { Cluster: null, Endpoint: 24, DeviceType: null },
-                              { Cluster: 25, Endpoint: null, DeviceType: null },
-                              { Cluster: 26, Endpoint: 27, DeviceType: null },
-                          ],
+                      Subjects: null,
+                      Targets: null,
                   },
               ]
 
@@ -584,6 +594,13 @@ tests:
                       Subjects: null,
                       Targets: null,
                   },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 3, # operate
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
               ]
 
     - label: "Verify"
@@ -594,6 +611,107 @@ tests:
                   {
                       FabricIndex: 1,
                       Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 3, # operate
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+              ]
+
+    - label:
+          "Write invalid field in first ACL Entry, with 2nd ACL Entry completely
+          valid"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 0, # invalid privilege
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: [12, 13, 14, 15],
+                      Targets: null,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    # Even though a malformed entry was sent, nothing has changed and we still retain the Valid ACLs from previous step
+    - label: "Verify"
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 3, # operate
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+              ]
+
+    - label:
+          "Write invalid field in second ACL Entry, with 1st ACL Entry being
+          Valid"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 1, # view
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 0, # invalid privilege
+                      AuthMode: 2, # case
+                      Subjects: [12, 13, 14, 15],
+                      Targets: null,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    # Test: If second ACL Entry had invalid field, even 1st ACL Entry should be rejected. While retaining the previous Valid ACLs
+    - label: "Verify"
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 3, # operate
                       AuthMode: 2, # case
                       Subjects: null,
                       Targets: null,
