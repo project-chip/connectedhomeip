@@ -220,9 +220,9 @@ void CheckCommissioningWindowManagerBasicWindowOpenCloseFromClusterTask(intptr_t
     EXPECT_FALSE(commissionMgr.GetOpenerVendorId().IsNull());
     EXPECT_EQ(commissionMgr.GetOpenerVendorId().Value(), vendorId);
     EXPECT_FALSE(chip::DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled());
-    EXPECT_TRUE(sWindowStatusDirty);
-    EXPECT_TRUE(sAdminFabricIndexDirty);
-    EXPECT_TRUE(sAdminVendorIdDirty);
+    EXPECT_FALSE(sWindowStatusDirty);
+    EXPECT_FALSE(sAdminFabricIndexDirty);
+    EXPECT_FALSE(sAdminVendorIdDirty);
 
     ResetDirtyFlags();
     EXPECT_FALSE(sWindowStatusDirty);
@@ -233,9 +233,9 @@ void CheckCommissioningWindowManagerBasicWindowOpenCloseFromClusterTask(intptr_t
     EXPECT_FALSE(commissionMgr.IsCommissioningWindowOpen());
     EXPECT_TRUE(commissionMgr.GetOpenerFabricIndex().IsNull());
     EXPECT_TRUE(commissionMgr.GetOpenerVendorId().IsNull());
-    EXPECT_TRUE(sWindowStatusDirty);
-    EXPECT_TRUE(sAdminFabricIndexDirty);
-    EXPECT_TRUE(sAdminVendorIdDirty);
+    EXPECT_FALSE(sWindowStatusDirty);
+    EXPECT_FALSE(sAdminFabricIndexDirty);
+    EXPECT_FALSE(sAdminVendorIdDirty);
 
     ResetDirtyFlags();
 }
@@ -377,9 +377,9 @@ void CheckCommissioningWindowManagerEnhancedWindowTask(intptr_t context)
     EXPECT_EQ(commissionMgr.GetOpenerFabricIndex().Value(), fabricIndex);
     EXPECT_FALSE(commissionMgr.GetOpenerVendorId().IsNull());
     EXPECT_EQ(commissionMgr.GetOpenerVendorId().Value(), vendorId);
-    EXPECT_TRUE(sWindowStatusDirty);
-    EXPECT_TRUE(sAdminFabricIndexDirty);
-    EXPECT_TRUE(sAdminVendorIdDirty);
+    EXPECT_FALSE(sWindowStatusDirty);
+    EXPECT_FALSE(sAdminFabricIndexDirty);
+    EXPECT_FALSE(sAdminVendorIdDirty);
 
     ResetDirtyFlags();
     EXPECT_FALSE(sWindowStatusDirty);
@@ -392,9 +392,9 @@ void CheckCommissioningWindowManagerEnhancedWindowTask(intptr_t context)
               chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
     EXPECT_TRUE(commissionMgr.GetOpenerFabricIndex().IsNull());
     EXPECT_TRUE(commissionMgr.GetOpenerVendorId().IsNull());
-    EXPECT_TRUE(sWindowStatusDirty);
-    EXPECT_TRUE(sAdminFabricIndexDirty);
-    EXPECT_TRUE(sAdminVendorIdDirty);
+    EXPECT_FALSE(sWindowStatusDirty);
+    EXPECT_FALSE(sAdminFabricIndexDirty);
+    EXPECT_FALSE(sAdminVendorIdDirty);
 
     ResetDirtyFlags();
 }
