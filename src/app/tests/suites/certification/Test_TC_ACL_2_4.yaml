@@ -1101,12 +1101,19 @@ tests:
       command: "readAttribute"
       attribute: "ACL"
       response:
-          value:
-              [
+          value: [
                   {
                       Privilege: 5,
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  # We are retaining the ACLs from Step 21 and Step 22
+                  {
+                      Privilege: 3,
+                      AuthMode: 2,
+                      Subjects: [CAT1, CAT2, CAT3, CAT4],
                       Targets: null,
                       FabricIndex: CurrentFabricIndexValue,
                   },
