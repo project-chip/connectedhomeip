@@ -204,6 +204,8 @@ namespace Inet {
         mParameters = nw_parameters_create_secure_udp(configure_tls, NW_PARAMETERS_DEFAULT_CONFIGURATION);
         VerifyOrReturnError(nullptr != mParameters, CHIP_ERROR_INVALID_ARGUMENT, ReleaseAll());
 
+        nw_parameters_set_reuse_local_address(mParameters, true);
+
         // Note: The ConfigureProtocol function uses nw_ip_options_set_version to set the IP version for this endpoint.
         //
         // This works as expected when the IPAddress is specified. However, when using a wildcard address (chip::Inet::IPAddressType::kAny)
@@ -267,7 +269,35 @@ namespace Inet {
 
     CHIP_ERROR UDPEndPointImplNetworkFramework::ListenImpl()
     {
-        return StartListener();
+        // When using a temporary socket to bind to port 0 and obtain an ephemeral port,
+        // the OS may not immediately release that port for reuse after the socket is closed.
+        // This can lead to a race where we attempt to use the same port again (via Network.framework),
+        // but the OS still considers it in use, resulting in EADDRINUSE errors.
+        //
+        // This issue is more likely to surface on slower systems or in CI environments.
+        //
+        // To mitigate it, we retry the connection setup a few times with short exponential backoff delays,
+        // giving the kernel time to fully release the port and avoid flakiness when reusing it.
+        constexpr int kMaxRetries = 3;
+        constexpr uint64_t kRetryBackoffMs = 10;
+
+        CHIP_ERROR error = CHIP_NO_ERROR;
+        for (int attempt = 0; attempt < kMaxRetries; ++attempt) {
+#if NETWORK_FRAMEWORK_DEBUG
+            ChipLogError(Inet, "Listen attempt: %d/%d", attempt + 1, kMaxRetries);
+#endif
+            error = StartListener();
+
+            // Only retry on "address in use" errors (EADDRINUSE)
+            if (CHIP_ERROR_POSIX(EADDRINUSE) != error) {
+                break;
+            }
+
+            // Delay to give the OS time to release the ephemeral port.
+            usleep(static_cast<useconds_t>((static_cast<uint64_t>(attempt) + 1) * kRetryBackoffMs * 1000));
+        }
+
+        return error;
     }
 
     CHIP_ERROR UDPEndPointImplNetworkFramework::SendMsgImpl(const IPPacketInfo * pktInfo, System::PacketBufferHandle && msg)
@@ -439,6 +469,7 @@ namespace Inet {
         const IPAddress & aAddress, uint16_t aPort, InterfaceId interfaceIndex)
     {
         char addrStr[IPAddress::kMaxStringLength + 1 /*%*/ + InterfaceId::kMaxIfNameLength + 1 /*null terminator */];
+        nw_endpoint_t endpoint = nullptr;
 
         // When aPort == 0, we want the system to assign an ephemeral port.
         // However, Network.framework does not directly support binding to port 0
@@ -454,12 +485,14 @@ namespace Inet {
         if (aPort == 0) {
 #if INET_CONFIG_ENABLE_IPV4
             if (aAddressType == IPAddressType::kIPv4 && aAddress.Type() == IPAddressType::kAny) {
-                int fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
                 sockaddr_in addr = {};
                 addr.sin_family = AF_INET;
                 addr.sin_port = 0; // system assigns
                 addr.sin_addr = aAddress.ToIPv4();
 
+                int fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+                int one = 1;
+                setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
                 bind(fd, (sockaddr *) &addr, sizeof(addr));
 
                 socklen_t len = sizeof(addr);
@@ -468,16 +501,15 @@ namespace Inet {
                 close(fd);
 
                 addr.sin_port = htons(aPort);
+                endpoint = nw_endpoint_create_address((sockaddr *) &addr);
 
 #if NETWORK_FRAMEWORK_DEBUG
                 inet_ntop(AF_INET, &addr.sin_addr, addrStr, sizeof(addrStr));
                 ChipLogError(Inet, "Create endpoint (IPv4) for ip(%s) port(%u)", addrStr, aPort);
 #endif
-                return nw_endpoint_create_address((sockaddr *) &addr);
             } else
 #endif
             {
-                int fd = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
                 sockaddr_in6 addr6 = {};
                 addr6.sin6_family = AF_INET6;
                 addr6.sin6_port = 0; // system assigns
@@ -487,6 +519,9 @@ namespace Inet {
                     addr6.sin6_scope_id = interfaceIndex.GetPlatformInterface();
                 }
 
+                int fd = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
+                int one = 1;
+                setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
                 bind(fd, (sockaddr *) &addr6, sizeof(addr6));
 
                 socklen_t len = sizeof(addr6);
@@ -495,12 +530,12 @@ namespace Inet {
                 close(fd);
 
                 addr6.sin6_port = htons(aPort);
+                endpoint = nw_endpoint_create_address((sockaddr *) &addr6);
 
 #if NETWORK_FRAMEWORK_DEBUG
                 inet_ntop(AF_INET6, &addr6.sin6_addr, addrStr, sizeof(addrStr));
                 ChipLogError(Inet, "Create endpoint (IPv6) for ip(%s%%%u) port(%u)", addrStr, addr6.sin6_scope_id, aPort);
 #endif
-                return nw_endpoint_create_address((sockaddr *) &addr6);
             }
         } else {
             // Note: aAddress.ToString will return the IPv6 Any address if the address type is Any, but that's not what
@@ -532,8 +567,10 @@ namespace Inet {
             ChipLogError(Inet, "Create endpoint for ip(%s) port(%s)", addrStr, portStr);
 #endif
 
-            return nw_endpoint_create_host(addrStr, portStr);
+            endpoint = nw_endpoint_create_host(addrStr, portStr);
         }
+
+        return endpoint;
     }
 
     CHIP_ERROR UDPEndPointImplNetworkFramework::GetConnection(const IPPacketInfo * aPktInfo)
@@ -630,6 +667,8 @@ namespace Inet {
 
         if (CHIP_NO_ERROR != err) {
             mListener = nullptr;
+            mListenerSemaphore = nullptr;
+            mListenerQueue = nullptr;
         }
 
         return err;
@@ -638,7 +677,6 @@ namespace Inet {
     CHIP_ERROR UDPEndPointImplNetworkFramework::StartConnection(nw_connection_t aConnection)
     {
         __block CHIP_ERROR err = CHIP_NO_ERROR;
-
         nw_connection_set_queue(aConnection, mConnectionQueue);
 
         nw_connection_set_state_changed_handler(aConnection, ^(nw_connection_state_t state, nw_error_t error) {
@@ -686,7 +724,9 @@ namespace Inet {
 
             mConnection = aConnection;
             HandleDataReceived(mConnection);
+            return CHIP_NO_ERROR;
         }
+
         return err;
     }
 
