@@ -62,7 +62,19 @@ public:
     DefaultSceneTableImpl() : Super(kMaxScenesPerFabric, kMaxScenesPerEndpoint) {}
     ~DefaultSceneTableImpl() { Finish(); };
 
+    CHIP_ERROR Init(PersistentStorageDelegate * storage) override;
     void Finish() override;
+
+    // Scene count
+    CHIP_ERROR GetEndpointSceneCount(uint8_t & scene_count) override;
+    CHIP_ERROR GetFabricSceneCount(FabricIndex fabric_index, uint8_t & scene_count) override;
+
+    // Data
+    CHIP_ERROR GetRemainingCapacity(FabricIndex fabric_index, uint8_t & capacity) override;
+    CHIP_ERROR SetSceneTableEntry(FabricIndex fabric_index, const SceneTableEntry & entry) override;
+    CHIP_ERROR GetSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id, SceneTableEntry & entry) override;
+    CHIP_ERROR RemoveSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id) override;
+    CHIP_ERROR RemoveSceneTableEntryAtPosition(EndpointId endpoint, FabricIndex fabric_index, SceneIndex scene_idx) override;
 
     // Groups
     CHIP_ERROR GetAllSceneIdsInGroup(FabricIndex fabric_index, GroupId group_id, Span<SceneId> & scene_list) override;
@@ -77,6 +89,13 @@ public:
     CHIP_ERROR SceneSaveEFS(SceneTableEntry & scene) override;
     CHIP_ERROR SceneApplyEFS(const SceneTableEntry & scene) override;
 
+    // Fabrics
+    CHIP_ERROR RemoveFabric(FabricIndex fabric_index) override;
+    CHIP_ERROR RemoveEndpoint() override;
+
+    // Iterators
+    SceneEntryIterator * IterateSceneEntries(FabricIndex fabric_index) override;
+
 protected:
     // This constructor is meant for test purposes, it allows to change the defined max for scenes per fabric and global, which
     // allows to simulate OTA where this value was changed
@@ -85,7 +104,7 @@ protected:
     {}
 
     // Global scene count
-    inline CHIP_ERROR SetEndpointSceneCount(const uint8_t & scene_count) { return SetEndpointEntryCount(scene_count); }
+    inline CHIP_ERROR SetEndpointSceneCount(const uint8_t & scene_count);
 }; // class DefaultSceneTableImpl
 
 /// @brief Gets a pointer to the instance of Scene Table Impl, providing EndpointId and Table Size for said endpoint

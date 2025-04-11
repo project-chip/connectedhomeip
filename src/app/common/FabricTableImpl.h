@@ -32,35 +32,35 @@ namespace common {
  * on the device.
  */
 template <class StorageId, class StorageData, size_t kIteratorsMax>
-class FabricTableImpl : public virtual FabricTable<StorageId, StorageData>
+class FabricTableImpl
 {
-    using Super         = FabricTable<StorageId, StorageData>;
-    using TableEntry    = typename Super::TableEntry;
-    using EntryIterator = typename Super::EntryIterator;
+    using TableEntry    = data::TableEntry<StorageId, StorageData>;
+    using EntryIterator = CommonIterator<TableEntry>;
+    using EntryIndex    = data::EntryIndex;
 
 public:
-    ~FabricTableImpl() { Finish(); };
+    virtual ~FabricTableImpl() { Finish(); };
 
-    CHIP_ERROR Init(PersistentStorageDelegate * storage) override;
-    void Finish() override;
+    CHIP_ERROR Init(PersistentStorageDelegate * storage);
+    void Finish();
 
     // Scene count
-    CHIP_ERROR GetEndpointEntryCount(uint8_t & entry_count) override;
-    CHIP_ERROR GetFabricEntryCount(FabricIndex fabric_index, uint8_t & entry_count) override;
+    CHIP_ERROR GetEndpointEntryCount(uint8_t & entry_count);
+    CHIP_ERROR GetFabricEntryCount(FabricIndex fabric_index, uint8_t & entry_count);
 
     // Data
-    CHIP_ERROR GetRemainingCapacity(FabricIndex fabric_index, uint8_t & capacity) override;
-    CHIP_ERROR SetTableEntry(FabricIndex fabric_index, const TableEntry & entry) override;
-    CHIP_ERROR GetTableEntry(FabricIndex fabric_index, StorageId entry_id, TableEntry & entry) override;
-    CHIP_ERROR RemoveTableEntry(FabricIndex fabric_index, StorageId entry_id) override;
-    CHIP_ERROR RemoveTableEntryAtPosition(EndpointId endpoint, FabricIndex fabric_index, EntryIndex entry_idx) override;
+    CHIP_ERROR GetRemainingCapacity(FabricIndex fabric_index, uint8_t & capacity);
+    CHIP_ERROR SetTableEntry(FabricIndex fabric_index, const TableEntry & entry);
+    CHIP_ERROR GetTableEntry(FabricIndex fabric_index, StorageId entry_id, TableEntry & entry);
+    CHIP_ERROR RemoveTableEntry(FabricIndex fabric_index, StorageId entry_id);
+    CHIP_ERROR RemoveTableEntryAtPosition(EndpointId endpoint, FabricIndex fabric_index, EntryIndex entry_idx);
 
     // Fabrics
-    CHIP_ERROR RemoveFabric(FabricIndex fabric_index) override;
-    CHIP_ERROR RemoveEndpoint() override;
+    CHIP_ERROR RemoveFabric(FabricIndex fabric_index);
+    CHIP_ERROR RemoveEndpoint();
 
     // Iterators
-    EntryIterator * IterateTableEntries(FabricIndex fabric_index) override;
+    EntryIterator * IterateTableEntries(FabricIndex fabric_index);
 
     void SetEndpoint(EndpointId endpoint);
     void SetTableSize(uint16_t endpointEntryTableSize);
