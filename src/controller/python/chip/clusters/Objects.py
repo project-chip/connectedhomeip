@@ -48608,7 +48608,7 @@ class PushAvStreamTransport(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="supportedContainerFormats", Tag=0x00000000, Type=uint),
                 ClusterObjectFieldDescriptor(Label="supportedIngestMethods", Tag=0x00000001, Type=uint),
-                ClusterObjectFieldDescriptor(Label="currentConnections", Tag=0x00000002, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="currentConnections", Tag=0x00000002, Type=typing.List[PushAvStreamTransport.Structs.TransportConfigurationStruct]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -48618,7 +48618,7 @@ class PushAvStreamTransport(Cluster):
 
     supportedContainerFormats: uint = 0
     supportedIngestMethods: uint = 0
-    currentConnections: typing.List[uint] = field(default_factory=lambda: [])
+    currentConnections: typing.List[PushAvStreamTransport.Structs.TransportConfigurationStruct] = field(default_factory=lambda: [])
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -48643,15 +48643,14 @@ class PushAvStreamTransport(Cluster):
             kUnknownEnumValue = 1
 
         class StatusCodeEnum(MatterIntEnum):
-            kAllocationNotPermitted = 0x02
-            kInvalidTLSEndpoint = 0x03
-            kInvalidStream = 0x04
-            kInvalidURL = 0x05
-            kInvalidZone = 0x06
-            kUnsupportedContainerFormat = 0x07
-            kUnsupportedIngestMethod = 0x08
-            kInvalidTriggerType = 0x09
-            kInvalidTransportStatus = 0x10
+            kInvalidTLSEndpoint = 0x02
+            kInvalidStream = 0x03
+            kInvalidURL = 0x04
+            kInvalidZone = 0x05
+            kUnsupportedContainerFormat = 0x06
+            kUnsupportedIngestMethod = 0x07
+            kInvalidTriggerType = 0x08
+            kInvalidTransportStatus = 0x09
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
@@ -48814,8 +48813,8 @@ class PushAvStreamTransport(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="streamUsage", Tag=0, Type=PushAvStreamTransport.Enums.StreamUsageEnum),
-                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=1, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=2, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=1, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=2, Type=typing.Union[None, Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="endpointID", Tag=3, Type=uint),
                         ClusterObjectFieldDescriptor(Label="url", Tag=4, Type=str),
                         ClusterObjectFieldDescriptor(Label="triggerOptions", Tag=5, Type=PushAvStreamTransport.Structs.TransportTriggerOptionsStruct),
@@ -48827,8 +48826,8 @@ class PushAvStreamTransport(Cluster):
                     ])
 
             streamUsage: 'PushAvStreamTransport.Enums.StreamUsageEnum' = 0
-            videoStreamID: 'typing.Optional[uint]' = None
-            audioStreamID: 'typing.Optional[uint]' = None
+            videoStreamID: 'typing.Union[None, Nullable, uint]' = None
+            audioStreamID: 'typing.Union[None, Nullable, uint]' = None
             endpointID: 'uint' = 0
             url: 'str' = ""
             triggerOptions: 'PushAvStreamTransport.Structs.TransportTriggerOptionsStruct' = field(default_factory=lambda: PushAvStreamTransport.Structs.TransportTriggerOptionsStruct())
@@ -48846,12 +48845,14 @@ class PushAvStreamTransport(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="connectionID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="transportStatus", Tag=1, Type=PushAvStreamTransport.Enums.TransportStatusEnum),
-                        ClusterObjectFieldDescriptor(Label="transportOptions", Tag=2, Type=PushAvStreamTransport.Structs.TransportOptionsStruct),
+                        ClusterObjectFieldDescriptor(Label="transportOptions", Tag=2, Type=typing.Optional[PushAvStreamTransport.Structs.TransportOptionsStruct]),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             connectionID: 'uint' = 0
             transportStatus: 'PushAvStreamTransport.Enums.TransportStatusEnum' = 0
-            transportOptions: 'PushAvStreamTransport.Structs.TransportOptionsStruct' = field(default_factory=lambda: PushAvStreamTransport.Structs.TransportOptionsStruct())
+            transportOptions: 'typing.Optional[PushAvStreamTransport.Structs.TransportOptionsStruct]' = None
+            fabricIndex: 'uint' = 0
 
     class Commands:
         @dataclass
@@ -48881,14 +48882,10 @@ class PushAvStreamTransport(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="connectionID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="transportOptions", Tag=1, Type=PushAvStreamTransport.Structs.TransportOptionsStruct),
-                        ClusterObjectFieldDescriptor(Label="transportStatus", Tag=2, Type=PushAvStreamTransport.Enums.TransportStatusEnum),
+                        ClusterObjectFieldDescriptor(Label="transportConfiguration", Tag=0, Type=PushAvStreamTransport.Structs.TransportConfigurationStruct),
                     ])
 
-            connectionID: uint = 0
-            transportOptions: PushAvStreamTransport.Structs.TransportOptionsStruct = field(default_factory=lambda: PushAvStreamTransport.Structs.TransportOptionsStruct())
-            transportStatus: PushAvStreamTransport.Enums.TransportStatusEnum = 0
+            transportConfiguration: PushAvStreamTransport.Structs.TransportConfigurationStruct = field(default_factory=lambda: PushAvStreamTransport.Structs.TransportConfigurationStruct())
 
         @dataclass
         class DeallocatePushTransport(ClusterCommand):
@@ -48935,11 +48932,11 @@ class PushAvStreamTransport(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="connectionID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="connectionID", Tag=0, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="transportStatus", Tag=1, Type=PushAvStreamTransport.Enums.TransportStatusEnum),
                     ])
 
-            connectionID: uint = 0
+            connectionID: typing.Union[Nullable, uint] = NullValue
             transportStatus: PushAvStreamTransport.Enums.TransportStatusEnum = 0
 
         @dataclass
@@ -48989,10 +48986,10 @@ class PushAvStreamTransport(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="streamConfigurations", Tag=0, Type=typing.List[PushAvStreamTransport.Structs.TransportConfigurationStruct]),
+                        ClusterObjectFieldDescriptor(Label="transportConfigurations", Tag=0, Type=typing.List[PushAvStreamTransport.Structs.TransportConfigurationStruct]),
                     ])
 
-            streamConfigurations: typing.List[PushAvStreamTransport.Structs.TransportConfigurationStruct] = field(default_factory=lambda: [])
+            transportConfigurations: typing.List[PushAvStreamTransport.Structs.TransportConfigurationStruct] = field(default_factory=lambda: [])
 
     class Attributes:
         @dataclass
@@ -49039,9 +49036,9 @@ class PushAvStreamTransport(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.List[PushAvStreamTransport.Structs.TransportConfigurationStruct])
 
-            value: typing.List[uint] = field(default_factory=lambda: [])
+            value: typing.List[PushAvStreamTransport.Structs.TransportConfigurationStruct] = field(default_factory=lambda: [])
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

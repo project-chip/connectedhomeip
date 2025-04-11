@@ -45077,8 +45077,8 @@ struct Type
 {
 public:
     StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
-    Optional<uint16_t> videoStreamID;
-    Optional<uint16_t> audioStreamID;
+    Optional<DataModel::Nullable<uint16_t>> videoStreamID;
+    Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     uint16_t endpointID = static_cast<uint16_t>(0);
     chip::CharSpan url;
     Structs::TransportTriggerOptionsStruct::Type triggerOptions;
@@ -45097,8 +45097,8 @@ struct DecodableType
 {
 public:
     StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
-    Optional<uint16_t> videoStreamID;
-    Optional<uint16_t> audioStreamID;
+    Optional<DataModel::Nullable<uint16_t>> videoStreamID;
+    Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     uint16_t endpointID = static_cast<uint16_t>(0);
     chip::CharSpan url;
     Structs::TransportTriggerOptionsStruct::DecodableType triggerOptions;
@@ -45120,6 +45120,7 @@ enum class Fields : uint8_t
     kConnectionID     = 0,
     kTransportStatus  = 1,
     kTransportOptions = 2,
+    kFabricIndex      = 254,
 };
 
 struct Type
@@ -45127,11 +45128,20 @@ struct Type
 public:
     uint16_t connectionID               = static_cast<uint16_t>(0);
     TransportStatusEnum transportStatus = static_cast<TransportStatusEnum>(0);
-    Structs::TransportOptionsStruct::Type transportOptions;
+    Optional<Structs::TransportOptionsStruct::Type> transportOptions;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
-    static constexpr bool kIsFabricScoped = false;
+    static constexpr bool kIsFabricScoped = true;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
+
+    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
+
+private:
+    CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
 };
 
 struct DecodableType
@@ -45139,11 +45149,16 @@ struct DecodableType
 public:
     uint16_t connectionID               = static_cast<uint16_t>(0);
     TransportStatusEnum transportStatus = static_cast<TransportStatusEnum>(0);
-    Structs::TransportOptionsStruct::DecodableType transportOptions;
+    Optional<Structs::TransportOptionsStruct::DecodableType> transportOptions;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
-    static constexpr bool kIsFabricScoped = false;
+    static constexpr bool kIsFabricScoped = true;
+
+    auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
 };
 
 } // namespace TransportConfigurationStruct
@@ -45230,9 +45245,7 @@ public:
 namespace AllocatePushTransportResponse {
 enum class Fields : uint8_t
 {
-    kConnectionID     = 0,
-    kTransportOptions = 1,
-    kTransportStatus  = 2,
+    kTransportConfiguration = 0,
 };
 
 struct Type
@@ -45242,9 +45255,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::AllocatePushTransportResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
 
-    uint16_t connectionID = static_cast<uint16_t>(0);
-    Structs::TransportOptionsStruct::Type transportOptions;
-    TransportStatusEnum transportStatus = static_cast<TransportStatusEnum>(0);
+    Structs::TransportConfigurationStruct::Type transportConfiguration;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -45259,9 +45270,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::AllocatePushTransportResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
 
-    uint16_t connectionID = static_cast<uint16_t>(0);
-    Structs::TransportOptionsStruct::DecodableType transportOptions;
-    TransportStatusEnum transportStatus = static_cast<TransportStatusEnum>(0);
+    Structs::TransportConfigurationStruct::DecodableType transportConfiguration;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AllocatePushTransportResponse
@@ -45346,7 +45355,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetTransportStatus::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
 
-    uint16_t connectionID               = static_cast<uint16_t>(0);
+    DataModel::Nullable<uint16_t> connectionID;
     TransportStatusEnum transportStatus = static_cast<TransportStatusEnum>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -45362,7 +45371,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetTransportStatus::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
 
-    uint16_t connectionID               = static_cast<uint16_t>(0);
+    DataModel::Nullable<uint16_t> connectionID;
     TransportStatusEnum transportStatus = static_cast<TransportStatusEnum>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -45440,7 +45449,7 @@ public:
 namespace FindTransportResponse {
 enum class Fields : uint8_t
 {
-    kStreamConfigurations = 0,
+    kTransportConfigurations = 0,
 };
 
 struct Type
@@ -45450,7 +45459,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::FindTransportResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
 
-    DataModel::List<const Structs::TransportConfigurationStruct::Type> streamConfigurations;
+    DataModel::List<const Structs::TransportConfigurationStruct::Type> transportConfigurations;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -45465,7 +45474,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::FindTransportResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
 
-    DataModel::DecodableList<Structs::TransportConfigurationStruct::DecodableType> streamConfigurations;
+    DataModel::DecodableList<Structs::TransportConfigurationStruct::DecodableType> transportConfigurations;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace FindTransportResponse
@@ -45500,9 +45509,12 @@ struct TypeInfo
 namespace CurrentConnections {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const uint16_t>;
-    using DecodableType    = chip::app::DataModel::DecodableList<uint16_t>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<uint16_t> &;
+    using Type =
+        chip::app::DataModel::List<const chip::app::Clusters::PushAvStreamTransport::Structs::TransportConfigurationStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::PushAvStreamTransport::Structs::TransportConfigurationStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::PushAvStreamTransport::Structs::TransportConfigurationStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentConnections::Id; }
