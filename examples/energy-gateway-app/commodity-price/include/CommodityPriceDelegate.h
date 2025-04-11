@@ -17,10 +17,10 @@
  */
 #pragma once
 
+#include "CommodityPriceMemMgr.h"
 #include <app/clusters/commodity-price-server/commodity-price-server.h>
 #include <app/util/af-types.h>
 #include <lib/core/CHIPError.h>
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -62,8 +62,10 @@ public:
     CHIP_ERROR SetTariffUnit(Globals::TariffUnitEnum);
     CHIP_ERROR SetCurrency(Globals::Structs::CurrencyStruct::Type);
     CHIP_ERROR SetCurrentPrice(const DataModel::Nullable<Structs::CommodityPriceStruct::Type>);
-    CHIP_ERROR SetForecast(const DataModel::List<const Structs::CommodityPriceStruct::Type>  &);
+    CHIP_ERROR SetForecast(const DataModel::List<const Structs::CommodityPriceStruct::Type> &);
     // TODO work out how to set forecast data and retrieve it
+
+    const PriceForecastMemMgr & GetPriceForecastMemMgr() { return mPriceForecastMemMgr; }
 
     Status SendPriceChangeEvent();
 
@@ -72,6 +74,16 @@ private:
     Globals::TariffUnitEnum mTariffUnit;
     Globals::Structs::CurrencyStruct::Type mCurrencyStruct;
     DataModel::Nullable<Structs::CommodityPriceStruct::Type> mCurrentPrice;
+
+    // This storage is only needed if the FORE (forecast) feature is supported
+    // ------------
+    // Object to handle the allocation of memory for the price components list
+    PriceForecastMemMgr mPriceForecastMemMgr;
+
+    // actual storage of price entries as an array
+    Structs::CommodityPriceStruct::Type mPriceEntryArray[kMaxCommodityPriceEntries];
+
+    // The DataModel List of Price entries
     DataModel::List<const Structs::CommodityPriceStruct::Type> mPriceForecast;
 };
 

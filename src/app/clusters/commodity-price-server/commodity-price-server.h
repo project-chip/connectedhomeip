@@ -34,6 +34,10 @@ namespace app {
 namespace Clusters {
 namespace CommodityPrice {
 
+// Spec-defined constraints
+constexpr uint8_t kMaxCommodityPriceEntries   = 56;
+constexpr uint8_t kMaxComponentsPerPriceEntry = 10;
+
 class Delegate
 {
 public:
@@ -45,8 +49,9 @@ public:
     // Get attribute methods
     virtual Globals::TariffUnitEnum GetTariffUnit()                                            = 0;
     virtual Globals::Structs::CurrencyStruct::Type GetCurrency()                               = 0;
-    virtual const DataModel::Nullable<Structs::CommodityPriceStruct::Type> & GetCurrentPrice() = 0;   
-    virtual const DataModel::List<const Structs::CommodityPriceStruct::Type> & GetPriceForecast(CommodityPriceDetailBitmap bitmap) = 0;
+    virtual const DataModel::Nullable<Structs::CommodityPriceStruct::Type> & GetCurrentPrice() = 0;
+    virtual const DataModel::List<const Structs::CommodityPriceStruct::Type> &
+    GetPriceForecast(CommodityPriceDetailBitmap bitmap) = 0;
 
     // DELETE THESE...
     virtual CHIP_ERROR StartPriceForecastRead(CommodityPriceDetailBitmap bitmap)               = 0;
