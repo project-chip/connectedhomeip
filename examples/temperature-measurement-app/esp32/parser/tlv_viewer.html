@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matter TLV Log Visualizer</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-bottom: 30px;
+        }
+
+        .file-input {
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+        }
+
+        #file-name {
+            display: inline-block;
+            margin: 0 10px;
+            font-style: italic;
+            color: #666;
+        }
+
+        .input-buttons {
+            margin-top: 10px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .manual-input {
+            margin-top: 10px;
+            display: none;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+            margin-bottom: 10px;
+        }
+
+        .input-toggle {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #007bff;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .stats {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+
+        .stat-row {
+            display: flex;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .stat-box {
+            background-color: #f0f8ff;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 5px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+            cursor: pointer;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .stat-details {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: auto;
+            max-height: 300px;
+        }
+
+        .stat-details.active {
+            display: block;
+        }
+
+        .close-button {
+            float: right;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 3px 8px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #e0e0e0;
+            margin-right: 5px;
+            border-radius: 4px 4px 0 0;
+        }
+
+        .tab.active {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-size: 18px;
+            color: #007bff;
+        }
+
+        .error-message {
+            color: #dc3545;
+            text-align: center;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f8d7da;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Matter TLV Log Visualizer</h1>
+
+        <div class="file-input">
+            <form id="upload-form" enctype="multipart/form-data">
+                <div>
+                    <input type="file" id="file-input" name="tlv_file" accept=".log,.bin">
+                    <span id="file-name">No file selected</span>
+                </div>
+                <div class="input-toggle" id="manual-toggle">Or paste log data manually</div>
+                <div class="manual-input" id="manual-input-area">
+                    <textarea id="log-data-input" placeholder="Paste your log data here..."></textarea>
+                </div>
+                <div class="input-buttons">
+                    <button type="button" id="parse-btn">Parse TLV Log Data</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="overview">Overview</div>
+            <div class="tab" data-tab="timeline">Timeline (Pake/Sigma)</div>
+            <div class="tab" data-tab="all-entries">All Entries</div>
+            <div class="tab" data-tab="stats">Statistics</div>
+        </div>
+
+        <div id="overview" class="tab-content active">
+            <div class="chart-container">
+                <canvas id="overview-chart"></canvas>
+            </div>
+        </div>
+
+        <div id="timeline" class="tab-content">
+            <div class="chart-container">
+                <canvas id="timeline-chart"></canvas>
+            </div>
+        </div>
+
+        <div id="all-entries" class="tab-content">
+            <table style="width:100%; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th style="border: 1px solid #ddd; padding: 8px;">Timestamp</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">Label</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">Value</th>
+                    </tr>
+                </thead>
+                <tbody id="entries-table-body">
+                </tbody>
+            </table>
+        </div>
+
+        <div id="stats" class="tab-content">
+            <div class="stats" id="stats-container">
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        const TLV_TYPE = {
+            TIMESTAMP: 0,
+            LABEL: 1,
+            VALUE: 2
+        };
+
+        let logData = [];
+        let overviewChart, pakeChart, sigmaChart, timelineChart;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function () {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+
+                    const tabContents = document.querySelectorAll('.tab-content');
+                    tabContents.forEach(content => content.classList.remove('active'));
+
+                    const targetTab = this.getAttribute('data-tab');
+                    document.getElementById(targetTab).classList.add('active');
+                });
+            });
+
+            const fileInput = document.getElementById('file-input');
+            fileInput.addEventListener('change', function () {
+                if (this.files.length > 0) {
+                    const fileName = this.files[0].name;
+                    document.getElementById('file-name').textContent = fileName;
+                } else {
+                    document.getElementById('file-name').textContent = 'No file selected';
+                }
+            });
+
+            document.getElementById('parse-btn').addEventListener('click', function () {
+                const fileInput = document.getElementById('file-input');
+                const file = fileInput.files[0];
+                const manualInput = document.getElementById('log-data-input').value.trim();
+
+                if (file) {
+                    console.log("File selected:", file.name);
+
+                    const formData = new FormData();
+                    formData.append('tlv_file', file);
+
+                    const statsContainer = document.getElementById('stats-container');
+                    if (statsContainer) {
+                        statsContainer.innerHTML = '<div class="loading">Parsing TLV data, please wait...</div>';
+                    }
+
+                    fetch('/parse_tlv', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Server error: ' + response.status);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log("Received parsed data:", data);
+                            if (data && data.length > 0) {
+                                logData = data;
+                                processData(logData);
+                            } else {
+                                alert('No valid TLV data found in the file');
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error parsing file:", error);
+                            alert('Error: ' + error.message);
+                        });
+                } else if (manualInput) {
+                    console.log("Using manual input");
+                    try {
+                        const statsContainer = document.getElementById('stats-container');
+                        if (statsContainer) {
+                            statsContainer.innerHTML = '<div class="loading">Processing manual input data, please wait...</div>';
+                        }
+
+                        try {
+                            const jsonData = JSON.parse(manualInput);
+
+                            if (Array.isArray(jsonData) && jsonData.length > 0) {
+                                if (typeof jsonData[0].timestamp === 'undefined' &&
+                                    typeof jsonData[0][0] !== 'undefined') {
+                                    logData = jsonData.map(entry => ({
+                                        timestamp: entry[0] || 0,
+                                        label: entry[1] || '',
+                                        value: entry[2] || ''
+                                    }));
+                                } else {
+                                    logData = jsonData;
+                                }
+                                processData(logData);
+                                return;
+                            }
+                        } catch (jsonError) {
+                            console.log("Not valid JSON, trying text parsing");
+                        }
+
+                        logData = parseLogContent(manualInput);
+                        if (logData && logData.length > 0) {
+                            processData(logData);
+                        } else {
+                            statsContainer.innerHTML = '<div class="error-message">Failed to parse input data. Please check format.</div>';
+                        }
+                    } catch (error) {
+                        console.error("Error parsing manual input:", error);
+                        alert('Error parsing input: ' + error.message);
+                    }
+                } else {
+                    alert('Please select a file or enter log data manually');
+                }
+            });
+
+            document.getElementById('manual-toggle').addEventListener('click', function () {
+                const manualInputArea = document.getElementById('manual-input-area');
+                if (manualInputArea.style.display === 'none' || !manualInputArea.style.display) {
+                    manualInputArea.style.display = 'block';
+                    this.textContent = 'Switch to file upload';
+                } else {
+                    manualInputArea.style.display = 'none';
+                    this.textContent = 'Or paste log data manually';
+                }
+            });
+
+            processData(logData);
+        });
+
+        function hexStringToUint8Array(hexString) {
+            if (!/^[0-9A-Fa-f]+$/.test(hexString.replace(/\s+/g, ''))) {
+                throw new Error('Input is not a valid hex string');
+            }
+
+            const cleanedHexString = hexString.replace(/\s+/g, '');
+            const result = new Uint8Array(cleanedHexString.length / 2);
+
+            for (let i = 0; i < cleanedHexString.length; i += 2) {
+                result[i / 2] = parseInt(cleanedHexString.substring(i, i + 2), 16);
+            }
+
+            return result;
+        }
+
+        function parseTLVBinaryData(binaryData) {
+            console.log("Parsing TLV binary data of length:", binaryData.length);
+
+            try {
+                const containerStart = new Uint8Array([0x17]);
+                const containerEnd = new Uint8Array([0x18]);
+
+                const wrappedData = new Uint8Array(containerStart.length + binaryData.length + containerEnd.length);
+                wrappedData.set(containerStart);
+                wrappedData.set(binaryData, containerStart.length);
+                wrappedData.set(containerEnd, containerStart.length + binaryData.length);
+
+                console.log("Wrapped data length:", wrappedData.length);
+
+                const entries = [];
+                let position = 1;
+
+                while (position < wrappedData.length - 1) {
+                    try {
+                        const result = parseTLVEntry(wrappedData, position);
+                        if (result) {
+                            entries.push(result.entry);
+                            position = result.nextPosition;
+                        } else {
+                            position++;
+                        }
+                    } catch (error) {
+                        console.warn("Error parsing TLV at position", position, error);
+                        position++;
+                    }
+                }
+
+                console.log("Parsed", entries.length, "TLV entries");
+                return entries;
+            } catch (error) {
+                console.error("Failed to parse TLV data:", error);
+                return [];
+            }
+        }
+
+        function parseTLVEntry(data, position) {
+            if (position + 2 >= data.length) {
+                return null;
+            }
+
+            const entry = {
+                timestamp: 0,
+                label: "",
+                value: ""
+            };
+
+            let nextPosition = position;
+
+            while (nextPosition < data.length - 2) {
+                const tagType = data[nextPosition] & 0xF;
+                const tagId = (data[nextPosition] >> 4) & 0xF;
+
+                nextPosition++;
+
+                if (tagId === TLV_TYPE.TIMESTAMP) {
+                    if (tagType === 2) {
+                        entry.timestamp = (data[nextPosition] | (data[nextPosition + 1] << 8));
+                        nextPosition += 2;
+                    } else if (tagType === 3) {
+                        entry.timestamp = (data[nextPosition] |
+                            (data[nextPosition + 1] << 8) |
+                            (data[nextPosition + 2] << 16) |
+                            (data[nextPosition + 3] << 24));
+                        nextPosition += 4;
+                    } else {
+                        nextPosition += 1;
+                    }
+                } else if (tagId === TLV_TYPE.LABEL) {
+                    if (tagType === 4) {
+                        const strLen = data[nextPosition];
+                        nextPosition++;
+
+                        if (nextPosition + strLen <= data.length) {
+                            const strBytes = data.slice(nextPosition, nextPosition + strLen);
+                            entry.label = new TextDecoder().decode(strBytes);
+                            nextPosition += strLen;
+                        }
+                    } else {
+                        nextPosition += 1;
+                    }
+                } else if (tagId === TLV_TYPE.VALUE) {
+                    if (tagType === 4) {
+                        const strLen = data[nextPosition];
+                        nextPosition++;
+
+                        if (nextPosition + strLen <= data.length) {
+                            const strBytes = data.slice(nextPosition, nextPosition + strLen);
+                            entry.value = new TextDecoder().decode(strBytes);
+                            nextPosition += strLen;
+                        }
+                    } else if (tagType === 0) {
+                        entry.value = data[nextPosition].toString();
+                        nextPosition += 1;
+                    } else if (tagType === 1 || tagType === 2 || tagType === 3) {
+                        entry.value = data[nextPosition].toString();
+                        nextPosition += (tagType === 1) ? 1 : (tagType === 2) ? 2 : 4;
+                    } else {
+                        nextPosition += 1;
+                    }
+                } else {
+                    nextPosition += 1;
+                }
+
+                if (entry.timestamp && entry.label) {
+                    return { entry, nextPosition };
+                }
+            }
+
+            return null;
+        }
+
+        function parseLogContent(content) {
+            const parsedData = [];
+            const lines = content.split('\n');
+
+            console.log("Total lines to parse:", lines.length);
+
+            let dataStarted = false;
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+
+                if (line.includes('Timestamp') && line.includes('Label') && line.includes('Value')) {
+                    dataStarted = true;
+                    console.log("Found header row at line", i);
+                    continue;
+                }
+
+                if (!line.trim() || line.includes('═') || line.includes('╞') || line.includes('╡') ||
+                    line.includes('├') || line.includes('┤') || line.includes('┼')) {
+                    continue;
+                }
+
+                if (dataStarted) {
+                    const parts = line.split('│').filter(part => part.trim());
+
+                    if (parts.length >= 3) {
+                        try {
+                            const timestamp = parseInt(parts[0].trim());
+                            const label = parts[1].trim();
+                            const value = parts[2].trim();
+
+                            if (!isNaN(timestamp)) {
+                                parsedData.push({
+                                    timestamp: timestamp,
+                                    label: label,
+                                    value: value
+                                });
+                            }
+                        } catch (error) {
+                            console.warn("Error parsing line:", line, error);
+                        }
+                    }
+                }
+            }
+
+            console.log("Successfully parsed entries:", parsedData.length);
+
+            if (parsedData.length === 0) {
+                for (const line of lines) {
+                    if (line.trim()) {
+                        const parts = line.split('|').map(part => part.trim());
+                        if (parts.length >= 3) {
+                            try {
+                                const timestamp = parseInt(parts[0]);
+                                if (!isNaN(timestamp)) {
+                                    parsedData.push({
+                                        timestamp: timestamp,
+                                        label: parts[1],
+                                        value: parts[2]
+                                    });
+                                }
+                            } catch (error) {
+                                console.warn("Error in fallback parsing:", line);
+                            }
+                        }
+                    }
+                }
+                console.log("Fallback parsing entries:", parsedData.length);
+            }
+
+            return parsedData;
+        }
+
+        function processData(data) {
+            if (!data || data.length === 0) {
+                alert('No valid data found');
+                return;
+            }
+            updateStatistics(data);
+            createOverviewChart(data);
+            createTimelineChart(data);
+            populateEntriesTable(data);
+
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            document.querySelector('.tab[data-tab="overview"]').classList.add('active');
+
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+            document.getElementById('overview').classList.add('active');
+        }
+
+        function updateStatistics(data) {
+            const statsContainer = document.getElementById('stats-container');
+            statsContainer.innerHTML = '';
+
+            const pakeMessages = data.filter(item =>
+                item.label.includes('Pake1') ||
+                item.label.includes('Pake2') ||
+                item.label.includes('Pake3')
+            );
+            const pakeCount = pakeMessages.length;
+
+            const sigmaMessages = data.filter(item =>
+                item.label.includes('Sigma1') ||
+                item.label.includes('Sigma2') ||
+                item.label.includes('Sigma3')
+            );
+            const sigmaCount = sigmaMessages.length;
+
+            const startTime = Math.min(...data.map(item => item.timestamp));
+            const endTime = Math.max(...data.map(item => item.timestamp));
+            const duration = endTime - startTime;
+
+            const messageTypeCounts = {};
+            const messagesByType = {};
+            data.forEach(item => {
+                if (!messageTypeCounts[item.label]) {
+                    messageTypeCounts[item.label] = 0;
+                    messagesByType[item.label] = [];
+                }
+                messageTypeCounts[item.label]++;
+                messagesByType[item.label].push(item);
+            });
+
+            const stats = [
+                { label: 'PAKE Messages', value: pakeCount, detailData: pakeMessages, type: 'messages' },
+                { label: 'Sigma Messages', value: sigmaCount, detailData: sigmaMessages, type: 'messages' },
+                { label: 'Timeline Duration', value: `${duration} ms`, detailData: { start: startTime, end: endTime }, type: 'duration' },
+            ];
+
+            for (const [label, count] of Object.entries(messageTypeCounts)) {
+                stats.push({
+                    label: `${label} Count`,
+                    value: count,
+                    detailData: messagesByType[label],
+                    type: 'messages'
+                });
+            }
+
+            for (let i = 0; i < stats.length; i++) {
+                const row = document.createElement('div');
+                row.className = 'stat-row';
+
+                const stat = stats[i];
+                const statBox = document.createElement('div');
+                statBox.className = 'stat-box';
+
+                const header = document.createElement('div');
+                header.innerHTML = `<h3>${stat.label}</h3><p>${stat.value}</p>`;
+                statBox.appendChild(header);
+
+                const details = document.createElement('div');
+                details.className = 'stat-details';
+
+                const closeButton = document.createElement('button');
+                closeButton.className = 'close-button';
+                closeButton.textContent = 'Close';
+                closeButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    details.classList.remove('active');
+                });
+                details.appendChild(closeButton);
+
+                if (stat.type === 'messages') {
+                    const table = document.createElement('table');
+                    table.style.width = '100%';
+                    table.style.borderCollapse = 'collapse';
+
+                    const thead = document.createElement('thead');
+                    thead.innerHTML = `
+                        <tr>
+                            <th style="border: 1px solid #ddd; padding: 8px;">Timestamp</th>
+                            <th style="border: 1px solid #ddd; padding: 8px;">Label</th>
+                            <th style="border: 1px solid #ddd; padding: 8px;">Value</th>
+                        </tr>
+                    `;
+                    table.appendChild(thead);
+
+                    const tbody = document.createElement('tbody');
+                    stat.detailData.forEach(item => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td style="border: 1px solid #ddd; padding: 8px;">${item.timestamp}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${item.label}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${item.value}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                    table.appendChild(tbody);
+                    details.appendChild(table);
+                } else if (stat.type === 'sessions') {
+                    const sessionList = document.createElement('ul');
+                    stat.detailData.forEach(session => {
+                        const li = document.createElement('li');
+                        li.textContent = session;
+                        sessionList.appendChild(li);
+                    });
+                    details.appendChild(sessionList);
+                } else if (stat.type === 'duration') {
+                    details.innerHTML += `
+                        <p>Start Time: ${stat.detailData.start}</p>
+                        <p>End Time: ${stat.detailData.end}</p>
+                        <p>Duration: ${stat.detailData.end - stat.detailData.start} ms</p>
+                    `;
+                }
+
+                statBox.appendChild(details);
+
+                statBox.addEventListener('click', () => {
+                    document.querySelectorAll('.stat-details.active').forEach(el => {
+                        if (el !== details) {
+                            el.classList.remove('active');
+                        }
+                    });
+
+                    details.classList.toggle('active');
+                });
+
+                row.appendChild(statBox);
+                statsContainer.appendChild(row);
+            }
+        }
+
+        function createOverviewChart(data) {
+            const ctx = document.getElementById('overview-chart').getContext('2d');
+
+            const messageTypes = {};
+            data.forEach(item => {
+                const type = item.label;
+                if (!messageTypes[type]) {
+                    messageTypes[type] = { count: 0, timestamps: [] };
+                }
+                messageTypes[type].count++;
+                messageTypes[type].timestamps.push(item.timestamp);
+            });
+
+            const labels = Object.keys(messageTypes);
+            const values = labels.map(label => messageTypes[label].count);
+            const timestamps = labels.map(label => messageTypes[label].timestamps.join(', '));
+
+            if (overviewChart) {
+                overviewChart.destroy();
+            }
+
+            overviewChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Message Count',
+                        data: values,
+                        backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Count'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Overview of All Message Types'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                afterLabel: function (context) {
+                                    return 'Timestamps: ' + timestamps[context.dataIndex];
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createTimelineChart(data) {
+            const ctx = document.getElementById('timeline-chart').getContext('2d');
+            console.log(data);
+            const filteredData = data.filter(item =>
+                (item.label.includes('Pake') || item.label.includes('Sigma')) &&
+                !isNaN(parseInt(item.value))
+            );
+
+            const timeEvents = {};
+            filteredData.forEach(item => {
+                if (!timeEvents[item.timestamp]) {
+                    timeEvents[item.timestamp] = [];
+                }
+                timeEvents[item.timestamp].push(item);
+            });
+
+            const timestamps = Object.keys(timeEvents).sort((a, b) => parseInt(a) - parseInt(b));
+
+            let pakeCount = 0;
+            let sigmaCount = 0;
+            const pakeData = [];
+            const sigmaData = [];
+
+            timestamps.forEach(timestamp => {
+                const events = timeEvents[timestamp];
+                events.forEach(event => {
+                    if (event.label.includes('Pake')) {
+                        pakeCount++;
+                        pakeData.push({ x: parseInt(timestamp), y: pakeCount, label: event.label });
+                    } else if (event.label.includes('Sigma')) {
+                        sigmaCount++;
+                        sigmaData.push({ x: parseInt(timestamp), y: sigmaCount, label: event.label });
+                    }
+                });
+            });
+
+            if (timelineChart) {
+                timelineChart.destroy();
+            }
+
+            timelineChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [
+                        {
+                            label: 'PAKE Messages',
+                            data: pakeData,
+                            backgroundColor: 'rgba(255, 99, 132, 0.3)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 2,
+                            fill: true
+                        },
+                        {
+                            label: 'Sigma Messages',
+                            data: sigmaData,
+                            backgroundColor: 'rgba(54, 162, 235, 0.3)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 2,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            title: {
+                                display: true,
+                                text: 'Timestamp (ms)'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Cumulative Count'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Message Timeline'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    const label = context.dataset.label || '';
+                                    const messageLabel = context.raw.label || '';
+                                    return `${label}: ${context.raw.y} (${messageLabel})`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function populateEntriesTable(data) {
+            const tableBody = document.getElementById('entries-table-body');
+            tableBody.innerHTML = '';
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td style="border: 1px solid #ddd; padding: 8px;">${item.timestamp}</td>
+                    <td style="border: 1px solid #ddd; padding: 8px;">${item.label}</td>
+                    <td style="border: 1px solid #ddd; padding: 8px;">${item.value}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+    </script>
+</body>
+
+</html>
