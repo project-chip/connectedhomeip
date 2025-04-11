@@ -683,15 +683,6 @@ CHIP_ERROR ResolveContext::OnNewAddress(const InterfaceKey & interfaceKey, const
                     addrStr);
 #endif // CHIP_PROGRESS_LOGGING
 
-    if (ip.IsIPv6LinkLocal() && interfaceId == kDNSServiceInterfaceIndexLocalOnly)
-    {
-        // We need a real interface to use a link-local address.  Just ignore
-        // this one, because trying to use it will simply lead to "No route to
-        // host" errors.
-        ChipLogProgress(Discovery, "Mdns: Ignoring link-local address with no usable interface");
-        return CHIP_NO_ERROR;
-    }
-
     interfaces[interfaceKey].addresses.push_back(ip);
 
     return CHIP_NO_ERROR;
@@ -753,8 +744,9 @@ void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname,
 
     if (kDNSServiceInterfaceIndexLocalOnly == interfaceId)
     {
-        // Set interface to ANY (0) - network stack can decide how to route this.
-        interface.service.mInterface = Inet::InterfaceId(0);
+        // Set interface to local loopback.  This should also work for
+        // link-local IPs that we resolve on the local-only interface.
+        interface.service.mInterface = Inet::InterfaceId(if_nametoindex("lo0"));
     }
     else
     {
