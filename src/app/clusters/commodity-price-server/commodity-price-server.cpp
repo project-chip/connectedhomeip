@@ -72,7 +72,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-        return aEncoder.Encode(mDelegate.GetPriceForecast());
+        return aEncoder.Encode(mFeature); // TODO //aEncoder.Encode(mDelegate.GetPriceForecast());
 
     /* FeatureMap - is held locally */
     case FeatureMap::Id:
