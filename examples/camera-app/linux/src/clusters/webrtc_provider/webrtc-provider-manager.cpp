@@ -56,10 +56,10 @@ void WebRTCProviderManager::Init()
     mPeerConnection->onStateChange([this](rtc::PeerConnection::State state) {
         // Convert the enum to an integer or string as needed
         ChipLogProgress(Camera, "[State: %u]", static_cast<unsigned>(state));
-	 if (state == rtc::PeerConnection::State::Connected)
-         {
-             RegisterWebrtcTransport(mCurrentSessionId);
-         }
+        if (state == rtc::PeerConnection::State::Connected)
+        {
+            RegisterWebrtcTransport(mCurrentSessionId);
+        }
     });
 
     mPeerConnection->onGatheringStateChange([](rtc::PeerConnection::GatheringState state) {
@@ -191,7 +191,7 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
         else
         {
             outSession.videoStreamID = args.videoStreamId.Value();
-	    videoStreamID = outSession.videoStreamID;
+            videoStreamID            = static_cast<uint16_t>(args.videoStreamId.Value());
         }
     }
     else
@@ -210,7 +210,7 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
         else
         {
             outSession.audioStreamID = args.audioStreamId.Value();
-	    audioStreamID = outSession.audioStreamID;
+            audioStreamID            = static_cast<uint16_t>(args.audioStreamId.Value());
         }
     }
     else
@@ -225,7 +225,7 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
 
     if (webrtcTransportMap.find(args.sessionId) == webrtcTransportMap.end())
     {
-        webrtcTransportMap[args.sessionId] = new WebrtcTransport(args.sessionId, peerId.GetNodeId(), mPeerConnection);
+        webrtcTransportMap[args.sessionId] = new WebrtcTransport(args.sessionId, mPeerId.GetNodeId(), mPeerConnection);
     }
 
     mPeerConnection->setRemoteDescription(args.sdp);
