@@ -37,6 +37,9 @@ CHIP_ERROR ClusterLogic::Init(const ClusterConformance & conformance)
 
 CHIP_ERROR ClusterLogic::SetCurrentState(GenericCurrentStateStruct & currentState)
 {
+    ChipLogError(Zcl, ">>>>>>>>>>>>>>>>>>>>>>");
+    ChipLogError(Zcl, "ClosureControlManager::SetCurrentState");
+    ChipLogError(Zcl, "<<<<<<<<<<<<<<<<<<<<<");
     // TODO : Q reporting for this attribute
 
     if (currentState.position.HasValue())
@@ -44,6 +47,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(GenericCurrentStateStruct & currentStat
         if (mConformance.HasFeature(Feature::kPositioning))
         {
             VerifyOrReturnError(currentState.position.Value() <= PERCENT100THS_MAX_VALUE, CHIP_ERROR_INVALID_ARGUMENT);
+            ChipLogError(Zcl, "ClosureControlManager::SetCurrentState 2");
         }
         else
         {
@@ -52,11 +56,14 @@ CHIP_ERROR ClusterLogic::SetCurrentState(GenericCurrentStateStruct & currentStat
             currentState.position.ClearValue();
         }
     }
+    
+    ChipLogError(Zcl, "ClosureControlManager::SetCurrentState 3");
 
     if (currentState.latching.HasValue())
     {
         if (mConformance.HasFeature(Feature::kMotionLatching))
         {
+            ChipLogError(Zcl, "ClosureControlManager::SetCurrentState 4");
             VerifyOrReturnError(EnsureKnownEnumValue(currentState.latching.Value()) != LatchingEnum::kUnknownEnumValue,
                                 CHIP_ERROR_INVALID_ARGUMENT);
         }
@@ -67,13 +74,14 @@ CHIP_ERROR ClusterLogic::SetCurrentState(GenericCurrentStateStruct & currentStat
             currentState.latching.ClearValue();
         }
     }
-
+    ChipLogError(Zcl, "ClosureControlManager::SetCurrentState 5");
     if (currentState.speed.HasValue())
     {
         if (mConformance.HasFeature(Feature::kSpeed))
         {
             VerifyOrReturnError(EnsureKnownEnumValue(currentState.speed.Value()) != Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
                                 CHIP_ERROR_INVALID_ARGUMENT);
+                                ChipLogError(Zcl, "ClosureControlManager::SetCurrentState 6");
         }
         else
         {
@@ -81,6 +89,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(GenericCurrentStateStruct & currentStat
             currentState.speed.ClearValue();
         }
     }
+    ChipLogError(Zcl, "ClosureControlManager::SetCurrentState 7");
 
     // TODO: currentState.Position value SHALL follow the scaling from "Resolution Attribute".
 
@@ -88,6 +97,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(GenericCurrentStateStruct & currentStat
     {
         mState.currentState = currentState;
         mMatterContext.MarkDirty(Attributes::Current::Id);
+        ChipLogError(Zcl, "ClosureControlManager::SetCurrentState 8");
     }
 
     return CHIP_NO_ERROR;
@@ -100,6 +110,7 @@ CHIP_ERROR ClusterLogic::SetTarget(GenericTargetStruct & target)
         if (mConformance.HasFeature(Feature::kPositioning))
         {
             VerifyOrReturnError(target.position.Value() <= PERCENT100THS_MAX_VALUE, CHIP_ERROR_INVALID_ARGUMENT);
+            
         }
         else
         {
@@ -422,8 +433,10 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
         // TODO: In case a SetTarget command is sent with only the Speed field then if: It SHOULD affect the current dimension
         // motion speed of the device (this change speed on the fly).
     }
-    return Status::Success;
-    ;
+    
+    auto status = mClusterDriver.HandleSetTarget(position,latch,speed);
+
+    return status;
 }
 
 Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t numberOfSteps,
@@ -458,10 +471,9 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
         step_target.speed = speed;
     }
 
-    // TODO: CHIP_ERROR err = mClusterDriver.HandleStep(direction,numberOfSteps,speed);
-    SetTarget(step_target);
+    auto status = mClusterDriver.HandleStep(direction,numberOfSteps,speed);
 
-    return Status::Success;
+    return status;
 }
 } // namespace ClosureDimension
 } // namespace Clusters
