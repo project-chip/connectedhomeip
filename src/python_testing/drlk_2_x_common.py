@@ -179,7 +179,7 @@ class DRLK_COMMON:
             if self.check_pics("DRLK.S.C1a.Rsp"):
                 self.print_step("4a", "TH writes the RequirePINforRemoteOperation attribute value as true on the DUT")
                 await self.set_user_command()
-        if self.check_pics("DRLK.S.F00"):
+        if self.check_pics("DRLK.S.F00") and self.check_pics("DRLK.S.F08"):
             self.print_step("4b", "TH reads MinPINCodeLength attribute and saves the value")
             min_pin_code_length = await self.read_and_verify_pincode_length(
                 attribute=Clusters.DoorLock.Attributes.MinPINCodeLength,
