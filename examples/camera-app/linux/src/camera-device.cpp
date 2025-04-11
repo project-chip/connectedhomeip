@@ -713,3 +713,8 @@ CameraAVStreamMgmtDelegate & CameraDevice::GetCameraAVStreamMgmtDelegate()
 {
     return mCameraAVStreamManager;
 }
+
+MediaController & CameraDevice::GetMediaController()
+{
+    return mMediaController;
+}

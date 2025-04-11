@@ -39,16 +39,12 @@ public:
     virtual ~MediaController() {}
     // Transports register themselves with the media-controller for receiving
     // media from stream sources.
-    void RegisterTransport(Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID);
+    virtual void RegisterTransport(Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID) = 0;
     // Transports must first unregister from the media-controller when they are
     // getting destroyed.
-    void UnregisterTransport(Transport * transport);
+    virtual void UnregisterTransport(Transport * transport) = 0;
     // Media controller goes through registered transports and dispatches media
     // if the transport is ready.
-    void DistributeVideo(const char * data, size_t size, uint16_t videoStreamID);
-    void DistributeAudio(const char * data, size_t size, uint16_t audioStreamID);
-
-private:
-    std::vector<Connection> connections;
-    std::mutex connectionsMutex;
+    virtual void DistributeVideo(const char * data, size_t size, uint16_t videoStreamID) = 0;
+    virtual void DistributeAudio(const char * data, size_t size, uint16_t audioStreamID) = 0;
 };
