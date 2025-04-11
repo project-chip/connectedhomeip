@@ -45,7 +45,7 @@ bool DeviceTypes::EndpointHasDeviceType(EndpointId endpoint, DeviceTypeId device
     return false;
 }
 
-ReadOnlyBufferBuilder<EndpointId> DeviceTypes::GetAllEndpointsHavingDeviceType(DeviceTypeId deviceTypeId)
+ReadOnlyBuffer<EndpointId> DeviceTypes::GetAllEndpointsHavingDeviceType(DeviceTypeId deviceTypeId)
 {
     ReadOnlyBufferBuilder<DataModel::EndpointEntry> endpointsList;
     CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetDataModelProvider()->Endpoints(endpointsList);
@@ -74,5 +74,5 @@ ReadOnlyBufferBuilder<EndpointId> DeviceTypes::GetAllEndpointsHavingDeviceType(D
             }
         }
     }
-    return endpoints;
+    return endpoints.TakeBuffer();
 }

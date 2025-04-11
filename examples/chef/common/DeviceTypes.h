@@ -63,7 +63,7 @@ bool EndpointHasDeviceType(chip::EndpointId endpoint, chip::DeviceTypeId deviceT
  * Returns a list of all endpoints that have the specified device type in their respective device types list.
  * Endpoints list is fetched using DataModelProvider. Device type match is checked using EndpointHasDeviceType.
  */
-chip::app::ReadOnlyBufferBuilder<chip::EndpointId> GetAllEndpointsHavingDeviceType(chip::DeviceTypeId deviceTypeId);
+chip::ReadOnlyBuffer<chip::EndpointId> GetAllEndpointsHavingDeviceType(chip::DeviceTypeId deviceTypeId);
 
 } // namespace DeviceTypes
 } // namespace chef
