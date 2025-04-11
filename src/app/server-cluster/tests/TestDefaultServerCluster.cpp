@@ -48,9 +48,7 @@ namespace {
 class FakeDefaultServerCluster : public DefaultServerCluster
 {
 public:
-    FakeDefaultServerCluster(ConcreteClusterPath path) : mPath(path) {}
-
-    [[nodiscard]] ConcreteClusterPath GetPath() const override { return mPath; }
+    FakeDefaultServerCluster(ConcreteClusterPath path) : DefaultServerCluster(path) {}
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override
@@ -67,9 +65,6 @@ public:
 
     void TestIncreaseDataVersion() { IncreaseDataVersion(); }
     void TestNotifyAttributeChanged(AttributeId attributeId) { NotifyAttributeChanged(attributeId); }
-
-private:
-    ConcreteClusterPath mPath;
 };
 
 } // namespace
@@ -78,15 +73,15 @@ TEST(TestDefaultServerCluster, TestDataVersion)
 {
     FakeDefaultServerCluster cluster({ 1, 2 });
 
-    DataVersion v1 = cluster.GetDataVersion();
+    DataVersion v1 = cluster.GetDataVersion({ 1, 2 });
     cluster.TestIncreaseDataVersion();
-    ASSERT_EQ(cluster.GetDataVersion(), v1 + 1);
+    ASSERT_EQ(cluster.GetDataVersion({ 1, 2 }), v1 + 1);
 }
 
 TEST(TestDefaultServerCluster, TestFlagsDefault)
 {
     FakeDefaultServerCluster cluster({ 1, 2 });
-    ASSERT_EQ(cluster.GetClusterFlags().Raw(), 0u);
+    ASSERT_EQ(cluster.GetClusterFlags({ 1, 2 }).Raw(), 0u);
 }
 
 TEST(TestDefaultServerCluster, ListWriteNotification)
@@ -183,18 +178,18 @@ TEST(TestDefaultServerCluster, NotifyAttributeChanged)
     FakeDefaultServerCluster cluster({ kEndpointId, kClusterId });
 
     // When no ServerClusterContext is set, only the data version should change.
-    DataVersion oldVersion = cluster.GetDataVersion();
+    DataVersion oldVersion = cluster.GetDataVersion({ kEndpointId, kClusterId });
 
     cluster.TestNotifyAttributeChanged(123);
-    ASSERT_NE(cluster.GetDataVersion(), oldVersion);
+    ASSERT_NE(cluster.GetDataVersion({ kEndpointId, kClusterId }), oldVersion);
 
     // Create a ServerClusterContext and verify that attribute change notifications are processed.
     TestServerClusterContext context;
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    oldVersion = cluster.GetDataVersion();
+    oldVersion = cluster.GetDataVersion({ kEndpointId, kClusterId });
     cluster.TestNotifyAttributeChanged(234);
-    ASSERT_NE(cluster.GetDataVersion(), oldVersion);
+    ASSERT_NE(cluster.GetDataVersion({ kEndpointId, kClusterId }), oldVersion);
 
     ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
     ASSERT_EQ(context.ChangeListener().DirtyList()[0], AttributePathParams(kEndpointId, kClusterId, 234));

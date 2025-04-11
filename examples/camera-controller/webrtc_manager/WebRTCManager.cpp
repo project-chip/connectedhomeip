@@ -56,6 +56,8 @@ void WebRTCManager::Init()
 
 CHIP_ERROR WebRTCManager::SetRemoteDescription(uint16_t webRTCSessionID, const std::string & sdp)
 {
+    mWebRTCProviderClient.NotifyRemoteDecryptorReceived(webRTCSessionID);
+
     if (!mPeerConnection)
     {
         ChipLogError(Camera, "Cannot set remote description: mPeerConnection is null");
@@ -85,7 +87,7 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
 
     chip::ScopedNodeId peerId(nodeId, fabricIndex);
 
-    mWebRTCProviderClient.Init(peerId, endpointId);
+    mWebRTCProviderClient.Init(peerId, endpointId, &mWebRTCRequestorServer);
 
     rtc::InitLogger(rtc::LogLevel::Warning);
 
@@ -185,24 +187,4 @@ CHIP_ERROR WebRTCManager::ProvideICECandidates(uint16_t webRTCSessionID)
     }
 
     return err;
-}
-
-void WebRTCManager::HandleProvideOfferResponse(TLV::TLVReader & data)
-{
-    ChipLogProgress(Camera, "WebRTCManager::HandleProvideOfferResponse.");
-}
-
-void WebRTCManager::HandleCommandResponse(const ConcreteCommandPath & path, TLV::TLVReader & data)
-{
-    ChipLogProgress(Camera, "Command Response received.");
-
-    // TODO: Upon receiving, the client SHALL create a new WebRTCSessionStruct populated with the values from this command, along
-    // with the accessing Peer Node ID and Local Fabric Index entries stored in the Secure Session Context, as the PeerNodeID and
-    // FabricIndex values, and store in the Requestor clusters CurrentSessions.
-    if (path.mClusterId == Clusters::WebRTCTransportProvider::Id &&
-        path.mCommandId == Clusters::WebRTCTransportProvider::Commands::ProvideOfferResponse::Id)
-    {
-        VerifyOrDie(path.mEndpointId == kWebRTCRequesterDynamicEndpointId);
-        HandleProvideOfferResponse(data);
-    }
 }
