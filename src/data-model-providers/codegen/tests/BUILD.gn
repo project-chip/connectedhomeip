@@ -52,6 +52,7 @@ chip_test_suite("tests") {
 
   test_sources = [
     "TestCodegenModelViaMocks.cpp",
+    "TestCodegenServerCluster.cpp",
     "TestEmberAttributeDataBuffer.cpp",
     "TestServerClusterInterfaceRegistry.cpp",
   ]

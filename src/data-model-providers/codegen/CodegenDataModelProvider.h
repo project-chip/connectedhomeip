@@ -18,8 +18,7 @@
 
 #include <app/data-model-provider/Provider.h>
 
-#include <app/CommandHandlerInterface.h>
-#include <app/ConcreteCommandPath.h>
+#include <app/ConcreteClusterPath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/MetadataList.h>
 #include <app/util/af-types.h>
@@ -121,6 +120,8 @@ private:
 
     /// Find the index of the given endpoint id
     std::optional<unsigned> TryFindEndpointIndex(EndpointId id) const;
+
+    std::optional<ServerClusterContext> mServerClusterContext;
 };
 
 } // namespace app
