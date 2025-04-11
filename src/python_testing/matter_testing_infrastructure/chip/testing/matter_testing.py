@@ -359,6 +359,7 @@ class ClusterAttributeChangeAccumulator:
         expected_attribute (ClusterObjects.ClusterAttributeDescriptor, optional): 
             If provided, subscribes to a single attribute. Defaults to None.
     """
+
     def __init__(self, expected_cluster: ClusterObjects.Cluster, expected_attribute: ClusterObjects.ClusterAttributeDescriptor = None):
         self._expected_cluster = expected_cluster
         self._expected_attribute = expected_attribute
@@ -420,7 +421,7 @@ class ClusterAttributeChangeAccumulator:
         if valid_report:
             data = transaction.GetAttribute(path)
             value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType,
-                                value=data, timestamp_utc=datetime.now(timezone.utc))
+                                   value=data, timestamp_utc=datetime.now(timezone.utc))
             logging.info(f"Got subscription report for {path.AttributeType}: {data}")
             self._q.put(value)
             with self._lock:
