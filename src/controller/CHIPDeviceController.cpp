@@ -2713,7 +2713,7 @@ CHIP_ERROR DeviceCommissioner::ParsePowerSource(ReadCommissioningInfo & info)
                 ChipLogProgress(Controller, "PowerSourceStatus: Power not available");
                 break;
             default:
-                ChipLogError(Controller, "Invalid PowerSourceStatusEnum value: %d", (int) info.power.status);
+                ChipLogError(Controller, "Invalid PowerSourceStatusEnum value: %d", to_underlying(info.power.status));
                 break;
         }
     }
