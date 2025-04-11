@@ -28,7 +28,7 @@ namespace StaticApplicationConfig {
 /// An enumeration acting as a placeholder of "no features defined
 /// for a cluster, enforcing that the feature map type is always
 /// a form of bitflags"
-enum NoFeatureFlagsDefined : uint32_t
+enum class NoFeatureFlagsDefined : uint32_t
 {
 };
 
