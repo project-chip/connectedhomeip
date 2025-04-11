@@ -229,6 +229,8 @@ static_library("support") {
     "PoolWrapper.h",
     "PrivateHeap.cpp",
     "PrivateHeap.h",
+    "ReadOnlyBuffer.cpp",
+    "ReadOnlyBuffer.h",
     "ReferenceCountedHandle.h",
     "SafePointerCast.h",
     "SafeString.h",

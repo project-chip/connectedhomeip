@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/data-model-provider/MetadataList.h>
+#include <lib/support/ReadOnlyBuffer.h>
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
@@ -21,8 +21,6 @@
 #include <lib/support/ScopedBuffer.h>
 
 namespace chip {
-namespace app {
-namespace DataModel {
 namespace detail {
 
 GenericAppendOnlyBuffer::~GenericAppendOnlyBuffer()
@@ -180,6 +178,4 @@ ScopedBuffer & ScopedBuffer::operator=(ScopedBuffer && other)
 }
 
 } // namespace detail
-} // namespace DataModel
-} // namespace app
 } // namespace chip
