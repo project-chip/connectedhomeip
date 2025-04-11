@@ -956,7 +956,7 @@ CHIP_ERROR BLEManagerImpl::EncodeAdditionalDataTlv()
 
     VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "Failed to generate TLV encoded Additional Data"));
 
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 void BLEManagerImpl::HandleC3ReadRequest(volatile sl_bt_msg_t * evt)
