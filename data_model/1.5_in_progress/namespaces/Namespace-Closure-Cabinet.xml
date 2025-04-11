@@ -57,16 +57,16 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<namespace xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd namespace namespace.xsd" id="0x000B" name="Energy Tariff Chronology">
+<namespace xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd namespace namespace.xsd" id="0x0048" name="Closure Cabinet">
   <tags>
-    <tag id="0x0000" name="Current">
-      <description>Represents the current energy tariff</description>
+    <tag id="0x0000" name="CabinetDoor">
+      <description>A hinged or sliding panel used to cover the opening of a cabinet, providing access to its interior.</description>
     </tag>
-    <tag id="0x0001" name="Previous">
-      <description>Represents the previous energy tariff</description>
+    <tag id="0x0001" name="Drawer">
+      <description>A sliding storage compartment, typically built into furniture like cabinets, desks, or dressers.</description>
     </tag>
-    <tag id="0x0002" name="Upcoming">
-      <description>Represents the upcoming energy tariff</description>
+    <tag id="0x0002" name="Flap">
+      <description>A hinged front or flexible cover that can be lifted or moved, providing access to its interior.</description>
     </tag>
   </tags>
 </namespace>
