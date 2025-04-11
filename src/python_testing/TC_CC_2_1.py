@@ -166,7 +166,7 @@ class TC_CC_2_1(MatterBaseTest):
             if await self.verify_primary_index(pindex):
                 numberofprimaries += 1
             else:
-                # Dont break to count all
+                # Don't break to count all
                 logger.warning(f"PrimaryN<X,Y,Intensity> with index {pindex} was not found in the cluster.")
         return numberofprimaries
 
@@ -188,13 +188,13 @@ class TC_CC_2_1(MatterBaseTest):
             attr_val = await self.read_single_attribute_check_success(cluster=self.cluster, attribute=attribute, endpoint=self.endpoint)
             logger.info(f"Current value for {attribute} is {attr_val}")
             if data_type == ValueTypesEnum.UINT8:
-                logger.info("Checkng is uint8")
+                logger.info("Checking is uint8")
                 matter_asserts.assert_valid_uint8(attr_val, "Is not uint8")
             elif data_type == ValueTypesEnum.UINT16:
-                logger.info("Checkng is uint16")
+                logger.info("Checking is uint16")
                 matter_asserts.assert_valid_uint16(attr_val, "Is not uint16")
             elif data_type == ValueTypesEnum.UINT32:
-                logger.info("Checkng is uint32")
+                logger.info("Checking is uint32")
                 matter_asserts.assert_valid_uint32(attr_val, "Is not uint32")
             elif data_type == ValueTypesEnum.ENUM:
                 if len(enum_range) >= 0:
@@ -332,7 +332,7 @@ class TC_CC_2_1(MatterBaseTest):
             primariesfound = await self._get_totalnumberofprimaries(primaries=numberofprimaries_value)
             logger.info(f"Fetched Primaries attributes {primariesfound}")
             asserts.assert_equal(numberofprimaries_value, primariesfound,
-                                 "NumberOfPrimaries does not match with the Primaries found in the cluster.")
+                                 "NumberOfPrimaries does not match with the Primaries attributes found in the cluster.")
             # Verify for NumberOfPrimaries section
             # We are at step 24 before all the number of primaries checks
             current_step = 24
