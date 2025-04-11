@@ -52,7 +52,8 @@ namespace Logging {
     X(CASESessionManager, "CSM")                                                                                                   \
     X(ICD, "ICD")                                                                                                                  \
     X(FabricSync, "FS")                                                                                                            \
-    X(WiFiPAF, "PAF")
+    X(WiFiPAF, "PAF")                                                                                                              \
+    X(Camera, "CAM")
 
 /**
  *  @enum LogModule
@@ -245,6 +246,10 @@ enum LogModule
 
 #ifndef CHIP_CONFIG_LOG_MODULE_WiFiPAF
 #define CHIP_CONFIG_LOG_MODULE_WiFiPAF 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_Camera
+#define CHIP_CONFIG_LOG_MODULE_Camera 1
 #endif
 
 /**
