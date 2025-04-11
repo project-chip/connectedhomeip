@@ -212,7 +212,7 @@ class TestRunnerHooks():
         """
         pass
 
-    async def step_manual(self):
+    async def step_manual(self, request: Optional[TestStep] = None):
         """
         This method is called when the step is executed manually.
         """
@@ -234,6 +234,16 @@ class TestRunnerHooks():
         This method is called when the test script determines that the test is not applicable for the DUT.
         """
         pass
+
+    async def prompt_with_string_response(self,
+                                          msg: str,
+                                          placeholder: Optional[str] = None,
+                                          default_value: Optional[str] = None,
+                                          )-> str:
+        """
+        This method is called when the step needs to ask the user to provide a string value.
+        """
+        return ""
 
 
 class WebSocketRunnerHooks():
