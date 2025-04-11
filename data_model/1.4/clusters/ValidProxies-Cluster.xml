@@ -81,7 +81,9 @@ Davis, CA 95616, USA
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="allowed" value=""/>
+      <constraint>
+        <allowed value=""/>
+      </constraint>
     </attribute>
   </attributes>
   <commands>

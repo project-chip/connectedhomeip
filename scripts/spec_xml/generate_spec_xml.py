@@ -125,6 +125,7 @@ def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress):
     cluster_out = make_asciidoc('pdf-appclusters-book', include_in_progress, spec_root, dry_run)
     print('Generating device type library to get file include list - this may take a few minutes')
     device_type_files = make_asciidoc('pdf-devicelibrary-book', include_in_progress, spec_root, dry_run)
+    namespace_files = make_asciidoc('pdf-standardnamespaces-book', include_in_progress, spec_root, dry_run)
 
     cluster_files = main_out + cluster_out
     cmd = [scraper, 'dm', '--dmRoot', output_dir, '--specRoot', spec_root]
@@ -142,6 +143,7 @@ def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress):
     # Remove all the files that weren't compiled into the spec
     clusters_output_dir = os.path.join(output_dir, 'clusters')
     device_types_output_dir = os.path.abspath(os.path.join(output_dir, 'device_types'))
+    namespaces_output_dir = os.path.abspath(os.path.join(output_dir, 'namespaces'))
     for filename in os.listdir(clusters_output_dir):
         # There are a couple of clusters that appear in the same adoc file and they have prefixes.
         # Look for these specifically.
@@ -161,6 +163,12 @@ def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress):
         if adoc not in device_type_files:
             print(f'Removing {adoc} as it was not in the generated spec document')
             os.remove(os.path.join(device_types_output_dir, filename))
+
+    for filename in os.listdir(namespaces_output_dir):
+        adoc = os.path.basename(filename).replace('.xml', '.adoc')
+        if adoc not in namespace_files:
+            print(f'Removing {adoc} as it was not in the generated spec document')
+            os.remove(os.path.join(namespaces_output_dir, filename))
 
 
 def scrape_clusters(scraper, spec_root, output_dir, dry_run, include_in_progress):

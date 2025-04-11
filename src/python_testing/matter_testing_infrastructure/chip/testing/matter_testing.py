@@ -1943,11 +1943,11 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
 
     commission_group.add_argument('-m', '--commissioning-method', type=str,
                                   metavar='METHOD_NAME',
-                                  choices=["on-network", "ble-wifi", "ble-thread", "on-network-ip"],
+                                  choices=["on-network", "ble-wifi", "ble-thread"],
                                   help='Name of commissioning method to use')
     commission_group.add_argument('--in-test-commissioning-method', type=str,
                                   metavar='METHOD_NAME',
-                                  choices=["on-network", "ble-wifi", "ble-thread", "on-network-ip"],
+                                  choices=["on-network", "ble-wifi", "ble-thread"],
                                   help='Name of commissioning method to use, for commissioning tests')
     commission_group.add_argument('-d', '--discriminator', type=int_decimal_or_hex,
                                   metavar='LONG_DISCRIMINATOR',
@@ -1959,9 +1959,6 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                                   dest='passcodes',
                                   default=[],
                                   help='PAKE passcode to use', nargs="+")
-    commission_group.add_argument('-i', '--ip-addr', type=str,
-                                  metavar='RAW_IP_ADDRESS',
-                                  help='IP address to use (only for method "on-network-ip". ONLY FOR LOCAL TESTING!', nargs="+")
 
     commission_group.add_argument('--wifi-ssid', type=str,
                                   metavar='SSID',
