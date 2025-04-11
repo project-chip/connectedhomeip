@@ -15,10 +15,10 @@
 import os
 from typing import Union
 
-from matter.idl.generators import CodeGenerator, GeneratorStorage
-from matter.idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute, AttributeQuality, AttributeStorage, Command,
-                                         CommandQuality, Event, EventPriority, EventQuality, FieldQuality, Idl, StructQuality,
-                                         StructTag)
+from ...matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute, AttributeQuality, AttributeStorage, Command,
+                                 CommandQuality, Event, EventPriority, EventQuality, FieldQuality, Idl, StructQuality, StructTag)
+from ..generator import CodeGenerator
+from ..storage import GeneratorStorage
 
 
 def human_text_string(value: Union[StructTag, StructQuality, EventPriority, EventQuality, AccessPrivilege, AttributeQuality, CommandQuality, ApiMaturity, AttributeStorage]) -> str:

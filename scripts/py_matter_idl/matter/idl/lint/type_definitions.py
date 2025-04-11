@@ -16,7 +16,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import List, MutableMapping, Optional, Union
 
-from matter.idl.matter_idl_types import Idl, ParseMetaData
+from ..matter_idl_types import Idl, ParseMetaData
 
 
 class MissingIdlError(Exception):
