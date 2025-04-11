@@ -42,19 +42,19 @@ const ClosureErrorEnum kCurrentErrorList[] = {
     },
 };
 
-PositioningEnum getStatePositionFromTarget(TagPositionEnum tagPosition)
+PositioningEnum getStatePositionFromTarget(TargetPositionEnum tagPosition)
 {
     switch (tagPosition)
     {
-    case TagPositionEnum::kCloseInFull:
+    case TargetPositionEnum::kCloseInFull:
         return PositioningEnum::kFullyClosed;
-    case TagPositionEnum::kOpenInFull:
+    case TargetPositionEnum::kOpenInFull:
         return PositioningEnum::kFullyOpened;
-    case TagPositionEnum::kPedestrian:
+    case TargetPositionEnum::kPedestrian:
         return PositioningEnum::kOpenedForPedestrian;
-    case TagPositionEnum::kVentilation:
+    case TargetPositionEnum::kVentilation:
         return PositioningEnum::kOpenedForVentilation;
-    case TagPositionEnum::kSignature:
+    case TargetPositionEnum::kSignature:
         return PositioningEnum::kOpenedAtSignature;
     default:
         break;
@@ -112,8 +112,8 @@ Protocols::InteractionModel::Status ClosureControlManager::Stop()
 }
 
 // Return default success, will add command handling in next phase
-Protocols::InteractionModel::Status ClosureControlManager::MoveTo(const Optional<TagPositionEnum> & tag,
-                                                                  const Optional<TagLatchEnum> & latch,
+Protocols::InteractionModel::Status ClosureControlManager::MoveTo(const Optional<TargetPositionEnum> & tag,
+                                                                  const Optional<TargetLatchEnum> & latch,
                                                                   const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
     MainStateEnum state              = mpClosureControlInstance->GetMainState();
@@ -121,7 +121,7 @@ Protocols::InteractionModel::Status ClosureControlManager::MoveTo(const Optional
 
     if (tag.HasValue())
     {
-        VerifyOrReturnValue(Clusters::EnsureKnownEnumValue(tag.Value()) != TagPositionEnum::kUnknownEnumValue,
+        VerifyOrReturnValue(Clusters::EnsureKnownEnumValue(tag.Value()) != TargetPositionEnum::kUnknownEnumValue,
                             Status::ConstraintError);
         VerifyOrReturnValue(mpClosureControlInstance->HasFeature(Feature::kPositioning), Status::Success);
         ChipLogDetail(DataManagement, "ClosureControlManager::positioning");
@@ -144,7 +144,7 @@ Protocols::InteractionModel::Status ClosureControlManager::MoveTo(const Optional
 
     if (latch.HasValue())
     {
-        VerifyOrReturnValue(Clusters::EnsureKnownEnumValue(latch.Value()) == TagLatchEnum::kUnknownEnumValue,
+        VerifyOrReturnValue(Clusters::EnsureKnownEnumValue(latch.Value()) == TargetLatchEnum::kUnknownEnumValue,
                             Status::ConstraintError);
         VerifyOrReturnValue(mpClosureControlInstance->HasFeature(Feature::kMotionLatching), Status::Success);
         ChipLogDetail(DataManagement, "ClosureControlManager::latch");
@@ -152,11 +152,11 @@ Protocols::InteractionModel::Status ClosureControlManager::MoveTo(const Optional
 
         // TODO: device to perform latch operation
 
-        if (latch.Value() == TagLatchEnum::kLatch)
+        if (latch.Value() == TargetLatchEnum::kLatch)
         {
             overallState.latching.SetValue(LatchingEnum::kLatchedAndSecured);
         }
-        if (latch.Value() == TagLatchEnum::kUnlatch)
+        if (latch.Value() == TargetLatchEnum::kUnlatch)
         {
             overallState.latching.SetValue(LatchingEnum::kNotLatched);
         }

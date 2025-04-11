@@ -337,7 +337,7 @@ Status Instance::HandleMoveTo(HandlerContext & ctx, const Commands::MoveTo::Deco
 {
     MainStateEnum state = GetMainState();
     VerifyOrReturnValue(CheckCommandStateCompatiblilty(Commands::Stop::Id, state), Status::InvalidInState);
-    return mDelegate.MoveTo(commandData.tag, commandData.latch, commandData.speed);
+    return mDelegate.MoveTo(commandData.position, commandData.latch, commandData.speed);
 }
 
 Status Instance::HandleCalibrate(HandlerContext & ctx, const Commands::Calibrate::DecodableType & commandData)
