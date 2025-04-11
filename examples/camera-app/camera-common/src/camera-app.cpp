@@ -47,12 +47,12 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     features.Set(CameraAvStreamManagement::Feature::kVideo);
     if (mCameraDevice->GetCameraHALInterface().HasMicrophone())
     {
-        features.Set(Feature::kAudio);
+        features.Set(CameraAvStreamManagement::Feature::kAudio);
     }
 
-    features.Set(Feature::kHighDynamicRange);
+    features.Set(CameraAvStreamManagement::Feature::kHighDynamicRange);
 
-    BitFlags<OptionalAttribute> optionalAttrs;
+    BitFlags<CameraAvStreamManagement::OptionalAttribute> optionalAttrs;
     optionalAttrs.Set(chip::app::Clusters::CameraAvStreamManagement::OptionalAttribute::kNightVision);
     optionalAttrs.Set(chip::app::Clusters::CameraAvStreamManagement::OptionalAttribute::kNightVisionIllum);
 
