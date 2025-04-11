@@ -263,41 +263,12 @@ namespace Inet {
 
     uint16_t UDPEndPointImplNetworkFramework::GetBoundPort() const
     {
-        __auto_type endpoint = nw_parameters_copy_local_endpoint(mParameters);
-        return nw_endpoint_get_port(endpoint);
+        return nw_listener_get_port(mListener);
     }
 
     CHIP_ERROR UDPEndPointImplNetworkFramework::ListenImpl()
     {
-        // When using a temporary socket to bind to port 0 and obtain an ephemeral port,
-        // the OS may not immediately release that port for reuse after the socket is closed.
-        // This can lead to a race where we attempt to use the same port again (via Network.framework),
-        // but the OS still considers it in use, resulting in EADDRINUSE errors.
-        //
-        // This issue is more likely to surface on slower systems or in CI environments.
-        //
-        // To mitigate it, we retry the connection setup a few times with short exponential backoff delays,
-        // giving the kernel time to fully release the port and avoid flakiness when reusing it.
-        constexpr int kMaxRetries = 3;
-        constexpr uint64_t kRetryBackoffMs = 10;
-
-        CHIP_ERROR error = CHIP_NO_ERROR;
-        for (int attempt = 0; attempt < kMaxRetries; ++attempt) {
-#if NETWORK_FRAMEWORK_DEBUG
-            ChipLogError(Inet, "Listen attempt: %d/%d", attempt + 1, kMaxRetries);
-#endif
-            error = StartListener();
-
-            // Only retry on "address in use" errors (EADDRINUSE)
-            if (CHIP_ERROR_POSIX(EADDRINUSE) != error) {
-                break;
-            }
-
-            // Delay to give the OS time to release the ephemeral port.
-            usleep(static_cast<useconds_t>((static_cast<uint64_t>(attempt) + 1) * kRetryBackoffMs * 1000));
-        }
-
-        return error;
+        return StartListener();
     }
 
     CHIP_ERROR UDPEndPointImplNetworkFramework::SendMsgImpl(const IPPacketInfo * pktInfo, System::PacketBufferHandle && msg)
@@ -469,108 +440,37 @@ namespace Inet {
         const IPAddress & aAddress, uint16_t aPort, InterfaceId interfaceIndex)
     {
         char addrStr[IPAddress::kMaxStringLength + 1 /*%*/ + InterfaceId::kMaxIfNameLength + 1 /*null terminator */];
-        nw_endpoint_t endpoint = nullptr;
 
-        // When aPort == 0, we want the system to assign an ephemeral port.
-        // However, Network.framework does not directly support binding to port 0
-        // and then retrieving the assigned port like BSD sockets do.
-        //
-        // To work around this, we manually create a temporary socket, bind it
-        // to port 0, and call getsockname() to obtain the actual port assigned by the OS.
-        // We then construct a sockaddr with this assigned port and use it to
-        // create a nw_endpoint_t via nw_endpoint_create_address.
-        //
-        // This allows us to later pass the endpoint to Network.framework APIs
-        // (via nw_parameters_set_local_endpoint) and bind to a known, system-assigned port.
-        if (aPort == 0) {
+        // Note: aAddress.ToString will return the IPv6 Any address if the address type is Any, but that's not what
+        // we want if the local endpoint is IPv4.
 #if INET_CONFIG_ENABLE_IPV4
-            if (aAddressType == IPAddressType::kIPv4 && aAddress.Type() == IPAddressType::kAny) {
-                sockaddr_in addr = {};
-                addr.sin_family = AF_INET;
-                addr.sin_port = 0; // system assigns
-                addr.sin_addr = aAddress.ToIPv4();
-
-                int fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-                int one = 1;
-                setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
-                bind(fd, (sockaddr *) &addr, sizeof(addr));
-
-                socklen_t len = sizeof(addr);
-                getsockname(fd, (sockaddr *) &addr, &len);
-                aPort = ntohs(addr.sin_port);
-                close(fd);
-
-                addr.sin_port = htons(aPort);
-                endpoint = nw_endpoint_create_address((sockaddr *) &addr);
-
-#if NETWORK_FRAMEWORK_DEBUG
-                inet_ntop(AF_INET, &addr.sin_addr, addrStr, sizeof(addrStr));
-                ChipLogError(Inet, "Create endpoint (IPv4) for ip(%s) port(%u)", addrStr, aPort);
-#endif
-            } else
-#endif
-            {
-                sockaddr_in6 addr6 = {};
-                addr6.sin6_family = AF_INET6;
-                addr6.sin6_port = 0; // system assigns
-                addr6.sin6_addr = aAddress.ToIPv6();
-
-                if (interfaceIndex != InterfaceId::Null()) {
-                    addr6.sin6_scope_id = interfaceIndex.GetPlatformInterface();
-                }
-
-                int fd = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
-                int one = 1;
-                setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
-                bind(fd, (sockaddr *) &addr6, sizeof(addr6));
-
-                socklen_t len = sizeof(addr6);
-                getsockname(fd, (sockaddr *) &addr6, &len);
-                aPort = ntohs(addr6.sin6_port);
-                close(fd);
-
-                addr6.sin6_port = htons(aPort);
-                endpoint = nw_endpoint_create_address((sockaddr *) &addr6);
-
-#if NETWORK_FRAMEWORK_DEBUG
-                inet_ntop(AF_INET6, &addr6.sin6_addr, addrStr, sizeof(addrStr));
-                ChipLogError(Inet, "Create endpoint (IPv6) for ip(%s%%%u) port(%u)", addrStr, addr6.sin6_scope_id, aPort);
-#endif
-            }
-        } else {
-            // Note: aAddress.ToString will return the IPv6 Any address if the address type is Any, but that's not what
-            // we want if the local endpoint is IPv4.
-#if INET_CONFIG_ENABLE_IPV4
-            if (aAddressType == IPAddressType::kIPv4 && aAddress.Type() == IPAddressType::kAny) {
-                const IPAddress anyAddr = IPAddress(aAddress.ToIPv4());
-                anyAddr.ToString(addrStr);
-            } else
+        if (aAddressType == IPAddressType::kIPv4 && aAddress.Type() == IPAddressType::kAny) {
+            const IPAddress anyAddr = IPAddress(aAddress.ToIPv4());
+            anyAddr.ToString(addrStr);
+        } else
 #endif // INET_CONFIG_ENABLE_IPV4
-            {
-                aAddress.ToString(addrStr);
-                if (interfaceIndex != InterfaceId::Null()) {
-                    char interface[InterfaceId::kMaxIfNameLength + 1] = {}; // +1 to prepend '%'
-                    interface[0] = '%';
-                    interface[1] = 0;
-                    CHIP_ERROR err = interfaceIndex.GetInterfaceName(interface + 1, sizeof(interface) - 1);
-                    if (err != CHIP_NO_ERROR) {
-                        Platform::CopyString(interface, sizeof(interface), "%(err)");
-                    }
-                    strncat(addrStr, interface, sizeof(addrStr) - strlen(addrStr) - 1);
+        {
+            aAddress.ToString(addrStr);
+            if (interfaceIndex != InterfaceId::Null()) {
+                char interface[InterfaceId::kMaxIfNameLength + 1] = {}; // +1 to prepend '%'
+                interface[0] = '%';
+                interface[1] = 0;
+                CHIP_ERROR err = interfaceIndex.GetInterfaceName(interface + 1, sizeof(interface) - 1);
+                if (err != CHIP_NO_ERROR) {
+                    Platform::CopyString(interface, sizeof(interface), "%(err)");
                 }
+                strncat(addrStr, interface, sizeof(addrStr) - strlen(addrStr) - 1);
             }
-
-            char portStr[INET_PORTSTRLEN];
-            snprintf(portStr, sizeof(portStr), "%u", aPort);
-
-#if NETWORK_FRAMEWORK_DEBUG
-            ChipLogError(Inet, "Create endpoint for ip(%s) port(%s)", addrStr, portStr);
-#endif
-
-            endpoint = nw_endpoint_create_host(addrStr, portStr);
         }
 
-        return endpoint;
+        char portStr[INET_PORTSTRLEN];
+        snprintf(portStr, sizeof(portStr), "%u", aPort);
+
+#if NETWORK_FRAMEWORK_DEBUG
+        ChipLogError(Inet, "Create endpoint for ip(%s) port(%s)", addrStr, portStr);
+#endif
+
+        return nw_endpoint_create_host(addrStr, portStr);
     }
 
     CHIP_ERROR UDPEndPointImplNetworkFramework::GetConnection(const IPPacketInfo * aPktInfo)
