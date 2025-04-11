@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2024-2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,9 +37,7 @@ namespace Transport {
 CHIP_ERROR WiFiPAFBase::Init(const WiFiPAFListenParameters & param)
 {
     ChipLogDetail(Inet, "WiFiPAFBase::Init - setting/overriding transport");
-    mWiFiPAFLayer = DeviceLayer::ConnectivityMgr().GetWiFiPAF();
     SetWiFiPAFLayerTransportToSelf();
-    mWiFiPAFLayer->SetWiFiPAFState(State::kInitialized);
 
     if (!DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
     {
@@ -69,10 +67,9 @@ CHIP_ERROR WiFiPAFBase::Init(const WiFiPAFListenParameters & param)
 CHIP_ERROR WiFiPAFBase::SendMessage(const Transport::PeerAddress & address, PacketBufferHandle && msgBuf)
 {
     VerifyOrReturnError(address.GetTransportType() == Type::kWiFiPAF, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(mWiFiPAFLayer->GetWiFiPAFState() != State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
 
     WiFiPAFSession sessionInfo = { .nodeId = address.GetRemoteId() };
-    WiFiPAFSession * pTxInfo   = mWiFiPAFLayer->GetPAFInfo(chip::WiFiPAF::PafInfoAccess::kAccNodeId, sessionInfo);
+    WiFiPAFSession * pTxInfo   = mWiFiPAFLayer.GetPAFInfo(chip::WiFiPAF::PafInfoAccess::kAccNodeId, sessionInfo);
     if (pTxInfo == nullptr)
     {
         /*
@@ -81,23 +78,19 @@ CHIP_ERROR WiFiPAFBase::SendMessage(const Transport::PeerAddress & address, Pack
         ChipLogError(Inet, "WiFi-PAF: No valid session whose nodeId: %lu", address.GetRemoteId());
         return CHIP_ERROR_INCORRECT_STATE;
     }
-    mWiFiPAFLayer->SendMessage(*pTxInfo, std::move(msgBuf));
+    mWiFiPAFLayer.SendMessage(*pTxInfo, std::move(msgBuf));
 
     return CHIP_NO_ERROR;
 }
 
 bool WiFiPAFBase::CanSendToPeer(const Transport::PeerAddress & address)
 {
-    if (mWiFiPAFLayer != nullptr)
-    {
-        return (mWiFiPAFLayer->GetWiFiPAFState() != State::kNotReady) && (address.GetTransportType() == Type::kWiFiPAF);
-    }
-    return false;
+    return (address.GetTransportType() == Type::kWiFiPAF);
 }
 
 CHIP_ERROR WiFiPAFBase::WiFiPAFMessageReceived(WiFiPAFSession & RxInfo, PacketBufferHandle && buffer)
 {
-    auto pPafInfo = mWiFiPAFLayer->GetPAFInfo(chip::WiFiPAF::PafInfoAccess::kAccSessionId, RxInfo);
+    auto pPafInfo = mWiFiPAFLayer.GetPAFInfo(chip::WiFiPAF::PafInfoAccess::kAccSessionId, RxInfo);
     if (pPafInfo == nullptr)
     {
         /*
@@ -128,17 +121,12 @@ CHIP_ERROR WiFiPAFBase::WiFiPAFMessageReceived(WiFiPAFSession & RxInfo, PacketBu
 
 CHIP_ERROR WiFiPAFBase::WiFiPAFMessageSend(WiFiPAFSession & TxInfo, PacketBufferHandle && msgBuf)
 {
-    VerifyOrReturnError(mWiFiPAFLayer->GetWiFiPAFState() != State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
-    DeviceLayer::ConnectivityMgr().WiFiPAFSend(TxInfo, std::move(msgBuf));
-
-    return CHIP_NO_ERROR;
+    return DeviceLayer::ConnectivityMgr().WiFiPAFSend(TxInfo, std::move(msgBuf));
 }
 
 CHIP_ERROR WiFiPAFBase::WiFiPAFCloseSession(WiFiPAFSession & SessionInfo)
 {
-    VerifyOrReturnError(mWiFiPAFLayer->GetWiFiPAFState() != State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
     DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(SessionInfo.id, SessionInfo.role);
-    mWiFiPAFLayer->SetWiFiPAFState(State::kInitialized);
 
     return CHIP_NO_ERROR;
 }
