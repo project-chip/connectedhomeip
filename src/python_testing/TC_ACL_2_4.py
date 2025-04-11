@@ -886,13 +886,13 @@ class TC_ACL_2_4(MatterBaseTest):
             asserts.assert_true(isinstance(entry.targets, Nullable),
                                 f"Entry {i} targets should be Nullable")
 
-        # Step 21: Write ACL with specific subjects
+        # Step 21: Write ACL with 4 valid CATs as subjects
         self.step(21)
-        # Define specific test subject IDs
-        CAT1 = 0x434154_1  # 'CAT1' in hex
-        CAT2 = 0x434154_2  # 'CAT2' in hex
-        CAT3 = 0x434154_3  # 'CAT3' in hex
-        CAT4 = 0x434154_4  # 'CAT4' in hex
+        # Define various Valid CATs taken from Test Spec
+        CAT1 = 0xFFFFFFFDABCD0001  # 'CAT1' in hex
+        CAT2 = 0xFFFFFFFDFFFF0001  # 'CAT2' in hex
+        CAT3 = 0xFFFFFFFD071C1074  # 'CAT3' in hex
+        CAT4 = 0xFFFFFFFD071C1074  # 'CAT4' in hex
 
         specific_subjects_acl = [
             # Admin entry (unchanged)
