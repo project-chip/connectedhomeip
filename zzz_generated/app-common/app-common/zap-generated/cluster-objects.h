@@ -25288,6 +25288,204 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace DeviceEnergyManagementMode
+namespace ElectricalGridConditions {
+namespace Structs {
+namespace ElectricalGridConditionsStruct {
+enum class Fields : uint8_t
+{
+    kPeriodStart          = 0,
+    kPeriodEnd            = 1,
+    kGridCarbonIntensity  = 2,
+    kGridCarbonLevel      = 3,
+    kLocalCarbonIntensity = 4,
+    kLocalCarbonLevel     = 5,
+};
+
+struct Type
+{
+public:
+    uint32_t periodStart = static_cast<uint32_t>(0);
+    DataModel::Nullable<uint32_t> periodEnd;
+    int16_t gridCarbonIntensity     = static_cast<int16_t>(0);
+    ThreeLevelEnum gridCarbonLevel  = static_cast<ThreeLevelEnum>(0);
+    int16_t localCarbonIntensity    = static_cast<int16_t>(0);
+    ThreeLevelEnum localCarbonLevel = static_cast<ThreeLevelEnum>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ElectricalGridConditionsStruct
+} // namespace Structs
+
+namespace Attributes {
+
+namespace LocalGenerationAvailable {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<bool>;
+    using DecodableType    = chip::app::DataModel::Nullable<bool>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<bool> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalGridConditions::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LocalGenerationAvailable::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LocalGenerationAvailable
+namespace CurrentConditions {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<
+        chip::app::Clusters::ElectricalGridConditions::Structs::ElectricalGridConditionsStruct::Type>;
+    using DecodableType = chip::app::DataModel::Nullable<
+        chip::app::Clusters::ElectricalGridConditions::Structs::ElectricalGridConditionsStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<
+        chip::app::Clusters::ElectricalGridConditions::Structs::ElectricalGridConditionsStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalGridConditions::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentConditions::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CurrentConditions
+namespace ForecastConditions {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<
+        const chip::app::Clusters::ElectricalGridConditions::Structs::ElectricalGridConditionsStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ElectricalGridConditions::Structs::ElectricalGridConditionsStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ElectricalGridConditions::Structs::ElectricalGridConditionsStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalGridConditions::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ForecastConditions::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ForecastConditions
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalGridConditions::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalGridConditions::Id; }
+};
+} // namespace AcceptedCommandList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalGridConditions::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalGridConditions::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalGridConditions::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::ElectricalGridConditions::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::LocalGenerationAvailable::TypeInfo::DecodableType localGenerationAvailable;
+        Attributes::CurrentConditions::TypeInfo::DecodableType currentConditions;
+        Attributes::ForecastConditions::TypeInfo::DecodableType forecastConditions;
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+namespace Events {
+namespace CurrentConditionsChanged {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kCurrentConditions = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::CurrentConditionsChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalGridConditions::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    DataModel::Nullable<Structs::ElectricalGridConditionsStruct::Type> currentConditions;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::CurrentConditionsChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalGridConditions::Id; }
+
+    DataModel::Nullable<Structs::ElectricalGridConditionsStruct::DecodableType> currentConditions;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace CurrentConditionsChanged
+namespace ForecastConditionsChanged {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kForecastConditions = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::ForecastConditionsChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalGridConditions::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    DataModel::Nullable<DataModel::List<const Structs::ElectricalGridConditionsStruct::Type>> forecastConditions;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::ForecastConditionsChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalGridConditions::Id; }
+
+    DataModel::Nullable<DataModel::DecodableList<Structs::ElectricalGridConditionsStruct::DecodableType>> forecastConditions;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace ForecastConditionsChanged
+} // namespace Events
+} // namespace ElectricalGridConditions
 namespace DoorLock {
 namespace Structs {
 namespace CredentialStruct {

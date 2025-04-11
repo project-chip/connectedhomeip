@@ -18969,6 +18969,174 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 namespace Events {} // namespace Events
 
 } // namespace DeviceEnergyManagementMode
+namespace ElectricalGridConditions {
+namespace Structs {
+
+namespace ElectricalGridConditionsStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kPeriodStart), periodStart);
+    encoder.Encode(to_underlying(Fields::kPeriodEnd), periodEnd);
+    encoder.Encode(to_underlying(Fields::kGridCarbonIntensity), gridCarbonIntensity);
+    encoder.Encode(to_underlying(Fields::kGridCarbonLevel), gridCarbonLevel);
+    encoder.Encode(to_underlying(Fields::kLocalCarbonIntensity), localCarbonIntensity);
+    encoder.Encode(to_underlying(Fields::kLocalCarbonLevel), localCarbonLevel);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kPeriodStart))
+        {
+            err = DataModel::Decode(reader, periodStart);
+        }
+        else if (__context_tag == to_underlying(Fields::kPeriodEnd))
+        {
+            err = DataModel::Decode(reader, periodEnd);
+        }
+        else if (__context_tag == to_underlying(Fields::kGridCarbonIntensity))
+        {
+            err = DataModel::Decode(reader, gridCarbonIntensity);
+        }
+        else if (__context_tag == to_underlying(Fields::kGridCarbonLevel))
+        {
+            err = DataModel::Decode(reader, gridCarbonLevel);
+        }
+        else if (__context_tag == to_underlying(Fields::kLocalCarbonIntensity))
+        {
+            err = DataModel::Decode(reader, localCarbonIntensity);
+        }
+        else if (__context_tag == to_underlying(Fields::kLocalCarbonLevel))
+        {
+            err = DataModel::Decode(reader, localCarbonLevel);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace ElectricalGridConditionsStruct
+} // namespace Structs
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::LocalGenerationAvailable::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, localGenerationAvailable);
+    case Attributes::CurrentConditions::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, currentConditions);
+    case Attributes::ForecastConditions::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, forecastConditions);
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, generatedCommandList);
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, acceptedCommandList);
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, attributeList);
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, featureMap);
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, clusterRevision);
+    default:
+        return CHIP_NO_ERROR;
+    }
+}
+} // namespace Attributes
+
+namespace Events {
+namespace CurrentConditionsChanged {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kCurrentConditions), currentConditions));
+    return aWriter.EndContainer(outer);
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kCurrentConditions))
+        {
+            err = DataModel::Decode(reader, currentConditions);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace CurrentConditionsChanged.
+namespace ForecastConditionsChanged {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kForecastConditions), forecastConditions));
+    return aWriter.EndContainer(outer);
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kForecastConditions))
+        {
+            err = DataModel::Decode(reader, forecastConditions);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace ForecastConditionsChanged.
+} // namespace Events
+
+} // namespace ElectricalGridConditions
 namespace DoorLock {
 namespace Structs {
 

@@ -1212,6 +1212,30 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("waterHeaterMode", writeWaterHeaterModeInteractionInfo);
     Map<String, InteractionInfo> writeDeviceEnergyManagementModeInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("deviceEnergyManagementMode", writeDeviceEnergyManagementModeInteractionInfo);
+    Map<String, InteractionInfo> writeElectricalGridConditionsInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeElectricalGridConditionsLocalGenerationAvailableCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo electricalGridConditionslocalGenerationAvailableCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Boolean.class, 
+            Boolean.class 
+        );
+    writeElectricalGridConditionsLocalGenerationAvailableCommandParams.put(
+        "value",
+        electricalGridConditionslocalGenerationAvailableCommandParameterInfo
+    );
+    InteractionInfo writeElectricalGridConditionsLocalGenerationAvailableAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ElectricalGridConditionsCluster) cluster).writeLocalGenerationAvailableAttribute(
+          (DefaultClusterCallback) callback,
+          (Boolean) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeElectricalGridConditionsLocalGenerationAvailableCommandParams
+    );
+    writeElectricalGridConditionsInteractionInfo.put("writeLocalGenerationAvailableAttribute", writeElectricalGridConditionsLocalGenerationAvailableAttributeInteractionInfo);
+    writeAttributeMap.put("electricalGridConditions", writeElectricalGridConditionsInteractionInfo);
     Map<String, InteractionInfo> writeDoorLockInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeDoorLockDoorOpenEventsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo doorLockdoorOpenEventsCommandParameterInfo =

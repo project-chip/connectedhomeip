@@ -253,6 +253,9 @@ static constexpr ClusterId Id = 0x0000009E;
 namespace DeviceEnergyManagementMode {
 static constexpr ClusterId Id = 0x0000009F;
 } // namespace DeviceEnergyManagementMode
+namespace ElectricalGridConditions {
+static constexpr ClusterId Id = 0x000000A0;
+} // namespace ElectricalGridConditions
 namespace DoorLock {
 static constexpr ClusterId Id = 0x00000101;
 } // namespace DoorLock

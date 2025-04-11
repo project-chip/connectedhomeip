@@ -547,6 +547,20 @@ static constexpr EventId Id = 0x00000005;
 } // namespace Events
 } // namespace EnergyEvse
 
+namespace ElectricalGridConditions {
+namespace Events {
+
+namespace CurrentConditionsChanged {
+static constexpr EventId Id = 0x00000000;
+} // namespace CurrentConditionsChanged
+
+namespace ForecastConditionsChanged {
+static constexpr EventId Id = 0x00000001;
+} // namespace ForecastConditionsChanged
+
+} // namespace Events
+} // namespace ElectricalGridConditions
+
 namespace DoorLock {
 namespace Events {
 

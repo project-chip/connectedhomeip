@@ -4956,6 +4956,98 @@ public static class EnergyEvseClusterRFIDEvent {
     return output.toString();
   }
 }
+public static class ElectricalGridConditionsClusterCurrentConditionsChangedEvent {
+  public @Nullable ChipStructs.ElectricalGridConditionsClusterElectricalGridConditionsStruct currentConditions;
+  private static final long CURRENT_CONDITIONS_ID = 0L;
+
+  public ElectricalGridConditionsClusterCurrentConditionsChangedEvent(
+    @Nullable ChipStructs.ElectricalGridConditionsClusterElectricalGridConditionsStruct currentConditions
+  ) {
+    this.currentConditions = currentConditions;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CURRENT_CONDITIONS_ID, currentConditions != null ? currentConditions.encodeTlv() : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static ElectricalGridConditionsClusterCurrentConditionsChangedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    @Nullable ChipStructs.ElectricalGridConditionsClusterElectricalGridConditionsStruct currentConditions = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CURRENT_CONDITIONS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          currentConditions = ChipStructs.ElectricalGridConditionsClusterElectricalGridConditionsStruct.decodeTlv(castingValue);
+        }
+      }
+    }
+    return new ElectricalGridConditionsClusterCurrentConditionsChangedEvent(
+      currentConditions
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ElectricalGridConditionsClusterCurrentConditionsChangedEvent {\n");
+    output.append("\tcurrentConditions: ");
+    output.append(currentConditions);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ElectricalGridConditionsClusterForecastConditionsChangedEvent {
+  public @Nullable ArrayList<ChipStructs.ElectricalGridConditionsClusterElectricalGridConditionsStruct> forecastConditions;
+  private static final long FORECAST_CONDITIONS_ID = 0L;
+
+  public ElectricalGridConditionsClusterForecastConditionsChangedEvent(
+    @Nullable ArrayList<ChipStructs.ElectricalGridConditionsClusterElectricalGridConditionsStruct> forecastConditions
+  ) {
+    this.forecastConditions = forecastConditions;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(FORECAST_CONDITIONS_ID, forecastConditions != null ? ArrayType.generateArrayType(forecastConditions, (elementforecastConditions) -> elementforecastConditions.encodeTlv()) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static ElectricalGridConditionsClusterForecastConditionsChangedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    @Nullable ArrayList<ChipStructs.ElectricalGridConditionsClusterElectricalGridConditionsStruct> forecastConditions = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == FORECAST_CONDITIONS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          forecastConditions = castingValue.map((elementcastingValue) -> ChipStructs.ElectricalGridConditionsClusterElectricalGridConditionsStruct.decodeTlv(elementcastingValue));
+        }
+      }
+    }
+    return new ElectricalGridConditionsClusterForecastConditionsChangedEvent(
+      forecastConditions
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ElectricalGridConditionsClusterForecastConditionsChangedEvent {\n");
+    output.append("\tforecastConditions: ");
+    output.append(forecastConditions);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class DoorLockClusterDoorLockAlarmEvent {
   public Integer alarmCode;
   private static final long ALARM_CODE_ID = 0L;
