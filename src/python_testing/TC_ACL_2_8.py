@@ -40,6 +40,7 @@ from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
+
 class TC_ACL_2_8(MatterBaseTest):
     def _verify_acl_event(self, event, admin_node_id, admin_passcode_id, change_type, subjects, targets, fabric_index):
         """Verifies ACL event contents"""
