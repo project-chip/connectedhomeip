@@ -98,6 +98,16 @@ public:
      */
     CHIP_ERROR ProvideICECandidates(uint16_t webRTCSessionID, chip::app::DataModel::List<const chip::CharSpan> ICECandidates);
 
+    /**
+     * @brief Notify WebRTCProviderClient that the remote decryptor has been received.
+     *
+     * This allows the client to take appropriate transitions upon receiving
+     * confirmation that the remote decryptor has been received.
+     *
+     * @param webRTCSessionID   The unique identifier for the WebRTC session.
+     */
+    void NotifyRemoteDecryptorReceived(uint16_t webRTCSessionID);
+
     /////////// CommandSender Callback Interface /////////
     virtual void OnResponse(chip::app::CommandSender * client, const chip::app::ConcreteCommandPath & path,
                             const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override;
@@ -118,6 +128,17 @@ private:
         kProvideICECandidates = 4,
         kEndSession           = 5,
     };
+
+    enum class State : uint8_t
+    {
+        Idle,             ///< Default state, no communication initiated yet
+        Connecting,       ///< Waiting for OnDeviceConnected or OnDeviceConnectionFailure callbacks to be called
+        AwaitingResponse, ///< Waiting for command response from camera
+        AwaitingAnswer,   ///< Waiting for Answer command from camera
+    };
+
+    void MoveToState(const State targetState);
+    const char * GetStateStr() const;
 
     template <class T>
     CHIP_ERROR SendCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle,
@@ -143,7 +164,10 @@ private:
 
     static void OnDeviceConnected(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
                                   const chip::SessionHandle & sessionHandle);
+
     static void OnDeviceConnectionFailure(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error);
+
+    static void OnSessionEstablishTimeout(chip::System::Layer * systemLayer, void * appState);
 
     void HandleProvideOfferResponse(chip::TLV::TLVReader & data);
 
@@ -151,7 +175,10 @@ private:
     chip::ScopedNodeId mPeerId;
     chip::EndpointId mEndpointId = chip::kInvalidEndpointId;
     CommandType mCommandType     = CommandType::kUndefined;
+    uint16_t mCurrentSessionId   = 0;
     std::unique_ptr<chip::app::CommandSender> mCommandSender;
+
+    State mState = State::Idle;
 
     chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorServer * mRequestorServer = nullptr;
 

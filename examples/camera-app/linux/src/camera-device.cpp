@@ -571,6 +571,16 @@ CameraError CameraDevice::StopSnapshotStream(uint16_t streamID)
     return CameraError::SUCCESS;
 }
 
+uint8_t CameraDevice::GetMaxConcurrentVideoEncoders()
+{
+    return MAX_CONCURRENT_VIDEO_ENCODERS;
+}
+
+uint32_t CameraDevice::GetMaxEncodedPixelRate()
+{
+    return MAX_ENCODED_PIXEL_RATE;
+}
+
 VideoSensorParamsStruct & CameraDevice::GetVideoSensorParams()
 {
     static VideoSensorParamsStruct videoSensorParams = { 4608, 2592, 120,
@@ -589,22 +599,50 @@ VideoResolutionStruct & CameraDevice::GetMinViewport()
     return minViewport;
 }
 
-uint8_t CameraDevice::GetMaxConcurrentVideoEncoders()
+uint32_t CameraDevice::GetMaxContentBufferSize()
 {
-    return 1;
+    return MAX_CONTENT_BUFFER_SIZE_BYTES;
 }
 
-uint32_t CameraDevice::GetMaxEncodedPixelRate()
+uint32_t CameraDevice::GetMaxNetworkBandwidth()
 {
-    return 10000;
+    return MAX_NETWORK_BANDWIDTH_MBPS;
 }
 
-uint16_t CameraDevice::GetFrameRate()
+uint16_t CameraDevice::GetCurrentFrameRate()
 {
-    return 60;
+    return mCurrentVideoFrameRate;
 }
 
-void CameraDevice::SetHDRMode(bool hdrMode) {}
+CameraError CameraDevice::SetHDRMode(bool hdrMode)
+{
+    mHDREnabled = hdrMode;
+
+    return CameraError::SUCCESS;
+}
+
+CameraError CameraDevice::SetViewport(const ViewportStruct & viewPort)
+{
+    mViewport = viewPort;
+
+    return CameraError::SUCCESS;
+}
+
+// Mute/Unmute microphone.
+CameraError CameraDevice::SetMicrophoneMuted(bool muteMicrophone)
+{
+    mMicrophoneMuted = muteMicrophone;
+
+    return CameraError::SUCCESS;
+}
+
+// Set microphone volume level.
+CameraError CameraDevice::SetMicrophoneVolume(uint8_t microphoneVol)
+{
+    mMicrophoneVol = microphoneVol;
+
+    return CameraError::SUCCESS;
+}
 
 void CameraDevice::InitializeVideoStreams()
 {
@@ -612,11 +650,11 @@ void CameraDevice::InitializeVideoStreams()
     VideoStream videoStream = { { 1 /* Id */,
                                   StreamUsageEnum::kLiveView /* StreamUsage */,
                                   VideoCodecEnum::kH264,
-                                  30 /* MinFrameRate */,
+                                  15 /* MinFrameRate */,
                                   120 /* MaxFrameRate */,
-                                  { 640, 480 } /* MinResolution */,
+                                  { 320, 240 } /* MinResolution */,
                                   { 640, 480 } /* MaxResolution */,
-                                  500000 /* MinBitRate */,
+                                  10000 /* MinBitRate */,
                                   2000000 /* MaxBitRate */,
                                   1000 /* MinFragmentLen */,
                                   10000 /* MaxFragmentLen */,
