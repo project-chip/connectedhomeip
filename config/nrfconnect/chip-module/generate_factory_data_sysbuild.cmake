@@ -46,7 +46,6 @@ function(nrfconnect_create_factory_data factory_data_target script_path schema_p
   sysbuild_get(CONFIG_CHIP_DEVICE_PRODUCT_NAME IMAGE ${image} VAR CONFIG_CHIP_DEVICE_PRODUCT_NAME KCONFIG)
   sysbuild_get(CONFIG_CHIP_DEVICE_HARDWARE_VERSION IMAGE ${image} VAR CONFIG_CHIP_DEVICE_HARDWARE_VERSION KCONFIG)
   sysbuild_get(CONFIG_CHIP_DEVICE_HARDWARE_VERSION_STRING IMAGE ${image} VAR CONFIG_CHIP_DEVICE_HARDWARE_VERSION_STRING KCONFIG)
-  sysbuild_get(CONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING IMAGE ${image} VAR CONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING KCONFIG)
   sysbuild_get(CONFIG_CHIP_ROTATING_DEVICE_ID IMAGE ${image} VAR CONFIG_CHIP_ROTATING_DEVICE_ID KCONFIG)
   sysbuild_get(CONFIG_CHIP_DEVICE_GENERATE_ROTATING_DEVICE_UID IMAGE ${image} VAR CONFIG_CHIP_DEVICE_GENERATE_ROTATING_DEVICE_UID KCONFIG)
   sysbuild_get(CONFIG_CHIP_DEVICE_ROTATING_DEVICE_UID IMAGE ${image} VAR CONFIG_CHIP_DEVICE_ROTATING_DEVICE_UID KCONFIG)
@@ -80,7 +79,6 @@ function(nrfconnect_create_factory_data factory_data_target script_path schema_p
   string(APPEND script_args "--product_name \"${CONFIG_CHIP_DEVICE_PRODUCT_NAME}\"\n")
   string(APPEND script_args "--hw_ver ${CONFIG_CHIP_DEVICE_HARDWARE_VERSION}\n")
   string(APPEND script_args "--hw_ver_str \"${CONFIG_CHIP_DEVICE_HARDWARE_VERSION_STRING}\"\n")
-  string(APPEND script_args "--sw_ver_str \"${CONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING}\"\n")  #+++x  Do we need to handle this differently since it's optional?
 
   # Check if Rotating Device Id Unique Id should be generated
   if(CONFIG_CHIP_ROTATING_DEVICE_ID)

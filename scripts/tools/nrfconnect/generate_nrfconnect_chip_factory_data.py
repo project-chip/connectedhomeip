@@ -331,7 +331,6 @@ class FactoryDataGenerator:
             self._add_entry("date", self._args.date)
             self._add_entry("hw_ver", self._args.hw_ver)
             self._add_entry("hw_ver_str", self._args.hw_ver_str)
-            self._add_entry("sw_ver_str", self._args.sw_ver_str)
             self._add_entry("dac_cert", self._process_der(dac_cert))
             self._add_entry("dac_key", dac_priv_key)
             self._add_entry("pai_cert", self._process_der(pai_cert))
@@ -554,8 +553,6 @@ def main():
                                     help="Partition offset - an address in device's NVM memory, where factory data will be stored.")
     optional_arguments.add_argument("--size", type=allow_any_int,
                                     help="The maximum partition size.")
-    optional_arguments.add_argument("--sw_ver_str", type=str,
-                                     help="[ascii string] Provide software version in string format.")  #+++x Should this go here rather than in mandatory_arguments?
     args = parser.parse_args()
 
     if args.verbose:

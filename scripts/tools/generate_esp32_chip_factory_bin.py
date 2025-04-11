@@ -166,11 +166,6 @@ FACTORY_DATA = {
         'encoding': 'string',
         'value': None,
     },
-    'sw-ver-str': {
-        'type': 'data',
-        'encoding': 'string',
-        'value': None,
-    },
     'mfg-date': {
         'type': 'data',
         'encoding': 'string',
@@ -284,7 +279,6 @@ def validate_args(args):
     check_str_range(args.vendor_name, 1, 32, 'Vendor name')
     check_str_range(args.product_name, 1, 32, 'Product name')
     check_str_range(args.hw_ver_str, 1, 64, 'Hardware version string')
-    check_str_range(args.sw_ver_str, 1, 64, 'Software version string')  #+++x Do we need to handle this differently since it's optional?
     check_str_range(args.mfg_date, 8, 16, 'Manufacturing date')
     check_str_range(args.rd_id_uid, 32, 32, 'Rotating device Unique id')
 
@@ -365,8 +359,6 @@ def populate_factory_data(args, spake2p_params):
         FACTORY_DATA['hardware-ver']['value'] = args.hw_ver
     if args.hw_ver_str:
         FACTORY_DATA['hw-ver-str']['value'] = args.hw_ver_str
-    if args.sw_ver_str:
-        FACTORY_DATA['sw-ver-str']['value'] = args.sw_ver_str
     if args.product_finish:
         FACTORY_DATA['product-finish']['value'] = Product_Finish_Enum[args.product_finish].value
     if args.product_color:
@@ -540,7 +532,6 @@ def get_args():
     parser.add_argument('--product-name', help='Product name')
     parser.add_argument('--hw-ver', type=any_base_int, help='Hardware version')
     parser.add_argument('--hw-ver-str', help='Hardware version string')
-    parser.add_argument('--sw-ver-str', help='Software version string')
     parser.add_argument('--mfg-date', help='Manufacturing date in format YYYY-MM-DD')
     parser.add_argument('--serial-num', help='Serial number')
     parser.add_argument('--rd-id-uid',

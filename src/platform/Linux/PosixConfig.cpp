@@ -60,7 +60,7 @@ const PosixConfig::Key PosixConfig::kConfigKey_SetupDiscriminator    = { kConfig
 const PosixConfig::Key PosixConfig::kConfigKey_Spake2pIterationCount = { kConfigNamespace_ChipFactory, "iteration-count" };
 const PosixConfig::Key PosixConfig::kConfigKey_Spake2pSalt           = { kConfigNamespace_ChipFactory, "salt" };
 const PosixConfig::Key PosixConfig::kConfigKey_Spake2pVerifier       = { kConfigNamespace_ChipFactory, "verifier" };
-//+++x Do we need to define "chip-factory/vendor-name" and its kin in another place since we're now referring to it here?
+//+++x Do we need to define "chip-factory/vendor-name" (and its kin) anywhere else now that we're referring to it here?
 const PosixConfig::Key PosixConfig::kConfigKey_VendorName            = { kConfigNamespace_ChipFactory, "vendor-name" };
 const PosixConfig::Key PosixConfig::kConfigKey_VendorId              = { kConfigNamespace_ChipFactory, "vendor-id" };
 const PosixConfig::Key PosixConfig::kConfigKey_ProductName           = { kConfigNamespace_ChipFactory, "product-name" };

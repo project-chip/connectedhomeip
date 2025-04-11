@@ -75,8 +75,20 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     # Device vendor id as a decimal integer. Configurable vendor ids allowed are 65521 (0xFFF1), 65522 (0xFFF2), 655223 (0xFFF3).
     chip_device_config_device_vendor_id = ""
 
+    # Device vendor name as a string.
+    chip_device_config_device_vendor_name = ""
+
     # Device product id as a decimal integer. Configurable product ids allowed are in the range 32768 (0x8000) - 32867 (0x8063)
     chip_device_config_device_product_id = ""
+
+    # Device product name as a string.
+    chip_device_config_device_product_name = ""
+
+    # Device hardware version as a string
+    chip_device_config_device_hardware_version_string = ""
+
+    # Device serial number as a string
+    chip_device_config_device_serial_number = ""
 
     # Define the default number of ip addresses to discover
     chip_max_discovered_ip_addresses = 5
@@ -399,8 +411,24 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       defines += [ "CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID=${chip_device_config_device_vendor_id}" ]
     }
 
+    if (chip_device_config_device_vendor_name != "") {
+      defines += [ "CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME=${chip_device_config_device_vendor_name}" ]
+    }
+
     if (chip_device_config_device_product_id != "") {
       defines += [ "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID=${chip_device_config_device_product_id}" ]
+    }
+
+    if (chip_device_config_device_product_name != "") {
+      defines += [ "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME=${chip_device_config_device_product_name}" ]
+    }
+
+    if (chip_device_config_device_hardware_version_string != "") {
+      defines += [ "CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING=\"${chip_device_config_device_hardware_version_string}\"" ]
+    }
+
+    if (chip_device_config_device_serial_number != "") {
+      defines += [ "CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER=\"${chip_device_config_device_serial_number}\"" ]
     }
 
     defines += [ "CHIP_DEVICE_CONFIG_MAX_DISCOVERED_IP_ADDRESSES=${chip_max_discovered_ip_addresses}" ]
