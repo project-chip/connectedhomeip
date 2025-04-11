@@ -51,7 +51,8 @@ CHIP_ERROR EmptyProvider::ServerClusters(EndpointId endpointId, ReadOnlyBufferBu
     return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
 }
 
-CHIP_ERROR EmptyProvider::Attributes(const app::ConcreteClusterPath & path, ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> & builder)
+CHIP_ERROR EmptyProvider::Attributes(const app::ConcreteClusterPath & path,
+                                     ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> & builder)
 {
     return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
 }

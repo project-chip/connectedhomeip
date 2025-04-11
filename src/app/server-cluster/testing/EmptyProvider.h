@@ -40,7 +40,8 @@ public:
     CHIP_ERROR DeviceTypes(EndpointId endpointId, ReadOnlyBufferBuilder<app::DataModel::DeviceTypeEntry> & builder) override;
     CHIP_ERROR ClientClusters(EndpointId endpointId, ReadOnlyBufferBuilder<ClusterId> & builder) override;
     CHIP_ERROR ServerClusters(EndpointId endpointId, ReadOnlyBufferBuilder<app::DataModel::ServerClusterEntry> & builder) override;
-    CHIP_ERROR Attributes(const app::ConcreteClusterPath & path, ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> & builder) override;
+    CHIP_ERROR Attributes(const app::ConcreteClusterPath & path,
+                          ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> & builder) override;
     CHIP_ERROR GeneratedCommands(const app::ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
     CHIP_ERROR AcceptedCommands(const app::ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<app::DataModel::AcceptedCommandEntry> & builder) override;
