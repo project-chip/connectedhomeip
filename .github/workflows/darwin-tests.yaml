@@ -50,9 +50,10 @@ jobs:
       # it.
       BUILD_VARIANT_FRAMEWORK_TOOL: no-ble
       LSAN_OPTIONS: detect_leaks=1 malloc_context_size=40 suppressions=scripts/tests/chiptest/lsan-mac-suppressions.txt
+      DARWIN_ARCH: "arm64"
 
     if: github.actor != 'restyled-io[bot]'
-    runs-on: macos-13
+    runs-on: macos-14
 
     steps:
       - name: Checkout
@@ -89,17 +90,17 @@ jobs:
         run: |
           ./scripts/run_in_build_env.sh \
              "./scripts/build/build_examples.py \
-                --target darwin-x64-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL} \
-                --target darwin-x64-all-clusters-${BUILD_VARIANT} \
-                --target darwin-x64-lock-${BUILD_VARIANT} \
-                --target darwin-x64-ota-provider-${BUILD_VARIANT} \
-                --target darwin-x64-ota-requestor-${BUILD_VARIANT} \
-                --target darwin-x64-tv-app-${BUILD_VARIANT} \
-                --target darwin-x64-bridge-${BUILD_VARIANT} \
-                --target darwin-x64-lit-icd-${BUILD_VARIANT} \
-                --target darwin-x64-microwave-oven-${BUILD_VARIANT} \
-                --target darwin-x64-rvc-${BUILD_VARIANT} \
-                --target darwin-x64-network-manager-${BUILD_VARIANT} \
+                --target darwin-${DARWIN_ARCH}-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL} \
+                --target darwin-${DARWIN_ARCH}-all-clusters-${BUILD_VARIANT} \
+                --target darwin-${DARWIN_ARCH}-lock-${BUILD_VARIANT} \
+                --target darwin-${DARWIN_ARCH}-ota-provider-${BUILD_VARIANT} \
+                --target darwin-${DARWIN_ARCH}-ota-requestor-${BUILD_VARIANT} \
+                --target darwin-${DARWIN_ARCH}-tv-app-${BUILD_VARIANT} \
+                --target darwin-${DARWIN_ARCH}-bridge-${BUILD_VARIANT} \
+                --target darwin-${DARWIN_ARCH}-lit-icd-${BUILD_VARIANT} \
+                --target darwin-${DARWIN_ARCH}-microwave-oven-${BUILD_VARIANT} \
+                --target darwin-${DARWIN_ARCH}-rvc-${BUILD_VARIANT} \
+                --target darwin-${DARWIN_ARCH}-network-manager-${BUILD_VARIANT} \
                 build \
                 --copy-artifacts-to objdir-clone \
              "
@@ -108,28 +109,28 @@ jobs:
           ./scripts/run_in_build_env.sh \
           "./scripts/tests/run_test_suite.py \
              --runner darwin_framework_tool_python \
-             --chip-tool ./out/darwin-x64-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL}/darwin-framework-tool \
+             --chip-tool ./out/darwin-${DARWIN_ARCH}-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL}/darwin-framework-tool \
              --target-skip-glob '{TestAccessControlConstraints}' \
              run \
              --iterations 1 \
              --test-timeout-seconds 120 \
-             --all-clusters-app ./out/darwin-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
-             --lock-app ./out/darwin-x64-lock-${BUILD_VARIANT}/chip-lock-app \
-             --ota-provider-app ./out/darwin-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
-             --ota-requestor-app ./out/darwin-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
-             --tv-app ./out/darwin-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
-             --bridge-app ./out/darwin-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
-             --microwave-oven-app ./out/darwin-x64-microwave-oven-${BUILD_VARIANT}/chip-microwave-oven-app \
-             --rvc-app ./out/darwin-x64-rvc-${BUILD_VARIANT}/chip-rvc-app \
-             --network-manager-app ./out/darwin-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
+             --all-clusters-app ./out/darwin-${DARWIN_ARCH}-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+             --lock-app ./out/darwin-${DARWIN_ARCH}-lock-${BUILD_VARIANT}/chip-lock-app \
+             --ota-provider-app ./out/darwin-${DARWIN_ARCH}-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
+             --ota-requestor-app ./out/darwin-${DARWIN_ARCH}-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
+             --tv-app ./out/darwin-${DARWIN_ARCH}-tv-app-${BUILD_VARIANT}/chip-tv-app \
+             --bridge-app ./out/darwin-${DARWIN_ARCH}-bridge-${BUILD_VARIANT}/chip-bridge-app \
+             --microwave-oven-app ./out/darwin-${DARWIN_ARCH}-microwave-oven-${BUILD_VARIANT}/chip-microwave-oven-app \
+             --rvc-app ./out/darwin-${DARWIN_ARCH}-rvc-${BUILD_VARIANT}/chip-rvc-app \
+             --network-manager-app ./out/darwin-${DARWIN_ARCH}-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
           "
       - name: Run OTA Test
         run: |
           ./scripts/run_in_build_env.sh \
           "./scripts/tests/run_darwin_framework_ota_test.py \
              run \
-             --darwin-framework-tool ./out/darwin-x64-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL}/darwin-framework-tool \
-             --ota-requestor-app ./out/darwin-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
+             --darwin-framework-tool ./out/darwin-${DARWIN_ARCH}-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL}/darwin-framework-tool \
+             --ota-requestor-app ./out/darwin-${DARWIN_ARCH}-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
              --ota-data-file /tmp/rawImage \
              --ota-image-file /tmp/otaImage \
              --ota-destination-file /tmp/downloadedImage \
@@ -154,7 +155,7 @@ jobs:
         if: ${{ failure() && !env.ACT }}
         with:
           name: framework-build-log-darwin-${BUILD_VARIANT_FRAMEWORK_TOOL}
-          path: out/darwin-x64-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL}/darwin_framework_build.log
+          path: out/darwin-${DARWIN_ARCH}-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL}/darwin_framework_build.log
       - name: Uploading objdir for debugging
         uses: actions/upload-artifact@v4
         if: ${{ failure() && !env.ACT }}
