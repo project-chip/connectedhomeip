@@ -42,32 +42,26 @@ from mobly import asserts
 
 class TC_ACL_2_8(MatterBaseTest):
     def _verify_acl_event(self, event, admin_node_id, admin_passcode_id, change_type, subjects, targets, fabric_index):
-        """Helper method to verify ACL event contents"""
+        """Verifies ACL event contents"""
         data = event.Data
-                    
-        # Handle Null vs None for adminNodeID and adminPasscodeID
+
+        # Verify admin IDs
         if admin_node_id is None:
-            asserts.assert_equal(data.adminNodeID, NullValue, "adminNodeID should be NullValue")
+            asserts.assert_equal(data.adminNodeID, NullValue)
         else:
             asserts.assert_equal(data.adminNodeID, admin_node_id)
-            
+
         if admin_passcode_id is None:
-            asserts.assert_equal(data.adminPasscodeID, NullValue, "adminPasscodeID should be NullValue")
+            asserts.assert_equal(data.adminPasscodeID, NullValue)
         else:
             asserts.assert_equal(data.adminPasscodeID, admin_passcode_id)
-            
-        asserts.assert_equal(data.changeType, change_type, 
-                           f"Change type mismatch. Expected {change_type}, got {data.changeType}")
-        asserts.assert_equal(data.latestValue.privilege, 5)  # Administer (5)
-        asserts.assert_equal(data.latestValue.authMode, 2)   # CASE (2)
-        
-        # Handle subjects that could be single value or list
-        if isinstance(subjects, list):
-            asserts.assert_equal(data.latestValue.subjects, subjects)
-        else:
-            asserts.assert_equal(data.latestValue.subjects, [subjects])
-            
-        asserts.assert_equal(data.latestValue.targets, NullValue, "Targets should be NullValue")
+
+        # Verify event data
+        asserts.assert_equal(data.changeType, change_type)
+        asserts.assert_equal(data.latestValue.privilege, 5)
+        asserts.assert_equal(data.latestValue.authMode, 2)
+        asserts.assert_equal(data.latestValue.subjects, [subjects] if not isinstance(subjects, list) else subjects)
+        asserts.assert_equal(data.latestValue.targets, NullValue)
         asserts.assert_equal(data.fabricIndex, fabric_index)
 
     def desc_TC_ACL_2_8(self) -> str:
