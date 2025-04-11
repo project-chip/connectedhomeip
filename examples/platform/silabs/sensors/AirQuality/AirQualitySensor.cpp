@@ -25,10 +25,10 @@
 #include <sparkfun_sgp40.h>
 
 #ifdef SLI_SI91X_MCU_INTERFACE
-#include "sl_i2c_instances.h"
 #include "rsi_debug.h"
+#include "sl_i2c_instances.h"
 
-#define I2C_INSTANCE_USED            SL_I2C2
+#define I2C_INSTANCE_USED SL_I2C2
 static sl_i2c_instance_t i2c_instance = I2C_INSTANCE_USED;
 #else
 #include "sl_i2cspm_instances.h"
@@ -65,7 +65,7 @@ sl_status_t Init()
     app_i2c_instance = &i2c_instance;
 #else
     app_i2c_instance = sl_i2cspm_qwiic;
-# endif // SLI_SI91X_MCU_INTERFACE
+#endif // SLI_SI91X_MCU_INTERFACE
 
 #ifdef USE_SPARKFUN_AIR_QUALITY_SENSOR
     status = sparkfun_sgp40_init(app_i2c_instance);
