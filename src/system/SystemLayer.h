@@ -362,7 +362,6 @@ class LayerDispatch :
 {
 public:
     virtual void SetDispatchQueue(dispatch_queue_t dispatchQueue)  = 0;
-    virtual dispatch_queue_t GetDispatchQueue()                    = 0;
     virtual void HandleDispatchQueueEvents(Clock::Timeout timeout) = 0;
 
     /**
