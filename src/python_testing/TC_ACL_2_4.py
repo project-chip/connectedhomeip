@@ -54,7 +54,7 @@ class TC_ACL_2_4(MatterBaseTest):
             TestStep(1, "TH1 commissions DUT using admin node ID N1", is_commissioning=True),
             TestStep(2, "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
                      "Result is SUCCESS, value is stored as F1"),
-            TestStep(3, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
+            TestStep(3, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute and saves as acl_original",
                      "Result is SUCCESS, value is list of AccessControlEntryStruct containing 1 element with admin entry N1"),
             TestStep(4, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with 3 elements:\n" +
                      "1. Admin entry (N1, privilege: Administer, authMode: CASE)\n" +
@@ -129,8 +129,8 @@ class TC_ACL_2_4(MatterBaseTest):
                      "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
             TestStep(43, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing an invalid target entry containing endpoint, device type and cluster fields in the same entry",
                      "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
-            TestStep(44, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute value is an empty list",
-                     "Result is SUCCESS (note since all ACL entries removed, cannot perform more operations)"),
+            TestStep(44, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute value is acl_original",
+                     "Result is SUCCESS"),
         ]
         return steps
 
@@ -155,20 +155,19 @@ class TC_ACL_2_4(MatterBaseTest):
         self.step(3)
         acl_cluster = Clusters.AccessControl
         acl_attribute = acl_cluster.Attributes.Acl
-        initial_acl = await self.read_single_attribute_check_success(
+        acl_original = await self.read_single_attribute_check_success(
             endpoint=0,
             cluster=acl_cluster,
             attribute=acl_attribute
         )
-        self.print_step("Initial ACL", initial_acl)
 
         # Verify initial ACL contains single admin entry
-        asserts.assert_equal(len(initial_acl), 1, "Initial ACL should contain exactly 1 entry")
-        asserts.assert_equal(initial_acl[0].privilege, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister)
-        asserts.assert_equal(initial_acl[0].authMode, Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase)
-        asserts.assert_equal(initial_acl[0].subjects, [self.th1.nodeId])
-        asserts.assert_true(isinstance(initial_acl[0].targets, Nullable), "Targest should currently be null")
-        asserts.assert_equal(initial_acl[0].fabricIndex, f1)
+        asserts.assert_equal(len(acl_original), 1, "Initial ACL should contain exactly 1 entry")
+        asserts.assert_equal(acl_original[0].privilege, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister)
+        asserts.assert_equal(acl_original[0].authMode, Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase)
+        asserts.assert_equal(acl_original[0].subjects, [self.th1.nodeId])
+        asserts.assert_true(isinstance(acl_original[0].targets, Nullable), "Targest should currently be null")
+        asserts.assert_equal(acl_original[0].fabricIndex, f1)
 
         # Step 4: Write ACL with 3 entries
         self.step(4)
@@ -1692,22 +1691,10 @@ class TC_ACL_2_4(MatterBaseTest):
 
         # Step 44: Write minimum required ACL (admin only)
         self.step(44)
-        # Must keep admin entry, can't have empty ACL
-        admin_only_acl = [
-            # Admin entry must remain
-            Clusters.AccessControl.Structs.AccessControlEntryStruct(
-                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
-                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                subjects=[self.th1.nodeId],
-                targets=NullValue,
-                fabricIndex=f1
-            )
-        ]
-
         try:
             result = await self.default_controller.WriteAttribute(
                 self.dut_node_id,
-                [(0, acl_attribute(value=admin_only_acl))]
+                [(0, acl_attribute(value=acl_original))]
             )
             asserts.assert_equal(result[0].Status, Status.Success,
                                  "Write admin-only ACL should succeed")
