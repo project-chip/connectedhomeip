@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023, 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,10 +16,10 @@
  *    limitations under the License.
  */
 
+#include <platform/CHIPDeviceLayer.h>
 #include <platform/nxp/common/ota/OTAImageProcessorImpl.h>
-#include <src/include/platform/CHIPDeviceLayer.h>
 
-#include <src/app/clusters/ota-requestor/OTARequestorInterface.h>
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 
 #include <platform/nxp/common/ota/OTAFirmwareProcessor.h>
 #if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
@@ -27,6 +27,7 @@
 #include <platform/nxp/common/ota/OTAFactoryDataProcessor.h>
 #endif // CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
 
+#include "EmbeddedTypes.h"
 #include "OtaSupport.h"
 
 #ifndef CONFIG_CHIP_MAX_ENTRIES_TEST
@@ -97,7 +98,11 @@ extern "C" WEAK void OtaHookReset()
 
     // Set the bootloader flags
     OTA_SetNewImageFlag();
-    ResetMCU();
+#if CONFIG_CHIP_OTA_POSTED_OPERATIONS_IN_IDLE
+    chip::DeviceLayer::PlatformMgrImpl().ScheduleResetInIdle();
+#else
+    chip::DeviceLayer::PlatformMgrImpl().Reset();
+#endif
 }
 
 extern "C" WEAK void OtaHookAbort()

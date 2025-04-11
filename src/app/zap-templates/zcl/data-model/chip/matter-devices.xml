@@ -857,6 +857,7 @@ limitations under the License.
         <deviceId editable="false">0x010F</deviceId>
         <class>Simple</class>
         <scope>Endpoint</scope>
+        <superset>On/Off Plug-in Unit</superset>
         <clusters>
             <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
@@ -887,6 +888,7 @@ limitations under the License.
         <deviceId editable="false">0x0110</deviceId>
         <class>Simple</class>
         <scope>Endpoint</scope>
+        <superset>Dimmable Plug-in Unit</superset>
         <clusters>
             <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
@@ -1478,7 +1480,66 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
-        <name>MA-controlbridge</name>
+        <name>MA-electrical-utility-meter</name>
+        <domain>CHIP</domain>
+        <typeName>Electrical Utility Meter</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0511</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Meter Identification" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Time Synchronization" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-meter-reference-point</name>
+        <domain>CHIP</domain>
+        <typeName>Meter Reference Point</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0512</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Time Synchronization" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-electrical-energy-tariff</name>
+        <domain>CHIP</domain>
+        <typeName>Electrical Energy Tariff</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0513</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Commodity Price" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Commodity Tariff" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>TAG_LIST</requireAttribute>
+                <features>
+                    <feature code="TAGLIST" name="TagList"></feature>
+                </features>
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-electrical-meter</name>
+        <domain>CHIP</domain>
+        <typeName>Electrical Meter</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0514</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Commodity Metering" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-control-bridge</name>
         <domain>CHIP</domain>
         <typeName>Control Bridge</typeName>
         <profileId editable="false">0x0103</profileId>
@@ -2536,6 +2597,15 @@ limitations under the License.
         <deviceId editable="false">0x007B</deviceId>
         <class>Simple</class>
         <scope>Endpoint</scope>
+        <endpointComposition>
+            <compositionType>tree</compositionType>
+            <endpoint conformance="M" constraint="min 1">
+                    <deviceType>0x0071</deviceType>
+            </endpoint>
+             <endpoint conformance="O" constraint="max 1">
+                    <deviceType>0x0078</deviceType>
+            </endpoint>
+        </endpointComposition>
         <clusters lockOthers="true">
             <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>

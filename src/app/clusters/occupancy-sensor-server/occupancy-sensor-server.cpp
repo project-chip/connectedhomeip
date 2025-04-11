@@ -269,3 +269,4 @@ HalOccupancySensorType __attribute__((weak)) halOccupancyGetSensorType(EndpointI
 }
 
 void MatterOccupancySensingPluginServerInitCallback() {}
+void MatterOccupancySensingPluginServerShutdownCallback() {}

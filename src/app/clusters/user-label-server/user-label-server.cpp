@@ -230,3 +230,9 @@ void MatterUserLabelPluginServerInitCallback()
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
     Server::GetInstance().GetFabricTable().AddFabricDelegate(&gUserLabelFabricDelegate);
 }
+
+void MatterUserLabelPluginServerShutdownCallback()
+{
+    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(&gUserLabelFabricDelegate);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
+}

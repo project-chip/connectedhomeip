@@ -274,3 +274,8 @@ void MatterCommissionerControlPluginServerInitCallback()
 {
     ChipLogProgress(Zcl, "Initializing Commissioner Control cluster.");
 }
+
+void MatterCommissionerControlPluginServerShutdownCallback()
+{
+    ChipLogProgress(Zcl, "Shutdown Commissioner Control cluster.");
+}

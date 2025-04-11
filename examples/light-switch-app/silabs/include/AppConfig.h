@@ -31,7 +31,7 @@
 // state to another.
 #define ACTUATOR_MOVEMENT_PERIOS_MS 10
 
-#define LONG_PRESS_TIMEOUT 3000
+#define LONG_PRESS_TIMEOUT_MS 3000
 
 // APP Logo, boolean only. must be 64x64
 #define ON_DEMO_BITMAP                                                                                                             \

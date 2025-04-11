@@ -270,7 +270,8 @@ def BuildEfr32Target():
         TargetPart('lock', app=Efr32App.LOCK),
         TargetPart('thermostat', app=Efr32App.THERMOSTAT),
         TargetPart('pump', app=Efr32App.PUMP),
-        TargetPart('air-quality-sensor-app', app=Efr32App.AIR_QUALITY_SENSOR)
+        TargetPart('air-quality-sensor-app', app=Efr32App.AIR_QUALITY_SENSOR),
+        TargetPart('closure', app=Efr32App.CLOSURE)
     ])
 
     target.AppendModifier('rpc', enable_rpcs=True)
@@ -667,6 +668,7 @@ def BuildTizenTarget():
     # board
     target.AppendFixedTargets([
         TargetPart('arm', board=TizenBoard.ARM),
+        TargetPart('arm64', board=TizenBoard.ARM64),
     ])
 
     # apps

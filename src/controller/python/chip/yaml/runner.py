@@ -22,19 +22,18 @@ from dataclasses import dataclass, field
 from enum import Enum, IntEnum
 from typing import Any, Optional, Tuple
 
-import chip.interaction_model
-import chip.yaml.format_converter as Converter
-from chip.ChipDeviceCtrl import ChipDeviceController, discovery
-from chip.clusters import ClusterObjects
-from chip.clusters.Attribute import (AttributeStatus, EventReadResult, SubscriptionTransaction, TypedAttributePath,
-                                     ValueDecodeFailure)
-from chip.exceptions import ChipStackError
-from chip.yaml.data_model_lookup import DataModelLookup
-from chip.yaml.errors import ActionCreationError, UnexpectedActionCreationError
-from matter_idl.generators.filters import to_pascal_case, to_snake_case
 from matter_yamltests.pseudo_clusters.pseudo_clusters import get_default_pseudo_clusters
 
-from .data_model_lookup import PreDefinedDataModelLookup
+from matter.idl.generators.filters import to_pascal_case, to_snake_case
+
+from .. import interaction_model as MatterInteractionModel
+from ..ChipDeviceCtrl import ChipDeviceController, discovery
+from ..clusters import ClusterObjects
+from ..clusters.Attribute import AttributeStatus, EventReadResult, SubscriptionTransaction, TypedAttributePath, ValueDecodeFailure
+from ..exceptions import ChipStackError
+from . import format_converter as Converter
+from .data_model_lookup import DataModelLookup, PreDefinedDataModelLookup
+from .errors import ActionCreationError, UnexpectedActionCreationError
 
 _PSEUDO_CLUSTERS = get_default_pseudo_clusters()
 logger = logging.getLogger('YamlParser')
@@ -196,7 +195,7 @@ class InvokeAction(BaseAction):
                     self._node_id, self._endpoint, self._request_object,
                     timedRequestTimeoutMs=self._interation_timeout_ms,
                     busyWaitMs=self._busy_wait_ms)
-        except chip.interaction_model.InteractionModelError as error:
+        except MatterInteractionModel.InteractionModelError as error:
             return _ActionResult(status=_ActionStatus.ERROR, response=error)
 
         # Commands with no response give a None response. In those cases we return a success
@@ -253,7 +252,7 @@ class ReadAttributeAction(BaseAction):
             raw_resp = await dev_ctrl.ReadAttribute(self._node_id,
                                                     [(self._endpoint, self._request_object)],
                                                     fabricFiltered=self._fabric_filtered)
-        except chip.interaction_model.InteractionModelError as error:
+        except MatterInteractionModel.InteractionModelError as error:
             return _ActionResult(status=_ActionStatus.ERROR, response=error)
         except ChipStackError as error:
             _CHIP_TIMEOUT_ERROR = 50
@@ -271,7 +270,7 @@ class ReadAttributeAction(BaseAction):
         resp = raw_resp[self._endpoint][self._cluster_object][self._request_object]
 
         if isinstance(resp, ValueDecodeFailure):
-            # response.Reason is of type chip.interaction_model.Status.
+            # response.Reason is of type MatterInteractionModel.Status.
             return _ActionResult(status=_ActionStatus.ERROR, response=resp.Reason)
 
         # decode() is expecting to get a DataModelLookup Object type to grab certain attributes
@@ -322,7 +321,7 @@ class ReadEventAction(BaseAction):
             request = [(self._endpoint, self._request_object, urgent)]
             resp = await dev_ctrl.ReadEvent(self._node_id, events=request, eventNumberFilter=self._event_number_filter,
                                             fabricFiltered=self._fabric_filtered)
-        except chip.interaction_model.InteractionModelError as error:
+        except MatterInteractionModel.InteractionModelError as error:
             return _ActionResult(status=_ActionStatus.ERROR, response=error)
 
         parsed_resp = EventResponse(event_result_list=resp)
@@ -441,7 +440,7 @@ class SubscribeAttributeAction(ReadAttributeAction):
             subscription = await dev_ctrl.ReadAttribute(self._node_id, [(self._endpoint, self._request_object)],
                                                         reportInterval=(self._min_interval, self._max_interval),
                                                         keepSubscriptions=False)
-        except chip.interaction_model.InteractionModelError as error:
+        except MatterInteractionModel.InteractionModelError as error:
             return _ActionResult(status=_ActionStatus.ERROR, response=error)
 
         self._context.subscriptions.append(subscription)
@@ -495,7 +494,7 @@ class SubscribeEventAction(ReadEventAction):
             subscription = await dev_ctrl.ReadEvent(self._node_id, events=request, eventNumberFilter=self._event_number_filter,
                                                     reportInterval=(self._min_interval, self._max_interval),
                                                     keepSubscriptions=False)
-        except chip.interaction_model.InteractionModelError as error:
+        except MatterInteractionModel.InteractionModelError as error:
             return _ActionResult(status=_ActionStatus.ERROR, response=error)
 
         self._context.subscriptions.append(subscription)
@@ -577,7 +576,7 @@ class WriteAttributeAction(BaseAction):
                 resp = await dev_ctrl.WriteAttribute(self._node_id, [(self._endpoint, self._request_object)],
                                                      timedRequestTimeoutMs=self._interation_timeout_ms,
                                                      busyWaitMs=self._busy_wait_ms)
-        except chip.interaction_model.InteractionModelError as error:
+        except MatterInteractionModel.InteractionModelError as error:
             return _ActionResult(status=_ActionStatus.ERROR, response=error)
 
         # Group writes are expected to have no response upon success.
@@ -585,7 +584,7 @@ class WriteAttributeAction(BaseAction):
             return _ActionResult(status=_ActionStatus.SUCCESS, response=None)
 
         if len(resp) == 1 and isinstance(resp[0], AttributeStatus):
-            if resp[0].Status == chip.interaction_model.Status.Success:
+            if resp[0].Status == MatterInteractionModel.Status.Success:
                 return _ActionResult(status=_ActionStatus.SUCCESS, response=None)
             else:
                 return _ActionResult(status=_ActionStatus.ERROR, response=resp[0].Status)
@@ -889,12 +888,12 @@ class ReplTestRunner:
         if isinstance(response, dict):
             return response
 
-        if isinstance(response, chip.interaction_model.InteractionModelError):
+        if isinstance(response, MatterInteractionModel.InteractionModelError):
             decoded_response['error'] = to_snake_case(response.status.name).upper()
             decoded_response['clusterError'] = response.clusterStatus
             return decoded_response
 
-        if isinstance(response, chip.interaction_model.Status):
+        if isinstance(response, MatterInteractionModel.Status):
             decoded_response['error'] = to_snake_case(response.name).upper()
             return decoded_response
 
@@ -902,7 +901,7 @@ class ReplTestRunner:
             decoded_response['value'] = {'nodeId': response.node_id}
             return decoded_response
 
-        if isinstance(response, chip.discovery.CommissionableNode):
+        if isinstance(response, discovery.CommissionableNode):
             decoded_response['value'] = {
                 'instanceName': response.instanceName,
                 'hostName': response.hostName,
@@ -939,7 +938,7 @@ class ReplTestRunner:
                 return decoded_response
             decoded_response = []
             for event in response.event_result_list:
-                if event.Status != chip.interaction_model.Status.Success:
+                if event.Status != MatterInteractionModel.Status.Success:
                     error_message = to_snake_case(event.Status.name).upper()
                     decoded_response.append({'error': error_message})
                     continue

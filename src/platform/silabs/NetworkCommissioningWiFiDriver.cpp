@@ -339,7 +339,7 @@ CHIP_ERROR GetConnectedNetwork(Network & network)
     // we are able to fetch the wifi provision data and STA should be connected
     VerifyOrReturnError(WifiInterface::GetInstance().IsStationConnected(), CHIP_ERROR_NOT_CONNECTED);
     ReturnErrorOnFailure(WifiInterface::GetInstance().GetWifiCredentials(wifiConfig));
-    VerifyOrReturnError(wifiConfig.ssidLength < NetworkCommissioning::kMaxNetworkIDLen, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(wifiConfig.ssidLength <= NetworkCommissioning::kMaxNetworkIDLen, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     network.connected = true;
 

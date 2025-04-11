@@ -468,10 +468,6 @@ const MockNodeConfig gTestNodeConfig({
             MOCK_ATTRIBUTE_CONFIG_NON_NULLABLE(ZCL_SYSTIME_MS_ATTRIBUTE_TYPE),
             MOCK_ATTRIBUTE_CONFIG_NON_NULLABLE(ZCL_ELAPSED_S_ATTRIBUTE_TYPE),
             MOCK_ATTRIBUTE_CONFIG_NON_NULLABLE(ZCL_TEMPERATURE_ATTRIBUTE_TYPE),
-            MOCK_ATTRIBUTE_CONFIG_NON_NULLABLE(ZCL_POWER_MW_ATTRIBUTE_TYPE),
-            MOCK_ATTRIBUTE_CONFIG_NON_NULLABLE(ZCL_AMPERAGE_MA_ATTRIBUTE_TYPE),
-            MOCK_ATTRIBUTE_CONFIG_NON_NULLABLE(ZCL_VOLTAGE_MV_ATTRIBUTE_TYPE),
-            MOCK_ATTRIBUTE_CONFIG_NON_NULLABLE(ZCL_ENERGY_MWH_ATTRIBUTE_TYPE),
             MOCK_ATTRIBUTE_CONFIG_NON_NULLABLE(ZCL_TOD_ATTRIBUTE_TYPE),
             MOCK_ATTRIBUTE_CONFIG_NON_NULLABLE(ZCL_DATE_ATTRIBUTE_TYPE),
             MOCK_ATTRIBUTE_CONFIG_NON_NULLABLE(ZCL_EPOCH_US_ATTRIBUTE_TYPE),
@@ -541,10 +537,6 @@ const MockNodeConfig gTestNodeConfig({
             MOCK_ATTRIBUTE_CONFIG_NULLABLE(ZCL_SYSTIME_MS_ATTRIBUTE_TYPE),
             MOCK_ATTRIBUTE_CONFIG_NULLABLE(ZCL_ELAPSED_S_ATTRIBUTE_TYPE),
             MOCK_ATTRIBUTE_CONFIG_NULLABLE(ZCL_TEMPERATURE_ATTRIBUTE_TYPE),
-            MOCK_ATTRIBUTE_CONFIG_NULLABLE(ZCL_POWER_MW_ATTRIBUTE_TYPE),
-            MOCK_ATTRIBUTE_CONFIG_NULLABLE(ZCL_AMPERAGE_MA_ATTRIBUTE_TYPE),
-            MOCK_ATTRIBUTE_CONFIG_NULLABLE(ZCL_VOLTAGE_MV_ATTRIBUTE_TYPE),
-            MOCK_ATTRIBUTE_CONFIG_NULLABLE(ZCL_ENERGY_MWH_ATTRIBUTE_TYPE),
             MOCK_ATTRIBUTE_CONFIG_NULLABLE(ZCL_TOD_ATTRIBUTE_TYPE),
             MOCK_ATTRIBUTE_CONFIG_NULLABLE(ZCL_DATE_ATTRIBUTE_TYPE),
             MOCK_ATTRIBUTE_CONFIG_NULLABLE(ZCL_EPOCH_US_ATTRIBUTE_TYPE),
@@ -761,11 +753,9 @@ public:
         { 102 },
     };
 
-    FakeDefaultServerCluster(ConcreteClusterPath path) : mPath(path) {}
+    FakeDefaultServerCluster(const ConcreteClusterPath & path) : DefaultServerCluster(path) {}
 
-    [[nodiscard]] ConcreteClusterPath GetPath() const override { return mPath; }
-
-    [[nodiscard]] BitFlags<DataModel::ClusterQualityFlags> GetClusterFlags() const override
+    [[nodiscard]] BitFlags<DataModel::ClusterQualityFlags> GetClusterFlags(const ConcreteClusterPath &) const override
     {
         return DataModel::ClusterQualityFlags::kDiagnosticsData;
     }
@@ -815,9 +805,6 @@ public:
 
     void TestIncreaseDataVersion() { IncreaseDataVersion(); }
     void TestNotifyAttributeChanged(AttributeId attributeId) { NotifyAttributeChanged(attributeId); }
-
-private:
-    ConcreteClusterPath mPath;
 };
 
 template <typename T, EmberAfAttributeType ZclType>
@@ -2677,7 +2664,7 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRegistration)
         ASSERT_TRUE(result.has_value() && result->GetUnderlyingError() == CHIP_ERROR_INCORRECT_STATE);
     }
 
-    model.Registry().Unregister(kTestClusterPath);
+    model.Registry().Unregister(&fakeClusterServer);
     model.Shutdown();
 }
 
@@ -2701,7 +2688,7 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesListClusters)
     // version as we use this data version to differentiate between the two
     DataVersion * versionPtr = emberAfDataVersionStorage(kTestClusterPath);
     ASSERT_NE(versionPtr, nullptr);
-    if (*versionPtr == fakeClusterServer.GetDataVersion())
+    if (*versionPtr == fakeClusterServer.GetDataVersion(kTestClusterPath))
     {
         fakeClusterServer.TestIncreaseDataVersion();
     }
@@ -2743,8 +2730,8 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesListClusters)
         {
             updatedClusterFound = true;
             EXPECT_EQ(registered.clusterId, original.clusterId);
-            EXPECT_EQ(registered.dataVersion, fakeClusterServer.GetDataVersion());
-            EXPECT_EQ(registered.flags, fakeClusterServer.GetClusterFlags());
+            EXPECT_EQ(registered.dataVersion, fakeClusterServer.GetDataVersion(kTestClusterPath));
+            EXPECT_EQ(registered.flags, fakeClusterServer.GetClusterFlags(kTestClusterPath));
 
             // version MUST be different for ember for the test to make sense
             EXPECT_NE(original.dataVersion, registered.dataVersion);
@@ -2758,6 +2745,6 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesListClusters)
     }
     EXPECT_TRUE(updatedClusterFound);
 
-    model.Registry().Unregister(kTestClusterPath);
+    model.Registry().Unregister(&fakeClusterServer);
     model.Shutdown();
 }

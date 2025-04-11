@@ -93,212 +93,114 @@ Davis, CA 95616, USA
   <dataTypes>
     <enum name="EndProductTypeEnum">
       <item value="0" name="RollerShade" summary="Simple Roller Shade">
-        <mandatoryConform>
-          <feature name="LF"/>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="1" name="RomanShade" summary="Roman Shade">
-        <mandatoryConform>
-          <feature name="LF"/>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="2" name="BalloonShade" summary="Balloon Shade">
-        <mandatoryConform>
-          <feature name="LF"/>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="3" name="WovenWood" summary="Woven Wood">
-        <mandatoryConform>
-          <feature name="LF"/>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="4" name="PleatedShade" summary="Pleated Shade">
-        <mandatoryConform>
-          <feature name="LF"/>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="5" name="CellularShade" summary="Cellular Shade">
-        <mandatoryConform>
-          <feature name="LF"/>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="6" name="LayeredShade" summary="Layered Shade">
-        <mandatoryConform>
-          <feature name="LF"/>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="7" name="LayeredShade2D" summary="Layered Shade 2D">
-        <mandatoryConform>
-          <feature name="LF"/>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="8" name="SheerShade" summary="Sheer Shade">
-        <mandatoryConform>
-          <andTerm>
-            <feature name="LF"/>
-            <feature name="TL"/>
-          </andTerm>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="9" name="TiltOnlyInteriorBlind" summary="Tilt Only Interior Blind">
-        <mandatoryConform>
-          <feature name="TL"/>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="10" name="InteriorBlind" summary="Interior Blind">
-        <mandatoryConform>
-          <andTerm>
-            <feature name="LF"/>
-            <feature name="TL"/>
-          </andTerm>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="11" name="VerticalBlindStripCurtain" summary="Vertical Blind, Strip Curtain">
-        <mandatoryConform>
-          <andTerm>
-            <feature name="LF"/>
-            <feature name="TL"/>
-          </andTerm>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="12" name="InteriorVenetianBlind" summary="Interior Venetian Blind">
-        <mandatoryConform>
-          <andTerm>
-            <feature name="LF"/>
-            <feature name="TL"/>
-          </andTerm>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="13" name="ExteriorVenetianBlind" summary="Exterior Venetian Blind">
-        <mandatoryConform>
-          <andTerm>
-            <feature name="LF"/>
-            <feature name="TL"/>
-          </andTerm>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="14" name="LateralLeftCurtain" summary="Lateral Left Curtain">
-        <mandatoryConform>
-          <feature name="LF"/>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="15" name="LateralRightCurtain" summary="Lateral Right Curtain">
-        <mandatoryConform>
-          <feature name="LF"/>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="16" name="CentralCurtain" summary="Central Curtain">
-        <mandatoryConform>
-          <feature name="LF"/>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="17" name="RollerShutter" summary="Roller Shutter">
-        <mandatoryConform>
-          <feature name="LF"/>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="18" name="ExteriorVerticalScreen" summary="Exterior Vertical Screen">
-        <mandatoryConform>
-          <feature name="LF"/>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="19" name="AwningTerracePatio" summary="Awning Terrace (Patio)">
-        <mandatoryConform>
-          <feature name="LF"/>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="20" name="AwningVerticalScreen" summary="Awning Vertical Screen">
-        <mandatoryConform>
-          <feature name="LF"/>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="21" name="TiltOnlyPergola" summary="Tilt Only Pergola">
-        <mandatoryConform>
-          <orTerm>
-            <feature name="LF"/>
-            <feature name="TL"/>
-          </orTerm>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="22" name="SwingingShutter" summary="Swinging Shutter">
-        <mandatoryConform>
-          <orTerm>
-            <feature name="LF"/>
-            <feature name="TL"/>
-          </orTerm>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="23" name="SlidingShutter" summary="Sliding Shutter">
-        <mandatoryConform>
-          <orTerm>
-            <feature name="LF"/>
-            <feature name="TL"/>
-          </orTerm>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="255" name="Unknown" summary="Unknown">
-        <optionalConform/>
+        <mandatoryConform/>
       </item>
     </enum>
     <enum name="TypeEnum">
       <item value="0" name="RollerShade" summary="RollerShade">
-        <mandatoryConform>
-          <feature name="LF"/>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="1" name="RollerShade2Motor" summary="RollerShade - 2 Motor">
-        <mandatoryConform>
-          <feature name="LF"/>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="2" name="RollerShadeExterior" summary="RollerShade - Exterior">
-        <mandatoryConform>
-          <feature name="LF"/>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="3" name="RollerShadeExterior2Motor" summary="RollerShade - Exterior - 2 Motor">
-        <mandatoryConform>
-          <feature name="LF"/>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="4" name="Drapery" summary="Drapery (curtain)">
-        <mandatoryConform>
-          <feature name="LF"/>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="5" name="Awning" summary="Awning">
-        <mandatoryConform>
-          <feature name="LF"/>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="6" name="Shutter" summary="Shutter">
-        <mandatoryConform>
-          <orTerm>
-            <feature name="LF"/>
-            <feature name="TL"/>
-          </orTerm>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="7" name="TiltBlindTiltOnly" summary="Tilt Blind - Tilt Only">
-        <mandatoryConform>
-          <feature name="TL"/>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="8" name="TiltBlindLiftAndTilt" summary="Tilt Blind - Lift &amp; Tilt">
-        <mandatoryConform>
-          <andTerm>
-            <feature name="LF"/>
-            <feature name="TL"/>
-          </andTerm>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="9" name="ProjectorScreen" summary="Projector Screen">
-        <mandatoryConform>
-          <feature name="LF"/>
-        </mandatoryConform>
+        <mandatoryConform/>
       </item>
       <item value="255" name="Unknown" summary="Unknown">
-        <optionalConform/>
+        <mandatoryConform/>
       </item>
     </enum>
     <bitmap name="ConfigStatusBitmap">
@@ -445,8 +347,12 @@ Davis, CA 95616, USA
       </optionalConform>
       <constraint>
         <between>
-          <attribute name="InstalledOpenLimitLift"/>
-          <attribute name="InstalledClosedLimitLift"/>
+          <from>
+            <attribute name="InstalledOpenLimitLift"/>
+          </from>
+          <to>
+            <attribute name="InstalledClosedLimitLift"/>
+          </to>
         </between>
       </constraint>
     </attribute>
@@ -462,8 +368,12 @@ Davis, CA 95616, USA
       </optionalConform>
       <constraint>
         <between>
-          <attribute name="InstalledOpenLimitTilt"/>
-          <attribute name="InstalledClosedLimitTilt"/>
+          <from>
+            <attribute name="InstalledOpenLimitTilt"/>
+          </from>
+          <to>
+            <attribute name="InstalledClosedLimitTilt"/>
+          </to>
         </between>
       </constraint>
     </attribute>

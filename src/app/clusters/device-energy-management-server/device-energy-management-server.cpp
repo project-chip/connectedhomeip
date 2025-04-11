@@ -924,3 +924,4 @@ Status Instance::GetMatterEpochTimeFromUnixTime(uint32_t & currentUtcTime) const
 } // namespace chip
 
 void MatterDeviceEnergyManagementPluginServerInitCallback() {}
+void MatterDeviceEnergyManagementPluginServerShutdownCallback() {}

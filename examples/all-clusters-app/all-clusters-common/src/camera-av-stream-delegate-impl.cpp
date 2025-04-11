@@ -357,3 +357,9 @@ void emberAfCameraAvStreamManagementClusterInitCallback(EndpointId endpoint)
         spkrCapabilities, twowayTalkSupport, supportedSnapshotParams, maxNetworkBandwidth, supportedStreamUsages);
     sCameraAVStreamMgmtClusterServerInstance->Init();
 }
+
+void emberAfCameraAvStreamManagementClusterShutdownCallback(EndpointId endpoint)
+{
+    sCameraAVStreamMgmtClusterServerInstance = nullptr;
+    sCameraAVStreamMgrInstance               = nullptr;
+}

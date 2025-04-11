@@ -1,5 +1,4 @@
 import Matter
-import XCTest
 
 // This more or less parallels the "no delegate" case in MTRPairingTests, but uses the "normal"
 // all-clusters-app, since it does not do any of the "interesting" VID/PID notification so far.  If
@@ -45,8 +44,11 @@ class MTRSwiftPairingTestControllerDelegate : NSObject, MTRDeviceControllerDeleg
     }
 }
 
-class MTRSwiftPairingTests : XCTestCase {
+class MTRSwiftPairingTests : MTRTestCase {
     func test001_BasicPairing() {
+        let started = self.startApp(withName: "all-clusters", arguments: [], payload: PairingConstants.onboardingPayload)
+        XCTAssertTrue(started);
+        
         let factory = MTRDeviceControllerFactory.sharedInstance()
 
         let storage = MTRTestStorage()
@@ -98,8 +100,6 @@ class MTRSwiftPairingTests : XCTestCase {
         }
 
         wait(for: [expectation], timeout: TimeInterval(PairingConstants.pairingTimeoutInSeconds))
-
-        ResetCommissionee(MTRBaseDevice(nodeID: PairingConstants.deviceID as NSNumber, controller: controller), DispatchQueue.main, self, PairingConstants.timeoutInSeconds)
 
         controller.shutdown()
         XCTAssertFalse(controller.isRunning)
