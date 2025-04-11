@@ -119,25 +119,25 @@ Davis, CA 95616, USA
       </item>
     </enum>
     <enum name="WiFiVersionEnum">
-      <item value="0" name="a" summary="Indicate the network interface is currently using 802.11a against the wireless access point.">
+      <item value="0" name="a" summary="Indicate the network interface is currently using IEEE 802.11a against the wireless access point.">
         <mandatoryConform/>
       </item>
-      <item value="1" name="b" summary="Indicate the network interface is currently using 802.11b against the wireless access point.">
+      <item value="1" name="b" summary="Indicate the network interface is currently using IEEE 802.11b against the wireless access point.">
         <mandatoryConform/>
       </item>
-      <item value="2" name="g" summary="Indicate the network interface is currently using 802.11g against the wireless access point.">
+      <item value="2" name="g" summary="Indicate the network interface is currently using IEEE 802.11g against the wireless access point.">
         <mandatoryConform/>
       </item>
-      <item value="3" name="n" summary="Indicate the network interface is currently using 802.11n against the wireless access point.">
+      <item value="3" name="n" summary="Indicate the network interface is currently using IEEE 802.11n against the wireless access point.">
         <mandatoryConform/>
       </item>
-      <item value="4" name="ac" summary="Indicate the network interface is currently using 802.11ac against the wireless access point.">
+      <item value="4" name="ac" summary="Indicate the network interface is currently using IEEE 802.11ac against the wireless access point.">
         <mandatoryConform/>
       </item>
-      <item value="5" name="ax" summary="Indicate the network interface is currently using 802.11ax against the wireless access point.">
+      <item value="5" name="ax" summary="Indicate the network interface is currently using IEEE 802.11ax against the wireless access point.">
         <mandatoryConform/>
       </item>
-      <item value="6" name="ah" summary="Indicate the network interface is currently using 802.11ah against the wireless access point.">
+      <item value="6" name="ah" summary="Indicate the network interface is currently using IEEE 802.11ah against the wireless access point.">
         <mandatoryConform/>
       </item>
     </enum>

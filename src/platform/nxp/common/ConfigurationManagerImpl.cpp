@@ -38,7 +38,7 @@
 #endif
 
 #if CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
-#include "FactoryDataProvider.h"
+#include <platform/nxp/common/factory_data/legacy/FactoryDataProvider.h>
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA

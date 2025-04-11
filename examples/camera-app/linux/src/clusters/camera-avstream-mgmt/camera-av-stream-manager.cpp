@@ -19,7 +19,6 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
 #include <camera-av-stream-manager.h>
 #include <fstream>
 #include <iostream>
@@ -34,6 +33,7 @@ using namespace chip::app;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::CameraAvStreamManagement;
+using namespace chip::app::Clusters::CameraAvStreamManagement::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
 void CameraAVStreamManager::SetCameraDeviceHAL(CameraDeviceInterface::CameraHALInterface * aCameraDeviceHAL)
@@ -236,6 +236,49 @@ void CameraAVStreamManager::OnRankedStreamPrioritiesChanged()
 void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)
 {
     ChipLogProgress(Camera, "Attribute changed for AttributeId = " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
+
+    switch (attributeId)
+    {
+    case HDRModeEnabled::Id: {
+
+        mCameraDeviceHAL->SetHDRMode(GetCameraAVStreamMgmtServer()->GetHDRModeEnabled());
+        break;
+    }
+    case SoftRecordingPrivacyModeEnabled::Id: {
+        break;
+    }
+    case SoftLivestreamPrivacyModeEnabled::Id: {
+        break;
+    }
+    case NightVision::Id: {
+        break;
+    }
+    case NightVisionIllum::Id: {
+        break;
+    }
+    case Viewport::Id: {
+        mCameraDeviceHAL->SetViewport(GetCameraAVStreamMgmtServer()->GetViewport());
+        break;
+    }
+    case SpeakerMuted::Id: {
+        mCameraDeviceHAL->SetSpeakerMuted(GetCameraAVStreamMgmtServer()->GetSpeakerMuted());
+        break;
+    }
+    case SpeakerVolumeLevel::Id: {
+        mCameraDeviceHAL->SetSpeakerVolume(GetCameraAVStreamMgmtServer()->GetSpeakerVolumeLevel());
+        break;
+    }
+    case MicrophoneMuted::Id: {
+        mCameraDeviceHAL->SetMicrophoneMuted(GetCameraAVStreamMgmtServer()->GetMicrophoneMuted());
+        break;
+    }
+    case MicrophoneVolumeLevel::Id: {
+        mCameraDeviceHAL->SetMicrophoneVolume(GetCameraAVStreamMgmtServer()->GetMicrophoneVolumeLevel());
+        break;
+    }
+    default:
+        ChipLogProgress(Camera, "Unknown Attribute with AttributeId = " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
+    }
 }
 
 Protocols::InteractionModel::Status CameraAVStreamManager::CaptureSnapshot(const uint16_t streamID,
