@@ -227,6 +227,16 @@ private:
     Layer & operator=(const Layer &) = delete;
 };
 
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+class LayerDispatch : public Layer
+{
+public:
+    virtual void SetDispatchQueue(dispatch_queue_t dispatchQueue) = 0;
+    virtual dispatch_queue_t GetDispatchQueue()                   = 0;
+    virtual void HandleDispatchQueueEvents()                      = 0;
+};
+#endif
+
 #if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 
 class LayerFreeRTOS : public Layer
@@ -343,10 +353,7 @@ public:
     virtual void RemoveLoopHandler(EventLoopHandler & handler) = 0;
 #endif // !CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    virtual void SetDispatchQueue(dispatch_queue_t dispatchQueue) = 0;
-    virtual dispatch_queue_t GetDispatchQueue()                   = 0;
-#elif CHIP_SYSTEM_CONFIG_USE_LIBEV
+#if CHIP_SYSTEM_CONFIG_USE_LIBEV
     virtual void SetLibEvLoop(struct ev_loop * aLibEvLoopP) = 0;
     virtual struct ev_loop * GetLibEvLoop()                 = 0;
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH/LIBEV

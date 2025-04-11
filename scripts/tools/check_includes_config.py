@@ -195,4 +195,8 @@ ALLOW: Dict[str, Set[str]] = {
     'src/access/AccessRestrictionProvider.h': {'vector', 'map'},
     # nrfconnect test runner
     'src/test_driver/nrfconnect/main/runner.cpp': {'vector'},
+
+    # Not really for embedded consumers; uses std::unordered_set to keep track
+    # of a list of timers while draining during unit tests
+    'src/system/SystemLayerImplDispatch.h': {'unordered_set'},
 }

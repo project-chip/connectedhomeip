@@ -368,6 +368,10 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
     gSystemLayer.HandleEvents();
 #endif
 
+#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+    gSystemLayer.HandleDispatchQueueEvents();
+#endif
+
 #if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     if (gSystemLayer.IsInitialized())
     {
