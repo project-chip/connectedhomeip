@@ -27,9 +27,6 @@
 #include <type_traits>
 
 namespace chip {
-namespace app {
-namespace DataModel {
-
 namespace detail {
 
 class GenericAppendOnlyBuffer
@@ -48,12 +45,12 @@ public:
     /// can be appended to the internal buffer;
     ///
     /// This will cause the internal buffer to become an allocated buffer
-    CHIP_ERROR EnsureAppendCapacity(size_t numElements);
+    [[nodiscard]] CHIP_ERROR EnsureAppendCapacity(size_t numElements);
 
-    bool IsEmpty() const { return mElementCount == 0; }
+    [[nodiscard]] bool IsEmpty() const { return mElementCount == 0; }
 
     /// Number of elements stored in the object.
-    size_t Size() const { return mElementCount; }
+    [[nodiscard]] size_t Size() const { return mElementCount; }
 
 protected:
     /// Appends a single element of mElementSize size.
@@ -166,7 +163,7 @@ public:
 
     /// Reference methods attempt to reference the existing array IN PLACE
     /// so its lifetime is assumed to be longer than the usage of this list.
-    CHIP_ERROR ReferenceExisting(SpanType span) { return ReferenceExistingElementArrayRaw(span.data(), span.size()); }
+    [[nodiscard]] CHIP_ERROR ReferenceExisting(SpanType span) { return ReferenceExistingElementArrayRaw(span.data(), span.size()); }
 
     /// Append always attempts to append/extend existing memory.
     ///
@@ -176,11 +173,11 @@ public:
     /// `span` MUST NOT point inside "own" buffer (and generally will not
     /// as this class does not expose buffer access except by releasing ownership
     /// via `Take`)
-    CHIP_ERROR AppendElements(SpanType span) { return AppendElementArrayRaw(span.data(), span.size()); }
+    [[nodiscard]] CHIP_ERROR AppendElements(SpanType span) { return AppendElementArrayRaw(span.data(), span.size()); }
 
     /// Append a single element.
     /// Sufficent append capacity MUST exist.
-    CHIP_ERROR Append(const T & value) { return AppendSingleElementRaw(&value); }
+    [[nodiscard]] CHIP_ERROR Append(const T & value) { return AppendSingleElementRaw(&value); }
 
     /// Once a list is built, the data is taken as a scoped SPAN that owns its data
     /// and the original list is cleared
@@ -195,6 +192,4 @@ public:
     }
 };
 
-} // namespace DataModel
-} // namespace app
 } // namespace chip

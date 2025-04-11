@@ -257,6 +257,8 @@ static_library("support") {
     "verhoeff/Verhoeff.cpp",
     "verhoeff/Verhoeff.h",
     "verhoeff/Verhoeff10.cpp",
+    "ReadOnlyBuffer.cpp",
+    "ReadOnlyBuffer.h",
   ]
 
   if (chip_device_platform == "android" || matter_enable_java_compilation) {

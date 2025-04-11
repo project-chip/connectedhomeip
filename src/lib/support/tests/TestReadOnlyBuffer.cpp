@@ -31,8 +31,7 @@
 #include <lib/support/Span.h>
 
 using namespace chip;
-using namespace chip::app::DataModel;
-using namespace chip::app::DataModel::detail;
+using namespace chip::detail;
 
 namespace {
 
