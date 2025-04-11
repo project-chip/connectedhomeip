@@ -53,7 +53,7 @@ public:
     class DecodableEntry
     {
         using Entry        = Access::AccessControl::Entry;
-        using StagingEntry = Clusters::AccessControl::Structs::AccessControlEntryStruct::DecodableType;
+        using StagingEntry = Clusters::Globals::Structs::AccessControlEntryStruct::DecodableType;
 
     public:
         DecodableEntry() = default;
@@ -93,8 +93,8 @@ public:
     class EncodableEntry
     {
         using Entry         = Access::AccessControl::Entry;
-        using StagingEntry  = Clusters::AccessControl::Structs::AccessControlEntryStruct::Type;
-        using StagingTarget = Clusters::AccessControl::Structs::AccessControlTargetStruct::Type;
+        using StagingEntry  = Clusters::Globals::Structs::AccessControlEntryStruct::Type;
+        using StagingTarget = Clusters::Globals::Structs::AccessControlTargetStruct::Type;
 
     public:
         EncodableEntry(const Entry & entry) : mEntry(entry) {}

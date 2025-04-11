@@ -52,10 +52,47 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) MTRDataTypeCurrencyStruct * _Nonnull currency MTR_PROVISIONALLY_AVAILABLE;
 @end
 
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRDataTypeAccessControlTargetStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nullable cluster MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable endpoint MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable deviceType MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRDataTypeAccessControlEntryStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull privilege MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull authMode MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nullable subjects MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nullable targets MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
+@end
+
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 @interface MTRDataTypeAtomicAttributeStatusStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull attributeID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 @property (nonatomic, copy) NSNumber * _Nonnull statusCode MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRDataTypeGroupKeySetStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull groupKeySetID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull groupKeySecurityPolicy MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSData * _Nullable epochKey0 MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable epochStartTime0 MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSData * _Nullable epochKey1 MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable epochStartTime1 MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSData * _Nullable epochKey2 MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable epochStartTime2 MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRDataTypeTargetStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nullable node MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable group MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable endpoint MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable cluster MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
@@ -76,15 +113,6 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSNumber * _Nonnull namespaceID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull tag MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSString * _Nullable label MTR_PROVISIONALLY_AVAILABLE;
-@end
-
-MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRBindingClusterTargetStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nullable node MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nullable group MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nullable endpoint MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nullable cluster MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -108,38 +136,6 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 @end
 
-MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
-@interface MTRAccessControlClusterAccessControlTargetStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nullable cluster MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
-@property (nonatomic, copy) NSNumber * _Nullable endpoint MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
-@property (nonatomic, copy) NSNumber * _Nullable deviceType MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
-@end
-
-MTR_DEPRECATED("Please use MTRAccessControlClusterAccessControlTargetStruct", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0))
-@interface MTRAccessControlClusterTarget : MTRAccessControlClusterAccessControlTargetStruct
-@property (nonatomic, copy) NSNumber * _Nullable cluster MTR_DEPRECATED("Please use MTRAccessControlClusterAccessControlTargetStruct", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0));
-@property (nonatomic, copy) NSNumber * _Nullable endpoint MTR_DEPRECATED("Please use MTRAccessControlClusterAccessControlTargetStruct", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0));
-@property (nonatomic, copy) NSNumber * _Nullable deviceType MTR_DEPRECATED("Please use MTRAccessControlClusterAccessControlTargetStruct", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0));
-@end
-
-MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-@interface MTRAccessControlClusterAccessControlEntryStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull privilege MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-@property (nonatomic, copy) NSNumber * _Nonnull authMode MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-@property (nonatomic, copy) NSArray * _Nullable subjects MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-@property (nonatomic, copy) NSArray * _Nullable targets MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-@end
-
-MTR_DEPRECATED("Please use MTRAccessControlClusterAccessControlEntryStruct", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-@interface MTRAccessControlClusterAccessControlEntry : MTRAccessControlClusterAccessControlEntryStruct
-@property (nonatomic, copy) NSNumber * _Nonnull privilege MTR_DEPRECATED("Please use MTRAccessControlClusterAccessControlEntryStruct", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-@property (nonatomic, copy) NSNumber * _Nonnull authMode MTR_DEPRECATED("Please use MTRAccessControlClusterAccessControlEntryStruct", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-@property (nonatomic, copy) NSArray * _Nullable subjects MTR_DEPRECATED("Please use MTRAccessControlClusterAccessControlEntryStruct", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-@property (nonatomic, copy) NSArray * _Nullable targets MTR_DEPRECATED("Please use MTRAccessControlClusterAccessControlEntryStruct", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_DEPRECATED("Please use MTRAccessControlClusterAccessControlEntryStruct", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-@end
-
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRAccessControlClusterAccessControlExtensionStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSData * _Nonnull data MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
@@ -157,7 +153,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy) NSNumber * _Nullable adminNodeID MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @property (nonatomic, copy) NSNumber * _Nullable adminPasscodeID MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @property (nonatomic, copy) NSNumber * _Nonnull changeType MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) MTRAccessControlClusterAccessControlEntryStruct * _Nullable latestValue MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+@property (nonatomic, copy) MTRDataTypeAccessControlEntryStruct * _Nullable latestValue MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @end
 
@@ -802,18 +798,6 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy) NSNumber * _Nonnull groupId MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @property (nonatomic, copy) NSNumber * _Nonnull groupKeySetID MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@end
-
-MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRGroupKeyManagementClusterGroupKeySetStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull groupKeySetID MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nonnull groupKeySecurityPolicy MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSData * _Nullable epochKey0 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nullable epochStartTime0 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSData * _Nullable epochKey1 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nullable epochStartTime1 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSData * _Nullable epochKey2 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nullable epochStartTime2 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1671,6 +1655,13 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
+@interface MTRClosureDimensionClusterClosureDimensionTargetStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nullable position MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable latch MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable speed MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
 @interface MTRClosureDimensionClusterCurrentStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nullable position MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable latching MTR_PROVISIONALLY_AVAILABLE;
@@ -1681,13 +1672,6 @@ MTR_PROVISIONALLY_AVAILABLE
 @interface MTRClosureDimensionClusterRangePercent100thsStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull min MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull max MTR_PROVISIONALLY_AVAILABLE;
-@end
-
-MTR_PROVISIONALLY_AVAILABLE
-@interface MTRClosureDimensionClusterTargetStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nullable position MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable latch MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable speed MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -2589,6 +2573,78 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 @property (nonatomic, copy) NSNumber * _Nonnull clientNodeID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 @property (nonatomic, copy) NSNumber * _Nonnull statusCode MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRJointFabricDatastoreClusterDatastoreStatusEntryStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull state MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable updateTimestamp MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull failureCode MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRJointFabricDatastoreClusterDatastoreNodeKeyEntryStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull nodeID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull groupKeySetId MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRJointFabricDatastoreClusterDatastoreStatusEntryStruct * _Nonnull statusEntry MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRJointFabricDatastoreClusterDatastoreNodeInformationEntryStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull nodeID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull friendlyName MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRJointFabricDatastoreClusterDatastoreStatusEntryStruct * _Nonnull commissioningStatusEntry MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRJointFabricDatastoreClusterDatastoreEndpointGroupIDEntryStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull nodeID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull endpointID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull groupID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRJointFabricDatastoreClusterDatastoreStatusEntryStruct * _Nonnull statusEntry MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRJointFabricDatastoreClusterDatastoreEndpointEntryStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull endpointID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull nodeID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull friendlyName MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRJointFabricDatastoreClusterDatastoreStatusEntryStruct * _Nonnull statusEntry MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRJointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull nodeID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull endpointID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull listID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRJointFabricDatastoreClusterDatastoreStatusEntryStruct * _Nonnull statusEntry MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRJointFabricDatastoreClusterDatastoreACLEntryStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull nodeID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull listID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRJointFabricDatastoreClusterDatastoreStatusEntryStruct * _Nonnull statusEntry MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRJointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull nodeID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull friendlyName MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull vendorID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSData * _Nonnull icac MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRJointFabricDatastoreClusterDatastoreGroupInformationEntryStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull groupID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull friendlyName MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull groupKeySetID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull groupCAT MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull groupCATVersion MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull groupPermission MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE

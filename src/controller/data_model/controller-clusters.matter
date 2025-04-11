@@ -1,6 +1,20 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
+enum AccessControlEntryAuthModeEnum : enum8 {
+  kPASE = 1;
+  kCASE = 2;
+  kGroup = 3;
+}
+
+enum AccessControlEntryPrivilegeEnum : enum8 {
+  kView = 1;
+  kProxyView = 2;
+  kOperate = 3;
+  kManage = 4;
+  kAdminister = 5;
+}
+
 enum AreaTypeTag : enum8 {
   kAisle = 0;
   kAttic = 1;
@@ -130,6 +144,11 @@ enum FloorSurfaceTag : enum8 {
   kTerrazzo = 21;
   kTile = 22;
   kVinyl = 23;
+}
+
+enum GroupKeySecurityPolicyEnum : enum8 {
+  kTrustFirst = 0;
+  kCacheAndSync = 1;
 }
 
 enum LandmarkTag : enum8 {
@@ -271,9 +290,42 @@ struct PriceStruct {
   CurrencyStruct currency = 1;
 }
 
+struct AccessControlTargetStruct {
+  nullable cluster_id cluster = 0;
+  nullable endpoint_no endpoint = 1;
+  nullable devtype_id deviceType = 2;
+}
+
+fabric_scoped struct AccessControlEntryStruct {
+  fabric_sensitive AccessControlEntryPrivilegeEnum privilege = 1;
+  fabric_sensitive AccessControlEntryAuthModeEnum authMode = 2;
+  nullable fabric_sensitive int64u subjects[] = 3;
+  nullable fabric_sensitive AccessControlTargetStruct targets[] = 4;
+  fabric_idx fabricIndex = 254;
+}
+
 struct AtomicAttributeStatusStruct {
   attrib_id attributeID = 0;
   status statusCode = 1;
+}
+
+struct GroupKeySetStruct {
+  int16u groupKeySetID = 0;
+  GroupKeySecurityPolicyEnum groupKeySecurityPolicy = 1;
+  nullable octet_string<16> epochKey0 = 2;
+  nullable epoch_us epochStartTime0 = 3;
+  nullable octet_string<16> epochKey1 = 4;
+  nullable epoch_us epochStartTime1 = 5;
+  nullable octet_string<16> epochKey2 = 6;
+  nullable epoch_us epochStartTime2 = 7;
+}
+
+fabric_scoped struct TargetStruct {
+  optional node_id node = 1;
+  optional group_id group = 2;
+  optional endpoint_no endpoint = 3;
+  optional cluster_id cluster = 4;
+  fabric_idx fabricIndex = 254;
 }
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
@@ -649,14 +701,6 @@ cluster Descriptor = 29 {
 cluster Binding = 30 {
   revision 1; // NOTE: Default/not specifically set
 
-  fabric_scoped struct TargetStruct {
-    optional node_id node = 1;
-    optional group_id group = 2;
-    optional endpoint_no endpoint = 3;
-    optional cluster_id cluster = 4;
-    fabric_idx fabricIndex = 254;
-  }
-
   attribute access(write: manage) TargetStruct binding[] = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -672,20 +716,6 @@ cluster Binding = 30 {
       cluster instances. */
 cluster AccessControl = 31 {
   revision 2;
-
-  enum AccessControlEntryAuthModeEnum : enum8 {
-    kPASE = 1;
-    kCASE = 2;
-    kGroup = 3;
-  }
-
-  enum AccessControlEntryPrivilegeEnum : enum8 {
-    kView = 1;
-    kProxyView = 2;
-    kOperate = 3;
-    kManage = 4;
-    kAdminister = 5;
-  }
 
   enum AccessRestrictionTypeEnum : enum8 {
     kAttributeAccessForbidden = 0;
@@ -720,20 +750,6 @@ cluster AccessControl = 31 {
     fabric_sensitive endpoint_no endpoint = 0;
     fabric_sensitive cluster_id cluster = 1;
     fabric_sensitive AccessRestrictionStruct restrictions[] = 2;
-    fabric_idx fabricIndex = 254;
-  }
-
-  struct AccessControlTargetStruct {
-    nullable cluster_id cluster = 0;
-    nullable endpoint_no endpoint = 1;
-    nullable devtype_id deviceType = 2;
-  }
-
-  fabric_scoped struct AccessControlEntryStruct {
-    fabric_sensitive AccessControlEntryPrivilegeEnum privilege = 1;
-    fabric_sensitive AccessControlEntryAuthModeEnum authMode = 2;
-    nullable fabric_sensitive int64u subjects[] = 3;
-    nullable fabric_sensitive AccessControlTargetStruct targets[] = 4;
     fabric_idx fabricIndex = 254;
   }
 
@@ -2859,11 +2875,6 @@ cluster OperationalCredentials = 62 {
 cluster GroupKeyManagement = 63 {
   revision 1; // NOTE: Default/not specifically set
 
-  enum GroupKeySecurityPolicyEnum : enum8 {
-    kTrustFirst = 0;
-    kCacheAndSync = 1;
-  }
-
   bitmap Feature : bitmap32 {
     kCacheAndSync = 0x1;
   }
@@ -2879,17 +2890,6 @@ cluster GroupKeyManagement = 63 {
     group_id groupId = 1;
     int16u groupKeySetID = 2;
     fabric_idx fabricIndex = 254;
-  }
-
-  struct GroupKeySetStruct {
-    int16u groupKeySetID = 0;
-    GroupKeySecurityPolicyEnum groupKeySecurityPolicy = 1;
-    nullable octet_string<16> epochKey0 = 2;
-    nullable epoch_us epochStartTime0 = 3;
-    nullable octet_string<16> epochKey1 = 4;
-    nullable epoch_us epochStartTime1 = 5;
-    nullable octet_string<16> epochKey2 = 6;
-    nullable epoch_us epochStartTime2 = 7;
   }
 
   attribute access(write: manage) GroupKeyMapStruct groupKeyMap[] = 0;
@@ -6802,6 +6802,12 @@ provisional cluster ClosureDimension = 261 {
     kModulation = 0x80;
   }
 
+  struct ClosureDimensionTargetStruct {
+    optional percent100ths position = 0;
+    optional TargetLatchEnum latch = 1;
+    optional ThreeLevelAutoEnum speed = 2;
+  }
+
   struct CurrentStruct {
     optional percent100ths position = 0;
     optional LatchingEnum latching = 1;
@@ -6813,19 +6819,13 @@ provisional cluster ClosureDimension = 261 {
     percent100ths max = 1;
   }
 
-  struct TargetStruct {
-    optional percent100ths position = 0;
-    optional TargetLatchEnum latch = 1;
-    optional ThreeLevelAutoEnum speed = 2;
-  }
-
   struct UnitRangeStruct {
     int16s min = 0;
     int16s max = 1;
   }
 
   readonly attribute nullable CurrentStruct current = 0;
-  readonly attribute nullable TargetStruct target = 1;
+  readonly attribute nullable ClosureDimensionTargetStruct target = 1;
   readonly attribute optional percent100ths resolution = 2;
   readonly attribute optional percent100ths stepValue = 3;
   readonly attribute optional ClosureUnitEnum unit = 4;
@@ -10975,6 +10975,299 @@ cluster CommissionerControl = 1873 {
   command access(invoke: manage) RequestCommissioningApproval(RequestCommissioningApprovalRequest): DefaultSuccess = 0;
   /** This command is sent by a client to request that the server begins commissioning a previously approved request. */
   command access(invoke: manage) CommissionNode(CommissionNodeRequest): ReverseOpenCommissioningWindow = 1;
+}
+
+/** Joint Fabric Datastore Cluster. */
+cluster JointFabricDatastore = 1874 {
+  revision 1; // NOTE: Default/not specifically set
+
+  enum DatastoreStateEnum : enum8 {
+    kPending = 0;
+    kCommitted = 1;
+    kDeletePending = 2;
+    kCommitFailed = 3;
+  }
+
+  struct DatastoreStatusEntryStruct {
+    DatastoreStateEnum state = 0;
+    nullable epoch_us updateTimestamp = 1;
+    status failureCode = 2;
+  }
+
+  struct DatastoreNodeKeyEntryStruct {
+    node_id nodeID = 0;
+    int16u groupKeySetId = 1;
+    DatastoreStatusEntryStruct statusEntry = 2;
+  }
+
+  fabric_scoped struct DatastoreNodeInformationEntryStruct {
+    node_id nodeID = 1;
+    char_string<32> friendlyName = 2;
+    DatastoreStatusEntryStruct commissioningStatusEntry = 3;
+    fabric_idx fabricIndex = 254;
+  }
+
+  struct DatastoreEndpointGroupIDEntryStruct {
+    node_id nodeID = 0;
+    endpoint_no endpointID = 1;
+    group_id groupID = 2;
+    DatastoreStatusEntryStruct statusEntry = 3;
+  }
+
+  struct DatastoreEndpointEntryStruct {
+    endpoint_no endpointID = 0;
+    node_id nodeID = 1;
+    char_string<32> friendlyName = 2;
+    DatastoreStatusEntryStruct statusEntry = 3;
+  }
+
+  struct DatastoreEndpointBindingEntryStruct {
+    node_id nodeID = 0;
+    endpoint_no endpointID = 1;
+    int16u listID = 2;
+    DatastoreStatusEntryStruct statusEntry = 4;
+  }
+
+  struct DatastoreACLEntryStruct {
+    node_id nodeID = 0;
+    int16u listID = 1;
+    DatastoreStatusEntryStruct statusEntry = 3;
+  }
+
+  struct DatastoreAdministratorInformationEntryStruct {
+    node_id nodeID = 1;
+    char_string<32> friendlyName = 2;
+    vendor_id vendorID = 3;
+    octet_string<400> icac = 4;
+  }
+
+  fabric_scoped struct DatastoreGroupInformationEntryStruct {
+    int64u groupID = 0;
+    char_string<32> friendlyName = 1;
+    int16u groupKeySetID = 2;
+    int16u groupCAT = 3;
+    int16u groupCATVersion = 4;
+    AccessControlEntryPrivilegeEnum groupPermission = 5;
+    fabric_idx fabricIndex = 254;
+  }
+
+  readonly attribute access(read: administer) octet_string<254> anchorRootCa = 0;
+  readonly attribute access(read: administer) node_id anchorNodeID = 1;
+  readonly attribute access(read: administer) vendor_id anchorVendorID = 2;
+  readonly attribute access(read: administer) char_string<32> friendlyName = 3;
+  readonly attribute access(read: administer) GroupKeySetStruct groupKeySetList[] = 4;
+  readonly attribute access(read: administer) DatastoreGroupInformationEntryStruct groupList[] = 5;
+  readonly attribute access(read: administer) DatastoreNodeInformationEntryStruct nodeList[] = 6;
+  readonly attribute access(read: administer) DatastoreAdministratorInformationEntryStruct adminList[] = 7;
+  readonly attribute access(read: administer) DatastoreStatusEntryStruct statusEntry[] = 8;
+  readonly attribute access(read: administer) DatastoreEndpointGroupIDEntryStruct endpointGroupIDList[] = 9;
+  readonly attribute access(read: administer) DatastoreEndpointBindingEntryStruct endpointBindingList[] = 10;
+  readonly attribute access(read: administer) DatastoreNodeKeyEntryStruct nodeKeySetList[] = 11;
+  readonly attribute access(read: administer) DatastoreACLEntryStruct nodeACLList[] = 12;
+  readonly attribute access(read: administer) DatastoreEndpointEntryStruct nodeEndpointList[] = 13;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct AddKeySetRequest {
+    GroupKeySetStruct groupKeySet = 0;
+  }
+
+  request struct UpdateKeySetRequest {
+    GroupKeySetStruct groupKeySet = 0;
+  }
+
+  request struct RemoveKeySetRequest {
+    int16u groupKeySetId = 0;
+  }
+
+  request struct AddGroupRequest {
+    group_id groupID = 0;
+    char_string<32> friendlyName = 1;
+    int16u groupKeySetID = 2;
+    int16u groupCAT = 3;
+    int16u groupCATVersion = 4;
+    AccessControlEntryPrivilegeEnum groupPermission = 5;
+  }
+
+  request struct UpdateGroupRequest {
+    group_id groupID = 0;
+    char_string<32> friendlyName = 1;
+    int16u groupKeySetID = 2;
+    int16u groupCAT = 3;
+    int16u groupCATVersion = 4;
+    AccessControlEntryPrivilegeEnum groupPermission = 5;
+  }
+
+  request struct RemoveGroupRequest {
+    group_id groupID = 0;
+  }
+
+  request struct AddAdminRequest {
+    nullable DatastoreAdministratorInformationEntryStruct adminInformationEntry = 0;
+  }
+
+  request struct UpdateAdminRequest {
+    node_id nodeID = 0;
+    char_string<32> friendlyName = 1;
+    octet_string<400> icac = 2;
+  }
+
+  request struct RemoveAdminRequest {
+    node_id nodeID = 0;
+  }
+
+  request struct AddPendingNodeRequest {
+    node_id nodeID = 0;
+    char_string<32> friendlyName = 1;
+  }
+
+  request struct RefreshNodeRequest {
+    node_id nodeID = 0;
+  }
+
+  request struct UpdateNodeRequest {
+    node_id nodeID = 0;
+    char_string<32> friendlyName = 1;
+  }
+
+  request struct RemoveNodeRequest {
+    node_id nodeID = 0;
+  }
+
+  request struct UpdateEndpointForNodeRequest {
+    endpoint_no endpointID = 0;
+    node_id nodeID = 1;
+    char_string<32> friendlyName = 2;
+  }
+
+  request struct AddGroupIDToEndpointForNodeRequest {
+    node_id nodeID = 0;
+    endpoint_no endpointID = 1;
+    group_id groupID = 2;
+  }
+
+  request struct RemoveGroupIDFromEndpointForNodeRequest {
+    node_id nodeID = 0;
+    endpoint_no endpointID = 1;
+    group_id groupID = 2;
+  }
+
+  request struct AddBindingToEndpointForNodeRequest {
+    node_id nodeID = 0;
+    endpoint_no endpointID = 1;
+  }
+
+  request struct RemoveBindingFromEndpointForNodeRequest {
+    int16u listID = 0;
+    endpoint_no endpointID = 1;
+    node_id nodeID = 2;
+  }
+
+  request struct AddACLToNodeRequest {
+    node_id nodeID = 0;
+  }
+
+  request struct RemoveACLFromNodeRequest {
+    int16u listID = 0;
+    node_id nodeID = 1;
+  }
+
+  /** AddKeySet */
+  fabric command access(invoke: administer) AddKeySet(AddKeySetRequest): DefaultSuccess = 0;
+  /** UpdateKeySet */
+  fabric command access(invoke: administer) UpdateKeySet(UpdateKeySetRequest): DefaultSuccess = 1;
+  /** RemoveKeySet */
+  fabric command access(invoke: administer) RemoveKeySet(RemoveKeySetRequest): DefaultSuccess = 2;
+  /** AddGroup */
+  fabric command access(invoke: administer) AddGroup(AddGroupRequest): DefaultSuccess = 3;
+  /** UpdateGroup */
+  fabric command access(invoke: administer) UpdateGroup(UpdateGroupRequest): DefaultSuccess = 4;
+  /** RemoveGroup */
+  fabric command access(invoke: administer) RemoveGroup(RemoveGroupRequest): DefaultSuccess = 5;
+  /** AddAdmin */
+  fabric command access(invoke: administer) AddAdmin(AddAdminRequest): DefaultSuccess = 6;
+  /** UpdateAdmin */
+  fabric command access(invoke: administer) UpdateAdmin(UpdateAdminRequest): DefaultSuccess = 7;
+  /** RemoveAdmin */
+  fabric command access(invoke: administer) RemoveAdmin(RemoveAdminRequest): DefaultSuccess = 8;
+  /** AddPendingNode */
+  fabric command access(invoke: administer) AddPendingNode(AddPendingNodeRequest): DefaultSuccess = 9;
+  /** RefreshNode */
+  fabric command access(invoke: administer) RefreshNode(RefreshNodeRequest): DefaultSuccess = 10;
+  /** UpdateNode */
+  fabric command access(invoke: administer) UpdateNode(UpdateNodeRequest): DefaultSuccess = 11;
+  /** RemoveNode */
+  fabric command access(invoke: administer) RemoveNode(RemoveNodeRequest): DefaultSuccess = 12;
+  /** UpdateEndpointForNode */
+  fabric command access(invoke: administer) UpdateEndpointForNode(UpdateEndpointForNodeRequest): DefaultSuccess = 13;
+  /** AddGroupIDToEndpointForNode */
+  fabric command access(invoke: administer) AddGroupIDToEndpointForNode(AddGroupIDToEndpointForNodeRequest): DefaultSuccess = 14;
+  /** RemoveGroupIDFromEndpointForNode */
+  fabric command access(invoke: administer) RemoveGroupIDFromEndpointForNode(RemoveGroupIDFromEndpointForNodeRequest): DefaultSuccess = 15;
+  /** AddBindingToEndpointForNode */
+  fabric command access(invoke: administer) AddBindingToEndpointForNode(AddBindingToEndpointForNodeRequest): DefaultSuccess = 16;
+  /** RemoveBindingFromEndpointForNode */
+  fabric command access(invoke: administer) RemoveBindingFromEndpointForNode(RemoveBindingFromEndpointForNodeRequest): DefaultSuccess = 17;
+  /** AddACLToNode */
+  fabric command access(invoke: administer) AddACLToNode(AddACLToNodeRequest): DefaultSuccess = 18;
+  /** RemoveACLFromNode */
+  fabric command access(invoke: administer) RemoveACLFromNode(RemoveACLFromNodeRequest): DefaultSuccess = 19;
+}
+
+/** Joint Fabric Administrator Cluster. */
+cluster JointFabricAdministrator = 1875 {
+  revision 1; // NOTE: Default/not specifically set
+
+  enum ICACResponseStatusEnum : enum8 {
+    kOK = 0;
+    kInvalidPublicKey = 1;
+    kInvalidICAC = 2;
+  }
+
+  readonly attribute access(read: administer) fabric_idx administratorFabricIndex = 0;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  response struct ICACCSRResponse = 1 {
+    octet_string<600> icaccsr = 0;
+  }
+
+  request struct AddICACRequest {
+    octet_string<400> ICACValue = 0;
+  }
+
+  response struct ICACResponse = 3 {
+    ICACResponseStatusEnum statusCode = 0;
+  }
+
+  request struct OpenJointCommissioningWindowRequest {
+    int16u commissioningTimeout = 0;
+    octet_string PAKEPasscodeVerifier = 1;
+    int16u discriminator = 2;
+    int32u iterations = 3;
+    octet_string<32> salt = 4;
+  }
+
+  request struct AnnounceJointFabricAdministratorRequest {
+    endpoint_no endpointID = 0;
+  }
+
+  /** ICACCSRRequest */
+  command access(invoke: administer) ICACCSRRequest(): ICACCSRResponse = 0;
+  /** AddICAC */
+  command access(invoke: administer) AddICAC(AddICACRequest): ICACResponse = 2;
+  /** OpenJointCommissioningWindow */
+  command access(invoke: administer) OpenJointCommissioningWindow(OpenJointCommissioningWindowRequest): DefaultSuccess = 4;
+  /** AnnounceJointFabricAdministrator */
+  command access(invoke: administer) AnnounceJointFabricAdministrator(AnnounceJointFabricAdministratorRequest): DefaultSuccess = 8;
 }
 
 /** This Cluster is used to manage TLS Client Certificates and to provision

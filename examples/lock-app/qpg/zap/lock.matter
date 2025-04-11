@@ -1,6 +1,20 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
+enum AccessControlEntryAuthModeEnum : enum8 {
+  kPASE = 1;
+  kCASE = 2;
+  kGroup = 3;
+}
+
+enum AccessControlEntryPrivilegeEnum : enum8 {
+  kView = 1;
+  kProxyView = 2;
+  kOperate = 3;
+  kManage = 4;
+  kAdminister = 5;
+}
+
 enum AreaTypeTag : enum8 {
   kAisle = 0;
   kAttic = 1;
@@ -130,6 +144,11 @@ enum FloorSurfaceTag : enum8 {
   kTerrazzo = 21;
   kTile = 22;
   kVinyl = 23;
+}
+
+enum GroupKeySecurityPolicyEnum : enum8 {
+  kTrustFirst = 0;
+  kCacheAndSync = 1;
 }
 
 enum LandmarkTag : enum8 {
@@ -271,9 +290,42 @@ struct PriceStruct {
   CurrencyStruct currency = 1;
 }
 
+struct AccessControlTargetStruct {
+  nullable cluster_id cluster = 0;
+  nullable endpoint_no endpoint = 1;
+  nullable devtype_id deviceType = 2;
+}
+
+fabric_scoped struct AccessControlEntryStruct {
+  fabric_sensitive AccessControlEntryPrivilegeEnum privilege = 1;
+  fabric_sensitive AccessControlEntryAuthModeEnum authMode = 2;
+  nullable fabric_sensitive int64u subjects[] = 3;
+  nullable fabric_sensitive AccessControlTargetStruct targets[] = 4;
+  fabric_idx fabricIndex = 254;
+}
+
 struct AtomicAttributeStatusStruct {
   attrib_id attributeID = 0;
   status statusCode = 1;
+}
+
+struct GroupKeySetStruct {
+  int16u groupKeySetID = 0;
+  GroupKeySecurityPolicyEnum groupKeySecurityPolicy = 1;
+  nullable octet_string<16> epochKey0 = 2;
+  nullable epoch_us epochStartTime0 = 3;
+  nullable octet_string<16> epochKey1 = 4;
+  nullable epoch_us epochStartTime1 = 5;
+  nullable octet_string<16> epochKey2 = 6;
+  nullable epoch_us epochStartTime2 = 7;
+}
+
+fabric_scoped struct TargetStruct {
+  optional node_id node = 1;
+  optional group_id group = 2;
+  optional endpoint_no endpoint = 3;
+  optional cluster_id cluster = 4;
+  fabric_idx fabricIndex = 254;
 }
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
@@ -443,20 +495,6 @@ cluster Descriptor = 29 {
 cluster AccessControl = 31 {
   revision 2;
 
-  enum AccessControlEntryAuthModeEnum : enum8 {
-    kPASE = 1;
-    kCASE = 2;
-    kGroup = 3;
-  }
-
-  enum AccessControlEntryPrivilegeEnum : enum8 {
-    kView = 1;
-    kProxyView = 2;
-    kOperate = 3;
-    kManage = 4;
-    kAdminister = 5;
-  }
-
   enum AccessRestrictionTypeEnum : enum8 {
     kAttributeAccessForbidden = 0;
     kAttributeWriteForbidden = 1;
@@ -490,20 +528,6 @@ cluster AccessControl = 31 {
     fabric_sensitive endpoint_no endpoint = 0;
     fabric_sensitive cluster_id cluster = 1;
     fabric_sensitive AccessRestrictionStruct restrictions[] = 2;
-    fabric_idx fabricIndex = 254;
-  }
-
-  struct AccessControlTargetStruct {
-    nullable cluster_id cluster = 0;
-    nullable endpoint_no endpoint = 1;
-    nullable devtype_id deviceType = 2;
-  }
-
-  fabric_scoped struct AccessControlEntryStruct {
-    fabric_sensitive AccessControlEntryPrivilegeEnum privilege = 1;
-    fabric_sensitive AccessControlEntryAuthModeEnum authMode = 2;
-    nullable fabric_sensitive int64u subjects[] = 3;
-    nullable fabric_sensitive AccessControlTargetStruct targets[] = 4;
     fabric_idx fabricIndex = 254;
   }
 
@@ -1670,11 +1694,6 @@ cluster OperationalCredentials = 62 {
 cluster GroupKeyManagement = 63 {
   revision 1; // NOTE: Default/not specifically set
 
-  enum GroupKeySecurityPolicyEnum : enum8 {
-    kTrustFirst = 0;
-    kCacheAndSync = 1;
-  }
-
   bitmap Feature : bitmap32 {
     kCacheAndSync = 0x1;
   }
@@ -1690,17 +1709,6 @@ cluster GroupKeyManagement = 63 {
     group_id groupId = 1;
     int16u groupKeySetID = 2;
     fabric_idx fabricIndex = 254;
-  }
-
-  struct GroupKeySetStruct {
-    int16u groupKeySetID = 0;
-    GroupKeySecurityPolicyEnum groupKeySecurityPolicy = 1;
-    nullable octet_string<16> epochKey0 = 2;
-    nullable epoch_us epochStartTime0 = 3;
-    nullable octet_string<16> epochKey1 = 4;
-    nullable epoch_us epochStartTime1 = 5;
-    nullable octet_string<16> epochKey2 = 6;
-    nullable epoch_us epochStartTime2 = 7;
   }
 
   attribute access(write: manage) GroupKeyMapStruct groupKeyMap[] = 0;

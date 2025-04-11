@@ -55,10 +55,10 @@ class ClosureDimensionCluster(
     object SubscriptionEstablished : CurrentAttributeSubscriptionState()
   }
 
-  class TargetAttribute(val value: ClosureDimensionClusterTargetStruct?)
+  class TargetAttribute(val value: ClosureDimensionClusterClosureDimensionTargetStruct?)
 
   sealed class TargetAttributeSubscriptionState {
-    data class Success(val value: ClosureDimensionClusterTargetStruct?) :
+    data class Success(val value: ClosureDimensionClusterClosureDimensionTargetStruct?) :
       TargetAttributeSubscriptionState()
 
     data class Error(val exception: Exception) : TargetAttributeSubscriptionState()
@@ -311,9 +311,9 @@ class ClosureDimensionCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: ClosureDimensionClusterTargetStruct? =
+    val decodedValue: ClosureDimensionClusterClosureDimensionTargetStruct? =
       if (!tlvReader.isNull()) {
-        ClosureDimensionClusterTargetStruct.fromTlv(AnonymousTag, tlvReader)
+        ClosureDimensionClusterClosureDimensionTargetStruct.fromTlv(AnonymousTag, tlvReader)
       } else {
         tlvReader.getNull(AnonymousTag)
         null
@@ -361,9 +361,9 @@ class ClosureDimensionCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: ClosureDimensionClusterTargetStruct? =
+          val decodedValue: ClosureDimensionClusterClosureDimensionTargetStruct? =
             if (!tlvReader.isNull()) {
-              ClosureDimensionClusterTargetStruct.fromTlv(AnonymousTag, tlvReader)
+              ClosureDimensionClusterClosureDimensionTargetStruct.fromTlv(AnonymousTag, tlvReader)
             } else {
               tlvReader.getNull(AnonymousTag)
               null

@@ -155,11 +155,11 @@ static id _Nullable DecodeEventPayloadForAccessControlCluster(EventId aEventId, 
             value.changeType = memberValue;
         } while (0);
         do {
-            MTRAccessControlClusterAccessControlEntryStruct * _Nullable memberValue;
+            MTRDataTypeAccessControlEntryStruct * _Nullable memberValue;
             if (cppValue.latestValue.IsNull()) {
                 memberValue = nil;
             } else {
-                memberValue = [MTRAccessControlClusterAccessControlEntryStruct new];
+                memberValue = [MTRDataTypeAccessControlEntryStruct new];
                 memberValue.privilege = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.latestValue.Value().privilege)];
                 memberValue.authMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.latestValue.Value().authMode)];
                 if (cppValue.latestValue.Value().subjects.IsNull()) {
@@ -190,8 +190,8 @@ static id _Nullable DecodeEventPayloadForAccessControlCluster(EventId aEventId, 
                         auto iter_3 = cppValue.latestValue.Value().targets.Value().begin();
                         while (iter_3.Next()) {
                             auto & entry_3 = iter_3.GetValue();
-                            MTRAccessControlClusterAccessControlTargetStruct * newElement_3;
-                            newElement_3 = [MTRAccessControlClusterAccessControlTargetStruct new];
+                            MTRDataTypeAccessControlTargetStruct * newElement_3;
+                            newElement_3 = [MTRDataTypeAccessControlTargetStruct new];
                             if (entry_3.cluster.IsNull()) {
                                 newElement_3.cluster = nil;
                             } else {
@@ -5037,6 +5037,30 @@ static id _Nullable DecodeEventPayloadForCommissionerControlCluster(EventId aEve
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForJointFabricDatastoreCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::JointFabricDatastore;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForJointFabricAdministratorCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::JointFabricAdministrator;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForTLSCertificateManagementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::TlsCertificateManagement;
@@ -5657,6 +5681,12 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::CommissionerControl::Id: {
         return DecodeEventPayloadForCommissionerControlCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::JointFabricDatastore::Id: {
+        return DecodeEventPayloadForJointFabricDatastoreCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::JointFabricAdministrator::Id: {
+        return DecodeEventPayloadForJointFabricAdministratorCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::TlsCertificateManagement::Id: {
         return DecodeEventPayloadForTLSCertificateManagementCluster(aPath.mEventId, aReader, aError);

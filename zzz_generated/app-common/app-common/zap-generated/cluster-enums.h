@@ -190,6 +190,34 @@ enum class WebRTCMetadataOptionsBitmap : uint8_t
 namespace Globals {
 // Global enums.
 
+// Enum for AccessControlEntryAuthModeEnum
+enum class AccessControlEntryAuthModeEnum : uint8_t
+{
+    kPase  = 0x01,
+    kCase  = 0x02,
+    kGroup = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
+// Enum for AccessControlEntryPrivilegeEnum
+enum class AccessControlEntryPrivilegeEnum : uint8_t
+{
+    kView       = 0x01,
+    kProxyView  = 0x02,
+    kOperate    = 0x03,
+    kManage     = 0x04,
+    kAdminister = 0x05,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
 // Enum for AreaTypeTag
 enum class AreaTypeTag : uint8_t
 {
@@ -340,6 +368,18 @@ enum class FloorSurfaceTag : uint8_t
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 24,
+};
+
+// Enum for GroupKeySecurityPolicyEnum
+enum class GroupKeySecurityPolicyEnum : uint8_t
+{
+    kTrustFirst   = 0x00,
+    kCacheAndSync = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
 };
 
 // Enum for LandmarkTag
@@ -698,34 +738,6 @@ enum class Feature : uint32_t
 namespace Binding {} // namespace Binding
 
 namespace AccessControl {
-
-// Enum for AccessControlEntryAuthModeEnum
-enum class AccessControlEntryAuthModeEnum : uint8_t
-{
-    kPase  = 0x01,
-    kCase  = 0x02,
-    kGroup = 0x03,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 0,
-};
-
-// Enum for AccessControlEntryPrivilegeEnum
-enum class AccessControlEntryPrivilegeEnum : uint8_t
-{
-    kView       = 0x01,
-    kProxyView  = 0x02,
-    kOperate    = 0x03,
-    kManage     = 0x04,
-    kAdminister = 0x05,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 0,
-};
 
 // Enum for AccessRestrictionTypeEnum
 enum class AccessRestrictionTypeEnum : uint8_t
@@ -1943,18 +1955,6 @@ enum class NodeOperationalCertStatusEnum : uint8_t
 } // namespace OperationalCredentials
 
 namespace GroupKeyManagement {
-
-// Enum for GroupKeySecurityPolicyEnum
-enum class GroupKeySecurityPolicyEnum : uint8_t
-{
-    kTrustFirst   = 0x00,
-    kCacheAndSync = 0x01,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 2,
-};
 
 // Bitmap for Feature
 enum class Feature : uint32_t
@@ -6175,6 +6175,39 @@ enum class SupportedDeviceCategoryBitmap : uint32_t
     kFabricSynchronization = 0x1,
 };
 } // namespace CommissionerControl
+
+namespace JointFabricDatastore {
+
+// Enum for DatastoreStateEnum
+enum class DatastoreStateEnum : uint8_t
+{
+    kPending       = 0x00,
+    kCommitted     = 0x01,
+    kDeletePending = 0x02,
+    kCommitFailed  = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+} // namespace JointFabricDatastore
+
+namespace JointFabricAdministrator {
+
+// Enum for ICACResponseStatusEnum
+enum class ICACResponseStatusEnum : uint8_t
+{
+    kOk               = 0x00,
+    kInvalidPublicKey = 0x01,
+    kInvalidICAC      = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+} // namespace JointFabricAdministrator
 
 namespace TlsCertificateManagement {} // namespace TlsCertificateManagement
 

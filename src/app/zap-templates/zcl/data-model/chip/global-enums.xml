@@ -40,6 +40,24 @@ TODO: Make these structures global rather than defining them for each cluster.
     <item name="Equipment" value="0x02"/>
   </enum>
 
+  <enum name="AccessControlEntryPrivilegeEnum" type="enum8">
+    <item name="View" value="0x01"/>
+    <item name="ProxyView" value="0x02"/>
+    <item name="Operate" value="0x03"/>
+    <item name="Manage" value="0x04"/>
+    <item name="Administer" value="0x05"/>
+  </enum>
+
+  <enum name="AccessControlEntryAuthModeEnum" type="enum8">
+    <item name="PASE" value="0x01"/>
+    <item name="CASE" value="0x02"/>
+    <item name="Group" value="0x03"/>
+  </enum>
+
+  <enum name="GroupKeySecurityPolicyEnum" type="enum8">
+    <item name="TrustFirst" value="0x00"/>
+    <item name="CacheAndSync" value="0x01"/>
+  </enum>
 
   <enum name="TariffPriceTypeEnum" type="enum8">
     <item name="Standard" value="0x00"/>

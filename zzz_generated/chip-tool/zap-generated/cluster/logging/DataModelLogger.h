@@ -54,10 +54,19 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::detail::Structs::ApplicationStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Globals::Structs::AccessControlTargetStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Globals::Structs::AccessControlEntryStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Globals::Structs::AtomicAttributeStatusStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::detail::Structs::ErrorStateStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Globals::Structs::GroupKeySetStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::detail::Structs::ICEServerStruct::DecodableType & value);
@@ -69,6 +78,9 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::detail::Structs::OperationalStateStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Globals::Structs::TargetStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::detail::Structs::ViewportStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -76,9 +88,6 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::DecodableType & value);
-
-static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::AccessControl::Structs::AccessRestrictionStruct::DecodableType & value);
@@ -89,12 +98,6 @@ LogValue(const char * label, size_t indent,
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::AccessControl::Structs::AccessRestrictionEntryStruct::DecodableType & value);
-
-static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::AccessControl::Structs::AccessControlTargetStruct::DecodableType & value);
-
-static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::AccessControl::Structs::AccessControlEntryStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::AccessControl::Structs::AccessControlExtensionStruct::DecodableType & value);
@@ -186,9 +189,6 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType & value);
-
-static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySetStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::IcdManagement::Structs::MonitoringRegistrationStruct::DecodableType & value);
@@ -321,14 +321,15 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ClosureControl::Structs::OverallTargetStruct::DecodableType & value);
 
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::ClosureDimension::Structs::ClosureDimensionTargetStruct::DecodableType & value);
+
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ClosureDimension::Structs::CurrentStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ClosureDimension::Structs::RangePercent100thsStruct::DecodableType & value);
-
-static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::ClosureDimension::Structs::TargetStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ClosureDimension::Structs::UnitRangeStruct::DecodableType & value);
@@ -568,6 +569,42 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
          const chip::app::Clusters::EcosystemInformation::Structs::EcosystemLocationStruct::DecodableType & value);
+
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreStatusEntryStruct::DecodableType & value);
+
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreNodeKeyEntryStruct::DecodableType & value);
+
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreNodeInformationEntryStruct::DecodableType & value);
+
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::DecodableType & value);
+
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::DecodableType & value);
+
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::DecodableType & value);
+
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreAdministratorInformationEntryStruct::DecodableType & value);
+
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreGroupInformationEntryStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::TlsCertificateManagement::Structs::TLSCertStruct::DecodableType & value);
@@ -1071,6 +1108,10 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
          const chip::app::Clusters::CommissionerControl::Commands::ReverseOpenCommissioningWindow::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::JointFabricAdministrator::Commands::ICACCSRResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::JointFabricAdministrator::Commands::ICACResponse::DecodableType & value);
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
          const chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionRootCertificateResponse::DecodableType & value);

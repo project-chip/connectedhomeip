@@ -398,6 +398,96 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::Globals::Structs::AccessControlTargetStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("Cluster", indent + 1, value.cluster);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Cluster'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Endpoint", indent + 1, value.endpoint);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Endpoint'");
+            return err;
+        }
+    }
+    {
+        if (value.deviceType.IsNull())
+        {
+            CHIP_ERROR err = LogValue("DeviceType", indent + 1, value.deviceType);
+            if (err != CHIP_NO_ERROR)
+            {
+                DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DeviceType'");
+                return err;
+            }
+        }
+        else
+        {
+            std::string item = std::to_string(value.deviceType.Value()) + " (" + DeviceTypeIdToText(value.deviceType.Value()) + ")";
+            DataModelLogger::LogString("DeviceType", indent + 1, item);
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::Globals::Structs::AccessControlEntryStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("Privilege", indent + 1, value.privilege);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Privilege'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("AuthMode", indent + 1, value.authMode);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AuthMode'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Subjects", indent + 1, value.subjects);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Subjects'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Targets", indent + 1, value.targets);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Targets'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricIndex'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::Globals::Structs::AtomicAttributeStatusStruct::DecodableType & value)
@@ -449,6 +539,79 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ErrorStateDetails'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::Globals::Structs::GroupKeySetStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("GroupKeySetID", indent + 1, value.groupKeySetID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'GroupKeySetID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("GroupKeySecurityPolicy", indent + 1, value.groupKeySecurityPolicy);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'GroupKeySecurityPolicy'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("EpochKey0", indent + 1, value.epochKey0);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EpochKey0'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("EpochStartTime0", indent + 1, value.epochStartTime0);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EpochStartTime0'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("EpochKey1", indent + 1, value.epochKey1);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EpochKey1'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("EpochStartTime1", indent + 1, value.epochStartTime1);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EpochStartTime1'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("EpochKey2", indent + 1, value.epochKey2);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EpochKey2'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("EpochStartTime2", indent + 1, value.epochStartTime2);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EpochStartTime2'");
             return err;
         }
     }
@@ -540,6 +703,55 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'OperationalStateLabel'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::Globals::Structs::TargetStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("Node", indent + 1, value.node);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Node'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Group", indent + 1, value.group);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Group'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Endpoint", indent + 1, value.endpoint);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Endpoint'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Cluster", indent + 1, value.cluster);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Cluster'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricIndex'");
             return err;
         }
     }
@@ -703,55 +915,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("Node", indent + 1, value.node);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Node'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Group", indent + 1, value.group);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Group'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Endpoint", indent + 1, value.endpoint);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Endpoint'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Cluster", indent + 1, value.cluster);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Cluster'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricIndex'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::AccessControl::Structs::AccessRestrictionStruct::DecodableType & value)
@@ -838,98 +1001,6 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Restrictions'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricIndex'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::AccessControl::Structs::AccessControlTargetStruct::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("Cluster", indent + 1, value.cluster);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Cluster'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Endpoint", indent + 1, value.endpoint);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Endpoint'");
-            return err;
-        }
-    }
-    {
-        if (value.deviceType.IsNull())
-        {
-            CHIP_ERROR err = LogValue("DeviceType", indent + 1, value.deviceType);
-            if (err != CHIP_NO_ERROR)
-            {
-                DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DeviceType'");
-                return err;
-            }
-        }
-        else
-        {
-            std::string item = std::to_string(value.deviceType.Value()) + " (" + DeviceTypeIdToText(value.deviceType.Value()) + ")";
-            DataModelLogger::LogString("DeviceType", indent + 1, item);
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::AccessControl::Structs::AccessControlEntryStruct::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("Privilege", indent + 1, value.privilege);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Privilege'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("AuthMode", indent + 1, value.authMode);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AuthMode'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Subjects", indent + 1, value.subjects);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Subjects'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Targets", indent + 1, value.targets);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Targets'");
             return err;
         }
     }
@@ -2228,80 +2299,6 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricIndex'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySetStruct::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("GroupKeySetID", indent + 1, value.groupKeySetID);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'GroupKeySetID'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("GroupKeySecurityPolicy", indent + 1, value.groupKeySecurityPolicy);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'GroupKeySecurityPolicy'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("EpochKey0", indent + 1, value.epochKey0);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EpochKey0'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("EpochStartTime0", indent + 1, value.epochStartTime0);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EpochStartTime0'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("EpochKey1", indent + 1, value.epochKey1);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EpochKey1'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("EpochStartTime1", indent + 1, value.epochStartTime1);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EpochStartTime1'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("EpochKey2", indent + 1, value.epochKey2);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EpochKey2'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("EpochStartTime2", indent + 1, value.epochStartTime2);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EpochStartTime2'");
             return err;
         }
     }
@@ -3999,6 +3996,40 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::ClosureDimension::Structs::ClosureDimensionTargetStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("Position", indent + 1, value.position);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Position'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Latch", indent + 1, value.latch);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Latch'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Speed", indent + 1, value.speed);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Speed'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::ClosureDimension::Structs::CurrentStruct::DecodableType & value)
 {
@@ -4050,39 +4081,6 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Max'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::ClosureDimension::Structs::TargetStruct::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("Position", indent + 1, value.position);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Position'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Latch", indent + 1, value.latch);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Latch'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Speed", indent + 1, value.speed);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Speed'");
             return err;
         }
     }
@@ -7046,6 +7044,384 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LocationDescriptorLastEdit'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricIndex'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreStatusEntryStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("State", indent + 1, value.state);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'State'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("UpdateTimestamp", indent + 1, value.updateTimestamp);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'UpdateTimestamp'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FailureCode", indent + 1, value.failureCode);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FailureCode'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreNodeKeyEntryStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("NodeID", indent + 1, value.nodeID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'NodeID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("GroupKeySetId", indent + 1, value.groupKeySetId);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'GroupKeySetId'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("StatusEntry", indent + 1, value.statusEntry);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'StatusEntry'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreNodeInformationEntryStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("NodeID", indent + 1, value.nodeID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'NodeID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FriendlyName", indent + 1, value.friendlyName);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FriendlyName'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("CommissioningStatusEntry", indent + 1, value.commissioningStatusEntry);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CommissioningStatusEntry'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricIndex'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("NodeID", indent + 1, value.nodeID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'NodeID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("EndpointID", indent + 1, value.endpointID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EndpointID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("GroupID", indent + 1, value.groupID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'GroupID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("StatusEntry", indent + 1, value.statusEntry);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'StatusEntry'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("EndpointID", indent + 1, value.endpointID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EndpointID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("NodeID", indent + 1, value.nodeID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'NodeID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FriendlyName", indent + 1, value.friendlyName);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FriendlyName'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("StatusEntry", indent + 1, value.statusEntry);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'StatusEntry'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("NodeID", indent + 1, value.nodeID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'NodeID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("EndpointID", indent + 1, value.endpointID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EndpointID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ListID", indent + 1, value.listID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ListID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("StatusEntry", indent + 1, value.statusEntry);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'StatusEntry'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("NodeID", indent + 1, value.nodeID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'NodeID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ListID", indent + 1, value.listID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ListID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("StatusEntry", indent + 1, value.statusEntry);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'StatusEntry'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreAdministratorInformationEntryStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("NodeID", indent + 1, value.nodeID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'NodeID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FriendlyName", indent + 1, value.friendlyName);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FriendlyName'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("VendorID", indent + 1, value.vendorID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'VendorID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Icac", indent + 1, value.icac);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Icac'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreGroupInformationEntryStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("GroupID", indent + 1, value.groupID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'GroupID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FriendlyName", indent + 1, value.friendlyName);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FriendlyName'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("GroupKeySetID", indent + 1, value.groupKeySetID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'GroupKeySetID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("GroupCAT", indent + 1, value.groupCAT);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'GroupCAT'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("GroupCATVersion", indent + 1, value.groupCATVersion);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'GroupCATVersion'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("GroupPermission", indent + 1, value.groupPermission);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'GroupPermission'");
             return err;
         }
     }
@@ -11107,6 +11483,22 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const JointFabricAdministrator::Commands::ICACCSRResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("icaccsr", indent + 1, value.icaccsr));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const JointFabricAdministrator::Commands::ICACResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("statusCode", indent + 1, value.statusCode));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const TlsCertificateManagement::Commands::ProvisionRootCertificateResponse::DecodableType & value)
@@ -11689,7 +12081,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case Binding::Attributes::Binding::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType> value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::Globals::Structs::TargetStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Binding", 1, value);
         }
@@ -11725,8 +12117,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case AccessControl::Attributes::Acl::Id: {
-            chip::app::DataModel::DecodableList<
-                chip::app::Clusters::AccessControl::Structs::AccessControlEntryStruct::DecodableType>
+            chip::app::DataModel::DecodableList<chip::app::Clusters::Globals::Structs::AccessControlEntryStruct::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ACL", 1, value);
@@ -16750,7 +17141,9 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Current", 1, value);
         }
         case ClosureDimension::Attributes::Target::Id: {
-            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::TargetStruct::DecodableType> value;
+            chip::app::DataModel::Nullable<
+                chip::app::Clusters::ClosureDimension::Structs::ClosureDimensionTargetStruct::DecodableType>
+                value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Target", 1, value);
         }
@@ -20725,6 +21118,161 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
+    case JointFabricDatastore::Id: {
+        switch (path.mAttributeId)
+        {
+        case JointFabricDatastore::Attributes::AnchorRootCa::Id: {
+            chip::ByteSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AnchorRootCa", 1, value);
+        }
+        case JointFabricDatastore::Attributes::AnchorNodeID::Id: {
+            chip::NodeId value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AnchorNodeID", 1, value);
+        }
+        case JointFabricDatastore::Attributes::AnchorVendorID::Id: {
+            chip::VendorId value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AnchorVendorID", 1, value);
+        }
+        case JointFabricDatastore::Attributes::FriendlyName::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FriendlyName", 1, value);
+        }
+        case JointFabricDatastore::Attributes::GroupKeySetList::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::Globals::Structs::GroupKeySetStruct::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GroupKeySetList", 1, value);
+        }
+        case JointFabricDatastore::Attributes::GroupList::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::JointFabricDatastore::Structs::DatastoreGroupInformationEntryStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GroupList", 1, value);
+        }
+        case JointFabricDatastore::Attributes::NodeList::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::JointFabricDatastore::Structs::DatastoreNodeInformationEntryStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NodeList", 1, value);
+        }
+        case JointFabricDatastore::Attributes::AdminList::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::JointFabricDatastore::Structs::DatastoreAdministratorInformationEntryStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AdminList", 1, value);
+        }
+        case JointFabricDatastore::Attributes::StatusEntry::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::JointFabricDatastore::Structs::DatastoreStatusEntryStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("StatusEntry", 1, value);
+        }
+        case JointFabricDatastore::Attributes::EndpointGroupIDList::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EndpointGroupIDList", 1, value);
+        }
+        case JointFabricDatastore::Attributes::EndpointBindingList::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EndpointBindingList", 1, value);
+        }
+        case JointFabricDatastore::Attributes::NodeKeySetList::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::JointFabricDatastore::Structs::DatastoreNodeKeyEntryStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NodeKeySetList", 1, value);
+        }
+        case JointFabricDatastore::Attributes::NodeACLList::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NodeACLList", 1, value);
+        }
+        case JointFabricDatastore::Attributes::NodeEndpointList::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NodeEndpointList", 1, value);
+        }
+        case JointFabricDatastore::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, JointFabricDatastore::Id);
+        }
+        case JointFabricDatastore::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, JointFabricDatastore::Id);
+        }
+        case JointFabricDatastore::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, JointFabricDatastore::Id);
+        }
+        case JointFabricDatastore::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case JointFabricDatastore::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
+    case JointFabricAdministrator::Id: {
+        switch (path.mAttributeId)
+        {
+        case JointFabricAdministrator::Attributes::AdministratorFabricIndex::Id: {
+            chip::FabricIndex value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AdministratorFabricIndex", 1, value);
+        }
+        case JointFabricAdministrator::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, JointFabricAdministrator::Id);
+        }
+        case JointFabricAdministrator::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, JointFabricAdministrator::Id);
+        }
+        case JointFabricAdministrator::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, JointFabricAdministrator::Id);
+        }
+        case JointFabricAdministrator::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case JointFabricAdministrator::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
     case TlsCertificateManagement::Id: {
         switch (path.mAttributeId)
         {
@@ -22194,6 +22742,22 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             CommissionerControl::Commands::ReverseOpenCommissioningWindow::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ReverseOpenCommissioningWindow", 1, value);
+        }
+        }
+        break;
+    }
+    case JointFabricAdministrator::Id: {
+        switch (path.mCommandId)
+        {
+        case JointFabricAdministrator::Commands::ICACCSRResponse::Id: {
+            JointFabricAdministrator::Commands::ICACCSRResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ICACCSRResponse", 1, value);
+        }
+        case JointFabricAdministrator::Commands::ICACResponse::Id: {
+            JointFabricAdministrator::Commands::ICACResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ICACResponse", 1, value);
         }
         }
         break;

@@ -23,13 +23,13 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ClosureDimensionClusterTargetStruct(
+class ClosureDimensionClusterClosureDimensionTargetStruct(
   val position: Optional<UShort>,
   val latch: Optional<UByte>,
   val speed: Optional<UByte>,
 ) {
   override fun toString(): String = buildString {
-    append("ClosureDimensionClusterTargetStruct {\n")
+    append("ClosureDimensionClusterClosureDimensionTargetStruct {\n")
     append("\tposition : $position\n")
     append("\tlatch : $latch\n")
     append("\tspeed : $speed\n")
@@ -60,7 +60,10 @@ class ClosureDimensionClusterTargetStruct(
     private const val TAG_LATCH = 1
     private const val TAG_SPEED = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ClosureDimensionClusterTargetStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): ClosureDimensionClusterClosureDimensionTargetStruct {
       tlvReader.enterStructure(tlvTag)
       val position =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_POSITION))) {
@@ -83,7 +86,7 @@ class ClosureDimensionClusterTargetStruct(
 
       tlvReader.exitContainer()
 
-      return ClosureDimensionClusterTargetStruct(position, latch, speed)
+      return ClosureDimensionClusterClosureDimensionTargetStruct(position, latch, speed)
     }
   }
 }
