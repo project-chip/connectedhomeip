@@ -6615,16 +6615,11 @@ provisional cluster ClosureControl = 260 {
   revision 1;
 
   enum ClosureErrorEnum : enum8 {
-    kBlocked = 0;
-    kTemperatureLimited = 1;
-    kMaintenanceRequired = 2;
-    kInternalInterference = 3;
-  }
-
-  enum LatchingEnum : enum8 {
-    kLatchedAndSecured = 0;
-    kLatchedButNotSecured = 1;
-    kNotLatched = 2;
+    kPhysicallyBlocked = 0;
+    kBlockedBySensor = 1;
+    kTemperatureLimited = 2;
+    kMaintenanceRequired = 3;
+    kInternalInterference = 4;
   }
 
   enum MainStateEnum : enum8 {
@@ -6645,11 +6640,6 @@ provisional cluster ClosureControl = 260 {
     kOpenedForPedestrian = 3;
     kOpenedForVentilation = 4;
     kOpenedAtSignature = 5;
-  }
-
-  enum TargetLatchEnum : enum8 {
-    kLatch = 0;
-    kUnlatch = 1;
   }
 
   enum TargetPositionEnum : enum8 {
@@ -6674,15 +6664,30 @@ provisional cluster ClosureControl = 260 {
 
   struct OverallStateStruct {
     optional nullable PositioningEnum positioning = 0;
-    optional nullable LatchingEnum latching = 1;
+    optional nullable boolean latch = 1;
     optional nullable ThreeLevelAutoEnum speed = 2;
-    optional nullable bitmap32 extraInfo = 3;
+    optional nullable boolean secureState = 3;
   }
 
   struct OverallTargetStruct {
     optional TargetPositionEnum position = 0;
-    optional TargetLatchEnum latch = 1;
+    optional boolean latch = 1;
     optional ThreeLevelAutoEnum speed = 2;
+  }
+
+  critical event OperationalError = 0 {
+    ClosureErrorEnum errorState[] = 0;
+  }
+
+  info event MovementCompleted = 1 {
+  }
+
+  info event EngageStateChanged = 2 {
+    boolean engageValue = 0;
+  }
+
+  info event SecureStateChanged = 3 {
+    boolean secureValue = 0;
   }
 
   readonly attribute optional nullable elapsed_s countdownTime = 0;
@@ -6699,11 +6704,11 @@ provisional cluster ClosureControl = 260 {
 
   request struct MoveToRequest {
     optional TargetPositionEnum position = 0;
-    optional TargetLatchEnum latch = 1;
+    optional boolean latch = 1;
     optional ThreeLevelAutoEnum speed = 2;
   }
 
-  /** On receipt of this command, the device SHALL stop its operation if it is at a position where it is safe to do so and/or permitted. */
+  /** On receipt of this command, the closure SHALL stop its operation if it is at a position where it is safe to do so and/or permitted. */
   command Stop(): DefaultSuccess = 0;
   /** Upon receipt, this SHALL move the product in the most fitting state following the data as follows: */
   command MoveTo(MoveToRequest): DefaultSuccess = 1;

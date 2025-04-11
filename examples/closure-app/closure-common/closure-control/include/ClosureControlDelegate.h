@@ -43,8 +43,12 @@ public:
      *
      *********************************************************************************/
     Protocols::InteractionModel::Status Stop() override;
+<<<<<<< HEAD
     Protocols::InteractionModel::Status MoveTo(const Optional<TargetPositionEnum> & position,
                                                const Optional<TargetLatchEnum> & latch,
+=======
+    Protocols::InteractionModel::Status MoveTo(const Optional<TargetPositionEnum> & tag, const Optional<bool> & latch,
+>>>>>>> 97ea3f006f... CLosure control cluster Event code implementation
                                                const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
     Protocols::InteractionModel::Status Calibrate() override;
 

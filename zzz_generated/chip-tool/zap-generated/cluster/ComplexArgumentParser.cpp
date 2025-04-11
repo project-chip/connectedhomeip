@@ -4442,12 +4442,12 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     }
     valueCopy.removeMember("positioning");
 
-    if (value.isMember("latching"))
+    if (value.isMember("latch"))
     {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "latching");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.latching, value["latching"]));
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "latch");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.latch, value["latch"]));
     }
-    valueCopy.removeMember("latching");
+    valueCopy.removeMember("latch");
 
     if (value.isMember("speed"))
     {
@@ -4456,12 +4456,12 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     }
     valueCopy.removeMember("speed");
 
-    if (value.isMember("extraInfo"))
+    if (value.isMember("secureState"))
     {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "extraInfo");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.extraInfo, value["extraInfo"]));
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "secureState");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.secureState, value["secureState"]));
     }
-    valueCopy.removeMember("extraInfo");
+    valueCopy.removeMember("secureState");
 
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
@@ -4469,9 +4469,9 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 void ComplexArgumentParser::Finalize(chip::app::Clusters::ClosureControl::Structs::OverallStateStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.positioning);
-    ComplexArgumentParser::Finalize(request.latching);
+    ComplexArgumentParser::Finalize(request.latch);
     ComplexArgumentParser::Finalize(request.speed);
-    ComplexArgumentParser::Finalize(request.extraInfo);
+    ComplexArgumentParser::Finalize(request.secureState);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,

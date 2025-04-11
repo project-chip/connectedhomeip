@@ -27977,18 +27977,18 @@ namespace OverallStateStruct {
 enum class Fields : uint8_t
 {
     kPositioning = 0,
-    kLatching    = 1,
+    kLatch       = 1,
     kSpeed       = 2,
-    kExtraInfo   = 3,
+    kSecureState = 3,
 };
 
 struct Type
 {
 public:
     Optional<DataModel::Nullable<PositioningEnum>> positioning;
-    Optional<DataModel::Nullable<LatchingEnum>> latching;
+    Optional<DataModel::Nullable<bool>> latch;
     Optional<DataModel::Nullable<Globals::ThreeLevelAutoEnum>> speed;
-    Optional<DataModel::Nullable<uint32_t>> extraInfo;
+    Optional<DataModel::Nullable<bool>> secureState;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -28012,7 +28012,7 @@ struct Type
 {
 public:
     Optional<TargetPositionEnum> position;
-    Optional<TargetLatchEnum> latch;
+    Optional<bool> latch;
     Optional<Globals::ThreeLevelAutoEnum> speed;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -28092,7 +28092,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
 
     Optional<TargetPositionEnum> position;
-    Optional<TargetLatchEnum> latch;
+    Optional<bool> latch;
     Optional<Globals::ThreeLevelAutoEnum> speed;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -28109,7 +28109,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
 
     Optional<TargetPositionEnum> position;
-    Optional<TargetLatchEnum> latch;
+    Optional<bool> latch;
     Optional<Globals::ThreeLevelAutoEnum> speed;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -28263,6 +28263,135 @@ struct TypeInfo
     };
 };
 } // namespace Attributes
+namespace Events {
+namespace OperationalError {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
+
+enum class Fields : uint8_t
+{
+    kErrorState = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::OperationalError::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    DataModel::List<const ClosureErrorEnum> errorState;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::OperationalError::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
+
+    DataModel::DecodableList<ClosureErrorEnum> errorState;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace OperationalError
+namespace MovementCompleted {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::MovementCompleted::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::MovementCompleted::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace MovementCompleted
+namespace EngageStateChanged {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kEngageValue = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::EngageStateChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    bool engageValue = static_cast<bool>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::EngageStateChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
+
+    bool engageValue = static_cast<bool>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace EngageStateChanged
+namespace SecureStateChanged {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kSecureValue = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::SecureStateChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    bool secureValue = static_cast<bool>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::SecureStateChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
+
+    bool secureValue = static_cast<bool>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace SecureStateChanged
+} // namespace Events
 } // namespace ClosureControl
 namespace ClosureDimension {
 namespace Structs {
