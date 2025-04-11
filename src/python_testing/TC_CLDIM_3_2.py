@@ -128,7 +128,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
 
         # STEP 3a: If manual latching is required, skip steps 3b and 3c
         self.step("3a")
-        if self.matter_test_config.global_test_params.get("CLDIM.S.M.ManualLatching", False):
+        if self.check_pics("CLDIM.S.M.ManualLatching"):
             logging.info("Manual latching is required. Skipping steps 3b and 3c.")
             self.skip_step("3b")
             self.skip_step("3c")
@@ -150,7 +150,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
 
         # STEP 4a: If manual latching is not required, skip steps 4b to 4d
         self.step("4a")
-        if not self.matter_test_config.global_test_params.get("CLDIM.S.M.ManualLatching", False):
+        if not self.check_pics("CLDIM.S.M.ManualLatching"):
             self.skip("4b")
             self.skip("4c")
             self.skip("4d")          
