@@ -55,13 +55,15 @@ class TC_CNET_4_3(MatterBaseTest):
             TestStep(1, test_plan_support.commission_if_required(), "", is_commissioning=True),
             TestStep(2, "TH reads the MaxNetworks attribute from the DUT",
                      "Verify that MaxNetworks attribute value is within a range of 1 to 255"),
-            TestStep(3, "TH reads the Networks attribute list from the DUT",
+            TestStep(3, "TH reads the Networks attribute list from the DUT on all endpoints (all network commissioning clusters of the DUT)",
                      "Verify that each element in the Networks attribute list has the following fields: 'NetworkID', 'connected'.\n\
                       NetworkID field is of type octstr with a length range 1 to 32 \n\
                       The connected field is of type bool \n\
-                      Verify that only one entry has connected status as TRUE across ALL endpoints \n\
+                      Verify that there is a single connected network across ALL network commissioning clusters \n\
                       Verify that the number of entries in the Networks attribute is less than or equal to 'MaxNetworksValue'"),
-            TestStep(4, "TH reads InterfaceEnabled attribute from the DUT", "Verify that InterfaceEnabled attribute value is true"),
+            TestStep(4, "Skip remaining steps if the connected network is not on the cluster currently being verified."
+                     "TH reads InterfaceEnabled attribute from the DUT. Skip this and remaining steps if the connected network is not on the cluster currently being verified.",
+                     "Verify that InterfaceEnabled attribute value is true"),
             TestStep(5, "TH reads LastNetworkingStatus attribute from the DUT",
                      "LastNetworkingStatus attribute value will be within any one of the following values \
                       Success, NetworkNotFound, OutOfRange, RegulatoryError, UnknownError, null"),
