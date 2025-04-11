@@ -355,7 +355,7 @@ class HostBuilder(GnBuilder):
                  chip_casting_simplified: Optional[bool] = None,
                  disable_shell=False,
                  use_googletest=False,
-                 terms_and_conditions_required: Optional[bool] = None,
+                 terms_and_conditions_required: Optional[bool] = None, chip_enable_nfc_based_commissioning=None,
                  ):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
@@ -476,6 +476,12 @@ class HostBuilder(GnBuilder):
                 self.extra_gn_options.append('chip_enable_dnssd_tests=true')
             else:
                 self.extra_gn_options.append('chip_enable_dnssd_tests=false')
+
+        if chip_enable_nfc_based_commissioning is not None:
+            if chip_enable_nfc_based_commissioning:
+                self.extra_gn_options.append('chip_enable_nfc_based_commissioning=true')
+            else:
+                self.extra_gn_options.append('chip_enable_nfc_based_commissioning=false')
 
         if chip_casting_simplified is not None:
             self.extra_gn_options.append(f'chip_casting_simplified={str(chip_casting_simplified).lower()}')

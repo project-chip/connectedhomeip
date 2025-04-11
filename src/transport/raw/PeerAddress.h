@@ -54,7 +54,8 @@ enum class Type : uint8_t
     kBle,
     kTcp,
     kWiFiPAF,
-    kLast = kWiFiPAF, // This is not an actual transport type, it just refers to the last transport type
+    kNfc,
+    kLast = kNfc, // This is not an actual transport type, it just refers to the last transport type
 };
 
 /**
@@ -179,6 +180,10 @@ public:
             // Note that BLE does not currently use any specific address.
             snprintf(buf, bufSize, "BLE");
             break;
+        case Type::kNfc:
+            // Note that NFC does not use any specific address.
+            snprintf(buf, bufSize, "NFC");
+            break;
         default:
             snprintf(buf, bufSize, "ERROR");
             break;
@@ -190,6 +195,7 @@ public:
     static PeerAddress Uninitialized() { return PeerAddress(Inet::IPAddress::Any, Type::kUndefined); }
 
     static PeerAddress BLE() { return PeerAddress(Type::kBle); }
+    static PeerAddress NFC() { return PeerAddress(Type::kNfc); }
     static PeerAddress UDP(const Inet::IPAddress & addr) { return PeerAddress(addr, Type::kUdp); }
     static PeerAddress UDP(const Inet::IPAddress & addr, uint16_t port) { return UDP(addr).SetPort(port); }
 
