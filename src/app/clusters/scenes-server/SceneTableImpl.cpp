@@ -32,7 +32,7 @@ namespace {
 /// kTransitionTime: Tag for the transition time of the scene in miliseconds
 enum class TagScene : uint8_t
 {
-    kGroupID = 4,
+    kGroupID = (uint8_t) TagEntry::kNextFabricTableTag,
     kSceneID,
     kName,
     kTransitionTimeMs,
@@ -102,10 +102,56 @@ using SceneTableData  = TableEntryData<SceneStorageId, SceneData, Serializer::kP
 using FabricSceneData = FabricEntryData<SceneStorageId, SceneData, Serializer::kPersistentStorageDataBufferMax(),
                                         Serializer::kPersistentFabricBufferMax(), kMaxScenesPerFabric>;
 
+CHIP_ERROR DefaultSceneTableImpl::Init(PersistentStorageDelegate * storage)
+{
+    return FabricTableImpl::Init(storage);
+}
+
 void DefaultSceneTableImpl::Finish()
 {
     UnregisterAllHandlers();
     FabricTableImpl::Finish();
+}
+
+CHIP_ERROR DefaultSceneTableImpl::GetFabricSceneCount(FabricIndex fabric_index, uint8_t & scene_count)
+{
+    return this->GetFabricEntryCount(fabric_index, scene_count);
+}
+
+CHIP_ERROR DefaultSceneTableImpl::GetEndpointSceneCount(uint8_t & scene_count)
+{
+    return this->GetEndpointEntryCount(scene_count);
+}
+
+CHIP_ERROR DefaultSceneTableImpl::SetEndpointSceneCount(const uint8_t & scene_count)
+{
+    return this->SetEndpointEntryCount(scene_count);
+}
+
+CHIP_ERROR DefaultSceneTableImpl::GetRemainingCapacity(FabricIndex fabric_index, uint8_t & capacity)
+{
+    return FabricTableImpl::GetRemainingCapacity(fabric_index, capacity);
+}
+
+CHIP_ERROR DefaultSceneTableImpl::SetSceneTableEntry(FabricIndex fabric_index, const SceneTableEntry & entry)
+{
+    return this->SetTableEntry(fabric_index, entry);
+}
+
+CHIP_ERROR DefaultSceneTableImpl::GetSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id, SceneTableEntry & entry)
+{
+    return this->GetTableEntry(fabric_index, scene_id, entry);
+}
+
+CHIP_ERROR DefaultSceneTableImpl::RemoveSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id)
+{
+    return this->RemoveTableEntry(fabric_index, scene_id);
+}
+
+CHIP_ERROR DefaultSceneTableImpl::RemoveSceneTableEntryAtPosition(EndpointId endpoint, FabricIndex fabric_index,
+                                                                  SceneIndex scene_idx)
+{
+    return this->RemoveTableEntryAtPosition(endpoint, fabric_index, scene_idx);
 }
 
 CHIP_ERROR DefaultSceneTableImpl::GetAllSceneIdsInGroup(FabricIndex fabric_index, GroupId group_id, Span<SceneId> & scene_list)
@@ -249,6 +295,21 @@ CHIP_ERROR DefaultSceneTableImpl::SceneApplyEFS(const SceneTableEntry & scene)
     }
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DefaultSceneTableImpl::RemoveFabric(FabricIndex fabric_index)
+{
+    return FabricTableImpl::RemoveFabric(fabric_index);
+}
+
+CHIP_ERROR DefaultSceneTableImpl::RemoveEndpoint()
+{
+    return FabricTableImpl::RemoveEndpoint();
+}
+
+DefaultSceneTableImpl::SceneEntryIterator * DefaultSceneTableImpl::IterateSceneEntries(FabricIndex fabric)
+{
+    return this->IterateTableEntries(fabric);
 }
 
 namespace {

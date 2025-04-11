@@ -26,6 +26,8 @@ namespace chip {
 namespace app {
 namespace common {
 
+using EntryIndex = data::EntryIndex;
+
 /// @brief Tags Used to serialize entries so they can be stored in flash memory.
 /// kEntryCount: Number of entries in a Fabric
 /// kStorageIDArray: Array of StorageID struct
@@ -35,6 +37,7 @@ enum class TagEntry : uint8_t
     kEndpointEntryCount = 1,
     kEntryCount,
     kStorageIDArray,
+    kNextFabricTableTag
     // NOTICE: Take great care adding more, as specializations have their own
     // serialization indices
 };
@@ -96,10 +99,10 @@ struct EndpointEntryCount : public PersistentData<kPersistentBufferEntryCountByt
 };
 
 template <class StorageId, class StorageData, size_t kPersistentStorageDataBufferMax>
-struct TableEntryData : public FabricTable<StorageId, StorageData>::TableEntry, PersistentData<kPersistentStorageDataBufferMax>
+struct TableEntryData : public data::TableEntry<StorageId, StorageData>, PersistentData<kPersistentStorageDataBufferMax>
 {
     using Serializer = DefaultSerializer<StorageId, StorageData>;
-    using TableEntry = typename FabricTable<StorageId, StorageData>::TableEntry;
+    using TableEntry = data::TableEntry<StorageId, StorageData>;
 
     EndpointId endpoint_id   = kInvalidEndpointId;
     FabricIndex fabric_index = kUndefinedFabricIndex;
@@ -285,7 +288,7 @@ struct FabricEntryData : public PersistentData<kPersistentFabricBufferMax>
     ///         CHIP_ERROR_NO_MEMORY if target was not found and table is full
     CHIP_ERROR Find(StorageId target_entry, EntryIndex & idx)
     {
-        EntryIndex firstFreeIdx = kUndefinedEntryIndex; // storage index if entry not found
+        EntryIndex firstFreeIdx = data::kUndefinedEntryIndex; // storage index if entry not found
         uint16_t index          = 0;
 
         while (index < max_per_fabric)
@@ -295,7 +298,7 @@ struct FabricEntryData : public PersistentData<kPersistentFabricBufferMax>
                 idx = index;
                 return CHIP_NO_ERROR; // return entry at current index if entry found
             }
-            if (!entry_map[index].IsValid() && firstFreeIdx == kUndefinedEntryIndex)
+            if (!entry_map[index].IsValid() && firstFreeIdx == data::kUndefinedEntryIndex)
             {
                 firstFreeIdx = index;
             }

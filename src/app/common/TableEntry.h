@@ -1,0 +1,68 @@
+/*
+ *    Copyright (c) 2023 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+/**
+ * This file contains backwards-compatibility enum name definitions.  This file
+ * is meant to be included at the end of cluster-enums.h, after all the normal
+ * enum definitions are available.
+ */
+#pragma once
+
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/CommonIterator.h>
+#include <lib/support/IntrusiveList.h>
+#include <lib/support/PersistentData.h>
+#include <lib/support/Span.h>
+#include <lib/support/TypeTraits.h>
+
+namespace chip {
+namespace app {
+namespace common {
+namespace data {
+
+// Storage index for entries in nvm
+typedef uint16_t EntryIndex;
+inline constexpr EntryIndex kUndefinedEntryIndex = 0xffff;
+
+/// @brief Struct combining both ID and data of a table entry
+template <class StorageId, class StorageData>
+struct TableEntry
+{
+    // ID
+    StorageId mStorageId;
+
+    // DATA
+    StorageData mStorageData;
+
+    TableEntry() = default;
+    TableEntry(StorageId id) : mStorageId(id) {}
+    TableEntry(const StorageId id, const StorageData data) : mStorageId(id), mStorageData(data) {}
+
+    bool operator==(const TableEntry & other) const
+    {
+        return (mStorageId == other.mStorageId && mStorageData == other.mStorageData);
+    }
+
+    void operator=(const TableEntry & other)
+    {
+        mStorageId   = other.mStorageId;
+        mStorageData = other.mStorageData;
+    }
+};
+} // namespace data
+} // namespace common
+} // namespace app
+} // namespace chip
