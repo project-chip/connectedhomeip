@@ -52,17 +52,26 @@ ReadOnlyBufferBuilder<EndpointId> DeviceTypes::GetAllEndpointsHavingDeviceType(D
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "GetDataModelProvider Endpoints returned error: %" CHIP_ERROR_FORMAT, err.Format());
-        return ReadOnlyBufferBuilder<EndpointId>();
+        return {};
     }
     auto allEndpoints = endpointsList.TakeBuffer();
 
     ReadOnlyBufferBuilder<EndpointId> endpoints;
+    err = endpoints.EnsureAppendCapacity(allEndpoints.size());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Error ensuring append capacity for endpoints: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 
     for (const auto & ep : allEndpoints)
     {
         if (EndpointHasDeviceType(ep.id, deviceTypeId))
         {
-            endpoints.Append(ep.id);
+            err = endpoints.Append(ep.id);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "Error appending endpoint: %" CHIP_ERROR_FORMAT, err.Format());
+            }
         }
     }
     return endpoints;
