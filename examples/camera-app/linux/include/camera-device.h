@@ -22,7 +22,7 @@
 #include "chime-manager.h"
 #include "webrtc-provider-manager.h"
 
-#include "media-controller.h"
+#include "default-media-controller.h"
 #include "network-stream-source.h"
 
 #include <protocols/interaction_model/StatusCode.h>
@@ -48,6 +48,8 @@ public:
     chip::app::Clusters::ChimeDelegate & GetChimeDelegate();
     chip::app::Clusters::WebRTCTransportProvider::Delegate & GetWebRTCProviderDelegate();
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate();
+
+    MediaController & GetMediaController();
 
     CameraDevice();
     ~CameraDevice();
@@ -159,7 +161,8 @@ private:
 
     NetworkStreamSource mNetworkVideoSource;
     NetworkStreamSource mNetworkAudioSource;
-    MediaController mMediaController;
+
+    DefaultMediaController mMediaController;
 
     uint16_t mCurrentVideoFrameRate                                         = 0;
     bool mHDREnabled                                                        = false;
