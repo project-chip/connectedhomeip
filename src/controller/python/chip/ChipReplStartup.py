@@ -148,7 +148,7 @@ or run `os.chdir` to the root of your CHIP repository checkout.
         # nothing we can do ... things will NOT work
         return
 
-    chip.native.Init(bluetoothAdapter=args.ble_adapter)
+    chip.native.Init(bluetoothAdapter=args.ble_controller)
 
     global certificateAuthorityManager
     global chipStack
