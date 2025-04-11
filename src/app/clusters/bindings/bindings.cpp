@@ -35,7 +35,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
-using TargetStructType         = Binding::Structs::TargetStruct::Type;
+using TargetStructType         = Globals::Structs::TargetStruct::Type;
 using DecodableBindingListType = Binding::Attributes::Binding::TypeInfo::DecodableType;
 
 // TODO: add binding table to the persistent storage
@@ -156,7 +156,7 @@ CHIP_ERROR BindingTableAccess::ReadBindingTable(EndpointId endpoint, AttributeVa
         {
             if (entry.local == endpoint && entry.type == MATTER_UNICAST_BINDING)
             {
-                Binding::Structs::TargetStruct::Type value = {
+                Globals::Structs::TargetStruct::Type value = {
                     .node        = MakeOptional(entry.nodeId),
                     .group       = NullOptional,
                     .endpoint    = MakeOptional(entry.remote),
@@ -167,7 +167,7 @@ CHIP_ERROR BindingTableAccess::ReadBindingTable(EndpointId endpoint, AttributeVa
             }
             else if (entry.local == endpoint && entry.type == MATTER_MULTICAST_BINDING)
             {
-                Binding::Structs::TargetStruct::Type value = {
+                Globals::Structs::TargetStruct::Type value = {
                     .node        = NullOptional,
                     .group       = MakeOptional(entry.groupId),
                     .endpoint    = NullOptional,

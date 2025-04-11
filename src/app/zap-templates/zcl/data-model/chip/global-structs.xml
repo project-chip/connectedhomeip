@@ -37,6 +37,37 @@ Git: 0.7-summer-2025-511-g2b8c413df
     <item fieldId="2" name="AreaType" type="AreaTypeTag" isNullable="true"/>
   </struct>
 
+  <struct name="AccessControlTargetStruct">
+    <item fieldId="0" name="Cluster" type="cluster_id" isNullable="true"/>
+    <item fieldId="1" name="Endpoint" type="endpoint_no" isNullable="true"/>
+    <item fieldId="2" name="DeviceType" type="devtype_id" isNullable="true"/>
+  </struct>
+
+  <struct name="AccessControlEntryStruct" isFabricScoped="true">
+    <item fieldId="1" name="Privilege" type="AccessControlEntryPrivilegeEnum" isFabricSensitive="true" min="0x00" max="0x05"/>
+    <item fieldId="2" name="AuthMode" type="AccessControlEntryAuthModeEnum" isFabricSensitive="true" min="0x00" max="0x03"/>
+    <item fieldId="3" name="Subjects" type="int64u" isNullable="true" array="true" isFabricSensitive="true"/>
+    <item fieldId="4" name="Targets" type="AccessControlTargetStruct" isNullable="true" array="true" isFabricSensitive="true"/>
+  </struct>
+
+  <struct name="GroupKeySetStruct">
+    <item fieldId="0" name="GroupKeySetID" type="int16u"/>
+    <item fieldId="1" name="GroupKeySecurityPolicy" type="GroupKeySecurityPolicyEnum"/>
+    <item fieldId="2" name="EpochKey0" type="octet_string" length="16" isNullable="true"/>
+    <item fieldId="3" name="EpochStartTime0" type="epoch_us" isNullable="true"/>
+    <item fieldId="4" name="EpochKey1" type="octet_string" length="16" isNullable="true"/>
+    <item fieldId="5" name="EpochStartTime1" type="epoch_us" isNullable="true"/>
+    <item fieldId="6" name="EpochKey2" type="octet_string" length="16" isNullable="true"/>
+    <item fieldId="7" name="EpochStartTime2" type="epoch_us" isNullable="true"/>
+  </struct>
+
+  <struct name="TargetStruct" isFabricScoped="true">
+    <item fieldId="1" name="Node" type="node_id" optional="true"/>
+    <item fieldId="2" name="Group" type="group_id" optional="true"/>
+    <item fieldId="3" name="Endpoint" type="endpoint_no" optional="true"/>
+    <item fieldId="4" name="Cluster" type="cluster_id" optional="true"/>
+  </struct>
+
   <!--
     These are test global items (no cluster attached) for testing only.
     Their usage is defined for UnitTestCluster only.

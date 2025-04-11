@@ -33,7 +33,7 @@ namespace Credentials {
 class GroupDataProvider
 {
 public:
-    using SecurityPolicy                                  = app::Clusters::GroupKeyManagement::GroupKeySecurityPolicyEnum;
+    using SecurityPolicy                                  = app::Clusters::Globals::GroupKeySecurityPolicyEnum;
     static constexpr KeysetId kIdentityProtectionKeySetId = 0;
 
     struct GroupInfo
@@ -195,8 +195,7 @@ public:
 
     GroupDataProvider(uint16_t maxGroupsPerFabric    = CHIP_CONFIG_MAX_GROUPS_PER_FABRIC,
                       uint16_t maxGroupKeysPerFabric = CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC) :
-        mMaxGroupsPerFabric(maxGroupsPerFabric),
-        mMaxGroupKeysPerFabric(maxGroupKeysPerFabric)
+        mMaxGroupsPerFabric(maxGroupsPerFabric), mMaxGroupKeysPerFabric(maxGroupKeysPerFabric)
     {}
 
     virtual ~GroupDataProvider() = default;

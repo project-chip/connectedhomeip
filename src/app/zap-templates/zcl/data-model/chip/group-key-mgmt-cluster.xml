@@ -30,24 +30,6 @@ limitations under the License.
     <item fieldId="3" name="GroupName" type="char_string" length="16" optional="true"/>
   </struct>
 
-  <enum name="GroupKeySecurityPolicyEnum" type="enum8">
-    <cluster code="0x003F"/>
-    <item name="TrustFirst" value="0x00"/>
-    <item name="CacheAndSync" value="0x01"/>
-  </enum>
-
-  <struct name="GroupKeySetStruct">
-    <cluster code="0x003F"/>
-    <item fieldId="0" name="GroupKeySetID" type="int16u"/>
-    <item fieldId="1" name="GroupKeySecurityPolicy" type="GroupKeySecurityPolicyEnum"/>
-    <item fieldId="2" name="EpochKey0" type="octet_string" length="16" isNullable="true"/>
-    <item fieldId="3" name="EpochStartTime0" type="epoch_us" isNullable="true"/>
-    <item fieldId="4" name="EpochKey1" type="octet_string" length="16" isNullable="true"/>
-    <item fieldId="5" name="EpochStartTime1" type="epoch_us" isNullable="true"/>
-    <item fieldId="6" name="EpochKey2" type="octet_string" length="16" isNullable="true"/>
-    <item fieldId="7" name="EpochStartTime2" type="epoch_us" isNullable="true"/>
-  </struct>
-
   <cluster>
     <domain>General</domain>
     <name>Group Key Management</name>

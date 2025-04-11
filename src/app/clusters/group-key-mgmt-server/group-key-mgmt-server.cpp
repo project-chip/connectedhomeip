@@ -487,7 +487,7 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
         return true;
     }
 
-    if (commandData.groupKeySet.groupKeySecurityPolicy == GroupKeySecurityPolicyEnum::kUnknownEnumValue)
+    if (commandData.groupKeySet.groupKeySecurityPolicy == Globals::GroupKeySecurityPolicyEnum::kUnknownEnumValue)
     {
         // If a client indicates an enumeration value to the server, that is not
         // supported by the server, because it is ... a new value unrecognized
@@ -498,7 +498,7 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
     }
 
     if (!GroupKeyManagementAttributeAccess::IsMCSPSupported() &&
-        commandData.groupKeySet.groupKeySecurityPolicy == GroupKeySecurityPolicyEnum::kCacheAndSync)
+        commandData.groupKeySet.groupKeySecurityPolicy == Globals::GroupKeySecurityPolicyEnum::kCacheAndSync)
     {
         // When CacheAndSync is not supported in the FeatureMap of this cluster,
         // any action attempting to set CacheAndSync in the

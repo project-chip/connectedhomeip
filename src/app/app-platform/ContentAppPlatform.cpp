@@ -106,9 +106,9 @@ Status __attribute__((weak)) AppPlatformExternalAttributeReadCallback(EndpointId
     return (Status::Failure);
 }
 
-Status __attribute__((weak))
-AppPlatformExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
-                                          const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
+Status __attribute__((weak)) AppPlatformExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
+                                                                       const EmberAfAttributeMetadata * attributeMetadata,
+                                                                       uint8_t * buffer)
 {
     return (Status::Failure);
 }
@@ -661,7 +661,7 @@ CHIP_ERROR ContentAppPlatform::GetACLEntryIndex(size_t * foundIndex, FabricIndex
 CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle,
                                                   uint16_t targetVendorId, uint16_t targetProductId, NodeId localNodeId,
                                                   CharSpan rotatingId, uint32_t passcode,
-                                                  std::vector<Binding::Structs::TargetStruct::Type> bindings,
+                                                  std::vector<Globals::Structs::TargetStruct::Type> bindings,
                                                   Controller::WriteResponseSuccessCallback successCb,
                                                   Controller::WriteResponseFailureCallback failureCb)
 {
@@ -748,7 +748,7 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
         if (hasClusterAccess)
         {
             ChipLogProgress(Controller, "ContentAppPlatform::ManageClientAccess adding a binding on ep1");
-            bindings.push_back(Binding::Structs::TargetStruct::Type{
+            bindings.push_back(Globals::Structs::TargetStruct::Type{
                 .node        = MakeOptional(localNodeId),
                 .group       = NullOptional,
                 .endpoint    = MakeOptional(kLocalVideoPlayerEndpointId),
@@ -764,7 +764,7 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
                                                         .endpoint = kLocalSpeakerEndpointId };
         ReturnErrorOnFailure(entry.AddTarget(nullptr, target));
 
-        bindings.push_back(Binding::Structs::TargetStruct::Type{
+        bindings.push_back(Globals::Structs::TargetStruct::Type{
             .node        = MakeOptional(localNodeId),
             .group       = NullOptional,
             .endpoint    = MakeOptional(kLocalSpeakerEndpointId),
@@ -793,7 +793,7 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
                                                                     .endpoint = app->GetEndpointId() };
                     ReturnErrorOnFailure(entry.AddTarget(nullptr, target));
 
-                    bindings.push_back(Binding::Structs::TargetStruct::Type{
+                    bindings.push_back(Globals::Structs::TargetStruct::Type{
                         .node        = MakeOptional(localNodeId),
                         .group       = NullOptional,
                         .endpoint    = MakeOptional(app->GetEndpointId()),
