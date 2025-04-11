@@ -1,3 +1,4 @@
+#include "DeviceTypes.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app/data-model/Nullable.h>
@@ -7,6 +8,7 @@
 
 using chip::app::DataModel::Nullable;
 
+using namespace chef;
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -38,7 +40,6 @@ using namespace chip::app::Clusters;
 #include "refrigerator-and-temperature-controlled-cabinet-mode/tcc-mode.h"
 #endif // MATTER_DM_PLUGIN_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SERVER
 
-#ifdef MATTER_DM_PLUGIN_REFRIGERATOR_ALARM_SERVER
 namespace {
 
 // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
@@ -46,13 +47,25 @@ constexpr const uint8_t kNamespaceRefrigerator = 0x41;
 // Refrigerator Namespace: 0x41, tag 0x00 (Refrigerator)
 constexpr const uint8_t kTagRefrigerator = 0x00;
 // Refrigerator Namespace: 0x41, tag 0x01 (Freezer)
-constexpr const uint8_t kTagFreezer                                                = 0x01;
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type refrigeratorTagList[] = { { .namespaceID = kNamespaceRefrigerator,
-                                                                                         .tag         = kTagRefrigerator } };
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type freezerTagList[]      = { { .namespaceID = kNamespaceRefrigerator,
-                                                                                         .tag         = kTagFreezer } };
+constexpr const uint8_t kTagFreezer                                                 = 0x01;
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type gRefrigeratorTagList[] = { { .namespaceID = kNamespaceRefrigerator,
+                                                                                          .tag         = kTagRefrigerator } };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type gFreezerTagList[]      = { { .namespaceID = kNamespaceRefrigerator,
+                                                                                          .tag         = kTagFreezer } };
 } // namespace
-#endif // MATTER_DM_PLUGIN_REFRIGERATOR_ALARM_SERVER
+
+namespace PostionSemanticTag {
+
+constexpr const uint8_t kNamespace                                   = 0x08; // Common Position Namespace
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kLeft   = { .namespaceID = kNamespace, .tag = 0x00 };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kRight  = { .namespaceID = kNamespace, .tag = 0x01 };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kTop    = { .namespaceID = kNamespace, .tag = 0x02 };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kBottom = { .namespaceID = kNamespace, .tag = 0x03 };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kMiddle = { .namespaceID = kNamespace, .tag = 0x04 };
+
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kTopTagList[]  = { PostionSemanticTag::kTop };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kLeftTagList[] = { PostionSemanticTag::kLeft };
+} // namespace PostionSemanticTag
 
 #ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
 #include "chef-rvc-operational-state-delegate.h"
@@ -347,22 +360,115 @@ void emberAfWakeOnLanClusterInitCallback(EndpointId endpoint)
 }
 #endif
 
+/**
+ * This initializer is for the application having refrigerator on EP1 and child
+ * temperatureControlledCabinet endpoints on EP2 and EP3.
+ */
+void RefrigeratorTemperatureControlledCabinetInit()
+{
+    EndpointId kRefEndpointId           = DeviceTypes::ExpectedEndpointId::kRefrigerator;
+    EndpointId kColdCabinetEndpointId   = DeviceTypes::ExpectedEndpointId::kColdCabinetPartOfRefrigerator;
+    EndpointId kFreezeCabinetEndpointId = DeviceTypes::ExpectedEndpointId::kFreezeCabinetPartOfRefrigerator;
+    if (!DeviceTypes::EndpointHasDeviceType(kRefEndpointId, DeviceTypes::kRefrigeratorDeviceId))
+    {
+        return;
+    }
+    ChipLogDetail(NotSpecified, "Refrigerator device type on EP: %d", kRefEndpointId);
+    SetTreeCompositionForEndpoint(kRefEndpointId);
+
+    if (DeviceTypes::EndpointHasDeviceType(kColdCabinetEndpointId, DeviceTypes::kTemperatureControlledCabinetDeviceId))
+    {
+        ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kColdCabinetEndpointId);
+        SetParentEndpointForEndpoint(kColdCabinetEndpointId, kRefEndpointId);
+        SetTagList(kColdCabinetEndpointId,
+                   Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gRefrigeratorTagList));
+    }
+
+    if (DeviceTypes::EndpointHasDeviceType(kFreezeCabinetEndpointId, DeviceTypes::kTemperatureControlledCabinetDeviceId))
+    {
+        ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kFreezeCabinetEndpointId);
+        SetParentEndpointForEndpoint(kFreezeCabinetEndpointId, kRefEndpointId);
+        SetTagList(kFreezeCabinetEndpointId, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gFreezerTagList));
+    }
+}
+
+/**
+ * This initializer is for the application having cooktop. The cooktop can be a part of an oven
+ * or standalone cooktop.
+ *     Standalone Cooktop: Cooktop on EP1 and optional CookSurface on EP2.
+ *     Cooktop part of Oven: Oven on EP1, Cooktop on EP3 and optional CookSurface on EP4.
+ */
+void CooktopCookSurfaceInit(EndpointId kCooktopEpId)
+{
+    SetTreeCompositionForEndpoint(kCooktopEpId);
+    switch (kCooktopEpId)
+    {
+    case DeviceTypes::ExpectedEndpointId::kCooktopStandAlone:
+        if (DeviceTypes::EndpointHasDeviceType(kCooktopEpId, DeviceTypes::kCooktopDeviceId))
+        {
+            ChipLogDetail(NotSpecified, "Cooktop device type on EP: %d", kCooktopEpId);
+            EndpointId kCookSurfaceEpId = DeviceTypes::ExpectedEndpointId::kCookSurfacePartOfCooktop;
+            if (DeviceTypes::EndpointHasDeviceType(kCookSurfaceEpId, DeviceTypes::kCookSurfaceDeviceId))
+            {
+                ChipLogDetail(NotSpecified, "Cook Surface device type on EP: %d", kCookSurfaceEpId);
+                SetParentEndpointForEndpoint(kCookSurfaceEpId, kCooktopEpId);
+                SetTagList(kCookSurfaceEpId,
+                           Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(PostionSemanticTag::kLeftTagList));
+            }
+        }
+        break;
+    case DeviceTypes::ExpectedEndpointId::kCooktopPartOfOven:
+        EndpointId kOvenEpId = DeviceTypes::ExpectedEndpointId::kOven;
+        if (DeviceTypes::EndpointHasDeviceType(kCooktopEpId, DeviceTypes::kCooktopDeviceId) &&
+            DeviceTypes::EndpointHasDeviceType(kOvenEpId, DeviceTypes::kOvenDeviceId))
+        {
+            ChipLogDetail(NotSpecified, "Cooktop device type on EP: %d", kCooktopEpId);
+            SetParentEndpointForEndpoint(kCooktopEpId, kOvenEpId);
+            EndpointId kCookSurfaceEpId = DeviceTypes::ExpectedEndpointId::kCookSurfacePartOfCooktopOven;
+            if (DeviceTypes::EndpointHasDeviceType(kCookSurfaceEpId, DeviceTypes::kCookSurfaceDeviceId))
+            {
+                ChipLogDetail(NotSpecified, "Cook Surface device type on EP: %d", kCookSurfaceEpId);
+                SetParentEndpointForEndpoint(kCookSurfaceEpId, kCooktopEpId);
+                SetTagList(kCookSurfaceEpId,
+                           Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(PostionSemanticTag::kLeftTagList));
+            }
+        }
+    }
+}
+
+/**
+ * This initializer is for the application having oven on EP1 and child endpoints -
+ * temperatureControlledCabinet on EP2, cooktop on EP3 and cooksurface on EP4.
+ */
+void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
+{
+    EndpointId kOvenEpId                         = DeviceTypes::ExpectedEndpointId::kOven;
+    EndpointId kTemperatureControlledCabinetEpId = DeviceTypes::ExpectedEndpointId::kTopCabinetPartOfOven;
+    EndpointId kCooktopEpId                      = DeviceTypes::ExpectedEndpointId::kCooktopPartOfOven;
+    if (!DeviceTypes::EndpointHasDeviceType(kOvenEpId, DeviceTypes::kOvenDeviceId))
+    {
+        return;
+    }
+
+    ChipLogDetail(NotSpecified, "Oven device type on EP: %d", kOvenEpId);
+    SetTreeCompositionForEndpoint(kOvenEpId);
+
+    if (DeviceTypes::EndpointHasDeviceType(kTemperatureControlledCabinetEpId, DeviceTypes::kTemperatureControlledCabinetDeviceId))
+    {
+        ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kTemperatureControlledCabinetEpId);
+        SetParentEndpointForEndpoint(kTemperatureControlledCabinetEpId, kOvenEpId);
+        SetTagList(kTemperatureControlledCabinetEpId,
+                   Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(PostionSemanticTag::kTopTagList));
+    }
+    CooktopCookSurfaceInit(kCooktopEpId);
+}
+
 void ApplicationInit()
 {
     ChipLogProgress(NotSpecified, "Chef Application Init !!!");
 
-#ifdef MATTER_DM_PLUGIN_REFRIGERATOR_ALARM_SERVER
-    // set Parent Endpoint and Composition Type for an Endpoint
-    EndpointId kRefEndpointId           = 1;
-    EndpointId kColdCabinetEndpointId   = 2;
-    EndpointId kFreezeCabinetEndpointId = 3;
-    SetTreeCompositionForEndpoint(kRefEndpointId);
-    SetParentEndpointForEndpoint(kColdCabinetEndpointId, kRefEndpointId);
-    SetParentEndpointForEndpoint(kFreezeCabinetEndpointId, kRefEndpointId);
-    // set TagList
-    SetTagList(kColdCabinetEndpointId, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(refrigeratorTagList));
-    SetTagList(kFreezeCabinetEndpointId, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(freezerTagList));
-#endif // MATTER_DM_PLUGIN_REFRIGERATOR_ALARM_SERVER
+    RefrigeratorTemperatureControlledCabinetInit();
+    OvenTemperatureControlledCabinetCooktopCookSurfaceInit();
 
 #ifdef MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER
     ChipLogProgress(NotSpecified, "Initializing WindowCovering cluster delegate.");

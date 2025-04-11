@@ -57,6 +57,7 @@ CommandHandlerInterfaceOnlyClusters:
     - General Diagnostics
     - Software Diagnostics
     - Wi-Fi Network Diagnostics
+    - Camera AV Settings User Level Management
     - Administrator Commissioning
     - Actions
     - Closure Control

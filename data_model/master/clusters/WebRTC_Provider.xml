@@ -62,9 +62,19 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial version of the WebRTC Transport Provider Cluster"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0553" name="WebRTC Transport Provider"/>
+    <clusterId id="0x0553" name="WebRTC Transport Provider">
+      <provisionalConform/>
+    </clusterId>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="WEBRTCP" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="METADATA" name="Metadata" summary="Supports metadata transmission in WebRTC sessions">
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
+    </feature>
+  </features>
   <dataTypes>
     <number name="WebRTCSessionID" type="uint16"/>
     <enum name="WebRTCEndReasonEnum">
@@ -105,281 +115,255 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
     </enum>
-    <bitmap name="WebRTCMetadataOptionsBitmap">
-      <bitfield name="DataTLV" bit="0" summary="Reserved for future use">
-        <optionalConform/>
-      </bitfield>
-    </bitmap>
-    <struct name="ICEServerStruct">
-      <field id="1" name="urls" type="list">
-        <entry type="string"/>
+    <struct name="ICECandidateStruct">
+      <field id="0" name="Candidate" type="string">
         <mandatoryConform/>
       </field>
-      <field id="2" name="username" type="string">
-        <optionalConform/>
+      <field id="1" name="SDPMid" type="string">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <minLength value="1"/>
+        </constraint>
       </field>
-      <field id="3" name="credential" type="string">
-        <optionalConform/>
+      <field id="2" name="SDPMLineIndex" type="uint16">
+        <quality nullable="true"/>
+        <mandatoryConform/>
       </field>
-      <field id="4" name="CAID" type="TLSCAID">
+    </struct>
+    <struct name="ICEServerStruct">
+      <field id="0" name="URLs" type="list">
+        <entry type="string">
+          <constraint>
+            <maxLength value="2000"/>
+          </constraint>
+        </entry>
+        <mandatoryConform/>
+        <constraint>
+          <maxCount value="10"/>
+        </constraint>
+      </field>
+      <field id="1" name="Username" type="string">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="508"/>
+        </constraint>
+      </field>
+      <field id="2" name="Credential" type="string">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="512"/>
+        </constraint>
+      </field>
+      <field id="3" name="CAID" type="TLSCAID">
         <optionalConform/>
       </field>
     </struct>
     <struct name="WebRTCSessionStruct">
-      <field id="1" name="ID" type="WebRTCSessionID">
+      <field id="0" name="ID" type="WebRTCSessionID">
         <mandatoryConform/>
       </field>
-      <field id="2" name="PeerNodeID" type="node-id">
+      <field id="1" name="PeerNodeID" type="node-id">
         <mandatoryConform/>
       </field>
-      <field id="3" name="PeerFabricIndex" type="fabric-idx">
+      <field id="2" name="PeerEndpointID" type="endpoint-no">
         <mandatoryConform/>
       </field>
-      <field id="4" name="StreamUsage" type="StreamUsageEnum">
+      <field id="3" name="StreamUsage" type="StreamUsageEnum">
         <mandatoryConform/>
       </field>
-      <field id="5" name="VideoStreamID" type="VideoStreamID">
+      <field id="4" name="VideoStreamID" type="VideoStreamID">
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
-      <field id="6" name="AudioStreamID" type="AudioStreamID">
+      <field id="5" name="AudioStreamID" type="AudioStreamID">
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
-      <field id="7" name="MetadataOptions" type="WebRTCMetadataOptionsBitmap" default="0">
-        <mandatoryConform/>
+      <field id="6" name="MetadataEnabled" type="bool">
+        <mandatoryConform>
+          <feature name="METADATA"/>
+        </mandatoryConform>
       </field>
+      <access fabricScoped="true"/>
     </struct>
   </dataTypes>
   <attributes>
     <attribute id="0x0000" name="CurrentSessions" type="list">
       <entry type="WebRTCSessionStruct"/>
-      <access read="true" readPrivilege="view"/>
+      <access read="true" readPrivilege="manage" fabricSensitive="true"/>
       <mandatoryConform/>
     </attribute>
   </attributes>
   <commands>
-    <command id="0x01" name="SolicitOffer" direction="commandToServer" response="SolicitOfferResponse">
+    <command id="0x00" name="SolicitOffer" direction="commandToServer" response="SolicitOfferResponse">
       <quality largeMessage="true"/>
-      <access invokePrivilege="operate"/>
+      <access invokePrivilege="operate" fabricScoped="true"/>
       <mandatoryConform/>
-      <field id="1" name="StreamUsage" type="StreamUsageEnum">
+      <field id="0" name="StreamUsage" type="StreamUsageEnum">
         <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
+      </field>
+      <field id="1" name="OriginatingEndpointID" type="endpoint-no">
+        <mandatoryConform/>
       </field>
       <field id="2" name="VideoStreamID" type="VideoStreamID">
         <quality nullable="true"/>
         <optionalConform choice="a" more="true" min="1"/>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
       <field id="3" name="AudioStreamID" type="AudioStreamID">
         <quality nullable="true"/>
         <optionalConform choice="a" more="true" min="1"/>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
       <field id="4" name="ICEServers" type="list">
         <entry type="ICEServerStruct"/>
         <optionalConform/>
         <constraint>
-          <desc/>
+          <maxCount value="10"/>
         </constraint>
       </field>
       <field id="5" name="ICETransportPolicy" type="string">
         <optionalConform/>
         <constraint>
-          <desc/>
+          <maxLength value="16"/>
         </constraint>
       </field>
-      <field id="6" name="MetadataOptions" type="WebRTCMetadataOptionsBitmap">
-        <optionalConform/>
-        <constraint>
-          <desc/>
-        </constraint>
+      <field id="6" name="MetadataEnabled" type="bool">
+        <mandatoryConform>
+          <feature name="METADATA"/>
+        </mandatoryConform>
       </field>
     </command>
-    <command id="0x02" name="SolicitOfferResponse" direction="responseFromServer">
+    <command id="0x01" name="SolicitOfferResponse" direction="responseFromServer">
       <quality largeMessage="true"/>
       <mandatoryConform/>
-      <field id="1" name="WebRTCSessionID" type="WebRTCSessionID">
+      <field id="0" name="WebRTCSessionID" type="WebRTCSessionID">
         <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
-      <field id="2" name="DeferredOffer" type="bool">
+      <field id="1" name="DeferredOffer" type="bool">
         <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
-      <field id="3" name="VideoStreamID" type="VideoStreamID">
+      <field id="2" name="VideoStreamID" type="VideoStreamID">
         <quality nullable="true"/>
         <mandatoryConform>
           <command name="SolicitOffer">
             <field name="VideoStreamID"/>
           </command>
         </mandatoryConform>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
-      <field id="4" name="AudioStreamID" type="AudioStreamID">
+      <field id="3" name="AudioStreamID" type="AudioStreamID">
         <quality nullable="true"/>
         <mandatoryConform>
           <command name="SolicitOffer">
             <field name="AudioStreamID"/>
           </command>
         </mandatoryConform>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
     </command>
-    <command id="0x03" name="ProvideOffer" direction="commandToServer" response="ProvideOfferResponse">
+    <command id="0x02" name="ProvideOffer" direction="commandToServer" response="ProvideOfferResponse">
       <quality largeMessage="true"/>
-      <access invokePrivilege="operate"/>
+      <access invokePrivilege="operate" fabricScoped="true"/>
       <mandatoryConform/>
-      <field id="1" name="WebRTCSessionID" type="WebRTCSessionID" default="null">
+      <field id="0" name="WebRTCSessionID" type="WebRTCSessionID" default="null">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
-      <field id="2" name="SDP" type="string">
+      <field id="1" name="SDP" type="string">
         <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
-      <field id="3" name="StreamUsage" type="StreamUsageEnum">
+      <field id="2" name="StreamUsage" type="StreamUsageEnum">
         <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
+      </field>
+      <field id="3" name="OriginatingEndpointID" type="endpoint-no">
+        <mandatoryConform/>
       </field>
       <field id="4" name="VideoStreamID" type="VideoStreamID">
         <quality nullable="true"/>
         <optionalConform choice="c" more="true" min="1"/>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
       <field id="5" name="AudioStreamID" type="AudioStreamID">
         <quality nullable="true"/>
         <optionalConform choice="c" more="true" min="1"/>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
       <field id="6" name="ICEServers" type="list">
         <entry type="ICEServerStruct"/>
         <optionalConform/>
         <constraint>
-          <desc/>
+          <maxCount value="10"/>
         </constraint>
       </field>
       <field id="7" name="ICETransportPolicy" type="string">
         <optionalConform/>
         <constraint>
-          <desc/>
+          <maxLength value="16"/>
         </constraint>
       </field>
-      <field id="8" name="MetadataOptions" type="WebRTCMetadataOptionsBitmap">
-        <optionalConform/>
-        <constraint>
-          <desc/>
-        </constraint>
+      <field id="8" name="MetadataEnabled" type="bool">
+        <mandatoryConform>
+          <feature name="METADATA"/>
+        </mandatoryConform>
       </field>
     </command>
-    <command id="0x04" name="ProvideOfferResponse" direction="responseFromServer">
+    <command id="0x03" name="ProvideOfferResponse" direction="responseFromServer">
       <quality largeMessage="true"/>
       <mandatoryConform/>
-      <field id="1" name="WebRTCSessionID" type="WebRTCSessionID">
+      <field id="0" name="WebRTCSessionID" type="WebRTCSessionID">
         <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
-      <field id="2" name="VideoStreamID" type="VideoStreamID">
+      <field id="1" name="VideoStreamID" type="VideoStreamID">
         <quality nullable="true"/>
         <mandatoryConform>
           <command name="ProvideOffer">
             <field name="VideoStreamID"/>
           </command>
         </mandatoryConform>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
-      <field id="3" name="AudioStreamID" type="AudioStreamID">
+      <field id="2" name="AudioStreamID" type="AudioStreamID">
         <quality nullable="true"/>
         <mandatoryConform>
           <command name="ProvideOffer">
             <field name="AudioStreamID"/>
           </command>
         </mandatoryConform>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
     </command>
-    <command id="0x05" name="ProvideAnswer" direction="commandToServer" response="Y">
+    <command id="0x04" name="ProvideAnswer" direction="commandToServer" response="Y">
       <quality largeMessage="true"/>
-      <access invokePrivilege="operate"/>
+      <access invokePrivilege="operate" fabricScoped="true"/>
       <mandatoryConform/>
-      <field id="1" name="WebRTCSessionID" type="WebRTCSessionID">
+      <field id="0" name="WebRTCSessionID" type="WebRTCSessionID">
         <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
-      <field id="2" name="SDP" type="string">
+      <field id="1" name="SDP" type="string">
         <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
     </command>
-    <command id="0x06" name="ProvideICECandidates" direction="commandToServer" response="Y">
+    <command id="0x05" name="ProvideICECandidates" direction="commandToServer" response="Y">
       <quality largeMessage="true"/>
-      <access invokePrivilege="operate"/>
+      <access invokePrivilege="operate" fabricScoped="true"/>
       <mandatoryConform/>
-      <field id="1" name="WebRTCSessionID" type="WebRTCSessionID">
+      <field id="0" name="WebRTCSessionID" type="WebRTCSessionID">
         <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
-      <field id="2" name="ICECandidates" type="list">
-        <entry type="string"/>
+      <field id="1" name="ICECandidates" type="list">
+        <entry type="ICECandidateStruct"/>
         <mandatoryConform/>
         <constraint>
           <minCount value="1"/>
         </constraint>
       </field>
     </command>
-    <command id="0x07" name="EndSession" direction="commandToServer" response="Y">
+    <command id="0x06" name="EndSession" direction="commandToServer" response="Y">
       <quality largeMessage="true"/>
-      <access invokePrivilege="operate"/>
+      <access invokePrivilege="operate" fabricScoped="true"/>
       <mandatoryConform/>
-      <field id="1" name="WebRTCSessionID" type="WebRTCSessionID">
+      <field id="0" name="WebRTCSessionID" type="WebRTCSessionID">
         <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
-      <field id="2" name="Reason" type="WebRTCEndReasonEnum" default="UnknownReason">
+      <field id="1" name="Reason" type="WebRTCEndReasonEnum">
+        <default>
+          <enum default="UnknownReason"/>
+        </default>
         <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
     </command>
   </commands>

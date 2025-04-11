@@ -65,9 +65,13 @@ Davis, CA 95616, USA
   <clusterIds>
     <clusterId id="0x0033" name="General Diagnostics"/>
   </clusterIds>
-  <classification hierarchy="base" role="utility" picsCode="DGGEN" scope="Node"/>
+  <classification hierarchy="base" role="utility" picsCode="DGGEN" scope="Node">
+    <quality diagnostics="true"/>
+  </classification>
   <features>
-    <feature bit="0" code="DMTEST" name="DataModelTest" summary="Support specific testing needs for extended Data Model features"/>
+    <feature bit="0" code="DMTEST" name="DataModelTest" summary="Support specific testing needs for extended Data Model features">
+      <describedConform/>
+    </feature>
   </features>
   <dataTypes>
     <enum name="BootReasonEnum">

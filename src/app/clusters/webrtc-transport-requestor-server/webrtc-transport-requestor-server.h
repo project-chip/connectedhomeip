@@ -159,6 +159,15 @@ public:
      */
     UpsertResultEnum UpsertSession(const WebRTCSessionTypeStruct & session); // Now public
 
+    /**
+     * @brief
+     *   Removes a session identified by its session ID from the internal list of current sessions.
+     *
+     * @param sessionId  The session ID of the session to remove.
+     *                   If the ID is not found, the call is a no‑op.
+     */
+    void RemoveSession(uint16_t sessionId);
+
 private:
     WebRTCTransportRequestorDelegate & mDelegate;
     std::vector<WebRTCSessionTypeStruct> mCurrentSessions;
@@ -172,7 +181,6 @@ private:
     // Helper functions
     WebRTCSessionTypeStruct * FindSession(uint16_t sessionId);
     uint16_t GenerateSessionId();
-    void RemoveSession(uint16_t sessionId);
     bool IsPeerNodeSessionValid(uint16_t sessionId, HandlerContext & ctx);
 
     // Command handlers

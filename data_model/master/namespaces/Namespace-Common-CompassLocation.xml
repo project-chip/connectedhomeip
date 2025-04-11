@@ -60,12 +60,12 @@ Davis, CA 95616, USA
 <namespace xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd namespace namespace.xsd" id="0x0003" name="Common Compass Location">
   <tags>
     <tag id="0x0000" name="North"/>
-    <tag id="0x0001" name="North-East"/>
+    <tag id="0x0001" name="NorthEast"/>
     <tag id="0x0002" name="East"/>
-    <tag id="0x0003" name="South-East"/>
+    <tag id="0x0003" name="SouthEast"/>
     <tag id="0x0004" name="South"/>
-    <tag id="0x0005" name="South-West"/>
+    <tag id="0x0005" name="SouthWest"/>
     <tag id="0x0006" name="West"/>
-    <tag id="0x0007" name="North-West"/>
+    <tag id="0x0007" name="NorthWest"/>
   </tags>
 </namespace>

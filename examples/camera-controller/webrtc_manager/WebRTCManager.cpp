@@ -56,6 +56,8 @@ void WebRTCManager::Init()
 
 CHIP_ERROR WebRTCManager::SetRemoteDescription(uint16_t webRTCSessionID, const std::string & sdp)
 {
+    mWebRTCProviderClient.NotifyRemoteDecryptorReceived(webRTCSessionID);
+
     if (!mPeerConnection)
     {
         ChipLogError(Camera, "Cannot set remote description: mPeerConnection is null");

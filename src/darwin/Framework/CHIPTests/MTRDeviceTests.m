@@ -34,6 +34,7 @@
 #import "MTRErrorTestUtils.h"
 #import "MTRTestCase+ServerAppRunner.h"
 #import "MTRTestCase.h"
+#import "MTRTestControllerDelegate.h"
 #import "MTRTestDeclarations.h"
 #import "MTRTestKeys.h"
 #import "MTRTestStorage.h"
@@ -76,53 +77,6 @@ static MTRBaseDevice * GetConnectedDevice(void)
     XCTAssertNotNil(mConnectedDevice);
     return mConnectedDevice;
 }
-
-@interface MTRDeviceTestDeviceControllerDelegate : NSObject <MTRDeviceControllerDelegate>
-@property (nonatomic, strong) XCTestExpectation * expectation;
-@end
-
-@implementation MTRDeviceTestDeviceControllerDelegate
-- (id)initWithExpectation:(XCTestExpectation *)expectation
-{
-    self = [super init];
-    if (self) {
-        _expectation = expectation;
-    }
-    return self;
-}
-
-- (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError *)error
-{
-    XCTAssertEqual(error.code, 0);
-
-    NSError * getDeviceError = nil;
-    __auto_type * device = [controller deviceBeingCommissionedWithNodeID:@(kDeviceId) error:&getDeviceError];
-    XCTAssertNil(getDeviceError);
-    XCTAssertNotNil(device);
-
-    // Now check that getting with some other random id fails.
-    device = [controller deviceBeingCommissionedWithNodeID:@(kDeviceId + 1) error:&getDeviceError];
-    XCTAssertNil(device);
-    XCTAssertNotNil(getDeviceError);
-
-    __auto_type * params = [[MTRCommissioningParameters alloc] init];
-    params.countryCode = @("au");
-
-    NSError * commissionError = nil;
-    [sController commissionNodeWithID:@(kDeviceId) commissioningParams:params error:&commissionError];
-    XCTAssertNil(commissionError);
-
-    // Keep waiting for controller:commissioningComplete:
-}
-
-- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError *)error
-{
-    XCTAssertEqual(error.code, 0);
-    [_expectation fulfill];
-    _expectation = nil;
-}
-
-@end
 
 @interface MTRDeviceTests : MTRTestCase
 
@@ -171,8 +125,9 @@ static BOOL slocalTestStorageEnabledBeforeUnitTest;
 
     sController = controller;
 
-    MTRDeviceTestDeviceControllerDelegate * deviceControllerDelegate =
-        [[MTRDeviceTestDeviceControllerDelegate alloc] initWithExpectation:pairingExpectation];
+    MTRTestControllerDelegate * deviceControllerDelegate =
+        [[MTRTestControllerDelegate alloc] initWithExpectation:pairingExpectation newNodeID:@(kDeviceId)];
+    deviceControllerDelegate.countryCode = @("au");
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.device_controller_delegate", DISPATCH_QUEUE_SERIAL);
 
     [controller setDeviceControllerDelegate:deviceControllerDelegate queue:callbackQueue];
