@@ -3689,7 +3689,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
 
     case CommissioningStage::kWaitDeviceInstallation: {
-        // Nothing to do. Wait until the user confirms that he has installed the device and powered it up
+        // Nothing to do. Wait until the user confirms that the device has been installed and powered up.
         return;
     }
 
