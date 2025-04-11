@@ -53,7 +53,6 @@ config("nxp_platform_config") {
       "../../common/factory_data",
     ]
     defines += [ "CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA=1" ]
-    defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/rt/rt1060/FactoryDataProviderImpl.h\"" ]
   }
 
   # When OTBR is enabled Thread network commissioning cluster is enabled using chip_enable_secondary_nwk_if
@@ -186,8 +185,8 @@ static_library("nxp_platform") {
 
   if (nxp_use_factory_data) {
     sources += [
-      "../../common/factory_data/FactoryDataProvider.cpp",
-      "../../common/factory_data/FactoryDataProvider.h",
+      "../../common/factory_data/legacy/FactoryDataProvider.cpp",
+      "../../common/factory_data/legacy/FactoryDataProvider.h",
       "FactoryDataProviderImpl.cpp",
       "FactoryDataProviderImpl.h",
     ]
