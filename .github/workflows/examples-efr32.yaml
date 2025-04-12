@@ -84,6 +84,7 @@ jobs:
                 --target efr32-brd4187c-lock-rpc \
                 --target efr32-brd4187c-air-quality-sensor-app-shell-heap-monitoring \
                 --target efr32-brd4187c-window-covering-additional-data-advertising \
+                --target efr32-brd4187c-closure \
                 build \
                 --copy-artifacts-to out/artifacts \
              "
@@ -106,6 +107,7 @@ jobs:
                 --enable-flashbundle \
                 --target efr32-brd2605a-light-skip-rps-generation \
                 --target efr32-brd4338a-lock-skip-rps-generation \
+                --target efr32-brd4338a-closure-skip-rps-generation \
                 build \
                 --copy-artifacts-to out/artifacts \
              "

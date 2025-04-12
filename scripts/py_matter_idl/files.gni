@@ -6,6 +6,7 @@ matter_idl_generator_templates = [
   "${chip_root}/scripts/py_matter_idl/matter/idl/generators/cpp/application/CallbackStubSource.jinja",
   "${chip_root}/scripts/py_matter_idl/matter/idl/generators/cpp/application/ClusterCallbacksSource.jinja",
   "${chip_root}/scripts/py_matter_idl/matter/idl/generators/cpp/application/PluginApplicationCallbacksHeader.jinja",
+  "${chip_root}/scripts/py_matter_idl/matter/idl/generators/cpp/application/ServerClusterConfig.jinja",
   "${chip_root}/scripts/py_matter_idl/matter/idl/generators/cpp/sdk/AllItemsGni.jinja",
   "${chip_root}/scripts/py_matter_idl/matter/idl/generators/cpp/sdk/AttributeIds.jinja",
   "${chip_root}/scripts/py_matter_idl/matter/idl/generators/cpp/sdk/Build.jinja",

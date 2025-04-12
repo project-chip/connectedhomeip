@@ -33,6 +33,7 @@ except ImportError:
 
 # isort: off
 from matter.idl.generators import FileSystemGeneratorStorage, GeneratorStorage
+from matter.idl.generators.path_resolution import expand_path_for_idl
 from matter.idl.generators.registry import CodeGenerator, GENERATORS
 
 
@@ -154,8 +155,8 @@ def main(log_level, generator, option, output_dir, dry_run, name_only, expected_
             expected = set()
             for line in fin.readlines():
                 line = line.strip()
-                if line:
-                    expected.add(line)
+                for expanded_path in expand_path_for_idl(idl_tree, line):
+                    expected.add(expanded_path)
 
             if expected != storage.generated_paths:
                 logging.fatal("expected and generated files do not match.")
