@@ -31,6 +31,12 @@ using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ClosureControl;
 
+namespace {
+
+    constexpr BitMask<Feature> gFeatureMap(Feature::kCalibration, Feature::kPositioning, Feature::kSpeed,Feature::kMotionLatching);
+    
+} // namespace
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -66,8 +72,7 @@ CHIP_ERROR ClosureControlInit(EndpointId endpointId)
     VerifyOrReturnError(gClosureCtrlDelegate,CHIP_ERROR_NO_MEMORY);
 
     /* Manufacturer may optionally not support all features, commands & attributes */
-    gClosureCtrlInstance = std::make_unique<ClosureControlInstance>(endpointId, *gClosureCtrlDelegate,
-                            BitMask<Feature, uint32_t>(Feature::kCalibration, Feature::kPositioning, Feature::kSpeed,Feature::kMotionLatching), OptionalAttribute::kCountdownTime);
+    gClosureCtrlInstance = std::make_unique<ClosureControlInstance>(endpointId, *gClosureCtrlDelegate, gFeatureMap, OptionalAttribute::kCountdownTime);
     if (!gClosureCtrlInstance)
     {
         ChipLogError(AppServer, "Failed to allocate memory for ClosureControlInstance");

@@ -83,6 +83,7 @@ inline ClosureControlManager & ClosureCtrlMgr()
 {
     return ClosureControlManager::sClosureCtrlMgr;
 }
+
 } // namespace ClosureControl
 } // namespace Clusters
 } // namespace app
