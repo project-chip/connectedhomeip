@@ -14,18 +14,23 @@ namespace Commands {
 namespace TestEventTrigger {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace TestEventTrigger
+
 namespace TimeSnapshot {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace TimeSnapshot
+
 namespace PayloadTestRequest {
 inline constexpr CommandId Id = 0x00000003;
 } // namespace PayloadTestRequest
+
 namespace TimeSnapshotResponse {
 inline constexpr CommandId Id = 0x00000002;
 } // namespace TimeSnapshotResponse
+
 namespace PayloadTestResponse {
 inline constexpr CommandId Id = 0x00000004;
 } // namespace PayloadTestResponse
+
 } // namespace Commands
 } // namespace GeneralDiagnostics
 } // namespace Clusters

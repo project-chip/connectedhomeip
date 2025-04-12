@@ -14,24 +14,31 @@ namespace Commands {
 namespace UpOrOpen {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace UpOrOpen
+
 namespace DownOrClose {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace DownOrClose
+
 namespace StopMotion {
 inline constexpr CommandId Id = 0x00000002;
 } // namespace StopMotion
+
 namespace GoToLiftValue {
 inline constexpr CommandId Id = 0x00000004;
 } // namespace GoToLiftValue
+
 namespace GoToLiftPercentage {
 inline constexpr CommandId Id = 0x00000005;
 } // namespace GoToLiftPercentage
+
 namespace GoToTiltValue {
 inline constexpr CommandId Id = 0x00000007;
 } // namespace GoToTiltValue
+
 namespace GoToTiltPercentage {
 inline constexpr CommandId Id = 0x00000008;
 } // namespace GoToTiltPercentage
+
 } // namespace Commands
 } // namespace WindowCovering
 } // namespace Clusters

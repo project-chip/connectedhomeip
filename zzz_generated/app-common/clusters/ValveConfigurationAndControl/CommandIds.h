@@ -14,9 +14,11 @@ namespace Commands {
 namespace Open {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace Open
+
 namespace Close {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace Close
+
 } // namespace Commands
 } // namespace ValveConfigurationAndControl
 } // namespace Clusters

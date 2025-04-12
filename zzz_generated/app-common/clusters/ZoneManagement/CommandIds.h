@@ -14,21 +14,27 @@ namespace Commands {
 namespace CreateTwoDCartesianZone {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace CreateTwoDCartesianZone
+
 namespace UpdateTwoDCartesianZone {
 inline constexpr CommandId Id = 0x00000002;
 } // namespace UpdateTwoDCartesianZone
+
 namespace GetTwoDCartesianZone {
 inline constexpr CommandId Id = 0x00000003;
 } // namespace GetTwoDCartesianZone
+
 namespace RemoveZone {
 inline constexpr CommandId Id = 0x00000005;
 } // namespace RemoveZone
+
 namespace CreateTwoDCartesianZoneResponse {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace CreateTwoDCartesianZoneResponse
+
 namespace GetTwoDCartesianZoneResponse {
 inline constexpr CommandId Id = 0x00000004;
 } // namespace GetTwoDCartesianZoneResponse
+
 } // namespace Commands
 } // namespace ZoneManagement
 } // namespace Clusters

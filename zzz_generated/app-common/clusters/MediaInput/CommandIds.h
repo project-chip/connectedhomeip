@@ -14,15 +14,19 @@ namespace Commands {
 namespace SelectInput {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace SelectInput
+
 namespace ShowInputStatus {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace ShowInputStatus
+
 namespace HideInputStatus {
 inline constexpr CommandId Id = 0x00000002;
 } // namespace HideInputStatus
+
 namespace RenameInput {
 inline constexpr CommandId Id = 0x00000003;
 } // namespace RenameInput
+
 } // namespace Commands
 } // namespace MediaInput
 } // namespace Clusters

@@ -14,33 +14,43 @@ namespace Commands {
 namespace AddGroup {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace AddGroup
+
 namespace ViewGroup {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace ViewGroup
+
 namespace GetGroupMembership {
 inline constexpr CommandId Id = 0x00000002;
 } // namespace GetGroupMembership
+
 namespace RemoveGroup {
 inline constexpr CommandId Id = 0x00000003;
 } // namespace RemoveGroup
+
 namespace RemoveAllGroups {
 inline constexpr CommandId Id = 0x00000004;
 } // namespace RemoveAllGroups
+
 namespace AddGroupIfIdentifying {
 inline constexpr CommandId Id = 0x00000005;
 } // namespace AddGroupIfIdentifying
+
 namespace AddGroupResponse {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace AddGroupResponse
+
 namespace ViewGroupResponse {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace ViewGroupResponse
+
 namespace GetGroupMembershipResponse {
 inline constexpr CommandId Id = 0x00000002;
 } // namespace GetGroupMembershipResponse
+
 namespace RemoveGroupResponse {
 inline constexpr CommandId Id = 0x00000003;
 } // namespace RemoveGroupResponse
+
 } // namespace Commands
 } // namespace Groups
 } // namespace Clusters

@@ -14,21 +14,27 @@ namespace Commands {
 namespace SetUTCTime {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace SetUTCTime
+
 namespace SetTrustedTimeSource {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace SetTrustedTimeSource
+
 namespace SetTimeZone {
 inline constexpr CommandId Id = 0x00000002;
 } // namespace SetTimeZone
+
 namespace SetDSTOffset {
 inline constexpr CommandId Id = 0x00000004;
 } // namespace SetDSTOffset
+
 namespace SetDefaultNTP {
 inline constexpr CommandId Id = 0x00000005;
 } // namespace SetDefaultNTP
+
 namespace SetTimeZoneResponse {
 inline constexpr CommandId Id = 0x00000003;
 } // namespace SetTimeZoneResponse
+
 } // namespace Commands
 } // namespace TimeSynchronization
 } // namespace Clusters

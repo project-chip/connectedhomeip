@@ -14,15 +14,19 @@ namespace Commands {
 namespace GetTariffComponent {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace GetTariffComponent
+
 namespace GetDayEntry {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace GetDayEntry
+
 namespace GetTariffComponentResponse {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace GetTariffComponentResponse
+
 namespace GetDayEntryResponse {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace GetDayEntryResponse
+
 } // namespace Commands
 } // namespace CommodityTariff
 } // namespace Clusters

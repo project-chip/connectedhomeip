@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster SoftwareDiagnostics (cluster code: 52/0x34)
+// Identifier constant values for cluster SoftwareDiagnostics (cluster code: 52/0x0434)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

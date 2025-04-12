@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster FixedLabel (cluster code: 64/0x40)
+// Identifier constant values for cluster FixedLabel (cluster code: 64/0x0440)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

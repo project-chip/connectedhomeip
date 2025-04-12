@@ -14,9 +14,11 @@ namespace Commands {
 namespace SetCookingParameters {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace SetCookingParameters
+
 namespace AddMoreTime {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace AddMoreTime
+
 } // namespace Commands
 } // namespace MicrowaveOvenControl
 } // namespace Clusters

@@ -14,9 +14,11 @@ namespace Commands {
 namespace Reset {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace Reset
+
 namespace ModifyEnabledAlarms {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace ModifyEnabledAlarms
+
 } // namespace Commands
 } // namespace DishwasherAlarm
 } // namespace Clusters

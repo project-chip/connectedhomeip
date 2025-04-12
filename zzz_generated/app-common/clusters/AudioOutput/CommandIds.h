@@ -14,9 +14,11 @@ namespace Commands {
 namespace SelectOutput {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace SelectOutput
+
 namespace RenameOutput {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace RenameOutput
+
 } // namespace Commands
 } // namespace AudioOutput
 } // namespace Clusters

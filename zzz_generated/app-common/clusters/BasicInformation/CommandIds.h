@@ -14,6 +14,7 @@ namespace Commands {
 namespace MfgSpecificPing {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace MfgSpecificPing
+
 } // namespace Commands
 } // namespace BasicInformation
 } // namespace Clusters

@@ -14,21 +14,27 @@ namespace Commands {
 namespace KeySetWrite {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace KeySetWrite
+
 namespace KeySetRead {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace KeySetRead
+
 namespace KeySetRemove {
 inline constexpr CommandId Id = 0x00000003;
 } // namespace KeySetRemove
+
 namespace KeySetReadAllIndices {
 inline constexpr CommandId Id = 0x00000004;
 } // namespace KeySetReadAllIndices
+
 namespace KeySetReadResponse {
 inline constexpr CommandId Id = 0x00000002;
 } // namespace KeySetReadResponse
+
 namespace KeySetReadAllIndicesResponse {
 inline constexpr CommandId Id = 0x00000005;
 } // namespace KeySetReadAllIndicesResponse
+
 } // namespace Commands
 } // namespace GroupKeyManagement
 } // namespace Clusters

@@ -14,27 +14,35 @@ namespace Commands {
 namespace ChangeChannel {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace ChangeChannel
+
 namespace ChangeChannelByNumber {
 inline constexpr CommandId Id = 0x00000002;
 } // namespace ChangeChannelByNumber
+
 namespace SkipChannel {
 inline constexpr CommandId Id = 0x00000003;
 } // namespace SkipChannel
+
 namespace GetProgramGuide {
 inline constexpr CommandId Id = 0x00000004;
 } // namespace GetProgramGuide
+
 namespace RecordProgram {
 inline constexpr CommandId Id = 0x00000006;
 } // namespace RecordProgram
+
 namespace CancelRecordProgram {
 inline constexpr CommandId Id = 0x00000007;
 } // namespace CancelRecordProgram
+
 namespace ChangeChannelResponse {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace ChangeChannelResponse
+
 namespace ProgramGuideResponse {
 inline constexpr CommandId Id = 0x00000005;
 } // namespace ProgramGuideResponse
+
 } // namespace Commands
 } // namespace Channel
 } // namespace Clusters

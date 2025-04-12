@@ -14,30 +14,39 @@ namespace Commands {
 namespace MoveToLevel {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace MoveToLevel
+
 namespace Move {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace Move
+
 namespace Step {
 inline constexpr CommandId Id = 0x00000002;
 } // namespace Step
+
 namespace Stop {
 inline constexpr CommandId Id = 0x00000003;
 } // namespace Stop
+
 namespace MoveToLevelWithOnOff {
 inline constexpr CommandId Id = 0x00000004;
 } // namespace MoveToLevelWithOnOff
+
 namespace MoveWithOnOff {
 inline constexpr CommandId Id = 0x00000005;
 } // namespace MoveWithOnOff
+
 namespace StepWithOnOff {
 inline constexpr CommandId Id = 0x00000006;
 } // namespace StepWithOnOff
+
 namespace StopWithOnOff {
 inline constexpr CommandId Id = 0x00000007;
 } // namespace StopWithOnOff
+
 namespace MoveToClosestFrequency {
 inline constexpr CommandId Id = 0x00000008;
 } // namespace MoveToClosestFrequency
+
 } // namespace Commands
 } // namespace LevelControl
 } // namespace Clusters

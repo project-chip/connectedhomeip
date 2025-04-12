@@ -14,15 +14,19 @@ namespace Commands {
 namespace Offer {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace Offer
+
 namespace Answer {
 inline constexpr CommandId Id = 0x00000002;
 } // namespace Answer
+
 namespace ICECandidates {
 inline constexpr CommandId Id = 0x00000003;
 } // namespace ICECandidates
+
 namespace End {
 inline constexpr CommandId Id = 0x00000004;
 } // namespace End
+
 } // namespace Commands
 } // namespace WebRTCTransportRequestor
 } // namespace Clusters

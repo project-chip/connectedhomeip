@@ -14,12 +14,15 @@ namespace Commands {
 namespace Ping {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace Ping
+
 namespace AddArguments {
 inline constexpr CommandId Id = 0x00000002;
 } // namespace AddArguments
+
 namespace AddArgumentsResponse {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace AddArgumentsResponse
+
 } // namespace Commands
 } // namespace SampleMei
 } // namespace Clusters

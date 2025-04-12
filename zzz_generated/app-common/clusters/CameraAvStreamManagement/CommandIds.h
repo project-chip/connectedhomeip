@@ -14,45 +14,59 @@ namespace Commands {
 namespace AudioStreamAllocate {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace AudioStreamAllocate
+
 namespace AudioStreamDeallocate {
 inline constexpr CommandId Id = 0x00000002;
 } // namespace AudioStreamDeallocate
+
 namespace VideoStreamAllocate {
 inline constexpr CommandId Id = 0x00000003;
 } // namespace VideoStreamAllocate
+
 namespace VideoStreamModify {
 inline constexpr CommandId Id = 0x00000005;
 } // namespace VideoStreamModify
+
 namespace VideoStreamDeallocate {
 inline constexpr CommandId Id = 0x00000006;
 } // namespace VideoStreamDeallocate
+
 namespace SnapshotStreamAllocate {
 inline constexpr CommandId Id = 0x00000007;
 } // namespace SnapshotStreamAllocate
+
 namespace SnapshotStreamModify {
 inline constexpr CommandId Id = 0x00000009;
 } // namespace SnapshotStreamModify
+
 namespace SnapshotStreamDeallocate {
 inline constexpr CommandId Id = 0x0000000A;
 } // namespace SnapshotStreamDeallocate
+
 namespace SetStreamPriorities {
 inline constexpr CommandId Id = 0x0000000B;
 } // namespace SetStreamPriorities
+
 namespace CaptureSnapshot {
 inline constexpr CommandId Id = 0x0000000C;
 } // namespace CaptureSnapshot
+
 namespace AudioStreamAllocateResponse {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace AudioStreamAllocateResponse
+
 namespace VideoStreamAllocateResponse {
 inline constexpr CommandId Id = 0x00000004;
 } // namespace VideoStreamAllocateResponse
+
 namespace SnapshotStreamAllocateResponse {
 inline constexpr CommandId Id = 0x00000008;
 } // namespace SnapshotStreamAllocateResponse
+
 namespace CaptureSnapshotResponse {
 inline constexpr CommandId Id = 0x0000000D;
 } // namespace CaptureSnapshotResponse
+
 } // namespace Commands
 } // namespace CameraAvStreamManagement
 } // namespace Clusters

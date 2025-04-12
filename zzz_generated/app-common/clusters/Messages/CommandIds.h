@@ -14,9 +14,11 @@ namespace Commands {
 namespace PresentMessagesRequest {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace PresentMessagesRequest
+
 namespace CancelMessagesRequest {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace CancelMessagesRequest
+
 } // namespace Commands
 } // namespace Messages
 } // namespace Clusters

@@ -14,9 +14,11 @@ namespace Commands {
 namespace Boost {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace Boost
+
 namespace CancelBoost {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace CancelBoost
+
 } // namespace Commands
 } // namespace WaterHeaterManagement
 } // namespace Clusters

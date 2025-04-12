@@ -14,60 +14,79 @@ namespace Commands {
 namespace MoveToHue {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace MoveToHue
+
 namespace MoveHue {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace MoveHue
+
 namespace StepHue {
 inline constexpr CommandId Id = 0x00000002;
 } // namespace StepHue
+
 namespace MoveToSaturation {
 inline constexpr CommandId Id = 0x00000003;
 } // namespace MoveToSaturation
+
 namespace MoveSaturation {
 inline constexpr CommandId Id = 0x00000004;
 } // namespace MoveSaturation
+
 namespace StepSaturation {
 inline constexpr CommandId Id = 0x00000005;
 } // namespace StepSaturation
+
 namespace MoveToHueAndSaturation {
 inline constexpr CommandId Id = 0x00000006;
 } // namespace MoveToHueAndSaturation
+
 namespace MoveToColor {
 inline constexpr CommandId Id = 0x00000007;
 } // namespace MoveToColor
+
 namespace MoveColor {
 inline constexpr CommandId Id = 0x00000008;
 } // namespace MoveColor
+
 namespace StepColor {
 inline constexpr CommandId Id = 0x00000009;
 } // namespace StepColor
+
 namespace MoveToColorTemperature {
 inline constexpr CommandId Id = 0x0000000A;
 } // namespace MoveToColorTemperature
+
 namespace EnhancedMoveToHue {
 inline constexpr CommandId Id = 0x00000040;
 } // namespace EnhancedMoveToHue
+
 namespace EnhancedMoveHue {
 inline constexpr CommandId Id = 0x00000041;
 } // namespace EnhancedMoveHue
+
 namespace EnhancedStepHue {
 inline constexpr CommandId Id = 0x00000042;
 } // namespace EnhancedStepHue
+
 namespace EnhancedMoveToHueAndSaturation {
 inline constexpr CommandId Id = 0x00000043;
 } // namespace EnhancedMoveToHueAndSaturation
+
 namespace ColorLoopSet {
 inline constexpr CommandId Id = 0x00000044;
 } // namespace ColorLoopSet
+
 namespace StopMoveStep {
 inline constexpr CommandId Id = 0x00000047;
 } // namespace StopMoveStep
+
 namespace MoveColorTemperature {
 inline constexpr CommandId Id = 0x0000004B;
 } // namespace MoveColorTemperature
+
 namespace StepColorTemperature {
 inline constexpr CommandId Id = 0x0000004C;
 } // namespace StepColorTemperature
+
 } // namespace Commands
 } // namespace ColorControl
 } // namespace Clusters

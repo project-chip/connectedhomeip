@@ -14,9 +14,11 @@ namespace Commands {
 namespace NetworkPassphraseRequest {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace NetworkPassphraseRequest
+
 namespace NetworkPassphraseResponse {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace NetworkPassphraseResponse
+
 } // namespace Commands
 } // namespace WiFiNetworkManagement
 } // namespace Clusters

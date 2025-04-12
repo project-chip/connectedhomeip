@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster WaterHeaterMode (cluster code: 158/0x9E)
+// Identifier constant values for cluster WaterHeaterMode (cluster code: 158/0x049E)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

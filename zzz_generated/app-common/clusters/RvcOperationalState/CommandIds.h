@@ -14,15 +14,19 @@ namespace Commands {
 namespace Pause {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace Pause
+
 namespace Resume {
 inline constexpr CommandId Id = 0x00000003;
 } // namespace Resume
+
 namespace GoHome {
 inline constexpr CommandId Id = 0x00000080;
 } // namespace GoHome
+
 namespace OperationalCommandResponse {
 inline constexpr CommandId Id = 0x00000004;
 } // namespace OperationalCommandResponse
+
 } // namespace Commands
 } // namespace RvcOperationalState
 } // namespace Clusters

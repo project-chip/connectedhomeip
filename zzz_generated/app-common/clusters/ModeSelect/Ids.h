@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster ModeSelect (cluster code: 80/0x50)
+// Identifier constant values for cluster ModeSelect (cluster code: 80/0x0450)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

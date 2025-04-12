@@ -14,6 +14,7 @@ namespace Commands {
 namespace SelfTestRequest {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace SelfTestRequest
+
 } // namespace Commands
 } // namespace SmokeCoAlarm
 } // namespace Clusters
