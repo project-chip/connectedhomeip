@@ -26,23 +26,17 @@ using namespace chip::app::Clusters::ClosureControl;
 
 using Protocols::InteractionModel::Status;
 
+namespace {
+    
 // Mock Error List generated for sample application usage.
 const ClosureErrorEnum kCurrentErrorList[] = {
-    {
         ClosureErrorEnum::kBlocked,
-    },
-    {
         ClosureErrorEnum::kInternalInterference,
-    },
-    {
         ClosureErrorEnum::kMaintenanceRequired,
-    },
-    {
         ClosureErrorEnum::kTemperatureLimited,
-    },
 };
 
-PositioningEnum getStatePositionFromTarget(TargetPositionEnum tagPosition)
+PositioningEnum GetStatePositionFromTarget(TargetPositionEnum tagPosition)
 {
     switch (tagPosition)
     {
@@ -61,6 +55,8 @@ PositioningEnum getStatePositionFromTarget(TargetPositionEnum tagPosition)
     }
     return PositioningEnum::kUnknownEnumValue;
 }
+
+} //namespace
 
 void ClosureControlManager::SetClosureControlInstance(ClosureControl::Instance & instance)
 {
@@ -82,7 +78,7 @@ DataModel::Nullable<uint32_t> ClosureControlManager::GetCountdownTime()
     return DataModel::NullNullable;
 }
 
-// Return default value, will add attribute handling in next phase
+// TODO: try to Single API for start , read and end
 CHIP_ERROR ClosureControlManager::StartCurrentErrorListRead()
 {
     // Notify device that errorlist is being read and data should locked
@@ -139,7 +135,7 @@ Protocols::InteractionModel::Status ClosureControlManager::MoveTo(const Optional
             // TODO: change target for motion
         }
 
-        overallState.positioning.SetValue(getStatePositionFromTarget(tag.Value()));
+        overallState.positioning.SetValue(GetStatePositionFromTarget(tag.Value()));
     }
 
     if (latch.HasValue())

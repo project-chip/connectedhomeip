@@ -46,7 +46,6 @@ void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attrib
                         ChipLogValueMEI(attributePath.mAttributeId), type, *value, size);
         break;
     default:
-        ChipLogProgress(NotSpecified, "Unhandled cluster ID: 0x%04lx", attributePath.mClusterId);
         break;
     }
 }

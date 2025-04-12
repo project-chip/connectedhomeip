@@ -54,8 +54,6 @@
 namespace {
 
 constexpr chip::EndpointId kClosureEndpoint       = 1;
-constexpr chip::EndpointId kClosurePanelEndpoint1 = 2;
-constexpr chip::EndpointId kClosurePanelEndpoint2 = 3;
 
 } // namespace
 
@@ -81,11 +79,13 @@ AppTask AppTask::sAppTask;
 
 void ApplicationInit()
 {
+    
+    ChipLogDetail(AppServer, "==================================================");
+    ChipLogDetail(AppServer,"Closure-app ClosureControl starting for endpoint EP%d", kClosureEndpoint);
+    ChipLogDetail(AppServer,"==================================================");
+    
     chip::DeviceLayer::PlatformMgr().LockChipStack();
-    SILABS_LOG("==================================================");
-    SILABS_LOG("Closure-app ClosureControl starting for endpoint EP%d", kClosureEndpoint);
     ClosureControlInit(kClosureEndpoint);
-    SILABS_LOG("==================================================");
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 }
 
@@ -138,11 +138,11 @@ void AppTask::AppTaskMain(void * pvParameter)
     CHIP_ERROR err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
     {
-        SILABS_LOG("AppTask.Init() failed");
+        ChipLogError(AppServer,"AppTask.Init() failed");
         appError(err);
     }
 
-    SILABS_LOG("App Task started");
+    ChipLogDetail(AppServer,"App Task started");
 
     while (true)
     {

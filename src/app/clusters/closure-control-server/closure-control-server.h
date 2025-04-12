@@ -72,7 +72,7 @@ public:
     virtual CHIP_ERROR EndCurrentErrorListRead()                              = 0;
 
 protected:
-    EndpointId mEndpointId = chip::kInvalidEndpointId;
+    EndpointId mEndpointId = kInvalidEndpointId;
 };
 
 enum class OptionalAttribute : uint32_t
@@ -166,12 +166,12 @@ public:
     bool IsSupportedState(MainStateEnum aMainState);
 
     /**
-     * @brief This function checks if specifc command is supported on specific state or not.
-     * @param[in] cmd Command to be supported.
-     * @param[in] state MainState on which command should be supported.
-     * @return true if command is supported on specific state, false if not supported.
+     * @brief This function checks whether a specfic command is supported in specific state or not.
+     * @param[in] cmd Command to be check.
+     * @param[in] state MainState in which command should be supported.
+     * @return true if cmd is supported in state, false if not supported.
      */
-    bool CheckCommandStateCompatiblilty(CommandId cmd, MainStateEnum state);
+    bool CheckCommandStateCompatibility(CommandId cmd, MainStateEnum state);
 
     /**
      * Reports that the contents of the current error list has changed.
@@ -213,11 +213,11 @@ private:
     // CommandHandlerInterface
     void InvokeCommand(HandlerContext & handlerContext) override;
 
-    chip::Protocols::InteractionModel::Status HandleStop(HandlerContext & ctx, const Commands::Stop::DecodableType & commandData);
-    chip::Protocols::InteractionModel::Status HandleMoveTo(HandlerContext & ctx,
-                                                           const Commands::MoveTo::DecodableType & commandData);
-    chip::Protocols::InteractionModel::Status HandleCalibrate(HandlerContext & ctx,
-                                                              const Commands::Calibrate::DecodableType & commandData);
+    Protocols::InteractionModel::Status HandleStop(HandlerContext & ctx, const Commands::Stop::DecodableType & commandData);
+    Protocols::InteractionModel::Status HandleMoveTo(HandlerContext & ctx,
+                                                        const Commands::MoveTo::DecodableType & commandData);
+    Protocols::InteractionModel::Status HandleCalibrate(HandlerContext & ctx,
+                                                            const Commands::Calibrate::DecodableType & commandData);
 };
 
 } // namespace ClosureControl

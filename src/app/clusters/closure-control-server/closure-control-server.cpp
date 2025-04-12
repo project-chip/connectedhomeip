@@ -78,7 +78,7 @@ bool Instance::IsSupportedState(MainStateEnum aMainState)
     return true;
 }
 
-bool Instance::CheckCommandStateCompatiblilty(CommandId cmd, MainStateEnum state)
+bool Instance::CheckCommandStateCompatibility(CommandId cmd, MainStateEnum state)
 {
     if ((state == MainStateEnum::kDisengaged) || (state == MainStateEnum::kProtected) || (state == MainStateEnum::kSetupRequired))
     {
@@ -88,10 +88,24 @@ bool Instance::CheckCommandStateCompatiblilty(CommandId cmd, MainStateEnum state
     switch (cmd)
     {
     case Commands::Stop::Id:
-        VerifyOrReturnValue(state == MainStateEnum::kError, true);
+        if (state == MainStateEnum::kError) 
+        {
+            return false;  
+        } 
+        else
+        {
+            return true;
+        }
         break;
     case Commands::MoveTo::Id:
-        VerifyOrReturnValue(state == MainStateEnum::kCalibrating, true);
+        if (state == MainStateEnum::kCalibrating)
+        {
+            return false;
+        }
+        else
+        {
+            return true;    
+        }
         break;
     case Commands::Calibrate::Id:
         if ((state == MainStateEnum::kMoving) || (state == MainStateEnum::kWaitingForMotion))
@@ -248,6 +262,12 @@ CHIP_ERROR Instance::EncodeCurrentErrorList(const AttributeValueEncoder::ListEnc
 
         // Check if another error occurred before trying to encode
         SuccessOrExit(err);
+        
+        // Encode the error 
+        err = encoder.Encode(error);
+        
+        // Check if another error occurred before trying to encode
+        SuccessOrExit(err);
     }
 
 exit:
@@ -318,7 +338,7 @@ Status Instance::HandleStop(HandlerContext & ctx, const Commands::Stop::Decodabl
 
     Status status = Status::Failure;
 
-    VerifyOrReturnValue(CheckCommandStateCompatiblilty(Commands::Stop::Id, state), Status::InvalidInState);
+    VerifyOrReturnValue(CheckCommandStateCompatibility(Commands::Stop::Id, state), Status::InvalidInState);
     if (state == MainStateEnum::kStopped)
     {
         return Status::Success;
@@ -336,7 +356,7 @@ Status Instance::HandleStop(HandlerContext & ctx, const Commands::Stop::Decodabl
 Status Instance::HandleMoveTo(HandlerContext & ctx, const Commands::MoveTo::DecodableType & commandData)
 {
     MainStateEnum state = GetMainState();
-    VerifyOrReturnValue(CheckCommandStateCompatiblilty(Commands::Stop::Id, state), Status::InvalidInState);
+    VerifyOrReturnValue(CheckCommandStateCompatibility(Commands::Stop::Id, state), Status::InvalidInState);
     return mDelegate.MoveTo(commandData.position, commandData.latch, commandData.speed);
 }
 
@@ -344,7 +364,7 @@ Status Instance::HandleCalibrate(HandlerContext & ctx, const Commands::Calibrate
 {
     MainStateEnum state = GetMainState();
     Status status       = Status::Failure;
-    VerifyOrReturnValue(CheckCommandStateCompatiblilty(Commands::Calibrate::Id, state), Status::InvalidInState);
+    VerifyOrReturnValue(CheckCommandStateCompatibility(Commands::Calibrate::Id, state), Status::InvalidInState);
 
     if (state == MainStateEnum::kCalibrating)
     {
