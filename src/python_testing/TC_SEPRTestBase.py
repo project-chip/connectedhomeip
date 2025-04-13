@@ -22,7 +22,6 @@ from chip.clusters import Globals
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing import matter_asserts
-
 from mobly import asserts
 
 logger = logging.getLogger(__name__)

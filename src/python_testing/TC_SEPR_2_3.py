@@ -46,9 +46,8 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, EventChangeCallback, async_test_body, default_matter_test_main
 from chip.testing import matter_asserts
-
+from chip.testing.matter_testing import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from TC_SEPRTestBase import CommodityPriceTestBaseHelper
 
 logger = logging.getLogger(__name__)
