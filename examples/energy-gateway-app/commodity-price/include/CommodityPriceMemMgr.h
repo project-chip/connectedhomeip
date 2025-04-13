@@ -20,14 +20,14 @@
 
  #include <app/clusters/commodity-price-server/commodity-price-server.h>
  #include <lib/core/CHIPError.h>
- 
+
  #include <app-common/zap-generated/cluster-objects.h>
- 
+
  namespace chip {
  namespace app {
  namespace Clusters {
  namespace CommodityPrice {
- 
+
  /*
   * The PriceForecast data structure defined as:
   *
@@ -85,13 +85,13 @@
   * PriceForecastMemMgr destructor is called.
   *
   */
- 
+
  class PriceForecastMemMgr
  {
  public:
      PriceForecastMemMgr();
      ~PriceForecastMemMgr();
- 
+
      /**
       * @brief This method prepares a new price entry. Subsequent calls to
       *        GetPriceComponents and the AllocAndCopy methods below will
@@ -100,7 +100,7 @@
       * @param priceEntryIdx  - The new price entry index
       */
      void PreparePriceEntry(uint16_t priceEntryIdx);
- 
+
      /**
       * @brief Called as each individual price component is loaded.
       *
@@ -108,14 +108,14 @@
       *                    current priceEntry
       */
      void AddPriceComponent(const CommodityPrice::Structs::CommodityPriceComponentStruct::Type & component);
- 
+
      /**
       * @brief Called to allocate and copy the priceComponent added via
       *        AddPriceComponent into the current price entry as set by
       *        PreparePriceEntry().
       */
      CHIP_ERROR AllocAndCopy();
- 
+
      /**
       * @brief Called to allocate and copy the priceComponent list into the
       *        current price entry as set set by PreparePriceEntry(). If an
@@ -127,7 +127,7 @@
       *                           day schedule
       */
      CHIP_ERROR AllocAndCopy(const DataModel::List<const Structs::CommodityPriceComponentStruct::Type> & priceComponents);
- 
+
      /**
       * @brief Called to allocate and copy the priceComponent list into the
       *        current price entry as set set by PreparePriceEntry().
@@ -136,7 +136,7 @@
       *                           day schedule
       */
      CHIP_ERROR AllocAndCopy(const DataModel::DecodableList<Structs::CommodityPriceComponentStruct::DecodableType> & priceComponents);
- 
+
      /**
       * @brief Returns the list of priceComponents associated with the current price
       * entry.
@@ -145,23 +145,22 @@
       * entry.
       */
      CommodityPrice::Structs::CommodityPriceComponentStruct::Type * GetPriceComponents() const;
- 
+
      /**
       * @brief Returns the number of priceComponents associated with current price entry.
       *
       * @return Returns the number of priceComponents associated with current price entry.
       */
      uint16_t GetNumPriceComponents() const;
- 
+
  private:
      CommodityPrice::Structs::CommodityPriceComponentStruct::Type * mpListOfPriceEntries[kMaxCommodityPriceEntries];
      CommodityPrice::Structs::CommodityPriceComponentStruct::Type mPriceComponents[kMaxComponentsPerPriceEntry];
      uint16_t mPriceEntryIdx;
      uint16_t mNumPriceComponents;
  };
- 
+
  } // namespace CommodityPrice
  } // namespace Clusters
  } // namespace app
  } // namespace chip
- 
