@@ -49,13 +49,16 @@ import time
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, EventChangeCallback, async_test_body, default_matter_test_main
 from mobly import asserts
+
+from TC_SEPRTestBase import CommodityPriceTestBaseHelper
 
 logger = logging.getLogger(__name__)
 
+cluster = Clusters.CommodityPrice
 
-class TC_SEPR_2_3(MatterBaseTest):
+class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
     """Implementation of test case TC_SEPR_2_3."""
 
     def desc_TC_SEPR_2_3(self) -> str:
@@ -77,7 +80,7 @@ class TC_SEPR_2_3(MatterBaseTest):
             TestStep("2", "Set up a subscription to all CommodityPrice cluster events"),
             TestStep("3", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
                      "Value has to be 1 (True)"),
-            TestStep("4", "TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to True, and Components set to False. a",
+            TestStep("4", "TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to True, and Components set to False.",
                      """Verify that the DUT response contains GetDetailedForecastResponse with a list of CommodityPriceStruct entries (it may be empty) and shall have not more than 56 entries.
                         For each entry in the list:
                         - except for the first list entry, verify that the PeriodStart is greater than the PeriodEnd of the previous list entry.
@@ -86,7 +89,7 @@ class TC_SEPR_2_3(MatterBaseTest):
                         - verify that either or both of Price, PriceLevel are not null.
                         - verify that the Description which is a string with max length of 32.
                         - verify that the Components list is not included."""),
-            TestStep("5", "TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to False and Components set to True. a",
+            TestStep("5", "TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to False and Components set to True.",
                      """Verify that the DUT response contains GetDetailedForecastResponse with a list of CommodityPriceStruct entries (it may be empty) and shall have not more than 56 entries.
                         For each entry in the list:
                         - except for the first list entry, verify that the PeriodStart is greater than the PeriodEnd of the list entry.
@@ -108,11 +111,32 @@ class TC_SEPR_2_3(MatterBaseTest):
     async def test_TC_SEPR_2_3(self):
         # pylint: disable=too-many-locals, too-many-statements
         """Run the test steps."""
+        endpoint = self.get_endpoint()
+
         self.step("1")
         # Commission DUT - already done
 
         self.step("2")
+        events_callback = EventChangeCallback(cluster)
+        await events_callback.start(self.default_controller,
+                                    self.dut_node_id,
+                                    endpoint)
 
+        self.step("3")
+        # TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster
+        await self.check_test_event_triggers_enabled()
+
+        self.step("4")
+        # TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to True, and Components set to False.
+        val = await self.send_get_detailed_forecast_request(details=cluster.Bitmaps.CommodityPriceDetailBitmap.kDescription)
+
+        # Verify that the DUT response contains GetDetailedForecastResponse with a
+        # list of CommodityPriceStruct entries (it may be empty) and shall have not more than 56 entries.
+        matter_asserts.assert_list(val, "PriceForecast must return a list")
+
+        # if val is not NullValue:
+        #     asserts.assert_true(isinstance(
+        #         val, cluster.Structs.CommodityPriceStruct), "val must be of type CommodityPriceStruct")
 
 if __name__ == "__main__":
     default_matter_test_main()

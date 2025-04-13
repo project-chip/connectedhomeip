@@ -106,10 +106,27 @@ class CommodityPriceTestBaseHelper:
         if struct.tariffComponentId is not None:
             matter_asserts.assert_valid_uint32(struct.tariffComponentID, 'TariffComponentID')
 
-    async def send_get_detailed_price_request(self, endpoint: int = None, details: Clusters.CommodityPrice.Bitmaps = 0, timedRequestTimeoutMs: int = 3000,
+
+    async def send_get_detailed_price_request(self, endpoint: int = None, details: Clusters.CommodityPrice.Bitmaps = 0,
+                                         timedRequestTimeoutMs: int = 3000,
                                          expected_status: Status = Status.Success):
         try:
             result = await self.send_single_cmd(cmd=Clusters.CommodityPrice.Commands.GetDetailedPriceRequest(
+                details=details),
+                endpoint=endpoint,
+                timedRequestTimeoutMs=timedRequestTimeoutMs)
+
+            return result
+
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status,
+                                 "Unexpected error returned")
+
+    async def send_get_detailed_forecast_request(self, endpoint: int = None, details: Clusters.CommodityPrice.Bitmaps = 0,
+                                         timedRequestTimeoutMs: int = 3000,
+                                         expected_status: Status = Status.Success):
+        try:
+            result = await self.send_single_cmd(cmd=Clusters.CommodityPrice.Commands.GetDetailedForecastRequest(
                 details=details),
                 endpoint=endpoint,
                 timedRequestTimeoutMs=timedRequestTimeoutMs)

@@ -120,7 +120,7 @@ class TC_SEPR_2_2(CommodityPriceTestBaseHelper, MatterBaseTest):
         # Commission DUT - already done
 
         self.step("2")
-        events_callback = EventChangeCallback(Clusters.CommodityPrice)
+        events_callback = EventChangeCallback(cluster)
         await events_callback.start(self.default_controller,
                                     self.dut_node_id,
                                     endpoint)
@@ -131,10 +131,10 @@ class TC_SEPR_2_2(CommodityPriceTestBaseHelper, MatterBaseTest):
 
         self.step("4")
         # TH sends command GetDetailedPriceRequest with Details=CommodityPriceDetailBitmap.Description set to True, and Components set to False.
-        result = await self.send_get_detailed_price_request(details=Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap.kDescription)
+        val = await self.send_get_detailed_price_request(details=cluster.Bitmaps.CommodityPriceDetailBitmap.kDescription)
 
         # Verify that the DUT response contains GetDetailedPriceResponse with CurrentPrice is a CommodityPriceStruct or is null.
-        if result is not NullValue:
+        if val is not NullValue:
             asserts.assert_true(isinstance(
                 val, cluster.Structs.CommodityPriceStruct), "val must be of type CommodityPriceStruct")
             
@@ -146,7 +146,7 @@ class TC_SEPR_2_2(CommodityPriceTestBaseHelper, MatterBaseTest):
             # - verify that the Description is a string with max length of 32.
             # - verify that the Components list is not included
 
-        print(result)
+        print(val)
        
 
 
