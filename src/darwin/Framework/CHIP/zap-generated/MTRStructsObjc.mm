@@ -5198,7 +5198,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _price = @(0);
+        _price = nil;
+
+        _priceLevel = nil;
 
         _source = @(0);
 
@@ -5214,6 +5216,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRCommodityPriceClusterCommodityPriceComponentStruct alloc] init];
 
     other.price = self.price;
+    other.priceLevel = self.priceLevel;
     other.source = self.source;
     other.descriptionString = self.descriptionString;
     other.tariffComponentID = self.tariffComponentID;
@@ -5223,7 +5226,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: price:%@; source:%@; descriptionString:%@; tariffComponentID:%@; >", NSStringFromClass([self class]), _price, _source, _descriptionString, _tariffComponentID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: price:%@; priceLevel:%@; source:%@; descriptionString:%@; tariffComponentID:%@; >", NSStringFromClass([self class]), _price, _priceLevel, _source, _descriptionString, _tariffComponentID];
     return descriptionString;
 }
 
@@ -5238,7 +5241,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _periodEnd = nil;
 
-        _price = [MTRDataTypePriceStruct new];
+        _price = nil;
+
+        _priceLevel = nil;
 
         _descriptionString = nil;
 
@@ -5254,6 +5259,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.periodStart = self.periodStart;
     other.periodEnd = self.periodEnd;
     other.price = self.price;
+    other.priceLevel = self.priceLevel;
     other.descriptionString = self.descriptionString;
     other.components = self.components;
 
@@ -5262,7 +5268,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: periodStart:%@; periodEnd:%@; price:%@; descriptionString:%@; components:%@; >", NSStringFromClass([self class]), _periodStart, _periodEnd, _price, _descriptionString, _components];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: periodStart:%@; periodEnd:%@; price:%@; priceLevel:%@; descriptionString:%@; components:%@; >", NSStringFromClass([self class]), _periodStart, _periodEnd, _price, _priceLevel, _descriptionString, _components];
     return descriptionString;
 }
 
@@ -5273,7 +5279,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _currentPrice = [MTRCommodityPriceClusterCommodityPriceStruct new];
+        _currentPrice = nil;
     }
     return self;
 }
@@ -5300,7 +5306,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _priceForecast = [NSArray array];
+        _priceForecast = nil;
     }
     return self;
 }
