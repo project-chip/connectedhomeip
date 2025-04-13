@@ -23002,13 +23002,15 @@ class CommodityPrice(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="price", Tag=0, Type=int),
-                        ClusterObjectFieldDescriptor(Label="source", Tag=1, Type=Globals.Enums.TariffPriceTypeEnum),
-                        ClusterObjectFieldDescriptor(Label="description", Tag=2, Type=typing.Optional[str]),
-                        ClusterObjectFieldDescriptor(Label="tariffComponentID", Tag=3, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="price", Tag=0, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="priceLevel", Tag=1, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="source", Tag=2, Type=Globals.Enums.TariffPriceTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="description", Tag=3, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="tariffComponentID", Tag=4, Type=typing.Optional[uint]),
                     ])
 
-            price: 'int' = 0
+            price: 'typing.Optional[int]' = None
+            priceLevel: 'typing.Optional[int]' = None
             source: 'Globals.Enums.TariffPriceTypeEnum' = 0
             description: 'typing.Optional[str]' = None
             tariffComponentID: 'typing.Optional[uint]' = None
@@ -23021,14 +23023,16 @@ class CommodityPrice(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="periodStart", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="periodEnd", Tag=1, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="price", Tag=2, Type=Globals.Structs.PriceStruct),
-                        ClusterObjectFieldDescriptor(Label="description", Tag=3, Type=typing.Optional[str]),
-                        ClusterObjectFieldDescriptor(Label="components", Tag=4, Type=typing.Optional[typing.List[CommodityPrice.Structs.CommodityPriceComponentStruct]]),
+                        ClusterObjectFieldDescriptor(Label="price", Tag=2, Type=typing.Optional[Globals.Structs.PriceStruct]),
+                        ClusterObjectFieldDescriptor(Label="priceLevel", Tag=3, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="description", Tag=4, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="components", Tag=5, Type=typing.Optional[typing.List[CommodityPrice.Structs.CommodityPriceComponentStruct]]),
                     ])
 
             periodStart: 'uint' = 0
             periodEnd: 'typing.Union[Nullable, uint]' = NullValue
-            price: 'Globals.Structs.PriceStruct' = field(default_factory=lambda: Globals.Structs.PriceStruct())
+            price: 'typing.Optional[Globals.Structs.PriceStruct]' = None
+            priceLevel: 'typing.Optional[int]' = None
             description: 'typing.Optional[str]' = None
             components: 'typing.Optional[typing.List[CommodityPrice.Structs.CommodityPriceComponentStruct]]' = None
 
@@ -23257,10 +23261,10 @@ class CommodityPrice(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="currentPrice", Tag=0, Type=CommodityPrice.Structs.CommodityPriceStruct),
+                        ClusterObjectFieldDescriptor(Label="currentPrice", Tag=0, Type=typing.Union[Nullable, CommodityPrice.Structs.CommodityPriceStruct]),
                     ])
 
-            currentPrice: CommodityPrice.Structs.CommodityPriceStruct = field(default_factory=lambda: CommodityPrice.Structs.CommodityPriceStruct())
+            currentPrice: typing.Union[Nullable, CommodityPrice.Structs.CommodityPriceStruct] = NullValue
 
         @dataclass
         class ForecastChange(ClusterEvent):
@@ -23276,10 +23280,10 @@ class CommodityPrice(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="priceForecast", Tag=0, Type=typing.List[CommodityPrice.Structs.CommodityPriceStruct]),
+                        ClusterObjectFieldDescriptor(Label="priceForecast", Tag=0, Type=typing.Union[Nullable, typing.List[CommodityPrice.Structs.CommodityPriceStruct]]),
                     ])
 
-            priceForecast: typing.List[CommodityPrice.Structs.CommodityPriceStruct] = field(default_factory=lambda: [])
+            priceForecast: typing.Union[Nullable, typing.List[CommodityPrice.Structs.CommodityPriceStruct]] = NullValue
 
 
 @dataclass
