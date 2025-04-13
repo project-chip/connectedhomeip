@@ -79,7 +79,7 @@ class TC_SEPR_2_1(MatterBaseTest):
         steps = [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)."),
             TestStep("2", "TH reads from the DUT the TariffUnit attribute.",
-                     "Verify that the DUT response contains an enum8 value."),
+                     "Verify that the DUT response contains a TariffUnitEnum value."),
             TestStep("3", "TH reads from the DUT the Currency attribute.",
                      "Verify that the DUT response contains either null or a CurrencyStruct value."),
             TestStep("4", "TH reads from the DUT the CurrentPrice attribute.",

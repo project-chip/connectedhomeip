@@ -78,22 +78,27 @@ class TC_SEPR_2_3(MatterBaseTest):
             TestStep("3", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
                      "Value has to be 1 (True)"),
             TestStep("4", "TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to True, and Components set to False. a",
-                     """Verify that the DUT response contains GetDetailedForecastResponse with a list of CommodityPriceStruct entries (it may be empty) and shall have not more than 96 entries.
+                     """Verify that the DUT response contains GetDetailedForecastResponse with a list of CommodityPriceStruct entries (it may be empty) and shall have not more than 56 entries.
                         For each entry in the list:
                         - except for the first list entry, verify that the PeriodStart is greater than the PeriodEnd of the previous list entry.
-                        - verify that the Price is a PriceStruct with a valid Amount as a signed integer and Currency which contains a CurrencyStruct with a valid Currency. Currency (unsigned integer max 999) and Currency.DecimalPoints.
+                        - verify that the Price is null or a PriceStruct with a valid Amount as a signed integer and Currency which contains a CurrencyStruct with a valid Currency. Currency (unsigned integer max 999) and Currency.DecimalPoints.
+                        - verify that the PriceLevel is null or a valid signed integer.
+                        - verify that either or both of Price, PriceLevel are not null.
                         - verify that the Description which is a string with max length of 32.
                         - verify that the Components list is not included."""),
             TestStep("5", "TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to False and Components set to True. a",
-                     """Verify that the DUT response contains GetDetailedForecastResponse with a list of CommodityPriceStruct entries (it may be empty) and shall have not more than 96 entries.
+                     """Verify that the DUT response contains GetDetailedForecastResponse with a list of CommodityPriceStruct entries (it may be empty) and shall have not more than 56 entries.
                         For each entry in the list:
                         - except for the first list entry, verify that the PeriodStart is greater than the PeriodEnd of the list entry.
-                        - verify that the Price is a PriceStruct with a valid Amount as a signed integer and Currency which contains a CurrencyStruct with a valid Currency. Currency (unsigned integer max 999) and Currency.DecimalPoints.
+                        - verify that the Price is null or a PriceStruct with a valid Amount as a signed integer and Currency which contains a CurrencyStruct with a valid Currency. Currency (unsigned integer max 999) and Currency.DecimalPoints.
+                        - verify that the PriceLevel is null or a valid signed integer.
+                        - verify that either or both of Price, PriceLevel are not null.
                         - verify that the Description field is not included.
-                        - verify that the Components field is included. It may be an empty list but shall have no more than 10 entries. Each entry shall have a valid value of Price, Source (a valid TariffPriceTypeEnum), it may include an optional Description (a string of max length 32) and may include an optional TariffComponentID (unsigned integer value)."""),
+                        - verify that the Components field is included. It may be an empty list but shall have no more than 10 entries.
+                            Each entry shall have a valid value of Price (money) or PriceLevel (signed int16) or both, Source (a valid TariffPriceTypeEnum), it may include an optional Description (a string of max length 32) and may include an optional TariffComponentID (unsigned integer value)."""),
             TestStep("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.SEPR.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.SEPR.TESTEVENTTRIGGER for Forecast Update Test Event",
                      "Verify DUT responds w/ status SUCCESS(0x00) and event SEPR.S.E0001(ForecastChange) sent. Store the event's PriceForecast field as NewForecast."),
-            TestStep("6a", "",
+            TestStep("6a", "TH reads PriceForecast attribute.",
                      "Verify that the DUT response contains a list of  CommodityPriceStruct (or empty). Verify that the list matches the NewForecast from step 6."),
         ]
 
