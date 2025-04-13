@@ -44,13 +44,10 @@
 
 
 import logging
-import sys
-import time
 
 import chip.clusters as Clusters
-from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, EventChangeCallback, async_test_body, default_matter_test_main
-from mobly import asserts
+from chip.testing import matter_asserts
 
 from TC_SEPRTestBase import CommodityPriceTestBaseHelper
 

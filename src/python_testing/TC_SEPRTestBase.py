@@ -16,7 +16,6 @@
 
 
 import logging
-import typing
 
 import chip.clusters as Clusters
 from chip.clusters import Globals
@@ -39,18 +38,18 @@ class CommodityPriceTestBaseHelper:
         if struct.periodEnd is not NullValue:
             matter_asserts.assert_valid_uint32(struct.periodEnd, 'PeriodEnd')
 
-        bPriceIncluded = false
-        bPriceLevelIncluded = false
+        bPriceIncluded = False
+        bPriceLevelIncluded = False
 
         if struct.price is not NullValue:
             asserts.assert_true(isinstance(
                 struct.price, Globals.Structs.PriceStruct), "struct.price must be of type PriceStruct")
             await self.test_checkPriceStruct(endpoint=endpoint, cluster=cluster, struct=struct.price)
-            bPriceIncluded = true
+            bPriceIncluded = True
 
         if struct.priceLevel is not NullValue:
             matter_asserts.assert_valid_int16(struct.priceLevel, 'PriceLevel')
-            bPriceLevelIncluded = true
+            bPriceLevelIncluded = True
         
         asserts.assert_true(bPriceIncluded or bPriceLevelIncluded, "Either Price or PriceLevel must be included")
 
