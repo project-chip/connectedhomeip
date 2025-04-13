@@ -55,6 +55,7 @@ logger = logging.getLogger(__name__)
 
 cluster = Clusters.CommodityPrice
 
+
 class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
     """Implementation of test case TC_SEPR_2_3."""
 
@@ -134,6 +135,7 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
         # if val is not NullValue:
         #     asserts.assert_true(isinstance(
         #         val, cluster.Structs.CommodityPriceStruct), "val must be of type CommodityPriceStruct")
+
 
 if __name__ == "__main__":
     default_matter_test_main()

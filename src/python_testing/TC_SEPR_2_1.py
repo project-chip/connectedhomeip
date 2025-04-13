@@ -58,6 +58,7 @@ logger = logging.getLogger(__name__)
 
 cluster = Clusters.CommodityPrice
 
+
 class TC_SEPR_2_1(CommodityPriceTestBaseHelper, MatterBaseTest):
     """Implementation of test case TC_SEPR_2_1."""
 
@@ -100,13 +101,13 @@ class TC_SEPR_2_1(CommodityPriceTestBaseHelper, MatterBaseTest):
 
         self.step("2")
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
-                                                                attribute=cluster.Attributes.TariffUnit)
+                                                             attribute=cluster.Attributes.TariffUnit)
         matter_asserts.assert_valid_enum(
             val, "TariffUnit attribute must return a TariffUnitEnum", Globals.Enums.TariffUnitEnum)
 
         self.step("3")
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
-                                                                attribute=cluster.Attributes.Currency)
+                                                             attribute=cluster.Attributes.Currency)
         if val is not NullValue:
             asserts.assert_true(isinstance(
                 val, Globals.Structs.CurrencyStruct), "val must be of type CurrencyStruct")
@@ -114,7 +115,7 @@ class TC_SEPR_2_1(CommodityPriceTestBaseHelper, MatterBaseTest):
 
         self.step("4")
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
-                                                                attribute=cluster.Attributes.CurrentPrice)
+                                                             attribute=cluster.Attributes.CurrentPrice)
         if val is not NullValue:
             asserts.assert_true(isinstance(
                 val, cluster.Structs.CommodityPriceStruct), "val must be of type CommodityPriceStruct")
@@ -122,8 +123,8 @@ class TC_SEPR_2_1(CommodityPriceTestBaseHelper, MatterBaseTest):
 
         self.step("5")
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.PriceForecast):
-            val = await self.read_single_attribute_check_success(endpoint=endpoint, 
-                                                                 cluster=cluster, 
+            val = await self.read_single_attribute_check_success(endpoint=endpoint,
+                                                                 cluster=cluster,
                                                                  attribute=cluster.Attributes.PriceForecast)
             matter_asserts.assert_list(val, "PriceForecast attribute must return a list")
             matter_asserts.assert_list_element_type(

@@ -27,6 +27,7 @@ from mobly import asserts
 
 logger = logging.getLogger(__name__)
 
+
 class CommodityPriceTestBaseHelper:
 
     async def test_checkCommodityPriceStruct(self,
@@ -50,7 +51,7 @@ class CommodityPriceTestBaseHelper:
         if struct.priceLevel is not NullValue:
             matter_asserts.assert_valid_int16(struct.priceLevel, 'PriceLevel')
             bPriceLevelIncluded = True
-        
+
         asserts.assert_true(bPriceIncluded or bPriceLevelIncluded, "Either Price or PriceLevel must be included")
 
         # In the attribute description and components must not be included based on Bitmap (default 0)
@@ -74,7 +75,6 @@ class CommodityPriceTestBaseHelper:
         else:
             asserts.assert_is_none(struct.components)
 
-    
     async def test_checkCurrencyStruct(self,
                                        endpoint: int = None,
                                        cluster: Clusters.CommodityPrice = None,
@@ -105,10 +105,9 @@ class CommodityPriceTestBaseHelper:
         if struct.tariffComponentId is not None:
             matter_asserts.assert_valid_uint32(struct.tariffComponentID, 'TariffComponentID')
 
-
     async def send_get_detailed_price_request(self, endpoint: int = None, details: Clusters.CommodityPrice.Bitmaps = 0,
-                                         timedRequestTimeoutMs: int = 3000,
-                                         expected_status: Status = Status.Success):
+                                              timedRequestTimeoutMs: int = 3000,
+                                              expected_status: Status = Status.Success):
         try:
             result = await self.send_single_cmd(cmd=Clusters.CommodityPrice.Commands.GetDetailedPriceRequest(
                 details=details),
@@ -122,8 +121,8 @@ class CommodityPriceTestBaseHelper:
                                  "Unexpected error returned")
 
     async def send_get_detailed_forecast_request(self, endpoint: int = None, details: Clusters.CommodityPrice.Bitmaps = 0,
-                                         timedRequestTimeoutMs: int = 3000,
-                                         expected_status: Status = Status.Success):
+                                                 timedRequestTimeoutMs: int = 3000,
+                                                 expected_status: Status = Status.Success):
         try:
             result = await self.send_single_cmd(cmd=Clusters.CommodityPrice.Commands.GetDetailedForecastRequest(
                 details=details),

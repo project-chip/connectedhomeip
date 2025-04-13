@@ -56,6 +56,7 @@ logger = logging.getLogger(__name__)
 
 cluster = Clusters.CommodityPrice
 
+
 class TC_SEPR_2_2(CommodityPriceTestBaseHelper, MatterBaseTest):
     """Implementation of test case TC_SEPR_2_2."""
 
@@ -107,13 +108,12 @@ class TC_SEPR_2_2(CommodityPriceTestBaseHelper, MatterBaseTest):
 
         return steps
 
-
     @run_if_endpoint_matches(has_cluster(cluster))
     async def test_TC_SEPR_2_2(self):
         # pylint: disable=too-many-locals, too-many-statements
         """Run the test steps."""
         endpoint = self.get_endpoint()
- 
+
         self.step("1")
         # Commission DUT - already done
 
@@ -135,7 +135,7 @@ class TC_SEPR_2_2(CommodityPriceTestBaseHelper, MatterBaseTest):
         if val is not NullValue:
             asserts.assert_true(isinstance(
                 val, cluster.Structs.CommodityPriceStruct), "val must be of type CommodityPriceStruct")
-            
+
             # - verify that the PeriodStart is in the past.
             # - verify that the PeriodEnd is in the future or is null.
             # - verify that the Price is null or a PriceStruct with a valid Amount as a signed integer and Currency contains a CurrencyStruct with a valid Currency.Currency (unsigned integer max 999) and Currency.DecimalPoints.
@@ -145,7 +145,6 @@ class TC_SEPR_2_2(CommodityPriceTestBaseHelper, MatterBaseTest):
             # - verify that the Components list is not included
 
         print(val)
-       
 
 
 if __name__ == "__main__":
