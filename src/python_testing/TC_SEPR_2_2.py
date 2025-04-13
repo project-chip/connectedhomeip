@@ -49,13 +49,16 @@ import time
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, EventChangeCallback, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
+
+from TC_SEPRTestBase import CommodityPriceTestBaseHelper
 
 logger = logging.getLogger(__name__)
 
+cluster = Clusters.CommodityPrice
 
-class TC_SEPR_2_2(MatterBaseTest):
+class TC_SEPR_2_2(CommodityPriceTestBaseHelper, MatterBaseTest):
     """Implementation of test case TC_SEPR_2_2."""
 
     def desc_TC_SEPR_2_2(self) -> str:
@@ -76,7 +79,7 @@ class TC_SEPR_2_2(MatterBaseTest):
             TestStep("2", "Set up a subscription to all CommodityPrice cluster events"),
             TestStep("3", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
                      "Value has to be 1 (True)"),
-            TestStep("4", "TH sends command GetDetailedPriceRequest with Details=CommodityPriceDetailBitmap.Description set to True, and Components set to False. a",
+            TestStep("4", "TH sends command GetDetailedPriceRequest with Details=CommodityPriceDetailBitmap.Description set to True, and Components set to False.",
                      """Verify that the DUT response contains GetDetailedPriceResponse with CurrentPrice is a CommodityPriceStruct or is null. If not null:
                         - verify that the PeriodStart is in the past.
                         - verify that the PeriodEnd is in the future or is null.
@@ -85,7 +88,7 @@ class TC_SEPR_2_2(MatterBaseTest):
                         - verify that either or both of Price, PriceLevel are not null.
                         - verify that the Description is a string with max length of 32.
                         - verify that the Components list is not included."""),
-            TestStep("5", "TH sends command GetDetailedPriceRequest with Details=CommodityPriceDetailBitmap.Description set to False and Components set to True. a",
+            TestStep("5", "TH sends command GetDetailedPriceRequest with Details=CommodityPriceDetailBitmap.Description set to False and Components set to True.",
                      """Verify that the DUT response contains GetDetailedPriceResponse with CurrentPrice is a CommodityPriceStruct or is null. If not null:
                         - verify that the PeriodStart is in the past.
                         - verify that the PeriodEnd is in the future or is null.
@@ -106,14 +109,45 @@ class TC_SEPR_2_2(MatterBaseTest):
 
         return steps
 
-    @async_test_body
+
+    @run_if_endpoint_matches(has_cluster(cluster))
     async def test_TC_SEPR_2_2(self):
         # pylint: disable=too-many-locals, too-many-statements
         """Run the test steps."""
+        endpoint = self.get_endpoint()
+ 
         self.step("1")
         # Commission DUT - already done
 
         self.step("2")
+        events_callback = EventChangeCallback(Clusters.CommodityPrice)
+        await events_callback.start(self.default_controller,
+                                    self.dut_node_id,
+                                    endpoint)
+
+        self.step("3")
+        # TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster
+        await self.check_test_event_triggers_enabled()
+
+        self.step("4")
+        # TH sends command GetDetailedPriceRequest with Details=CommodityPriceDetailBitmap.Description set to True, and Components set to False.
+        result = await self.send_get_detailed_price_request(details=Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap.kDescription)
+
+        # Verify that the DUT response contains GetDetailedPriceResponse with CurrentPrice is a CommodityPriceStruct or is null.
+        if result is not NullValue:
+            asserts.assert_true(isinstance(
+                val, cluster.Structs.CommodityPriceStruct), "val must be of type CommodityPriceStruct")
+            
+            # - verify that the PeriodStart is in the past.
+            # - verify that the PeriodEnd is in the future or is null.
+            # - verify that the Price is null or a PriceStruct with a valid Amount as a signed integer and Currency contains a CurrencyStruct with a valid Currency.Currency (unsigned integer max 999) and Currency.DecimalPoints.
+            # - verify that the PriceLevel is null or a valid signed integer.
+            # - verify that either or both of Price, PriceLevel are not null.
+            # - verify that the Description is a string with max length of 32.
+            # - verify that the Components list is not included
+
+        print(result)
+       
 
 
 if __name__ == "__main__":
