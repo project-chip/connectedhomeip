@@ -19,14 +19,8 @@
 #ifndef MBEDTLS_CONFIG_H
 #define MBEDTLS_CONFIG_H
 
-#include "openthread-core-config.h"
-
 #include <stdio.h>
 #include <stdlib.h>
-
-#include <openthread/config.h>
-#include <openthread/platform/logging.h>
-#include <openthread/platform/memory.h>
 
 #undef MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES
 #define MBEDTLS_PLATFORM_SNPRINTF_MACRO snprintf
@@ -67,16 +61,6 @@
 #define MBEDTLS_SSL_PROTO_DTLS
 #define MBEDTLS_SSL_TLS_C
 
-#if OPENTHREAD_CONFIG_BORDER_AGENT_ENABLE || OPENTHREAD_CONFIG_COMMISSIONER_ENABLE || OPENTHREAD_CONFIG_COAP_SECURE_API_ENABLE
-#define MBEDTLS_SSL_COOKIE_C
-#define MBEDTLS_SSL_SRV_C
-#endif
-
-#if OPENTHREAD_CONFIG_COAP_SECURE_API_ENABLE
-#define MBEDTLS_KEY_EXCHANGE_PSK_ENABLED
-#define MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED
-#endif
-
 #ifdef MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED
 #define MBEDTLS_BASE64_C
 #define MBEDTLS_ECDH_C
@@ -87,16 +71,6 @@
 #define MBEDTLS_X509_CRT_PARSE_C
 #endif
 
-#if OPENTHREAD_CONFIG_ECDSA_ENABLE
-#define MBEDTLS_BASE64_C
-#define MBEDTLS_ECDH_C
-#define MBEDTLS_ECDSA_C
-#define MBEDTLS_ECDSA_DETERMINISTIC
-#define MBEDTLS_OID_C
-#define MBEDTLS_PEM_PARSE_C
-#define MBEDTLS_PK_WRITE_C
-#endif
-
 #define MBEDTLS_MPI_WINDOW_SIZE 1       /**< Maximum windows size used. */
 #define MBEDTLS_MPI_MAX_SIZE 32         /**< Maximum number of bytes for usable MPIs. */
 #define MBEDTLS_ECP_MAX_BITS 256        /**< Maximum bit size of groups */
@@ -104,19 +78,9 @@
 #define MBEDTLS_ECP_FIXED_POINT_OPTIM 0 /**< Enable fixed-point speed-up */
 #define MBEDTLS_ENTROPY_MAX_SOURCES 2   /**< Maximum number of sources supported */
 
-#if OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE
-#define MBEDTLS_PLATFORM_STD_CALLOC otPlatCAlloc /**< Default allocator to use, can be undefined */
-#define MBEDTLS_PLATFORM_STD_FREE otPlatFree     /**< Default free to use, can be undefined */
-#else
 #define MBEDTLS_MEMORY_BUFFER_ALLOC_C
-#endif
 
-#if OPENTHREAD_CONFIG_COAP_SECURE_API_ENABLE
-#define MBEDTLS_SSL_MAX_CONTENT_LEN 900 /**< Maxium fragment length in bytes */
-#else
 #define MBEDTLS_SSL_MAX_CONTENT_LEN 768 /**< Maxium fragment length in bytes */
-#endif
-
 #define MBEDTLS_SSL_IN_CONTENT_LEN MBEDTLS_SSL_MAX_CONTENT_LEN
 #define MBEDTLS_SSL_OUT_CONTENT_LEN MBEDTLS_SSL_MAX_CONTENT_LEN
 #define MBEDTLS_SSL_CIPHERSUITES MBEDTLS_TLS_ECJPAKE_WITH_AES_128_CCM_8

@@ -671,7 +671,7 @@ class BaseTestHelper:
         # the controller and target.
         #
         for x in range(minimumSupportedFabrics * minimumCASESessionsPerFabric * 2):
-            self.devCtrl.CloseSession(nodeid)
+            self.devCtrl.MarkSessionDefunct(nodeid)
             await self.devCtrl.ReadAttribute(nodeid, [(Clusters.BasicInformation.Attributes.ClusterRevision)])
 
         self.logger.info("Testing CASE defunct logic")
@@ -700,7 +700,7 @@ class BaseTestHelper:
         #
         # This marks the session defunct.
         #
-        self.devCtrl.CloseSession(nodeid)
+        self.devCtrl.MarkSessionDefunct(nodeid)
 
         #
         # Now write the attribute from fabric2, give it some time before checking if the report
@@ -732,7 +732,7 @@ class BaseTestHelper:
         sub.SetAttributeUpdateCallback(OnValueChange)
 
         for x in range(minimumSupportedFabrics * minimumCASESessionsPerFabric * 2):
-            self.devCtrl2.CloseSession(nodeid)
+            self.devCtrl2.MarkSessionDefunct(nodeid)
             await self.devCtrl2.ReadAttribute(nodeid, [(Clusters.BasicInformation.Attributes.ClusterRevision)])
 
         #
@@ -760,7 +760,7 @@ class BaseTestHelper:
         sub.SetAttributeUpdateCallback(OnValueChange)
 
         for x in range(minimumSupportedFabrics * minimumCASESessionsPerFabric * 2):
-            self.devCtrl.CloseSession(nodeid)
+            self.devCtrl.MarkSessionDefunct(nodeid)
             await self.devCtrl.ReadAttribute(nodeid, [(Clusters.BasicInformation.Attributes.ClusterRevision)])
 
         await self.devCtrl.WriteAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.Int8u(6))])
@@ -1022,8 +1022,8 @@ class BaseTestHelper:
     async def TestResubscription(self, nodeid: int):
         ''' This validates the re-subscription logic by triggering a liveness failure caused by the expiration
             of the underlying CASE session and the resultant failure to receive reports from the server. This should
-            trigger CASE session establishment and subscription restablishment. Both the attempt and successful
-            restablishment of the subscription are validated.
+            trigger CASE session establishment and subscription reestablishment. Both the attempt and successful
+            reestablishment of the subscription are validated.
         '''
         cv = asyncio.Condition()
         resubAttempted = False
@@ -1053,7 +1053,7 @@ class BaseTestHelper:
         subscription.SetResubscriptionSucceededCallback(OnResubscriptionSucceeded, True)
 
         #
-        # Over-ride the default liveness timeout (which is set quite high to accomodate for
+        # Over-ride the default liveness timeout (which is set quite high to accommodate for
         # transport delays) to something very small. This ensures that our liveness timer will
         # fire quickly and cause a re-subscription to occur naturally.
         #
@@ -1072,7 +1072,7 @@ class BaseTestHelper:
     def TestCloseSession(self, nodeid: int):
         self.logger.info(f"Closing sessions with device {nodeid}")
         try:
-            self.devCtrl.CloseSession(nodeid)
+            self.devCtrl.MarkSessionDefunct(nodeid)
             return True
         except Exception as ex:
             self.logger.exception(
@@ -1476,7 +1476,7 @@ class BaseTestHelper:
 
             self.logger.info("Send a new subscription request from the second controller")
             # Close previous session so that the second controller will res-establish the session with the remote device
-            self.devCtrl.CloseSession(nodeid)
+            self.devCtrl.MarkSessionDefunct(nodeid)
             await self.devCtrl.ReadAttribute(nodeid, [(endpoint, Clusters.BasicInformation.Attributes.NodeLabel)], None,
                                              False, reportInterval=(1, 50),
                                              keepSubscriptions=True, autoResubscribe=False)

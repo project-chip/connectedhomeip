@@ -18,6 +18,7 @@
 
 #include "Esp32AppServer.h"
 #include "CHIPDeviceManager.h"
+#include "Esp32ThreadInit.h"
 #include <app/InteractionModelEngine.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
@@ -158,6 +159,8 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
         initParams.appDelegate = sAppDelegate;
     }
     chip::Server::GetInstance().Init(initParams);
+
+    ESPOpenThreadInit();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #ifdef CONFIG_ENABLE_CHIP_SHELL

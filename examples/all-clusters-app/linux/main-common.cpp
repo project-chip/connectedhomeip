@@ -22,6 +22,7 @@
 #include "WindowCoveringManager.h"
 #include "air-quality-instance.h"
 #include "app-common/zap-generated/ids/Clusters.h"
+#include "camera-av-settings-user-level-management-instance.h"
 #include "device-energy-management-modes.h"
 #include "dishwasher-mode.h"
 #include "energy-evse-modes.h"
@@ -53,7 +54,6 @@
 #include <app/clusters/time-synchronization-server/time-synchronization-server.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
 #include <app/server/Server.h>
-#include <app/util/att-storage.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/CHIPMem.h>
 #include <platform/DeviceInstanceInfoProvider.h>

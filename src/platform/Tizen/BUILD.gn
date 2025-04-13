@@ -68,6 +68,7 @@ static_library("Tizen") {
   deps = [ "${chip_root}/src/setup_payload" ]
 
   public_deps = [
+    "${chip_root}/src/app:app_config",
     "${chip_root}/src/platform:platform_base",
     "${chip_root}/src/platform/logging:headers",
     "${tizen_root}:tizen",
@@ -100,6 +101,7 @@ static_library("Tizen") {
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]
+    deps += [ "${chip_root}/src/app:app_config" ]
   }
 
   if (chip_enable_wifi) {

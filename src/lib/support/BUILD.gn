@@ -236,6 +236,7 @@ static_library("support") {
     "ScopedBuffer.h",
     "SetupDiscriminator.h",
     "SortUtils.h",
+    "SpanSearchValue.h",
     "StateMachine.h",
     "StringBuilder.cpp",
     "StringBuilder.h",

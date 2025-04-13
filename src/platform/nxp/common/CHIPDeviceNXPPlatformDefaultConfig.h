@@ -45,6 +45,13 @@
 #define CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE CONFIG_CHIP_DEVICE_USE_TEST_PAIRING_CODE
 #define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER CONFIG_CHIP_DEVICE_SERIAL_NUMBER
 #endif // CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
+
+#ifdef CONFIG_CHIP_ENABLE_PAIRING_AUTOSTART
+#define CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART CONFIG_CHIP_ENABLE_PAIRING_AUTOSTART
+#else
+#define CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART 0
+#endif
+
 #endif // CONFIG_CHIP_USE_GENERATED_CONFIG
 
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
@@ -78,13 +85,33 @@
 #ifndef CHIP_DEVICE_BLE_ADVERTISING_PRIORITY
 /// Priority of the Matter BLE advertising when there are multiple application
 /// components that compete for the BLE advertising.
-#define CHIP_DEVICE_BLE_ADVERTISING_PRIORITY 0
+/// Increase priority to 1 to allow user to insert custom advertising data with higher priority (0)
+#define CHIP_DEVICE_BLE_ADVERTISING_PRIORITY 1
 #endif // CHIP_DEVICE_BLE_ADVERTISING_PRIORITY
 
 // ========== Platform-specific Configuration =========
 
 // These are configuration options that are unique to the NXP platform.
 // These can be overridden by the application as needed.
+
+/**
+ * @def CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY
+ *
+ * The delay before rebooting after an OTA process was finished.
+ */
+#ifndef CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY
+#define CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY 3000
+#endif // CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY
+
+/**
+ * @def CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
+ *
+ * Enables default OTA TLV factory data processor.
+ * Disabled by default.
+ */
+#ifndef CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
+#define CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR 0
+#endif // CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
 
 // ========== Platform-specific Configuration Overrides =========
 #ifndef CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE

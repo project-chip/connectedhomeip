@@ -137,6 +137,7 @@ types or functionality) as well as individual examples.
 | `examples/rvc-app`                             |                              | UNMAINTAINED |
 | `examples/smoke-co-alarm-app`                  |                              | UNMAINTAINED |
 | `examples/temperature-measurement-app`         |                              | UNMAINTAINED |
+| `examples/terms-and-conditions-app`            | James Swan                   |              |
 | `examples/thermostat`                          |                              | UNMAINTAINED |
 | `examples/thread-br-app`                       |                              | UNMAINTAINED |
 | `examples/tv-app`                              | Chris DeCenzo, Lazar Kovacic |              |

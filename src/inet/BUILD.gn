@@ -22,7 +22,7 @@ import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/platform/device.gni")
 import("inet.gni")
 
-if (chip_system_config_use_open_thread_inet_endpoints) {
+if (chip_system_config_use_openthread_inet_endpoints) {
   import("//build_overrides/openthread.gni")
 }
 
@@ -78,6 +78,12 @@ source_set("impl_header") {
   public_deps = [ "${chip_root}/src/system:system_config_header" ]
 }
 
+source_set("inet_zephyr_socket") {
+  sources = [ "ZephyrSocket.h" ]
+  public_configs = [ "${chip_root}/src:includes" ]
+  public_deps = [ "${chip_root}/src/system:system_config_header" ]
+}
+
 static_library("inet") {
   output_name = "libInetLayer"
 
@@ -122,7 +128,7 @@ static_library("inet") {
     public_deps += [ "${lwip_root}:lwip" ]
   }
 
-  if (chip_system_config_use_open_thread_inet_endpoints) {
+  if (chip_system_config_use_openthread_inet_endpoints) {
     public_deps += [ "${chip_root}/third_party/openthread:openthread" ]
   }
 
@@ -167,12 +173,10 @@ static_library("inet") {
     } else {
       sources += [ "UDPEndPointImpl${chip_system_config_inet}.cpp" ]
     }
+  }
 
-    if (chip_system_config_inet == "Sockets") {
-      # TODO: dependency on this one is not clear as it is only ever
-      #       enabled through CMakeLists.txt. Added here for completeness
-      sources += [ "ZephyrSocket.h" ]
-    }
+  if (current_os == "zephyr") {
+    public_deps += [ ":inet_zephyr_socket" ]
   }
 
   if (chip_with_nlfaultinjection) {

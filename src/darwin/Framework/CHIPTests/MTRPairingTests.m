@@ -1,6 +1,5 @@
-/*
- *
- *    Copyright (c) 2022 Project CHIP Authors
+/**
+ *    Copyright (c) 2022-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -107,6 +106,7 @@ static MTRTestKeys * sTestKeys = nil;
 @property (nonatomic, strong) XCTestExpectation * expectation;
 @property (nonatomic, nullable) id<MTRDeviceAttestationDelegate> attestationDelegate;
 @property (nonatomic, nullable) NSNumber * failSafeExtension;
+@property (nonatomic) BOOL shouldReadEndpointInformation;
 @property (nullable) NSError * commissioningCompleteError;
 @end
 
@@ -131,12 +131,47 @@ static MTRTestKeys * sTestKeys = nil;
     __auto_type * params = [[MTRCommissioningParameters alloc] init];
     params.deviceAttestationDelegate = self.attestationDelegate;
     params.failSafeTimeout = self.failSafeExtension;
+    params.readEndpointInformation = self.shouldReadEndpointInformation;
 
     NSError * commissionError = nil;
     XCTAssertTrue([controller commissionNodeWithID:@(sDeviceId) commissioningParams:params error:&commissionError],
         @"Failed to start commissioning for node ID %" PRIu64 ": %@", sDeviceId, commissionError);
 
     // Keep waiting for onCommissioningComplete
+}
+
+- (void)controller:(MTRDeviceController *)controller readCommissioneeInfo:(MTRCommissioneeInfo *)info
+{
+    XCTAssertNotNil(info.productIdentity);
+    XCTAssertEqualObjects(info.productIdentity.vendorID, /* Test Vendor 1 */ @0xFFF1);
+
+    if (self.shouldReadEndpointInformation) {
+        XCTAssertNotNil(info.endpointsById);
+        XCTAssertNotNil(info.rootEndpoint);
+        XCTAssertGreaterThanOrEqual(info.rootEndpoint.children.count, 1); // at least one application endpoint
+        for (MTREndpointInfo * endpoint in info.endpointsById.allValues) {
+            XCTAssertGreaterThanOrEqual(endpoint.deviceTypes.count, 1);
+            XCTAssertNotNil(endpoint.children);
+            XCTAssertNotNil(endpoint.partsList);
+            XCTAssertGreaterThanOrEqual(endpoint.partsList.count, endpoint.children.count);
+            for (MTREndpointInfo * child in endpoint.children) {
+                XCTAssertTrue([endpoint.partsList containsObject:child.endpointID]);
+            }
+        }
+
+        // There is currently no convenient way to initialize an MTRCommissioneeInfo
+        // object from basic ObjC data types, so we do some unit testing here.
+        NSData * data = [NSKeyedArchiver archivedDataWithRootObject:info requiringSecureCoding:YES error:NULL];
+        MTRCommissioneeInfo * decoded = [NSKeyedUnarchiver unarchivedObjectOfClass:MTRCommissioneeInfo.class fromData:data error:NULL];
+        XCTAssertNotNil(decoded);
+        XCTAssertTrue([decoded isEqual:info]);
+        XCTAssertEqualObjects(decoded.productIdentity, info.productIdentity);
+        XCTAssertEqualObjects(decoded.endpointsById, info.endpointsById);
+        XCTAssertEqualObjects(decoded.rootEndpoint.children, info.rootEndpoint.children);
+    } else {
+        XCTAssertNil(info.endpointsById);
+        XCTAssertNil(info.rootEndpoint);
+    }
 }
 
 - (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError * _Nullable)error
@@ -152,20 +187,20 @@ static MTRTestKeys * sTestKeys = nil;
 @property (atomic, readwrite) BOOL statusUpdateCalled;
 @property (atomic, readwrite) BOOL commissioningSessionEstablishmentDoneCalled;
 @property (atomic, readwrite) BOOL commissioningCompleteCalled;
-@property (atomic, readwrite) BOOL readCommissioningInfoCalled;
+@property (atomic, readwrite) BOOL readCommissioneeInfoCalled;
 @property (atomic, readwrite, strong) XCTestExpectation * allCallbacksCalledExpectation;
 @end
 
 @implementation MTRPairingTestMonitoringControllerDelegate
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTRPairingTestMonitoringControllerDelegate: %p statusUpdateCalled %@ commissioningSessionEstablishmentDoneCalled %@ commissioningCompleteCalled %@ readCommissioningInfoCalled %@>", self, MTR_YES_NO(_statusUpdateCalled), MTR_YES_NO(_commissioningSessionEstablishmentDoneCalled), MTR_YES_NO(_commissioningCompleteCalled), MTR_YES_NO(_readCommissioningInfoCalled)];
+    return [NSString stringWithFormat:@"<MTRPairingTestMonitoringControllerDelegate: %p statusUpdateCalled %@ commissioningSessionEstablishmentDoneCalled %@ commissioningCompleteCalled %@ readCommissioneeInfoCalled %@>", self, MTR_YES_NO(_statusUpdateCalled), MTR_YES_NO(_commissioningSessionEstablishmentDoneCalled), MTR_YES_NO(_commissioningCompleteCalled), MTR_YES_NO(_readCommissioneeInfoCalled)];
 }
 
 - (void)_checkIfAllCallbacksCalled
 {
     if (self.allCallbacksCalledExpectation) {
-        if (self.statusUpdateCalled && self.commissioningSessionEstablishmentDoneCalled && self.commissioningCompleteCalled && self.readCommissioningInfoCalled) {
+        if (self.statusUpdateCalled && self.commissioningSessionEstablishmentDoneCalled && self.commissioningCompleteCalled && self.readCommissioneeInfoCalled) {
             [self.allCallbacksCalledExpectation fulfill];
             self.allCallbacksCalledExpectation = nil;
         }
@@ -193,11 +228,12 @@ static MTRTestKeys * sTestKeys = nil;
     [self _checkIfAllCallbacksCalled];
 }
 
-- (void)controller:(MTRDeviceController *)controller readCommissioningInfo:(MTRProductIdentity *)info
+- (void)controller:(MTRDeviceController *)controller readCommissioneeInfo:(MTRCommissioneeInfo *)info
 {
-    self.readCommissioningInfoCalled = YES;
+    self.readCommissioneeInfoCalled = YES;
     [self _checkIfAllCallbacksCalled];
 }
+
 @end
 
 @interface MTRPairingTests : MTRTestCase
@@ -318,7 +354,7 @@ static MTRTestKeys * sTestKeys = nil;
     XCTAssertTrue(monitoringControllerDelegate.statusUpdateCalled);
     XCTAssertTrue(monitoringControllerDelegate.commissioningSessionEstablishmentDoneCalled);
     XCTAssertTrue(monitoringControllerDelegate.commissioningCompleteCalled);
-    XCTAssertTrue(monitoringControllerDelegate.readCommissioningInfoCalled);
+    XCTAssertTrue(monitoringControllerDelegate.readCommissioneeInfoCalled);
     [sController removeDeviceControllerDelegate:monitoringControllerDelegate];
 }
 
@@ -444,14 +480,40 @@ static MTRTestKeys * sTestKeys = nil;
 - (void)test008_pairingAfterCancellation_DeviceAttestationVerification
 {
     // Cancel pairing while we are waiting for our client to decide what to do
-    // with the attestation information we got.
-    __block BOOL delegateCalled = NO;
-    __auto_type * attestationDelegate = [[NoOpAttestationDelegate alloc] initWithCallback:^{
-        delegateCalled = YES;
-    } blockCommissioning:YES];
+    // with the attestation information we got.  Note that the delegate is
+    // called on some arbitrary queue, so we need to make sure we wait for it to
+    // actually be called; we can't just have it set a boolean that we then
+    // check, because that can race.
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Attestation delegate called"];
+    __auto_type * attestationDelegate = [[NoOpAttestationDelegate alloc] initWithExpectation:expectation blockCommissioning:YES];
 
     [self doPairingTestAfterCancellationAtProgress:@"Successfully extended fail-safe timer to handle DA failure" attestationDelegate:attestationDelegate];
-    XCTAssertTrue(delegateCalled);
+    [self waitForExpectations:@[ expectation ] timeout:kPairingTimeoutInSeconds];
+}
+
+- (void)test009_PairWithReadingEndpointInformation
+{
+    [self startServerApp];
+
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Commissioning Complete"];
+    __auto_type * controllerDelegate = [[MTRPairingTestControllerDelegate alloc] initWithExpectation:expectation
+                                                                                 attestationDelegate:nil
+                                                                                   failSafeExtension:nil];
+
+    // Endpoint info is validated by MTRPairingTestControllerDelegate
+    controllerDelegate.shouldReadEndpointInformation = YES;
+
+    dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+    [sController setDeviceControllerDelegate:controllerDelegate queue:callbackQueue];
+    self.controllerDelegate = controllerDelegate;
+
+    NSError * error;
+    __auto_type * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:kOnboardingPayload error:&error];
+    XCTAssertTrue([sController setupCommissioningSessionWithPayload:payload newNodeID:@(++sDeviceId) error:&error]);
+    XCTAssertNil(error);
+
+    [self waitForExpectations:@[ expectation ] timeout:kPairingTimeoutInSeconds];
+    XCTAssertNil(controllerDelegate.commissioningCompleteError);
 }
 
 @end

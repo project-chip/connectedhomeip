@@ -38,6 +38,9 @@ NS_ASSUME_NONNULL_BEGIN
     removeValueForKey:(NSString *)key
         securityLevel:(MTRStorageSecurityLevel)securityLevel
           sharingType:(MTRStorageSharingType)sharingType;
+
+// For testing - direct access to the current count of keys in storage
+@property (nonatomic, readonly) NSUInteger count;
 @end
 
 @interface MTRTestPerControllerStorageWithBulkReadWrite : MTRTestPerControllerStorage

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2024). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -62,49 +62,48 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0205" name="Humidistat"/>
+    <clusterId id="0x0205" name="Humidistat">
+      <provisionalConform/>
+    </clusterId>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="HSTAT" scope="Endpoint"/>
   <features>
     <feature bit="0" code="HUM" name="Humidifier" summary="Supports increasing the humidity in a space">
-      <optionalConform choice="a" more="true"/>
+      <optionalConform choice="a" more="true" min="1"/>
     </feature>
     <feature bit="1" code="DEHUM" name="Dehumidifier" summary="Supports decreasing the humidity in a space">
-      <optionalConform choice="a" more="true"/>
+      <optionalConform choice="a" more="true" min="1"/>
     </feature>
-    <feature bit="2" code="CONT" name="Continuous" summary="Supports continuous or open-loop humidity operation">
-      <optionalConform choice="b" more="true"/>
+    <feature bit="2" code="CONT" name="Continuous" summary="Supports continuous humidity operation">
+      <optionalConform choice="b" more="true" min="1"/>
     </feature>
-    <feature bit="3" code="CLOSED" name="ClosedLoop" summary="Supports closed-loop control of the humidity">
-      <optionalConform choice="b" more="true"/>
+    <feature bit="3" code="SENSOR" name="Sensor" summary="Supports humidity control to a setpoint via an humidity sensor">
+      <optionalConform choice="b" more="true" min="1"/>
     </feature>
     <feature bit="4" code="AUTO" name="Auto" summary="Supports automatically switching operating states to maintain a set humidity">
       <optionalConform>
         <andTerm>
           <feature name="HUM"/>
           <feature name="DEHUM"/>
-          <feature name="CLOSED"/>
+          <feature name="SENSOR"/>
         </andTerm>
       </optionalConform>
     </feature>
     <feature bit="5" code="FAN" name="FanOnly" summary="Supports running the fan alone without humidity control">
       <optionalConform/>
     </feature>
-    <feature bit="6" code="SLEEP" name="Sleep" summary="Supports a quieter option suitable for sleep">
-      <optionalConform/>
-    </feature>
-    <feature bit="7" code="OPT" name="Optimal" summary="Supports controlling to an optimal humidity">
+    <feature bit="6" code="OPT" name="Optimal" summary="Supports controlling to an optimal humidity">
       <optionalConform>
-        <feature name="CLOSED"/>
+        <feature name="SENSOR"/>
       </optionalConform>
     </feature>
-    <feature bit="8" code="WARM" name="WarmMist" summary="Supports warm mist operation">
-      <optionalConform choice="c" more="true">
+    <feature bit="7" code="WARM" name="WarmMist" summary="Supports warm mist operation">
+      <optionalConform choice="c" more="true" min="1">
         <feature name="HUM"/>
       </optionalConform>
     </feature>
-    <feature bit="9" code="COLD" name="ColdMist" summary="Supports cold mist operation">
-      <optionalConform choice="c" more="true">
+    <feature bit="8" code="COLD" name="ColdMist" summary="Supports cold mist operation">
+      <optionalConform choice="c" more="true" min="1">
         <feature name="HUM"/>
       </optionalConform>
     </feature>
@@ -172,47 +171,61 @@ Davis, CA 95616, USA
     </bitmap>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="Mode" type="Mode" default="Off">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+    <attribute id="0x0000" name="Mode" type="Mode">
+      <default>
+        <enum default="Off"/>
+      </default>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0001" name="SystemState" type="SystemStateEnum" default="Off">
+    <attribute id="0x0001" name="SystemState" type="SystemStateEnum">
+      <default>
+        <enum default="Off"/>
+      </default>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0002" name="UserSetpoint" type="percent" default="MS">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform>
-        <feature name="CLOSED"/>
+        <feature name="SENSOR"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0003" name="MinSetpoint" type="percent">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
-        <feature name="CLOSED"/>
+        <feature name="SENSOR"/>
       </mandatoryConform>
-      <constraint type="max" value="99"/>
+      <constraint>
+        <max value="99"/>
+      </constraint>
     </attribute>
     <attribute id="0x0004" name="MaxSetpoint" type="percent">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
-        <feature name="CLOSED"/>
+        <feature name="SENSOR"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0005" name="Step" type="percent">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
-        <feature name="CLOSED"/>
+        <feature name="SENSOR"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0006" name="TargetSetpoint" type="percent">
       <access read="true" readPrivilege="view"/>
@@ -221,47 +234,49 @@ Davis, CA 95616, USA
           <feature name="OPT"/>
         </mandatoryConform>
         <optionalConform>
-          <feature name="CLOSED"/>
+          <feature name="SENSOR"/>
         </optionalConform>
       </otherwiseConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0007" name="MistType" type="MistTypeBitmap" default="MS">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="HUM"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0008" name="Continuous" type="Boolean" default="False">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+    <attribute id="0x0008" name="Continuous" type="bool" default="false">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="CONT"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0009" name="Sleep" type="Boolean" default="False">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
-      <mandatoryConform>
-        <feature name="SLEEP"/>
-      </mandatoryConform>
+    <attribute id="0x0009" name="Sleep" type="bool" default="false">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform/>
     </attribute>
-    <attribute id="0x000A" name="Optimal" type="Boolean" default="False">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+    <attribute id="0x000A" name="Optimal" type="bool" default="false">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="OPT"/>
       </mandatoryConform>
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="SetSettings" direction="commandToServer" response="Y">
+    <command id="0x00" name="SetSettings" direction="commandToServer">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="UserSetpoint" type="percent">
         <optionalConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="Mode" type="Mode">
         <optionalConform/>
@@ -269,13 +284,13 @@ Davis, CA 95616, USA
       <field id="2" name="MistType" type="MistTypeBitmap">
         <optionalConform/>
       </field>
-      <field id="3" name="Continuous" type="Boolean">
+      <field id="3" name="Continuous" type="bool">
         <optionalConform/>
       </field>
-      <field id="4" name="Sleep" type="Boolean">
+      <field id="4" name="Sleep" type="bool">
         <optionalConform/>
       </field>
-      <field id="5" name="Optimal" type="Boolean">
+      <field id="5" name="Optimal" type="bool">
         <optionalConform/>
       </field>
     </command>

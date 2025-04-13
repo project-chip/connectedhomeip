@@ -19,10 +19,13 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/InteractionModelEngine.h>
+#include <app/MessageDef/StatusResponseMessage.h>
 #include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
 #include <app/tests/test-interaction-model-api.h>
+#include <app/util/mock/MockNodeConfig.h>
 #include <credentials/GroupDataProviderImpl.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <crypto/DefaultSessionKeystore.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/ErrorStr.h>
@@ -51,6 +54,74 @@ chip::Credentials::GroupDataProviderImpl gGroupsProvider(kMaxGroupsPerFabric, kM
 
 namespace chip {
 namespace app {
+
+using namespace chip::Test;
+
+const MockNodeConfig & TestMockNodeConfig()
+{
+    using namespace Clusters::Globals::Attributes;
+
+    // clang-format off
+    static const MockNodeConfig config({
+        MockEndpointConfig(kRootEndpointId, {
+            MockClusterConfig(Clusters::IcdManagement::Id, {
+                ClusterRevision::Id, FeatureMap::Id,
+                Clusters::IcdManagement::Attributes::OperatingMode::Id,
+            }),
+        }),
+        MockEndpointConfig(kTestEndpointId, {
+            MockClusterConfig(Clusters::UnitTesting::Id, {
+                ClusterRevision::Id, FeatureMap::Id,
+                Clusters::UnitTesting::Attributes::Boolean::Id,
+                Clusters::UnitTesting::Attributes::Int16u::Id,
+                Clusters::UnitTesting::Attributes::ListFabricScoped::Id,
+                Clusters::UnitTesting::Attributes::ListStructOctetString::Id,
+            }),
+        }),
+        MockEndpointConfig(kMockEndpoint1, {
+            MockClusterConfig(MockClusterId(1), {
+                ClusterRevision::Id, FeatureMap::Id,
+            }, {
+                MockEventId(1), MockEventId(2),
+            }),
+            MockClusterConfig(MockClusterId(2), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1),
+            }),
+        }),
+        MockEndpointConfig(kMockEndpoint2, {
+            MockClusterConfig(MockClusterId(1), {
+                ClusterRevision::Id, FeatureMap::Id,
+            }),
+            MockClusterConfig(MockClusterId(2), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2),
+            }),
+            MockClusterConfig(MockClusterId(3), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2), MockAttributeId(3),
+            }),
+        }),
+        MockEndpointConfig(kMockEndpoint3, {
+            MockClusterConfig(MockClusterId(1), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1),
+            }),
+            MockClusterConfig(MockClusterId(2), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2), MockAttributeId(3), MockAttributeId(4),
+            }),
+            MockClusterConfig(MockClusterId(3), {
+                ClusterRevision::Id, FeatureMap::Id,
+            }),
+            MockClusterConfig(MockClusterId(4), {
+                ClusterRevision::Id, FeatureMap::Id,
+            }),
+        }),
+        /// For `TestWriteRoundtripWithClusterObjects` where path 2/3/4 is used
+        MockEndpointConfig(2, {
+            MockClusterConfig(3, {4}),
+        })
+    });
+    // clang-format on
+    return config;
+}
+
 class TestWriteInteraction : public chip::Test::AppContext
 {
 public:
@@ -70,9 +141,11 @@ public:
         ASSERT_EQ(chip::GroupTesting::InitData(&gGroupsProvider, GetBobFabricIndex(), span), CHIP_NO_ERROR);
 
         mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestImCustomDataModel::Instance());
+        chip::Test::SetMockNodeConfig(TestMockNodeConfig());
     }
     void TearDown() override
     {
+        chip::Test::ResetMockNodeConfig();
         InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
         chip::Credentials::GroupDataProvider * provider = chip::Credentials::GetGroupDataProvider();
         if (provider != nullptr)
@@ -85,6 +158,7 @@ public:
     void TestWriteClient();
     void TestWriteClientGroup();
     void TestWriteHandlerReceiveInvalidMessage();
+    void TestWriteHandlerReceiveEmptyWriteRequest();
     void TestWriteInvalidMessage1();
     void TestWriteInvalidMessage2();
     void TestWriteInvalidMessage3();
@@ -101,9 +175,30 @@ private:
 
 class TestExchangeDelegate : public Messaging::ExchangeDelegate
 {
+public:
+    Protocols::InteractionModel::Status mLastStatus = Protocols::InteractionModel::Status::Success;
+    bool mLastStatusParsedSuccessfully              = false;
+
+private:
+    CHIP_ERROR UpdateLastStatus(System::PacketBufferHandle && payload)
+    {
+        StatusResponseMessage::Parser response;
+        System::PacketBufferTLVReader reader;
+        reader.Init(std::move(payload));
+        ReturnErrorOnFailure(response.Init(reader));
+        StatusIB status;
+        ReturnErrorOnFailure(response.GetStatus(mLastStatus));
+        return CHIP_NO_ERROR;
+    }
+
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && payload) override
     {
+        if (payloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
+        {
+            CHIP_ERROR err                = UpdateLastStatus(std::move(payload));
+            mLastStatusParsedSuccessfully = (err == CHIP_NO_ERROR);
+        }
         return CHIP_NO_ERROR;
     }
 
@@ -627,6 +722,52 @@ TEST_F(TestWriteInteraction, TestWriteHandlerInvalidateFabric)
 }
 
 #endif
+
+// This test sends an invalid (because there is no application payload at all)
+// Write Request message and makes sure that a correct Status Response is
+// received.
+TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteHandlerReceiveEmptyWriteRequest)
+{
+    Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+
+    TestWriteClientCallback writeCallback;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
+
+    GetLoopback().mDroppedMessageCount = 0;
+    GetLoopback().mSentMessageCount    = 0;
+    GetLoopback().mNumMessagesToDrop   = 0;
+
+    // Just send an empty message claiming to be a write request.
+    System::PacketBufferHandle emptyMessage = System::PacketBufferHandle::New(Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
+
+    TestExchangeDelegate delegate;
+    delegate.mLastStatusParsedSuccessfully = false;
+
+    auto exchange = NewExchangeToAlice(&delegate);
+    EXPECT_NE(exchange, nullptr);
+
+    EXPECT_EQ(exchange->SendMessage(Protocols::InteractionModel::MsgType::WriteRequest, std::move(emptyMessage),
+                                    Messaging::SendMessageFlags::kExpectResponse),
+              CHIP_NO_ERROR);
+
+    DrainAndServiceIO();
+
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
+    EXPECT_EQ(GetLoopback().mSentMessageCount, 3u); // Request, response, ack
+    EXPECT_EQ(GetLoopback().mDroppedMessageCount, 0u);
+
+    EXPECT_TRUE(delegate.mLastStatusParsedSuccessfully);
+    EXPECT_EQ(delegate.mLastStatus, Protocols::InteractionModel::Status::InvalidAction);
+
+    engine->Shutdown();
+    ExpireSessionAliceToBob();
+    ExpireSessionBobToAlice();
+    CreateSessionAliceToBob();
+    CreateSessionBobToAlice();
+}
 
 // Write Client sends a write request, receives an unexpected message type, sends a status response to that.
 TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage1)

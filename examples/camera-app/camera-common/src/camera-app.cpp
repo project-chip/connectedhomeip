@@ -1,0 +1,115 @@
+/*
+ *
+ *    Copyright (c) 2025 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+#include "camera-app.h"
+
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::Chime;
+using namespace chip::app::Clusters::WebRTCTransportProvider;
+using namespace chip::app::Clusters::CameraAvStreamManagement;
+
+template <typename T>
+using List   = chip::app::DataModel::List<T>;
+using Status = Protocols::InteractionModel::Status;
+
+CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface * aCameraDevice)
+{
+    mEndpoint     = aClustersEndpoint;
+    mCameraDevice = aCameraDevice;
+
+    // Instantiate Chime Server
+    mChimeServerPtr = std::make_unique<ChimeServer>(mEndpoint, mCameraDevice->GetChimeDelegate());
+
+    // Instantiate WebRTCTransport Provider
+    mWebRTCTransportProviderPtr =
+        std::make_unique<WebRTCTransportProviderServer>(mCameraDevice->GetWebRTCProviderDelegate(), mEndpoint);
+
+    // Fetch all initialization parameters for CameraAVStreamMgmt Server
+    BitFlags<Feature> features;
+    features.Set(Feature::kSnapshot);
+    features.Set(Feature::kVideo);
+    if (mCameraDevice->GetCameraHALInterface().HasMicrophone())
+    {
+        features.Set(Feature::kAudio);
+    }
+
+    features.Set(Feature::kHighDynamicRange);
+
+    BitFlags<OptionalAttribute> optionalAttrs;
+    optionalAttrs.Set(chip::app::Clusters::CameraAvStreamManagement::OptionalAttribute::kNightVision);
+    optionalAttrs.Set(chip::app::Clusters::CameraAvStreamManagement::OptionalAttribute::kNightVisionIllum);
+
+    uint32_t maxConcurrentVideoEncoders  = mCameraDevice->GetCameraHALInterface().GetMaxConcurrentVideoEncoders();
+    uint32_t maxEncodedPixelRate         = mCameraDevice->GetCameraHALInterface().GetMaxEncodedPixelRate();
+    VideoSensorParamsStruct sensorParams = mCameraDevice->GetCameraHALInterface().GetVideoSensorParams();
+    bool nightVisionCapable              = mCameraDevice->GetCameraHALInterface().GetNightVisionCapable();
+    VideoResolutionStruct minViewport    = mCameraDevice->GetCameraHALInterface().GetMinViewport();
+    std::vector<RateDistortionTradeOffStruct> rateDistortionTradeOffPoints = {};
+
+    uint32_t maxContentBufferSize = mCameraDevice->GetCameraHALInterface().GetMaxContentBufferSize();
+    AudioCapabilitiesStruct micCapabilities{};
+    AudioCapabilitiesStruct spkrCapabilities{};
+    TwoWayTalkSupportTypeEnum twowayTalkSupport               = TwoWayTalkSupportTypeEnum::kNotSupported;
+    std::vector<SnapshotParamsStruct> supportedSnapshotParams = {};
+    uint32_t maxNetworkBandwidth                              = mCameraDevice->GetCameraHALInterface().GetMaxNetworkBandwidth();
+    std::vector<StreamUsageEnum> supportedStreamUsages        = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
+
+    // Instantiate the CameraAVStreamMgmt Server
+    mAVStreamMgmtServerPtr = std::make_unique<CameraAVStreamMgmtServer>(
+        mCameraDevice->GetCameraAVStreamMgmtDelegate(), mEndpoint, features, optionalAttrs, maxConcurrentVideoEncoders,
+        maxEncodedPixelRate, sensorParams, nightVisionCapable, minViewport, rateDistortionTradeOffPoints, maxContentBufferSize,
+        micCapabilities, spkrCapabilities, twowayTalkSupport, supportedSnapshotParams, maxNetworkBandwidth, supportedStreamUsages);
+}
+
+void CameraApp::InitializeCameraAVStreamMgmt()
+{
+    // Set the attribute defaults
+    mAVStreamMgmtServerPtr->SetHDRModeEnabled(mCameraDevice->GetCameraHALInterface().GetHDRMode());
+    mAVStreamMgmtServerPtr->SetViewport(mCameraDevice->GetCameraHALInterface().GetViewport());
+
+    mAVStreamMgmtServerPtr->Init();
+}
+
+void CameraApp::InitCameraDeviceClusters()
+{
+    // Initialize Cluster Servers
+    mWebRTCTransportProviderPtr->Init();
+
+    mChimeServerPtr->Init();
+
+    InitializeCameraAVStreamMgmt();
+}
+
+static constexpr EndpointId kCameraEndpointId = 1;
+
+Platform::UniquePtr<CameraApp> gCameraApp;
+
+void CameraAppInit(CameraDeviceInterface * cameraDevice)
+{
+    gCameraApp = Platform::MakeUnique<CameraApp>(kCameraEndpointId, cameraDevice);
+    gCameraApp.get()->InitCameraDeviceClusters();
+
+    ChipLogDetail(Camera, "CameraAppInit: Initialized Camera clusters");
+}
+
+void CameraAppShutdown()
+{
+    ChipLogDetail(Camera, "CameraAppShutdown: Shutting down Camera app");
+    gCameraApp = nullptr;
+}

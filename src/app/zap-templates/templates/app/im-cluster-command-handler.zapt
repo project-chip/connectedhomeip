@@ -25,7 +25,7 @@ namespace Clusters {
 {{#if (isServer clusterSide)}}
 namespace {{asUpperCamelCase clusterName}} {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
     {{#all_incoming_commands_for_cluster clusterName clusterSide}}
     {{#first}}
@@ -47,18 +47,22 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
     {{#last}}
         default: {
             // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
             ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI, ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
+            return Protocols::InteractionModel::Status::UnsupportedCommand;
         }
         }
     }
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-      apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
       ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+      return Protocols::InteractionModel::Status::InvalidCommand;
     }
+
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
+
     {{/last}}
     {{/all_incoming_commands_for_cluster}}
 }
@@ -73,24 +77,28 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aReader, CommandHandler * apCommandObj)
 {
+    Protocols::InteractionModel::Status errorStatus = Protocols::InteractionModel::Status::Success;
+
     switch (aCommandPath.mClusterId)
     {
     {{#all_user_clusters_with_incoming_commands}}
     {{#unless (isInConfigList clusterName "CommandHandlerInterfaceOnlyClusters")}}
     {{#if (isServer clusterSide)}}
     case Clusters::{{asUpperCamelCase clusterName}}::Id:
-        Clusters::{{asUpperCamelCase clusterName}}::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::{{asUpperCamelCase clusterName}}::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     {{/if}}
     {{/unless}}
     {{/all_user_clusters_with_incoming_commands}}
     default:
         ChipLogError(Zcl, "Unknown cluster " ChipLogFormatMEI, ChipLogValueMEI(aCommandPath.mClusterId));
-        apCommandObj->AddStatus(
-          aCommandPath,
-          Protocols::InteractionModel::Status::UnsupportedCluster
-        );
+        errorStatus = Protocols::InteractionModel::Status::UnsupportedCluster;
         break;
+    }
+
+    if (errorStatus != Protocols::InteractionModel::Status::Success)
+    {
+        apCommandObj->AddStatus(aCommandPath, errorStatus);
     }
 }
 

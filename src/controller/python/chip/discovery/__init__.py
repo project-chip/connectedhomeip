@@ -21,9 +21,9 @@ import time
 from dataclasses import dataclass
 from typing import Callable, List, Optional, Set
 
-from chip.discovery.library_handle import _GetDiscoveryLibraryHandle
-from chip.discovery.types import DiscoverFailureCallback_t, DiscoverSuccessCallback_t
-from chip.native import PyChipError
+from ..native import PyChipError
+from .library_handle import _GetDiscoveryLibraryHandle
+from .types import DiscoverFailureCallback_t, DiscoverSuccessCallback_t
 
 
 class DiscoveryType(enum.IntEnum):

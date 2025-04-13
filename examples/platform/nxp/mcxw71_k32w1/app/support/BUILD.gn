@@ -55,8 +55,6 @@ source_set("freertos_memory_utils") {
 
   if (nxp_nvm_component == "fwk_nvm") {
     defines = [ "CHIP_PLAT_NVM_SUPPORT=1" ]
-  } else if (nxp_nvm_component == "littlefs") {
-    defines = [ "CHIP_PLAT_NVM_SUPPORT=3" ]
   }
 
   public_configs = [

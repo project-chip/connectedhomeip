@@ -50,10 +50,21 @@ CHIP_ERROR TestDACRevocationDelegateImpl::SetDeviceAttestationRevocationSetPath(
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR TestDACRevocationDelegateImpl::SetDeviceAttestationRevocationData(const std::string & jsonData)
+{
+    mRevocationData = jsonData;
+    return CHIP_NO_ERROR;
+}
+
 void TestDACRevocationDelegateImpl::ClearDeviceAttestationRevocationSetPath()
 {
     // clear the string_view
     mDeviceAttestationRevocationSetPath = mDeviceAttestationRevocationSetPath.substr(0, 0);
+}
+
+void TestDACRevocationDelegateImpl::ClearDeviceAttestationRevocationData()
+{
+    mRevocationData.clear();
 }
 
 // Check if issuer and AKID matches with the crl signer OR crl signer delegator's subject and SKID
@@ -115,26 +126,42 @@ bool TestDACRevocationDelegateImpl::CrossValidateCert(const Json::Value & revoke
 bool TestDACRevocationDelegateImpl::IsEntryInRevocationSet(const std::string & akidHexStr, const std::string & issuerNameBase64Str,
                                                            const std::string & serialNumberHexStr)
 {
-    std::ifstream file(mDeviceAttestationRevocationSetPath.c_str());
-    if (!file.is_open())
-    {
-        ChipLogError(NotSpecified, "Failed to open file: %s", mDeviceAttestationRevocationSetPath.c_str());
-        return false;
-    }
-
-    // Parse the JSON data incrementally
-    Json::CharReaderBuilder readerBuilder;
     Json::Value jsonData;
-    std::string errs;
 
-    bool parsingSuccessful = Json::parseFromStream(readerBuilder, file, &jsonData, &errs);
-
-    // Close the file as it's no longer needed
-    file.close();
-
-    if (!parsingSuccessful)
+    // Try direct data first, then fall back to file
+    if (!mRevocationData.empty())
     {
-        ChipLogError(NotSpecified, "Failed to parse JSON: %s", errs.c_str());
+        std::string errs;
+        std::istringstream jsonStream(!mRevocationData.empty() ? mRevocationData : "[]");
+        if (!Json::parseFromStream(Json::CharReaderBuilder(), jsonStream, &jsonData, &errs))
+        {
+            ChipLogError(NotSpecified, "Failed to parse JSON data: %s", errs.c_str());
+            return false;
+        }
+    }
+    else if (!mDeviceAttestationRevocationSetPath.empty())
+    {
+        std::string errs;
+        std::ifstream file(mDeviceAttestationRevocationSetPath.c_str());
+        if (!file.is_open())
+        {
+            ChipLogError(NotSpecified, "Failed to open file: %s", mDeviceAttestationRevocationSetPath.c_str());
+            return false;
+        }
+
+        bool parsingSuccessful = Json::parseFromStream(Json::CharReaderBuilder(), file, &jsonData, &errs);
+        file.close();
+
+        if (!parsingSuccessful)
+        {
+            ChipLogError(NotSpecified, "Failed to parse JSON from file: %s", errs.c_str());
+            return false;
+        }
+    }
+    else
+    {
+        ChipLogDetail(NotSpecified, "No revocation data available");
+        // No revocation data available
         return false;
     }
 
@@ -278,7 +305,7 @@ void TestDACRevocationDelegateImpl::CheckForRevokedDACChain(
 {
     AttestationVerificationResult attestationError = AttestationVerificationResult::kSuccess;
 
-    if (mDeviceAttestationRevocationSetPath.empty())
+    if (mDeviceAttestationRevocationSetPath.empty() && mRevocationData.empty())
     {
         onCompletion->mCall(onCompletion->mContext, info, attestationError);
         return;

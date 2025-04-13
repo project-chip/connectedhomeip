@@ -119,11 +119,12 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     }
     SuccessOrExit(err);
 
-    // Initialize the NFC Manager.
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC
-    err = NFCMgr().Init();
-    VerifyOrExit(err == CHIP_NO_ERROR,
-                 ChipLogError(DeviceLayer, "NFC Manager initialization failed: %" CHIP_ERROR_FORMAT, err.Format()));
+    // Initialize the NFC onboarding payload manager
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_ONBOARDING_PAYLOAD
+    err = NFCOnboardingPayloadMgr().Init();
+    VerifyOrExit(
+        err == CHIP_NO_ERROR,
+        ChipLogError(DeviceLayer, "NFC onboarding payload manager initialization failed: %" CHIP_ERROR_FORMAT, err.Format()));
 #endif
 
     // TODO Initialize CHIP Event Logging.
@@ -149,6 +150,12 @@ void GenericPlatformManagerImpl<ImplClass>::_Shutdown()
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     ChipLogProgress(DeviceLayer, "BLE Layer shutdown");
     BLEMgr().Shutdown();
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    ChipLogProgress(DeviceLayer, "WiFi-PAF Layer shutdown");
+    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown(
+        [](uint32_t id, WiFiPAF::WiFiPafRole role) { DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(id, role); });
 #endif
 
     ChipLogProgress(DeviceLayer, "System Layer shutdown");

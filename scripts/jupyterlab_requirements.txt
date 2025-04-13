@@ -4,10 +4,10 @@
 # jupyter-lab
 #
 # --------------------------------------
-# import chip.native
-# import pkgutil
-# module = pkgutil.get_loader('chip.ChipReplStartup')
-# %run {module.path}
+# %reset -f
+# import importlib.util
+# spec = importlib.util.find_spec('chip.ChipReplStartup')
+# %run {spec.origin}
 # --------------------------------------
 #
 
@@ -15,3 +15,4 @@ jupyterlab
 ipykernel
 jupyterlab-lsp
 python-lsp-server
+jupyterlab-git

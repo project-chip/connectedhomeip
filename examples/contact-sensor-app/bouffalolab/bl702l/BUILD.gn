@@ -1,0 +1,262 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/bouffalolab_iot_sdk.gni")
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("${bouffalolab_iot_sdk_build_root}/bl702l/bl_iot_sdk.gni")
+import("${bouffalolab_iot_sdk_build_root}/common/bouffalolab_executable.gni")
+import("${build_root}/config/defaults.gni")
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+import("${chip_root}/src/platform/bouffalolab/common/args.gni")
+import("${chip_root}/src/platform/device.gni")
+
+import("${chip_root}/src/app/chip_data_model.gni")
+
+if (chip_enable_pw_rpc) {
+  import("//build_overrides/pigweed.gni")
+  import("$dir_pw_build/target_types.gni")
+}
+
+assert(current_os == "freertos")
+
+example_dir = "${chip_root}/examples/contact-sensor-app/bouffalolab"
+examples_plat_dir = "${chip_root}/examples/platform/bouffalolab"
+
+declare_args() {
+  # Dump memory usage at link time.
+  chip_print_memory_usage = true
+
+  # OTA periodic query timeout in seconds
+  ota_periodic_query_timeout_seconds = 86400
+
+  # reboot delay in seconds to apply new OTA image
+  ota_auto_reboot_delay_seconds = 5
+
+  enable_heap_monitoring = false
+
+  setupPinCode = 20202021
+  setupDiscriminator = 3840
+
+  board = "BL704L-EVB"
+  module_type = "BL704L"
+  baudrate = 2000000
+
+  enable_psram = true
+}
+
+bl_iot_sdk("sdk") {
+  include_dirs = [
+    "${example_dir}/bl702l",
+    "${example_dir}/bl702l/include",
+    "${examples_plat_dir}",
+    "${chip_root}/src/platform/bouffalolab/BL702L",
+    "${chip_root}/src/platform/bouffalolab/common",
+  ]
+
+  freertos_config = "${example_dir}/bl702l/FreeRTOSConfig.h"
+
+  defines = [
+    "INCLUDE_xSemaphoreGetMutexHolder=1",
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setupDiscriminator}",
+    "OTA_PERIODIC_TIMEOUT=${ota_periodic_query_timeout_seconds}",
+    "OTA_AUTO_REBOOT_DELAY=${ota_auto_reboot_delay_seconds}",
+    "PRINT_DEBUG=0",
+  ]
+
+  defines += [ "PW_RPC_ENABLED=${chip_enable_pw_rpc}" ]
+  if (chip_enable_pw_rpc) {
+    include_dirs += [ "${examples_plat_dir}/common/rpc" ]
+    defines += [ "DISABLE_PRINT=1" ]
+  } else if (chip_build_libshell) {
+    include_dirs += [ "${examples_plat_dir}/common/plat" ]
+  }
+
+  if (chip_enable_openthread) {
+    defines += [ "OPENTHREAD_CONFIG_PLATFORM_XTAL_ACCURACY=40" ]
+  }
+
+  assert(enable_psram == true, "BL702L must have psram for this application")
+  defines += [ "CFG_USE_PSRAM=1" ]
+}
+
+chip_data_model("bouffalolab_contact_sensor") {
+  zap_file = "${example_dir}/data_model/contact-sensor-app.zap"
+  is_server = true
+}
+
+bouffalolab_executable("contact_sensor_app") {
+  output_name = "chip-bl702l-contact-sensor-example.out"
+  bl_plat_name = "bl702l"
+
+  defines = [
+    "APP_TASK_STACK_SIZE=2048",
+    "CHIP_UART_BAUDRATE=${baudrate}",
+    "START_ENTRY=bl702_main",
+  ]
+
+  defines +=
+      [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE=${chip_enable_factory_data}" ]
+  if (chip_config_network_layer_ble) {
+    defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=1" ]
+  }
+
+  if ("BL704LDK" == board) {
+    defines += [ "XT_ZB6_DevKit" ]
+  }
+
+  include_dirs = [
+    "${chip_root}/src/platform/bouffalolab/BL702L",
+    "${example_dir}/common",
+    "${example_dir}/bl702l",
+    "${examples_plat_dir}/common/plat",
+    "${examples_plat_dir}/common/iot_sdk",
+  ]
+
+  sources = [
+    "${example_dir}/bl702l/app_pds.cpp",
+    "${example_dir}/common/AppTask.cpp",
+    "${example_dir}/common/ZclCallbacks.cpp",
+    "${examples_plat_dir}/common/iot_sdk/aos_task.c",
+    "${examples_plat_dir}/common/iot_sdk/platform_port.cpp",
+    "${examples_plat_dir}/common/iot_sdk/uart.cpp",
+    "${examples_plat_dir}/common/plat/OTAConfig.cpp",
+    "${examples_plat_dir}/common/plat/main.cpp",
+    "${examples_plat_dir}/common/plat/platform.cpp",
+  ]
+
+  deps = [
+    ":bouffalolab_contact_sensor",
+    ":sdk",
+    "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/platform/logging:default",
+    "${chip_root}/src/setup_payload",
+  ]
+
+  if (chip_enable_openthread) {
+    deps += [
+      "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
+      "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
+    ]
+
+    assert(chip_openthread_ftd == false,
+           "Only Thread MTD support on contact sensor application.")
+    defines += [ "CHIP_DEVICE_CONFIG_THREAD_FTD=0" ]
+    deps += [ "${openthread_root}:libopenthread-mtd" ]
+    if (chip_build_libshell) {
+      deps += [ "${openthread_root}:libopenthread-cli-mtd" ]
+    }
+  }
+
+  defines += [ "CONFIG_ENABLE_CHIP_SHELL=${chip_build_libshell}" ]
+  defines += [ "PW_RPC_ENABLED=${chip_enable_pw_rpc}" ]
+  if (chip_enable_pw_rpc) {
+    defines += [
+      "PW_RPC_ATTRIBUTE_SERVICE=1",
+      "PW_RPC_BUTTON_SERVICE=1",
+      "PW_RPC_DESCRIPTOR_SERVICE=1",
+      "PW_RPC_DEVICE_SERVICE=1",
+      "PW_RPC_LIGHTING_SERVICE=1",
+
+      "PW_RPC_OTCLI_SERVICE=1",
+      "PW_RPC_THREAD_SERVICE=1",
+
+      #"PW_RPC_TRACING_SERVICE=1",
+    ]
+
+    sources += [
+      "${chip_root}/examples/common/pigweed/RpcService.cpp",
+      "${chip_root}/examples/common/pigweed/bouffalolab/PigweedLoggerMutex.cpp",
+      "${examples_plat_dir}/common/rpc/PigweedLogger.cpp",
+      "${examples_plat_dir}/common/rpc/Rpc.cpp",
+    ]
+
+    deps += [
+      "$dir_pw_hdlc:default_addresses",
+      "$dir_pw_hdlc:rpc_channel_output",
+      "$dir_pw_stream:sys_io_stream",
+
+      #"$dir_pw_trace",
+      #"$dir_pw_trace_tokenized",
+      #"$dir_pw_trace_tokenized:trace_rpc_service",
+      "${chip_root}/config/bouffalolab/common/lib/pw_rpc:pw_rpc",
+      "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc",
+      "${examples_plat_dir}/common/rpc/pw_sys_io:pw_sys_io",
+    ]
+
+    if (chip_enable_openthread) {
+      deps += [
+        "${chip_root}/examples/common/pigweed:ot_cli_service.nanopb_rpc",
+        "${chip_root}/examples/common/pigweed:thread_service.nanopb_rpc",
+      ]
+    }
+
+    deps += pw_build_LINK_DEPS
+
+    include_dirs += [
+      "${chip_root}/examples/common",
+      "${chip_root}/examples/common/pigweed/bouffalolab",
+    ]
+  } else {
+    if (chip_build_libshell) {
+      include_dirs += [
+        "${chip_root}/src/lib/shell",
+        "${chip_root}/examples/shell/shell_common/include",
+      ]
+
+      deps += [ "${chip_root}/examples/shell/shell_common:shell_common" ]
+    }
+  }
+
+  defines += [ "HEAP_MONITORING=${enable_heap_monitoring}" ]
+  if (enable_heap_monitoring) {
+    sources += [ "${examples_plat_dir}/common/plat/MemMonitoring.cpp" ]
+  }
+
+  assert(enable_psram == true, "BL702L must have psram for this application")
+  defines += [ "CFG_USE_PSRAM=1" ]
+  ldscript = "${examples_plat_dir}/bl702l/ldscripts/psram_flash.ld"
+
+  inputs = [ ldscript ]
+
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+  cflags_c = [
+    "-Wno-unused-variable",
+    "-Wno-old-style-declaration",
+  ]
+  cflags = [ "-Wno-unused-variable" ]
+  if (chip_print_memory_usage) {
+    ldflags += [
+      "-Wl,--print-memory-usage",
+      "-fstack-usage",
+    ]
+  }
+
+  output_dir = root_out_dir
+}
+
+group("bl702l") {
+  deps = [ ":contact_sensor_app" ]
+}
+
+group("default") {
+  deps = [ ":bl702l" ]
+}

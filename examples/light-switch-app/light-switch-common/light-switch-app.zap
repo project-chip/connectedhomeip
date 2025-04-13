@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 103,
+  "featureLevel": 106,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -41,14 +41,16 @@
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
-        "name": "MA-rootdevice"
+        "name": "MA-rootdevice",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
-          "name": "MA-rootdevice"
+          "name": "MA-rootdevice",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -4369,10 +4371,10 @@
               "side": "server",
               "type": "bitmap32",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x0000",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -4400,29 +4402,31 @@
     },
     {
       "id": 2,
-      "name": "MA-onofflightswitch",
+      "name": "MA-dimmerswitch",
       "deviceTypeRef": {
-        "code": 259,
+        "code": 260,
         "profileId": 259,
-        "label": "MA-onofflightswitch",
-        "name": "MA-onofflightswitch"
+        "label": "MA-dimmerswitch",
+        "name": "MA-dimmerswitch",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
-          "code": 259,
+          "code": 260,
           "profileId": 259,
-          "label": "MA-onofflightswitch",
-          "name": "MA-onofflightswitch"
+          "label": "MA-dimmerswitch",
+          "name": "MA-dimmerswitch",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
         1
       ],
       "deviceIdentifiers": [
-        259
+        260
       ],
-      "deviceTypeName": "MA-onofflightswitch",
-      "deviceTypeCode": 259,
+      "deviceTypeName": "MA-dimmerswitch",
+      "deviceTypeCode": 260,
       "deviceTypeProfileId": 259,
       "clusters": [
         {
@@ -4726,6 +4730,80 @@
             {
               "name": "Toggle",
               "code": 2,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            }
+          ]
+        },
+        {
+          "name": "Level Control",
+          "code": 8,
+          "mfgCode": null,
+          "define": "LEVEL_CONTROL_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "commands": [
+            {
+              "name": "MoveToLevel",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "Move",
+              "code": 1,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "Step",
+              "code": 2,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "Stop",
+              "code": 3,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "MoveToLevelWithOnOff",
+              "code": 4,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "MoveWithOnOff",
+              "code": 5,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "StepWithOnOff",
+              "code": 6,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "StopWithOnOff",
+              "code": 7,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 0,
@@ -5175,14 +5253,16 @@
         "code": 15,
         "profileId": 259,
         "label": "MA-genericswitch",
-        "name": "MA-genericswitch"
+        "name": "MA-genericswitch",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 15,
           "profileId": 259,
           "label": "MA-genericswitch",
-          "name": "MA-genericswitch"
+          "name": "MA-genericswitch",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -5633,7 +5713,7 @@
       "parentEndpointIdentifier": null
     },
     {
-      "endpointTypeName": "MA-onofflightswitch",
+      "endpointTypeName": "MA-dimmerswitch",
       "endpointTypeIndex": 1,
       "profileId": 259,
       "endpointId": 1,

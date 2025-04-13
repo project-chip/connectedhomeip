@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2020 Project CHIP Authors
+ *   Copyright (c) 2020-2024 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +27,9 @@
 
 #include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
+
+#include "../dcl/DCLClient.h"
+#include "../dcl/DisplayTermsAndConditions.h"
 
 #include <string>
 
@@ -66,6 +69,10 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
         err = Unpair(remoteId);
         break;
     case PairingMode::Code:
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        chip::DeviceLayer::ConnectivityMgr().WiFiPafSetApFreq(
+            mApFreqStr.HasValue() ? static_cast<uint16_t>(std::stol(mApFreqStr.Value())) : 0);
+#endif
         err = PairWithCode(remoteId);
         break;
     case PairingMode::CodePaseOnly:
@@ -82,6 +89,8 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
         break;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     case PairingMode::WiFiPAF:
+        chip::DeviceLayer::ConnectivityMgr().WiFiPafSetApFreq(
+            mApFreqStr.HasValue() ? static_cast<uint16_t>(std::stol(mApFreqStr.Value())) : 0);
         err = Pair(remoteId, PeerAddress::WiFiPAF(remoteId));
         break;
 #endif
@@ -127,6 +136,17 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
     if (mCountryCode.HasValue())
     {
         params.SetCountryCode(CharSpan::fromCharString(mCountryCode.Value()));
+    }
+
+    // mTCAcknowledgements and mTCAcknowledgementVersion are optional, but related. When one is missing, default the value to 0, to
+    // increase the test tools ability to test the applications.
+    if (mTCAcknowledgements.HasValue() || mTCAcknowledgementVersion.HasValue())
+    {
+        TermsAndConditionsAcknowledgement termsAndConditionsAcknowledgement = {
+            .acceptedTermsAndConditions        = mTCAcknowledgements.ValueOr(0),
+            .acceptedTermsAndConditionsVersion = mTCAcknowledgementVersion.ValueOr(0),
+        };
+        params.SetTermsAndConditionsAcknowledgement(termsAndConditionsAcknowledgement);
     }
 
     // mTimeZoneList is an optional argument managed by TypedComplexArgument mComplex_TimeZones.
@@ -221,6 +241,7 @@ CHIP_ERROR PairingCommand::PairWithCode(NodeId remoteId)
         discoveryType = DiscoveryType::kDiscoveryNetworkOnlyWithoutPASEAutoRetry;
     }
 
+    ReturnErrorOnFailure(MaybeDisplayTermsAndConditions(commissioningParams));
     return CurrentCommissioner().PairDevice(remoteId, mOnboardingPayload, commissioningParams, discoveryType);
 }
 
@@ -573,4 +594,27 @@ void PairingCommand::OnDeviceAttestationCompleted(Controller::DeviceCommissioner
     {
         SetCommandExitStatus(err);
     }
+}
+
+CHIP_ERROR PairingCommand::MaybeDisplayTermsAndConditions(CommissioningParameters & params)
+{
+    VerifyOrReturnError(mUseDCL.ValueOr(false), CHIP_NO_ERROR);
+
+    Json::Value tc;
+    auto client = tool::dcl::DCLClient(mDCLHostName, mDCLPort);
+    ReturnErrorOnFailure(client.TermsAndConditions(mOnboardingPayload, tc));
+    if (tc != Json::nullValue)
+    {
+        uint16_t version      = 0;
+        uint16_t userResponse = 0;
+        ReturnErrorOnFailure(tool::dcl::DisplayTermsAndConditions(tc, version, userResponse, mCountryCode));
+
+        TermsAndConditionsAcknowledgement termsAndConditionsAcknowledgement = {
+            .acceptedTermsAndConditions        = userResponse,
+            .acceptedTermsAndConditionsVersion = version,
+        };
+        params.SetTermsAndConditionsAcknowledgement(termsAndConditionsAcknowledgement);
+    }
+
+    return CHIP_NO_ERROR;
 }

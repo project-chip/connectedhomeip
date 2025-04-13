@@ -16,6 +16,10 @@
 
 set(CHIP_APP_BASE_DIR ${CMAKE_CURRENT_LIST_DIR})
 
+if (NOT CHIP_APP_ZAP_DIR)
+    get_filename_component(CHIP_APP_ZAP_DIR ${CHIP_ROOT}/zzz_generated/app-common REALPATH)
+endif()
+
 include("${CHIP_ROOT}/build/chip/chip_codegen.cmake")
 include("${CHIP_ROOT}/src/data-model-providers/codegen/model.cmake")
 
@@ -24,6 +28,16 @@ include("${CHIP_ROOT}/src/data-model-providers/codegen/model.cmake")
 function(chip_configure_cluster APP_TARGET CLUSTER)
     file(GLOB CLUSTER_SOURCES "${CHIP_APP_BASE_DIR}/clusters/${CLUSTER}/*.cpp")
     target_sources(${APP_TARGET} PRIVATE ${CLUSTER_SOURCES})
+
+    # Add clusters dependencies
+    if (CLUSTER STREQUAL "icd-management-server")
+      # TODO(#32321): Remove after issue is resolved
+      # Add ICDConfigurationData when ICD management server cluster is included,
+      # but ICD support is disabled, e.g. lock-app on some platforms
+      if(NOT CONFIG_CHIP_ENABLE_ICD_SUPPORT)
+        target_sources(${APP_TARGET} PRIVATE ${CHIP_APP_BASE_DIR}/icd/server/ICDConfigurationData.cpp)
+      endif()
+    endif()
 endfunction()
 
 #
@@ -81,11 +95,11 @@ function(chip_configure_data_model APP_TARGET)
         ${CHIP_APP_BASE_DIR}/SafeAttributePersistenceProvider.cpp
         ${CHIP_APP_BASE_DIR}/StorageDelegateWrapper.cpp
         ${CHIP_APP_BASE_DIR}/server/AclStorage.cpp
-        ${CHIP_APP_BASE_DIR}/server/DefaultAclStorage.cpp
         ${CHIP_APP_BASE_DIR}/server/CommissioningWindowManager.cpp
+        ${CHIP_APP_BASE_DIR}/server/DefaultAclStorage.cpp
+        ${CHIP_APP_BASE_DIR}/server/DefaultTermsAndConditionsProvider.cpp
         ${CHIP_APP_BASE_DIR}/server/Dnssd.cpp
         ${CHIP_APP_BASE_DIR}/server/EchoHandler.cpp
-        ${CHIP_APP_BASE_DIR}/server/OnboardingCodesUtil.cpp
         ${CHIP_APP_BASE_DIR}/server/Server.cpp
     )
 
@@ -108,7 +122,8 @@ function(chip_configure_data_model APP_TARGET)
             OUTPUTS
             "app/PluginApplicationCallbacks.h"
             "app/callback-stub.cpp"
-            "app/cluster-init-callback.cpp"
+            "app/cluster-callbacks.cpp"
+            "app/static-cluster-config/{{server_cluster_name}}.h"
             OUTPUT_PATH APP_GEN_DIR
             OUTPUT_FILES APP_GEN_FILES
         )
@@ -118,27 +133,6 @@ function(chip_configure_data_model APP_TARGET)
     else()
         set(APP_GEN_FILES)
     endif()
-
-    # These are:
-    #   //src/app/icd/server:notfier
-    #   //src/app/icd/server:monitoring-table
-    #   //src/app/icd/server:configuration-data
-    #
-    # TODO: ideally we would avoid duplication and would link gn-built items. In this case
-    #       it may be slightly harder because these are source_sets rather than libraries.
-    target_sources(${APP_TARGET} ${SCOPE}
-        ${CHIP_APP_BASE_DIR}/icd/server/ICDMonitoringTable.cpp
-        ${CHIP_APP_BASE_DIR}/icd/server/ICDNotifier.cpp
-        ${CHIP_APP_BASE_DIR}/icd/server/ICDConfigurationData.cpp
-    )
-
-    # This is:
-    #    //src/app/common:cluster-objects
-    #
-    # TODO: ideally we would avoid duplication and would link gn-built items
-    target_sources(${APP_TARGET} ${SCOPE}
-        ${CHIP_APP_BASE_DIR}/../../zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp
-    )
 
     chip_zapgen(${APP_TARGET}-zapgen
         INPUT "${ARG_ZAP_FILE}"
@@ -155,13 +149,12 @@ function(chip_configure_data_model APP_TARGET)
     add_dependencies(${APP_TARGET} ${APP_TARGET}-zapgen)
 
     target_sources(${APP_TARGET} ${SCOPE}
-        ${CHIP_APP_BASE_DIR}/../../zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
+        ${CHIP_APP_ZAP_DIR}/app-common/zap-generated/attributes/Accessors.cpp
         ${CHIP_APP_BASE_DIR}/reporting/reporting.cpp
         ${CHIP_APP_BASE_DIR}/util/attribute-storage.cpp
         ${CHIP_APP_BASE_DIR}/util/attribute-table.cpp
         ${CHIP_APP_BASE_DIR}/util/binding-table.cpp
         ${CHIP_APP_BASE_DIR}/util/DataModelHandler.cpp
-        ${CHIP_APP_BASE_DIR}/util/ember-global-attribute-access-interface.cpp
         ${CHIP_APP_BASE_DIR}/util/ember-io-storage.cpp
         ${CHIP_APP_BASE_DIR}/util/generic-callback-stubs.cpp
         ${CHIP_APP_BASE_DIR}/util/privilege-storage.cpp

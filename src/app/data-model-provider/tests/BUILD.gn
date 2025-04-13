@@ -20,6 +20,7 @@ chip_test_suite("tests") {
   test_sources = [
     "TestActionReturnStatus.cpp",
     "TestEventEmitting.cpp",
+    "TestMetadataList.cpp",
   ]
 
   cflags = [ "-Wconversion" ]

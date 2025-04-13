@@ -16,7 +16,7 @@
 
 from ctypes import CFUNCTYPE, c_char_p, c_uint16, c_uint32, c_uint64
 
-from chip.native import PyChipError
+from ..native import PyChipError
 
 DiscoverSuccessCallback_t = CFUNCTYPE(
     None,  # void return
