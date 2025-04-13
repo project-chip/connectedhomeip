@@ -151,9 +151,21 @@ class TC_SEPR_2_1(MatterBaseTest):
         matter_asserts.assert_valid_uint32(struct.periodStart, 'PeriodStart')
         if struct.periodEnd is not NullValue:
             matter_asserts.assert_valid_uint32(struct.periodEnd, 'PeriodEnd')
-        asserts.assert_true(isinstance(
-            struct.price, Globals.Structs.PriceStruct), "struct.price must be of type PriceStruct")
-        await self.test_checkPriceStruct(endpoint=endpoint, cluster=cluster, struct=struct.price)
+
+        bPriceIncluded = false
+        bPriceLevelIncluded = false
+
+        if struct.price is not NullValue:
+            asserts.assert_true(isinstance(
+                struct.price, Globals.Structs.PriceStruct), "struct.price must be of type PriceStruct")
+            await self.test_checkPriceStruct(endpoint=endpoint, cluster=cluster, struct=struct.price)
+            bPriceIncluded = true
+
+        if struct.priceLevel is not NullValue:
+            matter_asserts.assert_valid_int16(struct.priceLevel, 'PriceLevel')
+            bPriceLevelIncluded = true
+        
+        asserts.assert_true(bPriceIncluded or bPriceLevelIncluded, "Either Price or PriceLevel must be included")
 
         # In the attribute description and components must not be included based on Bitmap (default 0)
         if bitmap & Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap.kDescription:
