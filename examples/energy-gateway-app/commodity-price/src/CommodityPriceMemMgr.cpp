@@ -98,8 +98,9 @@ CHIP_ERROR PriceForecastMemMgr::AllocAndCopy()
     if (mNumPriceComponents > 0)
     {
         // Allocate the memory first and then use placement new to initialise the memory of each element in the array
-        mpListOfPriceEntries[mPriceEntryIdx] = static_cast<CommodityPrice::Structs::CommodityPriceComponentStruct::Type *>(
-            chip::Platform::MemoryAlloc(sizeof(CommodityPrice::Structs::CommodityPriceComponentStruct::Type) * mNumPriceComponents));
+        mpListOfPriceEntries[mPriceEntryIdx] =
+            static_cast<CommodityPrice::Structs::CommodityPriceComponentStruct::Type *>(chip::Platform::MemoryAlloc(
+                sizeof(CommodityPrice::Structs::CommodityPriceComponentStruct::Type) * mNumPriceComponents));
 
         VerifyOrReturnError(mpListOfPriceEntries[mPriceEntryIdx] != nullptr, CHIP_ERROR_NO_MEMORY);
 
@@ -130,8 +131,9 @@ PriceForecastMemMgr::AllocAndCopy(const DataModel::List<const Structs::Commodity
     if (mNumPriceComponents > 0)
     {
         // Allocate the memory first and then use placement new to initialise the memory of each element in the array
-        mpListOfPriceEntries[mPriceEntryIdx] = static_cast<CommodityPrice::Structs::CommodityPriceComponentStruct::Type *>(
-            chip::Platform::MemoryAlloc(sizeof(CommodityPrice::Structs::CommodityPriceComponentStruct::Type) * priceComponents.size()));
+        mpListOfPriceEntries[mPriceEntryIdx] =
+            static_cast<CommodityPrice::Structs::CommodityPriceComponentStruct::Type *>(chip::Platform::MemoryAlloc(
+                sizeof(CommodityPrice::Structs::CommodityPriceComponentStruct::Type) * priceComponents.size()));
 
         VerifyOrReturnError(mpListOfPriceEntries[mPriceEntryIdx] != nullptr, CHIP_ERROR_NO_MEMORY);
 
@@ -152,7 +154,8 @@ PriceForecastMemMgr::AllocAndCopy(const DataModel::List<const Structs::Commodity
 }
 
 CHIP_ERROR
-PriceForecastMemMgr::AllocAndCopy(const DataModel::DecodableList<Structs::CommodityPriceComponentStruct::DecodableType> & priceComponents)
+PriceForecastMemMgr::AllocAndCopy(
+    const DataModel::DecodableList<Structs::CommodityPriceComponentStruct::DecodableType> & priceComponents)
 {
     // NOTE: PriceForecastMemMgr::PreparePriceEntry() must be called as
     // specified in the class comments in CommodityPriceMemMgr.h before this
@@ -168,8 +171,9 @@ PriceForecastMemMgr::AllocAndCopy(const DataModel::DecodableList<Structs::Commod
     if (mNumPriceComponents > 0)
     {
         // Allocate the memory first and then use placement new to initialise the memory of each element in the array
-        mpListOfPriceEntries[mPriceEntryIdx] = static_cast<CommodityPrice::Structs::CommodityPriceComponentStruct::Type *>(
-            chip::Platform::MemoryAlloc(sizeof(CommodityPrice::Structs::CommodityPriceComponentStruct::Type) * mNumPriceComponents));
+        mpListOfPriceEntries[mPriceEntryIdx] =
+            static_cast<CommodityPrice::Structs::CommodityPriceComponentStruct::Type *>(chip::Platform::MemoryAlloc(
+                sizeof(CommodityPrice::Structs::CommodityPriceComponentStruct::Type) * mNumPriceComponents));
 
         VerifyOrReturnError(mpListOfPriceEntries[mPriceEntryIdx] != nullptr, CHIP_ERROR_NO_MEMORY);
 

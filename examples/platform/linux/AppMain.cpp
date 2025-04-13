@@ -788,9 +788,9 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     signal(SIGTERM, StopSignalHandler);
     // NOLINTEND(bugprone-signal-handler)
 #else
-    struct sigaction sa = {};
-    sa.sa_handler       = StopSignalHandler;
-    sa.sa_flags         = SA_RESETHAND;
+    struct sigaction sa                        = {};
+    sa.sa_handler                              = StopSignalHandler;
+    sa.sa_flags                                = SA_RESETHAND;
     sigaction(SIGINT, &sa, nullptr);
     sigaction(SIGTERM, &sa, nullptr);
 #endif

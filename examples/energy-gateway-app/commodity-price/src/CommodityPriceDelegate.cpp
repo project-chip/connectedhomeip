@@ -148,7 +148,7 @@ Status CommodityPriceDelegate::SendPriceChangeEvent()
     return Status::Success;
 }
 
-CHIP_ERROR CommodityPriceDelegate::SetForecast(const DataModel::List<const Structs::CommodityPriceStruct::Type>  & priceForecast)
+CHIP_ERROR CommodityPriceDelegate::SetForecast(const DataModel::List<const Structs::CommodityPriceStruct::Type> & priceForecast)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -159,11 +159,12 @@ CHIP_ERROR CommodityPriceDelegate::SetForecast(const DataModel::List<const Struc
     return CHIP_NO_ERROR;
 }
 
-const DataModel::List<const CommodityPriceStruct::Type> & CommodityPriceDelegate::GetPriceForecast(CommodityPriceDetailBitmap bitmap)
+const DataModel::List<const CommodityPriceStruct::Type> &
+CommodityPriceDelegate::GetPriceForecast(CommodityPriceDetailBitmap bitmap)
 {
     ChipLogDetail(Zcl, "CommodityPriceDelegate::GetForecast");
 
-    //TODO using the bitmap we need to knock out description/components if they are not required
+    // TODO using the bitmap we need to knock out description/components if they are not required
 
     return mPriceForecast;
 }
