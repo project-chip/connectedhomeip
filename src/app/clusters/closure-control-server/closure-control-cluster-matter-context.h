@@ -37,7 +37,7 @@ public:
     MatterContext(EndpointId endpointId) : mEndpointId(endpointId) {}
     virtual ~MatterContext() = default;
 
-    virtual void MarkDirty(AttributeId attributeId) { MatterReportingAttributeChangeCallback(mEndpoint, Id, attributeId); }
+    virtual void MarkDirty(AttributeId attributeId) { MatterReportingAttributeChangeCallback(mEndpointId, Id, attributeId); }
 
 private:
     EndpointId mEndpointId = kInvalidEndpointId;

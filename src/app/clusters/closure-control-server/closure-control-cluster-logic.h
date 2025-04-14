@@ -21,6 +21,9 @@
 
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/cluster-building-blocks/QuieterReporting.h>
+#include <app/clusters/closure-control-server/closure-control-cluster-delegate.h>
+#include <app/clusters/closure-control-server/closure-control-cluster-matter-context.h>
+#include <app/clusters/closure-control-server/closure-control-cluster-objects.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -98,16 +101,50 @@ private:
 /**
  * @brief Struct to store the current cluster state
  */
-struct ClusterState
+struct ClusterStateAttributes
 {
-    QuieterReportingAttribute<DataModel::Nullable<ElapsedS>> mCountDownTime = QuieterReportingAttribute<DataModel::NullNullable>();
-    MainStateEnum mMainState                                                = kUnknownEnumValue;
-    DataModel::Nullable<GenericOverallState>                                = DataModel::NullNullable;
-    DataModel::Nullable<GenericOverallTarget>                               = DataModel::NullNullable;
+    QuieterReportingAttribute<ElapsedS> mCountDownTime{ DataModel::NullNullable };
+    MainStateEnum mMainState                                 = MainStateEnum::kUnknownEnumValue;
+    DataModel::Nullable<GenericOverallState> mOverallState   = DataModel::NullNullable;
+    DataModel::Nullable<GenericOverallTarget> mOverallTarget = DataModel::NullNullable;
 
     // CurrentErrorList attribute is not stored here. When it is necessary it will be requested from the delegate to get the current
     // active errors.
-}
+};
+
+/**
+ * @brief Class containing the cluster buisness logic
+ *
+ */
+class ClusterLogic
+{
+public:
+    // Instantiates a ClusterLogic class. The caller maintains ownership of the driver and the context, but provides them for use by
+    // the ClusterLogic class.
+    ClusterLogic(DelegateBase & delegate, MatterContext & matterContext) : mDelegate(delegate), mMatterContext(matterContext) {}
+    ~ClusterLogic() = default;
+
+    const ClusterConformance & GetConformance() const { return mConformance; }
+    const ClusterStateAttributes & GetState() const { return mState; }
+
+    /**
+     * @brief Initializes the cluster logic
+     *        Validates that the provided conformance is spec compliant
+     *
+     * @param[in] conformance
+     * @return CHIP_ERROR
+     */
+    CHIP_ERROR Init(const ClusterConformance & conformance);
+
+private:
+    bool mIsInitialized = false;
+
+    ClusterConformance mConformance;
+    ClusterStateAttributes mState;
+
+    [[maybe_unused]] DelegateBase & mDelegate;
+    [[maybe_unused]] MatterContext & mMatterContext;
+};
 
 } // namespace ClosureControl
 } // namespace Clusters

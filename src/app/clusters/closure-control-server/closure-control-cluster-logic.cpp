@@ -20,7 +20,18 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace ClosureControl {}
+namespace ClosureControl {
+
+CHIP_ERROR ClusterLogic::Init(const ClusterConformance & conformance)
+{
+    VerifyOrReturnError(conformance.Valid(), CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
+    mConformance = conformance;
+
+    mIsInitialized = true;
+    return CHIP_NO_ERROR;
+}
+
+} // namespace ClosureControl
 } // namespace Clusters
 } // namespace app
 } // namespace chip

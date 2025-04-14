@@ -20,125 +20,50 @@
 
 #include <app/clusters/closure-control-server/closure-control-cluster-logic.h>
 
-using chip::app::Clusters::ClosureControl::ClusterConformance;
-using chip::app::Clusters::ClosureControl::Feature;
+using namespace chip;
+using namespace chip::app::Clusters::ClosureControl;
+using Status = chip::Protocols::InteractionModel::Status;
 
-/*
-    ClusterConformance Valid Function Test Case
-*/
+namespace {
+// Simple mock implementation of DelegateBase
+class MockDelegate : public DelegateBase
+{
+public:
+    virtual ~MockDelegate() = default;
 
-TEST(TestClosureControlClusterLogic, ValidWhenPositioningEnabled)
+    Status HandleStopCommand() override { return Status::Success; }
+    Status HandleMoveToCommand() override { return Status::Success; }
+    Status HandleCalibrateCommand() override { return Status::Success; }
+};
+} // namespace
+
+// Simple mock implementation of MatterContext
+class MockMatterContext : public MatterContext
+{
+public:
+    MockMatterContext() : MatterContext(kInvalidEndpointId) {}
+    void MarkDirty(AttributeId attributeId) override { /* No-op for testing */ }
+};
+
+TEST(TestClosureControlClusterLogic, InitValidConformance)
 {
     ClusterConformance conformance;
     conformance.FeatureMap().Set(Feature::kPositioning);
 
-    EXPECT_TRUE(conformance.Valid());
+    MockDelegate mockDelegate;
+    MockMatterContext mockContext;
+    ClusterLogic logic(mockDelegate, mockContext);
+
+    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
 }
 
-TEST(TestClosureControlClusterLogic, ValidWhenMotionLatchingEnabled)
-{
-    ClusterConformance conformance;
-    conformance.FeatureMap().Set(Feature::kMotionLatching);
-
-    EXPECT_TRUE(conformance.Valid());
-}
-
-TEST(TestClosureControlClusterLogic, InvalidWhenNeitherPositioningNorMotionLatchingEnabled)
+TEST(TestClosureControlClusterLogic, InitInvalidConformance)
 {
     ClusterConformance conformance;
 
-    EXPECT_FALSE(conformance.Valid());
-}
+    MockDelegate mockDelegate;
+    MockMatterContext mockContext;
+    ClusterLogic logic(mockDelegate, mockContext);
 
-TEST(TestClosureControlClusterLogic, ValidWhenSpeedAndPositioningEnabledAndInstantaneousDisabled)
-{
-    ClusterConformance conformance;
-    conformance.FeatureMap().Set(Feature::kSpeed).Set(Feature::kPositioning);
-
-    EXPECT_TRUE(conformance.Valid());
-}
-
-TEST(TestClosureControlClusterLogic, InvalidWhenSpeedEnabledButPositioningDisabled)
-{
-    ClusterConformance conformance;
-    conformance.FeatureMap().Set(Feature::kSpeed);
-
-    EXPECT_FALSE(conformance.Valid());
-}
-
-TEST(TestClosureControlClusterLogic, InvalidWhenSpeedAndInstantaneousBothEnabled)
-{
-    ClusterConformance conformance;
-    conformance.FeatureMap().Set(Feature::kSpeed).Set(Feature::kPositioning).Set(Feature::kInstantaneous);
-
-    EXPECT_FALSE(conformance.Valid());
-}
-
-TEST(TestClosureControlClusterLogic, ValidWhenVentilationAndPositioningEnabled)
-{
-    ClusterConformance conformance;
-    conformance.FeatureMap().Set(Feature::kVentilation).Set(Feature::kPositioning);
-
-    EXPECT_TRUE(conformance.Valid());
-}
-
-TEST(TestClosureControlClusterLogic, InvalidWhenVentilationEnabledButPositioningDisabled)
-{
-    ClusterConformance conformance;
-    conformance.FeatureMap().Set(Feature::kVentilation);
-
-    EXPECT_FALSE(conformance.Valid());
-}
-
-TEST(TestClosureControlClusterLogic, ValidWhenPedestrianAndPositioningEnabled)
-{
-    ClusterConformance conformance;
-    conformance.FeatureMap().Set(Feature::kPedestrian).Set(Feature::kPositioning);
-
-    EXPECT_TRUE(conformance.Valid());
-}
-
-TEST(TestClosureControlClusterLogic, InvalidWhenPedestrianEnabledButPositioningDisabled)
-{
-    ClusterConformance conformance;
-    conformance.FeatureMap().Set(Feature::kPedestrian);
-
-    EXPECT_FALSE(conformance.Valid());
-}
-
-TEST(TestClosureControlClusterLogic, ValidWhenCalibrationAndPositioningEnabled)
-{
-    ClusterConformance conformance;
-    conformance.FeatureMap().Set(Feature::kCalibration).Set(Feature::kPositioning);
-
-    EXPECT_TRUE(conformance.Valid());
-}
-
-TEST(TestClosureControlClusterLogic, InvalidWhenCalibrationEnabledButPositioningDisabled)
-{
-    ClusterConformance conformance;
-    conformance.FeatureMap().Set(Feature::kCalibration);
-
-    EXPECT_FALSE(conformance.Valid());
-}
-
-TEST(TestClosureControlClusterLogic, ValidWhenVentilationPedestrianCalibrationAndPositioningEnabled)
-{
-    ClusterConformance conformance;
-    conformance.FeatureMap()
-        .ClearAll()
-        .Set(Feature::kVentilation)
-        .Set(Feature::kPedestrian)
-        .Set(Feature::kCalibration)
-        .Set(Feature::kPositioning);
-
-    EXPECT_TRUE(conformance.Valid());
-}
-
-TEST(TestClosureControlClusterLogic, InvalidWhenVentilationPedestrianCalibrationEnabledButPositioningDisabled)
-{
-    ClusterConformance conformance;
-    conformance.FeatureMap().Set(Feature::kVentilation).Set(Feature::kPedestrian).Set(Feature::kCalibration);
-
-    EXPECT_FALSE(conformance.Valid());
+    EXPECT_NE(logic.Init(conformance), CHIP_NO_ERROR);
 }

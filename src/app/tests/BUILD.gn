@@ -205,6 +205,7 @@ source_set("closure-control-test-srcs") {
   sources = [
     "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-logic.cpp",
     "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-logic.h",
+    "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-matter-context.h",
   ]
 
   deps = [
@@ -231,6 +232,7 @@ chip_test_suite("tests") {
     "TestBuilderParser.cpp",
     "TestCheckInHandler.cpp",
     "TestClosureControlClusterLogic.cpp",
+    "TestClosureControlConformance.cpp",
     "TestCommandHandlerInterfaceRegistry.cpp",
     "TestCommandInteraction.cpp",
     "TestCommandPathParams.cpp",
@@ -269,6 +271,7 @@ chip_test_suite("tests") {
   public_deps = [
     ":app-test-stubs",
     ":binding-test-srcs",
+    ":closure-control-test-srcs",
     ":ecosystem-information-test-srcs",
     ":operational-state-test-srcs",
     ":ota-requestor-test-srcs",
