@@ -21819,7 +21819,7 @@ namespace TemperatureControlStruct {
 enum class Fields : uint8_t
 {
     kCoolingTempOffset   = 0,
-    kHeatingtTempOffset  = 1,
+    kHeatingTempOffset   = 1,
     kCoolingTempSetpoint = 2,
     kHeatingTempSetpoint = 3,
 };
@@ -21827,8 +21827,8 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    Optional<DataModel::Nullable<uint16_t>> coolingTempOffset;
-    Optional<DataModel::Nullable<uint16_t>> heatingtTempOffset;
+    Optional<DataModel::Nullable<int16_t>> coolingTempOffset;
+    Optional<DataModel::Nullable<int16_t>> heatingTempOffset;
     Optional<DataModel::Nullable<int16_t>> coolingTempSetpoint;
     Optional<DataModel::Nullable<int16_t>> heatingTempSetpoint;
 
@@ -21878,14 +21878,13 @@ using DecodableType = Type;
 namespace LoadControlEventStruct {
 enum class Fields : uint8_t
 {
-    kEventID         = 0,
-    kProgramID       = 1,
-    kControl         = 2,
-    kDeviceClass     = 3,
-    kEnrollmentGroup = 4,
-    kCriticality     = 5,
-    kStartTime       = 6,
-    kTransitions     = 7,
+    kEventID     = 0,
+    kProgramID   = 1,
+    kStatus      = 2,
+    kControl     = 3,
+    kCriticality = 4,
+    kStartTime   = 5,
+    kTransitions = 6,
 };
 
 struct Type
@@ -21893,10 +21892,9 @@ struct Type
 public:
     chip::ByteSpan eventID;
     DataModel::Nullable<chip::ByteSpan> programID;
-    chip::BitMask<EventControlBitmap> control    = static_cast<chip::BitMask<EventControlBitmap>>(0);
-    chip::BitMask<DeviceClassBitmap> deviceClass = static_cast<chip::BitMask<DeviceClassBitmap>>(0);
-    Optional<uint8_t> enrollmentGroup;
-    CriticalityLevelEnum criticality = static_cast<CriticalityLevelEnum>(0);
+    Optional<LoadControlEventStatusEnum> status;
+    chip::BitMask<EventControlBitmap> control = static_cast<chip::BitMask<EventControlBitmap>>(0);
+    CriticalityLevelEnum criticality          = static_cast<CriticalityLevelEnum>(0);
     DataModel::Nullable<uint32_t> startTime;
     DataModel::List<const Structs::LoadControlEventTransitionStruct::Type> transitions;
 
@@ -21910,10 +21908,9 @@ struct DecodableType
 public:
     chip::ByteSpan eventID;
     DataModel::Nullable<chip::ByteSpan> programID;
-    chip::BitMask<EventControlBitmap> control    = static_cast<chip::BitMask<EventControlBitmap>>(0);
-    chip::BitMask<DeviceClassBitmap> deviceClass = static_cast<chip::BitMask<DeviceClassBitmap>>(0);
-    Optional<uint8_t> enrollmentGroup;
-    CriticalityLevelEnum criticality = static_cast<CriticalityLevelEnum>(0);
+    Optional<LoadControlEventStatusEnum> status;
+    chip::BitMask<EventControlBitmap> control = static_cast<chip::BitMask<EventControlBitmap>>(0);
+    CriticalityLevelEnum criticality          = static_cast<CriticalityLevelEnum>(0);
     DataModel::Nullable<uint32_t> startTime;
     DataModel::DecodableList<Structs::LoadControlEventTransitionStruct::DecodableType> transitions;
 
@@ -21928,9 +21925,8 @@ enum class Fields : uint8_t
 {
     kProgramID             = 0,
     kName                  = 1,
-    kEnrollmentGroup       = 2,
-    kRandomStartMinutes    = 3,
-    kRandomDurationMinutes = 4,
+    kRandomStartMinutes    = 2,
+    kRandomDurationMinutes = 3,
 };
 
 struct Type
@@ -21938,7 +21934,6 @@ struct Type
 public:
     chip::ByteSpan programID;
     chip::CharSpan name;
-    DataModel::Nullable<uint8_t> enrollmentGroup;
     DataModel::Nullable<uint8_t> randomStartMinutes;
     DataModel::Nullable<uint8_t> randomDurationMinutes;
 
@@ -21976,11 +21971,6 @@ namespace RemoveLoadControlEventRequest {
 struct Type;
 struct DecodableType;
 } // namespace RemoveLoadControlEventRequest
-
-namespace ClearLoadControlEventsRequest {
-struct Type;
-struct DecodableType;
-} // namespace ClearLoadControlEventsRequest
 
 } // namespace Commands
 
@@ -22116,34 +22106,6 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RemoveLoadControlEventRequest
-namespace ClearLoadControlEventsRequest {
-enum class Fields : uint8_t
-{
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ClearLoadControlEventsRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DemandResponseLoadControl::Id; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ClearLoadControlEventsRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DemandResponseLoadControl::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ClearLoadControlEventsRequest
 } // namespace Commands
 
 namespace Attributes {
@@ -22193,12 +22155,9 @@ struct TypeInfo
 namespace ActiveEvents {
 struct TypeInfo
 {
-    using Type =
-        chip::app::DataModel::List<const chip::app::Clusters::DemandResponseLoadControl::Structs::LoadControlEventStruct::Type>;
-    using DecodableType = chip::app::DataModel::DecodableList<
-        chip::app::Clusters::DemandResponseLoadControl::Structs::LoadControlEventStruct::DecodableType>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::DemandResponseLoadControl::Structs::LoadControlEventStruct::DecodableType> &;
+    using Type             = chip::app::DataModel::List<const chip::ByteSpan>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::ByteSpan>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::ByteSpan> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DemandResponseLoadControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveEvents::Id; }
@@ -22335,7 +22294,7 @@ public:
     static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan eventID;
-    DataModel::Nullable<uint8_t> transitionIndex;
+    uint8_t transitionIndex                   = static_cast<uint8_t>(0);
     LoadControlEventStatusEnum status         = static_cast<LoadControlEventStatusEnum>(0);
     CriticalityLevelEnum criticality          = static_cast<CriticalityLevelEnum>(0);
     chip::BitMask<EventControlBitmap> control = static_cast<chip::BitMask<EventControlBitmap>>(0);
@@ -22356,7 +22315,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::DemandResponseLoadControl::Id; }
 
     chip::ByteSpan eventID;
-    DataModel::Nullable<uint8_t> transitionIndex;
+    uint8_t transitionIndex                   = static_cast<uint8_t>(0);
     LoadControlEventStatusEnum status         = static_cast<LoadControlEventStatusEnum>(0);
     CriticalityLevelEnum criticality          = static_cast<CriticalityLevelEnum>(0);
     chip::BitMask<EventControlBitmap> control = static_cast<chip::BitMask<EventControlBitmap>>(0);
