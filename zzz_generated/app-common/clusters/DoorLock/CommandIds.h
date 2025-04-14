@@ -121,6 +121,6 @@ inline constexpr CommandId Id = 0x00000025;
 
 } // namespace Commands
 } // namespace DoorLock
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

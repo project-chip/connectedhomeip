@@ -21,16 +21,19 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace TemperatureUnit {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = UnitLocalization::Attributes::TemperatureUnit::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = TemperatureUnit::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 } // namespace TemperatureUnit
 
+
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+
+} // namespace Commands
 } // namespace UnitLocalization
 } // namespace Clusters
 } // namespace app

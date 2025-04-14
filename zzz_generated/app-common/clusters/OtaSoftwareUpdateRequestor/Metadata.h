@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace DefaultOTAProviders {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id,
+    .attributeId    = DefaultOTAProviders::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kAdminister,
@@ -29,28 +29,29 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace DefaultOTAProviders
 namespace UpdatePossible {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = UpdatePossible::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace UpdatePossible
 namespace UpdateState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = UpdateState::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace UpdateState
 namespace UpdateStateProgress {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = UpdateStateProgress::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace UpdateStateProgress
+
 
 } // namespace Attributes
 
@@ -58,7 +59,7 @@ namespace Commands {
 namespace AnnounceOTAProvider {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace AnnounceOTAProvider

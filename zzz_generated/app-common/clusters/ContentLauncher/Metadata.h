@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace AcceptHeader {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ContentLauncher::Attributes::AcceptHeader::Id,
+    .attributeId    = AcceptHeader::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,12 +29,13 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace AcceptHeader
 namespace SupportedStreamingProtocols {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ContentLauncher::Attributes::SupportedStreamingProtocols::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = SupportedStreamingProtocols::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace SupportedStreamingProtocols
+
 
 } // namespace Attributes
 
@@ -42,14 +43,14 @@ namespace Commands {
 namespace LaunchContent {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = ContentLauncher::Commands::LaunchContent::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace LaunchContent
 namespace LaunchURL {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = ContentLauncher::Commands::LaunchURL::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace LaunchURL

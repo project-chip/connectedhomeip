@@ -10,8 +10,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace EcosystemInformation {
-namespace Commands {} // namespace Commands
+namespace Commands {
+} // namespace Commands
 } // namespace EcosystemInformation
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

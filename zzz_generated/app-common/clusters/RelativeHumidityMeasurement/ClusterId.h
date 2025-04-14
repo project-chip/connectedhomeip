@@ -14,6 +14,6 @@ namespace RelativeHumidityMeasurement {
 inline constexpr ClusterId Id = 0x00000405;
 
 } // namespace RelativeHumidityMeasurement
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

@@ -14,6 +14,6 @@ namespace FixedLabel {
 inline constexpr ClusterId Id = 0x00000040;
 
 } // namespace FixedLabel
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

@@ -10,8 +10,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ClosureDimension {
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 } // namespace ClosureDimension
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

@@ -14,6 +14,6 @@ namespace NitrogenDioxideConcentrationMeasurement {
 inline constexpr ClusterId Id = 0x00000413;
 
 } // namespace NitrogenDioxideConcentrationMeasurement
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

@@ -21,28 +21,29 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace WindowStatus {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = AdministratorCommissioning::Attributes::WindowStatus::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = WindowStatus::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace WindowStatus
 namespace AdminFabricIndex {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = AdministratorCommissioning::Attributes::AdminFabricIndex::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = AdminFabricIndex::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace AdminFabricIndex
 namespace AdminVendorId {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = AdministratorCommissioning::Attributes::AdminVendorId::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = AdminVendorId::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace AdminVendorId
+
 
 } // namespace Attributes
 

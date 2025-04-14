@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 2;
 namespace Attributes {
 namespace DeviceTypeList {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Descriptor::Attributes::DeviceTypeList::Id,
+    .attributeId    = DeviceTypeList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace DeviceTypeList
 namespace ServerList {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Descriptor::Attributes::ServerList::Id,
+    .attributeId    = ServerList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -37,7 +37,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ServerList
 namespace ClientList {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Descriptor::Attributes::ClientList::Id,
+    .attributeId    = ClientList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -45,7 +45,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ClientList
 namespace PartsList {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Descriptor::Attributes::PartsList::Id,
+    .attributeId    = PartsList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -53,16 +53,19 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace PartsList
 namespace TagList {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Descriptor::Attributes::TagList::Id,
+    .attributeId    = TagList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace TagList
 
+
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+
+} // namespace Commands
 } // namespace Descriptor
 } // namespace Clusters
 } // namespace app

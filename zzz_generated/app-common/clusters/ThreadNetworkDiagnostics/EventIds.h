@@ -14,11 +14,13 @@ namespace Events {
 namespace ConnectionStatus {
 inline constexpr EventId Id = 0x00000000;
 } // namespace ConnectionStatus
+
 namespace NetworkFaultChange {
 inline constexpr EventId Id = 0x00000001;
 } // namespace NetworkFaultChange
+
 } // namespace Events
 } // namespace ThreadNetworkDiagnostics
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

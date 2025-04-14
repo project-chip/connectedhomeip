@@ -14,11 +14,13 @@ namespace Events {
 namespace PushTransportBegin {
 inline constexpr EventId Id = 0x00000000;
 } // namespace PushTransportBegin
+
 namespace PushTransportEnd {
 inline constexpr EventId Id = 0x00000001;
 } // namespace PushTransportEnd
+
 } // namespace Events
 } // namespace PushAvStreamTransport
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

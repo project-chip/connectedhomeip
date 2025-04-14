@@ -14,6 +14,6 @@ namespace Descriptor {
 inline constexpr ClusterId Id = 0x0000001D;
 
 } // namespace Descriptor
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

@@ -14,6 +14,6 @@ namespace UserLabel {
 inline constexpr ClusterId Id = 0x00000041;
 
 } // namespace UserLabel
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

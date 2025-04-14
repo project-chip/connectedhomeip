@@ -14,6 +14,6 @@ namespace BasicInformation {
 inline constexpr ClusterId Id = 0x00000028;
 
 } // namespace BasicInformation
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

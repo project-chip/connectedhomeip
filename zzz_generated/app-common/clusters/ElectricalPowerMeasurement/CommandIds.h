@@ -10,8 +10,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ElectricalPowerMeasurement {
-namespace Commands {} // namespace Commands
+namespace Commands {
+} // namespace Commands
 } // namespace ElectricalPowerMeasurement
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

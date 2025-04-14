@@ -10,8 +10,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace FaultInjection {
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 } // namespace FaultInjection
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

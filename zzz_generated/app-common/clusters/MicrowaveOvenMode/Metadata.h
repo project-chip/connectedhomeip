@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace SupportedModes {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MicrowaveOvenMode::Attributes::SupportedModes::Id,
+    .attributeId    = SupportedModes::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,16 +29,19 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace SupportedModes
 namespace CurrentMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MicrowaveOvenMode::Attributes::CurrentMode::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = CurrentMode::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace CurrentMode
 
+
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+
+} // namespace Commands
 } // namespace MicrowaveOvenMode
 } // namespace Clusters
 } // namespace app

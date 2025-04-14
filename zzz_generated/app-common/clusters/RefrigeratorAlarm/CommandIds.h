@@ -10,8 +10,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace RefrigeratorAlarm {
-namespace Commands {} // namespace Commands
+namespace Commands {
+} // namespace Commands
 } // namespace RefrigeratorAlarm
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

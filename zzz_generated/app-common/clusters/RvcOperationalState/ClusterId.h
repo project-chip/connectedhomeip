@@ -14,6 +14,6 @@ namespace RvcOperationalState {
 inline constexpr ClusterId Id = 0x00000061;
 
 } // namespace RvcOperationalState
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

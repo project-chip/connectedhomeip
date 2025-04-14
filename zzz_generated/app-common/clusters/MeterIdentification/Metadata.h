@@ -21,48 +21,51 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace MeterType {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MeterIdentification::Attributes::MeterType::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = MeterType::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace MeterType
 namespace PointOfDelivery {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MeterIdentification::Attributes::PointOfDelivery::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = PointOfDelivery::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace PointOfDelivery
 namespace MeterSerialNumber {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MeterIdentification::Attributes::MeterSerialNumber::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = MeterSerialNumber::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace MeterSerialNumber
 namespace ProtocolVersion {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MeterIdentification::Attributes::ProtocolVersion::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = ProtocolVersion::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace ProtocolVersion
 namespace PowerThreshold {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MeterIdentification::Attributes::PowerThreshold::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = PowerThreshold::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace PowerThreshold
 
+
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+
+} // namespace Commands
 } // namespace MeterIdentification
 } // namespace Clusters
 } // namespace app

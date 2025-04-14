@@ -14,8 +14,9 @@ namespace Events {
 namespace StateChange {
 inline constexpr EventId Id = 0x00000000;
 } // namespace StateChange
+
 } // namespace Events
 } // namespace BooleanState
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

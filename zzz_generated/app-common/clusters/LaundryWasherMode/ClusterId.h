@@ -14,6 +14,6 @@ namespace LaundryWasherMode {
 inline constexpr ClusterId Id = 0x00000051;
 
 } // namespace LaundryWasherMode
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

@@ -14,6 +14,6 @@ namespace Channel {
 inline constexpr ClusterId Id = 0x00000504;
 
 } // namespace Channel
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

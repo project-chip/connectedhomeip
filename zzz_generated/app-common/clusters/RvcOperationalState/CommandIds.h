@@ -29,6 +29,6 @@ inline constexpr CommandId Id = 0x00000004;
 
 } // namespace Commands
 } // namespace RvcOperationalState
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

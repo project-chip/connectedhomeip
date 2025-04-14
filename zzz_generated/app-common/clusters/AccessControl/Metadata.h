@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 2;
 namespace Attributes {
 namespace Acl {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = AccessControl::Attributes::Acl::Id,
+    .attributeId    = Acl::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = Access::Privilege::kAdminister,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace Acl
 namespace Extension {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = AccessControl::Attributes::Extension::Id,
+    .attributeId    = Extension::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = Access::Privilege::kAdminister,
@@ -37,31 +37,31 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace Extension
 namespace SubjectsPerAccessControlEntry {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = AccessControl::Attributes::SubjectsPerAccessControlEntry::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = SubjectsPerAccessControlEntry::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace SubjectsPerAccessControlEntry
 namespace TargetsPerAccessControlEntry {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = AccessControl::Attributes::TargetsPerAccessControlEntry::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = TargetsPerAccessControlEntry::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace TargetsPerAccessControlEntry
 namespace AccessControlEntriesPerFabric {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = AccessControl::Attributes::AccessControlEntriesPerFabric::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = AccessControlEntriesPerFabric::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace AccessControlEntriesPerFabric
 namespace CommissioningARL {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = AccessControl::Attributes::CommissioningARL::Id,
+    .attributeId    = CommissioningARL::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -69,12 +69,13 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace CommissioningARL
 namespace Arl {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = AccessControl::Attributes::Arl::Id,
+    .attributeId    = Arl::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace Arl
+
 
 } // namespace Attributes
 

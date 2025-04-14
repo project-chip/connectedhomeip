@@ -73,6 +73,6 @@ inline constexpr CommandId Id = 0x0000000D;
 
 } // namespace Commands
 } // namespace TlsCertificateManagement
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

@@ -10,8 +10,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace TlsClientManagement {
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 } // namespace TlsClientManagement
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

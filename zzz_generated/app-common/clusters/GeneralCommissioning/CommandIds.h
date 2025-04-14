@@ -45,6 +45,6 @@ inline constexpr CommandId Id = 0x00000007;
 
 } // namespace Commands
 } // namespace GeneralCommissioning
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

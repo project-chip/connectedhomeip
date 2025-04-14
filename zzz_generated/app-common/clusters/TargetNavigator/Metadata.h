@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 2;
 namespace Attributes {
 namespace TargetList {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = TargetNavigator::Attributes::TargetList::Id,
+    .attributeId    = TargetList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,12 +29,13 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace TargetList
 namespace CurrentTarget {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = TargetNavigator::Attributes::CurrentTarget::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = CurrentTarget::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace CurrentTarget
+
 
 } // namespace Attributes
 
@@ -42,7 +43,7 @@ namespace Commands {
 namespace NavigateTarget {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = TargetNavigator::Commands::NavigateTarget::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace NavigateTarget

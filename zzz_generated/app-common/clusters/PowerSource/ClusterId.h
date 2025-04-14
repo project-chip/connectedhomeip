@@ -14,6 +14,6 @@ namespace PowerSource {
 inline constexpr ClusterId Id = 0x0000002F;
 
 } // namespace PowerSource
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

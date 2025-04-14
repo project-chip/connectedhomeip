@@ -14,6 +14,6 @@ namespace FormaldehydeConcentrationMeasurement {
 inline constexpr ClusterId Id = 0x0000042B;
 
 } // namespace FormaldehydeConcentrationMeasurement
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

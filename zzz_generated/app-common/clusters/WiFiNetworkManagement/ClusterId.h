@@ -14,6 +14,6 @@ namespace WiFiNetworkManagement {
 inline constexpr ClusterId Id = 0x00000451;
 
 } // namespace WiFiNetworkManagement
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

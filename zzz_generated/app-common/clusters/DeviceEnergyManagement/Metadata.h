@@ -21,68 +21,69 @@ inline constexpr uint32_t kRevision = 4;
 namespace Attributes {
 namespace ESAType {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = DeviceEnergyManagement::Attributes::ESAType::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = ESAType::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace ESAType
 namespace ESACanGenerate {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = DeviceEnergyManagement::Attributes::ESACanGenerate::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = ESACanGenerate::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace ESACanGenerate
 namespace ESAState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = DeviceEnergyManagement::Attributes::ESAState::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = ESAState::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace ESAState
 namespace AbsMinPower {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = DeviceEnergyManagement::Attributes::AbsMinPower::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = AbsMinPower::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace AbsMinPower
 namespace AbsMaxPower {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = DeviceEnergyManagement::Attributes::AbsMaxPower::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = AbsMaxPower::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace AbsMaxPower
 namespace PowerAdjustmentCapability {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = DeviceEnergyManagement::Attributes::PowerAdjustmentCapability::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = PowerAdjustmentCapability::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace PowerAdjustmentCapability
 namespace Forecast {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = DeviceEnergyManagement::Attributes::Forecast::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = Forecast::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace Forecast
 namespace OptOutState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = DeviceEnergyManagement::Attributes::OptOutState::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = OptOutState::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace OptOutState
+
 
 } // namespace Attributes
 
@@ -90,56 +91,56 @@ namespace Commands {
 namespace PowerAdjustRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = DeviceEnergyManagement::Commands::PowerAdjustRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace PowerAdjustRequest
 namespace CancelPowerAdjustRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = DeviceEnergyManagement::Commands::CancelPowerAdjustRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace CancelPowerAdjustRequest
 namespace StartTimeAdjustRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = DeviceEnergyManagement::Commands::StartTimeAdjustRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace StartTimeAdjustRequest
 namespace PauseRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = DeviceEnergyManagement::Commands::PauseRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace PauseRequest
 namespace ResumeRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = DeviceEnergyManagement::Commands::ResumeRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace ResumeRequest
 namespace ModifyForecastRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = DeviceEnergyManagement::Commands::ModifyForecastRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace ModifyForecastRequest
 namespace RequestConstraintBasedForecast {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = DeviceEnergyManagement::Commands::RequestConstraintBasedForecast::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace RequestConstraintBasedForecast
 namespace CancelRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = DeviceEnergyManagement::Commands::CancelRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace CancelRequest

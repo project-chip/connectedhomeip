@@ -10,8 +10,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace KeypadInput {
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 } // namespace KeypadInput
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

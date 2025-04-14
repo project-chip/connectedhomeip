@@ -10,8 +10,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace PowerTopology {
-namespace Commands {} // namespace Commands
+namespace Commands {
+} // namespace Commands
 } // namespace PowerTopology
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

@@ -10,8 +10,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ActivatedCarbonFilterMonitoring {
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 } // namespace ActivatedCarbonFilterMonitoring
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

@@ -20,6 +20,7 @@ inline constexpr AttributeId Id = Globals::Attributes::{{attribute.definition.na
 inline constexpr AttributeId Id = {{ "0x%08X" | format(attribute.definition.code)}};
    {%- endif %}
 } // namespace {{attribute.definition.name | name_for_id_usage}}
+
 {% endfor %}
 } // namespace Attributes
 } // namespace {{cluster.name}}

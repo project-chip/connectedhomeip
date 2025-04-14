@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace PhaseList {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = OvenCavityOperationalState::Attributes::PhaseList::Id,
+    .attributeId    = PhaseList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,23 +29,23 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace PhaseList
 namespace CurrentPhase {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = OvenCavityOperationalState::Attributes::CurrentPhase::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = CurrentPhase::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace CurrentPhase
 namespace CountdownTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = OvenCavityOperationalState::Attributes::CountdownTime::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = CountdownTime::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace CountdownTime
 namespace OperationalStateList {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = OvenCavityOperationalState::Attributes::OperationalStateList::Id,
+    .attributeId    = OperationalStateList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -53,20 +53,21 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace OperationalStateList
 namespace OperationalState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = OvenCavityOperationalState::Attributes::OperationalState::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = OperationalState::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace OperationalState
 namespace OperationalError {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = OvenCavityOperationalState::Attributes::OperationalError::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = OperationalError::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace OperationalError
+
 
 } // namespace Attributes
 
@@ -74,28 +75,28 @@ namespace Commands {
 namespace Pause {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = OvenCavityOperationalState::Commands::Pause::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Pause
 namespace Stop {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = OvenCavityOperationalState::Commands::Stop::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Stop
 namespace Start {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = OvenCavityOperationalState::Commands::Start::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Start
 namespace Resume {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = OvenCavityOperationalState::Commands::Resume::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Resume

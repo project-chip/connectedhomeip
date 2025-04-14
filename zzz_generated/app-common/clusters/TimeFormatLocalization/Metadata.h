@@ -21,32 +21,35 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace HourFormat {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = TimeFormatLocalization::Attributes::HourFormat::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = HourFormat::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 } // namespace HourFormat
 namespace ActiveCalendarType {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = TimeFormatLocalization::Attributes::ActiveCalendarType::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = ActiveCalendarType::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 } // namespace ActiveCalendarType
 namespace SupportedCalendarTypes {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = TimeFormatLocalization::Attributes::SupportedCalendarTypes::Id,
+    .attributeId    = SupportedCalendarTypes::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace SupportedCalendarTypes
 
+
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+
+} // namespace Commands
 } // namespace TimeFormatLocalization
 } // namespace Clusters
 } // namespace app

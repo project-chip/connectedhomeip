@@ -37,6 +37,6 @@ inline constexpr CommandId Id = 0x00000003;
 
 } // namespace Commands
 } // namespace TimeSynchronization
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

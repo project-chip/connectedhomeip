@@ -21,16 +21,19 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace Sources {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PowerSourceConfiguration::Attributes::Sources::Id,
+    .attributeId    = Sources::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace Sources
 
+
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+
+} // namespace Commands
 } // namespace PowerSourceConfiguration
 } // namespace Clusters
 } // namespace app

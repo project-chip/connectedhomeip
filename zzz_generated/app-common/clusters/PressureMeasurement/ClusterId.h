@@ -14,6 +14,6 @@ namespace PressureMeasurement {
 inline constexpr ClusterId Id = 0x00000403;
 
 } // namespace PressureMeasurement
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

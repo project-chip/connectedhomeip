@@ -8,3 +8,4 @@
 #include <clusters/CameraAvStreamManagement/ClusterId.h>
 #include <clusters/CameraAvStreamManagement/CommandIds.h>
 #include <clusters/CameraAvStreamManagement/EventIds.h>
+

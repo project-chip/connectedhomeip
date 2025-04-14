@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace InputList {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MediaInput::Attributes::InputList::Id,
+    .attributeId    = InputList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,12 +29,13 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace InputList
 namespace CurrentInput {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MediaInput::Attributes::CurrentInput::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = CurrentInput::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace CurrentInput
+
 
 } // namespace Attributes
 
@@ -42,28 +43,28 @@ namespace Commands {
 namespace SelectInput {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = MediaInput::Commands::SelectInput::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace SelectInput
 namespace ShowInputStatus {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = MediaInput::Commands::ShowInputStatus::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace ShowInputStatus
 namespace HideInputStatus {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = MediaInput::Commands::HideInputStatus::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace HideInputStatus
 namespace RenameInput {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = MediaInput::Commands::RenameInput::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace RenameInput

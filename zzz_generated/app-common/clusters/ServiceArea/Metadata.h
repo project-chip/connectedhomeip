@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 2;
 namespace Attributes {
 namespace SupportedAreas {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ServiceArea::Attributes::SupportedAreas::Id,
+    .attributeId    = SupportedAreas::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace SupportedAreas
 namespace SupportedMaps {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ServiceArea::Attributes::SupportedMaps::Id,
+    .attributeId    = SupportedMaps::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -37,7 +37,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace SupportedMaps
 namespace SelectedAreas {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ServiceArea::Attributes::SelectedAreas::Id,
+    .attributeId    = SelectedAreas::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -45,28 +45,29 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace SelectedAreas
 namespace CurrentArea {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ServiceArea::Attributes::CurrentArea::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = CurrentArea::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace CurrentArea
 namespace EstimatedEndTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ServiceArea::Attributes::EstimatedEndTime::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = EstimatedEndTime::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace EstimatedEndTime
 namespace Progress {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ServiceArea::Attributes::Progress::Id,
+    .attributeId    = Progress::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace Progress
+
 
 } // namespace Attributes
 
@@ -74,14 +75,14 @@ namespace Commands {
 namespace SelectAreas {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = ServiceArea::Commands::SelectAreas::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace SelectAreas
 namespace SkipArea {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = ServiceArea::Commands::SkipArea::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace SkipArea

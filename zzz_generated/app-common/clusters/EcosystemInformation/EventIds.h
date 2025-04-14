@@ -10,8 +10,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace EcosystemInformation {
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 } // namespace EcosystemInformation
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

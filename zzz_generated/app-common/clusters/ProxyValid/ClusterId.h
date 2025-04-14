@@ -14,6 +14,6 @@ namespace ProxyValid {
 inline constexpr ClusterId Id = 0x00000044;
 
 } // namespace ProxyValid
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

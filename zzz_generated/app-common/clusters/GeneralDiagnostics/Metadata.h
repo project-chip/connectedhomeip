@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 2;
 namespace Attributes {
 namespace NetworkInterfaces {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = GeneralDiagnostics::Attributes::NetworkInterfaces::Id,
+    .attributeId    = NetworkInterfaces::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,39 +29,39 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace NetworkInterfaces
 namespace RebootCount {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = GeneralDiagnostics::Attributes::RebootCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = RebootCount::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace RebootCount
 namespace UpTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = GeneralDiagnostics::Attributes::UpTime::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = UpTime::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace UpTime
 namespace TotalOperationalHours {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = GeneralDiagnostics::Attributes::TotalOperationalHours::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = TotalOperationalHours::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace TotalOperationalHours
 namespace BootReason {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = GeneralDiagnostics::Attributes::BootReason::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = BootReason::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace BootReason
 namespace ActiveHardwareFaults {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id,
+    .attributeId    = ActiveHardwareFaults::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -69,7 +69,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ActiveHardwareFaults
 namespace ActiveRadioFaults {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = GeneralDiagnostics::Attributes::ActiveRadioFaults::Id,
+    .attributeId    = ActiveRadioFaults::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -77,7 +77,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ActiveRadioFaults
 namespace ActiveNetworkFaults {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id,
+    .attributeId    = ActiveNetworkFaults::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -85,12 +85,13 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ActiveNetworkFaults
 namespace TestEventTriggersEnabled {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = GeneralDiagnostics::Attributes::TestEventTriggersEnabled::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = TestEventTriggersEnabled::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace TestEventTriggersEnabled
+
 
 } // namespace Attributes
 
@@ -98,21 +99,21 @@ namespace Commands {
 namespace TestEventTrigger {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = GeneralDiagnostics::Commands::TestEventTrigger::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace TestEventTrigger
 namespace TimeSnapshot {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = GeneralDiagnostics::Commands::TimeSnapshot::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace TimeSnapshot
 namespace PayloadTestRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = GeneralDiagnostics::Commands::PayloadTestRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace PayloadTestRequest

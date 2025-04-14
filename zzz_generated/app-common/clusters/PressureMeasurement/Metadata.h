@@ -21,80 +21,83 @@ inline constexpr uint32_t kRevision = 3;
 namespace Attributes {
 namespace MeasuredValue {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PressureMeasurement::Attributes::MeasuredValue::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = MeasuredValue::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PressureMeasurement::Attributes::MinMeasuredValue::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = MinMeasuredValue::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PressureMeasurement::Attributes::MaxMeasuredValue::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = MaxMeasuredValue::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PressureMeasurement::Attributes::Tolerance::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = Tolerance::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace Tolerance
 namespace ScaledValue {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PressureMeasurement::Attributes::ScaledValue::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = ScaledValue::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace ScaledValue
 namespace MinScaledValue {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PressureMeasurement::Attributes::MinScaledValue::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = MinScaledValue::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace MinScaledValue
 namespace MaxScaledValue {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PressureMeasurement::Attributes::MaxScaledValue::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = MaxScaledValue::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace MaxScaledValue
 namespace ScaledTolerance {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PressureMeasurement::Attributes::ScaledTolerance::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = ScaledTolerance::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace ScaledTolerance
 namespace Scale {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PressureMeasurement::Attributes::Scale::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = Scale::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace Scale
 
+
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+
+} // namespace Commands
 } // namespace PressureMeasurement
 } // namespace Clusters
 } // namespace app

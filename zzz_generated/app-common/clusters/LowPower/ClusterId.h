@@ -14,6 +14,6 @@ namespace LowPower {
 inline constexpr ClusterId Id = 0x00000508;
 
 } // namespace LowPower
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

@@ -10,8 +10,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace FixedLabel {
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 } // namespace FixedLabel
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

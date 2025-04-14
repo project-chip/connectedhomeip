@@ -10,8 +10,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace TimeFormatLocalization {
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 } // namespace TimeFormatLocalization
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

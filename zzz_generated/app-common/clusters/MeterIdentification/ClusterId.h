@@ -14,6 +14,6 @@ namespace MeterIdentification {
 inline constexpr ClusterId Id = 0x00000B06;
 
 } // namespace MeterIdentification
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

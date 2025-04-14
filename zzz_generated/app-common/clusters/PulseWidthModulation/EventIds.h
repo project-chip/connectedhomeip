@@ -10,8 +10,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace PulseWidthModulation {
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 } // namespace PulseWidthModulation
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

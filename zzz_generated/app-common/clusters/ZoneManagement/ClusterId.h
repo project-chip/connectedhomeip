@@ -14,6 +14,6 @@ namespace ZoneManagement {
 inline constexpr ClusterId Id = 0x00000550;
 
 } // namespace ZoneManagement
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

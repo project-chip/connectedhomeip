@@ -10,8 +10,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace TlsCertificateManagement {
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 } // namespace TlsCertificateManagement
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

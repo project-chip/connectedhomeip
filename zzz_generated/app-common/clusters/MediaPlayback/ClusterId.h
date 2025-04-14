@@ -14,6 +14,6 @@ namespace MediaPlayback {
 inline constexpr ClusterId Id = 0x00000506;
 
 } // namespace MediaPlayback
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

@@ -10,8 +10,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ProxyValid {
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 } // namespace ProxyValid
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

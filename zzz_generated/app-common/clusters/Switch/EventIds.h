@@ -14,26 +14,33 @@ namespace Events {
 namespace SwitchLatched {
 inline constexpr EventId Id = 0x00000000;
 } // namespace SwitchLatched
+
 namespace InitialPress {
 inline constexpr EventId Id = 0x00000001;
 } // namespace InitialPress
+
 namespace LongPress {
 inline constexpr EventId Id = 0x00000002;
 } // namespace LongPress
+
 namespace ShortRelease {
 inline constexpr EventId Id = 0x00000003;
 } // namespace ShortRelease
+
 namespace LongRelease {
 inline constexpr EventId Id = 0x00000004;
 } // namespace LongRelease
+
 namespace MultiPressOngoing {
 inline constexpr EventId Id = 0x00000005;
 } // namespace MultiPressOngoing
+
 namespace MultiPressComplete {
 inline constexpr EventId Id = 0x00000006;
 } // namespace MultiPressComplete
+
 } // namespace Events
 } // namespace Switch
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

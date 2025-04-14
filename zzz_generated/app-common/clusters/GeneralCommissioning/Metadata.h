@@ -21,84 +21,85 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace Breadcrumb {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = GeneralCommissioning::Attributes::Breadcrumb::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = Breadcrumb::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace Breadcrumb
 namespace BasicCommissioningInfo {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = GeneralCommissioning::Attributes::BasicCommissioningInfo::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = BasicCommissioningInfo::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace BasicCommissioningInfo
 namespace RegulatoryConfig {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = GeneralCommissioning::Attributes::RegulatoryConfig::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = RegulatoryConfig::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace RegulatoryConfig
 namespace LocationCapability {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = GeneralCommissioning::Attributes::LocationCapability::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = LocationCapability::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace LocationCapability
 namespace SupportsConcurrentConnection {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = GeneralCommissioning::Attributes::SupportsConcurrentConnection::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = SupportsConcurrentConnection::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace SupportsConcurrentConnection
 namespace TCAcceptedVersion {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = GeneralCommissioning::Attributes::TCAcceptedVersion::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = TCAcceptedVersion::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
 } // namespace TCAcceptedVersion
 namespace TCMinRequiredVersion {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = GeneralCommissioning::Attributes::TCMinRequiredVersion::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = TCMinRequiredVersion::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
 } // namespace TCMinRequiredVersion
 namespace TCAcknowledgements {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = GeneralCommissioning::Attributes::TCAcknowledgements::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = TCAcknowledgements::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
 } // namespace TCAcknowledgements
 namespace TCAcknowledgementsRequired {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = GeneralCommissioning::Attributes::TCAcknowledgementsRequired::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = TCAcknowledgementsRequired::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
 } // namespace TCAcknowledgementsRequired
 namespace TCUpdateDeadline {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = GeneralCommissioning::Attributes::TCUpdateDeadline::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = TCUpdateDeadline::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
 } // namespace TCUpdateDeadline
+
 
 } // namespace Attributes
 
@@ -106,14 +107,14 @@ namespace Commands {
 namespace ArmFailSafe {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = GeneralCommissioning::Commands::ArmFailSafe::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace ArmFailSafe
 namespace SetRegulatoryConfig {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = GeneralCommissioning::Commands::SetRegulatoryConfig::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace SetRegulatoryConfig
@@ -127,7 +128,7 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
 namespace SetTCAcknowledgements {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = GeneralCommissioning::Commands::SetTCAcknowledgements::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace SetTCAcknowledgements

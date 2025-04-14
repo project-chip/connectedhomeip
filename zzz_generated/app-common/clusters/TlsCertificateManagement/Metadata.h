@@ -21,15 +21,15 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace MaxRootCertificates {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = TlsCertificateManagement::Attributes::MaxRootCertificates::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = MaxRootCertificates::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace MaxRootCertificates
 namespace ProvisionedRootCertificates {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = TlsCertificateManagement::Attributes::ProvisionedRootCertificates::Id,
+    .attributeId    = ProvisionedRootCertificates::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -37,20 +37,21 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ProvisionedRootCertificates
 namespace MaxClientCertificates {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = TlsCertificateManagement::Attributes::MaxClientCertificates::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = MaxClientCertificates::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace MaxClientCertificates
 namespace ProvisionedClientCertificates {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = TlsCertificateManagement::Attributes::ProvisionedClientCertificates::Id,
+    .attributeId    = ProvisionedClientCertificates::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace ProvisionedClientCertificates
+
 
 } // namespace Attributes
 
@@ -93,7 +94,7 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
 namespace ProvisionClientCertificate {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = TlsCertificateManagement::Commands::ProvisionClientCertificate::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace ProvisionClientCertificate

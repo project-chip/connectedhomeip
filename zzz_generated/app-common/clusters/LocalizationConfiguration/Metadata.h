@@ -21,24 +21,27 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace ActiveLocale {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = LocalizationConfiguration::Attributes::ActiveLocale::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = ActiveLocale::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 } // namespace ActiveLocale
 namespace SupportedLocales {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = LocalizationConfiguration::Attributes::SupportedLocales::Id,
+    .attributeId    = SupportedLocales::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace SupportedLocales
 
+
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+
+} // namespace Commands
 } // namespace LocalizationConfiguration
 } // namespace Clusters
 } // namespace app

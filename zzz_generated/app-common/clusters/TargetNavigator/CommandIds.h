@@ -21,6 +21,6 @@ inline constexpr CommandId Id = 0x00000001;
 
 } // namespace Commands
 } // namespace TargetNavigator
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

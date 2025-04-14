@@ -14,6 +14,6 @@ namespace Pm10ConcentrationMeasurement {
 inline constexpr ClusterId Id = 0x0000042D;
 
 } // namespace Pm10ConcentrationMeasurement
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

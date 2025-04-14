@@ -14,6 +14,6 @@ namespace UnitLocalization {
 inline constexpr ClusterId Id = 0x0000002D;
 
 } // namespace UnitLocalization
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

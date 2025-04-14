@@ -17,6 +17,6 @@ inline constexpr CommandId Id = 0x00000000;
 
 } // namespace Commands
 } // namespace EthernetNetworkDiagnostics
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

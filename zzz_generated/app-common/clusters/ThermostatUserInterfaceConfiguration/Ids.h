@@ -8,3 +8,4 @@
 #include <clusters/ThermostatUserInterfaceConfiguration/ClusterId.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/CommandIds.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/EventIds.h>
+

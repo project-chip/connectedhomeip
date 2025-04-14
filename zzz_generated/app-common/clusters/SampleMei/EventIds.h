@@ -14,8 +14,9 @@ namespace Events {
 namespace PingCountEvent {
 inline constexpr EventId Id = 0x00000000;
 } // namespace PingCountEvent
+
 } // namespace Events
 } // namespace SampleMei
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

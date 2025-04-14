@@ -14,8 +14,9 @@ namespace Events {
 namespace LoadControlEventStatusChange {
 inline constexpr EventId Id = 0x00000000;
 } // namespace LoadControlEventStatusChange
+
 } // namespace Events
 } // namespace DemandResponseLoadControl
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

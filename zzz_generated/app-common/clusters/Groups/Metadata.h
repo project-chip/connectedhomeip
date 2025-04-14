@@ -21,12 +21,13 @@ inline constexpr uint32_t kRevision = 4;
 namespace Attributes {
 namespace NameSupport {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Groups::Attributes::NameSupport::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = NameSupport::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace NameSupport
+
 
 } // namespace Attributes
 

@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 3;
 namespace Attributes {
 namespace Messages {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Messages::Attributes::Messages::Id,
+    .attributeId    = Messages::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,12 +29,13 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace Messages
 namespace ActiveMessageIDs {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Messages::Attributes::ActiveMessageIDs::Id,
+    .attributeId    = ActiveMessageIDs::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace ActiveMessageIDs
+
 
 } // namespace Attributes
 

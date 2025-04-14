@@ -21,52 +21,53 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace Condition {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ActivatedCarbonFilterMonitoring::Attributes::Condition::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = Condition::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace Condition
 namespace DegradationDirection {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ActivatedCarbonFilterMonitoring::Attributes::DegradationDirection::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = DegradationDirection::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace DegradationDirection
 namespace ChangeIndication {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ActivatedCarbonFilterMonitoring::Attributes::ChangeIndication::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = ChangeIndication::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace ChangeIndication
 namespace InPlaceIndicator {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ActivatedCarbonFilterMonitoring::Attributes::InPlaceIndicator::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = InPlaceIndicator::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace InPlaceIndicator
 namespace LastChangedTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = LastChangedTime::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 } // namespace LastChangedTime
 namespace ReplacementProductList {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ActivatedCarbonFilterMonitoring::Attributes::ReplacementProductList::Id,
+    .attributeId    = ReplacementProductList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace ReplacementProductList
+
 
 } // namespace Attributes
 
@@ -74,7 +75,7 @@ namespace Commands {
 namespace ResetCondition {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = ActivatedCarbonFilterMonitoring::Commands::ResetCondition::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace ResetCondition

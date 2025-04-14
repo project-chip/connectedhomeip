@@ -21,36 +21,37 @@ inline constexpr uint32_t kRevision = 4;
 namespace Attributes {
 namespace TariffUnit {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CommodityPrice::Attributes::TariffUnit::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = TariffUnit::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace TariffUnit
 namespace Currency {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CommodityPrice::Attributes::Currency::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = Currency::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace Currency
 namespace CurrentPrice {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CommodityPrice::Attributes::CurrentPrice::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = CurrentPrice::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace CurrentPrice
 namespace PriceForecast {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CommodityPrice::Attributes::PriceForecast::Id,
+    .attributeId    = PriceForecast::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace PriceForecast
+
 
 } // namespace Attributes
 
@@ -58,14 +59,14 @@ namespace Commands {
 namespace GetDetailedPriceRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = CommodityPrice::Commands::GetDetailedPriceRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace GetDetailedPriceRequest
 namespace GetDetailedForecastRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = CommodityPrice::Commands::GetDetailedForecastRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace GetDetailedForecastRequest

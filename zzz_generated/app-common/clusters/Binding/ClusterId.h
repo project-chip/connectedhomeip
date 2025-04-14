@@ -14,6 +14,6 @@ namespace Binding {
 inline constexpr ClusterId Id = 0x0000001E;
 
 } // namespace Binding
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

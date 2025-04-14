@@ -21,52 +21,53 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace TemperatureSetpoint {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = TemperatureControl::Attributes::TemperatureSetpoint::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = TemperatureSetpoint::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace TemperatureSetpoint
 namespace MinTemperature {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = TemperatureControl::Attributes::MinTemperature::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = MinTemperature::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace MinTemperature
 namespace MaxTemperature {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = TemperatureControl::Attributes::MaxTemperature::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = MaxTemperature::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace MaxTemperature
 namespace Step {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = TemperatureControl::Attributes::Step::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = Step::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace Step
 namespace SelectedTemperatureLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = TemperatureControl::Attributes::SelectedTemperatureLevel::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = SelectedTemperatureLevel::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace SelectedTemperatureLevel
 namespace SupportedTemperatureLevels {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = TemperatureControl::Attributes::SupportedTemperatureLevels::Id,
+    .attributeId    = SupportedTemperatureLevels::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace SupportedTemperatureLevels
+
 
 } // namespace Attributes
 
@@ -74,7 +75,7 @@ namespace Commands {
 namespace SetTemperature {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = TemperatureControl::Commands::SetTemperature::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace SetTemperature

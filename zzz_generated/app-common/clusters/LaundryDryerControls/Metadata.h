@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace SupportedDrynessLevels {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = LaundryDryerControls::Attributes::SupportedDrynessLevels::Id,
+    .attributeId    = SupportedDrynessLevels::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,16 +29,19 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace SupportedDrynessLevels
 namespace SelectedDrynessLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = LaundryDryerControls::Attributes::SelectedDrynessLevel::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = SelectedDrynessLevel::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 } // namespace SelectedDrynessLevel
 
+
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+
+} // namespace Commands
 } // namespace LaundryDryerControls
 } // namespace Clusters
 } // namespace app

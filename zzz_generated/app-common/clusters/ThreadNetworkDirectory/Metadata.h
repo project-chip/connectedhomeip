@@ -21,15 +21,15 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace PreferredExtendedPanID {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ThreadNetworkDirectory::Attributes::PreferredExtendedPanID::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = PreferredExtendedPanID::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kManage,
     .writePrivilege = Access::Privilege::kManage,
 };
 } // namespace PreferredExtendedPanID
 namespace ThreadNetworks {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ThreadNetworkDirectory::Attributes::ThreadNetworks::Id,
+    .attributeId    = ThreadNetworks::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kOperate,
     .writePrivilege = std::nullopt,
@@ -37,12 +37,13 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ThreadNetworks
 namespace ThreadNetworkTableSize {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ThreadNetworkDirectory::Attributes::ThreadNetworkTableSize::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = ThreadNetworkTableSize::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace ThreadNetworkTableSize
+
 
 } // namespace Attributes
 
@@ -64,7 +65,7 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
 namespace GetOperationalDataset {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = ThreadNetworkDirectory::Commands::GetOperationalDataset::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace GetOperationalDataset

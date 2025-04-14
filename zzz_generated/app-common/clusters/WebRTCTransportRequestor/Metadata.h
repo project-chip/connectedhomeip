@@ -21,12 +21,13 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace CurrentSessions {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WebRTCTransportRequestor::Attributes::CurrentSessions::Id,
+    .attributeId    = CurrentSessions::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
 } // namespace CurrentSessions
+
 
 } // namespace Attributes
 
@@ -34,28 +35,28 @@ namespace Commands {
 namespace Offer {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = WebRTCTransportRequestor::Commands::Offer::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Offer
 namespace Answer {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = WebRTCTransportRequestor::Commands::Answer::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Answer
 namespace ICECandidates {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = WebRTCTransportRequestor::Commands::ICECandidates::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace ICECandidates
 namespace End {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = WebRTCTransportRequestor::Commands::End::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace End

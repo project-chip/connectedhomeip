@@ -14,6 +14,6 @@ namespace TlsClientManagement {
 inline constexpr ClusterId Id = 0x00000802;
 
 } // namespace TlsClientManagement
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

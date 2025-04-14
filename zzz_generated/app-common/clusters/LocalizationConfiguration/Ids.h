@@ -8,3 +8,4 @@
 #include <clusters/LocalizationConfiguration/ClusterId.h>
 #include <clusters/LocalizationConfiguration/CommandIds.h>
 #include <clusters/LocalizationConfiguration/EventIds.h>
+

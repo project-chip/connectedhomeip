@@ -21,52 +21,53 @@ inline constexpr uint32_t kRevision = 2;
 namespace Attributes {
 namespace HeaterTypes {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WaterHeaterManagement::Attributes::HeaterTypes::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = HeaterTypes::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace HeaterTypes
 namespace HeatDemand {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WaterHeaterManagement::Attributes::HeatDemand::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = HeatDemand::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace HeatDemand
 namespace TankVolume {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WaterHeaterManagement::Attributes::TankVolume::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = TankVolume::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace TankVolume
 namespace EstimatedHeatRequired {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WaterHeaterManagement::Attributes::EstimatedHeatRequired::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = EstimatedHeatRequired::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace EstimatedHeatRequired
 namespace TankPercentage {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WaterHeaterManagement::Attributes::TankPercentage::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = TankPercentage::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace TankPercentage
 namespace BoostState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WaterHeaterManagement::Attributes::BoostState::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = BoostState::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace BoostState
+
 
 } // namespace Attributes
 
@@ -74,14 +75,14 @@ namespace Commands {
 namespace Boost {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = WaterHeaterManagement::Commands::Boost::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace Boost
 namespace CancelBoost {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = WaterHeaterManagement::Commands::CancelBoost::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace CancelBoost

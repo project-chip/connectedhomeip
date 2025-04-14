@@ -14,6 +14,6 @@ namespace ClosureControl {
 inline constexpr ClusterId Id = 0x00000104;
 
 } // namespace ClosureControl
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

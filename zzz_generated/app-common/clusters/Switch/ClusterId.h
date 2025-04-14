@@ -14,6 +14,6 @@ namespace Switch {
 inline constexpr ClusterId Id = 0x0000003B;
 
 } // namespace Switch
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

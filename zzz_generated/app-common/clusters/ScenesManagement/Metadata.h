@@ -21,20 +21,21 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace SceneTableSize {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ScenesManagement::Attributes::SceneTableSize::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = SceneTableSize::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace SceneTableSize
 namespace FabricSceneInfo {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ScenesManagement::Attributes::FabricSceneInfo::Id,
+    .attributeId    = FabricSceneInfo::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace FabricSceneInfo
+
 
 } // namespace Attributes
 

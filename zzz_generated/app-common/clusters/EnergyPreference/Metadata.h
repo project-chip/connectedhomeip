@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace EnergyBalances {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = EnergyPreference::Attributes::EnergyBalances::Id,
+    .attributeId    = EnergyBalances::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,15 +29,15 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace EnergyBalances
 namespace CurrentEnergyBalance {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = EnergyPreference::Attributes::CurrentEnergyBalance::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = CurrentEnergyBalance::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 } // namespace CurrentEnergyBalance
 namespace EnergyPriorities {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = EnergyPreference::Attributes::EnergyPriorities::Id,
+    .attributeId    = EnergyPriorities::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -45,7 +45,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace EnergyPriorities
 namespace LowPowerModeSensitivities {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = EnergyPreference::Attributes::LowPowerModeSensitivities::Id,
+    .attributeId    = LowPowerModeSensitivities::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -53,16 +53,19 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace LowPowerModeSensitivities
 namespace CurrentLowPowerModeSensitivity {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = EnergyPreference::Attributes::CurrentLowPowerModeSensitivity::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = CurrentLowPowerModeSensitivity::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 } // namespace CurrentLowPowerModeSensitivity
 
+
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+
+} // namespace Commands
 } // namespace EnergyPreference
 } // namespace Clusters
 } // namespace app

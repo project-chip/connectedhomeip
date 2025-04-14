@@ -10,8 +10,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace WakeOnLan {
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 } // namespace WakeOnLan
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

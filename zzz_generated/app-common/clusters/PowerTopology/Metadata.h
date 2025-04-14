@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace AvailableEndpoints {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PowerTopology::Attributes::AvailableEndpoints::Id,
+    .attributeId    = AvailableEndpoints::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,16 +29,19 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace AvailableEndpoints
 namespace ActiveEndpoints {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PowerTopology::Attributes::ActiveEndpoints::Id,
+    .attributeId    = ActiveEndpoints::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace ActiveEndpoints
 
+
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+
+} // namespace Commands
 } // namespace PowerTopology
 } // namespace Clusters
 } // namespace app

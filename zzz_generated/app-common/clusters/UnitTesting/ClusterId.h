@@ -14,6 +14,6 @@ namespace UnitTesting {
 inline constexpr ClusterId Id = 0xFFF1FC05;
 
 } // namespace UnitTesting
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

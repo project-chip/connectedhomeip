@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace SupportedModes {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = OvenMode::Attributes::SupportedModes::Id,
+    .attributeId    = SupportedModes::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,28 +29,29 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace SupportedModes
 namespace CurrentMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = OvenMode::Attributes::CurrentMode::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = CurrentMode::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace CurrentMode
 namespace StartUpMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = OvenMode::Attributes::StartUpMode::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = StartUpMode::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 } // namespace StartUpMode
 namespace OnMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = OvenMode::Attributes::OnMode::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = OnMode::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 } // namespace OnMode
+
 
 } // namespace Attributes
 
@@ -58,7 +59,7 @@ namespace Commands {
 namespace ChangeToMode {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = OvenMode::Commands::ChangeToMode::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace ChangeToMode

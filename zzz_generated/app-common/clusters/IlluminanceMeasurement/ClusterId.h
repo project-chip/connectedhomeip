@@ -14,6 +14,6 @@ namespace IlluminanceMeasurement {
 inline constexpr ClusterId Id = 0x00000400;
 
 } // namespace IlluminanceMeasurement
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

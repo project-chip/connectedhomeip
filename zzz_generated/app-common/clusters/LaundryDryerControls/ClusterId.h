@@ -14,6 +14,6 @@ namespace LaundryDryerControls {
 inline constexpr ClusterId Id = 0x0000004A;
 
 } // namespace LaundryDryerControls
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

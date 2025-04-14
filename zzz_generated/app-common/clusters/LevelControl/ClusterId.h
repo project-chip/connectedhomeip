@@ -14,6 +14,6 @@ namespace LevelControl {
 inline constexpr ClusterId Id = 0x00000008;
 
 } // namespace LevelControl
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

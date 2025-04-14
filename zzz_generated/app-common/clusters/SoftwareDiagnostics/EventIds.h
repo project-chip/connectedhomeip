@@ -14,8 +14,9 @@ namespace Events {
 namespace SoftwareFault {
 inline constexpr EventId Id = 0x00000000;
 } // namespace SoftwareFault
+
 } // namespace Events
 } // namespace SoftwareDiagnostics
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

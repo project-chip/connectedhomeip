@@ -14,8 +14,9 @@ namespace Events {
 namespace CommissioningRequestResult {
 inline constexpr EventId Id = 0x00000000;
 } // namespace CommissioningRequestResult
+
 } // namespace Events
 } // namespace CommissionerControl
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip
