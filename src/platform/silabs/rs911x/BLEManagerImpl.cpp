@@ -1060,8 +1060,8 @@ CHIP_ERROR BLEManagerImpl::EncodeAdditionalDataTlv()
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to generate TLV encoded Additional Data: %" CHIP_ERROR_FORMAT, err.Format());
-     }
-     return err;
+    }
+    return err;
 
     return CHIP_NO_ERROR;
 }
