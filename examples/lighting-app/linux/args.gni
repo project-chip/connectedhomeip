@@ -32,3 +32,5 @@ chip_enable_additional_data_advertising = true
 chip_enable_rotating_device_id = true
 
 chip_enable_read_client = false
+
+chip_enable_pw_rpc = true
