@@ -35,10 +35,11 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import operator
 import logging
+import operator
 from enum import Enum
 from typing import Any
+
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.interaction_model import Status
