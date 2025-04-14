@@ -47,6 +47,9 @@ CameraDevice::CameraDevice()
     // Initialize Audio Sources
     mNetworkAudioSource.Init(&mMediaController, AUDIO_STREAM_GST_DEST_PORT, StreamType::kAudio);
 
+    // Initialize WebRTC connnection
+    mWebRTCProviderManager.Init();
+
     // Set the CameraHALInterface in CameraAVStreamManager.
     mCameraAVStreamManager.SetCameraDeviceHAL(this);
 }
@@ -709,4 +712,9 @@ WebRTCTransportProvider::Delegate & CameraDevice::GetWebRTCProviderDelegate()
 CameraAVStreamMgmtDelegate & CameraDevice::GetCameraAVStreamMgmtDelegate()
 {
     return mCameraAVStreamManager;
+}
+
+MediaController & CameraDevice::GetMediaController()
+{
+    return mMediaController;
 }
