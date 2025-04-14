@@ -436,7 +436,7 @@ Status Instance::HandleMoveTo(HandlerContext & ctx, const Commands::MoveTo::Deco
     return mDelegate.MoveTo(commandData.position, commandData.latch, commandData.speed);
 }
 
-//Calibrate command is valid only in calibrating and stopped states.
+// Calibrate command is valid only in calibrating and stopped states.
 Status Instance::HandleCalibrate(HandlerContext & ctx, const Commands::Calibrate::DecodableType & commandData)
 {
     MainStateEnum state = GetMainState();

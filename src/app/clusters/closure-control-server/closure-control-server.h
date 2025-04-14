@@ -69,7 +69,7 @@ public:
     virtual CHIP_ERROR StartCurrentErrorListRead() = 0;
     // The delegate is expected to return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED to indicate end of list.
     virtual CHIP_ERROR GetCurrentErrorAtIndex(size_t, ClosureErrorEnum &) = 0;
-    virtual CHIP_ERROR EndCurrentErrorListRead()                              = 0;
+    virtual CHIP_ERROR EndCurrentErrorListRead()                          = 0;
 
     /**
      * @brief Checks if the device can move or need pre-motion stages to complete
