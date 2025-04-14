@@ -77,7 +77,15 @@ CameraAVStreamMgmtServer::~CameraAVStreamMgmtServer()
 
 CHIP_ERROR CameraAVStreamMgmtServer::Init()
 {
-    // Necessary feature checks
+    // Constraint checks for RateDistortionTardeOffPoints vector
+    for (const auto & rateDistortionTradeOffPoints : mRateDistortionTradeOffPointsList)
+    {
+        VerifyOrReturnError(rateDistortionTradeOffPoints.minBitRate >=1,  CHIP_ERROR_INVALID_ARGUMENT,
+        ChipLogError(
+            Zcl,
+            "CameraAVStreamMgmt[ep=%d]: RateDistortionTradeOffPoints configuration error",
+            mEndpointId));
+    }
 
     // At least one of Video, Audio or Snapshot needs to be supported.
     VerifyOrReturnError(
@@ -183,9 +191,9 @@ CameraAVStreamMgmtServer::ReadAndEncodeRateDistortionTradeOffPoints(const Attrib
 
 CHIP_ERROR CameraAVStreamMgmtServer::ReadAndEncodeSnapshotCapabilities(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
-    for (const auto & snapshotParams : mSnapshotCapabilitiesList)
+    for (const auto & snapshotCapabilities : mSnapshotCapabilitiesList)
     {
-        ReturnErrorOnFailure(encoder.Encode(snapshotParams));
+        ReturnErrorOnFailure(encoder.Encode(snapshotCapabilities));
     }
 
     return CHIP_NO_ERROR;
