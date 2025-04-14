@@ -48,7 +48,6 @@ enum class OptionalAttributeEnum : uint32_t
 struct ClusterConformance
 {
 public:
-    // Expose the feature map directly for chaining and other operations
     BitFlags<Feature> & FeatureMap() { return mFeatureMap; }
     const BitFlags<Feature> & FeatureMap() const { return mFeatureMap; }
 
@@ -113,7 +112,27 @@ struct ClusterState
 };
 
 /**
- * @brief Class containing the cluster buisness logic
+ * @brief Attribute Class Set interface
+ *        Class is responsible for setting the attributes of the cluster and marking them as dirty if necessary.
+ */
+class ClusterStateAttributes
+{
+public:
+    explicit ClusterStateAttributes(MatterContext & matterContext) : mMatterContext(matterContext) { (void) mMatterContext; }
+    ~ClusterStateAttributes() = default;
+
+    CHIP_ERROR SetCountdownTime(const DataModel::Nullable<ElapsedS> & countdownTime);
+    CHIP_ERROR SetMainState(const MainStateEnum & mainState);
+    CHIP_ERROR SetOverallState(const DataModel::Nullable<GenericOverallState> & overallState);
+    CHIP_ERROR SetTargetState(const DataModel::Nullable<GenericOverallTarget> & targetState);
+
+private:
+    MatterContext & mMatterContext;
+    ClusterState mState;
+};
+
+/**
+ * @brief Class containing the cluster business logic
  *
  */
 class ClusterLogic
@@ -121,17 +140,16 @@ class ClusterLogic
 public:
     // Instantiates a ClusterLogic class. The caller maintains ownership of the driver and the context, but provides them for use by
     // the ClusterLogic class.
-    ClusterLogic(DelegateBase & delegate, MatterContext & matterContext) : mDelegate(delegate), mMatterContext(matterContext)
+    ClusterLogic(DelegateBase & delegate, MatterContext & matterContext) : mDelegate(delegate), mState(matterContext)
     {
         // TODO remove this
         (void) mDelegate;
-        (void) mMatterContext;
     }
 
     ~ClusterLogic() = default;
 
     const ClusterConformance & GetConformance() const { return mConformance; }
-    const ClusterState & GetState() const { return mState; }
+    const ClusterStateAttributes & GetState() const { return mState; }
 
     /**
      * @brief Initializes the cluster logic
@@ -142,14 +160,17 @@ public:
      */
     CHIP_ERROR Init(const ClusterConformance & conformance);
 
+    CHIP_ERROR SetCountdownTime(const DataModel::Nullable<ElapsedS> & countdownTime);
+    CHIP_ERROR SetMainState(const MainStateEnum & mainState);
+    CHIP_ERROR SetOverallState(const DataModel::Nullable<GenericOverallState> & overallState);
+
 private:
     bool mIsInitialized = false;
 
-    ClusterConformance mConformance;
-    ClusterState mState;
-
     DelegateBase & mDelegate;
-    MatterContext & mMatterContext;
+
+    ClusterConformance mConformance;
+    ClusterStateAttributes mState;
 };
 
 } // namespace ClosureControl

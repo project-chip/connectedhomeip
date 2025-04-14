@@ -22,6 +22,44 @@ namespace app {
 namespace Clusters {
 namespace ClosureControl {
 
+/*
+    ClusterStateAttributes Implementation
+*/
+
+CHIP_ERROR ClusterStateAttributes::SetCountdownTime(const DataModel::Nullable<ElapsedS> & countdownTime)
+{
+    // TODO
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClusterStateAttributes::SetMainState(const MainStateEnum & mainState)
+{
+    // TODO
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClusterStateAttributes::SetOverallState(const DataModel::Nullable<GenericOverallState> & overallState)
+{
+    // TODO
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClusterStateAttributes::SetTargetState(const DataModel::Nullable<GenericOverallTarget> & targetState)
+{
+    // TODO
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClusterLogic::SetCountdownTime(const DataModel::Nullable<ElapsedS> & countdownTime)
+{
+    // TODO
+    return CHIP_NO_ERROR;
+}
+
+/*
+    ClusterLogic Implementation
+*/
+
 CHIP_ERROR ClusterLogic::Init(const ClusterConformance & conformance)
 {
     VerifyOrReturnError(conformance.Valid(), CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
