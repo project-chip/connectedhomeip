@@ -32,7 +32,7 @@ CHIP_ERROR ClusterStateAttributes::SetCountdownTime(const DataModel::Nullable<El
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterStateAttributes::SetMainState(const MainStateEnum & mainState)
+CHIP_ERROR ClusterStateAttributes::SetMainState(MainStateEnum mainState)
 {
     // TODO
     return CHIP_NO_ERROR;
@@ -50,12 +50,6 @@ CHIP_ERROR ClusterStateAttributes::SetTargetState(const DataModel::Nullable<Gene
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::SetCountdownTime(const DataModel::Nullable<ElapsedS> & countdownTime)
-{
-    // TODO
-    return CHIP_NO_ERROR;
-}
-
 /*
     ClusterLogic Implementation
 */
@@ -66,6 +60,24 @@ CHIP_ERROR ClusterLogic::Init(const ClusterConformance & conformance)
     mConformance = conformance;
 
     mIsInitialized = true;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClusterLogic::SetMainState(MainStateEnum mainState)
+{
+    // TODO
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOverallState> & overallState)
+{
+    // TODO
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClusterLogic::SetCountdownTime(const DataModel::Nullable<ElapsedS> & countdownTime)
+{
+    // TODO
     return CHIP_NO_ERROR;
 }
 

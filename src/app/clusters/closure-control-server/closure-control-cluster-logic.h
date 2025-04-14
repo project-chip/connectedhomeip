@@ -122,9 +122,14 @@ public:
     ~ClusterStateAttributes() = default;
 
     CHIP_ERROR SetCountdownTime(const DataModel::Nullable<ElapsedS> & countdownTime);
-    CHIP_ERROR SetMainState(const MainStateEnum & mainState);
+    CHIP_ERROR SetMainState(MainStateEnum mainState);
     CHIP_ERROR SetOverallState(const DataModel::Nullable<GenericOverallState> & overallState);
     CHIP_ERROR SetTargetState(const DataModel::Nullable<GenericOverallTarget> & targetState);
+
+    CHIP_ERROR GetCountdownTime(DataModel::Nullable<ElapsedS> & countdownTime);
+    CHIP_ERROR GetMainState(MainStateEnum & mainState);
+    CHIP_ERROR GetOverallState(DataModel::Nullable<GenericOverallState> & overallState);
+    CHIP_ERROR GetOverallTarget(DataModel::Nullable<GenericOverallTarget> & overallTarget);
 
 private:
     MatterContext & mMatterContext;
@@ -160,8 +165,29 @@ public:
      */
     CHIP_ERROR Init(const ClusterConformance & conformance);
 
+    // All Get functions - TODO update
+    // Return CHIP_ERROR_INCORRECT_STATE if the class has not been initialized.
+    // Return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if the attribute is not supported by the conformance.
+    // Otherwise return CHIP_NO_ERROR and set the input parameter value to the current cluster state value
+
+    CHIP_ERROR GetCountdownTime(DataModel::Nullable<ElapsedS> & countdownTime);
+    CHIP_ERROR GetMainState(MainStateEnum & mainState);
+    CHIP_ERROR GetOverallState(DataModel::Nullable<GenericOverallState> & overallState);
+    CHIP_ERROR GetOverallTarget(DataModel::Nullable<GenericOverallTarget> & overallTarget);
+    CHIP_ERROR GetCurrentErrorList(DataModel::Nullable<ErrorList> & currentErrorList); // -> use delegate for this
+
+    // All Set functions - TODO update
+    // Return CHIP_ERROR_INCORRECT_STATE if the class has not been initialized.
+    // Return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if the attribute is not supported by the conformance.
+    // Return CHIP_ERROR_INVALID_ARGUMENT if the input value is out of range.
+    // Returns CHIP_ERROR_PERSISTED_STORAGE_FAILED if the value could not not be stored in persistent storage.
+    // Otherwise return CHIP_NO_ERROR and set the parameter value in the cluster state
+    // Set functions are supplied for any values that can be set either internally by the device or externally
+    // through a direct attribute write. Changes to attributes that happen as a side effect of cluster commands
+    // are handled by the cluster command handlers.
+
     CHIP_ERROR SetCountdownTime(const DataModel::Nullable<ElapsedS> & countdownTime);
-    CHIP_ERROR SetMainState(const MainStateEnum & mainState);
+    CHIP_ERROR SetMainState(MainStateEnum mainState);
     CHIP_ERROR SetOverallState(const DataModel::Nullable<GenericOverallState> & overallState);
 
 private:
