@@ -116,9 +116,9 @@ class TC_TBRM_2_6(MatterBaseTest):
         _index = 0
         while _index < len(b_active_dataset):
             tlv_type = b_active_dataset[_index]
-            tlv_lenght = b_active_dataset[_index+1]
-            nwk_dataset_tlvs[tlv_type]["value"] = b_active_dataset[_index+2:_index+2+tlv_lenght]
-            _index += tlv_lenght + 2
+            tlv_length = b_active_dataset[_index+1]
+            nwk_dataset_tlvs[tlv_type]["value"] = b_active_dataset[_index+2:_index+2+tlv_length]
+            _index += tlv_length + 2
         return nwk_dataset_tlvs
 
     @async_test_body
@@ -157,7 +157,7 @@ class TC_TBRM_2_6(MatterBaseTest):
         logging.info(f" Response: {rsp}")
         asserts.assert_equal(
             True, rsp[tbrm_endpoint][Clusters.NetworkCommissioning][Clusters.NetworkCommissioning.Attributes.InterfaceEnabled],
-            "Clusters.NetworkCommissioning.Attributes.InterfaceEnabled != True")
+            "NetworkCommissioning.Attributes.InterfaceEnabled != True")
 
         self.step(5)
 
@@ -172,7 +172,7 @@ class TC_TBRM_2_6(MatterBaseTest):
         logging.info(f" Response: {rsp}")
         asserts.assert_equal(
             nwk_dataset[2]["value"], rsp[tbrm_endpoint][Clusters.NetworkCommissioning][Clusters.NetworkCommissioning.Attributes.LastNetworkID],
-            "NetworkCommissioning.Attributes.LastNetworkID Attribute != 1")
+            f"NetworkCommissioning Cluster LastNetworkID Attribute dose not match TBRM Cluster Extended PanID Attribute(extracted from dataset)")
 
         self.step(7)
 

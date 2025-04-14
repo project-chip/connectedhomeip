@@ -110,9 +110,9 @@ class TC_TBRM_2_5(MatterBaseTest):
         _index = 0
         while _index < len(b_active_dataset):
             tlv_type = b_active_dataset[_index]
-            tlv_lenght = b_active_dataset[_index+1]
-            nwk_dataset_tlvs[tlv_type]["value"] = b_active_dataset[_index+2:_index+2+tlv_lenght]
-            _index += tlv_lenght + 2
+            tlv_length = b_active_dataset[_index+1]
+            nwk_dataset_tlvs[tlv_type]["value"] = b_active_dataset[_index+2:_index+2+tlv_length]
+            _index += tlv_length + 2
         return nwk_dataset_tlvs
 
     @async_test_body
@@ -184,7 +184,7 @@ class TC_TBRM_2_5(MatterBaseTest):
         logging.info(f" Response: {rsp}")
         asserts.assert_equal(
             True, rsp[tbrm_endpoint][Clusters.NetworkCommissioning][Clusters.NetworkCommissioning.Attributes.InterfaceEnabled],
-            "NClusters.NetworkCommissioning.Attributes.InterfaceEnabled != True")
+            "NetworkCommissioning.Attributes.InterfaceEnabled != True")
 
 
 if __name__ == "__main__":
