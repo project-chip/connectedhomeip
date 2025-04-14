@@ -42,7 +42,9 @@ class MockMatterContext : public MatterContext
 {
 public:
     MockMatterContext() : MatterContext(kInvalidEndpointId) {}
-    void MarkDirty(AttributeId attributeId) override { /* No-op for testing */ }
+    void MarkDirty(AttributeId attributeId) override
+    { /* No-op for testing */
+    }
 };
 
 TEST(TestClosureControlClusterLogic, InitValidConformance)
