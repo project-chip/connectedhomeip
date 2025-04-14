@@ -59,7 +59,7 @@ public:
      *
      ***************************************************************************/
     CHIP_ERROR StartCurrentErrorListRead() override;
-    CHIP_ERROR GetCurrentErrorListAtIndex(size_t Index, ClosureErrorEnum & closureError) override;
+    CHIP_ERROR GetCurrentErrorAtIndex(size_t Index, ClosureErrorEnum & closureError) override;
     CHIP_ERROR EndCurrentErrorListRead() override;
 
     void ClosureControlAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId);
@@ -76,8 +76,6 @@ private:
 
     // Need the following so can determine which features are supported
     ClosureControl::Instance * mpClosureControlInstance = nullptr;
-    bool IsManualLatch();
-    bool IsDeviceReadytoMove();
 };
 
 } // namespace ClosureControl

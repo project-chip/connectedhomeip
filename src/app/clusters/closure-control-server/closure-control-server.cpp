@@ -268,28 +268,34 @@ CHIP_ERROR Instance::EncodeCurrentErrorList(const AttributeValueEncoder::ListEnc
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    // Tell the delegate that read has started , error list data should be locked.
     ReturnErrorOnFailure(mDelegate.StartCurrentErrorListRead());
 
     for (size_t i = 0; true; i++)
     {
         ClosureErrorEnum error;
 
-        err = mDelegate.GetCurrentErrorListAtIndex(i, error);
-        // Convert end of list to CHIP_NO_ERROR
-        VerifyOrExit(err != CHIP_ERROR_PROVIDER_LIST_EXHAUSTED, err = CHIP_NO_ERROR);
+        err = mDelegate.GetCurrentErrorAtIndex(i, error);
 
-        // Check if another error occurred before trying to encode
+        // Convert CHIP_ERROR_PROVIDER_LIST_EXHAUSTED to CHIP_NO_ERROR
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+        {
+            err = CHIP_NO_ERROR;
+            goto exit;
+        }
+
+        // Exit for other errors occurred apart from CHIP_ERROR_PROVIDER_LIST_EXHAUSTED
         SuccessOrExit(err);
 
         // Encode the error
         err = encoder.Encode(error);
 
-        // Check if another error occurred before trying to encode
+        // Check if error occurred while trying to encode
         SuccessOrExit(err);
     }
 
 exit:
-    // Tell the delegate the read is complete
+    // Tell the delegate the read is complete , error list can be modified.
     ReturnErrorOnFailure(mDelegate.EndCurrentErrorListRead());
     return err;
 }
@@ -316,7 +322,6 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeVal
     }
 }
 
-// CommandHandlerInterface
 void Instance::InvokeCommand(HandlerContext & handlerContext)
 {
     using namespace Commands;
@@ -395,7 +400,10 @@ Status Instance::HandleMoveTo(HandlerContext & ctx, const Commands::MoveTo::Deco
         VerifyOrReturnError(HasFeature(Feature::kMotionLatching), Status::Success);
 
         // If manual intervention is required to latch, respond with INVALID_ACTION
-        VerifyOrReturnError(mDelegate.IsLatchManual() == true, Status::InvalidAction);
+        if (mDelegate.IsLatchManual())
+        {
+            return Status::InvalidAction;
+        }
     }
 
     if (commandData.speed.HasValue())
@@ -405,9 +413,9 @@ Status Instance::HandleMoveTo(HandlerContext & ctx, const Commands::MoveTo::Deco
         VerifyOrReturnError(HasFeature(Feature::kSpeed), Status::Success);
     }
 
+    // If the device is in an error state, set the MainState to Error and return Failure.
     if (mDelegate.CheckErrorOnDevice())
     {
-        // If the device is in an error state, set the MainState to Error
         VerifyOrReturnError(SetMainState(MainStateEnum::kError) == CHIP_NO_ERROR, Status::Failure);
         // Return Status Failure
         return Status::Failure;
@@ -428,6 +436,7 @@ Status Instance::HandleMoveTo(HandlerContext & ctx, const Commands::MoveTo::Deco
     return mDelegate.MoveTo(commandData.position, commandData.latch, commandData.speed);
 }
 
+//Calibrate command is valid only in calibrating and stopped states.
 Status Instance::HandleCalibrate(HandlerContext & ctx, const Commands::Calibrate::DecodableType & commandData)
 {
     MainStateEnum state = GetMainState();

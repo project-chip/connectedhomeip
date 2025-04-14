@@ -68,7 +68,7 @@ CHIP_ERROR ClosureControlDelegate::StartCurrentErrorListRead()
 }
 
 // Return emualted error list, will add attribute handling in next phase
-CHIP_ERROR ClosureControlDelegate::GetCurrentErrorListAtIndex(size_t Index, ClosureErrorEnum & closureError)
+CHIP_ERROR ClosureControlDelegate::GetCurrentErrorAtIndex(size_t Index, ClosureErrorEnum & closureError)
 {
     if (Index >= MATTER_ARRAY_SIZE(kCurrentErrorList))
     {

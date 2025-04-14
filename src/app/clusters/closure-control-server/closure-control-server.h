@@ -68,7 +68,7 @@ public:
      */
     virtual CHIP_ERROR StartCurrentErrorListRead() = 0;
     // The delegate is expected to return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED to indicate end of list.
-    virtual CHIP_ERROR GetCurrentErrorListAtIndex(size_t, ClosureErrorEnum &) = 0;
+    virtual CHIP_ERROR GetCurrentErrorAtIndex(size_t, ClosureErrorEnum &) = 0;
     virtual CHIP_ERROR EndCurrentErrorListRead()                              = 0;
 
     /**
@@ -195,8 +195,8 @@ public:
     bool CheckCommandStateCompatibility(CommandId cmd, MainStateEnum state);
 
     /**
-     * Reports that the contents of the current error list has changed.
-     * The device SHALL call this method whenever it changes the current error list.
+     * @brief This function should be called when current error list has changed.
+     *        The device SHALL call this method whenever it changes the current error list.
      */
     void ReportCurrentErrorListChange();
 
