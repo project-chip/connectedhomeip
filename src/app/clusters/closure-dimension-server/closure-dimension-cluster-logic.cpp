@@ -49,7 +49,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const GenericCurrentStateStruct & acurr
     // TODO: To implement the impact of the MoveTo command from the Closure Control cluster
 
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    
+
     GenericCurrentStateStruct currentState = acurrentState;
 
     if (currentState.position.HasValue())
@@ -112,7 +112,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const GenericCurrentStateStruct & acurr
 CHIP_ERROR ClusterLogic::SetTarget(const GenericTargetStruct & atarget)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    
+
     GenericTargetStruct target = atarget;
 
     if (target.position.HasValue())
@@ -128,7 +128,7 @@ CHIP_ERROR ClusterLogic::SetTarget(const GenericTargetStruct & atarget)
             target.position.ClearValue();
         }
     }
-    
+
     // If MotionLatching feature is supported,Target latch SHALL be available else latch SHALL NOT be present
     if (target.latch.HasValue())
     {
@@ -225,17 +225,17 @@ CHIP_ERROR ClusterLogic::SetUnitRange(const DataModel::Nullable<Structs::UnitRan
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
 
     VerifyOrReturnError(mConformance.HasFeature(Feature::kUnit), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    
+
     if (unitRange.IsNull())
     {
         mState.unitRange.SetNull();
         mMatterContext.MarkDirty(Attributes::UnitRange::Id);
         return CHIP_NO_ERROR;
     }
-    
+
     // If the unit range is invalid, we need to return an error
     VerifyOrReturnError(unitRange.Value().min <= unitRange.Value().max, CHIP_ERROR_INVALID_ARGUMENT);
-    
+
     // If the unit range is null, we need to set it to the new value
     if(mState.unitRange.IsNull())
     {
@@ -243,7 +243,7 @@ CHIP_ERROR ClusterLogic::SetUnitRange(const DataModel::Nullable<Structs::UnitRan
         mMatterContext.MarkDirty(Attributes::UnitRange::Id);
         return CHIP_NO_ERROR;
     }
-    
+
     // If the unit range is not null, we need to check if the values are different
     if ((unitRange.Value().min != mState.unitRange.Value().min) || (unitRange.Value().max != mState.unitRange.Value().max))
     {
@@ -260,7 +260,7 @@ CHIP_ERROR ClusterLogic::SetLimitRange(const Structs::RangePercent100thsStruct::
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
 
     VerifyOrReturnError(mConformance.HasFeature(Feature::kLimitation), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    
+
     // If the limit range is invalid, we need to return an error
     VerifyOrReturnError(limitRange.min <= limitRange.max, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(limitRange.min <= PERCENT100THS_MAX_VALUE, CHIP_ERROR_INVALID_ARGUMENT);
@@ -458,12 +458,12 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
     VerifyOrDieWithMsg(mInitialized, NotSpecified, "Unexpected command recieved when device is yet to be initialized");
     // TODO: If this command is sent while the device is in a non-compatible internal-state, a status code of INVALID_IN_STATE SHALL
     // be returned.
-    
+
     GenericCurrentStateStruct currentState;
     VerifyOrReturnError(GetCurrentState(currentState) == CHIP_NO_ERROR, Status::Failure);
-    // Check if the current position is valid or else return InvalidInState 
+    // Check if the current position is valid or else return InvalidInState
     VerifyOrReturnValue(currentState.position.HasValue(), Status::InvalidInState);
-    
+
     GenericTargetStruct target;
     VerifyOrReturnError(GetTarget(target) == CHIP_NO_ERROR, Status::Failure);
 
@@ -477,7 +477,7 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
         // multiple of the Resolution attribute according to the server, and a status code of SUCCESS is returned.
         // TODO: supported then the device (depending of its current state) start or change the course of its motion procedure and
         // update Target.Position.
-        target.position = position; 
+        target.position = position;
     }
 
     if (latch.HasValue())
@@ -487,7 +487,7 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
         // TODO: If the device supports the Latching(LT) feature, the device dimension SHALL either fulfill the latch order and
         // update Target.Latch or, if manual intervention is required to latch, respond with INVALID_ACTION and remain in its
         // current state.
-        target.latch = latch; 
+        target.latch = latch;
     }
 
     if (speed.HasValue())
@@ -498,9 +498,9 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
         // TODO: If Speed(SP) feature is enabled then Target.Speed is updated with the Speed Field.
         // TODO: In case a SetTarget command is sent with only the Speed field then if: It SHOULD affect the current dimension
         // motion speed of the device (this change speed on the fly).
-        target.speed = speed; 
+        target.speed = speed;
     }
-    
+
     VerifyOrReturnError(SetTarget(target) == CHIP_NO_ERROR, Status::Failure);
     // TODO: CHIP_ERROR err = mClusterDriver.HandleSetTarget(target.position, target.latch, target.speed);
     return Status::Success;
@@ -510,10 +510,10 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
                                        Optional<Globals::ThreeLevelAutoEnum> speed)
 {
     VerifyOrDieWithMsg(mInitialized, NotSpecified, "Unexpected command recieved when device is yet to be initialized");
-    
+
     // Return UnsupportedCommand if Positioning feature is not supported.
     VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), Status::UnsupportedCommand);
-    
+
     // Return ConstraintError if command parameters are out of bounds
     VerifyOrReturnError(direction != StepDirectionEnum::kUnknownEnumValue, Status::ConstraintError);
     VerifyOrReturnError(numberOfSteps > 0, Status::ConstraintError);
@@ -521,7 +521,7 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
     {
         VerifyOrReturnError(speed.Value() != Globals::ThreeLevelAutoEnum::kUnknownEnumValue,Status::ConstraintError);
     }
-    
+
     // TODO: If the server is in a state where it cannot support the command, the server SHALL respond with an INVALID_IN_STATE
     // response and the Target attribute value SHALL remain unchanged.
     // TODO: , this SHALL update the Target.Position attribute value e.g. by sending multiple commands with short step by step or a
@@ -529,25 +529,25 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
 
     GenericCurrentStateStruct currentState;
     VerifyOrReturnError(GetCurrentState(currentState) == CHIP_NO_ERROR, Status::Failure);
-    // Check if the current position is valid or else return InvalidInState 
+    // Check if the current position is valid or else return InvalidInState
     VerifyOrReturnValue(currentState.position.HasValue(), Status::InvalidInState);
-    
+
     GenericTargetStruct stepTarget;
     VerifyOrReturnError(GetTarget(stepTarget) == CHIP_NO_ERROR, Status::Failure);
-    
+
     Percent100ths stepValue;
     VerifyOrReturnError(GetStepValue(stepValue) == CHIP_NO_ERROR, Status::Failure);
 
     //Derive Target Position from StepValue and NumberOfSteps.
     int32_t currentPosition = static_cast<uint32_t>(currentState.position.Value());
-    
+
     // Convert step to position delta
     int32_t delta    = numberOfSteps * stepValue;
     int32_t newPosition   = 0;
-    
+
     // check if device supports Limitation feature, if yes fetch the LimitRange values
     bool limitSupported = mConformance.HasFeature(Feature::kLimitation) ? true : false;
-    
+
     Structs::RangePercent100thsStruct::Type limitRange;
     if (limitSupported)
     {
@@ -557,25 +557,25 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
     //Position = Position - NumberOfSteps * StepValue
     switch (direction)
     {
-        
+
         case StepDirectionEnum::kDecrease:
             newPosition = currentPosition - delta;
             //Position value SHALL be clamped to 0.00% if the LM feature is not supported or LimitRange.Min if the LM feature is supported.
             newPosition = limitSupported ? std::max(newPosition, static_cast<int32_t>(limitRange.min)) : std::max(newPosition, (int32_t)0);
             break;
-            
+
         case StepDirectionEnum::kIncrease:
             newPosition = currentPosition + delta;
             //Position value SHALL be clamped to 0.00% if the LM feature is not supported or LimitRange.Max if the LM feature is supported.
             newPosition = limitSupported ? std::min(newPosition, static_cast<int32_t>(limitRange.max)) : std::min(newPosition, (int32_t)10000);
             break;
-            
+
         default:
             // Should never reach here due to earlier VerifyOrReturnError check
             ChipLogError(AppServer, "Unhandled StepDirectionEnum value");
             return Status::ConstraintError;
     }
-    
+
     //set the target position
     stepTarget.position.SetValue(newPosition);
 
