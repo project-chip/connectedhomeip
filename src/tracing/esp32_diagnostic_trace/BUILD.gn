@@ -47,18 +47,12 @@ source_set("esp32_diagnostic_tracing") {
   deps = [ ":backend" ]
 }
 
-source_set("esp32_diagnostic_trace") {
-  public = [ "include/matter/tracing/macros_impl.h" ]
-
+source_set("diagnostic_storage") {
   sources = [
     "DiagnosticEntry.cpp",
     "DiagnosticEntry.h",
     "DiagnosticStorage.cpp",
     "DiagnosticStorage.h",
   ]
-  public_deps = [
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/tracing",
-  ]
-  public_configs = [ ":tracing" ]
+  public_deps = [ "${chip_root}/src/lib/core" ]
 }

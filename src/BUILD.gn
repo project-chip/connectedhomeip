@@ -71,6 +71,7 @@ if (chip_build_tests) {
       "${chip_root}/src/system/tests",
       "${chip_root}/src/transport/retransmit/tests",
       "${chip_root}/src/transport/tests",
+      "${chip_root}/src/tracing/esp32_diagnostic_trace/tests",
     ]
 
     # Skip DNSSD tests for Mbed platform due to flash memory size limitations
@@ -121,12 +122,6 @@ if (chip_build_tests) {
 
     if (matter_enable_tracing_support &&
         matter_trace_config == "${chip_root}/src/tracing/multiplexed") {
-      tests += [ "${chip_root}/src/tracing/tests" ]
-    }
-
-    if (matter_enable_tracing_support &&
-        matter_trace_config ==
-        "${chip_root}/src/tracing/esp32_diagnostic_trace") {
       tests += [ "${chip_root}/src/tracing/tests" ]
     }
 

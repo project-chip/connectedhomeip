@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Project CHIP Authors
+# Copyright (c) 2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,26 +14,17 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/pigweed.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
-import("${chip_root}/src/tracing/tracing_args.gni")
 
-if (matter_enable_tracing_support &&
-    matter_trace_config == "${chip_root}/src/tracing/multiplexed") {
-  chip_test_suite("tests") {
-    output_name = "libTracingTests"
+# ESP32 Diagnostic Storage specific tests
+chip_test_suite("tests") {
+  output_name = "libDiagnosticTests"
 
-    test_sources = [
-      "TestMetricEvents.cpp",
-      "TestTracing.cpp",
-    ]
+  test_sources = [ "TestESP32DiagnosticTrace.cpp" ]
 
-    public_deps = [
-      "${chip_root}/src/lib/core:string-builder-adapters",
-      "${chip_root}/src/platform",
-      "${chip_root}/src/tracing",
-      "${chip_root}/src/tracing:macros",
-    ]
-  }
+  public_deps = [
+    "${chip_root}/src/lib/core:string-builder-adapters",
+    "${chip_root}/src/tracing/esp32_diagnostic_trace:diagnostic_storage",
+  ]
 }
