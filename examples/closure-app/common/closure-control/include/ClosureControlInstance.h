@@ -33,7 +33,7 @@ class ClosureControlInstance : public Instance
 {
 public:
     ClosureControlInstance(EndpointId aEndpointId, ClosureControlManager & aDelegate, BitMask<Feature> aFeatures,
-                            BitMask<OptionalAttribute> aOptionalAttribute) :
+                           BitMask<OptionalAttribute> aOptionalAttribute) :
         ClosureControl::Instance(aEndpointId, aDelegate, aFeatures, aOptionalAttribute)
     {
         mDelegate = &aDelegate;

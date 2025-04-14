@@ -78,15 +78,15 @@ bool Instance::IsSupportedState(MainStateEnum aMainState)
     return true;
 }
 
-//Closure Control MainState and supoorted commands are given below
-// 1. Calibrating        -> Calibrate and Stop commands supported
-// 2. Stopped            -> Calibrate, MoveTo and Stop commands supported
-// 3. Moving             -> MoveTo and Stop command supported
-// 4. WaitingForMotion   -> MoveTo and Stop command supported
-// 5. Disengaged         -> No commands supported
-// 6. Protected          -> No commands supported
-// 7. SetupRequired      -> No commands supported
-// 8. Error              -> Only MoveTo command supported
+// Closure Control MainState and supoorted commands are given below
+//  1. Calibrating        -> Calibrate and Stop commands supported
+//  2. Stopped            -> Calibrate, MoveTo and Stop commands supported
+//  3. Moving             -> MoveTo and Stop command supported
+//  4. WaitingForMotion   -> MoveTo and Stop command supported
+//  5. Disengaged         -> No commands supported
+//  6. Protected          -> No commands supported
+//  7. SetupRequired      -> No commands supported
+//  8. Error              -> Only MoveTo command supported
 bool Instance::CheckCommandStateCompatibility(CommandId cmd, MainStateEnum state)
 {
     // None of the commands are supported in Disengaged, Protected and SetupRequired States
@@ -98,7 +98,8 @@ bool Instance::CheckCommandStateCompatibility(CommandId cmd, MainStateEnum state
     switch (cmd)
     {
     case Commands::Stop::Id:
-    // The Stop command is supported in Calibrating ,Stopped, Moving and WaitingForMotion states, not supported in the Error state.
+        // The Stop command is supported in Calibrating ,Stopped, Moving and WaitingForMotion states, not supported in the Error
+        // state.
         if (state == MainStateEnum::kError)
         {
             return false;
@@ -110,7 +111,8 @@ bool Instance::CheckCommandStateCompatibility(CommandId cmd, MainStateEnum state
         break;
 
     case Commands::MoveTo::Id:
-    // The MoveTo command is supported in Stopped, Error, Moving and WaitingForMotion states, not supported in the Calibrating State.
+        // The MoveTo command is supported in Stopped, Error, Moving and WaitingForMotion states, not supported in the Calibrating
+        // State.
         if (state == MainStateEnum::kCalibrating)
         {
             return false;
@@ -122,7 +124,8 @@ bool Instance::CheckCommandStateCompatibility(CommandId cmd, MainStateEnum state
         break;
 
     case Commands::Calibrate::Id:
-    // The Calibrate command is supported in Calibrating and Stopped states, not supported in Error, Moving and WaitingForMotion states.
+        // The Calibrate command is supported in Calibrating and Stopped states, not supported in Error, Moving and WaitingForMotion
+        // states.
         if ((state == MainStateEnum::kCalibrating) || (state == MainStateEnum::kStopped))
         {
             return true;
@@ -374,7 +377,8 @@ Status Instance::HandleMoveTo(HandlerContext & ctx, const Commands::MoveTo::Deco
     VerifyOrReturnValue(CheckCommandStateCompatibility(Commands::Stop::Id, state), Status::InvalidInState);
 
     // If all command parameters don't have a value, return InvalidCommand
-    VerifyOrReturnValue(commandData.position.HasValue() || commandData.latch.HasValue() || commandData.speed.HasValue(), Status::InvalidCommand);
+    VerifyOrReturnValue(commandData.position.HasValue() || commandData.latch.HasValue() || commandData.speed.HasValue(),
+                        Status::InvalidCommand);
 
     if (commandData.position.HasValue())
     {
@@ -401,7 +405,7 @@ Status Instance::HandleMoveTo(HandlerContext & ctx, const Commands::MoveTo::Deco
         VerifyOrReturnError(HasFeature(Feature::kSpeed), Status::Success);
     }
 
-    if(mDelegate.CheckErrorOnDevice())
+    if (mDelegate.CheckErrorOnDevice())
     {
         // If the device is in an error state, set the MainState to Error
         VerifyOrReturnError(SetMainState(MainStateEnum::kError) == CHIP_NO_ERROR, Status::Failure);
@@ -409,16 +413,18 @@ Status Instance::HandleMoveTo(HandlerContext & ctx, const Commands::MoveTo::Deco
         return Status::Failure;
     }
 
-    if(mDelegate.IsDeviceReadyToMove())
+    if (mDelegate.IsDeviceReadyToMove())
     {
         // If the device is ready to move, set MainState to Moving
         SetMainState(MainStateEnum::kMoving);
-    } else {
+    }
+    else
+    {
         // If device need pre-stage before moving, then set MainState to Waiting for Moving
         SetMainState(MainStateEnum::kWaitingForMotion);
     }
 
-    //TODO: Check if the device is in a state to move and set MainState to Moving or Waiting for Moving
+    // TODO: Check if the device is in a state to move and set MainState to Moving or Waiting for Moving
     return mDelegate.MoveTo(commandData.position, commandData.latch, commandData.speed);
 }
 

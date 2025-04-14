@@ -30,10 +30,10 @@ namespace {
 
 // Mock Error List generated for sample application usage.
 const ClosureErrorEnum kCurrentErrorList[] = {
-        ClosureErrorEnum::kBlocked,
-        ClosureErrorEnum::kInternalInterference,
-        ClosureErrorEnum::kMaintenanceRequired,
-        ClosureErrorEnum::kTemperatureLimited,
+    ClosureErrorEnum::kBlocked,
+    ClosureErrorEnum::kInternalInterference,
+    ClosureErrorEnum::kMaintenanceRequired,
+    ClosureErrorEnum::kTemperatureLimited,
 };
 
 PositioningEnum GetStatePositionFromTarget(TargetPositionEnum tagPosition)
@@ -56,7 +56,7 @@ PositioningEnum GetStatePositionFromTarget(TargetPositionEnum tagPosition)
     return PositioningEnum::kUnknownEnumValue;
 }
 
-} //namespace
+} // namespace
 
 void ClosureControlManager::SetClosureControlInstance(ClosureControl::Instance & instance)
 {
@@ -146,8 +146,8 @@ Protocols::InteractionModel::Status ClosureControlManager::MoveTo(const Optional
 
     if (speed.HasValue())
     {
-            overallState.speed = speed;
-            // TODO: device to change speed
+        overallState.speed = speed;
+        // TODO: device to change speed
     }
 
     mpClosureControlInstance->SetOverallState(overallState);

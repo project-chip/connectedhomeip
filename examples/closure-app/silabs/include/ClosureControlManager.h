@@ -33,7 +33,6 @@ namespace ClosureControl {
 class ClosureControlManager : public ClosureControl::Delegate
 {
 public:
-
     static ClosureControlManager sClosureCtrlMgr;
 
     void SetClosureControlInstance(ClosureControl::Instance & instance);
@@ -69,7 +68,6 @@ public:
     bool IsLatchManual();
 
 private:
-
     /***************************************************************************
      *
      * ClosureControlDelegate specific variables

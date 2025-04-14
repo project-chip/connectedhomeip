@@ -53,7 +53,7 @@
 
 namespace {
 
-constexpr chip::EndpointId kClosureEndpoint       = 1;
+constexpr chip::EndpointId kClosureEndpoint = 1;
 
 } // namespace
 
@@ -81,8 +81,8 @@ void ApplicationInit()
 {
 
     ChipLogDetail(AppServer, "==================================================");
-    ChipLogDetail(AppServer,"Closure-app ClosureControl starting for endpoint EP%d", kClosureEndpoint);
-    ChipLogDetail(AppServer,"==================================================");
+    ChipLogDetail(AppServer, "Closure-app ClosureControl starting for endpoint EP%d", kClosureEndpoint);
+    ChipLogDetail(AppServer, "==================================================");
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     ClosureControlInit(kClosureEndpoint);
@@ -138,11 +138,11 @@ void AppTask::AppTaskMain(void * pvParameter)
     CHIP_ERROR err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer,"AppTask.Init() failed");
+        ChipLogError(AppServer, "AppTask.Init() failed");
         appError(err);
     }
 
-    ChipLogDetail(AppServer,"App Task started");
+    ChipLogDetail(AppServer, "App Task started");
 
     while (true)
     {
