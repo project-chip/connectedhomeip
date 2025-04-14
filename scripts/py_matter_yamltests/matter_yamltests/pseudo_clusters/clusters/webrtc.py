@@ -14,7 +14,6 @@
 #    limitations under the License.
 
 from ..pseudo_cluster import PseudoCluster
-from loguru import logger
 
 _DEFINITION = '''<?xml version="1.0"?>
 <configurator>
@@ -22,37 +21,21 @@ _DEFINITION = '''<?xml version="1.0"?>
     <name>WebRTC</name>
     <code>0xFFF1FD20</code>
 
-    <command source="client" code="0" name="UserPromptSdp" response="UserPromptSdpResponse">
-      <arg name="promptMessage" type="char_string"/>
+    <command source="client" code="0" name="VerifyVideoStream">
     </command>
 
-    <command source="client" code="1" name="VerifyVideoStream">
+    <command source="client" code="1" name="Connect">
+      <arg name="nodeId" type="node_id"/>
     </command>
 
-    <command source="server" code="1" name="UserPromptSdpResponse">
-      <arg name="offerSdp" type="char_string"/>
-    </command>
 </cluster>
 </configurator>
 '''
 
-def _get_arg_value(request, item_name: str, default_value="Please enter SDP from TH Logs"):
-    logger.info("LOGGER")
-    if request.arguments:
-        values = request.arguments['values']
-        for item in values:
-            name = item['name']
-            value = item['value']
-            if name == item_name:
-                return value
-
-    return default_value
 
 class WebRTC(PseudoCluster):
     name = 'WebRTC'
     definition = _DEFINITION
-    async def UserPromptSdp(self, request):
-      pass
 
     async def VerifyVideoStream(self, request):
-      pass
+        pass

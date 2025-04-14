@@ -30,8 +30,14 @@ _DEFINITION = '''<?xml version="1.0"?>
       <arg name="expectedValue" type="char_string" optional="true"/>
     </command>
 
-    <command source="client" code="0" name="UserPromptSdp">
-      <arg name="promptMessage" type="char_string"/>
+    <command source="client" code="2" name="PromptWithResponse" response="PromptResponse">
+      <arg name="message" type="char_string"/>
+      <arg name="placeHolder" type="char_string" optional="true"/>
+      <arg name="parseStr" type="boolean" optional="true"/>
+    </command>
+
+    <command source="server" code="0" name="PromptResponse">
+      <arg name="responseValue" type="char_string"/>
     </command>
 </cluster>
 </configurator>
@@ -47,7 +53,8 @@ class LogCommands(PseudoCluster):
         for value in request.arguments.get("values", []):
             if value.get('name') and 'expectedValue' in value['name']:
                 expected_value = value['value']
-                request.responses = [{"values": [{"name": "expectedValue", "value": expected_value}]}]
+                request.responses = [
+                    {"values": [{"name": "expectedValue", "value": expected_value}]}]
 
         if expected_value is not None:
             input_result = input("")
@@ -58,6 +65,5 @@ class LogCommands(PseudoCluster):
     async def Log(self, request):
         pass
 
-    async def UserPromptSdp(self, request):
+    async def PromptWithResponse(self, request):
         pass
-

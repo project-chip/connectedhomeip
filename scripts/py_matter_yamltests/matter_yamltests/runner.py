@@ -13,6 +13,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import ast
 import asyncio
 import time
 from abc import ABC, abstractmethod
@@ -24,6 +25,7 @@ from .hooks import TestRunnerHooks
 from .parser import TestParser
 from .parser_builder import TestParserBuilder, TestParserBuilderConfig
 from .pseudo_clusters.pseudo_clusters import PseudoClusters
+
 
 @dataclass
 class TestRunnerOptions:
@@ -169,17 +171,14 @@ class TestRunner(TestRunnerBase):
             if config.auto_start_stop:
                 await self.stop()
             return status
-    
-    def _get_arg_value(self, request, key_name: str, default_value=None) -> str | None:
-      if request.arguments:
-          values = request.arguments['values']
-          for item in values:
-              name = item['name']
-              value = item['value']
-              if name == key_name:
-                  return value
 
-      return default_value
+    def _get_arg_value(self, request, key_name: str):
+        if not hasattr(request, 'arguments'):
+            return None
+
+        for item in request.arguments.get('values', []):
+            if item.get('name') == key_name:
+                return item.get('value')
 
     async def _run(self, parser: TestParser, config: TestRunnerConfig):
         status = True
@@ -205,13 +204,17 @@ class TestRunner(TestRunnerBase):
 
                 start = time.time()
                 if config.pseudo_clusters.supports(request):
-                      cluster = config.pseudo_clusters.get_cluster(request)
-                      if request.command == "UserPromptSdp":
-                        prompt = self._get_arg_value(request, "promptRequest", "Provide the SDP offer from TH Logs")
-                        response_string = await hooks.prompt_with_string_response(prompt)
-                        responses = {'value': {'offerSdp': response_string}}
+                    if request.command == "PromptWithResponse":
+                        prompt_msg = self._get_arg_value(request, "message")
+                        placeholder = self._get_arg_value(
+                            request, "placeHolder")
+                        response = await hooks.show_prompt(prompt_msg, placeholder)
+                        parseStr = self._get_arg_value(request, "parseStr")
+                        if parseStr is not None:
+                            response = ast.literal_eval(response)
+                        responses = {'value': {'responseValue': response}}
                         logs = []
-                      else:
+                    else:
                         responses, logs = await config.pseudo_clusters.execute(request, parser.definitions)
                 else:
                     encoded_request = config.adapter.encode(request)
@@ -248,4 +251,3 @@ class TestRunner(TestRunnerBase):
             status = exception
         finally:
             return status
-

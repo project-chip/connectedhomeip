@@ -304,7 +304,7 @@ class YamlLoader:
         if 'verification' in content:
             disabled = content.get('disabled')
             command = content.get('command')
-            if disabled is not True and command != 'UserPrompt' and command != 'UserPromptSdp':
+            if disabled is not True and command != 'UserPrompt':
                 raise TestStepVerificationStandaloneError(content)
 
     def __rule_response_value_and_values_are_mutually_exclusive(self, content):
