@@ -16,6 +16,7 @@ matter_structs_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/ApplicationLauncherClusterApplicationStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/AudioOutputClusterOutputInfoStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/BasicInformationClusterCapabilityMinimaStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/BasicInformationClusterLocationDescriptorStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/BasicInformationClusterProductAppearanceStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/BindingClusterTargetStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/BridgedDeviceBasicInformationClusterProductAppearanceStruct.kt",

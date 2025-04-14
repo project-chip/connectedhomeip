@@ -532,6 +532,10 @@ namespace MaxPathsPerInvoke {
 static constexpr AttributeId Id = 0x00000016;
 } // namespace MaxPathsPerInvoke
 
+namespace DeviceLocation {
+static constexpr AttributeId Id = 0x00000017;
+} // namespace DeviceLocation
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
