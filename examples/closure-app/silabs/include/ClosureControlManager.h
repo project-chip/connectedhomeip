@@ -33,6 +33,9 @@ namespace ClosureControl {
 class ClosureControlManager : public ClosureControl::Delegate
 {
 public:
+
+    static ClosureControlManager sClosureCtrlMgr;
+
     void SetClosureControlInstance(ClosureControl::Instance & instance);
 
     /*********************************************************************************
@@ -61,9 +64,11 @@ public:
     CHIP_ERROR EndCurrentErrorListRead() override;
 
     void ClosureControlAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId);
+    bool IsDeviceReadyToMove();
+    bool CheckErrorOnDevice();
+    bool IsLatchManual();
 
 private:
-    friend ClosureControlManager & ClosureCtrlMgr();
 
     /***************************************************************************
      *
@@ -75,14 +80,7 @@ private:
     ClosureControl::Instance * mpClosureControlInstance = nullptr;
     bool IsManualLatch();
     bool IsDeviceReadytoMove();
-
-    static ClosureControlManager sClosureCtrlMgr;
 };
-
-inline ClosureControlManager & ClosureCtrlMgr()
-{
-    return ClosureControlManager::sClosureCtrlMgr;
-}
 
 } // namespace ClosureControl
 } // namespace Clusters

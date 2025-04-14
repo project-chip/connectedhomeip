@@ -372,7 +372,52 @@ Status Instance::HandleMoveTo(HandlerContext & ctx, const Commands::MoveTo::Deco
 {
     MainStateEnum state = GetMainState();
     VerifyOrReturnValue(CheckCommandStateCompatibility(Commands::Stop::Id, state), Status::InvalidInState);
-    //TODO: Check if the device is ready to move and set MainState to Error
+    
+    // If all command parameters don't have a value, return InvalidCommand
+    VerifyOrReturnValue(commandData.position.HasValue() || commandData.latch.HasValue() || commandData.speed.HasValue(), Status::InvalidCommand);
+    
+    if (commandData.position.HasValue())
+    {
+        VerifyOrReturnError((commandData.position.Value() != TargetPositionEnum::kUnknownEnumValue), Status::ConstraintError);
+        // If Positioning(PS) feature or not, it SHALL return a status code SUCCESS.
+        VerifyOrReturnError(HasFeature(Feature::kPositioning), Status::Success);
+    }
+
+    if (commandData.latch.HasValue())
+    {
+        VerifyOrReturnError(commandData.latch.Value() != TargetLatchEnum::kUnknownEnumValue, Status::ConstraintError);
+        
+        // If MotionLatching (LT) feature or not, the server SHALL return a status code SUCCESS
+        VerifyOrReturnError(HasFeature(Feature::kMotionLatching), Status::Success);
+        
+        // If manual intervention is required to latch, respond with INVALID_ACTION 
+        VerifyOrReturnError(mDelegate.IsLatchManual() == true, Status::InvalidAction);
+    }
+
+    if (commandData.speed.HasValue())
+    {
+        VerifyOrReturnError(commandData.speed.Value() != Globals::ThreeLevelAutoEnum::kUnknownEnumValue, Status::ConstraintError);
+        // If Speed (SP) feature or not, the server SHALL return a status code SUCCESS
+        VerifyOrReturnError(HasFeature(Feature::kSpeed), Status::Success);
+    }    
+
+    if(mDelegate.CheckErrorOnDevice())
+    {
+        // If the device is in an error state, set the MainState to Error
+        VerifyOrReturnError(SetMainState(MainStateEnum::kError) == CHIP_NO_ERROR, Status::Failure);
+        // Return Status Failure
+        return Status::Failure;
+    }
+    
+    if(mDelegate.IsDeviceReadyToMove())
+    {
+        // If the device is ready to move, set MainState to Moving
+        SetMainState(MainStateEnum::kMoving);
+    } else {
+        // If device need pre-stage before moving, then set MainState to Waiting for Moving
+        SetMainState(MainStateEnum::kWaitingForMotion);
+    }
+    
     //TODO: Check if the device is in a state to move and set MainState to Moving or Waiting for Moving
     return mDelegate.MoveTo(commandData.position, commandData.latch, commandData.speed);
 }

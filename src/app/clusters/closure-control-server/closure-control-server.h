@@ -70,7 +70,28 @@ public:
     // The delegate is expected to return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED to indicate end of list.
     virtual CHIP_ERROR GetCurrentErrorListAtIndex(size_t, ClosureErrorEnum &) = 0;
     virtual CHIP_ERROR EndCurrentErrorListRead()                              = 0;
+    
+    /**
+     * @brief Checks if the device can move or need pre-motion stages to complete
+     * @return true if device is ready to move
+     *         false if device is not ready to move
+     */
+    virtual bool IsDeviceReadyToMove() = 0;
 
+    /**
+     * @brief Checks if device is error state or not and sets mainstate to error.
+     * @return true if device is error state
+     *         false if device is not in error state
+     */
+    virtual bool CheckErrorOnDevice() = 0;
+    
+    /**
+     * @brief Checks if device need manual latching or not.
+     * @return true if device is error state
+     *         false if device is not in error state
+     */
+    virtual bool IsLatchManual() = 0;
+    
 protected:
     EndpointId mEndpointId = kInvalidEndpointId;
 };

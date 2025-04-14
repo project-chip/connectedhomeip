@@ -117,14 +117,6 @@ Protocols::InteractionModel::Status ClosureControlManager::MoveTo(const Optional
 
     if (tag.HasValue())
     {
-        VerifyOrReturnValue(Clusters::EnsureKnownEnumValue(tag.Value()) != TargetPositionEnum::kUnknownEnumValue,
-                            Status::ConstraintError);
-        VerifyOrReturnValue(mpClosureControlInstance->HasFeature(Feature::kPositioning), Status::Success);
-        ChipLogDetail(DataManagement, "ClosureControlManager::positioning");
-
-        // TODO: CheckErrorondevice() -> if device error state move state to error and give failure
-        // TODO: IsDeviceReadytoMove()
-
         if ((state == MainStateEnum::kStopped) || (state == MainStateEnum::kError))
         {
             // TODO: set target for motion
@@ -140,12 +132,6 @@ Protocols::InteractionModel::Status ClosureControlManager::MoveTo(const Optional
 
     if (latch.HasValue())
     {
-        VerifyOrReturnValue(Clusters::EnsureKnownEnumValue(latch.Value()) == TargetLatchEnum::kUnknownEnumValue,
-                            Status::ConstraintError);
-        VerifyOrReturnValue(mpClosureControlInstance->HasFeature(Feature::kMotionLatching), Status::Success);
-        ChipLogDetail(DataManagement, "ClosureControlManager::latch");
-        VerifyOrReturnValue(IsManualLatch(), Status::InvalidAction);
-
         // TODO: device to perform latch operation
 
         if (latch.Value() == TargetLatchEnum::kLatch)
@@ -160,36 +146,12 @@ Protocols::InteractionModel::Status ClosureControlManager::MoveTo(const Optional
 
     if (speed.HasValue())
     {
-        VerifyOrReturnValue(Clusters::EnsureKnownEnumValue(speed.Value()) == Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
-                            Status::ConstraintError);
-        VerifyOrReturnValue(mpClosureControlInstance->HasFeature(Feature::kSpeed), Status::Success);
-        ChipLogDetail(DataManagement, "ClosureControlManager::speed");
-        if (!(latch.HasValue() || tag.HasValue()))
-        {
-            if ((state == MainStateEnum::kMoving) || (state == MainStateEnum::kWaitingForMotion))
-            {
-                overallState.speed = speed;
-                // TODO: device to change speed
-            }
-            else
-            {
-                overallState.speed.SetValue(Globals::ThreeLevelAutoEnum::kAuto);
-            }
-        }
+            overallState.speed = speed;
+            // TODO: device to change speed
     }
 
     mpClosureControlInstance->SetOverallState(overallState);
-
-    if (IsDeviceReadytoMove())
-    {
-        mpClosureControlInstance->SetMainState(MainStateEnum::kMoving);
-        // TODO: move the device
-    }
-    else
-    {
-        mpClosureControlInstance->SetMainState(MainStateEnum::kWaitingForMotion);
-        // TODO: device to wait for ready to move and the move the device.
-    }
+    // TODO: move the device or device to wait for ready to move and the move the device
 
     return Status::Success;
 }
@@ -225,13 +187,19 @@ void ClosureControlManager::ClosureControlAttributeChangeHandler(EndpointId endp
     }
 }
 
-bool ClosureControlManager::IsManualLatch()
+bool ClosureControlManager::IsLatchManual()
 {
     // TODO: Check the latch is manual or not on device
     return false;
 }
 
-bool ClosureControlManager::IsDeviceReadytoMove()
+bool ClosureControlManager::CheckErrorOnDevice()
+{
+    // TODO: Check for errors on the device
+    return false;
+}
+
+bool ClosureControlManager::IsDeviceReadyToMove()
 {
     // TODO: Check if device is ready to move or should wait.
     return true;
