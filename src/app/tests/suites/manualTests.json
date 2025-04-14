@@ -177,8 +177,7 @@
         "Test_TC_CADMIN_1_6",
         "Test_TC_CADMIN_1_10",
         "Test_TC_CADMIN_1_13",
-        "Test_TC_CADMIN_1_25",
-        "Test_TC_CADMIN_1_26"
+        "Test_TC_CADMIN_1_25"
     ],
     "ModeSelect": ["Test_TC_MOD_1_2", "Test_TC_MOD_1_3", "Test_TC_MOD_2_2"],
     "OTASoftwareUpdate": [
