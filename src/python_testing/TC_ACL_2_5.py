@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2023 Project CHIP Authors
+#    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -103,13 +103,11 @@ class TC_ACL_2_5(MatterBaseTest):
                 fabricFiltered=True
             )
             self.print_step("Initial events response", str(events_response))
-
+            
             # Extract events from the response
             events = events_response
             self.print_step(f"Found {len(events)} initial events", "")
-
-            for event_data in events:
-                self.print_step("Initial event", str(event_data))
+            asserts.assert_equal(len(events), 0, "Expected 0 events")
 
         except Exception as e:
             self.print_step("Error reading initial events", str(e))
