@@ -58,6 +58,13 @@ limitations under the License.
     <item name="WaterTankMissing"           value="0x45"/>
     <item name="WaterTankLidOpen"           value="0x46"/>
     <item name="MopCleaningPadMissing"      value="0x47"/>
+    <item name="LowBattery"                 value="0x48"/>
+    <item name="CannotReachTargetArea"      value="0x49"/>
+    <item name="DirtyWaterTankFull"         value="0x4a"/>
+    <item name="DirtyWaterTankMissing"      value="0x4b"/>
+    <item name="WheelsJammed"               value="0x4c"/>
+    <item name="BrushJammed"                value="0x4d"/>
+    <item name="NavigationSensorObscured"   value="0x4e"/>
   </enum>
 
   <cluster>
