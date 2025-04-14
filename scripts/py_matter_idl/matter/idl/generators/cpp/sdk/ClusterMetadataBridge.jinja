@@ -1,0 +1,43 @@
+// DO NOT EDIT MANUALLY - Generated file
+//
+// Cluster metadata information for cluster {{cluster.name}} (cluster code: {{"%d/0x%X" | format(cluster.code, cluster.code)}})
+// based on {{input_name}}
+
+#include <app/data-model-provider/MetadataTypes.h>
+#include <clusters/{{cluster.name | upfirst}}/Ids.h>
+
+namespace chip {
+namespace app {
+namespace DataModel {
+
+template<>
+struct ClusterMetadataHolder<DataModel::AttributeEntry, {{cluster.name | upfirst}}::Id>
+{
+  constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId) {
+    using namespace {{cluster.name | upfirst}}::Attributes;
+    switch(commandId){
+    {% for attribute in cluster.attributes | reject("global_attribute") -%}
+      case {{attribute.definition.name | upfirst}}::Id: return {{attribute.definition.name | upfirst}}::kMetatadaEntry;
+    {% endfor %}
+      default: return {};
+    }
+  }
+};
+
+template<>
+struct ClusterMetadataHolder<DataModel::AcceptedCommandEntry, {{cluster.name | upfirst}}::Id>
+{
+  constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId) {
+    using namespace {{cluster.name | upfirst}}::Commands;
+    switch(commandId){
+    {% for command in cluster.commands -%}
+      case {{command.name | upfirst}}::Id: return {{command.name | upfirst}}::kMetatadaEntry;
+    {% endfor %}
+      default: return {};
+    }
+  }
+};
+
+} // namespace DataModel
+} // namespace app
+} // namespace chip

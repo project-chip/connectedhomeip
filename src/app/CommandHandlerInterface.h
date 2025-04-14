@@ -234,27 +234,54 @@ private:
     CommandHandlerInterface * mNext = nullptr;
 };
 
-template <ClusterId... ClusterIds>
+template <ClusterId... TClusterIds>
 class CommandHandlerInterfaceShim : CommandHandlerInterface
 {
 
+    DataModel::AcceptedCommandEntry GetEntry(const ConcreteClusterPath & cluster, CommandId command)
+    {
+        if constexpr (sizeof...(TClusterIds) == 0)
+        {
+            return GetEntry(cluster.mClusterId, command, ClusterMetadataHolder<>::ClusterIds{});
+        }
+        else
+        {
+            return GetEntry<TClusterIds...>(cluster.mClusterId, command, ClusterMetadataHolder<>::ClusterIds{});
+        }
+    }
 
     // Implements new interface
     CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
                                          DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder) override
     {
-        while (EnumerateAcceptedCommands)
-        {
-            Get
-        }
-        
+        size_t commandCount = 0;
+        CHIP_ERROR err      = CHIP_NO_ERROR;
+
+        auto counter = SplitLambda([&](CommandId commandId) {
+            commandCount++;
+            return Loop::Continue;
+        });
+
+        ReturnErrorOnFailure(EnumerateAcceptedCommands(cluster, counter.Caller(), counter.Context()));
+        ReturnErrorOnFailure(builder.EnsureAppendCapacity(commandCount));
+
+        auto appender = SplitLambda([&](CommandId commandId) {
+            err = builder.Append(getEntry(cluster, id));
+            return err == CHIP_NO_ERROR ? Loop::Continue : Loop::Break;
+        });
+
+        ReturnErrorOnFailure(chi->EnumerateAcceptedCommands(path, appender.Caller(), appender.Context()));
+        ReturnErrorOnFailure(err);
+        // the two invocations MUST return the same sizes
+        VerifyOrReturnError(builder.Size() == commandCount, CHIP_ERROR_INTERNAL);
+        return CHIP_NO_ERROR;
     }
 
     virtual CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
-}
+};
 
 } // namespace app
 } // namespace chip

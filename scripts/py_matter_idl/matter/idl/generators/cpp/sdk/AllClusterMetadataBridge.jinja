@@ -1,0 +1,42 @@
+// DO NOT EDIT MANUALLY - Generated file
+//
+// This file provides an interface to bridge the gap when doing Ember decoupling
+// based on {{input_name}}
+
+#include <lib/meta/MetaSwitch.h>
+#include <lib/meta/MetaObjects.h>
+
+{%- for cluster in clusters | sort(attribute='name') %}
+#include <clusters/{{cluster.name | name_for_id_usage}}/Ids.h>
+{%- endfor%}
+
+
+namespace chip {
+namespace app {
+
+namespace Clusters {
+    ObjectList<
+        {%- for cluster in clusters | sort(attribute='name') %}
+        chip::app::Clusters::{{cluster.name}}::Id,
+        {%- endfor%}
+    > ClusterIdsMetaList;
+}
+
+
+template <ClusterId... TClusterIds>
+DataModel::AcceptedCommandEntry AcceptedCommandEntryFor(ClusterId id, CommandId command,
+                                                        DataMetaList<TClusterIds...>  = {} /*For easy template deduction*/)
+{
+    // Dynamically generate the Switch statement with the only the required metadata
+    // clang-format off
+    return Meta::Switch(id,
+        Meta::Case<TClusterIds>([](){}
+            return ClusterMetadataHolder<DataModel::AcceptedCommandEntry, TClusterIds>::EntryFor(command);
+        )...,
+        Meta::Default(DataModel::AcceptedCommandEntry{})
+    );
+    // clang-format on
+}
+
+} // namespace app
+} // namespace chip
