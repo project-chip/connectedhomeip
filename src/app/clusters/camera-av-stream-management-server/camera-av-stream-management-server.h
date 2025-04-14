@@ -225,7 +225,8 @@ public:
      *   @return Success if the processing of the Command is successful; otherwise, the command SHALL be rejected with an
      * appropriate error.
      */
-    virtual Protocols::InteractionModel::Status CaptureSnapshot(const chip::app::DataModel::Nullable<uint16_t> streamID, const VideoResolutionStruct & resolution,
+    virtual Protocols::InteractionModel::Status CaptureSnapshot(const chip::app::DataModel::Nullable<uint16_t> streamID,
+                                                                const VideoResolutionStruct & resolution,
                                                                 ImageSnapshot & outImageSnapshot) = 0;
 
     /**

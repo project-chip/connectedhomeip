@@ -83,8 +83,7 @@ public:
     void OnAttributeChanged(AttributeId attributeId);
 
     Protocols::InteractionModel::Status CaptureSnapshot(const chip::app::DataModel::Nullable<uint16_t> streamID,
-                                                        const VideoResolutionStruct & resolution,
-                                                        ImageSnapshot & outImageSnapshot);
+                                                        const VideoResolutionStruct & resolution, ImageSnapshot & outImageSnapshot);
 
     CHIP_ERROR
     LoadAllocatedVideoStreams(std::vector<VideoStreamStruct> & allocatedVideoStreams);

@@ -53,13 +53,13 @@ CameraAVStreamMgmtServer::CameraAVStreamMgmtServer(
     const std::vector<StreamUsageEnum> & aSupportedStreamUsages) :
     CommandHandlerInterface(MakeOptional(aEndpointId), CameraAvStreamManagement::Id),
     AttributeAccessInterface(MakeOptional(aEndpointId), CameraAvStreamManagement::Id), mDelegate(aDelegate),
-    mEndpointId(aEndpointId), mFeatures(aFeatures), mOptionalAttrs(aOptionalAttrs),
-    mMaxConcurrentEncoders(aMaxConcurrentEncoders), mMaxEncodedPixelRate(aMaxEncodedPixelRate),
-    mVideoSensorParams(aVideoSensorParams), mNightVisionCapable(aNightVisionCapable), mMinViewPort(aMinViewPort),
-    mRateDistortionTradeOffPointsList(aRateDistortionTradeOffPoints), mMaxContentBufferSize(aMaxContentBufferSize),
-    mMicrophoneCapabilities(aMicrophoneCapabilities), mSpeakerCapabilities(aSpeakerCapabilities),
-    mTwoWayTalkSupport(aTwoWayTalkSupport), mSnapshotCapabilitiesList(aSnapshotCapabilities),
-    mMaxNetworkBandwidth(aMaxNetworkBandwidth), mSupportedStreamUsages(aSupportedStreamUsages)
+    mEndpointId(aEndpointId), mFeatures(aFeatures), mOptionalAttrs(aOptionalAttrs), mMaxConcurrentEncoders(aMaxConcurrentEncoders),
+    mMaxEncodedPixelRate(aMaxEncodedPixelRate), mVideoSensorParams(aVideoSensorParams), mNightVisionCapable(aNightVisionCapable),
+    mMinViewPort(aMinViewPort), mRateDistortionTradeOffPointsList(aRateDistortionTradeOffPoints),
+    mMaxContentBufferSize(aMaxContentBufferSize), mMicrophoneCapabilities(aMicrophoneCapabilities),
+    mSpeakerCapabilities(aSpeakerCapabilities), mTwoWayTalkSupport(aTwoWayTalkSupport),
+    mSnapshotCapabilitiesList(aSnapshotCapabilities), mMaxNetworkBandwidth(aMaxNetworkBandwidth),
+    mSupportedStreamUsages(aSupportedStreamUsages)
 {
     mDelegate.SetCameraAVStreamMgmtServer(this);
 }
@@ -80,11 +80,9 @@ CHIP_ERROR CameraAVStreamMgmtServer::Init()
     // Constraint checks for RateDistortionTardeOffPoints vector
     for (const auto & rateDistortionTradeOffPoints : mRateDistortionTradeOffPointsList)
     {
-        VerifyOrReturnError(rateDistortionTradeOffPoints.minBitRate >=1,  CHIP_ERROR_INVALID_ARGUMENT,
-        ChipLogError(
-            Zcl,
-            "CameraAVStreamMgmt[ep=%d]: RateDistortionTradeOffPoints configuration error",
-            mEndpointId));
+        VerifyOrReturnError(
+            rateDistortionTradeOffPoints.minBitRate >= 1, CHIP_ERROR_INVALID_ARGUMENT,
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: RateDistortionTradeOffPoints configuration error", mEndpointId));
     }
 
     // At least one of Video, Audio or Snapshot needs to be supported.
@@ -342,10 +340,10 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
         ReturnErrorOnFailure(aEncoder.Encode(mFeatures));
         break;
     case MaxConcurrentEncoders::Id:
-        VerifyOrReturnError(
-            HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get MaxConcurrentEncoders, feature is not supported",
-                         mEndpointId));
+        VerifyOrReturnError(HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+                            ChipLogError(Zcl,
+                                         "CameraAVStreamMgmt[ep=%d]: can not get MaxConcurrentEncoders, feature is not supported",
+                                         mEndpointId));
 
         ReturnErrorOnFailure(aEncoder.Encode(mMaxConcurrentEncoders));
         break;

@@ -63,8 +63,7 @@ public:
 
     CameraError InitializeStreams();
 
-    CameraError CaptureSnapshot(const chip::app::DataModel::Nullable<uint16_t> streamID,
-                                const VideoResolutionStruct & resolution,
+    CameraError CaptureSnapshot(const chip::app::DataModel::Nullable<uint16_t> streamID, const VideoResolutionStruct & resolution,
                                 ImageSnapshot & outImageSnapshot);
 
     CameraError StartVideoStream(uint16_t streamID);

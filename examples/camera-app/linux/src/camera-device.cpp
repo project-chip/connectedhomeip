@@ -277,12 +277,11 @@ CameraError CameraDevice::SetV4l2Control(uint32_t controlId, int value)
 }
 
 CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<uint16_t> streamID,
-                                          const VideoResolutionStruct & resolution,
-                                          ImageSnapshot & outImageSnapshot)
+                                          const VideoResolutionStruct & resolution, ImageSnapshot & outImageSnapshot)
 {
     uint16_t streamId = streamID.IsNull() ? 1 : streamID.Value();
-    auto it = std::find_if(snapshotStreams.begin(), snapshotStreams.end(),
-                           [streamId](const SnapshotStream & s) { return s.snapshotStreamParams.snapshotStreamID == streamId; });
+    auto it           = std::find_if(snapshotStreams.begin(), snapshotStreams.end(),
+                                     [streamId](const SnapshotStream & s) { return s.snapshotStreamParams.snapshotStreamID == streamId; });
     if (it == snapshotStreams.end())
     {
         ChipLogError(Camera, "Snapshot streamID : %u not found", streamId);
