@@ -23,13 +23,42 @@
 #include <system/SystemClock.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <cmsis_os2.h>
-
+namespace {
+    constexpr chip::Percent100ths LIMIT_RANGE_MIN = 0;
+    constexpr chip::Percent100ths LIMIT_RANGE_MAX = 10000;
+    constexpr chip::Percent100ths STEP = 1000;
+}
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ClosureDimension;
 
 using Protocols::InteractionModel::Status;
+
+CHIP_ERROR ClosureDimensionDelegate::Init()
+{
+    ChipLogProgress(AppServer, "ClosureDimensionDelegate::Init start");
+    GenericCurrentStateStruct current;
+    current.position.SetValue(0);
+    current.latching.SetValue(LatchingEnum::kNotLatched);
+    current.speed.SetValue(Globals::ThreeLevelAutoEnum::kAuto);
+    getLogic()->SetCurrentState(current);
+
+    GenericTargetStruct target;
+    target.position.SetValue(0);
+    target.latch.SetValue(TargetLatchEnum::kUnlatch);
+    target.speed.SetValue(Globals::ThreeLevelAutoEnum::kAuto);
+    getLogic()->SetTarget(target);
+
+    Structs::RangePercent100thsStruct::Type limitRange;
+    limitRange.min = LIMIT_RANGE_MIN;
+    limitRange.max = LIMIT_RANGE_MAX;
+    getLogic()->SetLimitRange(limitRange);
+    
+    getLogic()->SetStepValue(STEP);
+    ChipLogProgress(AppServer, "ClosureDimensionDelegate::Init done");
+    return CHIP_NO_ERROR;
+}
 
 void ClosureDimensionDelegate::SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB)
 {
@@ -48,36 +77,32 @@ Status ClosureDimensionDelegate::HandleSetTarget(const Optional<Percent100ths> &
     ClusterState state = getLogic()->GetState();
     ClusterConformance conformance = getLogic()->GetConformance();
 
-    if (pos.HasValue())
+    if (conformance.HasFeature(Feature::kPositioning) && pos.HasValue())
     {
-        if (conformance.HasFeature(Feature::kPositioning))
+        if (static_cast<uint16_t>(pos.Value()) != static_cast<uint16_t>(state.currentState.position.Value()))
         {
-            if (static_cast<uint16_t>(pos.Value()) != static_cast<uint16_t>(state.currentState.position.Value()))
-            {
-                    motionNeeded  = true;
-                    target.position = pos;
-            }
+            motionNeeded  = true;
+            target.position = pos;
         }
     }
 
-    if (latch.HasValue())
+    if (conformance.HasFeature(Feature::kMotionLatching) && latch.HasValue())
     {
-        if (conformance.HasFeature(Feature::kMotionLatching))
-        {
-            latchNeeded  = true;
-            target.latch = latch;
-        }
+        latchNeeded  = true;
+        target.latch = latch;
     }
 
-    if (speed.HasValue())
+    if (conformance.HasFeature(Feature::kSpeed) && speed.HasValue())
     {
-        if (conformance.HasFeature(Feature::kSpeed))
+        if(!state.currentState.speed.HasValue())
         {
-            if(static_cast<uint16_t>(state.currentState.speed.Value()) != static_cast<uint16_t>(speed.Value()))
-            {
-                motionNeeded  = true;
-                target.speed = speed;
-            }
+            motionNeeded  = true;
+            target.speed = speed;
+        }
+        else if(static_cast<uint16_t>(state.currentState.speed.Value()) != static_cast<uint16_t>(speed.Value()))
+        {
+            motionNeeded  = true;
+            target.speed = speed;
         }
     }
     // If device is already at TargetState ,no Action is required will give Status::Success
@@ -100,14 +125,20 @@ static void HandleStepMotion(System::Layer * systemLayer, void * data)
     VerifyOrReturn(delegate != nullptr, void());
     
     ClusterState state = delegate->getLogic()->GetState();
-    ChipLogDetail(Zcl, "state.target.position.Value() = %d, state.currentState.position.Value() = %d ", state.target.position.Value(),state.currentState.position.Value());
-    int32_t newPos = std::min((state.target.position.Value() + 0), (state.currentState.position.Value() + state.stepValue));
-    ChipLogDetail(Zcl,"Handle newpos : %ld", newPos);
-    osDelay(2000);
+
+    StepDirectionEnum direction = delegate->GetTargetDirection();
+    
+    int32_t newPos;
+    if (direction == StepDirectionEnum::kDecrease)
+    {
+        newPos = std::max((state.target.position.Value() + 0), (state.currentState.position.Value() - state.stepValue));
+    }
+    else
+    {
+        newPos = std::min((state.target.position.Value() + 0), (state.currentState.position.Value() + state.stepValue));
+    }
     state.currentState.position.SetValue(newPos);
     delegate->getLogic()->SetCurrentState(state.currentState);
-    ChipLogDetail(Zcl,"after SetCurrentState");
-    osDelay(2000);
     if (state.target.position.Value() == state.currentState.position.Value())
     {
         (void) DeviceLayer::SystemLayer().CancelTimer(HandleStepMotion, delegate);
@@ -119,11 +150,8 @@ static void HandleStepMotion(System::Layer * systemLayer, void * data)
     } 
     else
     {
-        ChipLogDetail(Zcl,"Timer restart");
-        osDelay(2000);
         (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds16(delegate->kExampleStepCountDown), HandleStepMotion, delegate);
     }
-
     
     if (delegate->mActionInitiated_CB)
     {   
@@ -137,27 +165,19 @@ Status ClosureDimensionDelegate::HandleStep(const StepDirectionEnum & direction,
                                                 const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {    
     mAction = STEP_ACTION;
+    mTargetDirection = direction;
     (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds16(kExampleStepCountDown), HandleStepMotion, this);
-
     return Status::Success;
 }
 
 static void MotionTimerEventHandler(System::Layer * systemLayer, void * data)
 {
-    ChipLogDetail(Zcl, "Inside MotionTimerEventHandler");
-    osDelay(2000);
     ClosureDimensionDelegate * delegate = reinterpret_cast<ClosureDimensionDelegate *>(data);
     delegate->SetDeviceMoving(false);
-    ChipLogDetail(Zcl,"After setdevice");
-    osDelay(2000);
     GenericTargetStruct target;
     GenericCurrentStateStruct current;
     
     delegate->getLogic()->GetTarget(target);
-
-    ChipLogDetail(Zcl, "After GetTarget()");
-    osDelay(2000);
-
     current.position.SetValue(static_cast<uint16_t>(target.position.Value()));
     if (target.latch.HasValue())
     {
@@ -176,8 +196,6 @@ static void MotionTimerEventHandler(System::Layer * systemLayer, void * data)
         current.speed.SetValue(target.speed.Value());
     }
     delegate->getLogic()->SetCurrentState(current);
-    osDelay(2000);
-    ChipLogDetail(Zcl, "SetCurrentState done");
     
     if (delegate->mActionCompleted_CB)
     {    
@@ -208,9 +226,7 @@ Status ClosureDimensionDelegate::HandleMotion(bool latchNeeded, bool motionNeede
             action = MOVE_ACTION;
         }
     }
-    // chip::DeviceLayer::PlatformMgr().LockChipStack();
     (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(kExampleMotionCountDown), MotionTimerEventHandler, this);
-    // chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     if (mActionInitiated_CB)
     {   
         isMoving = true;

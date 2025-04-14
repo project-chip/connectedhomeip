@@ -68,31 +68,7 @@ public:
                           
     Status HandleMotion(bool latchNeeded, bool motionNeeded, bool newTarget);
     
-    CHIP_ERROR Init()
-    {
-        ChipLogError(Zcl, "ClosureDimensionDelegate::Init start");
-        GenericCurrentStateStruct current;
-        current.position.SetValue(0);
-        current.latching.SetValue(LatchingEnum::kNotLatched);
-        current.speed.SetValue(Globals::ThreeLevelAutoEnum::kAuto);
-        getLogic()->SetCurrentState(current);
-
-        GenericTargetStruct target;
-        target.position.SetValue(0);
-        // target.latching.SetValue(LatchingEnum::kNotLatched);
-        // target.speed.SetValue(Globals::ThreeLevelAutoEnum::kAuto);
-        getLogic()->SetTarget(target);
-    
-        Structs::RangePercent100thsStruct::Type limitRange;
-        limitRange.min = 0;    
-        limitRange.max = 10000;
-        getLogic()->SetLimitRange(limitRange);
-        
-        Percent100ths step = 1000;
-        getLogic()->SetStepValue(step);
-        ChipLogError(Zcl, "ClosureDimensionDelegate::Init done");
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR Init();
                           
     void SetLogic(ClusterLogic* logic) 
     {
@@ -123,10 +99,21 @@ public:
     {
         mAction = action;
     }
+
+    StepDirectionEnum GetTargetDirection()
+    {
+        return mTargetDirection;
+    }
+
+    void SetTargetDirection(StepDirectionEnum direction)
+    {
+        mTargetDirection = direction;
+    }
     
 private:
     bool isMoving = false;
     bool isManualLatch = false;
+    StepDirectionEnum mTargetDirection = StepDirectionEnum::kUnknownEnumValue;
     Action_t mAction = INVALID_ACTION;
     EndpointId mEndpoint;
     ClusterLogic* gLogic;
@@ -145,11 +132,11 @@ public:
     
     CHIP_ERROR Init()
     {
-        ChipLogError(Zcl, "ClosureDimensionManager::Init start");
+        ChipLogProgress(AppServer, "ClosureDimensionManager::Init start");
         ReturnErrorOnFailure(mLogic.Init(kConformance));
         ReturnErrorOnFailure(mInterface.Init());
         ReturnErrorOnFailure(mDelegate.Init());
-        ChipLogError(Zcl, "ClosureDimensionManager::Init end");
+        ChipLogProgress(AppServer, "ClosureDimensionManager::Init end");
         return CHIP_NO_ERROR;
     }
     
