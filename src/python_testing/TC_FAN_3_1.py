@@ -38,7 +38,6 @@
 import logging
 import operator
 from enum import Enum
-import time
 from typing import Any
 
 import chip.clusters as Clusters
