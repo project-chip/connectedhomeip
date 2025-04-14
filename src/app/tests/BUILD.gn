@@ -209,6 +209,8 @@ source_set("closure-control-test-srcs") {
   ]
 
   deps = [
+    "${chip_root}/src/app:interaction-model",
+    "${chip_root}/src/app/cluster-building-blocks:cluster-building-blocks",
     "${chip_root}/src/app/common:enums",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
