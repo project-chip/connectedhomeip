@@ -20,6 +20,7 @@
 #include "AirQualitySensor.h"
 #include "sl_board_control.h"
 #include <platform/CHIPDeviceLayer.h>
+#include <AirQualityConfig.h>
 
 #ifdef USE_SPARKFUN_AIR_QUALITY_SENSOR
 #include <sparkfun_sgp40.h>
@@ -28,7 +29,6 @@
 #include "rsi_debug.h"
 #include "sl_i2c_instances.h"
 
-#define I2C_INSTANCE_USED SL_I2C2
 static sl_i2c_instance_t i2c_instance = I2C_INSTANCE_USED;
 #else
 #include "sl_i2cspm_instances.h"
@@ -61,19 +61,18 @@ namespace AirQualitySensor {
 sl_status_t Init()
 {
     sl_status_t status = SL_STATUS_FAIL;
+
+#ifdef USE_SPARKFUN_AIR_QUALITY_SENSOR
 #ifdef SLI_SI91X_MCU_INTERFACE
     app_i2c_instance = &i2c_instance;
 #else
     app_i2c_instance = sl_i2cspm_qwiic;
 #endif // SLI_SI91X_MCU_INTERFACE
-
-#ifdef USE_SPARKFUN_AIR_QUALITY_SENSOR
     status = sparkfun_sgp40_init(app_i2c_instance);
     VerifyOrReturnError(status == SL_STATUS_OK, SL_STATUS_FAIL);
     initialized = true;
 
     sparkfun_sgp40_voc_algorithm_init();
-
 #else
 // User implementation of Init
 #endif // USE_SPARKFUN_AIR_QUALITY_SENSOR
