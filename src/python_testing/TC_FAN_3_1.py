@@ -170,7 +170,7 @@ class TC_FAN_3_1(MatterBaseTest):
                 ClusterAttributeChangeAccumulator(cluster, attr.SpeedCurrent)
             ])
 
-        for sub in self.subscriptions: 
+        for sub in self.subscriptions:
             await sub.start(self.default_controller, self.dut_node_id, self.endpoint)
 
     def log_results(self) -> None:
