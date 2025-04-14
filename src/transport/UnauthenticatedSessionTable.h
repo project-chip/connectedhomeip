@@ -84,11 +84,7 @@ public:
         return Access::SubjectDescriptor(); // return an empty ISD for unauthenticated session.
     }
 
-    bool AllowsMRP() const override
-    {
-        return ((GetPeerAddress().GetTransportType() == Transport::Type::kUdp) ||
-                (GetPeerAddress().GetTransportType() == Transport::Type::kWiFiPAF));
-    }
+    bool AllowsMRP() const override { return (GetPeerAddress().GetTransportType() == Transport::Type::kUdp); }
 
     bool AllowsLargePayload() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kTcp; }
 

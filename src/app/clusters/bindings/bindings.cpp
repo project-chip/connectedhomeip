@@ -271,6 +271,11 @@ void MatterBindingPluginServerInitCallback()
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }
 
+void MatterBindingPluginServerShutdownCallback()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
+}
+
 CHIP_ERROR AddBindingEntry(const EmberBindingTableEntry & entry)
 {
     CHIP_ERROR err = BindingTable::GetInstance().Add(entry);

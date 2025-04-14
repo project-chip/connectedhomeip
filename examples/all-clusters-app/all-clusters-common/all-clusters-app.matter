@@ -196,6 +196,12 @@ enum PositionTag : enum8 {
   kColumn = 6;
 }
 
+enum PowerThresholdSourceEnum : enum8 {
+  kContract = 0;
+  kRegulator = 1;
+  kEquipment = 2;
+}
+
 enum RelativePositionTag : enum8 {
   kUnder = 0;
   kNextTo = 1;
@@ -204,6 +210,19 @@ enum RelativePositionTag : enum8 {
   kAbove = 4;
   kFrontOf = 5;
   kBehind = 6;
+}
+
+enum TariffPriceTypeEnum : enum8 {
+  kStandard = 0;
+  kCritical = 1;
+  kVirtual = 2;
+  kIncentive = 3;
+  kIncentiveSignal = 4;
+}
+
+enum TariffUnitEnum : enum8 {
+  kKWh = 0;
+  kKVAh = 1;
 }
 
 enum TestGlobalEnum : enum8 {
@@ -224,6 +243,17 @@ bitmap TestGlobalBitmap : bitmap32 {
   kSecondBit = 0x2;
 }
 
+struct CurrencyStruct {
+  int16u currency = 0;
+  int8u decimalPoints = 1;
+}
+
+struct PowerThresholdStruct {
+  optional power_mw powerThreshold = 0;
+  optional power_mva apparentPowerThreshold = 1;
+  nullable PowerThresholdSourceEnum powerThresholdSource = 2;
+}
+
 struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
@@ -234,6 +264,11 @@ struct LocationDescriptorStruct {
   char_string<128> locationName = 0;
   nullable int16s floorNumber = 1;
   nullable AreaTypeTag areaType = 2;
+}
+
+struct PriceStruct {
+  money amount = 0;
+  CurrencyStruct currency = 1;
 }
 
 struct AtomicAttributeStatusStruct {
@@ -645,7 +680,7 @@ cluster Descriptor = 29 {
     kTagList = 0x1;
   }
 
-  struct DeviceTypeStruct {
+  shared struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
   }
@@ -2092,7 +2127,7 @@ cluster SoftwareDiagnostics = 52 {
 
 /** The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems */
 cluster ThreadNetworkDiagnostics = 53 {
-  revision 2;
+  revision 3;
 
   enum ConnectionStatusEnum : enum8 {
     kConnected = 0;
@@ -2245,6 +2280,8 @@ cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute nullable octet_string<4> channelPage0Mask = 60;
   readonly attribute nullable OperationalDatasetComponents operationalDatasetComponents = 61;
   readonly attribute NetworkFaultEnum activeNetworkFaultsList[] = 62;
+  provisional readonly attribute nullable int64u extAddress = 63;
+  provisional readonly attribute nullable int16u rloc16 = 64;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2252,7 +2289,7 @@ cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  /** Reception of this command SHALL reset the OverrunCount attributes to 0 */
+  /** Reception of this command SHALL reset the following attributes to 0: */
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
 }
 
@@ -2861,7 +2898,7 @@ labels. */
 cluster FixedLabel = 64 {
   revision 1; // NOTE: Default/not specifically set
 
-  struct LabelStruct {
+  shared struct LabelStruct {
     char_string<16> label = 0;
     char_string<16> value = 1;
   }
@@ -2879,7 +2916,7 @@ cluster FixedLabel = 64 {
 cluster UserLabel = 65 {
   revision 1; // NOTE: Default/not specifically set
 
-  struct LabelStruct {
+  shared struct LabelStruct {
     char_string<16> label = 0;
     char_string<16> value = 1;
   }
@@ -2928,13 +2965,13 @@ cluster OvenCavityOperationalState = 72 {
     kError = 3;
   }
 
-  struct ErrorStateStruct {
+  shared struct ErrorStateStruct {
     enum8 errorStateID = 0;
     optional char_string<64> errorStateLabel = 1;
     optional char_string<64> errorStateDetails = 2;
   }
 
-  struct OperationalStateStruct {
+  shared struct OperationalStateStruct {
     enum8 operationalStateID = 0;
     optional char_string<64> operationalStateLabel = 1;
   }
@@ -3006,12 +3043,12 @@ cluster OvenMode = 73 {
     kOnOff = 0x1;
   }
 
-  struct ModeTagStruct {
+  shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
   }
 
-  struct ModeOptionStruct {
+  shared struct ModeOptionStruct {
     char_string<64> label = 0;
     int8u mode = 1;
     ModeTagStruct modeTags[] = 2;
@@ -3132,12 +3169,12 @@ cluster LaundryWasherMode = 81 {
     kOnOff = 0x1;
   }
 
-  struct ModeTagStruct {
+  shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
   }
 
-  struct ModeOptionStruct {
+  shared struct ModeOptionStruct {
     char_string<64> label = 0;
     int8u mode = 1;
     ModeTagStruct modeTags[] = 2;
@@ -3191,12 +3228,12 @@ cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
     kOnOff = 0x1;
   }
 
-  struct ModeTagStruct {
+  shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
   }
 
-  struct ModeOptionStruct {
+  shared struct ModeOptionStruct {
     char_string<64> label = 0;
     int8u mode = 1;
     ModeTagStruct modeTags[] = 2;
@@ -3290,12 +3327,12 @@ cluster RvcRunMode = 84 {
     kDirectModeChange = 0x10000;
   }
 
-  struct ModeTagStruct {
+  shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
   }
 
-  struct ModeOptionStruct {
+  shared struct ModeOptionStruct {
     char_string<64> label = 0;
     int8u mode = 1;
     ModeTagStruct modeTags[] = 2;
@@ -3352,12 +3389,12 @@ cluster RvcCleanMode = 85 {
     kDirectModeChange = 0x10000;
   }
 
-  struct ModeTagStruct {
+  shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
   }
 
-  struct ModeOptionStruct {
+  shared struct ModeOptionStruct {
     char_string<64> label = 0;
     int8u mode = 1;
     ModeTagStruct modeTags[] = 2;
@@ -3468,12 +3505,12 @@ cluster DishwasherMode = 89 {
     kOnOff = 0x1;
   }
 
-  struct ModeTagStruct {
+  shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
   }
 
-  struct ModeOptionStruct {
+  shared struct ModeOptionStruct {
     char_string<64> label = 0;
     int8u mode = 1;
     ModeTagStruct modeTags[] = 2;
@@ -3718,12 +3755,12 @@ cluster MicrowaveOvenMode = 94 {
     kOnOff = 0x1;
   }
 
-  struct ModeTagStruct {
+  shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
   }
 
-  struct ModeOptionStruct {
+  shared struct ModeOptionStruct {
     char_string<64> label = 0;
     int8u mode = 1;
     ModeTagStruct modeTags[] = 2;
@@ -3757,13 +3794,13 @@ cluster OperationalState = 96 {
     kError = 3;
   }
 
-  struct ErrorStateStruct {
+  shared struct ErrorStateStruct {
     enum8 errorStateID = 0;
     optional char_string<64> errorStateLabel = 1;
     optional char_string<64> errorStateDetails = 2;
   }
 
-  struct OperationalStateStruct {
+  shared struct OperationalStateStruct {
     enum8 operationalStateID = 0;
     optional char_string<64> operationalStateLabel = 1;
   }
@@ -3834,13 +3871,13 @@ cluster RvcOperationalState = 97 {
     kDocked = 66;
   }
 
-  struct ErrorStateStruct {
+  shared struct ErrorStateStruct {
     enum8 errorStateID = 0;
     optional char_string<64> errorStateLabel = 1;
     optional char_string<64> errorStateDetails = 2;
   }
 
-  struct OperationalStateStruct {
+  shared struct OperationalStateStruct {
     enum8 operationalStateID = 0;
     optional char_string<64> operationalStateLabel = 1;
   }
@@ -4039,18 +4076,18 @@ provisional cluster ScenesManagement = 98 {
 cluster HepaFilterMonitoring = 113 {
   revision 1; // NOTE: Default/not specifically set
 
-  enum ChangeIndicationEnum : enum8 {
+  shared enum ChangeIndicationEnum : enum8 {
     kOK = 0;
     kWarning = 1;
     kCritical = 2;
   }
 
-  enum DegradationDirectionEnum : enum8 {
+  shared enum DegradationDirectionEnum : enum8 {
     kUp = 0;
     kDown = 1;
   }
 
-  enum ProductIdentifierTypeEnum : enum8 {
+  shared enum ProductIdentifierTypeEnum : enum8 {
     kUPC = 0;
     kGTIN8 = 1;
     kEAN = 2;
@@ -4090,18 +4127,18 @@ cluster HepaFilterMonitoring = 113 {
 cluster ActivatedCarbonFilterMonitoring = 114 {
   revision 1; // NOTE: Default/not specifically set
 
-  enum ChangeIndicationEnum : enum8 {
+  shared enum ChangeIndicationEnum : enum8 {
     kOK = 0;
     kWarning = 1;
     kCritical = 2;
   }
 
-  enum DegradationDirectionEnum : enum8 {
+  shared enum DegradationDirectionEnum : enum8 {
     kUp = 0;
     kDown = 1;
   }
 
-  enum ProductIdentifierTypeEnum : enum8 {
+  shared enum ProductIdentifierTypeEnum : enum8 {
     kUPC = 0;
     kGTIN8 = 1;
     kEAN = 2;
@@ -4265,7 +4302,7 @@ cluster ValveConfigurationAndControl = 129 {
 cluster ElectricalPowerMeasurement = 144 {
   revision 1;
 
-  enum MeasurementTypeEnum : enum16 {
+  shared enum MeasurementTypeEnum : enum16 {
     kUnspecified = 0;
     kVoltage = 1;
     kActiveCurrent = 2;
@@ -4281,6 +4318,8 @@ cluster ElectricalPowerMeasurement = 144 {
     kPowerFactor = 12;
     kNeutralCurrent = 13;
     kElectricalEnergy = 14;
+    kReactiveEnergy = 15;
+    kApparentEnergy = 16;
   }
 
   enum PowerModeEnum : enum8 {
@@ -4297,7 +4336,7 @@ cluster ElectricalPowerMeasurement = 144 {
     kPowerQuality = 0x10;
   }
 
-  struct MeasurementAccuracyRangeStruct {
+  shared struct MeasurementAccuracyRangeStruct {
     int64s rangeMin = 0;
     int64s rangeMax = 1;
     optional percent100ths percentMax = 2;
@@ -4308,7 +4347,7 @@ cluster ElectricalPowerMeasurement = 144 {
     optional int64u fixedTypical = 7;
   }
 
-  struct MeasurementAccuracyStruct {
+  shared struct MeasurementAccuracyStruct {
     MeasurementTypeEnum measurementType = 0;
     boolean measured = 1;
     int64s minMeasuredValue = 2;
@@ -4370,7 +4409,7 @@ cluster ElectricalPowerMeasurement = 144 {
 cluster ElectricalEnergyMeasurement = 145 {
   revision 1;
 
-  enum MeasurementTypeEnum : enum16 {
+  shared enum MeasurementTypeEnum : enum16 {
     kUnspecified = 0;
     kVoltage = 1;
     kActiveCurrent = 2;
@@ -4386,6 +4425,8 @@ cluster ElectricalEnergyMeasurement = 145 {
     kPowerFactor = 12;
     kNeutralCurrent = 13;
     kElectricalEnergy = 14;
+    kReactiveEnergy = 15;
+    kApparentEnergy = 16;
   }
 
   bitmap Feature : bitmap32 {
@@ -4395,7 +4436,7 @@ cluster ElectricalEnergyMeasurement = 145 {
     kPeriodicEnergy = 0x8;
   }
 
-  struct MeasurementAccuracyRangeStruct {
+  shared struct MeasurementAccuracyRangeStruct {
     int64s rangeMin = 0;
     int64s rangeMax = 1;
     optional percent100ths percentMax = 2;
@@ -4406,7 +4447,7 @@ cluster ElectricalEnergyMeasurement = 145 {
     optional int64u fixedTypical = 7;
   }
 
-  struct MeasurementAccuracyStruct {
+  shared struct MeasurementAccuracyStruct {
     MeasurementTypeEnum measurementType = 0;
     boolean measured = 1;
     int64s minMeasuredValue = 2;
@@ -4996,12 +5037,12 @@ cluster EnergyEvseMode = 157 {
     kOnOff = 0x1;
   }
 
-  struct ModeTagStruct {
+  shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
   }
 
-  struct ModeOptionStruct {
+  shared struct ModeOptionStruct {
     char_string<64> label = 0;
     int8u mode = 1;
     ModeTagStruct modeTags[] = 2;
@@ -5053,12 +5094,12 @@ cluster WaterHeaterMode = 158 {
     kOnOff = 0x1;
   }
 
-  struct ModeTagStruct {
+  shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
   }
 
-  struct ModeOptionStruct {
+  shared struct ModeOptionStruct {
     char_string<64> label = 0;
     int8u mode = 1;
     ModeTagStruct modeTags[] = 2;
@@ -5111,12 +5152,12 @@ provisional cluster DeviceEnergyManagementMode = 159 {
     kOnOff = 0x1;
   }
 
-  struct ModeTagStruct {
+  shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
   }
 
-  struct ModeOptionStruct {
+  shared struct ModeOptionStruct {
     char_string<64> label = 0;
     int8u mode = 1;
     ModeTagStruct modeTags[] = 2;
@@ -6418,7 +6459,7 @@ cluster OccupancySensing = 1030 {
 cluster CarbonMonoxideConcentrationMeasurement = 1036 {
   revision 3;
 
-  enum LevelValueEnum : enum8 {
+  shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -6426,13 +6467,13 @@ cluster CarbonMonoxideConcentrationMeasurement = 1036 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : enum8 {
+  shared enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : enum8 {
+  shared enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -6475,7 +6516,7 @@ cluster CarbonMonoxideConcentrationMeasurement = 1036 {
 cluster CarbonDioxideConcentrationMeasurement = 1037 {
   revision 3;
 
-  enum LevelValueEnum : enum8 {
+  shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -6483,13 +6524,13 @@ cluster CarbonDioxideConcentrationMeasurement = 1037 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : enum8 {
+  shared enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : enum8 {
+  shared enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -6532,7 +6573,7 @@ cluster CarbonDioxideConcentrationMeasurement = 1037 {
 cluster NitrogenDioxideConcentrationMeasurement = 1043 {
   revision 3;
 
-  enum LevelValueEnum : enum8 {
+  shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -6540,13 +6581,13 @@ cluster NitrogenDioxideConcentrationMeasurement = 1043 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : enum8 {
+  shared enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : enum8 {
+  shared enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -6589,7 +6630,7 @@ cluster NitrogenDioxideConcentrationMeasurement = 1043 {
 cluster OzoneConcentrationMeasurement = 1045 {
   revision 3;
 
-  enum LevelValueEnum : enum8 {
+  shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -6597,13 +6638,13 @@ cluster OzoneConcentrationMeasurement = 1045 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : enum8 {
+  shared enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : enum8 {
+  shared enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -6646,7 +6687,7 @@ cluster OzoneConcentrationMeasurement = 1045 {
 cluster Pm25ConcentrationMeasurement = 1066 {
   revision 3;
 
-  enum LevelValueEnum : enum8 {
+  shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -6654,13 +6695,13 @@ cluster Pm25ConcentrationMeasurement = 1066 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : enum8 {
+  shared enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : enum8 {
+  shared enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -6703,7 +6744,7 @@ cluster Pm25ConcentrationMeasurement = 1066 {
 cluster FormaldehydeConcentrationMeasurement = 1067 {
   revision 3;
 
-  enum LevelValueEnum : enum8 {
+  shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -6711,13 +6752,13 @@ cluster FormaldehydeConcentrationMeasurement = 1067 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : enum8 {
+  shared enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : enum8 {
+  shared enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -6760,7 +6801,7 @@ cluster FormaldehydeConcentrationMeasurement = 1067 {
 cluster Pm1ConcentrationMeasurement = 1068 {
   revision 3;
 
-  enum LevelValueEnum : enum8 {
+  shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -6768,13 +6809,13 @@ cluster Pm1ConcentrationMeasurement = 1068 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : enum8 {
+  shared enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : enum8 {
+  shared enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -6817,7 +6858,7 @@ cluster Pm1ConcentrationMeasurement = 1068 {
 cluster Pm10ConcentrationMeasurement = 1069 {
   revision 3;
 
-  enum LevelValueEnum : enum8 {
+  shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -6825,13 +6866,13 @@ cluster Pm10ConcentrationMeasurement = 1069 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : enum8 {
+  shared enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : enum8 {
+  shared enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -6874,7 +6915,7 @@ cluster Pm10ConcentrationMeasurement = 1069 {
 cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
   revision 3;
 
-  enum LevelValueEnum : enum8 {
+  shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -6882,13 +6923,13 @@ cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : enum8 {
+  shared enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : enum8 {
+  shared enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -6931,7 +6972,7 @@ cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
 cluster RadonConcentrationMeasurement = 1071 {
   revision 3;
 
-  enum LevelValueEnum : enum8 {
+  shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -6939,13 +6980,13 @@ cluster RadonConcentrationMeasurement = 1071 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : enum8 {
+  shared enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : enum8 {
+  shared enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -7026,7 +7067,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
     kJPEG = 0;
   }
 
-  enum StreamUsageEnum : enum8 {
+  shared enum StreamUsageEnum : enum8 {
     kInternal = 0;
     kRecording = 1;
     kAnalysis = 2;
@@ -7135,7 +7176,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
     optional int16u maxHDRFPS = 3;
   }
 
-  struct ViewportStruct {
+  shared struct ViewportStruct {
     int16u x1 = 0;
     int16u y1 = 1;
     int16u x2 = 2;
@@ -7296,6 +7337,106 @@ provisional cluster CameraAvStreamManagement = 1361 {
   command access(invoke: administer) SetStreamPriorities(SetStreamPrioritiesRequest): DefaultSuccess = 11;
   /** This command SHALL return a Snapshot from the camera. */
   command CaptureSnapshot(CaptureSnapshotRequest): CaptureSnapshotResponse = 12;
+}
+
+/** This cluster provides an interface into controls associated with the operation of a device that provides pan, tilt, and zoom functions, either mechanically, or against a digital image. */
+provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
+  revision 1;
+
+  bitmap Feature : bitmap32 {
+    kDigitalPTZ = 0x1;
+    kMechanicalPan = 0x2;
+    kMechanicalTilt = 0x4;
+    kMechanicalZoom = 0x8;
+    kMechanicalPresets = 0x10;
+  }
+
+  struct MPTZStruct {
+    optional int16s pan = 0;
+    optional int16s tilt = 1;
+    optional int8u zoom = 2;
+  }
+
+  struct MPTZPresetStruct {
+    int8u presetID = 0;
+    char_string<32> name = 1;
+    MPTZStruct settings = 2;
+  }
+
+  shared struct ViewportStruct {
+    int16u x1 = 0;
+    int16u y1 = 1;
+    int16u x2 = 2;
+    int16u y2 = 3;
+  }
+
+  readonly attribute optional MPTZStruct MPTZPosition = 0;
+  readonly attribute optional int8u maxPresets = 1;
+  readonly attribute optional MPTZPresetStruct MPTZPresets[] = 2;
+  readonly attribute optional int16u DPTZRelativeMove[] = 3;
+  readonly attribute optional int8u zoomMax = 4;
+  readonly attribute optional int16s tiltMin = 5;
+  readonly attribute optional int16s tiltMax = 6;
+  readonly attribute optional int16s panMin = 7;
+  readonly attribute optional int16s panMax = 8;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct MPTZSetPositionRequest {
+    optional int16s pan = 0;
+    optional int16s tilt = 1;
+    optional int8u zoom = 2;
+  }
+
+  request struct MPTZRelativeMoveRequest {
+    optional int16s panDelta = 0;
+    optional int16s tiltDelta = 1;
+    optional int8s zoomDelta = 2;
+  }
+
+  request struct MPTZMoveToPresetRequest {
+    int8u presetID = 0;
+  }
+
+  request struct MPTZSavePresetRequest {
+    optional int8u presetID = 0;
+    char_string<32> name = 1;
+  }
+
+  request struct MPTZRemovePresetRequest {
+    int8u presetID = 0;
+  }
+
+  request struct DPTZSetViewportRequest {
+    int16u videoStreamID = 0;
+    ViewportStruct viewport = 1;
+  }
+
+  request struct DPTZRelativeMoveRequest {
+    int16u videoStreamID = 0;
+    optional int16s deltaX = 1;
+    optional int16s deltaY = 2;
+    optional int8s zoomDelta = 3;
+  }
+
+  /** This command SHALL set the values for the pan, tilt, and zoom in the mechanical PTZ. */
+  command MPTZSetPosition(MPTZSetPositionRequest): DefaultSuccess = 0;
+  /** This command SHALL move the device by the delta values relative to the currently defined position. */
+  command MPTZRelativeMove(MPTZRelativeMoveRequest): DefaultSuccess = 1;
+  /** This command SHALL move the camera to the positions specified by the Preset passed. */
+  command MPTZMoveToPreset(MPTZMoveToPresetRequest): DefaultSuccess = 2;
+  /** This command allows creating a new preset or updating the values of an existing one. */
+  command MPTZSavePreset(MPTZSavePresetRequest): DefaultSuccess = 3;
+  /** This command SHALL remove a preset entry from the PresetMptzTable. */
+  command MPTZRemovePreset(MPTZRemovePresetRequest): DefaultSuccess = 4;
+  /** This command allows for setting the digital viewport for a specific Video Stream. */
+  command DPTZSetViewport(DPTZSetViewportRequest): DefaultSuccess = 5;
+  /** This command SHALL change the viewports location by the amount specified in a relative fashion. */
+  command DPTZRelativeMove(DPTZRelativeMoveRequest): DefaultSuccess = 6;
 }
 
 /** This cluster provides facilities to configure and play Chime sounds, such as those used in a doorbell. */
@@ -8601,8 +8742,8 @@ endpoint 1 {
   server cluster LaundryWasherMode {
     callback attribute supportedModes;
     callback attribute currentMode;
-    callback attribute startUpMode;
-    callback attribute onMode;
+    ram      attribute startUpMode;
+    ram      attribute onMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -8616,8 +8757,8 @@ endpoint 1 {
   server cluster RefrigeratorAndTemperatureControlledCabinetMode {
     callback attribute supportedModes;
     callback attribute currentMode;
-    callback attribute startUpMode;
-    callback attribute onMode;
+    ram      attribute startUpMode;
+    ram      attribute onMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -8693,8 +8834,8 @@ endpoint 1 {
   server cluster DishwasherMode {
     callback attribute supportedModes;
     callback attribute currentMode;
-    callback attribute startUpMode;
-    callback attribute onMode;
+    ram      attribute startUpMode;
+    ram      attribute onMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -9619,6 +9760,31 @@ endpoint 1 {
     handle command SetStreamPriorities;
     handle command CaptureSnapshot;
     handle command CaptureSnapshotResponse;
+  }
+
+  server cluster CameraAvSettingsUserLevelManagement {
+    callback attribute MPTZPosition;
+    ram      attribute maxPresets default = 5;
+    callback attribute MPTZPresets;
+    callback attribute DPTZRelativeMove;
+    ram      attribute zoomMax default = 100;
+    ram      attribute tiltMin default = -90;
+    ram      attribute tiltMax default = 90;
+    ram      attribute panMin default = -180;
+    ram      attribute panMax default = 180;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command MPTZSetPosition;
+    handle command MPTZRelativeMove;
+    handle command MPTZMoveToPreset;
+    handle command MPTZSavePreset;
+    handle command MPTZRemovePreset;
+    handle command DPTZSetViewport;
+    handle command DPTZRelativeMove;
   }
 
   server cluster Chime {
