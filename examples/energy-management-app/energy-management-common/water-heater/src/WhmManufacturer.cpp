@@ -109,6 +109,12 @@ Status WhmManufacturer::TurnHeatingOn(bool emergencyBoost)
     {
         dg->SetHeatDemand(BitMask<WaterHeaterHeatSourceBitmap>(WaterHeaterHeatSourceBitmap::kImmersionElement1));
     }
+    
+    status = dg->SetWaterHeaterMode(WaterHeaterMode::kModeManual);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "TurnHeatingOn setting mode -> kModeManual failed 0x%02x", to_underlying(status));
+    }
 
     return status;
 }
@@ -122,6 +128,12 @@ Status WhmManufacturer::TurnHeatingOff()
     WaterHeaterManagementDelegate * dg = GetWhmDelegate();
 
     dg->SetHeatDemand(BitMask<WaterHeaterHeatSourceBitmap>(0));
+    
+    status = dg->SetWaterHeaterMode(WaterHeaterMode::kModeOff);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "TurnHeatingOff setting mode -> kModeOff failed 0x%02x", to_underlying(status));
+    }
 
     return status;
 }
