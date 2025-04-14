@@ -1332,23 +1332,25 @@ tests:
       response:
           value: Current_WrongCode_EntryLimit
 
-    - label: "Step 31b: TH writes WrongCodeEntryLimit attribute as 8"
+    - label: "Step 31d: TH writes WrongCodeEntryLimit attribute as 0 on the DUT"
       PICS:
           " ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0030 &&
           DRLK.S.M.WrongCodeEntryLimitAttributeWritable "
       command: "writeAttribute"
       attribute: "WrongCodeEntryLimit"
       arguments:
-          value: 8
+          value: 0
+      response:
+          error: CONSTRAINT_ERROR
 
-    - label: "Step 31b: TH writes WrongCodeEntryLimit attribute as 8"
+    - label: "Step 31d: TH writes WrongCodeEntryLimit attribute as 0 on the DUT"
       PICS:
           " ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0030 &&
           !DRLK.S.M.WrongCodeEntryLimitAttributeWritable "
       command: "writeAttribute"
       attribute: "WrongCodeEntryLimit"
       arguments:
-          value: 8
+          value: 0
       response:
           error: UNSUPPORTED_WRITE
 
@@ -1402,6 +1404,28 @@ tests:
       attribute: "UserCodeTemporaryDisableTime"
       response:
           value: Current_UserCode_TemporaryDisableTime
+          
+    - label: "Step 32d: TH writes UserCodeTemporaryDisableTime attribute as 0 second on the DUT"
+      PICS:
+          " ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0031 &&
+          DRLK.S.M.UserCodedTemporaryDisableTimeAttributeWritable "
+      command: "writeAttribute"
+      attribute: "UserCodeTemporaryDisableTime"
+      arguments:
+          value: 0
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Step 32d: TH writes UserCodeTemporaryDisableTime attribute as 0 second on the DUT"
+      PICS:
+          " ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0031 &&
+          !DRLK.S.M.UserCodedTemporaryDisableTimeAttributeWritable "
+      command: "writeAttribute"
+      attribute: "UserCodeTemporaryDisableTime"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label:
           "Step 33a: TH reads RequirePINfor RemoteOperation attribute from DUT"
