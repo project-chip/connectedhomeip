@@ -7884,7 +7884,7 @@ class ChipClusters:
                 "commandName": "MoveTo",
                 "args": {
                     "position": "int",
-                    "latch": "int",
+                    "latch": "bool",
                     "speed": "int",
                 },
             },

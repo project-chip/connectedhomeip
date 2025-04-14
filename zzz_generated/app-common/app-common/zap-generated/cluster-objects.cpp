@@ -20883,9 +20883,9 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kPositioning), positioning);
-    encoder.Encode(to_underlying(Fields::kLatching), latching);
+    encoder.Encode(to_underlying(Fields::kLatch), latch);
     encoder.Encode(to_underlying(Fields::kSpeed), speed);
-    encoder.Encode(to_underlying(Fields::kExtraInfo), extraInfo);
+    encoder.Encode(to_underlying(Fields::kSecureState), secureState);
     return encoder.Finalize();
 }
 
@@ -20907,17 +20907,17 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, positioning);
         }
-        else if (__context_tag == to_underlying(Fields::kLatching))
+        else if (__context_tag == to_underlying(Fields::kLatch))
         {
-            err = DataModel::Decode(reader, latching);
+            err = DataModel::Decode(reader, latch);
         }
         else if (__context_tag == to_underlying(Fields::kSpeed))
         {
             err = DataModel::Decode(reader, speed);
         }
-        else if (__context_tag == to_underlying(Fields::kExtraInfo))
+        else if (__context_tag == to_underlying(Fields::kSecureState))
         {
-            err = DataModel::Decode(reader, extraInfo);
+            err = DataModel::Decode(reader, secureState);
         }
         else
         {
@@ -21094,7 +21094,134 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+namespace OperationalError {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kErrorState), errorState));
+    return aWriter.EndContainer(outer);
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kErrorState))
+        {
+            err = DataModel::Decode(reader, errorState);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace OperationalError.
+namespace MovementCompleted {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
+    return aWriter.EndContainer(outer);
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+    }
+}
+} // namespace MovementCompleted.
+namespace EngageStateChanged {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kEngageValue), engageValue));
+    return aWriter.EndContainer(outer);
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kEngageValue))
+        {
+            err = DataModel::Decode(reader, engageValue);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace EngageStateChanged.
+namespace SecureStateChanged {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kSecureValue), secureValue));
+    return aWriter.EndContainer(outer);
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kSecureValue))
+        {
+            err = DataModel::Decode(reader, secureValue);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace SecureStateChanged.
+} // namespace Events
 
 } // namespace ClosureControl
 namespace ClosureDimension {

@@ -10968,14 +10968,14 @@ static id _Nullable DecodeAttributeValueForClosureControlCluster(AttributeId aAt
             } else {
                 value.positioning = nil;
             }
-            if (cppValue.Value().latching.HasValue()) {
-                if (cppValue.Value().latching.Value().IsNull()) {
-                    value.latching = nil;
+            if (cppValue.Value().latch.HasValue()) {
+                if (cppValue.Value().latch.Value().IsNull()) {
+                    value.latch = nil;
                 } else {
-                    value.latching = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().latching.Value().Value())];
+                    value.latch = [NSNumber numberWithBool:cppValue.Value().latch.Value().Value()];
                 }
             } else {
-                value.latching = nil;
+                value.latch = nil;
             }
             if (cppValue.Value().speed.HasValue()) {
                 if (cppValue.Value().speed.Value().IsNull()) {
@@ -10986,14 +10986,14 @@ static id _Nullable DecodeAttributeValueForClosureControlCluster(AttributeId aAt
             } else {
                 value.speed = nil;
             }
-            if (cppValue.Value().extraInfo.HasValue()) {
-                if (cppValue.Value().extraInfo.Value().IsNull()) {
-                    value.extraInfo = nil;
+            if (cppValue.Value().secureState.HasValue()) {
+                if (cppValue.Value().secureState.Value().IsNull()) {
+                    value.secureState = nil;
                 } else {
-                    value.extraInfo = [NSNumber numberWithUnsignedInt:cppValue.Value().extraInfo.Value().Value()];
+                    value.secureState = [NSNumber numberWithBool:cppValue.Value().secureState.Value().Value()];
                 }
             } else {
-                value.extraInfo = nil;
+                value.secureState = nil;
             }
         }
         return value;
@@ -11016,7 +11016,7 @@ static id _Nullable DecodeAttributeValueForClosureControlCluster(AttributeId aAt
                 value.position = nil;
             }
             if (cppValue.Value().latch.HasValue()) {
-                value.latch = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().latch.Value())];
+                value.latch = [NSNumber numberWithBool:cppValue.Value().latch.Value()];
             } else {
                 value.latch = nil;
             }

@@ -4030,28 +4030,16 @@ namespace ClosureControl {
 // Enum for ClosureErrorEnum
 enum class ClosureErrorEnum : uint8_t
 {
-    kBlocked              = 0x00,
-    kTemperatureLimited   = 0x01,
-    kMaintenanceRequired  = 0x02,
-    kInternalInterference = 0x03,
+    kPhysicallyBlocked    = 0x00,
+    kBlockedBySensor      = 0x01,
+    kTemperatureLimited   = 0x02,
+    kMaintenanceRequired  = 0x03,
+    kInternalInterference = 0x04,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 4,
-};
-
-// Enum for LatchingEnum
-enum class LatchingEnum : uint8_t
-{
-    kLatchedAndSecured    = 0x00,
-    kLatchedButNotSecured = 0x01,
-    kNotLatched           = 0x02,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 3,
+    kUnknownEnumValue = 5,
 };
 
 // Enum for MainStateEnum
@@ -4086,18 +4074,6 @@ enum class PositioningEnum : uint8_t
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 6,
-};
-
-// Enum for TargetLatchEnum
-enum class TargetLatchEnum : uint8_t
-{
-    kLatch   = 0x00,
-    kUnlatch = 0x01,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 2,
 };
 
 // Enum for TargetPositionEnum
