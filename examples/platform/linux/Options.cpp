@@ -137,11 +137,11 @@ enum
     kDeviceOption_icdActiveModeDurationMs,
     kDeviceOption_icdIdleModeDuration,
 #endif // CHIP_ENABLE_ICD_SERVER
-    kDeviceOption_VendorName            = 0x1028,
-    kDeviceOption_ProductName           = 0x1029,
-    kDeviceOption_HardwareVersionString = 0x102a,
-    kDeviceOption_SoftwareVersionString = 0x102b,
-    kDeviceOption_SerialNumber          = 0x102c,
+    kDeviceOption_VendorName,
+    kDeviceOption_ProductName,
+    kDeviceOption_HardwareVersionString,
+    kDeviceOption_SoftwareVersionString,
+    kDeviceOption_SerialNumber,
 };
 
 constexpr unsigned kAppUsageLength = 64;
