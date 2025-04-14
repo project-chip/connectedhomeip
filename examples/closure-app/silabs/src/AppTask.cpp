@@ -79,11 +79,11 @@ AppTask AppTask::sAppTask;
 
 void ApplicationInit()
 {
-    
+
     ChipLogDetail(AppServer, "==================================================");
     ChipLogDetail(AppServer,"Closure-app ClosureControl starting for endpoint EP%d", kClosureEndpoint);
     ChipLogDetail(AppServer,"==================================================");
-    
+
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     ClosureControlInit(kClosureEndpoint);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();

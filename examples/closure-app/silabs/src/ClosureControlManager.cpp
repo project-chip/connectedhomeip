@@ -27,7 +27,7 @@ using namespace chip::app::Clusters::ClosureControl;
 using Protocols::InteractionModel::Status;
 
 namespace {
-    
+
 // Mock Error List generated for sample application usage.
 const ClosureErrorEnum kCurrentErrorList[] = {
         ClosureErrorEnum::kBlocked,

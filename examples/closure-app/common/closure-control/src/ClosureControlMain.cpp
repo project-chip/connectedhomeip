@@ -34,7 +34,7 @@ using namespace chip::app::Clusters::ClosureControl;
 namespace {
 
     constexpr BitMask<Feature> gFeatureMap(Feature::kCalibration, Feature::kPositioning, Feature::kSpeed,Feature::kMotionLatching);
-    
+
 } // namespace
 
 namespace chip {

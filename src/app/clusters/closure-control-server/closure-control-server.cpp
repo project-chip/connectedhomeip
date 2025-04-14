@@ -99,16 +99,16 @@ bool Instance::CheckCommandStateCompatibility(CommandId cmd, MainStateEnum state
     {
     case Commands::Stop::Id:
     // The Stop command is supported in Calibrating ,Stopped, Moving and WaitingForMotion states, not supported in the Error state.
-        if (state == MainStateEnum::kError) 
+        if (state == MainStateEnum::kError)
         {
-            return false;  
-        } 
+            return false;
+        }
         else
         {
             return true;
         }
         break;
-        
+
     case Commands::MoveTo::Id:
     // The MoveTo command is supported in Stopped, Error, Moving and WaitingForMotion states, not supported in the Calibrating State.
         if (state == MainStateEnum::kCalibrating)
@@ -117,10 +117,10 @@ bool Instance::CheckCommandStateCompatibility(CommandId cmd, MainStateEnum state
         }
         else
         {
-            return true;    
+            return true;
         }
         break;
-        
+
     case Commands::Calibrate::Id:
     // The Calibrate command is supported in Calibrating and Stopped states, not supported in Error, Moving and WaitingForMotion states.
         if ((state == MainStateEnum::kCalibrating) || (state == MainStateEnum::kStopped))
@@ -277,10 +277,10 @@ CHIP_ERROR Instance::EncodeCurrentErrorList(const AttributeValueEncoder::ListEnc
 
         // Check if another error occurred before trying to encode
         SuccessOrExit(err);
-        
-        // Encode the error 
+
+        // Encode the error
         err = encoder.Encode(error);
-        
+
         // Check if another error occurred before trying to encode
         SuccessOrExit(err);
     }
@@ -372,10 +372,10 @@ Status Instance::HandleMoveTo(HandlerContext & ctx, const Commands::MoveTo::Deco
 {
     MainStateEnum state = GetMainState();
     VerifyOrReturnValue(CheckCommandStateCompatibility(Commands::Stop::Id, state), Status::InvalidInState);
-    
+
     // If all command parameters don't have a value, return InvalidCommand
     VerifyOrReturnValue(commandData.position.HasValue() || commandData.latch.HasValue() || commandData.speed.HasValue(), Status::InvalidCommand);
-    
+
     if (commandData.position.HasValue())
     {
         VerifyOrReturnError((commandData.position.Value() != TargetPositionEnum::kUnknownEnumValue), Status::ConstraintError);
@@ -386,11 +386,11 @@ Status Instance::HandleMoveTo(HandlerContext & ctx, const Commands::MoveTo::Deco
     if (commandData.latch.HasValue())
     {
         VerifyOrReturnError(commandData.latch.Value() != TargetLatchEnum::kUnknownEnumValue, Status::ConstraintError);
-        
+
         // If MotionLatching (LT) feature or not, the server SHALL return a status code SUCCESS
         VerifyOrReturnError(HasFeature(Feature::kMotionLatching), Status::Success);
-        
-        // If manual intervention is required to latch, respond with INVALID_ACTION 
+
+        // If manual intervention is required to latch, respond with INVALID_ACTION
         VerifyOrReturnError(mDelegate.IsLatchManual() == true, Status::InvalidAction);
     }
 
@@ -399,7 +399,7 @@ Status Instance::HandleMoveTo(HandlerContext & ctx, const Commands::MoveTo::Deco
         VerifyOrReturnError(commandData.speed.Value() != Globals::ThreeLevelAutoEnum::kUnknownEnumValue, Status::ConstraintError);
         // If Speed (SP) feature or not, the server SHALL return a status code SUCCESS
         VerifyOrReturnError(HasFeature(Feature::kSpeed), Status::Success);
-    }    
+    }
 
     if(mDelegate.CheckErrorOnDevice())
     {
@@ -408,7 +408,7 @@ Status Instance::HandleMoveTo(HandlerContext & ctx, const Commands::MoveTo::Deco
         // Return Status Failure
         return Status::Failure;
     }
-    
+
     if(mDelegate.IsDeviceReadyToMove())
     {
         // If the device is ready to move, set MainState to Moving
@@ -417,7 +417,7 @@ Status Instance::HandleMoveTo(HandlerContext & ctx, const Commands::MoveTo::Deco
         // If device need pre-stage before moving, then set MainState to Waiting for Moving
         SetMainState(MainStateEnum::kWaitingForMotion);
     }
-    
+
     //TODO: Check if the device is in a state to move and set MainState to Moving or Waiting for Moving
     return mDelegate.MoveTo(commandData.position, commandData.latch, commandData.speed);
 }
