@@ -30261,11 +30261,12 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kSnapshotStreamID), snapshotStreamID);
     encoder.Encode(to_underlying(Fields::kImageCodec), imageCodec);
     encoder.Encode(to_underlying(Fields::kFrameRate), frameRate);
-    encoder.Encode(to_underlying(Fields::kBitRate), bitRate);
     encoder.Encode(to_underlying(Fields::kMinResolution), minResolution);
     encoder.Encode(to_underlying(Fields::kMaxResolution), maxResolution);
     encoder.Encode(to_underlying(Fields::kQuality), quality);
     encoder.Encode(to_underlying(Fields::kReferenceCount), referenceCount);
+    encoder.Encode(to_underlying(Fields::kEncodedPixels), encodedPixels);
+    encoder.Encode(to_underlying(Fields::kHardwareEncoder), hardwareEncoder);
     return encoder.Finalize();
 }
 
@@ -30295,10 +30296,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, frameRate);
         }
-        else if (__context_tag == to_underlying(Fields::kBitRate))
-        {
-            err = DataModel::Decode(reader, bitRate);
-        }
         else if (__context_tag == to_underlying(Fields::kMinResolution))
         {
             err = DataModel::Decode(reader, minResolution);
@@ -30315,6 +30312,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, referenceCount);
         }
+        else if (__context_tag == to_underlying(Fields::kEncodedPixels))
+        {
+            err = DataModel::Decode(reader, encodedPixels);
+        }
+        else if (__context_tag == to_underlying(Fields::kHardwareEncoder))
+        {
+            err = DataModel::Decode(reader, hardwareEncoder);
+        }
         else
         {
         }
@@ -30325,13 +30330,15 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
 } // namespace SnapshotStreamStruct
 
-namespace SnapshotParamsStruct {
+namespace SnapshotCapabilitiesStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kResolution), resolution);
     encoder.Encode(to_underlying(Fields::kMaxFrameRate), maxFrameRate);
     encoder.Encode(to_underlying(Fields::kImageCodec), imageCodec);
+    encoder.Encode(to_underlying(Fields::kRequiresEncodedPixels), requiresEncodedPixels);
+    encoder.Encode(to_underlying(Fields::kRequiresHardwareEncoder), requiresHardwareEncoder);
     return encoder.Finalize();
 }
 
@@ -30361,6 +30368,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, imageCodec);
         }
+        else if (__context_tag == to_underlying(Fields::kRequiresEncodedPixels))
+        {
+            err = DataModel::Decode(reader, requiresEncodedPixels);
+        }
+        else if (__context_tag == to_underlying(Fields::kRequiresHardwareEncoder))
+        {
+            err = DataModel::Decode(reader, requiresHardwareEncoder);
+        }
         else
         {
         }
@@ -30369,7 +30384,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 
-} // namespace SnapshotParamsStruct
+} // namespace SnapshotCapabilitiesStruct
 
 namespace RateDistortionTradeOffPointsStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -30926,7 +30941,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kImageCodec), imageCodec);
     encoder.Encode(to_underlying(Fields::kMaxFrameRate), maxFrameRate);
-    encoder.Encode(to_underlying(Fields::kBitRate), bitRate);
     encoder.Encode(to_underlying(Fields::kMinResolution), minResolution);
     encoder.Encode(to_underlying(Fields::kMaxResolution), maxResolution);
     encoder.Encode(to_underlying(Fields::kQuality), quality);
@@ -30956,10 +30970,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kMaxFrameRate))
         {
             err = DataModel::Decode(reader, maxFrameRate);
-        }
-        else if (__context_tag == to_underlying(Fields::kBitRate))
-        {
-            err = DataModel::Decode(reader, bitRate);
         }
         else if (__context_tag == to_underlying(Fields::kMinResolution))
         {
@@ -31225,8 +31235,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::MaxConcurrentVideoEncoders::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, maxConcurrentVideoEncoders);
+    case Attributes::MaxConcurrentEncoders::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, maxConcurrentEncoders);
     case Attributes::MaxEncodedPixelRate::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, maxEncodedPixelRate);
     case Attributes::VideoSensorParams::TypeInfo::GetAttributeId():
@@ -31245,8 +31255,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, speakerCapabilities);
     case Attributes::TwoWayTalkSupport::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, twoWayTalkSupport);
-    case Attributes::SupportedSnapshotParams::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, supportedSnapshotParams);
+    case Attributes::SnapshotCapabilities::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, snapshotCapabilities);
     case Attributes::MaxNetworkBandwidth::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, maxNetworkBandwidth);
     case Attributes::CurrentFrameRate::TypeInfo::GetAttributeId():

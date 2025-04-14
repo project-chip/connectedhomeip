@@ -17377,8 +17377,8 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
 {
     using namespace Clusters::CameraAvStreamManagement;
     switch (aAttributeId) {
-    case Attributes::MaxConcurrentVideoEncoders::Id: {
-        using TypeInfo = Attributes::MaxConcurrentVideoEncoders::TypeInfo;
+    case Attributes::MaxConcurrentEncoders::Id: {
+        using TypeInfo = Attributes::MaxConcurrentEncoders::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -17615,8 +17615,8 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
         value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
-    case Attributes::SupportedSnapshotParams::Id: {
-        using TypeInfo = Attributes::SupportedSnapshotParams::TypeInfo;
+    case Attributes::SnapshotCapabilities::Id: {
+        using TypeInfo = Attributes::SnapshotCapabilities::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -17628,13 +17628,19 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                MTRCameraAVStreamManagementClusterSnapshotParamsStruct * newElement_0;
-                newElement_0 = [MTRCameraAVStreamManagementClusterSnapshotParamsStruct new];
+                MTRCameraAVStreamManagementClusterSnapshotCapabilitiesStruct * newElement_0;
+                newElement_0 = [MTRCameraAVStreamManagementClusterSnapshotCapabilitiesStruct new];
                 newElement_0.resolution = [MTRCameraAVStreamManagementClusterVideoResolutionStruct new];
                 newElement_0.resolution.width = [NSNumber numberWithUnsignedShort:entry_0.resolution.width];
                 newElement_0.resolution.height = [NSNumber numberWithUnsignedShort:entry_0.resolution.height];
                 newElement_0.maxFrameRate = [NSNumber numberWithUnsignedShort:entry_0.maxFrameRate];
                 newElement_0.imageCodec = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.imageCodec)];
+                newElement_0.requiresEncodedPixels = [NSNumber numberWithBool:entry_0.requiresEncodedPixels];
+                if (entry_0.requiresHardwareEncoder.HasValue()) {
+                    newElement_0.requiresHardwareEncoder = [NSNumber numberWithBool:entry_0.requiresHardwareEncoder.Value()];
+                } else {
+                    newElement_0.requiresHardwareEncoder = nil;
+                }
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -17809,7 +17815,6 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
                 newElement_0.snapshotStreamID = [NSNumber numberWithUnsignedShort:entry_0.snapshotStreamID];
                 newElement_0.imageCodec = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.imageCodec)];
                 newElement_0.frameRate = [NSNumber numberWithUnsignedShort:entry_0.frameRate];
-                newElement_0.bitRate = [NSNumber numberWithUnsignedInt:entry_0.bitRate];
                 newElement_0.minResolution = [MTRCameraAVStreamManagementClusterVideoResolutionStruct new];
                 newElement_0.minResolution.width = [NSNumber numberWithUnsignedShort:entry_0.minResolution.width];
                 newElement_0.minResolution.height = [NSNumber numberWithUnsignedShort:entry_0.minResolution.height];
@@ -17818,6 +17823,8 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
                 newElement_0.maxResolution.height = [NSNumber numberWithUnsignedShort:entry_0.maxResolution.height];
                 newElement_0.quality = [NSNumber numberWithUnsignedChar:entry_0.quality];
                 newElement_0.referenceCount = [NSNumber numberWithUnsignedChar:entry_0.referenceCount];
+                newElement_0.encodedPixels = [NSNumber numberWithBool:entry_0.encodedPixels];
+                newElement_0.hardwareEncoder = [NSNumber numberWithBool:entry_0.hardwareEncoder];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
