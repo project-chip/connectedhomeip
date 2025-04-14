@@ -186,8 +186,6 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
                                                DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Commands;
-    using QF   = DataModel::CommandQualityFlags;
-    using Priv = Access::Privilege;
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(7));
 
     ReturnErrorOnFailure(builder.AppendElements({ Disable::kMetadataEntry, EnableCharging::kMetadataEntry }));

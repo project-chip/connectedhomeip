@@ -108,7 +108,6 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
                                                DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Commands;
-    using Priv = Access::Privilege;
 
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(8)); // Ensure we have capacity for all possible commands
 
