@@ -23,8 +23,6 @@
 #include <commands/common/Commands.h>
 #include <websocket-server/WebSocketServer.h>
 
-#include <websocket-server/WebSocketServer.h>
-
 #include <string>
 
 class Commands;
