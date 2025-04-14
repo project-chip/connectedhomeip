@@ -18,11 +18,13 @@
 import argparse
 import glob
 import json
+import logging
 import os
 import shutil
 import subprocess
 import sys
 import tempfile
+
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Generator, Optional
@@ -296,9 +298,9 @@ def runClangPrettifier(templates_file, output_dir):
             args = [clang_format, '-i']
             args.extend(clangOutputs)
             subprocess.check_call(args)
-            print('Formatted using %s (%s)' % (clang_format, subprocess.check_output([clang_format, '--version'])))
+            print('Formatted %d files using %s (%s)' % (len(clangOutputs), clang_format, subprocess.check_output([clang_format, '--version'])))
             for outputName in clangOutputs:
-                print('  - %s' % outputName)
+                logging.detail("Formatted: %s", outputName)
     except subprocess.CalledProcessError as err:
         print('clang-format error: %s', err)
 
