@@ -31,7 +31,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ClosureDimension {
-    
+
 using Protocols::InteractionModel::Status;
 
 // This is an application level delegate to handle Closure Dimension commands according to the specific business logic.
@@ -44,57 +44,57 @@ public:
         MOVE_AND_LATCH_ACTION,
         STEP_ACTION,
         TARGET_CHANGE_ACTION,
-    
+
         INVALID_ACTION
     } Action;
-    
+
     typedef void (*Callback_fn_initiated)(Action_t);
     typedef void (*Callback_fn_completed)(Action_t);
     void SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB);
-    
+
     Callback_fn_initiated mActionInitiated_CB;
     Callback_fn_completed mActionCompleted_CB;
-    
+
     const uint32_t kExampleMotionCountDown     = 5;
     const uint32_t kExampleStepCountDown       = 3000;
-    
+
     ClosureDimensionDelegate(EndpointId endpoint) : mEndpoint(endpoint), gLogic(nullptr) {}
-    
+
     Status HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<TargetLatchEnum> & latch,
                                const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
 
     Status HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
                           const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
-                          
+
     Status HandleMotion(bool latchNeeded, bool motionNeeded, bool newTarget);
-    
+
     CHIP_ERROR Init();
-                          
-    void SetLogic(ClusterLogic* logic) 
+
+    void SetLogic(ClusterLogic* logic)
     {
         gLogic = logic;
     }
-    
+
     ClusterLogic* getLogic() const
     {
         return gLogic;
     }
-    
+
     bool IsDeviceMoving() const
     {
         return isMoving;
     }
-    
+
     void SetDeviceMoving(bool moving)
     {
         isMoving = moving;
     }
-    
+
     Action_t GetAction() const
     {
         return mAction;
     }
-    
+
     void SetAction(Action_t action)
     {
         mAction = action;
@@ -109,7 +109,7 @@ public:
     {
         mTargetDirection = direction;
     }
-    
+
 private:
     bool isMoving = false;
     bool isManualLatch = false;
@@ -122,14 +122,14 @@ private:
 class ClosureDimensionManager
 {
 public:
-    
+
 
     ClosureDimensionManager(EndpointId endpoint) :
         mEndpoint(endpoint), mContext(mEndpoint), mDelegate(mEndpoint), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
     {
-        mDelegate.SetLogic(&mLogic); 
+        mDelegate.SetLogic(&mLogic);
     }
-    
+
     CHIP_ERROR Init()
     {
         ChipLogProgress(AppServer, "ClosureDimensionManager::Init start");
@@ -139,8 +139,8 @@ public:
         ChipLogProgress(AppServer, "ClosureDimensionManager::Init end");
         return CHIP_NO_ERROR;
     }
-    
-    ClosureDimensionDelegate& getDelegate() 
+
+    ClosureDimensionDelegate& getDelegate()
     {
         return mDelegate;
     }

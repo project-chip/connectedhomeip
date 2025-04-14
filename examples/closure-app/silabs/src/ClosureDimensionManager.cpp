@@ -54,7 +54,7 @@ CHIP_ERROR ClosureDimensionDelegate::Init()
     limitRange.min = LIMIT_RANGE_MIN;
     limitRange.max = LIMIT_RANGE_MAX;
     getLogic()->SetLimitRange(limitRange);
-    
+
     getLogic()->SetStepValue(STEP);
     ChipLogProgress(AppServer, "ClosureDimensionDelegate::Init done");
     return CHIP_NO_ERROR;
@@ -73,7 +73,7 @@ Status ClosureDimensionDelegate::HandleSetTarget(const Optional<Percent100ths> &
     bool latchNeeded  = false;
     GenericTargetStruct target;
     Status status = Status::Success;
-        
+
     ClusterState state = getLogic()->GetState();
     ClusterConformance conformance = getLogic()->GetConformance();
 
@@ -107,27 +107,27 @@ Status ClosureDimensionDelegate::HandleSetTarget(const Optional<Percent100ths> &
     }
     // If device is already at TargetState ,no Action is required will give Status::Success
     VerifyOrReturnValue(motionNeeded || latchNeeded, Status::Success);
- 
+
     if (isMoving)
-    {  
+    {
         status = HandleMotion(latchNeeded, motionNeeded, true);
     } else
     {
         status = HandleMotion(latchNeeded, motionNeeded, false);
     }
     return status;
- 
+
 }
 
 static void HandleStepMotion(System::Layer * systemLayer, void * data)
 {
     ClosureDimensionDelegate * delegate = reinterpret_cast<ClosureDimensionDelegate *>(data);
     VerifyOrReturn(delegate != nullptr, void());
-    
+
     ClusterState state = delegate->getLogic()->GetState();
 
     StepDirectionEnum direction = delegate->GetTargetDirection();
-    
+
     int32_t newPos;
     if (direction == StepDirectionEnum::kDecrease)
     {
@@ -143,27 +143,27 @@ static void HandleStepMotion(System::Layer * systemLayer, void * data)
     {
         (void) DeviceLayer::SystemLayer().CancelTimer(HandleStepMotion, delegate);
         if (delegate->mActionCompleted_CB)
-        {    
+        {
             delegate->mActionCompleted_CB(delegate->GetAction());
         }
-        
-    } 
+
+    }
     else
     {
         (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds16(delegate->kExampleStepCountDown), HandleStepMotion, delegate);
     }
-    
+
     if (delegate->mActionInitiated_CB)
-    {   
-        delegate->SetDeviceMoving(true);  
+    {
+        delegate->SetDeviceMoving(true);
         delegate->mActionInitiated_CB(delegate->GetAction());
     }
-    
+
 }
 
 Status ClosureDimensionDelegate::HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
                                                 const Optional<Globals::ThreeLevelAutoEnum> & speed)
-{    
+{
     mAction = STEP_ACTION;
     mTargetDirection = direction;
     (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds16(kExampleStepCountDown), HandleStepMotion, this);
@@ -176,7 +176,7 @@ static void MotionTimerEventHandler(System::Layer * systemLayer, void * data)
     delegate->SetDeviceMoving(false);
     GenericTargetStruct target;
     GenericCurrentStateStruct current;
-    
+
     delegate->getLogic()->GetTarget(target);
     current.position.SetValue(static_cast<uint16_t>(target.position.Value()));
     if (target.latch.HasValue())
@@ -196,16 +196,16 @@ static void MotionTimerEventHandler(System::Layer * systemLayer, void * data)
         current.speed.SetValue(target.speed.Value());
     }
     delegate->getLogic()->SetCurrentState(current);
-    
+
     if (delegate->mActionCompleted_CB)
-    {    
+    {
         delegate->mActionCompleted_CB(delegate->GetAction());
     }
 
 }
 
 Status ClosureDimensionDelegate::HandleMotion(bool latchNeeded, bool motionNeeded, bool newTarget)
-{   
+{
     Action_t action = INVALID_ACTION;
 
     // Target changes when target is in motion
@@ -228,9 +228,9 @@ Status ClosureDimensionDelegate::HandleMotion(bool latchNeeded, bool motionNeede
     }
     (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(kExampleMotionCountDown), MotionTimerEventHandler, this);
     if (mActionInitiated_CB)
-    {   
+    {
         isMoving = true;
-        SetAction(action);  
+        SetAction(action);
         mActionInitiated_CB(action);
     }
     return Status::Success;
