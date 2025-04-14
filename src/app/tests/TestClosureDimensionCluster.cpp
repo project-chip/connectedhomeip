@@ -34,7 +34,7 @@ namespace Clusters {
 namespace ClosureDimension {
 
 namespace {
-    
+
     constexpr uint16_t kExpectedClusterRevision = 1u;
 
 } // namespace
@@ -56,7 +56,7 @@ class TestDelegate : public DelegateBase
 {
 public:
     TestDelegate() {}
-   
+
     Protocols::InteractionModel::Status HandleSetTarget(const Optional<Percent100ths> & position,
         const Optional<TargetLatchEnum> & latch, const Optional<Globals::ThreeLevelAutoEnum> & speed) {
             return Protocols::InteractionModel::Status::Success;
@@ -101,7 +101,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestConformanceValid)
         .featureMap = 0, .supportsOverflow = false
     };
     EXPECT_TRUE(conformance.Valid());
-    
+
     conformance = {
         .featureMap = 0, .supportsOverflow = true
     };
@@ -116,7 +116,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestConformanceValid)
     conformance = { .featureMap               = to_underlying(Feature::kRotation),
                     .supportsOverflow         = false };
     EXPECT_FALSE(conformance.Valid());
-    
+
     // LVL on, no optional stuff, should be valid
     conformance = { .featureMap               = to_underlying(Feature::kMotionLatching),
                     .supportsOverflow         = true };
@@ -126,7 +126,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestConformanceValid)
     conformance = { .featureMap               = to_underlying(Feature::kMotionLatching),
                 .supportsOverflow         = false };
     EXPECT_TRUE(conformance.Valid());
-    
+
     // LVL on, no optional stuff, should be valid
     conformance = { .featureMap               = 66,
                     .supportsOverflow         = true };
@@ -213,7 +213,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestGetAttributesAllFeatures)
 
     EXPECT_EQ(logic->GetUnit(unit), CHIP_NO_ERROR);
     EXPECT_EQ(unit, ClosureUnitEnum::kUnknownEnumValue);
-    
+
     EXPECT_EQ(logic->GetUnitRange(unitRange), CHIP_NO_ERROR);
     EXPECT_EQ(unitRange.IsNull(), true);
 
@@ -283,7 +283,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetAttributesNoFeatures)
     EXPECT_EQ(logic->GetStepValue(stepValue), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     EXPECT_EQ(logic->GetUnit(unit), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    
+
     EXPECT_EQ(logic->GetUnitRange(unitRange), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     EXPECT_EQ(logic->GetLimitRange(limitRange), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
@@ -388,8 +388,8 @@ TEST_F(TestClosureDimensionClusterLogic, TestGetAttributesUninitialized)
     TestDelegate delegate;
     MockedMatterContext context(1);
     auto logic = std::make_unique<ClusterLogic>(delegate, context);
-    
-    
+
+
     GenericCurrentStateStruct currentState;
     GenericTargetStruct target;
     Percent100ths resolution;
@@ -430,16 +430,16 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetAttributesUninitialized)
     TestDelegate delegate;
     MockedMatterContext context(1);
     auto logic = std::make_unique<ClusterLogic>(delegate, context);
-    
-    
+
+
     GenericCurrentStateStruct currentState{
-        Optional<Percent100ths>(0), 
-        Optional<LatchingEnum>(LatchingEnum::kNotLatched), 
+        Optional<Percent100ths>(0),
+        Optional<LatchingEnum>(LatchingEnum::kNotLatched),
         Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto)
         };
     GenericTargetStruct target{
-        Optional<Percent100ths>(0), 
-        Optional<TargetLatchEnum>(TargetLatchEnum::kUnlatch), 
+        Optional<Percent100ths>(0),
+        Optional<TargetLatchEnum>(TargetLatchEnum::kUnlatch),
         Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto)
         };
     Percent100ths resolution = 1;
@@ -480,14 +480,14 @@ TEST_F(TestClosureDimensionClusterLogic, TestGetAttributesNoFeatures)
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
 
     GenericCurrentStateStruct testcurrentState{
-        Optional<Percent100ths>(0), 
-        Optional<LatchingEnum>(LatchingEnum::kNotLatched), 
+        Optional<Percent100ths>(0),
+        Optional<LatchingEnum>(LatchingEnum::kNotLatched),
         Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto)
         };
     GenericCurrentStateStruct currentState;
     GenericTargetStruct testtarget{
-        Optional<Percent100ths>(0), 
-        Optional<TargetLatchEnum>(TargetLatchEnum::kUnlatch), 
+        Optional<Percent100ths>(0),
+        Optional<TargetLatchEnum>(TargetLatchEnum::kUnlatch),
         Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto)
         };
     GenericTargetStruct target;
@@ -500,14 +500,14 @@ TEST_F(TestClosureDimensionClusterLogic, TestGetAttributesNoFeatures)
     RotationAxisEnum rotationAxis = RotationAxisEnum::kBottom;
     OverflowEnum overflow = OverflowEnum::kBottomInside;
     ModulationTypeEnum modulationType = ModulationTypeEnum::kOpacity;
-    
+
     //As Feature conformance is not present, Current state should not be set
     EXPECT_EQ(logic->SetCurrentState(testcurrentState), CHIP_NO_ERROR);
     EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
     EXPECT_EQ(currentState.position, NullOptional);
     EXPECT_EQ(currentState.latching, NullOptional);
     EXPECT_EQ(currentState.speed, NullOptional);
-    
+
     //As Feature conformance is not present, Target should not be set
     EXPECT_EQ(logic->SetTarget(testtarget), CHIP_NO_ERROR);
     EXPECT_EQ(logic->GetTarget(target), CHIP_NO_ERROR);
@@ -520,7 +520,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestGetAttributesNoFeatures)
     EXPECT_EQ(logic->SetStepValue(stepValue), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     EXPECT_EQ(logic->SetUnit(unit), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    
+
     EXPECT_EQ(logic->SetUnitRange(unitRange), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     EXPECT_EQ(logic->SetLimitRange(limitRange), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
@@ -534,7 +534,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestGetAttributesNoFeatures)
     EXPECT_EQ(logic->SetModulationType(modulationType), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 }
 
-// This test ensures that the Set function  
+// This test ensures that the Set function
 // - sets the value properly including
 // - constraints checks
 TEST_F(TestClosureDimensionClusterLogic, TestSetCurrentStateValues)
@@ -544,10 +544,10 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetCurrentStateValues)
     MockedMatterContext context(endpoint);
     auto logic = std::make_unique<ClusterLogic>(delegate, context);
 
-    
+
     GenericCurrentStateStruct testCurrentState{
-        Optional<Percent100ths>(0), 
-        Optional<LatchingEnum>(LatchingEnum::kNotLatched), 
+        Optional<Percent100ths>(0),
+        Optional<LatchingEnum>(LatchingEnum::kNotLatched),
         Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto)
         };
     GenericCurrentStateStruct currentState;
@@ -557,7 +557,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetCurrentStateValues)
 
     ClusterConformance conformance = { .featureMap = 255,
                                        .supportsOverflow = true };
-                                       
+
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
 
     EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
@@ -571,36 +571,36 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetCurrentStateValues)
     // Ensure the value is accessible via the API
     EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
     EXPECT_EQ(currentState, testCurrentState);
-    
+
     //Change values
-    testCurrentState.Set(Optional<Percent100ths>(10000), 
-    Optional<LatchingEnum>(LatchingEnum::kLatchedAndSecured), 
+    testCurrentState.Set(Optional<Percent100ths>(10000),
+    Optional<LatchingEnum>(LatchingEnum::kLatchedAndSecured),
     Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh));
     EXPECT_EQ(logic->SetCurrentState(testCurrentState), CHIP_NO_ERROR);
     EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
     EXPECT_EQ(currentState, testCurrentState);
 
     //Invlaid position
-    GenericCurrentStateStruct InvalidCurrentState{Optional<Percent100ths>(10001), 
-        Optional<LatchingEnum>(LatchingEnum::kLatchedButNotSecured), 
+    GenericCurrentStateStruct InvalidCurrentState{Optional<Percent100ths>(10001),
+        Optional<LatchingEnum>(LatchingEnum::kLatchedButNotSecured),
         Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow)};
     EXPECT_EQ(logic->SetCurrentState(InvalidCurrentState), CHIP_ERROR_INVALID_ARGUMENT);
     // Ensure the value wasn't changed
     EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
     EXPECT_EQ(currentState, testCurrentState);
-    
+
     //Invalid latching
-    InvalidCurrentState.Set(Optional<Percent100ths>(10000), 
-        Optional<LatchingEnum>(LatchingEnum::kUnknownEnumValue), 
+    InvalidCurrentState.Set(Optional<Percent100ths>(10000),
+        Optional<LatchingEnum>(LatchingEnum::kUnknownEnumValue),
         Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow));
     EXPECT_EQ(logic->SetCurrentState(InvalidCurrentState), CHIP_ERROR_INVALID_ARGUMENT);
      // Ensure the value wasn't changed
      EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
      EXPECT_EQ(currentState, testCurrentState);
-     
-    //Invalid speed 
-    InvalidCurrentState.Set(Optional<Percent100ths>(10000), 
-        Optional<LatchingEnum>(LatchingEnum::kLatchedButNotSecured), 
+
+    //Invalid speed
+    InvalidCurrentState.Set(Optional<Percent100ths>(10000),
+        Optional<LatchingEnum>(LatchingEnum::kLatchedButNotSecured),
         Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kUnknownEnumValue));
     EXPECT_EQ(logic->SetCurrentState(InvalidCurrentState), CHIP_ERROR_INVALID_ARGUMENT);
      // Ensure the value wasn't changed
@@ -608,7 +608,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetCurrentStateValues)
      EXPECT_EQ(currentState, testCurrentState);
 }
 
-// This test ensures that the Set function  
+// This test ensures that the Set function
 // - checks conformance properly
 TEST_F(TestClosureDimensionClusterLogic, TestSetCurrentStateOnlyPosition)
 {
@@ -617,10 +617,10 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetCurrentStateOnlyPosition)
     MockedMatterContext context(endpoint);
     auto logic = std::make_unique<ClusterLogic>(delegate, context);
 
-    
+
     GenericCurrentStateStruct testCurrentState{
-        Optional<Percent100ths>(0), 
-        Optional<LatchingEnum>(LatchingEnum::kNotLatched), 
+        Optional<Percent100ths>(0),
+        Optional<LatchingEnum>(LatchingEnum::kNotLatched),
         Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto)
         };
     GenericCurrentStateStruct currentState;
@@ -630,7 +630,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetCurrentStateOnlyPosition)
 
     ClusterConformance conformance = { .featureMap = 1,
                                        .supportsOverflow = false };
-                                       
+
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
 
     EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
@@ -649,7 +649,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetCurrentStateOnlyPosition)
     EXPECT_EQ(currentState.speed, DataModel::NullNullable);
 }
 
-// This test ensures that the Set function  
+// This test ensures that the Set function
 // - checks conformance properly
 TEST_F(TestClosureDimensionClusterLogic, TestSetCurrentStateOnlylatching)
 {
@@ -658,10 +658,10 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetCurrentStateOnlylatching)
     MockedMatterContext context(endpoint);
     auto logic = std::make_unique<ClusterLogic>(delegate, context);
 
-    
+
     GenericCurrentStateStruct testCurrentState{
-        Optional<Percent100ths>(0), 
-        Optional<LatchingEnum>(LatchingEnum::kNotLatched), 
+        Optional<Percent100ths>(0),
+        Optional<LatchingEnum>(LatchingEnum::kNotLatched),
         Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto)
         };
     GenericCurrentStateStruct currentState;
@@ -671,7 +671,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetCurrentStateOnlylatching)
 
     ClusterConformance conformance = { .featureMap = 2,
                                        .supportsOverflow = false };
-                                       
+
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
 
     EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
@@ -690,7 +690,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetCurrentStateOnlylatching)
     EXPECT_EQ(currentState.speed, DataModel::NullNullable);
 }
 
-// This test ensures that the Set function  
+// This test ensures that the Set function
 // - checks conformance properly
 TEST_F(TestClosureDimensionClusterLogic, TestSetCurrentStateOnlyspeed)
 {
@@ -699,10 +699,10 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetCurrentStateOnlyspeed)
     MockedMatterContext context(endpoint);
     auto logic = std::make_unique<ClusterLogic>(delegate, context);
 
-    
+
     GenericCurrentStateStruct testCurrentState{
-        Optional<Percent100ths>(0), 
-        Optional<LatchingEnum>(LatchingEnum::kNotLatched), 
+        Optional<Percent100ths>(0),
+        Optional<LatchingEnum>(LatchingEnum::kNotLatched),
         Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto)
         };
     GenericCurrentStateStruct currentState;
@@ -712,7 +712,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetCurrentStateOnlyspeed)
 
     ClusterConformance conformance = { .featureMap = 16,
                                        .supportsOverflow = false };
-                                       
+
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
 
     EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
@@ -731,7 +731,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetCurrentStateOnlyspeed)
     EXPECT_EQ(currentState.latching, DataModel::NullNullable);
 }
 
-// This test ensures that the Set function  
+// This test ensures that the Set function
 // - sets the value properly including
 // - constraints checks
 TEST_F(TestClosureDimensionClusterLogic, TestSetTargetValues)
@@ -741,10 +741,10 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetTargetValues)
     MockedMatterContext context(endpoint);
     auto logic = std::make_unique<ClusterLogic>(delegate, context);
 
-    
+
     GenericTargetStruct testTarget{
-        Optional<Percent100ths>(0), 
-        Optional<TargetLatchEnum>(TargetLatchEnum::kUnlatch), 
+        Optional<Percent100ths>(0),
+        Optional<TargetLatchEnum>(TargetLatchEnum::kUnlatch),
         Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto)
         };
     GenericTargetStruct Target;
@@ -754,7 +754,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetTargetValues)
 
     ClusterConformance conformance = { .featureMap = 255,
                                        .supportsOverflow = true };
-                                       
+
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
 
     EXPECT_EQ(logic->GetTarget(Target), CHIP_NO_ERROR);
@@ -768,36 +768,36 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetTargetValues)
     // Ensure the value is accessible via the API
     EXPECT_EQ(logic->GetTarget(Target), CHIP_NO_ERROR);
     EXPECT_EQ(Target, testTarget);
-    
+
     //Change values
-    testTarget.Set(Optional<Percent100ths>(10000), 
-    Optional<TargetLatchEnum>(TargetLatchEnum::kLatch), 
+    testTarget.Set(Optional<Percent100ths>(10000),
+    Optional<TargetLatchEnum>(TargetLatchEnum::kLatch),
     Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh));
     EXPECT_EQ(logic->SetTarget(testTarget), CHIP_NO_ERROR);
     EXPECT_EQ(logic->GetTarget(Target), CHIP_NO_ERROR);
     EXPECT_EQ(Target, testTarget);
 
     //Invlaid position
-    GenericTargetStruct InvalidTarget{Optional<Percent100ths>(10001), 
-        Optional<TargetLatchEnum>(TargetLatchEnum::kUnlatch), 
+    GenericTargetStruct InvalidTarget{Optional<Percent100ths>(10001),
+        Optional<TargetLatchEnum>(TargetLatchEnum::kUnlatch),
         Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow)};
     EXPECT_EQ(logic->SetTarget(InvalidTarget), CHIP_ERROR_INVALID_ARGUMENT);
     // Ensure the value wasn't changed
     EXPECT_EQ(logic->GetTarget(Target), CHIP_NO_ERROR);
     EXPECT_EQ(Target, testTarget);
-    
+
     //Invalid latch
-    InvalidTarget.Set(Optional<Percent100ths>(100), 
-    Optional<TargetLatchEnum>(TargetLatchEnum::kUnknownEnumValue), 
+    InvalidTarget.Set(Optional<Percent100ths>(100),
+    Optional<TargetLatchEnum>(TargetLatchEnum::kUnknownEnumValue),
     Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto));
     EXPECT_EQ(logic->SetTarget(InvalidTarget), CHIP_ERROR_INVALID_ARGUMENT);
      // Ensure the value wasn't changed
      EXPECT_EQ(logic->GetTarget(Target), CHIP_NO_ERROR);
      EXPECT_EQ(Target, testTarget);
-     
-    //Invalid speed 
-    InvalidTarget.Set(Optional<Percent100ths>(100), 
-    Optional<TargetLatchEnum>(TargetLatchEnum::kUnlatch), 
+
+    //Invalid speed
+    InvalidTarget.Set(Optional<Percent100ths>(100),
+    Optional<TargetLatchEnum>(TargetLatchEnum::kUnlatch),
     Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kUnknownEnumValue));
     EXPECT_EQ(logic->SetTarget(InvalidTarget), CHIP_ERROR_INVALID_ARGUMENT);
      // Ensure the value wasn't changed
@@ -805,7 +805,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetTargetValues)
      EXPECT_EQ(Target, testTarget);
 }
 
-// This test ensures that the Set function  
+// This test ensures that the Set function
 // - checks conformance properly
 TEST_F(TestClosureDimensionClusterLogic, TestSetTargetOnlyPosition)
 {
@@ -814,10 +814,10 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetTargetOnlyPosition)
     MockedMatterContext context(endpoint);
     auto logic = std::make_unique<ClusterLogic>(delegate, context);
 
-    
+
     GenericTargetStruct testTarget{
-        Optional<Percent100ths>(0), 
-        Optional<TargetLatchEnum>(TargetLatchEnum::kUnlatch), 
+        Optional<Percent100ths>(0),
+        Optional<TargetLatchEnum>(TargetLatchEnum::kUnlatch),
         Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto)
         };
     GenericTargetStruct Target;
@@ -827,7 +827,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetTargetOnlyPosition)
 
     ClusterConformance conformance = { .featureMap = 1,
                                        .supportsOverflow = false };
-                                       
+
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
 
     EXPECT_EQ(logic->GetTarget(Target), CHIP_NO_ERROR);
@@ -846,7 +846,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetTargetOnlyPosition)
     EXPECT_EQ(Target.speed, DataModel::NullNullable);
 }
 
-// This test ensures that the Set function  
+// This test ensures that the Set function
 // - checks conformance properly
 TEST_F(TestClosureDimensionClusterLogic, TestSetTargetOnlylatch)
 {
@@ -855,10 +855,10 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetTargetOnlylatch)
     MockedMatterContext context(endpoint);
     auto logic = std::make_unique<ClusterLogic>(delegate, context);
 
-    
+
     GenericTargetStruct testTarget{
-        Optional<Percent100ths>(0), 
-        Optional<TargetLatchEnum>(TargetLatchEnum::kUnlatch), 
+        Optional<Percent100ths>(0),
+        Optional<TargetLatchEnum>(TargetLatchEnum::kUnlatch),
         Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto)
         };
     GenericTargetStruct Target;
@@ -868,7 +868,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetTargetOnlylatch)
 
     ClusterConformance conformance = { .featureMap = 2,
                                        .supportsOverflow = false };
-                                       
+
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
 
     EXPECT_EQ(logic->GetTarget(Target), CHIP_NO_ERROR);
@@ -887,7 +887,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetTargetOnlylatch)
     EXPECT_EQ(Target.speed, DataModel::NullNullable);
 }
 
-// This test ensures that the Set function  
+// This test ensures that the Set function
 // - checks conformance properly
 TEST_F(TestClosureDimensionClusterLogic, TestSetTargetOnlyspeed)
 {
@@ -896,10 +896,10 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetTargetOnlyspeed)
     MockedMatterContext context(endpoint);
     auto logic = std::make_unique<ClusterLogic>(delegate, context);
 
-    
+
     GenericTargetStruct testTarget{
-        Optional<Percent100ths>(0), 
-        Optional<TargetLatchEnum>(TargetLatchEnum::kUnlatch), 
+        Optional<Percent100ths>(0),
+        Optional<TargetLatchEnum>(TargetLatchEnum::kUnlatch),
         Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto)
         };
     GenericTargetStruct Target;
@@ -909,7 +909,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetTargetOnlyspeed)
 
     ClusterConformance conformance = { .featureMap = 16,
                                        .supportsOverflow = false };
-                                       
+
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
 
     EXPECT_EQ(logic->GetTarget(Target), CHIP_NO_ERROR);
@@ -928,7 +928,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetTargetOnlyspeed)
     EXPECT_EQ(Target.latch, DataModel::NullNullable);
 }
 
-// This test ensures that the Set function  
+// This test ensures that the Set function
 // - sets the value properly including
 // - constraints checks
 TEST_F(TestClosureDimensionClusterLogic, TestSetResolution)
@@ -938,7 +938,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetResolution)
     MockedMatterContext context(endpoint);
     auto logic = std::make_unique<ClusterLogic>(delegate, context);
 
-    
+
     Percent100ths testResolution = 10;
     Percent100ths Resolution;
 
@@ -947,7 +947,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetResolution)
 
     ClusterConformance conformance = { .featureMap = 255,
                                        .supportsOverflow = true };
-                                       
+
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
 
     EXPECT_EQ(logic->GetResolution(Resolution), CHIP_NO_ERROR);
@@ -959,7 +959,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetResolution)
     // Ensure the value is accessible via the API
     EXPECT_EQ(logic->GetResolution(Resolution), CHIP_NO_ERROR);
     EXPECT_EQ(Resolution, testResolution);
-    
+
     //Change values
     testResolution = 100;
     EXPECT_EQ(logic->SetResolution(testResolution), CHIP_NO_ERROR);
@@ -974,7 +974,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetResolution)
     EXPECT_EQ(Resolution, testResolution);
 }
 
-// This test ensures that the Set function  
+// This test ensures that the Set function
 // - sets the value properly including
 // - constraints checks
 TEST_F(TestClosureDimensionClusterLogic, TestStepValue)
@@ -984,7 +984,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestStepValue)
     MockedMatterContext context(endpoint);
     auto logic = std::make_unique<ClusterLogic>(delegate, context);
 
-    
+
     Percent100ths testStepValue = 10;
     Percent100ths StepValue;
 
@@ -993,7 +993,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestStepValue)
 
     ClusterConformance conformance = { .featureMap = 255,
                                        .supportsOverflow = true };
-                                       
+
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
 
     EXPECT_EQ(logic->GetStepValue(StepValue), CHIP_NO_ERROR);
@@ -1005,7 +1005,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestStepValue)
     // Ensure the value is accessible via the API
     EXPECT_EQ(logic->GetStepValue(StepValue), CHIP_NO_ERROR);
     EXPECT_EQ(StepValue, testStepValue);
-    
+
     //Change values
     testStepValue = 100;
     EXPECT_EQ(logic->SetStepValue(testStepValue), CHIP_NO_ERROR);
@@ -1020,7 +1020,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestStepValue)
     EXPECT_EQ(StepValue, testStepValue);
 }
 
-// This test ensures that the Set function  
+// This test ensures that the Set function
 // - sets the value properly including
 // - constraints checks
 TEST_F(TestClosureDimensionClusterLogic, TestUnit)
@@ -1030,7 +1030,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestUnit)
     MockedMatterContext context(endpoint);
     auto logic = std::make_unique<ClusterLogic>(delegate, context);
 
-    
+
     ClosureUnitEnum testUnit = ClosureUnitEnum::kDegree;
     ClosureUnitEnum Unit;
 
@@ -1039,7 +1039,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestUnit)
 
     ClusterConformance conformance = { .featureMap = 255,
                                        .supportsOverflow = true };
-                                       
+
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
 
     EXPECT_EQ(logic->GetUnit(Unit), CHIP_NO_ERROR);
@@ -1051,7 +1051,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestUnit)
     // Ensure the value is accessible via the API
     EXPECT_EQ(logic->GetUnit(Unit), CHIP_NO_ERROR);
     EXPECT_EQ(Unit, testUnit);
-    
+
     //Change values
     testUnit = ClosureUnitEnum::kMillimeter;
     EXPECT_EQ(logic->SetUnit(testUnit), CHIP_NO_ERROR);
@@ -1066,7 +1066,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestUnit)
     EXPECT_EQ(Unit, testUnit);
 }
 
-// This test ensures that the Set function  
+// This test ensures that the Set function
 // - sets the value properly including
 // - constraints checks
 TEST_F(TestClosureDimensionClusterLogic, TestUnitRange)
@@ -1087,7 +1087,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestUnitRange)
 
     ClusterConformance conformance = { .featureMap = 255,
                                        .supportsOverflow = true };
-                                       
+
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
 
     EXPECT_EQ(logic->GetUnitRange(UnitRange), CHIP_NO_ERROR);
@@ -1100,26 +1100,26 @@ TEST_F(TestClosureDimensionClusterLogic, TestUnitRange)
     EXPECT_EQ(logic->GetUnitRange(UnitRange), CHIP_NO_ERROR);
     EXPECT_EQ(UnitRange.Value().min, testUnitRange.Value().min);
     EXPECT_EQ(UnitRange.Value().max, testUnitRange.Value().max);
-    
+
     //Change values
     testUnitRange = DataModel::Nullable<Structs::UnitRangeStruct::Type>(newUnitRange);
     EXPECT_EQ(logic->SetUnitRange(testUnitRange), CHIP_NO_ERROR);
     EXPECT_EQ(logic->GetUnitRange(UnitRange), CHIP_NO_ERROR);
     EXPECT_EQ(UnitRange.Value().min, testUnitRange.Value().min);
     EXPECT_EQ(UnitRange.Value().max, testUnitRange.Value().max);
-    
+
     //Change to Null
     testUnitRange.SetNull();
     EXPECT_EQ(logic->SetUnitRange(testUnitRange), CHIP_NO_ERROR);
     EXPECT_EQ(logic->GetUnitRange(UnitRange), CHIP_NO_ERROR);
     EXPECT_EQ(UnitRange.IsNull(), true);
-    
+
     //Invalid Values
     testUnitRange = DataModel::Nullable<Structs::UnitRangeStruct::Type>(invalidUnitRange);
     EXPECT_EQ(logic->SetUnitRange(testUnitRange), CHIP_ERROR_INVALID_ARGUMENT);
 }
 
-// This test ensures that the Set function  
+// This test ensures that the Set function
 // - sets the value properly including
 // - constraints checks
 TEST_F(TestClosureDimensionClusterLogic, TestLimitRange)
@@ -1137,7 +1137,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestLimitRange)
 
     ClusterConformance conformance = { .featureMap = 255,
                                        .supportsOverflow = true };
-                                       
+
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
 
     EXPECT_EQ(logic->GetLimitRange(LimitRange), CHIP_NO_ERROR);
@@ -1151,14 +1151,14 @@ TEST_F(TestClosureDimensionClusterLogic, TestLimitRange)
     EXPECT_EQ(logic->GetLimitRange(LimitRange), CHIP_NO_ERROR);
     EXPECT_EQ(LimitRange.min, testLimitRange.min);
     EXPECT_EQ(LimitRange.max, testLimitRange.max);
-    
+
     //Change values
     testLimitRange = { .min = 10, .max = 100};
     EXPECT_EQ(logic->SetLimitRange(testLimitRange), CHIP_NO_ERROR);
     EXPECT_EQ(logic->GetLimitRange(LimitRange), CHIP_NO_ERROR);
     EXPECT_EQ(LimitRange.min, testLimitRange.min);
     EXPECT_EQ(LimitRange.max, testLimitRange.max);
-    
+
     //Invalid Values
     testLimitRange = { .min = 10001, .max = 100};
     EXPECT_EQ(logic->SetLimitRange(testLimitRange), CHIP_ERROR_INVALID_ARGUMENT);
@@ -1166,11 +1166,11 @@ TEST_F(TestClosureDimensionClusterLogic, TestLimitRange)
     EXPECT_EQ(logic->SetLimitRange(testLimitRange), CHIP_ERROR_INVALID_ARGUMENT);
     testLimitRange = { .min = 10000, .max = 0};
     EXPECT_EQ(logic->SetLimitRange(testLimitRange), CHIP_ERROR_INVALID_ARGUMENT);
-    
-    
+
+
 }
 
-// This test ensures that the Set function  
+// This test ensures that the Set function
 // - sets the value properly including
 // - constraints checks
 TEST_F(TestClosureDimensionClusterLogic, TestTranslationDirection)
@@ -1180,7 +1180,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestTranslationDirection)
     MockedMatterContext context(endpoint);
     auto logic = std::make_unique<ClusterLogic>(delegate, context);
 
-    
+
     TranslationDirectionEnum testTranslationDirection = TranslationDirectionEnum::kBackward;
     TranslationDirectionEnum TranslationDirection;
 
@@ -1189,7 +1189,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestTranslationDirection)
 
     ClusterConformance conformance = { .featureMap = 255,
                                        .supportsOverflow = true };
-                                       
+
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
 
     EXPECT_EQ(logic->GetTranslationDirection(TranslationDirection), CHIP_NO_ERROR);
@@ -1201,7 +1201,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestTranslationDirection)
     // Ensure the value is accessible via the API
     EXPECT_EQ(logic->GetTranslationDirection(TranslationDirection), CHIP_NO_ERROR);
     EXPECT_EQ(TranslationDirection, testTranslationDirection);
-    
+
     //Change values
     testTranslationDirection = TranslationDirectionEnum::kCeilingCenteredSymmetry;
     EXPECT_EQ(logic->SetTranslationDirection(testTranslationDirection), CHIP_NO_ERROR);
@@ -1216,7 +1216,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestTranslationDirection)
     EXPECT_EQ(TranslationDirection, testTranslationDirection);
 }
 
-// This test ensures that the Set function  
+// This test ensures that the Set function
 // - sets the value properly including
 // - constraints checks
 TEST_F(TestClosureDimensionClusterLogic, TestRotationAxis)
@@ -1226,7 +1226,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestRotationAxis)
     MockedMatterContext context(endpoint);
     auto logic = std::make_unique<ClusterLogic>(delegate, context);
 
-    
+
     RotationAxisEnum testRotationAxis = RotationAxisEnum::kBottom;
     RotationAxisEnum RotationAxis;
 
@@ -1235,7 +1235,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestRotationAxis)
 
     ClusterConformance conformance = { .featureMap = 255,
                                        .supportsOverflow = true };
-                                       
+
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
 
     EXPECT_EQ(logic->GetRotationAxis(RotationAxis), CHIP_NO_ERROR);
@@ -1247,7 +1247,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestRotationAxis)
     // Ensure the value is accessible via the API
     EXPECT_EQ(logic->GetRotationAxis(RotationAxis), CHIP_NO_ERROR);
     EXPECT_EQ(RotationAxis, testRotationAxis);
-    
+
     //Change values
     testRotationAxis = RotationAxisEnum::kCenteredHorizontal;
     EXPECT_EQ(logic->SetRotationAxis(testRotationAxis), CHIP_NO_ERROR);
@@ -1262,7 +1262,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestRotationAxis)
     EXPECT_EQ(RotationAxis, testRotationAxis);
 }
 
-// This test ensures that the Set function  
+// This test ensures that the Set function
 // - sets the value properly including
 // - constraints checks
 TEST_F(TestClosureDimensionClusterLogic, TestOverflow)
@@ -1272,7 +1272,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestOverflow)
     MockedMatterContext context(endpoint);
     auto logic = std::make_unique<ClusterLogic>(delegate, context);
 
-    
+
     OverflowEnum testOverflow = OverflowEnum::kBottomInside;
     OverflowEnum Overflow;
 
@@ -1281,7 +1281,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestOverflow)
 
     ClusterConformance conformance = { .featureMap = 255,
                                        .supportsOverflow = true };
-                                       
+
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
 
     EXPECT_EQ(logic->GetOverflow(Overflow), CHIP_NO_ERROR);
@@ -1293,7 +1293,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestOverflow)
     // Ensure the value is accessible via the API
     EXPECT_EQ(logic->GetOverflow(Overflow), CHIP_NO_ERROR);
     EXPECT_EQ(Overflow, testOverflow);
-    
+
     //Change values
     testOverflow = OverflowEnum::kBottomOutside;
     EXPECT_EQ(logic->SetOverflow(testOverflow), CHIP_NO_ERROR);
@@ -1308,7 +1308,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestOverflow)
     EXPECT_EQ(Overflow, testOverflow);
 }
 
-// This test ensures that the Set function  
+// This test ensures that the Set function
 // - sets the value properly including
 // - constraints checks
 TEST_F(TestClosureDimensionClusterLogic, TestModulationType)
@@ -1318,7 +1318,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestModulationType)
     MockedMatterContext context(endpoint);
     auto logic = std::make_unique<ClusterLogic>(delegate, context);
 
-    
+
     ModulationTypeEnum testModulationType = ModulationTypeEnum::kOpacity;
     ModulationTypeEnum ModulationType;
 
@@ -1327,7 +1327,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestModulationType)
 
     ClusterConformance conformance = { .featureMap = 255,
                                        .supportsOverflow = true };
-                                       
+
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
 
     EXPECT_EQ(logic->GetModulationType(ModulationType), CHIP_NO_ERROR);
@@ -1339,7 +1339,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestModulationType)
     // Ensure the value is accessible via the API
     EXPECT_EQ(logic->GetModulationType(ModulationType), CHIP_NO_ERROR);
     EXPECT_EQ(ModulationType, testModulationType);
-    
+
     //Change values
     testModulationType = ModulationTypeEnum::kSlatsOpenwork;
     EXPECT_EQ(logic->SetModulationType(testModulationType), CHIP_NO_ERROR);
@@ -1376,23 +1376,23 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommand)
                                        .supportsOverflow = true};
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
 
-    
+
     GenericCurrentStateStruct currentState;
     GenericTargetStruct target;
-    
+
     context.ClearDirtyList();
-    EXPECT_EQ(logic->HandleSetTargetCommand(Optional<Percent100ths>(10), Optional<TargetLatchEnum>(TargetLatchEnum::kUnlatch), 
-        Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto)), Protocols::InteractionModel::Status::InvalidInState); 
-    
-    
+    EXPECT_EQ(logic->HandleSetTargetCommand(Optional<Percent100ths>(10), Optional<TargetLatchEnum>(TargetLatchEnum::kUnlatch),
+        Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto)), Protocols::InteractionModel::Status::InvalidInState);
+
+
     GenericCurrentStateStruct setCurrentState{
-        Optional<Percent100ths>(0), 
-        Optional<LatchingEnum>(LatchingEnum::kNotLatched), 
+        Optional<Percent100ths>(0),
+        Optional<LatchingEnum>(LatchingEnum::kNotLatched),
         Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto)
         };
     EXPECT_EQ(logic->SetCurrentState(setCurrentState), CHIP_NO_ERROR);
-    
-    
+
+
     context.ClearDirtyList();
     EXPECT_EQ(logic->HandleSetTargetCommand(NullOptional, NullOptional, NullOptional), Protocols::InteractionModel::Status::InvalidCommand);
     EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::Current::Id));
@@ -1400,8 +1400,8 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommand)
 
     //Check Target and current state after command
     context.ClearDirtyList();
-    EXPECT_EQ(logic->HandleSetTargetCommand(Optional<Percent100ths>(1000), Optional<TargetLatchEnum>(TargetLatchEnum::kLatch), 
-        Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh)), Protocols::InteractionModel::Status::Success);    
+    EXPECT_EQ(logic->HandleSetTargetCommand(Optional<Percent100ths>(1000), Optional<TargetLatchEnum>(TargetLatchEnum::kLatch),
+        Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh)), Protocols::InteractionModel::Status::Success);
     EXPECT_EQ(logic->GetTarget(target), CHIP_NO_ERROR);
     EXPECT_EQ(target.position.Value(),static_cast<unsigned short>(1000));
     EXPECT_EQ(target.latch.Value(), TargetLatchEnum::kLatch);
@@ -1409,7 +1409,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommand)
     EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::Target::Id));
 
     context.ClearDirtyList();
-    EXPECT_EQ(logic->HandleSetTargetCommand(Optional<Percent100ths>(10001), Optional<TargetLatchEnum>(TargetLatchEnum::kUnlatch), 
+    EXPECT_EQ(logic->HandleSetTargetCommand(Optional<Percent100ths>(10001), Optional<TargetLatchEnum>(TargetLatchEnum::kUnlatch),
         Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow)), Protocols::InteractionModel::Status::ConstraintError);
     EXPECT_EQ(logic->GetTarget(target), CHIP_NO_ERROR);
     EXPECT_EQ(target.position.Value(),static_cast<unsigned short>(1000));
@@ -1417,8 +1417,8 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommand)
     EXPECT_EQ(target.speed.Value(), Globals::ThreeLevelAutoEnum::kHigh);
     EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::Current::Id));
     EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::Target::Id));
-        
-    EXPECT_EQ(logic->HandleSetTargetCommand(Optional<Percent100ths>(10000), Optional<TargetLatchEnum>(TargetLatchEnum::kUnknownEnumValue), 
+
+    EXPECT_EQ(logic->HandleSetTargetCommand(Optional<Percent100ths>(10000), Optional<TargetLatchEnum>(TargetLatchEnum::kUnknownEnumValue),
         Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh)), Protocols::InteractionModel::Status::ConstraintError);
     EXPECT_EQ(logic->GetTarget(target), CHIP_NO_ERROR);
     EXPECT_EQ(target.position.Value(),static_cast<unsigned short>(1000));
@@ -1428,8 +1428,8 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommand)
     EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::Target::Id));
     EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::Current::Id));
     EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::Target::Id));
-            
-    EXPECT_EQ(logic->HandleSetTargetCommand(Optional<Percent100ths>(10000), Optional<TargetLatchEnum>(TargetLatchEnum::kLatch), 
+
+    EXPECT_EQ(logic->HandleSetTargetCommand(Optional<Percent100ths>(10000), Optional<TargetLatchEnum>(TargetLatchEnum::kLatch),
         Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kUnknownEnumValue)), Protocols::InteractionModel::Status::ConstraintError);
     EXPECT_EQ(logic->GetTarget(target), CHIP_NO_ERROR);
     EXPECT_EQ(target.position.Value(),static_cast<unsigned short>(1000));
@@ -1439,7 +1439,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommand)
     EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::Target::Id));
     EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::Current::Id));
     EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::Target::Id));
-    
+
 }
 
 // This test ensures Handle set Target command executes as expected. Tests:
@@ -1455,41 +1455,41 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommandConformace)
     ClusterConformance conformance = { .featureMap = 255,
                                        .supportsOverflow = true};
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
-    
+
     GenericCurrentStateStruct setCurrentState{
-        Optional<Percent100ths>(0), 
-        Optional<LatchingEnum>(LatchingEnum::kNotLatched), 
+        Optional<Percent100ths>(0),
+        Optional<LatchingEnum>(LatchingEnum::kNotLatched),
         Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto)
         };
     EXPECT_EQ(logic->SetCurrentState(setCurrentState), CHIP_NO_ERROR);
-    
+
     conformance = { .featureMap = 0,
                     .supportsOverflow = false};
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
-    
+
     context.ClearDirtyList();
-    EXPECT_EQ(logic->HandleSetTargetCommand(Optional<Percent100ths>(1000), Optional<TargetLatchEnum>(TargetLatchEnum::kLatch), 
-        Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh)), Protocols::InteractionModel::Status::Success);    
+    EXPECT_EQ(logic->HandleSetTargetCommand(Optional<Percent100ths>(1000), Optional<TargetLatchEnum>(TargetLatchEnum::kLatch),
+        Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh)), Protocols::InteractionModel::Status::Success);
     EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::Current::Id));
     EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::Target::Id));
-    
+
     conformance = { .featureMap = 1,
         .supportsOverflow = false};
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
 
     context.ClearDirtyList();
-    EXPECT_EQ(logic->HandleSetTargetCommand(Optional<Percent100ths>(1000), Optional<TargetLatchEnum>(TargetLatchEnum::kLatch), 
-        Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh)), Protocols::InteractionModel::Status::Success);    
+    EXPECT_EQ(logic->HandleSetTargetCommand(Optional<Percent100ths>(1000), Optional<TargetLatchEnum>(TargetLatchEnum::kLatch),
+        Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh)), Protocols::InteractionModel::Status::Success);
     EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::Current::Id));
     EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::Target::Id));
-    
+
     conformance = { .featureMap = 3,
         .supportsOverflow = false};
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
 
     context.ClearDirtyList();
-    EXPECT_EQ(logic->HandleSetTargetCommand(Optional<Percent100ths>(1000), Optional<TargetLatchEnum>(TargetLatchEnum::kLatch), 
-        Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh)), Protocols::InteractionModel::Status::Success);    
+    EXPECT_EQ(logic->HandleSetTargetCommand(Optional<Percent100ths>(1000), Optional<TargetLatchEnum>(TargetLatchEnum::kLatch),
+        Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh)), Protocols::InteractionModel::Status::Success);
     EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::Current::Id));
     EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::Target::Id));
 }
@@ -1505,10 +1505,10 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommandConformace)
 //     MockedMatterContext context(endpoint);
 //     auto logic = std::make_unique<ClusterLogic>(delegate, context);
 
-    
-//     EXPECT_DEATH(logic->HandleStepTarget(Optional<Percent100ths>(1000), Optional<TargetLatchEnum>(TargetLatchEnum::kLatch), 
-//     Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh)), Protocols::InteractionModel::Status::Success); 
-    
+
+//     EXPECT_DEATH(logic->HandleStepTarget(Optional<Percent100ths>(1000), Optional<TargetLatchEnum>(TargetLatchEnum::kLatch),
+//     Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh)), Protocols::InteractionModel::Status::Success);
+
 // }
 
 // This test ensures Handle Step command executes as expected. Tests:
@@ -1524,23 +1524,23 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommand)
     ClusterConformance conformance = { .featureMap = 247,
                                        .supportsOverflow = true};
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
-    
+
     context.ClearDirtyList();
-    EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kIncrease, 10, Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh)), 
-        Protocols::InteractionModel::Status::InvalidInState); 
+    EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kIncrease, 10, Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh)),
+        Protocols::InteractionModel::Status::InvalidInState);
 
     GenericCurrentStateStruct currentState;
     GenericTargetStruct target;
     Percent100ths stepValue = 10;
-    
+
     GenericCurrentStateStruct setCurrentState{
-        Optional<Percent100ths>(0), 
-        Optional<LatchingEnum>(LatchingEnum::kNotLatched), 
+        Optional<Percent100ths>(0),
+        Optional<LatchingEnum>(LatchingEnum::kNotLatched),
         Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto)
         };
     GenericTargetStruct settarget{
-        Optional<Percent100ths>(0), 
-        Optional<TargetLatchEnum>(TargetLatchEnum::kUnlatch), 
+        Optional<Percent100ths>(0),
+        Optional<TargetLatchEnum>(TargetLatchEnum::kUnlatch),
         Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto)
         };
     EXPECT_EQ(logic->SetCurrentState(setCurrentState), CHIP_NO_ERROR);
@@ -1549,8 +1549,8 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommand)
 
     //Check Target and current state after command
     context.ClearDirtyList();
-    EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kIncrease, 10, Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh)), 
-        Protocols::InteractionModel::Status::Success);    
+    EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kIncrease, 10, Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh)),
+        Protocols::InteractionModel::Status::Success);
     EXPECT_EQ(logic->GetTarget(target), CHIP_NO_ERROR);
     EXPECT_EQ(target.position.Value(),static_cast<unsigned short>(100));
     EXPECT_EQ(target.latch.Value(), TargetLatchEnum::kUnlatch);
@@ -1559,10 +1559,10 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommand)
     //As delegate is not implemented, we are updating current state here
     setCurrentState.position = Optional<Percent100ths>(100);
     EXPECT_EQ(logic->SetCurrentState(setCurrentState), CHIP_NO_ERROR);
-    
+
     context.ClearDirtyList();
-    EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kIncrease, 65535, Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kMedium)), 
-        Protocols::InteractionModel::Status::Success);    
+    EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kIncrease, 65535, Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kMedium)),
+        Protocols::InteractionModel::Status::Success);
     EXPECT_EQ(logic->GetTarget(target), CHIP_NO_ERROR);
     EXPECT_EQ(target.position.Value(),static_cast<unsigned short>(10000));
     EXPECT_EQ(target.latch.Value(), TargetLatchEnum::kUnlatch);
@@ -1571,10 +1571,10 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommand)
     //As delegate is not implemented, we are updating current state here
     setCurrentState.position = Optional<Percent100ths>(10000);
     EXPECT_EQ(logic->SetCurrentState(setCurrentState), CHIP_NO_ERROR);
-    
+
     context.ClearDirtyList();
-    EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kDecrease, 10, Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow)), 
-        Protocols::InteractionModel::Status::Success);    
+    EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kDecrease, 10, Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow)),
+        Protocols::InteractionModel::Status::Success);
     EXPECT_EQ(logic->GetTarget(target), CHIP_NO_ERROR);
     EXPECT_EQ(target.position.Value(),static_cast<unsigned short>(9900));
     EXPECT_EQ(target.latch.Value(), TargetLatchEnum::kUnlatch);
@@ -1583,10 +1583,10 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommand)
     //As delegate is not implemented, we are updating current state here
     setCurrentState.position = Optional<Percent100ths>(9900);
     EXPECT_EQ(logic->SetCurrentState(setCurrentState), CHIP_NO_ERROR);
-    
+
     context.ClearDirtyList();
-    EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kDecrease, 65535, Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto)), 
-        Protocols::InteractionModel::Status::Success);    
+    EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kDecrease, 65535, Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto)),
+        Protocols::InteractionModel::Status::Success);
     EXPECT_EQ(logic->GetTarget(target), CHIP_NO_ERROR);
     EXPECT_EQ(target.position.Value(),static_cast<unsigned short>(0));
     EXPECT_EQ(target.latch.Value(), TargetLatchEnum::kUnlatch);
@@ -1595,22 +1595,22 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommand)
     //As delegate is not implemented, we are updating current state here
     setCurrentState.position = Optional<Percent100ths>(0);
     EXPECT_EQ(logic->SetCurrentState(setCurrentState), CHIP_NO_ERROR);
-    
-    
+
+
     //Test with Limiting Feature enabled
     conformance = { .featureMap = 255,
         .supportsOverflow = true};
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
-    
+
     Structs::RangePercent100thsStruct::Type limitRange = { .min = 1000, .max = 9000};
     EXPECT_EQ(logic->SetLimitRange(limitRange), CHIP_NO_ERROR);
     setCurrentState.position = Optional<Percent100ths>(1000);
     EXPECT_EQ(logic->SetCurrentState(setCurrentState), CHIP_NO_ERROR);
     EXPECT_EQ(logic->SetStepValue(stepValue), CHIP_NO_ERROR);
-    
+
     context.ClearDirtyList();
-    EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kIncrease, 10 , Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow)), 
-        Protocols::InteractionModel::Status::Success);    
+    EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kIncrease, 10 , Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow)),
+        Protocols::InteractionModel::Status::Success);
     EXPECT_EQ(logic->GetTarget(target), CHIP_NO_ERROR);
     EXPECT_EQ(target.position.Value(),static_cast<unsigned short>(1100));
     EXPECT_EQ(target.latch.Value(), TargetLatchEnum::kUnlatch);
@@ -1619,10 +1619,10 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommand)
     //As delegate is not implemented, we are updating current state here
     setCurrentState.position = Optional<Percent100ths>(1100);
     EXPECT_EQ(logic->SetCurrentState(setCurrentState), CHIP_NO_ERROR);
-    
+
     context.ClearDirtyList();
-    EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kIncrease, 65535, Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kMedium)), 
-        Protocols::InteractionModel::Status::Success);    
+    EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kIncrease, 65535, Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kMedium)),
+        Protocols::InteractionModel::Status::Success);
     EXPECT_EQ(logic->GetTarget(target), CHIP_NO_ERROR);
     EXPECT_EQ(target.position.Value(),static_cast<unsigned short>(9000));
     EXPECT_EQ(target.latch.Value(), TargetLatchEnum::kUnlatch);
@@ -1631,10 +1631,10 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommand)
     //As delegate is not implemented, we are updating current state here
     setCurrentState.position = Optional<Percent100ths>(9000);
     EXPECT_EQ(logic->SetCurrentState(setCurrentState), CHIP_NO_ERROR);
-    
+
     context.ClearDirtyList();
-    EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kDecrease, 10, Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow)), 
-        Protocols::InteractionModel::Status::Success);    
+    EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kDecrease, 10, Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow)),
+        Protocols::InteractionModel::Status::Success);
     EXPECT_EQ(logic->GetTarget(target), CHIP_NO_ERROR);
     EXPECT_EQ(target.position.Value(),static_cast<unsigned short>(8900));
     EXPECT_EQ(target.latch.Value(), TargetLatchEnum::kUnlatch);
@@ -1643,10 +1643,10 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommand)
     //As delegate is not implemented, we are updating current state here
     setCurrentState.position = Optional<Percent100ths>(8900);
     EXPECT_EQ(logic->SetCurrentState(setCurrentState), CHIP_NO_ERROR);
-    
+
     context.ClearDirtyList();
-    EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kDecrease, 65535, Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto)), 
-        Protocols::InteractionModel::Status::Success);    
+    EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kDecrease, 65535, Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto)),
+        Protocols::InteractionModel::Status::Success);
     EXPECT_EQ(logic->GetTarget(target), CHIP_NO_ERROR);
     EXPECT_EQ(target.position.Value(),static_cast<unsigned short>(1000));
     EXPECT_EQ(target.latch.Value(), TargetLatchEnum::kUnlatch);
@@ -1655,25 +1655,25 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommand)
     //As delegate is not implemented, we are updating current state here
     setCurrentState.position = Optional<Percent100ths>(1000);
     EXPECT_EQ(logic->SetCurrentState(setCurrentState), CHIP_NO_ERROR);
-    
-    
+
+
 
     context.ClearDirtyList();
-    EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kUnknownEnumValue, 10, Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh)), 
-        Protocols::InteractionModel::Status::ConstraintError); 
+    EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kUnknownEnumValue, 10, Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh)),
+        Protocols::InteractionModel::Status::ConstraintError);
     EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::Current::Id));
     EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::Target::Id));
-        
-    EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kIncrease, 0, Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh)), 
-        Protocols::InteractionModel::Status::ConstraintError); 
+
+    EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kIncrease, 0, Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh)),
+        Protocols::InteractionModel::Status::ConstraintError);
     EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::Current::Id));
     EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::Target::Id));
-            
-    EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kIncrease, 10, Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kUnknownEnumValue)), 
-        Protocols::InteractionModel::Status::ConstraintError); 
+
+    EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kIncrease, 10, Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kUnknownEnumValue)),
+        Protocols::InteractionModel::Status::ConstraintError);
     EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::Current::Id));
     EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::Target::Id));
-    
+
 }
 
 // This test ensures Handle set Target command executes as expected. Tests:
@@ -1686,19 +1686,19 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommandConformace)
     EndpointId endpoint = 0;
     MockedMatterContext context(endpoint);
     auto logic = std::make_unique<ClusterLogic>(delegate, context);
-    
+
     ClusterConformance conformance = { .featureMap = 255,
         .supportsOverflow = true};
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
 
     GenericCurrentStateStruct setCurrentState{
-    Optional<Percent100ths>(0), 
-    Optional<LatchingEnum>(LatchingEnum::kNotLatched), 
+    Optional<Percent100ths>(0),
+    Optional<LatchingEnum>(LatchingEnum::kNotLatched),
     Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto)
     };
     GenericTargetStruct settarget{
-        Optional<Percent100ths>(0), 
-        Optional<TargetLatchEnum>(TargetLatchEnum::kUnlatch), 
+        Optional<Percent100ths>(0),
+        Optional<TargetLatchEnum>(TargetLatchEnum::kUnlatch),
         Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto)
     };
     EXPECT_EQ(logic->SetCurrentState(setCurrentState), CHIP_NO_ERROR);
@@ -1708,22 +1708,22 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommandConformace)
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
 
     GenericTargetStruct target;
-    
+
     context.ClearDirtyList();
-    EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kIncrease, 10, Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh)), 
-        Protocols::InteractionModel::Status::UnsupportedCommand);     
+    EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kIncrease, 10, Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh)),
+        Protocols::InteractionModel::Status::UnsupportedCommand);
     EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::Current::Id));
     EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::Target::Id));
-    
+
     conformance = { .featureMap = 3,
         .supportsOverflow = false};
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
-    
+
     EXPECT_EQ(logic->SetCurrentState(setCurrentState), CHIP_NO_ERROR);
     EXPECT_EQ(logic->SetTarget(settarget), CHIP_NO_ERROR);
 
     context.ClearDirtyList();
-    EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kIncrease, 10, Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh)), 
+    EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kIncrease, 10, Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh)),
         Protocols::InteractionModel::Status::Success);
     EXPECT_EQ(logic->GetTarget(target), CHIP_NO_ERROR);
     EXPECT_EQ(target.position.Value(),static_cast<unsigned short>(10));
