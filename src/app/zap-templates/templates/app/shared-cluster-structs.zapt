@@ -1,0 +1,45 @@
+{{> header}}
+#pragma once
+
+#include <app/data-model/DecodableList.h>
+#include <app/data-model/Decode.h>
+#include <app/data-model/Encode.h>
+#include <app/data-model/List.h>
+#include <app/data-model/NullObject.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/EventLoggingTypes.h>
+#include <lib/core/ClusterEnums.h>
+#include <lib/support/BitMask.h>
+#include <protocols/interaction_model/Constants.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+
+// Structs shared across multiple clusters.
+namespace detail {
+namespace Structs {
+
+{{#zcl_structs}}
+{{#if has_more_than_one_cluster}}
+{{> cluster_objects_struct header=true}}
+{{/if}}
+{{/zcl_structs}}
+} // namespace Structs
+} // namespace detail
+
+// Global structs.
+namespace Globals {
+namespace Structs {
+
+{{#zcl_structs}}
+{{#if has_no_clusters}}
+{{> cluster_objects_struct header=true}}
+
+{{/if}}
+{{/zcl_structs}}
+} // namespace Structs
+} // namespace Globals
+} // namespace Clusters
+} // namespace app
+} // namespace chip

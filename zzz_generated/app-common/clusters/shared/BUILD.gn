@@ -1,0 +1,25 @@
+import("//build_overrides/chip.gni")
+
+source_set("enums") {
+  sources = [
+    "Enums.h",
+    "EnumsCheck.h",
+  ]
+}
+
+source_set("elements") {
+  sources = [
+    "Attributes.h",
+    "Structs.h",
+    "Structs.cpp",
+  ]
+  public_deps = [
+    ":enums",
+    "${chip_root}/src/app:events",
+    "${chip_root}/src/app:paths",
+    "${chip_root}/src/app/common:global-ids",
+    "${chip_root}/src/app/data-model",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/protocols/interaction_model",
+  ]
+}

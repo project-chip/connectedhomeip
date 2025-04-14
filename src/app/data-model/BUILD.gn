@@ -40,6 +40,9 @@ source_set("data-model") {
     "List.h",
     "PreEncodedValue.cpp",
     "PreEncodedValue.h",
+    "StructDecodeIterator.cpp",
+    "StructDecodeIterator.h",
+    "WrappedStructEncoder.cpp",
     "WrappedStructEncoder.h",
   ]
 

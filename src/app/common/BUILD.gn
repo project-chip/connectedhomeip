@@ -14,7 +14,6 @@
 
 import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/common_flags.gni")
-import("${chip_root}/zzz_generated/app-common/clusters/all_items.gni")
 
 config("includes") {
   include_dirs = [ "${chip_app_zap_dir}" ]
@@ -40,7 +39,7 @@ source_set("ids") {
     "${chip_app_zap_dir}/app-common/zap-generated/ids/Events.h",
   ]
 
-  public_deps = chip_all_cluster_id_targets
+  public_deps = [ "${chip_root}/zzz_generated/app-common/clusters:all-ids" ]
 
   public_configs = [ ":includes" ]
 }
@@ -62,6 +61,8 @@ static_library("cluster-objects") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/protocols/interaction_model",
+    "${chip_root}/zzz_generated/app-common/clusters:all-headers",
+    "${chip_root}/zzz_generated/app-common/clusters/shared:elements",
   ]
 
   public_configs = [ ":includes" ]
@@ -74,5 +75,9 @@ source_set("enums") {
     "CompatEnumNames.h",
   ]
 
+  deps = [
+    "${chip_root}/zzz_generated/app-common/clusters:all-enums",
+    "${chip_root}/zzz_generated/app-common/clusters/shared:enums",
+  ]
   public_configs = [ ":includes" ]
 }
