@@ -19,8 +19,6 @@
  */
 
 #include "closure-dimension-cluster-logic.h"
-#include <cmsis_os2.h>
-
 
 namespace chip {
 namespace app {
@@ -47,9 +45,6 @@ CHIP_ERROR ClusterLogic::Init(const ClusterConformance & conformance)
 
 CHIP_ERROR ClusterLogic::SetCurrentState(const GenericCurrentStateStruct & acurrentState)
 {
-    ChipLogError(Zcl, ">>>>>>>>>>>>>>>>>>>>>>");
-    ChipLogError(Zcl, "ClosureControlManager::SetCurrentState");
-    ChipLogError(Zcl, "<<<<<<<<<<<<<<<<<<<<<");
     // TODO : Q reporting for this attribute
     // TODO: To implement the impact of the MoveTo command from the Closure Control cluster
 
@@ -63,7 +58,6 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const GenericCurrentStateStruct & acurr
         if (mConformance.HasFeature(Feature::kPositioning))
         {
             VerifyOrReturnError(currentState.position.Value() <= PERCENT100THS_MAX_VALUE, CHIP_ERROR_INVALID_ARGUMENT);
-            ChipLogError(Zcl, "ClosureControlManager::SetCurrentState 2");
         }
         else
         {
@@ -72,15 +66,12 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const GenericCurrentStateStruct & acurr
             currentState.position.ClearValue();
         }
     }
-    
-    ChipLogError(Zcl, "ClosureControlManager::SetCurrentState 3");
 
     if (currentState.latching.HasValue())
     {
         // If MotionLatching feature is supported,CurrentState latching SHALL be available else latching SHALL NOT be present
         if (mConformance.HasFeature(Feature::kMotionLatching))
         {
-            ChipLogError(Zcl, "ClosureControlManager::SetCurrentState 4");
             VerifyOrReturnError(EnsureKnownEnumValue(currentState.latching.Value()) != LatchingEnum::kUnknownEnumValue,
                                 CHIP_ERROR_INVALID_ARGUMENT);
         }
@@ -91,7 +82,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const GenericCurrentStateStruct & acurr
             currentState.latching.ClearValue();
         }
     }
-    ChipLogError(Zcl, "ClosureControlManager::SetCurrentState 5");
+
     if (currentState.speed.HasValue())
     {
         // If Speed feature is supported,CurrentState speed SHALL be available else speed SHALL NOT be present
@@ -99,7 +90,6 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const GenericCurrentStateStruct & acurr
         {
             VerifyOrReturnError(EnsureKnownEnumValue(currentState.speed.Value()) != Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
                                 CHIP_ERROR_INVALID_ARGUMENT);
-                                ChipLogError(Zcl, "ClosureControlManager::SetCurrentState 6");
         }
         else
         {
@@ -107,32 +97,30 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const GenericCurrentStateStruct & acurr
             currentState.speed.ClearValue();
         }
     }
-    ChipLogError(Zcl, "ClosureControlManager::SetCurrentState 7");
 
     // TODO: currentState.Position value SHALL follow the scaling from "Resolution Attribute".
-    // TODO : Fix the current object comparision
 
-    // if (currentState != mState.currentState)
-    // {
+    if (currentState != mState.currentState)
+    {
         mState.currentState = currentState;
         mMatterContext.MarkDirty(Attributes::Current::Id);
-        ChipLogError(Zcl, "ClosureControlManager::SetCurrentState 8");
-    // }
+    }
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ClusterLogic::SetTarget(const GenericTargetStruct & atarget)
 {
-    ChipLogDetail(Zcl, "SetTarget started");
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
+    
+    GenericTargetStruct target = atarget;
+
     if (target.position.HasValue())
     {
-        ChipLogDetail(Zcl, "target value incoming");
+        // If Positioning feature is supported,Target position SHALL be available else position SHALL NOT be present
         if (mConformance.HasFeature(Feature::kPositioning))
         {
-
             VerifyOrReturnError(target.position.Value() <= PERCENT100THS_MAX_VALUE, CHIP_ERROR_INVALID_ARGUMENT);
-            
         }
         else
         {
@@ -171,24 +159,13 @@ CHIP_ERROR ClusterLogic::SetTarget(const GenericTargetStruct & atarget)
         }
     }
 
-    if (mState.target.position.HasValue())
-    {
-        ChipLogDetail(Zcl, "mstate has value");
-    }
-    else
-    {
-        ChipLogDetail(Zcl, "mstate null");
-    }
-
     // TODO: Target.Position value SHALL follow the scaling from "Resolution Attribute".
-    // TODO : Fix the target object comparision
-    // if (target != mState.target)
-    // {
-        ChipLogDetail(Zcl, "SetTarget setting target");
+    if (target != mState.target)
+    {
         mState.target = target;
         mMatterContext.MarkDirty(Attributes::Target::Id);
-    // }
-    ChipLogDetail(Zcl, "SetTarget done");
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -524,42 +501,92 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
         target.speed = speed; 
     }
     
-    auto status = mClusterDriver.HandleSetTarget(position,latch,speed);
-
-    return status;
+    VerifyOrReturnError(SetTarget(target) == CHIP_NO_ERROR, Status::Failure);
+    // TODO: CHIP_ERROR err = mClusterDriver.HandleSetTarget(target.position, target.latch, target.speed);
+    return Status::Success;
 }
 
 Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t numberOfSteps,
                                        Optional<Globals::ThreeLevelAutoEnum> speed)
 {
-    VerifyOrReturnError(mInitialized, Status::Failure);
-    VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), Status::Failure);
-    // TODO: If any of the mandatory fields are missing then a status code of INVALID_COMMAND SHALL be returned and the Target
-    // attribute value SHALL remain unchanged.
-    VerifyOrReturnError(EnsureKnownEnumValue(direction) != StepDirectionEnum::kUnknownEnumValue, Status::ConstraintError);
-    // VerifyOrReturnError(EnsureKnownEnumValue(speed.Value()) != Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
-    //                     Status::ConstraintError);
+    VerifyOrDieWithMsg(mInitialized, NotSpecified, "Unexpected command recieved when device is yet to be initialized");
+    
+    // Return UnsupportedCommand if Positioning feature is not supported.
+    VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), Status::UnsupportedCommand);
+    
+    // Return ConstraintError if command parameters are out of bounds
+    VerifyOrReturnError(direction != StepDirectionEnum::kUnknownEnumValue, Status::ConstraintError);
+    VerifyOrReturnError(numberOfSteps > 0, Status::ConstraintError);
+    if (speed.HasValue())
+    {
+        VerifyOrReturnError(speed.Value() != Globals::ThreeLevelAutoEnum::kUnknownEnumValue,Status::ConstraintError);
+    }
+    
     // TODO: If the server is in a state where it cannot support the command, the server SHALL respond with an INVALID_IN_STATE
     // response and the Target attribute value SHALL remain unchanged.
-    VerifyOrReturnError(numberOfSteps != 0, Status::Success);
     // TODO: , this SHALL update the Target.Position attribute value e.g. by sending multiple commands with short step by step or a
     // single command with multiple steps.
-    GenericTargetStruct step_target;
-    GetTarget(step_target);
-    // TODO: If the Direction field is set to Decrease, the Position field of the Target attribute SHALL be set to: Position =
-    // Position - NumberOfSteps * StepValue and the value SHALL be clamped to 0.00% if the LM feature is not supported or
-    // LimitRange.Min if the LM feature is supported.
-    // TODO: If the Direction field is set to Increase, the Position field of the Target attribute SHALL be set to: Position =
-    // Position + NumberOfSteps * StepValue and the value SHALL be clamped to 100.00% if the LM feature is not supported or
-    // LimitRange.Max if the LM feature is supported.
+
+    GenericCurrentStateStruct currentState;
+    VerifyOrReturnError(GetCurrentState(currentState) == CHIP_NO_ERROR, Status::Failure);
+    // Check if the current position is valid or else return InvalidInState 
+    VerifyOrReturnValue(currentState.position.HasValue(), Status::InvalidInState);
+    
+    GenericTargetStruct stepTarget;
+    VerifyOrReturnError(GetTarget(stepTarget) == CHIP_NO_ERROR, Status::Failure);
+    
+    Percent100ths stepValue;
+    VerifyOrReturnError(GetStepValue(stepValue) == CHIP_NO_ERROR, Status::Failure);
+
+    //Derive Target Position from StepValue and NumberOfSteps.
+    int32_t currentPosition = static_cast<uint32_t>(currentState.position.Value());
+    
+    // Convert step to position delta
+    int32_t delta    = numberOfSteps * stepValue;
+    int32_t newPosition   = 0;
+    
+    // check if device supports Limitation feature, if yes fetch the LimitRange values
+    bool limitSupported = mConformance.HasFeature(Feature::kLimitation) ? true : false;
+    
+    Structs::RangePercent100thsStruct::Type limitRange;
+    if (limitSupported)
+    {
+        VerifyOrReturnError(GetLimitRange(limitRange) == CHIP_NO_ERROR, Status::Failure);
+    }
+
+    //Position = Position - NumberOfSteps * StepValue
+    switch (direction)
+    {
+        
+        case StepDirectionEnum::kDecrease:
+            newPosition = currentPosition - delta;
+            //Position value SHALL be clamped to 0.00% if the LM feature is not supported or LimitRange.Min if the LM feature is supported.
+            newPosition = limitSupported ? std::max(newPosition, static_cast<int32_t>(limitRange.min)) : std::max(newPosition, (int32_t)0);
+            break;
+            
+        case StepDirectionEnum::kIncrease:
+            newPosition = currentPosition + delta;
+            //Position value SHALL be clamped to 0.00% if the LM feature is not supported or LimitRange.Max if the LM feature is supported.
+            newPosition = limitSupported ? std::min(newPosition, static_cast<int32_t>(limitRange.max)) : std::min(newPosition, (int32_t)10000);
+            break;
+            
+        default:
+            // Should never reach here due to earlier VerifyOrReturnError check
+            ChipLogError(AppServer, "Unhandled StepDirectionEnum value");
+            return Status::ConstraintError;
+    }
+    
+    //set the target position
+    stepTarget.position.SetValue(static_cast<Percent100ths>(newPosition));
 
     if (speed.HasValue())
     {
         stepTarget.speed = speed;
     }
-    auto status = mClusterDriver.HandleStep(direction,numberOfSteps,speed);
 
-    return status;
+    VerifyOrReturnError(SetTarget(stepTarget) == CHIP_NO_ERROR, Status::Failure);
+    // TODO: CHIP_ERROR err = mClusterDriver.HandleStep(direction,numberOfSteps,speed);
+    return Status::Success;
 }
 } // namespace ClosureDimension
 } // namespace Clusters

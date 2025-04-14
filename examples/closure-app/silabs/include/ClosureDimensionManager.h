@@ -35,7 +35,7 @@ namespace ClosureDimension {
 using Protocols::InteractionModel::Status;
 
 // This is an application level delegate to handle Closure Dimension commands according to the specific business logic.
-class ClosureDimensionManager : public ClosureDimension::Delegate
+class ClosureDimensionDelegate : public DelegateBase
 {
 public:
     enum Action_t
@@ -167,11 +167,6 @@ private:
     ClusterLogic mLogic;
     Interface mInterface;
 };
-
-inline ClosureDimensionManager & ClosureCtrlMgr()
-{
-    return ClosureDimensionManager::sClosureCtrlMgr;
-}
 } // namespace ClosureDimension
 } // namespace Clusters
 } // namespace app
