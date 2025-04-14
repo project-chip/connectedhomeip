@@ -112,6 +112,15 @@ struct ClusterState
 };
 
 /**
+ * @brief Struct to store the cluster initialization parameters
+ */
+struct ClusterInitParameters
+{
+    MainStateEnum mMainState                               = MainStateEnum::kStopped;
+    DataModel::Nullable<GenericOverallState> mOverallState = DataModel::NullNullable;
+};
+
+/**
  * @brief Attribute Class Set interface
  *        Class is responsible for setting the attributes of the cluster and marking them as dirty if necessary.
  */
@@ -165,7 +174,7 @@ public:
      */
     CHIP_ERROR Init(const ClusterConformance & conformance);
 
-    // All Get functions - TODO update
+    // All Get functions
     // Return CHIP_ERROR_INCORRECT_STATE if the class has not been initialized.
     // Return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if the attribute is not supported by the conformance.
     // Otherwise return CHIP_NO_ERROR and set the input parameter value to the current cluster state value
@@ -174,9 +183,10 @@ public:
     CHIP_ERROR GetMainState(MainStateEnum & mainState);
     CHIP_ERROR GetOverallState(DataModel::Nullable<GenericOverallState> & overallState);
     CHIP_ERROR GetOverallTarget(DataModel::Nullable<GenericOverallTarget> & overallTarget);
-    CHIP_ERROR GetCurrentErrorList(DataModel::Nullable<ErrorList> & currentErrorList); // -> use delegate for this
 
-    // All Set functions - TODO update
+    // TODO: Add ErrorList guetter with its implementation
+
+    // All Set functions
     // Return CHIP_ERROR_INCORRECT_STATE if the class has not been initialized.
     // Return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if the attribute is not supported by the conformance.
     // Return CHIP_ERROR_INVALID_ARGUMENT if the input value is out of range.

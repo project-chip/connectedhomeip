@@ -129,12 +129,6 @@ CHIP_ERROR ClusterLogic::GetOverallTarget(DataModel::Nullable<GenericOverallTarg
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::GetCurrentErrorList(DataModel::Nullable<ErrorList> & currentErrorList)
-{
-    // TODO: Implement logic to retrieve CurrentErrorList
-    return CHIP_NO_ERROR;
-}
-
 } // namespace ClosureControl
 } // namespace Clusters
 } // namespace app
