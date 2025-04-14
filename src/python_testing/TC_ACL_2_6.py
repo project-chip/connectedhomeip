@@ -49,12 +49,16 @@ class TC_ACL_2_6(MatterBaseTest):
     def steps_TC_ACL_2_6(self) -> list[TestStep]:
         steps = [
             TestStep(1, "TH1 commissions DUT using admin node ID N1", "DUT is commissioned on TH1 fabric", is_commissioning=True),
-            TestStep(2, "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute", "Result is SUCCESS, value is stored as F1"),
-            TestStep(3, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event", "Result is SUCCESS value is list of AccessControlEntryChangedEvent events containing 1 element"),
+            TestStep(2, "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
+                     "Result is SUCCESS, value is stored as F1"),
+            TestStep(3, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
+                     "Result is SUCCESS value is list of AccessControlEntryChangedEvent events containing 1 element"),
             TestStep(4, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 2 elements", "Result is SUCCESS"),
-            TestStep(5, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event", "Result is SUCCESS, value is list of AccessControlEntryChanged events containing at least 3 new elements"),
+            TestStep(5, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
+                     "Result is SUCCESS, value is list of AccessControlEntryChanged events containing at least 3 new elements"),
             TestStep(6, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 2 elements. The first item is valid, the second item is invalid due to group ID 0 being used, which is illegal.", "Result is CONSTRAINT_ERROR"),
-            TestStep(7, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event", "value is empty list (received ReportData Message should have no/empty EventReportIB list) since the entire list of Test Step 6 was rejected."),
+            TestStep(7, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
+                     "value is empty list (received ReportData Message should have no/empty EventReportIB list) since the entire list of Test Step 6 was rejected."),
         ]
         return steps
 
@@ -151,15 +155,16 @@ class TC_ACL_2_6(MatterBaseTest):
             events=[(0, acec_event)],
             fabricFiltered=True
         )
-        
+
         found_invalid_event = False
         for event in events_response:
-            if (hasattr(event, 'Data') and 
-                hasattr(event.Data, 'subjects') and 
-                0 in event.Data.subjects):
+            if (hasattr(event, 'Data') and
+                hasattr(event.Data, 'subjects') and
+                    0 in event.Data.subjects):
                 found_invalid_event = True
                 break
         asserts.assert_false(found_invalid_event, "Should not find event for invalid entry")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
