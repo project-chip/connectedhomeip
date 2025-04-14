@@ -74,10 +74,10 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
                 ChipLogError(Zcl, "Wrong length for ColorControl value: %d", size);
                 return;
             }
-            Protocols::InteractionModel::Status status = ColorControl::Attributes::CurrentY::Get(endpoint, &xy.y);
-            Protocols::InteractionModel::Status status = ColorControl::Attributes::CurrentX::Get(endpoint, &xy.x);
-            assert(status == Protocols::InteractionModel::Status::Success);
-            assert(status == Protocols::InteractionModel::Status::Success);
+            Protocols::InteractionModel::Status status_x = ColorControl::Attributes::CurrentY::Get(endpoint, &xy.y);
+            assert(status_x == Protocols::InteractionModel::Status::Success);
+            Protocols::InteractionModel::Status status_y = ColorControl::Attributes::CurrentX::Get(endpoint, &xy.x);
+            assert(status_y == Protocols::InteractionModel::Status::Success);
             if (attributeId == ColorControl::Attributes::CurrentX::Id)
             {
                 xy.x = *reinterpret_cast<uint16_t *>(value);
@@ -96,11 +96,11 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
                  attributeId == ColorControl::Attributes::CurrentSaturation::Id ||
                  attributeId == ColorControl::Attributes::EnhancedCurrentHue::Id)
         {
-            HsvColor_t hsv                             = {};
-            Protocols::InteractionModel::Status status = ColorControl::Attributes::CurrentHue::Get(endpoint, &hsv.h);
-            Protocols::InteractionModel::Status status = ColorControl::Attributes::CurrentSaturation::Get(endpoint, &hsv.s);
-            ChipLogProgress(Zcl, "New HSV color: %u|%u", hsv.h, hsv.s);
+            HsvColor_t hsv                                = {};
+            Protocols::InteractionModel::Status statusHue = ColorControl::Attributes::CurrentHue::Get(endpoint, &hsv.h);
             assert(statusHue == Protocols::InteractionModel::Status::Success);
+            Protocols::InteractionModel::Status statusSat = ColorControl::Attributes::CurrentSaturation::Get(endpoint, &hsv.s);
+            ChipLogProgress(Zcl, "New HSV color: %u|%u", hsv.h, hsv.s);
             assert(statusSat == Protocols::InteractionModel::Status::Success);
             LightMgr().InitiateLightAction(AppEvent::kEventType_Light, LightingManager::COLOR_ACTION_HSV, sizeof(hsv),
                                            (uint8_t *) &hsv);

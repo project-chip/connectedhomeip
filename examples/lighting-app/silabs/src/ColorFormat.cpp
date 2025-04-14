@@ -100,7 +100,6 @@ RgbColor_t ColorConverter::ConvertXYZToRGB(float X, float Y, float Z)
     // X, Y and Z input refer to a D65/2° standard illuminant.
     // sR, sG and sB (standard RGB) output range = 0 ÷ 255
     // convert XYZ to RGB - CIE XYZ to sRGB
-    RgbColor_t srgb;
     float r = (X * 3.2410f) - (Y * 1.5374f) - (Z * 0.4986f);
     float g = -(X * 0.9692f) + (Y * 1.8760f) + (Z * 0.0416f);
     float b = (X * 0.0556f) - (Y * 0.2040f) + (Z * 1.0570f);
