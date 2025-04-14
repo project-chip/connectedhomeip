@@ -18,6 +18,7 @@
 
 #include "JFAManager.h"
 #include <AppMain.h>
+#include "rpc/RpcServer.h"
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -53,6 +54,8 @@ extern "C" {
 
 int main(int argc, char * argv[])
 {
+    LinuxDeviceOptions::GetInstance().rpcServerPort = RPC_SERVER_PORT;
+
     if (ChipLinuxAppInit(argc, argv) != 0)
     {
         return -1;
