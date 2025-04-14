@@ -35,7 +35,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging as logger
 import random
 import string
 
