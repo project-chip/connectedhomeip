@@ -1404,7 +1404,7 @@ tests:
       attribute: "UserCodeTemporaryDisableTime"
       response:
           value: Current_UserCode_TemporaryDisableTime
-          
+
     - label: "Step 32d: TH writes UserCodeTemporaryDisableTime attribute as 0 second on the DUT"
       PICS:
           " ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0031 &&
