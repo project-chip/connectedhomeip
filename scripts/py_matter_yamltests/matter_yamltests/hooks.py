@@ -239,7 +239,7 @@ class TestRunnerHooks():
                                           msg: str,
                                           placeholder: Optional[str] = None,
                                           default_value: Optional[str] = None,
-                                          )-> str:
+                                          ) -> str:
         """
         This method is called when the step needs to ask the user to provide a string value.
         """

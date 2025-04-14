@@ -13,8 +13,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-from ..pseudo_cluster import PseudoCluster
 from loguru import logger
+
+from ..pseudo_cluster import PseudoCluster
 
 _DEFINITION = '''<?xml version="1.0"?>
 <configurator>
@@ -36,6 +37,7 @@ _DEFINITION = '''<?xml version="1.0"?>
 </configurator>
 '''
 
+
 def _get_arg_value(request, item_name: str, default_value="Please enter SDP from TH Logs"):
     logger.info("LOGGER")
     if request.arguments:
@@ -48,11 +50,13 @@ def _get_arg_value(request, item_name: str, default_value="Please enter SDP from
 
     return default_value
 
+
 class WebRTC(PseudoCluster):
     name = 'WebRTC'
     definition = _DEFINITION
+
     async def UserPromptSdp(self, request):
-      pass
+        pass
 
     async def VerifyVideoStream(self, request):
-      pass
+        pass

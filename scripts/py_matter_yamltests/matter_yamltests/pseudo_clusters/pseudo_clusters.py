@@ -39,11 +39,11 @@ class PseudoClusters:
 
     def add(self, cluster: PseudoCluster):
         self.clusters.append(cluster)
-    
+
     def get_cluster(self, request):
-      for cluster in self.clusters:
+        for cluster in self.clusters:
             if request.cluster == cluster.name:
-              return cluster
+                return cluster
 
     async def execute(self, request, definitions=None):
         status = {'error': 'FAILURE'}
@@ -79,4 +79,3 @@ def get_default_pseudo_clusters() -> PseudoClusters:
         SystemCommands()
     ]
     return PseudoClusters(clusters)
-
