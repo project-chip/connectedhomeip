@@ -25,6 +25,7 @@
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model/Decode.h>
 #include <app/data-model/List.h> // So we can encode lists
+#include <clusters/MetadataBridge.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Iterators.h>
 
@@ -242,11 +243,11 @@ class CommandHandlerInterfaceShim : CommandHandlerInterface
     {
         if constexpr (sizeof...(TClusterIds) == 0)
         {
-            return GetEntry(cluster.mClusterId, command, ClusterMetadataHolder<>::ClusterIds{});
+            return DataModel::AcceptedCommandEntryFor(cluster.mClusterId, command, Clusters::ClusterIdsMetaList);
         }
         else
         {
-            return GetEntry<TClusterIds...>(cluster.mClusterId, command, ClusterMetadataHolder<>::ClusterIds{});
+            return DataModel::AcceptedCommandEntryFor<TClusterIds...>(cluster.mClusterId, command);
         }
     }
 
@@ -266,11 +267,11 @@ class CommandHandlerInterfaceShim : CommandHandlerInterface
         ReturnErrorOnFailure(builder.EnsureAppendCapacity(commandCount));
 
         auto appender = SplitLambda([&](CommandId commandId) {
-            err = builder.Append(getEntry(cluster, id));
+            err = builder.Append(GetEntry(cluster, commandId));
             return err == CHIP_NO_ERROR ? Loop::Continue : Loop::Break;
         });
 
-        ReturnErrorOnFailure(chi->EnumerateAcceptedCommands(path, appender.Caller(), appender.Context()));
+        ReturnErrorOnFailure(EnumerateAcceptedCommands(cluster, appender.Caller(), appender.Context()));
         ReturnErrorOnFailure(err);
         // the two invocations MUST return the same sizes
         VerifyOrReturnError(builder.Size() == commandCount, CHIP_ERROR_INTERNAL);
@@ -280,6 +281,31 @@ class CommandHandlerInterfaceShim : CommandHandlerInterface
     virtual CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, DataModel::ListBuilder<CommandId> & builder) override
+    {
+        size_t commandCount = 0;
+        CHIP_ERROR err      = CHIP_NO_ERROR;
+
+        auto counter = SplitLambda([&](CommandId commandId) {
+            commandCount++;
+            return Loop::Continue;
+        });
+
+        ReturnErrorOnFailure(EnumerateGeneratedCommands(cluster, counter.Caller(), counter.Context()));
+        ReturnErrorOnFailure(builder.EnsureAppendCapacity(commandCount));
+
+        auto appender = SplitLambda([&](CommandId commandId) {
+            err = builder.Append(commandId);
+            return err == CHIP_NO_ERROR ? Loop::Continue : Loop::Break;
+        });
+
+        ReturnErrorOnFailure(EnumerateGeneratedCommands(cluster, appender.Caller(), appender.Context()));
+        ReturnErrorOnFailure(err);
+        // the two invocations MUST return the same sizes
+        VerifyOrReturnError(builder.Size() == commandCount, CHIP_ERROR_INTERNAL);
+        return CHIP_NO_ERROR;
     }
 };
 
