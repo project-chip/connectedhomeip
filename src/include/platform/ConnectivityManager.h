@@ -188,7 +188,7 @@ public:
 
     WiFiPAFAdvertiseParam mPafAdverParam;
     CHIP_ERROR SetWiFiPAFAdvertisingEnabled(bool val);
-    CHIP_ERROR SetWiFiPAFPublishParam(WiFiPAFAdvertiseParam & args);
+    CHIP_ERROR SetWiFiPAFPublishParam(const WiFiPAFAdvertiseParam & args);
     CHIP_ERROR WiFiPAFPublish(WiFiPAFAdvertiseParam & args);
     CHIP_ERROR WiFiPAFCancelPublish(uint32_t PublishId);
     typedef void (*OnConnectionCompleteFunct)(void * appState);
@@ -448,7 +448,7 @@ inline CHIP_ERROR ConnectivityManager::SetWiFiPAFAdvertisingEnabled(bool val)
     return WiFiPAFCancelPublish(mPafAdverParam.publish_id);
 }
 
-inline CHIP_ERROR ConnectivityManager::SetWiFiPAFPublishParam(WiFiPAFAdvertiseParam & args)
+inline CHIP_ERROR ConnectivityManager::SetWiFiPAFPublishParam(const WiFiPAFAdvertiseParam & args)
 {
     mPafAdverParam.freq_list_len = args.freq_list_len;
     mPafAdverParam.freq_list     = std::make_unique<uint16_t[]>(args.freq_list_len);

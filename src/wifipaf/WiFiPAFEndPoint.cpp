@@ -31,6 +31,7 @@
 #include <lib/support/BitFlags.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/StringBuilder.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemClock.h>
 #include <system/SystemLayer.h>
@@ -766,13 +767,14 @@ CHIP_ERROR WiFiPAFEndPoint::HandleCapabilitiesResponseReceived(PacketBufferHandl
 SequenceNumber_t WiFiPAFEndPoint::AdjustRemoteReceiveWindow(SequenceNumber_t lastReceivedAck, SequenceNumber_t maxRemoteWindowSize,
                                                             SequenceNumber_t newestUnackedSentSeqNum)
 {
-    // Assumption: SequenceNumber_t is uint8_t.
+    // Ref: "Sequence Numbers" of PAFTP chapter in spec
+    // SequenceNumber_t is uint8_t.
+    // Maximum possible sequence number value is UINT8_MAX.
+    // Sequence numbers incremented past maximum value wrap to 0.
+    // Newest unacked sent sequence number never exceeds current (and by extension, new and un-wrapped)
+    //  window boundary, so it never wraps relative to last received ack, if new window boundary would not
+    //  also wrap.
     static_assert(std::is_same<SequenceNumber_t, uint8_t>::value, "Type of SequenceNumber_t is unexpected.");
-    // Assumption: Maximum possible sequence number value is UINT8_MAX.
-    // Assumption: Sequence numbers incremented past maximum value wrap to 0.
-    // Assumption: newest unacked sent sequence number never exceeds current (and by extension, new and un-wrapped)
-    //             window boundary, so it never wraps relative to last received ack, if new window boundary would not
-    //             also wrap.
     // Define new window boundary (inclusive) as uint16_t, so its value can temporarily exceed UINT8_MAX.
     uint16_t newRemoteWindowBoundary = static_cast<uint16_t>(lastReceivedAck + maxRemoteWindowSize);
 
@@ -787,88 +789,83 @@ SequenceNumber_t WiFiPAFEndPoint::AdjustRemoteReceiveWindow(SequenceNumber_t las
     return static_cast<uint8_t>(newRemoteWindowBoundary - newestUnackedSentSeqNum);
 }
 
-CHIP_ERROR WiFiPAFEndPoint::GetPktSn(Encoding::LittleEndian::Reader & reader, SequenceNumber_t & seqNum)
+CHIP_ERROR WiFiPAFEndPoint::GetPktSn(Encoding::LittleEndian::Reader reader, SequenceNumber_t & seqNum)
 {
     CHIP_ERROR err;
-    BitFlags<WiFiPAFTP::HeaderFlags> rx_flags;
-    size_t SnOffset = 0;
-    SequenceNumber_t * pSn;
-    err = reader.Read8(rx_flags.RawStorage()).StatusCode();
-    if (rx_flags.Has(WiFiPAFTP::HeaderFlags::kHankshake))
+    BitFlags<WiFiPAFTP::HeaderFlags> rxFlags;
+    size_t SkipOffset = 0;
+
+    err = reader.Read8(rxFlags.RawStorage()).StatusCode();
+    SuccessOrExit(err);
+    if (rxFlags.Has(WiFiPAFTP::HeaderFlags::kHandshake))
     {
         // Handkshake message => No ack/sn
         return CHIP_ERROR_INTERNAL;
     }
     // Always has header flag
-    SnOffset += kTransferProtocolHeaderFlagsSize;
     if (rxFlags.Has(WiFiPAFTP::HeaderFlags::kManagementOpcode))
     {
-        SnOffset += kTransferProtocolMgmtOpSize;
+        SkipOffset += kTransferProtocolMgmtOpSize;
     }
-    if (rxFlags.Has(WiFiPAFTP::HeaderFlags::kFragmentAck)) // Has ack
+    if (rxFlags.Has(WiFiPAFTP::HeaderFlags::kFragmentAck))
     {
-        SnOffset += kTransferProtocolAckSize;
+        SkipOffset += kTransferProtocolAckSize;
     }
-    static_assert(std::is_same<SequenceNumber_t, uint8_t>::value, "Type of SequenceNumber_t is unexpected.");
-    err = readerSn.Skip(SnOffset).ReadBytes(&seqNum, 1).StatusCode();
+    err = static_cast<Encoding::LittleEndian::Reader &>(reader.Skip(SkipOffset)).Read8(&seqNum).StatusCode();
     SuccessOrExit(err);
 exit:
     return err;
 }
 
-CHIP_ERROR WiFiPAFEndPoint::DebugPktAckSn(const PktDirect_t pktDirect, Encoding::LittleEndian::Reader & reader)
+CHIP_ERROR WiFiPAFEndPoint::DebugPktAckSn(const PktDirect_t pktDirect, Encoding::LittleEndian::Reader reader)
 {
 #ifdef CHIP_WIFIPAF_END_POINT_DEBUG_LOGGING_ENABLED
-    auto readerHdr = reader;
-    auto readerSn  = reader;
     BitFlags<WiFiPAFTP::HeaderFlags> rxFlags;
     CHIP_ERROR err;
     bool hasAck = false;
     SequenceNumber_t ackNum, snNum;
-    char AckBuff[4];
-    size_t SnOffset = 0;
+    size_t SkipOffset = 0;
 
-    err = readerHdr.Read8(rxFlags.RawStorage()).StatusCode();
-    SuccessOrExit(err);
+    err = reader.Read8(rxFlags.RawStorage()).StatusCode();
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
     if (rxFlags.Has(WiFiPAFTP::HeaderFlags::kHandshake))
     {
         // Handkshake message => No ack/sn
         return CHIP_NO_ERROR;
     }
-    // Always has header flag
-    SnOffset += kTransferProtocolHeaderFlagsSize;
-    if (rxFlags.Has(WiFiPAFTP::HeaderFlags::kManagementOpcode)) // Has Mgmt_Op
+
+    if (rxFlags.Has(WiFiPAFTP::HeaderFlags::kManagementOpcode))
     {
-        SnOffset += kTransferProtocolMgmtOpSize;
+        SkipOffset += kTransferProtocolMgmtOpSize;
     }
-    if (rxFlags.Has(WiFiPAFTP::HeaderFlags::kFragmentAck)) // Has ack
+    if (rxFlags.Has(WiFiPAFTP::HeaderFlags::kFragmentAck))
     {
-        auto readerAck = reader;
-        err            = readerAck.Skip(kTransferProtocolHeaderFlagsSize).ReadBytes(&ackNum, 1).StatusCode();
-        SuccessOrExit(err);
-        hasAck = true;
-        SnOffset += kTransferProtocolAckSize;
+        err = static_cast<Encoding::LittleEndian::Reader &>(reader.Skip(SkipOffset)).Read8(&ackNum).StatusCode();
+        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+        SkipOffset = 0;
+        hasAck     = true;
     }
-    err = readerSn.Skip(SnOffset).ReadBytes(&snNum, 1).StatusCode();
-    SuccessOrExit(err);
+    err = static_cast<Encoding::LittleEndian::Reader &>(reader.Skip(SkipOffset)).Read8(&snNum).StatusCode();
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+
+    StringBuilder<4> AckBuff;
     if (hasAck == false)
     {
-        strcpy(AckBuff, "  ");
+        AckBuff.Add("  ");
     }
     else
     {
-        snprintf(AckBuff, sizeof(AckBuff), "%02hhu", ackNum);
+        AckBuff.AddFormat("%02hhu", ackNum);
     }
     if (pktDirect == PktDirect_t::kTx)
     {
-        ChipLogDebugWiFiPAFEndPoint_L0(WiFiPAF, "==>[tx] [Sn, Ack] = [   %02u, -- %s]", snNum, AckBuff);
+        ChipLogDebugWiFiPAFEndPoint_L0(WiFiPAF, "==>[tx] [Sn, Ack] = [   %02u, -- %s]", snNum, AckBuff.c_str());
     }
     else if (pktDirect == PktDirect_t::kRx)
     {
-        ChipLogDebugWiFiPAFEndPoint_L0(WiFiPAF, "<==[rx] [Ack, Sn] = [-- %s,    %02u]", AckBuff, snNum);
+        ChipLogDebugWiFiPAFEndPoint_L0(WiFiPAF, "<==[rx] [Ack, Sn] = [-- %s,    %02u]", AckBuff.c_str(), snNum);
     }
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 #else
     return CHIP_NO_ERROR;
 #endif
