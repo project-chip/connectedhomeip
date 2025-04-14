@@ -205,11 +205,11 @@ def _has_feature(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse,
         return False
 
     # Access cluster.Attributes.FeatureMap with a type ignore
-    if cluster.Attributes.FeatureMap not in wildcard.attributes[endpoint][cluster]:  # type: ignore
+    if cluster.Attributes.FeatureMap not in wildcard.attributes[endpoint][cluster]:  # type: ignore[attr-defined]
         return False
 
     # Access the feature map value
-    feature_map = wildcard.attributes[endpoint][cluster][cluster.Attributes.FeatureMap]  # type: ignore
+    feature_map = wildcard.attributes[endpoint][cluster][cluster.Attributes.FeatureMap]  # type: ignore[attr-defined]
     if not isinstance(feature_map, int):
         raise ValueError(
             f"Failed to read mandatory FeatureMap attribute value for cluster {cluster} on endpoint {endpoint}: {feature_map}.")
