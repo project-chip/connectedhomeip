@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelTimeout.h>
@@ -41,8 +43,6 @@
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
 namespace chip {
 namespace app {
 
@@ -165,8 +165,8 @@ public:
     /**
      *  Encode a possibly-chunked list attribute value.  Will create a new chunk when necessary.
      *
-     * This method will attempt to to encode as many list items as possible into a SingleAttributeDataIB, which will be handled by
-     * cluster server as a ReplaceAll Item operation.
+     *  Note: As an exception, for attributes in the AccessControl Clusters, this method will attempt to encode as many list items
+     * as possible into a SingleAttributeDataIB, which will be handled by cluster server as a ReplaceAll Item operation.
      * If the list is too large, the WriteRequest will be chunked and remaining items will be encoded as AppendItem operations,
      chunking them as needed.
      *
@@ -180,9 +180,9 @@ public:
             ConcreteDataAttributePath(attributePath.HasWildcardEndpointId() ? kInvalidEndpointId : attributePath.mEndpointId,
                                       attributePath.mClusterId, attributePath.mAttributeId, aDataVersion);
 
-        ListIndex nextItemToAppendIndex = kInvalidListIndex;
-        uint16_t encodedItemCount       = 0;
-        bool chunkingNeeded             = false;
+        ListIndex firstItemToAppendIndex = 0;
+        uint16_t encodedItemCount        = 0;
+        bool chunkingNeeded              = false;
 
         // By convention, and as tested against all cluster servers, clients have historically encoded an empty list as a
         // ReplaceAll, (i.e. the entire attribute contents are cleared before appending the new list’s items). However, this
@@ -196,18 +196,14 @@ public:
         // enforce all clusters to support it in testing and in certification.
         bool encodeEmptyListAsReplaceAll = !(path.mClusterId == Clusters::AccessControl::Id);
 
+        ReturnErrorOnFailure(EnsureMessage());
+
         if (encodeEmptyListAsReplaceAll)
         {
-            ReturnErrorOnFailure(EnsureMessage());
             ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<uint8_t>()));
         }
         else
         {
-            // We will always start a new chunk when we have a new Attribute to Encode. This might be more efficient since this
-            // first chunk contains the "ReplaceAll List" which will pack as many list items as possible into a single
-            // AttributeDataIB.
-            ReturnErrorOnFailure(StartNewMessage());
-
             // Encode as many list-items as possible into a single AttributeDataIB, which will be included in a single
             // WriteRequestMessage chunk.
             ReturnErrorOnFailure(TryEncodeListIntoSingleAttributeDataIB(path, listValue, chunkingNeeded, encodedItemCount));
@@ -220,14 +216,12 @@ public:
             // appended one by one, each into its own AttributeDataIB. Unlike the first chunk (which contains only one
             // AttributeDataIB), subsequent chunks may contain multiple AttributeDataIBs if space allows it.
             ReturnErrorOnFailure(StartNewMessage());
-            nextItemToAppendIndex = encodedItemCount;
+            firstItemToAppendIndex = encodedItemCount;
         }
 
         path.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
 
-        ListIndex startIndex = encodeEmptyListAsReplaceAll ? 0 : nextItemToAppendIndex;
-
-        for (ListIndex i = startIndex; i < listValue.size(); i++)
+        for (ListIndex i = firstItemToAppendIndex; i < listValue.size(); i++)
         {
             ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, listValue[i]));
         }
@@ -303,7 +297,22 @@ private:
     CHIP_ERROR ProcessWriteResponseMessage(System::PacketBufferHandle && payload);
     CHIP_ERROR ProcessAttributeStatusIB(AttributeStatusIB::Parser & aAttributeStatusIB);
     const char * GetStateStr() const;
+
+    /**
+     * Prepare the Encoding of an Attribute with List DataType into an AttributeDataIB.
+     *
+     * @note Must always be followed by a call to EnsureListEnded(), to undo buffer reservation that took place within
+     * it, and properly close TLV Containers.
+     */
+
     CHIP_ERROR EnsureListStarted(const ConcreteDataAttributePath & attributePath);
+    /**
+     * Complete the Encoding of an Attribute with List DataType into an AttributeDataIB.
+     *
+     * @note Must always be called after EnsureListStarted(), even in cases of encoding failures; to undo buffer reservation that
+     * took place in EnsureListStarted.
+     */
+
     CHIP_ERROR EnsureListEnded();
 
     /**
@@ -341,30 +350,26 @@ private:
                                                       const DataModel::List<T> & list, bool & outChunkingNeeded,
                                                       uint16_t & outEncodedItemCount)
     {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        TLV::TLVWriter backupWriter;
-
         ReturnErrorOnFailure(EnsureListStarted(attributePath));
 
-        chip::TLV::TLVWriter * attributeDataIBWriter = nullptr;
-        VerifyOrReturnError((attributeDataIBWriter = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
         AttributeDataIB::Builder & attributeDataIB = mWriteRequestBuilder.GetWriteRequests().GetAttributeDataIBBuilder();
-
+        TLV::TLVWriter backupWriter;
+        CHIP_ERROR err      = CHIP_NO_ERROR;
         outEncodedItemCount = 0;
 
         for (auto & item : list)
         {
-            // We essentially write List items to the Data Container within the first AttributeDataIB. We checkpoint the
-            // AttributeDataIB Builder in case there's not enough space to encode a list item.
+            // Try to put all the list items into the list we just started, until we either run out of items
+            // or run out of space.
+            // Make sure that if we run out of space we don't leave a partially-encoded list item around.
             attributeDataIB.Checkpoint(backupWriter);
             if constexpr (DataModel::IsFabricScoped<T>::value)
             {
-                err = DataModel::EncodeForWrite(*attributeDataIBWriter, TLV::AnonymousTag(), item);
+                err = DataModel::EncodeForWrite(*attributeDataIB.GetWriter(), TLV::AnonymousTag(), item);
             }
             else
             {
-                err = DataModel::Encode(*attributeDataIBWriter, TLV::AnonymousTag(), item);
+                err = DataModel::Encode(*attributeDataIB.GetWriter(), TLV::AnonymousTag(), item);
             }
 
             if (err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL)
@@ -375,7 +380,11 @@ private:
                 outChunkingNeeded = true;
                 break;
             }
-            ReturnErrorOnFailure(err);
+            else if (err != CHIP_NO_ERROR)
+            {
+                ReturnErrorOnFailure(EnsureListEnded());
+                ReturnErrorOnFailure(err);
+            }
             outEncodedItemCount++;
         }
 
@@ -384,7 +393,11 @@ private:
 
     /**
      * A wrapper for TryEncodeSingleAttributeDataIB which will start a new chunk when failed with CHIP_ERROR_NO_MEMORY or
-     * CHIP_ERROR_BUFFER_TOO_SMALL. This will not be used for Lists. For Lists, use TryEncodeListIntoSingleAttributeDataIB instead.
+     * CHIP_ERROR_BUFFER_TOO_SMALL.
+     *
+     * NOTE: This method must not be used for encoding non-empty lists, even if the template accepts a list type.
+     * For such cases, use TryEncodeListIntoSingleAttributeDataIB as part of a suitable encoding strategy,
+     * since it has a different contract and has different usage expectations.
      */
     template <class T>
     CHIP_ERROR EncodeSingleAttributeDataIB(const ConcreteDataAttributePath & attributePath, const T & value)

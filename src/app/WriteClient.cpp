@@ -251,6 +251,8 @@ CHIP_ERROR WriteClient::PutSinglePreencodedAttributeWritePayload(const chip::app
 // TODO #38287 Add Unit Tests for PutPreencodedAttribute and for TryPutPreencodedAttributeWritePayloadIntoList.
 CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath & attributePath, const TLV::TLVReader & data)
 {
+    ReturnErrorOnFailure(EnsureMessage());
+
     // ListIndex is missing and the data is an array -- we are writing a whole list.
     if (!attributePath.IsListOperation() && data.GetType() == TLV::TLVType::kTLVType_Array)
     {
@@ -274,15 +276,10 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
 
         if (encodeEmptyListAsReplaceAll)
         {
-            ReturnErrorOnFailure(EnsureMessage());
             ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<uint8_t>()));
         }
         else
         {
-            // We will always start a new chunk when we have a new Attribute to Encode. This might be more efficient since this
-            // first chunk contains the "ReplaceAll List" which will pack as many list items as possible into a single
-            // AttributeDataIB.
-            ReturnErrorOnFailure(StartNewMessage());
 
             dataReader.Init(data);
             dataReader.OpenContainer(valueReader);
@@ -313,7 +310,9 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
 
         while ((err = valueReader.Next()) == CHIP_NO_ERROR)
         {
-            if (currentItemCount++ < encodedItemCount)
+            currentItemCount++;
+
+            if (currentItemCount <= encodedItemCount)
             {
                 // Element already encoded via `TryPutPreencodedAttributeWritePayloadIntoList`
                 continue;
@@ -330,22 +329,25 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
     }
 
     // We are writing a non-list attribute, or we are writing a single element of a list.
-    ReturnErrorOnFailure(EnsureMessage());
     return PutSinglePreencodedAttributeWritePayload(attributePath, data);
 }
 
 CHIP_ERROR WriteClient::EnsureListStarted(const ConcreteDataAttributePath & attributePath)
 {
-    chip::TLV::TLVWriter * writer = nullptr;
-
-    TLV::TLVType outerType;
+    if (mMessageWriter.GetRemainingFreeLength() < (kReservedSizeForEndOfListContainer + kReservedSizeForEndOfAttributeDataIB))
+    {
+        StartNewMessage();
+    }
 
     ReturnErrorOnFailure(mMessageWriter.ReserveBuffer(kReservedSizeForEndOfListContainer + kReservedSizeForEndOfAttributeDataIB));
 
     ReturnErrorOnFailure(PrepareAttributeIB(attributePath));
-    VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(
-        writer->StartContainer(chip::TLV::ContextTag(chip::app::AttributeDataIB::Tag::kData), TLV::kTLVType_Array, outerType));
+
+    TLV::TLVWriter * writer = GetAttributeDataIBTLVWriter();
+    VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    TLV::TLVType outerType;
+    ReturnErrorOnFailure(writer->StartContainer(TLV::ContextTag(AttributeDataIB::Tag::kData), TLV::kTLVType_Array, outerType));
 
     VerifyOrReturnError(outerType == kAttributeDataIBType, CHIP_ERROR_INCORRECT_STATE);
 
@@ -354,11 +356,11 @@ CHIP_ERROR WriteClient::EnsureListStarted(const ConcreteDataAttributePath & attr
 
 CHIP_ERROR WriteClient::EnsureListEnded()
 {
-    chip::TLV::TLVWriter * writer = nullptr;
-    VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    TLV::TLVWriter * writer = GetAttributeDataIBTLVWriter();
+    VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    // In the event of Chunking (we have a CHIP_ERROR_NO_MEMORY), we need to Unreserve two more Bytes in order to be able to
-    // Append EndOfContainer of the List + EndOfContainer of the AttributeDataIB.
+    // Undo the reservation made in EnsureListStarted() to free up space for the EndOfContainer TLV Elements
+    // (for both the List and AttributeDataIB).
     ReturnErrorOnFailure(writer->UnreserveBuffer(kReservedSizeForEndOfListContainer + kReservedSizeForEndOfAttributeDataIB));
     ReturnErrorOnFailure(writer->EndContainer(kAttributeDataIBType));
 
@@ -366,28 +368,25 @@ CHIP_ERROR WriteClient::EnsureListEnded()
 }
 
 CHIP_ERROR
-WriteClient::TryPutPreencodedAttributeWritePayloadIntoList(const chip::app::ConcreteDataAttributePath & attributePath,
+WriteClient::TryPutPreencodedAttributeWritePayloadIntoList(const ConcreteDataAttributePath & attributePath,
                                                            TLV::TLVReader & valueReader, bool & outChunkingNeeded,
                                                            ListIndex & outEncodedItemCount)
 {
 
     ReturnErrorOnFailure(EnsureListStarted(attributePath));
 
-    chip::TLV::TLVWriter * attributeDataIBWriter = nullptr;
-    VerifyOrReturnError((attributeDataIBWriter = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
     AttributeDataIB::Builder & attributeDataIB = mWriteRequestBuilder.GetWriteRequests().GetAttributeDataIBBuilder();
-
     TLV::TLVWriter backupWriter;
     CHIP_ERROR err      = CHIP_NO_ERROR;
     outEncodedItemCount = 0;
 
     while ((err = valueReader.Next()) == CHIP_NO_ERROR)
     {
-        // We essentially write List items to the Data Container within the first AttributeDataIB. We checkpoint the AttributeDataIB
-        // Builder in case there's not enough space to encode a list item.
+        // Try to put all the list items into the list we just started, until we either run out of items
+        // or run out of space.
+        // Make sure that if we run out of space we don't leave a partially-encoded list item around.
         attributeDataIB.Checkpoint(backupWriter);
-        err = attributeDataIBWriter->CopyElement(TLV::AnonymousTag(), valueReader);
+        err = attributeDataIB.GetWriter()->CopyElement(TLV::AnonymousTag(), valueReader);
 
         if (err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL)
         {
@@ -398,7 +397,11 @@ WriteClient::TryPutPreencodedAttributeWritePayloadIntoList(const chip::app::Conc
             err               = CHIP_NO_ERROR;
             break;
         }
-        ReturnErrorOnFailure(err);
+        else if (err != CHIP_NO_ERROR)
+        {
+            ReturnErrorOnFailure(EnsureListEnded());
+            ReturnErrorOnFailure(err);
+        }
         outEncodedItemCount++;
     }
     VerifyOrReturnError(err == CHIP_END_OF_TLV || err == CHIP_NO_ERROR, err);

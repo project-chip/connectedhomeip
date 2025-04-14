@@ -297,7 +297,8 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
 
         // Validating all ACL entries in the ReplaceAll list before Updating or Deleting any entries. If any of the entries has an
         // invalid field, the whole "ReplaceAll" list will be rejected.
-        ReturnErrorOnFailure(IsValidAclEntryList(list));
+        CHIP_ERROR err = IsValidAclEntryList(list);
+        VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
         auto iterator = list.begin();
         size_t i      = 0;
