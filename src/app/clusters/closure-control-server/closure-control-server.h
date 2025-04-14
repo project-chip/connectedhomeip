@@ -79,7 +79,7 @@ public:
     virtual bool IsDeviceReadyToMove() = 0;
 
     /**
-     * @brief Checks if device is error state or not and sets mainstate to error.
+     * @brief Checks if device is error state or not.
      * @return true if device is error state
      *         false if device is not in error state
      */
@@ -87,8 +87,8 @@ public:
 
     /**
      * @brief Checks if device need manual latching or not.
-     * @return true if device is error state
-     *         false if device is not in error state
+     * @return true if device needs manual latching
+     *         false if device does not need manual latching
      */
     virtual bool IsLatchManual() = 0;
 
