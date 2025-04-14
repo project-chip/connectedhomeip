@@ -50,7 +50,7 @@ CHIP_ERROR StructDecodeIterator::Next(uint8_t & context_tag)
         return CHIP_NO_ERROR;
     }
 
-    // we get here IFF error is CHIP_ERROR_END_OF_TLV. We exist the container but
+    // we get here IFF error is CHIP_ERROR_END_OF_TLV. We exit the container but
     // forward the the `end of tlv` as a final marker
     ReturnErrorOnFailure(mReader.ExitContainer(mOuter));
     return CHIP_ERROR_END_OF_TLV;
