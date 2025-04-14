@@ -11,7 +11,7 @@
 #ifdef USE_SPARKFUN_AIR_QUALITY_SENSOR
 #ifdef SLI_SI91X_MCU_INTERFACE
 
-//Enable the same I2C instance 
+//Enable the same I2C instance
 #define I2C_INSTANCE_USED SL_I2C2
 
 #endif //SLI_SI91X_MCU_INTERFACE
