@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace SpinSpeeds {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = LaundryWasherControls::Attributes::SpinSpeeds::Id,
+    .attributeId    = Attributes::SpinSpeeds::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace SpinSpeeds
 namespace SpinSpeedCurrent {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = LaundryWasherControls::Attributes::SpinSpeedCurrent::Id,
+    .attributeId    = Attributes::SpinSpeedCurrent::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
@@ -37,7 +37,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace SpinSpeedCurrent
 namespace NumberOfRinses {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = LaundryWasherControls::Attributes::NumberOfRinses::Id,
+    .attributeId    = Attributes::NumberOfRinses::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
@@ -45,7 +45,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace NumberOfRinses
 namespace SupportedRinses {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = LaundryWasherControls::Attributes::SupportedRinses::Id,
+    .attributeId    = Attributes::SupportedRinses::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,

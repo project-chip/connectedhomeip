@@ -2,12 +2,15 @@
 //
 // This file provides an interface to bridge the gap when doing Ember decoupling
 // based on {{input_name}}
+#pragma once
 
 #include <lib/meta/MetaSwitch.h>
 #include <lib/meta/MetaObjects.h>
 
+
 {%- for cluster in clusters | sort(attribute='name') %}
 #include <clusters/{{cluster.name | name_for_id_usage}}/Ids.h>
+#include <clusters/{{cluster.name | name_for_id_usage}}/MetadataBridge.h>
 {%- endfor%}
 
 
@@ -15,28 +18,29 @@ namespace chip {
 namespace app {
 
 namespace Clusters {
-    ObjectList<
-        {%- for cluster in clusters | sort(attribute='name') %}
-        chip::app::Clusters::{{cluster.name}}::Id,
-        {%- endfor%}
-    > ClusterIdsMetaList;
-}
+constexpr Meta::ObjectList<
+    {%- for cluster in clusters | sort(attribute='name') %}
+    chip::app::Clusters::{{cluster.name}}::Id{{ "" if loop.last else ", " }}
+    {%- endfor%}
+> ClusterIdsMetaList;
+} // namespace Clusters
 
-
+namespace DataModel {
 template <ClusterId... TClusterIds>
 DataModel::AcceptedCommandEntry AcceptedCommandEntryFor(ClusterId id, CommandId command,
-                                                        DataMetaList<TClusterIds...>  = {} /*For easy template deduction*/)
+                                                        Meta::ObjectList<TClusterIds...>  = {} /*For easy template deduction*/)
 {
     // Dynamically generate the Switch statement with the only the required metadata
     // clang-format off
     return Meta::Switch(id,
-        Meta::Case<TClusterIds>([](){}
-            return ClusterMetadataHolder<DataModel::AcceptedCommandEntry, TClusterIds>::EntryFor(command);
-        )...,
+        Meta::Case<TClusterIds>([=](){
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, TClusterIds>::EntryFor(command);
+        })...,
         Meta::Default(DataModel::AcceptedCommandEntry{})
     );
     // clang-format on
 }
 
+} // namespace DataModel
 } // namespace app
 } // namespace chip

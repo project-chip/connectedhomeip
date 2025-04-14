@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 3;
 namespace Attributes {
 namespace VendorName {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = BridgedDeviceBasicInformation::Attributes::VendorName::Id,
+    .attributeId    = Attributes::VendorName::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace VendorName
 namespace VendorID {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = BridgedDeviceBasicInformation::Attributes::VendorID::Id,
+    .attributeId    = Attributes::VendorID::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -37,7 +37,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace VendorID
 namespace ProductName {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = BridgedDeviceBasicInformation::Attributes::ProductName::Id,
+    .attributeId    = Attributes::ProductName::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -45,7 +45,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ProductName
 namespace ProductID {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = BridgedDeviceBasicInformation::Attributes::ProductID::Id,
+    .attributeId    = Attributes::ProductID::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -53,7 +53,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ProductID
 namespace NodeLabel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = BridgedDeviceBasicInformation::Attributes::NodeLabel::Id,
+    .attributeId    = Attributes::NodeLabel::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
@@ -61,7 +61,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace NodeLabel
 namespace HardwareVersion {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = BridgedDeviceBasicInformation::Attributes::HardwareVersion::Id,
+    .attributeId    = Attributes::HardwareVersion::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -69,7 +69,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace HardwareVersion
 namespace HardwareVersionString {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = BridgedDeviceBasicInformation::Attributes::HardwareVersionString::Id,
+    .attributeId    = Attributes::HardwareVersionString::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -77,7 +77,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace HardwareVersionString
 namespace SoftwareVersion {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = BridgedDeviceBasicInformation::Attributes::SoftwareVersion::Id,
+    .attributeId    = Attributes::SoftwareVersion::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -85,7 +85,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace SoftwareVersion
 namespace SoftwareVersionString {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = BridgedDeviceBasicInformation::Attributes::SoftwareVersionString::Id,
+    .attributeId    = Attributes::SoftwareVersionString::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -93,7 +93,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace SoftwareVersionString
 namespace ManufacturingDate {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = BridgedDeviceBasicInformation::Attributes::ManufacturingDate::Id,
+    .attributeId    = Attributes::ManufacturingDate::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -101,7 +101,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ManufacturingDate
 namespace PartNumber {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = BridgedDeviceBasicInformation::Attributes::PartNumber::Id,
+    .attributeId    = Attributes::PartNumber::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -109,7 +109,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace PartNumber
 namespace ProductURL {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = BridgedDeviceBasicInformation::Attributes::ProductURL::Id,
+    .attributeId    = Attributes::ProductURL::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -117,7 +117,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ProductURL
 namespace ProductLabel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = BridgedDeviceBasicInformation::Attributes::ProductLabel::Id,
+    .attributeId    = Attributes::ProductLabel::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -125,7 +125,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ProductLabel
 namespace SerialNumber {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = BridgedDeviceBasicInformation::Attributes::SerialNumber::Id,
+    .attributeId    = Attributes::SerialNumber::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -133,7 +133,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace SerialNumber
 namespace Reachable {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = BridgedDeviceBasicInformation::Attributes::Reachable::Id,
+    .attributeId    = Attributes::Reachable::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -141,7 +141,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace Reachable
 namespace UniqueID {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = BridgedDeviceBasicInformation::Attributes::UniqueID::Id,
+    .attributeId    = Attributes::UniqueID::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -149,7 +149,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace UniqueID
 namespace ProductAppearance {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = BridgedDeviceBasicInformation::Attributes::ProductAppearance::Id,
+    .attributeId    = Attributes::ProductAppearance::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -160,8 +160,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 
 namespace Commands {
 namespace KeepActive {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = BridgedDeviceBasicInformation::Commands::KeepActive::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::KeepActive::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

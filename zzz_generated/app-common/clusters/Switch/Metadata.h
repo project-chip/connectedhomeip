@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 2;
 namespace Attributes {
 namespace NumberOfPositions {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Switch::Attributes::NumberOfPositions::Id,
+    .attributeId    = Attributes::NumberOfPositions::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace NumberOfPositions
 namespace CurrentPosition {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Switch::Attributes::CurrentPosition::Id,
+    .attributeId    = Attributes::CurrentPosition::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -37,7 +37,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace CurrentPosition
 namespace MultiPressMax {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Switch::Attributes::MultiPressMax::Id,
+    .attributeId    = Attributes::MultiPressMax::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,

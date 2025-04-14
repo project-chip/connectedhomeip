@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace CountdownTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ClosureControl::Attributes::CountdownTime::Id,
+    .attributeId    = Attributes::CountdownTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace CountdownTime
 namespace MainState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ClosureControl::Attributes::MainState::Id,
+    .attributeId    = Attributes::MainState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -37,7 +37,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace MainState
 namespace CurrentErrorList {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ClosureControl::Attributes::CurrentErrorList::Id,
+    .attributeId    = Attributes::CurrentErrorList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -45,7 +45,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace CurrentErrorList
 namespace OverallState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ClosureControl::Attributes::OverallState::Id,
+    .attributeId    = Attributes::OverallState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -53,7 +53,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace OverallState
 namespace OverallTarget {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ClosureControl::Attributes::OverallTarget::Id,
+    .attributeId    = Attributes::OverallTarget::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -64,22 +64,22 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 
 namespace Commands {
 namespace Stop {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = ClosureControl::Commands::Stop::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::Stop::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Stop
 namespace MoveTo {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = ClosureControl::Commands::MoveTo::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::MoveTo::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace MoveTo
 namespace Calibrate {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = ClosureControl::Commands::Calibrate::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::Calibrate::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };

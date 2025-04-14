@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace ActiveLocale {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = LocalizationConfiguration::Attributes::ActiveLocale::Id,
+    .attributeId    = Attributes::ActiveLocale::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ActiveLocale
 namespace SupportedLocales {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = LocalizationConfiguration::Attributes::SupportedLocales::Id,
+    .attributeId    = Attributes::SupportedLocales::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,

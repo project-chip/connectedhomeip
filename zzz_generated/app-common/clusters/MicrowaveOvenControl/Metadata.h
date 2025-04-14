@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace CookTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MicrowaveOvenControl::Attributes::CookTime::Id,
+    .attributeId    = Attributes::CookTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace CookTime
 namespace MaxCookTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MicrowaveOvenControl::Attributes::MaxCookTime::Id,
+    .attributeId    = Attributes::MaxCookTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -37,7 +37,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace MaxCookTime
 namespace PowerSetting {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MicrowaveOvenControl::Attributes::PowerSetting::Id,
+    .attributeId    = Attributes::PowerSetting::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -45,7 +45,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace PowerSetting
 namespace MinPower {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MicrowaveOvenControl::Attributes::MinPower::Id,
+    .attributeId    = Attributes::MinPower::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -53,7 +53,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace MinPower
 namespace MaxPower {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MicrowaveOvenControl::Attributes::MaxPower::Id,
+    .attributeId    = Attributes::MaxPower::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -61,7 +61,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace MaxPower
 namespace PowerStep {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MicrowaveOvenControl::Attributes::PowerStep::Id,
+    .attributeId    = Attributes::PowerStep::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -69,7 +69,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace PowerStep
 namespace SupportedWatts {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MicrowaveOvenControl::Attributes::SupportedWatts::Id,
+    .attributeId    = Attributes::SupportedWatts::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -77,7 +77,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace SupportedWatts
 namespace SelectedWattIndex {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MicrowaveOvenControl::Attributes::SelectedWattIndex::Id,
+    .attributeId    = Attributes::SelectedWattIndex::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -85,7 +85,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace SelectedWattIndex
 namespace WattRating {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MicrowaveOvenControl::Attributes::WattRating::Id,
+    .attributeId    = Attributes::WattRating::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -96,15 +96,15 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 
 namespace Commands {
 namespace SetCookingParameters {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = MicrowaveOvenControl::Commands::SetCookingParameters::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::SetCookingParameters::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace SetCookingParameters
 namespace AddMoreTime {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = MicrowaveOvenControl::Commands::AddMoreTime::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::AddMoreTime::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

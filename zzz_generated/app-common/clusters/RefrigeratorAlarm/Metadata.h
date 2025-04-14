@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace Mask {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = RefrigeratorAlarm::Attributes::Mask::Id,
+    .attributeId    = Attributes::Mask::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace Mask
 namespace State {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = RefrigeratorAlarm::Attributes::State::Id,
+    .attributeId    = Attributes::State::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -37,7 +37,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace State
 namespace Supported {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = RefrigeratorAlarm::Attributes::Supported::Id,
+    .attributeId    = Attributes::Supported::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,

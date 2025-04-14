@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace BorderRouterName {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ThreadBorderRouterManagement::Attributes::BorderRouterName::Id,
+    .attributeId    = Attributes::BorderRouterName::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace BorderRouterName
 namespace BorderAgentID {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ThreadBorderRouterManagement::Attributes::BorderAgentID::Id,
+    .attributeId    = Attributes::BorderAgentID::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -37,7 +37,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace BorderAgentID
 namespace ThreadVersion {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ThreadBorderRouterManagement::Attributes::ThreadVersion::Id,
+    .attributeId    = Attributes::ThreadVersion::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -45,7 +45,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ThreadVersion
 namespace InterfaceEnabled {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ThreadBorderRouterManagement::Attributes::InterfaceEnabled::Id,
+    .attributeId    = Attributes::InterfaceEnabled::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -53,7 +53,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace InterfaceEnabled
 namespace ActiveDatasetTimestamp {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id,
+    .attributeId    = Attributes::ActiveDatasetTimestamp::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -61,7 +61,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ActiveDatasetTimestamp
 namespace PendingDatasetTimestamp {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ThreadBorderRouterManagement::Attributes::PendingDatasetTimestamp::Id,
+    .attributeId    = Attributes::PendingDatasetTimestamp::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -72,29 +72,29 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 
 namespace Commands {
 namespace GetActiveDatasetRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = ThreadBorderRouterManagement::Commands::GetActiveDatasetRequest::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::GetActiveDatasetRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace GetActiveDatasetRequest
 namespace GetPendingDatasetRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = ThreadBorderRouterManagement::Commands::GetPendingDatasetRequest::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::GetPendingDatasetRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace GetPendingDatasetRequest
 namespace SetActiveDatasetRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = ThreadBorderRouterManagement::Commands::SetActiveDatasetRequest::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::SetActiveDatasetRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace SetActiveDatasetRequest
 namespace SetPendingDatasetRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = ThreadBorderRouterManagement::Commands::SetPendingDatasetRequest::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::SetPendingDatasetRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };

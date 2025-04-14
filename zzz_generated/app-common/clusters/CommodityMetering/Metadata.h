@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace MeteredQuantity {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CommodityMetering::Attributes::MeteredQuantity::Id,
+    .attributeId    = Attributes::MeteredQuantity::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace MeteredQuantity
 namespace MeteredQuantityTimestamp {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CommodityMetering::Attributes::MeteredQuantityTimestamp::Id,
+    .attributeId    = Attributes::MeteredQuantityTimestamp::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -37,7 +37,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace MeteredQuantityTimestamp
 namespace MeasurementType {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CommodityMetering::Attributes::MeasurementType::Id,
+    .attributeId    = Attributes::MeasurementType::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,

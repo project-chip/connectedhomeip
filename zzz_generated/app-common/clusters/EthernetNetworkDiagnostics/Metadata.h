@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace PHYRate {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = EthernetNetworkDiagnostics::Attributes::PHYRate::Id,
+    .attributeId    = Attributes::PHYRate::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace PHYRate
 namespace FullDuplex {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = EthernetNetworkDiagnostics::Attributes::FullDuplex::Id,
+    .attributeId    = Attributes::FullDuplex::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -37,7 +37,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace FullDuplex
 namespace PacketRxCount {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = EthernetNetworkDiagnostics::Attributes::PacketRxCount::Id,
+    .attributeId    = Attributes::PacketRxCount::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -45,7 +45,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace PacketRxCount
 namespace PacketTxCount {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = EthernetNetworkDiagnostics::Attributes::PacketTxCount::Id,
+    .attributeId    = Attributes::PacketTxCount::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -53,7 +53,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace PacketTxCount
 namespace TxErrCount {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = EthernetNetworkDiagnostics::Attributes::TxErrCount::Id,
+    .attributeId    = Attributes::TxErrCount::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -61,7 +61,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace TxErrCount
 namespace CollisionCount {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = EthernetNetworkDiagnostics::Attributes::CollisionCount::Id,
+    .attributeId    = Attributes::CollisionCount::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -69,7 +69,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace CollisionCount
 namespace OverrunCount {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = EthernetNetworkDiagnostics::Attributes::OverrunCount::Id,
+    .attributeId    = Attributes::OverrunCount::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -77,7 +77,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace OverrunCount
 namespace CarrierDetect {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = EthernetNetworkDiagnostics::Attributes::CarrierDetect::Id,
+    .attributeId    = Attributes::CarrierDetect::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -85,7 +85,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace CarrierDetect
 namespace TimeSinceReset {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = EthernetNetworkDiagnostics::Attributes::TimeSinceReset::Id,
+    .attributeId    = Attributes::TimeSinceReset::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -96,8 +96,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 
 namespace Commands {
 namespace ResetCounts {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = EthernetNetworkDiagnostics::Commands::ResetCounts::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::ResetCounts::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };

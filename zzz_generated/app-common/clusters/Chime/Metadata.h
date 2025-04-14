@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace InstalledChimeSounds {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Chime::Attributes::InstalledChimeSounds::Id,
+    .attributeId    = Attributes::InstalledChimeSounds::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace InstalledChimeSounds
 namespace SelectedChime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Chime::Attributes::SelectedChime::Id,
+    .attributeId    = Attributes::SelectedChime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
@@ -37,7 +37,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace SelectedChime
 namespace Enabled {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Chime::Attributes::Enabled::Id,
+    .attributeId    = Attributes::Enabled::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
@@ -48,8 +48,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 
 namespace Commands {
 namespace PlayChimeSound {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = Chime::Commands::PlayChimeSound::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::PlayChimeSound::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

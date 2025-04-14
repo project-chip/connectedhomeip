@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace Condition {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = HepaFilterMonitoring::Attributes::Condition::Id,
+    .attributeId    = Attributes::Condition::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace Condition
 namespace DegradationDirection {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = HepaFilterMonitoring::Attributes::DegradationDirection::Id,
+    .attributeId    = Attributes::DegradationDirection::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -37,7 +37,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace DegradationDirection
 namespace ChangeIndication {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = HepaFilterMonitoring::Attributes::ChangeIndication::Id,
+    .attributeId    = Attributes::ChangeIndication::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -45,7 +45,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ChangeIndication
 namespace InPlaceIndicator {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = HepaFilterMonitoring::Attributes::InPlaceIndicator::Id,
+    .attributeId    = Attributes::InPlaceIndicator::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -53,7 +53,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace InPlaceIndicator
 namespace LastChangedTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = HepaFilterMonitoring::Attributes::LastChangedTime::Id,
+    .attributeId    = Attributes::LastChangedTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
@@ -61,7 +61,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace LastChangedTime
 namespace ReplacementProductList {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = HepaFilterMonitoring::Attributes::ReplacementProductList::Id,
+    .attributeId    = Attributes::ReplacementProductList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -72,8 +72,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 
 namespace Commands {
 namespace ResetCondition {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = HepaFilterMonitoring::Commands::ResetCondition::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::ResetCondition::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

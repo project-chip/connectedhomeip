@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace OpenDuration {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ValveConfigurationAndControl::Attributes::OpenDuration::Id,
+    .attributeId    = Attributes::OpenDuration::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace OpenDuration
 namespace DefaultOpenDuration {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ValveConfigurationAndControl::Attributes::DefaultOpenDuration::Id,
+    .attributeId    = Attributes::DefaultOpenDuration::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
@@ -37,7 +37,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace DefaultOpenDuration
 namespace AutoCloseTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ValveConfigurationAndControl::Attributes::AutoCloseTime::Id,
+    .attributeId    = Attributes::AutoCloseTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -45,7 +45,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace AutoCloseTime
 namespace RemainingDuration {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ValveConfigurationAndControl::Attributes::RemainingDuration::Id,
+    .attributeId    = Attributes::RemainingDuration::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -53,7 +53,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace RemainingDuration
 namespace CurrentState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ValveConfigurationAndControl::Attributes::CurrentState::Id,
+    .attributeId    = Attributes::CurrentState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -61,7 +61,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace CurrentState
 namespace TargetState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ValveConfigurationAndControl::Attributes::TargetState::Id,
+    .attributeId    = Attributes::TargetState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -69,7 +69,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace TargetState
 namespace CurrentLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ValveConfigurationAndControl::Attributes::CurrentLevel::Id,
+    .attributeId    = Attributes::CurrentLevel::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -77,7 +77,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace CurrentLevel
 namespace TargetLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ValveConfigurationAndControl::Attributes::TargetLevel::Id,
+    .attributeId    = Attributes::TargetLevel::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -85,7 +85,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace TargetLevel
 namespace DefaultOpenLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ValveConfigurationAndControl::Attributes::DefaultOpenLevel::Id,
+    .attributeId    = Attributes::DefaultOpenLevel::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
@@ -93,7 +93,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace DefaultOpenLevel
 namespace ValveFault {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ValveConfigurationAndControl::Attributes::ValveFault::Id,
+    .attributeId    = Attributes::ValveFault::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -101,7 +101,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ValveFault
 namespace LevelStep {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ValveConfigurationAndControl::Attributes::LevelStep::Id,
+    .attributeId    = Attributes::LevelStep::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -112,15 +112,15 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 
 namespace Commands {
 namespace Open {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = ValveConfigurationAndControl::Commands::Open::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::Open::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Open
 namespace Close {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = ValveConfigurationAndControl::Commands::Close::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::Close::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

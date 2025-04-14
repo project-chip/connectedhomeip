@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace TariffInfo {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CommodityTariff::Attributes::TariffInfo::Id,
+    .attributeId    = Attributes::TariffInfo::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace TariffInfo
 namespace TariffUnit {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CommodityTariff::Attributes::TariffUnit::Id,
+    .attributeId    = Attributes::TariffUnit::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -37,7 +37,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace TariffUnit
 namespace StartDate {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CommodityTariff::Attributes::StartDate::Id,
+    .attributeId    = Attributes::StartDate::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -45,7 +45,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace StartDate
 namespace DayEntries {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CommodityTariff::Attributes::DayEntries::Id,
+    .attributeId    = Attributes::DayEntries::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -53,7 +53,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace DayEntries
 namespace DayPatterns {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CommodityTariff::Attributes::DayPatterns::Id,
+    .attributeId    = Attributes::DayPatterns::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -61,7 +61,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace DayPatterns
 namespace CalendarPeriods {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CommodityTariff::Attributes::CalendarPeriods::Id,
+    .attributeId    = Attributes::CalendarPeriods::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -69,7 +69,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace CalendarPeriods
 namespace IndividualDays {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CommodityTariff::Attributes::IndividualDays::Id,
+    .attributeId    = Attributes::IndividualDays::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -77,7 +77,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace IndividualDays
 namespace CurrentDay {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CommodityTariff::Attributes::CurrentDay::Id,
+    .attributeId    = Attributes::CurrentDay::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -85,7 +85,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace CurrentDay
 namespace NextDay {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CommodityTariff::Attributes::NextDay::Id,
+    .attributeId    = Attributes::NextDay::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -93,7 +93,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace NextDay
 namespace CurrentDayEntry {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CommodityTariff::Attributes::CurrentDayEntry::Id,
+    .attributeId    = Attributes::CurrentDayEntry::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -101,7 +101,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace CurrentDayEntry
 namespace CurrentDayEntryDate {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CommodityTariff::Attributes::CurrentDayEntryDate::Id,
+    .attributeId    = Attributes::CurrentDayEntryDate::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -109,7 +109,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace CurrentDayEntryDate
 namespace NextDayEntry {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CommodityTariff::Attributes::NextDayEntry::Id,
+    .attributeId    = Attributes::NextDayEntry::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -117,7 +117,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace NextDayEntry
 namespace NextDayEntryDate {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CommodityTariff::Attributes::NextDayEntryDate::Id,
+    .attributeId    = Attributes::NextDayEntryDate::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -125,7 +125,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace NextDayEntryDate
 namespace TariffComponents {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CommodityTariff::Attributes::TariffComponents::Id,
+    .attributeId    = Attributes::TariffComponents::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -133,7 +133,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace TariffComponents
 namespace TariffPeriods {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CommodityTariff::Attributes::TariffPeriods::Id,
+    .attributeId    = Attributes::TariffPeriods::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -141,7 +141,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace TariffPeriods
 namespace CurrentTariffComponents {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CommodityTariff::Attributes::CurrentTariffComponents::Id,
+    .attributeId    = Attributes::CurrentTariffComponents::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -149,7 +149,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace CurrentTariffComponents
 namespace NextTariffComponents {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CommodityTariff::Attributes::NextTariffComponents::Id,
+    .attributeId    = Attributes::NextTariffComponents::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -157,7 +157,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace NextTariffComponents
 namespace DefaultRandomizationOffset {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CommodityTariff::Attributes::DefaultRandomizationOffset::Id,
+    .attributeId    = Attributes::DefaultRandomizationOffset::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -165,7 +165,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace DefaultRandomizationOffset
 namespace DefaultRandomizationType {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CommodityTariff::Attributes::DefaultRandomizationType::Id,
+    .attributeId    = Attributes::DefaultRandomizationType::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -176,15 +176,15 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 
 namespace Commands {
 namespace GetTariffComponent {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = CommodityTariff::Commands::GetTariffComponent::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::GetTariffComponent::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace GetTariffComponent
 namespace GetDayEntry {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = CommodityTariff::Commands::GetDayEntry::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::GetDayEntry::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

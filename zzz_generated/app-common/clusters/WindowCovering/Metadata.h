@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 5;
 namespace Attributes {
 namespace Type {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WindowCovering::Attributes::Type::Id,
+    .attributeId    = Attributes::Type::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace Type
 namespace PhysicalClosedLimitLift {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WindowCovering::Attributes::PhysicalClosedLimitLift::Id,
+    .attributeId    = Attributes::PhysicalClosedLimitLift::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -37,7 +37,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace PhysicalClosedLimitLift
 namespace PhysicalClosedLimitTilt {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WindowCovering::Attributes::PhysicalClosedLimitTilt::Id,
+    .attributeId    = Attributes::PhysicalClosedLimitTilt::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -45,7 +45,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace PhysicalClosedLimitTilt
 namespace CurrentPositionLift {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WindowCovering::Attributes::CurrentPositionLift::Id,
+    .attributeId    = Attributes::CurrentPositionLift::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -53,7 +53,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace CurrentPositionLift
 namespace CurrentPositionTilt {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WindowCovering::Attributes::CurrentPositionTilt::Id,
+    .attributeId    = Attributes::CurrentPositionTilt::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -61,7 +61,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace CurrentPositionTilt
 namespace NumberOfActuationsLift {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WindowCovering::Attributes::NumberOfActuationsLift::Id,
+    .attributeId    = Attributes::NumberOfActuationsLift::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -69,7 +69,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace NumberOfActuationsLift
 namespace NumberOfActuationsTilt {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WindowCovering::Attributes::NumberOfActuationsTilt::Id,
+    .attributeId    = Attributes::NumberOfActuationsTilt::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -77,7 +77,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace NumberOfActuationsTilt
 namespace ConfigStatus {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WindowCovering::Attributes::ConfigStatus::Id,
+    .attributeId    = Attributes::ConfigStatus::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -85,7 +85,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ConfigStatus
 namespace CurrentPositionLiftPercentage {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WindowCovering::Attributes::CurrentPositionLiftPercentage::Id,
+    .attributeId    = Attributes::CurrentPositionLiftPercentage::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -93,7 +93,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace CurrentPositionLiftPercentage
 namespace CurrentPositionTiltPercentage {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WindowCovering::Attributes::CurrentPositionTiltPercentage::Id,
+    .attributeId    = Attributes::CurrentPositionTiltPercentage::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -101,7 +101,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace CurrentPositionTiltPercentage
 namespace OperationalStatus {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WindowCovering::Attributes::OperationalStatus::Id,
+    .attributeId    = Attributes::OperationalStatus::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -109,7 +109,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace OperationalStatus
 namespace TargetPositionLiftPercent100ths {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WindowCovering::Attributes::TargetPositionLiftPercent100ths::Id,
+    .attributeId    = Attributes::TargetPositionLiftPercent100ths::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -117,7 +117,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace TargetPositionLiftPercent100ths
 namespace TargetPositionTiltPercent100ths {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WindowCovering::Attributes::TargetPositionTiltPercent100ths::Id,
+    .attributeId    = Attributes::TargetPositionTiltPercent100ths::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -125,7 +125,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace TargetPositionTiltPercent100ths
 namespace EndProductType {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WindowCovering::Attributes::EndProductType::Id,
+    .attributeId    = Attributes::EndProductType::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -133,7 +133,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace EndProductType
 namespace CurrentPositionLiftPercent100ths {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WindowCovering::Attributes::CurrentPositionLiftPercent100ths::Id,
+    .attributeId    = Attributes::CurrentPositionLiftPercent100ths::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -141,7 +141,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace CurrentPositionLiftPercent100ths
 namespace CurrentPositionTiltPercent100ths {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WindowCovering::Attributes::CurrentPositionTiltPercent100ths::Id,
+    .attributeId    = Attributes::CurrentPositionTiltPercent100ths::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -149,7 +149,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace CurrentPositionTiltPercent100ths
 namespace InstalledOpenLimitLift {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WindowCovering::Attributes::InstalledOpenLimitLift::Id,
+    .attributeId    = Attributes::InstalledOpenLimitLift::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -157,7 +157,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace InstalledOpenLimitLift
 namespace InstalledClosedLimitLift {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WindowCovering::Attributes::InstalledClosedLimitLift::Id,
+    .attributeId    = Attributes::InstalledClosedLimitLift::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -165,7 +165,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace InstalledClosedLimitLift
 namespace InstalledOpenLimitTilt {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WindowCovering::Attributes::InstalledOpenLimitTilt::Id,
+    .attributeId    = Attributes::InstalledOpenLimitTilt::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -173,7 +173,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace InstalledOpenLimitTilt
 namespace InstalledClosedLimitTilt {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WindowCovering::Attributes::InstalledClosedLimitTilt::Id,
+    .attributeId    = Attributes::InstalledClosedLimitTilt::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -181,7 +181,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace InstalledClosedLimitTilt
 namespace Mode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WindowCovering::Attributes::Mode::Id,
+    .attributeId    = Attributes::Mode::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
@@ -189,7 +189,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace Mode
 namespace SafetyStatus {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WindowCovering::Attributes::SafetyStatus::Id,
+    .attributeId    = Attributes::SafetyStatus::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -200,50 +200,50 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 
 namespace Commands {
 namespace UpOrOpen {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = WindowCovering::Commands::UpOrOpen::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::UpOrOpen::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace UpOrOpen
 namespace DownOrClose {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = WindowCovering::Commands::DownOrClose::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::DownOrClose::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace DownOrClose
 namespace StopMotion {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = WindowCovering::Commands::StopMotion::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::StopMotion::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace StopMotion
 namespace GoToLiftValue {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = WindowCovering::Commands::GoToLiftValue::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::GoToLiftValue::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace GoToLiftValue
 namespace GoToLiftPercentage {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = WindowCovering::Commands::GoToLiftPercentage::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::GoToLiftPercentage::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace GoToLiftPercentage
 namespace GoToTiltValue {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = WindowCovering::Commands::GoToTiltValue::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::GoToTiltValue::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace GoToTiltValue
 namespace GoToTiltPercentage {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = WindowCovering::Commands::GoToTiltPercentage::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::GoToTiltPercentage::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

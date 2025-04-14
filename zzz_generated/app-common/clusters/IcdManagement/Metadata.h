@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 3;
 namespace Attributes {
 namespace IdleModeDuration {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = IcdManagement::Attributes::IdleModeDuration::Id,
+    .attributeId    = Attributes::IdleModeDuration::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace IdleModeDuration
 namespace ActiveModeDuration {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = IcdManagement::Attributes::ActiveModeDuration::Id,
+    .attributeId    = Attributes::ActiveModeDuration::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -37,7 +37,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ActiveModeDuration
 namespace ActiveModeThreshold {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = IcdManagement::Attributes::ActiveModeThreshold::Id,
+    .attributeId    = Attributes::ActiveModeThreshold::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -45,7 +45,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ActiveModeThreshold
 namespace RegisteredClients {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = IcdManagement::Attributes::RegisteredClients::Id,
+    .attributeId    = Attributes::RegisteredClients::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
@@ -53,7 +53,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace RegisteredClients
 namespace ICDCounter {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = IcdManagement::Attributes::ICDCounter::Id,
+    .attributeId    = Attributes::ICDCounter::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
@@ -61,7 +61,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ICDCounter
 namespace ClientsSupportedPerFabric {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = IcdManagement::Attributes::ClientsSupportedPerFabric::Id,
+    .attributeId    = Attributes::ClientsSupportedPerFabric::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -69,7 +69,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ClientsSupportedPerFabric
 namespace UserActiveModeTriggerHint {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = IcdManagement::Attributes::UserActiveModeTriggerHint::Id,
+    .attributeId    = Attributes::UserActiveModeTriggerHint::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -77,7 +77,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace UserActiveModeTriggerHint
 namespace UserActiveModeTriggerInstruction {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id,
+    .attributeId    = Attributes::UserActiveModeTriggerInstruction::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -85,7 +85,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace UserActiveModeTriggerInstruction
 namespace OperatingMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = IcdManagement::Attributes::OperatingMode::Id,
+    .attributeId    = Attributes::OperatingMode::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -93,7 +93,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace OperatingMode
 namespace MaximumCheckInBackOff {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = IcdManagement::Attributes::MaximumCheckInBackOff::Id,
+    .attributeId    = Attributes::MaximumCheckInBackOff::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -104,22 +104,22 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 
 namespace Commands {
 namespace RegisterClient {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = IcdManagement::Commands::RegisterClient::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::RegisterClient::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace RegisterClient
 namespace UnregisterClient {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = IcdManagement::Commands::UnregisterClient::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::UnregisterClient::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace UnregisterClient
 namespace StayActiveRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = IcdManagement::Commands::StayActiveRequest::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::StayActiveRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };

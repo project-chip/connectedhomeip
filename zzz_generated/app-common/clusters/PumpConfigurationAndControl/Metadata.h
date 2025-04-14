@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 4;
 namespace Attributes {
 namespace MaxPressure {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PumpConfigurationAndControl::Attributes::MaxPressure::Id,
+    .attributeId    = Attributes::MaxPressure::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace MaxPressure
 namespace MaxSpeed {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PumpConfigurationAndControl::Attributes::MaxSpeed::Id,
+    .attributeId    = Attributes::MaxSpeed::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -37,7 +37,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace MaxSpeed
 namespace MaxFlow {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PumpConfigurationAndControl::Attributes::MaxFlow::Id,
+    .attributeId    = Attributes::MaxFlow::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -45,7 +45,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace MaxFlow
 namespace MinConstPressure {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PumpConfigurationAndControl::Attributes::MinConstPressure::Id,
+    .attributeId    = Attributes::MinConstPressure::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -53,7 +53,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace MinConstPressure
 namespace MaxConstPressure {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PumpConfigurationAndControl::Attributes::MaxConstPressure::Id,
+    .attributeId    = Attributes::MaxConstPressure::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -61,7 +61,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace MaxConstPressure
 namespace MinCompPressure {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PumpConfigurationAndControl::Attributes::MinCompPressure::Id,
+    .attributeId    = Attributes::MinCompPressure::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -69,7 +69,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace MinCompPressure
 namespace MaxCompPressure {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PumpConfigurationAndControl::Attributes::MaxCompPressure::Id,
+    .attributeId    = Attributes::MaxCompPressure::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -77,7 +77,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace MaxCompPressure
 namespace MinConstSpeed {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PumpConfigurationAndControl::Attributes::MinConstSpeed::Id,
+    .attributeId    = Attributes::MinConstSpeed::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -85,7 +85,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace MinConstSpeed
 namespace MaxConstSpeed {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PumpConfigurationAndControl::Attributes::MaxConstSpeed::Id,
+    .attributeId    = Attributes::MaxConstSpeed::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -93,7 +93,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace MaxConstSpeed
 namespace MinConstFlow {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PumpConfigurationAndControl::Attributes::MinConstFlow::Id,
+    .attributeId    = Attributes::MinConstFlow::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -101,7 +101,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace MinConstFlow
 namespace MaxConstFlow {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PumpConfigurationAndControl::Attributes::MaxConstFlow::Id,
+    .attributeId    = Attributes::MaxConstFlow::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -109,7 +109,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace MaxConstFlow
 namespace MinConstTemp {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PumpConfigurationAndControl::Attributes::MinConstTemp::Id,
+    .attributeId    = Attributes::MinConstTemp::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -117,7 +117,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace MinConstTemp
 namespace MaxConstTemp {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PumpConfigurationAndControl::Attributes::MaxConstTemp::Id,
+    .attributeId    = Attributes::MaxConstTemp::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -125,7 +125,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace MaxConstTemp
 namespace PumpStatus {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PumpConfigurationAndControl::Attributes::PumpStatus::Id,
+    .attributeId    = Attributes::PumpStatus::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -133,7 +133,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace PumpStatus
 namespace EffectiveOperationMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PumpConfigurationAndControl::Attributes::EffectiveOperationMode::Id,
+    .attributeId    = Attributes::EffectiveOperationMode::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -141,7 +141,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace EffectiveOperationMode
 namespace EffectiveControlMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PumpConfigurationAndControl::Attributes::EffectiveControlMode::Id,
+    .attributeId    = Attributes::EffectiveControlMode::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -149,7 +149,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace EffectiveControlMode
 namespace Capacity {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PumpConfigurationAndControl::Attributes::Capacity::Id,
+    .attributeId    = Attributes::Capacity::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -157,7 +157,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace Capacity
 namespace Speed {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PumpConfigurationAndControl::Attributes::Speed::Id,
+    .attributeId    = Attributes::Speed::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -165,7 +165,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace Speed
 namespace LifetimeRunningHours {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PumpConfigurationAndControl::Attributes::LifetimeRunningHours::Id,
+    .attributeId    = Attributes::LifetimeRunningHours::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
@@ -173,7 +173,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace LifetimeRunningHours
 namespace Power {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PumpConfigurationAndControl::Attributes::Power::Id,
+    .attributeId    = Attributes::Power::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -181,7 +181,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace Power
 namespace LifetimeEnergyConsumed {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::Id,
+    .attributeId    = Attributes::LifetimeEnergyConsumed::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
@@ -189,7 +189,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace LifetimeEnergyConsumed
 namespace OperationMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PumpConfigurationAndControl::Attributes::OperationMode::Id,
+    .attributeId    = Attributes::OperationMode::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
@@ -197,7 +197,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace OperationMode
 namespace ControlMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PumpConfigurationAndControl::Attributes::ControlMode::Id,
+    .attributeId    = Attributes::ControlMode::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,

@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace Current {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ClosureDimension::Attributes::Current::Id,
+    .attributeId    = Attributes::Current::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace Current
 namespace Target {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ClosureDimension::Attributes::Target::Id,
+    .attributeId    = Attributes::Target::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -37,7 +37,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace Target
 namespace Resolution {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ClosureDimension::Attributes::Resolution::Id,
+    .attributeId    = Attributes::Resolution::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -45,7 +45,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace Resolution
 namespace StepValue {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ClosureDimension::Attributes::StepValue::Id,
+    .attributeId    = Attributes::StepValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -53,7 +53,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace StepValue
 namespace Unit {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ClosureDimension::Attributes::Unit::Id,
+    .attributeId    = Attributes::Unit::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -61,7 +61,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace Unit
 namespace UnitRange {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ClosureDimension::Attributes::UnitRange::Id,
+    .attributeId    = Attributes::UnitRange::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -69,7 +69,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace UnitRange
 namespace LimitRange {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ClosureDimension::Attributes::LimitRange::Id,
+    .attributeId    = Attributes::LimitRange::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -77,7 +77,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace LimitRange
 namespace TranslationDirection {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ClosureDimension::Attributes::TranslationDirection::Id,
+    .attributeId    = Attributes::TranslationDirection::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -85,7 +85,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace TranslationDirection
 namespace RotationAxis {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ClosureDimension::Attributes::RotationAxis::Id,
+    .attributeId    = Attributes::RotationAxis::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -93,7 +93,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace RotationAxis
 namespace Overflow {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ClosureDimension::Attributes::Overflow::Id,
+    .attributeId    = Attributes::Overflow::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -101,7 +101,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace Overflow
 namespace ModulationType {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ClosureDimension::Attributes::ModulationType::Id,
+    .attributeId    = Attributes::ModulationType::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -112,15 +112,15 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 
 namespace Commands {
 namespace SetTarget {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = ClosureDimension::Commands::SetTarget::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::SetTarget::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace SetTarget
 namespace Step {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = ClosureDimension::Commands::Step::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::Step::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

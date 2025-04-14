@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 6;
 namespace Attributes {
 namespace CurrentLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = LevelControl::Attributes::CurrentLevel::Id,
+    .attributeId    = Attributes::CurrentLevel::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace CurrentLevel
 namespace RemainingTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = LevelControl::Attributes::RemainingTime::Id,
+    .attributeId    = Attributes::RemainingTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -37,7 +37,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace RemainingTime
 namespace MinLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = LevelControl::Attributes::MinLevel::Id,
+    .attributeId    = Attributes::MinLevel::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -45,7 +45,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace MinLevel
 namespace MaxLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = LevelControl::Attributes::MaxLevel::Id,
+    .attributeId    = Attributes::MaxLevel::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -53,7 +53,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace MaxLevel
 namespace CurrentFrequency {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = LevelControl::Attributes::CurrentFrequency::Id,
+    .attributeId    = Attributes::CurrentFrequency::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -61,7 +61,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace CurrentFrequency
 namespace MinFrequency {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = LevelControl::Attributes::MinFrequency::Id,
+    .attributeId    = Attributes::MinFrequency::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -69,7 +69,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace MinFrequency
 namespace MaxFrequency {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = LevelControl::Attributes::MaxFrequency::Id,
+    .attributeId    = Attributes::MaxFrequency::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -77,7 +77,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace MaxFrequency
 namespace Options {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = LevelControl::Attributes::Options::Id,
+    .attributeId    = Attributes::Options::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
@@ -85,7 +85,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace Options
 namespace OnOffTransitionTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = LevelControl::Attributes::OnOffTransitionTime::Id,
+    .attributeId    = Attributes::OnOffTransitionTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
@@ -93,7 +93,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace OnOffTransitionTime
 namespace OnLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = LevelControl::Attributes::OnLevel::Id,
+    .attributeId    = Attributes::OnLevel::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
@@ -101,7 +101,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace OnLevel
 namespace OnTransitionTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = LevelControl::Attributes::OnTransitionTime::Id,
+    .attributeId    = Attributes::OnTransitionTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
@@ -109,7 +109,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace OnTransitionTime
 namespace OffTransitionTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = LevelControl::Attributes::OffTransitionTime::Id,
+    .attributeId    = Attributes::OffTransitionTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
@@ -117,7 +117,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace OffTransitionTime
 namespace DefaultMoveRate {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = LevelControl::Attributes::DefaultMoveRate::Id,
+    .attributeId    = Attributes::DefaultMoveRate::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
@@ -125,7 +125,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace DefaultMoveRate
 namespace StartUpCurrentLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = LevelControl::Attributes::StartUpCurrentLevel::Id,
+    .attributeId    = Attributes::StartUpCurrentLevel::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
@@ -136,64 +136,64 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 
 namespace Commands {
 namespace MoveToLevel {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = LevelControl::Commands::MoveToLevel::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::MoveToLevel::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace MoveToLevel
 namespace Move {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = LevelControl::Commands::Move::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::Move::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Move
 namespace Step {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = LevelControl::Commands::Step::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::Step::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Step
 namespace Stop {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = LevelControl::Commands::Stop::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::Stop::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Stop
 namespace MoveToLevelWithOnOff {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = LevelControl::Commands::MoveToLevelWithOnOff::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::MoveToLevelWithOnOff::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace MoveToLevelWithOnOff
 namespace MoveWithOnOff {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = LevelControl::Commands::MoveWithOnOff::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::MoveWithOnOff::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace MoveWithOnOff
 namespace StepWithOnOff {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = LevelControl::Commands::StepWithOnOff::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::StepWithOnOff::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace StepWithOnOff
 namespace StopWithOnOff {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = LevelControl::Commands::StopWithOnOff::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::StopWithOnOff::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace StopWithOnOff
 namespace MoveToClosestFrequency {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = LevelControl::Commands::MoveToClosestFrequency::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::MoveToClosestFrequency::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

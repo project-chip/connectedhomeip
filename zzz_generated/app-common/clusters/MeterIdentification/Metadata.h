@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace MeterType {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MeterIdentification::Attributes::MeterType::Id,
+    .attributeId    = Attributes::MeterType::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace MeterType
 namespace PointOfDelivery {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MeterIdentification::Attributes::PointOfDelivery::Id,
+    .attributeId    = Attributes::PointOfDelivery::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -37,7 +37,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace PointOfDelivery
 namespace MeterSerialNumber {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MeterIdentification::Attributes::MeterSerialNumber::Id,
+    .attributeId    = Attributes::MeterSerialNumber::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -45,7 +45,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace MeterSerialNumber
 namespace ProtocolVersion {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MeterIdentification::Attributes::ProtocolVersion::Id,
+    .attributeId    = Attributes::ProtocolVersion::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -53,7 +53,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ProtocolVersion
 namespace PowerThreshold {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MeterIdentification::Attributes::PowerThreshold::Id,
+    .attributeId    = Attributes::PowerThreshold::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,

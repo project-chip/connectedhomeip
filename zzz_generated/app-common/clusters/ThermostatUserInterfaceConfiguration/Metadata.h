@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 2;
 namespace Attributes {
 namespace TemperatureDisplayMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::Id,
+    .attributeId    = Attributes::TemperatureDisplayMode::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace TemperatureDisplayMode
 namespace KeypadLockout {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::Id,
+    .attributeId    = Attributes::KeypadLockout::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
@@ -37,7 +37,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace KeypadLockout
 namespace ScheduleProgrammingVisibility {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::Id,
+    .attributeId    = Attributes::ScheduleProgrammingVisibility::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,

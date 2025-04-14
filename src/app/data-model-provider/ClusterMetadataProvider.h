@@ -24,11 +24,13 @@ namespace chip {
 namespace app {
 namespace DataModel {
 
-// Base type to implement the bridge
+// This template will be specialized for each cluster type generated through idl_codegen
 template <class TypeInfo, ClusterId cluster>
 struct ClusterMetadataProvider
 {
-    static_assert(!std::is_same_v<TypeInfo, TypeInfo>, "Metadata provider for this TypeInfo and Cluster is not implemented")
+    static_assert(!std::is_same_v<TypeInfo, TypeInfo>,
+                  "Metadata provider for this TypeInfo and Cluster is not implemented, try importing "
+                  "<clusters/MetadataBridge.h>");
 };
 
 } // namespace DataModel

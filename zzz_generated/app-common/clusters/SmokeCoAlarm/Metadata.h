@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace ExpressedState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = SmokeCoAlarm::Attributes::ExpressedState::Id,
+    .attributeId    = Attributes::ExpressedState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ExpressedState
 namespace SmokeState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = SmokeCoAlarm::Attributes::SmokeState::Id,
+    .attributeId    = Attributes::SmokeState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -37,7 +37,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace SmokeState
 namespace COState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = SmokeCoAlarm::Attributes::COState::Id,
+    .attributeId    = Attributes::COState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -45,7 +45,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace COState
 namespace BatteryAlert {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = SmokeCoAlarm::Attributes::BatteryAlert::Id,
+    .attributeId    = Attributes::BatteryAlert::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -53,7 +53,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace BatteryAlert
 namespace DeviceMuted {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = SmokeCoAlarm::Attributes::DeviceMuted::Id,
+    .attributeId    = Attributes::DeviceMuted::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -61,7 +61,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace DeviceMuted
 namespace TestInProgress {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = SmokeCoAlarm::Attributes::TestInProgress::Id,
+    .attributeId    = Attributes::TestInProgress::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -69,7 +69,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace TestInProgress
 namespace HardwareFaultAlert {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = SmokeCoAlarm::Attributes::HardwareFaultAlert::Id,
+    .attributeId    = Attributes::HardwareFaultAlert::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -77,7 +77,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace HardwareFaultAlert
 namespace EndOfServiceAlert {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = SmokeCoAlarm::Attributes::EndOfServiceAlert::Id,
+    .attributeId    = Attributes::EndOfServiceAlert::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -85,7 +85,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace EndOfServiceAlert
 namespace InterconnectSmokeAlarm {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = SmokeCoAlarm::Attributes::InterconnectSmokeAlarm::Id,
+    .attributeId    = Attributes::InterconnectSmokeAlarm::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -93,7 +93,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace InterconnectSmokeAlarm
 namespace InterconnectCOAlarm {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = SmokeCoAlarm::Attributes::InterconnectCOAlarm::Id,
+    .attributeId    = Attributes::InterconnectCOAlarm::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -101,7 +101,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace InterconnectCOAlarm
 namespace ContaminationState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = SmokeCoAlarm::Attributes::ContaminationState::Id,
+    .attributeId    = Attributes::ContaminationState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -109,7 +109,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ContaminationState
 namespace SmokeSensitivityLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = SmokeCoAlarm::Attributes::SmokeSensitivityLevel::Id,
+    .attributeId    = Attributes::SmokeSensitivityLevel::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
@@ -117,7 +117,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace SmokeSensitivityLevel
 namespace ExpiryDate {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = SmokeCoAlarm::Attributes::ExpiryDate::Id,
+    .attributeId    = Attributes::ExpiryDate::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -128,8 +128,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 
 namespace Commands {
 namespace SelfTestRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = SmokeCoAlarm::Commands::SelfTestRequest::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::SelfTestRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

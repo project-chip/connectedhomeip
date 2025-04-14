@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace DefaultOTAProviders {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id,
+    .attributeId    = Attributes::DefaultOTAProviders::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kAdminister,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace DefaultOTAProviders
 namespace UpdatePossible {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id,
+    .attributeId    = Attributes::UpdatePossible::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -37,7 +37,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace UpdatePossible
 namespace UpdateState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id,
+    .attributeId    = Attributes::UpdateState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -45,7 +45,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace UpdateState
 namespace UpdateStateProgress {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id,
+    .attributeId    = Attributes::UpdateStateProgress::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -56,8 +56,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 
 namespace Commands {
 namespace AnnounceOTAProvider {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::AnnounceOTAProvider::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

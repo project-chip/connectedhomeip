@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace PowerMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ElectricalPowerMeasurement::Attributes::PowerMode::Id,
+    .attributeId    = Attributes::PowerMode::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace PowerMode
 namespace NumberOfMeasurementTypes {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ElectricalPowerMeasurement::Attributes::NumberOfMeasurementTypes::Id,
+    .attributeId    = Attributes::NumberOfMeasurementTypes::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -37,7 +37,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace NumberOfMeasurementTypes
 namespace Accuracy {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ElectricalPowerMeasurement::Attributes::Accuracy::Id,
+    .attributeId    = Attributes::Accuracy::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -45,7 +45,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace Accuracy
 namespace Ranges {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ElectricalPowerMeasurement::Attributes::Ranges::Id,
+    .attributeId    = Attributes::Ranges::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -53,7 +53,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace Ranges
 namespace Voltage {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ElectricalPowerMeasurement::Attributes::Voltage::Id,
+    .attributeId    = Attributes::Voltage::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -61,7 +61,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace Voltage
 namespace ActiveCurrent {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ElectricalPowerMeasurement::Attributes::ActiveCurrent::Id,
+    .attributeId    = Attributes::ActiveCurrent::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -69,7 +69,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ActiveCurrent
 namespace ReactiveCurrent {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ElectricalPowerMeasurement::Attributes::ReactiveCurrent::Id,
+    .attributeId    = Attributes::ReactiveCurrent::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -77,7 +77,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ReactiveCurrent
 namespace ApparentCurrent {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ElectricalPowerMeasurement::Attributes::ApparentCurrent::Id,
+    .attributeId    = Attributes::ApparentCurrent::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -85,7 +85,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ApparentCurrent
 namespace ActivePower {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ElectricalPowerMeasurement::Attributes::ActivePower::Id,
+    .attributeId    = Attributes::ActivePower::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -93,7 +93,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ActivePower
 namespace ReactivePower {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ElectricalPowerMeasurement::Attributes::ReactivePower::Id,
+    .attributeId    = Attributes::ReactivePower::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -101,7 +101,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ReactivePower
 namespace ApparentPower {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ElectricalPowerMeasurement::Attributes::ApparentPower::Id,
+    .attributeId    = Attributes::ApparentPower::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -109,7 +109,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ApparentPower
 namespace RMSVoltage {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ElectricalPowerMeasurement::Attributes::RMSVoltage::Id,
+    .attributeId    = Attributes::RMSVoltage::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -117,7 +117,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace RMSVoltage
 namespace RMSCurrent {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ElectricalPowerMeasurement::Attributes::RMSCurrent::Id,
+    .attributeId    = Attributes::RMSCurrent::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -125,7 +125,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace RMSCurrent
 namespace RMSPower {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ElectricalPowerMeasurement::Attributes::RMSPower::Id,
+    .attributeId    = Attributes::RMSPower::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -133,7 +133,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace RMSPower
 namespace Frequency {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ElectricalPowerMeasurement::Attributes::Frequency::Id,
+    .attributeId    = Attributes::Frequency::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -141,7 +141,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace Frequency
 namespace HarmonicCurrents {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ElectricalPowerMeasurement::Attributes::HarmonicCurrents::Id,
+    .attributeId    = Attributes::HarmonicCurrents::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -149,7 +149,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace HarmonicCurrents
 namespace HarmonicPhases {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ElectricalPowerMeasurement::Attributes::HarmonicPhases::Id,
+    .attributeId    = Attributes::HarmonicPhases::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -157,7 +157,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace HarmonicPhases
 namespace PowerFactor {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ElectricalPowerMeasurement::Attributes::PowerFactor::Id,
+    .attributeId    = Attributes::PowerFactor::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -165,7 +165,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace PowerFactor
 namespace NeutralCurrent {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ElectricalPowerMeasurement::Attributes::NeutralCurrent::Id,
+    .attributeId    = Attributes::NeutralCurrent::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,

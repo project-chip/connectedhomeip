@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace Bssid {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WiFiNetworkDiagnostics::Attributes::Bssid::Id,
+    .attributeId    = Attributes::Bssid::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace Bssid
 namespace SecurityType {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WiFiNetworkDiagnostics::Attributes::SecurityType::Id,
+    .attributeId    = Attributes::SecurityType::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -37,7 +37,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace SecurityType
 namespace WiFiVersion {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WiFiNetworkDiagnostics::Attributes::WiFiVersion::Id,
+    .attributeId    = Attributes::WiFiVersion::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -45,7 +45,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace WiFiVersion
 namespace ChannelNumber {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WiFiNetworkDiagnostics::Attributes::ChannelNumber::Id,
+    .attributeId    = Attributes::ChannelNumber::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -53,7 +53,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ChannelNumber
 namespace Rssi {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WiFiNetworkDiagnostics::Attributes::Rssi::Id,
+    .attributeId    = Attributes::Rssi::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -61,7 +61,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace Rssi
 namespace BeaconLostCount {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WiFiNetworkDiagnostics::Attributes::BeaconLostCount::Id,
+    .attributeId    = Attributes::BeaconLostCount::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -69,7 +69,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace BeaconLostCount
 namespace BeaconRxCount {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WiFiNetworkDiagnostics::Attributes::BeaconRxCount::Id,
+    .attributeId    = Attributes::BeaconRxCount::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -77,7 +77,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace BeaconRxCount
 namespace PacketMulticastRxCount {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WiFiNetworkDiagnostics::Attributes::PacketMulticastRxCount::Id,
+    .attributeId    = Attributes::PacketMulticastRxCount::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -85,7 +85,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace PacketMulticastRxCount
 namespace PacketMulticastTxCount {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WiFiNetworkDiagnostics::Attributes::PacketMulticastTxCount::Id,
+    .attributeId    = Attributes::PacketMulticastTxCount::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -93,7 +93,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace PacketMulticastTxCount
 namespace PacketUnicastRxCount {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WiFiNetworkDiagnostics::Attributes::PacketUnicastRxCount::Id,
+    .attributeId    = Attributes::PacketUnicastRxCount::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -101,7 +101,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace PacketUnicastRxCount
 namespace PacketUnicastTxCount {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::Id,
+    .attributeId    = Attributes::PacketUnicastTxCount::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -109,7 +109,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace PacketUnicastTxCount
 namespace CurrentMaxRate {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::Id,
+    .attributeId    = Attributes::CurrentMaxRate::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -117,7 +117,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace CurrentMaxRate
 namespace OverrunCount {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WiFiNetworkDiagnostics::Attributes::OverrunCount::Id,
+    .attributeId    = Attributes::OverrunCount::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -128,8 +128,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 
 namespace Commands {
 namespace ResetCounts {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = WiFiNetworkDiagnostics::Commands::ResetCounts::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::ResetCounts::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

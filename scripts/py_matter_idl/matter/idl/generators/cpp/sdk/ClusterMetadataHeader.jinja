@@ -22,7 +22,7 @@ namespace Attributes {
 {% for attribute in cluster.attributes | reject("global_attribute") -%}
 namespace {{attribute.definition.name | upfirst}} {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = {{cluster.name | upfirst}}::Attributes::{{attribute.definition.name | upfirst}}::Id,
+    .attributeId    = Attributes::{{attribute.definition.name | upfirst}}::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ {{ attribute | extract_attribute_quality_flags | join(", ") }} },
     .readPrivilege  = {% if attribute.is_readable -%}
         {{attribute.readacl | as_privilege}}
@@ -45,8 +45,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 {% for command in cluster.commands -%}
 namespace {{command.name | upfirst}} {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = {{cluster.name | upfirst}}::Commands::{{command.name | upfirst}}::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
+    .commandId       = Commands::{{command.name | upfirst}}::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ {{ command | extract_command_quality_flags | join(", ") }} },
     .invokePrivilege = {{ command.invokeacl | as_privilege}},
 };
@@ -54,7 +54,6 @@ inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
 {% endfor %}
 } // namespace Commands
 } // namespace {{cluster.name}}
-
 } // namespace Clusters
 } // namespace app
 } // namespace chip

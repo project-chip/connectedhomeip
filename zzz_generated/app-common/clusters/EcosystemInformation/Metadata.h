@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace DeviceDirectory {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = EcosystemInformation::Attributes::DeviceDirectory::Id,
+    .attributeId    = Attributes::DeviceDirectory::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kManage,
     .writePrivilege = std::nullopt,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace DeviceDirectory
 namespace LocationDirectory {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = EcosystemInformation::Attributes::LocationDirectory::Id,
+    .attributeId    = Attributes::LocationDirectory::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kManage,
     .writePrivilege = std::nullopt,

@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace VendorName {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ApplicationBasic::Attributes::VendorName::Id,
+    .attributeId    = Attributes::VendorName::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace VendorName
 namespace VendorID {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ApplicationBasic::Attributes::VendorID::Id,
+    .attributeId    = Attributes::VendorID::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -37,7 +37,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace VendorID
 namespace ApplicationName {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ApplicationBasic::Attributes::ApplicationName::Id,
+    .attributeId    = Attributes::ApplicationName::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -45,7 +45,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ApplicationName
 namespace ProductID {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ApplicationBasic::Attributes::ProductID::Id,
+    .attributeId    = Attributes::ProductID::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -53,7 +53,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ProductID
 namespace Application {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ApplicationBasic::Attributes::Application::Id,
+    .attributeId    = Attributes::Application::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -61,7 +61,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace Application
 namespace Status {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ApplicationBasic::Attributes::Status::Id,
+    .attributeId    = Attributes::Status::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -69,7 +69,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace Status
 namespace ApplicationVersion {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ApplicationBasic::Attributes::ApplicationVersion::Id,
+    .attributeId    = Attributes::ApplicationVersion::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -77,7 +77,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ApplicationVersion
 namespace AllowedVendorList {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ApplicationBasic::Attributes::AllowedVendorList::Id,
+    .attributeId    = Attributes::AllowedVendorList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
