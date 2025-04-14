@@ -9,10 +9,8 @@
  *        http://www.apache.org/licenses/LICENSE-2.0
  *
  *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ *    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
 /**
@@ -22,6 +20,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-enums.h>
+#include <app/cluster-building-blocks/QuieterReporting.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -32,22 +31,28 @@ namespace Clusters {
 namespace ClosureControl {
 
 /**
+ * @brief Closure Control optional attribute enum class
+ */
+enum class OptionalAttributeEnum : uint32_t
+{
+    kCountdownTime = 0x1
+};
+
+/**
  * @brief Structure is used to configure and validate the Cluster configuration.
  *        Validates if the feature map, attributes and commands configuration is valid.
  */
 struct ClusterConformance
 {
 public:
-    inline bool HasFeature(Feature aFeature) const { return mFeatureMap.Has(aFeature); }
+    // Expose the feature map directly for chaining and other operations
+    BitFlags<Feature> & FeatureMap() { return mFeatureMap; }
+    const BitFlags<Feature> & FeatureMap() const { return mFeatureMap; }
 
-    /**
-     * @brief Get the Feature Map object
-     *        This function can be used to configure the feature map.
-     *        Here is an example : conformance.GetFeatureMap().Set(Feature::...).Set(Feature:...)
-     *
-     * @return BitFlags<Feature>& reference to the ClusterConformance feature map
-     */
-    BitFlags<Feature> & GetFeatureMap() { return mFeatureMap; }
+    BitFlags<OptionalAttributeEnum> & OptionalAttributes() { return mOptionalAttributes; }
+    const BitFlags<OptionalAttributeEnum> & OptionalAttributes() const { return mOptionalAttributes; }
+
+    inline bool HasFeature(Feature aFeature) const { return mFeatureMap.Has(aFeature); }
 
     /**
      * @brief Functions determines if Cluster confrmance is valid
@@ -87,7 +92,22 @@ public:
 
 private:
     BitFlags<Feature> mFeatureMap;
+    BitFlags<OptionalAttributeEnum> mOptionalAttributes;
 };
+
+/**
+ * @brief Struct to store the current cluster state
+ */
+struct ClusterState
+{
+    QuieterReportingAttribute<DataModel::Nullable<ElapsedS>> mCountDownTime = QuieterReportingAttribute<DataModel::NullNullable>();
+    MainStateEnum mMainState                                                = kUnknownEnumValue;
+    DataModel::Nullable<GenericOverallState>                                = DataModel::NullNullable;
+    DataModel::Nullable<GenericOverallTarget>                               = DataModel::NullNullable;
+
+    // CurrentErrorList attribute is not stored here. When it is necessary it will be requested from the delegate to get the current
+    // active errors.
+}
 
 } // namespace ClosureControl
 } // namespace Clusters
