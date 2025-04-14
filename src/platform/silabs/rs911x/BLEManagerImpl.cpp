@@ -1057,7 +1057,11 @@ CHIP_ERROR BLEManagerImpl::EncodeAdditionalDataTlv()
     err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(
         additionalDataPayloadParams, sInstance.c3AdditionalDataBufferHandle, additionalDataFields);
 
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "Failed to generate TLV encoded Additional Data"));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to generate TLV encoded Additional Data: %" CHIP_ERROR_FORMAT, err.Format());
+     }
+     return err;
 
     return CHIP_NO_ERROR;
 }
