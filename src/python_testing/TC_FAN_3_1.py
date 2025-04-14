@@ -158,20 +158,20 @@ class TC_FAN_3_1(MatterBaseTest):
         logging.info(f"[FC] *** Value range to write: {value_range[0]} - {value_range[-1]}")
 
     def log_results(self) -> None:
-        logging.info(f"[FC]")
-        logging.info(f"[FC] - PercentSetting Sub -")
+        logging.info("[FC]")
+        logging.info("[FC] - PercentSetting Sub -")
         for q in self.sub_percent_setting.attribute_queue.queue:
             logging.info(f"[FC] {q.attribute.__name__}: {q.value}")
-        logging.info(f"[FC]")
-        logging.info(f"[FC] - FanMode Sub -")
+        logging.info("[FC]")
+        logging.info("[FC] - FanMode Sub -")
         for q in self.sub_fan_mode.attribute_queue.queue:
             logging.info(f"[FC] {q.attribute.__name__}: {q.value}")
-        logging.info(f"[FC]")
+        logging.info("[FC]")
         if self.supports_multispeed:
-            logging.info(f"[FC] - SpeedSetting Sub -")
+            logging.info("[FC] - SpeedSetting Sub -")
             for q in self.sub_speed_setting.attribute_queue.queue:
                 logging.info(f"[FC] {q.attribute.__name__}: {q.value}")
-            logging.info(f"[FC]")
+            logging.info("[FC]")
 
     async def subscribe_to_attributes(self) -> None:
         # Setup
