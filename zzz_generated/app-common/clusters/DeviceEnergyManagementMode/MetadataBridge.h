@@ -16,7 +16,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::DeviceEnergyManagementMode::Id>
 {
-    constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
+    static constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
     {
         using namespace Clusters::DeviceEnergyManagementMode::Attributes;
         switch (commandId)
@@ -35,7 +35,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::DeviceEnergy
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::DeviceEnergyManagementMode::Id>
 {
-    constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
     {
         using namespace Clusters::DeviceEnergyManagementMode::Commands;
         switch (commandId)

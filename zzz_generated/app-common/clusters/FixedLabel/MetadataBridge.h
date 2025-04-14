@@ -16,7 +16,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::FixedLabel::Id>
 {
-    constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
+    static constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
     {
         using namespace Clusters::FixedLabel::Attributes;
         switch (commandId)
@@ -33,7 +33,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::FixedLabel::
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::FixedLabel::Id>
 {
-    constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
     {
         using namespace Clusters::FixedLabel::Commands;
         switch (commandId)

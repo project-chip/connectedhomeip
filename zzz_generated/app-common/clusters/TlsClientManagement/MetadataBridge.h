@@ -16,7 +16,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::TlsClientManagement::Id>
 {
-    constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
+    static constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
     {
         using namespace Clusters::TlsClientManagement::Attributes;
         switch (commandId)
@@ -35,7 +35,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::TlsClientMan
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::TlsClientManagement::Id>
 {
-    constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
     {
         using namespace Clusters::TlsClientManagement::Commands;
         switch (commandId)

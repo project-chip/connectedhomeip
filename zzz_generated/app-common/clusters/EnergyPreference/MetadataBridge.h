@@ -16,7 +16,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::EnergyPreference::Id>
 {
-    constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
+    static constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
     {
         using namespace Clusters::EnergyPreference::Attributes;
         switch (commandId)
@@ -41,7 +41,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::EnergyPrefer
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::EnergyPreference::Id>
 {
-    constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
     {
         using namespace Clusters::EnergyPreference::Commands;
         switch (commandId)

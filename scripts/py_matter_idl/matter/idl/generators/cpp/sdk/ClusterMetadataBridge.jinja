@@ -16,7 +16,7 @@ namespace DataModel {
 template<>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::{{cluster.name | upfirst}}::Id>
 {
-  constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId) {
+  static constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId) {
     using namespace Clusters::{{cluster.name | upfirst}}::Attributes;
     switch(commandId){
     {% for attribute in cluster.attributes | reject("global_attribute") -%}
@@ -30,7 +30,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::{{cluster.na
 template<>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::{{cluster.name | upfirst}}::Id>
 {
-  constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId) {
+  static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId) {
     using namespace Clusters::{{cluster.name | upfirst}}::Commands;
     switch(commandId){
     {% for command in cluster.commands -%}

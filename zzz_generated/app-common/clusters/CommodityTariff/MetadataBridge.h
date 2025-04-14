@@ -16,7 +16,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::CommodityTariff::Id>
 {
-    constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
+    static constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
     {
         using namespace Clusters::CommodityTariff::Attributes;
         switch (commandId)
@@ -69,7 +69,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::CommodityTar
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::CommodityTariff::Id>
 {
-    constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
     {
         using namespace Clusters::CommodityTariff::Commands;
         switch (commandId)

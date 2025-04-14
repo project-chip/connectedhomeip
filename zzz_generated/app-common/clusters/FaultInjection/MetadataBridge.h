@@ -16,7 +16,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::FaultInjection::Id>
 {
-    constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
+    static constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
     {
         using namespace Clusters::FaultInjection::Attributes;
         switch (commandId)
@@ -31,7 +31,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::FaultInjecti
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::FaultInjection::Id>
 {
-    constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
     {
         using namespace Clusters::FaultInjection::Commands;
         switch (commandId)

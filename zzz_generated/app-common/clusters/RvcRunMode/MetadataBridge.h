@@ -16,7 +16,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::RvcRunMode::Id>
 {
-    constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
+    static constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
     {
         using namespace Clusters::RvcRunMode::Attributes;
         switch (commandId)
@@ -35,7 +35,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::RvcRunMode::
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::RvcRunMode::Id>
 {
-    constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
     {
         using namespace Clusters::RvcRunMode::Commands;
         switch (commandId)

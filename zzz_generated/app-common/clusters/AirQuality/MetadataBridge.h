@@ -16,7 +16,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::AirQuality::Id>
 {
-    constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
+    static constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
     {
         using namespace Clusters::AirQuality::Attributes;
         switch (commandId)
@@ -33,7 +33,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::AirQuality::
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::AirQuality::Id>
 {
-    constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
     {
         using namespace Clusters::AirQuality::Commands;
         switch (commandId)

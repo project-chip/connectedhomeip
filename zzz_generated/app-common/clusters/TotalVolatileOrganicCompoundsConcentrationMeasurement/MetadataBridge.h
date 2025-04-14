@@ -16,7 +16,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id>
 {
-    constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
+    static constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
     {
         using namespace Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Attributes;
         switch (commandId)
@@ -53,7 +53,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::TotalVolatil
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id>
 {
-    constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
     {
         using namespace Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Commands;
         switch (commandId)

@@ -16,7 +16,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::PowerTopology::Id>
 {
-    constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
+    static constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
     {
         using namespace Clusters::PowerTopology::Attributes;
         switch (commandId)
@@ -35,7 +35,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::PowerTopolog
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::PowerTopology::Id>
 {
-    constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
     {
         using namespace Clusters::PowerTopology::Commands;
         switch (commandId)

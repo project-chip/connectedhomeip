@@ -16,7 +16,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::Pm1ConcentrationMeasurement::Id>
 {
-    constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
+    static constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
     {
         using namespace Clusters::Pm1ConcentrationMeasurement::Attributes;
         switch (commandId)
@@ -53,7 +53,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::Pm1Concentra
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Pm1ConcentrationMeasurement::Id>
 {
-    constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
     {
         using namespace Clusters::Pm1ConcentrationMeasurement::Commands;
         switch (commandId)

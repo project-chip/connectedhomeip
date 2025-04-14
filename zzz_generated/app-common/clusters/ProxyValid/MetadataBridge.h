@@ -16,7 +16,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ProxyValid::Id>
 {
-    constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
+    static constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
     {
         using namespace Clusters::ProxyValid::Attributes;
         switch (commandId)
@@ -31,7 +31,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ProxyValid::
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::ProxyValid::Id>
 {
-    constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
     {
         using namespace Clusters::ProxyValid::Commands;
         switch (commandId)

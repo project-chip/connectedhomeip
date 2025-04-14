@@ -16,7 +16,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::WaterHeaterManagement::Id>
 {
-    constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
+    static constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
     {
         using namespace Clusters::WaterHeaterManagement::Attributes;
         switch (commandId)
@@ -43,7 +43,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::WaterHeaterM
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::WaterHeaterManagement::Id>
 {
-    constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
     {
         using namespace Clusters::WaterHeaterManagement::Commands;
         switch (commandId)

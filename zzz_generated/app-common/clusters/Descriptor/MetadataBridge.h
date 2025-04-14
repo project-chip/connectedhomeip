@@ -16,7 +16,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::Descriptor::Id>
 {
-    constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
+    static constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
     {
         using namespace Clusters::Descriptor::Attributes;
         switch (commandId)
@@ -41,7 +41,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::Descriptor::
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Descriptor::Id>
 {
-    constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
     {
         using namespace Clusters::Descriptor::Commands;
         switch (commandId)

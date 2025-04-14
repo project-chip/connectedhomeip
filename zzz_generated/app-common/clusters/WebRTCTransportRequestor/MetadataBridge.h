@@ -16,7 +16,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::WebRTCTransportRequestor::Id>
 {
-    constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
+    static constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
     {
         using namespace Clusters::WebRTCTransportRequestor::Attributes;
         switch (commandId)
@@ -33,7 +33,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::WebRTCTransp
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::WebRTCTransportRequestor::Id>
 {
-    constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
     {
         using namespace Clusters::WebRTCTransportRequestor::Commands;
         switch (commandId)

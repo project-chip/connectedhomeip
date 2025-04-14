@@ -16,7 +16,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::IcdManagement::Id>
 {
-    constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
+    static constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
     {
         using namespace Clusters::IcdManagement::Attributes;
         switch (commandId)
@@ -51,7 +51,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::IcdManagemen
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::IcdManagement::Id>
 {
-    constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
     {
         using namespace Clusters::IcdManagement::Commands;
         switch (commandId)

@@ -16,7 +16,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::PumpConfigurationAndControl::Id>
 {
-    constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
+    static constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
     {
         using namespace Clusters::PumpConfigurationAndControl::Attributes;
         switch (commandId)
@@ -77,7 +77,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::PumpConfigur
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::PumpConfigurationAndControl::Id>
 {
-    constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
     {
         using namespace Clusters::PumpConfigurationAndControl::Commands;
         switch (commandId)

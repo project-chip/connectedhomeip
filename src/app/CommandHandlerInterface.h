@@ -28,6 +28,7 @@
 #include <clusters/MetadataBridge.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Iterators.h>
+#include <lib/support/SplitLambda.h>
 
 namespace chip {
 namespace app {
@@ -236,9 +237,10 @@ private:
 };
 
 template <ClusterId... TClusterIds>
-class CommandHandlerInterfaceShim : CommandHandlerInterface
+class CommandHandlerInterfaceShim : public CommandHandlerInterface
 {
 
+    using CommandHandlerInterface::CommandHandlerInterface;
     DataModel::AcceptedCommandEntry GetEntry(const ConcreteClusterPath & cluster, CommandId command)
     {
         if constexpr (sizeof...(TClusterIds) == 0)
@@ -283,6 +285,11 @@ class CommandHandlerInterfaceShim : CommandHandlerInterface
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
+    virtual CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
     CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, DataModel::ListBuilder<CommandId> & builder) override
     {
         size_t commandCount = 0;
@@ -293,7 +300,7 @@ class CommandHandlerInterfaceShim : CommandHandlerInterface
             return Loop::Continue;
         });
 
-        ReturnErrorOnFailure(EnumerateGeneratedCommands(cluster, counter.Caller(), counter.Context()));
+        ReturnErrorOnFailure(this->EnumerateGeneratedCommands(cluster, counter.Caller(), counter.Context()));
         ReturnErrorOnFailure(builder.EnsureAppendCapacity(commandCount));
 
         auto appender = SplitLambda([&](CommandId commandId) {
@@ -301,7 +308,7 @@ class CommandHandlerInterfaceShim : CommandHandlerInterface
             return err == CHIP_NO_ERROR ? Loop::Continue : Loop::Break;
         });
 
-        ReturnErrorOnFailure(EnumerateGeneratedCommands(cluster, appender.Caller(), appender.Context()));
+        ReturnErrorOnFailure(this->EnumerateGeneratedCommands(cluster, appender.Caller(), appender.Context()));
         ReturnErrorOnFailure(err);
         // the two invocations MUST return the same sizes
         VerifyOrReturnError(builder.Size() == commandCount, CHIP_ERROR_INTERNAL);

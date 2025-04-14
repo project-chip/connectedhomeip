@@ -16,7 +16,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ColorControl::Id>
 {
-    constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
+    static constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId)
     {
         using namespace Clusters::ColorControl::Attributes;
         switch (commandId)
@@ -135,7 +135,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ColorControl
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::ColorControl::Id>
 {
-    constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
     {
         using namespace Clusters::ColorControl::Commands;
         switch (commandId)
