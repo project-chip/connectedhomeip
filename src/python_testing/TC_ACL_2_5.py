@@ -71,13 +71,12 @@ class TC_ACL_2_5(MatterBaseTest):
             TestStep(8, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element",
                      "Result is 0x87 (CONSTRAINT_ERROR)-Data value exceeds maximum length."),
             TestStep(9, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlExtensionChanged event",
-                     "Result is SUCCESS, value is list of AccessControlExtensionChanged containing at least 1 new element, and MUST NOT contain an added event for the extension with data that is too large"),
+                     "Result is SUCCESS, value is empty list (received ReportData Message should have no/empty EventReportIB list)"),
             TestStep(10, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 2 elements",
                      "Result is 0x87 (CONSTRAINT_ERROR)-as there are more than 1 entry associated with the given accessing fabric index in the extension list"),
             TestStep(11, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlExtensionChanged event",
-                     "Result is SUCCESS, value is list of AccessControlExtensionChanged containing at least 1 new element, and MUST NOT contain an added event for the second extension"),
-            TestStep(
-                12, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is an empty list", "Result is SUCCESS"),
+                     "Result is SUCCESS, value is empty list (received ReportData Message should have no/empty EventReportIB list) since the entire list of Test Step 10 was rejected."),
+            TestStep(12, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is an empty list", "Result is SUCCESS"),
             TestStep(13, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlExtensionChanged event",
                      "Result is SUCCESS, value is list of AccessControlExtensionChanged containing at least 1 new element"),
         ]
