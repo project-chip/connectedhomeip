@@ -22,9 +22,9 @@
 #include <arpa/inet.h>
 #include <commands/interactive/InteractiveCommands.h>
 #include <crypto/RandUtils.h>
-#include <lib/support/StringBuilder.h>
-
 #include <cstdio>
+#include <lib/support/StringBuilder.h>
+#include <nlohmann/json.hpp>
 #include <string>
 
 using namespace chip;
@@ -37,6 +37,8 @@ namespace {
 constexpr const char * kWebRTCDataChannelName = "urn:csa:matter:av-metadata";
 
 } // namespace
+
+using nlohmann::json;
 
 WebRTCManager::WebRTCManager() : mWebRTCRequestorServer(kWebRTCRequesterDynamicEndpointId, mWebRTCRequestorDelegate) {}
 
@@ -104,7 +106,7 @@ CHIP_ERROR WebRTCManager::HandleAnswer(uint16_t sessionId, const std::string & s
     mPeerConnection->setRemoteDescription(answerDesc);
 
     // Schedule the ProvideICECandidates() call to run asynchronously.
-    DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() { ProvideICECandidates(sessionId); });
+    // DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() { ProvideICECandidates(sessionId); });
 
     return CHIP_NO_ERROR;
 }
@@ -141,6 +143,7 @@ CHIP_ERROR WebRTCManager::HandleICECandidates(uint16_t sessionId, const std::vec
                                std::string(candidate.SDPMid.Value().begin(), candidate.SDPMid.Value().end())));
         }
     }
+    // DeviceLayer::SystemLayer().ScheduleLambda([this, webRTCSessionID]() { ProvideICECandidates(webRTCSessionID); });
 
     return CHIP_NO_ERROR;
 }
@@ -177,7 +180,8 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
     mPeerConnection->onLocalDescription([this](rtc::Description desc) {
         mLocalDescription = std::string(desc);
         ChipLogProgress(Camera, "Local Description:");
-        ChipLogProgress(Camera, "%s", mLocalDescription.c_str());
+        json offer = { { "offer", mLocalDescription } };
+        ChipLogProgress(Camera, "%s", offer.dump().c_str());
     });
 
     mPeerConnection->onLocalCandidate([this](rtc::Candidate candidate) {
@@ -190,8 +194,21 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
     mPeerConnection->onStateChange(
         [](rtc::PeerConnection::State state) { ChipLogProgress(Camera, "[PeerConnection State: %d]", static_cast<int>(state)); });
 
-    mPeerConnection->onGatheringStateChange([](rtc::PeerConnection::GatheringState state) {
+    mPeerConnection->onGatheringStateChange([this](rtc::PeerConnection::GatheringState state) {
         ChipLogProgress(Camera, "[Gathering State: %d]", static_cast<int>(state));
+        if (state == rtc::PeerConnection::GatheringState::Complete)
+        {
+            std::ostringstream oss;
+            oss << "[";
+            for (size_t i = 0; i < mLocalCandidates.size(); i++)
+            {
+                oss << "\"" << mLocalCandidates[i] << "\"";
+                if (i != mLocalCandidates.size() - 1)
+                    oss << ", ";
+            }
+            oss << "]";
+            ChipLogProgress(Camera, "IceCandidates: %s", oss.str().c_str());
+        }
     });
 
     // Add a media track so that controller can receive video

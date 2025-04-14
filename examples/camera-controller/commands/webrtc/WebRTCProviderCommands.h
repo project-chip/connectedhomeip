@@ -28,7 +28,7 @@ public:
     ConnectCommand(CredentialIssuerCommands * credIssuerCommands) : CHIPCommand("connect", credIssuerCommands)
     {
         AddArgument("node-id", 0, UINT64_MAX, &mPeerNodeId);
-        AddArgument("endpointid", 0, UINT16_MAX, &mPeerEndpointId);
+        AddArgument("endpoint-id-ignored-for-group-commands", 0, UINT16_MAX, &mPeerEndpointId);
     }
 
     /////////// CHIPCommand Interface /////////
