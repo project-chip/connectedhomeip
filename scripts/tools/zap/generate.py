@@ -300,7 +300,7 @@ def runClangPrettifier(templates_file, output_dir):
             print('Formatted %d files using %s (%s)' %
                   (len(clangOutputs), clang_format, subprocess.check_output([clang_format, '--version'])))
             for outputName in clangOutputs:
-                logging.detail("Formatted: %s", outputName)
+                logging.debug("Formatted: %s", outputName)
     except subprocess.CalledProcessError as err:
         print('clang-format error: %s', err)
 
