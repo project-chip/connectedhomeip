@@ -112,14 +112,14 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 
 namespace Commands {
 namespace Open {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = ValveConfigurationAndControl::Commands::Open::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Open
 namespace Close {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = ValveConfigurationAndControl::Commands::Close::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,

@@ -736,189 +736,189 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 
 namespace Commands {
 namespace Test {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = UnitTesting::Commands::Test::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Test
 namespace TestNotHandled {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = UnitTesting::Commands::TestNotHandled::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace TestNotHandled
 namespace TestSpecific {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = UnitTesting::Commands::TestSpecific::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace TestSpecific
 namespace TestUnknownCommand {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = UnitTesting::Commands::TestUnknownCommand::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace TestUnknownCommand
 namespace TestAddArguments {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = UnitTesting::Commands::TestAddArguments::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace TestAddArguments
 namespace TestSimpleArgumentRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = UnitTesting::Commands::TestSimpleArgumentRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace TestSimpleArgumentRequest
 namespace TestStructArrayArgumentRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = UnitTesting::Commands::TestStructArrayArgumentRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace TestStructArrayArgumentRequest
 namespace TestStructArgumentRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = UnitTesting::Commands::TestStructArgumentRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace TestStructArgumentRequest
 namespace TestNestedStructArgumentRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = UnitTesting::Commands::TestNestedStructArgumentRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace TestNestedStructArgumentRequest
 namespace TestListStructArgumentRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = UnitTesting::Commands::TestListStructArgumentRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace TestListStructArgumentRequest
 namespace TestListInt8UArgumentRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = UnitTesting::Commands::TestListInt8UArgumentRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace TestListInt8UArgumentRequest
 namespace TestNestedStructListArgumentRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = UnitTesting::Commands::TestNestedStructListArgumentRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace TestNestedStructListArgumentRequest
 namespace TestListNestedStructListArgumentRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = UnitTesting::Commands::TestListNestedStructListArgumentRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace TestListNestedStructListArgumentRequest
 namespace TestListInt8UReverseRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = UnitTesting::Commands::TestListInt8UReverseRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace TestListInt8UReverseRequest
 namespace TestEnumsRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = UnitTesting::Commands::TestEnumsRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace TestEnumsRequest
 namespace TestNullableOptionalRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = UnitTesting::Commands::TestNullableOptionalRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace TestNullableOptionalRequest
 namespace TestComplexNullableOptionalRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = UnitTesting::Commands::TestComplexNullableOptionalRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace TestComplexNullableOptionalRequest
 namespace SimpleStructEchoRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = UnitTesting::Commands::SimpleStructEchoRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace SimpleStructEchoRequest
 namespace TimedInvokeRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = UnitTesting::Commands::TimedInvokeRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace TimedInvokeRequest
 namespace TestSimpleOptionalArgumentRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = UnitTesting::Commands::TestSimpleOptionalArgumentRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace TestSimpleOptionalArgumentRequest
 namespace TestEmitTestEventRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = UnitTesting::Commands::TestEmitTestEventRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace TestEmitTestEventRequest
 namespace TestEmitTestFabricScopedEventRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = UnitTesting::Commands::TestEmitTestFabricScopedEventRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace TestEmitTestFabricScopedEventRequest
 namespace TestBatchHelperRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = UnitTesting::Commands::TestBatchHelperRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace TestBatchHelperRequest
 namespace TestSecondBatchHelperRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = UnitTesting::Commands::TestSecondBatchHelperRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace TestSecondBatchHelperRequest
 namespace StringEchoRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = UnitTesting::Commands::StringEchoRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace StringEchoRequest
 namespace GlobalEchoRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = UnitTesting::Commands::GlobalEchoRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace GlobalEchoRequest
 namespace TestDifferentVendorMeiRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = UnitTesting::Commands::TestDifferentVendorMeiRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,

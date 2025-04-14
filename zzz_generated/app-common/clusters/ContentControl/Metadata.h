@@ -88,70 +88,70 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 
 namespace Commands {
 namespace UpdatePIN {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = ContentControl::Commands::UpdatePIN::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace UpdatePIN
 namespace ResetPIN {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = ContentControl::Commands::ResetPIN::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace ResetPIN
 namespace Enable {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = ContentControl::Commands::Enable::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Enable
 namespace Disable {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = ContentControl::Commands::Disable::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Disable
 namespace AddBonusTime {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = ContentControl::Commands::AddBonusTime::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace AddBonusTime
 namespace SetScreenDailyTime {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = ContentControl::Commands::SetScreenDailyTime::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace SetScreenDailyTime
 namespace BlockUnratedContent {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = ContentControl::Commands::BlockUnratedContent::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace BlockUnratedContent
 namespace UnblockUnratedContent {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = ContentControl::Commands::UnblockUnratedContent::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace UnblockUnratedContent
 namespace SetOnDemandRatingThreshold {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = ContentControl::Commands::SetOnDemandRatingThreshold::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace SetOnDemandRatingThreshold
 namespace SetScheduledContentRatingThreshold {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = ContentControl::Commands::SetScheduledContentRatingThreshold::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,

@@ -22,7 +22,7 @@ namespace Attributes {} // namespace Attributes
 
 namespace Commands {
 namespace ContentAppMessage {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = ContentAppObserver::Commands::ContentAppMessage::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,

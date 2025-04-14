@@ -22,7 +22,7 @@ namespace Attributes {} // namespace Attributes
 
 namespace Commands {
 namespace GetSetupPIN {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = AccountLogin::Commands::GetSetupPIN::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped,
                                                                  DataModel::CommandQualityFlags::kTimed },
@@ -30,7 +30,7 @@ inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
 };
 } // namespace GetSetupPIN
 namespace Login {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = AccountLogin::Commands::Login::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped,
                                                                  DataModel::CommandQualityFlags::kTimed },
@@ -38,7 +38,7 @@ inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
 };
 } // namespace Login
 namespace Logout {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = AccountLogin::Commands::Logout::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped,
                                                                  DataModel::CommandQualityFlags::kTimed },
