@@ -41,8 +41,8 @@ import string
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.testing.matter_asserts import (assert_int_in_range, assert_string_length,
-                                         assert_valid_uint8, assert_valid_uint16, assert_valid_uint64)
+from chip.testing.matter_asserts import (assert_int_in_range, assert_string_length, assert_valid_uint8, assert_valid_uint16,
+                                         assert_valid_uint64)
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
 
