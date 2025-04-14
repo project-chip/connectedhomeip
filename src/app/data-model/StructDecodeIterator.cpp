@@ -21,7 +21,7 @@ namespace app {
 namespace Clusters {
 namespace detail {
 
-CHIP_ERROR StructDecodeIterator::Next(uint8_t &context_tag)
+CHIP_ERROR StructDecodeIterator::Next(uint8_t & context_tag)
 {
     if (!mEntered)
     {

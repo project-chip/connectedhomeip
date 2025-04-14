@@ -40,7 +40,7 @@ public:
     ///   - uint8_t CONTEXT TAG (keep iterating)
     ///   - CHIP_ERROR (including CHIP_NO_ERROR) which should be a final
     ///     return value (stop iterating)
-    CHIP_ERROR Next(uint8_t &context_tag);
+    CHIP_ERROR Next(uint8_t & context_tag);
 
 private:
     bool mEntered = false;
