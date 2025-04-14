@@ -520,12 +520,6 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
             status = setOnOffValue(endpoint, onOffValueForStartUp, true);
         }
 
-#if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
-        // Registers Scene handlers for the On/Off cluster on the server
-        app::Clusters::ScenesManagement::ScenesServer::Instance().RegisterSceneHandler(endpoint,
-                                                                                       OnOffServer::Instance().GetSceneHandler());
-#endif // defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
-
 #ifdef MATTER_DM_PLUGIN_MODE_SELECT
         // If OnMode is not a null value, then change the current mode to it.
         if (onOffValueForStartUp && emberAfContainsServer(endpoint, ModeSelect::Id) &&
@@ -541,6 +535,12 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
 #endif
     }
 #endif // IGNORE_ON_OFF_CLUSTER_START_UP_ON_OFF
+
+#if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+    // Registers Scene handlers for the On/Off cluster on the server
+    app::Clusters::ScenesManagement::ScenesServer::Instance().RegisterSceneHandler(endpoint,
+                                                                                   OnOffServer::Instance().GetSceneHandler());
+#endif // defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 
     emberAfPluginOnOffClusterServerPostInitCallback(endpoint);
 }
@@ -1038,3 +1038,5 @@ void onOffWaitTimeOffEventHandler(chip::EndpointId endpoint)
 void emberAfPluginOnOffClusterServerPostInitCallback(EndpointId endpoint) {}
 
 void MatterOnOffPluginServerInitCallback() {}
+
+void MatterOnOffPluginServerShutdownCallback() {}

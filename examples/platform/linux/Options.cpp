@@ -27,6 +27,7 @@
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <json/json.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Base64.h>
 #include <lib/support/BytesToHex.h>
@@ -132,6 +133,10 @@ enum
     kDeviceOption_TermsAndConditions_Version,
     kDeviceOption_TermsAndConditions_Required,
 #endif
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    kDeviceOption_icdActiveModeDurationMs,
+    kDeviceOption_icdIdleModeDuration,
+#endif // CHIP_ENABLE_ICD_SERVER
     kDeviceOption_VendorName            = 0x1028,
     kDeviceOption_ProductName           = 0x1029,
     kDeviceOption_HardwareVersionString = 0x102a,
@@ -143,7 +148,7 @@ constexpr unsigned kAppUsageLength = 64;
 
 OptionDef sDeviceOptionDefs[] = {
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-    { "ble-device", kArgumentRequired, kDeviceOption_BleDevice },
+    { "ble-controller", kArgumentRequired, kDeviceOption_BleDevice },
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     { "wifi", kNoArgument, kDeviceOption_WiFi },
@@ -222,13 +227,17 @@ OptionDef sDeviceOptionDefs[] = {
     { "tc-version", kArgumentRequired, kDeviceOption_TermsAndConditions_Version },
     { "tc-required", kArgumentRequired, kDeviceOption_TermsAndConditions_Required },
 #endif
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    { "icdActiveModeDurationMs", kArgumentRequired, kDeviceOption_icdActiveModeDurationMs },
+    { "icdIdleModeDuration", kArgumentRequired, kDeviceOption_icdIdleModeDuration },
+#endif // CHIP_ENABLE_ICD_SERVER
     {}
 };
 
 const char * sDeviceOptionHelp =
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-    "  --ble-device <number>\n"
-    "       The device number for CHIPoBLE, without 'hci' prefix, can be found by hciconfig.\n"
+    "  --ble-controller <selector>\n"
+    "       BLE controller selector, see example or platform docs for details\n"
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     "\n"
@@ -408,8 +417,17 @@ const char * sDeviceOptionHelp =
     "  --faults <fault-string,...>\n"
     "       Inject specified fault(s) at runtime.\n"
 #endif
-    "   --dac_provider <filepath>\n"
+    "  --dac_provider <filepath>\n"
     "       A json file with data used by the example dac provider to validate device attestation procedure.\n"
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    "  --icdActiveModeDurationMs <icdActiveModeDurationMs>\n"
+    "       Sets the ICD active mode duration (in milliseconds). (Default: 300) \n"
+    "       This defines the how long the the server typically will stay in active mode after \n"
+    "       initial transition out of idle mode.\n"
+    "  --icdIdleModeDuration <icdIdleModeDuration>\n"
+    "       Sets the ICD idle mode durations (in seconds). (Default: 300)\n"
+    "       This defines the how long the ICD server can stay in idle mode.\n"
+#endif
     "\n";
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
@@ -819,6 +837,35 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
     case kDeviceOption_SerialNumber:
         LinuxDeviceOptions::GetInstance().serialNumber.SetValue(std::string{ aValue });
         break;
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    case kDeviceOption_icdActiveModeDurationMs: {
+        uint32_t value = static_cast<uint32_t>(strtoul(aValue, nullptr, 0));
+        if (value < 1)
+        {
+            PrintArgError("%s: invalid value specified for icdActiveModeDurationMs: %s\n", aProgram, aValue);
+            retval = false;
+        }
+        else
+        {
+            LinuxDeviceOptions::GetInstance().icdActiveModeDurationMs.SetValue(chip::System::Clock::Milliseconds32(value));
+        }
+        break;
+    }
+    case kDeviceOption_icdIdleModeDuration: {
+        uint32_t value = static_cast<uint32_t>(strtoul(aValue, nullptr, 0));
+        if ((value < 1) || (value > 86400))
+        {
+            PrintArgError("%s: invalid value specified for icdIdleModeDuration: %s\n", aProgram, aValue);
+            retval = false;
+        }
+        else
+        {
+            // Covert from seconds to mini seconds
+            LinuxDeviceOptions::GetInstance().icdIdleModeDurationMs.SetValue(chip::System::Clock::Milliseconds32(value * 1000));
+        }
+        break;
+    }
+#endif
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;

@@ -18,6 +18,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/nxp_sdk.gni")
 import("//build_overrides/openthread.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/nxp/common/ota/ota.gni")
 
 # If external SDK is used, do not import ${nxp_sdk_name}.gni
 if (!nxp_external_sdk) {
@@ -27,6 +28,14 @@ if (!nxp_external_sdk) {
 import("${nxp_sdk_build_root}/nxp_sdk.gni")
 
 assert(chip_device_platform == "nxp")
+
+declare_args() {
+  # Enable OTA encryption
+  chip_with_ota_encryption = false
+
+  # AES key encryption for OTA encryption (16 bytes)
+  chip_with_ota_key = "1234567890ABCDEFA1B2C3D4E5F6F1B4"
+}
 
 source_set("nxp_factory_data") {
 }
@@ -56,14 +65,10 @@ config("nxp_platform_config") {
       assert(nxp_enable_secure_whole_factory_data &&
                  !nxp_enable_secure_EL2GO_factory_data,
              "please select only one protection solution")
-      defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/rt/rw61x/FactoryDataProviderEncImpl.h\"" ]
     } else if (nxp_enable_secure_EL2GO_factory_data) {
       assert(!nxp_enable_secure_whole_factory_data &&
                  nxp_enable_secure_EL2GO_factory_data,
              "please select only one protection solution")
-      defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/rt/rw61x/FactoryDataProviderEl2GoImpl.h\"" ]
-    } else {
-      defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/rt/rw61x/FactoryDataProviderImpl.h\"" ]
     }
   }
 
@@ -149,12 +154,19 @@ static_library("nxp_platform") {
   }
 
   if (chip_enable_ota_requestor) {
-    sources += [
-      "../../common/OTAImageProcessorImpl.cpp",
-      "../../common/OTAImageProcessorImpl.h",
-    ]
-    include_dirs =
-        [ "${chip_root}/examples/platform/nxp/common/mcuboot_app_support/" ]
+    defines += [ "CONFIG_CHIP_OTA_POSTED_OPERATIONS_IN_IDLE=1" ]
+    sources += ota_sources
+    if (nxp_enable_ota_factory_data_processor) {
+      defines += [ "CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR=1" ]
+    }
+    if (chip_with_ota_encryption) {
+      defines += [
+        "OTA_ENCRYPTION_ENABLE=1",
+        "OTA_ENCRYPTION_KEY=\"${chip_with_ota_key}\"",
+      ]
+    } else {
+      defines += [ "OTA_ENCRYPTION_ENABLE=0" ]
+    }
   }
 
   if (chip_enable_openthread) {
@@ -201,9 +213,18 @@ static_library("nxp_platform") {
 
   if (nxp_use_factory_data) {
     sources += [
-      "../../common/factory_data/FactoryDataProvider.cpp",
-      "../../common/factory_data/FactoryDataProvider.h",
+      "../../common/factory_data/legacy/FactoryDataProvider.cpp",
+      "../../common/factory_data/legacy/FactoryDataProvider.h",
     ]
+    if (nxp_enable_ota_factory_data_processor) {
+      sources += [
+        "../../common/factory_data/legacy/FactoryDataDriver.cpp",
+        "../../common/factory_data/legacy/FactoryDataDriver.h",
+        "FactoryDataDriverImpl.cpp",
+        "FactoryDataDriverImpl.h",
+      ]
+    }
+
     if (nxp_enable_secure_whole_factory_data) {
       sources += [
         "FactoryDataProviderEncImpl.cpp",

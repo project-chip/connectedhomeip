@@ -479,3 +479,9 @@ void MatterBasicInformationPluginServerInitCallback()
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
     PlatformMgr().SetDelegate(&gPlatformMgrDelegate);
 }
+
+void MatterBasicInformationPluginServerShutdownCallback()
+{
+    PlatformMgr().SetDelegate(nullptr);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
+}

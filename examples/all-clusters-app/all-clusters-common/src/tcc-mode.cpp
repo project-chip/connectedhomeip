@@ -98,3 +98,12 @@ void emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(c
                                               chip::to_underlying(Feature::kOnOff));
     gTccModeInstance->Init();
 }
+
+void emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterShutdownCallback(chip::EndpointId endpointId)
+{
+    if (gTccModeInstance)
+    {
+        gTccModeInstance->Shutdown();
+    }
+    RefrigeratorAndTemperatureControlledCabinetMode::Shutdown();
+}
