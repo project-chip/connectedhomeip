@@ -130,7 +130,7 @@ class TC_FAN_3_1(MatterBaseTest):
         # Compute value range tro write
         if attr_to_update == attribute.PercentSetting:
             value_range = range(1, percent_setting_max_value +
-                                    1) if order == OrderEnum.Ascending else range(percent_setting_max_value - 1, -1, -1)
+                                1) if order == OrderEnum.Ascending else range(percent_setting_max_value - 1, -1, -1)
         elif attr_to_update == attribute.FanMode:
             value_range = range(1, fan_modes_qty) if order == OrderEnum.Ascending else range(
                 fan_modes_qty - 2, -1, -1)
@@ -198,7 +198,7 @@ class TC_FAN_3_1(MatterBaseTest):
 
         # Verify that the PercentSetting attribute values progressed in the expected order
         ps_values = [q.value for q in self.sub_percent_setting.attribute_queue.queue]
-        ps_correct_progression =  all(comp(a, b) for a, b in zip(ps_values, ps_values[1:]))
+        ps_correct_progression = all(comp(a, b) for a, b in zip(ps_values, ps_values[1:]))
         asserts.assert_true(ps_correct_progression, f"[FC] PercentSetting: {shared_str}")
 
         # Verify that the FanMode attribute values progressed in the expected order
