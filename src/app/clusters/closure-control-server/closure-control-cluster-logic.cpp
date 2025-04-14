@@ -50,6 +50,30 @@ CHIP_ERROR ClusterStateAttributes::SetTargetState(const DataModel::Nullable<Gene
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ClusterStateAttributes::GetCountdownTime(DataModel::Nullable<ElapsedS> & countdownTime)
+{
+    // TODO: Implement logic to retrieve CountdownTime
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClusterStateAttributes::GetMainState(MainStateEnum & mainState)
+{
+    // TODO: Implement logic to retrieve MainState
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClusterStateAttributes::GetOverallState(DataModel::Nullable<GenericOverallState> & overallState)
+{
+    // TODO: Implement logic to retrieve OverallState
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClusterStateAttributes::GetOverallTarget(DataModel::Nullable<GenericOverallTarget> & overallTarget)
+{
+    // TODO: Implement logic to retrieve OverallTarget
+    return CHIP_NO_ERROR;
+}
+
 /*
     ClusterLogic Implementation
 */
@@ -78,6 +102,36 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
 CHIP_ERROR ClusterLogic::SetCountdownTime(const DataModel::Nullable<ElapsedS> & countdownTime)
 {
     // TODO
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClusterLogic::GetCountdownTime(DataModel::Nullable<ElapsedS> & countdownTime)
+{
+    // TODO: Implement logic to retrieve CountdownTime
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClusterLogic::GetMainState(MainStateEnum & mainState)
+{
+    // TODO: Implement logic to retrieve MainState
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClusterLogic::GetOverallState(DataModel::Nullable<GenericOverallState> & overallState)
+{
+    // TODO: Implement logic to retrieve OverallState
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClusterLogic::GetOverallTarget(DataModel::Nullable<GenericOverallTarget> & overallTarget)
+{
+    // TODO: Implement logic to retrieve OverallTarget
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClusterLogic::GetCurrentErrorList(DataModel::Nullable<ErrorList> & currentErrorList)
+{
+    // TODO: Implement logic to retrieve CurrentErrorList
     return CHIP_NO_ERROR;
 }
 
