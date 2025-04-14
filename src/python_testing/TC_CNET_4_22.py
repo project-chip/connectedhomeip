@@ -24,9 +24,10 @@
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
-#       --commissioning-method on-network
+#       --commissioning-method ble-thread
 #       --discriminator 1234
 #       --passcode 20202021
+#       --thread-dataset-hex <DATASET_HEX>
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -73,9 +74,7 @@ class TC_CNET_4_22(MatterBaseTest):
         assert_valid_uint64(thread_interface.extendedPanId, "Extended PanId")
 
         # NetworkName is a string with a size of 1 to 16 bytes
-        # CHECK BYTES TO INT
-        assert_string_length(thread_interface.networkName, "NetworkName", int.from_bytes(
-            1, byteorder="big"), int.from_bytes(16, byteorder="big"))
+        assert_string_length(thread_interface.networkName, "NetworkName", 1, 16)
 
         # Channel is of type uint16 with a range 0 to 65535 (2**16-1)
         assert_valid_uint16(thread_interface.channel, "Channel")
@@ -83,13 +82,13 @@ class TC_CNET_4_22(MatterBaseTest):
         # Version is a uint8
         assert_valid_uint8(thread_interface.version, "Version")
 
-        # ExtendedAddress is a hwaddr with a size of 8 bytes
+        # ExtendedAddress is a hwadr with a size of 8 bytes
         try:
             expected_len_bytes_extended_address = 8
             # CHECK INT AND BYTES
             asserts.assert_equal(len(thread_interface.extendedAddress), expected_len_bytes_extended_address,
                                  f"The hwaddr value is {len(thread_interface.extendedAddress)} bytes long instead of {expected_len_bytes_extended_address}")
-            mac = EUI(thread_interface.extendedAddress)
+            EUI(thread_interface.extendedAddress)
             logger.info(f"The hwaddr value: {thread_interface.extendedAddress} is a valid address")
         except AddrFormatError as e:
             logger.error(f"Invalid hwaddr format: {thread_interface.extendedAddress} - {e}")
@@ -139,7 +138,7 @@ class TC_CNET_4_22(MatterBaseTest):
             debug_text_len = len(scan_network_response.debugText)
             asserts.assert_less_equal(debug_text_len, 512, f"DebugText length {debug_text_len} was out of range")
 
-        self.verify_scan_network_response(scan_network_response.threadScanResults)
+        self.scan_network_response_thread_scan_results(scan_network_response.threadScanResults)
 
         # TH reads Breadcrumb attribute from the General Commissioning Cluster
         self.step(2)
@@ -150,7 +149,16 @@ class TC_CNET_4_22(MatterBaseTest):
         cmd = Clusters.NetworkCommissioning.Commands.ScanNetworks(ssid=NullValue, breadcrumb=2)
         scan_network_response = await self.send_single_cmd(cmd=cmd)
 
-        self.verify_scan_network_response(scan_network_response.threadScanResults)
+        # Verify that DUT sends ScanNetworksResponse command to the TH with the following fields:
+        # NetworkingStatus field value will be any one of the following values: Success, NetworkNotFound, OutOfRange, RegulatoryError, UnknownError
+        assert scan_network_response.networkingStatus in status
+
+        # DebugText is of type string with max length 512 or absent
+        if scan_network_response.debugText:
+            debug_text_len = len(scan_network_response.debugText)
+            asserts.assert_less_equal(debug_text_len, 512, f"DebugText length {debug_text_len} was out of range")
+
+        self.scan_network_response_thread_scan_results(scan_network_response.threadScanResults)
 
         # TH reads Breadcrumb attribute from the General Commissioning Cluster
         self.step(4)
@@ -162,8 +170,21 @@ class TC_CNET_4_22(MatterBaseTest):
         cmd = Clusters.NetworkCommissioning.Commands.ScanNetworks(ssid=random_ASCII, breadcrumb=3)
         scan_network_response = await self.send_single_cmd(cmd=cmd)
 
-        self.verify_scan_network_response(scan_network_response.threadScanResults)
+        # Verify that DUT sends ScanNetworksResponse command to the TH with the following fields:
+        # NetworkingStatus field value will be any one of the following values: Success, NetworkNotFound, OutOfRange, RegulatoryError, UnknownError
+        assert scan_network_response.networkingStatus in status
+
+        # DebugText is of type string with max length 512 or absent
+        if scan_network_response.debugText:
+            debug_text_len = len(scan_network_response.debugText)
+            asserts.assert_less_equal(debug_text_len, 512, f"DebugText length {debug_text_len} was out of range")
+
+        self.scan_network_response_thread_scan_results(scan_network_response.threadScanResults)
 
         # TH reads Breadcrumb attribute from the General Commissioning Cluster
         self.step(6)
         self.read_and_check_breadcrumb(expected_breadcrumb=3)
+
+
+if __name__ == "__main__":
+    default_matter_test_main()
