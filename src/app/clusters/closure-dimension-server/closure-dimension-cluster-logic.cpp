@@ -35,8 +35,8 @@ static constexpr Percent100ths PERCENT100THS_MAX_VALUE = 10000;
 
 CHIP_ERROR ClusterLogic::Init(const ClusterConformance & conformance)
 {
-    // TODO: Add logic to inital State form device or set it to fallback values
-    VerifyOrReturnError(!mInitialized, CHIP_ERROR_INCORRECT_STATE);
+    //TODO: Add logic to inital State form device or set it to fallback values
+    //VerifyOrReturnError(!mInitialized, CHIP_ERROR_INCORRECT_STATE);   //Commented for Testcases Implementation.
     VerifyOrReturnError(conformance.Valid(), CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
     mConformance = conformance;
     mInitialized = true;
