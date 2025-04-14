@@ -38,6 +38,7 @@
 import logging
 import operator
 from enum import Enum
+import time
 from typing import Any
 
 import chip.clusters as Clusters
@@ -123,136 +124,87 @@ class TC_FAN_3_1(MatterBaseTest):
     def get_value_range(self, attr_to_update, order) -> range:
         # Setup
         cluster = Clusters.FanControl
-        attribute = cluster.Attributes
+        attr = cluster.Attributes
         percent_setting_max_value = 100
         fan_modes_qty = len(self.fan_modes)
 
         # Compute value range tro write
-        if attr_to_update == attribute.PercentSetting:
+        if attr_to_update == attr.PercentSetting:
             value_range = range(1, percent_setting_max_value +
                                 1) if order == OrderEnum.Ascending else range(percent_setting_max_value - 1, -1, -1)
-        elif attr_to_update == attribute.FanMode:
+        elif attr_to_update == attr.FanMode:
             value_range = range(1, fan_modes_qty) if order == OrderEnum.Ascending else range(
                 fan_modes_qty - 2, -1, -1)
 
         return value_range
 
     def log_scenario(self, attr_to_update, value_range, order) -> None:
-        # Logging supported fan modes
+        # Logging support info
         logging.info("[FC] ====================================================================")
         logging.info(f"[FC] *** Supported fan modes: {self.fan_mode_sequence.name}")
-        init_fan_mode = "Off" if order == OrderEnum.Ascending else "High"
-
-        # Logging MultiSpeed feature support
         logging.info(f"[FC] *** MultiSpeed feature supported: {self.supports_multispeed}")
 
-        # Logging fan initial state
+        # Logging initial FanMode state
+        init_fan_mode = "Off" if order == OrderEnum.Ascending else "High"
         logging.info(f"[FC] *** Initial FanMode: {init_fan_mode}")
 
         # Logging the scenario being tested
         attr_to_verify = "FanMode" if attr_to_update == Clusters.FanControl.Attributes.PercentSetting else "PercentSetting, PercentCurrent"
         speed_setting_scenario = ", SpeedSetting, and SpeedCurrent" if self.supports_multispeed else ""
         logging.info(f"[FC] *** Update {attr_to_update.__name__} {order.name}, verify {attr_to_verify}{speed_setting_scenario}")
-
-        # Logging the range of values to write
-        logging.info(f"[FC] *** Value range to write: {value_range[0]} - {value_range[-1]}")
-
-    def log_results(self) -> None:
+        logging.info(f"[FC] *** Value range to update: {value_range[0]} - {value_range[-1]}")
         logging.info("[FC]")
-        logging.info("[FC] - PercentSetting Sub -")
-        for q in self.sub_percent_setting.attribute_queue.queue:
-            logging.info(f"[FC] {q.attribute.__name__}: {q.value}")
-        logging.info("[FC]")
-
-        logging.info("[FC] - PercentCurrent Sub -")
-        for q in self.sub_percent_current.attribute_queue.queue:
-            logging.info(f"[FC] {q.attribute.__name__}: {q.value}")
-        logging.info("[FC]")
-
-        logging.info("[FC] - FanMode Sub -")
-        for q in self.sub_fan_mode.attribute_queue.queue:
-            logging.info(f"[FC] {q.attribute.__name__}: {q.value}")
-        logging.info("[FC]")
-
-        if self.supports_multispeed:
-            logging.info("[FC] - SpeedSetting Sub -")
-            for q in self.sub_speed_setting.attribute_queue.queue:
-                logging.info(f"[FC] {q.attribute.__name__}: {q.value}")
-            logging.info("[FC]")
-
-            logging.info("[FC] - SpeedCurrent Sub -")
-            for q in self.sub_speed_current.attribute_queue.queue:
-                logging.info(f"[FC] {q.attribute.__name__}: {q.value}")
-            logging.info("[FC]")
 
     async def subscribe_to_attributes(self) -> None:
-        # Setup
         cluster = Clusters.FanControl
-        attributes = cluster.Attributes
+        attr = cluster.Attributes
 
-        # Subscribe to PercentSetting attribute changes
-        self.sub_percent_setting = ClusterAttributeChangeAccumulator(cluster, attributes.PercentSetting)
-        await self.sub_percent_setting.start(self.default_controller, self.dut_node_id, self.endpoint)
+        self.subscriptions = [
+            ClusterAttributeChangeAccumulator(cluster, attr.PercentSetting),
+            ClusterAttributeChangeAccumulator(cluster, attr.PercentCurrent),
+            ClusterAttributeChangeAccumulator(cluster, attr.FanMode)
+        ]
 
-        # Subscribe to PercentCurrent attribute changes
-        self.sub_percent_current = ClusterAttributeChangeAccumulator(cluster, attributes.PercentCurrent)
-        await self.sub_percent_current.start(self.default_controller, self.dut_node_id, self.endpoint)
-
-        # Subscribe to FanMode attribute changes
-        self.sub_fan_mode = ClusterAttributeChangeAccumulator(cluster, attributes.FanMode)
-        await self.sub_fan_mode.start(self.default_controller, self.dut_node_id, self.endpoint)
-
-        # Subscribe to SpeedSetting attribute changes if MultiSpeed feature is supported
         if self.supports_multispeed:
-            self.sub_speed_setting = ClusterAttributeChangeAccumulator(cluster, attributes.SpeedSetting)
-            await self.sub_speed_setting.start(self.default_controller, self.dut_node_id, self.endpoint)
+            self.subscriptions.extend([
+                ClusterAttributeChangeAccumulator(cluster, attr.SpeedSetting),
+                ClusterAttributeChangeAccumulator(cluster, attr.SpeedCurrent)
+            ])
 
-            self.sub_speed_current = ClusterAttributeChangeAccumulator(cluster, attributes.SpeedCurrent)
-            await self.sub_speed_current.start(self.default_controller, self.dut_node_id, self.endpoint)
+        for sub in self.subscriptions: 
+            await sub.start(self.default_controller, self.dut_node_id, self.endpoint)
+
+    def log_results(self) -> None:
+        for sub in self.subscriptions:
+            logging.info(f"[FC] - {sub._expected_attribute.__name__} Sub -")
+            for q in sub.attribute_queue.queue:
+                logging.info(f"[FC] {q.attribute.__name__}: {q.value}")
+            logging.info("[FC]")
 
     def verify_attribute_progression(self, order) -> None:
         # Setup
         comp = operator.le if order == OrderEnum.Ascending else operator.ge
-        shared_str = f"not all attribute values progressed in {order.name.lower()} order."
+        comp_str = "greater" if order == OrderEnum.Ascending else "less"
+        shared_str = f"not all attribute values progressed in {order.name.lower()} order (current value {comp_str} than previous value)."
 
-        # Verify that the PercentSetting attribute values progressed in the expected order
-        ps_values = [q.value for q in self.sub_percent_setting.attribute_queue.queue]
-        ps_correct_progression = all(comp(a, b) for a, b in zip(ps_values, ps_values[1:]))
-        asserts.assert_true(ps_correct_progression, f"[FC] PercentSetting: {shared_str}")
-
-        # Verify that the PercentCurrent attribute values progressed in the expected order
-        pc_values = [q.value for q in self.sub_percent_current.attribute_queue.queue]
-        pc_correct_progression = all(comp(a, b) for a, b in zip(pc_values, pc_values[1:]))
-        asserts.assert_true(pc_correct_progression, f"[FC] PercentCurrent: {shared_str}")
-
-        # Verify that the FanMode attribute values progressed in the expected order
-        fm_values = [q.value for q in self.sub_fan_mode.attribute_queue.queue]
-        fm_correct_progression = all(comp(a, b) for a, b in zip(fm_values, fm_values[1:]))
-        asserts.assert_true(fm_correct_progression, f"[FC] FanMode: {shared_str}")
-
-        # Verify that the SpeedSetting attribute (if present) values progressed in the expected order
-        if self.supports_multispeed:
-            ss_values = [q.value for q in self.sub_speed_setting.attribute_queue.queue]
-            ss_correct_progression = all(comp for a, b in zip(ss_values, ss_values[1:]))
-            asserts.assert_true(ss_correct_progression, f"[FC] SpeedSetting: {shared_str}")
-
-            sc_values = [q.value for q in self.sub_speed_current.attribute_queue.queue]
-            sc_correct_progression = all(comp for a, b in zip(sc_values, sc_values[1:]))
-            asserts.assert_true(sc_correct_progression, f"[FC] SpeedCurrent: {shared_str}")
+        for sub in self.subscriptions:
+            values = [q.value for q in sub.attribute_queue.queue]
+            correct_progression = all(comp(a, b) for a, b in zip(values, values[1:]))
+            asserts.assert_true(correct_progression, f"[FC] {sub._expected_attribute.__name__}: {shared_str}")
 
     async def testing_scenario(self, attr_to_update, order) -> None:
         # Setup
         cluster = Clusters.FanControl
-        attributes = cluster.Attributes
+        attr = cluster.Attributes
         fm_enum = cluster.Enums.FanModeEnum
 
         # *** NEXT STEP ***
         # TH performs the requested testing scenario (attr_to_update, order)
         self.step(self.current_step_index + 1)
 
-        # Initialize fan
+        # Initialize FanMode to Off or High based on the order
         init_fan_mode = fm_enum.kOff if order == OrderEnum.Ascending else fm_enum.kHigh
-        await self.write_and_verify_attribute(attributes.PercentSetting, init_fan_mode)
+        await self.write_and_verify_attribute(attr.FanMode, init_fan_mode)
 
         # Subscribe to the PercentSetting, PercentCurrent, FanMode, and if supported, SpeedSetting and SpeedCurrent attributes
         await self.subscribe_to_attributes()
@@ -263,7 +215,7 @@ class TC_FAN_3_1(MatterBaseTest):
         # Logging the scenario being tested
         self.log_scenario(attr_to_update, value_range, order)
 
-        # Write values to attribute and verify the result
+        # Write value to attribute and read back to verify the result
         for value_to_write in value_range:
             await self.write_and_verify_attribute(attr_to_update, value_to_write)
 
@@ -274,12 +226,8 @@ class TC_FAN_3_1(MatterBaseTest):
         self.verify_attribute_progression(order)
 
         # Cancel subscriptions
-        self.sub_percent_setting.cancel()
-        self.sub_percent_current.cancel()
-        self.sub_fan_mode.cancel()
-        if self.supports_multispeed:
-            self.sub_speed_setting.cancel()
-            self.sub_speed_current.cancel()
+        for sub in self.subscriptions:
+            sub.cancel()
 
     def pics_TC_FAN_3_1(self) -> list[str]:
         return ["FAN.S"]
@@ -289,7 +237,7 @@ class TC_FAN_3_1(MatterBaseTest):
         # Setup
         self.endpoint = self.get_endpoint(default=1)
         cluster = Clusters.FanControl
-        attributes = cluster.Attributes
+        attr = cluster.Attributes
 
         # *** STEP 1 ***
         # Commissioning already done
@@ -303,15 +251,16 @@ class TC_FAN_3_1(MatterBaseTest):
         # *** STEP 3 ***
         # TH checks the DUT for support of the MultiSpeed feature
         self.step(3)
-        feature_map = await self.read_setting(attributes.FeatureMap)
+        feature_map = await self.read_setting(attr.FeatureMap)
         self.supports_multispeed = bool(feature_map & cluster.Bitmaps.Feature.kMultiSpeed)
 
-        # TH tests the following scenarios and verifies the correct progression of
-        # the PercentSetting, FanMode, and SpeedSetting (if present) attributes
-        await self.testing_scenario(attr_to_update=attributes.PercentSetting, order=OrderEnum.Ascending)
-        await self.testing_scenario(attr_to_update=attributes.PercentSetting, order=OrderEnum.Descending)
-        await self.testing_scenario(attr_to_update=attributes.FanMode, order=OrderEnum.Ascending)
-        await self.testing_scenario(attr_to_update=attributes.FanMode, order=OrderEnum.Descending)
+        # *** NEXT STEPS ***
+        # TH tests the following scenarios and verifies the correct progression of the PercentSetting,
+        # PercentCurrent, FanMode, and if supported, SpeedSetting and SpeedCurrent attributes
+        await self.testing_scenario(attr_to_update=attr.PercentSetting, order=OrderEnum.Ascending)
+        await self.testing_scenario(attr_to_update=attr.PercentSetting, order=OrderEnum.Descending)
+        await self.testing_scenario(attr_to_update=attr.FanMode, order=OrderEnum.Ascending)
+        await self.testing_scenario(attr_to_update=attr.FanMode, order=OrderEnum.Descending)
 
 
 if __name__ == "__main__":
