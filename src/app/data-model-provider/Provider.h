@@ -116,7 +116,7 @@ public:
                                                      CommandHandler * handler) = 0;
 
 private:
-    InteractionModelContext mContext = {};
+    InteractionModelContext mContext;
 };
 
 } // namespace DataModel
