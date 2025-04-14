@@ -172,7 +172,7 @@ class TC_TBRM_2_6(MatterBaseTest):
         logging.info(f" Response: {rsp}")
         asserts.assert_equal(
             nwk_dataset[2]["value"], rsp[tbrm_endpoint][Clusters.NetworkCommissioning][Clusters.NetworkCommissioning.Attributes.LastNetworkID],
-            f"NetworkCommissioning Cluster LastNetworkID Attribute dose not match TBRM Cluster Extended PanID Attribute(extracted from dataset)")
+            "NetworkCommissioning Cluster LastNetworkID Attribute dose not match TBRM Cluster Extended PanID Attribute(extracted from dataset)")
 
         self.step(7)
 
