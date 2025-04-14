@@ -48,7 +48,6 @@ from chip.testing.matter_asserts import (assert_int_in_range, assert_valid_uint8
                                          assert_valid_uint16, assert_valid_uint64, assert_string_length)
 
 from mobly import asserts
-from netaddr import EUI, AddrFormatError
 
 
 class TC_CNET_4_22(MatterBaseTest):
@@ -69,39 +68,36 @@ class TC_CNET_4_22(MatterBaseTest):
     def pics_TC_CNET_4_22(self):
         return ['CNET.S']
 
-    def scan_network_response_thread_scan_results(self, thread_interface: list[str]):
+    def scan_network_response_thread_scan_results(self, thread_interfaces: list[str]):
+
         # Each element in the ThreadScanResults list will have the following fields:
-        # PanId with a range of 0 to 65534 (2**16-2)
-        assert_int_in_range(thread_interface.panId, 0, 65534, "PanId")
+        for thread_interface in thread_interfaces:
+            # PanId with a range of 0 to 65534 (2**16-2)
+            assert_int_in_range(thread_interface.panId, 0, 65534, "PanId")
 
-        # ExtendedPanId
-        assert_valid_uint64(thread_interface.extendedPanId, "Extended PanId")
+            # ExtendedPanId
+            assert_valid_uint64(thread_interface.extendedPanId, "Extended PanId")
 
-        # NetworkName is a string with a size of 1 to 16 bytes
-        assert_string_length(thread_interface.networkName, "NetworkName", 1, 16)
+            # NetworkName is a string with a size of 1 to 16 bytes
+            assert_string_length(thread_interface.networkName, "NetworkName", 1, 16)
 
-        # Channel is of type uint16 with a range 0 to 65535 (2**16-1)
-        assert_valid_uint16(thread_interface.channel, "Channel")
+            # Channel is of type uint16 with a range 0 to 65535 (2**16-1)
+            assert_valid_uint16(thread_interface.channel, "Channel")
 
-        # Version is a uint8
-        assert_valid_uint8(thread_interface.version, "Version")
+            # Version is a uint8
+            assert_valid_uint8(thread_interface.version, "Version")
 
-        # ExtendedAddress is a hwadr with a size of 8 bytes
-        try:
+            # ExtendedAddress is a hwaddr with a size of 8 bytes
             expected_len_bytes_extended_address = 8
-            # CHECK INT AND BYTES
             asserts.assert_equal(len(thread_interface.extendedAddress), expected_len_bytes_extended_address,
                                  f"The hwaddr value is {len(thread_interface.extendedAddress)} bytes long instead of {expected_len_bytes_extended_address}")
-            EUI(thread_interface.extendedAddress)
-            logger.info(f"The hwaddr value: {thread_interface.extendedAddress} is a valid address")
-        except AddrFormatError as e:
-            logger.error(f"Invalid hwaddr format: {thread_interface.extendedAddress} - {e}")
+            assert isinstance(thread_interface.extendedAddress, (bytes, bytearray)), "ExtendedAddress is not a hwadr instance"
 
-        # RSSI is an of type int8 with a range of -120 to 0
-        assert_int_in_range(thread_interface.rssi, -120, 0, "RSSI")
+            # RSSI is an of type int8 with a range of -120 to 0
+            assert_int_in_range(thread_interface.rssi, -120, 0, "RSSI")
 
-        # LQI is a uint8
-        assert_valid_uint8(thread_interface.lqi, "LQI")
+            # LQI is a uint8
+            assert_valid_uint8(thread_interface.lqi, "LQI")
 
     async def read_and_check_breadcrumb(self, expected_breadcrumb):
 
@@ -112,8 +108,7 @@ class TC_CNET_4_22(MatterBaseTest):
         asserts.assert_equal(breadcrumb, expected_breadcrumb,
                              f"Breadcrumb value is {breadcrumb} and it should be equal to {expected_breadcrumb}")
 
-    # @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kThreadNetworkInterface))
-    @async_test_body
+    @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kThreadNetworkInterface))
     async def test_TC_CNET_4_22(self):
 
         enum = Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum
@@ -130,7 +125,9 @@ class TC_CNET_4_22(MatterBaseTest):
 
         # TH sends ScanNetworks command to the DUT with the SSID field omitted and the Breadcrumb field set to 1
         self.step(1)
-        cmd = Clusters.NetworkCommissioning.Commands.ScanNetworks(ssid="", breadcrumb=1)
+        empty_string = ""
+        empty_octstr = empty_string.encode('utf-8')
+        cmd = Clusters.NetworkCommissioning.Commands.ScanNetworks(ssid=empty_octstr, breadcrumb=1)
         scan_network_response = await self.send_single_cmd(cmd=cmd)
 
         # Verify that DUT sends ScanNetworksResponse command to the TH with the following fields:
@@ -170,7 +167,8 @@ class TC_CNET_4_22(MatterBaseTest):
 
         # TH sends ScanNetworks command to the DUT with the SSID field set to a random string of ASCII characters with a size of between 1 and 31 characters and the Breadcrumb field set to 3
         self.step(5)
-        random_ASCII = ''.join(random.choices(string.ascii_letters + string.digits + string.punctuation, k=random.randint(1, 31)))
+        random_ASCII = ''.join(random.choices(string.ascii_letters + string.digits +
+                               string.punctuation, k=random.randint(1, 31))).encode('utf-8')
         cmd = Clusters.NetworkCommissioning.Commands.ScanNetworks(ssid=random_ASCII, breadcrumb=3)
         scan_network_response = await self.send_single_cmd(cmd=cmd)
 
