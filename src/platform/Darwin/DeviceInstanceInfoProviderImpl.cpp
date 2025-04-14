@@ -76,7 +76,6 @@ CHIP_ERROR DeviceInstanceInfoProviderImpl::GetSerialNumber(char * buf, size_t bu
         VerifyOrReturnError(bufSize >= sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER),
                             CHIP_ERROR_BUFFER_TOO_SMALL);
         strcpy(buf, CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER);
-        //+++x Should this be CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER or CHIP_DEVICE_CONFIG_DEVICE_SERIAL_NUMBER?  The former is already defined in src/include/platform/CHIPDeviceConig.h but the latter is not defined.  The word "TEST" makes me question if this is the right constant to use.
     }
 
     return err;

@@ -132,7 +132,7 @@ enum
     kDeviceOption_TermsAndConditions_Version,
     kDeviceOption_TermsAndConditions_Required,
 #endif
-    kDeviceOption_VendorName            = 0x1028,//+++x What's the reason for having hardcoded values, unlike the others?
+    kDeviceOption_VendorName            = 0x1028,
     kDeviceOption_ProductName           = 0x1029,
     kDeviceOption_HardwareVersionString = 0x102a,
     kDeviceOption_SoftwareVersionString = 0x102b,
