@@ -101,7 +101,7 @@ private:
 /**
  * @brief Struct to store the current cluster state
  */
-struct ClusterStateAttributes
+struct ClusterState
 {
     QuieterReportingAttribute<ElapsedS> mCountDownTime{ DataModel::NullNullable };
     MainStateEnum mMainState                                 = MainStateEnum::kUnknownEnumValue;
@@ -121,11 +121,17 @@ class ClusterLogic
 public:
     // Instantiates a ClusterLogic class. The caller maintains ownership of the driver and the context, but provides them for use by
     // the ClusterLogic class.
-    ClusterLogic(DelegateBase & delegate, MatterContext & matterContext) : mDelegate(delegate), mMatterContext(matterContext) {}
+    ClusterLogic(DelegateBase & delegate, MatterContext & matterContext) : mDelegate(delegate), mMatterContext(matterContext)
+    {
+        // TODO remove this
+        (void) mDelegate;
+        (void) mMatterContext;
+    }
+
     ~ClusterLogic() = default;
 
     const ClusterConformance & GetConformance() const { return mConformance; }
-    const ClusterStateAttributes & GetState() const { return mState; }
+    const ClusterState & GetState() const { return mState; }
 
     /**
      * @brief Initializes the cluster logic
@@ -140,10 +146,10 @@ private:
     bool mIsInitialized = false;
 
     ClusterConformance mConformance;
-    ClusterStateAttributes mState;
+    ClusterState mState;
 
-    [[maybe_unused]] DelegateBase & mDelegate;
-    [[maybe_unused]] MatterContext & mMatterContext;
+    DelegateBase & mDelegate;
+    MatterContext & mMatterContext;
 };
 
 } // namespace ClosureControl
