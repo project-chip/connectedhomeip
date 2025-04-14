@@ -197,7 +197,8 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
     if (mResetConditionCommandSupported)
     {
         ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
-        return builder.Append({ ResetCondition::Id, {}, Priv::kOperate });
+        // Maybe add interface to provide this entry dynamically for the alias?
+        return builder.Append(ResetCondition::kMetadataEntry);
     }
 
     return CHIP_NO_ERROR;

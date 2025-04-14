@@ -1374,19 +1374,15 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
 
     if (hasThread | hasWifi)
     {
-        ReturnErrorOnFailure(builder.AppendElements({
-            { ScanNetworks::Id, {}, Priv::kAdminister },   //
-            { RemoveNetwork::Id, {}, Priv::kAdminister },  //
-            { ConnectNetwork::Id, {}, Priv::kAdminister }, //
-            { ReorderNetwork::Id, {}, Priv::kAdminister }, //
-        }));
+        ReturnErrorOnFailure(builder.AppendElements({ ScanNetworks::kMetadataEntry, RemoveNetwork::kMetadataEntry,
+                                                      ConnectNetwork::kMetadataEntry, ReorderNetwork::kMetadataEntry }));
         ReturnErrorOnFailure(
-            builder.Append({ hasThread ? AddOrUpdateThreadNetwork::Id : AddOrUpdateWiFiNetwork::Id, {}, Priv::kAdminister }));
+            builder.Append(hasThread ? AddOrUpdateThreadNetwork::kMetadataEntry : AddOrUpdateWiFiNetwork::kMetadataEntry));
     }
 
     if (mFeatureFlags.Has(Feature::kPerDeviceCredentials))
     {
-        ReturnErrorOnFailure(builder.Append({ QueryIdentity::Id, {}, Priv::kAdminister }));
+        ReturnErrorOnFailure(builder.Append(QueryIdentity::kMetadataEntry));
     }
 
     return CHIP_NO_ERROR;

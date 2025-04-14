@@ -114,39 +114,34 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
 
     if (HasFeature(Feature::kPowerAdjustment))
     {
-        ReturnErrorOnFailure(builder.AppendElements({
-            { PowerAdjustRequest::Id, {}, Priv::kOperate },      //
-            { CancelPowerAdjustRequest::Id, {}, Priv::kOperate } //
-        }));
+        ReturnErrorOnFailure(
+            builder.AppendElements({ PowerAdjustRequest::kMetadataEntry, CancelPowerAdjustRequest::kMetadataEntry }));
     }
 
     if (HasFeature(Feature::kStartTimeAdjustment))
     {
-        ReturnErrorOnFailure(builder.Append({ StartTimeAdjustRequest::Id, {}, Priv::kOperate }));
+        ReturnErrorOnFailure(builder.Append(StartTimeAdjustRequest::kMetadataEntry));
     }
 
     if (HasFeature(Feature::kPausable))
     {
-        ReturnErrorOnFailure(builder.AppendElements({
-            { PauseRequest::Id, {}, Priv::kOperate }, //
-            { ResumeRequest::Id, {}, Priv::kOperate } //
-        }));
+        ReturnErrorOnFailure(builder.AppendElements({ PauseRequest::kMetadataEntry, ResumeRequest::kMetadataEntry }));
     }
 
     if (HasFeature(Feature::kForecastAdjustment))
     {
-        ReturnErrorOnFailure(builder.Append({ ModifyForecastRequest::Id, {}, Priv::kOperate }));
+        ReturnErrorOnFailure(builder.Append(ModifyForecastRequest::kMetadataEntry));
     }
 
     if (HasFeature(Feature::kConstraintBasedAdjustment))
     {
-        ReturnErrorOnFailure(builder.Append({ RequestConstraintBasedForecast::Id, {}, Priv::kOperate }));
+        ReturnErrorOnFailure(builder.Append(RequestConstraintBasedForecast::kMetadataEntry));
     }
 
     if (HasFeature(Feature::kStartTimeAdjustment) || HasFeature(Feature::kForecastAdjustment) ||
         HasFeature(Feature::kConstraintBasedAdjustment))
     {
-        ReturnErrorOnFailure(builder.Append({ CancelRequest::Id, {}, Priv::kOperate }));
+        ReturnErrorOnFailure(builder.Append(CancelRequest::kMetadataEntry));
     }
 
     return CHIP_NO_ERROR;

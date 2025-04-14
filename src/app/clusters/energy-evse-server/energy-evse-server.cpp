@@ -190,28 +190,22 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
     using Priv = Access::Privilege;
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(7));
 
-    ReturnErrorOnFailure(builder.AppendElements({
-        { Disable::Id, QF::kTimed, Priv::kOperate },        //
-        { EnableCharging::Id, QF::kTimed, Priv::kOperate }, //
-    }));
+    ReturnErrorOnFailure(builder.AppendElements({ Disable::kMetadataEntry, EnableCharging::kMetadataEntry }));
 
     if (HasFeature(Feature::kV2x))
     {
-        ReturnErrorOnFailure(builder.Append({ EnableDischarging::Id, QF::kTimed, Priv::kOperate }));
+        ReturnErrorOnFailure(builder.Append(EnableDischarging::kMetadataEntry));
     }
 
     if (HasFeature(Feature::kChargingPreferences))
     {
-        ReturnErrorOnFailure(builder.AppendElements({
-            { SetTargets::Id, QF::kTimed, Priv::kOperate },   //
-            { GetTargets::Id, QF::kTimed, Priv::kOperate },   //
-            { ClearTargets::Id, QF::kTimed, Priv::kOperate }, //
-        }));
+        ReturnErrorOnFailure(
+            builder.AppendElements({ SetTargets::kMetadataEntry, GetTargets::kMetadataEntry, ClearTargets::kMetadataEntry }));
     }
 
     if (SupportsOptCmd(OptionalCommands::kSupportsStartDiagnostics))
     {
-        ReturnErrorOnFailure(builder.Append({ StartDiagnostics::Id, QF::kTimed, Priv::kOperate }));
+        ReturnErrorOnFailure(builder.Append(StartDiagnostics::kMetadataEntry));
     }
     return CHIP_NO_ERROR;
 }
