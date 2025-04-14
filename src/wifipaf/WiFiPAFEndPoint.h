@@ -96,8 +96,8 @@ private:
         kTx,
         kRx
     };
-    CHIP_ERROR DebugPktAckSn(const PktDirect_t PktDirect, Encoding::LittleEndian::Reader & reader);
-    CHIP_ERROR GetPktSn(Encoding::LittleEndian::Reader & reader, SequenceNumber_t & seqNum);
+    CHIP_ERROR DebugPktAckSn(const PktDirect_t PktDirect, Encoding::LittleEndian::Reader reader);
+    CHIP_ERROR GetPktSn(Encoding::LittleEndian::Reader reader, SequenceNumber_t & seqNum);
 
     WiFiPAFLayer * mWiFiPafLayer; ///< [READ-ONLY] Pointer to the WiFiPAFLayer object that owns this object.
     WiFiPAFSession mSessionInfo;

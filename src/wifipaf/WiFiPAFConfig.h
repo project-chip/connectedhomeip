@@ -101,7 +101,8 @@
 #endif
 
 #if (PAF_MAX_RECEIVE_WINDOW_SIZE < (WIFIPAF_CONFIG_IMMEDIATE_ACK_WINDOW_THRESHOLD + 1))
-#error "PAF_MAX_RECEIVE_WINDOW_SIZE must be greater or equal than 2."
+// Ref: "Receive Windows" of PAFTP spec
+#error "PAF_MAX_RECEIVE_WINDOW_SIZE must be greater than WIFIPAF_CONFIG_IMMEDIATE_ACK_WINDOW_THRESHOLD."
 #endif
 
 /**
