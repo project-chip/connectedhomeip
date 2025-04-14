@@ -1405,7 +1405,9 @@ tests:
       response:
           value: Current_UserCode_TemporaryDisableTime
 
-    - label: "Step 32d: TH writes UserCodeTemporaryDisableTime attribute as 0 second on the DUT"
+    - label:
+          "Step 32d: TH writes UserCodeTemporaryDisableTime attribute as 0
+          second on the DUT"
       PICS:
           " ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0031 &&
           DRLK.S.M.UserCodedTemporaryDisableTimeAttributeWritable "
@@ -1416,7 +1418,9 @@ tests:
       response:
           error: CONSTRAINT_ERROR
 
-    - label: "Step 32d: TH writes UserCodeTemporaryDisableTime attribute as 0 second on the DUT"
+    - label:
+          "Step 32d: TH writes UserCodeTemporaryDisableTime attribute as 0
+          second on the DUT"
       PICS:
           " ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0031 &&
           !DRLK.S.M.UserCodedTemporaryDisableTimeAttributeWritable "
