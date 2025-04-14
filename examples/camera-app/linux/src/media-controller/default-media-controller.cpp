@@ -15,16 +15,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "media-controller.h"
+#include "default-media-controller.h"
 #include <algorithm>
 
-void MediaController::RegisterTransport(Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID)
+void DefaultMediaController::RegisterTransport(Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID)
 {
     std::lock_guard<std::mutex> lock(connectionsMutex);
     connections.push_back({ transport, videoStreamID, audioStreamID });
 }
 
-void MediaController::UnregisterTransport(Transport * transport)
+void DefaultMediaController::UnregisterTransport(Transport * transport)
 {
     std::lock_guard<std::mutex> lock(connectionsMutex);
     connections.erase(std::remove_if(connections.begin(), connections.end(),
@@ -32,7 +32,7 @@ void MediaController::UnregisterTransport(Transport * transport)
                       connections.end());
 }
 
-void MediaController::DistributeVideo(const char * data, size_t size, uint16_t videoStreamID)
+void DefaultMediaController::DistributeVideo(const char * data, size_t size, uint16_t videoStreamID)
 {
     std::lock_guard<std::mutex> lock(connectionsMutex);
     for (const Connection & connection : connections)
@@ -44,7 +44,7 @@ void MediaController::DistributeVideo(const char * data, size_t size, uint16_t v
     }
 }
 
-void MediaController::DistributeAudio(const char * data, size_t size, uint16_t audioStreamID)
+void DefaultMediaController::DistributeAudio(const char * data, size_t size, uint16_t audioStreamID)
 {
     std::lock_guard<std::mutex> lock(connectionsMutex);
     for (const Connection & connection : connections)

@@ -65,14 +65,10 @@ config("nxp_platform_config") {
       assert(nxp_enable_secure_whole_factory_data &&
                  !nxp_enable_secure_EL2GO_factory_data,
              "please select only one protection solution")
-      defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/rt/rw61x/FactoryDataProviderEncImpl.h\"" ]
     } else if (nxp_enable_secure_EL2GO_factory_data) {
       assert(!nxp_enable_secure_whole_factory_data &&
                  nxp_enable_secure_EL2GO_factory_data,
              "please select only one protection solution")
-      defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/rt/rw61x/FactoryDataProviderEl2GoImpl.h\"" ]
-    } else {
-      defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/rt/rw61x/FactoryDataProviderImpl.h\"" ]
     }
   }
 
@@ -160,6 +156,9 @@ static_library("nxp_platform") {
   if (chip_enable_ota_requestor) {
     defines += [ "CONFIG_CHIP_OTA_POSTED_OPERATIONS_IN_IDLE=1" ]
     sources += ota_sources
+    if (nxp_enable_ota_factory_data_processor) {
+      defines += [ "CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR=1" ]
+    }
     if (chip_with_ota_encryption) {
       defines += [
         "OTA_ENCRYPTION_ENABLE=1",
@@ -214,9 +213,18 @@ static_library("nxp_platform") {
 
   if (nxp_use_factory_data) {
     sources += [
-      "../../common/factory_data/FactoryDataProvider.cpp",
-      "../../common/factory_data/FactoryDataProvider.h",
+      "../../common/factory_data/legacy/FactoryDataProvider.cpp",
+      "../../common/factory_data/legacy/FactoryDataProvider.h",
     ]
+    if (nxp_enable_ota_factory_data_processor) {
+      sources += [
+        "../../common/factory_data/legacy/FactoryDataDriver.cpp",
+        "../../common/factory_data/legacy/FactoryDataDriver.h",
+        "FactoryDataDriverImpl.cpp",
+        "FactoryDataDriverImpl.h",
+      ]
+    }
+
     if (nxp_enable_secure_whole_factory_data) {
       sources += [
         "FactoryDataProviderEncImpl.cpp",
