@@ -24,7 +24,6 @@
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
 #include <app/SpecificationDefinedRevisions.h>
-#include <app/util/attribute-storage.h>
 #include <lib/core/CHIPConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
@@ -417,7 +416,11 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
         // The StartUp event SHALL be emitted by a Node after completing a boot or reboot process
         ChipLogDetail(Zcl, "Emitting StartUp event");
 
-        for (auto endpoint : EnabledEndpointsWithServerCluster(BasicInformation::Id))
+        DataModel::ListBuilder<EndpointId> endpointsList;
+        InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(BasicInformation::Id,
+                                                                                                  endpointsList);
+
+        for (auto endpoint : endpointsList.TakeBuffer())
         {
             // If Basic cluster is implemented on this endpoint
             Events::StartUp::Type event{ softwareVersion };
@@ -437,7 +440,11 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
         // The ShutDown event SHOULD be emitted on a best-effort basis by a Node prior to any orderly shutdown sequence.
         ChipLogDetail(Zcl, "Emitting ShutDown event");
 
-        for (auto endpoint : EnabledEndpointsWithServerCluster(BasicInformation::Id))
+        DataModel::ListBuilder<EndpointId> endpointsList;
+        InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(BasicInformation::Id,
+                                                                                                  endpointsList);
+
+        for (auto endpoint : endpointsList.TakeBuffer())
         {
             // If Basic cluster is implemented on this endpoint
             Events::ShutDown::Type event;

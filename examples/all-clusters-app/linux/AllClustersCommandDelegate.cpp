@@ -20,6 +20,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/EventLogging.h>
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/clusters/occupancy-sensor-server/occupancy-sensor-server.h>
 #include <app/clusters/refrigerator-alarm-server/refrigerator-alarm-server.h>
@@ -27,7 +28,6 @@
 #include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
 #include <app/clusters/switch-server/switch-server.h>
 #include <app/server/Server.h>
-#include <app/util/attribute-storage.h>
 #include <platform/PlatformManager.h>
 
 #include "ButtonEventsSimulator.h"
@@ -567,9 +567,9 @@ exit:
 
 bool AllClustersAppCommandHandler::IsClusterPresentOnAnyEndpoint(ClusterId clusterId)
 {
-    EnabledEndpointsWithServerCluster enabledEndpoints(clusterId);
-
-    return (enabledEndpoints.begin() != enabledEndpoints.end());
+    DataModel::ListBuilder<EndpointId> endpointsList;
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(clusterId, endpointsList);
+    return endpointsList.Size() > 0;
 }
 
 void AllClustersAppCommandHandler::OnRebootSignalHandler(BootReasonType bootReason)

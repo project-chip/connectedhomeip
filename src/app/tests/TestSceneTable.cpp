@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/scenes-server/SceneTableImpl.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/mock/Constants.h>
@@ -23,6 +24,7 @@
 #include <app/util/mock/MockNodeConfig.h>
 #include <app/util/odd-sized-integers.h>
 #include <crypto/DefaultSessionKeystore.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/core/TLV.h>
 #include <lib/support/Span.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
@@ -686,6 +688,10 @@ public:
         ASSERT_NE(sceneTable, nullptr);
         ASSERT_EQ(sceneTable->Init(mpTestStorage), CHIP_NO_ERROR);
         SetMockNodeConfig(SceneMockNodeConfig);
+
+        // Set Codegen Data Model Provider
+        auto * engine = chip::app::InteractionModelEngine::GetInstance();
+        engine->SetDataModelProvider(chip::app::CodegenDataModelProviderInstance(mpTestStorage));
     }
 
     static void TearDownTestSuite()
