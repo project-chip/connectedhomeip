@@ -15,9 +15,8 @@
 // <i> Default: SL_I2C2
 #define I2C_INSTANCE_USED SL_I2C2
 
-#endif //SLI_SI91X_MCU_INTERFACE
-#endif //USE_SPARKFUN_AIR_QUALITY_SENSOR
-
+#endif // SLI_SI91X_MCU_INTERFACE
+#endif // USE_SPARKFUN_AIR_QUALITY_SENSOR
 
 // <o MIN_THRESHOLD> Minimum Threshold Value
 // <i> Default: 0

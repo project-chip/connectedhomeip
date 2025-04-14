@@ -19,8 +19,8 @@
 
 #include "AirQualitySensor.h"
 #include "sl_board_control.h"
-#include <platform/CHIPDeviceLayer.h>
 #include <AirQualityConfig.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #ifdef USE_SPARKFUN_AIR_QUALITY_SENSOR
 #include <sparkfun_sgp40.h>
