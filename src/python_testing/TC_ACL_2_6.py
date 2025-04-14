@@ -31,8 +31,8 @@
 #       --endpoint 1
 # === END CI TEST ARGUMENTS ===
 
-import random
 import asyncio
+import random
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
