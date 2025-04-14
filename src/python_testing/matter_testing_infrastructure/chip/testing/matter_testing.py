@@ -1387,11 +1387,6 @@ class MatterBaseTest(base_test.BaseTestClass):
                 None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)]), timeout=60)
             self.stored_global_wildcard = await global_wildcard
 
-    async def cluster_has_attribute(self, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor):
-        """Similar to has_attribute this method verify the cluster contians the attribute  and return the status."""
-        await self._populate_wildcard()
-        return _has_attribute(wildcard=self.stored_global_wildcard, endpoint=endpoint, attribute=attribute)
-
     async def attribute_guard(self, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor):
         """Similar to pics_guard above, except checks a condition and if False marks the test step as skipped and
            returns False using attributes against attributes_list, otherwise returns True.
@@ -1405,7 +1400,8 @@ class MatterBaseTest(base_test.BaseTestClass):
               if self.attribute_guard(condition2_needs_to_be_false_to_skip_step):
                   # skip step 2 if condition not met
            """
-        attr_condition = await self.cluster_has_attribute(endpoint=endpoint, attribute=attribute)
+        await self._populate_wildcard()
+        attr_condition = _has_attribute(wildcard=self.stored_global_wildcard, endpoint=endpoint, attribute=attribute)
         if not attr_condition:
             self.mark_current_step_skipped()
         return attr_condition

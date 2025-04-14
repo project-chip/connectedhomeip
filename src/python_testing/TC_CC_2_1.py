@@ -43,7 +43,7 @@ import chip.clusters as Clusters
 from chip.clusters import Attribute
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.testing import matter_asserts
-from chip.testing.matter_testing import MatterBaseTest, TestStep, _has_attribute, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_attribute
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -153,9 +153,9 @@ class TC_CC_2_1(MatterBaseTest):
         for primary in primary_list:
             attribute_str = primary.format(primary=primary_index)
             await self._populate_wildcard()
-            has_attr = _has_attribute(wildcard=self.stored_global_wildcard, endpoint=self.endpoint,
-                                      attribute=getattr(self.attributes, attribute_str))
-            if attribute_str not in instance_attribute_names or not has_attr:
+            has_attr_func = has_attribute(attribute=getattr(self.attributes, attribute_str))
+            has_attr_status = has_attr_func(self.stored_global_wildcard, self.endpoint)
+            if attribute_str not in instance_attribute_names or not has_attr_status:
                 return False
         return True
 
