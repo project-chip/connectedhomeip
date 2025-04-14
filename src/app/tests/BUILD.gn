@@ -201,6 +201,19 @@ source_set("app-test-stubs") {
   ]
 }
 
+source_set("closure-control-test-srcs") {
+  sources = [
+    "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-logic.cpp",
+    "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-logic.h",
+  ]
+
+  deps = [
+    "${chip_root}/src/app/common:enums",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
 chip_test_suite("tests") {
   output_name = "libAppTests"
 
@@ -217,6 +230,7 @@ chip_test_suite("tests") {
     "TestBindingTable.cpp",
     "TestBuilderParser.cpp",
     "TestCheckInHandler.cpp",
+    "TestClosureControlClusterLogic.cpp",
     "TestCommandHandlerInterfaceRegistry.cpp",
     "TestCommandInteraction.cpp",
     "TestCommandPathParams.cpp",
