@@ -19,10 +19,10 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/clusters/closure-dimension-server/closure-dimension-delegate.h>
-#include <app/clusters/closure-dimension-server/closure-dimension-server.h>
 #include <app/clusters/closure-dimension-server/closure-dimension-cluster-logic.h>
+#include <app/clusters/closure-dimension-server/closure-dimension-delegate.h>
 #include <app/clusters/closure-dimension-server/closure-dimension-matter-context.h>
+#include <app/clusters/closure-dimension-server/closure-dimension-server.h>
 
 #include <lib/core/CHIPError.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -55,75 +55,49 @@ public:
     Callback_fn_initiated mActionInitiated_CB;
     Callback_fn_completed mActionCompleted_CB;
 
-    const uint32_t kExampleMotionCountDown     = 5;
-    const uint32_t kExampleStepCountDown       = 3000;
+    const uint32_t kExampleMotionCountDown = 5;
+    const uint32_t kExampleStepCountDown   = 3000;
 
     ClosureDimensionDelegate(EndpointId endpoint) : mEndpoint(endpoint), gLogic(nullptr) {}
 
     Status HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<TargetLatchEnum> & latch,
-                               const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
+                           const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
 
     Status HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
-                          const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
+                      const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
 
     Status HandleMotion(bool latchNeeded, bool motionNeeded, bool newTarget);
 
     CHIP_ERROR Init();
 
-    void SetLogic(ClusterLogic* logic)
-    {
-        gLogic = logic;
-    }
+    void SetLogic(ClusterLogic * logic) { gLogic = logic; }
 
-    ClusterLogic* getLogic() const
-    {
-        return gLogic;
-    }
+    ClusterLogic * getLogic() const { return gLogic; }
 
-    bool IsDeviceMoving() const
-    {
-        return isMoving;
-    }
+    bool IsDeviceMoving() const { return isMoving; }
 
-    void SetDeviceMoving(bool moving)
-    {
-        isMoving = moving;
-    }
+    void SetDeviceMoving(bool moving) { isMoving = moving; }
 
-    Action_t GetAction() const
-    {
-        return mAction;
-    }
+    Action_t GetAction() const { return mAction; }
 
-    void SetAction(Action_t action)
-    {
-        mAction = action;
-    }
+    void SetAction(Action_t action) { mAction = action; }
 
-    StepDirectionEnum GetTargetDirection()
-    {
-        return mTargetDirection;
-    }
+    StepDirectionEnum GetTargetDirection() { return mTargetDirection; }
 
-    void SetTargetDirection(StepDirectionEnum direction)
-    {
-        mTargetDirection = direction;
-    }
+    void SetTargetDirection(StepDirectionEnum direction) { mTargetDirection = direction; }
 
 private:
-    bool isMoving = false;
-    bool isManualLatch = false;
+    bool isMoving                      = false;
+    bool isManualLatch                 = false;
     StepDirectionEnum mTargetDirection = StepDirectionEnum::kUnknownEnumValue;
-    Action_t mAction = INVALID_ACTION;
+    Action_t mAction                   = INVALID_ACTION;
     EndpointId mEndpoint;
-    ClusterLogic* gLogic;
+    ClusterLogic * gLogic;
 };
 
 class ClosureDimensionManager
 {
 public:
-
-
     ClosureDimensionManager(EndpointId endpoint) :
         mEndpoint(endpoint), mContext(mEndpoint), mDelegate(mEndpoint), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
     {
@@ -140,10 +114,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    ClosureDimensionDelegate& getDelegate()
-    {
-        return mDelegate;
-    }
+    ClosureDimensionDelegate & getDelegate() { return mDelegate; }
 
 private:
     const ClusterConformance kConformance = { .featureMap = 255, .supportsOverflow = true };

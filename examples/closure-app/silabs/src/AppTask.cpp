@@ -67,8 +67,8 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;
 using namespace ::chip::DeviceLayer::Internal;
 using namespace chip::TLV;
-using chip::app::Clusters::ClosureDimension::ClosureDimensionManager;
 using chip::app::Clusters::ClosureDimension::ClosureDimensionDelegate;
+using chip::app::Clusters::ClosureDimension::ClosureDimensionManager;
 
 namespace chip {
 namespace app {
@@ -149,7 +149,6 @@ void AppTask::ActionInitiated(ClosureDimensionDelegate::Action_t action)
     {
         SILABS_LOG("Invalid Action");
     }
-
 }
 
 void AppTask::ActionCompleted(ClosureDimensionDelegate::Action_t action)
@@ -175,7 +174,6 @@ void AppTask::ActionCompleted(ClosureDimensionDelegate::Action_t action)
     {
         SILABS_LOG("Invalid Action");
     }
-
 }
 
 void ApplicationShutdown()

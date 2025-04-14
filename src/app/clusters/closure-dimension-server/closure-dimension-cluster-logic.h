@@ -64,9 +64,9 @@ struct ClusterState
 {
     GenericCurrentStateStruct currentState{};
     GenericTargetStruct target{};
-    Percent100ths resolution = 1;
-    Percent100ths stepValue  = 1;
-    ClosureUnitEnum unit     = ClosureUnitEnum::kUnknownEnumValue;
+    Percent100ths resolution                                      = 1;
+    Percent100ths stepValue                                       = 1;
+    ClosureUnitEnum unit                                          = ClosureUnitEnum::kUnknownEnumValue;
     DataModel::Nullable<Structs::UnitRangeStruct::Type> unitRange = DataModel::Nullable<Structs::UnitRangeStruct::Type>();
     Structs::RangePercent100thsStruct::Type limitRange{};
     TranslationDirectionEnum translationDirection = TranslationDirectionEnum::kUnknownEnumValue;

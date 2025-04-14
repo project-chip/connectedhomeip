@@ -16,18 +16,18 @@
  *    limitations under the License.
  */
 #include <ClosureDimensionManager.h>
-#include <app/clusters/closure-dimension-server/closure-dimension-server.h>
-#include <app/clusters/closure-dimension-server/closure-dimension-cluster-objects.h>
 #include <app/clusters/closure-dimension-server/closure-dimension-cluster-logic.h>
+#include <app/clusters/closure-dimension-server/closure-dimension-cluster-objects.h>
+#include <app/clusters/closure-dimension-server/closure-dimension-server.h>
+#include <cmsis_os2.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <system/SystemClock.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <cmsis_os2.h>
 namespace {
-    constexpr chip::Percent100ths LIMIT_RANGE_MIN = 0;
-    constexpr chip::Percent100ths LIMIT_RANGE_MAX = 10000;
-    constexpr chip::Percent100ths STEP = 1000;
-}
+constexpr chip::Percent100ths LIMIT_RANGE_MIN = 0;
+constexpr chip::Percent100ths LIMIT_RANGE_MAX = 10000;
+constexpr chip::Percent100ths STEP            = 1000;
+} // namespace
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -67,21 +67,21 @@ void ClosureDimensionDelegate::SetCallbacks(Callback_fn_initiated aActionInitiat
 }
 
 Status ClosureDimensionDelegate::HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<TargetLatchEnum> & latch,
-                                                     const Optional<Globals::ThreeLevelAutoEnum> & speed)
+                                                 const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
     bool motionNeeded = false;
     bool latchNeeded  = false;
     GenericTargetStruct target;
     Status status = Status::Success;
 
-    ClusterState state = getLogic()->GetState();
+    ClusterState state             = getLogic()->GetState();
     ClusterConformance conformance = getLogic()->GetConformance();
 
     if (conformance.HasFeature(Feature::kPositioning) && pos.HasValue())
     {
         if (static_cast<uint16_t>(pos.Value()) != static_cast<uint16_t>(state.currentState.position.Value()))
         {
-            motionNeeded  = true;
+            motionNeeded    = true;
             target.position = pos;
         }
     }
@@ -94,14 +94,14 @@ Status ClosureDimensionDelegate::HandleSetTarget(const Optional<Percent100ths> &
 
     if (conformance.HasFeature(Feature::kSpeed) && speed.HasValue())
     {
-        if(!state.currentState.speed.HasValue())
+        if (!state.currentState.speed.HasValue())
         {
-            motionNeeded  = true;
+            motionNeeded = true;
             target.speed = speed;
         }
-        else if(static_cast<uint16_t>(state.currentState.speed.Value()) != static_cast<uint16_t>(speed.Value()))
+        else if (static_cast<uint16_t>(state.currentState.speed.Value()) != static_cast<uint16_t>(speed.Value()))
         {
-            motionNeeded  = true;
+            motionNeeded = true;
             target.speed = speed;
         }
     }
@@ -111,12 +111,12 @@ Status ClosureDimensionDelegate::HandleSetTarget(const Optional<Percent100ths> &
     if (isMoving)
     {
         status = HandleMotion(latchNeeded, motionNeeded, true);
-    } else
+    }
+    else
     {
         status = HandleMotion(latchNeeded, motionNeeded, false);
     }
     return status;
-
 }
 
 static void HandleStepMotion(System::Layer * systemLayer, void * data)
@@ -146,11 +146,11 @@ static void HandleStepMotion(System::Layer * systemLayer, void * data)
         {
             delegate->mActionCompleted_CB(delegate->GetAction());
         }
-
     }
     else
     {
-        (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds16(delegate->kExampleStepCountDown), HandleStepMotion, delegate);
+        (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds16(delegate->kExampleStepCountDown),
+                                                     HandleStepMotion, delegate);
     }
 
     if (delegate->mActionInitiated_CB)
@@ -158,13 +158,12 @@ static void HandleStepMotion(System::Layer * systemLayer, void * data)
         delegate->SetDeviceMoving(true);
         delegate->mActionInitiated_CB(delegate->GetAction());
     }
-
 }
 
 Status ClosureDimensionDelegate::HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
-                                                const Optional<Globals::ThreeLevelAutoEnum> & speed)
+                                            const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
-    mAction = STEP_ACTION;
+    mAction          = STEP_ACTION;
     mTargetDirection = direction;
     (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds16(kExampleStepCountDown), HandleStepMotion, this);
     return Status::Success;
@@ -201,7 +200,6 @@ static void MotionTimerEventHandler(System::Layer * systemLayer, void * data)
     {
         delegate->mActionCompleted_CB(delegate->GetAction());
     }
-
 }
 
 Status ClosureDimensionDelegate::HandleMotion(bool latchNeeded, bool motionNeeded, bool newTarget)
