@@ -22,7 +22,7 @@ namespace Attributes {
 namespace CookTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = CookTime::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace MaxCookTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = MaxCookTime::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -38,7 +38,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace PowerSetting {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSetting::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -46,7 +46,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace MinPower {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = MinPower::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -54,7 +54,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace MaxPower {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = MaxPower::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -62,7 +62,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace PowerStep {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerStep::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -78,7 +78,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace SelectedWattIndex {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = SelectedWattIndex::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -86,12 +86,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace WattRating {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = WattRating::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace WattRating
-
 
 } // namespace Attributes
 
@@ -99,14 +98,14 @@ namespace Commands {
 namespace SetCookingParameters {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = MicrowaveOvenControl::Commands::SetCookingParameters::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace SetCookingParameters
 namespace AddMoreTime {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = MicrowaveOvenControl::Commands::AddMoreTime::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace AddMoreTime

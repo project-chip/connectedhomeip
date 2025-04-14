@@ -25,6 +25,6 @@ inline constexpr EventId Id = 0xFFF200EE;
 
 } // namespace Events
 } // namespace UnitTesting
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

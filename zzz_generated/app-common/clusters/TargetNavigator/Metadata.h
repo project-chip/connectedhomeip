@@ -30,12 +30,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace CurrentTarget {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = CurrentTarget::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace CurrentTarget
-
 
 } // namespace Attributes
 
@@ -43,7 +42,7 @@ namespace Commands {
 namespace NavigateTarget {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = TargetNavigator::Commands::NavigateTarget::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace NavigateTarget

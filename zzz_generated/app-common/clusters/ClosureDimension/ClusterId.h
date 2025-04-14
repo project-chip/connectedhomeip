@@ -14,6 +14,6 @@ namespace ClosureDimension {
 inline constexpr ClusterId Id = 0x00000105;
 
 } // namespace ClosureDimension
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

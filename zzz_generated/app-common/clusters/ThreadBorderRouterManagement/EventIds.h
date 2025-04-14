@@ -10,9 +10,8 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ThreadBorderRouterManagement {
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 } // namespace ThreadBorderRouterManagement
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

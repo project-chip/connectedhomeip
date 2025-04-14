@@ -4,8 +4,8 @@
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 
-#include <lib/core/DataModelTypes.h>
 #include <app/common/GlobalIds.h>
+#include <lib/core/DataModelTypes.h>
 
 namespace chip {
 namespace app {
@@ -104,9 +104,8 @@ namespace ClusterRevision {
 inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
-
 } // namespace Attributes
 } // namespace BridgedDeviceBasicInformation
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

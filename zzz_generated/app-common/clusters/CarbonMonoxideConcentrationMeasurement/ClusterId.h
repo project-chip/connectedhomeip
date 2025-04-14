@@ -14,6 +14,6 @@ namespace CarbonMonoxideConcentrationMeasurement {
 inline constexpr ClusterId Id = 0x0000040C;
 
 } // namespace CarbonMonoxideConcentrationMeasurement
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

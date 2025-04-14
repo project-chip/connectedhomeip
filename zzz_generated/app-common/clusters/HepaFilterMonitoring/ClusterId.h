@@ -14,6 +14,6 @@ namespace HepaFilterMonitoring {
 inline constexpr ClusterId Id = 0x00000071;
 
 } // namespace HepaFilterMonitoring
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

@@ -8,4 +8,3 @@
 #include <clusters/AdministratorCommissioning/ClusterId.h>
 #include <clusters/AdministratorCommissioning/CommandIds.h>
 #include <clusters/AdministratorCommissioning/EventIds.h>
-

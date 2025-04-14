@@ -10,9 +10,8 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace WindowCovering {
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 } // namespace WindowCovering
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

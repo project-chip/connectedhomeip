@@ -14,6 +14,6 @@ namespace TimeSynchronization {
 inline constexpr ClusterId Id = 0x00000038;
 
 } // namespace TimeSynchronization
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

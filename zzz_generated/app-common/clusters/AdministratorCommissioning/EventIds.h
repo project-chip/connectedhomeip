@@ -10,9 +10,8 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace AdministratorCommissioning {
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 } // namespace AdministratorCommissioning
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

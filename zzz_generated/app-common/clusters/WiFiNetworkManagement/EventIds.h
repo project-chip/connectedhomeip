@@ -10,9 +10,8 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace WiFiNetworkManagement {
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 } // namespace WiFiNetworkManagement
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

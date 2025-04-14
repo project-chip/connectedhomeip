@@ -8,4 +8,3 @@
 #include <clusters/LaundryDryerControls/ClusterId.h>
 #include <clusters/LaundryDryerControls/CommandIds.h>
 #include <clusters/LaundryDryerControls/EventIds.h>
-

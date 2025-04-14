@@ -25,6 +25,6 @@ inline constexpr CommandId Id = 0x00000002;
 
 } // namespace Commands
 } // namespace ClosureControl
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

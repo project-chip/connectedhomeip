@@ -14,6 +14,6 @@ namespace EthernetNetworkDiagnostics {
 inline constexpr ClusterId Id = 0x00000037;
 
 } // namespace EthernetNetworkDiagnostics
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

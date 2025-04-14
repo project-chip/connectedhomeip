@@ -14,6 +14,6 @@ namespace TemperatureMeasurement {
 inline constexpr ClusterId Id = 0x00000402;
 
 } // namespace TemperatureMeasurement
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

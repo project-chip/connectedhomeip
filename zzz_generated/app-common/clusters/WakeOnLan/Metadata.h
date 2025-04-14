@@ -22,7 +22,7 @@ namespace Attributes {
 namespace MACAddress {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = MACAddress::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -30,18 +30,15 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace LinkLocalAddress {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = LinkLocalAddress::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace LinkLocalAddress
 
-
 } // namespace Attributes
 
-namespace Commands {
-
-} // namespace Commands
+namespace Commands {} // namespace Commands
 } // namespace WakeOnLan
 } // namespace Clusters
 } // namespace app

@@ -22,7 +22,7 @@ namespace Attributes {
 namespace SupportedContainerFormats {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = SupportedContainerFormats::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace SupportedIngestMethods {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = SupportedIngestMethods::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -44,49 +44,48 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 };
 } // namespace CurrentConnections
 
-
 } // namespace Attributes
 
 namespace Commands {
 namespace AllocatePushTransport {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = PushAvStreamTransport::Commands::AllocatePushTransport::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace AllocatePushTransport
 namespace DeallocatePushTransport {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = PushAvStreamTransport::Commands::DeallocatePushTransport::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace DeallocatePushTransport
 namespace ModifyPushTransport {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = PushAvStreamTransport::Commands::ModifyPushTransport::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace ModifyPushTransport
 namespace SetTransportStatus {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = PushAvStreamTransport::Commands::SetTransportStatus::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace SetTransportStatus
 namespace ManuallyTriggerTransport {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = PushAvStreamTransport::Commands::ManuallyTriggerTransport::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace ManuallyTriggerTransport
 namespace FindTransport {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = PushAvStreamTransport::Commands::FindTransport::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace FindTransport

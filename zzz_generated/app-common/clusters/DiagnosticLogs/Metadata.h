@@ -18,16 +18,13 @@ namespace DiagnosticLogs {
 
 inline constexpr uint32_t kRevision = 1;
 
-namespace Attributes {
-
-
-} // namespace Attributes
+namespace Attributes {} // namespace Attributes
 
 namespace Commands {
 namespace RetrieveLogsRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = DiagnosticLogs::Commands::RetrieveLogsRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace RetrieveLogsRequest

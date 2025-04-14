@@ -8,4 +8,3 @@
 #include <clusters/Messages/ClusterId.h>
 #include <clusters/Messages/CommandIds.h>
 #include <clusters/Messages/EventIds.h>
-

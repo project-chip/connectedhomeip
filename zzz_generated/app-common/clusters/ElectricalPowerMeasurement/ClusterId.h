@@ -14,6 +14,6 @@ namespace ElectricalPowerMeasurement {
 inline constexpr ClusterId Id = 0x00000090;
 
 } // namespace ElectricalPowerMeasurement
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

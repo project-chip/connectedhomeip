@@ -14,6 +14,6 @@ namespace OperationalState {
 inline constexpr ClusterId Id = 0x00000060;
 
 } // namespace OperationalState
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

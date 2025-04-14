@@ -8,4 +8,3 @@
 #include <clusters/FaultInjection/ClusterId.h>
 #include <clusters/FaultInjection/CommandIds.h>
 #include <clusters/FaultInjection/EventIds.h>
-

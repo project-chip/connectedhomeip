@@ -8,4 +8,3 @@
 #include <clusters/RefrigeratorAlarm/ClusterId.h>
 #include <clusters/RefrigeratorAlarm/CommandIds.h>
 #include <clusters/RefrigeratorAlarm/EventIds.h>
-

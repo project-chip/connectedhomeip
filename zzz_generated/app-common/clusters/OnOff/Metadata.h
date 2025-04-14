@@ -22,7 +22,7 @@ namespace Attributes {
 namespace OnOff {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OnOff::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace GlobalSceneControl {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = GlobalSceneControl::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -38,7 +38,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace OnTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OnTime::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
@@ -46,7 +46,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace OffWaitTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OffWaitTime::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
@@ -54,12 +54,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace StartUpOnOff {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = StartUpOnOff::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 } // namespace StartUpOnOff
-
 
 } // namespace Attributes
 
@@ -67,42 +66,42 @@ namespace Commands {
 namespace Off {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = OnOff::Commands::Off::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Off
 namespace On {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = OnOff::Commands::On::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace On
 namespace Toggle {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = OnOff::Commands::Toggle::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Toggle
 namespace OffWithEffect {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = OnOff::Commands::OffWithEffect::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace OffWithEffect
 namespace OnWithRecallGlobalScene {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = OnOff::Commands::OnWithRecallGlobalScene::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace OnWithRecallGlobalScene
 namespace OnWithTimedOff {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = OnOff::Commands::OnWithTimedOff::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace OnWithTimedOff

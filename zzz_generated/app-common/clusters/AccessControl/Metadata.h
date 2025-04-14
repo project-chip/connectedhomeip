@@ -38,7 +38,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace SubjectsPerAccessControlEntry {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = SubjectsPerAccessControlEntry::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -46,7 +46,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace TargetsPerAccessControlEntry {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = TargetsPerAccessControlEntry::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -54,7 +54,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace AccessControlEntriesPerFabric {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = AccessControlEntriesPerFabric::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -75,7 +75,6 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .writePrivilege = std::nullopt,
 };
 } // namespace Arl
-
 
 } // namespace Attributes
 

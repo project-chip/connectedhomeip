@@ -41,6 +41,6 @@ inline constexpr CommandId Id = 0x00000006;
 
 } // namespace Commands
 } // namespace CameraAvSettingsUserLevelManagement
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

@@ -14,6 +14,6 @@ namespace AccountLogin {
 inline constexpr ClusterId Id = 0x0000050E;
 
 } // namespace AccountLogin
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

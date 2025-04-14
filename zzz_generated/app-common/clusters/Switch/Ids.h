@@ -8,4 +8,3 @@
 #include <clusters/Switch/ClusterId.h>
 #include <clusters/Switch/CommandIds.h>
 #include <clusters/Switch/EventIds.h>
-

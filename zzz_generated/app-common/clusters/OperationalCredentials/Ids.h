@@ -8,4 +8,3 @@
 #include <clusters/OperationalCredentials/ClusterId.h>
 #include <clusters/OperationalCredentials/CommandIds.h>
 #include <clusters/OperationalCredentials/EventIds.h>
-

@@ -21,6 +21,6 @@ inline constexpr EventId Id = 0x00000001;
 
 } // namespace Events
 } // namespace ElectricalEnergyMeasurement
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

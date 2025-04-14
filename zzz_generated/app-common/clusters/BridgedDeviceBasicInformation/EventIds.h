@@ -33,6 +33,6 @@ inline constexpr EventId Id = 0x00000080;
 
 } // namespace Events
 } // namespace BridgedDeviceBasicInformation
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

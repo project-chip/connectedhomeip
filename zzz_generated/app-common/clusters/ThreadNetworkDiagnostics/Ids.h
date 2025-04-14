@@ -8,4 +8,3 @@
 #include <clusters/ThreadNetworkDiagnostics/ClusterId.h>
 #include <clusters/ThreadNetworkDiagnostics/CommandIds.h>
 #include <clusters/ThreadNetworkDiagnostics/EventIds.h>
-

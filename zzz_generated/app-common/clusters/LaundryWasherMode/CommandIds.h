@@ -21,6 +21,6 @@ inline constexpr CommandId Id = 0x00000001;
 
 } // namespace Commands
 } // namespace LaundryWasherMode
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

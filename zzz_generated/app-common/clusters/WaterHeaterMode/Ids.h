@@ -8,4 +8,3 @@
 #include <clusters/WaterHeaterMode/ClusterId.h>
 #include <clusters/WaterHeaterMode/CommandIds.h>
 #include <clusters/WaterHeaterMode/EventIds.h>
-

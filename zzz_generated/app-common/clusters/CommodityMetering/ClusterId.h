@@ -14,6 +14,6 @@ namespace CommodityMetering {
 inline constexpr ClusterId Id = 0x00000B07;
 
 } // namespace CommodityMetering
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

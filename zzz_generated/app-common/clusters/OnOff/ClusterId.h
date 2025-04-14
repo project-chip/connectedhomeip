@@ -14,6 +14,6 @@ namespace OnOff {
 inline constexpr ClusterId Id = 0x00000006;
 
 } // namespace OnOff
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

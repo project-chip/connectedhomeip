@@ -22,7 +22,7 @@ namespace Attributes {
 namespace IdleModeDuration {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = IdleModeDuration::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace ActiveModeDuration {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ActiveModeDuration::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -38,7 +38,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace ActiveModeThreshold {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ActiveModeThreshold::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -54,7 +54,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace ICDCounter {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ICDCounter::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
@@ -62,7 +62,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace ClientsSupportedPerFabric {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ClientsSupportedPerFabric::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -70,7 +70,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace UserActiveModeTriggerHint {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = UserActiveModeTriggerHint::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -78,7 +78,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace UserActiveModeTriggerInstruction {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = UserActiveModeTriggerInstruction::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -86,7 +86,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace OperatingMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OperatingMode::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -94,12 +94,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace MaximumCheckInBackOff {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = MaximumCheckInBackOff::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace MaximumCheckInBackOff
-
 
 } // namespace Attributes
 
@@ -121,7 +120,7 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
 namespace StayActiveRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = IcdManagement::Commands::StayActiveRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace StayActiveRequest

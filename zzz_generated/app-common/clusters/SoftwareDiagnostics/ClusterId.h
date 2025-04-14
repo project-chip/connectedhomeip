@@ -14,6 +14,6 @@ namespace SoftwareDiagnostics {
 inline constexpr ClusterId Id = 0x00000034;
 
 } // namespace SoftwareDiagnostics
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

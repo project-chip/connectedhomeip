@@ -14,6 +14,6 @@ namespace RadonConcentrationMeasurement {
 inline constexpr ClusterId Id = 0x0000042F;
 
 } // namespace RadonConcentrationMeasurement
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

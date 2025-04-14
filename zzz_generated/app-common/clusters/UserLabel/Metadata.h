@@ -28,12 +28,9 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 };
 } // namespace LabelList
 
-
 } // namespace Attributes
 
-namespace Commands {
-
-} // namespace Commands
+namespace Commands {} // namespace Commands
 } // namespace UserLabel
 } // namespace Clusters
 } // namespace app

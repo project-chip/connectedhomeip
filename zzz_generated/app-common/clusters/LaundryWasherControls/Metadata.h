@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace SpinSpeedCurrent {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = SpinSpeedCurrent::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
@@ -38,7 +38,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace NumberOfRinses {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = NumberOfRinses::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
@@ -52,12 +52,9 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 };
 } // namespace SupportedRinses
 
-
 } // namespace Attributes
 
-namespace Commands {
-
-} // namespace Commands
+namespace Commands {} // namespace Commands
 } // namespace LaundryWasherControls
 } // namespace Clusters
 } // namespace app

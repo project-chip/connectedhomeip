@@ -10,9 +10,8 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace EthernetNetworkDiagnostics {
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 } // namespace EthernetNetworkDiagnostics
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

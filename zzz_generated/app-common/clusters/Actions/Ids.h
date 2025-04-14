@@ -8,4 +8,3 @@
 #include <clusters/Actions/ClusterId.h>
 #include <clusters/Actions/CommandIds.h>
 #include <clusters/Actions/EventIds.h>
-

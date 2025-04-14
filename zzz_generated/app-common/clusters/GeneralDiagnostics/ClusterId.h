@@ -14,6 +14,6 @@ namespace GeneralDiagnostics {
 inline constexpr ClusterId Id = 0x00000033;
 
 } // namespace GeneralDiagnostics
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

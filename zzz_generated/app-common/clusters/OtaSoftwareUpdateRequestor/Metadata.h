@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace UpdatePossible {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = UpdatePossible::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -38,7 +38,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace UpdateState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = UpdateState::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -46,12 +46,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace UpdateStateProgress {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = UpdateStateProgress::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace UpdateStateProgress
-
 
 } // namespace Attributes
 
@@ -59,7 +58,7 @@ namespace Commands {
 namespace AnnounceOTAProvider {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace AnnounceOTAProvider

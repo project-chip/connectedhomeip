@@ -10,9 +10,8 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace PowerSourceConfiguration {
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 } // namespace PowerSourceConfiguration
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

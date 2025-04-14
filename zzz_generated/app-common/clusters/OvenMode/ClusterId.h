@@ -14,6 +14,6 @@ namespace OvenMode {
 inline constexpr ClusterId Id = 0x00000049;
 
 } // namespace OvenMode
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

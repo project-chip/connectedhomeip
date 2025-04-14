@@ -36,7 +36,6 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 };
 } // namespace ActiveMessageIDs
 
-
 } // namespace Attributes
 
 namespace Commands {

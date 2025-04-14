@@ -8,4 +8,3 @@
 #include <clusters/ScenesManagement/ClusterId.h>
 #include <clusters/ScenesManagement/CommandIds.h>
 #include <clusters/ScenesManagement/EventIds.h>
-

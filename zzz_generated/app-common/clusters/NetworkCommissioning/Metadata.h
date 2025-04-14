@@ -22,7 +22,7 @@ namespace Attributes {
 namespace MaxNetworks {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = MaxNetworks::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
@@ -38,7 +38,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace ScanMaxTimeSeconds {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ScanMaxTimeSeconds::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -46,7 +46,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace ConnectMaxTimeSeconds {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ConnectMaxTimeSeconds::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -54,7 +54,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace InterfaceEnabled {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = InterfaceEnabled::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kAdminister,
 };
@@ -62,7 +62,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace LastNetworkingStatus {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = LastNetworkingStatus::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
@@ -70,7 +70,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace LastNetworkID {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = LastNetworkID::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
@@ -78,7 +78,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace LastConnectErrorValue {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = LastConnectErrorValue::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
@@ -94,7 +94,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace SupportedThreadFeatures {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = SupportedThreadFeatures::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -102,12 +102,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace ThreadVersion {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ThreadVersion::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace ThreadVersion
-
 
 } // namespace Attributes
 
@@ -115,49 +114,49 @@ namespace Commands {
 namespace ScanNetworks {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = NetworkCommissioning::Commands::ScanNetworks::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace ScanNetworks
 namespace AddOrUpdateWiFiNetwork {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace AddOrUpdateWiFiNetwork
 namespace AddOrUpdateThreadNetwork {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace AddOrUpdateThreadNetwork
 namespace RemoveNetwork {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = NetworkCommissioning::Commands::RemoveNetwork::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace RemoveNetwork
 namespace ConnectNetwork {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = NetworkCommissioning::Commands::ConnectNetwork::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace ConnectNetwork
 namespace ReorderNetwork {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = NetworkCommissioning::Commands::ReorderNetwork::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace ReorderNetwork
 namespace QueryIdentity {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = NetworkCommissioning::Commands::QueryIdentity::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace QueryIdentity

@@ -18,23 +18,20 @@ namespace FaultInjection {
 
 inline constexpr uint32_t kRevision = 1;
 
-namespace Attributes {
-
-
-} // namespace Attributes
+namespace Attributes {} // namespace Attributes
 
 namespace Commands {
 namespace FailAtFault {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = FaultInjection::Commands::FailAtFault::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace FailAtFault
 namespace FailRandomlyAtFault {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = FaultInjection::Commands::FailRandomlyAtFault::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace FailRandomlyAtFault

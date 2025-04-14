@@ -29,6 +29,6 @@ inline constexpr EventId Id = 0x00000003;
 
 } // namespace Events
 } // namespace DeviceEnergyManagement
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

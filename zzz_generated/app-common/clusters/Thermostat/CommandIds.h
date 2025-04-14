@@ -49,6 +49,6 @@ inline constexpr CommandId Id = 0x000000FD;
 
 } // namespace Commands
 } // namespace Thermostat
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

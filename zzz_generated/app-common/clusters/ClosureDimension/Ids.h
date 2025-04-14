@@ -8,4 +8,3 @@
 #include <clusters/ClosureDimension/ClusterId.h>
 #include <clusters/ClosureDimension/CommandIds.h>
 #include <clusters/ClosureDimension/EventIds.h>
-

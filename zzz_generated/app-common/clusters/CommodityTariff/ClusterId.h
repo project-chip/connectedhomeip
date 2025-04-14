@@ -14,6 +14,6 @@ namespace CommodityTariff {
 inline constexpr ClusterId Id = 0x00000700;
 
 } // namespace CommodityTariff
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

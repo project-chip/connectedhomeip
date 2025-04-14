@@ -22,7 +22,7 @@ namespace Attributes {
 namespace NumberOfPositions {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = NumberOfPositions::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace CurrentPosition {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = CurrentPosition::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -38,18 +38,15 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace MultiPressMax {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = MultiPressMax::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace MultiPressMax
 
-
 } // namespace Attributes
 
-namespace Commands {
-
-} // namespace Commands
+namespace Commands {} // namespace Commands
 } // namespace Switch
 } // namespace Clusters
 } // namespace app

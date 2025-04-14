@@ -10,9 +10,8 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace CameraAvSettingsUserLevelManagement {
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 } // namespace CameraAvSettingsUserLevelManagement
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

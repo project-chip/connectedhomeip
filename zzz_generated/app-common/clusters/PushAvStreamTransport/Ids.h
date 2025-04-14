@@ -8,4 +8,3 @@
 #include <clusters/PushAvStreamTransport/ClusterId.h>
 #include <clusters/PushAvStreamTransport/CommandIds.h>
 #include <clusters/PushAvStreamTransport/EventIds.h>
-

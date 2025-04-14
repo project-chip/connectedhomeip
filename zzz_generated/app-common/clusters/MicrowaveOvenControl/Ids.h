@@ -8,4 +8,3 @@
 #include <clusters/MicrowaveOvenControl/ClusterId.h>
 #include <clusters/MicrowaveOvenControl/CommandIds.h>
 #include <clusters/MicrowaveOvenControl/EventIds.h>
-

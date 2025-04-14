@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace CurrentHeapFree {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = CurrentHeapFree::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -38,7 +38,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace CurrentHeapUsed {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = CurrentHeapUsed::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -46,12 +46,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace CurrentHeapHighWatermark {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = CurrentHeapHighWatermark::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace CurrentHeapHighWatermark
-
 
 } // namespace Attributes
 
@@ -59,7 +58,7 @@ namespace Commands {
 namespace ResetWatermarks {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = SoftwareDiagnostics::Commands::ResetWatermarks::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace ResetWatermarks

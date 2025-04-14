@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace CurrentEnergyBalance {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = CurrentEnergyBalance::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
@@ -54,18 +54,15 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace CurrentLowPowerModeSensitivity {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = CurrentLowPowerModeSensitivity::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 } // namespace CurrentLowPowerModeSensitivity
 
-
 } // namespace Attributes
 
-namespace Commands {
-
-} // namespace Commands
+namespace Commands {} // namespace Commands
 } // namespace EnergyPreference
 } // namespace Clusters
 } // namespace app

@@ -22,7 +22,7 @@ namespace Attributes {
 namespace MeterType {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = MeterType::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace PointOfDelivery {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PointOfDelivery::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -38,7 +38,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace MeterSerialNumber {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = MeterSerialNumber::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -46,7 +46,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace ProtocolVersion {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ProtocolVersion::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -54,18 +54,15 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace PowerThreshold {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerThreshold::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace PowerThreshold
 
-
 } // namespace Attributes
 
-namespace Commands {
-
-} // namespace Commands
+namespace Commands {} // namespace Commands
 } // namespace MeterIdentification
 } // namespace Clusters
 } // namespace app

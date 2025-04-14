@@ -8,4 +8,3 @@
 #include <clusters/IcdManagement/ClusterId.h>
 #include <clusters/IcdManagement/CommandIds.h>
 #include <clusters/IcdManagement/EventIds.h>
-

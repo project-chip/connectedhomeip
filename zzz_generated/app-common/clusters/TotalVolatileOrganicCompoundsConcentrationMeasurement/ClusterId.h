@@ -14,6 +14,6 @@ namespace TotalVolatileOrganicCompoundsConcentrationMeasurement {
 inline constexpr ClusterId Id = 0x0000042E;
 
 } // namespace TotalVolatileOrganicCompoundsConcentrationMeasurement
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

@@ -14,6 +14,6 @@ namespace DishwasherMode {
 inline constexpr ClusterId Id = 0x00000059;
 
 } // namespace DishwasherMode
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

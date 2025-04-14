@@ -89,6 +89,6 @@ inline constexpr CommandId Id = 0x0000004C;
 
 } // namespace Commands
 } // namespace ColorControl
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

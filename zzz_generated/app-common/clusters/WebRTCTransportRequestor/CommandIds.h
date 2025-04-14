@@ -29,6 +29,6 @@ inline constexpr CommandId Id = 0x00000004;
 
 } // namespace Commands
 } // namespace WebRTCTransportRequestor
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

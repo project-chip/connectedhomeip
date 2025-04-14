@@ -22,7 +22,7 @@ namespace Attributes {
 namespace TariffUnit {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = TariffUnit::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Currency {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = Currency::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -38,7 +38,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace CurrentPrice {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = CurrentPrice::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -52,21 +52,20 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 };
 } // namespace PriceForecast
 
-
 } // namespace Attributes
 
 namespace Commands {
 namespace GetDetailedPriceRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = CommodityPrice::Commands::GetDetailedPriceRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace GetDetailedPriceRequest
 namespace GetDetailedForecastRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = CommodityPrice::Commands::GetDetailedForecastRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace GetDetailedForecastRequest

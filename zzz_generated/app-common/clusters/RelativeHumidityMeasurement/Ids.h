@@ -8,4 +8,3 @@
 #include <clusters/RelativeHumidityMeasurement/ClusterId.h>
 #include <clusters/RelativeHumidityMeasurement/CommandIds.h>
 #include <clusters/RelativeHumidityMeasurement/EventIds.h>
-

@@ -10,9 +10,8 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace PumpConfigurationAndControl {
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 } // namespace PumpConfigurationAndControl
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

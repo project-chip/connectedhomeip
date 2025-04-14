@@ -14,6 +14,6 @@ namespace ActivatedCarbonFilterMonitoring {
 inline constexpr ClusterId Id = 0x00000072;
 
 } // namespace ActivatedCarbonFilterMonitoring
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

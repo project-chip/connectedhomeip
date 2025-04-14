@@ -22,12 +22,11 @@ namespace Attributes {
 namespace FlipFlop {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = FlipFlop::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 } // namespace FlipFlop
-
 
 } // namespace Attributes
 
@@ -35,14 +34,14 @@ namespace Commands {
 namespace Ping {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = SampleMei::Commands::Ping::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Ping
 namespace AddArguments {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = SampleMei::Commands::AddArguments::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace AddArguments

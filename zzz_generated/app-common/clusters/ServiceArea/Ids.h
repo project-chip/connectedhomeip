@@ -8,4 +8,3 @@
 #include <clusters/ServiceArea/ClusterId.h>
 #include <clusters/ServiceArea/CommandIds.h>
 #include <clusters/ServiceArea/EventIds.h>
-

@@ -10,9 +10,8 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ThreadNetworkDirectory {
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 } // namespace ThreadNetworkDirectory
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

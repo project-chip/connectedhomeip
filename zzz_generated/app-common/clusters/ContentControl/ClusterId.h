@@ -14,6 +14,6 @@ namespace ContentControl {
 inline constexpr ClusterId Id = 0x0000050F;
 
 } // namespace ContentControl
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

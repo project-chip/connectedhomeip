@@ -14,6 +14,6 @@ namespace Pm25ConcentrationMeasurement {
 inline constexpr ClusterId Id = 0x0000042A;
 
 } // namespace Pm25ConcentrationMeasurement
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

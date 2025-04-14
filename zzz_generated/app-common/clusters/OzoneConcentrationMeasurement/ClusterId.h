@@ -14,6 +14,6 @@ namespace OzoneConcentrationMeasurement {
 inline constexpr ClusterId Id = 0x00000415;
 
 } // namespace OzoneConcentrationMeasurement
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

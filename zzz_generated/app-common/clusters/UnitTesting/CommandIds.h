@@ -185,6 +185,6 @@ inline constexpr CommandId Id = 0xFFF200BB;
 
 } // namespace Commands
 } // namespace UnitTesting
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

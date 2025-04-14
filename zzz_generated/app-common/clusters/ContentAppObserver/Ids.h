@@ -8,4 +8,3 @@
 #include <clusters/ContentAppObserver/ClusterId.h>
 #include <clusters/ContentAppObserver/CommandIds.h>
 #include <clusters/ContentAppObserver/EventIds.h>
-

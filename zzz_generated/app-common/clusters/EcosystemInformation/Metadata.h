@@ -36,12 +36,9 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 };
 } // namespace LocationDirectory
 
-
 } // namespace Attributes
 
-namespace Commands {
-
-} // namespace Commands
+namespace Commands {} // namespace Commands
 } // namespace EcosystemInformation
 } // namespace Clusters
 } // namespace app

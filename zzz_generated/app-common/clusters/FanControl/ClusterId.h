@@ -14,6 +14,6 @@ namespace FanControl {
 inline constexpr ClusterId Id = 0x00000202;
 
 } // namespace FanControl
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

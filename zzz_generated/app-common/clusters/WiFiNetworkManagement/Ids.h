@@ -8,4 +8,3 @@
 #include <clusters/WiFiNetworkManagement/ClusterId.h>
 #include <clusters/WiFiNetworkManagement/CommandIds.h>
 #include <clusters/WiFiNetworkManagement/EventIds.h>
-

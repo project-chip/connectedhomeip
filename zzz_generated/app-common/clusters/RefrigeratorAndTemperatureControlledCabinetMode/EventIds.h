@@ -10,9 +10,8 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace RefrigeratorAndTemperatureControlledCabinetMode {
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 } // namespace RefrigeratorAndTemperatureControlledCabinetMode
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

@@ -14,6 +14,6 @@ namespace OccupancySensing {
 inline constexpr ClusterId Id = 0x00000406;
 
 } // namespace OccupancySensing
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

@@ -17,6 +17,6 @@ inline constexpr CommandId Id = 0x00000000;
 
 } // namespace Commands
 } // namespace OtaSoftwareUpdateRequestor
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

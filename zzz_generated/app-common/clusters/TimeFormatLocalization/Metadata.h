@@ -22,7 +22,7 @@ namespace Attributes {
 namespace HourFormat {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = HourFormat::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace ActiveCalendarType {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ActiveCalendarType::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
@@ -44,12 +44,9 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 };
 } // namespace SupportedCalendarTypes
 
-
 } // namespace Attributes
 
-namespace Commands {
-
-} // namespace Commands
+namespace Commands {} // namespace Commands
 } // namespace TimeFormatLocalization
 } // namespace Clusters
 } // namespace app

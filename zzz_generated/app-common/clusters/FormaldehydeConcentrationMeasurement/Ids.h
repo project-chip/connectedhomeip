@@ -8,4 +8,3 @@
 #include <clusters/FormaldehydeConcentrationMeasurement/ClusterId.h>
 #include <clusters/FormaldehydeConcentrationMeasurement/CommandIds.h>
 #include <clusters/FormaldehydeConcentrationMeasurement/EventIds.h>
-

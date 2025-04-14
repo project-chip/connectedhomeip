@@ -14,6 +14,6 @@ namespace ThreadBorderRouterManagement {
 inline constexpr ClusterId Id = 0x00000452;
 
 } // namespace ThreadBorderRouterManagement
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

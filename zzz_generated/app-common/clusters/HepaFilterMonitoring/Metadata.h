@@ -22,7 +22,7 @@ namespace Attributes {
 namespace Condition {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = Condition::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace DegradationDirection {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DegradationDirection::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -38,7 +38,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace ChangeIndication {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ChangeIndication::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -46,7 +46,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace InPlaceIndicator {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = InPlaceIndicator::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -54,7 +54,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace LastChangedTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = LastChangedTime::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
@@ -68,14 +68,13 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 };
 } // namespace ReplacementProductList
 
-
 } // namespace Attributes
 
 namespace Commands {
 namespace ResetCondition {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = HepaFilterMonitoring::Commands::ResetCondition::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace ResetCondition

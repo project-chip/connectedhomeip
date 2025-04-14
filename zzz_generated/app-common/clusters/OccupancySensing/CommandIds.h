@@ -10,9 +10,8 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace OccupancySensing {
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 } // namespace OccupancySensing
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

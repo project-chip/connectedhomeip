@@ -8,4 +8,3 @@
 #include <clusters/OccupancySensing/ClusterId.h>
 #include <clusters/OccupancySensing/CommandIds.h>
 #include <clusters/OccupancySensing/EventIds.h>
-

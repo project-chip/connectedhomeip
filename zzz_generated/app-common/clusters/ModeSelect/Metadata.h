@@ -22,7 +22,7 @@ namespace Attributes {
 namespace Description {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = Description::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace StandardNamespace {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = StandardNamespace::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -46,7 +46,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace CurrentMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = CurrentMode::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -54,7 +54,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace StartUpMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = StartUpMode::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
@@ -62,12 +62,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace OnMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OnMode::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 } // namespace OnMode
-
 
 } // namespace Attributes
 
@@ -75,7 +74,7 @@ namespace Commands {
 namespace ChangeToMode {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = ModeSelect::Commands::ChangeToMode::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace ChangeToMode

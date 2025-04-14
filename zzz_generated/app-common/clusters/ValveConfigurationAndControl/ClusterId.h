@@ -14,6 +14,6 @@ namespace ValveConfigurationAndControl {
 inline constexpr ClusterId Id = 0x00000081;
 
 } // namespace ValveConfigurationAndControl
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

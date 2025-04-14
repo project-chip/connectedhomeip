@@ -41,6 +41,6 @@ inline constexpr EventId Id = 0x00000006;
 
 } // namespace Events
 } // namespace Switch
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip
