@@ -36,6 +36,7 @@ config("config") {
     "${chip_root}/zzz_generated/chip-tool",
     "${chip_root}/src/lib",
     "${chip_root}/third_party/libdatachannel/repo/include",
+    "${chip_root}/third_party/libdatachannel/repo/deps/json/include",
   ]
 
   defines = [ "CONFIG_USE_SEPARATE_EVENTLOOP=${config_use_separate_eventloop}" ]
