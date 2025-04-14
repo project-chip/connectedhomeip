@@ -103,11 +103,6 @@ CHIP_ERROR Interface::Read(const ConcreteReadAttributePath & aPath, AttributeVal
     }
 }
 
-CHIP_ERROR Interface::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
-{
-    return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
-}
-
 void Interface::InvokeCommand(HandlerContext & handlerContext)
 {
     switch (handlerContext.mRequestPath.mCommandId)

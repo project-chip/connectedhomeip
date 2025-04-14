@@ -34,12 +34,6 @@ struct GenericCurrentStateStruct : public Structs::CurrentStruct::Type
                               Optional<LatchingEnum> latchingValue             = NullOptional,
                               Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
     {
-
-        // Set default values if no value is present
-        positionValue.SetValue(positionValue.ValueOr(0));
-        latchingValue.SetValue(latchingValue.ValueOr(LatchingEnum::kNotLatched));
-        speedValue.SetValue(speedValue.ValueOr(Globals::ThreeLevelAutoEnum::kAuto));
-
         Set(positionValue, latchingValue, speedValue);
     }
 
@@ -59,12 +53,12 @@ struct GenericCurrentStateStruct : public Structs::CurrentStruct::Type
         speed    = speedValue;
     }
 
-    bool operator==(const Structs::CurrentStruct::Type & rhs) const
+    bool operator==(const GenericCurrentStateStruct & rhs) const
     {
         return position == rhs.position && latching == rhs.latching && speed == rhs.speed;
     }
 
-    bool operator!=(const Structs::CurrentStruct::Type & rhs) const
+    bool operator!=(const GenericCurrentStateStruct & rhs) const
     {
         return position != rhs.position || latching != rhs.latching || speed != rhs.speed;
     }
@@ -78,10 +72,6 @@ struct GenericTargetStruct : public Structs::TargetStruct::Type
     GenericTargetStruct(Optional<Percent100ths> positionValue = NullOptional, Optional<TargetLatchEnum> latchValue = NullOptional,
                         Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
     {
-        // Set default values if no value is present. Position has no default value.
-        latchValue.SetValue(latch.ValueOr(TargetLatchEnum::kUnlatch));
-        speedValue.SetValue(speedValue.ValueOr(Globals::ThreeLevelAutoEnum::kAuto));
-
         Set(positionValue, latchValue, speedValue);
     }
 
@@ -101,14 +91,14 @@ struct GenericTargetStruct : public Structs::TargetStruct::Type
         speed    = speedValue;
     }
 
-    bool operator==(const Structs::TargetStruct::Type & rhs) const
+    bool operator==(const GenericTargetStruct & rhs) const
     {
         return position == rhs.position && latch == rhs.latch && speed == rhs.speed;
     }
 
-    bool operator!=(const Structs::TargetStruct::Type & rhs) const
+    bool operator!=(const GenericTargetStruct & rhs) const
     {
-        return position != rhs.position && latch != rhs.latch && speed != rhs.speed;
+        return position != rhs.position || latch != rhs.latch || speed != rhs.speed;
     }
 };
 } // namespace ClosureDimension

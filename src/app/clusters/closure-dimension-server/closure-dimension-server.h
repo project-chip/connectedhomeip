@@ -42,8 +42,6 @@ public:
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
-
     // CommandHandlerInterface implementation
 
     void InvokeCommand(HandlerContext & handlerContext) override;

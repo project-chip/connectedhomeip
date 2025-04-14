@@ -67,7 +67,7 @@ struct ClusterState
     Percent100ths resolution = 1;
     Percent100ths stepValue  = 1;
     ClosureUnitEnum unit     = ClosureUnitEnum::kUnknownEnumValue;
-    Structs::UnitRangeStruct::Type unitRange{};
+    DataModel::Nullable<Structs::UnitRangeStruct::Type> unitRange = DataModel::Nullable<Structs::UnitRangeStruct::Type>();
     Structs::RangePercent100thsStruct::Type limitRange{};
     TranslationDirectionEnum translationDirection = TranslationDirectionEnum::kUnknownEnumValue;
     RotationAxisEnum rotationAxis                 = RotationAxisEnum::kUnknownEnumValue;
@@ -103,25 +103,25 @@ public:
      * @brief Set Current State.
      * @param[in] currentState Current State Position, Latching and/or Speed.
      * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has already been initialized.
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
      *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      */
-    CHIP_ERROR SetCurrentState(GenericCurrentStateStruct & currentState);
+    CHIP_ERROR SetCurrentState(const GenericCurrentStateStruct & currentState);
 
     /**
      * @brief Set Target.
      * @param[in] target Target Position, Latching and/or Speed.
      * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has already been initialized.
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
      *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      */
-    CHIP_ERROR SetTarget(GenericTargetStruct & target);
+    CHIP_ERROR SetTarget(const GenericTargetStruct & target);
 
     /**
      * @brief Set Resolution.
      * @param[in] resolution Minimal acceptable change of Position fields of attributes.
      * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has already been initialized
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
      *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
@@ -131,7 +131,7 @@ public:
      * @brief Set StepValue.
      * @param[in] stepValue One step value for Step command
      * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has already been initialized
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
      *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
@@ -141,7 +141,7 @@ public:
      * @brief Set Unit.
      * @param[in] unit Unit related to the Positioning.
      * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has already been initialized
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
      *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
@@ -151,16 +151,18 @@ public:
      * @brief Set UnitRange.
      * @param[in] unitRange Minimum and Maximum values expressed by positioning following the unit.
      * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has already been initialized
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
-    CHIP_ERROR SetUnitRange(const Structs::UnitRangeStruct::Type & unitRange);
+    CHIP_ERROR SetUnitRange(const DataModel::Nullable<Structs::UnitRangeStruct::Type> & unitRange);
 
     /**
      * @brief Set LimitRange.
      * @param[in] limitRange Range of possible values for the position field in Current attribute.
      * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has already been initialized
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetLimitRange(const Structs::RangePercent100thsStruct::Type & limitRange);
@@ -170,7 +172,7 @@ public:
      * @param[in] translationDirection Direction of the translation.
      * @return CHIP_NO_ERROR if set was successful.
      *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has already been initialized
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported
      */
     CHIP_ERROR SetTranslationDirection(const TranslationDirectionEnum translationDirection);
@@ -180,7 +182,7 @@ public:
      * @param[in] rotationAxis Axis of the rotation.
      * @return CHIP_NO_ERROR if set was successful.
      *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has already been initialized
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported
      */
     CHIP_ERROR SetRotationAxis(const RotationAxisEnum rotationAxis);
@@ -190,7 +192,7 @@ public:
      * @param[in] overflow Overflow related to Rotation.
      * @return CHIP_NO_ERROR if set was successful.
      *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has already been initialized
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetOverflow(const OverflowEnum overflow);
@@ -200,14 +202,14 @@ public:
      * @param[in] modulationType Modulation type.
      * @return CHIP_NO_ERROR if set was successful.
      *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has already been initialized
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetModulationType(const ModulationTypeEnum modulationType);
 
     // All Get functions:
-    // Return CHIP_ERROR_INCORRECT_STATE if the class has not been initialized.
-    // Return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if the attribute is not supported by the conformance.
+    // Return CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
+    // Return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if the attribute is not supported.
     // Otherwise return CHIP_NO_ERROR and set the input parameter value to the current cluster state value
     CHIP_ERROR GetCurrentState(GenericCurrentStateStruct & currentState);
     CHIP_ERROR GetTarget(GenericTargetStruct & target);
