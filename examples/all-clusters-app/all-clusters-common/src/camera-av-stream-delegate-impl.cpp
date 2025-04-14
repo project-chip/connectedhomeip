@@ -217,7 +217,7 @@ void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)
     ChipLogProgress(Zcl, "Attribute changed for AttributeId = " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
 }
 
-Protocols::InteractionModel::Status CameraAVStreamManager::CaptureSnapshot(const uint16_t streamID,
+Protocols::InteractionModel::Status CameraAVStreamManager::CaptureSnapshot(const chip::app::DataModel::Nullable<uint16_t> streamID,
                                                                            const VideoResolutionStruct & resolution,
                                                                            ImageSnapshot & outImageSnapshot)
 {
@@ -347,14 +347,14 @@ void emberAfCameraAvStreamManagementClusterInitCallback(EndpointId endpoint)
     AudioCapabilitiesStruct micCapabilities{};
     AudioCapabilitiesStruct spkrCapabilities{};
     TwoWayTalkSupportTypeEnum twowayTalkSupport               = TwoWayTalkSupportTypeEnum::kNotSupported;
-    std::vector<SnapshotParamsStruct> supportedSnapshotParams = {};
+    std::vector<SnapshotCapabilitiesStruct> snapshotCapabilities = {};
     uint32_t maxNetworkBandwidth                              = 64;
     std::vector<StreamUsageEnum> supportedStreamUsages        = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
 
     sCameraAVStreamMgmtClusterServerInstance = std::make_unique<CameraAVStreamMgmtServer>(
         *sCameraAVStreamMgrInstance.get(), endpoint, features, optionalAttrs, maxConcurrentVideoEncoders, maxEncodedPixelRate,
         sensorParams, nightVisionCapable, minViewport, rateDistortionTradeOffPoints, maxContentBufferSize, micCapabilities,
-        spkrCapabilities, twowayTalkSupport, supportedSnapshotParams, maxNetworkBandwidth, supportedStreamUsages);
+        spkrCapabilities, twowayTalkSupport, snapshotCapabilities, maxNetworkBandwidth, supportedStreamUsages);
     sCameraAVStreamMgmtClusterServerInstance->Init();
 }
 
