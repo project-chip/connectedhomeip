@@ -42,6 +42,7 @@
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;
+using WiFiBandEnum = chip::app::Clusters::NetworkCommissioning::WiFiBandEnum;
 
 // TODO: This is a workaround because we depend on the platform lib which depends on the platform implementation.
 //       As such we can't depend on the platform here as well
@@ -483,6 +484,8 @@ static void sl_wfx_scan_result_callback(sl_wfx_scan_result_ind_body_t * scan_res
 
     ap->scan.chan = scan_result->channel;
     ap->scan.rssi = ConvertRcpiToRssi(scan_result->rcpi);
+    // WF200 only supports 2.4GHz band
+    ap->scan.wiFiBand = WiFiBandEnum::k2g4;
 
     chip::ByteSpan scannedBssid(scan_result->mac, kWifiMacAddressLength);
     chip::MutableByteSpan outputBssid(ap->scan.bssid, kWifiMacAddressLength);
@@ -747,7 +750,7 @@ CHIP_ERROR WifiInterfaceImpl::GetAccessPointExtendedInfo(wfx_wifi_scan_ext_t & i
 }
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-CHIP_ERROR WifiInterfaceImpl::ConfigurePowerSave()
+CHIP_ERROR WifiInterfaceImpl::ConfigurePowerSave(PowerSaveInterface::PowerSaveConfiguration configuration, uint32_t listenInterval)
 {
     // TODO: Implement Power save configuration. We do a silent failure to avoid causing problems in higher layers.
     return CHIP_NO_ERROR;
@@ -830,12 +833,19 @@ CHIP_ERROR WifiInterfaceImpl::ConnectToAccessPoint(void)
     return CHIP_NO_ERROR;
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
 bool WifiInterfaceImpl::HasAnIPv4Address()
 {
-    return (sta_ip == STA_IP_FAIL) ? false : true;
-}
+    bool hasIPv4 = false;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
+    if (sta_ip != STA_IP_FAIL)
+    {
+        hasIPv4 = true;
+    }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
+
+    return hasIPv4;
+}
 
 bool WifiInterfaceImpl::HasAnIPv6Address()
 {

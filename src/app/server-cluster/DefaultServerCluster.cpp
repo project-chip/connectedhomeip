@@ -18,6 +18,7 @@
 
 #include <access/Privilege.h>
 #include <app-common/zap-generated/ids/Attributes.h>
+#include <app/ConcreteClusterPath.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <crypto/RandUtils.h>
 #include <lib/support/BitFlags.h>
@@ -66,7 +67,12 @@ constexpr std::array<AttributeEntry, 5> kGlobalAttributeEntries{ {
 
 } // namespace
 
-DefaultServerCluster::DefaultServerCluster()
+Span<const DataModel::AttributeEntry> DefaultServerCluster::GlobalAttributes()
+{
+    return { kGlobalAttributeEntries.data(), kGlobalAttributeEntries.size() };
+}
+
+DefaultServerCluster::DefaultServerCluster(const ConcreteClusterPath & path) : mPath(path)
 {
     // SPEC - 7.10.3. Cluster Data Version
     //   A cluster data version SHALL be initialized randomly when it is first published.
@@ -76,10 +82,30 @@ DefaultServerCluster::DefaultServerCluster()
 CHIP_ERROR DefaultServerCluster::Attributes(const ConcreteClusterPath & path, DataModel::ListBuilder<AttributeEntry> & builder)
 {
 
-    return builder.ReferenceExisting(kGlobalAttributeEntries);
+    return builder.ReferenceExisting(GlobalAttributes());
 }
 
-BitFlags<ClusterQualityFlags> DefaultServerCluster::GetClusterFlags() const
+CHIP_ERROR DefaultServerCluster::Startup(ServerClusterContext & context)
+{
+    VerifyOrReturnError(mContext == nullptr, CHIP_ERROR_ALREADY_INITIALIZED);
+    mContext = &context;
+    return CHIP_NO_ERROR;
+}
+
+void DefaultServerCluster::Shutdown()
+{
+    mContext = nullptr;
+}
+
+void DefaultServerCluster::NotifyAttributeChanged(AttributeId attributeId)
+{
+    IncreaseDataVersion();
+
+    VerifyOrReturn(mContext != nullptr);
+    mContext->interactionContext->dataModelChangeListener->MarkDirty({ mPath.mEndpointId, mPath.mClusterId, attributeId });
+}
+
+BitFlags<ClusterQualityFlags> DefaultServerCluster::GetClusterFlags(const ConcreteClusterPath &) const
 {
     return {};
 }
