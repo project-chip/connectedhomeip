@@ -35,16 +35,20 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-from netaddr import EUI, AddrFormatError
 import logging as logger
 import random
 import string
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.testing.matter_asserts import assert_int_in_range, assert_valid_uint8, assert_valid_uint16, assert_valid_uint64, assert_string_length
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches, run_if_endpoint_matches, has_feature
+from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body,
+                                         default_matter_test_main, type_matches, run_if_endpoint_matches, has_feature)
+
+from chip.testing.matter_asserts import (assert_int_in_range, assert_valid_uint8,
+                                         assert_valid_uint16, assert_valid_uint64, assert_string_length)
+
 from mobly import asserts
+from netaddr import EUI, AddrFormatError
 
 
 class TC_CNET_4_22(MatterBaseTest):
