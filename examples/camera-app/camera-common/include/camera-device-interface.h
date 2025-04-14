@@ -21,6 +21,7 @@
 #include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
 #include <app/clusters/chime-server/chime-server.h>
 #include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
+#include <media-controller.h>
 
 using chip::app::Clusters::CameraAvStreamManagement::AudioStreamStruct;
 using chip::app::Clusters::CameraAvStreamManagement::ImageSnapshot;
@@ -116,6 +117,9 @@ public:
 
     // Getter for CameraAVSettingsUserLevelManagement Delegate
     virtual chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate & GetCameraAVSettingsUserLevelMgmtDelegate() = 0;
+
+    // Getter for the Media Controller
+    virtual MediaController & GetMediaController() = 0;
 
     // Class defining the Camera HAL interface
     class CameraHALInterface

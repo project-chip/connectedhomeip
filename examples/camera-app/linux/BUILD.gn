@@ -37,6 +37,8 @@ config("config") {
     "include/network-stream-source",
     "include/transport",
     "${chip_root}/examples/camera-app/camera-common/include",
+    "${chip_root}/examples/camera-app/camera-common/include/media-controller",
+    "${chip_root}/examples/camera-app/camera-common/include/transport",
     "${chip_root}/third_party/libdatachannel/repo/include",
   ]
 }
@@ -54,13 +56,13 @@ executable("chip-camera-app") {
   configs += [ ":gstreamer" ]
 
   sources = [
-    "${chip_root}/examples/camera-app/linux/include/media-controller/media-controller.h",
+    "${chip_root}/examples/camera-app/linux/include/media-controller/default-media-controller.h",
     "${chip_root}/examples/camera-app/linux/src/camera-device.cpp",
     "${chip_root}/examples/camera-app/linux/src/clusters/camera-avsettingsuserlevel-mgmt/camera-avsettingsuserlevel-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/clusters/camera-avstream-mgmt/camera-av-stream-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/clusters/chime/chime-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/clusters/webrtc_provider/webrtc-provider-manager.cpp",
-    "${chip_root}/examples/camera-app/linux/src/media-controller/media-controller.cpp",
+    "${chip_root}/examples/camera-app/linux/src/media-controller/default-media-controller.cpp",
     "${chip_root}/examples/camera-app/linux/src/network-stream-source/network-stream-source.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
