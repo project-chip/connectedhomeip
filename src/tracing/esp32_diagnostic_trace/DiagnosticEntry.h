@@ -23,7 +23,7 @@ namespace chip {
 namespace Tracing {
 namespace Diagnostics {
 
-static constexpr size_t kMaxStringValueSize = 64;
+static constexpr uint32_t kMaxStringValueSize = 64;
 
 enum class ValueType
 {

@@ -30,7 +30,7 @@ namespace Diagnostics {
 class CircularDiagnosticBuffer : public chip::TLV::TLVCircularBuffer
 {
 public:
-    CircularDiagnosticBuffer(uint8_t * buffer, size_t bufferLength) : chip::TLV::TLVCircularBuffer(buffer, bufferLength) {}
+    CircularDiagnosticBuffer(uint8_t * buffer, uint32_t bufferLength) : chip::TLV::TLVCircularBuffer(buffer, bufferLength) {}
 
     /**
      * @brief Stores a diagnostic entry in the diagnostic storage buffer.
