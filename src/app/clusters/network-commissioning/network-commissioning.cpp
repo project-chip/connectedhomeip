@@ -1360,52 +1360,64 @@ void Instance::OnFailSafeTimerExpired()
     }
 }
 
-CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                               DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
+CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
 {
     using namespace Clusters::NetworkCommissioning::Commands;
-    using Priv = Access::Privilege;
 
-    static constexpr size_t kNetworkCommands = 7; // Count of max possible commands assuming all features
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(kNetworkCommands));
-
-    bool hasThread = mFeatureFlags.Has(Feature::kThreadNetworkInterface);
-    bool hasWifi   = mFeatureFlags.Has(Feature::kWiFiNetworkInterface);
-
-    if (hasThread | hasWifi)
+    if (mFeatureFlags.Has(Feature::kThreadNetworkInterface))
     {
-        ReturnErrorOnFailure(builder.AppendElements({ ScanNetworks::kMetadataEntry, RemoveNetwork::kMetadataEntry,
-                                                      ConnectNetwork::kMetadataEntry, ReorderNetwork::kMetadataEntry }));
-        ReturnErrorOnFailure(
-            builder.Append(hasThread ? AddOrUpdateThreadNetwork::kMetadataEntry : AddOrUpdateWiFiNetwork::kMetadataEntry));
+        for (auto && cmd : {
+                 ScanNetworks::Id,
+                 AddOrUpdateThreadNetwork::Id,
+                 RemoveNetwork::Id,
+                 ConnectNetwork::Id,
+                 ReorderNetwork::Id,
+             })
+        {
+            VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
+        }
+    }
+    else if (mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
+    {
+        for (auto && cmd : {
+                 ScanNetworks::Id,
+                 AddOrUpdateWiFiNetwork::Id,
+                 RemoveNetwork::Id,
+                 ConnectNetwork::Id,
+                 ReorderNetwork::Id,
+             })
+        {
+            VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
+        }
     }
 
     if (mFeatureFlags.Has(Feature::kPerDeviceCredentials))
     {
-        ReturnErrorOnFailure(builder.Append(QueryIdentity::kMetadataEntry));
+        VerifyOrExit(callback(QueryIdentity::Id, context) == Loop::Continue, /**/);
     }
 
+exit:
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, DataModel::ListBuilder<CommandId> & builder)
+CHIP_ERROR Instance::EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
 {
     using namespace Clusters::NetworkCommissioning::Commands;
 
-    static constexpr size_t kCommands = 4; // Count of max possible commands assuming all features
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(kCommands));
-
     if (mFeatureFlags.HasAny(Feature::kWiFiNetworkInterface, Feature::kThreadNetworkInterface))
     {
-        ReturnErrorOnFailure(
-            builder.AppendElements({ ScanNetworksResponse::Id, NetworkConfigResponse::Id, ConnectNetworkResponse::Id }));
+        for (auto && cmd : { ScanNetworksResponse::Id, NetworkConfigResponse::Id, ConnectNetworkResponse::Id })
+        {
+            VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
+        }
     }
 
     if (mFeatureFlags.Has(Feature::kPerDeviceCredentials))
     {
-        ReturnErrorOnFailure(builder.Append(QueryIdentityResponse::Id));
+        VerifyOrExit(callback(QueryIdentityResponse::Id, context) == Loop::Continue, /**/);
     }
 
+exit:
     return CHIP_NO_ERROR;
 }
 

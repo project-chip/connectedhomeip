@@ -40,7 +40,7 @@ class InstanceListNode : public IntrusiveListNodeBase<>
 };
 
 // TODO: Use macro to disable some wifi or thread
-class Instance : public CommandHandlerInterface,
+class Instance : public CommandHandlerInterfaceShim<NetworkCommissioning::Id>,
                  public AttributeAccessInterface,
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
                  private InstanceListNode,
@@ -59,10 +59,8 @@ public:
 
     // CommandHandlerInterface
     void InvokeCommand(HandlerContext & ctx) override;
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                         DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder) override;
-    CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster,
-                                          DataModel::ListBuilder<CommandId> & builder) override;
+    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
+    CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
 
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
