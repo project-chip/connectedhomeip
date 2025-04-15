@@ -21,22 +21,20 @@
 
 namespace chip {
 namespace app {
-namespace common {
+namespace Storage {
 
 /**
  * @brief Implementation of a storage in nonvolatile storage of a templatized table that stores by fabric id.
  *
- * DefaultSceneTableImpl is an implementation that allows to store scenes using PersistentStorageDelegate.
- * It handles the storage of scenes by their ID, GroupID and EnpointID over multiple fabrics.
- * It is meant to be used exclusively when the scene cluster is enable for at least one endpoint
- * on the device.
+ * FabricTableImpl is an implementation that allows to store arbitrary entities using PersistentStorageDelegate.
+ * It handles the storage of entities by their StorageId and EnpointID over multiple fabrics.
  */
 template <class StorageId, class StorageData, size_t kIteratorsMax>
 class FabricTableImpl
 {
-    using TableEntry    = data::TableEntry<StorageId, StorageData>;
+    using TableEntry    = Data::TableEntry<StorageId, StorageData>;
     using EntryIterator = CommonIterator<TableEntry>;
-    using EntryIndex    = data::EntryIndex;
+    using EntryIndex    = Data::EntryIndex;
 
 public:
     virtual ~FabricTableImpl() { Finish(); };
@@ -63,7 +61,7 @@ public:
     EntryIterator * IterateTableEntries(FabricIndex fabric_index);
 
     void SetEndpoint(EndpointId endpoint);
-    void SetTableSize(uint16_t endpointEntryTableSize);
+    void SetTableSize(uint16_t endpointEntryTableSize, uint16_t maxPerFabric);
     bool IsInitialized() { return (mStorage != nullptr); }
 
 protected:
@@ -121,7 +119,9 @@ public:
     // https://stackoverflow.com/questions/50638053/constexpr-static-data-member-without-initializer
     static constexpr size_t kPersistentStorageDataBufferMax();
     static constexpr size_t kPersistentFabricBufferMax();
+    // The max number of entries per fabric; this value directly affects memory usage
     static constexpr uint16_t kMaxPerFabric();
+    // The max number of entries for the endpoint (programmatic limit)
     static constexpr uint16_t kMaxPerEndpoint();
 
     DefaultSerializer() {}
@@ -138,6 +138,6 @@ public:
     static StorageKeyName FabricEntryKey(FabricIndex fabric, EndpointId endpoint, uint16_t idx);
 }; // class DefaultSerializer
 
-} // namespace common
+} // namespace Storage
 } // namespace app
 } // namespace chip

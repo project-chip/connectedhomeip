@@ -20,7 +20,7 @@
 #include <app/clusters/scenes-server/ExtensionFieldSetsImpl.h>
 #include <app/clusters/scenes-server/SceneHandlerImpl.h>
 #include <app/clusters/scenes-server/SceneTable.h>
-#include <app/common/FabricTableImpl.h>
+#include <app/storage/FabricTableImpl.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <lib/core/DataModelTypes.h>
@@ -54,10 +54,10 @@ static constexpr uint16_t kMaxScenesPerFabric = (kMaxScenesPerEndpoint - 1) / 2;
 using SceneTableBase = SceneTable<scenes::ExtensionFieldSetsImpl>;
 class DefaultSceneTableImpl
     : public SceneTableBase,
-      public app::common::FabricTableImpl<SceneTableBase::SceneStorageId, SceneTableBase::SceneData, kIteratorsMax>
+      public app::Storage::FabricTableImpl<SceneTableBase::SceneStorageId, SceneTableBase::SceneData, kIteratorsMax>
 {
 public:
-    using Super = app::common::FabricTableImpl<SceneTableBase::SceneStorageId, SceneTableBase::SceneData, kIteratorsMax>;
+    using Super = app::Storage::FabricTableImpl<SceneTableBase::SceneStorageId, SceneTableBase::SceneData, kIteratorsMax>;
 
     DefaultSceneTableImpl() : Super(kMaxScenesPerFabric, kMaxScenesPerEndpoint) {}
     ~DefaultSceneTableImpl() { Finish(); };
@@ -96,6 +96,8 @@ public:
     // Iterators
     SceneEntryIterator * IterateSceneEntries(FabricIndex fabric_index) override;
 
+    void SetTableSize(uint16_t endpointSceneTableSize);
+
 protected:
     // This constructor is meant for test purposes, it allows to change the defined max for scenes per fabric and global, which
     // allows to simulate OTA where this value was changed
@@ -104,7 +106,7 @@ protected:
     {}
 
     // Global scene count
-    inline CHIP_ERROR SetEndpointSceneCount(const uint8_t & scene_count);
+    CHIP_ERROR SetEndpointSceneCount(const uint8_t & scene_count);
 }; // class DefaultSceneTableImpl
 
 /// @brief Gets a pointer to the instance of Scene Table Impl, providing EndpointId and Table Size for said endpoint

@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,23 +15,16 @@
  */
 
 /**
- * This file contains backwards-compatibility enum name definitions.  This file
- * is meant to be included at the end of cluster-enums.h, after all the normal
- * enum definitions are available.
+ * This file contains common storage structures for FabricTableImpl
  */
 #pragma once
 
-#include <lib/support/CHIPMemString.h>
-#include <lib/support/CommonIterator.h>
-#include <lib/support/IntrusiveList.h>
-#include <lib/support/PersistentData.h>
-#include <lib/support/Span.h>
 #include <lib/support/TypeTraits.h>
 
 namespace chip {
 namespace app {
-namespace common {
-namespace data {
+namespace Storage {
+namespace Data {
 
 // Storage index for entries in nvm
 typedef uint16_t EntryIndex;
@@ -62,7 +55,7 @@ struct TableEntry
         mStorageData = other.mStorageData;
     }
 };
-} // namespace data
-} // namespace common
+} // namespace Data
+} // namespace Storage
 } // namespace app
 } // namespace chip

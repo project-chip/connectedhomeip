@@ -17,16 +17,16 @@
 
 #pragma once
 
-#include <app/common/FabricTableImpl.h>
+#include <app/storage/FabricTableImpl.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TypeTraits.h>
 #include <stdlib.h>
 
 namespace chip {
 namespace app {
-namespace common {
+namespace Storage {
 
-using EntryIndex = data::EntryIndex;
+using EntryIndex = Data::EntryIndex;
 
 /// @brief Tags Used to serialize entries so they can be stored in flash memory.
 /// kEntryCount: Number of entries in a Fabric
@@ -99,10 +99,10 @@ struct EndpointEntryCount : public PersistentData<kPersistentBufferEntryCountByt
 };
 
 template <class StorageId, class StorageData, size_t kPersistentStorageDataBufferMax>
-struct TableEntryData : public data::TableEntry<StorageId, StorageData>, PersistentData<kPersistentStorageDataBufferMax>
+struct TableEntryData : public Data::TableEntry<StorageId, StorageData>, PersistentData<kPersistentStorageDataBufferMax>
 {
     using Serializer = DefaultSerializer<StorageId, StorageData>;
-    using TableEntry = data::TableEntry<StorageId, StorageData>;
+    using TableEntry = Data::TableEntry<StorageId, StorageData>;
 
     EndpointId endpoint_id   = kInvalidEndpointId;
     FabricIndex fabric_index = kUndefinedFabricIndex;
@@ -288,7 +288,7 @@ struct FabricEntryData : public PersistentData<kPersistentFabricBufferMax>
     ///         CHIP_ERROR_NO_MEMORY if target was not found and table is full
     CHIP_ERROR Find(StorageId target_entry, EntryIndex & idx)
     {
-        EntryIndex firstFreeIdx = data::kUndefinedEntryIndex; // storage index if entry not found
+        EntryIndex firstFreeIdx = Data::kUndefinedEntryIndex; // storage index if entry not found
         uint16_t index          = 0;
 
         while (index < max_per_fabric)
@@ -298,7 +298,7 @@ struct FabricEntryData : public PersistentData<kPersistentFabricBufferMax>
                 idx = index;
                 return CHIP_NO_ERROR; // return entry at current index if entry found
             }
-            if (!entry_map[index].IsValid() && firstFreeIdx == data::kUndefinedEntryIndex)
+            if (!entry_map[index].IsValid() && firstFreeIdx == Data::kUndefinedEntryIndex)
             {
                 firstFreeIdx = index;
             }
@@ -469,7 +469,8 @@ CHIP_ERROR FabricTableImpl<StorageId, StorageData, kIteratorsMax>::Init(Persiste
     }
 
     // Verified the initialized parameter respect the maximum allowed values for entry capacity
-    VerifyOrReturnError(mMaxPerFabric <= Serializer::kMaxPerFabric(), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    VerifyOrReturnError(mMaxPerFabric <= Serializer::kMaxPerFabric() && mMaxPerEndpoint <= Serializer::kMaxPerEndpoint(),
+                        CHIP_ERROR_INVALID_INTEGER_VALUE);
     this->mStorage = storage;
     return CHIP_NO_ERROR;
 }
@@ -751,15 +752,15 @@ void FabricTableImpl<StorageId, StorageData, kIteratorsMax>::SetEndpoint(Endpoin
 }
 
 template <class StorageId, class StorageData, size_t kIteratorsMax>
-void FabricTableImpl<StorageId, StorageData, kIteratorsMax>::SetTableSize(uint16_t endpointTableSize)
+void FabricTableImpl<StorageId, StorageData, kIteratorsMax>::SetTableSize(uint16_t endpointTableSize, uint16_t maxPerFabric)
 {
     using Serializer = DefaultSerializer<StorageId, StorageData>;
 
     // Verify the endpoint passed size respects the limits of the device configuration
     VerifyOrDie(Serializer::kMaxPerFabric() > 0);
-    uint16_t deviceLimit = (Serializer::kMaxPerFabric() * 2) + 1;
-    mMaxPerEndpoint      = (deviceLimit < endpointTableSize) ? deviceLimit : endpointTableSize;
-    mMaxPerFabric        = static_cast<uint16_t>((mMaxPerEndpoint - 1) / 2);
+    VerifyOrDie(Serializer::kMaxPerEndpoint() > 0);
+    mMaxPerEndpoint = std::min(Serializer::kMaxPerEndpoint(), endpointTableSize);
+    mMaxPerFabric   = std::min(endpointTableSize, std::min(Serializer::kMaxPerFabric(), maxPerFabric));
 }
 
 template <class StorageId, class StorageData, size_t kIteratorsMax>
@@ -830,6 +831,6 @@ void FabricTableImpl<StorageId, StorageData, kIteratorsMax>::EntryIteratorImpl::
 {
     mProvider.mEntryIterators.ReleaseObject(this);
 }
-} // namespace common
+} // namespace Storage
 } // namespace app
 } // namespace chip

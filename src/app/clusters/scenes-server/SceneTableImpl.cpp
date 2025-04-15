@@ -16,13 +16,13 @@
  */
 
 #include <app/clusters/scenes-server/SceneTableImpl.h>
-#include <app/common/FabricTableImpl.hpp>
+#include <app/storage/FabricTableImpl.hpp>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <stdlib.h>
 
 using namespace chip;
 using namespace chip::scenes;
-using namespace chip::app::common;
+using namespace chip::app::Storage;
 
 namespace {
 /// @brief Tags Used to serialize Scenes so they can be stored in flash memory.
@@ -32,7 +32,7 @@ namespace {
 /// kTransitionTime: Tag for the transition time of the scene in miliseconds
 enum class TagScene : uint8_t
 {
-    kGroupID = (uint8_t) TagEntry::kNextFabricTableTag,
+    kGroupID = static_cast<uint8_t>(TagEntry::kNextFabricTableTag),
     kSceneID,
     kName,
     kTransitionTimeMs,
@@ -156,28 +156,33 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveSceneTableEntryAtPosition(EndpointId end
 
 CHIP_ERROR DefaultSceneTableImpl::GetAllSceneIdsInGroup(FabricIndex fabric_index, GroupId group_id, Span<SceneId> & scene_list)
 {
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
+
+    FabricSceneData fabric(mEndpointId, fabric_index, mMaxPerFabric, mMaxPerEndpoint);
     SceneTableData scene(mEndpointId, fabric_index);
 
-    auto * iterator = this->IterateSceneEntries(fabric_index);
-    VerifyOrReturnError(nullptr != iterator, CHIP_ERROR_INTERNAL);
+    CHIP_ERROR err = fabric.Load(this->mStorage);
+    VerifyOrReturnValue(CHIP_ERROR_NOT_FOUND != err, CHIP_NO_ERROR);
+    ReturnErrorOnFailure(err);
     SceneId * list      = scene_list.data();
     uint8_t scene_count = 0;
 
-    while (iterator->Next(scene))
+    for (uint16_t i = 0; i < mMaxPerFabric; i++)
     {
-        if (scene.mStorageId.mGroupId == group_id)
+        if (fabric.entry_map[i].mGroupId != group_id)
         {
-            if (scene_count >= scene_list.size())
-            {
-                iterator->Release();
-                return CHIP_ERROR_BUFFER_TOO_SMALL;
-            }
-            list[scene_count] = scene.mStorageId.mSceneId;
-            scene_count++;
+            continue;
         }
+
+        if (scene_count >= scene_list.size())
+        {
+            return CHIP_ERROR_BUFFER_TOO_SMALL;
+        }
+        list[scene_count] = fabric.entry_map[i].mSceneId;
+        scene_count++;
     }
+
     scene_list.reduce_size(scene_count);
-    iterator->Release();
     return CHIP_NO_ERROR;
 }
 
@@ -305,6 +310,11 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveFabric(FabricIndex fabric_index)
 CHIP_ERROR DefaultSceneTableImpl::RemoveEndpoint()
 {
     return FabricTableImpl::RemoveEndpoint();
+}
+
+void DefaultSceneTableImpl::SetTableSize(uint16_t endpointSceneTableSize)
+{
+    FabricTableImpl::SetTableSize(endpointSceneTableSize, static_cast<uint16_t>((endpointSceneTableSize - 1) / 2));
 }
 
 DefaultSceneTableImpl::SceneEntryIterator * DefaultSceneTableImpl::IterateSceneEntries(FabricIndex fabric)
