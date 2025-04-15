@@ -64,7 +64,7 @@ source_set("elements") {
     #       compilation.
     # Dependency tree is as:
     #      - <CLUSTER>:headers (mostly private as a target) contains *.h
-    #      - src/app/common:cluster-objects contains "*.ipp" for attr/commands/events/structs
+    #      - src/app/common:cluster-objects contains "*.ipp" for attrs/commands/events/structs
     #      - <CLUSTER>:elements makes the headers available and depends on the cluster-objects impl.
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/common:global-ids",
