@@ -12,6 +12,8 @@
 #include <clusters/{{asUpperCamelCase name}}/Structs.h>
 {{/zcl_clusters}}
 
+#include <app/common/CompatEnumNames.h>
+
 namespace chip {
 namespace app {
 

@@ -571,6 +571,8 @@
 #include <clusters/ZoneManagement/Events.h>
 #include <clusters/ZoneManagement/Structs.h>
 
+#include <app/common/CompatEnumNames.h>
+
 namespace chip {
 namespace app {
 
