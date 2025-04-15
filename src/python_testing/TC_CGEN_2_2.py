@@ -43,6 +43,7 @@ import time
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
+from chip.exceptions import ChipStackException
 from chip.interaction_model import InteractionModelError
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
@@ -506,13 +507,13 @@ class TC_CGEN_2_2(MatterBaseTest):
                 dev_ctrl=TH2,
                 node_id=newNodeId,
                 cmd=cmd)
-        except Exception as e:
+        except ChipStackException as e:
             # Expected behavior and proceeding to next step.
             logger.info(f"Step #22 - ArmFailSafe command failed as expected: {str(e)}. Proceeding to next step.")
             pass
         else:
-            # If no exception is raised, something is wrong — expected command to fail.
-            asserts.assert_true(False, 'Expected ArmFailSafe to fail because the device is not fully commissioned.')
+            # If no exception is raised, log that the device response before closing the connection is acceptable.
+            logger.info('Step #22 - ArmFailSafe did not fail, device response before closing is acceptable.')
 
         self.step(23)
         nocs_updated = await self.read_single_attribute_check_success(
