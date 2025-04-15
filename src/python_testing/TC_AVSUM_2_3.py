@@ -39,7 +39,6 @@ import logging
 import random
 
 import chip.clusters as Clusters
-from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_AVSUMTestBase import AVSUMTestBase
@@ -49,31 +48,6 @@ class TC_AVSUM_2_3(MatterBaseTest, AVSUMTestBase):
     has_feature_mpan = False
     has_feature_mtilt = False
     has_feature_mzoom = False
-
-    def ptz_range_validation(self, mptz, tiltmin, tiltmax, panmin, panmax, zoommax):
-        if self.has_feature_mpan:
-            if mptz.pan == None:
-                asserts.fail("Pan value missing when MPAN feature set")
-            else:
-                apan = mptz.pan
-                asserts.assert_greater_equal(apan, panmin, "Pan out of range of DUT defined values")
-                asserts.assert_less_equal(apan, panmax, "Pan out of range of DUT defined values")
-
-        if self.has_feature_mtilt:
-            if mptz.tilt == None:
-                asserts.fail("Tilt value missing when MTILT feature set")
-            else:
-                atilt = mptz.tilt
-                asserts.assert_greater_equal(atilt, tiltmin, "Tilt out of range of DUT defined values")
-                asserts.assert_less_equal(atilt, tiltmax, "Tilt out of range of DUT defined values")
-
-        if self.has_feature_mzoom:
-            if mptz.zoom == None:
-                asserts.fail("Zoom value missing when MZOOM feature set")
-            else:
-                azoom = mptz.zoom
-                asserts.assert_greater_equal(azoom, 1, "Zoom out of range of DUT defined values")
-                asserts.assert_less_equal(azoom, zoommax, "Zoom out of range of DUT defined values")
 
     def desc_TC_AVSUM_2_3(self) -> str:
         return "[TC-AVSUM-2.3] MptzRelativeMove Command Validation"

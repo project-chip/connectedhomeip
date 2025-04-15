@@ -52,7 +52,7 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
 
     def ptz_range_validation(self, mptz, tiltmin, tiltmax, panmin, panmax, zoommax):
         if self.has_feature_mpan:
-            if mptz.pan == None:
+            if mptz.pan is None:
                 asserts.fail("Pan value missing when MPAN feature set")
             else:
                 apan = mptz.pan
@@ -60,7 +60,7 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
                 asserts.assert_less_equal(apan, panmax, "Pan out of range of DUT defined values")
 
         if self.has_feature_mtilt:
-            if mptz.tilt == None:
+            if mptz.tilt is None:
                 asserts.fail("Tilt value missing when MTILT feature set")
             else:
                 atilt = mptz.tilt
@@ -68,7 +68,7 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
                 asserts.assert_less_equal(atilt, tiltmax, "Tilt out of range of DUT defined values")
 
         if self.has_feature_mzoom:
-            if mptz.zoom == None:
+            if mptz.zoom is None:
                 asserts.fail("Zoom value missing when MZOOM feature set")
             else:
                 azoom = mptz.zoom
@@ -197,7 +197,7 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
                               "MPTZPresets attribute is a mandatory attribut if MPRESETS.")
 
             mptz_presets_dut = await self.read_avsum_attribute_expect_success(endpoint=endpoint, attribute="MPTZPresets")
-            if mptz_presets_dut != None:
+            if mptz_presets_dut is not None:
                 asserts.assert_less_equal(len(mptz_presets_dut), max_presets_dut,
                                           "MPTZPresets size is greater than the allowed max.")
                 for mptzpreset in mptz_presets_dut:
