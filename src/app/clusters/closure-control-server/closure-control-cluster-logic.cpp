@@ -22,10 +22,6 @@ namespace app {
 namespace Clusters {
 namespace ClosureControl {
 
-/*
-    ClusterStateAttributes Implementation
-*/
-
 CHIP_ERROR ClusterStateAttributes::SetCountdownTime(const DataModel::Nullable<ElapsedS> & countdownTime)
 {
     // TODO
@@ -73,10 +69,6 @@ CHIP_ERROR ClusterStateAttributes::GetOverallTarget(DataModel::Nullable<GenericO
     // TODO: Implement logic to retrieve OverallTarget
     return CHIP_NO_ERROR;
 }
-
-/*
-    ClusterLogic Implementation
-*/
 
 CHIP_ERROR ClusterLogic::Init(const ClusterConformance & conformance)
 {

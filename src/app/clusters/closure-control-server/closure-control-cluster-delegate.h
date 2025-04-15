@@ -15,8 +15,6 @@
  *    limitations under the License.
  */
 
-#include <app-common/zap-generated/cluster-enums.h>
-#include <app/data-model/Nullable.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -34,26 +32,8 @@ public:
 
     // TODO: Delagte only has the default three APIs for now. This will be refined when the updated cluster structure is integrated
     // in the Closure Sample app
-
-    /**
-     * @brief TODO
-     *
-     * @return Protocols::InteractionModel::Status
-     */
-    virtual Protocols::InteractionModel::Status HandleStopCommand() = 0;
-
-    /**
-     * @brief TODO
-     *
-     * @return Protocols::InteractionModel::Status
-     */
-    virtual Protocols::InteractionModel::Status HandleMoveToCommand() = 0;
-
-    /**
-     * @brief TODO
-     *
-     * @return Protocols::InteractionModel::Status
-     */
+    virtual Protocols::InteractionModel::Status HandleStopCommand()      = 0;
+    virtual Protocols::InteractionModel::Status HandleMoveToCommand()    = 0;
     virtual Protocols::InteractionModel::Status HandleCalibrateCommand() = 0;
 };
 
