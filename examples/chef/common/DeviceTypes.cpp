@@ -27,7 +27,7 @@ using namespace chip::app;
 
 bool DeviceTypes::EndpointHasDeviceType(EndpointId endpoint, DeviceTypeId deviceTypeId)
 {
-    DataModel::ListBuilder<DataModel::DeviceTypeEntry> deviceTypesList;
+    ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> deviceTypesList;
     CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetDataModelProvider()->DeviceTypes(endpoint, deviceTypesList);
     if (err != CHIP_NO_ERROR)
     {
@@ -45,25 +45,34 @@ bool DeviceTypes::EndpointHasDeviceType(EndpointId endpoint, DeviceTypeId device
     return false;
 }
 
-DataModel::ListBuilder<EndpointId> DeviceTypes::GetAllEndpointsHavingDeviceType(DeviceTypeId deviceTypeId)
+ReadOnlyBuffer<EndpointId> DeviceTypes::GetAllEndpointsHavingDeviceType(DeviceTypeId deviceTypeId)
 {
-    DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
+    ReadOnlyBufferBuilder<DataModel::EndpointEntry> endpointsList;
     CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetDataModelProvider()->Endpoints(endpointsList);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "GetDataModelProvider Endpoints returned error: %" CHIP_ERROR_FORMAT, err.Format());
-        return DataModel::ListBuilder<EndpointId>();
+        return {};
     }
     auto allEndpoints = endpointsList.TakeBuffer();
 
-    DataModel::ListBuilder<EndpointId> endpoints;
+    ReadOnlyBufferBuilder<EndpointId> endpoints;
+    err = endpoints.EnsureAppendCapacity(allEndpoints.size());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Error ensuring append capacity for endpoints: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 
     for (const auto & ep : allEndpoints)
     {
         if (EndpointHasDeviceType(ep.id, deviceTypeId))
         {
-            endpoints.Append(ep.id);
+            err = endpoints.Append(ep.id);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "Error appending endpoint: %" CHIP_ERROR_FORMAT, err.Format());
+            }
         }
     }
-    return endpoints;
+    return endpoints.TakeBuffer();
 }

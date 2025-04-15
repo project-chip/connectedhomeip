@@ -15599,6 +15599,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kPrice), price);
+    encoder.Encode(to_underlying(Fields::kPriceLevel), priceLevel);
     encoder.Encode(to_underlying(Fields::kSource), source);
     encoder.Encode(to_underlying(Fields::kDescription), description);
     encoder.Encode(to_underlying(Fields::kTariffComponentID), tariffComponentID);
@@ -15622,6 +15623,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         if (__context_tag == to_underlying(Fields::kPrice))
         {
             err = DataModel::Decode(reader, price);
+        }
+        else if (__context_tag == to_underlying(Fields::kPriceLevel))
+        {
+            err = DataModel::Decode(reader, priceLevel);
         }
         else if (__context_tag == to_underlying(Fields::kSource))
         {
@@ -15652,6 +15657,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kPeriodStart), periodStart);
     encoder.Encode(to_underlying(Fields::kPeriodEnd), periodEnd);
     encoder.Encode(to_underlying(Fields::kPrice), price);
+    encoder.Encode(to_underlying(Fields::kPriceLevel), priceLevel);
     encoder.Encode(to_underlying(Fields::kDescription), description);
     encoder.Encode(to_underlying(Fields::kComponents), components);
     return encoder.Finalize();
@@ -15682,6 +15688,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kPrice))
         {
             err = DataModel::Decode(reader, price);
+        }
+        else if (__context_tag == to_underlying(Fields::kPriceLevel))
+        {
+            err = DataModel::Decode(reader, priceLevel);
         }
         else if (__context_tag == to_underlying(Fields::kDescription))
         {
