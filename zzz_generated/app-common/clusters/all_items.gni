@@ -45,6 +45,7 @@ chip_all_cluster_id_targets = [
   "${chip_root}/zzz_generated/app-common/clusters/DoorLock:ids",
   "${chip_root}/zzz_generated/app-common/clusters/EcosystemInformation:ids",
   "${chip_root}/zzz_generated/app-common/clusters/ElectricalEnergyMeasurement:ids",
+  "${chip_root}/zzz_generated/app-common/clusters/ElectricalGridConditions:ids",
   "${chip_root}/zzz_generated/app-common/clusters/ElectricalPowerMeasurement:ids",
   "${chip_root}/zzz_generated/app-common/clusters/EnergyEvse:ids",
   "${chip_root}/zzz_generated/app-common/clusters/EnergyEvseMode:ids",
