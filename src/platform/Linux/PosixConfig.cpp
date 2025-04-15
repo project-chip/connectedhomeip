@@ -60,8 +60,12 @@ const PosixConfig::Key PosixConfig::kConfigKey_SetupDiscriminator    = { kConfig
 const PosixConfig::Key PosixConfig::kConfigKey_Spake2pIterationCount = { kConfigNamespace_ChipFactory, "iteration-count" };
 const PosixConfig::Key PosixConfig::kConfigKey_Spake2pSalt           = { kConfigNamespace_ChipFactory, "salt" };
 const PosixConfig::Key PosixConfig::kConfigKey_Spake2pVerifier       = { kConfigNamespace_ChipFactory, "verifier" };
+const PosixConfig::Key PosixConfig::kConfigKey_VendorName            = { kConfigNamespace_ChipFactory, "vendor-name" };
 const PosixConfig::Key PosixConfig::kConfigKey_VendorId              = { kConfigNamespace_ChipFactory, "vendor-id" };
+const PosixConfig::Key PosixConfig::kConfigKey_ProductName           = { kConfigNamespace_ChipFactory, "product-name" };
 const PosixConfig::Key PosixConfig::kConfigKey_ProductId             = { kConfigNamespace_ChipFactory, "product-id" };
+const PosixConfig::Key PosixConfig::kConfigKey_SoftwareVersionString = { kConfigNamespace_ChipFactory, "software-ver-string" };
+const PosixConfig::Key PosixConfig::kConfigKey_HardwareVersionString = { kConfigNamespace_ChipFactory, "hardware-ver-string" };
 
 // Keys stored in the Chip-config namespace
 const PosixConfig::Key PosixConfig::kConfigKey_ServiceConfig      = { kConfigNamespace_ChipConfig, "service-config" };

@@ -137,6 +137,11 @@ enum
     kDeviceOption_icdActiveModeDurationMs,
     kDeviceOption_icdIdleModeDuration,
 #endif // CHIP_ENABLE_ICD_SERVER
+    kDeviceOption_VendorName,
+    kDeviceOption_ProductName,
+    kDeviceOption_HardwareVersionString,
+    kDeviceOption_SoftwareVersionString,
+    kDeviceOption_SerialNumber,
 };
 
 constexpr unsigned kAppUsageLength = 64;
@@ -158,6 +163,11 @@ OptionDef sDeviceOptionDefs[] = {
     { "version", kArgumentRequired, kDeviceOption_Version },
     { "vendor-id", kArgumentRequired, kDeviceOption_VendorID },
     { "product-id", kArgumentRequired, kDeviceOption_ProductID },
+    { "vendor-name", kArgumentRequired, kDeviceOption_VendorName },
+    { "product-name", kArgumentRequired, kDeviceOption_ProductName },
+    { "hardware-version-string", kArgumentRequired, kDeviceOption_HardwareVersionString },
+    { "software-version-string", kArgumentRequired, kDeviceOption_SoftwareVersionString },
+    { "serial-number", kArgumentRequired, kDeviceOption_SerialNumber },
     { "custom-flow", kArgumentRequired, kDeviceOption_CustomFlow },
     { "capabilities", kArgumentRequired, kDeviceOption_Capabilities },
     { "discriminator", kArgumentRequired, kDeviceOption_Discriminator },
@@ -259,6 +269,21 @@ const char * sDeviceOptionHelp =
     "\n"
     "  --product-id <id>\n"
     "       The Product ID is specified by vendor.\n"
+    "\n"
+    "  --vendor-name <name>\n"
+    "       The vendor name specified by the vendor.\n"
+    "\n"
+    "  --product-name <name>\n"
+    "       The product name specified by vendor.\n"
+    "\n"
+    "  --hardware-version-string <string>\n"
+    "       The HardwareVersionString used in the basic information cluster.\n"
+    "\n"
+    "  --software-version-string <string>\n"
+    "       The SoftwareVersionString used in the basic information cluster.\n"
+    "\n"
+    "  --serial-number <serial_number>\n"
+    "       The serial number specified by vendor.\n"
     "\n"
     "  --custom-flow <Standard = 0 | UserActionRequired = 1 | Custom = 2>\n"
     "       A 2-bit unsigned enumeration specifying manufacturer-specific custom flow options.\n"
@@ -793,6 +818,25 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         break;
     }
 #endif
+    case kDeviceOption_VendorName:
+        LinuxDeviceOptions::GetInstance().vendorName.SetValue(std::string{ aValue });
+        break;
+
+    case kDeviceOption_ProductName:
+        LinuxDeviceOptions::GetInstance().productName.SetValue(std::string{ aValue });
+        break;
+
+    case kDeviceOption_HardwareVersionString:
+        LinuxDeviceOptions::GetInstance().hardwareVersionString.SetValue(std::string{ aValue });
+        break;
+
+    case kDeviceOption_SoftwareVersionString:
+        LinuxDeviceOptions::GetInstance().softwareVersionString.SetValue(std::string{ aValue });
+        break;
+
+    case kDeviceOption_SerialNumber:
+        LinuxDeviceOptions::GetInstance().serialNumber.SetValue(std::string{ aValue });
+        break;
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     case kDeviceOption_icdActiveModeDurationMs: {
         uint32_t value = static_cast<uint32_t>(strtoul(aValue, nullptr, 0));
