@@ -28,25 +28,19 @@ namespace CommodityPrice {
 
 using chip::Protocols::InteractionModel::Status;
 
-constexpr bool operator!=(const Globals::Structs::CurrencyStruct::Type & lhs, const Globals::Structs::CurrencyStruct::Type & rhs)
-{
-    return ((lhs.currency != rhs.currency) || (lhs.decimalPoints != rhs.decimalPoints));
-}
-
 class CommodityPriceDelegate : public CommodityPrice::Delegate
 {
 public:
     CommodityPriceDelegate();
     ~CommodityPriceDelegate() = default;
 
-    static constexpr uint16_t kMaxCurrencyValue = 999; // From spec
-
     // Attribute Accessors
-    Globals::TariffUnitEnum GetTariffUnit() override { return mTariffUnit; }
-    Globals::Structs::CurrencyStruct::Type GetCurrency() override { return mCurrencyStruct; }
-    // TODO think about a better way to do this in a delegate without needing mCurrentPrice copy
-    const DataModel::Nullable<Structs::CommodityPriceStruct::Type> & GetCurrentPrice() override { return mCurrentPrice; }
-    const DataModel::List<const Structs::CommodityPriceStruct::Type> & GetPriceForecast(CommodityPriceDetailBitmap bitmap) override;
+    // Globals::TariffUnitEnum GetTariffUnit() override { return mTariffUnit; }
+    // Globals::Structs::CurrencyStruct::Type GetCurrency() override { return mCurrencyStruct; }
+    // // TODO think about a better way to do this in a delegate without needing mCurrentPrice copy
+    // const DataModel::Nullable<Structs::CommodityPriceStruct::Type> & GetCurrentPrice() override { return mCurrentPrice; }
+    // const DataModel::List<const Structs::CommodityPriceStruct::Type> & GetPriceForecast(CommodityPriceDetailBitmap bitmap)
+    // override;
 
     /* These functions are called by the ReadAttribute handler to iterate through lists
      * The cluster server will call Start<Type>Read to allow the delegate to create a temporary
@@ -54,27 +48,15 @@ public:
      * The delegate is expected to not change these values once Start<Type>Read has been called
      * until the End<Type>Read() has been called (e.g. releasing a lock on the data)
      */
-    CHIP_ERROR StartPriceForecastRead(CommodityPriceDetailBitmap bitmap) override;
-    CHIP_ERROR GetPriceForecastByIndex(uint8_t, Structs::CommodityPriceStruct::Type &) override;
-    CHIP_ERROR EndPriceForecastRead() override;
+    // CHIP_ERROR StartPriceForecastRead(CommodityPriceDetailBitmap bitmap) override;
+    // CHIP_ERROR GetPriceForecastByIndex(uint8_t, Structs::CommodityPriceStruct::Type &) override;
+    // CHIP_ERROR EndPriceForecastRead() override;
 
-    // Internal Application API to set attribute values
-    CHIP_ERROR SetTariffUnit(Globals::TariffUnitEnum);
-    CHIP_ERROR SetCurrency(Globals::Structs::CurrencyStruct::Type);
-    CHIP_ERROR SetCurrentPrice(const DataModel::Nullable<Structs::CommodityPriceStruct::Type>);
-    CHIP_ERROR SetForecast(const DataModel::List<const Structs::CommodityPriceStruct::Type> &);
     // TODO work out how to set forecast data and retrieve it
 
     const PriceForecastMemMgr & GetPriceForecastMemMgr() { return mPriceForecastMemMgr; }
 
-    Status SendPriceChangeEvent();
-
 private:
-    // Attribute storage
-    Globals::TariffUnitEnum mTariffUnit;
-    Globals::Structs::CurrencyStruct::Type mCurrencyStruct;
-    DataModel::Nullable<Structs::CommodityPriceStruct::Type> mCurrentPrice;
-
     // This storage is only needed if the FORE (forecast) feature is supported
     // ------------
     // Object to handle the allocation of memory for the price components list
@@ -82,9 +64,6 @@ private:
 
     // actual storage of price entries as an array
     Structs::CommodityPriceStruct::Type mPriceEntryArray[kMaxCommodityPriceEntries];
-
-    // The DataModel List of Price entries
-    DataModel::List<const Structs::CommodityPriceStruct::Type> mPriceForecast;
 };
 
 class CommodityPriceInstance : public Instance

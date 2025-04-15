@@ -38,6 +38,20 @@ namespace CommodityPrice {
 constexpr uint8_t kMaxCommodityPriceEntries   = 56;
 constexpr uint8_t kMaxComponentsPerPriceEntry = 10;
 
+constexpr uint16_t kMaxCurrencyValue = 999; // From spec
+// From ISO 4217 (non exhaustive selection)
+constexpr uint16_t kCurrencyCHF  = 756;
+constexpr uint16_t kCurrencyEURO = 978;
+constexpr uint16_t kCurrencyGBP  = 826;
+constexpr uint16_t kCurrencyNOK  = 578;
+constexpr uint16_t kCurrencySEK  = 752;
+constexpr uint16_t kCurrencyUSD  = 840;
+
+constexpr bool operator!=(const Globals::Structs::CurrencyStruct::Type & lhs, const Globals::Structs::CurrencyStruct::Type & rhs)
+{
+    return ((lhs.currency != rhs.currency) || (lhs.decimalPoints != rhs.decimalPoints));
+}
+
 class Delegate
 {
 public:
@@ -47,16 +61,11 @@ public:
 
     // ------------------------------------------------------------------
     // Get attribute methods
-    virtual Globals::TariffUnitEnum GetTariffUnit()                                            = 0;
-    virtual Globals::Structs::CurrencyStruct::Type GetCurrency()                               = 0;
-    virtual const DataModel::Nullable<Structs::CommodityPriceStruct::Type> & GetCurrentPrice() = 0;
-    virtual const DataModel::List<const Structs::CommodityPriceStruct::Type> &
-    GetPriceForecast(CommodityPriceDetailBitmap bitmap) = 0;
-
-    // DELETE THESE...
-    virtual CHIP_ERROR StartPriceForecastRead(CommodityPriceDetailBitmap bitmap)               = 0;
-    virtual CHIP_ERROR GetPriceForecastByIndex(uint8_t, Structs::CommodityPriceStruct::Type &) = 0;
-    virtual CHIP_ERROR EndPriceForecastRead()                                                  = 0;
+    // virtual Globals::TariffUnitEnum GetTariffUnit()                                            = 0;
+    // virtual Globals::Structs::CurrencyStruct::Type GetCurrency()                               = 0;
+    // virtual const DataModel::Nullable<Structs::CommodityPriceStruct::Type> & GetCurrentPrice() = 0;
+    // virtual const DataModel::List<const Structs::CommodityPriceStruct::Type> &
+    // GetPriceForecast(CommodityPriceDetailBitmap bitmap) = 0;
 
     // TODO GetPriceForecast returns a List of CommodityPriceStruct with simple details, unlike the command which can ask for
     // specific details.
@@ -78,6 +87,8 @@ protected:
     EndpointId mEndpointId = 0;
 };
 
+using chip::Protocols::InteractionModel::Status;
+
 class Instance : public AttributeAccessInterface, public CommandHandlerInterface
 {
 public:
@@ -87,6 +98,7 @@ public:
     {
         /* set the base class delegates endpointId */
         mDelegate.SetEndpointId(aEndpointId);
+        mEndpointId = aEndpointId;
     }
 
     ~Instance() { Shutdown(); }
@@ -96,12 +108,23 @@ public:
 
     bool HasFeature(Feature aFeature) const;
 
+    // Set attribute methods
+    CHIP_ERROR SetTariffUnit(Globals::TariffUnitEnum);
+    CHIP_ERROR SetCurrency(Globals::Structs::CurrencyStruct::Type);
+    CHIP_ERROR SetCurrentPrice(const DataModel::Nullable<Structs::CommodityPriceStruct::Type>);
+    CHIP_ERROR SetForecast(const DataModel::List<const Structs::CommodityPriceStruct::Type> &);
+
+    // Send Price Change event
+    Status SendPriceChangeEvent();
+
 private:
     Protocols::InteractionModel::Status GetMatterEpochTimeFromUnixTime(uint32_t & currentUtcTime) const;
 
 private:
     Delegate & mDelegate;
     BitMask<Feature> mFeature;
+
+    EndpointId mEndpointId;
 
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
@@ -114,6 +137,26 @@ private:
     void HandleGetDetailedPriceRequest(HandlerContext & ctx, const Commands::GetDetailedPriceRequest::DecodableType & commandData);
     void HandleGetDetailedForecastRequest(HandlerContext & ctx,
                                           const Commands::GetDetailedForecastRequest::DecodableType & commandData);
+
+    // Helper function to create a copy of the data for sending to client with the .description or .components knocked out
+    const DataModel::Nullable<Structs::CommodityPriceStruct::Type> *
+    GetDetailedPriceRequest(chip::BitMask<CommodityPriceDetailBitmap> details);
+    void FreeCurrentPrice(const DataModel::Nullable<Structs::CommodityPriceStruct::Type> *);
+
+    const DataModel::List<const Structs::CommodityPriceStruct::Type> *
+    GetDetailedForecastRequest(chip::BitMask<CommodityPriceDetailBitmap> details);
+    void FreePriceForecast(const DataModel::List<const Structs::CommodityPriceStruct::Type> *);
+
+    // Attribute storage
+    Globals::TariffUnitEnum mTariffUnit;
+    Globals::Structs::CurrencyStruct::Type mCurrency;
+
+    // NOTE the CurrentPrice and PriceForecast are stored here with description and components
+    // When read as an attribute the description and components should not be included
+    // When the GetDetailedPriceRequest or GetDetailedForecastRequest are called these may need
+    // munging to remove one or other elements
+    DataModel::Nullable<Structs::CommodityPriceStruct::Type> mCurrentPrice;
+    DataModel::List<const Structs::CommodityPriceStruct::Type> mPriceForecast;
 };
 
 } // namespace CommodityPrice

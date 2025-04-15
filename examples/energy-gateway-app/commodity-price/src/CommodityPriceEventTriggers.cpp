@@ -64,13 +64,13 @@ void SetTestEventTrigger_PriceUpdate()
 
     newPrice.SetNonNull(newPriceStruct);
 
-    CommodityPriceDelegate * dg = GetCommodityPriceDelegate();
-    dg->SetCurrentPrice(newPrice);
+    CommodityPriceInstance * inst = GetCommodityPriceInstance();
+    inst->SetCurrentPrice(newPrice);
 }
 
 void SetTestEventTrigger_ForecastUpdate()
 {
-    CommodityPriceDelegate * dg = GetCommodityPriceDelegate();
+    //  CommodityPriceInstance * inst = GetCommodityPriceInstance();
 
     uint32_t chipEpoch = 0;
 
@@ -120,30 +120,30 @@ void SetTestEventTrigger_ForecastUpdate()
         // newPriceStruct.description.SetValue(//TODO);
 
         // Create 2 component entries
-        PriceForecastMemMgr memMgr = dg->GetPriceForecastMemMgr();
+        // PriceForecastMemMgr memMgr = dg->GetPriceForecastMemMgr();
 
-        Structs::CommodityPriceComponentStruct::Type newPriceComponent;
+        // Structs::CommodityPriceComponentStruct::Type newPriceComponent;
 
-        newPriceComponent.source = Globals::TariffPriceTypeEnum::kStandard;
-        newPriceComponent.tariffComponentID.ClearValue(); // We don't have a tariff componentID
+        // newPriceComponent.source = Globals::TariffPriceTypeEnum::kStandard;
+        // newPriceComponent.tariffComponentID.ClearValue(); // We don't have a tariff componentID
 
-        newPriceComponent.price.SetValue(static_cast<Money>(price.amount * 95 / 100)); // exVAT
-        // newPriceComponent.description.SetValue(//TODO ("ExVAT)"));
-        memMgr.PreparePriceEntry(0);
-        memMgr.AddPriceComponent(newPriceComponent);
+        // newPriceComponent.price.SetValue(static_cast<Money>(price.amount * 95 / 100)); // exVAT
+        // // newPriceComponent.description.SetValue(//TODO ("ExVAT)"));
+        // memMgr.PreparePriceEntry(0);
+        // memMgr.AddPriceComponent(newPriceComponent);
 
-        newPriceComponent.price.SetValue(static_cast<Money>(price.amount * 5 / 100)); // VAT (5%)
-        // newPriceComponent.description.SetValue(//TODO ("VAT)"));
+        // newPriceComponent.price.SetValue(static_cast<Money>(price.amount * 5 / 100)); // VAT (5%)
+        // // newPriceComponent.description.SetValue(//TODO ("VAT)"));
 
-        memMgr.PreparePriceEntry(1);
-        memMgr.AddPriceComponent(newPriceComponent);
+        // memMgr.PreparePriceEntry(1);
+        // memMgr.AddPriceComponent(newPriceComponent);
     }
 
     //     DataModel::List<const Structs::CommodityPriceStruct::Type> myPriceForecast;
     //     myPriceForecast = DataModel::List<const Structs::CommodityPriceStruct::Type>(HERE!!!!!!!!!!
     //     This is wrong - we need to have an array here but it could be too big for the stack
     // Consider another list management class.)
-    // dg->SetForecast()
+    // inst->SetForecast()
 }
 
 bool HandleCommodityPriceTestEventTrigger(uint64_t eventTrigger)
