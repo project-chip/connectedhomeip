@@ -59,7 +59,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const GenericCurrentStateStruct & curre
     if (currentState.latching.HasValue())
     {
         VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-        VerifyOrReturnError(EnsureKnownEnumValue(currentState.latching.Value()) != TargetLatchEnum::kUnknownEnumValue,
+        VerifyOrReturnError(EnsureKnownEnumValue(currentState.latching.Value()) != LatchingEnum::kUnknownEnumValue,
                             CHIP_ERROR_INVALID_ARGUMENT);
     }
 
@@ -182,7 +182,7 @@ CHIP_ERROR ClusterLogic::SetUnitRange(const DataModel::Nullable<Structs::UnitRan
     // If the unit range is invalid, we need to return an error
     VerifyOrReturnError(unitRange.Value().min <= unitRange.Value().max, CHIP_ERROR_INVALID_ARGUMENT);
 
-    // If the unit range is null, we need to set it to the new value
+    // If the mState unit range is null, we need to set it to the new value
     if (mState.unitRange.IsNull())
     {
         mState.unitRange.SetNonNull(unitRange.Value());
@@ -405,11 +405,6 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
     // TODO: If this command is sent while the device is in a non-compatible internal-state, a status code of INVALID_IN_STATE SHALL
     // be returned.
 
-    GenericCurrentStateStruct currentState;
-    VerifyOrReturnError(GetCurrentState(currentState) == CHIP_NO_ERROR, Status::Failure);
-    // Check if the current position is valid or else return InvalidInState
-    VerifyOrReturnValue(currentState.position.HasValue(), Status::InvalidInState);
-
     GenericTargetStruct target;
     VerifyOrReturnError(GetTarget(target) == CHIP_NO_ERROR, Status::Failure);
 
@@ -446,6 +441,12 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
         target.speed = speed;
     }
 
+    GenericCurrentStateStruct currentState;
+    VerifyOrReturnError(GetCurrentState(currentState) == CHIP_NO_ERROR, Status::Failure);
+
+    // Check if the current position is valid or else return InvalidInState
+    VerifyOrReturnValue(currentState.position.HasValue(), Status::InvalidInState);
+
     VerifyOrReturnError(SetTarget(target) == CHIP_NO_ERROR, Status::Failure);
 
     return mClusterDriver.HandleSetTarget(target.position, target.latch, target.speed);
@@ -464,6 +465,8 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
     VerifyOrReturnError(numberOfSteps > 0, Status::ConstraintError);
     if (speed.HasValue())
     {
+        //TODO: Spec Issue: When the device does not support the speed(SP) feature, behaviour is undefined
+        VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), Status::Success);
         VerifyOrReturnError(speed.Value() != Globals::ThreeLevelAutoEnum::kUnknownEnumValue, Status::ConstraintError);
     }
 
@@ -474,6 +477,7 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
 
     GenericCurrentStateStruct currentState;
     VerifyOrReturnError(GetCurrentState(currentState) == CHIP_NO_ERROR, Status::Failure);
+
     // Check if the current position is valid or else return InvalidInState
     VerifyOrReturnValue(currentState.position.HasValue(), Status::InvalidInState);
 
