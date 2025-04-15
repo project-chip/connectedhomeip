@@ -94,7 +94,11 @@ target_sources(app
     ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp
 )
 
-chip_configure_data_model(app
-    INCLUDE_SERVER
-    ZAP_FILE ${NXP_EXAMPLE_ZAP_DIR}/all-clusters-app.zap
-)
+if (CONFIG_CHIP_WIFI AND CONFIG_NET_L2_OPENTHREAD)
+    message(FATAL_ERROR "WiFi + Thread (Border Router) configuration is not supported in this application.")
+else()
+    chip_configure_data_model(app
+        INCLUDE_SERVER
+        ZAP_FILE ${NXP_EXAMPLE_ZAP_DIR}/all-clusters-app.zap
+    )
+endif()
