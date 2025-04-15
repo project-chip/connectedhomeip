@@ -24,17 +24,10 @@ try:
 except ImportError:
     _has_coloredlogs = False
 
-try:
-    from matter.idl.matter_idl_parser import CreateParser
-except ImportError:
-    import os
-    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'py_matter_idl')))
-    from matter.idl.matter_idl_parser import CreateParser
-
-# isort: off
-from matter.idl.generators.storage import FileSystemGeneratorStorage, GeneratorStorage
 from matter.idl.generators.path_resolution import expand_path_for_idl
-from matter.idl.generators.registry import CodeGenerator, GENERATORS
+from matter.idl.generators.registry import GENERATORS, CodeGenerator
+from matter.idl.generators.storage import FileSystemGeneratorStorage, GeneratorStorage
+from matter.idl.matter_idl_parser import CreateParser
 
 
 class ListGeneratedFilesStorage(GeneratorStorage):

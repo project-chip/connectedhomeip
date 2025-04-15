@@ -4,8 +4,6 @@ import dataclasses
 import functools
 import logging
 import pprint
-import sys
-from pathlib import Path
 from typing import Dict, List, Optional
 
 import click
@@ -13,17 +11,11 @@ from lark import Lark
 from lark.lexer import Token
 from lark.visitors import Transformer, v_args
 
-try:
-    from matter.idl.matter_idl_types import AccessPrivilege
-except ModuleNotFoundError:
-    sys.path.append(str(Path(__file__).resolve().parent / ".." / ".."))
-    from matter.idl.matter_idl_types import AccessPrivilege
-
-from matter.idl.matter_idl_types import (ApiMaturity, Attribute, AttributeInstantiation, AttributeOperation, AttributeQuality,
-                                         AttributeStorage, Bitmap, Cluster, Command, CommandInstantiation, CommandQuality,
-                                         ConstantEntry, DataType, DeviceType, Endpoint, Enum, Event, EventPriority, EventQuality,
-                                         Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct, StructQuality,
-                                         StructTag)
+from matter.idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute, AttributeInstantiation, AttributeOperation,
+                                         AttributeQuality, AttributeStorage, Bitmap, Cluster, Command, CommandInstantiation,
+                                         CommandQuality, ConstantEntry, DataType, DeviceType, Endpoint, Enum, Event, EventPriority,
+                                         EventQuality, Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct,
+                                         StructQuality, StructTag)
 
 
 def UnionOfAllFlags(flags_list):
