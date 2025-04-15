@@ -11673,18 +11673,18 @@
                   - ReactiveEnergy
           RVCOperationalState:
               ErrorStateEnum:
-                    LowBattery
-                    CannotReachTargetArea
-                    DirtyWaterTankFull
-                    DirtyWaterTankMissing
-                    WheelsJammed
-                    BrushJammed
-                    NavigationSensorObscured
+                   - LowBattery
+                   - CannotReachTargetArea
+                   - DirtyWaterTankFull
+                   - DirtyWaterTankMissing
+                   - WheelsJammed
+                   - BrushJammed
+                   - NavigationSensorObscured
               OperationalStateEnum:
-                    EmptyingDustBin
-                    CleaningMop
-                    FillingWaterTank
-                    UpdatingMaps
+                   - EmptyingDustBin
+                   - CleaningMop
+                   - FillingWaterTank
+                   - UpdatingMaps
       device types:
           # In-progress for maybe Matter 1.5
           - Awning
