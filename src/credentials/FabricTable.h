@@ -1005,16 +1005,14 @@ public:
     void RevertPendingOpCertsExceptRoot();
 
     // Verifies credentials, using the root certificate of the provided fabric index.
-    CHIP_ERROR VerifyCredentials(FabricIndex fabricIndex, ByteSpan noc, ByteSpan icac,
-                                 Credentials::ValidationContext & context, CompressedFabricId & outCompressedFabricId,
-                                 FabricId & outFabricId, NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
-                                 Crypto::P256PublicKey * outRootPublicKey = nullptr) const;
+    CHIP_ERROR VerifyCredentials(FabricIndex fabricIndex, ByteSpan noc, ByteSpan icac, Credentials::ValidationContext & context,
+                                 CompressedFabricId & outCompressedFabricId, FabricId & outFabricId, NodeId & outNodeId,
+                                 Crypto::P256PublicKey & outNocPubkey, Crypto::P256PublicKey * outRootPublicKey = nullptr) const;
 
     // Verifies credentials, using the provided root certificate.
-    static CHIP_ERROR VerifyCredentials(ByteSpan noc, ByteSpan icac, ByteSpan rcac,
-                                        Credentials::ValidationContext & context, CompressedFabricId & outCompressedFabricId,
-                                        FabricId & outFabricId, NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
-                                        Crypto::P256PublicKey * outRootPublicKey = nullptr);
+    static CHIP_ERROR VerifyCredentials(ByteSpan noc, ByteSpan icac, ByteSpan rcac, Credentials::ValidationContext & context,
+                                        CompressedFabricId & outCompressedFabricId, FabricId & outFabricId, NodeId & outNodeId,
+                                        Crypto::P256PublicKey & outNocPubkey, Crypto::P256PublicKey * outRootPublicKey = nullptr);
     /**
      * @brief Enables FabricInfo instances to collide and reference the same logical fabric (i.e Root Public Key + FabricId).
      *
@@ -1025,18 +1023,18 @@ public:
 
     // Add a new fabric for testing. The Operational Key is a raw P256Keypair (public key and private key raw bits) that will
     // get copied (directly) into the fabric table.
-    CHIP_ERROR AddNewFabricForTest(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert,
-                                   ByteSpan opKeySpan, FabricIndex * outFabricIndex);
+    CHIP_ERROR AddNewFabricForTest(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan opKeySpan,
+                                   FabricIndex * outFabricIndex);
 
     // Add a new fabric for testing. The Operational Key is a raw P256Keypair (public key and private key raw bits) that will
     // get copied (directly) into the fabric table. The fabric will NOT be committed, and will remain pending.
-    CHIP_ERROR AddNewUncommittedFabricForTest(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert,
-                                              ByteSpan opKeySpan, FabricIndex * outFabricIndex);
+    CHIP_ERROR AddNewUncommittedFabricForTest(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan opKeySpan,
+                                              FabricIndex * outFabricIndex);
 
     // Same as AddNewFabricForTest, but ignore if we are colliding with same <Root Public Key, Fabric Id>, so
     // that a single fabric table can have N nodes for same fabric. This usually works, but is bad form.
-    CHIP_ERROR AddNewFabricForTestIgnoringCollisions(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert,
-                                                     ByteSpan opKeySpan, FabricIndex * outFabricIndex)
+    CHIP_ERROR AddNewFabricForTestIgnoringCollisions(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan opKeySpan,
+                                                     FabricIndex * outFabricIndex)
     {
         PermitCollidingFabrics();
         CHIP_ERROR err = AddNewFabricForTest(rootCert, icacCert, nocCert, opKeySpan, outFabricIndex);
@@ -1097,8 +1095,8 @@ public:
      * @retval CHIP_NO_ERROR on success
      * @retval CHIP_ERROR_INVALID_ARGUMENT if the fabricIndex or clientChallenge is incorrectly formatted.
      */
-    CHIP_ERROR SignVIDVerificationRequest(FabricIndex fabricIndex, ByteSpan clientChallenge,
-                                          ByteSpan attestationChallenge, SignVIDVerificationResponseData & outResponse);
+    CHIP_ERROR SignVIDVerificationRequest(FabricIndex fabricIndex, ByteSpan clientChallenge, ByteSpan attestationChallenge,
+                                          SignVIDVerificationResponseData & outResponse);
 
 private:
     enum class StateFlags : uint16_t

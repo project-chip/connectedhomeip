@@ -143,7 +143,7 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadNOCs(EndpointId endpoint, Attri
             }
             else
             {
-                icacOrVvscSpan = MutableByteSpan{icacOrVvscBuf};
+                icacOrVvscSpan = MutableByteSpan{ icacOrVvscBuf };
                 ReturnErrorOnFailure(fabricTable.FetchVVSC(fabricIndex, icacOrVvscSpan));
                 if (!icacOrVvscSpan.empty())
                 {
@@ -192,7 +192,7 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadFabricsList(EndpointId endpoint
             fabricDescriptor.rootPublicKey = ByteSpan{ pubKey.ConstBytes(), pubKey.Length() };
 
             uint8_t vidVerificationStatement[Crypto::kVendorIdVerificationStatementV1Size];
-            MutableByteSpan vidVerificationStatementSpan{vidVerificationStatement};
+            MutableByteSpan vidVerificationStatementSpan{ vidVerificationStatement };
             ReturnErrorOnFailure(fabricTable.FetchVIDVerificationStatement(fabricIndex, vidVerificationStatementSpan));
             if (!vidVerificationStatementSpan.empty())
             {
@@ -1239,7 +1239,8 @@ bool emberAfOperationalCredentialsClusterSignVIDVerificationRequestCallback(
     ChipLogProgress(Zcl, "OpCreds: Received a SignVIDVerificationRequest Command for FabricIndex 0x%x",
                     static_cast<unsigned>(commandData.fabricIndex));
 
-    if (!IsValidFabricIndex(commandData.fabricIndex) || (commandData.clientChallenge.size() != kVendorIdVerificationClientChallengeSize))
+    if (!IsValidFabricIndex(commandData.fabricIndex) ||
+        (commandData.clientChallenge.size() != kVendorIdVerificationClientChallengeSize))
     {
         commandObj->AddStatus(commandPath, Status::ConstraintError);
         return true;
@@ -1251,7 +1252,8 @@ bool emberAfOperationalCredentialsClusterSignVIDVerificationRequestCallback(
     FabricTable::SignVIDVerificationResponseData responseData;
     ByteSpan attestationChallenge = GetAttestationChallengeFromCurrentSession(commandObj);
 
-    CHIP_ERROR err = fabricTable.SignVIDVerificationRequest(commandData.fabricIndex, commandData.clientChallenge, attestationChallenge, responseData);
+    CHIP_ERROR err = fabricTable.SignVIDVerificationRequest(commandData.fabricIndex, commandData.clientChallenge,
+                                                            attestationChallenge, responseData);
     if (err == CHIP_ERROR_INVALID_ARGUMENT)
     {
         commandObj->AddStatus(commandPath, Status::ConstraintError);
@@ -1267,9 +1269,9 @@ bool emberAfOperationalCredentialsClusterSignVIDVerificationRequestCallback(
     }
 
     Commands::SignVIDVerificationResponse::Type response;
-    response.fabricIndex = responseData.fabricIndex;
+    response.fabricIndex          = responseData.fabricIndex;
     response.fabricBindingVersion = responseData.fabricBindingVersion;
-    response.signature = responseData.signature.Span();
+    response.signature            = responseData.signature.Span();
     commandObj->AddResponse(commandPath, response);
 
     return true;

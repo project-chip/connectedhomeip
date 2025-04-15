@@ -72,9 +72,8 @@ constexpr size_t IndexInfoTLVMaxSize()
     return TLV::EstimateStructOverhead(sizeof(FabricIndex), CHIP_CONFIG_MAX_FABRICS * (1 + sizeof(FabricIndex)) + 1);
 }
 
-CHIP_ERROR AddNewFabricForTestInternal(FabricTable & fabricTable, bool leavePending, ByteSpan rootCert,
-                                       ByteSpan icacCert, ByteSpan nocCert, ByteSpan opKeySpan,
-                                       FabricIndex * outFabricIndex)
+CHIP_ERROR AddNewFabricForTestInternal(FabricTable & fabricTable, bool leavePending, ByteSpan rootCert, ByteSpan icacCert,
+                                       ByteSpan nocCert, ByteSpan opKeySpan, FabricIndex * outFabricIndex)
 {
     VerifyOrReturnError(outFabricIndex != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -385,10 +384,9 @@ CHIP_ERROR FabricInfo::FetchRootPubkey(Crypto::P256PublicKey & outPublicKey) con
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FabricTable::VerifyCredentials(FabricIndex fabricIndex, ByteSpan noc, ByteSpan icac,
-                                          ValidationContext & context, CompressedFabricId & outCompressedFabricId,
-                                          FabricId & outFabricId, NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
-                                          Crypto::P256PublicKey * outRootPublicKey) const
+CHIP_ERROR FabricTable::VerifyCredentials(FabricIndex fabricIndex, ByteSpan noc, ByteSpan icac, ValidationContext & context,
+                                          CompressedFabricId & outCompressedFabricId, FabricId & outFabricId, NodeId & outNodeId,
+                                          Crypto::P256PublicKey & outNocPubkey, Crypto::P256PublicKey * outRootPublicKey) const
 {
     MATTER_TRACE_SCOPE("VerifyCredentials", "Fabric");
     assertChipStackLockedByCurrentThread();
@@ -399,10 +397,9 @@ CHIP_ERROR FabricTable::VerifyCredentials(FabricIndex fabricIndex, ByteSpan noc,
                              outRootPublicKey);
 }
 
-CHIP_ERROR FabricTable::VerifyCredentials(ByteSpan noc, ByteSpan icac, ByteSpan rcac,
-                                          ValidationContext & context, CompressedFabricId & outCompressedFabricId,
-                                          FabricId & outFabricId, NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
-                                          Crypto::P256PublicKey * outRootPublicKey)
+CHIP_ERROR FabricTable::VerifyCredentials(ByteSpan noc, ByteSpan icac, ByteSpan rcac, ValidationContext & context,
+                                          CompressedFabricId & outCompressedFabricId, FabricId & outFabricId, NodeId & outNodeId,
+                                          Crypto::P256PublicKey & outNocPubkey, Crypto::P256PublicKey * outRootPublicKey)
 {
     // TODO - Optimize credentials verification logic
     //        The certificate chain construction and verification is a compute and memory intensive operation.
@@ -733,14 +730,13 @@ CHIP_ERROR FabricTable::LoadFromStorage(FabricInfo * fabric, FabricIndex newFabr
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FabricTable::AddNewFabricForTest(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert,
-                                            ByteSpan opKeySpan, FabricIndex * outFabricIndex)
+CHIP_ERROR FabricTable::AddNewFabricForTest(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan opKeySpan,
+                                            FabricIndex * outFabricIndex)
 {
     return AddNewFabricForTestInternal(*this, /*leavePending=*/false, rootCert, icacCert, nocCert, opKeySpan, outFabricIndex);
 }
 
-CHIP_ERROR FabricTable::AddNewUncommittedFabricForTest(ByteSpan rootCert, ByteSpan icacCert,
-                                                       ByteSpan nocCert, ByteSpan opKeySpan,
+CHIP_ERROR FabricTable::AddNewUncommittedFabricForTest(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan opKeySpan,
                                                        FabricIndex * outFabricIndex)
 {
     return AddNewFabricForTestInternal(*this, /*leavePending=*/true, rootCert, icacCert, nocCert, opKeySpan, outFabricIndex);
@@ -2203,8 +2199,7 @@ CHIP_ERROR FabricTable::FetchVVSC(FabricIndex fabricIndex, MutableByteSpan & out
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FabricTable::SignVIDVerificationRequest(FabricIndex fabricIndex, ByteSpan clientChallenge,
-                                                   ByteSpan attestationChallenge,
+CHIP_ERROR FabricTable::SignVIDVerificationRequest(FabricIndex fabricIndex, ByteSpan clientChallenge, ByteSpan attestationChallenge,
                                                    SignVIDVerificationResponseData & outResponse)
 {
     FabricInfo * fabricInfo = GetMutableFabricByIndex(fabricIndex);
