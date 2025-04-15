@@ -35,19 +35,20 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from chip.interaction_model import InteractionModelError, Status
-from chip.tlv import TLVReader
-from chip.utils import CommissioningBuildingBlocks
 import enum
 import hashlib
+import logging
 from binascii import unhexlify
+from typing import Optional
+
+import chip.clusters as Clusters
+from chip.interaction_model import InteractionModelError, Status
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.tlv import TLVReader
+from chip.utils import CommissioningBuildingBlocks
 from ecdsa import NIST256p, VerifyingKey
 from ecdsa.keys import BadSignatureError
-from typing import Optional
 from mobly import asserts
-import logging
 
 
 class MatterCertParser:
