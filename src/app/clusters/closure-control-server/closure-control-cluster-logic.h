@@ -57,7 +57,7 @@ public:
     inline bool HasFeature(Feature aFeature) const { return mFeatureMap.Has(aFeature); }
 
     /**
-     * @brief Functions determines if Cluster confrmance is valid
+     * @brief Function determines if Cluster conformance is valid
      *
      *        The function executes these checks in order to validate the conformance
      *        1. Check if either Positioning or MotionLatching is supported. If neither are enabled, returns false.
@@ -73,7 +73,7 @@ public:
         VerifyOrReturnValue(HasFeature(Feature::kPositioning) || HasFeature(Feature::kMotionLatching), false,
                             ChipLogError(AppServer, "Validation failed: Neither Positioning nor MotionLatching is enabled."));
 
-        // If Speed is enabled, Positioning must be enabled and Instantaneous is disabled.
+        // If Speed is enabled, Positioning shall be enabled and Instantaneous shall be disabled.
         if (HasFeature(Feature::kSpeed))
         {
             VerifyOrReturnValue(

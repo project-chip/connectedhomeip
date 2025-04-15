@@ -62,7 +62,7 @@ TEST(TestClosureControlClusterLogic, InitValidConformance)
 TEST(TestClosureControlClusterLogic, InitInvalidConformance)
 {
     ClusterConformance conformance;
-
+conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kSpeed).Set(Feature::kInstantaneous);
     MockDelegate mockDelegate;
     MockMatterContext mockContext;
     ClusterLogic logic(mockDelegate, mockContext);
