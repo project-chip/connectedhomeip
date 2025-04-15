@@ -86,6 +86,7 @@ _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\""
 
     enum class AttributeQualityFlags : uint32_t
     {
+        kNoAttribute     = 0x0000, // No attribute value
         kListAttribute   = 0x0004, // This attribute is a list attribute
         kFabricScoped    = 0x0008, // 'F' quality on attributes
         kFabricSensitive = 0x0010, // 'S' quality on attributes
@@ -103,7 +104,7 @@ _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\""
             constexpr AttributeEntry(
                 AttributeId id = 0,                                                             // attributeId initial value,
                                                                                                 // this could be altered later
-                AttributeQualityFlags attrQualityFlags = AttributeQualityFlags::kListAttribute, // mask.flags initial value
+                AttributeQualityFlags attrQualityFlags = AttributeQualityFlags::kNoAttribute,   // mask.flags initial value
                 Access::Privilege readPriv             = Access::Privilege::kNoPrivilege,       // mask.readPrivilege initial value
                 Access::Privilege writePriv            = Access::Privilege::kNoPrivilege        // mask.writePrivilege initial value
                 ) :
