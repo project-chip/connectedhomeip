@@ -1,7 +1,8 @@
 {{> header}}
-
-#include <app/data-model/WrappedStructEncoder.h>
 #include <clusters/{{asUpperCamelCase name}}/Attributes.h>
+
+#include <app/data-model/Decode.h>
+#include <app/data-model/WrappedStructEncoder.h>
 
 namespace chip {
 namespace app {
