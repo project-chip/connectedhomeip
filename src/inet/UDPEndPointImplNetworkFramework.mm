@@ -652,7 +652,7 @@ namespace Inet {
             };
 
             auto localWeakFlag = mWorkFlagWeak;
-            dispatch_async(mSystemQueue, ^{
+            static_cast<System::LayerDispatch &>(GetSystemLayer()).ScheduleWorkWithBlock(^{
                 auto workFlag = localWeakFlag.lock();
                 if (!workFlag || !workFlag->IsAlive()) {
                     return;
