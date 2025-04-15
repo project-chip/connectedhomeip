@@ -38,7 +38,26 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
-
+    
+    - label:
+          "Step 1: TH sends a LaunchApp command to DUT to launch and bring an application to the foreground"
+      PICS: APPLAUNCHER.S.C00.Rsp
+      command: "LaunchApp"
+      arguments:
+          values:
+              - name: "Data"
+                value: "Hello World"
+              - name: "Application"
+                value:
+                    {
+                        CatalogVendorID: catalogVendorId,
+                        ApplicationID: applicationId,
+                    }
+      response:
+          values:
+              - name: "Status"
+                value: 0
+    
     - label:
           "Step 1a: TH sends a HideApp command to DUT to Hide a running and
           Active application"
