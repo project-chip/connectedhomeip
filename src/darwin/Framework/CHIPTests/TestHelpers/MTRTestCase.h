@@ -22,13 +22,40 @@
 #define HAVE_NSTASK 1
 #endif
 
+@class MTRDeviceController;
+@class MTRMockCB;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRTestCase : XCTestCase
+
++ (void)setUp NS_REQUIRES_SUPER;
++ (void)tearDown NS_REQUIRES_SUPER;
+- (void)setUp NS_REQUIRES_SUPER;
+- (void)tearDown NS_REQUIRES_SUPER;
+
 // It would be nice to do the leak-detection automatically, but running "leaks"
 // on every single sub-test is slow, and some of our tests seem to have leaks
 // outside Matter.framework.  So have it be opt-in for now, and improve later.
 @property (nonatomic) BOOL detectLeaks;
+
+// Creates a device controller on a new fabric with test keys and test storage.
+//
+// The controller will be shut down, and the controller factory stopped, at the
+// end of the current test.
+- (MTRDeviceController *)createControllerOnTestFabric;
+
+// Creates a device controller on a new fabric with test keys and test storage.
+//
+// The controller will be shut down, and the controller factory stopped, at the
+// end of the test suite.
++ (MTRDeviceController *)createControllerOnTestFabric;
+
+// Provides access to the mock CoreBlueooth instance managed automatically by
+// this class. Bluetooth mocking is enabled for all tests (even those that don't
+// actively interact with it) to avoid issues with accessing the real Bluetooth
+// implementation in CI.
+@property (class, readonly) MTRMockCB * mockCoreBluetooth;
 
 #if HAVE_NSTASK
 /**

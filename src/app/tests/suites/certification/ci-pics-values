@@ -204,7 +204,7 @@ CC.S.C41.Rsp=1
 CC.S.C42.Rsp=1
 CC.S.C43.Rsp=1
 CC.S.C44.Rsp=1
-CC.S.F00=0
+CC.S.F00=1
 CC.S.F01=1
 CC.S.F02=1
 CC.S.F03=1
@@ -677,7 +677,6 @@ I.C.AO-WRITE=0
 
 # Scenes Management Cluster
 S.S=1
-S.S.A0000=1
 S.S.A0001=1
 S.S.A0002=1
 S.S.C00.Rsp=1

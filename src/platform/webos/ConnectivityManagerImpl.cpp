@@ -93,7 +93,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     mpConnectCallback = nullptr;
     mpScanCallback    = nullptr;
 
-    if (ConnectivityUtils::GetEthInterfaceName(mEthIfName, IFNAMSIZ) == CHIP_NO_ERROR)
+    if (ConnectivityUtils::GetEthInterfaceName(mEthIfName, Inet::InterfaceId::kMaxIfNameLength) == CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "Got Ethernet interface: %s", mEthIfName);
     }
@@ -114,7 +114,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    if (ConnectivityUtils::GetWiFiInterfaceName(sWiFiIfName, IFNAMSIZ) == CHIP_NO_ERROR)
+    if (ConnectivityUtils::GetWiFiInterfaceName(sWiFiIfName, Inet::InterfaceId::kMaxIfNameLength) == CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "Got WiFi interface: %s", sWiFiIfName);
     }
@@ -1048,7 +1048,7 @@ void ConnectivityManagerImpl::PostNetworkConnect()
     // This should be removed or find a better place once we depercate the rendezvous session.
     for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
     {
-        char ifName[chip::Inet::InterfaceId::kMaxIfNameLength];
+        char ifName[Inet::InterfaceId::kMaxIfNameLength];
         if (it.IsUp() && CHIP_NO_ERROR == it.GetInterfaceName(ifName, sizeof(ifName)) &&
             strncmp(ifName, sWiFiIfName, sizeof(ifName)) == 0)
         {

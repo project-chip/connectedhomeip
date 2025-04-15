@@ -28,6 +28,7 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
+#include <lib/support/TypeTraits.h>
 #include <platform/LockTracker.h>
 #include <tracing/macros.h>
 
@@ -346,15 +347,17 @@ CHIP_ERROR FabricTable::ValidateIncomingNOCChain(const ByteSpan & noc, const Byt
     ChipLogProgress(FabricProvisioning, "Validating NOC chain");
     CHIP_ERROR err = FabricTable::VerifyCredentials(noc, icac, rcac, validContext, outCompressedFabricId, outFabricId, outNodeId,
                                                     outNocPubkey, &outRootPubkey);
-    if (err != CHIP_NO_ERROR && err != CHIP_ERROR_WRONG_NODE_ID)
-    {
-        err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT;
-    }
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(FabricProvisioning, "Failed NOC chain validation: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(FabricProvisioning, "Failed NOC chain validation, VerifyCredentials returned: %" CHIP_ERROR_FORMAT,
+                     err.Format());
+
+        if (err != CHIP_ERROR_WRONG_NODE_ID)
+        {
+            err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT;
+        }
+        return err;
     }
-    ReturnErrorOnFailure(err);
 
     // Validate fabric ID match for cases like UpdateNOC.
     if (existingFabricId != kUndefinedFabricId)
@@ -2174,6 +2177,74 @@ CHIP_ERROR FabricTable::SetShouldAdvertiseIdentity(FabricIndex fabricIndex, Adve
     VerifyOrReturnError(fabricIsInitialized, CHIP_ERROR_INVALID_FABRIC_INDEX);
 
     fabricInfo->SetShouldAdvertiseIdentity(advertiseIdentity == AdvertiseIdentity::Yes);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FabricTable::FetchVIDVerificationStatement(FabricIndex fabricIndex, MutableByteSpan & outVIDVerificationStatement) const
+{
+    VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(outVIDVerificationStatement.size() >= kVendorIdVerificationStatementV1Size, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    // TODO(#38308): Add VIDVerificationStatement loading support.
+    outVIDVerificationStatement.reduce_size(0);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FabricTable::FetchVVSC(FabricIndex fabricIndex, MutableByteSpan & outVVSC) const
+{
+    VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(outVVSC.size() >= kMaxCHIPCertLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    // TODO(#38308): Add VVSC loading support.
+    outVVSC.reduce_size(0);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FabricTable::SignVIDVerificationRequest(FabricIndex fabricIndex, const ByteSpan & clientChallenge,
+                                                   const ByteSpan & attestationChallenge,
+                                                   SignVIDVerificationResponseData & outResponse)
+{
+    FabricInfo * fabricInfo = GetMutableFabricByIndex(fabricIndex);
+    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    P256PublicKey rootPublicKey;
+    ReturnErrorOnFailure(fabricInfo->FetchRootPubkey(rootPublicKey));
+
+    // Step 1: Generate FabricBindingMessage for given fabric.
+    uint8_t fabricBindingMessageBuffer[kVendorFabricBindingMessageV1Size];
+    MutableByteSpan fabricBindingMessageSpan{ fabricBindingMessageBuffer };
+
+    ReturnErrorOnFailure(
+        GenerateVendorFabricBindingMessage(FabricBindingVersion::kVersion1, rootPublicKey, fabricInfo->GetFabricId(),
+                                           static_cast<uint16_t>(fabricInfo->GetVendorId()), fabricBindingMessageSpan));
+    VerifyOrReturnError(fabricBindingMessageSpan.size() == kVendorFabricBindingMessageV1Size, CHIP_ERROR_INTERNAL);
+
+    // Step 2: Recover VIDVerificationStatement, if any.
+    uint8_t vidVerificationStatementBuffer[kVendorIdVerificationStatementV1Size];
+    MutableByteSpan vidVerificationStatementSpan{ vidVerificationStatementBuffer };
+
+    ReturnErrorOnFailure(FetchVIDVerificationStatement(fabricIndex, vidVerificationStatementSpan));
+
+    // Step 3: Generate VidVerificationToBeSigned
+    uint8_t vidVerificationTbsBuffer[kVendorIdVerificationTbsV1MaxSize];
+    MutableByteSpan vidVerificationTbsSpan{ vidVerificationTbsBuffer };
+
+    P256ECDSASignature signature;
+    auto signatureBuffer = Platform::ScopedMemoryBufferWithSize<uint8_t>();
+    VerifyOrReturnError(signatureBuffer.Calloc(signature.Capacity()), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    ReturnErrorOnFailure(GenerateVendorIdVerificationToBeSigned(fabricIndex, clientChallenge, attestationChallenge,
+                                                                fabricBindingMessageSpan, vidVerificationStatementSpan,
+                                                                vidVerificationTbsSpan));
+
+    // Step 4: Sign the statement with the operational key.
+    ReturnErrorOnFailure(SignWithOpKeypair(fabricIndex, vidVerificationTbsSpan, signature));
+    memcpy(signatureBuffer.Get(), signature.Bytes(), signature.Capacity());
+
+    outResponse.fabricIndex          = fabricIndex;
+    outResponse.fabricBindingVersion = fabricBindingMessageSpan[0];
+    outResponse.signature            = std::move(signatureBuffer);
 
     return CHIP_NO_ERROR;
 }

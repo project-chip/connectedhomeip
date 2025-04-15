@@ -3836,6 +3836,98 @@ public static class WaterHeaterManagementClusterBoostEndedEvent {
     return output.toString();
   }
 }
+public static class CommodityPriceClusterPriceChangeEvent {
+  public @Nullable ChipStructs.CommodityPriceClusterCommodityPriceStruct currentPrice;
+  private static final long CURRENT_PRICE_ID = 0L;
+
+  public CommodityPriceClusterPriceChangeEvent(
+    @Nullable ChipStructs.CommodityPriceClusterCommodityPriceStruct currentPrice
+  ) {
+    this.currentPrice = currentPrice;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CURRENT_PRICE_ID, currentPrice != null ? currentPrice.encodeTlv() : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static CommodityPriceClusterPriceChangeEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    @Nullable ChipStructs.CommodityPriceClusterCommodityPriceStruct currentPrice = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CURRENT_PRICE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          currentPrice = ChipStructs.CommodityPriceClusterCommodityPriceStruct.decodeTlv(castingValue);
+        }
+      }
+    }
+    return new CommodityPriceClusterPriceChangeEvent(
+      currentPrice
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("CommodityPriceClusterPriceChangeEvent {\n");
+    output.append("\tcurrentPrice: ");
+    output.append(currentPrice);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class CommodityPriceClusterForecastChangeEvent {
+  public @Nullable ArrayList<ChipStructs.CommodityPriceClusterCommodityPriceStruct> priceForecast;
+  private static final long PRICE_FORECAST_ID = 0L;
+
+  public CommodityPriceClusterForecastChangeEvent(
+    @Nullable ArrayList<ChipStructs.CommodityPriceClusterCommodityPriceStruct> priceForecast
+  ) {
+    this.priceForecast = priceForecast;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(PRICE_FORECAST_ID, priceForecast != null ? ArrayType.generateArrayType(priceForecast, (elementpriceForecast) -> elementpriceForecast.encodeTlv()) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static CommodityPriceClusterForecastChangeEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    @Nullable ArrayList<ChipStructs.CommodityPriceClusterCommodityPriceStruct> priceForecast = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == PRICE_FORECAST_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          priceForecast = castingValue.map((elementcastingValue) -> ChipStructs.CommodityPriceClusterCommodityPriceStruct.decodeTlv(elementcastingValue));
+        }
+      }
+    }
+    return new CommodityPriceClusterForecastChangeEvent(
+      priceForecast
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("CommodityPriceClusterForecastChangeEvent {\n");
+    output.append("\tpriceForecast: ");
+    output.append(priceForecast);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class DemandResponseLoadControlClusterLoadControlEventStatusChangeEvent {
   public byte[] eventID;
   public @Nullable Integer transitionIndex;
@@ -6115,17 +6207,22 @@ public static class MediaPlaybackClusterStateChangedEvent {
 }
 public static class AccountLoginClusterLoggedOutEvent {
   public Optional<Long> node;
+  public Integer fabricIndex;
   private static final long NODE_ID = 0L;
+  private static final long FABRIC_INDEX_ID = 254L;
 
   public AccountLoginClusterLoggedOutEvent(
-    Optional<Long> node
+    Optional<Long> node,
+    Integer fabricIndex
   ) {
     this.node = node;
+    this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(NODE_ID, node.<BaseTLVType>map((nonOptionalnode) -> new UIntType(nonOptionalnode)).orElse(new EmptyType())));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
   }
@@ -6135,16 +6232,23 @@ public static class AccountLoginClusterLoggedOutEvent {
       return null;
     }
     Optional<Long> node = Optional.empty();
+    Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == NODE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
           node = Optional.of(castingValue.value(Long.class));
         }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
       }
     }
     return new AccountLoginClusterLoggedOutEvent(
-      node
+      node,
+      fabricIndex
     );
   }
 
@@ -6154,6 +6258,9 @@ public static class AccountLoginClusterLoggedOutEvent {
     output.append("AccountLoginClusterLoggedOutEvent {\n");
     output.append("\tnode: ");
     output.append(node);
+    output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -6304,474 +6411,6 @@ public static class ZoneManagementClusterZoneStoppedEvent {
     output.append("\n");
     output.append("\treason: ");
     output.append(reason);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-public static class CameraAvStreamManagementClusterVideoStreamChangedEvent {
-  public Integer videoStreamID;
-  public Optional<Integer> streamUsage;
-  public Optional<Integer> videoCodec;
-  public Optional<Integer> minFrameRate;
-  public Optional<Integer> maxFrameRate;
-  public Optional<ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct> minResolution;
-  public Optional<ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct> maxResolution;
-  public Optional<Long> minBitRate;
-  public Optional<Long> maxBitRate;
-  public Optional<Integer> minFragmentLen;
-  public Optional<Integer> maxFragmentLen;
-  private static final long VIDEO_STREAM_ID_ID = 0L;
-  private static final long STREAM_USAGE_ID = 1L;
-  private static final long VIDEO_CODEC_ID = 2L;
-  private static final long MIN_FRAME_RATE_ID = 3L;
-  private static final long MAX_FRAME_RATE_ID = 4L;
-  private static final long MIN_RESOLUTION_ID = 5L;
-  private static final long MAX_RESOLUTION_ID = 6L;
-  private static final long MIN_BIT_RATE_ID = 7L;
-  private static final long MAX_BIT_RATE_ID = 8L;
-  private static final long MIN_FRAGMENT_LEN_ID = 9L;
-  private static final long MAX_FRAGMENT_LEN_ID = 10L;
-
-  public CameraAvStreamManagementClusterVideoStreamChangedEvent(
-    Integer videoStreamID,
-    Optional<Integer> streamUsage,
-    Optional<Integer> videoCodec,
-    Optional<Integer> minFrameRate,
-    Optional<Integer> maxFrameRate,
-    Optional<ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct> minResolution,
-    Optional<ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct> maxResolution,
-    Optional<Long> minBitRate,
-    Optional<Long> maxBitRate,
-    Optional<Integer> minFragmentLen,
-    Optional<Integer> maxFragmentLen
-  ) {
-    this.videoStreamID = videoStreamID;
-    this.streamUsage = streamUsage;
-    this.videoCodec = videoCodec;
-    this.minFrameRate = minFrameRate;
-    this.maxFrameRate = maxFrameRate;
-    this.minResolution = minResolution;
-    this.maxResolution = maxResolution;
-    this.minBitRate = minBitRate;
-    this.maxBitRate = maxBitRate;
-    this.minFragmentLen = minFragmentLen;
-    this.maxFragmentLen = maxFragmentLen;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(VIDEO_STREAM_ID_ID, new UIntType(videoStreamID)));
-    values.add(new StructElement(STREAM_USAGE_ID, streamUsage.<BaseTLVType>map((nonOptionalstreamUsage) -> new UIntType(nonOptionalstreamUsage)).orElse(new EmptyType())));
-    values.add(new StructElement(VIDEO_CODEC_ID, videoCodec.<BaseTLVType>map((nonOptionalvideoCodec) -> new UIntType(nonOptionalvideoCodec)).orElse(new EmptyType())));
-    values.add(new StructElement(MIN_FRAME_RATE_ID, minFrameRate.<BaseTLVType>map((nonOptionalminFrameRate) -> new UIntType(nonOptionalminFrameRate)).orElse(new EmptyType())));
-    values.add(new StructElement(MAX_FRAME_RATE_ID, maxFrameRate.<BaseTLVType>map((nonOptionalmaxFrameRate) -> new UIntType(nonOptionalmaxFrameRate)).orElse(new EmptyType())));
-    values.add(new StructElement(MIN_RESOLUTION_ID, minResolution.<BaseTLVType>map((nonOptionalminResolution) -> nonOptionalminResolution.encodeTlv()).orElse(new EmptyType())));
-    values.add(new StructElement(MAX_RESOLUTION_ID, maxResolution.<BaseTLVType>map((nonOptionalmaxResolution) -> nonOptionalmaxResolution.encodeTlv()).orElse(new EmptyType())));
-    values.add(new StructElement(MIN_BIT_RATE_ID, minBitRate.<BaseTLVType>map((nonOptionalminBitRate) -> new UIntType(nonOptionalminBitRate)).orElse(new EmptyType())));
-    values.add(new StructElement(MAX_BIT_RATE_ID, maxBitRate.<BaseTLVType>map((nonOptionalmaxBitRate) -> new UIntType(nonOptionalmaxBitRate)).orElse(new EmptyType())));
-    values.add(new StructElement(MIN_FRAGMENT_LEN_ID, minFragmentLen.<BaseTLVType>map((nonOptionalminFragmentLen) -> new UIntType(nonOptionalminFragmentLen)).orElse(new EmptyType())));
-    values.add(new StructElement(MAX_FRAGMENT_LEN_ID, maxFragmentLen.<BaseTLVType>map((nonOptionalmaxFragmentLen) -> new UIntType(nonOptionalmaxFragmentLen)).orElse(new EmptyType())));
-
-    return new StructType(values);
-  }
-
-  public static CameraAvStreamManagementClusterVideoStreamChangedEvent decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    Integer videoStreamID = null;
-    Optional<Integer> streamUsage = Optional.empty();
-    Optional<Integer> videoCodec = Optional.empty();
-    Optional<Integer> minFrameRate = Optional.empty();
-    Optional<Integer> maxFrameRate = Optional.empty();
-    Optional<ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct> minResolution = Optional.empty();
-    Optional<ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct> maxResolution = Optional.empty();
-    Optional<Long> minBitRate = Optional.empty();
-    Optional<Long> maxBitRate = Optional.empty();
-    Optional<Integer> minFragmentLen = Optional.empty();
-    Optional<Integer> maxFragmentLen = Optional.empty();
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == VIDEO_STREAM_ID_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          videoStreamID = castingValue.value(Integer.class);
-        }
-      } else if (element.contextTagNum() == STREAM_USAGE_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          streamUsage = Optional.of(castingValue.value(Integer.class));
-        }
-      } else if (element.contextTagNum() == VIDEO_CODEC_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          videoCodec = Optional.of(castingValue.value(Integer.class));
-        }
-      } else if (element.contextTagNum() == MIN_FRAME_RATE_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          minFrameRate = Optional.of(castingValue.value(Integer.class));
-        }
-      } else if (element.contextTagNum() == MAX_FRAME_RATE_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          maxFrameRate = Optional.of(castingValue.value(Integer.class));
-        }
-      } else if (element.contextTagNum() == MIN_RESOLUTION_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
-          StructType castingValue = element.value(StructType.class);
-          minResolution = Optional.of(ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct.decodeTlv(castingValue));
-        }
-      } else if (element.contextTagNum() == MAX_RESOLUTION_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
-          StructType castingValue = element.value(StructType.class);
-          maxResolution = Optional.of(ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct.decodeTlv(castingValue));
-        }
-      } else if (element.contextTagNum() == MIN_BIT_RATE_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          minBitRate = Optional.of(castingValue.value(Long.class));
-        }
-      } else if (element.contextTagNum() == MAX_BIT_RATE_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          maxBitRate = Optional.of(castingValue.value(Long.class));
-        }
-      } else if (element.contextTagNum() == MIN_FRAGMENT_LEN_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          minFragmentLen = Optional.of(castingValue.value(Integer.class));
-        }
-      } else if (element.contextTagNum() == MAX_FRAGMENT_LEN_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          maxFragmentLen = Optional.of(castingValue.value(Integer.class));
-        }
-      }
-    }
-    return new CameraAvStreamManagementClusterVideoStreamChangedEvent(
-      videoStreamID,
-      streamUsage,
-      videoCodec,
-      minFrameRate,
-      maxFrameRate,
-      minResolution,
-      maxResolution,
-      minBitRate,
-      maxBitRate,
-      minFragmentLen,
-      maxFragmentLen
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("CameraAvStreamManagementClusterVideoStreamChangedEvent {\n");
-    output.append("\tvideoStreamID: ");
-    output.append(videoStreamID);
-    output.append("\n");
-    output.append("\tstreamUsage: ");
-    output.append(streamUsage);
-    output.append("\n");
-    output.append("\tvideoCodec: ");
-    output.append(videoCodec);
-    output.append("\n");
-    output.append("\tminFrameRate: ");
-    output.append(minFrameRate);
-    output.append("\n");
-    output.append("\tmaxFrameRate: ");
-    output.append(maxFrameRate);
-    output.append("\n");
-    output.append("\tminResolution: ");
-    output.append(minResolution);
-    output.append("\n");
-    output.append("\tmaxResolution: ");
-    output.append(maxResolution);
-    output.append("\n");
-    output.append("\tminBitRate: ");
-    output.append(minBitRate);
-    output.append("\n");
-    output.append("\tmaxBitRate: ");
-    output.append(maxBitRate);
-    output.append("\n");
-    output.append("\tminFragmentLen: ");
-    output.append(minFragmentLen);
-    output.append("\n");
-    output.append("\tmaxFragmentLen: ");
-    output.append(maxFragmentLen);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-public static class CameraAvStreamManagementClusterAudioStreamChangedEvent {
-  public Integer audioStreamID;
-  public Optional<Integer> streamUsage;
-  public Optional<Integer> audioCodec;
-  public Optional<Integer> channelCount;
-  public Optional<Long> sampleRate;
-  public Optional<Long> bitRate;
-  public Optional<Integer> bitDepth;
-  private static final long AUDIO_STREAM_ID_ID = 0L;
-  private static final long STREAM_USAGE_ID = 1L;
-  private static final long AUDIO_CODEC_ID = 2L;
-  private static final long CHANNEL_COUNT_ID = 3L;
-  private static final long SAMPLE_RATE_ID = 4L;
-  private static final long BIT_RATE_ID = 5L;
-  private static final long BIT_DEPTH_ID = 6L;
-
-  public CameraAvStreamManagementClusterAudioStreamChangedEvent(
-    Integer audioStreamID,
-    Optional<Integer> streamUsage,
-    Optional<Integer> audioCodec,
-    Optional<Integer> channelCount,
-    Optional<Long> sampleRate,
-    Optional<Long> bitRate,
-    Optional<Integer> bitDepth
-  ) {
-    this.audioStreamID = audioStreamID;
-    this.streamUsage = streamUsage;
-    this.audioCodec = audioCodec;
-    this.channelCount = channelCount;
-    this.sampleRate = sampleRate;
-    this.bitRate = bitRate;
-    this.bitDepth = bitDepth;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(AUDIO_STREAM_ID_ID, new UIntType(audioStreamID)));
-    values.add(new StructElement(STREAM_USAGE_ID, streamUsage.<BaseTLVType>map((nonOptionalstreamUsage) -> new UIntType(nonOptionalstreamUsage)).orElse(new EmptyType())));
-    values.add(new StructElement(AUDIO_CODEC_ID, audioCodec.<BaseTLVType>map((nonOptionalaudioCodec) -> new UIntType(nonOptionalaudioCodec)).orElse(new EmptyType())));
-    values.add(new StructElement(CHANNEL_COUNT_ID, channelCount.<BaseTLVType>map((nonOptionalchannelCount) -> new UIntType(nonOptionalchannelCount)).orElse(new EmptyType())));
-    values.add(new StructElement(SAMPLE_RATE_ID, sampleRate.<BaseTLVType>map((nonOptionalsampleRate) -> new UIntType(nonOptionalsampleRate)).orElse(new EmptyType())));
-    values.add(new StructElement(BIT_RATE_ID, bitRate.<BaseTLVType>map((nonOptionalbitRate) -> new UIntType(nonOptionalbitRate)).orElse(new EmptyType())));
-    values.add(new StructElement(BIT_DEPTH_ID, bitDepth.<BaseTLVType>map((nonOptionalbitDepth) -> new UIntType(nonOptionalbitDepth)).orElse(new EmptyType())));
-
-    return new StructType(values);
-  }
-
-  public static CameraAvStreamManagementClusterAudioStreamChangedEvent decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    Integer audioStreamID = null;
-    Optional<Integer> streamUsage = Optional.empty();
-    Optional<Integer> audioCodec = Optional.empty();
-    Optional<Integer> channelCount = Optional.empty();
-    Optional<Long> sampleRate = Optional.empty();
-    Optional<Long> bitRate = Optional.empty();
-    Optional<Integer> bitDepth = Optional.empty();
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == AUDIO_STREAM_ID_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          audioStreamID = castingValue.value(Integer.class);
-        }
-      } else if (element.contextTagNum() == STREAM_USAGE_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          streamUsage = Optional.of(castingValue.value(Integer.class));
-        }
-      } else if (element.contextTagNum() == AUDIO_CODEC_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          audioCodec = Optional.of(castingValue.value(Integer.class));
-        }
-      } else if (element.contextTagNum() == CHANNEL_COUNT_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          channelCount = Optional.of(castingValue.value(Integer.class));
-        }
-      } else if (element.contextTagNum() == SAMPLE_RATE_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          sampleRate = Optional.of(castingValue.value(Long.class));
-        }
-      } else if (element.contextTagNum() == BIT_RATE_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          bitRate = Optional.of(castingValue.value(Long.class));
-        }
-      } else if (element.contextTagNum() == BIT_DEPTH_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          bitDepth = Optional.of(castingValue.value(Integer.class));
-        }
-      }
-    }
-    return new CameraAvStreamManagementClusterAudioStreamChangedEvent(
-      audioStreamID,
-      streamUsage,
-      audioCodec,
-      channelCount,
-      sampleRate,
-      bitRate,
-      bitDepth
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("CameraAvStreamManagementClusterAudioStreamChangedEvent {\n");
-    output.append("\taudioStreamID: ");
-    output.append(audioStreamID);
-    output.append("\n");
-    output.append("\tstreamUsage: ");
-    output.append(streamUsage);
-    output.append("\n");
-    output.append("\taudioCodec: ");
-    output.append(audioCodec);
-    output.append("\n");
-    output.append("\tchannelCount: ");
-    output.append(channelCount);
-    output.append("\n");
-    output.append("\tsampleRate: ");
-    output.append(sampleRate);
-    output.append("\n");
-    output.append("\tbitRate: ");
-    output.append(bitRate);
-    output.append("\n");
-    output.append("\tbitDepth: ");
-    output.append(bitDepth);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-public static class CameraAvStreamManagementClusterSnapshotStreamChangedEvent {
-  public Integer snapshotStreamID;
-  public Optional<Integer> imageCodec;
-  public Optional<Integer> frameRate;
-  public Optional<Long> bitRate;
-  public Optional<ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct> minResolution;
-  public Optional<ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct> maxResolution;
-  public Optional<Integer> quality;
-  private static final long SNAPSHOT_STREAM_ID_ID = 0L;
-  private static final long IMAGE_CODEC_ID = 1L;
-  private static final long FRAME_RATE_ID = 2L;
-  private static final long BIT_RATE_ID = 3L;
-  private static final long MIN_RESOLUTION_ID = 4L;
-  private static final long MAX_RESOLUTION_ID = 5L;
-  private static final long QUALITY_ID = 6L;
-
-  public CameraAvStreamManagementClusterSnapshotStreamChangedEvent(
-    Integer snapshotStreamID,
-    Optional<Integer> imageCodec,
-    Optional<Integer> frameRate,
-    Optional<Long> bitRate,
-    Optional<ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct> minResolution,
-    Optional<ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct> maxResolution,
-    Optional<Integer> quality
-  ) {
-    this.snapshotStreamID = snapshotStreamID;
-    this.imageCodec = imageCodec;
-    this.frameRate = frameRate;
-    this.bitRate = bitRate;
-    this.minResolution = minResolution;
-    this.maxResolution = maxResolution;
-    this.quality = quality;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(SNAPSHOT_STREAM_ID_ID, new UIntType(snapshotStreamID)));
-    values.add(new StructElement(IMAGE_CODEC_ID, imageCodec.<BaseTLVType>map((nonOptionalimageCodec) -> new UIntType(nonOptionalimageCodec)).orElse(new EmptyType())));
-    values.add(new StructElement(FRAME_RATE_ID, frameRate.<BaseTLVType>map((nonOptionalframeRate) -> new UIntType(nonOptionalframeRate)).orElse(new EmptyType())));
-    values.add(new StructElement(BIT_RATE_ID, bitRate.<BaseTLVType>map((nonOptionalbitRate) -> new UIntType(nonOptionalbitRate)).orElse(new EmptyType())));
-    values.add(new StructElement(MIN_RESOLUTION_ID, minResolution.<BaseTLVType>map((nonOptionalminResolution) -> nonOptionalminResolution.encodeTlv()).orElse(new EmptyType())));
-    values.add(new StructElement(MAX_RESOLUTION_ID, maxResolution.<BaseTLVType>map((nonOptionalmaxResolution) -> nonOptionalmaxResolution.encodeTlv()).orElse(new EmptyType())));
-    values.add(new StructElement(QUALITY_ID, quality.<BaseTLVType>map((nonOptionalquality) -> new UIntType(nonOptionalquality)).orElse(new EmptyType())));
-
-    return new StructType(values);
-  }
-
-  public static CameraAvStreamManagementClusterSnapshotStreamChangedEvent decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    Integer snapshotStreamID = null;
-    Optional<Integer> imageCodec = Optional.empty();
-    Optional<Integer> frameRate = Optional.empty();
-    Optional<Long> bitRate = Optional.empty();
-    Optional<ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct> minResolution = Optional.empty();
-    Optional<ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct> maxResolution = Optional.empty();
-    Optional<Integer> quality = Optional.empty();
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == SNAPSHOT_STREAM_ID_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          snapshotStreamID = castingValue.value(Integer.class);
-        }
-      } else if (element.contextTagNum() == IMAGE_CODEC_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          imageCodec = Optional.of(castingValue.value(Integer.class));
-        }
-      } else if (element.contextTagNum() == FRAME_RATE_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          frameRate = Optional.of(castingValue.value(Integer.class));
-        }
-      } else if (element.contextTagNum() == BIT_RATE_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          bitRate = Optional.of(castingValue.value(Long.class));
-        }
-      } else if (element.contextTagNum() == MIN_RESOLUTION_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
-          StructType castingValue = element.value(StructType.class);
-          minResolution = Optional.of(ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct.decodeTlv(castingValue));
-        }
-      } else if (element.contextTagNum() == MAX_RESOLUTION_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
-          StructType castingValue = element.value(StructType.class);
-          maxResolution = Optional.of(ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct.decodeTlv(castingValue));
-        }
-      } else if (element.contextTagNum() == QUALITY_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          quality = Optional.of(castingValue.value(Integer.class));
-        }
-      }
-    }
-    return new CameraAvStreamManagementClusterSnapshotStreamChangedEvent(
-      snapshotStreamID,
-      imageCodec,
-      frameRate,
-      bitRate,
-      minResolution,
-      maxResolution,
-      quality
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("CameraAvStreamManagementClusterSnapshotStreamChangedEvent {\n");
-    output.append("\tsnapshotStreamID: ");
-    output.append(snapshotStreamID);
-    output.append("\n");
-    output.append("\timageCodec: ");
-    output.append(imageCodec);
-    output.append("\n");
-    output.append("\tframeRate: ");
-    output.append(frameRate);
-    output.append("\n");
-    output.append("\tbitRate: ");
-    output.append(bitRate);
-    output.append("\n");
-    output.append("\tminResolution: ");
-    output.append(minResolution);
-    output.append("\n");
-    output.append("\tmaxResolution: ");
-    output.append(maxResolution);
-    output.append("\n");
-    output.append("\tquality: ");
-    output.append(quality);
     output.append("\n");
     output.append("}\n");
     return output.toString();
