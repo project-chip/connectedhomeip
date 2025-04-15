@@ -232,20 +232,26 @@ public:
      *  @param [in] position target position
      *  @param [in] latch Target latch
      *  @param [in] speed Target speed
-     *  @return Returns ConstraintError if the input values are out is out of range
+     *  @return Exits if the cluster is not initialized.
+     *          Returns ConstraintError if the input values are out is out of range.
+     *          Returns InvalidInState if the current position of device is not known.
+     *          Returns Success if arguments don't match the feature conformance.
      *          Returns Success on succesful handling.
      */
     Protocols::InteractionModel::Status HandleSetTargetCommand(Optional<Percent100ths> position, Optional<TargetLatchEnum> latch,
                                                                Optional<Globals::ThreeLevelAutoEnum> speed);
 
     /**
-     *  @brief Calls delegate HandleStep function after validating the parameters and confromance.
+     *  @brief Calls delegate HandleStep function after validating the parameters and conformance.
      *  @param [in] direction step direction
      *  @param [in] numberOfSteps Number of steps
      *  @param [in] speed step speed
-     *  @return Returns ConstraintError if the input values are out is out of range
-     *          Returns Failure if feature conformance is not valid
-     *          Returns Success on succesful handling.
+     *  @return Exits if the cluster is not initialized.
+     *          Returns UnsupportedCommand if Positioning feature is not supported.
+     *          Returns ConstraintError if the input values are out is out of range.
+     *          Returns InvalidInState if the current position of device is not known.
+     *          Returns Success if speed field don't match the feature conformance.
+     *          Returns Success on successful handling.
      */
     Protocols::InteractionModel::Status HandleStepCommand(StepDirectionEnum direction, uint16_t numberOfSteps,
                                                           Optional<Globals::ThreeLevelAutoEnum> speed);

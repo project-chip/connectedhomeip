@@ -45,8 +45,7 @@ public:
      * @param [in] speed Target speed to be set
      *
      * @return Success when succesfully handled.
-     *         ConstraintError when arguments does not follow the constraints
-     *         InvalidInState when device is in a non-compatible internal-state.
+     *         Error when handle SetTarget fails.
      */
     virtual Protocols::InteractionModel::Status HandleSetTarget(const Optional<Percent100ths> & position,
                                                                 const Optional<TargetLatchEnum> & latch,
@@ -59,9 +58,8 @@ public:
      * @param [in] numberOfSteps total number of steps
      * @param [in] speed speed of each step
      *
-     * @return SUCCESS when succesfully handled..
-     *         ConstraintError when arguments does not follow the constraints
-     *         InvalidInState when device is in a non-compatible internal-state.
+     * @return Success when successfully handled.
+     *         Error when handle Step fails.
      */
     virtual Protocols::InteractionModel::Status HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
                                                            const Optional<Globals::ThreeLevelAutoEnum> & speed) = 0;
