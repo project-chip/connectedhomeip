@@ -107,7 +107,7 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
     });
 
     mPeerConnection->onLocalCandidate([this](rtc::Candidate candidate) {
-        std::string candidateStr = std::string(candidate);
+        std::string candidateStr = candidate.candidate();
         mLocalCandidates.push_back(candidateStr);
         ChipLogProgress(Camera, "Local Candidate:");
         ChipLogProgress(Camera, "%s", candidateStr.c_str());
