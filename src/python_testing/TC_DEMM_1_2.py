@@ -70,6 +70,46 @@ class TC_DEMM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         ]
         return pics
 
+    def validate_no_optimization_modes(self, supported_modes):
+        """
+        Verify that supported modes do not combine the 'No Optimization' tag with other optimization tags.
+
+        Args:
+            supported_modes (list): A list of supported modes that contain tags to be checked.
+
+        Raises:
+            AssertionError: If a mode contains 'No Optimization' combined with another optimization tag.
+        """
+        all_modes_valid = True
+
+        for mode in supported_modes:
+            tags = [tag.value for tag in mode.modeTags]
+
+            # Checking if the No Optimization tag is present in the list of tags
+            if cluster_demm_mode.Enums.ModeTag.kNoOptimization in tags:
+                # Verifying that No Optimization is not combined with other optimization tags
+                if (
+                    cluster_demm_mode.Enums.ModeTag.kDeviceOptimization in tags or
+                    cluster_demm_mode.Enums.ModeTag.kLocalOptimization in tags or
+                    cluster_demm_mode.Enums.ModeTag.kGridOptimization in tags
+                ):
+                    # Fails - No Optimization is combined with another optimization tag
+                    all_modes_valid = False
+                    self.assert_true(False, "No Optimization cannot be combined with other optimization tags")
+                else:
+                    # Success - No Optimization is not combined with other tags
+                    logger.info(
+                        f'Extra Check - Mode {mode.label}: No Optimization is valid, not combined with any other optimization tags.')
+            else:
+                # No Optimization tag is not found in mode
+                logger.info(f'Extra Check - {mode.label}: No Optimization tag not found.')
+
+        # Log the final result for the extra check after processing all modes
+        if all_modes_valid:
+            logger.info('Extra Check: All modes passed No Optimization validation successfully.')
+        else:
+            logger.info('Extra Check: One or more modes failed No Optimization validation.')
+
     @async_test_body
     async def test_TC_DEMM_1_2(self):
 
@@ -85,43 +125,8 @@ class TC_DEMM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         additional_tags = [cluster_demm_mode.Enums.ModeTag.kNoOptimization]
         self.check_tags_in_lists(supported_modes=supported_modes, required_tags=additional_tags)
 
-        # Verify that an entry in the SupportedModes attribute that include one of
-        # Device Optimization, Local Optimization, Grid Optimization does not also include No Optimization mode tag.
-        # Additional check: No Optimization should not be combined with other optimization tags
-
-        all_modes_valid = True
-
-        for mode in supported_modes:
-            tags = [tag.value for tag in mode.modeTags]
-            logger.info(f'Step #2.1 - Checking mode: {mode.label}, tags: {tags}')
-
-            # Checking if the No Optimization tag is present in the list of tags
-            if cluster_demm_mode.Enums.ModeTag.kNoOptimization in tags:
-                logger.info(f'Step #2.2 - Found No Optimization tag in {mode.label}.')
-
-                # Verifying that No Optimization is not combined with other optimization tags
-                if (
-                    cluster_demm_mode.Enums.ModeTag.kDeviceOptimization in tags or
-                    cluster_demm_mode.Enums.ModeTag.kLocalOptimization in tags or
-                    cluster_demm_mode.Enums.ModeTag.kGridOptimization in tags
-                ):
-                    # Fails - No Optimization is combined with another optimization tag
-                    logger.info(f'Step #2.3 - Mode {mode.label} includes No Optimization combined with another optimization tag.')
-                    all_modes_valid = False
-                    self.assert_true(False, "No Optimization cannot be combined with other optimization tags")
-                else:
-                    # Succes - No Optimization is not combined with other tags
-                    logger.info(
-                        f'Step #2.4 - Mode {mode.label}: No Optimization is valid, not combined with any other optimization tags.')
-            else:
-                #  No Optimization tag is not found in mode
-                logger.info(f'Step #2.2 - {mode.label}: NoOptimization not found, check passed.')
-
-        # Log the final result for the extra check after processing all modes
-        if all_modes_valid:
-            logger.info("Step #2.5 - Extra Check: All modes passed No Optimization validation successfully.")
-        else:
-            logger.info("Step #2.5 - Extra Check: One or more modes failed No Optimization validation.")
+        # Validation function for No Optimization check
+        self.validate_no_optimization_modes(supported_modes)
 
         self.step(3)
         # Verify that the CurrentMode attribute has a valid value.
