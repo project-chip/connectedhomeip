@@ -72,25 +72,25 @@ public:
     virtual CHIP_ERROR EndCurrentErrorListRead()                          = 0;
 
     /**
-     * @brief Checks if the device can move or need pre-motion stages to complete
-     * @return true if device is ready to move
-     *         false if device is not ready to move
+     * @brief Checks whether the closure can move (as opposed to still needing pre-motion stages to complete).
+     * @return true if closure is ready to move
+     *         false if closure is not ready to move
      */
-    virtual bool IsDeviceReadyToMove() = 0;
+    virtual bool IsReadyToMove() = 0;
 
     /**
-     * @brief Checks if device is error state or not.
-     * @return true if device is error state
-     *         false if device is not in error state
+     * @brief Checks whether the closure has any errors.
+     * @return true if the closure has errors.
+     *         false if the closure does not have any errors.
      */
-    virtual bool CheckErrorOnDevice() = 0;
+    virtual bool HasError() = 0;
 
     /**
-     * @brief Checks if device need manual latching or not.
-     * @return true if device needs manual latching
-     *         false if device does not need manual latching
+     * @brief Checks whether this closure needs manual latching.
+     * @return true if manual latching is needed
+     *         false if manual latching not needed
      */
-    virtual bool IsLatchManual() = 0;
+    virtual bool IsManualLatchingNeeded() = 0;
 
 protected:
     EndpointId mEndpointId = kInvalidEndpointId;
@@ -187,7 +187,7 @@ public:
     bool IsSupportedState(MainStateEnum aMainState);
 
     /**
-     * @brief This function checks whether a specfic command is supported in specific state or not.
+     * @brief This function checks whether a specfic command is supported in a specific state or not.
      * @param[in] cmd Command to be check.
      * @param[in] state MainState in which command should be supported.
      * @return true if cmd is supported in state, false if not supported.
@@ -195,8 +195,8 @@ public:
     bool CheckCommandStateCompatibility(CommandId cmd, MainStateEnum state);
 
     /**
-     * @brief This function should be called when current error list has changed.
-     *        The device SHALL call this method whenever it changes the current error list.
+     * @brief Causes reporting of CurrentErrorList.
+     *        Whenever application wants to report a change in Errorlist, call this method.
      */
     void ReportCurrentErrorListChange();
 

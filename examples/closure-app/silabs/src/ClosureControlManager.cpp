@@ -112,6 +112,9 @@ Protocols::InteractionModel::Status ClosureControlManager::MoveTo(const Optional
                                                                   const Optional<TargetLatchEnum> & latch,
                                                                   const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
+    // TODO: if closure has to wait for moveaction , then asynchronously wait for specific time and then start moveaction and Update OverallState.
+    // TODO: if closure is ready to move, perform move action on the closure and update OverallState.
+
     MainStateEnum state              = mpClosureControlInstance->GetMainState();
     GenericOverallState overallState = mpClosureControlInstance->GetOverallState();
 
@@ -151,8 +154,6 @@ Protocols::InteractionModel::Status ClosureControlManager::MoveTo(const Optional
     }
 
     mpClosureControlInstance->SetOverallState(overallState);
-    // TODO: move the device or device to wait for ready to move and the move the device
-
     return Status::Success;
 }
 
@@ -187,20 +188,20 @@ void ClosureControlManager::ClosureControlAttributeChangeHandler(EndpointId endp
     }
 }
 
-bool ClosureControlManager::IsLatchManual()
+bool ClosureControlManager::IsManualLatchingNeeded()
 {
-    // TODO: Check the latch is manual or not on device
+    // TODO: Check the latch is manual or not on closure
     return false;
 }
 
-bool ClosureControlManager::CheckErrorOnDevice()
+bool ClosureControlManager::HasError()
 {
-    // TODO: Check for errors on the device
+    // TODO: Check for errors on the closure
     return false;
 }
 
-bool ClosureControlManager::IsDeviceReadyToMove()
+bool ClosureControlManager::IsReadyToMove()
 {
-    // TODO: Check if device is ready to move or should wait.
+    // TODO: Check if closure is ready to move or should wait.
     return true;
 }

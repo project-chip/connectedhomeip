@@ -78,7 +78,7 @@ bool Instance::IsSupportedState(MainStateEnum aMainState)
     return true;
 }
 
-// Closure Control MainState and supoorted commands are given below
+// Closure Control MainState and supported commands are given below
 //  1. Calibrating        -> Calibrate and Stop commands supported
 //  2. Stopped            -> Calibrate, MoveTo and Stop commands supported
 //  3. Moving             -> MoveTo and Stop command supported
@@ -98,7 +98,7 @@ bool Instance::CheckCommandStateCompatibility(CommandId cmd, MainStateEnum state
     switch (cmd)
     {
     case Commands::Stop::Id:
-        // The Stop command is supported in Calibrating ,Stopped, Moving and WaitingForMotion states, not supported in the Error
+        // The Stop command is supported in Calibrating, Stopped, Moving and WaitingForMotion states, not supported in the Error
         // state.
         if (state == MainStateEnum::kError)
         {
@@ -379,7 +379,6 @@ Status Instance::HandleStop(HandlerContext & ctx, const Commands::Stop::Decodabl
 Status Instance::HandleMoveTo(HandlerContext & ctx, const Commands::MoveTo::DecodableType & commandData)
 {
     MainStateEnum state = GetMainState();
-    VerifyOrReturnValue(CheckCommandStateCompatibility(Commands::Stop::Id, state), Status::InvalidInState);
 
     // If all command parameters don't have a value, return InvalidCommand
     VerifyOrReturnValue(commandData.position.HasValue() || commandData.latch.HasValue() || commandData.speed.HasValue(),
@@ -388,7 +387,7 @@ Status Instance::HandleMoveTo(HandlerContext & ctx, const Commands::MoveTo::Deco
     if (commandData.position.HasValue())
     {
         VerifyOrReturnError((commandData.position.Value() != TargetPositionEnum::kUnknownEnumValue), Status::ConstraintError);
-        // If Positioning(PS) feature or not, it SHALL return a status code SUCCESS.
+        // If Positioning(PS) feature is not supported, it SHALL return a status code SUCCESS.
         VerifyOrReturnError(HasFeature(Feature::kPositioning), Status::Success);
     }
 
@@ -396,11 +395,11 @@ Status Instance::HandleMoveTo(HandlerContext & ctx, const Commands::MoveTo::Deco
     {
         VerifyOrReturnError(commandData.latch.Value() != TargetLatchEnum::kUnknownEnumValue, Status::ConstraintError);
 
-        // If MotionLatching (LT) feature or not, the server SHALL return a status code SUCCESS
+        // If MotionLatching (LT) feature is not supported, the server SHALL return a status code SUCCESS,
         VerifyOrReturnError(HasFeature(Feature::kMotionLatching), Status::Success);
 
         // If manual intervention is required to latch, respond with INVALID_ACTION
-        if (mDelegate.IsLatchManual())
+        if (mDelegate.IsManualLatchingNeeded())
         {
             return Status::InvalidAction;
         }
@@ -409,30 +408,32 @@ Status Instance::HandleMoveTo(HandlerContext & ctx, const Commands::MoveTo::Deco
     if (commandData.speed.HasValue())
     {
         VerifyOrReturnError(commandData.speed.Value() != Globals::ThreeLevelAutoEnum::kUnknownEnumValue, Status::ConstraintError);
-        // If Speed (SP) feature or not, the server SHALL return a status code SUCCESS
+        // If Speed (SP) feature is not supported, the server SHALL return a status code SUCCESS,
         VerifyOrReturnError(HasFeature(Feature::kSpeed), Status::Success);
     }
 
-    // If the device is in an error state, set the MainState to Error and return Failure.
-    if (mDelegate.CheckErrorOnDevice())
+    // If the MoveTo command is not supported in the current state, return InvalidInState
+    VerifyOrReturnValue(CheckCommandStateCompatibility(Commands::MoveTo::Id, state), Status::InvalidInState);
+
+    // If the closure has errors, set the MainState to Error and return SUCCESS.
+    if (mDelegate.HasError())
     {
         VerifyOrReturnError(SetMainState(MainStateEnum::kError) == CHIP_NO_ERROR, Status::Failure);
-        // Return Status Failure
-        return Status::Failure;
+        // Return Status SUCCESS
+        return Status::Success;
     }
 
-    if (mDelegate.IsDeviceReadyToMove())
+    if (mDelegate.IsReadyToMove())
     {
-        // If the device is ready to move, set MainState to Moving
+        // If the closure is ready to move, set MainState to Moving
         SetMainState(MainStateEnum::kMoving);
     }
     else
     {
-        // If device need pre-stage before moving, then set MainState to Waiting for Moving
+        // If closure needs to pre-stage before moving, then set MainState to WaitingForMoving
         SetMainState(MainStateEnum::kWaitingForMotion);
     }
 
-    // TODO: Check if the device is in a state to move and set MainState to Moving or Waiting for Moving
     return mDelegate.MoveTo(commandData.position, commandData.latch, commandData.speed);
 }
 

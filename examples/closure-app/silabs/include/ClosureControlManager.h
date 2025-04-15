@@ -63,9 +63,9 @@ public:
     CHIP_ERROR EndCurrentErrorListRead() override;
 
     void ClosureControlAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId);
-    bool IsDeviceReadyToMove();
-    bool CheckErrorOnDevice();
-    bool IsLatchManual();
+    bool IsReadyToMove();
+    bool HasError();
+    bool IsManualLatchingNeeded();
 
 private:
     /***************************************************************************
