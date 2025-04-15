@@ -33,11 +33,11 @@
 #   run1:
 #     script-args: >
 #       --storage-path admin_storage.json
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --string-arg app_path:out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app
 #       --string-arg dac_provider_base_path:credentials/test/revoked-attestation-certificates/dac-provider-test-vectors
 #       --string-arg revocation_set_base_path:credentials/test/revoked-attestation-certificates/revocation-sets
 #       --string-arg app_log_path:/tmp/TC_DA_1_9
-#       --bool-arg is_ci:true
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -55,11 +55,19 @@ from mobly import asserts
 class TC_DA_1_9(MatterBaseTest):
     def setup_class(self):
         super().setup_class()
+
+        self.app_path = self.matter_test_config.global_test_params.get('app_path')
         self.dac_provider_base_path = self.matter_test_config.global_test_params.get('dac_provider_base_path')
         self.revocation_set_base_path = self.matter_test_config.global_test_params.get('revocation_set_base_path')
-        self.app_path = self.matter_test_config.global_test_params.get('app_path')
-        self.app_log_path = self.matter_test_config.global_test_params.get('app_log_path')
-        self.is_ci = self.is_pics_sdk_ci_only
+
+        if self.app_path is None or not os.path.exists(self.app_path):
+            asserts.fail("--string-arg app_path:<app_path> is required for this test, please provide the path to the app (eg: all-clusters-app)")
+
+        if self.dac_provider_base_path is None or not os.path.exists(self.dac_provider_base_path):
+            asserts.fail("--string-arg dac_provider_base_path:<dac_provider_base_path> is required for this test, please provide the path to the dac provider test vectors, it can be found in Matter SDK at: credentials/test/revoked-attestation-certificates/dac-provider-test-vectors")
+
+        if self.revocation_set_base_path is None or not os.path.exists(self.revocation_set_base_path):
+            asserts.fail("--string-arg revocation_set_base_path:<revocation_set_base_path> is required for this test, please provide the path to the revocation set, it can be found in Matter SDK at: credentials/test/revoked-attestation-certificates/revocation-sets")
 
     def desc_TC_DA_1_9(self) -> str:
         return "[TC-DA-1.9] Device Attestation Revocation [DUT-Commissioner]"
@@ -156,8 +164,9 @@ class TC_DA_1_9(MatterBaseTest):
             subprocess.call("rm -f all-clusters-kvs*", shell=True)
 
             # Create log files for this test case
-            os.makedirs(self.app_log_path, exist_ok=True)
-            app_log_file_name = f"{self.app_log_path}/{test_case['name']}_app.log"
+            log_path = os.path.join(self.matter_test_config.logs_path, 'TC_DA_1_9')
+            os.makedirs(log_path, exist_ok=True)
+            app_log_file_name = os.path.join(log_path, f"{test_case['name']}_app.log")
 
             with open(app_log_file_name, 'w') as app_log_file:
                 # Start the all-clusters-app with appropriate DAC provider
@@ -186,7 +195,7 @@ class TC_DA_1_9(MatterBaseTest):
                 )
 
                 # TODO: Run Python commissioner, commission the DUT, and check the return code
-                if self.is_ci:
+                if self.is_pics_sdk_ci_only:
                     resp = 'Y' if test_case['expects_commissioning_success'] else 'N'
                 else:
                     resp = self.wait_for_user_input(prompt_msg)
