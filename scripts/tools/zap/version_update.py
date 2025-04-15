@@ -38,7 +38,7 @@ __LOG_LEVELS__ = {
 #
 # At this time we hard-code nightly however we may need to figure out a more
 # generic version string once we stop using nightly builds
-ZAP_VERSION_RE = re.compile(r'v(\d\d\d\d)\.(\d\d)\.(\d\d)-nightly')
+ZAP_VERSION_RE = re.compile(r'v(\d\d\d\d)\.(\d\d)\.(\d\d)(-nightly)?(?=\W|$)')
 
 # A list of files where ZAP is maintained. You can get a similar list using:
 #
@@ -49,7 +49,6 @@ ZAP_VERSION_RE = re.compile(r'v(\d\d\d\d)\.(\d\d)\.(\d\d)-nightly')
 # Set as a separate list to not pay the price of a full grep as the list of
 # files is not likely to change often
 USAGE_FILES_DEPENDING_ON_ZAP_VERSION = [
-    'integrations/docker/images/chip-cert-bins/Dockerfile',
     'scripts/setup/zap.json',
     'scripts/setup/zap.version',
 ]
@@ -110,7 +109,7 @@ def version_update(log_level, update, new_version):
         #
         # This makes every group element (date section) to a base 10 integer,
         # so for 'v2023.01.11-nightly' this gets (2023, 1, 11)
-        zap_min_version = tuple(map(lambda x: int(x, 10), parsed.groups()))
+        zap_min_version = tuple(map(lambda x: int(x, 10), parsed.groups()[:3]))
 
     files_to_update = []
     if UpdateChoice.USAGE in update:
@@ -127,7 +126,10 @@ def version_update(log_level, update, new_version):
             version = file_data[m.start():m.end()]
             if version not in found_versions:
                 logging.info('%s currently used in %s', version, name)
-                found_versions.add(version)
+            found_versions.add(version)
+
+        if not found_versions:
+            logging.warning('%s does NOT seem to contain any version (regex error?)', name)
 
         # If we update, perform the update
         if new_version:
@@ -143,7 +145,9 @@ def version_update(log_level, update, new_version):
                 file_data = file_data[:m.start()] + \
                     new_version + file_data[m.end():]
                 need_replace = True
-                search_pos = m.end()  # generally ok since our versions are fixed length
+                # We search a bit past the match to not re-match the same thing again
+                # This is because our version lengths may vary.
+                search_pos = m.start() + 1
                 m = ZAP_VERSION_RE.search(file_data, search_pos)
 
             if need_replace:

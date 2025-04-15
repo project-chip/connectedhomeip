@@ -27,7 +27,8 @@ import matter.tlv.TlvWriter
 class CommodityPriceClusterCommodityPriceStruct(
   val periodStart: UInt,
   val periodEnd: UInt?,
-  val price: CommodityPriceClusterPriceStruct,
+  val price: Optional<CommodityPriceClusterPriceStruct>,
+  val priceLevel: Optional<Short>,
   val description: Optional<String>,
   val components: Optional<List<CommodityPriceClusterCommodityPriceComponentStruct>>,
 ) {
@@ -36,6 +37,7 @@ class CommodityPriceClusterCommodityPriceStruct(
     append("\tperiodStart : $periodStart\n")
     append("\tperiodEnd : $periodEnd\n")
     append("\tprice : $price\n")
+    append("\tpriceLevel : $priceLevel\n")
     append("\tdescription : $description\n")
     append("\tcomponents : $components\n")
     append("}\n")
@@ -50,7 +52,14 @@ class CommodityPriceClusterCommodityPriceStruct(
       } else {
         putNull(ContextSpecificTag(TAG_PERIOD_END))
       }
-      price.toTlv(ContextSpecificTag(TAG_PRICE), this)
+      if (price.isPresent) {
+        val optprice = price.get()
+        optprice.toTlv(ContextSpecificTag(TAG_PRICE), this)
+      }
+      if (priceLevel.isPresent) {
+        val optpriceLevel = priceLevel.get()
+        put(ContextSpecificTag(TAG_PRICE_LEVEL), optpriceLevel)
+      }
       if (description.isPresent) {
         val optdescription = description.get()
         put(ContextSpecificTag(TAG_DESCRIPTION), optdescription)
@@ -71,8 +80,9 @@ class CommodityPriceClusterCommodityPriceStruct(
     private const val TAG_PERIOD_START = 0
     private const val TAG_PERIOD_END = 1
     private const val TAG_PRICE = 2
-    private const val TAG_DESCRIPTION = 3
-    private const val TAG_COMPONENTS = 4
+    private const val TAG_PRICE_LEVEL = 3
+    private const val TAG_DESCRIPTION = 4
+    private const val TAG_COMPONENTS = 5
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): CommodityPriceClusterCommodityPriceStruct {
       tlvReader.enterStructure(tlvTag)
@@ -84,7 +94,20 @@ class CommodityPriceClusterCommodityPriceStruct(
           tlvReader.getNull(ContextSpecificTag(TAG_PERIOD_END))
           null
         }
-      val price = CommodityPriceClusterPriceStruct.fromTlv(ContextSpecificTag(TAG_PRICE), tlvReader)
+      val price =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_PRICE))) {
+          Optional.of(
+            CommodityPriceClusterPriceStruct.fromTlv(ContextSpecificTag(TAG_PRICE), tlvReader)
+          )
+        } else {
+          Optional.empty()
+        }
+      val priceLevel =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_PRICE_LEVEL))) {
+          Optional.of(tlvReader.getShort(ContextSpecificTag(TAG_PRICE_LEVEL)))
+        } else {
+          Optional.empty()
+        }
       val description =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_DESCRIPTION))) {
           Optional.of(tlvReader.getString(ContextSpecificTag(TAG_DESCRIPTION)))
@@ -117,6 +140,7 @@ class CommodityPriceClusterCommodityPriceStruct(
         periodStart,
         periodEnd,
         price,
+        priceLevel,
         description,
         components,
       )

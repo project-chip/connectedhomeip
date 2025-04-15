@@ -40,6 +40,7 @@
 #include <lib/support/BitFlags.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/DLLUtil.h>
+#include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
 
 namespace chip {
@@ -398,6 +399,16 @@ public:
         Delegate * next = nullptr;
     };
 
+    /** Data to convey whenever a SignVIDVerificationRequest is executed. */
+    struct SignVIDVerificationResponseData
+    {
+        FabricIndex fabricIndex;
+        uint8_t fabricBindingVersion;
+        // The next field is a variable size buffer to account for different signature
+        // algorithms over time, which may have different sizes.
+        Platform::ScopedMemoryBufferWithSize<uint8_t> signature;
+    };
+
 public:
     FabricTable()  = default;
     ~FabricTable() = default;
@@ -645,6 +656,33 @@ public:
     CHIP_ERROR FetchNOCCert(FabricIndex fabricIndex, MutableByteSpan & outCert) const;
 
     /**
+     * @brief Recover the VIDVerificationStatement for a fabric, if any exists.
+     *
+     * This includes returning a pending one if one exists.
+     *
+     * @param fabricIndex - Fabric index for which to find a VIDVerificationStatement
+     * @param outVIDVerificationStatement - Buffer to receive the VIDVerificationstatement. Must be large enough for the maximum
+     * size.
+     *
+     * @retval CHIP_NO_ERROR on success, **including if missing**.
+     * @retval other CHIP_ERROR value on internal errors
+     */
+    CHIP_ERROR FetchVIDVerificationStatement(FabricIndex fabricIndex, MutableByteSpan & outVIDVerificationStatement) const;
+
+    /**
+     * @brief Recover the VVSC (VID Verification Signing Certificate) for a fabric, if any exists.
+     *
+     * This includes returning a pending one if one exists.
+     *
+     * @param fabricIndex - Fabric index for which to find a VVSC
+     * @param outVIDVerificationStatement - Buffer to receive the VVSC in Matter TLV certificate format.
+     *
+     * @retval CHIP_NO_ERROR on success, **including if missing**.
+     * @retval other CHIP_ERROR value on internal errors
+     */
+    CHIP_ERROR FetchVVSC(FabricIndex fabricIndex, MutableByteSpan & outVVSC) const;
+
+    /**
      * @brief Get the root public key by value for the given `fabricIndex`.
      *
      * @param fabricIndex - Fabric for which to get the root public key (subject public key of RCAC)
@@ -674,7 +712,7 @@ public:
      * This will use a pending key activated with `ActivatePendingOperationalKey` but
      * not yet persisted, if one is available for the fabric.
      *
-     * @param fabricIndex - Fabric index whose operational key touse
+     * @param fabricIndex - Fabric index whose operational key to use
      * @param message - Message to sign
      * @param outSignature - Signature object to receive the signature
      *
@@ -1048,6 +1086,19 @@ public:
      * @retval CHIP_ERROR_INVALID_FABRIC_INDEX if fabricIndex does not refer to a fabric in the table
      */
     CHIP_ERROR SetShouldAdvertiseIdentity(FabricIndex fabricIndex, AdvertiseIdentity advertiseIdentity);
+
+    /**
+     * @brief Request a VID verification signature to be generated for a specific fabric in the FabricTable.
+     *
+     * @param[in] fabricIndex - Fabric Index for which to produce the response.
+     * @param[in] clientChallenge - Client-provided challenge.
+     * @param[in] attestationChallenge - Attestation challenge from the secure session.
+     * @param[inout] outResponse - Reference to a pre-allocated response object that will be populated on success.
+     * @retval CHIP_NO_ERROR on success
+     * @retval CHIP_ERROR_INVALID_ARGUMENT if the fabricIndex or clientChallenge is incorrectly formatted.
+     */
+    CHIP_ERROR SignVIDVerificationRequest(FabricIndex fabricIndex, const ByteSpan & clientChallenge,
+                                          const ByteSpan & attestationChallenge, SignVIDVerificationResponseData & outResponse);
 
 private:
     enum class StateFlags : uint16_t

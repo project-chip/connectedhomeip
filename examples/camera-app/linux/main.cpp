@@ -25,12 +25,12 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace Camera;
 
-CameraDevice cameraDevice;
+CameraDevice gCameraDevice;
 
 void ApplicationInit()
 {
-    ChipLogProgress(NotSpecified, "Matter Camera Linux App: ApplicationInit()");
-    CameraAppInit(&cameraDevice);
+    ChipLogProgress(Camera, "Matter Camera Linux App: ApplicationInit()");
+    CameraAppInit(&gCameraDevice);
 }
 
 void ApplicationShutdown()

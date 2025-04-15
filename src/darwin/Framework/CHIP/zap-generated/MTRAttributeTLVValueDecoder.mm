@@ -3666,6 +3666,36 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
         }
         return value;
     }
+    case Attributes::ExtAddress::Id: {
+        using TypeInfo = Attributes::ExtAddress::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedLongLong:cppValue.Value()];
+        }
+        return value;
+    }
+    case Attributes::Rloc16::Id: {
+        using TypeInfo = Attributes::Rloc16::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
+        }
+        return value;
+    }
     default: {
         break;
     }
@@ -8349,11 +8379,20 @@ static id _Nullable DecodeAttributeValueForCommodityPriceCluster(AttributeId aAt
             } else {
                 value.periodEnd = [NSNumber numberWithUnsignedInt:cppValue.Value().periodEnd.Value()];
             }
-            value.price = [MTRDataTypePriceStruct new];
-            value.price.amount = [NSNumber numberWithLongLong:cppValue.Value().price.amount];
-            value.price.currency = [MTRDataTypeCurrencyStruct new];
-            value.price.currency.currency = [NSNumber numberWithUnsignedShort:cppValue.Value().price.currency.currency];
-            value.price.currency.decimalPoints = [NSNumber numberWithUnsignedChar:cppValue.Value().price.currency.decimalPoints];
+            if (cppValue.Value().price.HasValue()) {
+                value.price = [MTRDataTypePriceStruct new];
+                value.price.amount = [NSNumber numberWithLongLong:cppValue.Value().price.Value().amount];
+                value.price.currency = [MTRDataTypeCurrencyStruct new];
+                value.price.currency.currency = [NSNumber numberWithUnsignedShort:cppValue.Value().price.Value().currency.currency];
+                value.price.currency.decimalPoints = [NSNumber numberWithUnsignedChar:cppValue.Value().price.Value().currency.decimalPoints];
+            } else {
+                value.price = nil;
+            }
+            if (cppValue.Value().priceLevel.HasValue()) {
+                value.priceLevel = [NSNumber numberWithShort:cppValue.Value().priceLevel.Value()];
+            } else {
+                value.priceLevel = nil;
+            }
             if (cppValue.Value().description.HasValue()) {
                 value.descriptionString = AsString(cppValue.Value().description.Value());
                 if (value.descriptionString == nil) {
@@ -8372,7 +8411,16 @@ static id _Nullable DecodeAttributeValueForCommodityPriceCluster(AttributeId aAt
                         auto & entry_3 = iter_3.GetValue();
                         MTRCommodityPriceClusterCommodityPriceComponentStruct * newElement_3;
                         newElement_3 = [MTRCommodityPriceClusterCommodityPriceComponentStruct new];
-                        newElement_3.price = [NSNumber numberWithLongLong:entry_3.price];
+                        if (entry_3.price.HasValue()) {
+                            newElement_3.price = [NSNumber numberWithLongLong:entry_3.price.Value()];
+                        } else {
+                            newElement_3.price = nil;
+                        }
+                        if (entry_3.priceLevel.HasValue()) {
+                            newElement_3.priceLevel = [NSNumber numberWithShort:entry_3.priceLevel.Value()];
+                        } else {
+                            newElement_3.priceLevel = nil;
+                        }
                         newElement_3.source = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_3.source)];
                         if (entry_3.description.HasValue()) {
                             newElement_3.descriptionString = AsString(entry_3.description.Value());
@@ -8425,11 +8473,20 @@ static id _Nullable DecodeAttributeValueForCommodityPriceCluster(AttributeId aAt
                 } else {
                     newElement_0.periodEnd = [NSNumber numberWithUnsignedInt:entry_0.periodEnd.Value()];
                 }
-                newElement_0.price = [MTRDataTypePriceStruct new];
-                newElement_0.price.amount = [NSNumber numberWithLongLong:entry_0.price.amount];
-                newElement_0.price.currency = [MTRDataTypeCurrencyStruct new];
-                newElement_0.price.currency.currency = [NSNumber numberWithUnsignedShort:entry_0.price.currency.currency];
-                newElement_0.price.currency.decimalPoints = [NSNumber numberWithUnsignedChar:entry_0.price.currency.decimalPoints];
+                if (entry_0.price.HasValue()) {
+                    newElement_0.price = [MTRDataTypePriceStruct new];
+                    newElement_0.price.amount = [NSNumber numberWithLongLong:entry_0.price.Value().amount];
+                    newElement_0.price.currency = [MTRDataTypeCurrencyStruct new];
+                    newElement_0.price.currency.currency = [NSNumber numberWithUnsignedShort:entry_0.price.Value().currency.currency];
+                    newElement_0.price.currency.decimalPoints = [NSNumber numberWithUnsignedChar:entry_0.price.Value().currency.decimalPoints];
+                } else {
+                    newElement_0.price = nil;
+                }
+                if (entry_0.priceLevel.HasValue()) {
+                    newElement_0.priceLevel = [NSNumber numberWithShort:entry_0.priceLevel.Value()];
+                } else {
+                    newElement_0.priceLevel = nil;
+                }
                 if (entry_0.description.HasValue()) {
                     newElement_0.descriptionString = AsString(entry_0.description.Value());
                     if (newElement_0.descriptionString == nil) {
@@ -8448,7 +8505,16 @@ static id _Nullable DecodeAttributeValueForCommodityPriceCluster(AttributeId aAt
                             auto & entry_3 = iter_3.GetValue();
                             MTRCommodityPriceClusterCommodityPriceComponentStruct * newElement_3;
                             newElement_3 = [MTRCommodityPriceClusterCommodityPriceComponentStruct new];
-                            newElement_3.price = [NSNumber numberWithLongLong:entry_3.price];
+                            if (entry_3.price.HasValue()) {
+                                newElement_3.price = [NSNumber numberWithLongLong:entry_3.price.Value()];
+                            } else {
+                                newElement_3.price = nil;
+                            }
+                            if (entry_3.priceLevel.HasValue()) {
+                                newElement_3.priceLevel = [NSNumber numberWithShort:entry_3.priceLevel.Value()];
+                            } else {
+                                newElement_3.priceLevel = nil;
+                            }
                             newElement_3.source = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_3.source)];
                             if (entry_3.description.HasValue()) {
                                 newElement_3.descriptionString = AsString(entry_3.description.Value());
@@ -10930,22 +10996,38 @@ static id _Nullable DecodeAttributeValueForClosureControlCluster(AttributeId aAt
         } else {
             value = [MTRClosureControlClusterOverallStateStruct new];
             if (cppValue.Value().positioning.HasValue()) {
-                value.positioning = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().positioning.Value())];
+                if (cppValue.Value().positioning.Value().IsNull()) {
+                    value.positioning = nil;
+                } else {
+                    value.positioning = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().positioning.Value().Value())];
+                }
             } else {
                 value.positioning = nil;
             }
             if (cppValue.Value().latching.HasValue()) {
-                value.latching = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().latching.Value())];
+                if (cppValue.Value().latching.Value().IsNull()) {
+                    value.latching = nil;
+                } else {
+                    value.latching = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().latching.Value().Value())];
+                }
             } else {
                 value.latching = nil;
             }
             if (cppValue.Value().speed.HasValue()) {
-                value.speed = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().speed.Value())];
+                if (cppValue.Value().speed.Value().IsNull()) {
+                    value.speed = nil;
+                } else {
+                    value.speed = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().speed.Value().Value())];
+                }
             } else {
                 value.speed = nil;
             }
             if (cppValue.Value().extraInfo.HasValue()) {
-                value.extraInfo = [NSNumber numberWithUnsignedInt:cppValue.Value().extraInfo.Value()];
+                if (cppValue.Value().extraInfo.Value().IsNull()) {
+                    value.extraInfo = nil;
+                } else {
+                    value.extraInfo = [NSNumber numberWithUnsignedInt:cppValue.Value().extraInfo.Value().Value()];
+                }
             } else {
                 value.extraInfo = nil;
             }
@@ -10964,15 +11046,15 @@ static id _Nullable DecodeAttributeValueForClosureControlCluster(AttributeId aAt
             value = nil;
         } else {
             value = [MTRClosureControlClusterOverallTargetStruct new];
-            if (cppValue.Value().tagPosition.HasValue()) {
-                value.tagPosition = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().tagPosition.Value())];
+            if (cppValue.Value().position.HasValue()) {
+                value.position = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().position.Value())];
             } else {
-                value.tagPosition = nil;
+                value.position = nil;
             }
-            if (cppValue.Value().tagLatch.HasValue()) {
-                value.tagLatch = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().tagLatch.Value())];
+            if (cppValue.Value().latch.HasValue()) {
+                value.latch = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().latch.Value())];
             } else {
-                value.tagLatch = nil;
+                value.latch = nil;
             }
             if (cppValue.Value().speed.HasValue()) {
                 value.speed = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().speed.Value())];
@@ -10980,61 +11062,6 @@ static id _Nullable DecodeAttributeValueForClosureControlCluster(AttributeId aAt
                 value.speed = nil;
             }
         }
-        return value;
-    }
-    case Attributes::RestingProcedure::Id: {
-        using TypeInfo = Attributes::RestingProcedure::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
-        return value;
-    }
-    case Attributes::TriggerCondition::Id: {
-        using TypeInfo = Attributes::TriggerCondition::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
-        return value;
-    }
-    case Attributes::TriggerPosition::Id: {
-        using TypeInfo = Attributes::TriggerPosition::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
-        return value;
-    }
-    case Attributes::WaitingDelay::Id: {
-        using TypeInfo = Attributes::WaitingDelay::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedInt:cppValue];
-        return value;
-    }
-    case Attributes::KickoffTimer::Id: {
-        using TypeInfo = Attributes::KickoffTimer::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedInt:cppValue];
         return value;
     }
     default: {
