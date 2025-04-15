@@ -25,6 +25,8 @@
 #include <lib/support/BitMask.h>
 
 #include <clusters/shared/Attributes.h>
+#include <clusters/shared/Enums.h>
+#include <clusters/shared/Structs.h>
 
 #include <clusters/IcdManagement/AttributeIds.h>
 #include <clusters/IcdManagement/ClusterId.h>

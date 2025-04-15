@@ -19,7 +19,6 @@
 #pragma once
 
 #include <clusters/EthernetNetworkDiagnostics/Enums.h>
-#include <clusters/shared/EnumsCheck.h>
 
 namespace chip {
 namespace app {

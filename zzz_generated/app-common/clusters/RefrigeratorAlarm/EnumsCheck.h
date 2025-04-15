@@ -19,7 +19,6 @@
 #pragma once
 
 #include <clusters/RefrigeratorAlarm/Enums.h>
-#include <clusters/shared/EnumsCheck.h>
 
 namespace chip {
 namespace app {

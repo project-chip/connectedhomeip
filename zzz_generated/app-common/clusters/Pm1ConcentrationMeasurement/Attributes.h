@@ -25,6 +25,8 @@
 #include <lib/support/BitMask.h>
 
 #include <clusters/shared/Attributes.h>
+#include <clusters/shared/Enums.h>
+#include <clusters/shared/Structs.h>
 
 #include <clusters/Pm1ConcentrationMeasurement/AttributeIds.h>
 #include <clusters/Pm1ConcentrationMeasurement/ClusterId.h>

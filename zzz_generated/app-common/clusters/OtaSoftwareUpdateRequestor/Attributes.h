@@ -25,6 +25,8 @@
 #include <lib/support/BitMask.h>
 
 #include <clusters/shared/Attributes.h>
+#include <clusters/shared/Enums.h>
+#include <clusters/shared/Structs.h>
 
 #include <clusters/OtaSoftwareUpdateRequestor/AttributeIds.h>
 #include <clusters/OtaSoftwareUpdateRequestor/ClusterId.h>

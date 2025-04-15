@@ -1,6 +1,8 @@
 {{> header}}
 #pragma once
 
+#include <clusters/shared/Enums.h>
+
 {{#zcl_clusters}}
 #include <clusters/{{asUpperCamelCase name}}/Enums.h>
 {{/zcl_clusters}}

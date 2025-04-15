@@ -2,15 +2,15 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
-#include <app/data-model/Decode.h>
-#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
-#include <app/data-model/NullObject.h>
-#include <app/ConcreteAttributePath.h>
-#include <app/EventLoggingTypes.h>
-#include <lib/core/ClusterEnums.h>
-#include <lib/support/BitMask.h>
-#include <protocols/interaction_model/Constants.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
+#include <lib/core/Optional.h>
+#include <lib/core/TLV.h>
+
+#include <clustes/shared/Enums.h>
+
+#include <cstdint>
 
 namespace chip {
 namespace app {

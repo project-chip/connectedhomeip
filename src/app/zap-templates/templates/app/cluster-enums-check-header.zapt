@@ -2,7 +2,6 @@
 #pragma once
 
 #include <clusters/{{asUpperCamelCase name}}/Enums.h>
-#include <clusters/shared/EnumsCheck.h>
 
 namespace chip {
 namespace app {

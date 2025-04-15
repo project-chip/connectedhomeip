@@ -1,8 +1,10 @@
 {{> header}}
-
 #include <clusters/{{asUpperCamelCase name}}/Events.h>
-#include <app/data-model/WrappedStructEncoder.h>
+
+#include <app/data-model/Decode.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/StructDecodeIterator.h>
+#include <app/data-model/WrappedStructEncoder.h>
 
 namespace chip {
 namespace app {

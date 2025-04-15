@@ -1,10 +1,9 @@
 {{> header}}
-
-#include <app/data-model/WrappedStructEncoder.h>
-#include <app/data-model/StructDecodeIterator.h>
 #include <clusters/shared/Structs.h>
 
-#include <variant>
+#include <app/data-model/Decode.h>
+#include <app/data-model/StructDecodeIterator.h>
+#include <app/data-model/WrappedStructEncoder.h>
 
 namespace chip {
 namespace app {

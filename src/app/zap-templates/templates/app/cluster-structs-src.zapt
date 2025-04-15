@@ -1,8 +1,8 @@
 {{> header}}
+#include <clusters/{{asUpperCamelCase name}}/Structs.h>
 
 #include <app/data-model/WrappedStructEncoder.h>
 #include <app/data-model/StructDecodeIterator.h>
-#include <clusters/{{asUpperCamelCase name}}/Structs.h>
 
 namespace chip {
 namespace app {

@@ -1,7 +1,6 @@
 {{> header}}
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/data-model/WrappedStructEncoder.h>
 
 // Includes below are because the compiler seems to be able to optimize better if all
 // structures are visible in one compilation unit (saves aroud 500 bytes of flash on

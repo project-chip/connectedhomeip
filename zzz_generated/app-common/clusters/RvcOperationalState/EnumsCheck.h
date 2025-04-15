@@ -19,7 +19,6 @@
 #pragma once
 
 #include <clusters/RvcOperationalState/Enums.h>
-#include <clusters/shared/EnumsCheck.h>
 
 namespace chip {
 namespace app {

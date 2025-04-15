@@ -19,11 +19,13 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
 #include <lib/core/TLV.h>
 
+#include <clusters/shared/Enums.h>
 #include <clusters/shared/Structs.h>
 
 #include <clusters/ThreadBorderRouterManagement/ClusterId.h>
