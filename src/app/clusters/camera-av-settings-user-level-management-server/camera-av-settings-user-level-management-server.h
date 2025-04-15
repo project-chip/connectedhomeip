@@ -102,7 +102,7 @@ public:
      *                                           instance.
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    CameraAvSettingsUserLevelMgmtServer(EndpointId aEndpointId, Delegate * aDelegate, BitFlags<Feature> aFeatures,
+    CameraAvSettingsUserLevelMgmtServer(EndpointId aEndpointId, Delegate & aDelegate, BitFlags<Feature> aFeatures,
                                         BitFlags<OptionalAttributes> aOptionalAttrs, uint8_t aMaxPresets);
     ~CameraAvSettingsUserLevelMgmtServer() override;
 
@@ -175,7 +175,7 @@ public:
     EndpointId GetEndpointId() { return AttributeAccessInterface::GetEndpointId().Value(); }
 
 private:
-    Delegate * mDelegate;
+    Delegate & mDelegate;
     EndpointId mEndpointId;
     BitFlags<Feature> mFeatures;
     BitFlags<OptionalAttributes> mOptionalAttrs;

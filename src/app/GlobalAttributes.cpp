@@ -44,7 +44,7 @@ DataModel::ActionReturnStatus ReadGlobalAttributeFromMetadata(DataModel::Provide
     switch (path.mAttributeId)
     {
     case Clusters::Globals::Attributes::GeneratedCommandList::Id: {
-        DataModel::ListBuilder<CommandId> builder;
+        ReadOnlyBufferBuilder<CommandId> builder;
         err = provider->GeneratedCommands(path, builder);
         if (err != CHIP_NO_ERROR)
         {
@@ -63,7 +63,7 @@ DataModel::ActionReturnStatus ReadGlobalAttributeFromMetadata(DataModel::Provide
         });
     }
     case Clusters::Globals::Attributes::AcceptedCommandList::Id: {
-        DataModel::ListBuilder<DataModel::AcceptedCommandEntry> builder;
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> builder;
         err = provider->AcceptedCommands(path, builder);
         if (err != CHIP_NO_ERROR)
         {
@@ -82,7 +82,7 @@ DataModel::ActionReturnStatus ReadGlobalAttributeFromMetadata(DataModel::Provide
         });
     }
     case Clusters::Globals::Attributes::AttributeList::Id: {
-        DataModel::ListBuilder<DataModel::AttributeEntry> builder;
+        ReadOnlyBufferBuilder<DataModel::AttributeEntry> builder;
         err = provider->Attributes(path, builder);
         if (err != CHIP_NO_ERROR)
         {

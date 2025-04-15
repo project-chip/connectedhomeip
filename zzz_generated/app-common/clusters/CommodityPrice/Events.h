@@ -54,7 +54,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    Structs::CommodityPriceStruct::Type currentPrice;
+    DataModel::Nullable<Structs::CommodityPriceStruct::Type> currentPrice;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -66,7 +66,7 @@ public:
     static constexpr EventId GetEventId() { return Events::PriceChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
 
-    Structs::CommodityPriceStruct::DecodableType currentPrice;
+    DataModel::Nullable<Structs::CommodityPriceStruct::DecodableType> currentPrice;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -87,7 +87,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    DataModel::List<const Structs::CommodityPriceStruct::Type> priceForecast;
+    DataModel::Nullable<DataModel::List<const Structs::CommodityPriceStruct::Type>> priceForecast;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -99,7 +99,7 @@ public:
     static constexpr EventId GetEventId() { return Events::ForecastChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
 
-    DataModel::DecodableList<Structs::CommodityPriceStruct::DecodableType> priceForecast;
+    DataModel::Nullable<DataModel::DecodableList<Structs::CommodityPriceStruct::DecodableType>> priceForecast;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
