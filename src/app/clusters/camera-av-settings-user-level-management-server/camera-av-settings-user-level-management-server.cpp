@@ -40,7 +40,7 @@ namespace app {
 namespace Clusters {
 namespace CameraAvSettingsUserLevelManagement {
 
-CameraAvSettingsUserLevelMgmtServer::CameraAvSettingsUserLevelMgmtServer(EndpointId aEndpointId, Delegate * aDelegate,
+CameraAvSettingsUserLevelMgmtServer::CameraAvSettingsUserLevelMgmtServer(EndpointId aEndpointId, Delegate & aDelegate,
                                                                          BitFlags<Feature> aFeatures,
                                                                          BitFlags<OptionalAttributes> aOptionalAttrs,
                                                                          uint8_t aMaxPresets) :
@@ -48,7 +48,7 @@ CameraAvSettingsUserLevelMgmtServer::CameraAvSettingsUserLevelMgmtServer(Endpoin
     CommandHandlerInterface(MakeOptional(aEndpointId), CameraAvSettingsUserLevelManagement::Id), mDelegate(aDelegate),
     mEndpointId(aEndpointId), mFeatures(aFeatures), mOptionalAttrs(aOptionalAttrs), mMaxPresets(aMaxPresets)
 {
-    mDelegate->SetServer(this);
+    mDelegate.SetServer(this);
 }
 
 CameraAvSettingsUserLevelMgmtServer::~CameraAvSettingsUserLevelMgmtServer()
@@ -715,7 +715,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSetPosition(HandlerContext &
 
     // Check with the delegate that we're in a position to change any of the PTZ values
     //
-    if (!mDelegate->CanChangeMPTZ())
+    if (!mDelegate.CanChangeMPTZ())
     {
         ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Device not able to process MPTZ change", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Busy);
@@ -724,7 +724,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSetPosition(HandlerContext &
 
     // Call the delegate to set the new values
     //
-    status = mDelegate->MPTZSetPosition(pan, tilt, zoom);
+    status = mDelegate.MPTZSetPosition(pan, tilt, zoom);
 
     if (status != Status::Success)
     {
@@ -879,7 +879,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
 
     // Check with the delegate that we're in a position to change any of the PTZ values
     //
-    if (!mDelegate->CanChangeMPTZ())
+    if (!mDelegate.CanChangeMPTZ())
     {
         ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Device not able to process MPTZ relative value change",
                       mEndpointId);
@@ -889,7 +889,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
 
     // Call the delegate to simply set the newly calculated MPTZ values based on the deltas received
     //
-    status = mDelegate->MPTZRelativeMove(newPan, newTilt, newZoom);
+    status = mDelegate.MPTZRelativeMove(newPan, newTilt, newZoom);
 
     if (status != Status::Success)
     {
@@ -945,7 +945,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZMoveToPreset(HandlerContext 
     // This is effectively a manipulation of the current PTZ settings, ensure that the device is in a state wherein a PTZ change is
     // possible
     //
-    if (!mDelegate->CanChangeMPTZ())
+    if (!mDelegate.CanChangeMPTZ())
     {
         ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Device not able to process move to MPTZ preset", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Busy);
@@ -956,7 +956,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZMoveToPreset(HandlerContext 
 
     // Inform the delegate that the device is requested to move to PTZ values given by the selected preset id
     // Call the delegate to allow the device to handle the physical changes, on success set the MPTZ values based on the preset
-    status = mDelegate->MPTZMoveToPreset(preset, presetValues.pan, presetValues.tilt, presetValues.zoom);
+    status = mDelegate.MPTZMoveToPreset(preset, presetValues.pan, presetValues.tilt, presetValues.zoom);
 
     if (status != Status::Success)
     {
@@ -1023,7 +1023,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSavePreset(HandlerContext & 
     // Call the delegate, make sure that it is ok to save a new preset, given the current
     // delegate aware values for MPTZ
     //
-    status = mDelegate->MPTZSavePreset(presetToUse);
+    status = mDelegate.MPTZSavePreset(presetToUse);
 
     if (status != Status::Success)
     {
@@ -1098,7 +1098,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRemovePreset(HandlerContext 
 
     // Call the delegate to ensure that it is ok to remove the preset indicated.
     //
-    Status status = mDelegate->MPTZRemovePreset(presetToRemove);
+    Status status = mDelegate.MPTZRemovePreset(presetToRemove);
 
     if (status != Status::Success)
     {
@@ -1127,7 +1127,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleDPTZSetViewport(HandlerContext &
     {
         // Call the delegate to validate that the videoStreamID is known; if yes then add to our list and proceed
         //
-        if (!mDelegate->IsValidVideoStreamID(videoStreamID))
+        if (!mDelegate.IsValidVideoStreamID(videoStreamID))
         {
             ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Unknown Video Stream ID provided. ID: %d", mEndpointId,
                          videoStreamID);
@@ -1138,7 +1138,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleDPTZSetViewport(HandlerContext &
     }
 
     // Call the delegate
-    Status status = mDelegate->DPTZSetViewport(videoStreamID, viewport);
+    Status status = mDelegate.DPTZSetViewport(videoStreamID, viewport);
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
@@ -1177,7 +1177,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleDPTZRelativeMove(HandlerContext 
     }
 
     // Call the delegate
-    Status status = mDelegate->DPTZRelativeMove(videoStreamID, deltaX, deltaY, zoomDelta);
+    Status status = mDelegate.DPTZRelativeMove(videoStreamID, deltaX, deltaY, zoomDelta);
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
