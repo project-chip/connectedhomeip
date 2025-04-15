@@ -18,11 +18,12 @@
 
 #pragma once
 #include "camera-av-stream-manager.h"
+#include "camera-avsettingsuserlevel-manager.h"
 #include "camera-device-interface.h"
 #include "chime-manager.h"
 #include "webrtc-provider-manager.h"
 
-#include "media-controller.h"
+#include "default-media-controller.h"
 #include "network-stream-source.h"
 
 #include <protocols/interaction_model/StatusCode.h>
@@ -48,6 +49,9 @@ public:
     chip::app::Clusters::ChimeDelegate & GetChimeDelegate();
     chip::app::Clusters::WebRTCTransportProvider::Delegate & GetWebRTCProviderDelegate();
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate();
+    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate & GetCameraAVSettingsUserLevelMgmtDelegate();
+
+    MediaController & GetMediaController();
 
     CameraDevice();
     ~CameraDevice();
@@ -129,6 +133,16 @@ public:
     uint8_t GetMicrophoneMaxLevel() { return MICROPHONE_MAX_LEVEL; }
     uint8_t GetMicrophoneMinLevel() { return MICROPHONE_MIN_LEVEL; }
 
+    int16_t GetPanMin();
+
+    int16_t GetPanMax();
+
+    int16_t GetTiltMin();
+
+    int16_t GetTiltMax();
+
+    uint8_t GetZoomMax();
+
     std::vector<VideoStream> & GetAvailableVideoStreams() { return videoStreams; }
 
     std::vector<AudioStream> & GetAvailableAudioStreams() { return audioStreams; }
@@ -156,10 +170,12 @@ private:
     WebRTCProviderManager mWebRTCProviderManager;
 
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManager mCameraAVStreamManager;
+    chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAVSettingsUserLevelManager mCameraAVSettingsUserLevelManager;
 
     NetworkStreamSource mNetworkVideoSource;
     NetworkStreamSource mNetworkAudioSource;
-    MediaController mMediaController;
+
+    DefaultMediaController mMediaController;
 
     uint16_t mCurrentVideoFrameRate                                         = 0;
     bool mHDREnabled                                                        = false;
