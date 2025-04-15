@@ -38,16 +38,6 @@ class AVSUMTestBase:
         asserts.assert_equal(value, expected_value,
                              f"Unexpected '{attribute}' value - expected {expected_value}, was {value}")
 
-    async def validate_feature_map(self, must_have_features, must_not_have_features):
-        feature_map = await self.read_dem_attribute_expect_success(attribute="FeatureMap")
-        for must_have_feature in must_have_features:
-            asserts.assert_true(feature_map & must_have_feature,
-                                f"{must_have_feature.name} must be set but is not. feature_map 0x{feature_map:x}")
-
-        for must_not_have_feature in must_not_have_features:
-            asserts.assert_false(feature_map & must_not_have_feature,
-                                 f"{must_not_have_feature.name} is not allowed to be set. feature_map 0x{feature_map:x}")
-
     async def send_save_presets_command(self, endpoint, name: str, expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=Clusters.CameraAvSettingsUserLevelManagement.Commands.MPTZSavePreset(
