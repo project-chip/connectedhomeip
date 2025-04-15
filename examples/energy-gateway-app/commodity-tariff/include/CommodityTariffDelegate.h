@@ -19,9 +19,13 @@
 
 #include <json/json.h>
 
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/data-model/Nullable.h>
+#include <app/ConcreteAttributePath.h>
+#include <lib/support/CodeUtils.h>
 #include <app/clusters/commodity-tariff-server/commodity-tariff-server.h>
-#include <app/util/af-types.h>
-#include <lib/core/CHIPError.h>
+
+#include "CommodityTariffDataClasses.h"
 
 namespace chip {
 namespace app {
@@ -29,6 +33,60 @@ namespace Clusters {
 namespace CommodityTariff {
 
 using chip::Protocols::InteractionModel::Status;
+
+constexpr bool operator!=(const Globals::Structs::CurrencyStruct::Type & lhs, const Globals::Structs::CurrencyStruct::Type & rhs)
+{
+    return ((lhs.currency != rhs.currency) || (lhs.decimalPoints != rhs.decimalPoints));
+}
+
+#define X(attrName, attrType) \
+class attrName##DataClass : public CTC_BaseDataClass<attrType> { \
+public: \
+    attrName##DataClass() \
+        : CommodityTariff::CTC_BaseDataClass<attrType>() {} \
+    ~attrName##DataClass() override = default; \
+    bool LoadFromJson(const Json::Value& json); \
+protected:    \
+    void UpdateValue(const attrType& aValue) override; \
+};
+// Generate all classes
+COMMODITY_TARIFF_PRIMARY_ATTRIBUTES_STUBS
+COMMODITY_TARIFF_CURRENT_ATTRIBUTES_STUBS
+#undef X
+
+/*
+#define X(attrName, attrType) \
+class attrName##DataClass : public BaseDataClass { \
+protected: \
+    attrType mValue; \
+    bool HasChangedImpl(const void* newValue) const override { return true; } \
+    bool ValidateImpl() const override { return true; } \
+    bool UpdateImpl(const void* newValue) override { return true; } \
+    bool LoadFromJsonImpl(const Json::Value& json) override { return true; } \
+    const void* GetData() const override { return &mValue; } \
+public: \
+    attrType& GetValue() { return mValue; } \
+};
+// Generate all classes
+COMMODITY_TARIFF_PRIMARY_ATTRIBUTES_STUBS
+COMMODITY_TARIFF_CURRENT_ATTRIBUTES_STUBS
+#undef X
+*/
+class CommodityTariffPrimaryData {  
+    public:
+    #define X(attrName, attrType) \
+        attrName##DataClass attrName;
+        COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+    #undef X
+};
+
+class CommodityTariffCurrentData {
+    public:
+    #define X(attrName, attrType) \
+        attrName##DataClass attrName;
+        COMMODITY_TARIFF_CURRENT_ATTRIBUTES
+    #undef X
+};
 
 // --- Tariff Data Updater ---
 class TariffDataUpdater
@@ -67,7 +125,21 @@ public:
                                                                    DataModel::Nullable<chip::CharSpan> & label,
                                                                    DataModel::List<const uint32_t> & dayEntryIDs,
                                                                    Structs::TariffComponentStruct::Type & aTariffComponent) override;
+
+#define X(attrName, attrType) \
+    attrType& Get##attrName() override { return mTariffData.attrName.GetValue(); }
+COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+#undef X
+
+#define X(attrName, attrType) \
+    attrType& Get##attrName() override { return mCurrentData.attrName.GetValue(); }
+COMMODITY_TARIFF_CURRENT_ATTRIBUTES
+#undef X
+
 private:
+    CommodityTariffPrimaryData mTariffData;
+    CommodityTariffCurrentData mCurrentData;
+
     // Tariff data Attributes
     //CHIP_ERROR SetTariffInfo(const DataModel::Nullable<Structs::TariffInformationStruct::Type>*);
     //CHIP_ERROR SetTariffUnit(Globals::TariffUnitEnum);
@@ -93,9 +165,7 @@ private:
     // Generate setters
     #define X(attrName, attrType) \
         CHIP_ERROR Set##attrName(const attrType& newValue) override { \
-            auto& current = mTariffData.attrName; \
-            if (AttributeAccessor<attrType>::HasChanged(current, newValue)) { \
-                AttributeAccessor<attrType>::Update(current, newValue); \
+            if (mTariffData.attrName.Update(newValue)) { \
                 ReportAttributeChange(Attributes::attrName::Id); \
             } \
             return CHIP_NO_ERROR; \
@@ -105,9 +175,7 @@ private:
 
     #define X(attrName, attrType) \
         CHIP_ERROR Set##attrName(const attrType& newValue) override { \
-            auto& current = mCurrentData.attrName; \
-            if (AttributeAccessor<attrType>::HasChanged(current, newValue)) { \
-                AttributeAccessor<attrType>::Update(current, newValue); \
+            if (mCurrentData.attrName.Update(newValue)) { \
                 ReportAttributeChange(Attributes::attrName::Id); \
             } \
             return CHIP_NO_ERROR; \

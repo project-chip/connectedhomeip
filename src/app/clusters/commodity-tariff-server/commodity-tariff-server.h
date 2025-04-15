@@ -29,21 +29,55 @@
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPError.h>
 
-#include "CommodityTariffAttrAccessors.h"
-
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace CommodityTariff {
+
+// Centralized attribute declaration (Primary attrs)
+#define COMMODITY_TARIFF_PRIMARY_ATTRIBUTES_STUBS \
+    /*X(TariffInfo,                   DataModel::Nullable<Structs::TariffInformationStruct::Type>)*/ \
+    X(TariffUnit,                   DataModel::Nullable<Globals::TariffUnitEnum>) \
+    X(StartDate,                    DataModel::Nullable<uint32_t>) \
+    X(DefaultRandomizationOffset,   DataModel::Nullable<int16_t>) \
+    X(DefaultRandomizationType,     DataModel::Nullable<DayEntryRandomizationTypeEnum>) \
+    X(CalendarPeriods,              DataModel::List<Structs::CalendarPeriodStruct::Type>) \
+    X(DayPatterns,                  DataModel::List<Structs::DayPatternStruct::Type>) \
+    X(IndividualDays,               DataModel::List<Structs::DayStruct::Type>) \
+    X(DayEntries,                   DataModel::List<Structs::DayEntryStruct::Type>) \
+    X(TariffPeriods,                DataModel::List<Structs::TariffPeriodStruct::Type>) \
+    X(TariffComponents,             DataModel::List<Structs::TariffComponentStruct::Type>)
+
+#define COMMODITY_TARIFF_PRIMARY_ATTRIBUTES_DEV \
+    X(TariffInfo,                   DataModel::Nullable<Structs::TariffInformationStruct::Type>)
+
+// Centralized attribute declaration (Current attrs)
+#define COMMODITY_TARIFF_CURRENT_ATTRIBUTES_STUBS \
+    X(CurrentDay,                   DataModel::Nullable<Structs::DayStruct::Type>) \
+    X(NextDay,                      DataModel::Nullable<Structs::DayStruct::Type>) \
+    X(CurrentDayEntry,              DataModel::Nullable<Structs::DayEntryStruct::Type>) \
+    X(NextDayEntry,                 DataModel::Nullable<Structs::DayEntryStruct::Type>) \
+    X(CurrentDayEntryDate,          DataModel::Nullable<uint32_t>) \
+    X(NextDayEntryDate,             DataModel::Nullable<uint32_t>) \
+    X(CurrentTariffComponents,      DataModel::List<Structs::TariffComponentStruct::Type>) \
+    X(NextTariffComponents,         DataModel::List<Structs::TariffComponentStruct::Type>)
+
+#define COMMODITY_TARIFF_CURRENT_ATTRIBUTES_DEV \
+    /*X(CurrentDay,                   DataModel::Nullable<Structs::DayStruct::Type>)*/
+
+#define COMMODITY_TARIFF_PRIMARY_ATTRIBUTES \
+    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES_STUBS \
+    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES_DEV
+
+#define COMMODITY_TARIFF_CURRENT_ATTRIBUTES \
+    COMMODITY_TARIFF_CURRENT_ATTRIBUTES_STUBS \
+    COMMODITY_TARIFF_CURRENT_ATTRIBUTES_DEV
 
 class Delegate
 {
 public:
     Delegate()          = default;
     virtual ~Delegate() = default;
-
-    CommodityTariffPrimaryData mTariffData;
-    CommodityTariffCurrentData mCurrentData;
 
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
 
@@ -57,38 +91,34 @@ public:
                                                                            Structs::TariffComponentStruct::Type & aTariffComponent) = 0;
 
     // ------------------------------------------------------------------
+#if 0
     // Attribute  getters
-    // Get attribute methods
-    // Primary tariff data    
-    //virtual DataModel::Nullable<Structs::TariffInformationStruct::Type> & GetTariffInfo()        = 0;
-    //virtual Globals::TariffUnitEnum GetTariffUnit()                                              = 0;
-    //virtual DataModel::Nullable<epoch_s> GetStartDate()                                          = 0;
-    //virtual DataModel::Nullable<int16_t> GetDefaultRandomizationOffset()                         = 0;
-    //virtual DataModel::Nullable<DayEntryRandomizationTypeEnum> GetDefaultRandomizationType()     = 0;
-    //virtual DataModel::List<Structs::CalendarPeriodStruct::Type> & GetCalendarPeriods()          = 0;
-    //virtual DataModel::List<Structs::DayPatternStruct::Type> & GetDayPatterns()                  = 0;
-    //virtual DataModel::List<Structs::DayStruct::Type> & GetIndividualDays()                      = 0;
-    //virtual DataModel::List<Structs::DayEntryStruct::Type> & GetDayEntries()                     = 0;
-    //virtual DataModel::List<Structs::TariffPeriodStruct::Type> & GetTariffPeriods()              = 0;
-    //virtual DataModel::List<Structs::TariffComponentStruct::Type> & GetTariffComponents()        = 0;
+    virtual DataModel::Nullable<Structs::TariffInformationStruct::Type> & GetTariffInfo()        = 0;
+    virtual DataModel::Nullable<Globals::TariffUnitEnum> & GetTariffUnit()                       = 0;
+    virtual DataModel::Nullable<uint32_t> & GetStartDate()                                       = 0;
+    virtual DataModel::Nullable<int16_t> & GetDefaultRandomizationOffset()                       = 0;
+    virtual DataModel::Nullable<DayEntryRandomizationTypeEnum> & GetDefaultRandomizationType()   = 0;
+    virtual DataModel::List<Structs::CalendarPeriodStruct::Type> & GetCalendarPeriods()          = 0;
+    virtual DataModel::List<Structs::DayPatternStruct::Type> & GetDayPatterns()                  = 0;
+    virtual DataModel::List<Structs::DayStruct::Type> & GetIndividualDays()                      = 0;
+    virtual DataModel::List<Structs::DayEntryStruct::Type> & GetDayEntries()                     = 0;
+    virtual DataModel::List<Structs::TariffPeriodStruct::Type> & GetTariffPeriods()              = 0;
+    virtual DataModel::List<Structs::TariffComponentStruct::Type> & GetTariffComponents()        = 0;
+    virtual DataModel::Nullable<Structs::DayStruct::Type> & GetCurrentDay()                      = 0;
+    virtual DataModel::Nullable<Structs::DayStruct::Type> & GetNextDay()                         = 0;
+    virtual DataModel::Nullable<Structs::DayEntryStruct::Type> & GetCurrentDayEntry()            = 0;
+    virtual DataModel::Nullable<Structs::DayEntryStruct::Type> & GetNextDayEntry()               = 0;
+    virtual DataModel::Nullable<uint32_t> & GetCurrentDayEntryDate()                             = 0;
+    virtual DataModel::Nullable<uint32_t> & GetNextDayEntryDate()                                = 0;
+    virtual DataModel::List<Structs::TariffComponentStruct::Type> & GetCurrentTariffComponents() = 0;
+    virtual DataModel::List<Structs::TariffComponentStruct::Type> & GetNextTariffComponents()    = 0;
+#else
     #define X(attrName, attrType) \
-        attrType& Get##attrName() { return mTariffData.attrName; }
+        virtual attrType& Get##attrName() = 0;
     COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
-    #undef X    
-
-    //virtual DataModel::Nullable<Structs::DayStruct::Type> & GetCurrentDay()                      = 0;
-    //virtual DataModel::Nullable<Structs::DayStruct::Type> & GetNextDay()                         = 0;
-    //virtual DataModel::Nullable<Structs::DayEntryStruct::Type> & GetCurrentDayEntry()            = 0;
-    //virtual DataModel::Nullable<Structs::DayEntryStruct::Type> & GetNextDayEntry()               = 0;
-    //virtual DataModel::Nullable<epoch_s> GetCurrentDayEntryDate()                                = 0;
-    //virtual DataModel::Nullable<epoch_s> GetNextDayEntryDate()                                   = 0;
-    //virtual DataModel::List<Structs::TariffComponentStruct::Type> & GetCurrentTariffComponents() = 0;
-    //virtual DataModel::List<Structs::TariffComponentStruct::Type> & GetNextTariffComponents()    = 0;
-    //Current 
-    #define X(attrName, attrType) \
-        attrType& Get##attrName() { return mCurrentData.attrName; }
     COMMODITY_TARIFF_CURRENT_ATTRIBUTES
     #undef X
+#endif
 
 private:
     // Generate setters
