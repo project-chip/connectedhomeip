@@ -275,7 +275,7 @@ def expandPlaceholderWildcards(path: str) -> Generator[str, None, None]:
 
 def runClangPrettifier(templates_file, output_dir):
     listOfSupportedFileExtensions = [
-        '.js', '.h', '.c', '.hpp', '.cpp', '.m', '.mm']
+        '.js', '.h', '.c', '.hpp', '.cpp', '.m', '.mm', '.ipp']
 
     try:
         jsonData = json.loads(Path(templates_file).read_text())

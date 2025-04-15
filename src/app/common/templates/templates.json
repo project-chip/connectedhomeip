@@ -140,7 +140,7 @@
             "path": "../../zap-templates/templates/app/cluster-events-src.zapt",
             "name": "Cluster-specific event implementations",
             "iterator": "availableCluster",
-            "output": "../../clusters/{name:touppercamelcase}/Events.cpp"
+            "output": "../../clusters/{name:touppercamelcase}/Events.ipp"
         },
         {
             "path": "../../zap-templates/templates/app/cluster-structs-header.zapt",
@@ -152,13 +152,13 @@
             "path": "../../zap-templates/templates/app/cluster-structs-src.zapt",
             "name": "Cluster-specific structure implementations",
             "iterator": "availableCluster",
-            "output": "../../clusters/{name:touppercamelcase}/Structs.cpp"
+            "output": "../../clusters/{name:touppercamelcase}/Structs.ipp"
         },
         {
             "path": "../../zap-templates/templates/app/cluster-attributes-src.zapt",
             "name": "Cluster-specific attributes implementations",
             "iterator": "availableCluster",
-            "output": "../../clusters/{name:touppercamelcase}/Attributes.cpp"
+            "output": "../../clusters/{name:touppercamelcase}/Attributes.ipp"
         },
         {
             "path": "../../zap-templates/templates/app/cluster-commands-header.zapt",
@@ -170,7 +170,7 @@
             "path": "../../zap-templates/templates/app/cluster-commands-src.zapt",
             "name": "Cluster-specific command implementations",
             "iterator": "availableCluster",
-            "output": "../../clusters/{name:touppercamelcase}/Commands.cpp"
+            "output": "../../clusters/{name:touppercamelcase}/Commands.ipp"
         },
         {
             "path": "../../zap-templates/templates/app/cluster-enums-header.zapt",
