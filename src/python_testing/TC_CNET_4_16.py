@@ -41,6 +41,7 @@ from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_bod
 from mobly import asserts
 
 from chip import ChipDeviceCtrl
+from chip.interaction_model import InteractionModelError
 from matter_testing_infrastructure.chip.testing.matter_asserts import assert_valid_uint8
 
 logger = logging.getLogger(__name__)
@@ -71,8 +72,8 @@ class TC_CNET_4_16(MatterBaseTest):
     def steps_TC_CNET_4_16(self):
         return [TestStep("precondition", "TH is commissioned", is_commissioning=True),
                 TestStep(1, 'TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900'),
-                # TestStep(2, 'TH sends RemoveNetwork Command to the DUT with NetworkID field set to the extended PAN ID of PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET, which does not match the commissioned network, and Breadcrumb field set to 1'),
-                # TestStep(3, 'TH sends ConnectNetwork Command to the DUT with NetworkID value as the extended PAN ID of PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET, which does not match the commissioned network, and Breadcrumb field set to 1'),
+                TestStep(2, 'TH sends RemoveNetwork Command to the DUT with NetworkID field set to the extended PAN ID of PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET, which does not match the commissioned network, and Breadcrumb field set to 1'),
+                TestStep(3, 'TH sends ConnectNetwork Command to the DUT with NetworkID value as the extended PAN ID of PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET, which does not match the commissioned network, and Breadcrumb field set to 1'),
                 ]
 
     def desc_TC_CNET_4_16(self):
@@ -122,20 +123,20 @@ class TC_CNET_4_16(MatterBaseTest):
 
         # Precondition 5: TH can communicate with the DUT on PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET
         # Precondition 6: DUT MaxNetworks attribute value is at least 1 and is saved as 'MaxNetworksValue' for future use
-        logger.info("Check MaxNetworkValue")
+        logger.info("************************* Check MaxNetworkValue")
         maxNetworksValue = 0
         maxNetworksValue = await self.read_single_attribute_check_success(cluster=Clusters.NetworkCommissioning, attribute=Clusters.NetworkCommissioning.Attributes.MaxNetworks)
-        logger.info(f"maxNetworksValue: {maxNetworksValue}")
+        logger.info(f"************************* maxNetworksValue: {maxNetworksValue}")
         assert_valid_uint8(maxNetworksValue, "MaxNetworksValue range")
         asserts.assert_greater_equal(maxNetworksValue, 1, "MaxNetworksValue not greater or equal to 1")
 
         # TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900
         self.step(1)
 
-        logger.info("Arming the failsafe")
+        logger.info("************************* Arming the failsafe")
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900)
         res = await self.send_single_cmd(cmd=cmd)
-        logger.info(f"Received response: {res}")
+        logger.info(f"************************* Received response: {res}")
         # Verify that DUT sends ArmFailSafeResponse command to the TH
         asserts.assert_equal(
             res.errorCode,
@@ -145,45 +146,61 @@ class TC_CNET_4_16(MatterBaseTest):
 
         # # TH sends RemoveNetwork Command to the DUT with NetworkID field set to the extended PAN ID of PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET,
         # # which does not match the commissioned network, and Breadcrumb field set to 1
-        # self.step(2)
+        self.step(2)
 
-        # logger.info("Check network list")
+        logger.info("************************* Check network list")
         # res = await commissioner.ReadAttribute(nodeid=TH1_nodeid, attributes=[(endpoint, cnet.Attributes.Networks)], returnClusterObject=True)
         # networkList = res[endpoint][cnet].networks
-        # logger.info(f"Got network list: {networkList}")
-        # if len(networkList) != 0:
-        #     logger.info("Removing existing network with extended PAN ID of PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET")
-        #     req = cnet.Commands.RemoveNetwork(networkID=PIXIT_CNET_THREAD_2ND_OPERATIONALDATASET, breadcrumb=1)
-        #     res = await commissioner.SendCommand(nodeid=TH1_nodeid, endpoint=endpoint, payload=req)
-        #     logger.info(f"Received response: {res}")
-
-        #     # Verify that DUT sends NetworkConfigResponse command to the TH1 with NetworkingStatus field set to NetworkIDNotFound
-        #     asserts.assert_is_instance(res, cnet.Commands.NetworkConfigResponse.response_type)
-        #     asserts.assert_equal(res.networkingStatus,
-        #                          cnet.Enums.NetworkCommissioningStatusEnum.kNetworkIDNotFound,
-        #                          f"Expected kNetworkIDNotFound but got: {res.networkingStatus}")    # LastNetworkingStatus?
-        # else:
-        #     asserts.fail(f"NetworkList is Empty")
+        networkList = await self.read_single_attribute_check_success(cluster=Clusters.NetworkCommissioning, attribute=Clusters.NetworkCommissioning.Attributes.Networks)
+        logger.info(f"************************* Got network list: {networkList}")
+        # logger.info(f"************************* maxNetworksValue: {maxNetworksValue}")
+        if len(networkList) != 0:
+            logger.info("************************* Removing existing network with extended PAN ID of PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET")
+            logger.info(f"************************* PAN ID: {PIXIT_CNET_THREAD_2ND_OPERATIONALDATASET}")
+            try:
+                logger.info(f"************************* Trying RemoveNetwork")
+                cmd = Clusters.NetworkCommissioning.Commands.RemoveNetwork(
+                    networkID=PIXIT_CNET_THREAD_2ND_OPERATIONALDATASET, breadcrumb=1)
+                res = await self.send_single_cmd(cmd=cmd)
+                logger.info(f"************************* Received response: {res}")
+                logger.info(f"************************* networkingStatus: {res.networkingStatus}")
+            except InteractionModelError as e:
+                logger.info(f"************************* Except InteractionModelError")
+                # Verify that DUT sends NetworkConfigResponse command to the TH1 with NetworkingStatus field set to NetworkIDNotFound
+                asserts.assert_is_instance(res, cnet.Commands.NetworkConfigResponse.response_type)
+                asserts.assert_equal(res.networkingStatus,
+                                     cnet.Enums.NetworkCommissioningStatusEnum.kNetworkIDNotFound,
+                                     f"Expected kNetworkIDNotFound but got: {res.networkingStatus}")    # LastNetworkingStatus?
+        else:
+            asserts.fail(f"NetworkList is Empty")
 
         # # TH sends ConnectNetwork Command to the DUT with NetworkID value as the extended PAN ID of PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET,
         # # which does not match the commissioned network, and Breadcrumb field set to 1
-        # self.step(3)
+        self.step(3)
 
-        # logger.info("Connect to PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET")
-        # logger.info(
-        #     f"cnet.Structs.ThreadInterfaceScanResultStruct.extendedPanId = {cnet.Structs.ThreadInterfaceScanResultStruct.extendedPanId}")
-        # networkID = await self.read_single_attribute(
-        #     dev_ctrl=commissioner, node_id=TH2_nodeid, endpoint=endpoint, attribute=cnet.Structs.ThreadInterfaceScanResultStruct.extendedPanId)
-        # req = cnet.Commands.ConnectNetwork(networkID=networkID, breadcrumb=1)
-        # interactionTimeoutMs = commissioner.ComputeRoundTripTimeout(nodeid=TH2_nodeid, upperLayerProcessingTimeoutMs=30000)
-        # res = await commissioner.SendCommand(nodeid=TH1_nodeid, endpoint=endpoint, payload=req, interactionTimeoutMs=interactionTimeoutMs)
-        # logger.info(f"Received response: {res}")
-
-        # # Verify that DUT sends ConnectNetworkResponse command to the TH1 with NetworkingStatus field set to NetworkIDNotFound
-        # asserts.assert_is_instance(res, cnet.Commands.ConnectNetworkResponse.response_type)
-        # asserts.assert_equal(res.networkingStatus,
-        #                      cnet.Enums.NetworkCommissioningStatusEnum.kNetworkIDNotFound,
-        #                      f"Expected NetworkIDNotFound but got {res.networkingStatus}")  # LastNetworkingStatus?
+        logger.info("************************* Connect to PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET")
+        logger.info(
+            f"************************* cnet.Structs.ThreadInterfaceScanResultStruct.extendedPanId = {cnet.Structs.ThreadInterfaceScanResultStruct.extendedPanId}")
+        try:
+            logger.info(f"************************* Trying ConnectNetwork")
+            # networkID = await self.read_single_attribute(
+            #     dev_ctrl=commissioner, node_id=TH2_nodeid, endpoint=endpoint, attribute=cnet.Structs.ThreadInterfaceScanResultStruct.extendedPanId)
+            # logger.info("************************* networkID: {networkID}")
+            cmd = Clusters.NetworkCommissioning.Commands.ConnectNetwork(
+                networkID=PIXIT_CNET_THREAD_2ND_OPERATIONALDATASET, breadcrumb=1)
+            res = await self.send_single_cmd(cmd=cmd)
+            logger.info(f"************************* Received response: {res}")
+            # req = cnet.Commands.ConnectNetwork(networkID=networkID, breadcrumb=1)
+            # interactionTimeoutMs = commissioner.ComputeRoundTripTimeout(nodeid=TH2_nodeid, upperLayerProcessingTimeoutMs=30000)
+            # res = await commissioner.SendCommand(nodeid=TH1_nodeid, endpoint=endpoint, payload=req, interactionTimeoutMs=interactionTimeoutMs)
+            # logger.info(f"************************* Received response: {res}")
+        except InteractionModelError as e:
+            # Verify that DUT sends ConnectNetworkResponse command to the TH1 with NetworkingStatus field set to NetworkIDNotFound
+            asserts.assert_is_instance(res, cnet.Commands.ConnectNetworkResponse.response_type)
+            logger.info(f"************************* networkingStatus: {res.networkingStatus}")
+            asserts.assert_equal(res.networkingStatus,
+                                 cnet.Enums.NetworkCommissioningStatusEnum.kNetworkIDNotFound,
+                                 f"Expected NetworkIDNotFound but got {res.networkingStatus}")  # LastNetworkingStatus?
 
 
 if __name__ == "__main__":
