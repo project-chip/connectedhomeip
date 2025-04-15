@@ -25,6 +25,8 @@
 #include <lib/core/TLV.h>
 #include <lib/support/BitMask.h>
 
+#include <clusters/shared/Enums.h>
+
 namespace chip {
 namespace app {
 namespace Clusters {
