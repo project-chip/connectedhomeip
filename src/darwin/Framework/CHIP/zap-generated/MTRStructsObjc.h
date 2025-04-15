@@ -1272,7 +1272,8 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRCommodityPriceClusterCommodityPriceComponentStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull price MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable price MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable priceLevel MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull source MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSString * _Nullable descriptionString MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable tariffComponentID MTR_PROVISIONALLY_AVAILABLE;
@@ -1282,19 +1283,20 @@ MTR_PROVISIONALLY_AVAILABLE
 @interface MTRCommodityPriceClusterCommodityPriceStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull periodStart MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable periodEnd MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) MTRDataTypePriceStruct * _Nonnull price MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRDataTypePriceStruct * _Nullable price MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable priceLevel MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSString * _Nullable descriptionString MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSArray * _Nullable components MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRCommodityPriceClusterPriceChangeEvent : NSObject <NSCopying>
-@property (nonatomic, copy) MTRCommodityPriceClusterCommodityPriceStruct * _Nonnull currentPrice MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRCommodityPriceClusterCommodityPriceStruct * _Nullable currentPrice MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRCommodityPriceClusterForecastChangeEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSArray * _Nonnull priceForecast MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nullable priceForecast MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE

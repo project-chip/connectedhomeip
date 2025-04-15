@@ -3837,18 +3837,18 @@ public static class WaterHeaterManagementClusterBoostEndedEvent {
   }
 }
 public static class CommodityPriceClusterPriceChangeEvent {
-  public ChipStructs.CommodityPriceClusterCommodityPriceStruct currentPrice;
+  public @Nullable ChipStructs.CommodityPriceClusterCommodityPriceStruct currentPrice;
   private static final long CURRENT_PRICE_ID = 0L;
 
   public CommodityPriceClusterPriceChangeEvent(
-    ChipStructs.CommodityPriceClusterCommodityPriceStruct currentPrice
+    @Nullable ChipStructs.CommodityPriceClusterCommodityPriceStruct currentPrice
   ) {
     this.currentPrice = currentPrice;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(CURRENT_PRICE_ID, currentPrice.encodeTlv()));
+    values.add(new StructElement(CURRENT_PRICE_ID, currentPrice != null ? currentPrice.encodeTlv() : new NullType()));
 
     return new StructType(values);
   }
@@ -3857,7 +3857,7 @@ public static class CommodityPriceClusterPriceChangeEvent {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    ChipStructs.CommodityPriceClusterCommodityPriceStruct currentPrice = null;
+    @Nullable ChipStructs.CommodityPriceClusterCommodityPriceStruct currentPrice = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CURRENT_PRICE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
@@ -3883,18 +3883,18 @@ public static class CommodityPriceClusterPriceChangeEvent {
   }
 }
 public static class CommodityPriceClusterForecastChangeEvent {
-  public ArrayList<ChipStructs.CommodityPriceClusterCommodityPriceStruct> priceForecast;
+  public @Nullable ArrayList<ChipStructs.CommodityPriceClusterCommodityPriceStruct> priceForecast;
   private static final long PRICE_FORECAST_ID = 0L;
 
   public CommodityPriceClusterForecastChangeEvent(
-    ArrayList<ChipStructs.CommodityPriceClusterCommodityPriceStruct> priceForecast
+    @Nullable ArrayList<ChipStructs.CommodityPriceClusterCommodityPriceStruct> priceForecast
   ) {
     this.priceForecast = priceForecast;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(PRICE_FORECAST_ID, ArrayType.generateArrayType(priceForecast, (elementpriceForecast) -> elementpriceForecast.encodeTlv())));
+    values.add(new StructElement(PRICE_FORECAST_ID, priceForecast != null ? ArrayType.generateArrayType(priceForecast, (elementpriceForecast) -> elementpriceForecast.encodeTlv()) : new NullType()));
 
     return new StructType(values);
   }
@@ -3903,7 +3903,7 @@ public static class CommodityPriceClusterForecastChangeEvent {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    ArrayList<ChipStructs.CommodityPriceClusterCommodityPriceStruct> priceForecast = null;
+    @Nullable ArrayList<ChipStructs.CommodityPriceClusterCommodityPriceStruct> priceForecast = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == PRICE_FORECAST_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {

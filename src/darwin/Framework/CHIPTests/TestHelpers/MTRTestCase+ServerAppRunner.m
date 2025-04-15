@@ -22,11 +22,12 @@
 static unsigned sAppRunnerIndex = 1;
 static const uint16_t kPairingTimeoutInSeconds = 30;
 
-#if HAVE_NSTASK
 // kBasePort gets the discriminator added to it to figure out the port the app
 // should be using.  This ensures that apps with distinct discriminators use
 // distinct ports.
 static const uint16_t kMinDiscriminator = 1111;
+
+#if HAVE_NSTASK
 static const uint16_t kBasePort = 5542 - kMinDiscriminator;
 #endif // HAVE_NSTASK
 
