@@ -52,7 +52,7 @@ class AVSUMTestBase:
     async def send_mptz_set_pan_position_command(self, endpoint, pan, expected_status: Status = Status.Success):
         tilt = zoom = None
         await self.send_mptz_set_position_command(endpoint, pan, tilt, zoom, expected_status)
-        
+
     async def send_mptz_set_tilt_position_command(self, endpoint, tilt, expected_status: Status = Status.Success):
         pan = zoom = None
         await self.send_mptz_set_position_command(endpoint, pan, tilt, zoom, expected_status)
@@ -60,7 +60,7 @@ class AVSUMTestBase:
     async def send_mptz_set_zoom_position_command(self, endpoint, zoom, expected_status: Status = Status.Success):
         pan = tilt = None
         await self.send_mptz_set_position_command(endpoint, pan, tilt, zoom, expected_status)
-        
+
     async def send_mptz_set_position_command(self, endpoint, pan, tilt, zoom, expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=Clusters.CameraAvSettingsUserLevelManagement.Commands.MPTZSetPosition(

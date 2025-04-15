@@ -44,6 +44,7 @@ from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_bod
 from mobly import asserts
 from TC_AVSUMTestBase import AVSUMTestBase
 
+
 class TC_AVSUM_2_3(MatterBaseTest, AVSUMTestBase):
     has_feature_mpan = False
     has_feature_mtilt = False
@@ -53,15 +54,15 @@ class TC_AVSUM_2_3(MatterBaseTest, AVSUMTestBase):
         if self.has_feature_mpan:
             if mptz.pan == None:
                 asserts.fail("Pan value missing when MPAN feature set")
-            else: 
+            else:
                 apan = mptz.pan
                 asserts.assert_greater_equal(apan, panmin, "Pan out of range of DUT defined values")
                 asserts.assert_less_equal(apan, panmax, "Pan out of range of DUT defined values")
-            
+
         if self.has_feature_mtilt:
             if mptz.tilt == None:
                 asserts.fail("Tilt value missing when MTILT feature set")
-            else: 
+            else:
                 atilt = mptz.tilt
                 asserts.assert_greater_equal(atilt, tiltmin, "Tilt out of range of DUT defined values")
                 asserts.assert_less_equal(atilt, tiltmax, "Tilt out of range of DUT defined values")
@@ -69,7 +70,7 @@ class TC_AVSUM_2_3(MatterBaseTest, AVSUMTestBase):
         if self.has_feature_mzoom:
             if mptz.zoom == None:
                 asserts.fail("Zoom value missing when MZOOM feature set")
-            else: 
+            else:
                 azoom = mptz.zoom
                 asserts.assert_greater_equal(azoom, 1, "Zoom out of range of DUT defined values")
                 asserts.assert_less_equal(azoom, zoommax, "Zoom out of range of DUT defined values")
@@ -107,7 +108,7 @@ class TC_AVSUM_2_3(MatterBaseTest, AVSUMTestBase):
 
         attribute_list = await self.read_avsum_attribute_expect_success(endpoint=endpoint, attribute="AttributeList")
 
-        if not(self.has_feature_mpan | self.has_feature_mtilt | self.has_feature_mzoom):
+        if not (self.has_feature_mpan | self.has_feature_mtilt | self.has_feature_mzoom):
             asserts.fail("One of MPAN, MTILT, or MZOOM is mandatory")
             self.skip_all_remaining_steps(2)
 
@@ -128,18 +129,18 @@ class TC_AVSUM_2_3(MatterBaseTest, AVSUMTestBase):
 
             asserts.assert_in(attributes.PanMax.attribute_id, attribute_list,
                               "PanMax attribute is a mandatory attribute if MPAN.")
-            pan_max_dut = await self.read_avsum_attribute_expect_success(endpoint=endpoint, attribute="PanMax")    
+            pan_max_dut = await self.read_avsum_attribute_expect_success(endpoint=endpoint, attribute="PanMax")
             asserts.assert_less_equal(pan_max_dut, 180, "PanMax is not in valid range.")
             asserts.assert_greater_equal(pan_max_dut, -179, "PanMax is not in valid range.")
 
             # Create new Value for Pan
-            while True: 
+            while True:
                 newPan = random.randint(pan_min_dut, pan_max_dut)
                 if newPan != initialPan:
                     break
-            
+
             # Calulate the difference, this is the relative move
-            
+
             relativePan = abs(initialPan - newPan) if (initialPan < newPan) else -abs(newPan - initialPan)
             logging.info("***Current Pan value %s", initialPan)
             logging.info("***Target new Pan value %s", newPan)
@@ -171,16 +172,16 @@ class TC_AVSUM_2_3(MatterBaseTest, AVSUMTestBase):
 
             asserts.assert_in(attributes.TiltMax.attribute_id, attribute_list,
                               "TiltMax attribute is a mandatory attribute if MTILT.")
-            tilt_max_dut = await self.read_avsum_attribute_expect_success(endpoint=endpoint, attribute="TiltMax")    
+            tilt_max_dut = await self.read_avsum_attribute_expect_success(endpoint=endpoint, attribute="TiltMax")
             asserts.assert_less_equal(tilt_max_dut, 180, "TiltMax is not in valid range.")
             asserts.assert_greater_equal(tilt_max_dut, -179, "TiltMax is not in valid range.")
 
             # Create new Value for Tilt
-            while True: 
+            while True:
                 newTilt = random.randint(tilt_min_dut, tilt_max_dut)
                 if newTilt != initialTilt:
                     break
-            
+
             relativeTilt = abs(initialTilt - newTilt) if (initialTilt < newTilt) else -abs(newTilt - initialTilt)
 
             # Invoke the command with the new tilt value
@@ -203,16 +204,16 @@ class TC_AVSUM_2_3(MatterBaseTest, AVSUMTestBase):
             self.step(5)
             asserts.assert_in(attributes.ZoomMax.attribute_id, attribute_list,
                               "ZoomMax attribute is a mandatory attribute if MZOOM.")
-            zoom_max_dut = await self.read_avsum_attribute_expect_success(endpoint=endpoint, attribute="ZoomMax")    
+            zoom_max_dut = await self.read_avsum_attribute_expect_success(endpoint=endpoint, attribute="ZoomMax")
             asserts.assert_less_equal(zoom_max_dut, 100, "ZoomMax is not in valid range.")
             asserts.assert_greater_equal(zoom_max_dut, 2, "ZoomMax is not in valid range.")
 
             # Create new Value for Zoom
-            while True: 
+            while True:
                 newZoom = random.randint(2, zoom_max_dut)
                 if newZoom != initialZoom:
                     break
-            
+
             relativeZoom = abs(initialZoom - newZoom) if (initialZoom < newZoom) else -abs(newZoom - initialZoom)
 
             # Invoke the command with the new pan value
@@ -230,6 +231,7 @@ class TC_AVSUM_2_3(MatterBaseTest, AVSUMTestBase):
             asserts.assert_equal(newzoom_mptzposition_dut.zoom, zoom_max_dut, "Received Zoom does not match ZoomMax")
         else:
             self.skip_step(5)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
