@@ -450,10 +450,8 @@ TEST_F(TestClosureDimensionClusterLogic, TestGetAttributesNoFeatures)
 
     GenericCurrentStateStruct testcurrentState{ Optional<Percent100ths>(0), Optional<LatchingEnum>(LatchingEnum::kNotLatched),
                                                 Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
-    GenericCurrentStateStruct currentState;
     GenericTargetStruct testtarget{ Optional<Percent100ths>(0), Optional<TargetLatchEnum>(TargetLatchEnum::kUnlatch),
                                     Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
-    GenericTargetStruct target;
     Percent100ths resolution = 1;
     Percent100ths stepValue  = 1;
     ClosureUnitEnum unit     = ClosureUnitEnum::kDegree;
@@ -464,19 +462,9 @@ TEST_F(TestClosureDimensionClusterLogic, TestGetAttributesNoFeatures)
     OverflowEnum overflow                         = OverflowEnum::kBottomInside;
     ModulationTypeEnum modulationType             = ModulationTypeEnum::kOpacity;
 
-    // As Feature conformance is not present, Current state should not be set
-    EXPECT_EQ(logic->SetCurrentState(testcurrentState), CHIP_NO_ERROR);
-    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
-    EXPECT_EQ(currentState.position, NullOptional);
-    EXPECT_EQ(currentState.latching, NullOptional);
-    EXPECT_EQ(currentState.speed, NullOptional);
+    EXPECT_EQ(logic->SetCurrentState(testcurrentState), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-    // As Feature conformance is not present, Target should not be set
-    EXPECT_EQ(logic->SetTarget(testtarget), CHIP_NO_ERROR);
-    EXPECT_EQ(logic->GetTarget(target), CHIP_NO_ERROR);
-    EXPECT_EQ(target.position, NullOptional);
-    EXPECT_EQ(target.latch, NullOptional);
-    EXPECT_EQ(target.speed, NullOptional);
+    EXPECT_EQ(logic->SetTarget(testtarget), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     EXPECT_EQ(logic->SetResolution(resolution), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
@@ -583,24 +571,19 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetCurrentStateOnlyPosition)
 
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
 
-    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
-    EXPECT_EQ(currentState.position, DataModel::NullNullable);
-    EXPECT_EQ(currentState.latching, DataModel::NullNullable);
-    EXPECT_EQ(currentState.speed, DataModel::NullNullable);
-
     // set Values
-    EXPECT_EQ(logic->SetCurrentState(testCurrentState), CHIP_NO_ERROR);
-
+    EXPECT_EQ(logic->SetCurrentState(testCurrentState), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    
     // Ensure the value is accessible via the API
     EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
-    // check only the position is set
-    EXPECT_EQ(currentState.position, testCurrentState.position);
+    EXPECT_EQ(currentState.position, DataModel::NullNullable);
     EXPECT_EQ(currentState.latching, DataModel::NullNullable);
     EXPECT_EQ(currentState.speed, DataModel::NullNullable);
 }
 
 // This test ensures that the Set function
 // - checks conformance properly
+
 TEST_F(TestClosureDimensionClusterLogic, TestSetCurrentStateOnlylatching)
 {
     TestDelegate delegate;
@@ -618,20 +601,13 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetCurrentStateOnlylatching)
     ClusterConformance conformance = { .featureMap = 2, .supportsOverflow = false };
 
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
-
+    
+    EXPECT_EQ(logic->SetCurrentState(testCurrentState), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    
+    // Ensure the value is accessible via the API
     EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
     EXPECT_EQ(currentState.position, DataModel::NullNullable);
     EXPECT_EQ(currentState.latching, DataModel::NullNullable);
-    EXPECT_EQ(currentState.speed, DataModel::NullNullable);
-
-    // set Values
-    EXPECT_EQ(logic->SetCurrentState(testCurrentState), CHIP_NO_ERROR);
-
-    // Ensure the value is accessible via the API
-    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
-    // check only the latching is set
-    EXPECT_EQ(currentState.latching, testCurrentState.latching);
-    EXPECT_EQ(currentState.position, DataModel::NullNullable);
     EXPECT_EQ(currentState.speed, DataModel::NullNullable);
 }
 
@@ -655,20 +631,14 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetCurrentStateOnlyspeed)
 
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
 
+    // set Values
+    EXPECT_EQ(logic->SetCurrentState(testCurrentState), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    
+    // Ensure the value is accessible via the API
     EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
     EXPECT_EQ(currentState.position, DataModel::NullNullable);
     EXPECT_EQ(currentState.latching, DataModel::NullNullable);
     EXPECT_EQ(currentState.speed, DataModel::NullNullable);
-
-    // set Values
-    EXPECT_EQ(logic->SetCurrentState(testCurrentState), CHIP_NO_ERROR);
-
-    // Ensure the value is accessible via the API
-    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
-    // check only the speed is set
-    EXPECT_EQ(currentState.speed, testCurrentState.speed);
-    EXPECT_EQ(currentState.position, DataModel::NullNullable);
-    EXPECT_EQ(currentState.latching, DataModel::NullNullable);
 }
 
 // This test ensures that the Set function
@@ -756,18 +726,11 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetTargetOnlyPosition)
 
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
 
-    EXPECT_EQ(logic->GetTarget(Target), CHIP_NO_ERROR);
-    EXPECT_EQ(Target.position, DataModel::NullNullable);
-    EXPECT_EQ(Target.latch, DataModel::NullNullable);
-    EXPECT_EQ(Target.speed, DataModel::NullNullable);
-
-    // set Values
-    EXPECT_EQ(logic->SetTarget(testTarget), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->SetTarget(testTarget), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     // Ensure the value is accessible via the API
     EXPECT_EQ(logic->GetTarget(Target), CHIP_NO_ERROR);
-    // check only the position is set
-    EXPECT_EQ(Target.position, testTarget.position);
+    EXPECT_EQ(Target.position, DataModel::NullNullable);
     EXPECT_EQ(Target.latch, DataModel::NullNullable);
     EXPECT_EQ(Target.speed, DataModel::NullNullable);
 }
@@ -792,19 +755,12 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetTargetOnlylatch)
 
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
 
-    EXPECT_EQ(logic->GetTarget(Target), CHIP_NO_ERROR);
-    EXPECT_EQ(Target.position, DataModel::NullNullable);
-    EXPECT_EQ(Target.latch, DataModel::NullNullable);
-    EXPECT_EQ(Target.speed, DataModel::NullNullable);
-
-    // set Values
-    EXPECT_EQ(logic->SetTarget(testTarget), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->SetTarget(testTarget), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     // Ensure the value is accessible via the API
     EXPECT_EQ(logic->GetTarget(Target), CHIP_NO_ERROR);
-    // check only the latch is set
-    EXPECT_EQ(static_cast<uint32_t>(Target.latch.Value()), static_cast<uint32_t>(testTarget.latch.Value()));
     EXPECT_EQ(Target.position, DataModel::NullNullable);
+    EXPECT_EQ(Target.latch, DataModel::NullNullable);
     EXPECT_EQ(Target.speed, DataModel::NullNullable);
 }
 
@@ -828,20 +784,13 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetTargetOnlyspeed)
 
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
 
+    EXPECT_EQ(logic->SetTarget(testTarget), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
+    // Ensure the value is accessible via the API
     EXPECT_EQ(logic->GetTarget(Target), CHIP_NO_ERROR);
     EXPECT_EQ(Target.position, DataModel::NullNullable);
     EXPECT_EQ(Target.latch, DataModel::NullNullable);
     EXPECT_EQ(Target.speed, DataModel::NullNullable);
-
-    // set Values
-    EXPECT_EQ(logic->SetTarget(testTarget), CHIP_NO_ERROR);
-
-    // Ensure the value is accessible via the API
-    EXPECT_EQ(logic->GetTarget(Target), CHIP_NO_ERROR);
-    // check only the speed is set
-    EXPECT_EQ(static_cast<uint32_t>(Target.speed.Value()), static_cast<uint32_t>(testTarget.speed.Value()));
-    EXPECT_EQ(Target.position, DataModel::NullNullable);
-    EXPECT_EQ(Target.latch, DataModel::NullNullable);
 }
 
 // This test ensures that the Set function
@@ -1598,22 +1547,25 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommandConformace)
               Protocols::InteractionModel::Status::UnsupportedCommand);
     EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::Current::Id));
     EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::Target::Id));
+    
+    GenericCurrentStateStruct setCurrentState1{ Optional<Percent100ths>(0), Optional<LatchingEnum>(LatchingEnum::kNotLatched)};
+    GenericTargetStruct settarget1{ Optional<Percent100ths>(0), Optional<TargetLatchEnum>(TargetLatchEnum::kUnlatch)};
 
     conformance = { .featureMap = 3, .supportsOverflow = false };
     EXPECT_EQ(logic->Init(conformance), CHIP_NO_ERROR);
 
-    EXPECT_EQ(logic->SetCurrentState(setCurrentState), CHIP_NO_ERROR);
-    EXPECT_EQ(logic->SetTarget(settarget), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->SetCurrentState(setCurrentState1), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->SetTarget(settarget1), CHIP_NO_ERROR);
 
     context.ClearDirtyList();
     EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kIncrease, 10,
                                        Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh)),
               Protocols::InteractionModel::Status::Success);
     EXPECT_EQ(logic->GetTarget(target), CHIP_NO_ERROR);
-    EXPECT_EQ(target.position.Value(), static_cast<unsigned short>(10));
+    EXPECT_EQ(target.position.Value(), static_cast<unsigned short>(0));
     EXPECT_EQ(target.latch.Value(), TargetLatchEnum::kUnlatch);
     EXPECT_EQ(target.speed, NullOptional);
-    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::Target::Id));
+    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::Target::Id));
 }
 
 } // namespace ClosureDimension
