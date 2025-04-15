@@ -106,6 +106,7 @@ public:
             break;
         case PairingMode::Code:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
+            AddArgument("anchor", 0, 1, &mAnchor);
             AddArgument("dcl-hostname", &mDCLHostName,
                         "Hostname of the DCL server to fetch information from. Defaults to 'on.dcl.csa-iot.org'.");
             AddArgument("dcl-port", 0, UINT16_MAX, &mDCLPort, "Port number for connecting to the DCL server. Defaults to '443'.");
@@ -118,16 +119,19 @@ public:
             break;
         case PairingMode::Ble:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
+            AddArgument("anchor", 0, 1, &mAnchor);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
             break;
         case PairingMode::OnNetwork:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
+            AddArgument("anchor", 0, 1, &mAnchor);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("pase-only", 0, 1, &mPaseOnly);
             break;
         case PairingMode::SoftAP:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
+            AddArgument("anchor", 0, 1, &mAnchor);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
             AddArgument("device-remote-ip", &mRemoteAddr);
@@ -137,12 +141,14 @@ public:
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
         case PairingMode::WiFiPAF:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
+            AddArgument("anchor", 0, 1, &mAnchor);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
             break;
 #endif
         case PairingMode::AlreadyDiscovered:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
+            AddArgument("anchor", 0, 1, &mAnchor);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("device-remote-ip", &mRemoteAddr);
             AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
@@ -150,12 +156,14 @@ public:
             break;
         case PairingMode::AlreadyDiscoveredByIndex:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
+            AddArgument("anchor", 0, 1, &mAnchor);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("index", 0, UINT16_MAX, &mIndex);
             AddArgument("pase-only", 0, 1, &mPaseOnly);
             break;
         case PairingMode::AlreadyDiscoveredByIndexWithCode:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
+            AddArgument("anchor", 0, 1, &mAnchor);
             AddArgument("payload", &mOnboardingPayload);
             AddArgument("index", 0, UINT16_MAX, &mIndex);
             AddArgument("pase-only", 0, 1, &mPaseOnly);
@@ -264,11 +272,13 @@ private:
     const chip::Dnssd::DiscoveryFilterType mFilterType;
     Command::AddressWithInterface mRemoteAddr;
     NodeId mNodeId = chip::kUndefinedNodeId;
+    NodeId mAnchorNodeId = chip::kUndefinedNodeId;
     chip::Optional<uint16_t> mTimeout;
     chip::Optional<bool> mDiscoverOnce;
     chip::Optional<bool> mUseOnlyOnNetworkDiscovery;
     chip::Optional<bool> mPaseOnly;
     chip::Optional<bool> mSkipCommissioningComplete;
+    chip::Optional<bool> mAnchor;
     chip::Optional<bool> mBypassAttestationVerifier;
     chip::Optional<std::vector<uint32_t>> mCASEAuthTags;
     chip::Optional<char *> mCountryCode;

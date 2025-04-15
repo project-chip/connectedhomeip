@@ -18,6 +18,10 @@
 
 #include "PairingCommand.h"
 #include "platform/PlatformManager.h"
+
+#include "joint_fabric_service/joint_fabric_service.rpc.pb.h"
+#include "RpcClientProcessor.h"
+
 #include <commands/common/DeviceScanner.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -36,6 +40,27 @@ using namespace ::chip::Controller;
 CHIP_ERROR PairingCommand::RunCommand()
 {
     CurrentCommissioner().RegisterPairingDelegate(this);
+
+    if (mAnchorNodeId == chip::kUndefinedNodeId)
+    {
+        if (!mAnchor.ValueOr(false))
+        {
+            ChipLogError(chipTool,
+                "Please first commission the Anchor Administrator: add `--anchor true` parameter");
+            return CHIP_ERROR_NOT_CONNECTED;
+        }
+    }
+    else if (mAnchor.ValueOr(false))
+    {
+        ChipLogError(chipTool, "Anchor Administrator already commissioned as Node ID: "
+                                      ChipLogFormatX64, ChipLogValueX64(mAnchorNodeId));
+        return CHIP_ERROR_BAD_REQUEST;
+    }
+    else
+    {
+        mSkipCommissioningComplete = MakeOptional(true);
+    }
+
     // Clear the CATs in OperationalCredentialsIssuer
     mCredIssuerCmds->SetCredentialIssuerCATValues(kUndefinedCATs);
 
@@ -59,7 +84,7 @@ CHIP_ERROR PairingCommand::RunCommand()
 CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
+    
     switch (mPairingMode)
     {
     case PairingMode::None:
@@ -427,11 +452,89 @@ void PairingCommand::OnPairingDeleted(CHIP_ERROR err)
     SetCommandExitStatus(err);
 }
 
+
+
+namespace {
+
+// Constants
+constexpr uint32_t kRpcTimeoutMs     = 1000;
+constexpr uint32_t kDefaultChannelId = 1;
+
+::pw_rpc::nanopb::JointFabric::Client rpcClient(chip::rpc::client::GetDefaultRpcClient(), kDefaultChannelId);
+
+std::mutex responseMutex;
+std::condition_variable responseCv;
+bool responseReceived    = false;
+CHIP_ERROR responseError = CHIP_NO_ERROR;
+
+// By passing the `call` parameter into WaitForResponse we are explicitly trying to insure the caller takes into consideration that
+// the lifetime of the `call` object when calling WaitForResponse
+template <typename CallType>
+CHIP_ERROR WaitForResponse(CallType & call)
+{
+    std::unique_lock<std::mutex> lock(responseMutex);
+    responseReceived = false;
+    responseError    = CHIP_NO_ERROR;
+
+    if (responseCv.wait_for(lock, std::chrono::milliseconds(kRpcTimeoutMs), [] { return responseReceived; }))
+    {
+        return responseError;
+    }
+    else
+    {
+        return CHIP_ERROR_TIMEOUT;
+    }
+}
+
+// Callback function to be called when the RPC response is received
+void OnOwnershipTransferDone(const _pw_protobuf_Empty& response, ::pw::Status status)
+{
+    std::lock_guard<std::mutex> lock(responseMutex);
+    responseReceived = true;
+    responseError    = status.ok() ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
+    responseCv.notify_one();
+
+    if (status.ok())
+    {
+        ChipLogProgress(chipTool, "OnOwnershipTransferDone RPC call succeeded!");
+    }
+    else
+    {
+        ChipLogProgress(chipTool, "OnOwnershipTransferDone RPC call failed with status: %d\n", status.code());
+    }
+}
+
+}
+
 void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
 {
     if (err == CHIP_NO_ERROR)
     {
-        ChipLogProgress(chipTool, "Device commissioning completed with success");
+        if (!mSkipCommissioningComplete.ValueOr(false))
+        {
+            ChipLogProgress(chipTool, "Anchor Administrator commissioned with sucess");
+            mAnchorNodeId = nodeId;
+        }
+        else
+        {
+            OwnershipContext request;
+
+            memset(&request, 0, sizeof(request));
+            request.node_id = nodeId;
+
+            auto call = rpcClient.TransferOwnership(request, OnOwnershipTransferDone);
+            if (!call.active())
+            {
+                ChipLogError(chipTool, "RPC: OwnershipTransfer Call Error");
+                // The RPC call was not sent. This could occur due to, for example, an invalid channel ID. Handle if necessary.
+            }
+
+            err = WaitForResponse(call);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(chipTool, "RPC: OwnershipTransfer Timeout Error");
+            }
+        }
     }
     else
     {
