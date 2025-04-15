@@ -104,6 +104,7 @@ public:
      * @param[in] currentState Current State Position, Latching and/or Speed.
      * @return CHIP_NO_ERROR if set was successful.
      *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      */
     CHIP_ERROR SetCurrentState(const GenericCurrentStateStruct & currentState);
@@ -113,6 +114,7 @@ public:
      * @param[in] target Target Position, Latching and/or Speed.
      * @return CHIP_NO_ERROR if set was successful.
      *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      */
     CHIP_ERROR SetTarget(const GenericTargetStruct & target);
