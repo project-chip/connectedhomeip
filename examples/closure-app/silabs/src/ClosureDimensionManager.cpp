@@ -42,20 +42,41 @@ CHIP_ERROR ClosureDimensionDelegate::Init()
     current.position.SetValue(0);
     current.latching.SetValue(LatchingEnum::kNotLatched);
     current.speed.SetValue(Globals::ThreeLevelAutoEnum::kAuto);
-    getLogic()->SetCurrentState(current);
-
+    CHIP_ERROR err;
+    err = GetLogic()->SetCurrentState(current);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "SetCurrentState failed.");
+        return err;
+    }
     GenericTargetStruct target;
     target.position.SetValue(0);
     target.latch.SetValue(TargetLatchEnum::kUnlatch);
     target.speed.SetValue(Globals::ThreeLevelAutoEnum::kAuto);
-    getLogic()->SetTarget(target);
+    err = GetLogic()->SetTarget(target);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "SetTarget failed.");
+        return err;
+    }
 
     Structs::RangePercent100thsStruct::Type limitRange;
     limitRange.min = LIMIT_RANGE_MIN;
     limitRange.max = LIMIT_RANGE_MAX;
-    getLogic()->SetLimitRange(limitRange);
 
-    getLogic()->SetStepValue(STEP);
+    err = GetLogic()->SetLimitRange(limitRange);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "SetLimitRange failed.");
+        return err;
+    }
+
+    err = GetLogic()->SetStepValue(STEP);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "SetStepValue failed.");
+        return err;
+    }
     ChipLogProgress(AppServer, "ClosureDimensionDelegate::Init done");
     return CHIP_NO_ERROR;
 }
@@ -74,10 +95,9 @@ Status ClosureDimensionDelegate::HandleSetTarget(const Optional<Percent100ths> &
     GenericTargetStruct target;
     Status status = Status::Success;
 
-    ClusterState state             = getLogic()->GetState();
-    ClusterConformance conformance = getLogic()->GetConformance();
+    ClusterState state             = GetLogic()->GetState();
 
-    if (conformance.HasFeature(Feature::kPositioning) && pos.HasValue())
+    if (pos.HasValue())
     {
         if (static_cast<uint16_t>(pos.Value()) != static_cast<uint16_t>(state.currentState.position.Value()))
         {
@@ -86,13 +106,13 @@ Status ClosureDimensionDelegate::HandleSetTarget(const Optional<Percent100ths> &
         }
     }
 
-    if (conformance.HasFeature(Feature::kMotionLatching) && latch.HasValue())
+    if (latch.HasValue())
     {
         latchNeeded  = true;
         target.latch = latch;
     }
 
-    if (conformance.HasFeature(Feature::kSpeed) && speed.HasValue())
+    if (speed.HasValue())
     {
         if (!state.currentState.speed.HasValue())
         {
@@ -105,7 +125,7 @@ Status ClosureDimensionDelegate::HandleSetTarget(const Optional<Percent100ths> &
             target.speed = speed;
         }
     }
-    // If device is already at TargetState ,no Action is required will give Status::Success
+    // If device is already at TargetState ,no Action is required. Status::Success will be returned
     VerifyOrReturnValue(motionNeeded || latchNeeded, Status::Success);
 
     if (isMoving)
@@ -124,7 +144,7 @@ static void HandleStepMotion(System::Layer * systemLayer, void * data)
     ClosureDimensionDelegate * delegate = reinterpret_cast<ClosureDimensionDelegate *>(data);
     VerifyOrReturn(delegate != nullptr, void());
 
-    ClusterState state = delegate->getLogic()->GetState();
+    ClusterState state = delegate->GetLogic()->GetState();
 
     StepDirectionEnum direction = delegate->GetTargetDirection();
 
@@ -138,7 +158,12 @@ static void HandleStepMotion(System::Layer * systemLayer, void * data)
         newPos = std::min((state.target.position.Value() + 0), (state.currentState.position.Value() + state.stepValue));
     }
     state.currentState.position.SetValue(newPos);
-    delegate->getLogic()->SetCurrentState(state.currentState);
+    CHIP_ERROR err = delegate->GetLogic()->SetCurrentState(state.currentState);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "SetCurrentState failed.");
+        return ;
+    }
     if (state.target.position.Value() == state.currentState.position.Value())
     {
         (void) DeviceLayer::SystemLayer().CancelTimer(HandleStepMotion, delegate);
@@ -176,7 +201,7 @@ static void MotionTimerEventHandler(System::Layer * systemLayer, void * data)
     GenericTargetStruct target;
     GenericCurrentStateStruct current;
 
-    delegate->getLogic()->GetTarget(target);
+    delegate->GetLogic()->GetTarget(target);
     current.position.SetValue(static_cast<uint16_t>(target.position.Value()));
     if (target.latch.HasValue())
     {
@@ -194,8 +219,12 @@ static void MotionTimerEventHandler(System::Layer * systemLayer, void * data)
     {
         current.speed.SetValue(target.speed.Value());
     }
-    delegate->getLogic()->SetCurrentState(current);
-
+    CHIP_ERROR err = delegate->GetLogic()->SetCurrentState(current);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "SetCurrentState failed.");
+        return ;
+    }
     if (delegate->mActionCompleted_CB)
     {
         delegate->mActionCompleted_CB(delegate->GetAction());

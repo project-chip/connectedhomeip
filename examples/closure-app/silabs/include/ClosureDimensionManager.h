@@ -58,7 +58,7 @@ public:
     const uint32_t kExampleMotionCountDown = 5;
     const uint32_t kExampleStepCountDown   = 3000;
 
-    ClosureDimensionDelegate(EndpointId endpoint) : mEndpoint(endpoint), gLogic(nullptr) {}
+    ClosureDimensionDelegate(EndpointId endpoint) : mEndpoint(endpoint), mLogic(nullptr) {}
 
     Status HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<TargetLatchEnum> & latch,
                            const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
@@ -70,9 +70,9 @@ public:
 
     CHIP_ERROR Init();
 
-    void SetLogic(ClusterLogic * logic) { gLogic = logic; }
+    void SetLogic(ClusterLogic * logic) { mLogic = logic; }
 
-    ClusterLogic * getLogic() const { return gLogic; }
+    ClusterLogic * GetLogic() const { return mLogic; }
 
     bool IsDeviceMoving() const { return isMoving; }
 
@@ -92,7 +92,7 @@ private:
     StepDirectionEnum mTargetDirection = StepDirectionEnum::kUnknownEnumValue;
     Action_t mAction                   = INVALID_ACTION;
     EndpointId mEndpoint;
-    ClusterLogic * gLogic;
+    ClusterLogic * mLogic;
 };
 
 class ClosureDimensionManager
