@@ -26,6 +26,7 @@ import pathlib
 import queue
 import random
 import re
+import shlex
 import sys
 import textwrap
 import threading
@@ -934,14 +935,12 @@ class MatterBaseTest(base_test.BaseTestClass):
         Send an out-of-band command to a Matter app.
         Args:
             command_dict (dict): dictionary with the command and data
-            app_pipe_name (Optional[str], optional): Name of the cluster pipe file (i.e. /tmp/chip_all_clusters_fifo_ or /tmp/chip_rvc_fifo_). Defaults to None.
-            app_pid (Optional[uint], optional): pid of the process for app_pipe_name. Defaults to None.
+            app_pipe_prefix (Optional[str], optional): Name of the cluster pipe file prefix (i.e. /tmp/chip_all_clusters_fifo_ or /tmp/chip_rvc_fifo_). If None
+            takes the value from the CI argument --app-pipe-prefix.
+            app_pid (Optional[uint], optional): pid of the process for app_pipe_name. If None takes the value from the CI
+            argument --app-pid.
 
-        Extra:
-        By default app_pipe_name is taken from CI argument --app_pipe. Parameter (app_pipe_name) overwrites this value.
-        By default app_pid is taken from CI argument --app-pid. Parameter (app_pid) overwrites this value.
-
-        This method use the following environment variables:
+        This method uses the following environment variables:
 
          - LINUX_DUT_IP
             * if not provided, the Matter app is assumed to run on the same machine as the test,
@@ -967,10 +966,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         if not isinstance(command_dict, dict):
             raise TypeError("The command must be passed as a dictionary value")
 
-        import json
         command = json.dumps(command_dict)
-
-        import os
         dut_ip = os.getenv('LINUX_DUT_IP')
 
         # Checks for concatenate app_pipe and app_pid
@@ -989,7 +985,8 @@ class MatterBaseTest(base_test.BaseTestClass):
                 raise FileNotFoundError("CANNOT FIND %r" % app_pipe_name)
             with open(app_pipe_name, "w") as app_pipe:
                 logger.info(f"Sending out-of-band command: {command} to file: {app_pipe_name}")
-                app_pipe.write(command + "\n")
+                app_pipe.write(json.dumps(command_dict) + "\n")
+
             # TODO(#31239): remove the need for sleep
             sleep(0.001)
         else:
@@ -997,10 +994,8 @@ class MatterBaseTest(base_test.BaseTestClass):
 
             dut_uname = os.getenv('LINUX_DUT_USER')
             asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
-
             logging.info(f"Using DUT user name: {dut_uname}")
-
-            command_fixed = command.replace('\"', '\\"')
+            command_fixed = shlex.quote(json.dumps(command_dict))
             cmd = "echo \"%s\" | ssh %s@%s \'cat > %s\'" % (command_fixed, dut_uname, dut_ip, app_pipe_name)
             os.system(cmd)
 
