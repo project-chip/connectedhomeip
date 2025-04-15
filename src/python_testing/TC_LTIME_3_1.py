@@ -28,7 +28,6 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --json-arg PIXIT.LTIME.SCT:'[0,1,2,3,4,5,6,7,8,9,10,11]'
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -91,14 +90,12 @@ class TC_LTIME_3_1(MatterBaseTest):
         hour_format_values = [0, 1, 255]
 
         calendar_type_values = [i for i in range(0, 12)]
+        cluster_supported_calendar_types = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.SupportedCalendarTypes)
+        cluster_not_supported_calendar_types = []
+        for ctv in calendar_type_values:
+            if ctv not in cluster_supported_calendar_types:
+                cluster_not_supported_calendar_types.append(ctv)
         calendar_type_values.append(255)
-
-        # Read PIXIT values --json-arg
-        pixit_SCT = self.user_params.get('PIXIT.LTIME.SCT')
-        logging.info(f"PIXIT {pixit_SCT}")
-        if pixit_SCT is None:
-            logging.info("PIXIT.LTIME.SCT not found, creating range from 1 to 11")
-            pixit_SCT = [i for i in range(1, 12)]
 
         # Commisioning (precondition)
         self.step(0)
@@ -149,12 +146,19 @@ class TC_LTIME_3_1(MatterBaseTest):
         asserts.assert_equal(activecalendartype_value, 0)
 
         self.step(10)
-        # These values are from
-        logging.info(f"PIXIT.LTIME.SCT values {pixit_SCT}")
-        for i in pixit_SCT:
-            await self.write_single_attribute(self.cluster.Attributes.ActiveCalendarType(i), self.endpoint)
+        # Verify the supported calendar types are active (can read and write).
+        for supported in cluster_supported_calendar_types:
+            logging.info(f"Testing for SupportedCalendarType value {supported}")
+            await self.write_single_attribute(self.cluster.Attributes.ActiveCalendarType(supported), self.endpoint)
             activecalendartype_value = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.ActiveCalendarType)
-            asserts.assert_equal(activecalendartype_value, i)
+            asserts.assert_equal(activecalendartype_value, supported)
+
+        # If is the case for not supported check they return a ConstraintError
+        for unsupported in cluster_not_supported_calendar_types:
+            status = await self.write_single_attribute(self.cluster.Attributes.ActiveCalendarType(
+                unsupported), self.endpoint, expect_success=False)
+            asserts.assert_equal(status, Status.ConstraintError,
+                                 f"ConstraintError, unable to write value {unsupported} into ActiveCalendarType")
 
         self.step(11)
         supportedcalendartype_values = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.SupportedCalendarTypes)
