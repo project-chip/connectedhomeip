@@ -68,11 +68,25 @@ public:
      */
     virtual CHIP_ERROR StartCurrentErrorListRead() = 0;
     // The delegate is expected to return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED to indicate end of list.
-    virtual CHIP_ERROR GetCurrentErrorListAtIndex(size_t, ClosureErrorEnum &) = 0;
-    virtual CHIP_ERROR EndCurrentErrorListRead()                              = 0;
+    virtual CHIP_ERROR GetCurrentErrorAtIndex(size_t, ClosureErrorEnum &) = 0;
+    virtual CHIP_ERROR EndCurrentErrorListRead()                          = 0;
+
+    /**
+     * @brief Checks whether the closure can move (as opposed to still needing pre-motion stages to complete).
+     * @return true if closure is ready to move
+     *         false if closure is not ready to move
+     */
+    virtual bool IsReadyToMove() = 0;
+
+    /**
+     * @brief Checks whether this closure needs manual latching.
+     * @return true if manual latching is needed
+     *         false if manual latching not needed
+     */
+    virtual bool IsManualLatchingNeeded() = 0;
 
 protected:
-    EndpointId mEndpointId = chip::kInvalidEndpointId;
+    EndpointId mEndpointId = kInvalidEndpointId;
 };
 
 enum class OptionalAttribute : uint32_t
@@ -165,6 +179,20 @@ public:
      */
     bool IsSupportedState(MainStateEnum aMainState);
 
+    /**
+     * @brief This function checks whether a specfic command is supported in a specific state or not.
+     * @param[in] cmd Command to be check.
+     * @param[in] state MainState in which command should be supported.
+     * @return true if cmd is supported in state, false if not supported.
+     */
+    bool CheckCommandStateCompatibility(CommandId cmd, MainStateEnum state);
+
+    /**
+     * @brief Causes reporting of CurrentErrorList.
+     *        Whenever application wants to report a change in Errorlist, call this method.
+     */
+    void ReportCurrentErrorListChange();
+
 protected:
     /**
      * @brief Causes reporting/udpating of CountdownTime attribute from driver if sufficient changes have
@@ -199,9 +227,10 @@ private:
     // CommandHandlerInterface
     void InvokeCommand(HandlerContext & handlerContext) override;
 
-    void HandleStop(HandlerContext & ctx, const Commands::Stop::DecodableType & commandData);
-    void HandleMoveTo(HandlerContext & ctx, const Commands::MoveTo::DecodableType & commandData);
-    void HandleCalibrate(HandlerContext & ctx, const Commands::Calibrate::DecodableType & commandData);
+    Protocols::InteractionModel::Status HandleStop(HandlerContext & ctx, const Commands::Stop::DecodableType & commandData);
+    Protocols::InteractionModel::Status HandleMoveTo(HandlerContext & ctx, const Commands::MoveTo::DecodableType & commandData);
+    Protocols::InteractionModel::Status HandleCalibrate(HandlerContext & ctx,
+                                                        const Commands::Calibrate::DecodableType & commandData);
 };
 
 } // namespace ClosureControl

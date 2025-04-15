@@ -29,7 +29,7 @@
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
 
-#include <ClosureAppCommonMain.h>
+#include <ClosureControlMain.h>
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -53,7 +53,7 @@
 
 namespace {
 
-constexpr chip::EndpointId kClosureBaseEndpoint = 1;
+constexpr chip::EndpointId kClosureEndpoint = 1;
 
 } // namespace
 
@@ -70,36 +70,29 @@ using namespace chip::TLV;
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace ClosureControl {
-
-static chip::BitMask<Feature> sFeatureMap(Feature::kCalibration);
-
-} // namespace ClosureControl
+namespace ClosureControl {} // namespace ClosureControl
 } // namespace Clusters
 } // namespace app
 } // namespace chip
 
 AppTask AppTask::sAppTask;
 
-EndpointId GetClosureDeviceEndpointId()
-{
-    return kClosureBaseEndpoint;
-}
-
 void ApplicationInit()
 {
+
+    ChipLogDetail(AppServer, "==================================================");
+    ChipLogDetail(AppServer, "Closure-app ClosureControl starting for endpoint EP%d", kClosureEndpoint);
+    ChipLogDetail(AppServer, "==================================================");
+
     chip::DeviceLayer::PlatformMgr().LockChipStack();
-    SILABS_LOG("==================================================");
-    SILABS_LOG("Closure-app ClosureControl starting. featureMap 0x%08lx", ClosureControl::sFeatureMap.Raw());
-    ClosureApplicationInit();
-    SILABS_LOG("==================================================");
+    ClosureControlInit(kClosureEndpoint);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 }
 
 void ApplicationShutdown()
 {
     chip::DeviceLayer::PlatformMgr().LockChipStack();
-    ClosureApplicationShutdown();
+    ClosureControlShutdown();
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 }
 
@@ -145,11 +138,11 @@ void AppTask::AppTaskMain(void * pvParameter)
     CHIP_ERROR err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
     {
-        SILABS_LOG("AppTask.Init() failed");
+        ChipLogError(AppServer, "AppTask.Init() failed");
         appError(err);
     }
 
-    SILABS_LOG("App Task started");
+    ChipLogDetail(AppServer, "App Task started");
 
     while (true)
     {

@@ -78,6 +78,75 @@ bool Instance::IsSupportedState(MainStateEnum aMainState)
     return true;
 }
 
+// Closure Control MainState and supported commands are given below
+//  1. Calibrating        -> Calibrate and Stop commands supported
+//  2. Stopped            -> Calibrate, MoveTo and Stop commands supported
+//  3. Moving             -> MoveTo and Stop command supported
+//  4. WaitingForMotion   -> MoveTo and Stop command supported
+//  5. Disengaged         -> No commands supported
+//  6. Protected          -> No commands supported
+//  7. SetupRequired      -> No commands supported
+//  8. Error              -> Only MoveTo command supported
+bool Instance::CheckCommandStateCompatibility(CommandId cmd, MainStateEnum state)
+{
+    // None of the commands are supported in Disengaged, Protected and SetupRequired States
+    if ((state == MainStateEnum::kDisengaged) || (state == MainStateEnum::kProtected) || (state == MainStateEnum::kSetupRequired))
+    {
+        return false;
+    }
+
+    switch (cmd)
+    {
+    case Commands::Stop::Id:
+        // The Stop command is supported in Calibrating, Stopped, Moving and WaitingForMotion states, not supported in the Error
+        // state.
+        if (state == MainStateEnum::kError)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+        break;
+
+    case Commands::MoveTo::Id:
+        // The MoveTo command is supported in Stopped, Error, Moving and WaitingForMotion states, not supported in the Calibrating
+        // State.
+        if (state == MainStateEnum::kCalibrating)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+        break;
+
+    case Commands::Calibrate::Id:
+        // The Calibrate command is supported in Calibrating and Stopped states, not supported in Error, Moving and WaitingForMotion
+        // states.
+        if ((state == MainStateEnum::kCalibrating) || (state == MainStateEnum::kStopped))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+        break;
+    default:
+        return false;
+    }
+    return false;
+}
+
+void Instance::ReportCurrentErrorListChange()
+{
+    MatterReportingAttributeChangeCallback(
+        ConcreteAttributePath(mDelegate.GetEndpointId(), ClosureControl::Id, Attributes::CurrentErrorList::Id));
+}
+
 CHIP_ERROR Instance::SetMainState(MainStateEnum aMainState)
 {
     if (!IsSupportedState(aMainState))
@@ -199,24 +268,34 @@ CHIP_ERROR Instance::EncodeCurrentErrorList(const AttributeValueEncoder::ListEnc
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    // Tell the delegate that read has started , error list data should be locked.
     ReturnErrorOnFailure(mDelegate.StartCurrentErrorListRead());
+
     for (size_t i = 0; true; i++)
     {
         ClosureErrorEnum error;
 
-        err = mDelegate.GetCurrentErrorListAtIndex(i, error);
-        // Convert end of list to CHIP_NO_ERROR
-        VerifyOrExit(err != CHIP_ERROR_PROVIDER_LIST_EXHAUSTED, err = CHIP_NO_ERROR);
+        err = mDelegate.GetCurrentErrorAtIndex(i, error);
 
-        // Check if another error occurred before trying to encode
+        // Convert CHIP_ERROR_PROVIDER_LIST_EXHAUSTED to CHIP_NO_ERROR
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+        {
+            err = CHIP_NO_ERROR;
+            goto exit;
+        }
+
+        // Exit for other errors occurred apart from CHIP_ERROR_PROVIDER_LIST_EXHAUSTED
         SuccessOrExit(err);
 
+        // Encode the error
         err = encoder.Encode(error);
+
+        // Check if error occurred while trying to encode
         SuccessOrExit(err);
     }
 
 exit:
-    // Tell the delegate the read is complete
+    // Tell the delegate the read is complete , error list can be modified.
     ReturnErrorOnFailure(mDelegate.EndCurrentErrorListRead());
     return err;
 }
@@ -243,61 +322,142 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeVal
     }
 }
 
-// CommandHandlerInterface
 void Instance::InvokeCommand(HandlerContext & handlerContext)
 {
     using namespace Commands;
+    Status status = Status::UnsupportedCommand;
 
     switch (handlerContext.mRequestPath.mCommandId)
     {
     case Stop::Id:
         if (!HasFeature(Feature::kInstantaneous))
         {
-            HandleCommand<Stop::DecodableType>(
-                handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleStop(ctx, commandData); });
-        }
-        else
-        {
-            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
+            HandleCommand<Stop::DecodableType>(handlerContext, [this, &status](HandlerContext & ctx, const auto & commandData) {
+                status = HandleStop(ctx, commandData);
+            });
         }
         break;
     case MoveTo::Id:
-        HandleCommand<MoveTo::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleMoveTo(ctx, commandData); });
+        HandleCommand<MoveTo::DecodableType>(handlerContext, [this, &status](HandlerContext & ctx, const auto & commandData) {
+            status = HandleMoveTo(ctx, commandData);
+        });
         break;
     case Calibrate::Id:
         if (HasFeature(Feature::kCalibration))
         {
             HandleCommand<Calibrate::DecodableType>(
-                handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleCalibrate(ctx, commandData); });
-        }
-        else
-        {
-            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
+                handlerContext,
+                [this, &status](HandlerContext & ctx, const auto & commandData) { status = HandleCalibrate(ctx, commandData); });
         }
         break;
     }
+
+    handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, status);
 }
 
-void Instance::HandleStop(HandlerContext & ctx, const Commands::Stop::DecodableType & commandData)
+Status Instance::HandleStop(HandlerContext & ctx, const Commands::Stop::DecodableType & commandData)
 {
-    Status status = mDelegate.Stop();
+    MainStateEnum state = GetMainState();
 
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+    Status status = Status::Failure;
+
+    VerifyOrReturnValue(CheckCommandStateCompatibility(Commands::Stop::Id, state), Status::InvalidInState);
+    if (state == MainStateEnum::kStopped)
+    {
+        return Status::Success;
+    }
+
+    if ((state == MainStateEnum::kMoving) || (state == MainStateEnum::kWaitingForMotion))
+    {
+        status = mDelegate.Stop();
+        SetMainState(MainStateEnum::kStopped);
+    }
+
+    return status;
 }
 
-void Instance::HandleMoveTo(HandlerContext & ctx, const Commands::MoveTo::DecodableType & commandData)
+Status Instance::HandleMoveTo(HandlerContext & ctx, const Commands::MoveTo::DecodableType & commandData)
 {
-    Status status = mDelegate.MoveTo(commandData.position, commandData.latch, commandData.speed);
+    MainStateEnum state = GetMainState();
 
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+    // If all command parameters don't have a value, return InvalidCommand
+    VerifyOrReturnValue(commandData.position.HasValue() || commandData.latch.HasValue() || commandData.speed.HasValue(),
+                        Status::InvalidCommand);
+
+    if (commandData.position.HasValue())
+    {
+        VerifyOrReturnError((commandData.position.Value() != TargetPositionEnum::kUnknownEnumValue), Status::ConstraintError);
+
+        // If Positioning(PS) feature is not supported, it SHALL return a status code SUCCESS.
+        VerifyOrReturnError(HasFeature(Feature::kPositioning), Status::Success);
+
+    }
+
+    if (commandData.latch.HasValue())
+    {
+        VerifyOrReturnError(commandData.latch.Value() != TargetLatchEnum::kUnknownEnumValue, Status::ConstraintError);
+
+        // If MotionLatching (LT) feature is not supported, the server SHALL return a status code SUCCESS,
+        VerifyOrReturnError(HasFeature(Feature::kMotionLatching), Status::Success);
+
+        // If manual intervention is required to latch, respond with INVALID_ACTION
+        if (mDelegate.IsManualLatchingNeeded())
+        {
+            return Status::InvalidAction;
+        }
+    }
+
+    if (commandData.speed.HasValue())
+    {
+        VerifyOrReturnError(commandData.speed.Value() != Globals::ThreeLevelAutoEnum::kUnknownEnumValue, Status::ConstraintError);
+
+        // If Speed (SP) feature is not supported, the server SHALL return a status code SUCCESS,
+        VerifyOrReturnError(HasFeature(Feature::kSpeed), Status::Success);
+    }
+
+    // If the MoveTo command is not supported in the current Mainstate, return InvalidInState
+    VerifyOrReturnValue(CheckCommandStateCompatibility(Commands::MoveTo::Id, state), Status::InvalidInState);
+
+    // TODO: Check if Closure need to perform motion or not.
+    // if the closure is already in the target position, Motion is not required
+    // If Motion is required, then ignore next checks and start checking if closure is ready to move or not.
+    // If Motion is not required, then check for Errors on closure.
+    // If there are no errors on closure, set MainState to Stopped and return SUCCESS.
+    // If there are errors on closure, set MainState to Error and return SUCCESS.
+
+    if (mDelegate.IsReadyToMove())
+    {
+        // If the closure is ready to move, set MainState to Moving
+        SetMainState(MainStateEnum::kMoving);
+    }
+    else
+    {
+        // If closure needs to pre-stage before moving, then set MainState to WaitingForMoving
+        SetMainState(MainStateEnum::kWaitingForMotion);
+    }
+
+    return mDelegate.MoveTo(commandData.position, commandData.latch, commandData.speed);
 }
 
-void Instance::HandleCalibrate(HandlerContext & ctx, const Commands::Calibrate::DecodableType & commandData)
+// Calibrate command is valid only in calibrating and stopped states.
+Status Instance::HandleCalibrate(HandlerContext & ctx, const Commands::Calibrate::DecodableType & commandData)
 {
-    Status status = mDelegate.Calibrate();
+    MainStateEnum state = GetMainState();
+    Status status       = Status::Failure;
+    VerifyOrReturnValue(CheckCommandStateCompatibility(Commands::Calibrate::Id, state), Status::InvalidInState);
 
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+    if (state == MainStateEnum::kCalibrating)
+    {
+        return Status::Success;
+    }
+
+    if ((state == MainStateEnum::kStopped))
+    {
+        status = mDelegate.Calibrate();
+        SetMainState(MainStateEnum::kCalibrating);
+    }
+
+    return status;
 }
 
 } // namespace ClosureControl

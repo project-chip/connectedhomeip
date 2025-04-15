@@ -30,10 +30,10 @@ namespace Clusters {
 namespace ClosureControl {
 
 // This is an application level delegate to handle Closure Control commands according to the specific business logic.
-class ClosureControlDelegate : public ClosureControl::Delegate
+class ClosureControlManager : public ClosureControl::Delegate
 {
 public:
-    ClosureControlDelegate(EndpointId clustersEndpoint);
+    static ClosureControlManager sClosureCtrlMgr;
 
     void SetClosureControlInstance(ClosureControl::Instance & instance);
 
@@ -59,8 +59,12 @@ public:
      *
      ***************************************************************************/
     CHIP_ERROR StartCurrentErrorListRead() override;
-    CHIP_ERROR GetCurrentErrorListAtIndex(size_t Index, ClosureErrorEnum & closureError) override;
+    CHIP_ERROR GetCurrentErrorAtIndex(size_t Index, ClosureErrorEnum & closureError) override;
     CHIP_ERROR EndCurrentErrorListRead() override;
+
+    void ClosureControlAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId);
+    bool IsReadyToMove();
+    bool IsManualLatchingNeeded();
 
 private:
     /***************************************************************************
@@ -70,7 +74,7 @@ private:
      ***************************************************************************/
 
     // Need the following so can determine which features are supported
-    ClosureControl::Instance * mpClosureControlInstance;
+    ClosureControl::Instance * mpClosureControlInstance = nullptr;
 };
 
 } // namespace ClosureControl
