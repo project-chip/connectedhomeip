@@ -194,12 +194,6 @@ bool ClosureControlManager::IsManualLatchingNeeded()
     return false;
 }
 
-bool ClosureControlManager::HasError()
-{
-    // TODO: Check for errors on the closure
-    return false;
-}
-
 bool ClosureControlManager::IsReadyToMove()
 {
     // TODO: Check if closure is ready to move or should wait.

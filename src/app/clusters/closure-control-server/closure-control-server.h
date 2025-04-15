@@ -79,13 +79,6 @@ public:
     virtual bool IsReadyToMove() = 0;
 
     /**
-     * @brief Checks whether the closure has any errors.
-     * @return true if the closure has errors.
-     *         false if the closure does not have any errors.
-     */
-    virtual bool HasError() = 0;
-
-    /**
      * @brief Checks whether this closure needs manual latching.
      * @return true if manual latching is needed
      *         false if manual latching not needed

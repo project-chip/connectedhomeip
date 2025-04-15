@@ -64,7 +64,6 @@ public:
 
     void ClosureControlAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId);
     bool IsReadyToMove();
-    bool HasError();
     bool IsManualLatchingNeeded();
 
 private:

@@ -387,8 +387,10 @@ Status Instance::HandleMoveTo(HandlerContext & ctx, const Commands::MoveTo::Deco
     if (commandData.position.HasValue())
     {
         VerifyOrReturnError((commandData.position.Value() != TargetPositionEnum::kUnknownEnumValue), Status::ConstraintError);
+
         // If Positioning(PS) feature is not supported, it SHALL return a status code SUCCESS.
         VerifyOrReturnError(HasFeature(Feature::kPositioning), Status::Success);
+
     }
 
     if (commandData.latch.HasValue())
@@ -408,20 +410,20 @@ Status Instance::HandleMoveTo(HandlerContext & ctx, const Commands::MoveTo::Deco
     if (commandData.speed.HasValue())
     {
         VerifyOrReturnError(commandData.speed.Value() != Globals::ThreeLevelAutoEnum::kUnknownEnumValue, Status::ConstraintError);
+
         // If Speed (SP) feature is not supported, the server SHALL return a status code SUCCESS,
         VerifyOrReturnError(HasFeature(Feature::kSpeed), Status::Success);
     }
 
-    // If the MoveTo command is not supported in the current state, return InvalidInState
+    // If the MoveTo command is not supported in the current Mainstate, return InvalidInState
     VerifyOrReturnValue(CheckCommandStateCompatibility(Commands::MoveTo::Id, state), Status::InvalidInState);
 
-    // If the closure has errors, set the MainState to Error and return SUCCESS.
-    if (mDelegate.HasError())
-    {
-        VerifyOrReturnError(SetMainState(MainStateEnum::kError) == CHIP_NO_ERROR, Status::Failure);
-        // Return Status SUCCESS
-        return Status::Success;
-    }
+    // TODO: Check if Closure need to perform motion or not.
+    // if the closure is already in the target position, Motion is not required
+    // If Motion is required, then ignore next checks and start checking if closure is ready to move or not.
+    // If Motion is not required, then check for Errors on closure.
+    // If there are no errors on closure, set MainState to Stopped and return SUCCESS.
+    // If there are errors on closure, set MainState to Error and return SUCCESS.
 
     if (mDelegate.IsReadyToMove())
     {
