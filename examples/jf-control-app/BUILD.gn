@@ -28,10 +28,18 @@ import("${chip_root}/src/crypto/crypto.gni")
 
 assert(chip_build_tools)
 
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+
+if (chip_enable_pw_rpc) {
+  import("//build_overrides/pigweed.gni")
+  import("$dir_pw_build/target_types.gni")
+}
+
 config("config") {
   include_dirs = [
     ".",
     "${chip_root}/examples/common",
+    "${chip_root}/examples/platform/linux",
     "${chip_root}/zzz_generated/app-common/app-common",
     "${chip_root}/zzz_generated/chip-tool",
     "${chip_root}/src/lib",
@@ -56,6 +64,8 @@ config("config") {
 
 static_library("jfc-utils") {
   sources = [
+    "${chip_root}/examples/platform/linux/RpcClientProcessor.cpp",
+    "${chip_root}/examples/platform/linux/RpcClientProcessor.h",
     "${chip_root}/src/controller/ExamplePersistentStorage.cpp",
     "${chip_root}/src/controller/ExamplePersistentStorage.h",
     "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/ComplexArgumentParser.cpp",
@@ -102,6 +112,21 @@ static_library("jfc-utils") {
   }
 
   public_deps = [
+    "$dir_pw_hdlc:default_addresses",
+    "$dir_pw_hdlc:rpc_channel_output",
+    "$dir_pw_log",
+    "$dir_pw_rpc:server",
+    "$dir_pw_rpc/system_server:facade",
+    "$dir_pw_rpc/system_server:socket",
+    "$dir_pw_stream:socket_stream",
+    "$dir_pw_stream:sys_io_stream",
+    "$dir_pw_sync:mutex",
+    "$dir_pw_trace",
+    "$dir_pw_trace_tokenized",
+    "$dir_pw_trace_tokenized:trace_rpc_service",
+    "${chip_root}/config/linux/lib/pw_rpc:pw_rpc",
+    "${chip_root}/examples/common/pigweed:rpc_services",
+    "${chip_root}/examples/common/pigweed:joint_fabric_service.nanopb_rpc",
     "${chip_root}/examples/common/tracing:commandline",
     "${chip_root}/src/app/icd/client:handler",
     "${chip_root}/src/app/icd/client:manager",
@@ -117,6 +142,8 @@ static_library("jfc-utils") {
     "${chip_root}/third_party/inipp",
     "${chip_root}/third_party/jsoncpp",
   ]
+
+  public_deps += pw_build_LINK_DEPS
 
   public_configs = [ ":config" ]
 

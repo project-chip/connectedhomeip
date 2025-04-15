@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2020 Project CHIP Authors
+ *   Copyright (c) 2025 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,7 +28,21 @@
 #include "commands/interactive/Commands.h"
 #include "commands/pairing/Commands.h"
 
+#include "RpcClientProcessor.h"
+
 #include <zap-generated/cluster/Commands.h>
+
+
+static std::string rpcServerIp = "127.0.0.1";
+static uint16_t rpcServerPort = 33000;
+CHIP_ERROR RpcConnect();
+
+CHIP_ERROR RpcConnect(void)
+{
+    chip::rpc::client::SetRpcServerAddress(rpcServerIp.c_str());
+    chip::rpc::client::SetRpcServerPort(rpcServerPort);
+    return chip::rpc::client::StartPacketProcessing();
+}
 
 // ================================================================================
 // Main Code
@@ -55,11 +69,18 @@ int main(int argc, char * argv[])
     registerCommandsSubscriptions(commands, &credIssuerCommands);
 
 
-     std::vector<char *> c_args;
-     for (auto & arg : args)
-     {
-         c_args.push_back(const_cast<char *>(arg.c_str()));
-     }
+    std::vector<char *> c_args;
+    for (auto & arg : args)
+    {
+        c_args.push_back(const_cast<char *>(arg.c_str()));
+    }
+    
+    /* connect to the jf-admin-app RPC server (ownership transfer) */
+    if (RpcConnect() != CHIP_NO_ERROR)
+    {
+        ChipLogProgress(NotSpecified, "RPC: Unable to connect to the jf-admin-app@%s:%d", rpcServerIp.c_str(), rpcServerPort);
+        return -1;
+    }
  
-     return commands.Run(static_cast<int>(c_args.size()), c_args.data());
+    return commands.Run(static_cast<int>(c_args.size()), c_args.data());
 }
