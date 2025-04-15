@@ -499,19 +499,21 @@ class TC_CGEN_2_2(MatterBaseTest):
         resp = await TH2.FindOrEstablishPASESession(setupCode=setup_qr_code, nodeid=newNodeId)
         logger.info('Step #22 - TH2 successfully establish PASE session completed')
 
+        # This is expected to fail because the device is not fully commissioned.
+        # Some SDKs may raise a timeout here, but depends on the implementation.
         try:
-            # Verify DUT cannot proceed because the session has not been fully commissioned, leading to a timeout error
             cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0)
             resp = await self.send_single_cmd(
                 dev_ctrl=TH2,
                 node_id=newNodeId,
                 cmd=cmd)
-        except ChipStackError as e:
-            asserts.assert_in('Timeout',
-                              str(e), f'Expected Timeout error, but got {str(e)}')
-            logger.info(f"Step #22 - TH2 Expected error occurred during ArmFailSafe command: {str(e)}. Proceeding to next step.")
+        except Exception as e:
+            # Expected behavior and proceeding to next step.
+            logger.info(f"Step #22 - ArmFailSafe command failed as expected: {str(e)}. Proceeding to next step.")
+            pass
         else:
-            asserts.assert_true(False, 'Expected Timeout, but no exception occurred.')
+            # If no exception is raised, something is wrong — expected command to fail.
+            asserts.assert_true(False, 'Expected ArmFailSafe to fail because the device is not fully commissioned.')
 
         self.step(23)
         nocs_updated = await self.read_single_attribute_check_success(
