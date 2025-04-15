@@ -318,6 +318,7 @@ CPROTO
 cpuapp
 cpython
 CQM
+CRL
 crypto
 cryptographic
 CSA

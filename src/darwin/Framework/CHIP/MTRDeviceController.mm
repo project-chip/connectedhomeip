@@ -86,6 +86,10 @@ using namespace chip::Tracing::DarwinFramework;
 }
 @end
 
+@interface MTRDeviceController ()
+@property (readwrite, nonatomic) NSUUID * uniqueIdentifier;
+@end
+
 @implementation MTRDeviceController {
     os_unfair_lock _underlyingDeviceMapLock;
 
@@ -106,11 +110,14 @@ using namespace chip::Tracing::DarwinFramework;
     return &_underlyingDeviceMapLock;
 }
 
-- (instancetype)initForSubclasses:(BOOL)startSuspended
+- (instancetype)initForSubclasses:(BOOL)startSuspended uniqueIdentifier:(NSUUID *)uniqueIdentifier
 {
     if (self = [super init]) {
         // nothing, as superclass of MTRDeviceController is NSObject
     }
+
+    self.uniqueIdentifier = uniqueIdentifier;
+
     _underlyingDeviceMapLock = OS_UNFAIR_LOCK_INIT;
 
     _suspended = startSuspended;
@@ -711,6 +718,15 @@ using namespace chip::Tracing::DarwinFramework;
             [delegate controller:controller readCommissioneeInfo:info];
         } else if ([delegate respondsToSelector:@selector(controller:readCommissioningInfo:)]) {
             [delegate controller:controller readCommissioningInfo:info.productIdentity];
+        }
+    } logString:__PRETTY_FUNCTION__];
+}
+
+- (void)controller:(MTRDeviceController *)controller commissioneeHasReceivedNetworkCredentials:(NSNumber *)nodeID
+{
+    [self _callDelegatesWithBlock:^(id<MTRDeviceControllerDelegate> delegate) {
+        if ([delegate respondsToSelector:@selector(controller:commissioneeHasReceivedNetworkCredentials:)]) {
+            [delegate controller:controller commissioneeHasReceivedNetworkCredentials:nodeID];
         }
     } logString:__PRETTY_FUNCTION__];
 }
