@@ -72,8 +72,8 @@ constexpr size_t IndexInfoTLVMaxSize()
     return TLV::EstimateStructOverhead(sizeof(FabricIndex), CHIP_CONFIG_MAX_FABRICS * (1 + sizeof(FabricIndex)) + 1);
 }
 
-CHIP_ERROR AddNewFabricForTestInternal(FabricTable & fabricTable, bool leavePending, const ByteSpan & rootCert,
-                                       const ByteSpan & icacCert, const ByteSpan & nocCert, const ByteSpan & opKeySpan,
+CHIP_ERROR AddNewFabricForTestInternal(FabricTable & fabricTable, bool leavePending, ByteSpan rootCert,
+                                       ByteSpan icacCert, ByteSpan nocCert, ByteSpan opKeySpan,
                                        FabricIndex * outFabricIndex)
 {
     VerifyOrReturnError(outFabricIndex != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -385,7 +385,7 @@ CHIP_ERROR FabricInfo::FetchRootPubkey(Crypto::P256PublicKey & outPublicKey) con
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FabricTable::VerifyCredentials(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac,
+CHIP_ERROR FabricTable::VerifyCredentials(FabricIndex fabricIndex, ByteSpan noc, ByteSpan icac,
                                           ValidationContext & context, CompressedFabricId & outCompressedFabricId,
                                           FabricId & outFabricId, NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
                                           Crypto::P256PublicKey * outRootPublicKey) const
@@ -399,7 +399,7 @@ CHIP_ERROR FabricTable::VerifyCredentials(FabricIndex fabricIndex, const ByteSpa
                              outRootPublicKey);
 }
 
-CHIP_ERROR FabricTable::VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac,
+CHIP_ERROR FabricTable::VerifyCredentials(ByteSpan noc, ByteSpan icac, ByteSpan rcac,
                                           ValidationContext & context, CompressedFabricId & outCompressedFabricId,
                                           FabricId & outFabricId, NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
                                           Crypto::P256PublicKey * outRootPublicKey)
@@ -733,14 +733,14 @@ CHIP_ERROR FabricTable::LoadFromStorage(FabricInfo * fabric, FabricIndex newFabr
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FabricTable::AddNewFabricForTest(const ByteSpan & rootCert, const ByteSpan & icacCert, const ByteSpan & nocCert,
-                                            const ByteSpan & opKeySpan, FabricIndex * outFabricIndex)
+CHIP_ERROR FabricTable::AddNewFabricForTest(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert,
+                                            ByteSpan opKeySpan, FabricIndex * outFabricIndex)
 {
     return AddNewFabricForTestInternal(*this, /*leavePending=*/false, rootCert, icacCert, nocCert, opKeySpan, outFabricIndex);
 }
 
-CHIP_ERROR FabricTable::AddNewUncommittedFabricForTest(const ByteSpan & rootCert, const ByteSpan & icacCert,
-                                                       const ByteSpan & nocCert, const ByteSpan & opKeySpan,
+CHIP_ERROR FabricTable::AddNewUncommittedFabricForTest(ByteSpan rootCert, ByteSpan icacCert,
+                                                       ByteSpan nocCert, ByteSpan opKeySpan,
                                                        FabricIndex * outFabricIndex)
 {
     return AddNewFabricForTestInternal(*this, /*leavePending=*/true, rootCert, icacCert, nocCert, opKeySpan, outFabricIndex);
@@ -2186,7 +2186,8 @@ CHIP_ERROR FabricTable::FetchVIDVerificationStatement(FabricIndex fabricIndex, M
     VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(outVIDVerificationStatement.size() >= kVendorIdVerificationStatementV1Size, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    // TODO(#38308): Add VIDVerificationStatement loading support.
+    // TODO(#38308): Add VIDVerificationStatement loading support. Empty for now since setting is still
+    // to be done and the result will be correct with more of the actual code running.
     outVIDVerificationStatement.reduce_size(0);
     return CHIP_NO_ERROR;
 }
@@ -2196,13 +2197,14 @@ CHIP_ERROR FabricTable::FetchVVSC(FabricIndex fabricIndex, MutableByteSpan & out
     VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(outVVSC.size() >= kMaxCHIPCertLength, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    // TODO(#38308): Add VVSC loading support.
+    // TODO(#38308): Add VVSC loading support. Empty for now since setting is still
+    // to be done and the result will be correct with more of the actual code running.
     outVVSC.reduce_size(0);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FabricTable::SignVIDVerificationRequest(FabricIndex fabricIndex, const ByteSpan & clientChallenge,
-                                                   const ByteSpan & attestationChallenge,
+CHIP_ERROR FabricTable::SignVIDVerificationRequest(FabricIndex fabricIndex, ByteSpan clientChallenge,
+                                                   ByteSpan attestationChallenge,
                                                    SignVIDVerificationResponseData & outResponse)
 {
     FabricInfo * fabricInfo = GetMutableFabricByIndex(fabricIndex);
