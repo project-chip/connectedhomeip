@@ -30,6 +30,7 @@
 #endif // DISPLAY_ENABLED
 
 #include <ClosureAppCommonMain.h>
+#include <ClosureDimensionManager.h>
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -66,6 +67,8 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;
 using namespace ::chip::DeviceLayer::Internal;
 using namespace chip::TLV;
+using chip::app::Clusters::ClosureDimension::ClosureDimensionDelegate;
+using chip::app::Clusters::ClosureDimension::ClosureDimensionManager;
 
 namespace chip {
 namespace app {
@@ -80,6 +83,11 @@ static chip::BitMask<Feature> sFeatureMap(Feature::kCalibration);
 } // namespace chip
 
 AppTask AppTask::sAppTask;
+ClosureDimensionManager ep2(2);
+ClosureDimensionManager ep3(3);
+constexpr const uint8_t kNamespaceClosurePanel = 0x45;
+constexpr const uint8_t kNamespaceLift         = 0x00;
+constexpr const uint8_t kNamespaceTilt         = 0x01;
 
 EndpointId GetClosureDeviceEndpointId()
 {
@@ -93,7 +101,79 @@ void ApplicationInit()
     SILABS_LOG("Closure-app ClosureControl starting. featureMap 0x%08lx", ClosureControl::sFeatureMap.Raw());
     ClosureApplicationInit();
     SILABS_LOG("==================================================");
+
+    SILABS_LOG("Closure-app Dimesnion Manager updated starting");
+
+    const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp2TagList[] = {
+        { .namespaceID = kNamespaceClosurePanel,
+          .tag         = kNamespaceLift,
+          .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("ClosurePanel.Lift"_span)) },
+    };
+    const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp3TagList[] = {
+        { .namespaceID = kNamespaceClosurePanel,
+          .tag         = kNamespaceTilt,
+          .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("ClosurePanel.Tilt"_span)) },
+    };
+
+    ep2.Init();
+    ep3.Init();
+
+    ep2.getDelegate().SetCallbacks(AppTask::ActionInitiated, AppTask::ActionCompleted);
+    ep3.getDelegate().SetCallbacks(AppTask::ActionInitiated, AppTask::ActionCompleted);
+
+    SetTagList(/* endpoint= */ 2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp2TagList));
+    SetTagList(/* endpoint= */ 3, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp3TagList));
+
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+}
+
+void AppTask::ActionInitiated(ClosureDimensionDelegate::Action_t action)
+{
+    if (action == ClosureDimensionDelegate::MOVE_ACTION)
+    {
+        SILABS_LOG("Move Action Initiated. Starting Motion");
+    }
+    else if (action == ClosureDimensionDelegate::STEP_ACTION)
+    {
+        SILABS_LOG("Step Action Initiated. Starting Step");
+    }
+    else if (action == ClosureDimensionDelegate::MOVE_AND_LATCH_ACTION)
+    {
+        SILABS_LOG("Move and Latch Action Initiated. Starting Motion and Latch");
+    }
+    else if (action == ClosureDimensionDelegate::TARGET_CHANGE_ACTION)
+    {
+        SILABS_LOG("Target change Action Initiated. Starting Target Change");
+    }
+    else
+    {
+        SILABS_LOG("Invalid Action");
+    }
+}
+
+void AppTask::ActionCompleted(ClosureDimensionDelegate::Action_t action)
+{
+    SILABS_LOG("==================================================");
+    if (action == ClosureDimensionDelegate::MOVE_ACTION)
+    {
+        SILABS_LOG("Motion completed");
+    }
+    else if (action == ClosureDimensionDelegate::STEP_ACTION)
+    {
+        SILABS_LOG("Step completed");
+    }
+    else if (action == ClosureDimensionDelegate::MOVE_AND_LATCH_ACTION)
+    {
+        SILABS_LOG("Motion and Latch completed");
+    }
+    else if (action == ClosureDimensionDelegate::TARGET_CHANGE_ACTION)
+    {
+        SILABS_LOG("Target Change completed");
+    }
+    else
+    {
+        SILABS_LOG("Invalid Action");
+    }
 }
 
 void ApplicationShutdown()
