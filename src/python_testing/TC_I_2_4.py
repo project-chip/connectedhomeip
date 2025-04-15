@@ -59,7 +59,7 @@ class TC_I_2_4(MatterBaseTest):
                 TestStep(3, "TH stores the reported values of IdentifyTime in all incoming reports for IdentifyTime attribute, that contains data in reportedIdentifyTimeValuesList, over a period of 15 seconds."),
                 TestStep(4, f"{THwrite} IdentifyTime attribute to 5.", test_plan_support.verify_success()),
                 TestStep(5, f"{THwrite} IdentifyTime attribute to 10.", test_plan_support.verify_success()),
-                TestStep(6, "Wait for 15 seconds"),
+                TestStep(6, "Wait for 12 seconds"),
                 TestStep(7, "TH verifies reportedIdentifyTimeValuesList contains three entries",
                          "reportedIdentifyTimeValuesList has 3 entries in the list"),
                 TestStep(8, "TH verifies the first entry in reportedIdentifyTimeValuesList is 5",
@@ -83,7 +83,7 @@ class TC_I_2_4(MatterBaseTest):
                          test_plan_support.verify_success()),
                 TestStep(20, f"{THcommand} Identify command with the value of IdentifyTime field set to 10",
                          test_plan_support.verify_success()),
-                TestStep(21, "Wait for 15 seconds"),
+                TestStep(21, "Wait for 12 seconds"),
                 TestStep(22, "TH verifies reportedIdentifyTimeValuesList contains three entries",
                          "reportedIdentifyTimeValuesList has 3 entries in the list"),
                 TestStep(23, "TH verifies the first entry in reportedIdentifyTimeValuesList is 5",
@@ -132,8 +132,8 @@ class TC_I_2_4(MatterBaseTest):
         asserts.assert_equal(result, Status.Success, "Error when trying to write a IdentifyTime value")
 
         self.step(6)
-        logging.info("Test waits for 15 seconds")
-        time.sleep(15)
+        logging.info("Test waits for 12 seconds")
+        time.sleep(12)
 
         self.step(7)
         count = sub_handler.attribute_report_counts[cluster.Attributes.IdentifyTime]
@@ -202,8 +202,8 @@ class TC_I_2_4(MatterBaseTest):
             pass
 
         self.step(21)
-        logging.info("Test waits for 15 seconds")
-        time.sleep(15)
+        logging.info("Test waits for 12 seconds")
+        time.sleep(12)
 
         self.step(22)
         count = sub_handler.attribute_report_counts[cluster.Attributes.IdentifyTime]
