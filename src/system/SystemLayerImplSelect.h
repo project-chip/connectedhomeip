@@ -97,6 +97,7 @@ public:
     dispatch_queue_t GetDispatchQueue() override { return mDispatchQueue; };
     void HandleDispatchQueueEvents(Clock::Timeout timeout) override{};
     void HandleTimerComplete(TimerList::Node * timer);
+    CHIP_ERROR ScheduleWorkWithBlock(dispatch_block_t block) override { return CHIP_ERROR_NOT_IMPLEMENTED; };
 #elif CHIP_SYSTEM_CONFIG_USE_LIBEV
     virtual void SetLibEvLoop(struct ev_loop * aLibEvLoopP) override { mLibEvLoopP = aLibEvLoopP; };
     virtual struct ev_loop * GetLibEvLoop() override { return mLibEvLoopP; };
