@@ -32,3 +32,6 @@
 
 #define CHIP_DEVICE_CONFIG_DEVICE_TYPE 121 // 0x0079 = 121 = Matter Microwave Oven
 #define CHIP_DEVICE_CONFIG_DEVICE_NAME "Test Microwave Oven"
+
+// Allows app options (ports) to be configured on launch of app
+#define CHIP_DEVICE_ENABLE_PORT_PARAMS 1
