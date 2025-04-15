@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2024 Project CHIP Authors
+#    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,11 +13,6 @@
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
-#
-#  There are CI issues to be followed up for the test cases below that implements manually controlling sensor device for
-#  the occupancy state ON/OFF change.
-#  [TC-OCC-3.1] test procedure step 4
-#  [TC-OCC-3.2] test precedure step 3a, 3c
 
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
@@ -48,10 +43,6 @@ from mobly import asserts
 from TC_AVSUMTestBase import AVSUMTestBase
 
 class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
-    #async def read_avsum_attribute_expect_success(self, endpoint, attribute):
-    #    cluster = Clusters.Objects.CameraAvSettingsUserLevelManagement
-    #    return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
-
     has_feature_dptz = False
     has_feature_mpan = False
     has_feature_mtilt = False
@@ -109,8 +100,7 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
         return pics
 
     @async_test_body
-    async def test_TC_AVSUM_2_1(self):
-        endpoint = 1
+    async def test_TC_AVSUM_2_1(self, endpoint=1):
         cluster = Clusters.Objects.CameraAvSettingsUserLevelManagement
         attributes = cluster.Attributes
         tilt_min_dut = tilt_max_dut = pan_min_dut = pan_max_dut = zoom_max_dut = None
@@ -178,7 +168,7 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
             asserts.assert_less_equal(pan_max_dut, 180, "PanMax is not in valid range.")
             asserts.assert_greater_equal(pan_max_dut, -179, "PanMax is not in valid range.")
         else: 
-            logging.info("MTILT Feature not supported. Test steps skipped")
+            logging.info("MPAN Feature not supported. Test steps skipped")
             self.skip_step(6)
             self.skip_step(7)    
 
