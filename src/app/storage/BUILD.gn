@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Project CHIP Authors
+# Copyright (c) 2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,28 +11,22 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import("//build_overrides/chip.gni")
+import("${chip_root}/src/app/common_flags.gni")
 
-static_library("scenes") {
-  output_name = "libCHIPScenes"
+config("includes") {
+  include_dirs = [ "${chip_app_zap_dir}" ]
+}
 
+source_set("fabric-table") {
   sources = [
-    "ExtensionFieldSets.h",
-    "ExtensionFieldSetsImpl.cpp",
-    "ExtensionFieldSetsImpl.h",
-    "SceneHandlerImpl.cpp",
-    "SceneHandlerImpl.h",
-    "SceneTable.h",
-    "SceneTableImpl.cpp",
-    "SceneTableImpl.h",
+    "FabricTableImpl.h",
+    "FabricTableImpl.hpp",
+    "TableEntry.h",
   ]
 
   deps = [ "${chip_root}/src/app" ]
 
-  public_deps = [ "${chip_root}/src/app/storage:fabric-table" ]
-
-  cflags = [
-    "-Wconversion",
-    "-Wshadow",
-  ]
+  public_configs = [ ":includes" ]
 }

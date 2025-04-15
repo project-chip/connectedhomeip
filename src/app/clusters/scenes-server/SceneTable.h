@@ -18,7 +18,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/scenes-server/ExtensionFieldSets.h>
-#include <app/common/TableEntry.h>
+#include <app/storage/TableEntry.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CommonIterator.h>
 #include <lib/support/IntrusiveList.h>
@@ -29,7 +29,7 @@ namespace chip {
 namespace scenes {
 
 // Storage index for scenes in nvm
-typedef app::common::data::EntryIndex SceneIndex;
+typedef app::Storage::Data::EntryIndex SceneIndex;
 
 typedef uint32_t TransitionTimeMs;
 typedef uint32_t SceneTransitionTime;
@@ -222,7 +222,7 @@ public:
         }
     };
 
-    using SceneTableEntry = app::common::data::TableEntry<SceneStorageId, SceneData>;
+    using SceneTableEntry = app::Storage::Data::TableEntry<SceneStorageId, SceneData>;
 
     SceneTable(){};
 

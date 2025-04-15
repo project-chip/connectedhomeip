@@ -82,15 +82,3 @@ source_set("enums") {
   ]
   public_configs = [ ":includes" ]
 }
-
-source_set("fabric-table") {
-  sources = [
-    "FabricTableImpl.h",
-    "FabricTableImpl.hpp",
-    "TableEntry.h",
-  ]
-
-  deps = [ "${chip_root}/src/app" ]
-
-  public_configs = [ ":includes" ]
-}
