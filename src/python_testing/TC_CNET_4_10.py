@@ -16,7 +16,7 @@
 #
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches, async_test_body
+from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main)
 from mobly import asserts
 
 
@@ -56,7 +56,7 @@ class TC_CNET_4_10(MatterBaseTest):
     async def test_TC_CNET_4_10(self):
         # Commissioning is already done
         self.step("preconditions")
-        
+
         cnet = Clusters.NetworkCommissioning
         gen_comm = Clusters.GeneralCommissioning
         thread_network_id = "hex:1111111122222222"  # From PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET
