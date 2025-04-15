@@ -20,6 +20,8 @@
 
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/List.h>
+#include <app/data-model/Nullable.h>
 #include <app/util/basic-types.h>
 #include <lib/core/TLV.h>
 #include <lib/support/BitMask.h>

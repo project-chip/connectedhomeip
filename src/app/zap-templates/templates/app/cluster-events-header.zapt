@@ -1,10 +1,13 @@
 {{> header}}
 #pragma once
 
-#include <app/EventLoggingTypes.h>
+#include <app/data-model/DecodableList.h>
 #include <app/data-model/List.h>
+#include <app/data-model/Nullable.h>
+#include <app/EventLoggingTypes.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/TLV.h>
+#include <lib/support/BitMask.h>
 
 #include <clusters/shared/Enums.h>
 #include <clusters/shared/Structs.h>
