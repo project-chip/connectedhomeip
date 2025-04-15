@@ -320,7 +320,7 @@ namespace Inet {
         });
 
         __auto_type timeout = dispatch_time(DISPATCH_TIME_NOW, kSendTimeoutInSeconds);
-        dispatch_group_wait(group, timeout);
+        dispatch_group_wait(group, timeout); // NOLINT(clang-analyzer-optin.performance.GCDAntipattern)
         return err;
     }
 
