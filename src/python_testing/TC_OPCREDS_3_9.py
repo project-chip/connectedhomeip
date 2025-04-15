@@ -38,12 +38,13 @@
 import enum
 import hashlib
 import logging
+import re
 from binascii import unhexlify
 from typing import Optional
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from chip.tlv import TLVReader
 from chip.utils import CommissioningBuildingBlocks
 from ecdsa import NIST256p, VerifyingKey
@@ -88,15 +89,13 @@ def bytes_from_hex(hex: str) -> bytes:
 
     Handles any whitespace including newlines, which are all stripped.
     """
-    return unhexlify("".join(hex.replace(":", "").split()))
+    return unhexlify(re.sub(r'(\s|:)', "", hex))
 
 
 # From Matter spec src/crypto_primitives/vid_verify_payload_test_vector.py
 # ECDSA-with-SHA256 using NIST P-256
 FABRIC_BINDING_VERSION_1 = 0x01
 STATEMENT_VERSION_1 = 0x21
-SIGNATURE_SIZE = (2 * MappingsV1.CHIP_CRYPTO_GROUP_SIZE_BYTES)
-SKID_SIZE = 20
 VID_VERIFICATION_CLIENT_CHALLENGE_SIZE_BYTES = 32
 ATTESTATION_CHALLENGE_SIZE_BYTES = MappingsV1.CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES
 
@@ -140,7 +139,8 @@ def generate_vendor_id_verification_tbs(fabric_binding_version: int,
                                         vid_verification_statement: Optional[bytes] = None) -> bytes:
     assert len(attestation_challenge) == ATTESTATION_CHALLENGE_SIZE_BYTES
     assert len(client_challenge) == VID_VERIFICATION_CLIENT_CHALLENGE_SIZE_BYTES
-    assert fabric_index > 0 and fabric_index < 255
+    # Valid fabric indices are [1..254]. 255 is forbidden.
+    assert fabric_index >= 1 and fabric_index <= 254
     assert vendor_fabric_binding_message
     assert fabric_binding_version == FABRIC_BINDING_VERSION_1
 
@@ -190,7 +190,7 @@ class TC_OPCREDS_3_9(MatterBaseTest):
             attribute=opcreds.Attributes.TrustedRootCertificates,
             fabric_filtered=True
         )
-        asserts.assert_true(len(root_certs) == 1, "Could not read TH1's root cert from TrustedRootCertificates")
+        asserts.assert_true(len(root_certs) == 1, f"Expecting exactly one root from TrustedRootCertificates (TH1's), got {len(root_certs)}")
         th1_root_parser = MatterCertParser(root_certs[0])
         cr1_root_public_key = th1_root_parser.get_public_key_bytes()
 
@@ -325,7 +325,7 @@ class TC_OPCREDS_3_9(MatterBaseTest):
             await self.send_single_cmd(cmd=opcreds.Commands.SignVIDVerificationRequest(fabricIndex=0, clientChallenge=client_challenge))
 
         asserts.assert_equal(exception_context.exception.status, Status.ConstraintError,
-                             f"Expected CONSTRAINT_ERROR from SignVIDVerificationRequest against fabricIndex 0")
+                             "Expected CONSTRAINT_ERROR from SignVIDVerificationRequest against fabricIndex 0")
 
         # Must fail with client challenge different than expected length
         CHALLENGE_TOO_SMALL = b"\x01" * (VID_VERIFICATION_CLIENT_CHALLENGE_SIZE_BYTES - 1)
