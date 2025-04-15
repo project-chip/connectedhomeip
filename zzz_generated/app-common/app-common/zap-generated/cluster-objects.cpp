@@ -570,6 +570,7 @@
 #include <clusters/ZoneManagement/Commands.ipp>
 #include <clusters/ZoneManagement/Events.ipp>
 #include <clusters/ZoneManagement/Structs.ipp>
+#include <clusters/shared/Structs.ipp>
 
 namespace chip {
 namespace app {
