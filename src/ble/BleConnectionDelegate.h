@@ -55,8 +55,12 @@ public:
     typedef void (*OnConnectionErrorFunct)(void * appState, CHIP_ERROR err);
     OnConnectionErrorFunct OnConnectionError;
 
+    typedef void (*OnDiscoverCompleteFunct)(void * appState, uint64_t recoveryIdentifier);
+    OnDiscoverCompleteFunct OnDiscoverComplete;
+
     // Call this function to delegate the connection steps required to get a BLE_CONNECTION_OBJECT
     // out of a peripheral that matches the given discriminator.
+    virtual void NewConnection(BleLayer * bleLayer, void * appState, uint64_t connRecoveryIdentifier) = 0;
     virtual void NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) = 0;
 
     // Call this function to delegate the connection steps required to get a connected BLE_CONNECTION_OBJECT

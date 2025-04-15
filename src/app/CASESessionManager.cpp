@@ -49,6 +49,21 @@ void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Cal
 }
 
 void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
+                                                Callback::Callback<OnDeviceConnectionFailure> * onFailure,
+                                                RendezvousParameters & params,
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                                uint8_t attemptCount, Callback::Callback<OnDeviceConnectionRetry> * onRetry,
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES                                                    
+TransportPayloadCapability transportPayloadCapability)
+{
+    FindOrEstablishSessionHelper(peerId, onConnection, onFailure, nullptr, params,
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                 attemptCount, onRetry,
+#endif                
+                                 transportPayloadCapability);
+}
+
+void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
                                                 Callback::Callback<OperationalSessionSetup::OnSetupFailure> * onSetupFailure,
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                                 uint8_t attemptCount, Callback::Callback<OnDeviceConnectionRetry> * onRetry,
@@ -123,6 +138,62 @@ void CASESessionManager::FindOrEstablishSessionHelper(const ScopedNodeId & peerI
     if (onFailure != nullptr)
     {
         session->Connect(onConnection, onFailure, transportPayloadCapability);
+    }
+
+    if (onSetupFailure != nullptr)
+    {
+        session->Connect(onConnection, onSetupFailure, transportPayloadCapability);
+    }
+}
+
+void CASESessionManager::FindOrEstablishSessionHelper(const ScopedNodeId & peerId,
+                                                      Callback::Callback<OnDeviceConnected> * onConnection,
+                                                      Callback::Callback<OnDeviceConnectionFailure> * onFailure,
+                                                      Callback::Callback<OperationalSessionSetup::OnSetupFailure> * onSetupFailure,
+                                                      RendezvousParameters & params,
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                                      uint8_t attemptCount, Callback::Callback<OnDeviceConnectionRetry> * onRetry,
+#endif       
+                                                      TransportPayloadCapability transportPayloadCapability)
+{
+    ChipLogDetail(CASESessionManager, "FindOrEstablishSession: PeerId = [%d:" ChipLogFormatX64 "]", peerId.GetFabricIndex(),
+    ChipLogValueX64(peerId.GetNodeId()));
+
+    bool forAddressUpdate             = false;
+    OperationalSessionSetup * session = FindExistingSessionSetup(peerId, forAddressUpdate);
+    if (session == nullptr)
+    {
+        ChipLogDetail(CASESessionManager, "FindOrEstablishSession: No existing OperationalSessionSetup instance found");
+        session = mConfig.sessionSetupPool->Allocate(mConfig.sessionInitParams, mConfig.clientPool, peerId, this);
+
+        if (session == nullptr)
+        {
+            if (onFailure != nullptr)
+            {
+                onFailure->mCall(onFailure->mContext, peerId, CHIP_ERROR_NO_MEMORY);
+            }
+
+            if (onSetupFailure != nullptr)
+            {
+                OperationalSessionSetup::ConnectionFailureInfo failureInfo(peerId, CHIP_ERROR_NO_MEMORY,
+                                        SessionEstablishmentStage::kUnknown);
+                onSetupFailure->mCall(onSetupFailure->mContext, failureInfo);
+            }
+        return;
+        }
+    }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+    session->UpdateAttemptCount(attemptCount);
+    if (onRetry)
+    {
+        session->AddRetryHandler(onRetry);
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+
+    if (onFailure != nullptr)
+    {
+        session->Connect(onConnection, onFailure, params, transportPayloadCapability);
     }
 
     if (onSetupFailure != nullptr)

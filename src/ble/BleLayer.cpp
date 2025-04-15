@@ -367,6 +367,24 @@ CHIP_ERROR BleLayer::CancelBleIncompleteConnection()
     return err;
 }
 
+CHIP_ERROR BleLayer::NewBleConnectionByRecoveryIdentifier(uint64_t connRecoveryIdentifier, void * appState,
+                                                    BleConnectionDelegate::OnConnectionCompleteFunct onSuccess,
+                                                    BleConnectionDelegate::OnConnectionErrorFunct onError,
+                                                    BleConnectionDelegate::OnDiscoverCompleteFunct onDiscover)
+{
+    VerifyOrReturnError(mState == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mConnectionDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mBleTransport != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    mConnectionDelegate->OnConnectionComplete = onSuccess;
+    mConnectionDelegate->OnConnectionError    = onError;
+    mConnectionDelegate->OnDiscoverComplete   = onDiscover;
+
+    mConnectionDelegate->NewConnection(this, appState == nullptr ? this : appState, connRecoveryIdentifier);
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR BleLayer::NewBleConnectionByDiscriminator(const SetupDiscriminator & connDiscriminator, void * appState,
                                                      BleConnectionDelegate::OnConnectionCompleteFunct onSuccess,
                                                      BleConnectionDelegate::OnConnectionErrorFunct onError)
@@ -387,6 +405,7 @@ CHIP_ERROR BleLayer::NewBleConnectionByObject(BLE_CONNECTION_OBJECT connObj, voi
                                               BleConnectionDelegate::OnConnectionCompleteFunct onSuccess,
                                               BleConnectionDelegate::OnConnectionErrorFunct onError)
 {
+    ChipLogDetail(Ble, "NewBleConnectionByObject with success failed callback");
     VerifyOrReturnError(mState == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mConnectionDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mBleTransport != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -401,6 +420,7 @@ CHIP_ERROR BleLayer::NewBleConnectionByObject(BLE_CONNECTION_OBJECT connObj, voi
 
 CHIP_ERROR BleLayer::NewBleConnectionByObject(BLE_CONNECTION_OBJECT connObj)
 {
+    ChipLogDetail(Ble, "NewBleConnectionByObject complete");
     VerifyOrReturnError(mState == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mBleTransport != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -411,6 +431,7 @@ CHIP_ERROR BleLayer::NewBleConnectionByObject(BLE_CONNECTION_OBJECT connObj)
 
 CHIP_ERROR BleLayer::NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose)
 {
+    ChipLogDetail(Ble, "NewBleEndPoint");
     *retEndPoint = nullptr;
 
     if (mState != kState_Initialized)
@@ -643,6 +664,7 @@ BleTransportProtocolVersion BleLayer::GetHighestSupportedProtocolVersion(const B
 
 void BleLayer::OnConnectionComplete(void * appState, BLE_CONNECTION_OBJECT connObj)
 {
+    ChipLogProgress(Ble, "OnConnectionComplete, %s,%d", __FUNCTION__, __LINE__);
     BleLayer * layer       = reinterpret_cast<BleLayer *>(appState);
     BLEEndPoint * endPoint = nullptr;
     CHIP_ERROR err         = CHIP_NO_ERROR;
@@ -661,6 +683,13 @@ void BleLayer::OnConnectionError(void * appState, CHIP_ERROR err)
 {
     BleLayer * layer = reinterpret_cast<BleLayer *>(appState);
     layer->mBleTransport->OnBleConnectionError(err);
+}
+
+void BleLayer::OnDiscoverComplete(void * appState, uint64_t recoverIdentifier)
+{
+    ChipLogProgress(Ble, "OnDiscoverComplete, %s,%d", __FUNCTION__, __LINE__);
+    BleLayer * layer = reinterpret_cast<BleLayer *>(appState);
+    layer->mConnectionDelegate->OnDiscoverComplete(layer, recoverIdentifier);
 }
 
 } /* namespace Ble */

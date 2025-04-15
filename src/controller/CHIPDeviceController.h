@@ -43,6 +43,7 @@
 #include <controller/DevicePairingDelegate.h>
 #include <controller/OperationalCredentialsDelegate.h>
 #include <controller/SetUpCodePairer.h>
+#include <controller/NetworkRecover.h>
 #include <credentials/FabricTable.h>
 #include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
@@ -264,6 +265,29 @@ public:
                                                                1, nullptr,
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                                                transportPayloadCapability);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR
+    GetConnectedDevice(NodeId peerNodeId, Callback::Callback<OnDeviceConnected> * onConnection,
+                       chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure,
+                       RendezvousParameters & params,
+                       TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload)
+    {
+        VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+        mSystemState->CASESessionMgr()->FindOrEstablishSession(ScopedNodeId(peerNodeId, GetFabricIndex()), onConnection, onFailure,
+                                                               params,
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                                               1, nullptr,
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                                               transportPayloadCapability);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR ReleaseSession(NodeId peerNodeId) 
+    {
+        VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+        mSystemState->CASESessionMgr()->ReleaseSession(ScopedNodeId(peerNodeId, GetFabricIndex()));
         return CHIP_NO_ERROR;
     }
 
@@ -834,6 +858,20 @@ public:
                                          /* fireAndForget = */ true);
     }
 
+    void RegisterNetworkRecoverDelegate(NetworkRecoverDelegate * delegate) {
+        mNetworkRecover.SetNetworkRecoverDelegate(delegate);
+    }
+
+    /**
+     * @brief
+     *   Discover all devices advertising as recoverable.
+     *   Should be called on main loop thread.
+     */
+
+     CHIP_ERROR DiscoverRecoverableNodes(uint64_t recoveryId = 0);
+
+     CHIP_ERROR RecoverNode(NodeId remoteId, uint64_t recoveryId, WiFiCredentials wiFiCreds, uint64_t breadcrumb = 0);
+
 private:
     DevicePairingDelegate * mPairingDelegate = nullptr;
 
@@ -1102,6 +1140,7 @@ private:
     chip::Callback::Callback<OnNOCChainGeneration> mDeviceNOCChainCallback;
     SetUpCodePairer mSetUpCodePairer;
     AutoCommissioner mAutoCommissioner;
+    NetworkRecover mNetworkRecover;
     CommissioningDelegate * mDefaultCommissioner =
         nullptr; // Commissioning delegate to call when PairDevice / Commission functions are used
     CommissioningDelegate * mCommissioningDelegate =

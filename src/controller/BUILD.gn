@@ -70,6 +70,8 @@ static_library("controller") {
     "DevicePairingDelegate.h",
     "ExampleOperationalCredentialsIssuer.h",
     "SetUpCodePairer.h",
+    "AutoNetworkRecover.h",
+    "NetworkRecover.h",
   ]
 
   deps = [ "${chip_root}/src/lib/address_resolve" ]
@@ -87,6 +89,8 @@ static_library("controller") {
       "CommissioningDelegate.cpp",
       "ExampleOperationalCredentialsIssuer.cpp",
       "SetUpCodePairer.cpp",
+      "AutoNetworkRecover.cpp",
+      "NetworkRecover.cpp",
     ]
 
     # ExampleOperationalCredentialsIssuer uses TestGroupData

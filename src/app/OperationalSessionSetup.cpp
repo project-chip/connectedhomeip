@@ -175,6 +175,7 @@ void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * on
     //
     if (err != CHIP_NO_ERROR || isConnected)
     {
+        ChipLogDetail(Discovery, "Call DequeueConnectionCallbacks, %s, %d", __FUNCTION__, __LINE__);
         DequeueConnectionCallbacks(err);
         // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
         // While it is odd to have an explicit return here at the end of the function, we do so
@@ -190,6 +191,17 @@ void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * on
     Connect(onConnection, onFailure, nullptr, transportPayloadCapability);
 }
 
+void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * onConnection, Callback::Callback<OnDeviceConnectionFailure> * onFailure, 
+                                      RendezvousParameters & params,
+                                      TransportPayloadCapability transportPayloadCapability)
+{
+    mState = State::ResolvingAddress;
+    mTransportPayloadCapability = transportPayloadCapability;
+
+    UpdateDeviceData(params.GetPeerAddress(), params.GetMRPConfig());
+}
+
+    
 void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * onConnection,
                                       Callback::Callback<OnSetupFailure> * onSetupFailure,
                                       TransportPayloadCapability transportPayloadCapability)
@@ -201,6 +213,20 @@ void OperationalSessionSetup::UpdateDeviceData(const ResolveResult & result)
 {
     auto & config = result.mrpRemoteConfig;
     auto addr     = result.address;
+    UpdateDeviceData(addr, config, result.supportsTcpServer);
+}
+
+void OperationalSessionSetup::UpdateDeviceData(const Transport::PeerAddress & addr, const ReliableMessageProtocolConfig & config, bool supportsTcpServer)
+{
+    // If we are in the process of trying to establish a session, we need to
+    // cancel that attempt before we can update the address.
+    if (mState == State::Connecting)
+    {
+        CancelSessionSetupReattempt();
+    }
+
+    // If we are in the process of trying to establish a session, we need to
+    // cancel that attempt before we can update the address.
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     // Make sure to clear out our reason for trying the next result first thing,
     // so it does not stick around in various error cases.
@@ -244,13 +270,14 @@ void OperationalSessionSetup::UpdateDeviceData(const ResolveResult & result)
 
     if (mPerformingAddressUpdate)
     {
+        ChipLogDetail(Discovery, "Call DequeueConnectionCallbacks, %s, %d", __FUNCTION__, __LINE__);
         // Nothing else to do here.
         DequeueConnectionCallbacks(CHIP_NO_ERROR);
         // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
         return;
     }
 
-    CHIP_ERROR err = EstablishConnection(result);
+    CHIP_ERROR err = EstablishConnection(config, supportsTcpServer);
     LogErrorOnFailure(err);
     if (err == CHIP_NO_ERROR)
     {
@@ -289,18 +316,17 @@ void OperationalSessionSetup::UpdateDeviceData(const ResolveResult & result)
 
     // No need to reset mTryingNextResultDueToSessionEstablishmentError here,
     // because we're about to delete ourselves.
-
+    ChipLogDetail(Discovery, "Call DequeueConnectionCallbacks, %s, %d", __FUNCTION__, __LINE__);
     DequeueConnectionCallbacks(err);
     // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }
 
-CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & result)
+CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ReliableMessageProtocolConfig & config, bool supportsTcpServer)
 {
-    auto & config = result.mrpRemoteConfig;
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (mTransportPayloadCapability == TransportPayloadCapability::kLargePayload)
     {
-        if (result.supportsTcpServer)
+        if (supportsTcpServer)
         {
             // Set the transport type for carrying large payloads
             mDeviceAddress.SetTransportType(chip::Transport::Type::kTcp);
@@ -330,7 +356,7 @@ CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & re
     }
 
     MoveToState(State::Connecting);
-
+    
     return CHIP_NO_ERROR;
 }
 
@@ -345,19 +371,23 @@ void OperationalSessionSetup::DequeueConnectionCallbacks(CHIP_ERROR error, Sessi
                                                          ReleaseBehavior releaseBehavior)
 {
     // We expect that we only have callbacks if we are not performing just address update.
+    ChipLogDetail(Discovery, "mPerformingAddressUpdate:%s, mCallbacks.IsEmpty():%s",
+                  mPerformingAddressUpdate ? "true" : "false", mCallbacks.IsEmpty() ? "true" : "false");
     VerifyOrDie(!mPerformingAddressUpdate || mCallbacks.IsEmpty());
-
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     // Clear out mConnectionRetry, so that those cancelables are not holding
     // pointers to us, since we're about to go away.
-    while (auto * cb = mConnectionRetry.First())
+    if(!mConnectionRetry.IsEmpty())
     {
-        cb->Cancel();
+        while (auto * cb = mConnectionRetry.First())
+        {
+            cb->Cancel();
+        }
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
-
     // Gather up state we will need for our notifications.
     SuccessFailureCallbackList readyCallbacks;
+    ChipLogDetail(Discovery, "readyCallbacks.EnqueueTakeAll");
     readyCallbacks.EnqueueTakeAll(mCallbacks);
     auto * exchangeMgr                            = mInitParams.exchangeMgr;
     Optional<SessionHandle> optionalSessionHandle = mSecureSession.Get();
@@ -368,7 +398,6 @@ void OperationalSessionSetup::DequeueConnectionCallbacks(CHIP_ERROR error, Sessi
 #else
         System::Clock::kZero;
 #endif // CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP
-
     if (releaseBehavior == ReleaseBehavior::Release)
     {
         VerifyOrDie(mReleaseDelegate != nullptr);
@@ -388,14 +417,20 @@ void OperationalSessionSetup::NotifyConnectionCallbacks(SuccessFailureCallbackLi
     Callback::Callback<OnDeviceConnected> * onConnected;
     Callback::Callback<OnDeviceConnectionFailure> * onConnectionFailure;
     Callback::Callback<OnSetupFailure> * onSetupFailure;
+    ChipLogDetail(Discovery, "NotifyConnectionCallbacks: error=%s, stage=%d, ready is empty:%s", ErrorStr(error), static_cast<int>(stage), ready.IsEmpty() ? "true" : "false");
     while (ready.Take(onConnected, onConnectionFailure, onSetupFailure))
     {
+        ChipLogDetail(Discovery, "%s, %d", __FUNCTION__, __LINE__);
         if (error == CHIP_NO_ERROR)
         {
+            ChipLogDetail(Discovery, "%s, %d", __FUNCTION__, __LINE__);
             VerifyOrDie(exchangeMgr);
+            ChipLogDetail(Discovery, "%s, %d", __FUNCTION__, __LINE__);
             VerifyOrDie(optionalSessionHandle.Value()->AsSecureSession()->IsActiveSession());
+            ChipLogDetail(Discovery, "%s, %d", __FUNCTION__, __LINE__);
             if (onConnected != nullptr)
             {
+                ChipLogDetail(Discovery, "%s, %d", __FUNCTION__, __LINE__);
                 onConnected->mCall(onConnected->mContext, *exchangeMgr, optionalSessionHandle.Value());
 
                 // That sucessful call might have made the session inactive.  If it did, then we should
@@ -412,6 +447,7 @@ void OperationalSessionSetup::NotifyConnectionCallbacks(SuccessFailureCallbackLi
         }
         else // error
         {
+            ChipLogDetail(Discovery, "%s, %d", __FUNCTION__, __LINE__);
             if (onConnectionFailure != nullptr)
             {
                 onConnectionFailure->mCall(onConnectionFailure->mContext, peerId, error);
@@ -489,7 +525,7 @@ void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error, Sess
     // Session failed to be established. This is when discovery is also stopped
     MATTER_LOG_METRIC_END(kMetricDeviceOperationalDiscovery, error);
     MATTER_LOG_METRIC_END(kMetricDeviceCASESession, error);
-
+    ChipLogDetail(Discovery, "Call DequeueConnectionCallbacks, %s, %d", __FUNCTION__, __LINE__);
     DequeueConnectionCallbacks(error, stage);
     // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }
@@ -505,6 +541,9 @@ void OperationalSessionSetup::OnResponderBusy(System::Clock::Milliseconds16 requ
 
 void OperationalSessionSetup::OnSessionEstablished(const SessionHandle & session)
 {
+    ChipLogDetail(Discovery, "OnSessionEstablished!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!111");
+    ChipLogDetail(Discovery, "mRandom:%ld", mRandom);
+    ChipLogDetail(Discovery, "OnSessionEstablished, the mCallbacks is empty:%s", mCallbacks.IsEmpty() ? "true" : "false");
     VerifyOrReturn(mState == State::Connecting,
                    ChipLogError(Discovery, "OnSessionEstablished was called while we were not connecting"));
 
@@ -515,6 +554,7 @@ void OperationalSessionSetup::OnSessionEstablished(const SessionHandle & session
 
     if (!mSecureSession.Grab(session))
     {
+        ChipLogDetail(Discovery, "!mSecureSession.Grab(session)");
         // Got an invalid session, just dispatch an error.  We have to do this
         // so we don't leak.
         DequeueConnectionCallbacks(CHIP_ERROR_INCORRECT_STATE);
@@ -524,7 +564,7 @@ void OperationalSessionSetup::OnSessionEstablished(const SessionHandle & session
     }
 
     MoveToState(State::SecureConnected);
-
+    ChipLogDetail(Discovery, "Call DequeueConnectionCallbacks, %s, %d", __FUNCTION__, __LINE__);
     DequeueConnectionCallbacks(CHIP_NO_ERROR);
 }
 
@@ -564,7 +604,7 @@ OperationalSessionSetup::~OperationalSessionSetup()
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     CancelSessionSetupReattempt();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
-
+ChipLogDetail(Discovery, "Call DequeueConnectionCallbacks, %s, %d", __FUNCTION__, __LINE__);
     DequeueConnectionCallbacks(CHIP_ERROR_CANCELLED, ReleaseBehavior::DoNotRelease);
 }
 
@@ -614,6 +654,7 @@ CHIP_ERROR OperationalSessionSetup::LookupPeerAddress()
 
 void OperationalSessionSetup::PerformAddressUpdate()
 {
+    ChipLogDetail(Discovery, "PerformAddressUpdate, mPerformingAddressUpdate:%d", mPerformingAddressUpdate);
     if (mPerformingAddressUpdate)
     {
         // We are already in the middle of a lookup from a previous call to
@@ -621,10 +662,10 @@ void OperationalSessionSetup::PerformAddressUpdate()
         // we are already looking to update the results from the previous lookup.
         return;
     }
-
+    ChipLogDetail(Discovery, "mState == State::NeedsAddress:%s", mState == State::NeedsAddress ? "true" : "false");
     // We must be newly-allocated to handle this address lookup, so must be in the NeedsAddress state.
     VerifyOrDie(mState == State::NeedsAddress);
-
+    
     // We are doing an address lookup whether we have an active session for this peer or not.
     mPerformingAddressUpdate = true;
     MoveToState(State::ResolvingAddress);
@@ -690,7 +731,7 @@ void OperationalSessionSetup::OnNodeAddressResolutionFailed(const PeerId & peerI
 #endif
 
     MATTER_LOG_METRIC_END(kMetricDeviceOperationalDiscovery, reason);
-
+    ChipLogDetail(Discovery, "Call DequeueConnectionCallbacks, %s, %d", __FUNCTION__, __LINE__);
     // No need to modify any variables in `this` since call below releases `this`.
     DequeueConnectionCallbacks(reason);
     // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
@@ -811,6 +852,7 @@ void OperationalSessionSetup::CancelSessionSetupReattempt()
 
 void OperationalSessionSetup::TrySetupAgain(System::Layer * systemLayer, void * state)
 {
+    ChipLogDetail(Discovery, "TrySetupAgain");
     auto * self = static_cast<OperationalSessionSetup *>(state);
 
     self->MoveToState(State::ResolvingAddress);
@@ -820,6 +862,7 @@ void OperationalSessionSetup::TrySetupAgain(System::Layer * systemLayer, void * 
         return;
     }
 
+    ChipLogDetail(Discovery, "Call DequeueConnectionCallbacks, %s, %d", __FUNCTION__, __LINE__);
     // Give up; we could not start a lookup.
     self->DequeueConnectionCallbacks(err);
     // Do not touch `self` instance anymore; it has been destroyed in DequeueConnectionCallbacks.

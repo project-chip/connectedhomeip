@@ -41,6 +41,7 @@ enum chipBLEServiceDataType
 {
     kchipBLEServiceDataType_DeviceIdentificationInfo = 0x01,
     kchipBLEServiceDataType_TokenIdentificationInfo  = 0x02,
+    kchipBLEServiceDataType_NetworkRecoveryInfo      = 0x03,
 };
 
 /**
@@ -129,6 +130,62 @@ struct ChipBLEDeviceIdentificationInfo
         else
         {
             AdditionalDataFlag &= static_cast<uint8_t>(~kExtendedAnnouncementFlagMask);
+        }
+    }
+
+} __attribute__((packed));
+
+
+/**
+ * chip BLE Network Recovery Information Block
+ *
+ * Defines the over-the-air encoded format of the network recovery information block that appears
+ * within chip BLE service advertisement data.
+ */
+struct ChipBLENetworkRecoveryInfo
+{
+    constexpr static uint64_t kRecoveryIdentifierMask       = 0xfffffffffffffff;
+    constexpr static uint8_t kAdditionalDataFlagMask        = 0x1;
+    constexpr static uint8_t kAdvertisementVersionMask      = 0xf0;
+    constexpr static uint8_t kAdvertisementVersionShiftBits = 4u;
+
+    uint8_t OpCode;
+
+    uint8_t AdvertisementVersion;
+    uint8_t RecoveryIdentifier[8];
+    uint8_t AdditionalDataFlag;
+
+    void Init() { memset(this, 0, sizeof(*this)); }
+
+    uint64_t GetRecoveryIdentifier() const { return chip::Encoding::LittleEndian::Get64(RecoveryIdentifier); }
+
+    void SetRecoveryIdentifier(uint64_t recoveryIdentifier) { chip::Encoding::LittleEndian::Put64(RecoveryIdentifier, recoveryIdentifier); }
+
+    uint8_t GetAdvertisementVersion() const
+    {
+        uint8_t advertisementVersion = static_cast<uint8_t>((AdvertisementVersion & kAdvertisementVersionMask) >>
+                                                            kAdvertisementVersionShiftBits);
+        return advertisementVersion;
+    }
+
+    // Use only 4 bits to set advertisement version
+    void SetAdvertisementVersion(uint8_t advertisementVersion)
+    {
+        // Advertisement Version is 4 bit long from 12th to 15th
+        AdvertisementVersion = static_cast<uint8_t>((advertisementVersion << kAdvertisementVersionShiftBits) & kAdvertisementVersionMask);
+    }
+
+    uint8_t GetAdditionalDataFlag() const { return (AdditionalDataFlag & kAdditionalDataFlagMask); }
+
+    void SetAdditionalDataFlag(bool flag)
+    {
+        if (flag)
+        {
+            AdditionalDataFlag |= kAdditionalDataFlagMask;
+        }
+        else
+        {
+            AdditionalDataFlag &= static_cast<uint8_t>(~kAdditionalDataFlagMask);
         }
     }
 

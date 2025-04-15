@@ -78,5 +78,9 @@ constexpr MetricKey kMetricDeviceRMPRetryCount = "core_dev_rmp_retry_count";
 // Subscription setup
 constexpr MetricKey kMetricDeviceSubscriptionSetup = "core_dev_subscription_setup";
 
+// Network Recovery
+constexpr MetricKey kMetricNetworkRecover = "core_dev_network_recover";
+
+
 } // namespace Tracing
 } // namespace chip

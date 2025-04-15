@@ -45,6 +45,7 @@ enum class BleScanState : uint8_t
     kScanForDiscriminator,
     kScanForAddress,
     kConnecting,
+    kScanForNetworkRecovery,
 };
 
 struct BLEScanConfig
@@ -57,6 +58,9 @@ struct BLEScanConfig
 
     // If scanning by address, what address are we searching for
     std::string mAddress;
+
+    // If scanning by network recovery, what are we scanning for
+    uint64_t mRecoveryIdentifier;
 
     // Optional argument to be passed to callback functions provided by the BLE scan/connect requestor
     void * mAppState = nullptr;
@@ -134,7 +138,7 @@ private:
     void CheckNonConcurrentBleClosing() override;
 
     // ===== Members that implement virtual methods on BleConnectionDelegate.
-
+    void NewConnection(BleLayer * bleLayer, void * appState, uint64_t connRecoveryIdentifier);
     void NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) override;
     void NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override{};
     CHIP_ERROR CancelConnection() override;
@@ -142,6 +146,7 @@ private:
     // ===== Members that implement virtual methods on ChipDeviceScannerDelegate
 
     void OnDeviceScanned(BluezDevice1 & device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override;
+    void OnDeviceScanned(BluezDevice1 & device, const chip::Ble::ChipBLENetworkRecoveryInfo & info) override;
     void OnScanComplete() override;
 
     // ===== Members for internal use by the following friends.

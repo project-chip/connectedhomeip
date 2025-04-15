@@ -50,6 +50,32 @@ bool BluezGetChipDeviceInfo(BluezDevice1 & aDevice, chip::Ble::ChipBLEDeviceIden
     VerifyOrReturnError(dataBytes != nullptr && dataLen >= sizeof(aDeviceInfo), false);
 
     memcpy(&aDeviceInfo, dataBytes, sizeof(aDeviceInfo));
+    ChipLogDetail(Ble, "opcode:%d\n", aDeviceInfo.OpCode);
+    if(aDeviceInfo.OpCode != 0){
+        return false;
+    }
+    return true;
+}
+
+/// Retrieve CHIP network recovery info from the device advertising data
+bool BluezGetChipRecoveryInfo(BluezDevice1 & aDevice, chip::Ble::ChipBLENetworkRecoveryInfo & aRecoveryInfo)
+{
+    GVariant * serviceData = bluez_device1_get_service_data(&aDevice);
+    VerifyOrReturnError(serviceData != nullptr, false);
+
+    GAutoPtr<GVariant> dataValue(g_variant_lookup_value(serviceData, Ble::CHIP_BLE_SERVICE_LONG_UUID_STR, nullptr));
+    VerifyOrReturnError(dataValue != nullptr, false);
+
+    size_t dataLen         = 0;
+    const void * dataBytes = g_variant_get_fixed_array(dataValue.get(), &dataLen, sizeof(uint8_t));
+    ChipLogDetail(Ble, "recoverable advertising data lenght:%ld", dataLen);
+    VerifyOrReturnError(dataBytes != nullptr && dataLen >= sizeof(aRecoveryInfo), false);
+
+    memcpy(&aRecoveryInfo, dataBytes, sizeof(aRecoveryInfo));
+    ChipLogDetail(Ble, "opcode:%d\n", aRecoveryInfo.OpCode);
+    if(aRecoveryInfo.OpCode != 1){
+        return false;
+    }
     return true;
 }
 
@@ -178,10 +204,26 @@ void ChipDeviceScanner::ReportDevice(BluezDevice1 & device)
     if (!BluezGetChipDeviceInfo(device, deviceInfo))
     {
         ChipLogDetail(Ble, "Device %s does not look like a CHIP device.", bluez_device1_get_address(&device));
-        return;
+        // return;
+    } 
+    else 
+    {
+        return mDelegate->OnDeviceScanned(device, deviceInfo);
     }
 
-    mDelegate->OnDeviceScanned(device, deviceInfo);
+    chip::Ble::ChipBLENetworkRecoveryInfo recoveryInfo;
+
+    if(!BluezGetChipRecoveryInfo(device, recoveryInfo))
+    {
+        ChipLogDetail(Ble, "Device %s does not look like a recoverable device.", bluez_device1_get_address(&device));
+        // return;
+    }
+    else
+    {
+        return mDelegate->OnDeviceScanned(device, recoveryInfo);
+    }
+
+    
 }
 
 void ChipDeviceScanner::RemoveDevice(BluezDevice1 & device)
@@ -190,8 +232,9 @@ void ChipDeviceScanner::RemoveDevice(BluezDevice1 & device)
                           g_dbus_proxy_get_object_path(reinterpret_cast<GDBusProxy *>(mAdapter.get()))) == 0);
 
     chip::Ble::ChipBLEDeviceIdentificationInfo deviceInfo;
+    chip::Ble::ChipBLENetworkRecoveryInfo recoveryInfo;
 
-    if (!BluezGetChipDeviceInfo(device, deviceInfo))
+    if (!BluezGetChipDeviceInfo(device, deviceInfo) || !BluezGetChipRecoveryInfo(device, recoveryInfo))
     {
         return;
     }

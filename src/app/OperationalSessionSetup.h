@@ -41,6 +41,7 @@
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/secure_channel/CASESession.h>
+#include <protocols/secure_channel/RendezvousParameters.h>
 #include <system/SystemClock.h>
 #include <system/SystemLayer.h>
 #include <transport/SessionManager.h>
@@ -218,6 +219,10 @@ public:
     void Connect(Callback::Callback<OnDeviceConnected> * onConnection, Callback::Callback<OnDeviceConnectionFailure> * onFailure,
                  TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload);
 
+    void Connect(Callback::Callback<OnDeviceConnected> * onConnection, Callback::Callback<OnDeviceConnectionFailure> * onFailure, 
+                 RendezvousParameters & params,
+                 TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload);
+
     /*
      * This function can be called to establish a secure session with the device.
      *
@@ -312,6 +317,7 @@ private:
 
     typedef Callback::GroupedCallbackList<OnDeviceConnected, OnDeviceConnectionFailure, OnSetupFailure> SuccessFailureCallbackList;
     SuccessFailureCallbackList mCallbacks;
+    uint64_t mRandom;
 
     OperationalSessionReleaseDelegate * mReleaseDelegate;
 
@@ -347,8 +353,7 @@ private:
 
     void MoveToState(State aTargetState);
 
-    CHIP_ERROR EstablishConnection(const AddressResolve::ResolveResult & result);
-
+    CHIP_ERROR EstablishConnection(const ReliableMessageProtocolConfig & config, bool supportsTcpServer = false);
     /*
      * This checks to see if an existing CASE session exists to the peer within the SessionManager
      * and if one exists, to load that into mSecureSession.
@@ -420,6 +425,7 @@ private:
      * This function will set new IP address, port and MRP retransmission intervals of the device.
      */
     void UpdateDeviceData(const AddressResolve::ResolveResult & result);
+    void UpdateDeviceData(const Transport::PeerAddress & addr, const ReliableMessageProtocolConfig & config, bool supportsTcpServer = false);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     /**
