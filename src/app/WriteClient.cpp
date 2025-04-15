@@ -334,12 +334,13 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
 
 CHIP_ERROR WriteClient::EnsureListStarted(const ConcreteDataAttributePath & attributePath)
 {
-    if (mMessageWriter.GetRemainingFreeLength() < (kReservedSizeForEndOfListContainer + kReservedSizeForEndOfAttributeDataIB))
+    if (mMessageWriter.GetRemainingFreeLength() < kReservedSizeForEndOfListAttributeIB)
     {
         StartNewMessage();
     }
 
-    ReturnErrorOnFailure(mMessageWriter.ReserveBuffer(kReservedSizeForEndOfListContainer + kReservedSizeForEndOfAttributeDataIB));
+    // TODO (#38414) : Move reservation/unreservtion of Buffer for TLV Writing to AttributeDataIB Builder instead of WriteClient
+    ReturnErrorOnFailure(mMessageWriter.ReserveBuffer(kReservedSizeForEndOfListAttributeIB));
 
     ReturnErrorOnFailure(PrepareAttributeIB(attributePath));
 
@@ -361,7 +362,7 @@ CHIP_ERROR WriteClient::EnsureListEnded()
 
     // Undo the reservation made in EnsureListStarted() to free up space for the EndOfContainer TLV Elements
     // (for both the List and AttributeDataIB).
-    ReturnErrorOnFailure(writer->UnreserveBuffer(kReservedSizeForEndOfListContainer + kReservedSizeForEndOfAttributeDataIB));
+    ReturnErrorOnFailure(writer->UnreserveBuffer(kReservedSizeForEndOfListAttributeIB));
     ReturnErrorOnFailure(writer->EndContainer(kAttributeDataIBType));
 
     return FinishAttributeIB();
@@ -397,10 +398,11 @@ WriteClient::TryPutPreencodedAttributeWritePayloadIntoList(const ConcreteDataAtt
             err               = CHIP_NO_ERROR;
             break;
         }
-        else if (err != CHIP_NO_ERROR)
+        // Make sure that we undo the buffer reservation made in EnsureListStarted()
+        if (err != CHIP_NO_ERROR)
         {
             ReturnErrorOnFailure(EnsureListEnded());
-            ReturnErrorOnFailure(err);
+            return err;
         }
         outEncodedItemCount++;
     }

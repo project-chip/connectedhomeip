@@ -105,6 +105,17 @@ public:
      */
     CHIP_ERROR EndOfAttributeDataIB();
 
+    /**
+     *  @brief Get number of bytes required in the buffer to reserve the EndOfContainer of EndOfAttributeDataIB()
+     *
+     *  @return Expected number of bytes required in the buffer to reserve the EndOfContainer of EndOfAttributeDataIB()
+     */
+    static constexpr uint16_t GetSizeToEndAttributeDataIB()
+    {
+        uint16_t kEndOfAttributeDataIBSize = 1;
+        return kEndOfAttributeDataIBSize;
+    };
+
 private:
     AttributePathIB::Builder mPath;
 };

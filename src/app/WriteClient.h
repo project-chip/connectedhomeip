@@ -380,10 +380,11 @@ private:
                 outChunkingNeeded = true;
                 break;
             }
-            else if (err != CHIP_NO_ERROR)
+            // Make sure that we undo the buffer reservation made in EnsureListStarted()
+            if (err != CHIP_NO_ERROR)
             {
                 ReturnErrorOnFailure(EnsureListEnded());
-                ReturnErrorOnFailure(err);
+                return err;
             }
             outEncodedItemCount++;
         }
@@ -547,10 +548,8 @@ private:
         kReservedSizeForEndOfContainer + kReservedSizeForEndOfContainer;
     bool mHasDataVersion = false;
 
-    // These were not added to kReservedSizeForTLVEncodingOverhead since they will only be Reserved and Unreserved when Encoding
-    // Attributes that use a list Data Type
-    static constexpr uint32_t kReservedSizeForEndOfListContainer   = 1;
-    static constexpr uint32_t kReservedSizeForEndOfAttributeDataIB = 1;
+    static constexpr uint16_t kReservedSizeForEndOfListAttributeIB =
+        kReservedSizeForEndOfContainer + AttributeDataIB::Builder::GetSizeToEndAttributeDataIB();
 
     static constexpr TLV::TLVType kAttributeDataIBType = TLV::kTLVType_Structure;
 };
