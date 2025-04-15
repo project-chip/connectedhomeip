@@ -68,26 +68,26 @@ class MatterCertParser:
 
 # From Matter spec src/crypto_primitives/crypto_primitives.py
 class MappingsV1(enum.IntEnum):
-  CHIP_CRYPTO_HASH_LEN_BITS = 256
-  CHIP_CRYPTO_HASH_LEN_BYTES = 32
-  CHIP_CRYPTO_HASH_BLOCK_LEN_BYTES = 64
-  CHIP_CRYPTO_GROUP_SIZE_BITS = 256
-  CHIP_CRYPTO_GROUP_SIZE_BYTES = 32
-  CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES = (2 * CHIP_CRYPTO_GROUP_SIZE_BYTES) + 1
-  CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BITS = 128
-  CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES = 16
-  CHIP_CRYPTO_AEAD_MIC_LENGTH_BITS = 128
-  CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES = 16
-  CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES = 13
+    CHIP_CRYPTO_HASH_LEN_BITS = 256
+    CHIP_CRYPTO_HASH_LEN_BYTES = 32
+    CHIP_CRYPTO_HASH_BLOCK_LEN_BYTES = 64
+    CHIP_CRYPTO_GROUP_SIZE_BITS = 256
+    CHIP_CRYPTO_GROUP_SIZE_BYTES = 32
+    CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES = (2 * CHIP_CRYPTO_GROUP_SIZE_BYTES) + 1
+    CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BITS = 128
+    CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES = 16
+    CHIP_CRYPTO_AEAD_MIC_LENGTH_BITS = 128
+    CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES = 16
+    CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES = 13
 
 
 # From Matter spec src/crypto_primitives/crypto_primitives.py
 def bytes_from_hex(hex: str) -> bytes:
-  """Converts any `hex` string representation including `01:ab:cd` to bytes
+    """Converts any `hex` string representation including `01:ab:cd` to bytes
 
-  Handles any whitespace including newlines, which are all stripped.
-  """
-  return unhexlify("".join(hex.replace(":","").split()))
+    Handles any whitespace including newlines, which are all stripped.
+    """
+    return unhexlify("".join(hex.replace(":", "").split()))
 
 
 # From Matter spec src/crypto_primitives/vid_verify_payload_test_vector.py
@@ -101,53 +101,55 @@ ATTESTATION_CHALLENGE_SIZE_BYTES = MappingsV1.CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_B
 
 
 def verify_signature(public_key: bytes, message: bytes, signature: bytes) -> bool:
-  """Verify a `signature` on the given `message` using `public_key`. Returns True on success."""
+    """Verify a `signature` on the given `message` using `public_key`. Returns True on success."""
 
-  verifying_key: VerifyingKey = VerifyingKey.from_string(public_key, curve=NIST256p)
-  assert verifying_key.curve == NIST256p
+    verifying_key: VerifyingKey = VerifyingKey.from_string(public_key, curve=NIST256p)
+    assert verifying_key.curve == NIST256p
 
-  try:
-    return verifying_key.verify(signature, message, hashfunc=hashlib.sha256)
-  except BadSignatureError:
-    return False
+    try:
+        return verifying_key.verify(signature, message, hashfunc=hashlib.sha256)
+    except BadSignatureError:
+        return False
 
 
 # From Matter spec src/crypto_primitives/vid_verify_payload_test_vector.py
 def generate_vendor_fabric_binding_message(
-      root_public_key_bytes: bytes,
-      fabric_id: int,
-      vendor_id: int) -> bytes:
+        root_public_key_bytes: bytes,
+        fabric_id: int,
+        vendor_id: int) -> bytes:
 
-  assert len(root_public_key_bytes) == MappingsV1.CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES
-  assert fabric_id > 0 and fabric_id <= 0xFFFF_FFFF_FFFF_FFFF
-  assert vendor_id > 0 and vendor_id <= 0xFFF4
+    assert len(root_public_key_bytes) == MappingsV1.CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES
+    assert fabric_id > 0 and fabric_id <= 0xFFFF_FFFF_FFFF_FFFF
+    assert vendor_id > 0 and vendor_id <= 0xFFF4
 
-  fabric_id_bytes = fabric_id.to_bytes(length=8, byteorder='big')
-  vendor_id_bytes = vendor_id.to_bytes(length=2, byteorder='big')
-  vendor_fabric_binding_message = FABRIC_BINDING_VERSION_1.to_bytes(length=1) + root_public_key_bytes + fabric_id_bytes + vendor_id_bytes
-  return vendor_fabric_binding_message
+    fabric_id_bytes = fabric_id.to_bytes(length=8, byteorder='big')
+    vendor_id_bytes = vendor_id.to_bytes(length=2, byteorder='big')
+    vendor_fabric_binding_message = FABRIC_BINDING_VERSION_1.to_bytes(
+        length=1) + root_public_key_bytes + fabric_id_bytes + vendor_id_bytes
+    return vendor_fabric_binding_message
 
 # From Matter spec src/crypto_primitives/vid_verify_payload_test_vector.py
+
 
 def generate_vendor_id_verification_tbs(fabric_binding_version: int,
                                         attestation_challenge: bytes,
                                         client_challenge: bytes,
                                         fabric_index: int,
                                         vendor_fabric_binding_message: bytes,
-                                        vid_verification_statement: Optional[bytes]=None) -> bytes:
-  assert len(attestation_challenge) == ATTESTATION_CHALLENGE_SIZE_BYTES
-  assert len(client_challenge) == VID_VERIFICATION_CLIENT_CHALLENGE_SIZE_BYTES
-  assert fabric_index > 0 and fabric_index < 255
-  assert vendor_fabric_binding_message
-  assert fabric_binding_version == FABRIC_BINDING_VERSION_1
+                                        vid_verification_statement: Optional[bytes] = None) -> bytes:
+    assert len(attestation_challenge) == ATTESTATION_CHALLENGE_SIZE_BYTES
+    assert len(client_challenge) == VID_VERIFICATION_CLIENT_CHALLENGE_SIZE_BYTES
+    assert fabric_index > 0 and fabric_index < 255
+    assert vendor_fabric_binding_message
+    assert fabric_binding_version == FABRIC_BINDING_VERSION_1
 
-  vendor_id_verification_tbs = fabric_binding_version.to_bytes(length=1)
-  vendor_id_verification_tbs += client_challenge + attestation_challenge + fabric_index.to_bytes(length=1)
-  vendor_id_verification_tbs += vendor_fabric_binding_message
-  if vid_verification_statement is not None:
-    vendor_id_verification_tbs += vid_verification_statement
+    vendor_id_verification_tbs = fabric_binding_version.to_bytes(length=1)
+    vendor_id_verification_tbs += client_challenge + attestation_challenge + fabric_index.to_bytes(length=1)
+    vendor_id_verification_tbs += vendor_fabric_binding_message
+    if vid_verification_statement is not None:
+        vendor_id_verification_tbs += vid_verification_statement
 
-  return vendor_id_verification_tbs
+    return vendor_id_verification_tbs
 
 
 def get_unassigned_fabric_index(fabric_indices: list[int]) -> int:
@@ -251,8 +253,10 @@ class TC_OPCREDS_3_9(MatterBaseTest):
         logging.info(f"Fabric IDs found: {fabric_ids_from_certs}")
 
         for controller_name, fabric_id in fabric_ids.items():
-            asserts.assert_in(controller_name, fabric_ids_from_certs.keys(), f"Did not find {controller_name}'s fabric the NOCs attribute")
-            asserts.assert_equal(fabric_ids_from_certs[controller_name], fabric_id, f"Did not find {controller_name}'s fabric ID in the correct NOC")
+            asserts.assert_in(controller_name, fabric_ids_from_certs.keys(),
+                              f"Did not find {controller_name}'s fabric the NOCs attribute")
+            asserts.assert_equal(fabric_ids_from_certs[controller_name], fabric_id,
+                                 f"Did not find {controller_name}'s fabric ID in the correct NOC")
 
         self.print_step(3, "Read DUT's Fabrics attribute and validate both fabrics have expected values.")
 
@@ -277,25 +281,33 @@ class TC_OPCREDS_3_9(MatterBaseTest):
                 if fabric_struct.fabricIndex != fabric_index:
                     continue
 
-                asserts.assert_equal(fabric_struct.rootPublicKey, fabric_roots[controller_name], f"Did not find matching root public key in Fabrics attribute for {controller_name}")
-                asserts.assert_equal(fabric_struct.vendorID, fabric_vendor_ids[controller_name], f"Did not find matching VendorID in Fabrics attribute for {controller_name}")
-                asserts.assert_equal(fabric_struct.fabricID, fabric_ids[controller_name], f"Did not find matching FabricID in Fabrics attribute for {controller_name}")
+                asserts.assert_equal(fabric_struct.rootPublicKey, fabric_roots[controller_name],
+                                     f"Did not find matching root public key in Fabrics attribute for {controller_name}")
+                asserts.assert_equal(
+                    fabric_struct.vendorID, fabric_vendor_ids[controller_name], f"Did not find matching VendorID in Fabrics attribute for {controller_name}")
+                asserts.assert_equal(
+                    fabric_struct.fabricID, fabric_ids[controller_name], f"Did not find matching FabricID in Fabrics attribute for {controller_name}")
 
         self.print_step(4, "TH1 sends SignVIDVerificationRequest for TH2's fabric. Verify the response and signature.")
 
-        client_challenge = bytes_from_hex("a1:a2:a3:a4:a5:a6:a7:a8:a9:aa:ab:ac:ad:ae:af:b0:b1:b2:b3:b4:b5:b6:b7:b8:b9:ba:bb:bc:bd:be:bf:c0")
+        client_challenge = bytes_from_hex(
+            "a1:a2:a3:a4:a5:a6:a7:a8:a9:aa:ab:ac:ad:ae:af:b0:b1:b2:b3:b4:b5:b6:b7:b8:b9:ba:bb:bc:bd:be:bf:c0")
         sign_vid_verification_response = await self.send_single_cmd(cmd=opcreds.Commands.SignVIDVerificationRequest(fabricIndex=cr2_fabric_index, clientChallenge=client_challenge))
 
-        asserts.assert_equal(sign_vid_verification_response.fabricIndex, cr2_fabric_index, "FabricIndex in SignVIDVerificationResponse must match request.")
+        asserts.assert_equal(sign_vid_verification_response.fabricIndex, cr2_fabric_index,
+                             "FabricIndex in SignVIDVerificationResponse must match request.")
 
         # Locally generate the vendor_id_verification_tbs to check the signature.
-        expected_vendor_fabric_binding_message = generate_vendor_fabric_binding_message(root_public_key_bytes=cr2_root_public_key, fabric_id=cr2_fabricId, vendor_id=cr2_vid)
+        expected_vendor_fabric_binding_message = generate_vendor_fabric_binding_message(
+            root_public_key_bytes=cr2_root_public_key, fabric_id=cr2_fabricId, vendor_id=cr2_vid)
         attestation_challenge = dev_ctrl.GetConnectedDeviceSync(self.dut_node_id, allowPASE=False).attestationChallenge
-        vendor_id_verification_tbs = generate_vendor_id_verification_tbs(sign_vid_verification_response.fabricBindingVersion, attestation_challenge, client_challenge, sign_vid_verification_response.fabricIndex, expected_vendor_fabric_binding_message, vid_verification_statement=b"")
+        vendor_id_verification_tbs = generate_vendor_id_verification_tbs(sign_vid_verification_response.fabricBindingVersion, attestation_challenge,
+                                                                         client_challenge, sign_vid_verification_response.fabricIndex, expected_vendor_fabric_binding_message, vid_verification_statement=b"")
 
         # Check signature against vendor_id_verification_tbs
         noc_cert = MatterCertParser(noc_struct.noc)
-        asserts.assert_true(verify_signature(public_key=noc_public_keys_from_certs["CR2"], message=vendor_id_verification_tbs, signature=sign_vid_verification_response.signature), "VID Verification Signature must validate using DUT's NOC public key")
+        asserts.assert_true(verify_signature(public_key=noc_public_keys_from_certs["CR2"], message=vendor_id_verification_tbs,
+                            signature=sign_vid_verification_response.signature), "VID Verification Signature must validate using DUT's NOC public key")
 
         self.print_step(5, "Send bad SignVIDVerificationRequest commands and verify failures")
 
@@ -304,13 +316,15 @@ class TC_OPCREDS_3_9(MatterBaseTest):
         with asserts.assert_raises(InteractionModelError) as exception_context:
             await self.send_single_cmd(cmd=opcreds.Commands.SignVIDVerificationRequest(fabricIndex=unassigned_fabric_index, clientChallenge=client_challenge))
 
-        asserts.assert_equal(exception_context.exception.status, Status.ConstraintError, f"Expected CONSTRAINT_ERROR from SignVIDVerificationRequest against fabricIndex {unassigned_fabric_index}")
+        asserts.assert_equal(exception_context.exception.status, Status.ConstraintError,
+                             f"Expected CONSTRAINT_ERROR from SignVIDVerificationRequest against fabricIndex {unassigned_fabric_index}")
 
         # Must fail with correct client challenge but fabricIndex 0.
         with asserts.assert_raises(InteractionModelError) as exception_context:
             await self.send_single_cmd(cmd=opcreds.Commands.SignVIDVerificationRequest(fabricIndex=0, clientChallenge=client_challenge))
 
-        asserts.assert_equal(exception_context.exception.status, Status.ConstraintError, f"Expected CONSTRAINT_ERROR from SignVIDVerificationRequest against fabricIndex 0")
+        asserts.assert_equal(exception_context.exception.status, Status.ConstraintError,
+                             f"Expected CONSTRAINT_ERROR from SignVIDVerificationRequest against fabricIndex 0")
 
         # Must fail with client challenge different than expected length
         CHALLENGE_TOO_SMALL = b"\x01" * (VID_VERIFICATION_CLIENT_CHALLENGE_SIZE_BYTES - 1)
@@ -319,12 +333,14 @@ class TC_OPCREDS_3_9(MatterBaseTest):
         with asserts.assert_raises(InteractionModelError) as exception_context:
             await self.send_single_cmd(cmd=opcreds.Commands.SignVIDVerificationRequest(fabricIndex=cr2_fabric_index, clientChallenge=CHALLENGE_TOO_SMALL))
 
-        asserts.assert_equal(exception_context.exception.status, Status.ConstraintError, f"Expected CONSTRAINT_ERROR from SignVIDVerificationRequest with ClientChallenge of length {len(CHALLENGE_TOO_SMALL)}")
+        asserts.assert_equal(exception_context.exception.status, Status.ConstraintError,
+                             f"Expected CONSTRAINT_ERROR from SignVIDVerificationRequest with ClientChallenge of length {len(CHALLENGE_TOO_SMALL)}")
 
         with asserts.assert_raises(InteractionModelError) as exception_context:
             await self.send_single_cmd(cmd=opcreds.Commands.SignVIDVerificationRequest(fabricIndex=cr2_fabric_index, clientChallenge=CHALLENGE_TOO_BIG))
 
-        asserts.assert_equal(exception_context.exception.status, Status.ConstraintError, f"Expected CONSTRAINT_ERROR from SignVIDVerificationRequest with ClientChallenge of length {len(CHALLENGE_TOO_BIG)}")
+        asserts.assert_equal(exception_context.exception.status, Status.ConstraintError,
+                             f"Expected CONSTRAINT_ERROR from SignVIDVerificationRequest with ClientChallenge of length {len(CHALLENGE_TOO_BIG)}")
 
         self.print_step(6, "Remove TH2's fabric")
         cmd = opcreds.Commands.RemoveFabric(cr2_fabric_index)
