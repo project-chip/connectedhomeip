@@ -98,7 +98,7 @@ DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & cluster
     const ConcreteAttributePath attributePath(clusterPath.mEndpointId, clusterPath.mClusterId, attribute.attributeId);
 
     DataModel::AttributeEntry entry(
-        attribute.attributeId, DataModel::AttributeQualityFlags::kListAttribute, RequiredPrivilege::ForReadAttribute(attributePath),
+        attribute.attributeId, DataModel::AttributeQualityFlags::kNoAttribute, RequiredPrivilege::ForReadAttribute(attributePath),
         !attribute.IsReadOnly() ? RequiredPrivilege::ForWriteAttribute(attributePath) : Access::Privilege::kNoPrivilege);
 
     entry.SetFlags(DataModel::AttributeQualityFlags::kListAttribute, (attribute.attributeType == ZCL_ARRAY_ATTRIBUTE_TYPE));

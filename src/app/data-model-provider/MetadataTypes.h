@@ -23,6 +23,12 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
 
+// Pragma macros to disable the "conversion" and "narrowing" warnings.
+// This is done in some sections of the code in order to allow
+// the use of narrowing masks when assigning values to bitfields variables.
+// Without the use of these macros, the compiler would not allow
+// the narrowing and conversion of input values during the settings
+// of the variables inside of both 'AttributeEntry.mask' and 'AcceptedCommandEntry.mask'.
 #define StartBitFieldInit_1
 _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\"") _Pragma("GCC diagnostic ignored \"-Wnarrowing\"")
 #define EndBitFieldInit_1 _Pragma("GCC diagnostic pop")
