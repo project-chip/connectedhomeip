@@ -49,6 +49,8 @@ not_automated:
       reason:
           Unit test of the conformance test (TC_DeviceConformance) - does not
           run against an app
+    - name: TestDefaultWarnings.py
+      reason: Unit test - does not run against an app
     - name: TestIdChecks.py
       reason: Unit test - does not run against an app
     - name: TestSpecParsingDeviceType.py
