@@ -35,7 +35,7 @@
 #       --storage-path admin_storage.json
 #       --string-arg app_path:out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app
 #       --string-arg dac_provider_base_path:credentials/test/revoked-attestation-certificates/dac-provider-test-vectors
-#       --string-arg revocation_set_base_path:credentials/test/revoked-attestation-certificates/dac-provider-test-vectors/revocation-sets
+#       --string-arg revocation_set_base_path:credentials/test/revoked-attestation-certificates/revocation-sets
 #       --string-arg app_log_path:/tmp/TC_DA_1_9
 #       --bool-arg is_ci:true
 #       --trace-to json:${TRACE_TEST_JSON}.json
@@ -59,7 +59,7 @@ class TC_DA_1_9(MatterBaseTest):
         self.revocation_set_base_path = self.matter_test_config.global_test_params.get('revocation_set_base_path')
         self.app_path = self.matter_test_config.global_test_params.get('app_path')
         self.app_log_path = self.matter_test_config.global_test_params.get('app_log_path')
-        self.is_ci = self.matter_test_config.global_test_params.get('is_ci')
+        self.is_ci = self.is_pics_sdk_ci_only
 
     def desc_TC_DA_1_9(self) -> str:
         return "[TC-DA-1.9] Device Attestation Revocation [DUT-Commissioner]"
@@ -73,17 +73,17 @@ class TC_DA_1_9(MatterBaseTest):
     def steps_TC_DA_1_9(self) -> list[TestStep]:
         return [
             TestStep(1, "Test commissioning with revoked DAC",
-                     "(DUT)Commissioner warns about commissioning the non-genuine device, Or Commissioning fails with device attestation error 302"),
+                     "(DUT)Commissioner warns about commissioning the non-genuine device, Or Commissioning fails with device appropriate attestation error"),
             TestStep(2, "Test commissioning with revoked PAI",
-                     "(DUT)Commissioner warns about commissioning the non-genuine device, Or Commissioning fails with device attestation error 202"),
+                     "(DUT)Commissioner warns about commissioning the non-genuine device, Or Commissioning fails with device appropriate attestation error"),
             TestStep(3, "Test commissioning with both DAC and PAI revoked",
-                     "(DUT)Commissioner warns about commissioning the non-genuine device, Or Commissioning fails with device attestation error 208"),
+                     "(DUT)Commissioner warns about commissioning the non-genuine device, Or Commissioning fails with device appropriate attestation error"),
             TestStep(4, "Test commissioning with revoked DAC using delegated CRL signer",
-                     "(DUT)Commissioner warns about commissioning the non-genuine device, Or Commissioning fails with device attestation error 302"),
+                     "(DUT)Commissioner warns about commissioning the non-genuine device, Or Commissioning fails with device appropriate attestation error"),
             TestStep(5, "Test commissioning with revoked PAI using delegated CRL signer",
-                     "(DUT)Commissioner warns about commissioning the non-genuine device, Or Commissioning fails with device attestation error 202"),
+                     "(DUT)Commissioner warns about commissioning the non-genuine device, Or Commissioning fails with device appropriate attestation error"),
             TestStep(6, "Test commissioning with both DAC and PAI revoked using delegated CRL signer",
-                     "(DUT)Commissioner warns about commissioning the non-genuine device, Or Commissioning fails with device attestation error 208"),
+                     "(DUT)Commissioner warns about commissioning the non-genuine device, Or Commissioning fails with device appropriate attestation error"),
             TestStep(7, "Test commissioning with valid DAC and PAI",
                      "Commissioning succeeds without any attestation errors"),
         ]
@@ -96,49 +96,56 @@ class TC_DA_1_9(MatterBaseTest):
                 'dac_provider': 'revoked-dac-01.json',
                 'revocation_set': 'revocation-set.json',
                 'expects_commissioning_success': False,
-                'expects_att_err': 302
+                'manual_pairing_code': '14970112338',
+                'discriminator': 0x700,
             },
             {
                 'name': 'tc_pai_revoked',
                 'dac_provider': 'revoked-pai.json',
                 'revocation_set': 'revocation-set.json',
                 'expects_commissioning_success': False,
-                'expects_att_err': 202
+                'manual_pairing_code': '20054912334',
+                'discriminator': 0x800,
             },
             {
                 'name': 'tc_dac_and_pai_revoked',
                 'dac_provider': 'revoked-dac-and-pai.json',
                 'revocation_set': 'revocation-set.json',
                 'expects_commissioning_success': False,
-                'expects_att_err': 208
+                'manual_pairing_code': '21693312337',
+                'discriminator': 0x900,
             },
             {
                 'name': 'tc_dac_revoked_using_delegated_crl_signer',
                 'dac_provider': 'indirect-revoked-dac-01.json',
                 'revocation_set': 'revocation-set.json',
                 'expects_commissioning_success': False,
-                'expects_att_err': 302
+                'manual_pairing_code': '23331712339',
+                'discriminator': 0xA00,
             },
             {
                 'name': 'tc_pai_revoked_using_delegated_crl_signer',
                 'dac_provider': 'indirect-revoked-pai-03.json',
                 'revocation_set': 'revocation-set.json',
                 'expects_commissioning_success': False,
-                'expects_att_err': 202
+                'manual_pairing_code': '24970112330',
+                'discriminator': 0xB00,
             },
             {
                 'name': 'tc_dac_and_pai_revoked_using_delegated_crl_signer',
                 'dac_provider': 'indirect-revoked-dac-01-pai-03.json',
                 'revocation_set': 'revocation-set.json',
                 'expects_commissioning_success': False,
-                'expects_att_err': 208
+                'manual_pairing_code': '30054912331',
+                'discriminator': 0xC00,
             },
             {
                 'name': 'tc_dac_and_pai_valid',
                 'dac_provider': None,
                 'revocation_set': 'revocation-set.json',
                 'expects_commissioning_success': True,
-                'expects_att_err': None
+                'manual_pairing_code': '31693312339',
+                'discriminator': 0xD00,
             }
         ]
 
@@ -146,7 +153,7 @@ class TC_DA_1_9(MatterBaseTest):
             self.step(idx + 1)
 
             # Clean up any existing KVS files
-            subprocess.call("rm -f /tmp/tmpkvs*", shell=True)
+            subprocess.call("rm -f all-clusters-kvs*", shell=True)
 
             # Create log files for this test case
             os.makedirs(self.app_log_path, exist_ok=True)
@@ -154,10 +161,14 @@ class TC_DA_1_9(MatterBaseTest):
 
             with open(app_log_file_name, 'w') as app_log_file:
                 # Start the all-clusters-app with appropriate DAC provider
-                app_args = '--trace_decode 1 --KVS /tmp/tmpkvs'
+                app_args = '--trace_decode 1 --KVS all-clusters-kvs'
                 if test_case['dac_provider']:
                     dac_provider_path = os.path.join(self.dac_provider_base_path, test_case['dac_provider'])
                     app_args += f' --dac_provider {dac_provider_path}'
+
+                if test_case['discriminator']:
+                    discriminator = test_case['discriminator']
+                    app_args += f' --discriminator {discriminator}'
 
                 app_cmd = f"{self.app_path} {app_args}"
 
@@ -167,14 +178,14 @@ class TC_DA_1_9(MatterBaseTest):
                 # Prompt user with instructions
                 prompt_msg = (
                     f"\nPlease commission the DUT with:\n"
-                    f"  QR Code: 'MT:-24J0AFN00KA0648G00'\n"
+                    f"  Manual Pairing Code: '{test_case['manual_pairing_code']}'\n"
                     f"  Revocation Set: {os.path.join(self.revocation_set_base_path, test_case['revocation_set'])}\n\n"
                     f"Input 'Y' if DUT successfully commissions without any warnings\n"
                     f"Input 'N' if commissioner warns about commissioning the non-genuine device, "
-                    f"Or Commissioning fails with device attestation error {test_case['expects_att_err']}\n"
+                    f"Or Commissioning fails with device appropriate attestation error\n"
                 )
 
-                # TODO: run the chip-tool and commission the TH, parse the output and check if it matches the expected results
+                # TODO: Run Python commissioner, commission the DUT, and check the return code
                 if self.is_ci:
                     resp = 'Y' if test_case['expects_commissioning_success'] else 'N'
                 else:
@@ -189,7 +200,7 @@ class TC_DA_1_9(MatterBaseTest):
                     f"Commissioning {'succeeded' if commissioning_success else 'failed'} when it should have {'succeeded' if test_case['expects_commissioning_success'] else 'failed'}"
                 )
 
-                app_process.send_signal(signal.SIGINT.value)
+                app_process.send_signal(signal.SIGTERM.value)
                 app_process.wait()
 
 
