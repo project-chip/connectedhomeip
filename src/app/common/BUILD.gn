@@ -62,7 +62,7 @@ static_library("cluster-objects") {
     "${chip_root}/src/lib/support",
     "${chip_root}/src/protocols/interaction_model",
     "${chip_root}/zzz_generated/app-common/clusters:all-headers",
-    "${chip_root}/zzz_generated/app-common/clusters/shared:elements",
+    "${chip_root}/zzz_generated/app-common/clusters/shared:headers",
   ]
 
   public_configs = [ ":includes" ]

@@ -117,7 +117,7 @@
         {
             "path": "../../zap-templates/templates/app/shared-cluster-structs-src.zapt",
             "name": "Shared/global structures",
-            "output": "../../clusters/shared/Structs.cpp"
+            "output": "../../clusters/shared/Structs.ipp"
         },
         {
             "path": "../../zap-templates/templates/app/shared-cluster-attributes.zapt",

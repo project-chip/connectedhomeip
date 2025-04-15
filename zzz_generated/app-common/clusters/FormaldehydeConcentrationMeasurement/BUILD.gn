@@ -38,7 +38,7 @@ source_set("headers") {
     ":enums",
     ":ids",
     "${chip_root}/src/app/common:global-ids",
-    "${chip_root}/zzz_generated/app-common/clusters/shared:elements",
+    "${chip_root}/zzz_generated/app-common/clusters/shared:headers",
   ]
 
   public_configs = [ "${chip_root}/src/app/common:includes" ]
