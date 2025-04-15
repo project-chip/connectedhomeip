@@ -191,7 +191,7 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
         else
         {
             outSession.videoStreamID = args.videoStreamId.Value();
-            videoStreamID            = static_cast<uint16_t>(args.videoStreamId.Value());
+            videoStreamID            = args.videoStreamId.Value().Value();
         }
     }
     else
@@ -210,7 +210,7 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
         else
         {
             outSession.audioStreamID = args.audioStreamId.Value();
-            audioStreamID            = static_cast<uint16_t>(args.audioStreamId.Value());
+            audioStreamID            = args.videoStreamId.Value().Value();
         }
     }
     else
