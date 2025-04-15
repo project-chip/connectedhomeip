@@ -3393,6 +3393,28 @@ enum class Feature : uint32_t
 };
 } // namespace DeviceEnergyManagementMode
 
+namespace ElectricalGridConditions {
+
+// Enum for ThreeLevelEnum
+enum class ThreeLevelEnum : uint8_t
+{
+    kLow    = 0x00,
+    kMedium = 0x01,
+    kHigh   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kForecasting = 0x1,
+};
+} // namespace ElectricalGridConditions
+
 namespace DoorLock {
 
 // Enum for AlarmCodeEnum

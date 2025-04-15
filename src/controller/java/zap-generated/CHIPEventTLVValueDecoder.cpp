@@ -7186,6 +7186,285 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
+    case app::Clusters::ElectricalGridConditions::Id: {
+        using namespace app::Clusters::ElectricalGridConditions;
+        switch (aPath.mEventId)
+        {
+        case Events::CurrentConditionsChanged::Id: {
+            Events::CurrentConditionsChanged::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_currentConditions;
+            if (cppValue.currentConditions.IsNull())
+            {
+                value_currentConditions = nullptr;
+            }
+            else
+            {
+                jobject value_currentConditions_periodStart;
+                std::string value_currentConditions_periodStartClassName     = "java/lang/Long";
+                std::string value_currentConditions_periodStartCtorSignature = "(J)V";
+                jlong jnivalue_currentConditions_periodStart = static_cast<jlong>(cppValue.currentConditions.Value().periodStart);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    value_currentConditions_periodStartClassName.c_str(), value_currentConditions_periodStartCtorSignature.c_str(),
+                    jnivalue_currentConditions_periodStart, value_currentConditions_periodStart);
+                jobject value_currentConditions_periodEnd;
+                if (cppValue.currentConditions.Value().periodEnd.IsNull())
+                {
+                    value_currentConditions_periodEnd = nullptr;
+                }
+                else
+                {
+                    std::string value_currentConditions_periodEndClassName     = "java/lang/Long";
+                    std::string value_currentConditions_periodEndCtorSignature = "(J)V";
+                    jlong jnivalue_currentConditions_periodEnd =
+                        static_cast<jlong>(cppValue.currentConditions.Value().periodEnd.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_currentConditions_periodEndClassName.c_str(), value_currentConditions_periodEndCtorSignature.c_str(),
+                        jnivalue_currentConditions_periodEnd, value_currentConditions_periodEnd);
+                }
+                jobject value_currentConditions_gridCarbonIntensity;
+                std::string value_currentConditions_gridCarbonIntensityClassName     = "java/lang/Integer";
+                std::string value_currentConditions_gridCarbonIntensityCtorSignature = "(I)V";
+                jint jnivalue_currentConditions_gridCarbonIntensity =
+                    static_cast<jint>(cppValue.currentConditions.Value().gridCarbonIntensity);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    value_currentConditions_gridCarbonIntensityClassName.c_str(),
+                    value_currentConditions_gridCarbonIntensityCtorSignature.c_str(),
+                    jnivalue_currentConditions_gridCarbonIntensity, value_currentConditions_gridCarbonIntensity);
+                jobject value_currentConditions_gridCarbonLevel;
+                std::string value_currentConditions_gridCarbonLevelClassName     = "java/lang/Integer";
+                std::string value_currentConditions_gridCarbonLevelCtorSignature = "(I)V";
+                jint jnivalue_currentConditions_gridCarbonLevel =
+                    static_cast<jint>(cppValue.currentConditions.Value().gridCarbonLevel);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    value_currentConditions_gridCarbonLevelClassName.c_str(),
+                    value_currentConditions_gridCarbonLevelCtorSignature.c_str(), jnivalue_currentConditions_gridCarbonLevel,
+                    value_currentConditions_gridCarbonLevel);
+                jobject value_currentConditions_localCarbonIntensity;
+                std::string value_currentConditions_localCarbonIntensityClassName     = "java/lang/Integer";
+                std::string value_currentConditions_localCarbonIntensityCtorSignature = "(I)V";
+                jint jnivalue_currentConditions_localCarbonIntensity =
+                    static_cast<jint>(cppValue.currentConditions.Value().localCarbonIntensity);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    value_currentConditions_localCarbonIntensityClassName.c_str(),
+                    value_currentConditions_localCarbonIntensityCtorSignature.c_str(),
+                    jnivalue_currentConditions_localCarbonIntensity, value_currentConditions_localCarbonIntensity);
+                jobject value_currentConditions_localCarbonLevel;
+                std::string value_currentConditions_localCarbonLevelClassName     = "java/lang/Integer";
+                std::string value_currentConditions_localCarbonLevelCtorSignature = "(I)V";
+                jint jnivalue_currentConditions_localCarbonLevel =
+                    static_cast<jint>(cppValue.currentConditions.Value().localCarbonLevel);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    value_currentConditions_localCarbonLevelClassName.c_str(),
+                    value_currentConditions_localCarbonLevelCtorSignature.c_str(), jnivalue_currentConditions_localCarbonLevel,
+                    value_currentConditions_localCarbonLevel);
+
+                {
+                    jclass electricalGridConditionsStructStructClass_1;
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                        env, "chip/devicecontroller/ChipStructs$ElectricalGridConditionsClusterElectricalGridConditionsStruct",
+                        electricalGridConditionsStructStructClass_1);
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(
+                            Zcl, "Could not find class ChipStructs$ElectricalGridConditionsClusterElectricalGridConditionsStruct");
+                        return nullptr;
+                    }
+
+                    jmethodID electricalGridConditionsStructStructCtor_1;
+                    err = chip::JniReferences::GetInstance().FindMethod(env, electricalGridConditionsStructStructClass_1, "<init>",
+                                                                        "(Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Integer;Ljava/"
+                                                                        "lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V",
+                                                                        &electricalGridConditionsStructStructCtor_1);
+                    if (err != CHIP_NO_ERROR || electricalGridConditionsStructStructCtor_1 == nullptr)
+                    {
+                        ChipLogError(
+                            Zcl,
+                            "Could not find ChipStructs$ElectricalGridConditionsClusterElectricalGridConditionsStruct constructor");
+                        return nullptr;
+                    }
+
+                    value_currentConditions =
+                        env->NewObject(electricalGridConditionsStructStructClass_1, electricalGridConditionsStructStructCtor_1,
+                                       value_currentConditions_periodStart, value_currentConditions_periodEnd,
+                                       value_currentConditions_gridCarbonIntensity, value_currentConditions_gridCarbonLevel,
+                                       value_currentConditions_localCarbonIntensity, value_currentConditions_localCarbonLevel);
+                }
+            }
+
+            jclass currentConditionsChangedStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$ElectricalGridConditionsClusterCurrentConditionsChangedEvent",
+                currentConditionsChangedStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl,
+                             "Could not find class ChipEventStructs$ElectricalGridConditionsClusterCurrentConditionsChangedEvent");
+                return nullptr;
+            }
+
+            jmethodID currentConditionsChangedStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(
+                env, currentConditionsChangedStructClass, "<init>",
+                "(Lchip/devicecontroller/ChipStructs$ElectricalGridConditionsClusterElectricalGridConditionsStruct;)V",
+                &currentConditionsChangedStructCtor);
+            if (err != CHIP_NO_ERROR || currentConditionsChangedStructCtor == nullptr)
+            {
+                ChipLogError(
+                    Zcl,
+                    "Could not find ChipEventStructs$ElectricalGridConditionsClusterCurrentConditionsChangedEvent constructor");
+                return nullptr;
+            }
+
+            jobject value =
+                env->NewObject(currentConditionsChangedStructClass, currentConditionsChangedStructCtor, value_currentConditions);
+
+            return value;
+        }
+        case Events::ForecastConditionsChanged::Id: {
+            Events::ForecastConditionsChanged::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_forecastConditions;
+            if (cppValue.forecastConditions.IsNull())
+            {
+                value_forecastConditions = nullptr;
+            }
+            else
+            {
+                chip::JniReferences::GetInstance().CreateArrayList(value_forecastConditions);
+
+                auto iter_value_forecastConditions_1 = cppValue.forecastConditions.Value().begin();
+                while (iter_value_forecastConditions_1.Next())
+                {
+                    auto & entry_1 = iter_value_forecastConditions_1.GetValue();
+                    jobject newElement_1;
+                    jobject newElement_1_periodStart;
+                    std::string newElement_1_periodStartClassName     = "java/lang/Long";
+                    std::string newElement_1_periodStartCtorSignature = "(J)V";
+                    jlong jninewElement_1_periodStart                 = static_cast<jlong>(entry_1.periodStart);
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        newElement_1_periodStartClassName.c_str(), newElement_1_periodStartCtorSignature.c_str(),
+                        jninewElement_1_periodStart, newElement_1_periodStart);
+                    jobject newElement_1_periodEnd;
+                    if (entry_1.periodEnd.IsNull())
+                    {
+                        newElement_1_periodEnd = nullptr;
+                    }
+                    else
+                    {
+                        std::string newElement_1_periodEndClassName     = "java/lang/Long";
+                        std::string newElement_1_periodEndCtorSignature = "(J)V";
+                        jlong jninewElement_1_periodEnd                 = static_cast<jlong>(entry_1.periodEnd.Value());
+                        chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                            newElement_1_periodEndClassName.c_str(), newElement_1_periodEndCtorSignature.c_str(),
+                            jninewElement_1_periodEnd, newElement_1_periodEnd);
+                    }
+                    jobject newElement_1_gridCarbonIntensity;
+                    std::string newElement_1_gridCarbonIntensityClassName     = "java/lang/Integer";
+                    std::string newElement_1_gridCarbonIntensityCtorSignature = "(I)V";
+                    jint jninewElement_1_gridCarbonIntensity                  = static_cast<jint>(entry_1.gridCarbonIntensity);
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        newElement_1_gridCarbonIntensityClassName.c_str(), newElement_1_gridCarbonIntensityCtorSignature.c_str(),
+                        jninewElement_1_gridCarbonIntensity, newElement_1_gridCarbonIntensity);
+                    jobject newElement_1_gridCarbonLevel;
+                    std::string newElement_1_gridCarbonLevelClassName     = "java/lang/Integer";
+                    std::string newElement_1_gridCarbonLevelCtorSignature = "(I)V";
+                    jint jninewElement_1_gridCarbonLevel                  = static_cast<jint>(entry_1.gridCarbonLevel);
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        newElement_1_gridCarbonLevelClassName.c_str(), newElement_1_gridCarbonLevelCtorSignature.c_str(),
+                        jninewElement_1_gridCarbonLevel, newElement_1_gridCarbonLevel);
+                    jobject newElement_1_localCarbonIntensity;
+                    std::string newElement_1_localCarbonIntensityClassName     = "java/lang/Integer";
+                    std::string newElement_1_localCarbonIntensityCtorSignature = "(I)V";
+                    jint jninewElement_1_localCarbonIntensity                  = static_cast<jint>(entry_1.localCarbonIntensity);
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        newElement_1_localCarbonIntensityClassName.c_str(), newElement_1_localCarbonIntensityCtorSignature.c_str(),
+                        jninewElement_1_localCarbonIntensity, newElement_1_localCarbonIntensity);
+                    jobject newElement_1_localCarbonLevel;
+                    std::string newElement_1_localCarbonLevelClassName     = "java/lang/Integer";
+                    std::string newElement_1_localCarbonLevelCtorSignature = "(I)V";
+                    jint jninewElement_1_localCarbonLevel                  = static_cast<jint>(entry_1.localCarbonLevel);
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        newElement_1_localCarbonLevelClassName.c_str(), newElement_1_localCarbonLevelCtorSignature.c_str(),
+                        jninewElement_1_localCarbonLevel, newElement_1_localCarbonLevel);
+
+                    {
+                        jclass electricalGridConditionsStructStructClass_2;
+                        err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                            env, "chip/devicecontroller/ChipStructs$ElectricalGridConditionsClusterElectricalGridConditionsStruct",
+                            electricalGridConditionsStructStructClass_2);
+                        if (err != CHIP_NO_ERROR)
+                        {
+                            ChipLogError(
+                                Zcl,
+                                "Could not find class ChipStructs$ElectricalGridConditionsClusterElectricalGridConditionsStruct");
+                            return nullptr;
+                        }
+
+                        jmethodID electricalGridConditionsStructStructCtor_2;
+                        err = chip::JniReferences::GetInstance().FindMethod(
+                            env, electricalGridConditionsStructStructClass_2, "<init>",
+                            "(Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/"
+                            "Integer;)V",
+                            &electricalGridConditionsStructStructCtor_2);
+                        if (err != CHIP_NO_ERROR || electricalGridConditionsStructStructCtor_2 == nullptr)
+                        {
+                            ChipLogError(Zcl,
+                                         "Could not find ChipStructs$ElectricalGridConditionsClusterElectricalGridConditionsStruct "
+                                         "constructor");
+                            return nullptr;
+                        }
+
+                        newElement_1 = env->NewObject(
+                            electricalGridConditionsStructStructClass_2, electricalGridConditionsStructStructCtor_2,
+                            newElement_1_periodStart, newElement_1_periodEnd, newElement_1_gridCarbonIntensity,
+                            newElement_1_gridCarbonLevel, newElement_1_localCarbonIntensity, newElement_1_localCarbonLevel);
+                    }
+                    chip::JniReferences::GetInstance().AddToList(value_forecastConditions, newElement_1);
+                }
+            }
+
+            jclass forecastConditionsChangedStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$ElectricalGridConditionsClusterForecastConditionsChangedEvent",
+                forecastConditionsChangedStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl,
+                             "Could not find class ChipEventStructs$ElectricalGridConditionsClusterForecastConditionsChangedEvent");
+                return nullptr;
+            }
+
+            jmethodID forecastConditionsChangedStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(env, forecastConditionsChangedStructClass, "<init>",
+                                                                "(Ljava/util/ArrayList;)V", &forecastConditionsChangedStructCtor);
+            if (err != CHIP_NO_ERROR || forecastConditionsChangedStructCtor == nullptr)
+            {
+                ChipLogError(
+                    Zcl,
+                    "Could not find ChipEventStructs$ElectricalGridConditionsClusterForecastConditionsChangedEvent constructor");
+                return nullptr;
+            }
+
+            jobject value =
+                env->NewObject(forecastConditionsChangedStructClass, forecastConditionsChangedStructCtor, value_forecastConditions);
+
+            return value;
+        }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case app::Clusters::DoorLock::Id: {
         using namespace app::Clusters::DoorLock;
         switch (aPath.mEventId)

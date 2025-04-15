@@ -2325,6 +2325,20 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyPreference::Energ
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(ElectricalGridConditions::ThreeLevelEnum val)
+{
+    using EnumType = ElectricalGridConditions::ThreeLevelEnum;
+    switch (val)
+    {
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::AlarmCodeEnum val)
 {
     using EnumType = DoorLock::AlarmCodeEnum;
