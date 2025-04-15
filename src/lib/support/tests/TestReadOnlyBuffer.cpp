@@ -22,7 +22,7 @@
 
 #include <pw_unit_test/framework.h>
 
-#include <app/data-model-provider/MetadataList.h>
+#include <lib/support/ReadOnlyBuffer.h>
 
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
@@ -31,8 +31,7 @@
 #include <lib/support/Span.h>
 
 using namespace chip;
-using namespace chip::app::DataModel;
-using namespace chip::app::DataModel::detail;
+using namespace chip::detail;
 
 namespace {
 
@@ -57,7 +56,7 @@ struct IdAndValue
 
 TEST_F(TestMetadataList, ListBuilderWorks)
 {
-    ListBuilder<IdAndValue<int>> list1;
+    ReadOnlyBufferBuilder<IdAndValue<int>> list1;
     EXPECT_EQ(list1.Size(), 0u);
     EXPECT_TRUE(list1.IsEmpty());
 
@@ -81,7 +80,7 @@ TEST_F(TestMetadataList, ListBuilderWorks)
     EXPECT_EQ(list1.Append({ 0xA4, 444 }), CHIP_ERROR_BUFFER_TOO_SMALL);
     EXPECT_EQ(list1.Size(), 3u);
 
-    ListBuilder<IdAndValue<int>> list2 = std::move(list1);
+    ReadOnlyBufferBuilder<IdAndValue<int>> list2 = std::move(list1);
 
     // Moved-from list is "empty", un-Metadata and span is empty.
     EXPECT_EQ(list1.Size(), 0u);             // NOLINT(bugprone-use-after-move)
@@ -114,7 +113,7 @@ TEST_F(TestMetadataList, ListBuilderWorks)
 TEST_F(TestMetadataList, ListBuilderConvertersWorks)
 {
     {
-        ListBuilder<int> list;
+        ReadOnlyBufferBuilder<int> list;
         std::array<int, 3> kArray{ 1, 2, 3 };
         EXPECT_EQ(list.ReferenceExisting(Span<const int>(kArray)), CHIP_NO_ERROR);
 
@@ -130,7 +129,7 @@ TEST_F(TestMetadataList, ListBuilderConvertersWorks)
     }
 
     {
-        ListBuilder<int> list;
+        ReadOnlyBufferBuilder<int> list;
         std::array<int, 3> kArray{ 1, 2, 3 };
         std::array<int, 3> kArray2{ 4, 5, 6 };
         EXPECT_EQ(list.ReferenceExisting(Span<const int>(kArray)), CHIP_NO_ERROR);
@@ -151,7 +150,7 @@ TEST_F(TestMetadataList, ListBuilderConvertersWorks)
     }
 
     {
-        ListBuilder<int> list;
+        ReadOnlyBufferBuilder<int> list;
 
         EXPECT_EQ(list.Append(10), CHIP_ERROR_BUFFER_TOO_SMALL);
         EXPECT_EQ(list.EnsureAppendCapacity(5), CHIP_NO_ERROR);
@@ -176,7 +175,7 @@ TEST_F(TestMetadataList, ListBuilderConvertersWorks)
         EXPECT_EQ(list2Span[4], 3);
     }
     {
-        ListBuilder<int> list;
+        ReadOnlyBufferBuilder<int> list;
 
         EXPECT_EQ(list.Append(10), CHIP_ERROR_BUFFER_TOO_SMALL);
         EXPECT_EQ(list.EnsureAppendCapacity(1), CHIP_NO_ERROR);
@@ -208,15 +207,15 @@ TEST_F(TestMetadataList, ListBuilderConvertersWorks)
 TEST_F(TestMetadataList, BufferMoveOperationsWork)
 {
     {
-        using LIST = ListBuilder<int>;
+        using LIST = ReadOnlyBufferBuilder<int>;
 
         LIST movedFromList{};
 
         ASSERT_EQ(movedFromList.EnsureAppendCapacity(3), CHIP_NO_ERROR);
 
-        movedFromList.Append(10);
-        movedFromList.Append(11);
-        movedFromList.Append(12);
+        EXPECT_EQ(movedFromList.Append(10), CHIP_NO_ERROR);
+        EXPECT_EQ(movedFromList.Append(11), CHIP_NO_ERROR);
+        EXPECT_EQ(movedFromList.Append(12), CHIP_NO_ERROR);
 
         LIST movedToList{ std::move(movedFromList) };
 
@@ -234,7 +233,7 @@ TEST_F(TestMetadataList, BufferMoveOperationsWork)
     }
 
     {
-        using LIST = ListBuilder<int>;
+        using LIST = ReadOnlyBufferBuilder<int>;
 
         LIST movedFromList{};
         LIST movedToList{};
@@ -242,9 +241,9 @@ TEST_F(TestMetadataList, BufferMoveOperationsWork)
         ASSERT_EQ(movedFromList.EnsureAppendCapacity(3), CHIP_NO_ERROR);
         ASSERT_EQ(movedToList.EnsureAppendCapacity(3), CHIP_NO_ERROR);
 
-        movedFromList.Append(10);
-        movedFromList.Append(11);
-        movedFromList.Append(12);
+        EXPECT_EQ(movedFromList.Append(10), CHIP_NO_ERROR);
+        EXPECT_EQ(movedFromList.Append(11), CHIP_NO_ERROR);
+        EXPECT_EQ(movedFromList.Append(12), CHIP_NO_ERROR);
 
         movedToList = std::move(movedFromList);
 
