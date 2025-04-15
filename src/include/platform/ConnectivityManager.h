@@ -27,6 +27,7 @@
 #include <app/icd/server/ICDServerConfig.h>
 #include <inet/UDPEndPoint.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/ReadOnlyBuffer.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceEvent.h>
 
@@ -180,15 +181,14 @@ public:
     struct WiFiPAFAdvertiseParam
     {
         /* Frequency list */
-        uint16_t freq_list_len;
-        std::unique_ptr<uint16_t[]> freq_list;
+        ReadOnlyBuffer<uint16_t> freq_list;
         /* publish_id */
         uint32_t publish_id;
     };
 
     WiFiPAFAdvertiseParam mPafAdverParam;
     CHIP_ERROR SetWiFiPAFAdvertisingEnabled(bool val);
-    CHIP_ERROR SetWiFiPAFPublishParam(const WiFiPAFAdvertiseParam & args);
+    CHIP_ERROR SetWiFiPAFPublishParam(ReadOnlyBufferBuilder<uint16_t> & knownFreqListBuilder);
     CHIP_ERROR WiFiPAFPublish(WiFiPAFAdvertiseParam & args);
     CHIP_ERROR WiFiPAFCancelPublish(uint32_t PublishId);
     typedef void (*OnConnectionCompleteFunct)(void * appState);
@@ -448,12 +448,9 @@ inline CHIP_ERROR ConnectivityManager::SetWiFiPAFAdvertisingEnabled(bool val)
     return WiFiPAFCancelPublish(mPafAdverParam.publish_id);
 }
 
-inline CHIP_ERROR ConnectivityManager::SetWiFiPAFPublishParam(const WiFiPAFAdvertiseParam & args)
+inline CHIP_ERROR ConnectivityManager::SetWiFiPAFPublishParam(ReadOnlyBufferBuilder<uint16_t> & knownFreqListBuilder)
 {
-    mPafAdverParam.freq_list_len = args.freq_list_len;
-    mPafAdverParam.freq_list     = std::make_unique<uint16_t[]>(args.freq_list_len);
-    std::copy(args.freq_list.get(), args.freq_list.get() + args.freq_list_len, mPafAdverParam.freq_list.get());
-    mPafAdverParam.publish_id = args.publish_id;
+    mPafAdverParam.freq_list = knownFreqListBuilder.TakeBuffer();
     return CHIP_NO_ERROR;
 }
 
