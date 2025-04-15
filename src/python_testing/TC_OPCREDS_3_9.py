@@ -190,7 +190,8 @@ class TC_OPCREDS_3_9(MatterBaseTest):
             attribute=opcreds.Attributes.TrustedRootCertificates,
             fabric_filtered=True
         )
-        asserts.assert_true(len(root_certs) == 1, f"Expecting exactly one root from TrustedRootCertificates (TH1's), got {len(root_certs)}")
+        asserts.assert_true(len(root_certs) == 1,
+                            f"Expecting exactly one root from TrustedRootCertificates (TH1's), got {len(root_certs)}")
         th1_root_parser = MatterCertParser(root_certs[0])
         cr1_root_public_key = th1_root_parser.get_public_key_bytes()
 
