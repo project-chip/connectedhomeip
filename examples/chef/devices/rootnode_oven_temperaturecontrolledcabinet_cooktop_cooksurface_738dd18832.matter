@@ -1944,23 +1944,22 @@ endpoint 2 {
   }
 
   server cluster TemperatureControl {
-    ram      attribute temperatureSetpoint default = 200;
-    ram      attribute minTemperature default = 200;
-    ram      attribute maxTemperature default = 400;
-    ram      attribute step default = 10;
+    ram      attribute temperatureSetpoint default = 7600;
+    ram      attribute minTemperature default = 7600;
+    ram      attribute maxTemperature default = 28800;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 5;
+    ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
 
     handle command SetTemperature;
   }
 
   server cluster TemperatureMeasurement {
-    ram      attribute measuredValue default = 200;
-    ram      attribute minMeasuredValue default = -4000;
-    ram      attribute maxMeasuredValue default = 2000;
+    ram      attribute measuredValue default = 6555;
+    ram      attribute minMeasuredValue default = 3000;
+    ram      attribute maxMeasuredValue default = 30000;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
