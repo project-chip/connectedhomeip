@@ -17,7 +17,6 @@
 import logging
 import sys
 from pathlib import Path
-from typing import Optional
 
 try:
     from matter.idl.zapxml import ParseSource, ParseXmls
@@ -30,22 +29,7 @@ if __name__ == '__main__':
     import click
 
     from matter.idl.generators.idl import IdlGenerator
-    from matter.idl.generators.storage import GeneratorStorage
-
-    class InMemoryStorage(GeneratorStorage):
-        def __init__(self):
-            super().__init__()
-            self.content: Optional[str] = None
-
-        def get_existing_data(self, relative_path: str):
-            # Force re-generation each time
-            return None
-
-        def write_new_data(self, relative_path: str, content: str):
-            if self.content:
-                raise Exception(
-                    "Unexpected extra data: single file generation expected")
-            self.content = content
+    from matter.idl.generators.storage import InMemoryStorage
 
     # Supported log levels, mapping string values required for argument
     # parsing into logging constants
@@ -56,20 +40,20 @@ if __name__ == '__main__':
         'fatal': logging.FATAL,
     }
 
-    @ click.command()
-    @ click.option(
+    @click.command()
+    @click.option(
         '--log-level',
         default='INFO',
         show_default=True,
         type=click.Choice(list(__LOG_LEVELS__.keys()), case_sensitive=False),
         help='Determines the verbosity of script output.')
-    @ click.option(
+    @click.option(
         '--no-print',
         show_default=True,
         default=False,
         is_flag=True,
         help='Do not pring output data (parsed data)')
-    @ click.argument('filenames', nargs=-1)
+    @click.argument('filenames', nargs=-1)
     def main(log_level, no_print, filenames):
         logging.basicConfig(
             level=__LOG_LEVELS__[log_level],

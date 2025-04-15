@@ -16,7 +16,6 @@
 import logging
 import sys
 from pathlib import Path
-from typing import Optional
 
 import click
 
@@ -27,25 +26,9 @@ except ImportError:
     from matter.idl.data_model_xml import ParseSource, ParseXmls
 
 from matter.idl.generators.idl import IdlGenerator
-from matter.idl.generators.storage import GeneratorStorage
+from matter.idl.generators.storage import InMemoryStorage
 from matter.idl.matter_idl_parser import CreateParser
 from matter.idl.matter_idl_types import Idl
-
-
-class InMemoryStorage(GeneratorStorage):
-    def __init__(self):
-        super().__init__()
-        self.content: Optional[str] = None
-
-    def get_existing_data(self, relative_path: str):
-        # Force re-generation each time
-        return None
-
-    def write_new_data(self, relative_path: str, content: str):
-        if self.content:
-            raise Exception(
-                "Unexpected extra data: single file generation expected")
-        self.content = content
 
 
 def normalize_order(idl: Idl):

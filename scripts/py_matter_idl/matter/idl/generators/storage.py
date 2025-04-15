@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Copyright (c) 2022 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +14,7 @@
 
 import logging
 import os
+from typing import Optional
 
 
 class GeneratorStorage:
@@ -81,3 +81,20 @@ class FileSystemGeneratorStorage(GeneratorStorage):
         logging.info("Writing new data to: %s" % target)
         with open(target, "wt") as out:
             out.write(content)
+
+
+class InMemoryStorage(GeneratorStorage):
+    """A storage generator which will keep files in memory."""
+
+    def __init__(self):
+        super().__init__()
+        self.content: Optional[str] = None
+
+    def get_existing_data(self, relative_path: str):
+        # Force re-generation each time
+        return None
+
+    def write_new_data(self, relative_path: str, content: str):
+        if self.content:
+            raise Exception("Unexpected extra data: single file generation expected")
+        self.content = content
