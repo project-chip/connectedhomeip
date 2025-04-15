@@ -8692,8 +8692,10 @@ endpoint 1 {
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
 
+    handle command Pause;
     handle command Stop;
     handle command Start;
+    handle command Resume;
     handle command OperationalCommandResponse;
   }
 
@@ -10171,3 +10173,5 @@ endpoint 65534 {
     handle command ReorderNetwork;
   }
 }
+
+
