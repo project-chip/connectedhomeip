@@ -488,11 +488,11 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
     VerifyOrReturnError(GetStepValue(stepValue) == CHIP_NO_ERROR, Status::Failure);
 
     // Derive Target Position from StepValue and NumberOfSteps.
-    int32_t currentPosition = static_cast<uint32_t>(currentState.position.Value());
+    uint32_t currentPosition = static_cast<uint32_t>(currentState.position.Value());
 
     // Convert step to position delta
-    int32_t delta       = numberOfSteps * stepValue;
-    int32_t newPosition = 0;
+    uint32_t delta       = numberOfSteps * stepValue;
+    uint32_t newPosition = 0;
 
     // check if device supports Limitation feature, if yes fetch the LimitRange values
     bool limitSupported = mConformance.HasFeature(Feature::kLimitation) ? true : false;
@@ -508,11 +508,12 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
     {
 
     case StepDirectionEnum::kDecrease:
-        newPosition = currentPosition - delta;
+        // To avoid underflow, newPosition will be set to 0 if currentPosition is less than or equal to delta
+        newPosition = (currentPosition > delta) ? currentPosition - delta : 0;
         // Position value SHALL be clamped to 0.00% if the LM feature is not supported or LimitRange.Min if the LM feature is
         // supported.
         newPosition =
-            limitSupported ? std::max(newPosition, static_cast<int32_t>(limitRange.min)) : std::max(newPosition, (int32_t) 0);
+            limitSupported ? std::max(newPosition, static_cast<uint32_t>(limitRange.min)) : std::max(newPosition, (uint32_t) 0);
         break;
 
     case StepDirectionEnum::kIncrease:
@@ -520,7 +521,7 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
         // Position value SHALL be clamped to 0.00% if the LM feature is not supported or LimitRange.Max if the LM feature is
         // supported.
         newPosition =
-            limitSupported ? std::min(newPosition, static_cast<int32_t>(limitRange.max)) : std::min(newPosition, (int32_t) 10000);
+            limitSupported ? std::min(newPosition, static_cast<uint32_t>(limitRange.max)) : std::min(newPosition, (uint32_t) 10000);
         break;
 
     default:
