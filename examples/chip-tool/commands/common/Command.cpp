@@ -710,6 +710,37 @@ size_t Command::AddArgument(const char * name, chip::CharSpan * value, const cha
 size_t Command::AddArgument(const char * name, chip::ByteSpan * value, const char * desc, uint8_t flags)
 {
     Argument arg;
+    
+    // if the value is a hex string, we need to convert it from hex to bytes
+    if ((value->size() > kHexStringPrefixLen) && IsHexString((const char *) value->data()))
+    {
+        uint8_t * buffer = nullptr;
+        size_t size;
+
+        CHIP_ERROR err = HexToBytes(
+            chip::CharSpan((const char *) (&value->data()[kHexStringPrefixLen]), (value->size() - kHexStringPrefixLen)),
+            [&buffer](size_t allocSize) {
+                buffer = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(allocSize, sizeof(uint8_t)));
+                return buffer;
+            },
+            &size);
+
+        if (err != CHIP_NO_ERROR)
+        {
+            if (buffer != nullptr)
+            {
+                chip::Platform::MemoryFree(buffer);
+            }
+
+            return 0;
+        }
+
+        // The buffer is now filled with the decoded bytes, so we can set the value
+        // to point to the buffer and set the size accordingly
+        chip::ByteSpan newvalue = new chip::ByteSpan(buffer, size);
+        value = &newvalue;
+    }
+    
     arg.type  = ArgumentType::OctetString;
     arg.name  = name;
     arg.value = reinterpret_cast<void *>(value);
