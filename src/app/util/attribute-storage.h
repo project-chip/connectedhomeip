@@ -261,7 +261,7 @@ CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, chip::EndpointId id, const 
                                      const chip::Span<chip::DataVersion> & dataVersionStorage,
                                      chip::Span<const EmberAfDeviceType> deviceTypeList = {},
                                      chip::EndpointId parentEndpointId                  = chip::kInvalidEndpointId);
-
+#ifdef CONFIG_USE_ENDPOINT_UNIQUE_ID
 // Register a dynamic endpoint. This involves registering descriptors that describe
 // the composition of the endpoint (encapsulated in the 'ep' argument) as well as providing
 // storage for data versions.
@@ -276,7 +276,8 @@ CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, chip::EndpointId id, const 
 // An optional device type list can be passed in as well. If provided, the memory
 // backing the list needs to remain allocated until this dynamic endpoint is cleared.
 //
-// An optional endpointUniqueId can be passed.
+// An optional endpointUniqueId can be passed, the data will be copied out of 
+// endpointUniqueId and it does not need to survive once this call returns.
 //
 // An optional parent endpoint id should be passed for child endpoints of composed device.
 //
@@ -290,6 +291,7 @@ CHIP_ERROR emberAfSetDynamicEndpointWithEpUniqueId(uint16_t index, chip::Endpoin
                                                    chip::Span<const EmberAfDeviceType> deviceTypeList = {},
                                                    chip::CharSpan endpointUniqueId                    = {},
                                                    chip::EndpointId parentEndpointId                  = chip::kInvalidEndpointId);
+#endif
 chip::EndpointId emberAfClearDynamicEndpoint(uint16_t index);
 uint16_t emberAfGetDynamicIndexFromEndpoint(chip::EndpointId id);
 /**

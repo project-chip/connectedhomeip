@@ -211,7 +211,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, Attrib
 
     return err;
 }
-
+#ifdef CONFIG_USE_ENDPOINT_UNIQUE_ID
 CHIP_ERROR DescriptorAttrAccess::ReadEndpointUniqueId(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     char epUniqueId[Attributes::EndpointUniqueID::TypeInfo::MaxLength()] = { 0 };
@@ -220,6 +220,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadEndpointUniqueId(EndpointId endpoint, Attri
 
     return aEncoder.Encode(epUniqueIdSpan);
 }
+#endif
 
 CHIP_ERROR DescriptorAttrAccess::ReadServerClusters(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
@@ -281,9 +282,11 @@ CHIP_ERROR DescriptorAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
     case FeatureMap::Id: {
         return ReadFeatureMap(aPath.mEndpointId, aEncoder);
     }
+#ifdef CONFIG_USE_ENDPOINT_UNIQUE_ID
     case EndpointUniqueID::Id: {
         return ReadEndpointUniqueId(aPath.mEndpointId, aEncoder);
     }
+#endif
     default: {
         break;
     }

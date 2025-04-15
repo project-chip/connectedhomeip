@@ -29,6 +29,7 @@
 
 // overrides CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT in CHIPProjectConfig
 #define CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT 16
+#define CONFIG_USE_ENDPOINT_UNIQUE_ID
 
 // include the CHIPProjectConfig from config/standalone
 #include <CHIPProjectConfig.h>
