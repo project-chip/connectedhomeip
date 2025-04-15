@@ -31,6 +31,50 @@ using namespace chip::app::Clusters::WebRTCTransportProvider;
 
 using namespace Camera;
 
+void WebRTCProviderManager::Init()
+{
+    rtc::Configuration config;
+    // config.iceServers.emplace_back("stun.l.google.com:19302");
+
+    mPeerConnection = std::make_shared<rtc::PeerConnection>(config);
+
+    mPeerConnection->onLocalDescription([this](rtc::Description description) {
+        mSdpAnswer = std::string(description);
+        ChipLogProgress(Camera, "Local Description:");
+        ChipLogProgress(Camera, "%s", mSdpAnswer.c_str());
+
+        ScheduleAnswerSend();
+    });
+
+    mPeerConnection->onLocalCandidate([](rtc::Candidate candidate) {
+        ChipLogProgress(Camera, "Local Candidate:");
+        ChipLogProgress(Camera, "%s", std::string(candidate).c_str());
+    });
+
+    mPeerConnection->onStateChange([](rtc::PeerConnection::State state) {
+        // Convert the enum to an integer or string as needed
+        ChipLogProgress(Camera, "[State: %u]", static_cast<unsigned>(state));
+    });
+
+    mPeerConnection->onGatheringStateChange([](rtc::PeerConnection::GatheringState state) {
+        ChipLogProgress(Camera, "[Gathering State: %u]", static_cast<unsigned>(state));
+    });
+
+    mPeerConnection->onDataChannel([&](std::shared_ptr<rtc::DataChannel> _dc) {
+        ChipLogProgress(Camera, "[Got a DataChannel with label: %s]", _dc->label().c_str());
+        mDataChannel = _dc;
+
+        mDataChannel->onClosed([&]() { ChipLogProgress(Camera, "[DataChannel closed: %s]", mDataChannel->label().c_str()); });
+
+        mDataChannel->onMessage([](auto data) {
+            if (std::holds_alternative<std::string>(data))
+            {
+                ChipLogProgress(Camera, "[Received message: %s]", std::get<std::string>(data).c_str());
+            }
+        });
+    });
+}
+
 void WebRTCProviderManager::CloseConnection()
 {
     // Close the data channel and peer connection if they exist
@@ -53,8 +97,7 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession,
-                                                     const chip::ScopedNodeId & peerId, EndpointId originatingEndpointId)
+CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession)
 {
     // Initialize a new WebRTC session from the SolicitOfferRequestArgs
     outSession.id          = args.sessionId;
@@ -102,52 +145,9 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     }
 
     // Process the SDP Offer, begin the ICE Candidate gathering phase, create the SDP Answer, and invoke Answer.
-    CloseConnection();
-
-    mPeerId                = peerId;
-    mOriginatingEndpointId = originatingEndpointId;
+    mPeerId                = ScopedNodeId(args.peerNodeId, args.fabricIndex);
+    mOriginatingEndpointId = args.originatingEndpointId;
     mCurrentSessionId      = args.sessionId;
-
-    rtc::Configuration config;
-    // config.iceServers.emplace_back("stun.l.google.com:19302");
-
-    mPeerConnection = std::make_shared<rtc::PeerConnection>(config);
-
-    mPeerConnection->onLocalDescription([this](rtc::Description description) {
-        mSdpAnswer = std::string(description);
-        ChipLogProgress(Camera, "Local Description:");
-        ChipLogProgress(Camera, "%s", mSdpAnswer.c_str());
-
-        ScheduleAnswerSend();
-    });
-
-    mPeerConnection->onLocalCandidate([](rtc::Candidate candidate) {
-        ChipLogProgress(Camera, "Local Candidate:");
-        ChipLogProgress(Camera, "%s", std::string(candidate).c_str());
-    });
-
-    mPeerConnection->onStateChange([](rtc::PeerConnection::State state) {
-        // Convert the enum to an integer or string as needed
-        ChipLogProgress(Camera, "[State: %u]", static_cast<unsigned>(state));
-    });
-
-    mPeerConnection->onGatheringStateChange([](rtc::PeerConnection::GatheringState state) {
-        ChipLogProgress(Camera, "[Gathering State: %u]", static_cast<unsigned>(state));
-    });
-
-    mPeerConnection->onDataChannel([&](std::shared_ptr<rtc::DataChannel> _dc) {
-        ChipLogProgress(Camera, "[Got a DataChannel with label: %s]", _dc->label().c_str());
-        mDataChannel = _dc;
-
-        mDataChannel->onClosed([&]() { ChipLogProgress(Camera, "[DataChannel closed: %s]", mDataChannel->label().c_str()); });
-
-        mDataChannel->onMessage([](auto data) {
-            if (std::holds_alternative<std::string>(data))
-            {
-                ChipLogProgress(Camera, "[Received message: %s]", std::get<std::string>(data).c_str());
-            }
-        });
-    });
 
     mPeerConnection->setRemoteDescription(args.sdp);
 

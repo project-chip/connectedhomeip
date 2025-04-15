@@ -33,6 +33,8 @@
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Chime;
 using namespace chip::app::Clusters::CameraAvStreamManagement;
+using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
+
 using namespace Camera;
 
 CameraDevice::CameraDevice()
@@ -47,8 +49,12 @@ CameraDevice::CameraDevice()
     // Initialize Audio Sources
     mNetworkAudioSource.Init(&mMediaController, AUDIO_STREAM_GST_DEST_PORT, StreamType::kAudio);
 
-    // Set the CameraHALInterface in CameraAVStreamManager.
+    // Initialize WebRTC connnection
+    mWebRTCProviderManager.Init();
+
+    // Set the CameraHALInterface in CameraAVStreamManager and CameraAVsettingsUserLevelManager.
     mCameraAVStreamManager.SetCameraDeviceHAL(this);
+    mCameraAVSettingsUserLevelManager.SetCameraDeviceHAL(this);
 }
 
 CameraDevice::~CameraDevice()
@@ -644,6 +650,31 @@ CameraError CameraDevice::SetMicrophoneVolume(uint8_t microphoneVol)
     return CameraError::SUCCESS;
 }
 
+int16_t CameraDevice::GetPanMin()
+{
+    return -90;
+}
+
+int16_t CameraDevice::GetPanMax()
+{
+    return 90;
+}
+
+int16_t CameraDevice::GetTiltMin()
+{
+    return -90;
+}
+
+int16_t CameraDevice::GetTiltMax()
+{
+    return 90;
+}
+
+uint8_t CameraDevice::GetZoomMax()
+{
+    return 75;
+}
+
 void CameraDevice::InitializeVideoStreams()
 {
     // Create single video stream with typical supported parameters
@@ -709,4 +740,14 @@ WebRTCTransportProvider::Delegate & CameraDevice::GetWebRTCProviderDelegate()
 CameraAVStreamMgmtDelegate & CameraDevice::GetCameraAVStreamMgmtDelegate()
 {
     return mCameraAVStreamManager;
+}
+
+CameraAvSettingsUserLevelManagement::Delegate & CameraDevice::GetCameraAVSettingsUserLevelMgmtDelegate()
+{
+    return mCameraAVSettingsUserLevelManager;
+}
+
+MediaController & CameraDevice::GetMediaController()
+{
+    return mMediaController;
 }

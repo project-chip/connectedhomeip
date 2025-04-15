@@ -93,7 +93,7 @@ Davis, CA 95616, USA
           <feature name="TC"/>
         </mandatoryConform>
       </item>
-      <item value="6" name="TCAcknowledgementsNotReceived" summary="TCAcknowledgementsNotReceived No acknowledgements from the user for the TC features were received.">
+      <item value="6" name="TCAcknowledgementsNotReceived" summary="TCAcknowledgementsNotReceived No or insufficient acknowledgements from the user for the TC features were received.">
         <mandatoryConform>
           <feature name="TC"/>
         </mandatoryConform>
@@ -108,16 +108,10 @@ Davis, CA 95616, USA
       <item value="0" name="Unspecified" summary="Unspecified / unknown reason of network failure">
         <mandatoryConform/>
       </item>
-      <item value="1" name="Route" summary="Device is unable to route to the required resources, e.g. a Thread device is unable to reach a border router or a Wi-Fi device is unable to reach the public Internet which it requires for operation.">
+      <item value="1" name="Auth" summary="Credentials for the configured operational network are not valid">
         <mandatoryConform/>
       </item>
-      <item value="2" name="ICD" summary="ICD-related network failure, e.g. persistent failure to have an ICD checkin to result in a subscription">
-        <mandatoryConform/>
-      </item>
-      <item value="3" name="Auth" summary="Credentials for the configured operational network are not valid">
-        <mandatoryConform/>
-      </item>
-      <item value="4" name="Visibility" summary="Configured network cannot be found (e.g. the device cannot see the configured Wi-Fi SSID, Thread end-node is unable to find a parent router on the PAN)">
+      <item value="2" name="Visibility" summary="Configured network cannot be found (e.g. the device cannot see the configured Wi-Fi SSID, Thread end-node is unable to find a parent router on the PAN)">
         <mandatoryConform/>
       </item>
     </enum>
@@ -226,19 +220,6 @@ Davis, CA 95616, USA
           <feature name="TC"/>
         </mandatoryConform>
       </otherwiseConform>
-    </attribute>
-    <attribute id="0x000A" name="NFCConstrainedDataModel" type="bool" default="false">
-      <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
-      <otherwiseConform>
-        <mandatoryConform/>
-        <mandatoryConform>
-          <feature name="NFC"/>
-        </mandatoryConform>
-      </otherwiseConform>
-      <constraint>
-        <desc/>
-      </constraint>
     </attribute>
   </attributes>
   <commands>

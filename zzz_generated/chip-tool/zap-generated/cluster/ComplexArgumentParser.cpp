@@ -3256,14 +3256,22 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     Json::Value valueCopy(value);
 
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("CommodityPriceComponentStruct.price", "price", value.isMember("price")));
-    ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("CommodityPriceComponentStruct.source", "source", value.isMember("source")));
 
     char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "price");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.price, value["price"]));
+    if (value.isMember("price"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "price");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.price, value["price"]));
+    }
     valueCopy.removeMember("price");
+
+    if (value.isMember("priceLevel"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "priceLevel");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.priceLevel, value["priceLevel"]));
+    }
+    valueCopy.removeMember("priceLevel");
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "source");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.source, value["source"]));
@@ -3289,6 +3297,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 void ComplexArgumentParser::Finalize(chip::app::Clusters::CommodityPrice::Structs::CommodityPriceComponentStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.price);
+    ComplexArgumentParser::Finalize(request.priceLevel);
     ComplexArgumentParser::Finalize(request.source);
     ComplexArgumentParser::Finalize(request.description);
     ComplexArgumentParser::Finalize(request.tariffComponentID);
@@ -3307,7 +3316,6 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
         ComplexArgumentParser::EnsureMemberExist("CommodityPriceStruct.periodStart", "periodStart", value.isMember("periodStart")));
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("CommodityPriceStruct.periodEnd", "periodEnd", value.isMember("periodEnd")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("CommodityPriceStruct.price", "price", value.isMember("price")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "periodStart");
@@ -3318,9 +3326,19 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.periodEnd, value["periodEnd"]));
     valueCopy.removeMember("periodEnd");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "price");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.price, value["price"]));
+    if (value.isMember("price"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "price");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.price, value["price"]));
+    }
     valueCopy.removeMember("price");
+
+    if (value.isMember("priceLevel"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "priceLevel");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.priceLevel, value["priceLevel"]));
+    }
+    valueCopy.removeMember("priceLevel");
 
     if (value.isMember("description"))
     {
@@ -3344,6 +3362,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::CommodityPrice::Struct
     ComplexArgumentParser::Finalize(request.periodStart);
     ComplexArgumentParser::Finalize(request.periodEnd);
     ComplexArgumentParser::Finalize(request.price);
+    ComplexArgumentParser::Finalize(request.priceLevel);
     ComplexArgumentParser::Finalize(request.description);
     ComplexArgumentParser::Finalize(request.components);
 }

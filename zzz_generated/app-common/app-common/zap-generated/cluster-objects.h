@@ -21334,15 +21334,17 @@ namespace CommodityPriceComponentStruct {
 enum class Fields : uint8_t
 {
     kPrice             = 0,
-    kSource            = 1,
-    kDescription       = 2,
-    kTariffComponentID = 3,
+    kPriceLevel        = 1,
+    kSource            = 2,
+    kDescription       = 3,
+    kTariffComponentID = 4,
 };
 
 struct Type
 {
 public:
-    int64_t price                       = static_cast<int64_t>(0);
+    Optional<int64_t> price;
+    Optional<int16_t> priceLevel;
     Globals::TariffPriceTypeEnum source = static_cast<Globals::TariffPriceTypeEnum>(0);
     Optional<chip::CharSpan> description;
     Optional<uint32_t> tariffComponentID;
@@ -21363,8 +21365,9 @@ enum class Fields : uint8_t
     kPeriodStart = 0,
     kPeriodEnd   = 1,
     kPrice       = 2,
-    kDescription = 3,
-    kComponents  = 4,
+    kPriceLevel  = 3,
+    kDescription = 4,
+    kComponents  = 5,
 };
 
 struct Type
@@ -21372,7 +21375,8 @@ struct Type
 public:
     uint32_t periodStart = static_cast<uint32_t>(0);
     DataModel::Nullable<uint32_t> periodEnd;
-    Globals::Structs::PriceStruct::Type price;
+    Optional<Globals::Structs::PriceStruct::Type> price;
+    Optional<int16_t> priceLevel;
     Optional<chip::CharSpan> description;
     Optional<DataModel::List<const Structs::CommodityPriceComponentStruct::Type>> components;
 
@@ -21386,7 +21390,8 @@ struct DecodableType
 public:
     uint32_t periodStart = static_cast<uint32_t>(0);
     DataModel::Nullable<uint32_t> periodEnd;
-    Globals::Structs::PriceStruct::DecodableType price;
+    Optional<Globals::Structs::PriceStruct::DecodableType> price;
+    Optional<int16_t> priceLevel;
     Optional<chip::CharSpan> description;
     Optional<DataModel::DecodableList<Structs::CommodityPriceComponentStruct::DecodableType>> components;
 
@@ -21677,7 +21682,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    Structs::CommodityPriceStruct::Type currentPrice;
+    DataModel::Nullable<Structs::CommodityPriceStruct::Type> currentPrice;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -21689,7 +21694,7 @@ public:
     static constexpr EventId GetEventId() { return Events::PriceChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
 
-    Structs::CommodityPriceStruct::DecodableType currentPrice;
+    DataModel::Nullable<Structs::CommodityPriceStruct::DecodableType> currentPrice;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -21710,7 +21715,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    DataModel::List<const Structs::CommodityPriceStruct::Type> priceForecast;
+    DataModel::Nullable<DataModel::List<const Structs::CommodityPriceStruct::Type>> priceForecast;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -21722,7 +21727,7 @@ public:
     static constexpr EventId GetEventId() { return Events::ForecastChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
 
-    DataModel::DecodableList<Structs::CommodityPriceStruct::DecodableType> priceForecast;
+    DataModel::Nullable<DataModel::DecodableList<Structs::CommodityPriceStruct::DecodableType>> priceForecast;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

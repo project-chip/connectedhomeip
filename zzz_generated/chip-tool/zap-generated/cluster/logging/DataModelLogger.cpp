@@ -2915,6 +2915,14 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
+        CHIP_ERROR err = LogValue("PriceLevel", indent + 1, value.priceLevel);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PriceLevel'");
+            return err;
+        }
+    }
+    {
         CHIP_ERROR err = LogValue("Source", indent + 1, value.source);
         if (err != CHIP_NO_ERROR)
         {
@@ -2969,6 +2977,14 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Price'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("PriceLevel", indent + 1, value.priceLevel);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PriceLevel'");
             return err;
         }
     }
