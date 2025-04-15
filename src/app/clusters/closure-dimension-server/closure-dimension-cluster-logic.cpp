@@ -102,7 +102,7 @@ CHIP_ERROR ClusterLogic::SetTarget(const GenericTargetStruct & target)
     {
         VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
         VerifyOrReturnError(EnsureKnownEnumValue(target.speed.Value()) != Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
-                                CHIP_ERROR_INVALID_ARGUMENT);
+                            CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     // TODO: Target.Position value SHALL follow the scaling from "Resolution Attribute".
@@ -465,7 +465,7 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
     VerifyOrReturnError(numberOfSteps > 0, Status::ConstraintError);
     if (speed.HasValue())
     {
-        //TODO: Spec Issue: When the device does not support the speed(SP) feature, behaviour is undefined
+        // TODO: Spec Issue: When the device does not support the speed(SP) feature, behaviour is undefined
         VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), Status::Success);
         VerifyOrReturnError(speed.Value() != Globals::ThreeLevelAutoEnum::kUnknownEnumValue, Status::ConstraintError);
     }
