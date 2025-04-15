@@ -824,8 +824,17 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAF
     unsigned int ssi_len                          = sizeof(struct PAFPublishSSI);
 
     // Add the freq_list:
-    GVariant * freq_array_variant =
-        g_variant_new_fixed_array(G_VARIANT_TYPE_UINT16, InArgs.freq_list.get(), InArgs.freq_list_len, sizeof(guint16));
+    GVariant * freq_array_variant;
+    if (InArgs.freq_list.size() > 0)
+    {
+        freq_array_variant =
+            g_variant_new_fixed_array(G_VARIANT_TYPE_UINT16, InArgs.freq_list.data(), InArgs.freq_list.size(), sizeof(guint16));
+    }
+    else
+    {
+        freq_array_variant = g_variant_new_fixed_array(G_VARIANT_TYPE_UINT16, &freq, 1, sizeof(guint16));
+    }
+
     if (freq_array_variant == nullptr)
     {
         ChipLogError(DeviceLayer, "WiFi-PAF: freq_array_variant is NULL ");
