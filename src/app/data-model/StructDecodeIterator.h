@@ -27,19 +27,46 @@ namespace app {
 namespace Clusters {
 namespace detail {
 
-// Helper  class to make structure decoding more compact for structure
+// INTERNAL class used for structure decoding within individual
+// `DecodableType::Decode` calls for TLV-encoded data.
+//
+// This class provides the ability to iterate over all context tags
+// of a TLV-encoded structure. Example:
+//
+//    // reader is assumed to be positioned AT THE START of a kTLVType_Structure.
+//    TLV::TLVReader reader;
+//
+//    detail::StructDecodeIterator iterator(reader);
+//
+//    while (true) {
+//       uint8_t context_tag;
+//       CHIP_ERROR err = iterator.Next(context_tag);
+//
+//       if (err == CHIP_ERROR_END_OF_TLV) {
+//          break; // processing finished
+//       }
+//       ReturnErrorOnFailure(err); // CHIP_NO_ERROR means tag is valid
+//
+//       // process context_tag ... like using to_underlying(Fields::k....)
+//    }
+//
 class StructDecodeIterator
 {
 public:
-    // may return a context tag, a CHIP_ERROR (end iteration)
-    using EntryElement = std::variant<uint8_t, CHIP_ERROR>;
-
     StructDecodeIterator(TLV::TLVReader & reader) : mReader(reader) {}
 
-    /// Iterate through structure elements. Returns one of:
-    ///   - uint8_t CONTEXT TAG (keep iterating)
-    ///   - CHIP_ERROR (including CHIP_NO_ERROR) which should be a final
-    ///     return value (stop iterating)
+    /// Iterate through structure elements.
+    /// Reader MUST be positioned on a kTLVType_Structure element and iterator
+    /// handles enter/exit container.
+    ///
+    /// Possible return values:
+    ///
+    /// - CHIP_NO_ERROR: a new tag was found. `context_tag` is valid
+    /// - CHIP_ERROR_END_OF_TLV: no more tags. SUCCESSFULLY completed.
+    /// - Any other error meaning failure
+    ///
+    /// During the first call, the iterator will EnterContainer into the reader.
+    /// During the last call (CHIP_ERROR_END_OF_TLV), the iterator will ExitContainer.
     CHIP_ERROR Next(uint8_t & context_tag);
 
 private:
