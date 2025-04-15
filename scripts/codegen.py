@@ -32,7 +32,7 @@ except ImportError:
     from matter.idl.matter_idl_parser import CreateParser
 
 # isort: off
-from matter.idl.generators import FileSystemGeneratorStorage, GeneratorStorage
+from matter.idl.generators.storage import FileSystemGeneratorStorage, GeneratorStorage
 from matter.idl.generators.path_resolution import expand_path_for_idl
 from matter.idl.generators.registry import CodeGenerator, GENERATORS
 

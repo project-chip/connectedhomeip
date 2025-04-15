@@ -19,8 +19,9 @@ import logging
 import os
 from typing import List, Optional, Set
 
-from matter.idl.generators import CodeGenerator, GeneratorStorage
+from matter.idl.generators import CodeGenerator
 from matter.idl.generators.filters import upfirst
+from matter.idl.generators.storage import GeneratorStorage
 from matter.idl.generators.type_definitions import (BasicInteger, BasicString, FundamentalType, IdlBitmapType, IdlEnumType, IdlType,
                                                     ParseDataType, TypeLookupContext)
 from matter.idl.matter_idl_types import (Attribute, Cluster, Command, DataType, Field, FieldQuality, Idl, Struct, StructQuality,
