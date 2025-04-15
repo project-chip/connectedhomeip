@@ -25,7 +25,7 @@
 #include <lib/core/Optional.h>
 #include <lib/core/TLV.h>
 
-#include <clustes/shared/Enums.h>
+#include <clusters/shared/Enums.h>
 
 #include <cstdint>
 
