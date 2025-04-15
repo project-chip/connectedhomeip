@@ -281,7 +281,7 @@ namespace Inet {
         VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
 
         // Ensure the destination address type is compatible with the endpoint address type.
-        VerifyOrReturnError(mAddrType == pktInfo->DestAddress.Type(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(mAddrType == pktInfo->DestAddress.Type() || mAddrType == IPAddressType::kAny, CHIP_ERROR_INVALID_ARGUMENT);
 
         // For now the entire message must fit within a single buffer.
         VerifyOrReturnError(msg->Next() == nullptr, CHIP_ERROR_MESSAGE_TOO_LONG);
@@ -396,6 +396,10 @@ namespace Inet {
             nw_ip_options_set_version(ipOptions, nw_ip_version_4);
             break;
 #endif // INET_CONFIG_ENABLE_IPV4
+
+        case IPAddressType::kAny:
+            // Nothing to do.
+            break;
 
         default:
             err = INET_ERROR_WRONG_ADDRESS_TYPE;

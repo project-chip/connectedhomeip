@@ -172,6 +172,15 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     // The logic below expects IPv6 to be at index 0 of this tuple. Keep that logic in sync with
     // this code.
     //
+#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+    ReturnErrorOnFailure(stateParams.transportMgr->Init(Transport::UdpListenParameters(stateParams.udpEndPointManager)
+#if INET_CONFIG_ENABLE_IPV4
+                                                            .SetAddressType(Inet::IPAddressType::kAny)
+#else
+                                                            .SetAddressType(Inet::IPAddressType::kIPv6)
+#endif // INET_CONFIG_ENABLE_IPV4
+                                                            .SetListenPort(params.listenPort)
+#else // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     ReturnErrorOnFailure(stateParams.transportMgr->Init(Transport::UdpListenParameters(stateParams.udpEndPointManager)
                                                             .SetAddressType(Inet::IPAddressType::kIPv6)
                                                             .SetListenPort(params.listenPort)
@@ -185,6 +194,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
                                                             .SetAddressType(Inet::IPAddressType::kIPv4)
                                                             .SetListenPort(params.listenPort)
 #endif
+#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 #if CONFIG_NETWORK_LAYER_BLE
                                                             ,
                                                         Transport::BleListenParameters(stateParams.bleLayer)
@@ -281,11 +291,13 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         app::DnssdServer::Instance().SetSecuredIPv6Port(
             stateParams.transportMgr->GetTransport().GetImplAtIndex<0>().GetBoundPort());
 
+#if !CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 #if INET_CONFIG_ENABLE_IPV4
         // If enabled, our IPv4 transport is at index 1.
         app::DnssdServer::Instance().SetSecuredIPv4Port(
             stateParams.transportMgr->GetTransport().GetImplAtIndex<1>().GetBoundPort());
 #endif // INET_CONFIG_ENABLE_IPV4
+#endif // !CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
         //
         // TODO: This is a hack to workaround the fact that we have a bi-polar stack that has controller and server modalities that

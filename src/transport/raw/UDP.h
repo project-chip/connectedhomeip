@@ -141,7 +141,7 @@ public:
     bool CanSendToPeer(const Transport::PeerAddress & address) override
     {
         return (mState == State::kInitialized) && (address.GetTransportType() == Type::kUdp) &&
-            (address.GetIPAddress().Type() == mUDPEndpointType);
+            ((address.GetIPAddress().Type() == mUDPEndpointType || Inet::IPAddressType::kAny == mUDPEndpointType));
     }
 
 private:

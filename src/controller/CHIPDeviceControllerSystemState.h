@@ -71,9 +71,11 @@ inline constexpr size_t kMaxDeviceTransportTcpPendingPackets = CHIP_CONFIG_MAX_T
 
 using DeviceTransportMgr =
     TransportMgr<Transport::UDP /* IPv6 */
+#if !CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 #if INET_CONFIG_ENABLE_IPV4
                  ,
                  Transport::UDP /* IPv4 */
+#endif
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
                  ,

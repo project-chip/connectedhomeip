@@ -514,6 +514,15 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     mUdcTransportMgr = chip::Platform::New<UdcTransportMgr>();
+#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+    ReturnErrorOnFailure(mUdcTransportMgr->Init(Transport::UdpListenParameters(mSystemState->UDPEndPointManager())
+#if INET_CONFIG_ENABLE_IPV4
+                                                    .SetAddressType(Inet::IPAddressType::kAny)
+#else
+                                                    .SetAddressType(Inet::IPAddressType::kIPv6)
+#endif // INET_CONFIG_ENABLE_IPV4
+                                                    .SetListenPort(static_cast<uint16_t>(mUdcListenPort))
+#else
     ReturnErrorOnFailure(mUdcTransportMgr->Init(Transport::UdpListenParameters(mSystemState->UDPEndPointManager())
                                                     .SetAddressType(Inet::IPAddressType::kIPv6)
                                                     .SetListenPort(static_cast<uint16_t>(mUdcListenPort))
@@ -523,6 +532,7 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
                                                     .SetAddressType(Inet::IPAddressType::kIPv4)
                                                     .SetListenPort(static_cast<uint16_t>(mUdcListenPort))
 #endif // INET_CONFIG_ENABLE_IPV4
+#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
                                                     ));
 
     mUdcServer = chip::Platform::New<UserDirectedCommissioningServer>();
