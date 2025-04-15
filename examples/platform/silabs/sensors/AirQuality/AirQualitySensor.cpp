@@ -26,7 +26,6 @@
 #include <sparkfun_sgp40.h>
 
 #ifdef SLI_SI91X_MCU_INTERFACE
-#include "rsi_debug.h"
 #include "sl_i2c_instances.h"
 
 static sl_i2c_instance_t i2c_instance = I2C_INSTANCE_USED;
