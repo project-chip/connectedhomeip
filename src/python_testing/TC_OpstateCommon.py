@@ -133,12 +133,12 @@ class TC_OPSTATE_BASE():
         self.send_raw_manual_or_pipe_command(command, msg)
 
     def opcomplete_test_mandated(self, device_type_list):
-        mandatedevicetypes = [{"devicetype":115,"revision":2}, # Laundry Washer
-                              {"devicetype":116,"revision":4}, # RVC
-                              {"devicetype":117,"revision":2}, # Dishwasher
-                              {"devicetype":121,"revision":2}, # Microwave Oven
-                              {"devicetype":123,"revision":3}, # Oven
-                              {"devicetype":124,"revision":2}] # Laundry Dryer
+        mandatedevicetypes = [{"devicetype": 115, "revision": 2},  # Laundry Washer
+                              {"devicetype": 116, "revision": 4},  # RVC
+                              {"devicetype": 117, "revision": 2},  # Dishwasher
+                              {"devicetype": 121, "revision": 2},  # Microwave Oven
+                              {"devicetype": 123, "revision": 3},  # Oven
+                              {"devicetype": 124, "revision": 2}]  # Laundry Dryer
         for device in device_type_list:
             found = next((mydevice for mydevice in mandatedevicetypes if mydevice["devicetype"] == device.deviceType), None)
             if found is not None:
@@ -211,11 +211,10 @@ class TC_OPSTATE_BASE():
                 asserts.fail("Entry (%s), not found! The returned value SHALL include all the entries: [%s]!" % (
                     item, expected_contains))
 
-    
-
     ############################
     #   TEST CASE 1.1
     ############################
+
     def STEPS_TC_OPSTATE_BASE_1_1(self) -> list[TestStep]:
         steps = [TestStep(1, "Commissioning, already done", is_commissioning=True),
                  TestStep(2, "TH reads from the DUT the ClusterRevision attribute"),
@@ -1051,7 +1050,7 @@ class TC_OPSTATE_BASE():
         device_type_list = await self.read_single_attribute_check_success(cluster=Clusters.Descriptor,
                                                                           attribute=Clusters.Descriptor.Attributes.DeviceTypeList,
                                                                           endpoint=endpoint)
-        
+
         # Check to see if this test is mandated for the device type in question, that is, we expect support for the OpComplete Event
         istestmandated = self.opcomplete_test_mandated(device_type_list)
 
