@@ -231,9 +231,10 @@ private:
 class LayerDispatch : public Layer
 {
 public:
-    virtual void SetDispatchQueue(dispatch_queue_t dispatchQueue)  = 0;
-    virtual dispatch_queue_t GetDispatchQueue()                    = 0;
-    virtual void HandleDispatchQueueEvents(Clock::Timeout timeout) = 0;
+    virtual void SetDispatchQueue(dispatch_queue_t dispatchQueue)    = 0;
+    virtual dispatch_queue_t GetDispatchQueue()                      = 0;
+    virtual void HandleDispatchQueueEvents(Clock::Timeout timeout)   = 0;
+    virtual CHIP_ERROR ScheduleWorkWithBlock(dispatch_block_t block) = 0;
 };
 #endif
 

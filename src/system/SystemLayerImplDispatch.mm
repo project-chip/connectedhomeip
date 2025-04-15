@@ -34,6 +34,21 @@
 
 namespace chip {
 namespace System {
+    namespace {
+        struct TimerCompleteBlockCallbackContext {
+            dispatch_block_t block;
+        };
+
+        static void TimerCompleteBlockCallback(Layer * aLayer, void * appState)
+        {
+            __auto_type * ctx = static_cast<TimerCompleteBlockCallbackContext *>(appState);
+            if (ctx->block) {
+                ctx->block();
+            }
+            delete ctx;
+        }
+    }
+
     void LayerImplDispatch::EnableTimer(const char * source, TimerList::Node * timer)
     {
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
@@ -89,6 +104,31 @@ namespace System {
         mTimerPool.ReleaseAll();
 
         mLayerState.ResetFromShuttingDown(); // Return to uninitialized state to permit re-initialization.
+    }
+
+    CHIP_ERROR LayerImplDispatch::ScheduleWorkWithBlock(dispatch_block_t block)
+    {
+#if SYSTEM_LAYER_IMPL_DISPATCH_DEBUG
+        ChipLogError(Inet, "%s (block: %p)", __func__, block);
+#endif
+
+        VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+
+        __auto_type dispatchQueue = GetDispatchQueue();
+#if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        VerifyOrDie(nullptr != dispatchQueue);
+#endif
+
+        if (dispatchQueue) {
+            dispatch_async(dispatchQueue, ^{
+                block();
+            });
+            return CHIP_NO_ERROR;
+        }
+
+        TimerCompleteBlockCallbackContext * ctx = new TimerCompleteBlockCallbackContext { .block = block };
+        VerifyOrReturnError(ctx != nullptr, CHIP_ERROR_NO_MEMORY);
+        return ScheduleWork(TimerCompleteBlockCallback, ctx);
     }
 
     CHIP_ERROR LayerImplDispatch::ScheduleWork(TimerCompleteCallback onComplete, void * appState)
