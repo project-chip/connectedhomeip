@@ -41,8 +41,8 @@ import logging
 import time
 
 import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
 import test_plan_support
+from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, default_matter_test_main,
                                          has_cluster, run_if_endpoint_matches)
 from mobly import asserts
