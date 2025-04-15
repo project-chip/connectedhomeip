@@ -113,6 +113,7 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
         endpoint = 1
         cluster = Clusters.Objects.CameraAvSettingsUserLevelManagement
         attributes = cluster.Attributes
+        tilt_min_dut = tilt_max_dut = pan_min_dut = pan_max_dut = zoom_max_dut = None
 
         self.step(1)  # Already done, immediately go to step 2
 
@@ -141,7 +142,7 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
             asserts.assert_greater_equal(zoom_max_dut, 1, "ZoomMax is not in valid range.")
         else:
             logging.info("MZOOM Feature not supported. Test step skipped")
-            self.mark_current_step_skipped()
+            self.skip_step(3)
 
         if self.has_feature_mtilt:
             self.step(4)
@@ -225,10 +226,9 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
                 asserts.assert_equal(len(dptz_relative_move_dut), len(set(dptz_relative_move_dut)), "DPTZRelativeMove has non-unique values")
                 for videostreamid in dptz_relative_move_dut:
                     asserts.assert_greater_equal(videostreamid ,0, "Provided video stream id is out of range")
-
         else:
             logging.info("DPTZ Feature not supported. Test step skipped")
-            self.mark_current_step_skipped()
+            self.skip_step(11)
 
 
 if __name__ == "__main__":
