@@ -38,7 +38,7 @@ class TestSpecParsingSelection(MatterBaseTest, DeviceConformanceTests):
                              "Incorrect directory selected for 1.4.1")
         asserts.assert_equal(dm_from_spec_version(0x01040100), PrebuiltDataModelDirectory.k1_4_1,
                              "Incorrect directory selected for 1.4.1")
-        asserts.assert_equal(dm_from_spec_version(0x01050000), PrebuiltDataModelDirectory.kMaster,
+        asserts.assert_equal(dm_from_spec_version(0x01050000), PrebuiltDataModelDirectory.k1_5,
                              "Incorrect directory selected for 1.5")
 
         # We don't have data model files for 1.2, so these should error

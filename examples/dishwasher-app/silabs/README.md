@@ -75,6 +75,13 @@ Silicon Labs platform.
     -   BRD2703A / MG24 Explorer Kit
     -   BRD2704A / SparkFun Thing Plus MGM240P board
 
+*   Region code Setting (917 WiFi projects)
+
+    -   In Wifi configurations, the region code can be set in this
+        [file](https://github.com/project-chip/connectedhomeip/blob/85e9d5fd42071d52fa3940238739544fd2a3f717/src/platform/silabs/wifi/SiWx/WifiInterfaceImpl.cpp#L104).
+        The available region codes can be found
+        [here](https://github.com/SiliconLabs/wiseconnect/blob/f675628eefa1ac4990e94146abb75dd08b522571/components/device/silabs/si91x/wireless/inc/sl_si91x_types.h#L71)
+
 -   Build the example application:
 
           cd ~/connectedhomeip
@@ -234,5 +241,5 @@ Pi image. For more info on using `chip-tool`, see
 
 Here is an example using `chip-tool`:
 
-    $ chip-tool pairing ble-thread 1 hex:0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8 20202021 3840 --ble-adapter 0
+    $ chip-tool pairing ble-thread 1 hex:0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8 20202021 3840 --ble-controller 0
     $ chip-tool operationalstate start 1 1

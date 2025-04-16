@@ -146,9 +146,9 @@ SceneTableEntry scene14(sceneId11, sceneData14);
 SceneTableEntry scene15(sceneId12, sceneData15);
 
 // Clusters EFS data
-static app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type OOextensionFieldSet;
-static app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type LCextensionFieldSet;
-static app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type CCextensionFieldSet;
+static app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::Type OOextensionFieldSet;
+static app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::Type LCextensionFieldSet;
+static app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::Type CCextensionFieldSet;
 
 static app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type OOPairs[1];
 static app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type LCPairs[2];
@@ -771,8 +771,8 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
 {
     SceneTable * sceneTable = scenes::GetSceneTableImpl(kTestEndpoint1, defaultTestTableSize);
     ASSERT_NE(nullptr, sceneTable);
-    app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type extensionFieldSetOut;
-    app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::DecodableType extensionFieldSetIn;
+    app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::Type extensionFieldSetOut;
+    app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType extensionFieldSetIn;
 
     TLV::TLVReader reader;
     TLV::TLVWriter writer;
@@ -910,8 +910,8 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
     memset(buffer, 0, buff_span.size());
 
     // To test failure on serialize and deserialize when too many pairs are in the field sets
-    app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type extensionFieldFailTestOut;
-    app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::DecodableType extensionFieldFailTestIn;
+    app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::Type extensionFieldFailTestOut;
+    app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType extensionFieldFailTestIn;
     app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type TooManyPairs[16];
 
     for (uint8_t i = 0; i < 16; i++)
@@ -948,8 +948,8 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
     OOPairs[0].valueUnsigned8.SetValue(0xFF);
 
     // EFS to test caping of value once a variable above the mock attribute size is serialized
-    app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type extensionFieldValueCapOut;
-    app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::DecodableType extensionFieldValueCapIn;
+    app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::Type extensionFieldValueCapOut;
+    app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType extensionFieldValueCapIn;
 
     extensionFieldValueCapOut.clusterID          = kOnOffClusterId;
     extensionFieldValueCapOut.attributeValueList = OOPairs;

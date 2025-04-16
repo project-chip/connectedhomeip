@@ -70,10 +70,6 @@ target_sources(app
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/icd/source/ICDUtil.cpp
 )
 
-target_compile_definitions(app PUBLIC
-    "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/zephyr/FactoryDataProviderImpl.h\""
-)
-
 if(CONFIG_CHIP_CUSTOM_BLE_ADV_DATA)
     target_sources(app PRIVATE
                     ${THERMOSTAT_NXP_COMMON_DIR}/main/BleZephyrManagerApp.cpp

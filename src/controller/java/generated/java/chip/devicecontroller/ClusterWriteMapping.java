@@ -1038,6 +1038,8 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("electricalEnergyMeasurement", writeElectricalEnergyMeasurementInteractionInfo);
     Map<String, InteractionInfo> writeWaterHeaterManagementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("waterHeaterManagement", writeWaterHeaterManagementInteractionInfo);
+    Map<String, InteractionInfo> writeCommodityPriceInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("commodityPrice", writeCommodityPriceInteractionInfo);
     Map<String, InteractionInfo> writeDemandResponseLoadControlInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeDemandResponseLoadControlDefaultRandomStartCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo demandResponseLoadControldefaultRandomStartCommandParameterInfo =
@@ -1210,6 +1212,30 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("waterHeaterMode", writeWaterHeaterModeInteractionInfo);
     Map<String, InteractionInfo> writeDeviceEnergyManagementModeInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("deviceEnergyManagementMode", writeDeviceEnergyManagementModeInteractionInfo);
+    Map<String, InteractionInfo> writeElectricalGridConditionsInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeElectricalGridConditionsLocalGenerationAvailableCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo electricalGridConditionslocalGenerationAvailableCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Boolean.class, 
+            Boolean.class 
+        );
+    writeElectricalGridConditionsLocalGenerationAvailableCommandParams.put(
+        "value",
+        electricalGridConditionslocalGenerationAvailableCommandParameterInfo
+    );
+    InteractionInfo writeElectricalGridConditionsLocalGenerationAvailableAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ElectricalGridConditionsCluster) cluster).writeLocalGenerationAvailableAttribute(
+          (DefaultClusterCallback) callback,
+          (Boolean) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeElectricalGridConditionsLocalGenerationAvailableCommandParams
+    );
+    writeElectricalGridConditionsInteractionInfo.put("writeLocalGenerationAvailableAttribute", writeElectricalGridConditionsLocalGenerationAvailableAttributeInteractionInfo);
+    writeAttributeMap.put("electricalGridConditions", writeElectricalGridConditionsInteractionInfo);
     Map<String, InteractionInfo> writeDoorLockInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeDoorLockDoorOpenEventsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo doorLockdoorOpenEventsCommandParameterInfo =
@@ -1634,6 +1660,8 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("windowCovering", writeWindowCoveringInteractionInfo);
     Map<String, InteractionInfo> writeClosureControlInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("closureControl", writeClosureControlInteractionInfo);
+    Map<String, InteractionInfo> writeClosureDimensionInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("closureDimension", writeClosureDimensionInteractionInfo);
     Map<String, InteractionInfo> writeServiceAreaInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("serviceArea", writeServiceAreaInteractionInfo);
     Map<String, InteractionInfo> writePumpConfigurationAndControlInteractionInfo = new LinkedHashMap<>();
@@ -3796,6 +3824,8 @@ public class ClusterWriteMapping {
     );
     writeChimeInteractionInfo.put("writeEnabledAttribute", writeChimeEnabledAttributeInteractionInfo);
     writeAttributeMap.put("chime", writeChimeInteractionInfo);
+    Map<String, InteractionInfo> writeCommodityTariffInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("commodityTariff", writeCommodityTariffInteractionInfo);
     Map<String, InteractionInfo> writeEcosystemInformationInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("ecosystemInformation", writeEcosystemInformationInteractionInfo);
     Map<String, InteractionInfo> writeCommissionerControlInteractionInfo = new LinkedHashMap<>();
@@ -3804,6 +3834,10 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("tlsCertificateManagement", writeTlsCertificateManagementInteractionInfo);
     Map<String, InteractionInfo> writeTlsClientManagementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("tlsClientManagement", writeTlsClientManagementInteractionInfo);
+    Map<String, InteractionInfo> writeMeterIdentificationInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("meterIdentification", writeMeterIdentificationInteractionInfo);
+    Map<String, InteractionInfo> writeCommodityMeteringInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("commodityMetering", writeCommodityMeteringInteractionInfo);
     Map<String, InteractionInfo> writeUnitTestingInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeUnitTestingBooleanCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo unitTestingbooleanCommandParameterInfo =

@@ -31,48 +31,45 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import random
-
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+from support_modules.cadmin_support import CADMINSupport
 
 
 class TC_CADMIN_1_19(MatterBaseTest):
-    def generate_unique_random_value(self, value):
-        while True:
-            random_value = random.randint(10000000, 99999999)
-            asserts.assert_equal(random_value, value)
-            return random_value
-
-    async def get_fabrics(self, th: ChipDeviceCtrl) -> int:
-        OC_cluster = Clusters.OperationalCredentials
-        fabrics = await self.read_single_attribute_check_success(dev_ctrl=th, fabric_filtered=False, endpoint=0, cluster=OC_cluster, attribute=OC_cluster.Attributes.Fabrics)
-        return fabrics
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.support = CADMINSupport(self)
 
     def steps_TC_CADMIN_1_19(self) -> list[TestStep]:
         return [
-            TestStep(
-                1, "TH_CR1 reads the BasicCommissioningInfo attribute from the General Commissioning cluster and saves the MaxCumulativeFailsafeSeconds field as max_window_duration."),
+            TestStep(1, "TH_CR1 reads the BasicCommissioningInfo attribute from the General Commissioning cluster and saves the MaxCumulativeFailsafeSeconds field as max_window_duration."),
             TestStep(2, "TH_CR1 reads the Fabrics attribute from the Node Operational Credentials cluster using a non-fabric-filtered read. Save the number of fabrics in the list as initial_number_of_fabrics"),
             TestStep(3, "TH_CR1 reads the SupportedFabrics attribute from the Node Operational Credentials cluster. Save max_fabrics",
                      "Verify that max_fabrics is larger than initial_number_of_fabrics. If not, instruct the tester to remove one non-test-harness fabric and re-start the test."),
             TestStep(4, "Repeat the following steps (5a and 5b) max_fabrics - initial_number_of_fabrics times"),
-            TestStep(
-                "4a", "TH_CR1 send an OpenCommissioningWindow command to DUT_CE using a commissioning timeout of max_window_duration", "{resDutSuccess}"),
+            TestStep("4a",
+                     "TH_CR1 send an OpenCommissioningWindow command to DUT_CE using a commissioning timeout of max_window_duration",
+                     "{resDutSuccess}"),
             TestStep("4b", "TH creates a controller on a new fabric and commissions DUT_CE using that controller",
                      "Commissioning is successful"),
+            TestStep("4c",
+                     "The controller reads the CurrentFabricIndex from the Node Operational Credentials cluster. Save all fabrics in a list as fabric_idxs.",
+                     "{resDutSuccess}"),
+            TestStep("4d",
+                     "Shutdown the fabrics created during test step 4b from TH only so that it does not fill up the fabric table"),
             TestStep(5, "TH reads the CommissionedFabrics attributes from the Node Operational Credentials cluster.",
                      "Verify this is equal to max_fabrics"),
-            TestStep(
-                6, "TH_CR1 send an OpenCommissioningWindow command to DUT_CE using a commissioning timeout of max_window_duration", "{resDutSuccess}"),
+            TestStep(6,
+                     "TH_CR1 send an OpenCommissioningWindow command to DUT_CE using a commissioning timeout of max_window_duration",
+                     "{resDutSuccess}"),
             TestStep(7, "TH creates a controller on a new fabric and commissions DUT_CE using that controller",
                      "Verify DUT_CE responds with NOCResponse with a StatusCode field value of TableFull(5)"),
-            TestStep(8, "Repeat the following steps (9a and 9b) for each controller (TH_CRn) created by this test"),
-            TestStep("8a", "The controller reads the CurrentFabricIndex from the Node Operational Credentials cluster. Save as fabric_index."),
-            TestStep("8b", "TH_CR1 sends the RemoveFabric command to DUT_CE", "{resDutSuccess}"),
+            TestStep(8, "TH_CR1 sends the RemoveFabric command in to DUT_CE to remove fabrics saved on device using fabric_idxs",
+                     "{resDutSuccess}"),
             TestStep(9, "TH reads the CommissionedFabrics attributes from the Node Operational Credentials cluster.",
                      "Verify this is equal to initial_number_of_fabrics."),
         ]
@@ -92,7 +89,7 @@ class TC_CADMIN_1_19(MatterBaseTest):
         self.max_window_duration = duration.maxCumulativeFailsafeSeconds
 
         self.step(2)
-        fabrics = await self.get_fabrics(th=self.th1)
+        fabrics = await self.support.get_fabrics(th=self.th1)
         initial_number_of_fabrics = len(fabrics)
 
         self.step(3)
@@ -102,11 +99,8 @@ class TC_CADMIN_1_19(MatterBaseTest):
                                "max fabrics must be greater than initial fabrics, please remove one non-test-harness fabric and try test again")
 
         self.step(4)
-        fids_ca_dir = {}
-        fids_fa_dir = {}
-        fids = {}
+        fabric_idxs = []
         for fid in range(0, max_fabrics - initial_number_of_fabrics):
-            self.print_step("commissioning iteration", fid + 1)
             # Make sure that current test step is 5, resets here after each loop
             self.current_step_index = 4
 
@@ -114,13 +108,19 @@ class TC_CADMIN_1_19(MatterBaseTest):
             params = await self.open_commissioning_window(dev_ctrl=self.th1, timeout=self.max_window_duration, node_id=self.dut_node_id)
 
             self.step("4b")
-            fids_ca_dir[fid] = self.certificate_authority_manager.NewCertificateAuthority()
-            fids_fa_dir[fid] = fids_ca_dir[fid].NewFabricAdmin(vendorId=0xFFF1, fabricId=fid + 1)
-            fids[fid] = fids_fa_dir[fid].NewController(nodeId=fid + 1)
+            fids_ca = self.certificate_authority_manager.NewCertificateAuthority(caIndex=fid)
+            fids_fa = fids_ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=fid + 1)
+            fids = fids_fa.NewController(nodeId=fid + 1)
 
-            await fids[fid].CommissionOnNetwork(
+            await fids.CommissionOnNetwork(
                 nodeId=self.dut_node_id, setupPinCode=params.commissioningParameters.setupPinCode,
                 filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=params.randomDiscriminator)
+
+            self.step("4c")
+            fabric_idxs.append(await self.read_single_attribute_check_success(dev_ctrl=fids, endpoint=0, cluster=OC_cluster, attribute=OC_cluster.Attributes.CurrentFabricIndex))
+
+            self.step("4d")
+            fids.Shutdown()
 
         self.step(5)
         # TH reads the CommissionedFabrics attributes from the Node Operational Credentials cluster
@@ -133,12 +133,11 @@ class TC_CADMIN_1_19(MatterBaseTest):
         self.step(7)
         # TH creates a controller on a new fabric and attempts to commission DUT_CE using that controller
         next_fabric = current_fabrics + 1
-        fids_ca_dir[next_fabric] = self.certificate_authority_manager.NewCertificateAuthority()
-        fids_fa_dir[next_fabric] = fids_ca_dir[current_fabrics +
-                                               1].NewFabricAdmin(vendorId=0xFFF1, fabricId=next_fabric)
+        fids_ca2 = self.certificate_authority_manager.NewCertificateAuthority(caIndex=next_fabric)
+        fids_fa2 = fids_ca2.NewFabricAdmin(vendorId=0xFFF1, fabricId=next_fabric)
         try:
-            next_fabric_controller = fids_fa_dir[next_fabric].NewController(nodeId=next_fabric)
-            await next_fabric_controller.CommissionOnNetwork(
+            fids2 = fids_fa2.NewController(nodeId=next_fabric)
+            await fids2.CommissionOnNetwork(
                 nodeId=self.dut_node_id, setupPinCode=params.commissioningParameters.setupPinCode,
                 filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=params.randomDiscriminator)
 
@@ -151,15 +150,8 @@ class TC_CADMIN_1_19(MatterBaseTest):
                                  "Expected to return table is full since max number of fabrics has been created already")
 
         self.step(8)
-        for thc in fids.keys():
-            # Make sure that current test step is 11 (9 + 2 since 5a and 5b test steps included in count), resets here after each loop
-            self.current_step_index = 10
-
-            self.step("8a")
-            fabric_index = await self.read_single_attribute_check_success(dev_ctrl=fids[thc], endpoint=0, cluster=OC_cluster, attribute=OC_cluster.Attributes.CurrentFabricIndex)
-
-            self.step("8b")
-            removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(fabric_index)
+        for fab_idx in fabric_idxs:
+            removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(fab_idx)
             await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
 
         self.step(9)

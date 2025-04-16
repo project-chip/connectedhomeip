@@ -107,6 +107,7 @@ mcxw71_k32w1_executable("contact_sensor_app") {
     "CONFIG_THREAD_DEVICE_TYPE=kThreadDeviceType_SleepyEndDevice",
     "CONFIG_OPERATIONAL_KEYSTORE=1",
     "EXTERNAL_FACTORY_DATA_PROVIDER_HEADER=\"platform/nxp/common/factory_data/legacy/FactoryDataProvider.h\"",
+    "CONFIG_APP_FREERTOS_OS=1",
   ]
 
   if (chip_with_diag_logs_demo) {
@@ -125,6 +126,7 @@ mcxw71_k32w1_executable("contact_sensor_app") {
   # App common files
   include_dirs += [
     "${common_example_dir}/app_task/include",
+    "${common_example_dir}/icd/include",
     "${common_example_dir}/matter_button/include",
     "${common_example_dir}/clusters/include",
     "${common_example_dir}/device_callbacks/include",
@@ -145,6 +147,7 @@ mcxw71_k32w1_executable("contact_sensor_app") {
     "${common_example_dir}/clusters/source/ZclCallbacks.cpp",
     "${common_example_dir}/device_callbacks/source/CommonDeviceCallbacks.cpp",
     "${common_example_dir}/device_manager/source/CHIPDeviceManager.cpp",
+    "${common_example_dir}/icd/source/ICDUtil.cpp",
     "${common_example_dir}/matter_button/source/ButtonApp.cpp",
     "${common_example_dir}/matter_button/source/ButtonBle.cpp",
     "${common_example_dir}/matter_button/source/ButtonManager.cpp",

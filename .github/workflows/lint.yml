@@ -36,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:119
+            image: ghcr.io/project-chip/chip-build:125
 
         steps:
             - name: Checkout
@@ -102,7 +102,6 @@ jobs:
                      --known-failure app/CommandResponseSender.h \
                      --known-failure app/CommandSenderLegacyCallback.h \
                      --known-failure app/ReadHandler.h \
-                     --known-failure app/reporting/reporting.cpp \
                      --known-failure app/reporting/tests/MockReportScheduler.cpp \
                      --known-failure app/reporting/tests/MockReportScheduler.h \
                      --known-failure app/util/attribute-storage-detail.h \
@@ -151,13 +150,13 @@ jobs:
                       if [ "$idl_file" = './examples/lighting-app-data-mode-no-unique-id/lighting-common/lighting-app.matter' ]; then continue; fi
 
                       # Test files are intentionally small and not spec-compilant, just parse-compliant
-                      if [ "$idl_file" = "./scripts/py_matter_idl/matter_idl/tests/inputs/cluster_struct_attribute.matter" ]; then continue; fi
-                      if [ "$idl_file" = "./scripts/py_matter_idl/matter_idl/tests/inputs/global_struct_attribute.matter" ]; then continue; fi
-                      if [ "$idl_file" = "./scripts/py_matter_idl/matter_idl/tests/inputs/optional_argument.matter" ]; then continue; fi
-                      if [ "$idl_file" = "./scripts/py_matter_idl/matter_idl/tests/inputs/several_clusters.matter" ]; then continue; fi
-                      if [ "$idl_file" = "./scripts/py_matter_idl/matter_idl/tests/inputs/simple_attribute.matter" ]; then continue; fi
-                      if [ "$idl_file" = "./scripts/py_matter_idl/matter_idl/tests/inputs/large_lighting_app.matter" ]; then continue; fi
-                      if [ "$idl_file" = "./scripts/py_matter_idl/matter_idl/tests/inputs/large_all_clusters_app.matter" ]; then continue; fi
+                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/cluster_struct_attribute.matter" ]; then continue; fi
+                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/global_struct_attribute.matter" ]; then continue; fi
+                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/optional_argument.matter" ]; then continue; fi
+                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/several_clusters.matter" ]; then continue; fi
+                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/simple_attribute.matter" ]; then continue; fi
+                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/large_lighting_app.matter" ]; then continue; fi
+                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/large_all_clusters_app.matter" ]; then continue; fi
 
                       ./scripts/run_in_build_env.sh "./scripts/idl_lint.py --log-level warn $idl_file" >/dev/null || exit 1
                   done

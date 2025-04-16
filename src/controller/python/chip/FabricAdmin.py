@@ -21,9 +21,9 @@ from __future__ import annotations
 import logging
 from typing import List, Optional
 
-from chip import CertificateAuthority, ChipDeviceCtrl
-from chip.crypto import p256keypair
-from chip.native import GetLibraryHandle
+from . import CertificateAuthority, ChipDeviceCtrl
+from .crypto import p256keypair
+from .native import GetLibraryHandle
 
 LOGGER = logging.getLogger(__name__)
 

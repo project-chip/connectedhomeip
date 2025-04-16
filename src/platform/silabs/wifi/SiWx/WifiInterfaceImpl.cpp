@@ -56,8 +56,8 @@ extern "C" {
 #endif
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/server/ICDConfigurationData.h> // nogncheck
-#include <platform/silabs/wifi/icd/WifiSleepManager.h>
+#include <app/icd/server/ICDConfigurationData.h>       // nogncheck
+#include <platform/silabs/wifi/icd/WifiSleepManager.h> // nogncheck
 
 #if SLI_SI91X_MCU_INTERFACE // SoC Only
 #include "rsi_rom_power_save.h"
@@ -68,6 +68,7 @@ extern "C" {
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 using namespace chip::DeviceLayer::Silabs;
+using WiFiBandEnum = chip::app::Clusters::NetworkCommissioning::WiFiBandEnum;
 
 // TODO : Temporary work-around for wifi-init failure in 917NCP ACX module boards.
 // Can be removed after Wiseconnect fixes region code for all ACX module boards.
@@ -201,9 +202,9 @@ sl_status_t BackgroundScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t 
     {
         wfx_wifi_scan_result_t currentScanResult = { 0 };
 
-        // Lenght excludes null-character
-        size_t scannedSsidLenght = strnlen(reinterpret_cast<char *>(result->scan_info[i].ssid), WFX_MAX_SSID_LENGTH);
-        chip::ByteSpan scannedSsidSpan(result->scan_info[i].ssid, scannedSsidLenght);
+        // Length excludes null-character
+        size_t scannedSsidLength = strnlen(reinterpret_cast<char *>(result->scan_info[i].ssid), WFX_MAX_SSID_LENGTH);
+        chip::ByteSpan scannedSsidSpan(result->scan_info[i].ssid, scannedSsidLength);
 
         // Copy the scanned SSID to the current scan ssid buffer that will be forwarded to the callback
         chip::MutableByteSpan currentScanSsid(currentScanResult.ssid, WFX_MAX_SSID_LENGTH);
@@ -218,6 +219,8 @@ sl_status_t BackgroundScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t 
         currentScanResult.security = static_cast<wfx_sec_t>(result->scan_info[i].security_mode);
         currentScanResult.rssi     = (-1) * result->scan_info[i].rssi_val; // The returned value is positive - we need to flip it
         currentScanResult.chan     = result->scan_info[i].rf_channel;
+        // TODO: change this when SDK provides values
+        currentScanResult.wiFiBand = WiFiBandEnum::k2g4;
 
         // if user has provided ssid, check if the current scan result ssid matches the user provided ssid
         if (!requestedSsidSpan.empty())
@@ -431,6 +434,40 @@ sl_status_t SetWifiConfigurations()
     return status;
 }
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+/**
+ * @brief Converts the Matter Power Save Configuration to the SiWx Power Save Configuration
+ *
+ * @param configuration Matter Power Save Configuration
+ *
+ * @return sl_si91x_performance_profile_t SiWx Power Save Configuration; Default value is High Performance
+ *                                        kHighPerformance: HIGH_PERFORMANCE
+ *                                        kConnectedSleep: ASSOCIATED_POWER_SAVE
+ *                                        kDeepSleep: DEEP_SLEEP_WITH_RAM_RETENTION
+ */
+sl_si91x_performance_profile_t ConvertPowerSaveConfiguration(PowerSaveInterface::PowerSaveConfiguration configuration)
+{
+    sl_si91x_performance_profile_t profile = HIGH_PERFORMANCE;
+
+    switch (configuration)
+    {
+    case PowerSaveInterface::PowerSaveConfiguration::kHighPerformance:
+        profile = HIGH_PERFORMANCE;
+        break;
+    case PowerSaveInterface::PowerSaveConfiguration::kConnectedSleep:
+        profile = ASSOCIATED_POWER_SAVE;
+        break;
+    case PowerSaveInterface::PowerSaveConfiguration::kDeepSleep:
+        profile = DEEP_SLEEP_WITH_RAM_RETENTION;
+        break;
+    default:
+        break;
+    }
+
+    return profile;
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
 } // namespace
 
 namespace chip {
@@ -459,6 +496,11 @@ void WiseconnectWifiInterface::MatterWifiTask(void * arg)
     VerifyOrReturn(status == SL_STATUS_OK,
                    ChipLogError(DeviceLayer, "MatterWifiTask: SiWxPlatformInit failed: 0x%lx", static_cast<uint32_t>(status)));
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    // Remove High performance request after the device is initialized
+    chip::DeviceLayer::Silabs::WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
     WifiInterfaceImpl::GetInstance().NotifyWifiTaskInitialized();
 
     ChipLogDetail(DeviceLayer, "MatterWifiTask: starting event loop");
@@ -478,6 +520,11 @@ void WiseconnectWifiInterface::MatterWifiTask(void * arg)
 CHIP_ERROR WifiInterfaceImpl::InitWiFiStack(void)
 {
     sl_status_t status = SL_STATUS_OK;
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    // Force the device to high performance mode during the init sequence.
+    chip::DeviceLayer::Silabs::WifiSleepManager::GetInstance().RequestHighPerformanceWithoutTransition();
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &config, &wifi_client_context, nullptr);
     VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "sl_net_init failed: %lx", status));
@@ -638,7 +685,7 @@ sl_status_t WifiInterfaceImpl::JoinWifiNetwork(void)
 // To avoid IOP issues, it is recommended to enable high-performance mode before joining the network.
 // TODO: Remove this once the IOP issue related to power save mode switching is fixed in the Wi-Fi SDK.
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    chip::DeviceLayer::Silabs::WifiSleepManager::GetInstance().RequestHighPerformance();
+    chip::DeviceLayer::Silabs::WifiSleepManager::GetInstance().RequestHighPerformanceWithTransition();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
@@ -757,14 +804,13 @@ sl_status_t WifiInterfaceImpl::TriggerPlatformWifiDisconnection()
 }
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-CHIP_ERROR WifiInterfaceImpl::ConfigurePowerSave(rsi_power_save_profile_mode_t sl_si91x_ble_state,
-                                                 sl_si91x_performance_profile_t sl_si91x_wifi_state, uint32_t listenInterval)
+CHIP_ERROR WifiInterfaceImpl::ConfigurePowerSave(PowerSaveInterface::PowerSaveConfiguration configuration, uint32_t listenInterval)
 {
-    int32_t error = rsi_bt_power_save_profile(sl_si91x_ble_state, RSI_MAX_PSP);
+    int32_t error = rsi_bt_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
     VerifyOrReturnError(error == RSI_SUCCESS, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "rsi_bt_power_save_profile failed: %ld", error));
 
-    sl_wifi_performance_profile_t wifi_profile = { .profile = sl_si91x_wifi_state,
+    sl_wifi_performance_profile_t wifi_profile = { .profile = ConvertPowerSaveConfiguration(configuration),
                                                    // TODO: Performance profile fails if not alligned with DTIM
                                                    .dtim_aligned_type = SL_SI91X_ALIGN_WITH_DTIM_BEACON,
                                                    // TODO: Different types need to be fixed in the Wi-Fi SDK

@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-#include <app/server/Server.h>
 #include <lib/core/TLV.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/nxp/common/ota/OTAFactoryDataProcessor.h>
@@ -83,7 +82,7 @@ CHIP_ERROR OTAFactoryDataProcessor::ApplyAction()
 
     SuccessOrExit(error = mFactoryDataDriver->UpdateFactoryData());
 
-    provider = &chip::DeviceLayer::FactoryDataPrvd();
+    provider = &chip::DeviceLayer::FactoryDataPrvdImpl();
     VerifyOrReturnError(provider != nullptr, CHIP_ERROR_INTERNAL);
 
     SuccessOrExit(error = provider->PreResetCheck());

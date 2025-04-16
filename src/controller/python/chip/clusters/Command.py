@@ -25,11 +25,11 @@ from ctypes import CFUNCTYPE, POINTER, c_bool, c_char_p, c_size_t, c_uint8, c_ui
 from dataclasses import dataclass
 from typing import List, Optional, Type, Union
 
-import chip.exceptions
-import chip.interaction_model
-from chip.interaction_model import PyInvokeRequestData, TestOnlyPyBatchCommandsOverrides, TestOnlyPyOnDoneInfo
-from chip.native import PyChipError
-
+from ..interaction_model import InteractionModelError, PyInvokeRequestData
+from ..interaction_model import Status as InteractionModelStatus
+from ..interaction_model import TestOnlyPyBatchCommandsOverrides, TestOnlyPyOnDoneInfo
+from ..native import GetLibraryHandle, NativeLibraryHandleMethodArguments, PyChipError
+from . import Objects as GeneratedObjects  # noqa: F401
 from .ClusterObjects import ClusterCommand
 
 logger = logging.getLogger('chip.cluster.Command')
@@ -80,7 +80,7 @@ def FindCommandClusterObject(isClientSideCommand: bool, path: CommandPath):
                                 if ('__dataclass_fields__' in name):
                                     if (field['cluster_id'].default == path.ClusterId) and (field['command_id'].default ==
                                                                                             path.CommandId) and (field['is_client'].default == isClientSideCommand):
-                                        return eval('chip.clusters.Objects.' + clusterName + '.Commands.' + commandName)
+                                        return eval('GeneratedObjects.' + clusterName + '.Commands.' + commandName)
     return None
 
 
@@ -127,11 +127,11 @@ class AsyncCommandTransaction:
                 # add it to the except block below. We changed Exception->AttributeError as
                 # that is what we thought we are trying to catch here.
                 self._future.set_exception(
-                    chip.interaction_model.InteractionModelError(chip.interaction_model.Status(imError.IMStatus), imError.ClusterStatus))
+                    InteractionModelError(InteractionModelStatus(imError.IMStatus), imError.ClusterStatus))
             except AttributeError:
                 logger.exception("Failed to map interaction model status received: %s. Remapping to Failure." % imError)
-                self._future.set_exception(chip.interaction_model.InteractionModelError(
-                    chip.interaction_model.Status.Failure, imError.ClusterStatus))
+                self._future.set_exception(InteractionModelError(
+                    InteractionModelStatus.Failure, imError.ClusterStatus))
 
     def handleError(self, status: Status, chipError: PyChipError):
         self._event_loop.call_soon_threadsafe(
@@ -147,8 +147,8 @@ class AsyncBatchCommandsTransaction:
         self._event_loop = eventLoop
         self._future = future
         self._expect_types = expectTypes
-        default_im_failure = chip.interaction_model.InteractionModelError(
-            chip.interaction_model.Status.NoCommandResponse)
+        default_im_failure = InteractionModelError(
+            InteractionModelStatus.NoCommandResponse)
         self._responses = [default_im_failure] * len(expectTypes)
 
     def _handleResponse(self, path: CommandPath, index: int, status: Status, response: bytes):
@@ -156,10 +156,10 @@ class AsyncBatchCommandsTransaction:
             self._handleError(status, 0, IndexError(f"CommandSenderCallback has given us an unexpected index value {index}"))
             return
 
-        if status.IMStatus != chip.interaction_model.Status.Success:
+        if status.IMStatus != InteractionModelStatus.Success:
             try:
-                self._responses[index] = chip.interaction_model.InteractionModelError(
-                    chip.interaction_model.Status(status.IMStatus), status.ClusterStatus)
+                self._responses[index] = InteractionModelError(
+                    InteractionModelStatus(status.IMStatus), status.ClusterStatus)
             except AttributeError as ex:
                 self._handleError(status, 0, ex)
         elif (len(response) == 0):
@@ -198,11 +198,11 @@ class AsyncBatchCommandsTransaction:
                 # add it to the except block below. We changed Exception->AttributeError as
                 # that is what we thought we are trying to catch here.
                 self._future.set_exception(
-                    chip.interaction_model.InteractionModelError(chip.interaction_model.Status(imError.IMStatus), imError.ClusterStatus))
+                    InteractionModelError(InteractionModelStatus(imError.IMStatus), imError.ClusterStatus))
             except AttributeError:
                 logger.exception("Failed to map interaction model status received: %s. Remapping to Failure." % imError)
-                self._future.set_exception(chip.interaction_model.InteractionModelError(
-                    chip.interaction_model.Status.Failure, imError.ClusterStatus))
+                self._future.set_exception(InteractionModelError(
+                    InteractionModelStatus.Failure, imError.ClusterStatus))
 
     def handleError(self, status: Status, chipError: PyChipError):
         self._event_loop.call_soon_threadsafe(
@@ -276,7 +276,7 @@ def TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(future: Future, eventLo
     if (responseType is not None) and (not issubclass(responseType, ClusterCommand)):
         raise ValueError("responseType must be a ClusterCommand or None")
 
-    handle = chip.native.GetLibraryHandle()
+    handle = GetLibraryHandle()
     transaction = AsyncCommandTransaction(future, eventLoop, responseType)
 
     payloadTLV = payload.ToTLV()
@@ -309,9 +309,9 @@ async def SendCommand(future: Future, eventLoop, responseType: Type, device, com
     if (responseType is not None) and (not issubclass(responseType, ClusterCommand)):
         raise ValueError("responseType must be a ClusterCommand or None")
     if payload.must_use_timed_invoke and timedRequestTimeoutMs is None or timedRequestTimeoutMs == 0:
-        raise chip.interaction_model.InteractionModelError(chip.interaction_model.Status.NeedsTimedInteraction)
+        raise InteractionModelError(InteractionModelStatus.NeedsTimedInteraction)
 
-    handle = chip.native.GetLibraryHandle()
+    handle = GetLibraryHandle()
     transaction = AsyncCommandTransaction(future, eventLoop, responseType)
 
     payloadTLV = payload.ToTLV()
@@ -338,7 +338,7 @@ def _BuildPyInvokeRequestData(commands: List[InvokeRequestInfo], timedRequestTim
             raise ValueError("responseType must be a ClusterCommand or None")
         if clusterCommand.must_use_timed_invoke and timedRequestTimeoutMs is None or timedRequestTimeoutMs == 0:
             if not suppressTimedRequestMessage:
-                raise chip.interaction_model.InteractionModelError(chip.interaction_model.Status.NeedsTimedInteraction)
+                raise InteractionModelError(InteractionModelStatus.NeedsTimedInteraction)
 
         payloadTLV = clusterCommand.ToTLV()
 
@@ -380,7 +380,7 @@ async def SendBatchCommands(future: Future, eventLoop, device, commands: List[In
                   a specific command.
         - Non-path-specific error: An `InteractionModelError` exception is raised through the future.
     '''
-    handle = chip.native.GetLibraryHandle()
+    handle = GetLibraryHandle()
 
     responseTypes: List[Type] = []
     pyBatchCommandsData = _BuildPyInvokeRequestData(commands, timedRequestTimeoutMs, responseTypes)
@@ -415,7 +415,7 @@ def TestOnlySendBatchCommands(future: Future, eventLoop, device, commands: List[
         overrideCommandRefsType = c_uint16 * len(commandRefsOverride)
         overrideCommandRefs = overrideCommandRefsType()
 
-    handle = chip.native.GetLibraryHandle()
+    handle = GetLibraryHandle()
 
     responseTypes: List[Type] = []
     pyBatchCommandsData = _BuildPyInvokeRequestData(commands, timedRequestTimeoutMs,
@@ -447,7 +447,7 @@ def SendGroupCommand(groupId: int, devCtrl: c_void_p, payload: ClusterCommand, b
             - None (on a successful response containing no data)
             - Raises an exception if any errors are encountered.
     '''
-    handle = chip.native.GetLibraryHandle()
+    handle = GetLibraryHandle()
 
     payloadTLV = payload.ToTLV()
     return builtins.chipStack.Call(
@@ -459,12 +459,12 @@ def SendGroupCommand(groupId: int, devCtrl: c_void_p, payload: ClusterCommand, b
 
 
 def Init():
-    handle = chip.native.GetLibraryHandle()
+    handle = GetLibraryHandle()
 
     # Uses one of the type decorators as an indicator for everything being
     # initialized.
     if not handle.pychip_CommandSender_SendCommand.argtypes:
-        setter = chip.native.NativeLibraryHandleMethodArguments(handle)
+        setter = NativeLibraryHandleMethodArguments(handle)
 
         setter.Set('pychip_CommandSender_SendCommand',
                    PyChipError, [py_object, c_void_p, c_uint16, c_uint16, c_uint32, c_uint32, c_char_p, c_size_t, c_uint16, c_uint16, c_bool])

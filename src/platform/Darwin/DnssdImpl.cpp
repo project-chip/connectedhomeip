@@ -160,8 +160,9 @@ namespace {
 static void OnRegister(DNSServiceRef sdRef, DNSServiceFlags flags, DNSServiceErrorType err, const char * name, const char * type,
                        const char * domain, void * context)
 {
-    ChipLogProgress(Discovery, "Mdns: %s name: %s, type: %s, domain: %s, flags: %d", __func__, StringOrNullMarker(name),
-                    StringOrNullMarker(type), StringOrNullMarker(domain), flags);
+    ChipLogProgress(Discovery, "Mdns: %s name: %s, type: %s, domain: %s, flags: %d, err: %" PRIi32 " (%s)", __func__,
+                    StringOrNullMarker(name), StringOrNullMarker(type), StringOrNullMarker(domain), flags, err,
+                    Error::ToString(err));
 
     auto sdCtx = reinterpret_cast<RegisterContext *>(context);
     sdCtx->Finalize(err);
@@ -262,8 +263,8 @@ CHIP_ERROR Browse(DnssdBrowseDelegate * delegate, uint32_t interfaceId, const ch
 static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceId, DNSServiceErrorType err,
                           const char * hostname, const struct sockaddr * address, uint32_t ttl, void * context)
 {
-    ChipLogProgress(Discovery, "Mdns: %s flags: %d, interface: %u, hostname: %s", __func__, flags, (unsigned) interfaceId,
-                    StringOrNullMarker(hostname));
+    ChipLogProgress(Discovery, "Mdns: %s flags: %d, interface: %u, hostname: %s, err: %" PRIi32 " (%s)", __func__, flags,
+                    (unsigned) interfaceId, StringOrNullMarker(hostname), err, Error::ToString(err));
 
     auto contextWithType = reinterpret_cast<ResolveContextWithType *>(context);
     VerifyOrReturn(contextWithType != nullptr, ChipLogError(Discovery, "ResolveContextWithType is null"));
@@ -352,8 +353,9 @@ static void OnResolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t inter
                       const char * fullname, const char * hostname, uint16_t port, uint16_t txtLen, const unsigned char * txtRecord,
                       void * context)
 {
-    ChipLogProgress(Discovery, "Mdns: %s flags: %d, interface: %u, fullname: %s, hostname: %s, port: %u", __func__, flags,
-                    (unsigned) interfaceId, StringOrNullMarker(fullname), StringOrNullMarker(hostname), ntohs(port));
+    ChipLogProgress(Discovery, "Mdns: %s flags: %d, interface: %u, fullname: %s, hostname: %s, port: %u, err: %" PRIi32 " (%s)",
+                    __func__, flags, (unsigned) interfaceId, StringOrNullMarker(fullname), StringOrNullMarker(hostname),
+                    ntohs(port), err, Error::ToString(err));
 
     auto contextWithType = reinterpret_cast<ResolveContextWithType *>(context);
     VerifyOrReturn(contextWithType != nullptr, ChipLogError(Discovery, "ResolveContextWithType is null"));

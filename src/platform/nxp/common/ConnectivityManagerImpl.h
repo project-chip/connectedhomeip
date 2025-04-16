@@ -163,6 +163,8 @@ private:
     void UpdateInternetConnectivityState(void);
 #if CHIP_ENABLE_OPENTHREAD
     void BrHandleStateChange();
+    static void LockThreadStack();
+    static void UnlockThreadStack();
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_THREAD */
 #endif
     /* CHIP_DEVICE_CONFIG_ENABLE_WPA */

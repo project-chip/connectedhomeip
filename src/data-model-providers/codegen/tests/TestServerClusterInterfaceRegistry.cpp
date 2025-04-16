@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/server-cluster/ServerClusterInterface.h"
 #include <pw_unit_test/framework.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -48,10 +49,8 @@ constexpr chip::ClusterId kCluster3 = 3;
 class FakeServerClusterInterface : public DefaultServerCluster
 {
 public:
-    FakeServerClusterInterface(EndpointId endpoint, ClusterId cluster) : mPath({ endpoint, cluster }) {}
-    FakeServerClusterInterface(const ConcreteClusterPath & path) : mPath(path) {}
-
-    [[nodiscard]] ConcreteClusterPath GetPath() const override { return mPath; }
+    FakeServerClusterInterface(const ConcreteClusterPath & path) : DefaultServerCluster(path) {}
+    FakeServerClusterInterface(EndpointId endpoint, ClusterId cluster) : DefaultServerCluster({ endpoint, cluster }) {}
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override
@@ -68,15 +67,31 @@ public:
 
     bool HasContext() { return mContext != nullptr; }
 
+    const ConcreteClusterPath & GetPath() const { return mPath; }
+};
+
+class MultiPathCluster : public DefaultServerCluster
+{
+public:
+    MultiPathCluster(Span<const ConcreteClusterPath> paths) : DefaultServerCluster(paths[0]), mActualPaths(paths) {}
+
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    Span<const ConcreteClusterPath> GetPaths() const override { return mActualPaths; }
+
 private:
-    ConcreteClusterPath mPath;
+    Span<const ConcreteClusterPath> mActualPaths;
 };
 
 class CannotStartUpCluster : public FakeServerClusterInterface
 {
 public:
     CannotStartUpCluster(EndpointId endpoint, ClusterId id) : FakeServerClusterInterface(endpoint, id) {}
-    CHIP_ERROR Startup(ServerClusterContext * context) override { return CHIP_ERROR_BUSY; }
+    CHIP_ERROR Startup(ServerClusterContext & context) override { return CHIP_ERROR_BUSY; }
 };
 
 struct TestServerClusterInterfaceRegistry : public ::testing::Test
@@ -157,8 +172,8 @@ TEST_F(TestServerClusterInterfaceRegistry, BasicTest)
     EXPECT_EQ(registry.Get({ kEp2, kCluster1 }), nullptr);
 
     // remove registrations
-    EXPECT_EQ(registry.Unregister({ kEp2, kCluster2 }), &cluster2);
-    EXPECT_EQ(registry.Unregister({ kEp2, kCluster2 }), nullptr);
+    EXPECT_EQ(registry.Unregister(&cluster2), CHIP_NO_ERROR);
+    EXPECT_EQ(registry.Unregister(&cluster2), CHIP_ERROR_NOT_FOUND);
 
     // Re-adding works
     EXPECT_EQ(registry.Get({ kEp2, kCluster2 }), nullptr);
@@ -247,11 +262,20 @@ TEST_F(TestServerClusterInterfaceRegistry, StressTest)
             {
                 // item MUST exist and be accessible
                 ASSERT_EQ(registry.Get(items[cluster].GetPath()), &items[cluster]);
-                ASSERT_EQ(registry.Unregister(items[cluster].GetPath()), &items[cluster]);
+                ASSERT_EQ(registry.Unregister(&items[cluster]), CHIP_NO_ERROR);
 
                 // once unregistered, it is not there anymore
                 ASSERT_EQ(registry.Get(items[cluster].GetPath()), nullptr);
-                ASSERT_EQ(registry.Unregister(items[cluster].GetPath()), nullptr);
+                ASSERT_EQ(registry.Unregister(&items[cluster]), CHIP_ERROR_NOT_FOUND);
+            }
+
+            // all endpoints should be clear
+            for (ClusterId cluster = 0; cluster < kClusterTestCount; cluster++)
+            {
+                for (EndpointId ep = 0; ep < kEndpointTestCount; ep++)
+                {
+                    ASSERT_EQ(registry.Get({ ep, cluster }), nullptr);
+                }
             }
         }
         else
@@ -260,15 +284,6 @@ TEST_F(TestServerClusterInterfaceRegistry, StressTest)
             for (EndpointId ep = 0; ep < kEndpointTestCount; ep++)
             {
                 registry.UnregisterAllFromEndpoint(ep);
-            }
-        }
-
-        // all endpoints should be clear
-        for (ClusterId cluster = 0; cluster < kClusterTestCount; cluster++)
-        {
-            for (EndpointId ep = 0; ep < kEndpointTestCount; ep++)
-            {
-                ASSERT_EQ(registry.Get({ ep, cluster }), nullptr);
             }
         }
     }
@@ -314,10 +329,13 @@ TEST_F(TestServerClusterInterfaceRegistry, ClustersOnEndpoint)
         }
 
         // ensure that iteration happens exactly as we expect: reverse order and complete
-        for (auto cluster : registry.ClustersOnEndpoint(ep))
+        for (const auto & clusterId : registry.ClustersOnEndpoint(ep))
         {
             ASSERT_LT(expectedClusterId, kClusterTestCount);
-            ASSERT_EQ(cluster->GetPath(), ConcreteClusterPath(ep, expectedClusterId));
+
+            ServerClusterInterface * cluster = registry.Get({ ep, clusterId });
+            ASSERT_NE(cluster, nullptr);
+            ASSERT_TRUE(cluster->PathsContains(ConcreteClusterPath(ep, expectedClusterId)));
             expectedClusterId -= kEndpointTestCount; // next expected/registered cluster
         }
 
@@ -377,7 +395,7 @@ TEST_F(TestServerClusterInterfaceRegistry, Context)
         EXPECT_TRUE(cluster3.HasContext());
 
         // removing clears the context/shuts clusters down
-        EXPECT_EQ(registry.Unregister(cluster2.GetPath()), &cluster2);
+        EXPECT_EQ(registry.Unregister(&cluster2), CHIP_NO_ERROR);
         EXPECT_TRUE(cluster1.HasContext());
         EXPECT_FALSE(cluster2.HasContext());
         EXPECT_TRUE(cluster3.HasContext());
@@ -395,12 +413,90 @@ TEST_F(TestServerClusterInterfaceRegistry, Context)
         EXPECT_TRUE(cluster1.HasContext());
         EXPECT_FALSE(cluster2.HasContext());
         EXPECT_TRUE(cluster3.HasContext());
+
+        // Removing an entire endpoint clears the context for clusters (shuts them down)
+        registry.UnregisterAllFromEndpoint(kEp1);
+        EXPECT_FALSE(cluster1.HasContext());
+        EXPECT_FALSE(cluster2.HasContext());
+        EXPECT_TRUE(cluster3.HasContext());
     }
 
     // destructor clears the context
     EXPECT_FALSE(cluster1.HasContext());
     EXPECT_FALSE(cluster2.HasContext());
     EXPECT_FALSE(cluster3.HasContext());
+}
+
+TEST_F(TestServerClusterInterfaceRegistry, MultiPathRegistration)
+{
+    const std::array<ConcreteClusterPath, 4> kTestPaths{ {
+        { 15, 100 },
+        { 15, 88 },
+        { 15, 20 },
+        { 15, 33 },
+    } };
+    MultiPathCluster cluster(kTestPaths);
+    ServerClusterRegistration registration(cluster);
+
+    ServerClusterInterfaceRegistry registry;
+    ASSERT_EQ(registry.Register(registration), CHIP_NO_ERROR);
+
+    for (auto & p : kTestPaths)
+    {
+        ASSERT_EQ(registry.Get(p), &cluster);
+    }
+
+    // some things not there...
+    ASSERT_EQ(registry.Get({ 1, 20 }), nullptr);
+    ASSERT_EQ(registry.Get({ 1, 200 }), nullptr);
+    ASSERT_EQ(registry.Get({ 3, 200 }), nullptr);
+    ASSERT_EQ(registry.Get({ 4, 33 }), nullptr);
+
+    // Verify listing works
+    ServerClusterInterfaceRegistry::ClustersList clusters = registry.ClustersOnEndpoint(15);
+    auto it                                               = clusters.begin();
+
+    for (auto & p : kTestPaths)
+    {
+        ASSERT_NE(it, clusters.end());
+        ASSERT_EQ(*it, p.mClusterId);
+        ++it;
+    }
+    ASSERT_EQ(it, clusters.end());
+
+    ASSERT_EQ(registry.Unregister(&cluster), CHIP_NO_ERROR);
+    for (auto & p : kTestPaths)
+    {
+        ASSERT_EQ(registry.Get(p), nullptr);
+    }
+}
+
+TEST_F(TestServerClusterInterfaceRegistry, RejectDifferentEndpointPaths)
+{
+    {
+        const std::array<ConcreteClusterPath, 2> kTestPaths{ {
+            { 1, 100 },
+            { 2, 88 },
+        } };
+        MultiPathCluster cluster(kTestPaths);
+        ServerClusterRegistration registration(cluster);
+
+        ServerClusterInterfaceRegistry registry;
+        ASSERT_EQ(registry.Register(registration), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    {
+        const std::array<ConcreteClusterPath, 3> kTestPaths{ {
+            { 1, 100 },
+            { 1, 200 },
+            { 3, 100 },
+        } };
+        MultiPathCluster cluster(kTestPaths);
+        ServerClusterRegistration registration(cluster);
+
+        ServerClusterInterfaceRegistry registry;
+        ASSERT_EQ(registry.Register(registration), CHIP_ERROR_INVALID_ARGUMENT);
+    }
 }
 
 TEST_F(TestServerClusterInterfaceRegistry, StartupErrors)

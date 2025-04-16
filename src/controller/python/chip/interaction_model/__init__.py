@@ -24,8 +24,7 @@
 
 import enum
 
-from chip.exceptions import ChipStackException
-
+from ..exceptions import ChipStackException
 from .delegate import (AttributePath, AttributePathIBstruct, DataVersionFilterIBstruct, EventPath, EventPathIBstruct,
                        PyInvokeRequestData, PyWriteAttributeData, SessionParameters, SessionParametersStruct,
                        TestOnlyPyBatchCommandsOverrides, TestOnlyPyOnDoneInfo)

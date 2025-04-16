@@ -98,6 +98,91 @@
             "path": "../../zap-templates/templates/app/cluster-enums-check.zapt",
             "name": "Enum and bitmap method check header for clusters",
             "output": "cluster-enums-check.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/shared-cluster-enums-header.zapt",
+            "name": "Shared enumerations header",
+            "output": "../../clusters/shared/Enums.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/shared-cluster-enums-check.zapt",
+            "name": "Shared enumeration check header",
+            "output": "../../clusters/shared/EnumsCheck.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/shared-cluster-structs.zapt",
+            "name": "Shared/global structures",
+            "output": "../../clusters/shared/Structs.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/shared-cluster-structs-src.zapt",
+            "name": "Shared/global structures",
+            "output": "../../clusters/shared/Structs.ipp"
+        },
+        {
+            "path": "../../zap-templates/templates/app/shared-cluster-attributes.zapt",
+            "name": "Shared/global structures",
+            "output": "../../clusters/shared/Attributes.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/cluster-attributes-header.zapt",
+            "name": "Cluster-specific attribute declarations",
+            "iterator": "availableCluster",
+            "output": "../../clusters/{name:touppercamelcase}/Attributes.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/cluster-events-header.zapt",
+            "name": "Cluster-specific event declarations",
+            "iterator": "availableCluster",
+            "output": "../../clusters/{name:touppercamelcase}/Events.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/cluster-events-src.zapt",
+            "name": "Cluster-specific event implementations",
+            "iterator": "availableCluster",
+            "output": "../../clusters/{name:touppercamelcase}/Events.ipp"
+        },
+        {
+            "path": "../../zap-templates/templates/app/cluster-structs-header.zapt",
+            "name": "Cluster-specific structure declarations",
+            "iterator": "availableCluster",
+            "output": "../../clusters/{name:touppercamelcase}/Structs.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/cluster-structs-src.zapt",
+            "name": "Cluster-specific structure implementations",
+            "iterator": "availableCluster",
+            "output": "../../clusters/{name:touppercamelcase}/Structs.ipp"
+        },
+        {
+            "path": "../../zap-templates/templates/app/cluster-attributes-src.zapt",
+            "name": "Cluster-specific attributes implementations",
+            "iterator": "availableCluster",
+            "output": "../../clusters/{name:touppercamelcase}/Attributes.ipp"
+        },
+        {
+            "path": "../../zap-templates/templates/app/cluster-commands-header.zapt",
+            "name": "Cluster-specific command declarations",
+            "iterator": "availableCluster",
+            "output": "../../clusters/{name:touppercamelcase}/Commands.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/cluster-commands-src.zapt",
+            "name": "Cluster-specific command implementations",
+            "iterator": "availableCluster",
+            "output": "../../clusters/{name:touppercamelcase}/Commands.ipp"
+        },
+        {
+            "path": "../../zap-templates/templates/app/cluster-enums-header.zapt",
+            "name": "Cluster-specific enumerations header",
+            "iterator": "availableCluster",
+            "output": "../../clusters/{name:touppercamelcase}/Enums.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/cluster-enums-check-header.zapt",
+            "name": "Cluster-specific enumerations header",
+            "iterator": "availableCluster",
+            "output": "../../clusters/{name:touppercamelcase}/EnumsCheck.h"
         }
     ]
 }
