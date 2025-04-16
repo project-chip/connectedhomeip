@@ -84,8 +84,7 @@ struct GenericOverallTarget : public Structs::OverallTargetStruct::Type
         return *this;
     }
 
-    void Set(Optional<TargetPositionEnum> targetPositionValue = NullOptional,
-             Optional<bool> targetLatchValue       = NullOptional,
+    void Set(Optional<TargetPositionEnum> targetPositionValue = NullOptional, Optional<bool> targetLatchValue = NullOptional,
              Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
     {
         position = targetPositionValue;
