@@ -37,8 +37,20 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 {
 }
 
+void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+{
+    (void) arg;
+
+    if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
+    {
+        JFAMgr().HandleCommissioningCompleteEvent();
+    }
+}
+
 void ApplicationInit()
 {
+    JFAMgr().Init(Server::GetInstance());
+    DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0);
 }
 
 void ApplicationShutdown()
@@ -61,13 +73,6 @@ int main(int argc, char * argv[])
         return -1;
     }
 
-    CHIP_ERROR err = JFAMgr().Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to initialize JFA manager: %" CHIP_ERROR_FORMAT, err.Format());
-        chip::DeviceLayer::PlatformMgr().Shutdown();
-        return -1;
-    }
     ChipLinuxAppMainLoop();
 
     return 0;

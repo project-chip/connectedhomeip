@@ -18,25 +18,59 @@
 
 #pragma once
 
+#include <AppMain.h>
+#include <app/server/Server.h>
+
 #include <stdbool.h>
 #include <stdint.h>
-
 #include <functional>
 
 #include <lib/core/CHIPError.h>
 
+namespace chip
+{
+
 class JFAManager
 {
 public:
-    CHIP_ERROR Init();
+    JFAManager() : mOnConnectedCallback(OnConnected, this), mOnConnectionFailureCallback(OnConnectionFailure, this) {}
+
+    CHIP_ERROR Init(Server& server);
+    void HandleCommissioningCompleteEvent();
+    CHIP_ERROR FinalizeCommissioning(NodeId nodeId);
 
 private:
+    // Various actions to take when OnConnected callback is called
+    enum OnConnectedAction
+    {
+        kStandardCommissioningComplete = 0,
+    };
+
     friend JFAManager & JFAMgr(void);
 
     static JFAManager sJFA;
+    static void OnConnected(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
+    static void OnConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
+
+    Server* mServer = nullptr;
+    CASESessionManager * mCASESessionManager = nullptr;
+    Messaging::ExchangeManager * mExchangeMgr = nullptr;
+    SessionHolder mSessionHolder;
+    Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
+    Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
+    OnConnectedAction mOnConnectedAction = kStandardCommissioningComplete;
+    FabricId jfFabricIndex = kUndefinedFabricId;
+
+    void ConnectToNode(ScopedNodeId scopedNodeId, OnConnectedAction onConnectedAction);
+    CHIP_ERROR SendCommissioningComplete();
+    static void OnCommissioningCompleteResponse(void * context, const app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & data);
+    static void OnCommissioningCompleteFailure(void * context, CHIP_ERROR error);
+    void ReleaseSession();
 };
 
 inline JFAManager & JFAMgr(void)
 {
     return JFAManager::sJFA;
 }
+
+} // namespace chip
