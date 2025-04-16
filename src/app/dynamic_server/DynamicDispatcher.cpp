@@ -31,6 +31,7 @@
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/WriteHandler.h>
+#include <app/clusters/ota-provider/ota-provider-cluster.h>
 #include <app/data-model/Decode.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
@@ -57,10 +58,28 @@ namespace {
 
 DataVersion gMockDataVersion = 0;
 
+OtaProviderLogic gOtaProviderLogic;
+
 } // anonymous namespace
 
 namespace chip {
 namespace app {
+namespace Clusters {
+namespace OTAProvider {
+
+void SetDelegate(chip::EndpointId endpointId, OTAProviderDelegate * delegate)
+{
+    if (endpointId != kOtaProviderDynamicEndpointId)
+    {
+        ChipLogError(AppServer, "Trying to set OTA delegate on invalid endpoint %d (only %d supported)", endpointId,
+                     kOtaProviderDynamicEndpointId);
+        return;
+    }
+    gOtaProviderLogic.SetDelegate(delegate);
+}
+
+} // namespace OTAProvider
+} // namespace Clusters
 
 using Access::SubjectDescriptor;
 using Protocols::InteractionModel::Status;
@@ -71,8 +90,8 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aPath, TLV::TLVRea
     // supported commands.
     using namespace OtaSoftwareUpdateProvider::Commands;
 
-    bool wasHandled = false;
-    CHIP_ERROR err  = CHIP_NO_ERROR;
+    std::optional<DataModel::ActionReturnStatus> result;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     switch (aPath.mCommandId)
     {
@@ -81,7 +100,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aPath, TLV::TLVRea
         err = DataModel::Decode(aReader, commandData);
         if (err == CHIP_NO_ERROR)
         {
-            wasHandled = emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(aCommandObj, aPath, commandData);
+            result = gOtaProviderLogic.QueryImage(aPath, commandData, aCommandObj);
         }
         break;
     }
@@ -90,7 +109,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aPath, TLV::TLVRea
         err = DataModel::Decode(aReader, commandData);
         if (err == CHIP_NO_ERROR)
         {
-            wasHandled = emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(aCommandObj, aPath, commandData);
+            result = gOtaProviderLogic.ApplyUpdateRequest(aPath, commandData, aCommandObj);
         }
         break;
     }
@@ -99,7 +118,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aPath, TLV::TLVRea
         err = DataModel::Decode(aReader, commandData);
         if (err == CHIP_NO_ERROR)
         {
-            wasHandled = emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(aCommandObj, aPath, commandData);
+            result = gOtaProviderLogic.NotifyUpdateApplied(aPath, commandData, aCommandObj);
         }
         break;
     }
@@ -107,9 +126,16 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aPath, TLV::TLVRea
         break;
     }
 
-    if (CHIP_NO_ERROR != err || !wasHandled)
+    if (CHIP_NO_ERROR != err)
     {
         aCommandObj->AddStatus(aPath, Status::InvalidCommand);
+    }
+    else if (result.has_value())
+    {
+        // Provider indicates that handler status or data was already set (or will be set asynchronously) by
+        // returning std::nullopt. If any other value is returned, it is requesting that a status is set. This
+        // includes CHIP_NO_ERROR: in this case CHIP_NO_ERROR would mean set a `status success on the command`
+        aCommandObj->AddStatus(aPath, result->GetStatusCode());
     }
 }
 
