@@ -26,8 +26,6 @@
 #include <platform/LockTracker.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-#include <map>
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
