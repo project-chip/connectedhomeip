@@ -404,7 +404,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
         privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue]
         for p in privilege_enum:
             steps.append(TestStep(step_number_with_privilege(3, 'a', p),
-                         "TH_commissioner gives TH_second_commissioner the specified privilege"))
+                         "TH_commissioner gives TH_second_controller the specified privilege"))
             steps.append(TestStep(step_number_with_privilege(3, 'b', p),
                          """For each standard command on each standard cluster on each endpoint,
                          TH_second_controller checks the permission requirements for that command.
