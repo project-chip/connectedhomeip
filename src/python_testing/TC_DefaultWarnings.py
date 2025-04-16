@@ -131,7 +131,7 @@ class DefaultChecker(BasicCompositionTests):
         if cluster in self.endpoints[0].keys():
             val = self.endpoints[0][cluster][attr]
             if val == []:
-                return _problem(AttributePathLocation(0, cluster.id, attr.attribute_id), f"Fixed label list is empty")
+                return _problem(AttributePathLocation(0, cluster.id, attr.attribute_id), "Fixed label list is empty")
         else:
             self.mark_current_step_skipped()
 
