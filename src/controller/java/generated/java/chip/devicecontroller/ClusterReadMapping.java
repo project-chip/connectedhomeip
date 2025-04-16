@@ -10614,6 +10614,98 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readElectricalGridConditionsInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readElectricalGridConditionsLocalGenerationAvailableCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalGridConditionsLocalGenerationAvailableAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalGridConditionsCluster) cluster).readLocalGenerationAvailableAttribute(
+              (ChipClusters.ElectricalGridConditionsCluster.LocalGenerationAvailableAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedElectricalGridConditionsClusterLocalGenerationAvailableAttributeCallback(),
+          readElectricalGridConditionsLocalGenerationAvailableCommandParams
+        );
+        result.put("readLocalGenerationAvailableAttribute", readElectricalGridConditionsLocalGenerationAvailableAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalGridConditionsForecastConditionsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalGridConditionsForecastConditionsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalGridConditionsCluster) cluster).readForecastConditionsAttribute(
+              (ChipClusters.ElectricalGridConditionsCluster.ForecastConditionsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedElectricalGridConditionsClusterForecastConditionsAttributeCallback(),
+          readElectricalGridConditionsForecastConditionsCommandParams
+        );
+        result.put("readForecastConditionsAttribute", readElectricalGridConditionsForecastConditionsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalGridConditionsGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalGridConditionsGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalGridConditionsCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.ElectricalGridConditionsCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedElectricalGridConditionsClusterGeneratedCommandListAttributeCallback(),
+          readElectricalGridConditionsGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readElectricalGridConditionsGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalGridConditionsAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalGridConditionsAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalGridConditionsCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.ElectricalGridConditionsCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedElectricalGridConditionsClusterAcceptedCommandListAttributeCallback(),
+          readElectricalGridConditionsAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readElectricalGridConditionsAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalGridConditionsEventListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalGridConditionsEventListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalGridConditionsCluster) cluster).readEventListAttribute(
+              (ChipClusters.ElectricalGridConditionsCluster.EventListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedElectricalGridConditionsClusterEventListAttributeCallback(),
+          readElectricalGridConditionsEventListCommandParams
+        );
+        result.put("readEventListAttribute", readElectricalGridConditionsEventListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalGridConditionsAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalGridConditionsAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalGridConditionsCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.ElectricalGridConditionsCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedElectricalGridConditionsClusterAttributeListAttributeCallback(),
+          readElectricalGridConditionsAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readElectricalGridConditionsAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalGridConditionsFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalGridConditionsFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalGridConditionsCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readElectricalGridConditionsFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readElectricalGridConditionsFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalGridConditionsClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalGridConditionsClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalGridConditionsCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readElectricalGridConditionsClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readElectricalGridConditionsClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readDoorLockInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readDoorLockLockStateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readDoorLockLockStateAttributeInteractionInfo = new InteractionInfo(
@@ -21718,6 +21810,7 @@ public class ClusterReadMapping {
             put("energyEvseMode", readEnergyEvseModeInteractionInfo());
             put("waterHeaterMode", readWaterHeaterModeInteractionInfo());
             put("deviceEnergyManagementMode", readDeviceEnergyManagementModeInteractionInfo());
+            put("electricalGridConditions", readElectricalGridConditionsInteractionInfo());
             put("doorLock", readDoorLockInteractionInfo());
             put("windowCovering", readWindowCoveringInteractionInfo());
             put("closureControl", readClosureControlInteractionInfo());

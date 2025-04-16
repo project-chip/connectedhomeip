@@ -9610,6 +9610,127 @@ public static class DeviceEnergyManagementModeClusterModeOptionStruct {
     return output.toString();
   }
 }
+public static class ElectricalGridConditionsClusterElectricalGridConditionsStruct {
+  public Long periodStart;
+  public @Nullable Long periodEnd;
+  public Integer gridCarbonIntensity;
+  public Integer gridCarbonLevel;
+  public Integer localCarbonIntensity;
+  public Integer localCarbonLevel;
+  private static final long PERIOD_START_ID = 0L;
+  private static final long PERIOD_END_ID = 1L;
+  private static final long GRID_CARBON_INTENSITY_ID = 2L;
+  private static final long GRID_CARBON_LEVEL_ID = 3L;
+  private static final long LOCAL_CARBON_INTENSITY_ID = 4L;
+  private static final long LOCAL_CARBON_LEVEL_ID = 5L;
+
+  public ElectricalGridConditionsClusterElectricalGridConditionsStruct(
+    Long periodStart,
+    @Nullable Long periodEnd,
+    Integer gridCarbonIntensity,
+    Integer gridCarbonLevel,
+    Integer localCarbonIntensity,
+    Integer localCarbonLevel
+  ) {
+    this.periodStart = periodStart;
+    this.periodEnd = periodEnd;
+    this.gridCarbonIntensity = gridCarbonIntensity;
+    this.gridCarbonLevel = gridCarbonLevel;
+    this.localCarbonIntensity = localCarbonIntensity;
+    this.localCarbonLevel = localCarbonLevel;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(PERIOD_START_ID, new UIntType(periodStart)));
+    values.add(new StructElement(PERIOD_END_ID, periodEnd != null ? new UIntType(periodEnd) : new NullType()));
+    values.add(new StructElement(GRID_CARBON_INTENSITY_ID, new IntType(gridCarbonIntensity)));
+    values.add(new StructElement(GRID_CARBON_LEVEL_ID, new UIntType(gridCarbonLevel)));
+    values.add(new StructElement(LOCAL_CARBON_INTENSITY_ID, new IntType(localCarbonIntensity)));
+    values.add(new StructElement(LOCAL_CARBON_LEVEL_ID, new UIntType(localCarbonLevel)));
+
+    return new StructType(values);
+  }
+
+  public static ElectricalGridConditionsClusterElectricalGridConditionsStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long periodStart = null;
+    @Nullable Long periodEnd = null;
+    Integer gridCarbonIntensity = null;
+    Integer gridCarbonLevel = null;
+    Integer localCarbonIntensity = null;
+    Integer localCarbonLevel = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == PERIOD_START_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          periodStart = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == PERIOD_END_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          periodEnd = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == GRID_CARBON_INTENSITY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          gridCarbonIntensity = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == GRID_CARBON_LEVEL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          gridCarbonLevel = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == LOCAL_CARBON_INTENSITY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          localCarbonIntensity = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == LOCAL_CARBON_LEVEL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          localCarbonLevel = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new ElectricalGridConditionsClusterElectricalGridConditionsStruct(
+      periodStart,
+      periodEnd,
+      gridCarbonIntensity,
+      gridCarbonLevel,
+      localCarbonIntensity,
+      localCarbonLevel
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ElectricalGridConditionsClusterElectricalGridConditionsStruct {\n");
+    output.append("\tperiodStart: ");
+    output.append(periodStart);
+    output.append("\n");
+    output.append("\tperiodEnd: ");
+    output.append(periodEnd);
+    output.append("\n");
+    output.append("\tgridCarbonIntensity: ");
+    output.append(gridCarbonIntensity);
+    output.append("\n");
+    output.append("\tgridCarbonLevel: ");
+    output.append(gridCarbonLevel);
+    output.append("\n");
+    output.append("\tlocalCarbonIntensity: ");
+    output.append(localCarbonIntensity);
+    output.append("\n");
+    output.append("\tlocalCarbonLevel: ");
+    output.append(localCarbonLevel);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class DoorLockClusterCredentialStruct {
   public Integer credentialType;
   public Integer credentialIndex;

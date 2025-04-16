@@ -246,6 +246,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeDeviceEnergyManagementModeID:
         result = @"DeviceEnergyManagementMode";
         break;
+    case MTRClusterIDTypeElectricalGridConditionsID:
+        result = @"ElectricalGridConditions";
+        break;
     case MTRClusterIDTypeDoorLockID:
         result = @"DoorLock";
         break;
@@ -4661,6 +4664,49 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             break;
 
         case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeElectricalGridConditionsID:
+
+        switch (attributeID) {
+
+            // Cluster ElectricalGridConditions attributes
+        case MTRAttributeIDTypeClusterElectricalGridConditionsAttributeLocalGenerationAvailableID:
+            result = @"LocalGenerationAvailable";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalGridConditionsAttributeCurrentConditionsID:
+            result = @"CurrentConditions";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalGridConditionsAttributeForecastConditionsID:
+            result = @"ForecastConditions";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalGridConditionsAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalGridConditionsAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalGridConditionsAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalGridConditionsAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalGridConditionsAttributeClusterRevisionID:
             result = @"ClusterRevision";
             break;
 
@@ -10468,6 +10514,16 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeElectricalGridConditionsID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeDoorLockID:
 
         switch (commandID) {
@@ -12812,6 +12868,16 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
+    case MTRClusterIDTypeElectricalGridConditionsID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeDoorLockID:
 
         switch (commandID) {
@@ -14772,6 +14838,25 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
     case MTRClusterIDTypeDeviceEnergyManagementModeID:
 
         switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeElectricalGridConditionsID:
+
+        switch (eventID) {
+
+            // Cluster ElectricalGridConditions events
+        case MTREventIDTypeClusterElectricalGridConditionsEventCurrentConditionsChangedID:
+            result = @"CurrentConditionsChanged";
+            break;
+
+        case MTREventIDTypeClusterElectricalGridConditionsEventForecastConditionsChangedID:
+            result = @"ForecastConditionsChanged";
+            break;
 
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];

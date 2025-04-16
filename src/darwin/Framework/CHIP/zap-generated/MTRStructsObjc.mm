@@ -6718,6 +6718,102 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRElectricalGridConditionsClusterElectricalGridConditionsStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _periodStart = @(0);
+
+        _periodEnd = nil;
+
+        _gridCarbonIntensity = @(0);
+
+        _gridCarbonLevel = @(0);
+
+        _localCarbonIntensity = @(0);
+
+        _localCarbonLevel = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRElectricalGridConditionsClusterElectricalGridConditionsStruct alloc] init];
+
+    other.periodStart = self.periodStart;
+    other.periodEnd = self.periodEnd;
+    other.gridCarbonIntensity = self.gridCarbonIntensity;
+    other.gridCarbonLevel = self.gridCarbonLevel;
+    other.localCarbonIntensity = self.localCarbonIntensity;
+    other.localCarbonLevel = self.localCarbonLevel;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: periodStart:%@; periodEnd:%@; gridCarbonIntensity:%@; gridCarbonLevel:%@; localCarbonIntensity:%@; localCarbonLevel:%@; >", NSStringFromClass([self class]), _periodStart, _periodEnd, _gridCarbonIntensity, _gridCarbonLevel, _localCarbonIntensity, _localCarbonLevel];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRElectricalGridConditionsClusterCurrentConditionsChangedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _currentConditions = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRElectricalGridConditionsClusterCurrentConditionsChangedEvent alloc] init];
+
+    other.currentConditions = self.currentConditions;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: currentConditions:%@; >", NSStringFromClass([self class]), _currentConditions];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRElectricalGridConditionsClusterForecastConditionsChangedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _forecastConditions = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRElectricalGridConditionsClusterForecastConditionsChangedEvent alloc] init];
+
+    other.forecastConditions = self.forecastConditions;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: forecastConditions:%@; >", NSStringFromClass([self class]), _forecastConditions];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRDoorLockClusterCredentialStruct
 - (instancetype)init
 {
