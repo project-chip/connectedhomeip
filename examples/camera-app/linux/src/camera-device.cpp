@@ -276,14 +276,15 @@ CameraError CameraDevice::SetV4l2Control(uint32_t controlId, int value)
     return CameraError::SUCCESS;
 }
 
-CameraError CameraDevice::CaptureSnapshot(const uint16_t streamID, const VideoResolutionStruct & resolution,
-                                          ImageSnapshot & outImageSnapshot)
+CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<uint16_t> streamID,
+                                          const VideoResolutionStruct & resolution, ImageSnapshot & outImageSnapshot)
 {
-    auto it = std::find_if(snapshotStreams.begin(), snapshotStreams.end(),
-                           [streamID](const SnapshotStream & s) { return s.snapshotStreamParams.snapshotStreamID == streamID; });
+    uint16_t streamId = streamID.IsNull() ? 1 : streamID.Value();
+    auto it           = std::find_if(snapshotStreams.begin(), snapshotStreams.end(),
+                                     [streamId](const SnapshotStream & s) { return s.snapshotStreamParams.snapshotStreamID == streamId; });
     if (it == snapshotStreams.end())
     {
-        ChipLogError(Camera, "Snapshot streamID : %u not found", streamID);
+        ChipLogError(Camera, "Snapshot streamID : %u not found", streamId);
         return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
     }
 
@@ -716,7 +717,6 @@ void CameraDevice::InitializeSnapshotStreams()
     SnapshotStream snapshotStream = { { 1 /* Id */,
                                         ImageCodecEnum::kJpeg,
                                         30 /* FrameRate */,
-                                        512000 /* BitRate*/,
                                         { 320, 240 } /* MinResolution*/,
                                         { 320, 240 } /* MaxResolution */,
                                         90 /* Quality */,
