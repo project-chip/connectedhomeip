@@ -11672,6 +11672,8 @@
                   - ApparentEnergy
                   - ReactiveEnergy
           RVCOperationalState:
+              # Additional error and operational states:
+              # in-progress for maybe Matter 1.5
               ErrorStateEnum:
                    - LowBattery
                    - CannotReachTargetArea
