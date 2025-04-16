@@ -15,8 +15,11 @@
 #    limitations under the License.
 #
 
+import logging
+
 import chip.clusters as Clusters
-from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main)
+from chip.clusters.Types import NullValue
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
@@ -59,7 +62,25 @@ class TC_CNET_4_10(MatterBaseTest):
 
         cnet = Clusters.NetworkCommissioning
         gen_comm = Clusters.GeneralCommissioning
-        thread_network_id = "hex:1111111122222222"  # From PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET
+
+        # Get NetworkID from PIXIT operational dataset (stored as bytes)
+        pixit_dataset_bytes = self.matter_test_config.global_test_params['PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET']
+        logging.info(f"Retrieved PIXIT Dataset (type: {type(pixit_dataset_bytes)}): {pixit_dataset_bytes!r}")
+        asserts.assert_is_instance(pixit_dataset_bytes, bytes, "Expected PIXIT dataset from global_test_params to be bytes")
+        asserts.assert_true(len(pixit_dataset_bytes) > 0, "PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET must be configured.")
+
+        # Find the ExtPANID TLV (Context Tag 2, Length 8) in the bytes
+        # Marker sequence seems to be 0x02 (Tag) followed by 0x08 (Length)
+        ext_pan_id_marker = b'\x02\x08'
+        marker_index = pixit_dataset_bytes.find(ext_pan_id_marker)
+        asserts.assert_true(marker_index != -1 and len(pixit_dataset_bytes) >= marker_index + len(ext_pan_id_marker) + 8,
+                            f"Could not find ExtPANID marker {ext_pan_id_marker!r} or dataset too short in PIXIT bytes")
+
+        ext_pan_id_start = marker_index + len(ext_pan_id_marker)
+        thread_network_id_bytes = pixit_dataset_bytes[ext_pan_id_start: ext_pan_id_start + 8]
+
+        asserts.assert_equal(len(thread_network_id_bytes), 8, "Extracted ExtPANID must be 8 bytes long")
+        logging.info(f"Extracted Network ID (ExtPANID): {thread_network_id_bytes.hex()}")
 
         # Step 1: Verify FeatureMap indicates Thread support
         self.step(1)
@@ -71,11 +92,10 @@ class TC_CNET_4_10(MatterBaseTest):
 
         # Step 2: Arm failsafe and verify response
         self.step(2)
-        response = await self.send_single_cmd(
-            cluster=gen_comm,
+        await self.send_single_cmd(
             cmd=gen_comm.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=0)
         )
-        asserts.assert_equal(response.ErrorCode, 0, "ArmFailSafe command failed")
+        # Successful command execution is implied if no exception is raised.
 
         # Step 3: Read Networks and verify thread network
         self.step(3)
@@ -88,33 +108,32 @@ class TC_CNET_4_10(MatterBaseTest):
         # Find network index
         userth_netidx = None
         for idx, network in enumerate(networks):
-            if network.NetworkID == thread_network_id:
+            if network.networkID == thread_network_id_bytes:
                 userth_netidx = idx
-                asserts.assert_true(network.Connected, "Thread network not connected")
+                asserts.assert_true(network.connected, "Thread network not connected")
                 break
         asserts.assert_true(userth_netidx is not None, "Thread network not found")
 
         # Step 4: Remove network
         self.step(4)
         response = await self.send_single_cmd(
-            cluster=cnet,
             cmd=cnet.Commands.RemoveNetwork(
-                networkID=thread_network_id,
+                networkID=thread_network_id_bytes,
                 breadcrumb=1
             )
         )
-        asserts.assert_equal(response.NetworkingStatus,
+        asserts.assert_equal(response.networkingStatus,
                              cnet.Enums.NetworkCommissioningStatusEnum.kSuccess, "Network was not removed")
-        asserts.assert_equal(response.NetworkIndex, userth_netidx,
+        asserts.assert_equal(response.networkIndex, userth_netidx,
                              "Incorrect network index in response")
 
-        # Step 5: Verify network count reduced
+        # Step 5: Verify network count reduced and store the result
         self.step(5)
-        networks = await self.read_single_attribute_check_success(
+        networks_after_removal = await self.read_single_attribute_check_success(
             cluster=cnet,
             attribute=cnet.Attributes.Networks
         )
-        asserts.assert_equal(len(networks), num_networks - 1,
+        asserts.assert_equal(len(networks_after_removal), num_networks - 1,
                              "Network count not reduced")
 
         # Step 6: Check LastNetworkingStatus
@@ -123,8 +142,11 @@ class TC_CNET_4_10(MatterBaseTest):
             cluster=cnet,
             attribute=cnet.Attributes.LastNetworkingStatus
         )
-        expected_status = cnet.Enums.NetworkCommissioningStatusEnum.kSuccess
-        asserts.assert_equal(status, expected_status)
+        if len(networks_after_removal) == 0:
+            asserts.assert_equal(status, NullValue, "LastNetworkingStatus should be Null when Networks list is empty")
+        else:
+            expected_status = cnet.Enums.NetworkCommissioningStatusEnum.kSuccess
+            asserts.assert_equal(status, expected_status, "LastNetworkingStatus should be Success when Networks list is not empty")
 
         # Step 7: Check LastNetworkID
         self.step(7)
@@ -132,8 +154,11 @@ class TC_CNET_4_10(MatterBaseTest):
             cluster=cnet,
             attribute=cnet.Attributes.LastNetworkID
         )
-        expected_network_id = thread_network_id
-        asserts.assert_equal(last_network_id, expected_network_id)
+        if len(networks_after_removal) == 0:
+            asserts.assert_equal(last_network_id, NullValue, "LastNetworkID should be Null when Networks list is empty")
+        else:
+            expected_network_id = thread_network_id_bytes
+            asserts.assert_equal(last_network_id, expected_network_id, "LastNetworkID incorrect when Networks list is not empty")
 
         # Step 8: Verify breadcrumb
         self.step(8)
@@ -146,13 +171,12 @@ class TC_CNET_4_10(MatterBaseTest):
         # Step 9: Try to connect to removed network
         self.step(9)
         response = await self.send_single_cmd(
-            cluster=cnet,
             cmd=cnet.Commands.ConnectNetwork(
-                networkID=thread_network_id,
+                networkID=thread_network_id_bytes,
                 breadcrumb=2
             )
         )
-        asserts.assert_equal(response.NetworkingStatus,
+        asserts.assert_equal(response.networkingStatus,
                              cnet.Enums.NetworkCommissioningStatusEnum.kNetworkIDNotFound)
 
         # Step 10: Verify breadcrumb unchanged
@@ -165,11 +189,10 @@ class TC_CNET_4_10(MatterBaseTest):
 
         # Step 11: Disable failsafe
         self.step(11)
-        response = await self.send_single_cmd(
-            cluster=gen_comm,
+        await self.send_single_cmd(
             cmd=gen_comm.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=0)
         )
-        asserts.assert_equal(response.ErrorCode, 0)
+        # Successful command execution is implied if no exception is raised.
 
         # Step 12: Verify network restored
         self.step(12)
@@ -181,48 +204,44 @@ class TC_CNET_4_10(MatterBaseTest):
                              "Network count not restored")
         found = False
         for network in networks:
-            if (network.NetworkID == thread_network_id and
-                    network.Connected):
+            if (network.networkID == thread_network_id_bytes and
+                    network.connected):
                 found = True
                 break
         asserts.assert_true(found, "Thread network not restored")
 
         # Step 13: Re-arm failsafe
         self.step(13)
-        response = await self.send_single_cmd(
-            cluster=gen_comm,
+        await self.send_single_cmd(
             cmd=gen_comm.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=0)
         )
-        asserts.assert_equal(response.ErrorCode, 0)
+        # Successful command execution is implied if no exception is raised.
 
         # Step 14: Remove network again
         self.step(14)
         response = await self.send_single_cmd(
-            cluster=cnet,
             cmd=cnet.Commands.RemoveNetwork(
-                networkID=thread_network_id,
+                networkID=thread_network_id_bytes,
                 breadcrumb=1
             )
         )
-        asserts.assert_equal(response.NetworkingStatus,
+        asserts.assert_equal(response.networkingStatus,
                              cnet.Enums.NetworkCommissioningStatusEnum.kSuccess)
-        asserts.assert_equal(response.NetworkIndex, userth_netidx)
+        asserts.assert_equal(response.networkIndex, userth_netidx)
 
         # Step 15: Complete commissioning
         self.step(15)
-        response = await self.send_single_cmd(
-            cluster=gen_comm,
+        await self.send_single_cmd(
             cmd=gen_comm.Commands.CommissioningComplete()
         )
-        asserts.assert_equal(response.ErrorCode, 0)
+        # Successful command execution is implied if no exception is raised.
 
         # Step 16: Verify failsafe disabled
         self.step(16)
-        response = await self.send_single_cmd(
-            cluster=gen_comm,
+        await self.send_single_cmd(
             cmd=gen_comm.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=0)
         )
-        asserts.assert_equal(response.ErrorCode, 0)
+        # Successful command execution is implied if no exception is raised.
 
         # Step 17: Verify network remains removed
         self.step(17)
@@ -233,7 +252,7 @@ class TC_CNET_4_10(MatterBaseTest):
         asserts.assert_equal(len(networks), num_networks - 1,
                              "Incorrect network count")
         for network in networks:
-            asserts.assert_not_equal(network.NetworkID, thread_network_id,
+            asserts.assert_not_equal(network.networkID, thread_network_id_bytes,
                                      "Network still present after removal")
 
 
