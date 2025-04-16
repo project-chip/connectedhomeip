@@ -28,23 +28,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureControl::Closure
     using EnumType = ClosureControl::ClosureErrorEnum;
     switch (val)
     {
-    case EnumType::kBlocked:
+    case EnumType::kPhysicallyBlocked:
+    case EnumType::kBlockedBySensor:
     case EnumType::kTemperatureLimited:
     case EnumType::kMaintenanceRequired:
     case EnumType::kInternalInterference:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureControl::LatchingEnum val)
-{
-    using EnumType = ClosureControl::LatchingEnum;
-    switch (val)
-    {
-    case EnumType::kLatchedAndSecured:
-    case EnumType::kLatchedButNotSecured:
-    case EnumType::kNotLatched:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -79,18 +67,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureControl::Positio
     case EnumType::kOpenedForPedestrian:
     case EnumType::kOpenedForVentilation:
     case EnumType::kOpenedAtSignature:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureControl::TargetLatchEnum val)
-{
-    using EnumType = ClosureControl::TargetLatchEnum;
-    switch (val)
-    {
-    case EnumType::kLatch:
-    case EnumType::kUnlatch:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

@@ -27106,28 +27106,28 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     chip::JniReferences::GetInstance().CreateOptional(value_positioningInsideOptional, value_positioning);
                 }
-                jobject value_latching;
-                if (!cppValue.Value().latching.HasValue())
+                jobject value_latch;
+                if (!cppValue.Value().latch.HasValue())
                 {
-                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_latching);
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_latch);
                 }
                 else
                 {
-                    jobject value_latchingInsideOptional;
-                    if (cppValue.Value().latching.Value().IsNull())
+                    jobject value_latchInsideOptional;
+                    if (cppValue.Value().latch.Value().IsNull())
                     {
-                        value_latchingInsideOptional = nullptr;
+                        value_latchInsideOptional = nullptr;
                     }
                     else
                     {
-                        std::string value_latchingInsideOptionalClassName     = "java/lang/Integer";
-                        std::string value_latchingInsideOptionalCtorSignature = "(I)V";
-                        jint jnivalue_latchingInsideOptional = static_cast<jint>(cppValue.Value().latching.Value().Value());
-                        chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                            value_latchingInsideOptionalClassName.c_str(), value_latchingInsideOptionalCtorSignature.c_str(),
-                            jnivalue_latchingInsideOptional, value_latchingInsideOptional);
+                        std::string value_latchInsideOptionalClassName     = "java/lang/Boolean";
+                        std::string value_latchInsideOptionalCtorSignature = "(Z)V";
+                        jboolean jnivalue_latchInsideOptional = static_cast<jboolean>(cppValue.Value().latch.Value().Value());
+                        chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
+                            value_latchInsideOptionalClassName.c_str(), value_latchInsideOptionalCtorSignature.c_str(),
+                            jnivalue_latchInsideOptional, value_latchInsideOptional);
                     }
-                    chip::JniReferences::GetInstance().CreateOptional(value_latchingInsideOptional, value_latching);
+                    chip::JniReferences::GetInstance().CreateOptional(value_latchInsideOptional, value_latch);
                 }
                 jobject value_speed;
                 if (!cppValue.Value().speed.HasValue())
@@ -27152,28 +27152,29 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     chip::JniReferences::GetInstance().CreateOptional(value_speedInsideOptional, value_speed);
                 }
-                jobject value_extraInfo;
-                if (!cppValue.Value().extraInfo.HasValue())
+                jobject value_secureState;
+                if (!cppValue.Value().secureState.HasValue())
                 {
-                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_extraInfo);
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_secureState);
                 }
                 else
                 {
-                    jobject value_extraInfoInsideOptional;
-                    if (cppValue.Value().extraInfo.Value().IsNull())
+                    jobject value_secureStateInsideOptional;
+                    if (cppValue.Value().secureState.Value().IsNull())
                     {
-                        value_extraInfoInsideOptional = nullptr;
+                        value_secureStateInsideOptional = nullptr;
                     }
                     else
                     {
-                        std::string value_extraInfoInsideOptionalClassName     = "java/lang/Long";
-                        std::string value_extraInfoInsideOptionalCtorSignature = "(J)V";
-                        jlong jnivalue_extraInfoInsideOptional = static_cast<jlong>(cppValue.Value().extraInfo.Value().Value());
-                        chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                            value_extraInfoInsideOptionalClassName.c_str(), value_extraInfoInsideOptionalCtorSignature.c_str(),
-                            jnivalue_extraInfoInsideOptional, value_extraInfoInsideOptional);
+                        std::string value_secureStateInsideOptionalClassName     = "java/lang/Boolean";
+                        std::string value_secureStateInsideOptionalCtorSignature = "(Z)V";
+                        jboolean jnivalue_secureStateInsideOptional =
+                            static_cast<jboolean>(cppValue.Value().secureState.Value().Value());
+                        chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
+                            value_secureStateInsideOptionalClassName.c_str(), value_secureStateInsideOptionalCtorSignature.c_str(),
+                            jnivalue_secureStateInsideOptional, value_secureStateInsideOptional);
                     }
-                    chip::JniReferences::GetInstance().CreateOptional(value_extraInfoInsideOptional, value_extraInfo);
+                    chip::JniReferences::GetInstance().CreateOptional(value_secureStateInsideOptional, value_secureState);
                 }
 
                 {
@@ -27199,7 +27200,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
 
                     value = env->NewObject(overallStateStructStructClass_1, overallStateStructStructCtor_1, value_positioning,
-                                           value_latching, value_speed, value_extraInfo);
+                                           value_latch, value_speed, value_secureState);
                 }
             }
             return value;
@@ -27243,10 +27244,10 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 else
                 {
                     jobject value_latchInsideOptional;
-                    std::string value_latchInsideOptionalClassName     = "java/lang/Integer";
-                    std::string value_latchInsideOptionalCtorSignature = "(I)V";
-                    jint jnivalue_latchInsideOptional                  = static_cast<jint>(cppValue.Value().latch.Value());
-                    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    std::string value_latchInsideOptionalClassName     = "java/lang/Boolean";
+                    std::string value_latchInsideOptionalCtorSignature = "(Z)V";
+                    jboolean jnivalue_latchInsideOptional              = static_cast<jboolean>(cppValue.Value().latch.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
                         value_latchInsideOptionalClassName.c_str(), value_latchInsideOptionalCtorSignature.c_str(),
                         jnivalue_latchInsideOptional, value_latchInsideOptional);
                     chip::JniReferences::GetInstance().CreateOptional(value_latchInsideOptional, value_latch);

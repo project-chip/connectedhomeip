@@ -32,9 +32,9 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kPositioning), positioning);
-    encoder.Encode(to_underlying(Fields::kLatching), latching);
+    encoder.Encode(to_underlying(Fields::kLatch), latch);
     encoder.Encode(to_underlying(Fields::kSpeed), speed);
-    encoder.Encode(to_underlying(Fields::kExtraInfo), extraInfo);
+    encoder.Encode(to_underlying(Fields::kSecureState), secureState);
     return encoder.Finalize();
 }
 
@@ -52,17 +52,17 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, positioning);
         }
-        else if (__context_tag == to_underlying(Fields::kLatching))
+        else if (__context_tag == to_underlying(Fields::kLatch))
         {
-            err = DataModel::Decode(reader, latching);
+            err = DataModel::Decode(reader, latch);
         }
         else if (__context_tag == to_underlying(Fields::kSpeed))
         {
             err = DataModel::Decode(reader, speed);
         }
-        else if (__context_tag == to_underlying(Fields::kExtraInfo))
+        else if (__context_tag == to_underlying(Fields::kSecureState))
         {
-            err = DataModel::Decode(reader, extraInfo);
+            err = DataModel::Decode(reader, secureState);
         }
         else
         {

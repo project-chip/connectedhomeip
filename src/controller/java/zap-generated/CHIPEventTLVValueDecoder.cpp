@@ -7726,6 +7726,158 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         using namespace app::Clusters::ClosureControl;
         switch (aPath.mEventId)
         {
+        case Events::OperationalError::Id: {
+            Events::OperationalError::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_errorState;
+            chip::JniReferences::GetInstance().CreateArrayList(value_errorState);
+
+            auto iter_value_errorState_0 = cppValue.errorState.begin();
+            while (iter_value_errorState_0.Next())
+            {
+                auto & entry_0 = iter_value_errorState_0.GetValue();
+                jobject newElement_0;
+                std::string newElement_0ClassName     = "java/lang/Integer";
+                std::string newElement_0CtorSignature = "(I)V";
+                jint jninewElement_0                  = static_cast<jint>(entry_0);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), jninewElement_0, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value_errorState, newElement_0);
+            }
+
+            jclass operationalErrorStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$ClosureControlClusterOperationalErrorEvent",
+                operationalErrorStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$ClosureControlClusterOperationalErrorEvent");
+                return nullptr;
+            }
+
+            jmethodID operationalErrorStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(env, operationalErrorStructClass, "<init>",
+                                                                "(Ljava/util/ArrayList;)V", &operationalErrorStructCtor);
+            if (err != CHIP_NO_ERROR || operationalErrorStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$ClosureControlClusterOperationalErrorEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(operationalErrorStructClass, operationalErrorStructCtor, value_errorState);
+
+            return value;
+        }
+        case Events::MovementCompleted::Id: {
+            Events::MovementCompleted::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jclass movementCompletedStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$ClosureControlClusterMovementCompletedEvent",
+                movementCompletedStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$ClosureControlClusterMovementCompletedEvent");
+                return nullptr;
+            }
+
+            jmethodID movementCompletedStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(env, movementCompletedStructClass, "<init>", "()V",
+                                                                &movementCompletedStructCtor);
+            if (err != CHIP_NO_ERROR || movementCompletedStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$ClosureControlClusterMovementCompletedEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(movementCompletedStructClass, movementCompletedStructCtor);
+
+            return value;
+        }
+        case Events::EngageStateChanged::Id: {
+            Events::EngageStateChanged::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_engageValue;
+            std::string value_engageValueClassName     = "java/lang/Boolean";
+            std::string value_engageValueCtorSignature = "(Z)V";
+            jboolean jnivalue_engageValue              = static_cast<jboolean>(cppValue.engageValue);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(value_engageValueClassName.c_str(),
+                                                                           value_engageValueCtorSignature.c_str(),
+                                                                           jnivalue_engageValue, value_engageValue);
+
+            jclass engageStateChangedStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$ClosureControlClusterEngageStateChangedEvent",
+                engageStateChangedStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$ClosureControlClusterEngageStateChangedEvent");
+                return nullptr;
+            }
+
+            jmethodID engageStateChangedStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(env, engageStateChangedStructClass, "<init>",
+                                                                "(Ljava/lang/Boolean;)V", &engageStateChangedStructCtor);
+            if (err != CHIP_NO_ERROR || engageStateChangedStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$ClosureControlClusterEngageStateChangedEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(engageStateChangedStructClass, engageStateChangedStructCtor, value_engageValue);
+
+            return value;
+        }
+        case Events::SecureStateChanged::Id: {
+            Events::SecureStateChanged::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_secureValue;
+            std::string value_secureValueClassName     = "java/lang/Boolean";
+            std::string value_secureValueCtorSignature = "(Z)V";
+            jboolean jnivalue_secureValue              = static_cast<jboolean>(cppValue.secureValue);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(value_secureValueClassName.c_str(),
+                                                                           value_secureValueCtorSignature.c_str(),
+                                                                           jnivalue_secureValue, value_secureValue);
+
+            jclass secureStateChangedStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$ClosureControlClusterSecureStateChangedEvent",
+                secureStateChangedStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$ClosureControlClusterSecureStateChangedEvent");
+                return nullptr;
+            }
+
+            jmethodID secureStateChangedStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(env, secureStateChangedStructClass, "<init>",
+                                                                "(Ljava/lang/Boolean;)V", &secureStateChangedStructCtor);
+            if (err != CHIP_NO_ERROR || secureStateChangedStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$ClosureControlClusterSecureStateChangedEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(secureStateChangedStructClass, secureStateChangedStructCtor, value_secureValue);
+
+            return value;
+        }
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;

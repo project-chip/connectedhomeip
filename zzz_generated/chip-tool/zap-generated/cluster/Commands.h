@@ -9347,6 +9347,10 @@ private:
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
+| * OperationalError                                                  | 0x0000 |
+| * MovementCompleted                                                 | 0x0001 |
+| * EngageStateChanged                                                | 0x0002 |
+| * SecureStateChanged                                                | 0x0003 |
 \*----------------------------------------------------------------------------*/
 
 /*
@@ -9394,7 +9398,7 @@ public:
     ClosureControlMoveTo(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("move-to", credsIssuerConfig)
     {
         AddArgument("Position", 0, UINT8_MAX, &mRequest.position);
-        AddArgument("Latch", 0, UINT8_MAX, &mRequest.latch);
+        AddArgument("Latch", 0, 1, &mRequest.latch);
         AddArgument("Speed", 0, UINT8_MAX, &mRequest.speed);
         ClusterCommand::AddArguments();
     }
@@ -24668,8 +24672,16 @@ void registerClusterClosureControl(Commands & commands, CredentialIssuerCommands
         //
         // Events
         //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                              //
+        make_unique<ReadEvent>(Id, "operational-error", Events::OperationalError::Id, credsIssuerConfig),           //
+        make_unique<ReadEvent>(Id, "movement-completed", Events::MovementCompleted::Id, credsIssuerConfig),         //
+        make_unique<ReadEvent>(Id, "engage-state-changed", Events::EngageStateChanged::Id, credsIssuerConfig),      //
+        make_unique<ReadEvent>(Id, "secure-state-changed", Events::SecureStateChanged::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                         //
+        make_unique<SubscribeEvent>(Id, "operational-error", Events::OperationalError::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, "movement-completed", Events::MovementCompleted::Id, credsIssuerConfig),    //
+        make_unique<SubscribeEvent>(Id, "engage-state-changed", Events::EngageStateChanged::Id, credsIssuerConfig), //
+        make_unique<SubscribeEvent>(Id, "secure-state-changed", Events::SecureStateChanged::Id, credsIssuerConfig), //
     };
 
     commands.RegisterCluster(clusterName, clusterCommands);
