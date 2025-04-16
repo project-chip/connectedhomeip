@@ -43,6 +43,8 @@ from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
+logger = logging.getLogger(__name__)
+
 
 class TC_G_2_2(MatterBaseTest):
     def desc_TC_G_2_2(self):
@@ -142,11 +144,27 @@ class TC_G_2_2(MatterBaseTest):
         ]
         asserts.assert_true(len(matched_entries) > 0, f"No GroupTable entry found with groupId={expected_group_id}")
 
+        # Verify if support groupName feature
+        feature_map: int = await self.read_single_attribute(
+            dev_ctrl=th1,
+            node_id=self.dut_node_id,
+            endpoint=0,
+            attribute=Clusters.Groups.Attributes.FeatureMap
+        )
+
+        name_feature_bit: int = 0
+        name_supported: bool = (feature_map & (1 << name_feature_bit)) != 0
+
         self.step("2b")
-        try:
-            asserts.assert_equal(groupTableList[0].groupName, kGroupName1, "Found groupName does not match written value")
-        except Exception as e:
-            logging.exception('Error while retrieving the groupName %s', e)
+        if name_supported:
+            group_found = False
+            for group in groupTableList:
+                if group.groupName == kGroupName1:
+                    group_found = True
+                    break
+            asserts.assert_true(group_found, f"Group with name '{kGroupName1}' not found in the GroupTable")
+        else:
+            logger.info("Skipping GroupName check: Feature GroupNames not supported by DUT")
 
         self.step("3")
         kGroupName2 = "Gp2"
