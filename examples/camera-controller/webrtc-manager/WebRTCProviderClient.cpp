@@ -477,3 +477,17 @@ void WebRTCProviderClient::HandleProvideOfferResponse(TLV::TLVReader & data)
 
     MoveToState(State::AwaitingAnswer);
 }
+
+void WebRTCProviderClient::HandleWebRTCProviderResponse(const ConcreteCommandPath & path, const StatusIB & status,
+                                                        TLV::TLVReader * data)
+{
+    VerifyOrReturn(path.mClusterId == Clusters::WebRTCTransportProvider::Id);
+    VerifyOrReturn(status.ToChipError() == CHIP_NO_ERROR && data != nullptr);
+
+    if (path.mCommandId == Clusters::WebRTCTransportProvider::Commands::ProvideOfferResponse::Id)
+    {
+        HandleProvideOfferResponse(*data);
+    }
+
+    return;
+}

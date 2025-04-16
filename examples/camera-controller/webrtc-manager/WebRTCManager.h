@@ -60,6 +60,9 @@ public:
 
     CHIP_ERROR ProvideICECandidates(uint16_t sessionId);
 
+    static void HandleWebRTCProviderResponse(const chip::app::ConcreteCommandPath & path, const chip::app::StatusIB & status,
+                                             chip::TLV::TLVReader * data);
+
 private:
     // Make the constructor private to enforce the singleton pattern
     WebRTCManager();

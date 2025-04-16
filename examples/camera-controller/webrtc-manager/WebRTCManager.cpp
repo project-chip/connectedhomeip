@@ -339,3 +339,8 @@ CHIP_ERROR WebRTCManager::ProvideICECandidates(uint16_t sessionId)
 
     return err;
 }
+
+void WebRTCManager::HandleWebRTCProviderResponse(const ConcreteCommandPath & path, const StatusIB & status, TLV::TLVReader * data)
+{
+    Instance().mWebRTCProviderClient.HandleWebRTCProviderResponse(path, status, data);
+}
