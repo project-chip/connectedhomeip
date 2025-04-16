@@ -34,21 +34,22 @@ using namespace chip::app::Clusters;
 
 namespace {
 
-// Generally logic for what provides have a delegate set on them.
-// TODO: is a single OTA provider reasonable?
-std::map<EndpointId, OtaProviderLogic> gOtaProviders;
+// Code assumes there is only a single OTA provider and it lives on EP0
+constexpr EndpointId kOtaProviderEndpointId = 0;
+OtaProviderLogic gOtaProviderLogic;
 
+} // anonymous namespace
 }
 
 namespace chip::app::Clusters::OTAProvider {
 
-void SetDelegate(chip::EndpointId endpointId, OTAProviderDelegate * delegate)
+void SetDelegate(EndpointId endpointId, OTAProviderDelegate * delegate)
 {
-    if (gOtaProviders.find(endpointId) == gOtaProviders.end()) {
-        gOtaProviders[endpointId] = {};
-        ChipLogProgress(AppServer, "New OTA provider set up on endpoint %d", endpointId);
+    if (endpointId != kOtaProviderEndpointId) {
+        ChipLogError(AppServer, "Cannot set OTA provider for endpoint %d: not a valid OTA provider endpoint.", endpointId);
+        return;
     }
-    gOtaProviders[endpointId].SetDelegate(delegate);
+    gOtaProviderLogic.SetDelegate(delegate);
 }
 
 } // namespace chip::app::Clusters::OTAProvider
@@ -56,9 +57,6 @@ void SetDelegate(chip::EndpointId endpointId, OTAProviderDelegate * delegate)
 void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
     assertChipStackLockedByCurrentThread();
-
-    // No-op: Descriptor and OTA do not need this, and our client-defined
-    // clusters dont use it.
 }
 
 Protocols::InteractionModel::Status emAfWriteAttributeExternal(const ConcreteAttributePath & path,
@@ -92,13 +90,10 @@ namespace app {
             return;
         }
 
-        if (gOtaProviders.find(aPath.mEndpointId) == gOtaProviders.end()) {
-            // Error here is unclear: we have no delegate, so just give up
-            aCommandObj->AddStatus(aPath, Status::InvalidCommand);
+        if (aPath.mEndpointId != kOtaProviderEndpointId) {
+            aCommandObj->AddStatus(aPath, Status::UnsupportedCluster);
             return;
         }
-
-        OtaProviderLogic & logic = gOtaProviders[aPath.mEndpointId];
 
         // This command passed ServerClusterCommandExists so we know it's one of our
         // supported commands.
@@ -112,7 +107,7 @@ namespace app {
             QueryImage::DecodableType commandData;
             err = DataModel::Decode(aReader, commandData);
             if (err == CHIP_NO_ERROR) {
-                result = logic.QueryImage(aPath, commandData, aCommandObj);
+                result = gOtaProviderLogic.QueryImage(aPath, commandData, aCommandObj);
             }
             break;
         }
@@ -120,7 +115,7 @@ namespace app {
             ApplyUpdateRequest::DecodableType commandData;
             err = DataModel::Decode(aReader, commandData);
             if (err == CHIP_NO_ERROR) {
-                result = logic.ApplyUpdateRequest(aPath, commandData, aCommandObj);
+                result = gOtaProviderLogic.ApplyUpdateRequest(aPath, commandData, aCommandObj);
             }
             break;
         }
@@ -128,7 +123,7 @@ namespace app {
             NotifyUpdateApplied::DecodableType commandData;
             err = DataModel::Decode(aReader, commandData);
             if (err == CHIP_NO_ERROR) {
-                result = logic.NotifyUpdateApplied(aPath, commandData, aCommandObj);
+                result = gOtaProviderLogic.NotifyUpdateApplied(aPath, commandData, aCommandObj);
             }
             break;
         }
