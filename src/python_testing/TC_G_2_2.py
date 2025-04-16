@@ -28,8 +28,8 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --endpoint 0
 #       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --endpoint 0
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -98,12 +98,12 @@ class TC_G_2_2(MatterBaseTest):
         groupKey = Clusters.GroupKeyManagement.Structs.GroupKeySetStruct(
             groupKeySetID=kGroupKeySetID,
             groupKeySecurityPolicy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
-            epochKey0="0123456789abcdef".encode(),
-            epochStartTime0=1110000,
-            epochKey1="0123456789abcdef".encode(),
-            epochStartTime1=1110001,
-            epochKey2="0123456789abcdef".encode(),
-            epochStartTime2=1110002)
+            epochKey0=bytes.fromhex("d0d1d2d3d4d5d6d7d8d9dadbdcdddedf"),
+            epochStartTime0=1,
+            epochKey1=bytes.fromhex("d1d1d2d3d4d5d6d7d8d9dadbdcdddedf"),
+            epochStartTime1=18446744073709551613,
+            epochKey2=bytes.fromhex("d2d1d2d3d4d5d6d7d8d9dadbdcdddedf"),
+            epochStartTime2=18446744073709551614)
 
         cmd = Clusters.GroupKeyManagement.Commands.KeySetWrite(groupKey)
         resp = await self.send_single_cmd(dev_ctrl=th1, node_id=self.dut_node_id, cmd=cmd)
