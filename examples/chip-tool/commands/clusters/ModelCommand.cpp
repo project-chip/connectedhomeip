@@ -41,10 +41,9 @@ CHIP_ERROR ModelCommand::RunCommand()
     CommissioneeDeviceProxy * commissioneeDeviceProxy = nullptr;
     if (CHIP_NO_ERROR == CurrentCommissioner().GetDeviceBeingCommissioned(mDestinationId, &commissioneeDeviceProxy))
     {
-        ChipLogProgress(chipTool, "commissioneeDeviceProxy is %s", commissioneeDeviceProxy ? "not null" : "null");
         return SendCommand(commissioneeDeviceProxy, mEndPointId);
     }
-    
+
     // Check whether the session needs to allow large payload support.
     TransportPayloadCapability transportPayloadCapability =
         AllowLargePayload() ? TransportPayloadCapability::kLargePayload : TransportPayloadCapability::kMRPPayload;

@@ -593,10 +593,8 @@ void DeviceCommissioner::Shutdown()
 CommissioneeDeviceProxy * DeviceCommissioner::FindCommissioneeDevice(NodeId id)
 {
     MATTER_TRACE_SCOPE("FindCommissioneeDevice", "DeviceCommissioner");
-    ChipLogDetail(Controller, "find id:%ld", id);
     CommissioneeDeviceProxy * foundDevice = nullptr;
     mCommissioneeDevicePool.ForEachActiveObject([&](auto * deviceProxy) {
-        ChipLogDetail(Controller, "device id:%ld\n", deviceProxy->GetDeviceId());
         if (deviceProxy->GetDeviceId() == id)
         {
             foundDevice = deviceProxy;
@@ -651,12 +649,9 @@ void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * dev
 
 CHIP_ERROR DeviceCommissioner::GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** out_device)
 {
-    ChipLogDetail(Controller, "GetDeviceBeingCommissioned:%ld", deviceId);
     VerifyOrReturnError(out_device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     CommissioneeDeviceProxy * device = FindCommissioneeDevice(deviceId);
-    ChipLogDetail(Controller, "found");
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    ChipLogDetail(Controller, "not nullptr");
     *out_device = device;
 
     return CHIP_NO_ERROR;

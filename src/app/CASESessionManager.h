@@ -28,7 +28,6 @@
 #include <transport/SessionDelegate.h>
 #include <transport/SessionManager.h>
 #include <transport/SessionUpdateDelegate.h>
-#include <protocols/secure_channel/RendezvousParameters.h>
 
 namespace chip {
 

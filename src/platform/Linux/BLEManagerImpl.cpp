@@ -57,9 +57,9 @@ namespace Internal {
 
 namespace {
 
-static constexpr System::Clock::Timeout kNewConnectionScanTimeout   = System::Clock::Seconds16(20);
-static constexpr System::Clock::Timeout kConnectTimeout             = System::Clock::Seconds16(20);
-static constexpr System::Clock::Timeout kFastAdvertiseTimeout       =
+static constexpr System::Clock::Timeout kNewConnectionScanTimeout  = System::Clock::Seconds16(20);
+static constexpr System::Clock::Timeout kConnectTimeout            = System::Clock::Seconds16(20);
+static constexpr System::Clock::Timeout kFastAdvertiseTimeout =
     System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
 #if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
 // The CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_CHANGE_TIME_MS specifies the transition time

@@ -212,20 +212,10 @@ void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * on
     Connect(onConnection, nullptr, onSetupFailure, transportPayloadCapability);
 }
 
-void OperationalSessionSetup::UpdateDeviceData(const AddressResolve::ResolveResult & result)
+void OperationalSessionSetup::UpdateDeviceData(const ResolveResult & result)
 {
     auto & config = result.mrpRemoteConfig;
     auto addr     = result.address;
-
-    // If we are in the process of trying to establish a session, we need to
-    // cancel that attempt before we can update the address.
-    if (mState == State::Connecting)
-    {
-        CancelSessionSetupReattempt();
-    }
-
-    // If we are in the process of trying to establish a session, we need to
-    // cancel that attempt before we can update the address.
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     // Make sure to clear out our reason for trying the next result first thing,
     // so it does not stick around in various error cases.

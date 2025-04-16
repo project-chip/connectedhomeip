@@ -41,7 +41,6 @@
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/secure_channel/CASESession.h>
-#include <protocols/secure_channel/RendezvousParameters.h>
 #include <system/SystemClock.h>
 #include <system/SystemLayer.h>
 #include <transport/SessionManager.h>
@@ -353,6 +352,7 @@ private:
     void MoveToState(State aTargetState);
 
     CHIP_ERROR EstablishConnection(const AddressResolve::ResolveResult & result);
+
     /*
      * This checks to see if an existing CASE session exists to the peer within the SessionManager
      * and if one exists, to load that into mSecureSession.
@@ -424,7 +424,6 @@ private:
      * This function will set new IP address, port and MRP retransmission intervals of the device.
      */
     void UpdateDeviceData(const AddressResolve::ResolveResult & result);
-    void UpdateDeviceData(const Transport::PeerAddress & addr, const ReliableMessageProtocolConfig & config, bool supportsTcpServer = false);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     /**

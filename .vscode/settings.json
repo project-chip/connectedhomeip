@@ -137,18 +137,7 @@
         "any": "cpp",
         "future": "cpp",
         "list": "cpp",
-        "unordered_set": "cpp",
-        "__verbose_abort": "cpp",
-        "charconv": "cpp",
-        "forward_list": "cpp",
-        "source_location": "cpp",
-        "print": "cpp",
-        "compare": "cpp",
-        "concepts": "cpp",
-        "numbers": "cpp",
-        "semaphore": "cpp",
-        "stop_token": "cpp",
-        "codecvt": "cpp"
+        "unordered_set": "cpp"
     },
     "[ini]": {
         "editor.formatOnSave": false
