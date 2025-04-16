@@ -316,18 +316,17 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
     if (mAlwaysOmitIcac)
     {
         icac.reduce_size(0);
-        err = IssueX509Cert(mNow, mValidity, rcac_dn, noc_dn, CertType::kNoc, mUseMaximallySizedCerts, pubkey, mRootIssuer,
-                            noc);
+        err = IssueX509Cert(mNow, mValidity, rcac_dn, noc_dn, CertType::kNoc, mUseMaximallySizedCerts, pubkey, mRootIssuer, noc);
     }
     else
     {
         err = IssueX509Cert(mNow, mValidity, icac_dn, noc_dn, CertType::kNoc, mUseMaximallySizedCerts, pubkey, mIntermediateIssuer,
-        noc);
+                            noc);
     }
 
     if (err != CHIP_NO_ERROR)
     {
-      ChipLogError(Controller, "Failed to Generate NOC: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Controller, "Failed to Generate NOC: %" CHIP_ERROR_FORMAT, err.Format());
     }
     return err;
 }
