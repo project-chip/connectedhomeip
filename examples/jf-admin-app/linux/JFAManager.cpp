@@ -18,11 +18,165 @@
 
 #include "JFAManager.h"
 
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/ConcreteAttributePath.h>
+
+#include <controller/CHIPCluster.h>
 #include <lib/support/logging/CHIPLogging.h>
+
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::Controller;
 
 JFAManager JFAManager::sJFA;
 
-CHIP_ERROR JFAManager::Init()
+CHIP_ERROR JFAManager::Init(Server& server)
 {
+    mServer = &server;
+    mCASESessionManager = server.GetCASESessionManager();
+
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR JFAManager::FinalizeCommissioning(NodeId nodeId)
+{
+    if (jfFabricIndex == kUndefinedFabricId)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    ScopedNodeId scopedNodeId = ScopedNodeId(nodeId, jfFabricIndex);
+
+    ConnectToNode(scopedNodeId, kStandardCommissioningComplete);
+
+    return CHIP_NO_ERROR;
+}
+
+void JFAManager::HandleCommissioningCompleteEvent()
+{
+    for (const auto & fb : mServer->GetFabricTable())
+    {
+        FabricIndex fabricIndex = fb.GetFabricIndex();
+        CATValues cats;
+
+        if ((jfFabricIndex == kUndefinedFabricId) && mServer->GetFabricTable().FetchCATs(fabricIndex, cats) == CHIP_NO_ERROR)
+        {
+            /* TODO: check for Anchor CAT before assignment */
+            jfFabricIndex = fabricIndex;
+        }
+    }
+}
+
+void JFAManager::ReleaseSession()
+{
+    auto optionalSessionHandle = mSessionHolder.Get();
+
+    if (optionalSessionHandle.HasValue())
+    {
+        if (optionalSessionHandle.Value()->IsActiveSession())
+        {
+            optionalSessionHandle.Value()->AsSecureSession()->MarkAsDefunct();
+        }
+    }
+    mSessionHolder.Release();
+}
+
+void JFAManager::ConnectToNode(ScopedNodeId scopedNodeId, OnConnectedAction onConnectedAction)
+{
+    VerifyOrDie(mServer != nullptr);
+
+    if ((scopedNodeId.GetFabricIndex() == kUndefinedFabricIndex) ||
+        (scopedNodeId.GetNodeId() == kUndefinedNodeId))
+    {
+        ChipLogError(NotSpecified, "Invalid node location!");
+        return;
+    }
+
+    // Set the action to take once connection is successfully established
+    mOnConnectedAction = onConnectedAction;
+
+    ChipLogDetail(NotSpecified, "Establishing session to node ID 0x" ChipLogFormatX64 " on fabric index %d",
+                  ChipLogValueX64(scopedNodeId.GetNodeId()), scopedNodeId.GetFabricIndex());
+
+    mCASESessionManager->FindOrEstablishSession(scopedNodeId, &mOnConnectedCallback, &mOnConnectionFailureCallback);
+}
+
+void JFAManager::OnConnected(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
+{
+    JFAManager * jfaManager = static_cast<JFAManager *>(context);
+
+    VerifyOrDie(jfaManager != nullptr);
+    jfaManager->mSessionHolder.Grab(sessionHandle);
+    jfaManager->mExchangeMgr = &exchangeMgr;
+
+    ChipLogProgress(NotSpecified, "Established CASE");
+
+    switch (jfaManager->mOnConnectedAction)
+    {
+    case kStandardCommissioningComplete:
+    {
+        jfaManager->SendCommissioningComplete();
+        break;
+    }
+
+    default:
+        break;
+    }
+}
+
+void JFAManager::OnConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
+{
+    JFAManager * jfaManager = static_cast<JFAManager *>(context);
+    VerifyOrDie(jfaManager != nullptr);
+
+    ChipLogError(NotSpecified, "Failed to establish connection to 0x" ChipLogFormatX64 " on fabric index %d",
+                  ChipLogValueX64(peerId.GetNodeId()), peerId.GetFabricIndex());
+
+    jfaManager->ReleaseSession();
+}
+
+CHIP_ERROR JFAManager::SendCommissioningComplete()
+{
+    GeneralCommissioning::Commands::CommissioningComplete::Type request;
+
+    if (!mExchangeMgr)
+    {
+        return CHIP_ERROR_UNINITIALIZED;
+    }
+
+    ChipLogProgress(NotSpecified, "SendCommissioningComplete: invoke cluster command.");
+    Controller::ClusterBase cluster(*mExchangeMgr, mSessionHolder.Get().Value(), kRootEndpointId);
+    return cluster.InvokeCommand(request, this, OnCommissioningCompleteResponse, OnCommissioningCompleteFailure);
+}
+
+void JFAManager::OnCommissioningCompleteResponse(
+    void * context, const GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & data)
+{
+    JFAManager * jfaManagerCore = static_cast<JFAManager *>(context);
+    VerifyOrDie(jfaManagerCore != nullptr);
+    jfaManagerCore->ReleaseSession();
+
+    ChipLogProgress(NotSpecified, "OnCommissioningCompleteResponse, Code=%u", to_underlying(data.errorCode));
+
+    if (data.errorCode != GeneralCommissioning::CommissioningErrorEnum::kOk)
+    {
+        // TODO
+    }
+    else
+    {
+        // TODO
+    }
+
+    jfaManagerCore->ReleaseSession();
+}
+
+void JFAManager::OnCommissioningCompleteFailure(void * context, CHIP_ERROR error)
+{
+    JFAManager * jfaManagerCore = static_cast<JFAManager *>(context);
+    VerifyOrDie(jfaManagerCore != nullptr);
+    jfaManagerCore->ReleaseSession();
+
+    ChipLogError(NotSpecified, "Received failure response %s\n", chip::ErrorStr(error));
 }
