@@ -103,7 +103,7 @@ class DefaultChecker(BasicCompositionTests):
         if cluster in self.endpoints[0].keys() and attr in self.endpoints[0][cluster].keys():
             val = self.endpoints[0][cluster][attr]
             if val == cluster.Enums.CalendarTypeEnum.kBuddhist:
-                return _problem(AttributePathLocation(0, cluster.id, attr.attribute_id), f"Calendar format is set to default (Buddhist)")
+                return _problem(AttributePathLocation(0, cluster.id, attr.attribute_id), "Calendar format is set to default (Buddhist)")
         else:
             self.mark_current_step_skipped()
 

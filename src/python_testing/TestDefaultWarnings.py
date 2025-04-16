@@ -15,12 +15,11 @@
 #    limitations under the License.
 #
 
-from dataclasses import dataclass
 from typing import Callable
 
 import chip.clusters as Clusters
 import TC_DefaultWarnings
-from chip.testing.matter_testing import MatterBaseTest, MatterTestConfig, default_matter_test_main, generate_mobly_test_config
+from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
 from mobly import asserts
 
 
