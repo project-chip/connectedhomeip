@@ -159,7 +159,11 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
     pipeline = gst_pipeline_new("video-pipeline");
 
     // Create elements
-    source       = gst_element_factory_make("v4l2src", "source");
+#ifdef AV_STREAM_GST_USE_TEST_SRC
+    source = gst_element_factory_make("videotestsrc", "source");
+#else
+    source = gst_element_factory_make("v4l2src", "source");
+#endif
     capsfilter   = gst_element_factory_make("capsfilter", "filter");
     videoconvert = gst_element_factory_make("videoconvert", "videoconvert");
     videoscale   = gst_element_factory_make("videoscale", "videoscale");
@@ -193,6 +197,11 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
                                          G_TYPE_STRING, "NV12", // Adjust format as needed
                                          "framerate", GST_TYPE_FRACTION, framerate, 1, NULL);
 
+    // Set video test src pattern (ex: 18 -> ball animation) on the source element
+#ifdef AV_STREAM_GST_USE_TEST_SRC
+    g_object_set(source, "pattern", 18, NULL);
+#endif
+
     // Set the caps on the capsfilter element
     g_object_set(capsfilter, "caps", caps, NULL);
 
@@ -214,14 +223,18 @@ GstElement * CameraDevice::CreateAudioPipeline(const std::string & device, int c
     pipeline = gst_pipeline_new("audio-pipeline");
 
     // Create elements
-    source       = gst_element_factory_make("pulsesrc", "source");
+#ifdef AV_STREAM_GST_USE_TEST_SRC
+    source = gst_element_factory_make("audiotestsrc", "source");
+#else
+    source = gst_element_factory_make("pulsesrc", "source");
+#endif
     capsfilter   = gst_element_factory_make("capsfilter", "filter");
     audioconvert = gst_element_factory_make("audioconvert", "audio-convert");
     opusenc      = gst_element_factory_make("opusenc", "opus-encoder");
     rtpopuspay   = gst_element_factory_make("rtpopuspay", "rtpopuspay");
     udpsink      = gst_element_factory_make("udpsink", "udpsink");
 
-    if (!source || !capsfilter || !audioconvert || !opusenc || !rtpopuspay || !udpsink)
+    if (!pipeline || !source || !capsfilter || !audioconvert || !opusenc || !rtpopuspay || !udpsink)
     {
         ChipLogError(Camera, "Not all elements could be created.");
         if (pipeline)

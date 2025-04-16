@@ -83,6 +83,9 @@ void WebRTCProviderManager::Init()
 
 void WebRTCProviderManager::CloseConnection()
 {
+    // Clean up all the Webrtc Transports
+    webrtcTransportMap.clear();
+
     // Close the data channel and peer connection if they exist
     if (mDataChannel)
     {
@@ -166,7 +169,12 @@ void WebRTCProviderManager::RegisterWebrtcTransport(uint16_t sessionId)
         return;
     }
 
-    mMediaController->RegisterTransport(webrtcTransportMap[sessionId], videoStreamID, audioStreamID);
+    if (!mMediaController)
+    {
+        ChipLogProgress(Camera, "mMediaController is null. Failed to Register WebRTC Transport");
+        return;
+    }
+    mMediaController->RegisterTransport(webrtcTransportMap[sessionId].get(), mVideoStreamID, mAudioStreamID);
 }
 
 CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession)
@@ -191,7 +199,7 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
         else
         {
             outSession.videoStreamID = args.videoStreamId.Value();
-            videoStreamID            = args.videoStreamId.Value().Value();
+            mVideoStreamID           = args.videoStreamId.Value().Value();
         }
     }
     else
@@ -210,7 +218,7 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
         else
         {
             outSession.audioStreamID = args.audioStreamId.Value();
-            audioStreamID            = args.videoStreamId.Value().Value();
+            mAudioStreamID           = args.audioStreamId.Value().Value();
         }
     }
     else
@@ -225,7 +233,8 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
 
     if (webrtcTransportMap.find(args.sessionId) == webrtcTransportMap.end())
     {
-        webrtcTransportMap[args.sessionId] = new WebrtcTransport(args.sessionId, mPeerId.GetNodeId(), mPeerConnection);
+        webrtcTransportMap[args.sessionId] =
+            std::unique_ptr<WebrtcTransport>(new WebrtcTransport(args.sessionId, mPeerId.GetNodeId(), mPeerConnection));
     }
 
     mPeerConnection->setRemoteDescription(args.sdp);
@@ -274,6 +283,12 @@ CHIP_ERROR WebRTCProviderManager::HandleEndSession(uint16_t sessionId, WebRTCEnd
                                                    DataModel::Nullable<uint16_t> videoStreamID,
                                                    DataModel::Nullable<uint16_t> audioStreamID)
 {
+    if (webrtcTransportMap.find(sessionId) != webrtcTransportMap.end())
+    {
+        ChipLogProgress(Camera, "Delete Webrtc Transport for the session: %u", sessionId);
+        webrtcTransportMap.erase(sessionId);
+    }
+
     if (mCurrentSessionId == sessionId)
     {
         mCurrentSessionId      = 0;
