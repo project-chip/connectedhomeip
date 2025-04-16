@@ -32,14 +32,10 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import base64
-import binascii
-import codecs
+
 import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
-
-from chip.interaction_model import InteractionModelError
 from matter_testing_infrastructure.chip.testing.matter_asserts import assert_valid_uint8
 
 import logging
@@ -68,7 +64,9 @@ class TC_CNET_4_16(MatterBaseTest):
                             "PIXIT.CNET.ENDPOINT_THREAD must be included in the command line with "
                             "the --int-arg flag as PIXIT.CNET.ENDPOINT_THREAD:<endpoint>")
         endpoint = self.matter_test_config.global_test_params["PIXIT.CNET.ENDPOINT_THREAD"]
-        PIXIT_CNET_THREAD_1ST_OPERATIONALDATASET = self.matter_test_config.thread_operational_dataset
+        threadFirstOperationalDataset = self.matter_test_config.thread_operational_dataset
+
+        logger.info(f"------------------------------------ endpoint: {endpoint}")
 
         cgen = Clusters.GeneralCommissioning
         cnet = Clusters.NetworkCommissioning
@@ -86,8 +84,11 @@ class TC_CNET_4_16(MatterBaseTest):
 
         # Precondition 2: DUT is commissioned on PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET
         # Precondition 3: TH can communicate with the DUT on PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET
+        logger.info(f"------------------------------------ Thread 1st Operational Dataset: {threadFirstOperationalDataset.hex()}")
         networkID = await self.read_single_attribute_check_success(cluster=cnet, endpoint=endpoint, attribute=attr.LastNetworkID)
-        logger.info(f"------------------------------------ NetworkID: {str(networkID)}")
+        logger.info(f"------------------------------------ NetworkID: {networkID.hex()}")
+        asserts.assert_in(networkID.hex(), threadFirstOperationalDataset.hex(),
+                          f"NetworkID: {networkID.hex()} not in {threadFirstOperationalDataset.hex()}")
 
         # Precondition 4: DUT MaxNetworks attribute value is at least 1 and is saved as 'MaxNetworksValue' for future use
         maxNetworksValue = 0
@@ -99,7 +100,7 @@ class TC_CNET_4_16(MatterBaseTest):
         # TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900
         self.step(1)
 
-        cmd = cgen.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=0)
+        cmd = cgen.Commands.ArmFailSafe(expiryLengthSeconds=900)
         res = await self.send_single_cmd(cmd=cmd)
         # Verify that DUT sends ArmFailSafeResponse command to the TH
         asserts.assert_equal(
@@ -113,17 +114,15 @@ class TC_CNET_4_16(MatterBaseTest):
         self.step(2)
 
         networkList = await self.read_single_attribute_check_success(cluster=cnet, endpoint=endpoint, attribute=attr.Networks)
+        logger.info(f"------------------------------------ NetworkList: {networkList}")
         if len(networkList) != 0:
-            try:
-                cmd = cnet.Commands.RemoveNetwork(networkID=PIXIT_CNET_THREAD_2ND_OPERATIONALDATASET, breadcrumb=1)
-                res = await self.send_single_cmd(cmd=cmd)
-                logger.info(f"------------------------------------ NetworkingStatus on RemoveNetwork: {res.networkingStatus}")
-            except InteractionModelError as e:
-                # Verify that DUT sends NetworkConfigResponse command to the TH1 with NetworkingStatus field set to NetworkIDNotFound
-                asserts.assert_is_instance(res, cnet.Commands.NetworkConfigResponse.response_type)
-                asserts.assert_equal(res.networkingStatus,
-                                     cnet.Enums.NetworkCommissioningStatusEnum.kNetworkIDNotFound,
-                                     f"Expected kNetworkIDNotFound but got: {res.networkingStatus}")
+            cmd = cnet.Commands.RemoveNetwork(networkID=PIXIT_CNET_THREAD_2ND_OPERATIONALDATASET, breadcrumb=1)
+            res = await self.send_single_cmd(cmd=cmd)
+            logger.info(f"------------------------------------ NetworkingStatus on RemoveNetwork: {res.networkingStatus}")
+            # Verify that DUT sends NetworkConfigResponse command to the TH1 with NetworkingStatus field set to NetworkIDNotFound
+            asserts.assert_equal(res.networkingStatus,
+                                 cnet.Enums.NetworkCommissioningStatusEnum.kNetworkIDNotFound,
+                                 f"Expected kNetworkIDNotFound but got: {res.networkingStatus}")
         else:
             asserts.fail(f"NetworkList is Empty")
 
@@ -131,21 +130,14 @@ class TC_CNET_4_16(MatterBaseTest):
         # which does not match the commissioned network, and Breadcrumb field set to 1
         self.step(3)
 
-        try:
-            cmd = cnet.Commands.ConnectNetwork(networkID=PIXIT_CNET_THREAD_2ND_OPERATIONALDATASET, breadcrumb=1)
-            res = await self.send_single_cmd(cmd=cmd)
-            logger.info(f"NetworkingStatus on ConnectNetwork: {res.networkingStatus}")
-        except InteractionModelError as e:
-            # Verify that DUT sends ConnectNetworkResponse command to the TH1 with NetworkingStatus field set to NetworkIDNotFound
-            asserts.assert_is_instance(res, cnet.Commands.ConnectNetworkResponse.response_type)
-            asserts.assert_equal(res.networkingStatus,
-                                 cnet.Enums.NetworkCommissioningStatusEnum.kNetworkIDNotFound,
-                                 f"Expected NetworkIDNotFound but got {res.networkingStatus}")
+        cmd = cnet.Commands.ConnectNetwork(networkID=PIXIT_CNET_THREAD_2ND_OPERATIONALDATASET, breadcrumb=1)
+        res = await self.send_single_cmd(cmd=cmd)
+        logger.info(f"------------------------------------ NetworkingStatus on ConnectNetwork: {res.networkingStatus}")
+        # Verify that DUT sends ConnectNetworkResponse command to the TH1 with NetworkingStatus field set to NetworkIDNotFound
+        asserts.assert_equal(res.networkingStatus,
+                             cnet.Enums.NetworkCommissioningStatusEnum.kNetworkIDNotFound,
+                             f"Expected NetworkIDNotFound but got {res.networkingStatus}")
 
 
 if __name__ == "__main__":
     default_matter_test_main()
-
-
-# falta Reset device automatico
-# verificar los try/except
