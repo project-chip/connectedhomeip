@@ -2945,7 +2945,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterClosureControlAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster ClosureDimension attributes
-    MTRAttributeIDTypeClusterClosureDimensionAttributeCurrentID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterClosureDimensionAttributeCurrentStateID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTRAttributeIDTypeClusterClosureDimensionAttributeTargetID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
     MTRAttributeIDTypeClusterClosureDimensionAttributeResolutionID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
     MTRAttributeIDTypeClusterClosureDimensionAttributeStepValueID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,

@@ -2821,8 +2821,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
     case chip::app::Clusters::ClosureDimension::Id: {
         switch (id)
         {
-        case chip::app::Clusters::ClosureDimension::Attributes::Current::Id:
-            return "Current";
+        case chip::app::Clusters::ClosureDimension::Attributes::CurrentState::Id:
+            return "CurrentState";
         case chip::app::Clusters::ClosureDimension::Attributes::Target::Id:
             return "Target";
         case chip::app::Clusters::ClosureDimension::Attributes::Resolution::Id:
