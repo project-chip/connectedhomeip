@@ -20,6 +20,7 @@ import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/build/config/compiler/compiler.gni")
 import("${chip_root}/build/config/mac/mac_sdk.gni")
 import("${chip_root}/examples//chip-tool/chip-tool.gni")
+import("${chip_root}/src/inet/inet.gni")
 
 if (config_use_interactive_mode) {
   import("//build_overrides/editline.gni")
@@ -29,8 +30,6 @@ assert(chip_build_tools)
 
 declare_args() {
   chip_codesign = current_os == "ios"
-
-  chip_inet_config_enable_ipv4 = true
 
   if (!defined(chip_config_network_layer_ble)) {
     chip_config_network_layer_ble = true
@@ -258,8 +257,14 @@ executable("darwin-framework-tool") {
     "main.mm",
   ]
 
+  # TODO: this is WRONG however the darwin framework tool seems to manually
+  #       include files instead of depending on them and does not include
+  #       appropriate headers.
+  check_includes = false
+
   deps = [
     ":build-darwin-framework",
+    "${chip_root}/src/app/common:ids",
     "${chip_root}/third_party/libwebsockets",
     jsoncpp_root,
   ]

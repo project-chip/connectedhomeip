@@ -6896,22 +6896,26 @@ public static class WaterHeaterManagementClusterWaterHeaterBoostInfoStruct {
   }
 }
 public static class CommodityPriceClusterCommodityPriceComponentStruct {
-  public Long price;
+  public Optional<Long> price;
+  public Optional<Integer> priceLevel;
   public Integer source;
   public Optional<String> description;
   public Optional<Long> tariffComponentID;
   private static final long PRICE_ID = 0L;
-  private static final long SOURCE_ID = 1L;
-  private static final long DESCRIPTION_ID = 2L;
-  private static final long TARIFF_COMPONENT_ID_ID = 3L;
+  private static final long PRICE_LEVEL_ID = 1L;
+  private static final long SOURCE_ID = 2L;
+  private static final long DESCRIPTION_ID = 3L;
+  private static final long TARIFF_COMPONENT_ID_ID = 4L;
 
   public CommodityPriceClusterCommodityPriceComponentStruct(
-    Long price,
+    Optional<Long> price,
+    Optional<Integer> priceLevel,
     Integer source,
     Optional<String> description,
     Optional<Long> tariffComponentID
   ) {
     this.price = price;
+    this.priceLevel = priceLevel;
     this.source = source;
     this.description = description;
     this.tariffComponentID = tariffComponentID;
@@ -6919,7 +6923,8 @@ public static class CommodityPriceClusterCommodityPriceComponentStruct {
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(PRICE_ID, new IntType(price)));
+    values.add(new StructElement(PRICE_ID, price.<BaseTLVType>map((nonOptionalprice) -> new IntType(nonOptionalprice)).orElse(new EmptyType())));
+    values.add(new StructElement(PRICE_LEVEL_ID, priceLevel.<BaseTLVType>map((nonOptionalpriceLevel) -> new IntType(nonOptionalpriceLevel)).orElse(new EmptyType())));
     values.add(new StructElement(SOURCE_ID, new UIntType(source)));
     values.add(new StructElement(DESCRIPTION_ID, description.<BaseTLVType>map((nonOptionaldescription) -> new StringType(nonOptionaldescription)).orElse(new EmptyType())));
     values.add(new StructElement(TARIFF_COMPONENT_ID_ID, tariffComponentID.<BaseTLVType>map((nonOptionaltariffComponentID) -> new UIntType(nonOptionaltariffComponentID)).orElse(new EmptyType())));
@@ -6931,7 +6936,8 @@ public static class CommodityPriceClusterCommodityPriceComponentStruct {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Long price = null;
+    Optional<Long> price = Optional.empty();
+    Optional<Integer> priceLevel = Optional.empty();
     Integer source = null;
     Optional<String> description = Optional.empty();
     Optional<Long> tariffComponentID = Optional.empty();
@@ -6939,7 +6945,12 @@ public static class CommodityPriceClusterCommodityPriceComponentStruct {
       if (element.contextTagNum() == PRICE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Int) {
           IntType castingValue = element.value(IntType.class);
-          price = castingValue.value(Long.class);
+          price = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == PRICE_LEVEL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          priceLevel = Optional.of(castingValue.value(Integer.class));
         }
       } else if (element.contextTagNum() == SOURCE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -6960,6 +6971,7 @@ public static class CommodityPriceClusterCommodityPriceComponentStruct {
     }
     return new CommodityPriceClusterCommodityPriceComponentStruct(
       price,
+      priceLevel,
       source,
       description,
       tariffComponentID
@@ -6972,6 +6984,9 @@ public static class CommodityPriceClusterCommodityPriceComponentStruct {
     output.append("CommodityPriceClusterCommodityPriceComponentStruct {\n");
     output.append("\tprice: ");
     output.append(price);
+    output.append("\n");
+    output.append("\tpriceLevel: ");
+    output.append(priceLevel);
     output.append("\n");
     output.append("\tsource: ");
     output.append(source);
@@ -6989,25 +7004,29 @@ public static class CommodityPriceClusterCommodityPriceComponentStruct {
 public static class CommodityPriceClusterCommodityPriceStruct {
   public Long periodStart;
   public @Nullable Long periodEnd;
-  public ChipStructs.CommodityPriceClusterPriceStruct price;
+  public Optional<ChipStructs.CommodityPriceClusterPriceStruct> price;
+  public Optional<Integer> priceLevel;
   public Optional<String> description;
   public Optional<ArrayList<ChipStructs.CommodityPriceClusterCommodityPriceComponentStruct>> components;
   private static final long PERIOD_START_ID = 0L;
   private static final long PERIOD_END_ID = 1L;
   private static final long PRICE_ID = 2L;
-  private static final long DESCRIPTION_ID = 3L;
-  private static final long COMPONENTS_ID = 4L;
+  private static final long PRICE_LEVEL_ID = 3L;
+  private static final long DESCRIPTION_ID = 4L;
+  private static final long COMPONENTS_ID = 5L;
 
   public CommodityPriceClusterCommodityPriceStruct(
     Long periodStart,
     @Nullable Long periodEnd,
-    ChipStructs.CommodityPriceClusterPriceStruct price,
+    Optional<ChipStructs.CommodityPriceClusterPriceStruct> price,
+    Optional<Integer> priceLevel,
     Optional<String> description,
     Optional<ArrayList<ChipStructs.CommodityPriceClusterCommodityPriceComponentStruct>> components
   ) {
     this.periodStart = periodStart;
     this.periodEnd = periodEnd;
     this.price = price;
+    this.priceLevel = priceLevel;
     this.description = description;
     this.components = components;
   }
@@ -7016,7 +7035,8 @@ public static class CommodityPriceClusterCommodityPriceStruct {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(PERIOD_START_ID, new UIntType(periodStart)));
     values.add(new StructElement(PERIOD_END_ID, periodEnd != null ? new UIntType(periodEnd) : new NullType()));
-    values.add(new StructElement(PRICE_ID, price.encodeTlv()));
+    values.add(new StructElement(PRICE_ID, price.<BaseTLVType>map((nonOptionalprice) -> nonOptionalprice.encodeTlv()).orElse(new EmptyType())));
+    values.add(new StructElement(PRICE_LEVEL_ID, priceLevel.<BaseTLVType>map((nonOptionalpriceLevel) -> new IntType(nonOptionalpriceLevel)).orElse(new EmptyType())));
     values.add(new StructElement(DESCRIPTION_ID, description.<BaseTLVType>map((nonOptionaldescription) -> new StringType(nonOptionaldescription)).orElse(new EmptyType())));
     values.add(new StructElement(COMPONENTS_ID, components.<BaseTLVType>map((nonOptionalcomponents) -> ArrayType.generateArrayType(nonOptionalcomponents, (elementnonOptionalcomponents) -> elementnonOptionalcomponents.encodeTlv())).orElse(new EmptyType())));
 
@@ -7029,7 +7049,8 @@ public static class CommodityPriceClusterCommodityPriceStruct {
     }
     Long periodStart = null;
     @Nullable Long periodEnd = null;
-    ChipStructs.CommodityPriceClusterPriceStruct price = null;
+    Optional<ChipStructs.CommodityPriceClusterPriceStruct> price = Optional.empty();
+    Optional<Integer> priceLevel = Optional.empty();
     Optional<String> description = Optional.empty();
     Optional<ArrayList<ChipStructs.CommodityPriceClusterCommodityPriceComponentStruct>> components = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
@@ -7046,7 +7067,12 @@ public static class CommodityPriceClusterCommodityPriceStruct {
       } else if (element.contextTagNum() == PRICE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
           StructType castingValue = element.value(StructType.class);
-          price = ChipStructs.CommodityPriceClusterPriceStruct.decodeTlv(castingValue);
+          price = Optional.of(ChipStructs.CommodityPriceClusterPriceStruct.decodeTlv(castingValue));
+        }
+      } else if (element.contextTagNum() == PRICE_LEVEL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          priceLevel = Optional.of(castingValue.value(Integer.class));
         }
       } else if (element.contextTagNum() == DESCRIPTION_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.String) {
@@ -7064,6 +7090,7 @@ public static class CommodityPriceClusterCommodityPriceStruct {
       periodStart,
       periodEnd,
       price,
+      priceLevel,
       description,
       components
     );
@@ -7081,6 +7108,9 @@ public static class CommodityPriceClusterCommodityPriceStruct {
     output.append("\n");
     output.append("\tprice: ");
     output.append(price);
+    output.append("\n");
+    output.append("\tpriceLevel: ");
+    output.append(priceLevel);
     output.append("\n");
     output.append("\tdescription: ");
     output.append(description);
@@ -9642,20 +9672,20 @@ public static class DoorLockClusterCredentialStruct {
   }
 }
 public static class ClosureControlClusterOverallStateStruct {
-  public Optional<Integer> positioning;
-  public Optional<Integer> latching;
-  public Optional<Integer> speed;
-  public Optional<Long> extraInfo;
+  public @Nullable Optional<Integer> positioning;
+  public @Nullable Optional<Integer> latching;
+  public @Nullable Optional<Integer> speed;
+  public @Nullable Optional<Long> extraInfo;
   private static final long POSITIONING_ID = 0L;
   private static final long LATCHING_ID = 1L;
   private static final long SPEED_ID = 2L;
   private static final long EXTRA_INFO_ID = 3L;
 
   public ClosureControlClusterOverallStateStruct(
-    Optional<Integer> positioning,
-    Optional<Integer> latching,
-    Optional<Integer> speed,
-    Optional<Long> extraInfo
+    @Nullable Optional<Integer> positioning,
+    @Nullable Optional<Integer> latching,
+    @Nullable Optional<Integer> speed,
+    @Nullable Optional<Long> extraInfo
   ) {
     this.positioning = positioning;
     this.latching = latching;
@@ -9665,10 +9695,10 @@ public static class ClosureControlClusterOverallStateStruct {
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(POSITIONING_ID, positioning.<BaseTLVType>map((nonOptionalpositioning) -> new UIntType(nonOptionalpositioning)).orElse(new EmptyType())));
-    values.add(new StructElement(LATCHING_ID, latching.<BaseTLVType>map((nonOptionallatching) -> new UIntType(nonOptionallatching)).orElse(new EmptyType())));
-    values.add(new StructElement(SPEED_ID, speed.<BaseTLVType>map((nonOptionalspeed) -> new UIntType(nonOptionalspeed)).orElse(new EmptyType())));
-    values.add(new StructElement(EXTRA_INFO_ID, extraInfo.<BaseTLVType>map((nonOptionalextraInfo) -> new UIntType(nonOptionalextraInfo)).orElse(new EmptyType())));
+    values.add(new StructElement(POSITIONING_ID, positioning != null ? positioning.<BaseTLVType>map((nonOptionalpositioning) -> new UIntType(nonOptionalpositioning)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(LATCHING_ID, latching != null ? latching.<BaseTLVType>map((nonOptionallatching) -> new UIntType(nonOptionallatching)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(SPEED_ID, speed != null ? speed.<BaseTLVType>map((nonOptionalspeed) -> new UIntType(nonOptionalspeed)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(EXTRA_INFO_ID, extraInfo != null ? extraInfo.<BaseTLVType>map((nonOptionalextraInfo) -> new UIntType(nonOptionalextraInfo)).orElse(new EmptyType()) : new NullType()));
 
     return new StructType(values);
   }
@@ -9677,10 +9707,10 @@ public static class ClosureControlClusterOverallStateStruct {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Optional<Integer> positioning = Optional.empty();
-    Optional<Integer> latching = Optional.empty();
-    Optional<Integer> speed = Optional.empty();
-    Optional<Long> extraInfo = Optional.empty();
+    @Nullable Optional<Integer> positioning = null;
+    @Nullable Optional<Integer> latching = null;
+    @Nullable Optional<Integer> speed = null;
+    @Nullable Optional<Long> extraInfo = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == POSITIONING_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -9733,27 +9763,27 @@ public static class ClosureControlClusterOverallStateStruct {
   }
 }
 public static class ClosureControlClusterOverallTargetStruct {
-  public Optional<Integer> tagPosition;
-  public Optional<Integer> tagLatch;
+  public Optional<Integer> position;
+  public Optional<Integer> latch;
   public Optional<Integer> speed;
-  private static final long TAG_POSITION_ID = 0L;
-  private static final long TAG_LATCH_ID = 1L;
+  private static final long POSITION_ID = 0L;
+  private static final long LATCH_ID = 1L;
   private static final long SPEED_ID = 2L;
 
   public ClosureControlClusterOverallTargetStruct(
-    Optional<Integer> tagPosition,
-    Optional<Integer> tagLatch,
+    Optional<Integer> position,
+    Optional<Integer> latch,
     Optional<Integer> speed
   ) {
-    this.tagPosition = tagPosition;
-    this.tagLatch = tagLatch;
+    this.position = position;
+    this.latch = latch;
     this.speed = speed;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(TAG_POSITION_ID, tagPosition.<BaseTLVType>map((nonOptionaltagPosition) -> new UIntType(nonOptionaltagPosition)).orElse(new EmptyType())));
-    values.add(new StructElement(TAG_LATCH_ID, tagLatch.<BaseTLVType>map((nonOptionaltagLatch) -> new UIntType(nonOptionaltagLatch)).orElse(new EmptyType())));
+    values.add(new StructElement(POSITION_ID, position.<BaseTLVType>map((nonOptionalposition) -> new UIntType(nonOptionalposition)).orElse(new EmptyType())));
+    values.add(new StructElement(LATCH_ID, latch.<BaseTLVType>map((nonOptionallatch) -> new UIntType(nonOptionallatch)).orElse(new EmptyType())));
     values.add(new StructElement(SPEED_ID, speed.<BaseTLVType>map((nonOptionalspeed) -> new UIntType(nonOptionalspeed)).orElse(new EmptyType())));
 
     return new StructType(values);
@@ -9763,19 +9793,19 @@ public static class ClosureControlClusterOverallTargetStruct {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Optional<Integer> tagPosition = Optional.empty();
-    Optional<Integer> tagLatch = Optional.empty();
+    Optional<Integer> position = Optional.empty();
+    Optional<Integer> latch = Optional.empty();
     Optional<Integer> speed = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == TAG_POSITION_ID) {
+      if (element.contextTagNum() == POSITION_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          tagPosition = Optional.of(castingValue.value(Integer.class));
+          position = Optional.of(castingValue.value(Integer.class));
         }
-      } else if (element.contextTagNum() == TAG_LATCH_ID) {
+      } else if (element.contextTagNum() == LATCH_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          tagLatch = Optional.of(castingValue.value(Integer.class));
+          latch = Optional.of(castingValue.value(Integer.class));
         }
       } else if (element.contextTagNum() == SPEED_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -9785,8 +9815,8 @@ public static class ClosureControlClusterOverallTargetStruct {
       }
     }
     return new ClosureControlClusterOverallTargetStruct(
-      tagPosition,
-      tagLatch,
+      position,
+      latch,
       speed
     );
   }
@@ -9795,11 +9825,11 @@ public static class ClosureControlClusterOverallTargetStruct {
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("ClosureControlClusterOverallTargetStruct {\n");
-    output.append("\ttagPosition: ");
-    output.append(tagPosition);
+    output.append("\tposition: ");
+    output.append(position);
     output.append("\n");
-    output.append("\ttagLatch: ");
-    output.append(tagLatch);
+    output.append("\tlatch: ");
+    output.append(latch);
     output.append("\n");
     output.append("\tspeed: ");
     output.append(speed);
@@ -14154,38 +14184,42 @@ public static class CameraAvStreamManagementClusterSnapshotStreamStruct {
   public Integer snapshotStreamID;
   public Integer imageCodec;
   public Integer frameRate;
-  public Long bitRate;
   public ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct minResolution;
   public ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution;
   public Integer quality;
   public Integer referenceCount;
+  public Boolean encodedPixels;
+  public Boolean hardwareEncoder;
   private static final long SNAPSHOT_STREAM_ID_ID = 0L;
   private static final long IMAGE_CODEC_ID = 1L;
   private static final long FRAME_RATE_ID = 2L;
-  private static final long BIT_RATE_ID = 3L;
-  private static final long MIN_RESOLUTION_ID = 4L;
-  private static final long MAX_RESOLUTION_ID = 5L;
-  private static final long QUALITY_ID = 6L;
-  private static final long REFERENCE_COUNT_ID = 7L;
+  private static final long MIN_RESOLUTION_ID = 3L;
+  private static final long MAX_RESOLUTION_ID = 4L;
+  private static final long QUALITY_ID = 5L;
+  private static final long REFERENCE_COUNT_ID = 6L;
+  private static final long ENCODED_PIXELS_ID = 7L;
+  private static final long HARDWARE_ENCODER_ID = 8L;
 
   public CameraAvStreamManagementClusterSnapshotStreamStruct(
     Integer snapshotStreamID,
     Integer imageCodec,
     Integer frameRate,
-    Long bitRate,
     ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct minResolution,
     ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution,
     Integer quality,
-    Integer referenceCount
+    Integer referenceCount,
+    Boolean encodedPixels,
+    Boolean hardwareEncoder
   ) {
     this.snapshotStreamID = snapshotStreamID;
     this.imageCodec = imageCodec;
     this.frameRate = frameRate;
-    this.bitRate = bitRate;
     this.minResolution = minResolution;
     this.maxResolution = maxResolution;
     this.quality = quality;
     this.referenceCount = referenceCount;
+    this.encodedPixels = encodedPixels;
+    this.hardwareEncoder = hardwareEncoder;
   }
 
   public StructType encodeTlv() {
@@ -14193,11 +14227,12 @@ public static class CameraAvStreamManagementClusterSnapshotStreamStruct {
     values.add(new StructElement(SNAPSHOT_STREAM_ID_ID, new UIntType(snapshotStreamID)));
     values.add(new StructElement(IMAGE_CODEC_ID, new UIntType(imageCodec)));
     values.add(new StructElement(FRAME_RATE_ID, new UIntType(frameRate)));
-    values.add(new StructElement(BIT_RATE_ID, new UIntType(bitRate)));
     values.add(new StructElement(MIN_RESOLUTION_ID, minResolution.encodeTlv()));
     values.add(new StructElement(MAX_RESOLUTION_ID, maxResolution.encodeTlv()));
     values.add(new StructElement(QUALITY_ID, new UIntType(quality)));
     values.add(new StructElement(REFERENCE_COUNT_ID, new UIntType(referenceCount)));
+    values.add(new StructElement(ENCODED_PIXELS_ID, new BooleanType(encodedPixels)));
+    values.add(new StructElement(HARDWARE_ENCODER_ID, new BooleanType(hardwareEncoder)));
 
     return new StructType(values);
   }
@@ -14209,11 +14244,12 @@ public static class CameraAvStreamManagementClusterSnapshotStreamStruct {
     Integer snapshotStreamID = null;
     Integer imageCodec = null;
     Integer frameRate = null;
-    Long bitRate = null;
     ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct minResolution = null;
     ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution = null;
     Integer quality = null;
     Integer referenceCount = null;
+    Boolean encodedPixels = null;
+    Boolean hardwareEncoder = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == SNAPSHOT_STREAM_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -14229,11 +14265,6 @@ public static class CameraAvStreamManagementClusterSnapshotStreamStruct {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
           frameRate = castingValue.value(Integer.class);
-        }
-      } else if (element.contextTagNum() == BIT_RATE_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          bitRate = castingValue.value(Long.class);
         }
       } else if (element.contextTagNum() == MIN_RESOLUTION_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
@@ -14255,17 +14286,28 @@ public static class CameraAvStreamManagementClusterSnapshotStreamStruct {
           UIntType castingValue = element.value(UIntType.class);
           referenceCount = castingValue.value(Integer.class);
         }
+      } else if (element.contextTagNum() == ENCODED_PIXELS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          encodedPixels = castingValue.value(Boolean.class);
+        }
+      } else if (element.contextTagNum() == HARDWARE_ENCODER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          hardwareEncoder = castingValue.value(Boolean.class);
+        }
       }
     }
     return new CameraAvStreamManagementClusterSnapshotStreamStruct(
       snapshotStreamID,
       imageCodec,
       frameRate,
-      bitRate,
       minResolution,
       maxResolution,
       quality,
-      referenceCount
+      referenceCount,
+      encodedPixels,
+      hardwareEncoder
     );
   }
 
@@ -14282,9 +14324,6 @@ public static class CameraAvStreamManagementClusterSnapshotStreamStruct {
     output.append("\tframeRate: ");
     output.append(frameRate);
     output.append("\n");
-    output.append("\tbitRate: ");
-    output.append(bitRate);
-    output.append("\n");
     output.append("\tminResolution: ");
     output.append(minResolution);
     output.append("\n");
@@ -14297,26 +14336,40 @@ public static class CameraAvStreamManagementClusterSnapshotStreamStruct {
     output.append("\treferenceCount: ");
     output.append(referenceCount);
     output.append("\n");
+    output.append("\tencodedPixels: ");
+    output.append(encodedPixels);
+    output.append("\n");
+    output.append("\thardwareEncoder: ");
+    output.append(hardwareEncoder);
+    output.append("\n");
     output.append("}\n");
     return output.toString();
   }
 }
-public static class CameraAvStreamManagementClusterSnapshotParamsStruct {
+public static class CameraAvStreamManagementClusterSnapshotCapabilitiesStruct {
   public ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct resolution;
   public Integer maxFrameRate;
   public Integer imageCodec;
+  public Boolean requiresEncodedPixels;
+  public Optional<Boolean> requiresHardwareEncoder;
   private static final long RESOLUTION_ID = 0L;
   private static final long MAX_FRAME_RATE_ID = 1L;
   private static final long IMAGE_CODEC_ID = 2L;
+  private static final long REQUIRES_ENCODED_PIXELS_ID = 3L;
+  private static final long REQUIRES_HARDWARE_ENCODER_ID = 4L;
 
-  public CameraAvStreamManagementClusterSnapshotParamsStruct(
+  public CameraAvStreamManagementClusterSnapshotCapabilitiesStruct(
     ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct resolution,
     Integer maxFrameRate,
-    Integer imageCodec
+    Integer imageCodec,
+    Boolean requiresEncodedPixels,
+    Optional<Boolean> requiresHardwareEncoder
   ) {
     this.resolution = resolution;
     this.maxFrameRate = maxFrameRate;
     this.imageCodec = imageCodec;
+    this.requiresEncodedPixels = requiresEncodedPixels;
+    this.requiresHardwareEncoder = requiresHardwareEncoder;
   }
 
   public StructType encodeTlv() {
@@ -14324,17 +14377,21 @@ public static class CameraAvStreamManagementClusterSnapshotParamsStruct {
     values.add(new StructElement(RESOLUTION_ID, resolution.encodeTlv()));
     values.add(new StructElement(MAX_FRAME_RATE_ID, new UIntType(maxFrameRate)));
     values.add(new StructElement(IMAGE_CODEC_ID, new UIntType(imageCodec)));
+    values.add(new StructElement(REQUIRES_ENCODED_PIXELS_ID, new BooleanType(requiresEncodedPixels)));
+    values.add(new StructElement(REQUIRES_HARDWARE_ENCODER_ID, requiresHardwareEncoder.<BaseTLVType>map((nonOptionalrequiresHardwareEncoder) -> new BooleanType(nonOptionalrequiresHardwareEncoder)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
 
-  public static CameraAvStreamManagementClusterSnapshotParamsStruct decodeTlv(BaseTLVType tlvValue) {
+  public static CameraAvStreamManagementClusterSnapshotCapabilitiesStruct decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
     ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct resolution = null;
     Integer maxFrameRate = null;
     Integer imageCodec = null;
+    Boolean requiresEncodedPixels = null;
+    Optional<Boolean> requiresHardwareEncoder = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == RESOLUTION_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
@@ -14351,19 +14408,31 @@ public static class CameraAvStreamManagementClusterSnapshotParamsStruct {
           UIntType castingValue = element.value(UIntType.class);
           imageCodec = castingValue.value(Integer.class);
         }
+      } else if (element.contextTagNum() == REQUIRES_ENCODED_PIXELS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          requiresEncodedPixels = castingValue.value(Boolean.class);
+        }
+      } else if (element.contextTagNum() == REQUIRES_HARDWARE_ENCODER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          requiresHardwareEncoder = Optional.of(castingValue.value(Boolean.class));
+        }
       }
     }
-    return new CameraAvStreamManagementClusterSnapshotParamsStruct(
+    return new CameraAvStreamManagementClusterSnapshotCapabilitiesStruct(
       resolution,
       maxFrameRate,
-      imageCodec
+      imageCodec,
+      requiresEncodedPixels,
+      requiresHardwareEncoder
     );
   }
 
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("CameraAvStreamManagementClusterSnapshotParamsStruct {\n");
+    output.append("CameraAvStreamManagementClusterSnapshotCapabilitiesStruct {\n");
     output.append("\tresolution: ");
     output.append(resolution);
     output.append("\n");
@@ -14372,6 +14441,12 @@ public static class CameraAvStreamManagementClusterSnapshotParamsStruct {
     output.append("\n");
     output.append("\timageCodec: ");
     output.append(imageCodec);
+    output.append("\n");
+    output.append("\trequiresEncodedPixels: ");
+    output.append(requiresEncodedPixels);
+    output.append("\n");
+    output.append("\trequiresHardwareEncoder: ");
+    output.append(requiresHardwareEncoder);
     output.append("\n");
     output.append("}\n");
     return output.toString();

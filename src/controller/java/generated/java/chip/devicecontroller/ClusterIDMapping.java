@@ -3741,6 +3741,8 @@ public class ClusterIDMapping {
             ChannelPage0Mask(60L),
             OperationalDatasetComponents(61L),
             ActiveNetworkFaultsList(62L),
+            ExtAddress(63L),
+            Rloc16(64L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -11505,11 +11507,6 @@ public class ClusterIDMapping {
             CurrentErrorList(2L),
             OverallState(3L),
             OverallTarget(4L),
-            RestingProcedure(5L),
-            TriggerCondition(6L),
-            TriggerPosition(7L),
-            WaitingDelay(8L),
-            KickoffTimer(9L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -11558,9 +11555,7 @@ public class ClusterIDMapping {
         public enum Command {
             Stop(0L),
             MoveTo(1L),
-            Calibrate(2L),
-            ConfigureFallback(3L),
-            CancelFallback(4L),;
+            Calibrate(2L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -11578,7 +11573,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum MoveToCommandField {Tag(0),Latch(1),Speed(2),;
+        }public enum MoveToCommandField {Position(0),Latch(1),Speed(2),;
                     private final int id;
                     MoveToCommandField(int id) {
                         this.id = id;
@@ -11589,23 +11584,6 @@ public class ClusterIDMapping {
                     }
                     public static MoveToCommandField value(int id) throws NoSuchFieldError {
                         for (MoveToCommandField field : MoveToCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }public enum ConfigureFallbackCommandField {RestingProcedure(0),TriggerCondition(1),TriggerPosition(2),WaitingDelay(3),;
-                    private final int id;
-                    ConfigureFallbackCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static ConfigureFallbackCommandField value(int id) throws NoSuchFieldError {
-                        for (ConfigureFallbackCommandField field : ConfigureFallbackCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -17576,7 +17554,7 @@ public class ClusterIDMapping {
         }
 
         public enum Attribute {
-            MaxConcurrentVideoEncoders(0L),
+            MaxConcurrentEncoders(0L),
             MaxEncodedPixelRate(1L),
             VideoSensorParams(2L),
             NightVisionCapable(3L),
@@ -17586,7 +17564,7 @@ public class ClusterIDMapping {
             MicrophoneCapabilities(7L),
             SpeakerCapabilities(8L),
             TwoWayTalkSupport(9L),
-            SupportedSnapshotParams(10L),
+            SnapshotCapabilities(10L),
             MaxNetworkBandwidth(11L),
             CurrentFrameRate(12L),
             HDRModeEnabled(13L),
@@ -17775,7 +17753,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum SnapshotStreamAllocateCommandField {ImageCodec(0),MaxFrameRate(1),BitRate(2),MinResolution(3),MaxResolution(4),Quality(5),WatermarkEnabled(6),OSDEnabled(7),;
+                }public enum SnapshotStreamAllocateCommandField {ImageCodec(0),MaxFrameRate(1),MinResolution(2),MaxResolution(3),Quality(4),WatermarkEnabled(5),OSDEnabled(6),;
                     private final int id;
                     SnapshotStreamAllocateCommandField(int id) {
                         this.id = id;

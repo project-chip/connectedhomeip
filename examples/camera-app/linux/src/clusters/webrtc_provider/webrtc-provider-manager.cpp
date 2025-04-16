@@ -31,6 +31,50 @@ using namespace chip::app::Clusters::WebRTCTransportProvider;
 
 using namespace Camera;
 
+void WebRTCProviderManager::Init()
+{
+    rtc::Configuration config;
+    // config.iceServers.emplace_back("stun.l.google.com:19302");
+
+    mPeerConnection = std::make_shared<rtc::PeerConnection>(config);
+
+    mPeerConnection->onLocalDescription([this](rtc::Description description) {
+        mSdpAnswer = std::string(description);
+        ChipLogProgress(Camera, "Local Description:");
+        ChipLogProgress(Camera, "%s", mSdpAnswer.c_str());
+
+        ScheduleAnswerSend();
+    });
+
+    mPeerConnection->onLocalCandidate([](rtc::Candidate candidate) {
+        ChipLogProgress(Camera, "Local Candidate:");
+        ChipLogProgress(Camera, "%s", std::string(candidate).c_str());
+    });
+
+    mPeerConnection->onStateChange([](rtc::PeerConnection::State state) {
+        // Convert the enum to an integer or string as needed
+        ChipLogProgress(Camera, "[State: %u]", static_cast<unsigned>(state));
+    });
+
+    mPeerConnection->onGatheringStateChange([](rtc::PeerConnection::GatheringState state) {
+        ChipLogProgress(Camera, "[Gathering State: %u]", static_cast<unsigned>(state));
+    });
+
+    mPeerConnection->onDataChannel([&](std::shared_ptr<rtc::DataChannel> _dc) {
+        ChipLogProgress(Camera, "[Got a DataChannel with label: %s]", _dc->label().c_str());
+        mDataChannel = _dc;
+
+        mDataChannel->onClosed([&]() { ChipLogProgress(Camera, "[DataChannel closed: %s]", mDataChannel->label().c_str()); });
+
+        mDataChannel->onMessage([](auto data) {
+            if (std::holds_alternative<std::string>(data))
+            {
+                ChipLogProgress(Camera, "[Received message: %s]", std::get<std::string>(data).c_str());
+            }
+        });
+    });
+}
+
 void WebRTCProviderManager::CloseConnection()
 {
     // Close the data channel and peer connection if they exist
@@ -53,8 +97,7 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession,
-                                                     const chip::ScopedNodeId & peerId, EndpointId originatingEndpointId)
+CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession)
 {
     // Initialize a new WebRTC session from the SolicitOfferRequestArgs
     outSession.id          = args.sessionId;
@@ -102,52 +145,9 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     }
 
     // Process the SDP Offer, begin the ICE Candidate gathering phase, create the SDP Answer, and invoke Answer.
-    CloseConnection();
-
-    mPeerId                = peerId;
-    mOriginatingEndpointId = originatingEndpointId;
+    mPeerId                = ScopedNodeId(args.peerNodeId, args.fabricIndex);
+    mOriginatingEndpointId = args.originatingEndpointId;
     mCurrentSessionId      = args.sessionId;
-
-    rtc::Configuration config;
-    // config.iceServers.emplace_back("stun.l.google.com:19302");
-
-    mPeerConnection = std::make_shared<rtc::PeerConnection>(config);
-
-    mPeerConnection->onLocalDescription([this](rtc::Description description) {
-        mSdpAnswer = std::string(description);
-        ChipLogProgress(NotSpecified, "Local Description:");
-        ChipLogProgress(NotSpecified, "%s", mSdpAnswer.c_str());
-
-        ScheduleAnswerSend();
-    });
-
-    mPeerConnection->onLocalCandidate([](rtc::Candidate candidate) {
-        ChipLogProgress(NotSpecified, "Local Candidate:");
-        ChipLogProgress(NotSpecified, "%s", std::string(candidate).c_str());
-    });
-
-    mPeerConnection->onStateChange([](rtc::PeerConnection::State state) {
-        // Convert the enum to an integer or string as needed
-        ChipLogProgress(NotSpecified, "[State: %u]", static_cast<unsigned>(state));
-    });
-
-    mPeerConnection->onGatheringStateChange([](rtc::PeerConnection::GatheringState state) {
-        ChipLogProgress(NotSpecified, "[Gathering State: %u]", static_cast<unsigned>(state));
-    });
-
-    mPeerConnection->onDataChannel([&](std::shared_ptr<rtc::DataChannel> _dc) {
-        ChipLogProgress(NotSpecified, "[Got a DataChannel with label: %s]", _dc->label().c_str());
-        mDataChannel = _dc;
-
-        mDataChannel->onClosed([&]() { ChipLogProgress(NotSpecified, "[DataChannel closed: %s]", mDataChannel->label().c_str()); });
-
-        mDataChannel->onMessage([](auto data) {
-            if (std::holds_alternative<std::string>(data))
-            {
-                ChipLogProgress(NotSpecified, "[Received message: %s]", std::get<std::string>(data).c_str());
-            }
-        });
-    });
 
     mPeerConnection->setRemoteDescription(args.sdp);
 
@@ -161,30 +161,30 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideAnswer(uint16_t sessionId, const 
 
 CHIP_ERROR WebRTCProviderManager::HandleProvideICECandidates(uint16_t sessionId, const std::vector<std::string> & candidates)
 {
-    ChipLogProgress(NotSpecified, "HandleProvideICECandidates called with sessionId: %u", sessionId);
+    ChipLogProgress(Camera, "HandleProvideICECandidates called with sessionId: %u", sessionId);
 
     // Check if the provided sessionId matches your current session
     if (sessionId != mCurrentSessionId)
     {
-        ChipLogError(NotSpecified, "Session ID %u does not match the current session ID %u", sessionId, mCurrentSessionId);
+        ChipLogError(Camera, "Session ID %u does not match the current session ID %u", sessionId, mCurrentSessionId);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     if (!mPeerConnection)
     {
-        ChipLogError(NotSpecified, "Cannot process ICE candidates: mPeerConnection is null");
+        ChipLogError(Camera, "Cannot process ICE candidates: mPeerConnection is null");
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
     if (candidates.empty())
     {
-        ChipLogError(NotSpecified, "Candidate list is empty. At least one candidate is expected.");
+        ChipLogError(Camera, "Candidate list is empty. At least one candidate is expected.");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     for (const auto & candidate : candidates)
     {
-        ChipLogProgress(NotSpecified, "Applying candidate: %s", candidate.c_str());
+        ChipLogProgress(Camera, "Applying candidate: %s", candidate.c_str());
         mPeerConnection->addRemoteCandidate(candidate);
     }
 
@@ -198,7 +198,6 @@ CHIP_ERROR WebRTCProviderManager::HandleEndSession(uint16_t sessionId, WebRTCEnd
     if (mCurrentSessionId == sessionId)
     {
         mCurrentSessionId      = 0;
-        mOriginatingEndpointId = 0;
         mOriginatingEndpointId = 0;
         mPeerId                = ScopedNodeId();
         mSdpAnswer.clear();
@@ -219,45 +218,66 @@ WebRTCProviderManager::ValidateStreamUsage(StreamUsageEnum streamUsage,
 void WebRTCProviderManager::ScheduleAnswerSend()
 {
     DeviceLayer::SystemLayer().ScheduleLambda([this]() {
-        CHIP_ERROR err = SendAnswerCommand(mCurrentSessionId, mSdpAnswer, mPeerId, mOriginatingEndpointId);
+        ChipLogProgress(Camera, "Sending Answer command to node " ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
 
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(NotSpecified, "Answer failed: %" CHIP_ERROR_FORMAT, err.Format());
-        }
+        mCommandType = CommandType::kAnswer;
 
-        mOriginatingEndpointId = 0;
-        mOriginatingEndpointId = 0;
-        mPeerId                = ScopedNodeId();
+        // Attempt to find or establish a CASE session to the target PeerId.
+        CASESessionManager * caseSessionMgr = Server::GetInstance().GetCASESessionManager();
+        VerifyOrDie(caseSessionMgr != nullptr);
+
+        caseSessionMgr->FindOrEstablishSession(mPeerId, &mOnConnectedCallback, &mOnConnectionFailureCallback);
     });
 }
 
-CHIP_ERROR WebRTCProviderManager::SendAnswerCommand(uint16_t sessionId, const std::string & sdpAnswer, const ScopedNodeId & peerId,
-                                                    EndpointId originatingEndpointId)
+void WebRTCProviderManager::OnDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
+                                              const SessionHandle & sessionHandle)
+{
+    WebRTCProviderManager * self = reinterpret_cast<WebRTCProviderManager *>(context);
+    VerifyOrReturn(self != nullptr, ChipLogError(Camera, "OnDeviceConnected:: context is null"));
+
+    ChipLogProgress(Camera, "CASE session established, sending command with Command Type: %d...",
+                    static_cast<int>(self->mCommandType));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    switch (self->mCommandType)
+    {
+    case CommandType::kAnswer:
+        err = self->SendAnswerCommand(exchangeMgr, sessionHandle);
+        break;
+
+    default:
+        err = CHIP_ERROR_INVALID_ARGUMENT;
+        break;
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "OnDeviceConnected::SendCommand failed: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
+
+void WebRTCProviderManager::OnDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR err)
+{
+    LogErrorOnFailure(err);
+    WebRTCProviderManager * self = reinterpret_cast<WebRTCProviderManager *>(context);
+    VerifyOrReturn(self != nullptr, ChipLogError(Camera, "OnDeviceConnectionFailure: context is null"));
+}
+
+CHIP_ERROR WebRTCProviderManager::SendAnswerCommand(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
     auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
-        ChipLogProgress(NotSpecified, "Answer command succeeds");
+        ChipLogProgress(Camera, "Answer command succeeds");
     };
 
-    auto onFailure = [](CHIP_ERROR error) {
-        ChipLogError(NotSpecified, "Answer command failed: %" CHIP_ERROR_FORMAT, error.Format());
-    };
-
-    // TODO:#38183 Use CASESessionManager instead of sessionHandle to send Answer Command
-    Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
-    auto sessionHandle                       = exchangeMgr.GetSessionManager()->FindSecureSessionForNode(peerId);
-    if (!sessionHandle.HasValue())
-    {
-        ChipLogError(NotSpecified, "No secure session found for PeerId, cannot send Answer");
-        return CHIP_ERROR_NOT_CONNECTED;
-    }
+    auto onFailure = [](CHIP_ERROR error) { ChipLogError(Camera, "Answer command failed: %" CHIP_ERROR_FORMAT, error.Format()); };
 
     // Build the command
     WebRTCTransportRequestor::Commands::Answer::Type command;
-    command.webRTCSessionID = sessionId;
-    command.sdp             = CharSpan::fromCharString(sdpAnswer.c_str());
+    command.webRTCSessionID = mCurrentSessionId;
+    command.sdp             = CharSpan::fromCharString(mSdpAnswer.c_str());
 
     // Now invoke the command using the found session handle
-    return Controller::InvokeCommandRequest(&exchangeMgr, sessionHandle.Value(), originatingEndpointId, command, onSuccess,
-                                            onFailure);
+    return Controller::InvokeCommandRequest(&exchangeMgr, sessionHandle, mOriginatingEndpointId, command, onSuccess, onFailure);
 }

@@ -8432,6 +8432,8 @@ class ThreadNetworkDiagnostics(Cluster):
                 ClusterObjectFieldDescriptor(Label="channelPage0Mask", Tag=0x0000003C, Type=typing.Union[Nullable, bytes]),
                 ClusterObjectFieldDescriptor(Label="operationalDatasetComponents", Tag=0x0000003D, Type=typing.Union[Nullable, ThreadNetworkDiagnostics.Structs.OperationalDatasetComponents]),
                 ClusterObjectFieldDescriptor(Label="activeNetworkFaultsList", Tag=0x0000003E, Type=typing.List[ThreadNetworkDiagnostics.Enums.NetworkFaultEnum]),
+                ClusterObjectFieldDescriptor(Label="extAddress", Tag=0x0000003F, Type=typing.Union[Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="rloc16", Tag=0x00000040, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -8502,6 +8504,8 @@ class ThreadNetworkDiagnostics(Cluster):
     channelPage0Mask: typing.Union[Nullable, bytes] = NullValue
     operationalDatasetComponents: typing.Union[Nullable, ThreadNetworkDiagnostics.Structs.OperationalDatasetComponents] = NullValue
     activeNetworkFaultsList: typing.List[ThreadNetworkDiagnostics.Enums.NetworkFaultEnum] = field(default_factory=lambda: [])
+    extAddress: typing.Union[Nullable, uint] = NullValue
+    rloc16: typing.Union[Nullable, uint] = NullValue
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -9685,6 +9689,38 @@ class ThreadNetworkDiagnostics(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.List[ThreadNetworkDiagnostics.Enums.NetworkFaultEnum])
 
             value: typing.List[ThreadNetworkDiagnostics.Enums.NetworkFaultEnum] = field(default_factory=lambda: [])
+
+        @dataclass
+        class ExtAddress(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000035
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000003F
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
+
+            value: typing.Union[Nullable, uint] = NullValue
+
+        @dataclass
+        class Rloc16(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000035
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000040
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
+
+            value: typing.Union[Nullable, uint] = NullValue
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -22966,13 +23002,15 @@ class CommodityPrice(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="price", Tag=0, Type=int),
-                        ClusterObjectFieldDescriptor(Label="source", Tag=1, Type=Globals.Enums.TariffPriceTypeEnum),
-                        ClusterObjectFieldDescriptor(Label="description", Tag=2, Type=typing.Optional[str]),
-                        ClusterObjectFieldDescriptor(Label="tariffComponentID", Tag=3, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="price", Tag=0, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="priceLevel", Tag=1, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="source", Tag=2, Type=Globals.Enums.TariffPriceTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="description", Tag=3, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="tariffComponentID", Tag=4, Type=typing.Optional[uint]),
                     ])
 
-            price: 'int' = 0
+            price: 'typing.Optional[int]' = None
+            priceLevel: 'typing.Optional[int]' = None
             source: 'Globals.Enums.TariffPriceTypeEnum' = 0
             description: 'typing.Optional[str]' = None
             tariffComponentID: 'typing.Optional[uint]' = None
@@ -22985,14 +23023,16 @@ class CommodityPrice(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="periodStart", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="periodEnd", Tag=1, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="price", Tag=2, Type=Globals.Structs.PriceStruct),
-                        ClusterObjectFieldDescriptor(Label="description", Tag=3, Type=typing.Optional[str]),
-                        ClusterObjectFieldDescriptor(Label="components", Tag=4, Type=typing.Optional[typing.List[CommodityPrice.Structs.CommodityPriceComponentStruct]]),
+                        ClusterObjectFieldDescriptor(Label="price", Tag=2, Type=typing.Optional[Globals.Structs.PriceStruct]),
+                        ClusterObjectFieldDescriptor(Label="priceLevel", Tag=3, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="description", Tag=4, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="components", Tag=5, Type=typing.Optional[typing.List[CommodityPrice.Structs.CommodityPriceComponentStruct]]),
                     ])
 
             periodStart: 'uint' = 0
             periodEnd: 'typing.Union[Nullable, uint]' = NullValue
-            price: 'Globals.Structs.PriceStruct' = field(default_factory=lambda: Globals.Structs.PriceStruct())
+            price: 'typing.Optional[Globals.Structs.PriceStruct]' = None
+            priceLevel: 'typing.Optional[int]' = None
             description: 'typing.Optional[str]' = None
             components: 'typing.Optional[typing.List[CommodityPrice.Structs.CommodityPriceComponentStruct]]' = None
 
@@ -23221,10 +23261,10 @@ class CommodityPrice(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="currentPrice", Tag=0, Type=CommodityPrice.Structs.CommodityPriceStruct),
+                        ClusterObjectFieldDescriptor(Label="currentPrice", Tag=0, Type=typing.Union[Nullable, CommodityPrice.Structs.CommodityPriceStruct]),
                     ])
 
-            currentPrice: CommodityPrice.Structs.CommodityPriceStruct = field(default_factory=lambda: CommodityPrice.Structs.CommodityPriceStruct())
+            currentPrice: typing.Union[Nullable, CommodityPrice.Structs.CommodityPriceStruct] = NullValue
 
         @dataclass
         class ForecastChange(ClusterEvent):
@@ -23240,10 +23280,10 @@ class CommodityPrice(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="priceForecast", Tag=0, Type=typing.List[CommodityPrice.Structs.CommodityPriceStruct]),
+                        ClusterObjectFieldDescriptor(Label="priceForecast", Tag=0, Type=typing.Union[Nullable, typing.List[CommodityPrice.Structs.CommodityPriceStruct]]),
                     ])
 
-            priceForecast: typing.List[CommodityPrice.Structs.CommodityPriceStruct] = field(default_factory=lambda: [])
+            priceForecast: typing.Union[Nullable, typing.List[CommodityPrice.Structs.CommodityPriceStruct]] = NullValue
 
 
 @dataclass
@@ -29623,11 +29663,6 @@ class ClosureControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="currentErrorList", Tag=0x00000002, Type=typing.List[ClosureControl.Enums.ClosureErrorEnum]),
                 ClusterObjectFieldDescriptor(Label="overallState", Tag=0x00000003, Type=typing.Union[Nullable, ClosureControl.Structs.OverallStateStruct]),
                 ClusterObjectFieldDescriptor(Label="overallTarget", Tag=0x00000004, Type=typing.Union[Nullable, ClosureControl.Structs.OverallTargetStruct]),
-                ClusterObjectFieldDescriptor(Label="restingProcedure", Tag=0x00000005, Type=typing.Optional[ClosureControl.Enums.RestingProcedureEnum]),
-                ClusterObjectFieldDescriptor(Label="triggerCondition", Tag=0x00000006, Type=typing.Optional[ClosureControl.Enums.TriggerConditionEnum]),
-                ClusterObjectFieldDescriptor(Label="triggerPosition", Tag=0x00000007, Type=typing.Optional[ClosureControl.Enums.TriggerPositionEnum]),
-                ClusterObjectFieldDescriptor(Label="waitingDelay", Tag=0x00000008, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="kickoffTimer", Tag=0x00000009, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -29640,11 +29675,6 @@ class ClosureControl(Cluster):
     currentErrorList: typing.List[ClosureControl.Enums.ClosureErrorEnum] = field(default_factory=lambda: [])
     overallState: typing.Union[Nullable, ClosureControl.Structs.OverallStateStruct] = NullValue
     overallTarget: typing.Union[Nullable, ClosureControl.Structs.OverallTargetStruct] = NullValue
-    restingProcedure: typing.Optional[ClosureControl.Enums.RestingProcedureEnum] = None
-    triggerCondition: typing.Optional[ClosureControl.Enums.TriggerConditionEnum] = None
-    triggerPosition: typing.Optional[ClosureControl.Enums.TriggerPositionEnum] = None
-    waitingDelay: typing.Optional[uint] = None
-    kickoffTimer: typing.Optional[uint] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -29682,12 +29712,11 @@ class ClosureControl(Cluster):
             kProtected = 0x05
             kDisengaged = 0x06
             kSetupRequired = 0x07
-            kPendingFallback = 0x08
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 9
+            kUnknownEnumValue = 8
 
         class PositioningEnum(MatterIntEnum):
             kFullyClosed = 0x00
@@ -29702,17 +29731,7 @@ class ClosureControl(Cluster):
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 6
 
-        class RestingProcedureEnum(MatterIntEnum):
-            kDoNothing = 0x00
-            kReturnToFullyOpened = 0x01
-            kReturnToFullyClosed = 0x02
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3
-
-        class TagLatchEnum(MatterIntEnum):
+        class TargetLatchEnum(MatterIntEnum):
             kLatch = 0x00
             kUnlatch = 0x01
             # All received enum values that are not listed above will be mapped
@@ -29721,36 +29740,12 @@ class ClosureControl(Cluster):
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2
 
-        class TagPositionEnum(MatterIntEnum):
+        class TargetPositionEnum(MatterIntEnum):
             kCloseInFull = 0x00
             kOpenInFull = 0x01
             kPedestrian = 0x02
             kVentilation = 0x03
             kSignature = 0x04
-            kSequenceNextStep = 0x05
-            kPedestrianNextStep = 0x06
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 7
-
-        class TriggerConditionEnum(MatterIntEnum):
-            kAfterDelay = 0x00
-            kAfterApplicativeTrigger = 0x01
-            kAfterDelayOrApplicativeTrigger = 0x02
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3
-
-        class TriggerPositionEnum(MatterIntEnum):
-            kAtFullyClosed = 0x00
-            kAtFullyOpened = 0x01
-            kInBetween = 0x02
-            kAtVentilation = 0x03
-            kAtPedestrian = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
@@ -29768,7 +29763,6 @@ class ClosureControl(Cluster):
             kCalibration = 0x40
             kProtection = 0x80
             kManuallyOperable = 0x100
-            kFallback = 0x200
 
     class Structs:
         @dataclass
@@ -29777,16 +29771,16 @@ class ClosureControl(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="positioning", Tag=0, Type=typing.Optional[ClosureControl.Enums.PositioningEnum]),
-                        ClusterObjectFieldDescriptor(Label="latching", Tag=1, Type=typing.Optional[ClosureControl.Enums.LatchingEnum]),
-                        ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
-                        ClusterObjectFieldDescriptor(Label="extraInfo", Tag=3, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="positioning", Tag=0, Type=typing.Union[None, Nullable, ClosureControl.Enums.PositioningEnum]),
+                        ClusterObjectFieldDescriptor(Label="latching", Tag=1, Type=typing.Union[None, Nullable, ClosureControl.Enums.LatchingEnum]),
+                        ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Union[None, Nullable, Globals.Enums.ThreeLevelAutoEnum]),
+                        ClusterObjectFieldDescriptor(Label="extraInfo", Tag=3, Type=typing.Union[None, Nullable, uint]),
                     ])
 
-            positioning: 'typing.Optional[ClosureControl.Enums.PositioningEnum]' = None
-            latching: 'typing.Optional[ClosureControl.Enums.LatchingEnum]' = None
-            speed: 'typing.Optional[Globals.Enums.ThreeLevelAutoEnum]' = None
-            extraInfo: 'typing.Optional[uint]' = None
+            positioning: 'typing.Union[None, Nullable, ClosureControl.Enums.PositioningEnum]' = None
+            latching: 'typing.Union[None, Nullable, ClosureControl.Enums.LatchingEnum]' = None
+            speed: 'typing.Union[None, Nullable, Globals.Enums.ThreeLevelAutoEnum]' = None
+            extraInfo: 'typing.Union[None, Nullable, uint]' = None
 
         @dataclass
         class OverallTargetStruct(ClusterObject):
@@ -29794,13 +29788,13 @@ class ClosureControl(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="tagPosition", Tag=0, Type=typing.Optional[ClosureControl.Enums.TagPositionEnum]),
-                        ClusterObjectFieldDescriptor(Label="tagLatch", Tag=1, Type=typing.Optional[ClosureControl.Enums.TagLatchEnum]),
+                        ClusterObjectFieldDescriptor(Label="position", Tag=0, Type=typing.Optional[ClosureControl.Enums.TargetPositionEnum]),
+                        ClusterObjectFieldDescriptor(Label="latch", Tag=1, Type=typing.Optional[ClosureControl.Enums.TargetLatchEnum]),
                         ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
                     ])
 
-            tagPosition: 'typing.Optional[ClosureControl.Enums.TagPositionEnum]' = None
-            tagLatch: 'typing.Optional[ClosureControl.Enums.TagLatchEnum]' = None
+            position: 'typing.Optional[ClosureControl.Enums.TargetPositionEnum]' = None
+            latch: 'typing.Optional[ClosureControl.Enums.TargetLatchEnum]' = None
             speed: 'typing.Optional[Globals.Enums.ThreeLevelAutoEnum]' = None
 
     class Commands:
@@ -29828,54 +29822,19 @@ class ClosureControl(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="tag", Tag=0, Type=typing.Optional[ClosureControl.Enums.TagPositionEnum]),
-                        ClusterObjectFieldDescriptor(Label="latch", Tag=1, Type=typing.Optional[ClosureControl.Enums.TagLatchEnum]),
+                        ClusterObjectFieldDescriptor(Label="position", Tag=0, Type=typing.Optional[ClosureControl.Enums.TargetPositionEnum]),
+                        ClusterObjectFieldDescriptor(Label="latch", Tag=1, Type=typing.Optional[ClosureControl.Enums.TargetLatchEnum]),
                         ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
                     ])
 
-            tag: typing.Optional[ClosureControl.Enums.TagPositionEnum] = None
-            latch: typing.Optional[ClosureControl.Enums.TagLatchEnum] = None
+            position: typing.Optional[ClosureControl.Enums.TargetPositionEnum] = None
+            latch: typing.Optional[ClosureControl.Enums.TargetLatchEnum] = None
             speed: typing.Optional[Globals.Enums.ThreeLevelAutoEnum] = None
 
         @dataclass
         class Calibrate(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000104
             command_id: typing.ClassVar[int] = 0x00000002
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[typing.Optional[str]] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                    ])
-
-        @dataclass
-        class ConfigureFallback(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000104
-            command_id: typing.ClassVar[int] = 0x00000003
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[typing.Optional[str]] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="restingProcedure", Tag=0, Type=typing.Optional[ClosureControl.Enums.RestingProcedureEnum]),
-                        ClusterObjectFieldDescriptor(Label="triggerCondition", Tag=1, Type=typing.Optional[ClosureControl.Enums.TriggerConditionEnum]),
-                        ClusterObjectFieldDescriptor(Label="triggerPosition", Tag=2, Type=typing.Optional[ClosureControl.Enums.TriggerPositionEnum]),
-                        ClusterObjectFieldDescriptor(Label="waitingDelay", Tag=3, Type=typing.Optional[uint]),
-                    ])
-
-            restingProcedure: typing.Optional[ClosureControl.Enums.RestingProcedureEnum] = None
-            triggerCondition: typing.Optional[ClosureControl.Enums.TriggerConditionEnum] = None
-            triggerPosition: typing.Optional[ClosureControl.Enums.TriggerPositionEnum] = None
-            waitingDelay: typing.Optional[uint] = None
-
-        @dataclass
-        class CancelFallback(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000104
-            command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[typing.Optional[str]] = None
 
@@ -29965,86 +29924,6 @@ class ClosureControl(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, ClosureControl.Structs.OverallTargetStruct])
 
             value: typing.Union[Nullable, ClosureControl.Structs.OverallTargetStruct] = NullValue
-
-        @dataclass
-        class RestingProcedure(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000104
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000005
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[ClosureControl.Enums.RestingProcedureEnum])
-
-            value: typing.Optional[ClosureControl.Enums.RestingProcedureEnum] = None
-
-        @dataclass
-        class TriggerCondition(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000104
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000006
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[ClosureControl.Enums.TriggerConditionEnum])
-
-            value: typing.Optional[ClosureControl.Enums.TriggerConditionEnum] = None
-
-        @dataclass
-        class TriggerPosition(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000104
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000007
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[ClosureControl.Enums.TriggerPositionEnum])
-
-            value: typing.Optional[ClosureControl.Enums.TriggerPositionEnum] = None
-
-        @dataclass
-        class WaitingDelay(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000104
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000008
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
-
-            value: typing.Optional[uint] = None
-
-        @dataclass
-        class KickoffTimer(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000104
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000009
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
-
-            value: typing.Optional[uint] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -45206,9 +45085,11 @@ class AccountLogin(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="node", Tag=0, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             node: typing.Optional[uint] = None
+            fabricIndex: uint = 0
 
 
 @dataclass
@@ -46264,7 +46145,7 @@ class CameraAvStreamManagement(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="maxConcurrentVideoEncoders", Tag=0x00000000, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="maxConcurrentEncoders", Tag=0x00000000, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="maxEncodedPixelRate", Tag=0x00000001, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="videoSensorParams", Tag=0x00000002, Type=typing.Optional[CameraAvStreamManagement.Structs.VideoSensorParamsStruct]),
                 ClusterObjectFieldDescriptor(Label="nightVisionCapable", Tag=0x00000003, Type=typing.Optional[bool]),
@@ -46274,7 +46155,7 @@ class CameraAvStreamManagement(Cluster):
                 ClusterObjectFieldDescriptor(Label="microphoneCapabilities", Tag=0x00000007, Type=typing.Optional[CameraAvStreamManagement.Structs.AudioCapabilitiesStruct]),
                 ClusterObjectFieldDescriptor(Label="speakerCapabilities", Tag=0x00000008, Type=typing.Optional[CameraAvStreamManagement.Structs.AudioCapabilitiesStruct]),
                 ClusterObjectFieldDescriptor(Label="twoWayTalkSupport", Tag=0x00000009, Type=typing.Optional[CameraAvStreamManagement.Enums.TwoWayTalkSupportTypeEnum]),
-                ClusterObjectFieldDescriptor(Label="supportedSnapshotParams", Tag=0x0000000A, Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotParamsStruct]]),
+                ClusterObjectFieldDescriptor(Label="snapshotCapabilities", Tag=0x0000000A, Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotCapabilitiesStruct]]),
                 ClusterObjectFieldDescriptor(Label="maxNetworkBandwidth", Tag=0x0000000B, Type=uint),
                 ClusterObjectFieldDescriptor(Label="currentFrameRate", Tag=0x0000000C, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="HDRModeEnabled", Tag=0x0000000D, Type=typing.Optional[bool]),
@@ -46312,7 +46193,7 @@ class CameraAvStreamManagement(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    maxConcurrentVideoEncoders: typing.Optional[uint] = None
+    maxConcurrentEncoders: typing.Optional[uint] = None
     maxEncodedPixelRate: typing.Optional[uint] = None
     videoSensorParams: typing.Optional[CameraAvStreamManagement.Structs.VideoSensorParamsStruct] = None
     nightVisionCapable: typing.Optional[bool] = None
@@ -46322,7 +46203,7 @@ class CameraAvStreamManagement(Cluster):
     microphoneCapabilities: typing.Optional[CameraAvStreamManagement.Structs.AudioCapabilitiesStruct] = None
     speakerCapabilities: typing.Optional[CameraAvStreamManagement.Structs.AudioCapabilitiesStruct] = None
     twoWayTalkSupport: typing.Optional[CameraAvStreamManagement.Enums.TwoWayTalkSupportTypeEnum] = None
-    supportedSnapshotParams: typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotParamsStruct]] = None
+    snapshotCapabilities: typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotCapabilitiesStruct]] = None
     maxNetworkBandwidth: uint = 0
     currentFrameRate: typing.Optional[uint] = None
     HDRModeEnabled: typing.Optional[bool] = None
@@ -46492,24 +46373,26 @@ class CameraAvStreamManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="snapshotStreamID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="imageCodec", Tag=1, Type=CameraAvStreamManagement.Enums.ImageCodecEnum),
                         ClusterObjectFieldDescriptor(Label="frameRate", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="bitRate", Tag=3, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="minResolution", Tag=4, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
-                        ClusterObjectFieldDescriptor(Label="maxResolution", Tag=5, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
-                        ClusterObjectFieldDescriptor(Label="quality", Tag=6, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="referenceCount", Tag=7, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="minResolution", Tag=3, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
+                        ClusterObjectFieldDescriptor(Label="maxResolution", Tag=4, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
+                        ClusterObjectFieldDescriptor(Label="quality", Tag=5, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="referenceCount", Tag=6, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="encodedPixels", Tag=7, Type=bool),
+                        ClusterObjectFieldDescriptor(Label="hardwareEncoder", Tag=8, Type=bool),
                     ])
 
             snapshotStreamID: 'uint' = 0
             imageCodec: 'CameraAvStreamManagement.Enums.ImageCodecEnum' = 0
             frameRate: 'uint' = 0
-            bitRate: 'uint' = 0
             minResolution: 'CameraAvStreamManagement.Structs.VideoResolutionStruct' = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
             maxResolution: 'CameraAvStreamManagement.Structs.VideoResolutionStruct' = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
             quality: 'uint' = 0
             referenceCount: 'uint' = 0
+            encodedPixels: 'bool' = False
+            hardwareEncoder: 'bool' = False
 
         @dataclass
-        class SnapshotParamsStruct(ClusterObject):
+        class SnapshotCapabilitiesStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -46517,11 +46400,15 @@ class CameraAvStreamManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="resolution", Tag=0, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
                         ClusterObjectFieldDescriptor(Label="maxFrameRate", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="imageCodec", Tag=2, Type=CameraAvStreamManagement.Enums.ImageCodecEnum),
+                        ClusterObjectFieldDescriptor(Label="requiresEncodedPixels", Tag=3, Type=bool),
+                        ClusterObjectFieldDescriptor(Label="requiresHardwareEncoder", Tag=4, Type=typing.Optional[bool]),
                     ])
 
             resolution: 'CameraAvStreamManagement.Structs.VideoResolutionStruct' = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
             maxFrameRate: 'uint' = 0
             imageCodec: 'CameraAvStreamManagement.Enums.ImageCodecEnum' = 0
+            requiresEncodedPixels: 'bool' = False
+            requiresHardwareEncoder: 'typing.Optional[bool]' = None
 
         @dataclass
         class RateDistortionTradeOffPointsStruct(ClusterObject):
@@ -46776,17 +46663,15 @@ class CameraAvStreamManagement(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="imageCodec", Tag=0, Type=CameraAvStreamManagement.Enums.ImageCodecEnum),
                         ClusterObjectFieldDescriptor(Label="maxFrameRate", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="bitRate", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="minResolution", Tag=3, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
-                        ClusterObjectFieldDescriptor(Label="maxResolution", Tag=4, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
-                        ClusterObjectFieldDescriptor(Label="quality", Tag=5, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="watermarkEnabled", Tag=6, Type=typing.Optional[bool]),
-                        ClusterObjectFieldDescriptor(Label="OSDEnabled", Tag=7, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="minResolution", Tag=2, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
+                        ClusterObjectFieldDescriptor(Label="maxResolution", Tag=3, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
+                        ClusterObjectFieldDescriptor(Label="quality", Tag=4, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="watermarkEnabled", Tag=5, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="OSDEnabled", Tag=6, Type=typing.Optional[bool]),
                     ])
 
             imageCodec: CameraAvStreamManagement.Enums.ImageCodecEnum = 0
             maxFrameRate: uint = 0
-            bitRate: uint = 0
             minResolution: CameraAvStreamManagement.Structs.VideoResolutionStruct = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
             maxResolution: CameraAvStreamManagement.Structs.VideoResolutionStruct = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
             quality: uint = 0
@@ -46872,11 +46757,11 @@ class CameraAvStreamManagement(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="snapshotStreamID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="snapshotStreamID", Tag=0, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="requestedResolution", Tag=1, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
                     ])
 
-            snapshotStreamID: uint = 0
+            snapshotStreamID: typing.Union[Nullable, uint] = NullValue
             requestedResolution: CameraAvStreamManagement.Structs.VideoResolutionStruct = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
 
         @dataclass
@@ -46901,7 +46786,7 @@ class CameraAvStreamManagement(Cluster):
 
     class Attributes:
         @dataclass
-        class MaxConcurrentVideoEncoders(ClusterAttributeDescriptor):
+        class MaxConcurrentEncoders(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000551
@@ -47061,7 +46946,7 @@ class CameraAvStreamManagement(Cluster):
             value: typing.Optional[CameraAvStreamManagement.Enums.TwoWayTalkSupportTypeEnum] = None
 
         @dataclass
-        class SupportedSnapshotParams(ClusterAttributeDescriptor):
+        class SnapshotCapabilities(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000551
@@ -47072,9 +46957,9 @@ class CameraAvStreamManagement(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotParamsStruct]])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotCapabilitiesStruct]])
 
-            value: typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotParamsStruct]] = None
+            value: typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotCapabilitiesStruct]] = None
 
         @dataclass
         class MaxNetworkBandwidth(ClusterAttributeDescriptor):

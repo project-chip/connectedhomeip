@@ -5198,7 +5198,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _price = @(0);
+        _price = nil;
+
+        _priceLevel = nil;
 
         _source = @(0);
 
@@ -5214,6 +5216,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRCommodityPriceClusterCommodityPriceComponentStruct alloc] init];
 
     other.price = self.price;
+    other.priceLevel = self.priceLevel;
     other.source = self.source;
     other.descriptionString = self.descriptionString;
     other.tariffComponentID = self.tariffComponentID;
@@ -5223,7 +5226,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: price:%@; source:%@; descriptionString:%@; tariffComponentID:%@; >", NSStringFromClass([self class]), _price, _source, _descriptionString, _tariffComponentID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: price:%@; priceLevel:%@; source:%@; descriptionString:%@; tariffComponentID:%@; >", NSStringFromClass([self class]), _price, _priceLevel, _source, _descriptionString, _tariffComponentID];
     return descriptionString;
 }
 
@@ -5238,7 +5241,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _periodEnd = nil;
 
-        _price = [MTRDataTypePriceStruct new];
+        _price = nil;
+
+        _priceLevel = nil;
 
         _descriptionString = nil;
 
@@ -5254,6 +5259,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.periodStart = self.periodStart;
     other.periodEnd = self.periodEnd;
     other.price = self.price;
+    other.priceLevel = self.priceLevel;
     other.descriptionString = self.descriptionString;
     other.components = self.components;
 
@@ -5262,7 +5268,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: periodStart:%@; periodEnd:%@; price:%@; descriptionString:%@; components:%@; >", NSStringFromClass([self class]), _periodStart, _periodEnd, _price, _descriptionString, _components];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: periodStart:%@; periodEnd:%@; price:%@; priceLevel:%@; descriptionString:%@; components:%@; >", NSStringFromClass([self class]), _periodStart, _periodEnd, _price, _priceLevel, _descriptionString, _components];
     return descriptionString;
 }
 
@@ -5273,7 +5279,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _currentPrice = [MTRCommodityPriceClusterCommodityPriceStruct new];
+        _currentPrice = nil;
     }
     return self;
 }
@@ -5300,7 +5306,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _priceForecast = [NSArray array];
+        _priceForecast = nil;
     }
     return self;
 }
@@ -6974,9 +6980,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _tagPosition = nil;
+        _position = nil;
 
-        _tagLatch = nil;
+        _latch = nil;
 
         _speed = nil;
     }
@@ -6987,8 +6993,8 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRClosureControlClusterOverallTargetStruct alloc] init];
 
-    other.tagPosition = self.tagPosition;
-    other.tagLatch = self.tagLatch;
+    other.position = self.position;
+    other.latch = self.latch;
     other.speed = self.speed;
 
     return other;
@@ -6996,7 +7002,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: tagPosition:%@; tagLatch:%@; speed:%@; >", NSStringFromClass([self class]), _tagPosition, _tagLatch, _speed];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: position:%@; latch:%@; speed:%@; >", NSStringFromClass([self class]), _position, _latch, _speed];
     return descriptionString;
 }
 
@@ -9117,6 +9123,8 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _node = nil;
+
+        _fabricIndex = @(0);
     }
     return self;
 }
@@ -9126,13 +9134,14 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRAccountLoginClusterLoggedOutEvent alloc] init];
 
     other.node = self.node;
+    other.fabricIndex = self.fabricIndex;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: node:%@; >", NSStringFromClass([self class]), _node];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: node:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _node, _fabricIndex];
     return descriptionString;
 }
 
@@ -9496,8 +9505,6 @@ NS_ASSUME_NONNULL_BEGIN
 
         _frameRate = @(0);
 
-        _bitRate = @(0);
-
         _minResolution = [MTRCameraAVStreamManagementClusterVideoResolutionStruct new];
 
         _maxResolution = [MTRCameraAVStreamManagementClusterVideoResolutionStruct new];
@@ -9505,6 +9512,10 @@ NS_ASSUME_NONNULL_BEGIN
         _quality = @(0);
 
         _referenceCount = @(0);
+
+        _encodedPixels = @(0);
+
+        _hardwareEncoder = @(0);
     }
     return self;
 }
@@ -9516,24 +9527,25 @@ NS_ASSUME_NONNULL_BEGIN
     other.snapshotStreamID = self.snapshotStreamID;
     other.imageCodec = self.imageCodec;
     other.frameRate = self.frameRate;
-    other.bitRate = self.bitRate;
     other.minResolution = self.minResolution;
     other.maxResolution = self.maxResolution;
     other.quality = self.quality;
     other.referenceCount = self.referenceCount;
+    other.encodedPixels = self.encodedPixels;
+    other.hardwareEncoder = self.hardwareEncoder;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: snapshotStreamID:%@; imageCodec:%@; frameRate:%@; bitRate:%@; minResolution:%@; maxResolution:%@; quality:%@; referenceCount:%@; >", NSStringFromClass([self class]), _snapshotStreamID, _imageCodec, _frameRate, _bitRate, _minResolution, _maxResolution, _quality, _referenceCount];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: snapshotStreamID:%@; imageCodec:%@; frameRate:%@; minResolution:%@; maxResolution:%@; quality:%@; referenceCount:%@; encodedPixels:%@; hardwareEncoder:%@; >", NSStringFromClass([self class]), _snapshotStreamID, _imageCodec, _frameRate, _minResolution, _maxResolution, _quality, _referenceCount, _encodedPixels, _hardwareEncoder];
     return descriptionString;
 }
 
 @end
 
-@implementation MTRCameraAVStreamManagementClusterSnapshotParamsStruct
+@implementation MTRCameraAVStreamManagementClusterSnapshotCapabilitiesStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -9543,24 +9555,30 @@ NS_ASSUME_NONNULL_BEGIN
         _maxFrameRate = @(0);
 
         _imageCodec = @(0);
+
+        _requiresEncodedPixels = @(0);
+
+        _requiresHardwareEncoder = nil;
     }
     return self;
 }
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRCameraAVStreamManagementClusterSnapshotParamsStruct alloc] init];
+    auto other = [[MTRCameraAVStreamManagementClusterSnapshotCapabilitiesStruct alloc] init];
 
     other.resolution = self.resolution;
     other.maxFrameRate = self.maxFrameRate;
     other.imageCodec = self.imageCodec;
+    other.requiresEncodedPixels = self.requiresEncodedPixels;
+    other.requiresHardwareEncoder = self.requiresHardwareEncoder;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: resolution:%@; maxFrameRate:%@; imageCodec:%@; >", NSStringFromClass([self class]), _resolution, _maxFrameRate, _imageCodec];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: resolution:%@; maxFrameRate:%@; imageCodec:%@; requiresEncodedPixels:%@; requiresHardwareEncoder:%@; >", NSStringFromClass([self class]), _resolution, _maxFrameRate, _imageCodec, _requiresEncodedPixels, _requiresHardwareEncoder];
     return descriptionString;
 }
 

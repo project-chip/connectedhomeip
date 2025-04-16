@@ -1087,6 +1087,10 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "OperationalDatasetComponents";
         case chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::Id:
             return "ActiveNetworkFaultsList";
+        case chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ExtAddress::Id:
+            return "ExtAddress";
+        case chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::Rloc16::Id:
+            return "Rloc16";
         case chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::AcceptedCommandList::Id:
@@ -2771,16 +2775,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "OverallState";
         case chip::app::Clusters::ClosureControl::Attributes::OverallTarget::Id:
             return "OverallTarget";
-        case chip::app::Clusters::ClosureControl::Attributes::RestingProcedure::Id:
-            return "RestingProcedure";
-        case chip::app::Clusters::ClosureControl::Attributes::TriggerCondition::Id:
-            return "TriggerCondition";
-        case chip::app::Clusters::ClosureControl::Attributes::TriggerPosition::Id:
-            return "TriggerPosition";
-        case chip::app::Clusters::ClosureControl::Attributes::WaitingDelay::Id:
-            return "WaitingDelay";
-        case chip::app::Clusters::ClosureControl::Attributes::KickoffTimer::Id:
-            return "KickoffTimer";
         case chip::app::Clusters::ClosureControl::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::ClosureControl::Attributes::AcceptedCommandList::Id:
@@ -4288,8 +4282,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
     case chip::app::Clusters::CameraAvStreamManagement::Id: {
         switch (id)
         {
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxConcurrentVideoEncoders::Id:
-            return "MaxConcurrentVideoEncoders";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxConcurrentEncoders::Id:
+            return "MaxConcurrentEncoders";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxEncodedPixelRate::Id:
             return "MaxEncodedPixelRate";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::VideoSensorParams::Id:
@@ -4308,8 +4302,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SpeakerCapabilities";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::TwoWayTalkSupport::Id:
             return "TwoWayTalkSupport";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::SupportedSnapshotParams::Id:
-            return "SupportedSnapshotParams";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::SnapshotCapabilities::Id:
+            return "SnapshotCapabilities";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxNetworkBandwidth::Id:
             return "MaxNetworkBandwidth";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::CurrentFrameRate::Id:
@@ -5691,10 +5685,6 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "MoveTo";
         case chip::app::Clusters::ClosureControl::Commands::Calibrate::Id:
             return "Calibrate";
-        case chip::app::Clusters::ClosureControl::Commands::ConfigureFallback::Id:
-            return "ConfigureFallback";
-        case chip::app::Clusters::ClosureControl::Commands::CancelFallback::Id:
-            return "CancelFallback";
         default:
             return "Unknown";
         }
