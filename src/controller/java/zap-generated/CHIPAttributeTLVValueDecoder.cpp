@@ -41989,8 +41989,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         using namespace app::Clusters::CameraAvStreamManagement;
         switch (aPath.mAttributeId)
         {
-        case Attributes::MaxConcurrentVideoEncoders::Id: {
-            using TypeInfo = Attributes::MaxConcurrentVideoEncoders::TypeInfo;
+        case Attributes::MaxConcurrentEncoders::Id: {
+            using TypeInfo = Attributes::MaxConcurrentEncoders::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -42481,8 +42481,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                        value);
             return value;
         }
-        case Attributes::SupportedSnapshotParams::Id: {
-            using TypeInfo = Attributes::SupportedSnapshotParams::TypeInfo;
+        case Attributes::SnapshotCapabilities::Id: {
+            using TypeInfo = Attributes::SnapshotCapabilities::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -42552,33 +42552,62 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_imageCodecClassName.c_str(),
                                                                            newElement_0_imageCodecCtorSignature.c_str(),
                                                                            jninewElement_0_imageCodec, newElement_0_imageCodec);
+                jobject newElement_0_requiresEncodedPixels;
+                std::string newElement_0_requiresEncodedPixelsClassName     = "java/lang/Boolean";
+                std::string newElement_0_requiresEncodedPixelsCtorSignature = "(Z)V";
+                jboolean jninewElement_0_requiresEncodedPixels              = static_cast<jboolean>(entry_0.requiresEncodedPixels);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
+                    newElement_0_requiresEncodedPixelsClassName.c_str(), newElement_0_requiresEncodedPixelsCtorSignature.c_str(),
+                    jninewElement_0_requiresEncodedPixels, newElement_0_requiresEncodedPixels);
+                jobject newElement_0_requiresHardwareEncoder;
+                if (!entry_0.requiresHardwareEncoder.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_requiresHardwareEncoder);
+                }
+                else
+                {
+                    jobject newElement_0_requiresHardwareEncoderInsideOptional;
+                    std::string newElement_0_requiresHardwareEncoderInsideOptionalClassName     = "java/lang/Boolean";
+                    std::string newElement_0_requiresHardwareEncoderInsideOptionalCtorSignature = "(Z)V";
+                    jboolean jninewElement_0_requiresHardwareEncoderInsideOptional =
+                        static_cast<jboolean>(entry_0.requiresHardwareEncoder.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
+                        newElement_0_requiresHardwareEncoderInsideOptionalClassName.c_str(),
+                        newElement_0_requiresHardwareEncoderInsideOptionalCtorSignature.c_str(),
+                        jninewElement_0_requiresHardwareEncoderInsideOptional, newElement_0_requiresHardwareEncoderInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_requiresHardwareEncoderInsideOptional,
+                                                                      newElement_0_requiresHardwareEncoder);
+                }
 
                 {
-                    jclass snapshotParamsStructStructClass_1;
+                    jclass snapshotCapabilitiesStructStructClass_1;
                     err = chip::JniReferences::GetInstance().GetLocalClassRef(
-                        env, "chip/devicecontroller/ChipStructs$CameraAvStreamManagementClusterSnapshotParamsStruct",
-                        snapshotParamsStructStructClass_1);
+                        env, "chip/devicecontroller/ChipStructs$CameraAvStreamManagementClusterSnapshotCapabilitiesStruct",
+                        snapshotCapabilitiesStructStructClass_1);
                     if (err != CHIP_NO_ERROR)
                     {
-                        ChipLogError(Zcl, "Could not find class ChipStructs$CameraAvStreamManagementClusterSnapshotParamsStruct");
-                        return nullptr;
-                    }
-
-                    jmethodID snapshotParamsStructStructCtor_1;
-                    err = chip::JniReferences::GetInstance().FindMethod(
-                        env, snapshotParamsStructStructClass_1, "<init>",
-                        "(Lchip/devicecontroller/ChipStructs$CameraAvStreamManagementClusterVideoResolutionStruct;Ljava/lang/"
-                        "Integer;Ljava/lang/Integer;)V",
-                        &snapshotParamsStructStructCtor_1);
-                    if (err != CHIP_NO_ERROR || snapshotParamsStructStructCtor_1 == nullptr)
-                    {
                         ChipLogError(Zcl,
-                                     "Could not find ChipStructs$CameraAvStreamManagementClusterSnapshotParamsStruct constructor");
+                                     "Could not find class ChipStructs$CameraAvStreamManagementClusterSnapshotCapabilitiesStruct");
                         return nullptr;
                     }
 
-                    newElement_0 = env->NewObject(snapshotParamsStructStructClass_1, snapshotParamsStructStructCtor_1,
-                                                  newElement_0_resolution, newElement_0_maxFrameRate, newElement_0_imageCodec);
+                    jmethodID snapshotCapabilitiesStructStructCtor_1;
+                    err = chip::JniReferences::GetInstance().FindMethod(
+                        env, snapshotCapabilitiesStructStructClass_1, "<init>",
+                        "(Lchip/devicecontroller/ChipStructs$CameraAvStreamManagementClusterVideoResolutionStruct;Ljava/lang/"
+                        "Integer;Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/util/Optional;)V",
+                        &snapshotCapabilitiesStructStructCtor_1);
+                    if (err != CHIP_NO_ERROR || snapshotCapabilitiesStructStructCtor_1 == nullptr)
+                    {
+                        ChipLogError(
+                            Zcl,
+                            "Could not find ChipStructs$CameraAvStreamManagementClusterSnapshotCapabilitiesStruct constructor");
+                        return nullptr;
+                    }
+
+                    newElement_0 = env->NewObject(snapshotCapabilitiesStructStructClass_1, snapshotCapabilitiesStructStructCtor_1,
+                                                  newElement_0_resolution, newElement_0_maxFrameRate, newElement_0_imageCodec,
+                                                  newElement_0_requiresEncodedPixels, newElement_0_requiresHardwareEncoder);
                 }
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
@@ -43045,13 +43074,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_frameRateClassName.c_str(),
                                                                            newElement_0_frameRateCtorSignature.c_str(),
                                                                            jninewElement_0_frameRate, newElement_0_frameRate);
-                jobject newElement_0_bitRate;
-                std::string newElement_0_bitRateClassName     = "java/lang/Long";
-                std::string newElement_0_bitRateCtorSignature = "(J)V";
-                jlong jninewElement_0_bitRate                 = static_cast<jlong>(entry_0.bitRate);
-                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(newElement_0_bitRateClassName.c_str(),
-                                                                            newElement_0_bitRateCtorSignature.c_str(),
-                                                                            jninewElement_0_bitRate, newElement_0_bitRate);
                 jobject newElement_0_minResolution;
                 jobject newElement_0_minResolution_width;
                 std::string newElement_0_minResolution_widthClassName     = "java/lang/Integer";
@@ -43150,6 +43172,20 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
                     newElement_0_referenceCountClassName.c_str(), newElement_0_referenceCountCtorSignature.c_str(),
                     jninewElement_0_referenceCount, newElement_0_referenceCount);
+                jobject newElement_0_encodedPixels;
+                std::string newElement_0_encodedPixelsClassName     = "java/lang/Boolean";
+                std::string newElement_0_encodedPixelsCtorSignature = "(Z)V";
+                jboolean jninewElement_0_encodedPixels              = static_cast<jboolean>(entry_0.encodedPixels);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
+                    newElement_0_encodedPixelsClassName.c_str(), newElement_0_encodedPixelsCtorSignature.c_str(),
+                    jninewElement_0_encodedPixels, newElement_0_encodedPixels);
+                jobject newElement_0_hardwareEncoder;
+                std::string newElement_0_hardwareEncoderClassName     = "java/lang/Boolean";
+                std::string newElement_0_hardwareEncoderCtorSignature = "(Z)V";
+                jboolean jninewElement_0_hardwareEncoder              = static_cast<jboolean>(entry_0.hardwareEncoder);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
+                    newElement_0_hardwareEncoderClassName.c_str(), newElement_0_hardwareEncoderCtorSignature.c_str(),
+                    jninewElement_0_hardwareEncoder, newElement_0_hardwareEncoder);
 
                 {
                     jclass snapshotStreamStructStructClass_1;
@@ -43165,9 +43201,10 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     jmethodID snapshotStreamStructStructCtor_1;
                     err = chip::JniReferences::GetInstance().FindMethod(
                         env, snapshotStreamStructStructClass_1, "<init>",
-                        "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;Lchip/devicecontroller/"
+                        "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Lchip/devicecontroller/"
                         "ChipStructs$CameraAvStreamManagementClusterVideoResolutionStruct;Lchip/devicecontroller/"
-                        "ChipStructs$CameraAvStreamManagementClusterVideoResolutionStruct;Ljava/lang/Integer;Ljava/lang/Integer;)V",
+                        "ChipStructs$CameraAvStreamManagementClusterVideoResolutionStruct;Ljava/lang/Integer;Ljava/lang/"
+                        "Integer;Ljava/lang/Boolean;Ljava/lang/Boolean;)V",
                         &snapshotStreamStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || snapshotStreamStructStructCtor_1 == nullptr)
                     {
@@ -43176,10 +43213,11 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         return nullptr;
                     }
 
-                    newElement_0 = env->NewObject(snapshotStreamStructStructClass_1, snapshotStreamStructStructCtor_1,
-                                                  newElement_0_snapshotStreamID, newElement_0_imageCodec, newElement_0_frameRate,
-                                                  newElement_0_bitRate, newElement_0_minResolution, newElement_0_maxResolution,
-                                                  newElement_0_quality, newElement_0_referenceCount);
+                    newElement_0 =
+                        env->NewObject(snapshotStreamStructStructClass_1, snapshotStreamStructStructCtor_1,
+                                       newElement_0_snapshotStreamID, newElement_0_imageCodec, newElement_0_frameRate,
+                                       newElement_0_minResolution, newElement_0_maxResolution, newElement_0_quality,
+                                       newElement_0_referenceCount, newElement_0_encodedPixels, newElement_0_hardwareEncoder);
                 }
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }

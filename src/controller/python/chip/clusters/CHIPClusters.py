@@ -12814,7 +12814,6 @@ class ChipClusters:
                 "args": {
                     "imageCodec": "int",
                     "maxFrameRate": "int",
-                    "bitRate": "int",
                     "minResolution": "VideoResolutionStruct",
                     "maxResolution": "VideoResolutionStruct",
                     "quality": "int",
@@ -12856,7 +12855,7 @@ class ChipClusters:
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "MaxConcurrentVideoEncoders",
+                "attributeName": "MaxConcurrentEncoders",
                 "attributeId": 0x00000000,
                 "type": "int",
                 "reportable": True,
@@ -12916,7 +12915,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x0000000A: {
-                "attributeName": "SupportedSnapshotParams",
+                "attributeName": "SnapshotCapabilities",
                 "attributeId": 0x0000000A,
                 "type": "",
                 "reportable": True,

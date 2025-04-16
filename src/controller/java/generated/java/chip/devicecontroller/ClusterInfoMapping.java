@@ -21000,7 +21000,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedCameraAvStreamManagementClusterSupportedSnapshotParamsAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.SupportedSnapshotParamsAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedCameraAvStreamManagementClusterSnapshotCapabilitiesAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.SnapshotCapabilitiesAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -21008,9 +21008,9 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<ChipStructs.CameraAvStreamManagementClusterSnapshotParamsStruct> valueList) {
+    public void onSuccess(List<ChipStructs.CameraAvStreamManagementClusterSnapshotCapabilitiesStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.CameraAvStreamManagementClusterSnapshotParamsStruct>");
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.CameraAvStreamManagementClusterSnapshotCapabilitiesStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }
@@ -32380,9 +32380,6 @@ public class ClusterInfoMapping {
     CommandParameterInfo cameraAvStreamManagementsnapshotStreamAllocatemaxFrameRateCommandParameterInfo = new CommandParameterInfo("maxFrameRate", Integer.class, Integer.class);
     cameraAvStreamManagementsnapshotStreamAllocateCommandParams.put("maxFrameRate",cameraAvStreamManagementsnapshotStreamAllocatemaxFrameRateCommandParameterInfo);
 
-    CommandParameterInfo cameraAvStreamManagementsnapshotStreamAllocatebitRateCommandParameterInfo = new CommandParameterInfo("bitRate", Long.class, Long.class);
-    cameraAvStreamManagementsnapshotStreamAllocateCommandParams.put("bitRate",cameraAvStreamManagementsnapshotStreamAllocatebitRateCommandParameterInfo);
-
 
 
     CommandParameterInfo cameraAvStreamManagementsnapshotStreamAllocatequalityCommandParameterInfo = new CommandParameterInfo("quality", Integer.class, Integer.class);
@@ -32402,9 +32399,6 @@ public class ClusterInfoMapping {
 
            , (Integer)
              commandArguments.get("maxFrameRate")
-
-           , (Long)
-             commandArguments.get("bitRate")
 
            , (ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct)
              commandArguments.get("minResolution")

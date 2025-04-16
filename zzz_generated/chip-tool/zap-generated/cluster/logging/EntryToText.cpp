@@ -4307,8 +4307,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
     case chip::app::Clusters::CameraAvStreamManagement::Id: {
         switch (id)
         {
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxConcurrentVideoEncoders::Id:
-            return "MaxConcurrentVideoEncoders";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxConcurrentEncoders::Id:
+            return "MaxConcurrentEncoders";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxEncodedPixelRate::Id:
             return "MaxEncodedPixelRate";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::VideoSensorParams::Id:
@@ -4327,8 +4327,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SpeakerCapabilities";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::TwoWayTalkSupport::Id:
             return "TwoWayTalkSupport";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::SupportedSnapshotParams::Id:
-            return "SupportedSnapshotParams";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::SnapshotCapabilities::Id:
+            return "SnapshotCapabilities";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxNetworkBandwidth::Id:
             return "MaxNetworkBandwidth";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::CurrentFrameRate::Id:

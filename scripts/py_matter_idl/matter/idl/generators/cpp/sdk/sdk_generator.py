@@ -108,8 +108,8 @@ class SdkGenerator(CodeGenerator):
         """
 
         self.internal_render_one_output(
-            template_path="AllItemsGni.jinja",
-            output_file_name="all_items.gni",
+            template_path="AllItemsBuild.jinja",
+            output_file_name="BUILD.gn",
             vars={
                 "clusters": self.idl.clusters,
                 "input_name": self.idl.parse_file_name,

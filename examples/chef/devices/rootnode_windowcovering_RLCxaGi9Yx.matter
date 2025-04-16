@@ -1975,7 +1975,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_windowcovering = 514, version 1;
+  device type ma_windowcovering = 514, version 3;
 
   binding cluster Binding;
 
@@ -1986,7 +1986,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 5;
 
     handle command Identify;
   }
@@ -1997,7 +1997,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 4;
 
     handle command AddGroup;
     handle command AddGroupResponse;
@@ -2025,10 +2025,6 @@ endpoint 1 {
 
   server cluster WindowCovering {
     ram      attribute type default = 8;
-    ram      attribute physicalClosedLimitLift default = 0x0000;
-    ram      attribute physicalClosedLimitTilt default = 0x0000;
-    persist  attribute currentPositionLift default = 0;
-    persist  attribute currentPositionTilt default = 0;
     persist  attribute numberOfActuationsLift default = 0x0000;
     persist  attribute numberOfActuationsTilt default = 0x0000;
     persist  attribute configStatus default = 0x19;
@@ -2040,10 +2036,6 @@ endpoint 1 {
     ram      attribute endProductType default = 8;
     persist  attribute currentPositionLiftPercent100ths default = 0;
     persist  attribute currentPositionTiltPercent100ths default = 0;
-    persist  attribute installedOpenLimitLift default = 0;
-    persist  attribute installedClosedLimitLift default = 65534;
-    persist  attribute installedOpenLimitTilt default = 0;
-    persist  attribute installedClosedLimitTilt default = 1800;
     persist  attribute mode default = 0x00;
     ram      attribute safetyStatus default = 0x0000;
     callback attribute generatedCommandList;
@@ -2055,9 +2047,7 @@ endpoint 1 {
     handle command UpOrOpen;
     handle command DownOrClose;
     handle command StopMotion;
-    handle command GoToLiftValue;
     handle command GoToLiftPercentage;
-    handle command GoToTiltValue;
     handle command GoToTiltPercentage;
   }
 }

@@ -9601,8 +9601,6 @@ NS_ASSUME_NONNULL_BEGIN
 
         _frameRate = @(0);
 
-        _bitRate = @(0);
-
         _minResolution = [MTRCameraAVStreamManagementClusterVideoResolutionStruct new];
 
         _maxResolution = [MTRCameraAVStreamManagementClusterVideoResolutionStruct new];
@@ -9610,6 +9608,10 @@ NS_ASSUME_NONNULL_BEGIN
         _quality = @(0);
 
         _referenceCount = @(0);
+
+        _encodedPixels = @(0);
+
+        _hardwareEncoder = @(0);
     }
     return self;
 }
@@ -9621,24 +9623,25 @@ NS_ASSUME_NONNULL_BEGIN
     other.snapshotStreamID = self.snapshotStreamID;
     other.imageCodec = self.imageCodec;
     other.frameRate = self.frameRate;
-    other.bitRate = self.bitRate;
     other.minResolution = self.minResolution;
     other.maxResolution = self.maxResolution;
     other.quality = self.quality;
     other.referenceCount = self.referenceCount;
+    other.encodedPixels = self.encodedPixels;
+    other.hardwareEncoder = self.hardwareEncoder;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: snapshotStreamID:%@; imageCodec:%@; frameRate:%@; bitRate:%@; minResolution:%@; maxResolution:%@; quality:%@; referenceCount:%@; >", NSStringFromClass([self class]), _snapshotStreamID, _imageCodec, _frameRate, _bitRate, _minResolution, _maxResolution, _quality, _referenceCount];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: snapshotStreamID:%@; imageCodec:%@; frameRate:%@; minResolution:%@; maxResolution:%@; quality:%@; referenceCount:%@; encodedPixels:%@; hardwareEncoder:%@; >", NSStringFromClass([self class]), _snapshotStreamID, _imageCodec, _frameRate, _minResolution, _maxResolution, _quality, _referenceCount, _encodedPixels, _hardwareEncoder];
     return descriptionString;
 }
 
 @end
 
-@implementation MTRCameraAVStreamManagementClusterSnapshotParamsStruct
+@implementation MTRCameraAVStreamManagementClusterSnapshotCapabilitiesStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -9648,24 +9651,30 @@ NS_ASSUME_NONNULL_BEGIN
         _maxFrameRate = @(0);
 
         _imageCodec = @(0);
+
+        _requiresEncodedPixels = @(0);
+
+        _requiresHardwareEncoder = nil;
     }
     return self;
 }
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRCameraAVStreamManagementClusterSnapshotParamsStruct alloc] init];
+    auto other = [[MTRCameraAVStreamManagementClusterSnapshotCapabilitiesStruct alloc] init];
 
     other.resolution = self.resolution;
     other.maxFrameRate = self.maxFrameRate;
     other.imageCodec = self.imageCodec;
+    other.requiresEncodedPixels = self.requiresEncodedPixels;
+    other.requiresHardwareEncoder = self.requiresHardwareEncoder;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: resolution:%@; maxFrameRate:%@; imageCodec:%@; >", NSStringFromClass([self class]), _resolution, _maxFrameRate, _imageCodec];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: resolution:%@; maxFrameRate:%@; imageCodec:%@; requiresEncodedPixels:%@; requiresHardwareEncoder:%@; >", NSStringFromClass([self class]), _resolution, _maxFrameRate, _imageCodec, _requiresEncodedPixels, _requiresHardwareEncoder];
     return descriptionString;
 }
 

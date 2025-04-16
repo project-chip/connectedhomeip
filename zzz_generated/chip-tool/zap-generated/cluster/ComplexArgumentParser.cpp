@@ -6704,8 +6704,6 @@ ComplexArgumentParser::Setup(const char * label,
         ComplexArgumentParser::EnsureMemberExist("SnapshotStreamStruct.imageCodec", "imageCodec", value.isMember("imageCodec")));
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("SnapshotStreamStruct.frameRate", "frameRate", value.isMember("frameRate")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("SnapshotStreamStruct.bitRate", "bitRate", value.isMember("bitRate")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SnapshotStreamStruct.minResolution", "minResolution",
                                                                   value.isMember("minResolution")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SnapshotStreamStruct.maxResolution", "maxResolution",
@@ -6714,6 +6712,10 @@ ComplexArgumentParser::Setup(const char * label,
         ComplexArgumentParser::EnsureMemberExist("SnapshotStreamStruct.quality", "quality", value.isMember("quality")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SnapshotStreamStruct.referenceCount", "referenceCount",
                                                                   value.isMember("referenceCount")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SnapshotStreamStruct.encodedPixels", "encodedPixels",
+                                                                  value.isMember("encodedPixels")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SnapshotStreamStruct.hardwareEncoder", "hardwareEncoder",
+                                                                  value.isMember("hardwareEncoder")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "snapshotStreamID");
@@ -6727,10 +6729,6 @@ ComplexArgumentParser::Setup(const char * label,
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "frameRate");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.frameRate, value["frameRate"]));
     valueCopy.removeMember("frameRate");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "bitRate");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.bitRate, value["bitRate"]));
-    valueCopy.removeMember("bitRate");
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "minResolution");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.minResolution, value["minResolution"]));
@@ -6748,6 +6746,14 @@ ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.referenceCount, value["referenceCount"]));
     valueCopy.removeMember("referenceCount");
 
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "encodedPixels");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.encodedPixels, value["encodedPixels"]));
+    valueCopy.removeMember("encodedPixels");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "hardwareEncoder");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.hardwareEncoder, value["hardwareEncoder"]));
+    valueCopy.removeMember("hardwareEncoder");
+
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -6756,16 +6762,17 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::CameraAvStreamManageme
     ComplexArgumentParser::Finalize(request.snapshotStreamID);
     ComplexArgumentParser::Finalize(request.imageCodec);
     ComplexArgumentParser::Finalize(request.frameRate);
-    ComplexArgumentParser::Finalize(request.bitRate);
     ComplexArgumentParser::Finalize(request.minResolution);
     ComplexArgumentParser::Finalize(request.maxResolution);
     ComplexArgumentParser::Finalize(request.quality);
     ComplexArgumentParser::Finalize(request.referenceCount);
+    ComplexArgumentParser::Finalize(request.encodedPixels);
+    ComplexArgumentParser::Finalize(request.hardwareEncoder);
 }
 
 CHIP_ERROR
 ComplexArgumentParser::Setup(const char * label,
-                             chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotParamsStruct::Type & request,
+                             chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotCapabilitiesStruct::Type & request,
                              Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -6773,12 +6780,14 @@ ComplexArgumentParser::Setup(const char * label,
     // Copy to track which members we already processed.
     Json::Value valueCopy(value);
 
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("SnapshotParamsStruct.resolution", "resolution", value.isMember("resolution")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SnapshotParamsStruct.maxFrameRate", "maxFrameRate",
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SnapshotCapabilitiesStruct.resolution", "resolution",
+                                                                  value.isMember("resolution")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SnapshotCapabilitiesStruct.maxFrameRate", "maxFrameRate",
                                                                   value.isMember("maxFrameRate")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("SnapshotParamsStruct.imageCodec", "imageCodec", value.isMember("imageCodec")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SnapshotCapabilitiesStruct.imageCodec", "imageCodec",
+                                                                  value.isMember("imageCodec")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
+        "SnapshotCapabilitiesStruct.requiresEncodedPixels", "requiresEncodedPixels", value.isMember("requiresEncodedPixels")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "resolution");
@@ -6793,14 +6802,30 @@ ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.imageCodec, value["imageCodec"]));
     valueCopy.removeMember("imageCodec");
 
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "requiresEncodedPixels");
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::Setup(labelWithMember, request.requiresEncodedPixels, value["requiresEncodedPixels"]));
+    valueCopy.removeMember("requiresEncodedPixels");
+
+    if (value.isMember("requiresHardwareEncoder"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "requiresHardwareEncoder");
+        ReturnErrorOnFailure(
+            ComplexArgumentParser::Setup(labelWithMember, request.requiresHardwareEncoder, value["requiresHardwareEncoder"]));
+    }
+    valueCopy.removeMember("requiresHardwareEncoder");
+
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotParamsStruct::Type & request)
+void ComplexArgumentParser::Finalize(
+    chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotCapabilitiesStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.resolution);
     ComplexArgumentParser::Finalize(request.maxFrameRate);
     ComplexArgumentParser::Finalize(request.imageCodec);
+    ComplexArgumentParser::Finalize(request.requiresEncodedPixels);
+    ComplexArgumentParser::Finalize(request.requiresHardwareEncoder);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(

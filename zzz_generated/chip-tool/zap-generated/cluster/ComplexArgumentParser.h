@@ -775,10 +775,10 @@ static CHIP_ERROR Setup(const char * label,
 static void Finalize(chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotStreamStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
-                        chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotParamsStruct::Type & request,
+                        chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotCapabilitiesStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotParamsStruct::Type & request);
+static void Finalize(chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotCapabilitiesStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::CameraAvStreamManagement::Structs::RateDistortionTradeOffPointsStruct::Type & request,

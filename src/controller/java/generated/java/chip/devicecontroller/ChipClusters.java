@@ -61481,7 +61481,7 @@ public class ChipClusters {
   public static class CameraAvStreamManagementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1361L;
 
-    private static final long MAX_CONCURRENT_VIDEO_ENCODERS_ATTRIBUTE_ID = 0L;
+    private static final long MAX_CONCURRENT_ENCODERS_ATTRIBUTE_ID = 0L;
     private static final long MAX_ENCODED_PIXEL_RATE_ATTRIBUTE_ID = 1L;
     private static final long VIDEO_SENSOR_PARAMS_ATTRIBUTE_ID = 2L;
     private static final long NIGHT_VISION_CAPABLE_ATTRIBUTE_ID = 3L;
@@ -61491,7 +61491,7 @@ public class ChipClusters {
     private static final long MICROPHONE_CAPABILITIES_ATTRIBUTE_ID = 7L;
     private static final long SPEAKER_CAPABILITIES_ATTRIBUTE_ID = 8L;
     private static final long TWO_WAY_TALK_SUPPORT_ATTRIBUTE_ID = 9L;
-    private static final long SUPPORTED_SNAPSHOT_PARAMS_ATTRIBUTE_ID = 10L;
+    private static final long SNAPSHOT_CAPABILITIES_ATTRIBUTE_ID = 10L;
     private static final long MAX_NETWORK_BANDWIDTH_ATTRIBUTE_ID = 11L;
     private static final long CURRENT_FRAME_RATE_ATTRIBUTE_ID = 12L;
     private static final long HDR_MODE_ENABLED_ATTRIBUTE_ID = 13L;
@@ -61731,11 +61731,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void snapshotStreamAllocate(SnapshotStreamAllocateResponseCallback callback, Integer imageCodec, Integer maxFrameRate, Long bitRate, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct minResolution, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution, Integer quality, Optional<Boolean> watermarkEnabled, Optional<Boolean> OSDEnabled) {
-      snapshotStreamAllocate(callback, imageCodec, maxFrameRate, bitRate, minResolution, maxResolution, quality, watermarkEnabled, OSDEnabled, 0);
+    public void snapshotStreamAllocate(SnapshotStreamAllocateResponseCallback callback, Integer imageCodec, Integer maxFrameRate, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct minResolution, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution, Integer quality, Optional<Boolean> watermarkEnabled, Optional<Boolean> OSDEnabled) {
+      snapshotStreamAllocate(callback, imageCodec, maxFrameRate, minResolution, maxResolution, quality, watermarkEnabled, OSDEnabled, 0);
     }
 
-    public void snapshotStreamAllocate(SnapshotStreamAllocateResponseCallback callback, Integer imageCodec, Integer maxFrameRate, Long bitRate, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct minResolution, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution, Integer quality, Optional<Boolean> watermarkEnabled, Optional<Boolean> OSDEnabled, int timedInvokeTimeoutMs) {
+    public void snapshotStreamAllocate(SnapshotStreamAllocateResponseCallback callback, Integer imageCodec, Integer maxFrameRate, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct minResolution, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution, Integer quality, Optional<Boolean> watermarkEnabled, Optional<Boolean> OSDEnabled, int timedInvokeTimeoutMs) {
       final long commandId = 7L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -61747,27 +61747,23 @@ public class ChipClusters {
       BaseTLVType maxFrameRatetlvValue = new UIntType(maxFrameRate);
       elements.add(new StructElement(maxFrameRateFieldID, maxFrameRatetlvValue));
 
-      final long bitRateFieldID = 2L;
-      BaseTLVType bitRatetlvValue = new UIntType(bitRate);
-      elements.add(new StructElement(bitRateFieldID, bitRatetlvValue));
-
-      final long minResolutionFieldID = 3L;
+      final long minResolutionFieldID = 2L;
       BaseTLVType minResolutiontlvValue = minResolution.encodeTlv();
       elements.add(new StructElement(minResolutionFieldID, minResolutiontlvValue));
 
-      final long maxResolutionFieldID = 4L;
+      final long maxResolutionFieldID = 3L;
       BaseTLVType maxResolutiontlvValue = maxResolution.encodeTlv();
       elements.add(new StructElement(maxResolutionFieldID, maxResolutiontlvValue));
 
-      final long qualityFieldID = 5L;
+      final long qualityFieldID = 4L;
       BaseTLVType qualitytlvValue = new UIntType(quality);
       elements.add(new StructElement(qualityFieldID, qualitytlvValue));
 
-      final long watermarkEnabledFieldID = 6L;
+      final long watermarkEnabledFieldID = 5L;
       BaseTLVType watermarkEnabledtlvValue = watermarkEnabled.<BaseTLVType>map((nonOptionalwatermarkEnabled) -> new BooleanType(nonOptionalwatermarkEnabled)).orElse(new EmptyType());
       elements.add(new StructElement(watermarkEnabledFieldID, watermarkEnabledtlvValue));
 
-      final long OSDEnabledFieldID = 7L;
+      final long OSDEnabledFieldID = 6L;
       BaseTLVType OSDEnabledtlvValue = OSDEnabled.<BaseTLVType>map((nonOptionalOSDEnabled) -> new BooleanType(nonOptionalOSDEnabled)).orElse(new EmptyType());
       elements.add(new StructElement(OSDEnabledFieldID, OSDEnabledtlvValue));
 
@@ -61857,16 +61853,16 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void captureSnapshot(CaptureSnapshotResponseCallback callback, Integer snapshotStreamID, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct requestedResolution) {
+    public void captureSnapshot(CaptureSnapshotResponseCallback callback, @Nullable Integer snapshotStreamID, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct requestedResolution) {
       captureSnapshot(callback, snapshotStreamID, requestedResolution, 0);
     }
 
-    public void captureSnapshot(CaptureSnapshotResponseCallback callback, Integer snapshotStreamID, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct requestedResolution, int timedInvokeTimeoutMs) {
+    public void captureSnapshot(CaptureSnapshotResponseCallback callback, @Nullable Integer snapshotStreamID, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct requestedResolution, int timedInvokeTimeoutMs) {
       final long commandId = 12L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long snapshotStreamIDFieldID = 0L;
-      BaseTLVType snapshotStreamIDtlvValue = new UIntType(snapshotStreamID);
+      BaseTLVType snapshotStreamIDtlvValue = snapshotStreamID != null ? new UIntType(snapshotStreamID) : new NullType();
       elements.add(new StructElement(snapshotStreamIDFieldID, snapshotStreamIDtlvValue));
 
       final long requestedResolutionFieldID = 1L;
@@ -61941,8 +61937,8 @@ public class ChipClusters {
       void onSuccess(ChipStructs.CameraAvStreamManagementClusterAudioCapabilitiesStruct value);
     }
 
-    public interface SupportedSnapshotParamsAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<ChipStructs.CameraAvStreamManagementClusterSnapshotParamsStruct> value);
+    public interface SnapshotCapabilitiesAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.CameraAvStreamManagementClusterSnapshotCapabilitiesStruct> value);
     }
 
     public interface SupportedStreamUsagesAttributeCallback extends BaseAttributeCallback {
@@ -61985,9 +61981,9 @@ public class ChipClusters {
       void onSuccess(List<Long> value);
     }
 
-    public void readMaxConcurrentVideoEncodersAttribute(
+    public void readMaxConcurrentEncodersAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_CONCURRENT_VIDEO_ENCODERS_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_CONCURRENT_ENCODERS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -61995,12 +61991,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MAX_CONCURRENT_VIDEO_ENCODERS_ATTRIBUTE_ID, true);
+        }, MAX_CONCURRENT_ENCODERS_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeMaxConcurrentVideoEncodersAttribute(
+    public void subscribeMaxConcurrentEncodersAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_CONCURRENT_VIDEO_ENCODERS_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_CONCURRENT_ENCODERS_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -62008,7 +62004,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MAX_CONCURRENT_VIDEO_ENCODERS_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, MAX_CONCURRENT_ENCODERS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readMaxEncodedPixelRateAttribute(
@@ -62245,30 +62241,30 @@ public class ChipClusters {
         }, TWO_WAY_TALK_SUPPORT_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readSupportedSnapshotParamsAttribute(
-        SupportedSnapshotParamsAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_SNAPSHOT_PARAMS_ATTRIBUTE_ID);
+    public void readSnapshotCapabilitiesAttribute(
+        SnapshotCapabilitiesAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SNAPSHOT_CAPABILITIES_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            List<ChipStructs.CameraAvStreamManagementClusterSnapshotParamsStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.CameraAvStreamManagementClusterSnapshotCapabilitiesStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, SUPPORTED_SNAPSHOT_PARAMS_ATTRIBUTE_ID, true);
+        }, SNAPSHOT_CAPABILITIES_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeSupportedSnapshotParamsAttribute(
-        SupportedSnapshotParamsAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_SNAPSHOT_PARAMS_ATTRIBUTE_ID);
+    public void subscribeSnapshotCapabilitiesAttribute(
+        SnapshotCapabilitiesAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SNAPSHOT_CAPABILITIES_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            List<ChipStructs.CameraAvStreamManagementClusterSnapshotParamsStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.CameraAvStreamManagementClusterSnapshotCapabilitiesStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, SUPPORTED_SNAPSHOT_PARAMS_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, SNAPSHOT_CAPABILITIES_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readMaxNetworkBandwidthAttribute(

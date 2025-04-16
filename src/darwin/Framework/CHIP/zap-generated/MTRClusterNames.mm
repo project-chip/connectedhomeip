@@ -7948,8 +7948,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         switch (attributeID) {
 
             // Cluster CameraAVStreamManagement attributes
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMaxConcurrentVideoEncodersID:
-            result = @"MaxConcurrentVideoEncoders";
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMaxConcurrentEncodersID:
+            result = @"MaxConcurrentEncoders";
             break;
 
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMaxEncodedPixelRateID:
@@ -7988,8 +7988,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"TwoWayTalkSupport";
             break;
 
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeSupportedSnapshotParamsID:
-            result = @"SupportedSnapshotParams";
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeSnapshotCapabilitiesID:
+            result = @"SnapshotCapabilities";
             break;
 
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMaxNetworkBandwidthID:
