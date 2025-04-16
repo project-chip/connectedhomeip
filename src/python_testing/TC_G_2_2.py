@@ -29,7 +29,6 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --endpoint 0
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -84,6 +83,11 @@ class TC_G_2_2(MatterBaseTest):
 
     @async_test_body
     async def test_TC_G_2_2(self):
+        if self.matter_test_config.endpoint is None or self.matter_test_config.endpoint != 0:
+            self.matter_test_config.endpoint = 0
+        #self.endpoint = self.get_endpoint()
+        #asserts.assert_false(self.endpoint is None, "--endpoint <endpoint> must be included on the command line in.")
+
         # Pre-Conditions: Comissioning
         self.step(0)
         th1 = self.default_controller
@@ -130,7 +134,13 @@ class TC_G_2_2(MatterBaseTest):
         self.step("2a")
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
             dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
-        asserts.assert_equal(groupTableList[0].groupId, kGroupId1, "Found groupId does not match written value")
+        expected_group_id = 0x0001
+        expected_endpoint = self.matter_test_config.endpoint
+        matched_entries = [
+            entry for entry in groupTableList
+            if entry.groupId == expected_group_id and expected_endpoint in entry.endpoints
+        ]
+        asserts.assert_true(len(matched_entries) > 0, f"No GroupTable entry found with groupId={expected_group_id}")
 
         self.step("2b")
         try:
