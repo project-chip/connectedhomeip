@@ -51,13 +51,11 @@ private:
     CHIP_ERROR SendMsgImpl(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle && msg) override;
     void CloseImpl() override;
 
-    nw_listener_t mListener                   = nullptr;
-    dispatch_semaphore_t mListenerSemaphore   = nullptr;
-    dispatch_queue_t mListenerQueue           = nullptr;
-    nw_connection_t mConnection               = nullptr;
-    dispatch_semaphore_t mConnectionSemaphore = nullptr;
-    dispatch_queue_t mConnectionQueue         = nullptr;
-    dispatch_queue_t mSystemQueue             = nullptr;
+    nw_listener_t mListener                 = nullptr;
+    dispatch_semaphore_t mListenerSemaphore = nullptr;
+    dispatch_queue_t mListenerQueue         = nullptr;
+    dispatch_queue_t mConnectionQueue       = nullptr;
+    dispatch_queue_t mSystemQueue           = nullptr;
 
     class WorkFlag
     {
@@ -74,15 +72,23 @@ private:
 
     CHIP_ERROR ConfigureProtocol(IPAddressType aAddressType, const nw_parameters_t & aParameters);
     CHIP_ERROR StartListener();
-    CHIP_ERROR GetConnection(const IPPacketInfo * aPktInfo);
     nw_endpoint_t GetEndPoint(const IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort,
                               InterfaceId interfaceIndex = InterfaceId::Null());
-    CHIP_ERROR StartConnection(nw_connection_t aConnection);
     CHIP_ERROR GetPacketInfo(const nw_connection_t & aConnection, IPPacketInfo & aPacketInfo);
     void HandleDataReceived(nw_connection_t aConnection);
     CHIP_ERROR ReleaseListener();
-    CHIP_ERROR ReleaseConnection();
     void ReleaseAll();
+
+    CFMutableDictionaryRef mConnections = nullptr;
+    CHIP_ERROR GetConnection(const IPPacketInfo * aPktInfo);
+    CHIP_ERROR StartConnection(nw_connection_t aConnection);
+    CHIP_ERROR StartConnectionFromListener(nw_connection_t connection);
+    void PrepareConnections();
+    CHIP_ERROR ReleaseConnections();
+    bool RefreshConnectionTimeout(nw_connection_t connection);
+    bool CreateConnectionWrapper(nw_connection_t connection);
+    bool ClearConnectionWrapper(nw_connection_t connection);
+    nw_connection_t FindConnection(const IPPacketInfo & pktInfo);
 };
 
 using UDPEndPointImpl = UDPEndPointImplNetworkFramework;
