@@ -763,7 +763,7 @@
               "maxInterval": 65534,
               "reportableChange": 0
             },
-{
+            {
               "name": "ConfigurationVersion",
               "code": 24,
               "mfgCode": null,
