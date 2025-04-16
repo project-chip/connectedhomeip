@@ -55,6 +55,24 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::LocalizationConfiguration::Id:
         emberAfLocalizationConfigurationClusterInitCallback(endpoint);
         break;
+    case app::Clusters::LowPower::Id:
+        emberAfLowPowerClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::MatterScenes::Id:
+        emberAfMatterScenesClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::MediaInput::Id:
+        emberAfMediaInputClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::MediaPlayback::Id:
+        emberAfMediaPlaybackClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::MeterIdentification::Id:
+        emberAfMeterIdentificationClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::ModeSelect::Id:
+        emberAfModeSelectClusterInitCallback(endpoint);
+        break;
     case app::Clusters::NetworkCommissioning::Id:
         emberAfNetworkCommissioningClusterInitCallback(endpoint);
         break;
