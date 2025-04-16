@@ -98,7 +98,8 @@ class TC_FAN_3_2(MatterBaseTest):
         logging.info(f"[FC] *** Initial FanMode: {init_fan_mode}")
 
         # Logging the scenario being tested
-        logging.info(f"[FC] *** Update SpeedSetting {order.name.lower()}, verify PercentSetting, PercentCurrent, FanMode, SpeedSetting, and SpeedCurrent")
+        logging.info(
+            f"[FC] *** Update SpeedSetting {order.name.lower()}, verify PercentSetting, PercentCurrent, FanMode, SpeedSetting, and SpeedCurrent")
         logging.info(f"[FC] *** Value range to update: {value_range[0]} - {value_range[-1]}")
         logging.info("[FC]")
 
