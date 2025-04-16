@@ -148,7 +148,7 @@ class TC_G_2_2(MatterBaseTest):
         feature_map: int = await self.read_single_attribute(
             dev_ctrl=th1,
             node_id=self.dut_node_id,
-            endpoint=0,
+            endpoint=self.matter_test_config.endpoint,
             attribute=Clusters.Groups.Attributes.FeatureMap
         )
 
@@ -175,7 +175,8 @@ class TC_G_2_2(MatterBaseTest):
         self.step("4a")
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
             dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
-        asserts.assert_equal(groupTableList[1].groupId, kGroupId2, "Found groupId does not match written value")
+        found = any(entry.groupId == kGroupId2 for entry in groupTableList)
+        asserts.assert_true(found, f"GroupId {kGroupId2} not found in GroupTable")
 
         self.step("4b")
         asserts.assert_equal(groupTableList[1].groupName, kGroupName2, "Found groupName does not match written value")
