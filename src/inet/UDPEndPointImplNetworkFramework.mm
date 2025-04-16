@@ -239,9 +239,6 @@ namespace Inet {
         mConnectionQueue = dispatch_queue_create("inet_dispatch_global", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         VerifyOrReturnError(nullptr != mConnectionQueue, CHIP_ERROR_NO_MEMORY, ReleaseAll());
 
-        mConnectionSemaphore = dispatch_semaphore_create(0);
-        VerifyOrReturnError(nullptr != mConnectionSemaphore, CHIP_ERROR_NO_MEMORY, ReleaseAll());
-
         mSystemQueue = static_cast<System::LayerDispatch &>(GetSystemLayer()).GetDispatchQueue();
         mAddrType = addressType;
         mConnection = nullptr;
@@ -564,6 +561,7 @@ namespace Inet {
         nw_listener_start(mListener);
         __auto_type timeout = dispatch_time(DISPATCH_TIME_NOW, kListenerTimeoutInSeconds);
         dispatch_semaphore_wait(mListenerSemaphore, timeout);
+        nw_listener_set_state_changed_handler(mListener, nil);
 
         if (CHIP_NO_ERROR != err) {
             mListener = nullptr;
@@ -578,6 +576,9 @@ namespace Inet {
     {
         __block CHIP_ERROR err = CHIP_NO_ERROR;
         nw_connection_set_queue(aConnection, mConnectionQueue);
+
+        mConnectionSemaphore = dispatch_semaphore_create(0);
+        VerifyOrReturnError(nullptr != mConnectionSemaphore, CHIP_ERROR_NO_MEMORY);
 
         nw_connection_set_state_changed_handler(aConnection, ^(nw_connection_state_t state, nw_error_t error) {
             DebugPrintConnectionState(state);
@@ -618,6 +619,7 @@ namespace Inet {
         nw_connection_start(aConnection);
         __auto_type timeout = dispatch_time(DISPATCH_TIME_NOW, kConnectTimeoutInSeconds);
         dispatch_semaphore_wait(mConnectionSemaphore, timeout);
+        nw_connection_set_state_changed_handler(aConnection, nil);
 
         if (CHIP_NO_ERROR == err) {
             DebugPrintConnection(aConnection);
@@ -688,6 +690,12 @@ namespace Inet {
         VerifyOrReturnError(nullptr != mConnectionQueue, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(nullptr != mConnectionSemaphore, CHIP_ERROR_INCORRECT_STATE);
 
+        nw_listener_set_state_changed_handler(mListener, ^(nw_listener_state_t state, nw_error_t error) {
+            if (state == nw_listener_state_cancelled) {
+                dispatch_semaphore_signal(mListenerSemaphore);
+            }
+        });
+
         nw_listener_cancel(mListener);
         dispatch_semaphore_wait(mListenerSemaphore, DISPATCH_TIME_FOREVER);
         mListener = nullptr;
@@ -700,6 +708,13 @@ namespace Inet {
         VerifyOrReturnError(nullptr != mConnection, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(nullptr != mConnectionQueue, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(nullptr != mConnectionSemaphore, CHIP_ERROR_INCORRECT_STATE);
+
+        nw_connection_set_state_changed_handler(mConnection, ^(nw_connection_state_t state, nw_error_t error) {
+            if (state == nw_connection_state_cancelled) {
+                DebugPrintConnectionState(state);
+                dispatch_semaphore_signal(mConnectionSemaphore);
+            }
+        });
 
         nw_connection_cancel(mConnection);
         dispatch_semaphore_wait(mConnectionSemaphore, DISPATCH_TIME_FOREVER);
