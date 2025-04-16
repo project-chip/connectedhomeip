@@ -111,11 +111,12 @@ enum class Fields : uint8_t
     kSnapshotStreamID = 0,
     kImageCodec       = 1,
     kFrameRate        = 2,
-    kBitRate          = 3,
-    kMinResolution    = 4,
-    kMaxResolution    = 5,
-    kQuality          = 6,
-    kReferenceCount   = 7,
+    kMinResolution    = 3,
+    kMaxResolution    = 4,
+    kQuality          = 5,
+    kReferenceCount   = 6,
+    kEncodedPixels    = 7,
+    kHardwareEncoder  = 8,
 };
 
 struct Type
@@ -124,11 +125,12 @@ public:
     uint16_t snapshotStreamID = static_cast<uint16_t>(0);
     ImageCodecEnum imageCodec = static_cast<ImageCodecEnum>(0);
     uint16_t frameRate        = static_cast<uint16_t>(0);
-    uint32_t bitRate          = static_cast<uint32_t>(0);
     Structs::VideoResolutionStruct::Type minResolution;
     Structs::VideoResolutionStruct::Type maxResolution;
     uint8_t quality        = static_cast<uint8_t>(0);
     uint8_t referenceCount = static_cast<uint8_t>(0);
+    bool encodedPixels     = static_cast<bool>(0);
+    bool hardwareEncoder   = static_cast<bool>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -140,20 +142,24 @@ public:
 using DecodableType = Type;
 
 } // namespace SnapshotStreamStruct
-namespace SnapshotParamsStruct {
+namespace SnapshotCapabilitiesStruct {
 enum class Fields : uint8_t
 {
-    kResolution   = 0,
-    kMaxFrameRate = 1,
-    kImageCodec   = 2,
+    kResolution              = 0,
+    kMaxFrameRate            = 1,
+    kImageCodec              = 2,
+    kRequiresEncodedPixels   = 3,
+    kRequiresHardwareEncoder = 4,
 };
 
 struct Type
 {
 public:
     Structs::VideoResolutionStruct::Type resolution;
-    uint16_t maxFrameRate     = static_cast<uint16_t>(0);
-    ImageCodecEnum imageCodec = static_cast<ImageCodecEnum>(0);
+    uint16_t maxFrameRate      = static_cast<uint16_t>(0);
+    ImageCodecEnum imageCodec  = static_cast<ImageCodecEnum>(0);
+    bool requiresEncodedPixels = static_cast<bool>(0);
+    Optional<bool> requiresHardwareEncoder;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -164,7 +170,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace SnapshotParamsStruct
+} // namespace SnapshotCapabilitiesStruct
 namespace RateDistortionTradeOffPointsStruct {
 enum class Fields : uint8_t
 {

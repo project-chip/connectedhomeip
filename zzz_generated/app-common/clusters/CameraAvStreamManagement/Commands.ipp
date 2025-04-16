@@ -333,7 +333,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kImageCodec), imageCodec);
     encoder.Encode(to_underlying(Fields::kMaxFrameRate), maxFrameRate);
-    encoder.Encode(to_underlying(Fields::kBitRate), bitRate);
     encoder.Encode(to_underlying(Fields::kMinResolution), minResolution);
     encoder.Encode(to_underlying(Fields::kMaxResolution), maxResolution);
     encoder.Encode(to_underlying(Fields::kQuality), quality);
@@ -359,10 +358,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kMaxFrameRate))
         {
             err = DataModel::Decode(reader, maxFrameRate);
-        }
-        else if (__context_tag == to_underlying(Fields::kBitRate))
-        {
-            err = DataModel::Decode(reader, bitRate);
         }
         else if (__context_tag == to_underlying(Fields::kMinResolution))
         {

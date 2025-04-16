@@ -5881,14 +5881,6 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("BitRate", indent + 1, value.bitRate);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'BitRate'");
-            return err;
-        }
-    }
-    {
         CHIP_ERROR err = LogValue("MinResolution", indent + 1, value.minResolution);
         if (err != CHIP_NO_ERROR)
         {
@@ -5920,14 +5912,30 @@ DataModelLogger::LogValue(const char * label, size_t indent,
             return err;
         }
     }
+    {
+        CHIP_ERROR err = LogValue("EncodedPixels", indent + 1, value.encodedPixels);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EncodedPixels'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("HardwareEncoder", indent + 1, value.hardwareEncoder);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'HardwareEncoder'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotParamsStruct::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotCapabilitiesStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -5951,6 +5959,22 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ImageCodec'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("RequiresEncodedPixels", indent + 1, value.requiresEncodedPixels);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'RequiresEncodedPixels'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("RequiresHardwareEncoder", indent + 1, value.requiresHardwareEncoder);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'RequiresHardwareEncoder'");
             return err;
         }
     }
@@ -20027,10 +20051,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case CameraAvStreamManagement::Id: {
         switch (path.mAttributeId)
         {
-        case CameraAvStreamManagement::Attributes::MaxConcurrentVideoEncoders::Id: {
+        case CameraAvStreamManagement::Attributes::MaxConcurrentEncoders::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MaxConcurrentVideoEncoders", 1, value);
+            return DataModelLogger::LogValue("MaxConcurrentEncoders", 1, value);
         }
         case CameraAvStreamManagement::Attributes::MaxEncodedPixelRate::Id: {
             uint32_t value;
@@ -20079,12 +20103,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TwoWayTalkSupport", 1, value);
         }
-        case CameraAvStreamManagement::Attributes::SupportedSnapshotParams::Id: {
+        case CameraAvStreamManagement::Attributes::SnapshotCapabilities::Id: {
             chip::app::DataModel::DecodableList<
-                chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotParamsStruct::DecodableType>
+                chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotCapabilitiesStruct::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("SupportedSnapshotParams", 1, value);
+            return DataModelLogger::LogValue("SnapshotCapabilities", 1, value);
         }
         case CameraAvStreamManagement::Attributes::MaxNetworkBandwidth::Id: {
             uint32_t value;

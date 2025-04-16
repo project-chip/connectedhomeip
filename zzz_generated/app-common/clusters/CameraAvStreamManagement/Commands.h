@@ -400,12 +400,11 @@ enum class Fields : uint8_t
 {
     kImageCodec       = 0,
     kMaxFrameRate     = 1,
-    kBitRate          = 2,
-    kMinResolution    = 3,
-    kMaxResolution    = 4,
-    kQuality          = 5,
-    kWatermarkEnabled = 6,
-    kOSDEnabled       = 7,
+    kMinResolution    = 2,
+    kMaxResolution    = 3,
+    kQuality          = 4,
+    kWatermarkEnabled = 5,
+    kOSDEnabled       = 6,
 };
 
 struct Type
@@ -417,7 +416,6 @@ public:
 
     ImageCodecEnum imageCodec = static_cast<ImageCodecEnum>(0);
     uint16_t maxFrameRate     = static_cast<uint16_t>(0);
-    uint32_t bitRate          = static_cast<uint32_t>(0);
     Structs::VideoResolutionStruct::Type minResolution;
     Structs::VideoResolutionStruct::Type maxResolution;
     uint8_t quality = static_cast<uint8_t>(0);
@@ -439,7 +437,6 @@ public:
 
     ImageCodecEnum imageCodec = static_cast<ImageCodecEnum>(0);
     uint16_t maxFrameRate     = static_cast<uint16_t>(0);
-    uint32_t bitRate          = static_cast<uint32_t>(0);
     Structs::VideoResolutionStruct::DecodableType minResolution;
     Structs::VideoResolutionStruct::DecodableType maxResolution;
     uint8_t quality = static_cast<uint8_t>(0);
@@ -596,7 +593,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::CaptureSnapshot::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
 
-    uint16_t snapshotStreamID = static_cast<uint16_t>(0);
+    DataModel::Nullable<uint16_t> snapshotStreamID;
     Structs::VideoResolutionStruct::Type requestedResolution;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -612,7 +609,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::CaptureSnapshot::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
 
-    uint16_t snapshotStreamID = static_cast<uint16_t>(0);
+    DataModel::Nullable<uint16_t> snapshotStreamID;
     Structs::VideoResolutionStruct::DecodableType requestedResolution;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

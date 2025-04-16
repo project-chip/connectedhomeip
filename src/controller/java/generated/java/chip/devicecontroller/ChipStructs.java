@@ -14184,38 +14184,42 @@ public static class CameraAvStreamManagementClusterSnapshotStreamStruct {
   public Integer snapshotStreamID;
   public Integer imageCodec;
   public Integer frameRate;
-  public Long bitRate;
   public ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct minResolution;
   public ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution;
   public Integer quality;
   public Integer referenceCount;
+  public Boolean encodedPixels;
+  public Boolean hardwareEncoder;
   private static final long SNAPSHOT_STREAM_ID_ID = 0L;
   private static final long IMAGE_CODEC_ID = 1L;
   private static final long FRAME_RATE_ID = 2L;
-  private static final long BIT_RATE_ID = 3L;
-  private static final long MIN_RESOLUTION_ID = 4L;
-  private static final long MAX_RESOLUTION_ID = 5L;
-  private static final long QUALITY_ID = 6L;
-  private static final long REFERENCE_COUNT_ID = 7L;
+  private static final long MIN_RESOLUTION_ID = 3L;
+  private static final long MAX_RESOLUTION_ID = 4L;
+  private static final long QUALITY_ID = 5L;
+  private static final long REFERENCE_COUNT_ID = 6L;
+  private static final long ENCODED_PIXELS_ID = 7L;
+  private static final long HARDWARE_ENCODER_ID = 8L;
 
   public CameraAvStreamManagementClusterSnapshotStreamStruct(
     Integer snapshotStreamID,
     Integer imageCodec,
     Integer frameRate,
-    Long bitRate,
     ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct minResolution,
     ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution,
     Integer quality,
-    Integer referenceCount
+    Integer referenceCount,
+    Boolean encodedPixels,
+    Boolean hardwareEncoder
   ) {
     this.snapshotStreamID = snapshotStreamID;
     this.imageCodec = imageCodec;
     this.frameRate = frameRate;
-    this.bitRate = bitRate;
     this.minResolution = minResolution;
     this.maxResolution = maxResolution;
     this.quality = quality;
     this.referenceCount = referenceCount;
+    this.encodedPixels = encodedPixels;
+    this.hardwareEncoder = hardwareEncoder;
   }
 
   public StructType encodeTlv() {
@@ -14223,11 +14227,12 @@ public static class CameraAvStreamManagementClusterSnapshotStreamStruct {
     values.add(new StructElement(SNAPSHOT_STREAM_ID_ID, new UIntType(snapshotStreamID)));
     values.add(new StructElement(IMAGE_CODEC_ID, new UIntType(imageCodec)));
     values.add(new StructElement(FRAME_RATE_ID, new UIntType(frameRate)));
-    values.add(new StructElement(BIT_RATE_ID, new UIntType(bitRate)));
     values.add(new StructElement(MIN_RESOLUTION_ID, minResolution.encodeTlv()));
     values.add(new StructElement(MAX_RESOLUTION_ID, maxResolution.encodeTlv()));
     values.add(new StructElement(QUALITY_ID, new UIntType(quality)));
     values.add(new StructElement(REFERENCE_COUNT_ID, new UIntType(referenceCount)));
+    values.add(new StructElement(ENCODED_PIXELS_ID, new BooleanType(encodedPixels)));
+    values.add(new StructElement(HARDWARE_ENCODER_ID, new BooleanType(hardwareEncoder)));
 
     return new StructType(values);
   }
@@ -14239,11 +14244,12 @@ public static class CameraAvStreamManagementClusterSnapshotStreamStruct {
     Integer snapshotStreamID = null;
     Integer imageCodec = null;
     Integer frameRate = null;
-    Long bitRate = null;
     ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct minResolution = null;
     ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution = null;
     Integer quality = null;
     Integer referenceCount = null;
+    Boolean encodedPixels = null;
+    Boolean hardwareEncoder = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == SNAPSHOT_STREAM_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -14259,11 +14265,6 @@ public static class CameraAvStreamManagementClusterSnapshotStreamStruct {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
           frameRate = castingValue.value(Integer.class);
-        }
-      } else if (element.contextTagNum() == BIT_RATE_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          bitRate = castingValue.value(Long.class);
         }
       } else if (element.contextTagNum() == MIN_RESOLUTION_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
@@ -14285,17 +14286,28 @@ public static class CameraAvStreamManagementClusterSnapshotStreamStruct {
           UIntType castingValue = element.value(UIntType.class);
           referenceCount = castingValue.value(Integer.class);
         }
+      } else if (element.contextTagNum() == ENCODED_PIXELS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          encodedPixels = castingValue.value(Boolean.class);
+        }
+      } else if (element.contextTagNum() == HARDWARE_ENCODER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          hardwareEncoder = castingValue.value(Boolean.class);
+        }
       }
     }
     return new CameraAvStreamManagementClusterSnapshotStreamStruct(
       snapshotStreamID,
       imageCodec,
       frameRate,
-      bitRate,
       minResolution,
       maxResolution,
       quality,
-      referenceCount
+      referenceCount,
+      encodedPixels,
+      hardwareEncoder
     );
   }
 
@@ -14312,9 +14324,6 @@ public static class CameraAvStreamManagementClusterSnapshotStreamStruct {
     output.append("\tframeRate: ");
     output.append(frameRate);
     output.append("\n");
-    output.append("\tbitRate: ");
-    output.append(bitRate);
-    output.append("\n");
     output.append("\tminResolution: ");
     output.append(minResolution);
     output.append("\n");
@@ -14327,26 +14336,40 @@ public static class CameraAvStreamManagementClusterSnapshotStreamStruct {
     output.append("\treferenceCount: ");
     output.append(referenceCount);
     output.append("\n");
+    output.append("\tencodedPixels: ");
+    output.append(encodedPixels);
+    output.append("\n");
+    output.append("\thardwareEncoder: ");
+    output.append(hardwareEncoder);
+    output.append("\n");
     output.append("}\n");
     return output.toString();
   }
 }
-public static class CameraAvStreamManagementClusterSnapshotParamsStruct {
+public static class CameraAvStreamManagementClusterSnapshotCapabilitiesStruct {
   public ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct resolution;
   public Integer maxFrameRate;
   public Integer imageCodec;
+  public Boolean requiresEncodedPixels;
+  public Optional<Boolean> requiresHardwareEncoder;
   private static final long RESOLUTION_ID = 0L;
   private static final long MAX_FRAME_RATE_ID = 1L;
   private static final long IMAGE_CODEC_ID = 2L;
+  private static final long REQUIRES_ENCODED_PIXELS_ID = 3L;
+  private static final long REQUIRES_HARDWARE_ENCODER_ID = 4L;
 
-  public CameraAvStreamManagementClusterSnapshotParamsStruct(
+  public CameraAvStreamManagementClusterSnapshotCapabilitiesStruct(
     ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct resolution,
     Integer maxFrameRate,
-    Integer imageCodec
+    Integer imageCodec,
+    Boolean requiresEncodedPixels,
+    Optional<Boolean> requiresHardwareEncoder
   ) {
     this.resolution = resolution;
     this.maxFrameRate = maxFrameRate;
     this.imageCodec = imageCodec;
+    this.requiresEncodedPixels = requiresEncodedPixels;
+    this.requiresHardwareEncoder = requiresHardwareEncoder;
   }
 
   public StructType encodeTlv() {
@@ -14354,17 +14377,21 @@ public static class CameraAvStreamManagementClusterSnapshotParamsStruct {
     values.add(new StructElement(RESOLUTION_ID, resolution.encodeTlv()));
     values.add(new StructElement(MAX_FRAME_RATE_ID, new UIntType(maxFrameRate)));
     values.add(new StructElement(IMAGE_CODEC_ID, new UIntType(imageCodec)));
+    values.add(new StructElement(REQUIRES_ENCODED_PIXELS_ID, new BooleanType(requiresEncodedPixels)));
+    values.add(new StructElement(REQUIRES_HARDWARE_ENCODER_ID, requiresHardwareEncoder.<BaseTLVType>map((nonOptionalrequiresHardwareEncoder) -> new BooleanType(nonOptionalrequiresHardwareEncoder)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
 
-  public static CameraAvStreamManagementClusterSnapshotParamsStruct decodeTlv(BaseTLVType tlvValue) {
+  public static CameraAvStreamManagementClusterSnapshotCapabilitiesStruct decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
     ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct resolution = null;
     Integer maxFrameRate = null;
     Integer imageCodec = null;
+    Boolean requiresEncodedPixels = null;
+    Optional<Boolean> requiresHardwareEncoder = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == RESOLUTION_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
@@ -14381,19 +14408,31 @@ public static class CameraAvStreamManagementClusterSnapshotParamsStruct {
           UIntType castingValue = element.value(UIntType.class);
           imageCodec = castingValue.value(Integer.class);
         }
+      } else if (element.contextTagNum() == REQUIRES_ENCODED_PIXELS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          requiresEncodedPixels = castingValue.value(Boolean.class);
+        }
+      } else if (element.contextTagNum() == REQUIRES_HARDWARE_ENCODER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          requiresHardwareEncoder = Optional.of(castingValue.value(Boolean.class));
+        }
       }
     }
-    return new CameraAvStreamManagementClusterSnapshotParamsStruct(
+    return new CameraAvStreamManagementClusterSnapshotCapabilitiesStruct(
       resolution,
       maxFrameRate,
-      imageCodec
+      imageCodec,
+      requiresEncodedPixels,
+      requiresHardwareEncoder
     );
   }
 
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("CameraAvStreamManagementClusterSnapshotParamsStruct {\n");
+    output.append("CameraAvStreamManagementClusterSnapshotCapabilitiesStruct {\n");
     output.append("\tresolution: ");
     output.append(resolution);
     output.append("\n");
@@ -14402,6 +14441,12 @@ public static class CameraAvStreamManagementClusterSnapshotParamsStruct {
     output.append("\n");
     output.append("\timageCodec: ");
     output.append(imageCodec);
+    output.append("\n");
+    output.append("\trequiresEncodedPixels: ");
+    output.append(requiresEncodedPixels);
+    output.append("\n");
+    output.append("\trequiresHardwareEncoder: ");
+    output.append(requiresHardwareEncoder);
     output.append("\n");
     output.append("}\n");
     return output.toString();

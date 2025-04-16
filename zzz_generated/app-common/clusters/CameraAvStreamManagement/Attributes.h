@@ -41,7 +41,7 @@ namespace Clusters {
 namespace CameraAvStreamManagement {
 namespace Attributes {
 
-namespace MaxConcurrentVideoEncoders {
+namespace MaxConcurrentEncoders {
 struct TypeInfo
 {
     using Type             = uint8_t;
@@ -49,10 +49,10 @@ struct TypeInfo
     using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::MaxConcurrentVideoEncoders::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxConcurrentEncoders::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace MaxConcurrentVideoEncoders
+} // namespace MaxConcurrentEncoders
 namespace MaxEncodedPixelRate {
 struct TypeInfo
 {
@@ -164,21 +164,21 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TwoWayTalkSupport
-namespace SupportedSnapshotParams {
+namespace SnapshotCapabilities {
 struct TypeInfo
 {
     using Type =
-        chip::app::DataModel::List<const chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotParamsStruct::Type>;
+        chip::app::DataModel::List<const chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotCapabilitiesStruct::Type>;
     using DecodableType = chip::app::DataModel::DecodableList<
-        chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotParamsStruct::DecodableType>;
+        chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotCapabilitiesStruct::DecodableType>;
     using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotParamsStruct::DecodableType> &;
+        chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotCapabilitiesStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedSnapshotParams::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SnapshotCapabilities::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace SupportedSnapshotParams
+} // namespace SnapshotCapabilities
 namespace MaxNetworkBandwidth {
 struct TypeInfo
 {
@@ -587,8 +587,8 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::MaxConcurrentVideoEncoders::TypeInfo::DecodableType maxConcurrentVideoEncoders = static_cast<uint8_t>(0);
-        Attributes::MaxEncodedPixelRate::TypeInfo::DecodableType maxEncodedPixelRate               = static_cast<uint32_t>(0);
+        Attributes::MaxConcurrentEncoders::TypeInfo::DecodableType maxConcurrentEncoders = static_cast<uint8_t>(0);
+        Attributes::MaxEncodedPixelRate::TypeInfo::DecodableType maxEncodedPixelRate     = static_cast<uint32_t>(0);
         Attributes::VideoSensorParams::TypeInfo::DecodableType videoSensorParams;
         Attributes::NightVisionCapable::TypeInfo::DecodableType nightVisionCapable = static_cast<bool>(0);
         Attributes::MinViewport::TypeInfo::DecodableType minViewport;
@@ -598,7 +598,7 @@ struct TypeInfo
         Attributes::SpeakerCapabilities::TypeInfo::DecodableType speakerCapabilities;
         Attributes::TwoWayTalkSupport::TypeInfo::DecodableType twoWayTalkSupport =
             static_cast<chip::app::Clusters::CameraAvStreamManagement::TwoWayTalkSupportTypeEnum>(0);
-        Attributes::SupportedSnapshotParams::TypeInfo::DecodableType supportedSnapshotParams;
+        Attributes::SnapshotCapabilities::TypeInfo::DecodableType snapshotCapabilities;
         Attributes::MaxNetworkBandwidth::TypeInfo::DecodableType maxNetworkBandwidth = static_cast<uint32_t>(0);
         Attributes::CurrentFrameRate::TypeInfo::DecodableType currentFrameRate       = static_cast<uint16_t>(0);
         Attributes::HDRModeEnabled::TypeInfo::DecodableType HDRModeEnabled           = static_cast<bool>(0);

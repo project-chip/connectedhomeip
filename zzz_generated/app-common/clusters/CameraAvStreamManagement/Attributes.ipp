@@ -30,8 +30,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::MaxConcurrentVideoEncoders::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, maxConcurrentVideoEncoders);
+    case Attributes::MaxConcurrentEncoders::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, maxConcurrentEncoders);
     case Attributes::MaxEncodedPixelRate::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, maxEncodedPixelRate);
     case Attributes::VideoSensorParams::TypeInfo::GetAttributeId():
@@ -50,8 +50,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, speakerCapabilities);
     case Attributes::TwoWayTalkSupport::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, twoWayTalkSupport);
-    case Attributes::SupportedSnapshotParams::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, supportedSnapshotParams);
+    case Attributes::SnapshotCapabilities::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, snapshotCapabilities);
     case Attributes::MaxNetworkBandwidth::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, maxNetworkBandwidth);
     case Attributes::CurrentFrameRate::TypeInfo::GetAttributeId():
