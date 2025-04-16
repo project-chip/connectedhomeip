@@ -27,8 +27,8 @@
 #       --commissioning-method ble-thread
 #       --discriminator 1234
 #       --passcode 20202021
-#       --thread-dataset-hex <DATASET_HEX>
-#       --endpoint 0
+#       --int-arg PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET
+#       --int-arg PIXIT.CNET.ENDPOINT_THREAD:0
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
