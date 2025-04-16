@@ -42332,11 +42332,12 @@ enum class Fields : uint8_t
     kSnapshotStreamID = 0,
     kImageCodec       = 1,
     kFrameRate        = 2,
-    kBitRate          = 3,
-    kMinResolution    = 4,
-    kMaxResolution    = 5,
-    kQuality          = 6,
-    kReferenceCount   = 7,
+    kMinResolution    = 3,
+    kMaxResolution    = 4,
+    kQuality          = 5,
+    kReferenceCount   = 6,
+    kEncodedPixels    = 7,
+    kHardwareEncoder  = 8,
 };
 
 struct Type
@@ -42345,11 +42346,12 @@ public:
     uint16_t snapshotStreamID = static_cast<uint16_t>(0);
     ImageCodecEnum imageCodec = static_cast<ImageCodecEnum>(0);
     uint16_t frameRate        = static_cast<uint16_t>(0);
-    uint32_t bitRate          = static_cast<uint32_t>(0);
     Structs::VideoResolutionStruct::Type minResolution;
     Structs::VideoResolutionStruct::Type maxResolution;
     uint8_t quality        = static_cast<uint8_t>(0);
     uint8_t referenceCount = static_cast<uint8_t>(0);
+    bool encodedPixels     = static_cast<bool>(0);
+    bool hardwareEncoder   = static_cast<bool>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -42361,20 +42363,24 @@ public:
 using DecodableType = Type;
 
 } // namespace SnapshotStreamStruct
-namespace SnapshotParamsStruct {
+namespace SnapshotCapabilitiesStruct {
 enum class Fields : uint8_t
 {
-    kResolution   = 0,
-    kMaxFrameRate = 1,
-    kImageCodec   = 2,
+    kResolution              = 0,
+    kMaxFrameRate            = 1,
+    kImageCodec              = 2,
+    kRequiresEncodedPixels   = 3,
+    kRequiresHardwareEncoder = 4,
 };
 
 struct Type
 {
 public:
     Structs::VideoResolutionStruct::Type resolution;
-    uint16_t maxFrameRate     = static_cast<uint16_t>(0);
-    ImageCodecEnum imageCodec = static_cast<ImageCodecEnum>(0);
+    uint16_t maxFrameRate      = static_cast<uint16_t>(0);
+    ImageCodecEnum imageCodec  = static_cast<ImageCodecEnum>(0);
+    bool requiresEncodedPixels = static_cast<bool>(0);
+    Optional<bool> requiresHardwareEncoder;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -42385,7 +42391,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace SnapshotParamsStruct
+} // namespace SnapshotCapabilitiesStruct
 namespace RateDistortionTradeOffPointsStruct {
 enum class Fields : uint8_t
 {
@@ -42871,12 +42877,11 @@ enum class Fields : uint8_t
 {
     kImageCodec       = 0,
     kMaxFrameRate     = 1,
-    kBitRate          = 2,
-    kMinResolution    = 3,
-    kMaxResolution    = 4,
-    kQuality          = 5,
-    kWatermarkEnabled = 6,
-    kOSDEnabled       = 7,
+    kMinResolution    = 2,
+    kMaxResolution    = 3,
+    kQuality          = 4,
+    kWatermarkEnabled = 5,
+    kOSDEnabled       = 6,
 };
 
 struct Type
@@ -42888,7 +42893,6 @@ public:
 
     ImageCodecEnum imageCodec = static_cast<ImageCodecEnum>(0);
     uint16_t maxFrameRate     = static_cast<uint16_t>(0);
-    uint32_t bitRate          = static_cast<uint32_t>(0);
     Structs::VideoResolutionStruct::Type minResolution;
     Structs::VideoResolutionStruct::Type maxResolution;
     uint8_t quality = static_cast<uint8_t>(0);
@@ -42910,7 +42914,6 @@ public:
 
     ImageCodecEnum imageCodec = static_cast<ImageCodecEnum>(0);
     uint16_t maxFrameRate     = static_cast<uint16_t>(0);
-    uint32_t bitRate          = static_cast<uint32_t>(0);
     Structs::VideoResolutionStruct::DecodableType minResolution;
     Structs::VideoResolutionStruct::DecodableType maxResolution;
     uint8_t quality = static_cast<uint8_t>(0);
@@ -43067,7 +43070,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::CaptureSnapshot::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
 
-    uint16_t snapshotStreamID = static_cast<uint16_t>(0);
+    DataModel::Nullable<uint16_t> snapshotStreamID;
     Structs::VideoResolutionStruct::Type requestedResolution;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -43083,7 +43086,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::CaptureSnapshot::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
 
-    uint16_t snapshotStreamID = static_cast<uint16_t>(0);
+    DataModel::Nullable<uint16_t> snapshotStreamID;
     Structs::VideoResolutionStruct::DecodableType requestedResolution;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -43130,7 +43133,7 @@ public:
 
 namespace Attributes {
 
-namespace MaxConcurrentVideoEncoders {
+namespace MaxConcurrentEncoders {
 struct TypeInfo
 {
     using Type             = uint8_t;
@@ -43138,10 +43141,10 @@ struct TypeInfo
     using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::MaxConcurrentVideoEncoders::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxConcurrentEncoders::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace MaxConcurrentVideoEncoders
+} // namespace MaxConcurrentEncoders
 namespace MaxEncodedPixelRate {
 struct TypeInfo
 {
@@ -43253,21 +43256,21 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TwoWayTalkSupport
-namespace SupportedSnapshotParams {
+namespace SnapshotCapabilities {
 struct TypeInfo
 {
     using Type =
-        chip::app::DataModel::List<const chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotParamsStruct::Type>;
+        chip::app::DataModel::List<const chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotCapabilitiesStruct::Type>;
     using DecodableType = chip::app::DataModel::DecodableList<
-        chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotParamsStruct::DecodableType>;
+        chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotCapabilitiesStruct::DecodableType>;
     using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotParamsStruct::DecodableType> &;
+        chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotCapabilitiesStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedSnapshotParams::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SnapshotCapabilities::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace SupportedSnapshotParams
+} // namespace SnapshotCapabilities
 namespace MaxNetworkBandwidth {
 struct TypeInfo
 {
@@ -43676,8 +43679,8 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::MaxConcurrentVideoEncoders::TypeInfo::DecodableType maxConcurrentVideoEncoders = static_cast<uint8_t>(0);
-        Attributes::MaxEncodedPixelRate::TypeInfo::DecodableType maxEncodedPixelRate               = static_cast<uint32_t>(0);
+        Attributes::MaxConcurrentEncoders::TypeInfo::DecodableType maxConcurrentEncoders = static_cast<uint8_t>(0);
+        Attributes::MaxEncodedPixelRate::TypeInfo::DecodableType maxEncodedPixelRate     = static_cast<uint32_t>(0);
         Attributes::VideoSensorParams::TypeInfo::DecodableType videoSensorParams;
         Attributes::NightVisionCapable::TypeInfo::DecodableType nightVisionCapable = static_cast<bool>(0);
         Attributes::MinViewport::TypeInfo::DecodableType minViewport;
@@ -43687,7 +43690,7 @@ struct TypeInfo
         Attributes::SpeakerCapabilities::TypeInfo::DecodableType speakerCapabilities;
         Attributes::TwoWayTalkSupport::TypeInfo::DecodableType twoWayTalkSupport =
             static_cast<chip::app::Clusters::CameraAvStreamManagement::TwoWayTalkSupportTypeEnum>(0);
-        Attributes::SupportedSnapshotParams::TypeInfo::DecodableType supportedSnapshotParams;
+        Attributes::SnapshotCapabilities::TypeInfo::DecodableType snapshotCapabilities;
         Attributes::MaxNetworkBandwidth::TypeInfo::DecodableType maxNetworkBandwidth = static_cast<uint32_t>(0);
         Attributes::CurrentFrameRate::TypeInfo::DecodableType currentFrameRate       = static_cast<uint16_t>(0);
         Attributes::HDRModeEnabled::TypeInfo::DecodableType HDRModeEnabled           = static_cast<bool>(0);

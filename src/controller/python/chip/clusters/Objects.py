@@ -46145,7 +46145,7 @@ class CameraAvStreamManagement(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="maxConcurrentVideoEncoders", Tag=0x00000000, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="maxConcurrentEncoders", Tag=0x00000000, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="maxEncodedPixelRate", Tag=0x00000001, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="videoSensorParams", Tag=0x00000002, Type=typing.Optional[CameraAvStreamManagement.Structs.VideoSensorParamsStruct]),
                 ClusterObjectFieldDescriptor(Label="nightVisionCapable", Tag=0x00000003, Type=typing.Optional[bool]),
@@ -46155,7 +46155,7 @@ class CameraAvStreamManagement(Cluster):
                 ClusterObjectFieldDescriptor(Label="microphoneCapabilities", Tag=0x00000007, Type=typing.Optional[CameraAvStreamManagement.Structs.AudioCapabilitiesStruct]),
                 ClusterObjectFieldDescriptor(Label="speakerCapabilities", Tag=0x00000008, Type=typing.Optional[CameraAvStreamManagement.Structs.AudioCapabilitiesStruct]),
                 ClusterObjectFieldDescriptor(Label="twoWayTalkSupport", Tag=0x00000009, Type=typing.Optional[CameraAvStreamManagement.Enums.TwoWayTalkSupportTypeEnum]),
-                ClusterObjectFieldDescriptor(Label="supportedSnapshotParams", Tag=0x0000000A, Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotParamsStruct]]),
+                ClusterObjectFieldDescriptor(Label="snapshotCapabilities", Tag=0x0000000A, Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotCapabilitiesStruct]]),
                 ClusterObjectFieldDescriptor(Label="maxNetworkBandwidth", Tag=0x0000000B, Type=uint),
                 ClusterObjectFieldDescriptor(Label="currentFrameRate", Tag=0x0000000C, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="HDRModeEnabled", Tag=0x0000000D, Type=typing.Optional[bool]),
@@ -46193,7 +46193,7 @@ class CameraAvStreamManagement(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    maxConcurrentVideoEncoders: typing.Optional[uint] = None
+    maxConcurrentEncoders: typing.Optional[uint] = None
     maxEncodedPixelRate: typing.Optional[uint] = None
     videoSensorParams: typing.Optional[CameraAvStreamManagement.Structs.VideoSensorParamsStruct] = None
     nightVisionCapable: typing.Optional[bool] = None
@@ -46203,7 +46203,7 @@ class CameraAvStreamManagement(Cluster):
     microphoneCapabilities: typing.Optional[CameraAvStreamManagement.Structs.AudioCapabilitiesStruct] = None
     speakerCapabilities: typing.Optional[CameraAvStreamManagement.Structs.AudioCapabilitiesStruct] = None
     twoWayTalkSupport: typing.Optional[CameraAvStreamManagement.Enums.TwoWayTalkSupportTypeEnum] = None
-    supportedSnapshotParams: typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotParamsStruct]] = None
+    snapshotCapabilities: typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotCapabilitiesStruct]] = None
     maxNetworkBandwidth: uint = 0
     currentFrameRate: typing.Optional[uint] = None
     HDRModeEnabled: typing.Optional[bool] = None
@@ -46373,24 +46373,26 @@ class CameraAvStreamManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="snapshotStreamID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="imageCodec", Tag=1, Type=CameraAvStreamManagement.Enums.ImageCodecEnum),
                         ClusterObjectFieldDescriptor(Label="frameRate", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="bitRate", Tag=3, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="minResolution", Tag=4, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
-                        ClusterObjectFieldDescriptor(Label="maxResolution", Tag=5, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
-                        ClusterObjectFieldDescriptor(Label="quality", Tag=6, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="referenceCount", Tag=7, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="minResolution", Tag=3, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
+                        ClusterObjectFieldDescriptor(Label="maxResolution", Tag=4, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
+                        ClusterObjectFieldDescriptor(Label="quality", Tag=5, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="referenceCount", Tag=6, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="encodedPixels", Tag=7, Type=bool),
+                        ClusterObjectFieldDescriptor(Label="hardwareEncoder", Tag=8, Type=bool),
                     ])
 
             snapshotStreamID: 'uint' = 0
             imageCodec: 'CameraAvStreamManagement.Enums.ImageCodecEnum' = 0
             frameRate: 'uint' = 0
-            bitRate: 'uint' = 0
             minResolution: 'CameraAvStreamManagement.Structs.VideoResolutionStruct' = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
             maxResolution: 'CameraAvStreamManagement.Structs.VideoResolutionStruct' = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
             quality: 'uint' = 0
             referenceCount: 'uint' = 0
+            encodedPixels: 'bool' = False
+            hardwareEncoder: 'bool' = False
 
         @dataclass
-        class SnapshotParamsStruct(ClusterObject):
+        class SnapshotCapabilitiesStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -46398,11 +46400,15 @@ class CameraAvStreamManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="resolution", Tag=0, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
                         ClusterObjectFieldDescriptor(Label="maxFrameRate", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="imageCodec", Tag=2, Type=CameraAvStreamManagement.Enums.ImageCodecEnum),
+                        ClusterObjectFieldDescriptor(Label="requiresEncodedPixels", Tag=3, Type=bool),
+                        ClusterObjectFieldDescriptor(Label="requiresHardwareEncoder", Tag=4, Type=typing.Optional[bool]),
                     ])
 
             resolution: 'CameraAvStreamManagement.Structs.VideoResolutionStruct' = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
             maxFrameRate: 'uint' = 0
             imageCodec: 'CameraAvStreamManagement.Enums.ImageCodecEnum' = 0
+            requiresEncodedPixels: 'bool' = False
+            requiresHardwareEncoder: 'typing.Optional[bool]' = None
 
         @dataclass
         class RateDistortionTradeOffPointsStruct(ClusterObject):
@@ -46657,17 +46663,15 @@ class CameraAvStreamManagement(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="imageCodec", Tag=0, Type=CameraAvStreamManagement.Enums.ImageCodecEnum),
                         ClusterObjectFieldDescriptor(Label="maxFrameRate", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="bitRate", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="minResolution", Tag=3, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
-                        ClusterObjectFieldDescriptor(Label="maxResolution", Tag=4, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
-                        ClusterObjectFieldDescriptor(Label="quality", Tag=5, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="watermarkEnabled", Tag=6, Type=typing.Optional[bool]),
-                        ClusterObjectFieldDescriptor(Label="OSDEnabled", Tag=7, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="minResolution", Tag=2, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
+                        ClusterObjectFieldDescriptor(Label="maxResolution", Tag=3, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
+                        ClusterObjectFieldDescriptor(Label="quality", Tag=4, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="watermarkEnabled", Tag=5, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="OSDEnabled", Tag=6, Type=typing.Optional[bool]),
                     ])
 
             imageCodec: CameraAvStreamManagement.Enums.ImageCodecEnum = 0
             maxFrameRate: uint = 0
-            bitRate: uint = 0
             minResolution: CameraAvStreamManagement.Structs.VideoResolutionStruct = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
             maxResolution: CameraAvStreamManagement.Structs.VideoResolutionStruct = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
             quality: uint = 0
@@ -46753,11 +46757,11 @@ class CameraAvStreamManagement(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="snapshotStreamID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="snapshotStreamID", Tag=0, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="requestedResolution", Tag=1, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
                     ])
 
-            snapshotStreamID: uint = 0
+            snapshotStreamID: typing.Union[Nullable, uint] = NullValue
             requestedResolution: CameraAvStreamManagement.Structs.VideoResolutionStruct = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
 
         @dataclass
@@ -46782,7 +46786,7 @@ class CameraAvStreamManagement(Cluster):
 
     class Attributes:
         @dataclass
-        class MaxConcurrentVideoEncoders(ClusterAttributeDescriptor):
+        class MaxConcurrentEncoders(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000551
@@ -46942,7 +46946,7 @@ class CameraAvStreamManagement(Cluster):
             value: typing.Optional[CameraAvStreamManagement.Enums.TwoWayTalkSupportTypeEnum] = None
 
         @dataclass
-        class SupportedSnapshotParams(ClusterAttributeDescriptor):
+        class SnapshotCapabilities(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000551
@@ -46953,9 +46957,9 @@ class CameraAvStreamManagement(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotParamsStruct]])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotCapabilitiesStruct]])
 
-            value: typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotParamsStruct]] = None
+            value: typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotCapabilitiesStruct]] = None
 
         @dataclass
         class MaxNetworkBandwidth(ClusterAttributeDescriptor):

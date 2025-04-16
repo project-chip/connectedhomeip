@@ -5706,7 +5706,7 @@ static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aA
 {
     using namespace Clusters::CameraAvStreamManagement;
     switch (aAttributeId) {
-    case Attributes::MaxConcurrentVideoEncoders::Id: {
+    case Attributes::MaxConcurrentEncoders::Id: {
         return YES;
     }
     case Attributes::MaxEncodedPixelRate::Id: {
@@ -5736,7 +5736,7 @@ static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aA
     case Attributes::TwoWayTalkSupport::Id: {
         return YES;
     }
-    case Attributes::SupportedSnapshotParams::Id: {
+    case Attributes::SnapshotCapabilities::Id: {
         return YES;
     }
     case Attributes::MaxNetworkBandwidth::Id: {
