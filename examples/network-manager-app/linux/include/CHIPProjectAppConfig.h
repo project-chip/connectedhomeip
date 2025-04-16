@@ -26,3 +26,6 @@
 
 // Inherit defaults from config/standalone/CHIPProjectConfig.h
 #include <CHIPProjectConfig.h>
+
+// Allows app options (ports) to be configured on launch of app
+#define CHIP_DEVICE_ENABLE_PORT_PARAMS 1
