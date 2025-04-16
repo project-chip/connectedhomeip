@@ -763,15 +763,15 @@
               "maxInterval": 65534,
               "reportableChange": 0
             },
-            {
+{
               "name": "ConfigurationVersion",
               "code": 24,
               "mfgCode": null,
               "side": "server",
               "type": "int32u",
               "included": 1,
-              "storageOption": "RAM",
-              "singleton": 1,
+              "storageOption": "External",
+              "singleton": 0,
               "bounded": 0,
               "defaultValue": "1",
               "reportable": 1,
