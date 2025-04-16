@@ -42,7 +42,7 @@ DataModel::ActionReturnStatus OtaProviderServer::ReadAttribute(const DataModel::
     {
     case Globals::Attributes::FeatureMap::Id:
         // No features defined for the cluster ...
-        return encoder.Encode(0);
+        return encoder.Encode<uint32_t>(0);
     case Globals::Attributes::ClusterRevision::Id:
         return encoder.Encode(OtaSoftwareUpdateProvider::kRevision);
     }
