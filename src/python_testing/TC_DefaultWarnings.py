@@ -42,13 +42,14 @@ from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocat
                                          ProblemSeverity, TestStep, async_test_body, default_matter_test_main)
 from mobly import asserts
 
-FLAG_PRODUCT_NAME = "PIXIT.AllowTestInProductName"
-FLAG_VENDOR_NAME = "PIXIT.AllowTestInVendorName"
-FLAG_VENDOR_ID = "PIXIT.AllowDefaultVendorId"
-FLAG_DEFAULT_CALENDAR_FORMAT = "PIXIT.AllowDefaultCalendarFormat"
-FLAG_UNIT_TESTING = "PIXIT.AllowUnitTestingCluster"
-FLAG_FAULT_INJECTION = "PIXIT.AllowFaultInjectionCluster"
-FLAG_SAMPLE_MEI = "PIXIT.AllowSampleMeiCluster"
+FLAG_PRODUCT_NAME = "pixit_allow_test_in_product_name"
+FLAG_VENDOR_NAME = "pixit_allow_test_in_vendor_name"
+FLAG_VENDOR_ID = "pixit_allow_default_vendor_id"
+FLAG_DEFAULT_CALENDAR_FORMAT = "pixit_allow_default_calendar_format"
+FLAG_UNIT_TESTING = "pixit_allow_unit_testing_cluster"
+FLAG_FAULT_INJECTION = "pixit_allow_fault_injection_cluster"
+FLAG_SAMPLE_MEI = "pixit_allow_sample_mei_cluster"
+FLAG_FIXED_LABEL = "pixit_allow_empty_fixed_label_list"
 
 
 def _problem(location: ProblemLocation, msg: str):
@@ -58,7 +59,7 @@ def _problem(location: ProblemLocation, msg: str):
 def warning_wrapper(override_flag: str):
     def warning_wrapper_internal(body):
         def runner(self: MatterBaseTest):
-            skip = self.user_params.get(override_flag.lower(), False)
+            skip = self.user_params.get(override_flag, False)
             if not skip:
                 problem: ProblemNotice = body(self)
                 if problem:
@@ -123,6 +124,17 @@ class DefaultChecker(BasicCompositionTests):
     def check_sample_mei_cluster_presence(self):
         return self._check_testing_cluster_presence(Clusters.SampleMei)
 
+    @warning_wrapper(FLAG_FIXED_LABEL)
+    def check_fixed_label_cluster(self):
+        cluster = Clusters.FixedLabel
+        attr = cluster.Attributes.LabelList
+        if cluster in self.endpoints[0].keys():
+            val = self.endpoints[0][cluster][attr]
+            if val == []:
+                return _problem(AttributePathLocation(0, cluster.id, attr.attribute_id), f"Fixed label list is empty")
+        else:
+            self.mark_current_step_skipped()
+
 
 class TC_DefaultChecker(MatterBaseTest, DefaultChecker):
     @async_test_body
@@ -150,7 +162,9 @@ class TC_DefaultChecker(MatterBaseTest, DefaultChecker):
                           "Fault injection cluster does not appear on any endpoint"),
                  TestStep(8, f"If the {FLAG_SAMPLE_MEI} flag is not set, check for the presence of a sample mei cluster on any endpoint",
                           "Sample MEI cluster does not appear on any endpoint"),
-                 TestStep(9, "Fail on any problems")
+                 TestStep(
+                     9, f"If the {FLAG_FIXED_LABEL} flag is not set, and the FixedLabel cluster is present on the device, ,check that the fixed label cluster list is not empty", "List is not empty"),
+                 TestStep(10, "Fail on any problems")
                  ]
         return steps
 
@@ -175,6 +189,8 @@ class TC_DefaultChecker(MatterBaseTest, DefaultChecker):
         self.step(8)
         self.check_sample_mei_cluster_presence()
         self.step(9)
+        self.check_fixed_label_cluster()
+        self.step(10)
 
         if self.problems:
             asserts.fail("One or more default values found on device")

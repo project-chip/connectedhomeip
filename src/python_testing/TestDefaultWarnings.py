@@ -221,6 +221,46 @@ class TestDefaultChecker(MatterBaseTest):
         self._cluster_presence_test(Clusters.SampleMei, self.test.check_sample_mei_cluster_presence,
                                     TC_DefaultWarnings.FLAG_SAMPLE_MEI)
 
+    def test_fixed_label_test(self):
+        def run_check(label_list: list[Clusters.FixedLabel.Structs.LabelStruct], set_override: bool, expect_problem: bool):
+            self.test.user_params = {TC_DefaultWarnings.FLAG_FIXED_LABEL: set_override}
+            self.test.problems = []
+            self.test.endpoints = {0: {Clusters.FixedLabel: {Clusters.FixedLabel.Attributes.LabelList: label_list}}}
+            self.test.check_fixed_label_cluster()
+            if expect_problem:
+                asserts.assert_equal(len(self.test.problems), 1,
+                                     f"Did not generated expected problem when testing with empty fixed label list (override = {set_override})")
+            else:
+                asserts.assert_equal(len(self.test.problems), 0,
+                                     f"Unexpected problem when testing with non-empty fixed label list (override = {set_override})")
+
+        asserts.assert_equal(self.skipped, 0, "Skip not reset properly")
+        run_check([], set_override=False, expect_problem=True)
+        run_check([Clusters.FixedLabel.Structs.LabelStruct("test", "val")], set_override=False, expect_problem=False)
+        run_check([], set_override=True, expect_problem=False)
+        run_check([Clusters.FixedLabel.Structs.LabelStruct("test", "val")], set_override=True, expect_problem=False)
+        asserts.assert_equal(self.skipped, 2, "Some override tests did not mark steps skipped")
+
+        # Cluster not present
+        self.skipped = 0
+        self.test.problems = []
+        self.test.user_params = {}
+        self.test.endpoints = {0: {}}
+        self.test.check_fixed_label_cluster()
+        asserts.assert_equal(len(self.test.problems), 0,
+                             "Unexpected problem when testing device with no TimeFormatLocalization cluster")
+        # Should have marked this as skipped
+        asserts.assert_equal(self.skipped, 1, "Some override tests did not mark steps skipped")
+
+        # Flag should also work here
+        self.skipped = 0
+        self.test.user_params = {TC_DefaultWarnings.FLAG_FIXED_LABEL: True}
+        self.test.check_fixed_label_cluster()
+        asserts.assert_equal(len(self.test.problems), 0,
+                             "Unexpected problem when testing device with no TimeFormatLocalization cluster and override")
+        # Should have marked this as skipped
+        asserts.assert_equal(self.skipped, 1, "Some override tests did not mark steps skipped")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
