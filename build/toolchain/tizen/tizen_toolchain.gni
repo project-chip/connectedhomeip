@@ -27,8 +27,13 @@ template("tizen_toolchain") {
     forward_variables_from(_invoker_toolchain_args, "*")
   }
 
-  _tizen_toolchain_prefix =
-      "${tizen_sdk_root}/tools/arm-linux-gnueabi-gcc-9.2/bin/arm-linux-gnueabi-"
+  if (_invoker_toolchain_args.current_cpu == "arm") {
+    _tizen_toolchain_prefix = "${tizen_sdk_root}/tools/arm-linux-gnueabi-gcc-9.2/bin/arm-linux-gnueabi-"
+  } else if (_invoker_toolchain_args.current_cpu == "arm64") {
+    _tizen_toolchain_prefix = "${tizen_sdk_root}/tools/aarch64-linux-gnu-gcc-9.2/bin/aarch64-linux-gnu-"
+  } else {
+    assert(false, "CPU architecture is not supported.")
+  }
 
   gcc_toolchain(target_name) {
     toolchain_args = _tizen_toolchain_args

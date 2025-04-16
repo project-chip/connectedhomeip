@@ -67,10 +67,6 @@ target_sources(app
     ${EXAMPLE_PLATFORM_NXP_ZEPHYR_DIR}/factory_data/source/AppFactoryDataExample.cpp
 )
 
-target_compile_definitions(app PUBLIC
-    "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/zephyr/FactoryDataProviderImpl.h\""
-)
-
 if(CONFIG_CHIP_OTA_REQUESTOR)
     target_sources(app PRIVATE
                     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/ota_requestor/source/OTARequestorInitiatorCommon.cpp

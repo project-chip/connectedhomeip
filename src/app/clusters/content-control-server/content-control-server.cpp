@@ -416,3 +416,4 @@ exit:
 // Plugin initialization
 
 void MatterContentControlPluginServerInitCallback() {}
+void MatterContentControlPluginServerShutdownCallback() {}

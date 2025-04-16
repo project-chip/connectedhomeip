@@ -66,6 +66,7 @@ private:
     CHIP_ERROR ReadProductAppearance(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadSpecificationVersion(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadMaxPathsPerInvoke(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadConfigurationVersion(AttributeValueEncoder & aEncoder);
 };
 
 BasicAttrAccess gAttrAccess;
@@ -304,6 +305,16 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
         break;
     }
 
+    case ConfigurationVersion::Id: {
+        uint32_t configurationVersion = 0;
+        status                        = ConfigurationMgr().GetConfigurationVersion(configurationVersion);
+        if (status == CHIP_NO_ERROR)
+        {
+            status = aEncoder.Encode(configurationVersion);
+        }
+        break;
+    }
+
     default:
         // We did not find a processing path, the caller will delegate elsewhere.
         break;
@@ -478,4 +489,10 @@ void MatterBasicInformationPluginServerInitCallback()
 {
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
     PlatformMgr().SetDelegate(&gPlatformMgrDelegate);
+}
+
+void MatterBasicInformationPluginServerShutdownCallback()
+{
+    PlatformMgr().SetDelegate(nullptr);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
 }

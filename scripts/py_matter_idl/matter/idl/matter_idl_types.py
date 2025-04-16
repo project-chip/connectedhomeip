@@ -163,6 +163,7 @@ class Struct:
     qualities: StructQuality = StructQuality.NONE
     api_maturity: ApiMaturity = ApiMaturity.STABLE
     is_global: bool = False
+    is_shared: bool = False  # shared across multiple clusters (shared by name)
 
 
 @dataclass
@@ -195,6 +196,7 @@ class Enum:
     entries: List[ConstantEntry]
     api_maturity: ApiMaturity = ApiMaturity.STABLE
     is_global: bool = False
+    is_shared: bool = False  # shared across multiple clusters (shared by name)
 
 
 @dataclass
@@ -204,6 +206,7 @@ class Bitmap:
     entries: List[ConstantEntry]
     api_maturity: ApiMaturity = ApiMaturity.STABLE
     is_global: bool = False
+    is_shared: bool = False  # shared across multiple clusters (shared by name)
 
 
 @dataclass

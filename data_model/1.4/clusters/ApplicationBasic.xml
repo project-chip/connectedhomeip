@@ -94,7 +94,9 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <optionalConform/>
-      <constraint type="maxLength" value="32"/>
+      <constraint>
+        <maxLength value="32"/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="VendorID" type="vendor-id">
       <access read="true" readPrivilege="view"/>
@@ -105,7 +107,9 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0003" name="ProductID" type="uint16">
       <access read="true" readPrivilege="view"/>
@@ -116,18 +120,24 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0005" name="Status" type="ApplicationStatusEnum" default="MS">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0006" name="ApplicationVersion" type="string">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="maxLength" value="32"/>
+      <constraint>
+        <maxLength value="32"/>
+      </constraint>
     </attribute>
     <attribute id="0x0007" name="AllowedVendorList" type="list">
       <entry type="vendor-id"/>

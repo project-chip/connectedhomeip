@@ -69,6 +69,11 @@ matter_add_flags(-DMBEDTLS_USER_CONFIG_FILE=<${CONFIG_MBEDTLS_CFG_FILE}>)
 
 # Set up custom OpenThread configuration
 
+if (CONFIG_OPENTHREAD_TELINK_LIBRARY)
+    set(ZEPHYR_OPENTHREAD_MODULE_DIR ${ZEPHYR_BASE}/../modules/lib/openthread_telink_lib CACHE STRING INTERNAL)
+	message(STATUS "OpenThread used as precompiled Telink library, path: ${ZEPHYR_OPENTHREAD_MODULE_DIR}")
+endif()
+
 if (CONFIG_CHIP_OPENTHREAD_CONFIG)
     get_filename_component(CHIP_OPENTHREAD_CONFIG
         ${CONFIG_CHIP_OPENTHREAD_CONFIG}

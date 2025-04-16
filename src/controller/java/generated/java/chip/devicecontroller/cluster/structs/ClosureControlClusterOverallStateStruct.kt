@@ -24,38 +24,54 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class ClosureControlClusterOverallStateStruct(
-  val positioning: Optional<UInt>,
-  val latching: Optional<UInt>,
-  val speed: Optional<UInt>,
-  val extraInfo: Optional<ULong>,
+  val positioning: Optional<UInt>?,
+  val latch: Optional<Boolean>?,
+  val speed: Optional<UInt>?,
+  val secureState: Optional<Boolean>?,
 ) {
   override fun toString(): String = buildString {
     append("ClosureControlClusterOverallStateStruct {\n")
     append("\tpositioning : $positioning\n")
-    append("\tlatching : $latching\n")
+    append("\tlatch : $latch\n")
     append("\tspeed : $speed\n")
-    append("\textraInfo : $extraInfo\n")
+    append("\tsecureState : $secureState\n")
     append("}\n")
   }
 
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      if (positioning.isPresent) {
-        val optpositioning = positioning.get()
-        put(ContextSpecificTag(TAG_POSITIONING), optpositioning)
+      if (positioning != null) {
+        if (positioning.isPresent) {
+          val optpositioning = positioning.get()
+          put(ContextSpecificTag(TAG_POSITIONING), optpositioning)
+        }
+      } else {
+        putNull(ContextSpecificTag(TAG_POSITIONING))
       }
-      if (latching.isPresent) {
-        val optlatching = latching.get()
-        put(ContextSpecificTag(TAG_LATCHING), optlatching)
+      if (latch != null) {
+        if (latch.isPresent) {
+          val optlatch = latch.get()
+          put(ContextSpecificTag(TAG_LATCH), optlatch)
+        }
+      } else {
+        putNull(ContextSpecificTag(TAG_LATCH))
       }
-      if (speed.isPresent) {
-        val optspeed = speed.get()
-        put(ContextSpecificTag(TAG_SPEED), optspeed)
+      if (speed != null) {
+        if (speed.isPresent) {
+          val optspeed = speed.get()
+          put(ContextSpecificTag(TAG_SPEED), optspeed)
+        }
+      } else {
+        putNull(ContextSpecificTag(TAG_SPEED))
       }
-      if (extraInfo.isPresent) {
-        val optextraInfo = extraInfo.get()
-        put(ContextSpecificTag(TAG_EXTRA_INFO), optextraInfo)
+      if (secureState != null) {
+        if (secureState.isPresent) {
+          val optsecureState = secureState.get()
+          put(ContextSpecificTag(TAG_SECURE_STATE), optsecureState)
+        }
+      } else {
+        putNull(ContextSpecificTag(TAG_SECURE_STATE))
       }
       endStructure()
     }
@@ -63,40 +79,60 @@ class ClosureControlClusterOverallStateStruct(
 
   companion object {
     private const val TAG_POSITIONING = 0
-    private const val TAG_LATCHING = 1
+    private const val TAG_LATCH = 1
     private const val TAG_SPEED = 2
-    private const val TAG_EXTRA_INFO = 3
+    private const val TAG_SECURE_STATE = 3
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ClosureControlClusterOverallStateStruct {
       tlvReader.enterStructure(tlvTag)
       val positioning =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_POSITIONING))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_POSITIONING)))
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_POSITIONING))) {
+            Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_POSITIONING)))
+          } else {
+            Optional.empty()
+          }
         } else {
-          Optional.empty()
+          tlvReader.getNull(ContextSpecificTag(TAG_POSITIONING))
+          null
         }
-      val latching =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_LATCHING))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_LATCHING)))
+      val latch =
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_LATCH))) {
+            Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_LATCH)))
+          } else {
+            Optional.empty()
+          }
         } else {
-          Optional.empty()
+          tlvReader.getNull(ContextSpecificTag(TAG_LATCH))
+          null
         }
       val speed =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_SPEED))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_SPEED)))
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_SPEED))) {
+            Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_SPEED)))
+          } else {
+            Optional.empty()
+          }
         } else {
-          Optional.empty()
+          tlvReader.getNull(ContextSpecificTag(TAG_SPEED))
+          null
         }
-      val extraInfo =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_EXTRA_INFO))) {
-          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_EXTRA_INFO)))
+      val secureState =
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_SECURE_STATE))) {
+            Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_SECURE_STATE)))
+          } else {
+            Optional.empty()
+          }
         } else {
-          Optional.empty()
+          tlvReader.getNull(ContextSpecificTag(TAG_SECURE_STATE))
+          null
         }
 
       tlvReader.exitContainer()
 
-      return ClosureControlClusterOverallStateStruct(positioning, latching, speed, extraInfo)
+      return ClosureControlClusterOverallStateStruct(positioning, latch, speed, secureState)
     }
   }
 }

@@ -1,0 +1,46 @@
+// DO NOT EDIT - Generated file
+//
+// Application configuration for {{ cluster_name }} based on EMBER configuration
+{%- if input_name %}
+// from {{input_name}}
+{%- endif %}
+#pragma once
+
+#include <app-common/zap-generated/cluster-enums.h>
+#include <app/util/cluster-config.h>
+
+#include <array>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace {{ cluster_name }} {
+namespace StaticApplicationConfig {
+
+{% if config.feature_bitmap_type -%}
+using FeatureBitmapType = Feature;
+{%- else -%}
+using FeatureBitmapType = Clusters::StaticApplicationConfig::NoFeatureFlagsDefined;
+{%- endif %}
+
+inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfiguration<FeatureBitmapType>, {{config.endpoint_configs | length}}> kFixedClusterConfig = { {
+{%- for endpoint_config in config.endpoint_configs %}
+    {
+        .endpointNumber = {{ endpoint_config.endpoint_number }},
+        .featureMap = BitFlags<FeatureBitmapType> {
+          {%- for feature in endpoint_config.features %}
+            FeatureBitmapType::{{ feature.name }}
+            {%- if not loop.last -%}, {% endif -%}
+            // feature bit {{ "0x%0X" | format(feature.value) }}
+          {%- endfor %}
+        },
+    },
+{%- endfor %}
+} };
+
+} // namespace StaticApplicationConfig
+} // namespace {{ cluster_name }}
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
