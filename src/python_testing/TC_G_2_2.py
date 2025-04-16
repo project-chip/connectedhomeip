@@ -153,10 +153,10 @@ class TC_G_2_2(MatterBaseTest):
         )
 
         name_feature_bit: int = 0
-        name_supported: bool = (feature_map & (1 << name_feature_bit)) != 0
+        group_name_supported: bool = (feature_map & (1 << name_feature_bit)) != 0
 
         self.step("2b")
-        if name_supported:
+        if group_name_supported:
             group_found = False
             for group in groupTableList:
                 if group.groupName == kGroupName1:
@@ -232,10 +232,10 @@ class TC_G_2_2(MatterBaseTest):
         asserts.assert_equal(result.status, Status.Success, "ViewGroup 0x0001 failed")
 
         self.step("12")
-        try:
+        if group_name_supported:
             asserts.assert_equal(result.groupName, kGroupName1, "Unexpected error GroupName does not match written value")
-        except Exception as e:
-            logging.exception('Error while retrieving the groupName %s', e)
+        else:
+            logger.info("Skipping GroupName check: Feature GroupNames not supported by DUT")
 
         self.step("13")
         result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.ViewGroup(kGroupId))
