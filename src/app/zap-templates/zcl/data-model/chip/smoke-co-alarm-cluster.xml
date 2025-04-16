@@ -40,7 +40,7 @@ Git:
       <feature bit="0" code="SMOKE" name="SmokeAlarm" summary="Supports Smoke alarm">
         <optionalConform choice="a" more="true" min="1"/>
       </feature>
-      <feature bit="1" code="CO" name="CoAlarm" summary="Supports CO alarm">
+      <feature bit="1" code="CO" name="CO Alarm" summary="Supports CO alarm">
         <optionalConform choice="a" more="true" min="1"/>
       </feature>
     </features>
