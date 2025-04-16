@@ -24,6 +24,8 @@ using namespace chip;
 using namespace chip::scenes;
 using namespace chip::app::Storage;
 
+template class FabricTableImpl<SceneTableBase::SceneStorageId, SceneTableBase::SceneData, kIteratorsMax>;
+
 namespace {
 /// @brief Tags Used to serialize Scenes so they can be stored in flash memory.
 /// kGroupID: Tag for GroupID if the Scene is a Group Scene
