@@ -97,10 +97,10 @@ private:
     chip::Callback::Callback<chip::OnDeviceConnected> mOnConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnConnectionFailureCallback;
 
-    std::unordered_map<uint16_t, WebrtcTransport *> webrtcTransportMap;
+    std::unordered_map<uint16_t, std::unique_ptr<WebrtcTransport>> webrtcTransportMap;
 
-    uint16_t videoStreamID;
-    uint16_t audioStreamID;
+    uint16_t mVideoStreamID;
+    uint16_t mAudioStreamID;
 
     MediaController * mMediaController = nullptr;
 };
