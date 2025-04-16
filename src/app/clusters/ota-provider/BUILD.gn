@@ -35,8 +35,8 @@ source_set("ota-provider") {
   ]
   public_deps = [
     "${chip_root}/src/app:command-handler",
-    "${chip_root}/src/app/data-model",
     "${chip_root}/src/app:paths",
+    "${chip_root}/src/app/data-model",
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/src/lib/core:types",
     "${chip_root}/zzz_generated/app-common/clusters/OtaSoftwareUpdateProvider",
