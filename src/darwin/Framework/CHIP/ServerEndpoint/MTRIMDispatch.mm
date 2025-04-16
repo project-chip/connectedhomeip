@@ -39,7 +39,6 @@ constexpr EndpointId kOtaProviderEndpointId = 0;
 OtaProviderLogic gOtaProviderLogic;
 
 } // anonymous namespace
-}
 
 namespace chip::app::Clusters::OTAProvider {
 
