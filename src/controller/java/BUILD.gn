@@ -175,7 +175,7 @@ shared_library("jni") {
 
     defines += [ "CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1" ]
 
-    deps += [ 
+    deps += [
       "${chip_root}/src/app/clusters/ota-provider",
       "${chip_root}/src/controller:nodatamodel",
     ]
