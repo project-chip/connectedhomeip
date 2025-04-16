@@ -22,6 +22,16 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <lib/core/CHIPError.h>
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Structs::CurrencyStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Globals::Structs::CurrencyStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Structs::PowerThresholdStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Globals::Structs::PowerThresholdStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Structs::TestGlobalStruct::Type & request,
                         Json::Value & value);
 
@@ -56,6 +66,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::detail::Structs::DeviceTypeStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Structs::PriceStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Globals::Structs::PriceStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::ApplicationStruct::Type & request,
                         Json::Value & value);
@@ -312,10 +327,10 @@ static CHIP_ERROR Setup(const char * label,
 
 static void Finalize(chip::app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type & request);
 
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type & request);
+static void Finalize(chip::app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ScenesManagement::Structs::SceneInfoStruct::Type & request,
                         Json::Value & value);
@@ -363,6 +378,17 @@ static CHIP_ERROR Setup(const char * label,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::WaterHeaterManagement::Structs::WaterHeaterBoostInfoStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::CommodityPrice::Structs::CommodityPriceComponentStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::CommodityPrice::Structs::CommodityPriceComponentStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::CommodityPrice::Structs::CommodityPriceStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::CommodityPrice::Structs::CommodityPriceStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::DemandResponseLoadControl::Structs::HeatingSourceControlStruct::Type & request,
@@ -474,6 +500,12 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::EnergyPreferenc
 
 static void Finalize(chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ElectricalGridConditions::Structs::ElectricalGridConditionsStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ElectricalGridConditions::Structs::ElectricalGridConditionsStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type & request,
                         Json::Value & value);
 
@@ -488,6 +520,27 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ClosureControl:
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ClosureControl::Structs::OverallTargetStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ClosureDimension::Structs::CurrentStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ClosureDimension::Structs::CurrentStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ClosureDimension::Structs::RangePercent100thsStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ClosureDimension::Structs::RangePercent100thsStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ClosureDimension::Structs::TargetStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ClosureDimension::Structs::TargetStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ClosureDimension::Structs::UnitRangeStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ClosureDimension::Structs::UnitRangeStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ServiceArea::Structs::LandmarkInfoStruct::Type & request,
                         Json::Value & value);
@@ -722,10 +775,10 @@ static CHIP_ERROR Setup(const char * label,
 static void Finalize(chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotStreamStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
-                        chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotParamsStruct::Type & request,
+                        chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotCapabilitiesStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotParamsStruct::Type & request);
+static void Finalize(chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotCapabilitiesStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::CameraAvStreamManagement::Structs::RateDistortionTradeOffPointsStruct::Type & request,
@@ -817,6 +870,57 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Chime::Structs:
 
 static void Finalize(chip::app::Clusters::Chime::Structs::ChimeSoundStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::CommodityTariff::Structs::PeakPeriodStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::CommodityTariff::Structs::PeakPeriodStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::CommodityTariff::Structs::AuxiliaryLoadSwitchSettingsStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::CommodityTariff::Structs::AuxiliaryLoadSwitchSettingsStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::CommodityTariff::Structs::TariffPriceStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::CommodityTariff::Structs::TariffPriceStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::CommodityTariff::Structs::TariffComponentStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::CommodityTariff::Structs::TariffComponentStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::CommodityTariff::Structs::CalendarPeriodStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::CommodityTariff::Structs::CalendarPeriodStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::CommodityTariff::Structs::DayPatternStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::CommodityTariff::Structs::DayPatternStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::CommodityTariff::Structs::TariffInformationStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::CommodityTariff::Structs::TariffInformationStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::CommodityTariff::Structs::TariffPeriodStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::CommodityTariff::Structs::TariffPeriodStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::EcosystemInformation::Structs::EcosystemDeviceStruct::Type & request,
                         Json::Value & value);
@@ -844,6 +948,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::TlsClientManage
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::TlsClientManagement::Structs::TLSEndpointStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::CommodityMetering::Structs::MeteredQuantityStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::CommodityMetering::Structs::MeteredQuantityStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::UnitTesting::Structs::SimpleStruct::Type & request,
                         Json::Value & value);

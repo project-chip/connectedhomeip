@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -35,8 +35,20 @@ static struct stream_flash_ctx stream;
 
 static constexpr uint16_t deltaRebootDelayMs = 200;
 
+static chip::OTAImageProcessorImpl gImageProcessor;
+
 namespace chip {
-namespace DeviceLayer {
+
+using namespace ::chip::DeviceLayer;
+
+CHIP_ERROR OTAImageProcessorImpl::Init(OTADownloader * downloader)
+{
+    VerifyOrReturnError(downloader != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    gImageProcessor.SetOTADownloader(downloader);
+
+    return CHIP_NO_ERROR;
+}
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
@@ -187,5 +199,10 @@ void OTAImageProcessorImpl::SetRebootDelaySec(uint16_t rebootDelay)
 {
     mDelayBeforeRebootSec = rebootDelay;
 }
-} // namespace DeviceLayer
+
+OTAImageProcessorImpl & OTAImageProcessorImpl::GetDefaultInstance()
+{
+    return gImageProcessor;
+}
+
 } // namespace chip
