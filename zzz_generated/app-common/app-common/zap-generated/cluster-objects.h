@@ -358,19 +358,21 @@ enum class Fields : uint8_t
 {
     kId              = 1,
     kPeerNodeID      = 2,
-    kStreamUsage     = 3,
-    kVideoStreamID   = 4,
-    kAudioStreamID   = 5,
-    kMetadataOptions = 6,
+    kPeerEndpointID  = 3,
+    kStreamUsage     = 4,
+    kVideoStreamID   = 5,
+    kAudioStreamID   = 6,
+    kMetadataOptions = 7,
     kFabricIndex     = 254,
 };
 
 struct Type
 {
 public:
-    uint16_t id                 = static_cast<uint16_t>(0);
-    chip::NodeId peerNodeID     = static_cast<chip::NodeId>(0);
-    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
+    uint16_t id                     = static_cast<uint16_t>(0);
+    chip::NodeId peerNodeID         = static_cast<chip::NodeId>(0);
+    chip::EndpointId peerEndpointID = static_cast<chip::EndpointId>(0);
+    StreamUsageEnum streamUsage     = static_cast<StreamUsageEnum>(0);
     DataModel::Nullable<uint16_t> videoStreamID;
     DataModel::Nullable<uint16_t> audioStreamID;
     chip::BitMask<WebRTCMetadataOptionsBitmap> metadataOptions = static_cast<chip::BitMask<WebRTCMetadataOptionsBitmap>>(0);
@@ -401,6 +403,56 @@ namespace Globals {
 
 // Global structs.
 namespace Structs {
+
+namespace CurrencyStruct {
+enum class Fields : uint8_t
+{
+    kCurrency      = 0,
+    kDecimalPoints = 1,
+};
+
+struct Type
+{
+public:
+    uint16_t currency     = static_cast<uint16_t>(0);
+    uint8_t decimalPoints = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace CurrencyStruct
+
+namespace PowerThresholdStruct {
+enum class Fields : uint8_t
+{
+    kPowerThreshold         = 0,
+    kApparentPowerThreshold = 1,
+    kPowerThresholdSource   = 2,
+};
+
+struct Type
+{
+public:
+    Optional<int64_t> powerThreshold;
+    Optional<int64_t> apparentPowerThreshold;
+    DataModel::Nullable<Globals::PowerThresholdSourceEnum> powerThresholdSource;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace PowerThresholdStruct
 
 namespace TestGlobalStruct {
 enum class Fields : uint8_t
@@ -453,6 +505,30 @@ public:
 using DecodableType = Type;
 
 } // namespace LocationDescriptorStruct
+
+namespace PriceStruct {
+enum class Fields : uint8_t
+{
+    kAmount   = 0,
+    kCurrency = 1,
+};
+
+struct Type
+{
+public:
+    int64_t amount = static_cast<int64_t>(0);
+    Globals::Structs::CurrencyStruct::Type currency;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace PriceStruct
 
 namespace AtomicAttributeStatusStruct {
 enum class Fields : uint8_t
@@ -9189,6 +9265,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ActiveNetworkFaultsList
+namespace ExtAddress {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ExtAddress::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ExtAddress
+namespace Rloc16 {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Rloc16::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Rloc16
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -9292,6 +9392,8 @@ struct TypeInfo
         Attributes::ChannelPage0Mask::TypeInfo::DecodableType channelPage0Mask;
         Attributes::OperationalDatasetComponents::TypeInfo::DecodableType operationalDatasetComponents;
         Attributes::ActiveNetworkFaultsList::TypeInfo::DecodableType activeNetworkFaultsList;
+        Attributes::ExtAddress::TypeInfo::DecodableType extAddress;
+        Attributes::Rloc16::TypeInfo::DecodableType rloc16;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
@@ -11745,7 +11847,7 @@ enum class Fields : uint8_t
     kFabricID                 = 3,
     kNodeID                   = 4,
     kLabel                    = 5,
-    kVidVerificationStatement = 6,
+    kVIDVerificationStatement = 6,
     kFabricIndex              = 254,
 };
 
@@ -11757,7 +11859,7 @@ public:
     chip::FabricId fabricID = static_cast<chip::FabricId>(0);
     chip::NodeId nodeID     = static_cast<chip::NodeId>(0);
     chip::CharSpan label;
-    Optional<chip::ByteSpan> vidVerificationStatement;
+    Optional<chip::ByteSpan> VIDVerificationStatement;
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -11878,20 +11980,20 @@ struct Type;
 struct DecodableType;
 } // namespace AddTrustedRootCertificate
 
-namespace SetVidVerificationStatement {
+namespace SetVIDVerificationStatement {
 struct Type;
 struct DecodableType;
-} // namespace SetVidVerificationStatement
+} // namespace SetVIDVerificationStatement
 
-namespace SignVidVerificationRequest {
+namespace SignVIDVerificationRequest {
 struct Type;
 struct DecodableType;
-} // namespace SignVidVerificationRequest
+} // namespace SignVIDVerificationRequest
 
-namespace SignVidVerificationResponse {
+namespace SignVIDVerificationResponse {
 struct Type;
 struct DecodableType;
-} // namespace SignVidVerificationResponse
+} // namespace SignVIDVerificationResponse
 
 } // namespace Commands
 
@@ -12310,11 +12412,11 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddTrustedRootCertificate
-namespace SetVidVerificationStatement {
+namespace SetVIDVerificationStatement {
 enum class Fields : uint8_t
 {
     kVendorID                 = 0,
-    kVidVerificationStatement = 1,
+    kVIDVerificationStatement = 1,
     kVvsc                     = 2,
 };
 
@@ -12322,11 +12424,11 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SetVidVerificationStatement::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetVIDVerificationStatement::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     Optional<chip::VendorId> vendorID;
-    Optional<chip::ByteSpan> vidVerificationStatement;
+    Optional<chip::ByteSpan> VIDVerificationStatement;
     Optional<chip::ByteSpan> vvsc;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -12339,16 +12441,16 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::SetVidVerificationStatement::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetVIDVerificationStatement::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     Optional<chip::VendorId> vendorID;
-    Optional<chip::ByteSpan> vidVerificationStatement;
+    Optional<chip::ByteSpan> VIDVerificationStatement;
     Optional<chip::ByteSpan> vvsc;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace SetVidVerificationStatement
-namespace SignVidVerificationRequest {
+}; // namespace SetVIDVerificationStatement
+namespace SignVIDVerificationRequest {
 enum class Fields : uint8_t
 {
     kFabricIndex     = 0,
@@ -12359,7 +12461,7 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SignVidVerificationRequest::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SignVIDVerificationRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
@@ -12367,7 +12469,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
-    using ResponseType = Clusters::OperationalCredentials::Commands::SignVidVerificationResponse::DecodableType;
+    using ResponseType = Clusters::OperationalCredentials::Commands::SignVIDVerificationResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -12375,15 +12477,15 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::SignVidVerificationRequest::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SignVIDVerificationRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
     chip::ByteSpan clientChallenge;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace SignVidVerificationRequest
-namespace SignVidVerificationResponse {
+}; // namespace SignVIDVerificationRequest
+namespace SignVIDVerificationResponse {
 enum class Fields : uint8_t
 {
     kFabricIndex          = 0,
@@ -12395,7 +12497,7 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SignVidVerificationResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SignVIDVerificationResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
@@ -12412,7 +12514,7 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::SignVidVerificationResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SignVIDVerificationResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
@@ -12420,7 +12522,7 @@ public:
     chip::ByteSpan signature;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace SignVidVerificationResponse
+}; // namespace SignVIDVerificationResponse
 } // namespace Commands
 
 namespace Attributes {
@@ -18356,7 +18458,7 @@ public:
 using DecodableType = Type;
 
 } // namespace AttributeValuePairStruct
-namespace ExtensionFieldSet {
+namespace ExtensionFieldSetStruct {
 enum class Fields : uint8_t
 {
     kClusterID          = 0,
@@ -18385,7 +18487,7 @@ public:
     static constexpr bool kIsFabricScoped = false;
 };
 
-} // namespace ExtensionFieldSet
+} // namespace ExtensionFieldSetStruct
 namespace SceneInfoStruct {
 enum class Fields : uint8_t
 {
@@ -18511,11 +18613,11 @@ namespace Commands {
 namespace AddScene {
 enum class Fields : uint8_t
 {
-    kGroupID            = 0,
-    kSceneID            = 1,
-    kTransitionTime     = 2,
-    kSceneName          = 3,
-    kExtensionFieldSets = 4,
+    kGroupID                  = 0,
+    kSceneID                  = 1,
+    kTransitionTime           = 2,
+    kSceneName                = 3,
+    kExtensionFieldSetStructs = 4,
 };
 
 struct Type
@@ -18529,7 +18631,7 @@ public:
     uint8_t sceneID         = static_cast<uint8_t>(0);
     uint32_t transitionTime = static_cast<uint32_t>(0);
     chip::CharSpan sceneName;
-    DataModel::List<const Structs::ExtensionFieldSet::Type> extensionFieldSets;
+    DataModel::List<const Structs::ExtensionFieldSetStruct::Type> extensionFieldSetStructs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -18548,7 +18650,7 @@ public:
     uint8_t sceneID         = static_cast<uint8_t>(0);
     uint32_t transitionTime = static_cast<uint32_t>(0);
     chip::CharSpan sceneName;
-    DataModel::DecodableList<Structs::ExtensionFieldSet::DecodableType> extensionFieldSets;
+    DataModel::DecodableList<Structs::ExtensionFieldSetStruct::DecodableType> extensionFieldSetStructs;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddScene
@@ -18628,12 +18730,12 @@ public:
 namespace ViewSceneResponse {
 enum class Fields : uint8_t
 {
-    kStatus             = 0,
-    kGroupID            = 1,
-    kSceneID            = 2,
-    kTransitionTime     = 3,
-    kSceneName          = 4,
-    kExtensionFieldSets = 5,
+    kStatus                   = 0,
+    kGroupID                  = 1,
+    kSceneID                  = 2,
+    kTransitionTime           = 3,
+    kSceneName                = 4,
+    kExtensionFieldSetStructs = 5,
 };
 
 struct Type
@@ -18648,7 +18750,7 @@ public:
     uint8_t sceneID       = static_cast<uint8_t>(0);
     Optional<uint32_t> transitionTime;
     Optional<chip::CharSpan> sceneName;
-    Optional<DataModel::List<const Structs::ExtensionFieldSet::Type>> extensionFieldSets;
+    Optional<DataModel::List<const Structs::ExtensionFieldSetStruct::Type>> extensionFieldSetStructs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -18668,7 +18770,7 @@ public:
     uint8_t sceneID       = static_cast<uint8_t>(0);
     Optional<uint32_t> transitionTime;
     Optional<chip::CharSpan> sceneName;
-    Optional<DataModel::DecodableList<Structs::ExtensionFieldSet::DecodableType>> extensionFieldSets;
+    Optional<DataModel::DecodableList<Structs::ExtensionFieldSetStruct::DecodableType>> extensionFieldSetStructs;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ViewSceneResponse
@@ -19082,18 +19184,6 @@ public:
 
 namespace Attributes {
 
-namespace LastConfiguredBy {
-struct TypeInfo
-{
-    using Type             = chip::app::DataModel::Nullable<chip::NodeId>;
-    using DecodableType    = chip::app::DataModel::Nullable<chip::NodeId>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<chip::NodeId> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::LastConfiguredBy::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace LastConfiguredBy
 namespace SceneTableSize {
 struct TypeInfo
 {
@@ -19159,7 +19249,6 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::LastConfiguredBy::TypeInfo::DecodableType lastConfiguredBy;
         Attributes::SceneTableSize::TypeInfo::DecodableType sceneTableSize = static_cast<uint16_t>(0);
         Attributes::FabricSceneInfo::TypeInfo::DecodableType fabricSceneInfo;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
@@ -21239,6 +21328,412 @@ public:
 } // namespace BoostEnded
 } // namespace Events
 } // namespace WaterHeaterManagement
+namespace CommodityPrice {
+namespace Structs {
+namespace CommodityPriceComponentStruct {
+enum class Fields : uint8_t
+{
+    kPrice             = 0,
+    kPriceLevel        = 1,
+    kSource            = 2,
+    kDescription       = 3,
+    kTariffComponentID = 4,
+};
+
+struct Type
+{
+public:
+    Optional<int64_t> price;
+    Optional<int16_t> priceLevel;
+    Globals::TariffPriceTypeEnum source = static_cast<Globals::TariffPriceTypeEnum>(0);
+    Optional<chip::CharSpan> description;
+    Optional<uint32_t> tariffComponentID;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace CommodityPriceComponentStruct
+namespace CommodityPriceStruct {
+enum class Fields : uint8_t
+{
+    kPeriodStart = 0,
+    kPeriodEnd   = 1,
+    kPrice       = 2,
+    kPriceLevel  = 3,
+    kDescription = 4,
+    kComponents  = 5,
+};
+
+struct Type
+{
+public:
+    uint32_t periodStart = static_cast<uint32_t>(0);
+    DataModel::Nullable<uint32_t> periodEnd;
+    Optional<Globals::Structs::PriceStruct::Type> price;
+    Optional<int16_t> priceLevel;
+    Optional<chip::CharSpan> description;
+    Optional<DataModel::List<const Structs::CommodityPriceComponentStruct::Type>> components;
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    uint32_t periodStart = static_cast<uint32_t>(0);
+    DataModel::Nullable<uint32_t> periodEnd;
+    Optional<Globals::Structs::PriceStruct::DecodableType> price;
+    Optional<int16_t> priceLevel;
+    Optional<chip::CharSpan> description;
+    Optional<DataModel::DecodableList<Structs::CommodityPriceComponentStruct::DecodableType>> components;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
+
+} // namespace CommodityPriceStruct
+} // namespace Structs
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace GetDetailedPriceRequest {
+struct Type;
+struct DecodableType;
+} // namespace GetDetailedPriceRequest
+
+namespace GetDetailedPriceResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetDetailedPriceResponse
+
+namespace GetDetailedForecastRequest {
+struct Type;
+struct DecodableType;
+} // namespace GetDetailedForecastRequest
+
+namespace GetDetailedForecastResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetDetailedForecastResponse
+
+} // namespace Commands
+
+namespace Commands {
+namespace GetDetailedPriceRequest {
+enum class Fields : uint8_t
+{
+    kDetails = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GetDetailedPriceRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+
+    chip::BitMask<CommodityPriceDetailBitmap> details = static_cast<chip::BitMask<CommodityPriceDetailBitmap>>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::CommodityPrice::Commands::GetDetailedPriceResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GetDetailedPriceRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+
+    chip::BitMask<CommodityPriceDetailBitmap> details = static_cast<chip::BitMask<CommodityPriceDetailBitmap>>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetDetailedPriceRequest
+namespace GetDetailedPriceResponse {
+enum class Fields : uint8_t
+{
+    kCurrentPrice = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GetDetailedPriceResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+
+    DataModel::Nullable<Structs::CommodityPriceStruct::Type> currentPrice;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GetDetailedPriceResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+
+    DataModel::Nullable<Structs::CommodityPriceStruct::DecodableType> currentPrice;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetDetailedPriceResponse
+namespace GetDetailedForecastRequest {
+enum class Fields : uint8_t
+{
+    kDetails = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GetDetailedForecastRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+
+    chip::BitMask<CommodityPriceDetailBitmap> details = static_cast<chip::BitMask<CommodityPriceDetailBitmap>>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::CommodityPrice::Commands::GetDetailedForecastResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GetDetailedForecastRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+
+    chip::BitMask<CommodityPriceDetailBitmap> details = static_cast<chip::BitMask<CommodityPriceDetailBitmap>>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetDetailedForecastRequest
+namespace GetDetailedForecastResponse {
+enum class Fields : uint8_t
+{
+    kPriceForecast = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GetDetailedForecastResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+
+    DataModel::List<const Structs::CommodityPriceStruct::Type> priceForecast;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GetDetailedForecastResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+
+    DataModel::DecodableList<Structs::CommodityPriceStruct::DecodableType> priceForecast;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetDetailedForecastResponse
+} // namespace Commands
+
+namespace Attributes {
+
+namespace TariffUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::Globals::TariffUnitEnum;
+    using DecodableType    = chip::app::Clusters::Globals::TariffUnitEnum;
+    using DecodableArgType = chip::app::Clusters::Globals::TariffUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TariffUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TariffUnit
+namespace Currency {
+struct TypeInfo
+{
+    using Type          = chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::CurrencyStruct::Type>;
+    using DecodableType = chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::CurrencyStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::CurrencyStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Currency::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Currency
+namespace CurrentPrice {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::CommodityPrice::Structs::CommodityPriceStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::Nullable<chip::app::Clusters::CommodityPrice::Structs::CommodityPriceStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityPrice::Structs::CommodityPriceStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPrice::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CurrentPrice
+namespace PriceForecast {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::CommodityPrice::Structs::CommodityPriceStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityPrice::Structs::CommodityPriceStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::CommodityPrice::Structs::CommodityPriceStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PriceForecast::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PriceForecast
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+};
+} // namespace AcceptedCommandList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::TariffUnit::TypeInfo::DecodableType tariffUnit = static_cast<chip::app::Clusters::Globals::TariffUnitEnum>(0);
+        Attributes::Currency::TypeInfo::DecodableType currency;
+        Attributes::CurrentPrice::TypeInfo::DecodableType currentPrice;
+        Attributes::PriceForecast::TypeInfo::DecodableType priceForecast;
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+namespace Events {
+namespace PriceChange {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kCurrentPrice = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::PriceChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    DataModel::Nullable<Structs::CommodityPriceStruct::Type> currentPrice;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::PriceChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+
+    DataModel::Nullable<Structs::CommodityPriceStruct::DecodableType> currentPrice;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace PriceChange
+namespace ForecastChange {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kPriceForecast = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::ForecastChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    DataModel::Nullable<DataModel::List<const Structs::CommodityPriceStruct::Type>> priceForecast;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::ForecastChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+
+    DataModel::Nullable<DataModel::DecodableList<Structs::CommodityPriceStruct::DecodableType>> priceForecast;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace ForecastChange
+} // namespace Events
+} // namespace CommodityPrice
 namespace DemandResponseLoadControl {
 namespace Structs {
 namespace HeatingSourceControlStruct {
@@ -27495,10 +27990,10 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    Optional<PositioningEnum> positioning;
-    Optional<LatchingEnum> latching;
-    Optional<Globals::ThreeLevelAutoEnum> speed;
-    Optional<uint32_t> extraInfo;
+    Optional<DataModel::Nullable<PositioningEnum>> positioning;
+    Optional<DataModel::Nullable<LatchingEnum>> latching;
+    Optional<DataModel::Nullable<Globals::ThreeLevelAutoEnum>> speed;
+    Optional<DataModel::Nullable<uint32_t>> extraInfo;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -27513,16 +28008,16 @@ using DecodableType = Type;
 namespace OverallTargetStruct {
 enum class Fields : uint8_t
 {
-    kTagPosition = 0,
-    kTagLatch    = 1,
-    kSpeed       = 2,
+    kPosition = 0,
+    kLatch    = 1,
+    kSpeed    = 2,
 };
 
 struct Type
 {
 public:
-    Optional<TagPositionEnum> tagPosition;
-    Optional<TagLatchEnum> tagLatch;
+    Optional<TargetPositionEnum> position;
+    Optional<TargetLatchEnum> latch;
     Optional<Globals::ThreeLevelAutoEnum> speed;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -27554,16 +28049,6 @@ namespace Calibrate {
 struct Type;
 struct DecodableType;
 } // namespace Calibrate
-
-namespace ConfigureFallback {
-struct Type;
-struct DecodableType;
-} // namespace ConfigureFallback
-
-namespace CancelFallback {
-struct Type;
-struct DecodableType;
-} // namespace CancelFallback
 
 } // namespace Commands
 
@@ -27599,9 +28084,9 @@ public:
 namespace MoveTo {
 enum class Fields : uint8_t
 {
-    kTag   = 0,
-    kLatch = 1,
-    kSpeed = 2,
+    kPosition = 0,
+    kLatch    = 1,
+    kSpeed    = 2,
 };
 
 struct Type
@@ -27611,8 +28096,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveTo::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
 
-    Optional<TagPositionEnum> tag;
-    Optional<TagLatchEnum> latch;
+    Optional<TargetPositionEnum> position;
+    Optional<TargetLatchEnum> latch;
     Optional<Globals::ThreeLevelAutoEnum> speed;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -27628,8 +28113,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveTo::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
 
-    Optional<TagPositionEnum> tag;
-    Optional<TagLatchEnum> latch;
+    Optional<TargetPositionEnum> position;
+    Optional<TargetLatchEnum> latch;
     Optional<Globals::ThreeLevelAutoEnum> speed;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -27662,75 +28147,6 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Calibrate
-namespace ConfigureFallback {
-enum class Fields : uint8_t
-{
-    kRestingProcedure = 0,
-    kTriggerCondition = 1,
-    kTriggerPosition  = 2,
-    kWaitingDelay     = 3,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ConfigureFallback::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
-
-    Optional<RestingProcedureEnum> restingProcedure;
-    Optional<TriggerConditionEnum> triggerCondition;
-    Optional<TriggerPositionEnum> triggerPosition;
-    Optional<uint32_t> waitingDelay;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ConfigureFallback::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
-
-    Optional<RestingProcedureEnum> restingProcedure;
-    Optional<TriggerConditionEnum> triggerCondition;
-    Optional<TriggerPositionEnum> triggerPosition;
-    Optional<uint32_t> waitingDelay;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ConfigureFallback
-namespace CancelFallback {
-enum class Fields : uint8_t
-{
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::CancelFallback::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::CancelFallback::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace CancelFallback
 } // namespace Commands
 
 namespace Attributes {
@@ -27799,66 +28215,6 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OverallTarget
-namespace RestingProcedure {
-struct TypeInfo
-{
-    using Type             = chip::app::Clusters::ClosureControl::RestingProcedureEnum;
-    using DecodableType    = chip::app::Clusters::ClosureControl::RestingProcedureEnum;
-    using DecodableArgType = chip::app::Clusters::ClosureControl::RestingProcedureEnum;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RestingProcedure::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RestingProcedure
-namespace TriggerCondition {
-struct TypeInfo
-{
-    using Type             = chip::app::Clusters::ClosureControl::TriggerConditionEnum;
-    using DecodableType    = chip::app::Clusters::ClosureControl::TriggerConditionEnum;
-    using DecodableArgType = chip::app::Clusters::ClosureControl::TriggerConditionEnum;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::TriggerCondition::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace TriggerCondition
-namespace TriggerPosition {
-struct TypeInfo
-{
-    using Type             = chip::app::Clusters::ClosureControl::TriggerPositionEnum;
-    using DecodableType    = chip::app::Clusters::ClosureControl::TriggerPositionEnum;
-    using DecodableArgType = chip::app::Clusters::ClosureControl::TriggerPositionEnum;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::TriggerPosition::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace TriggerPosition
-namespace WaitingDelay {
-struct TypeInfo
-{
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::WaitingDelay::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace WaitingDelay
-namespace KickoffTimer {
-struct TypeInfo
-{
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::KickoffTimer::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace KickoffTimer
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -27904,14 +28260,6 @@ struct TypeInfo
         Attributes::CurrentErrorList::TypeInfo::DecodableType currentErrorList;
         Attributes::OverallState::TypeInfo::DecodableType overallState;
         Attributes::OverallTarget::TypeInfo::DecodableType overallTarget;
-        Attributes::RestingProcedure::TypeInfo::DecodableType restingProcedure =
-            static_cast<chip::app::Clusters::ClosureControl::RestingProcedureEnum>(0);
-        Attributes::TriggerCondition::TypeInfo::DecodableType triggerCondition =
-            static_cast<chip::app::Clusters::ClosureControl::TriggerConditionEnum>(0);
-        Attributes::TriggerPosition::TypeInfo::DecodableType triggerPosition =
-            static_cast<chip::app::Clusters::ClosureControl::TriggerPositionEnum>(0);
-        Attributes::WaitingDelay::TypeInfo::DecodableType waitingDelay = static_cast<uint32_t>(0);
-        Attributes::KickoffTimer::TypeInfo::DecodableType kickoffTimer = static_cast<uint32_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
@@ -27921,6 +28269,403 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace ClosureControl
+namespace ClosureDimension {
+namespace Structs {
+namespace CurrentStruct {
+enum class Fields : uint8_t
+{
+    kPosition = 0,
+    kLatching = 1,
+    kSpeed    = 2,
+};
+
+struct Type
+{
+public:
+    Optional<chip::Percent100ths> position;
+    Optional<LatchingEnum> latching;
+    Optional<Globals::ThreeLevelAutoEnum> speed;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace CurrentStruct
+namespace RangePercent100thsStruct {
+enum class Fields : uint8_t
+{
+    kMin = 0,
+    kMax = 1,
+};
+
+struct Type
+{
+public:
+    chip::Percent100ths min = static_cast<chip::Percent100ths>(0);
+    chip::Percent100ths max = static_cast<chip::Percent100ths>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace RangePercent100thsStruct
+namespace TargetStruct {
+enum class Fields : uint8_t
+{
+    kPosition = 0,
+    kLatch    = 1,
+    kSpeed    = 2,
+};
+
+struct Type
+{
+public:
+    Optional<chip::Percent100ths> position;
+    Optional<TargetLatchEnum> latch;
+    Optional<Globals::ThreeLevelAutoEnum> speed;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace TargetStruct
+namespace UnitRangeStruct {
+enum class Fields : uint8_t
+{
+    kMin = 0,
+    kMax = 1,
+};
+
+struct Type
+{
+public:
+    int16_t min = static_cast<int16_t>(0);
+    int16_t max = static_cast<int16_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace UnitRangeStruct
+} // namespace Structs
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace SetTarget {
+struct Type;
+struct DecodableType;
+} // namespace SetTarget
+
+namespace Step {
+struct Type;
+struct DecodableType;
+} // namespace Step
+
+} // namespace Commands
+
+namespace Commands {
+namespace SetTarget {
+enum class Fields : uint8_t
+{
+    kPosition = 0,
+    kLatch    = 1,
+    kSpeed    = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SetTarget::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
+
+    Optional<chip::Percent100ths> position;
+    Optional<TargetLatchEnum> latch;
+    Optional<Globals::ThreeLevelAutoEnum> speed;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SetTarget::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
+
+    Optional<chip::Percent100ths> position;
+    Optional<TargetLatchEnum> latch;
+    Optional<Globals::ThreeLevelAutoEnum> speed;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetTarget
+namespace Step {
+enum class Fields : uint8_t
+{
+    kDirection     = 0,
+    kNumberOfSteps = 1,
+    kSpeed         = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::Step::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
+
+    StepDirectionEnum direction = static_cast<StepDirectionEnum>(0);
+    uint16_t numberOfSteps      = static_cast<uint16_t>(0);
+    Optional<Globals::ThreeLevelAutoEnum> speed;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::Step::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
+
+    StepDirectionEnum direction = static_cast<StepDirectionEnum>(0);
+    uint16_t numberOfSteps      = static_cast<uint16_t>(0);
+    Optional<Globals::ThreeLevelAutoEnum> speed;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Step
+} // namespace Commands
+
+namespace Attributes {
+
+namespace Current {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::CurrentStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::CurrentStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::CurrentStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Current::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Current
+namespace Target {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::TargetStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::TargetStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::TargetStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Target::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Target
+namespace Resolution {
+struct TypeInfo
+{
+    using Type             = chip::Percent100ths;
+    using DecodableType    = chip::Percent100ths;
+    using DecodableArgType = chip::Percent100ths;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Resolution::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Resolution
+namespace StepValue {
+struct TypeInfo
+{
+    using Type             = chip::Percent100ths;
+    using DecodableType    = chip::Percent100ths;
+    using DecodableArgType = chip::Percent100ths;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::StepValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace StepValue
+namespace Unit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::ClosureDimension::ClosureUnitEnum;
+    using DecodableType    = chip::app::Clusters::ClosureDimension::ClosureUnitEnum;
+    using DecodableArgType = chip::app::Clusters::ClosureDimension::ClosureUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Unit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Unit
+namespace UnitRange {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::UnitRangeStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::UnitRangeStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::UnitRangeStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UnitRange::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace UnitRange
+namespace LimitRange {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::ClosureDimension::Structs::RangePercent100thsStruct::Type;
+    using DecodableType    = chip::app::Clusters::ClosureDimension::Structs::RangePercent100thsStruct::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::ClosureDimension::Structs::RangePercent100thsStruct::DecodableType &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LimitRange::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LimitRange
+namespace TranslationDirection {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::ClosureDimension::TranslationDirectionEnum;
+    using DecodableType    = chip::app::Clusters::ClosureDimension::TranslationDirectionEnum;
+    using DecodableArgType = chip::app::Clusters::ClosureDimension::TranslationDirectionEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TranslationDirection::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TranslationDirection
+namespace RotationAxis {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::ClosureDimension::RotationAxisEnum;
+    using DecodableType    = chip::app::Clusters::ClosureDimension::RotationAxisEnum;
+    using DecodableArgType = chip::app::Clusters::ClosureDimension::RotationAxisEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RotationAxis::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace RotationAxis
+namespace Overflow {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::ClosureDimension::OverflowEnum;
+    using DecodableType    = chip::app::Clusters::ClosureDimension::OverflowEnum;
+    using DecodableArgType = chip::app::Clusters::ClosureDimension::OverflowEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Overflow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Overflow
+namespace ModulationType {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::ClosureDimension::ModulationTypeEnum;
+    using DecodableType    = chip::app::Clusters::ClosureDimension::ModulationTypeEnum;
+    using DecodableArgType = chip::app::Clusters::ClosureDimension::ModulationTypeEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ModulationType::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ModulationType
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
+};
+} // namespace AcceptedCommandList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::Current::TypeInfo::DecodableType current;
+        Attributes::Target::TypeInfo::DecodableType target;
+        Attributes::Resolution::TypeInfo::DecodableType resolution = static_cast<chip::Percent100ths>(0);
+        Attributes::StepValue::TypeInfo::DecodableType stepValue   = static_cast<chip::Percent100ths>(0);
+        Attributes::Unit::TypeInfo::DecodableType unit = static_cast<chip::app::Clusters::ClosureDimension::ClosureUnitEnum>(0);
+        Attributes::UnitRange::TypeInfo::DecodableType unitRange;
+        Attributes::LimitRange::TypeInfo::DecodableType limitRange;
+        Attributes::TranslationDirection::TypeInfo::DecodableType translationDirection =
+            static_cast<chip::app::Clusters::ClosureDimension::TranslationDirectionEnum>(0);
+        Attributes::RotationAxis::TypeInfo::DecodableType rotationAxis =
+            static_cast<chip::app::Clusters::ClosureDimension::RotationAxisEnum>(0);
+        Attributes::Overflow::TypeInfo::DecodableType overflow =
+            static_cast<chip::app::Clusters::ClosureDimension::OverflowEnum>(0);
+        Attributes::ModulationType::TypeInfo::DecodableType modulationType =
+            static_cast<chip::app::Clusters::ClosureDimension::ModulationTypeEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace ClosureDimension
 namespace ServiceArea {
 namespace Structs {
 namespace LandmarkInfoStruct {
@@ -40183,7 +40928,8 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
 
 enum class Fields : uint8_t
 {
-    kNode = 0,
+    kNode        = 0,
+    kFabricIndex = 254,
 };
 
 struct Type
@@ -40192,9 +40938,12 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::LoggedOut::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
-    static constexpr bool kIsFabricScoped = false;
+    static constexpr bool kIsFabricScoped = true;
 
     Optional<chip::NodeId> node;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+
+    auto GetFabricIndex() const { return fabricIndex; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -40207,6 +40956,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
 
     Optional<chip::NodeId> node;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -43550,12 +44300,13 @@ namespace Commands {
 namespace SolicitOffer {
 enum class Fields : uint8_t
 {
-    kStreamUsage        = 0,
-    kVideoStreamID      = 1,
-    kAudioStreamID      = 2,
-    kICEServers         = 3,
-    kICETransportPolicy = 4,
-    kMetadataOptions    = 5,
+    kStreamUsage           = 0,
+    kOriginatingEndpointID = 1,
+    kVideoStreamID         = 2,
+    kAudioStreamID         = 3,
+    kICEServers            = 4,
+    kICETransportPolicy    = 5,
+    kMetadataOptions       = 6,
 };
 
 struct Type
@@ -43565,7 +44316,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SolicitOffer::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
 
-    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
+    StreamUsageEnum streamUsage            = static_cast<StreamUsageEnum>(0);
+    chip::EndpointId originatingEndpointID = static_cast<chip::EndpointId>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     Optional<DataModel::List<const Structs::ICEServerStruct::Type>> ICEServers;
@@ -43585,7 +44337,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SolicitOffer::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
 
-    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
+    StreamUsageEnum streamUsage            = static_cast<StreamUsageEnum>(0);
+    chip::EndpointId originatingEndpointID = static_cast<chip::EndpointId>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     Optional<DataModel::DecodableList<Structs::ICEServerStruct::DecodableType>> ICEServers;
@@ -43638,14 +44391,15 @@ public:
 namespace ProvideOffer {
 enum class Fields : uint8_t
 {
-    kWebRTCSessionID    = 0,
-    kSdp                = 1,
-    kStreamUsage        = 2,
-    kVideoStreamID      = 3,
-    kAudioStreamID      = 4,
-    kICEServers         = 5,
-    kICETransportPolicy = 6,
-    kMetadataOptions    = 7,
+    kWebRTCSessionID       = 0,
+    kSdp                   = 1,
+    kStreamUsage           = 2,
+    kOriginatingEndpointID = 3,
+    kVideoStreamID         = 4,
+    kAudioStreamID         = 5,
+    kICEServers            = 6,
+    kICETransportPolicy    = 7,
+    kMetadataOptions       = 8,
 };
 
 struct Type
@@ -43657,7 +44411,8 @@ public:
 
     DataModel::Nullable<uint16_t> webRTCSessionID;
     chip::CharSpan sdp;
-    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
+    StreamUsageEnum streamUsage            = static_cast<StreamUsageEnum>(0);
+    chip::EndpointId originatingEndpointID = static_cast<chip::EndpointId>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     Optional<DataModel::List<const Structs::ICEServerStruct::Type>> ICEServers;
@@ -43679,7 +44434,8 @@ public:
 
     DataModel::Nullable<uint16_t> webRTCSessionID;
     chip::CharSpan sdp;
-    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
+    StreamUsageEnum streamUsage            = static_cast<StreamUsageEnum>(0);
+    chip::EndpointId originatingEndpointID = static_cast<chip::EndpointId>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     Optional<DataModel::DecodableList<Structs::ICEServerStruct::DecodableType>> ICEServers;
@@ -45049,6 +45805,795 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace Chime
+namespace CommodityTariff {
+namespace Structs {
+namespace PeakPeriodStruct {
+enum class Fields : uint8_t
+{
+    kSeverity   = 0,
+    kPeakPeriod = 1,
+};
+
+struct Type
+{
+public:
+    PeakPeriodSeverityEnum severity = static_cast<PeakPeriodSeverityEnum>(0);
+    uint16_t peakPeriod             = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace PeakPeriodStruct
+namespace AuxiliaryLoadSwitchSettingsStruct {
+enum class Fields : uint8_t
+{
+    kNumber        = 0,
+    kRequiredState = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t number                         = static_cast<uint8_t>(0);
+    AuxiliaryLoadSettingEnum requiredState = static_cast<AuxiliaryLoadSettingEnum>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace AuxiliaryLoadSwitchSettingsStruct
+namespace TariffPriceStruct {
+enum class Fields : uint8_t
+{
+    kPriceType  = 0,
+    kPrice      = 1,
+    kPriceLevel = 2,
+};
+
+struct Type
+{
+public:
+    Globals::TariffPriceTypeEnum priceType = static_cast<Globals::TariffPriceTypeEnum>(0);
+    Optional<int64_t> price;
+    Optional<int16_t> priceLevel;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace TariffPriceStruct
+namespace TariffComponentStruct {
+enum class Fields : uint8_t
+{
+    kTariffComponentID = 0,
+    kPrice             = 1,
+    kFriendlyCredit    = 2,
+    kAuxiliaryLoad     = 3,
+    kPeakPeriod        = 4,
+    kPowerThreshold    = 5,
+    kThreshold         = 6,
+    kLabel             = 7,
+    kPredicted         = 8,
+};
+
+struct Type
+{
+public:
+    uint32_t tariffComponentID = static_cast<uint32_t>(0);
+    Optional<DataModel::Nullable<Structs::TariffPriceStruct::Type>> price;
+    Optional<bool> friendlyCredit;
+    Optional<Structs::AuxiliaryLoadSwitchSettingsStruct::Type> auxiliaryLoad;
+    Optional<Structs::PeakPeriodStruct::Type> peakPeriod;
+    Optional<Globals::Structs::PowerThresholdStruct::Type> powerThreshold;
+    DataModel::Nullable<uint32_t> threshold;
+    Optional<DataModel::Nullable<chip::CharSpan>> label;
+    Optional<bool> predicted;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace TariffComponentStruct
+namespace CalendarPeriodStruct {
+enum class Fields : uint8_t
+{
+    kStartDate     = 0,
+    kDayPatternIDs = 1,
+};
+
+struct Type
+{
+public:
+    DataModel::Nullable<uint32_t> startDate;
+    DataModel::List<const uint32_t> dayPatternIDs;
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    DataModel::Nullable<uint32_t> startDate;
+    DataModel::DecodableList<uint32_t> dayPatternIDs;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
+
+} // namespace CalendarPeriodStruct
+namespace DayEntryStruct {
+enum class Fields : uint8_t
+{
+    kDayEntryID          = 0,
+    kStartTime           = 1,
+    kDuration            = 2,
+    kRandomizationOffset = 3,
+    kRandomizationType   = 4,
+};
+
+struct Type
+{
+public:
+    uint32_t dayEntryID = static_cast<uint32_t>(0);
+    uint16_t startTime  = static_cast<uint16_t>(0);
+    Optional<uint16_t> duration;
+    Optional<int16_t> randomizationOffset;
+    Optional<DayEntryRandomizationTypeEnum> randomizationType;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace DayEntryStruct
+namespace DayPatternStruct {
+enum class Fields : uint8_t
+{
+    kDayPatternID = 0,
+    kDaysOfWeek   = 1,
+    kDayEntryIDs  = 2,
+};
+
+struct Type
+{
+public:
+    uint32_t dayPatternID                               = static_cast<uint32_t>(0);
+    chip::BitMask<DayPatternDayOfWeekBitmap> daysOfWeek = static_cast<chip::BitMask<DayPatternDayOfWeekBitmap>>(0);
+    DataModel::List<const uint32_t> dayEntryIDs;
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    uint32_t dayPatternID                               = static_cast<uint32_t>(0);
+    chip::BitMask<DayPatternDayOfWeekBitmap> daysOfWeek = static_cast<chip::BitMask<DayPatternDayOfWeekBitmap>>(0);
+    DataModel::DecodableList<uint32_t> dayEntryIDs;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
+
+} // namespace DayPatternStruct
+namespace DayStruct {
+enum class Fields : uint8_t
+{
+    kDate        = 0,
+    kDayType     = 1,
+    kDayEntryIDs = 2,
+};
+
+struct Type
+{
+public:
+    uint32_t date       = static_cast<uint32_t>(0);
+    DayTypeEnum dayType = static_cast<DayTypeEnum>(0);
+    DataModel::List<const uint32_t> dayEntryIDs;
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    uint32_t date       = static_cast<uint32_t>(0);
+    DayTypeEnum dayType = static_cast<DayTypeEnum>(0);
+    DataModel::DecodableList<uint32_t> dayEntryIDs;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
+
+} // namespace DayStruct
+namespace TariffInformationStruct {
+enum class Fields : uint8_t
+{
+    kTariffLabel  = 0,
+    kProviderName = 1,
+    kCurrency     = 2,
+    kBlockMode    = 3,
+};
+
+struct Type
+{
+public:
+    DataModel::Nullable<chip::CharSpan> tariffLabel;
+    DataModel::Nullable<chip::CharSpan> providerName;
+    Optional<DataModel::Nullable<Globals::Structs::CurrencyStruct::Type>> currency;
+    DataModel::Nullable<BlockModeEnum> blockMode;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace TariffInformationStruct
+namespace TariffPeriodStruct {
+enum class Fields : uint8_t
+{
+    kLabel              = 0,
+    kDayEntryIDs        = 1,
+    kTariffComponentIDs = 2,
+};
+
+struct Type
+{
+public:
+    DataModel::Nullable<chip::CharSpan> label;
+    DataModel::List<const uint32_t> dayEntryIDs;
+    DataModel::List<const uint32_t> tariffComponentIDs;
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    DataModel::Nullable<chip::CharSpan> label;
+    DataModel::DecodableList<uint32_t> dayEntryIDs;
+    DataModel::DecodableList<uint32_t> tariffComponentIDs;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
+
+} // namespace TariffPeriodStruct
+} // namespace Structs
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace GetTariffComponent {
+struct Type;
+struct DecodableType;
+} // namespace GetTariffComponent
+
+namespace GetTariffComponentResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetTariffComponentResponse
+
+namespace GetDayEntry {
+struct Type;
+struct DecodableType;
+} // namespace GetDayEntry
+
+namespace GetDayEntryResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetDayEntryResponse
+
+} // namespace Commands
+
+namespace Commands {
+namespace GetTariffComponent {
+enum class Fields : uint8_t
+{
+    kTariffComponentID = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GetTariffComponent::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+
+    uint32_t tariffComponentID = static_cast<uint32_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::CommodityTariff::Commands::GetTariffComponentResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GetTariffComponent::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+
+    uint32_t tariffComponentID = static_cast<uint32_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetTariffComponent
+namespace GetTariffComponentResponse {
+enum class Fields : uint8_t
+{
+    kLabel           = 0,
+    kDayEntryIDs     = 1,
+    kTariffComponent = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GetTariffComponentResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+
+    DataModel::Nullable<chip::CharSpan> label;
+    DataModel::List<const uint32_t> dayEntryIDs;
+    Structs::TariffComponentStruct::Type tariffComponent;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GetTariffComponentResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+
+    DataModel::Nullable<chip::CharSpan> label;
+    DataModel::DecodableList<uint32_t> dayEntryIDs;
+    Structs::TariffComponentStruct::DecodableType tariffComponent;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetTariffComponentResponse
+namespace GetDayEntry {
+enum class Fields : uint8_t
+{
+    kDayEntryID = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GetDayEntry::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+
+    uint32_t dayEntryID = static_cast<uint32_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::CommodityTariff::Commands::GetDayEntryResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GetDayEntry::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+
+    uint32_t dayEntryID = static_cast<uint32_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetDayEntry
+namespace GetDayEntryResponse {
+enum class Fields : uint8_t
+{
+    kDayEntry = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GetDayEntryResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+
+    Structs::DayEntryStruct::Type dayEntry;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GetDayEntryResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+
+    Structs::DayEntryStruct::DecodableType dayEntry;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetDayEntryResponse
+} // namespace Commands
+
+namespace Attributes {
+
+namespace TariffInfo {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::TariffInformationStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::TariffInformationStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<
+        chip::app::Clusters::CommodityTariff::Structs::TariffInformationStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TariffInfo::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TariffInfo
+namespace TariffUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::Globals::TariffUnitEnum>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::Globals::TariffUnitEnum>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::Globals::TariffUnitEnum> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TariffUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TariffUnit
+namespace StartDate {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::StartDate::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace StartDate
+namespace DayEntries {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type>>;
+    using DecodableType = chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::DecodableType>> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DayEntries::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DayEntries
+namespace DayPatterns {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::CommodityTariff::Structs::DayPatternStruct::Type>>;
+    using DecodableType = chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::DayPatternStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::DayPatternStruct::DecodableType>> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DayPatterns::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DayPatterns
+namespace CalendarPeriods {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::CommodityTariff::Structs::CalendarPeriodStruct::Type>>;
+    using DecodableType = chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::CalendarPeriodStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::CalendarPeriodStruct::DecodableType>> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CalendarPeriods::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CalendarPeriods
+namespace IndividualDays {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type>>;
+    using DecodableType = chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::DayStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::DayStruct::DecodableType>> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::IndividualDays::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace IndividualDays
+namespace CurrentDay {
+struct TypeInfo
+{
+    using Type          = chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type>;
+    using DecodableType = chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentDay::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CurrentDay
+namespace NextDay {
+struct TypeInfo
+{
+    using Type          = chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type>;
+    using DecodableType = chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NextDay::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace NextDay
+namespace CurrentDayEntry {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentDayEntry::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CurrentDayEntry
+namespace CurrentDayEntryDate {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentDayEntryDate::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CurrentDayEntryDate
+namespace NextDayEntry {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NextDayEntry::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace NextDayEntry
+namespace NextDayEntryDate {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NextDayEntryDate::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace NextDayEntryDate
+namespace TariffComponents {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::CommodityTariff::Structs::TariffComponentStruct::Type>>;
+    using DecodableType = chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::TariffComponentStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::TariffComponentStruct::DecodableType>> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TariffComponents::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TariffComponents
+namespace TariffPeriods {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::CommodityTariff::Structs::TariffPeriodStruct::Type>>;
+    using DecodableType = chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::TariffPeriodStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::TariffPeriodStruct::DecodableType>> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TariffPeriods::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TariffPeriods
+namespace CurrentTariffComponents {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::CommodityTariff::Structs::TariffComponentStruct::Type>>;
+    using DecodableType = chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::TariffComponentStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::TariffComponentStruct::DecodableType>> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentTariffComponents::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CurrentTariffComponents
+namespace NextTariffComponents {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::CommodityTariff::Structs::TariffComponentStruct::Type>>;
+    using DecodableType = chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::TariffComponentStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::TariffComponentStruct::DecodableType>> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NextTariffComponents::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace NextTariffComponents
+namespace DefaultRandomizationOffset {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<int16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int16_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DefaultRandomizationOffset::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DefaultRandomizationOffset
+namespace DefaultRandomizationType {
+struct TypeInfo
+{
+    using Type          = chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::DayEntryRandomizationTypeEnum>;
+    using DecodableType = chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::DayEntryRandomizationTypeEnum>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::DayEntryRandomizationTypeEnum> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DefaultRandomizationType::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DefaultRandomizationType
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+};
+} // namespace AcceptedCommandList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::TariffInfo::TypeInfo::DecodableType tariffInfo;
+        Attributes::TariffUnit::TypeInfo::DecodableType tariffUnit;
+        Attributes::StartDate::TypeInfo::DecodableType startDate;
+        Attributes::DayEntries::TypeInfo::DecodableType dayEntries;
+        Attributes::DayPatterns::TypeInfo::DecodableType dayPatterns;
+        Attributes::CalendarPeriods::TypeInfo::DecodableType calendarPeriods;
+        Attributes::IndividualDays::TypeInfo::DecodableType individualDays;
+        Attributes::CurrentDay::TypeInfo::DecodableType currentDay;
+        Attributes::NextDay::TypeInfo::DecodableType nextDay;
+        Attributes::CurrentDayEntry::TypeInfo::DecodableType currentDayEntry;
+        Attributes::CurrentDayEntryDate::TypeInfo::DecodableType currentDayEntryDate;
+        Attributes::NextDayEntry::TypeInfo::DecodableType nextDayEntry;
+        Attributes::NextDayEntryDate::TypeInfo::DecodableType nextDayEntryDate;
+        Attributes::TariffComponents::TypeInfo::DecodableType tariffComponents;
+        Attributes::TariffPeriods::TypeInfo::DecodableType tariffPeriods;
+        Attributes::CurrentTariffComponents::TypeInfo::DecodableType currentTariffComponents;
+        Attributes::NextTariffComponents::TypeInfo::DecodableType nextTariffComponents;
+        Attributes::DefaultRandomizationOffset::TypeInfo::DecodableType defaultRandomizationOffset;
+        Attributes::DefaultRandomizationType::TypeInfo::DecodableType defaultRandomizationType;
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace CommodityTariff
 namespace EcosystemInformation {
 namespace Structs {
 namespace DeviceTypeStruct = Clusters::detail::Structs::DeviceTypeStruct;
@@ -46545,6 +48090,254 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace TlsClientManagement
+namespace MeterIdentification {
+
+namespace Attributes {
+
+namespace MeterType {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::MeterIdentification::MeterTypeEnum>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::MeterIdentification::MeterTypeEnum>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::MeterIdentification::MeterTypeEnum> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeterType::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeterType
+namespace PointOfDelivery {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<chip::CharSpan>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::CharSpan>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::CharSpan> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PointOfDelivery::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 64; }
+};
+} // namespace PointOfDelivery
+namespace MeterSerialNumber {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<chip::CharSpan>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::CharSpan>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::CharSpan> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeterSerialNumber::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 64; }
+};
+} // namespace MeterSerialNumber
+namespace ProtocolVersion {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<chip::CharSpan>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::CharSpan>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::CharSpan> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ProtocolVersion::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 64; }
+};
+} // namespace ProtocolVersion
+namespace PowerThreshold {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::PowerThresholdStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::PowerThresholdStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::PowerThresholdStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PowerThreshold::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PowerThreshold
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+};
+} // namespace AcceptedCommandList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeterType::TypeInfo::DecodableType meterType;
+        Attributes::PointOfDelivery::TypeInfo::DecodableType pointOfDelivery;
+        Attributes::MeterSerialNumber::TypeInfo::DecodableType meterSerialNumber;
+        Attributes::ProtocolVersion::TypeInfo::DecodableType protocolVersion;
+        Attributes::PowerThreshold::TypeInfo::DecodableType powerThreshold;
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace MeterIdentification
+namespace CommodityMetering {
+namespace Structs {
+namespace MeteredQuantityStruct {
+enum class Fields : uint8_t
+{
+    kTariffComponentIDs = 0,
+    kQuantity           = 1,
+};
+
+struct Type
+{
+public:
+    DataModel::List<const uint32_t> tariffComponentIDs;
+    int64_t quantity = static_cast<int64_t>(0);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    DataModel::DecodableList<uint32_t> tariffComponentIDs;
+    int64_t quantity = static_cast<int64_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
+
+} // namespace MeteredQuantityStruct
+} // namespace Structs
+
+namespace Attributes {
+
+namespace MeteredQuantity {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::CommodityMetering::Structs::MeteredQuantityStruct::Type>>;
+    using DecodableType = chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityMetering::Structs::MeteredQuantityStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::CommodityMetering::Structs::MeteredQuantityStruct::DecodableType>> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityMetering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeteredQuantity::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeteredQuantity
+namespace MeteredQuantityTimestamp {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityMetering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeteredQuantityTimestamp::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeteredQuantityTimestamp
+namespace MeasurementType {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityMetering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementType::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementType
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityMetering::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityMetering::Id; }
+};
+} // namespace AcceptedCommandList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityMetering::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityMetering::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityMetering::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::CommodityMetering::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeteredQuantity::TypeInfo::DecodableType meteredQuantity;
+        Attributes::MeteredQuantityTimestamp::TypeInfo::DecodableType meteredQuantityTimestamp;
+        Attributes::MeasurementType::TypeInfo::DecodableType measurementType;
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace CommodityMetering
 namespace UnitTesting {
 namespace Structs {
 namespace SimpleStruct {

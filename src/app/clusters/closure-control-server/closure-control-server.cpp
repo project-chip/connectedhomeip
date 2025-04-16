@@ -71,8 +71,6 @@ bool Instance::IsSupportedState(MainStateEnum aMainState)
         return HasFeature(Feature::kProtection);
     case MainStateEnum::kDisengaged:
         return HasFeature(Feature::kManuallyOperable);
-    case MainStateEnum::kPendingFallback:
-        return HasFeature(Feature::kFallback);
     default:
         // Remaining MainState have Mandatory conformance,so will be supported.
         return true;
@@ -290,7 +288,7 @@ void Instance::HandleStop(HandlerContext & ctx, const Commands::Stop::DecodableT
 
 void Instance::HandleMoveTo(HandlerContext & ctx, const Commands::MoveTo::DecodableType & commandData)
 {
-    Status status = mDelegate.MoveTo(commandData.tag, commandData.latch, commandData.speed);
+    Status status = mDelegate.MoveTo(commandData.position, commandData.latch, commandData.speed);
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
@@ -311,3 +309,4 @@ void Instance::HandleCalibrate(HandlerContext & ctx, const Commands::Calibrate::
 // Plugin initialization
 
 void MatterClosureControlPluginServerInitCallback() {}
+void MatterClosureControlPluginServerShutdownCallback() {}

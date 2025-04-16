@@ -73,6 +73,8 @@ not_automated:
       reason:
           Python code that runs all the python tests from src/python_testing
           (This code itself run via tests.yaml)
+    - name: fake_device_builder.py
+      reason: Unit test helper code, not a standalone test
     - name: hello_external_runner.py
       reason: Code/Test not being used or not shared code for any other tests
     - name: hello_test.py

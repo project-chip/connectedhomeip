@@ -216,12 +216,17 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     }
 
     // Init transport before operations with secure session mgr.
+    //
+    // The logic below expects that the IPv6 transport is at index 0. Keep that logic in sync with
+    // this code.
     err = mTransports.Init(UdpListenParameters(DeviceLayer::UDPEndPointManager())
                                .SetAddressType(IPAddressType::kIPv6)
                                .SetListenPort(mOperationalServicePort)
                                .SetNativeParams(initParams.endpointNativeParams)
 #if INET_CONFIG_ENABLE_IPV4
                                ,
+                           // The logic below expects that the IPv4 transport, if enabled, is at
+                           // index 1. Keep that logic in sync with this code.
                            UdpListenParameters(DeviceLayer::UDPEndPointManager())
                                .SetAddressType(IPAddressType::kIPv4)
                                .SetListenPort(mOperationalServicePort)
@@ -236,7 +241,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
                            ,
-                           Transport::WiFiPAFListenParameters(DeviceLayer::ConnectivityMgr().GetWiFiPAF())
+                           Transport::WiFiPAFListenParameters(static_cast<Transport::WiFiPAFBase *>(
+                               DeviceLayer::ConnectivityMgr().GetWiFiPAF()->mWiFiPAFTransport))
 #endif
     );
 
@@ -318,13 +324,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     SuccessOrExit(err);
 #endif
 
-    //
-    // We need to advertise the port that we're listening to for unsolicited messages over UDP. However, we have both a IPv4
-    // and IPv6 endpoint to pick from. Given that the listen port passed in may be set to 0 (which then has the kernel select
-    // a valid port at bind time), that will result in two possible ports being provided back from the resultant endpoint
-    // initializations. Since IPv6 is POR for Matter, let's go ahead and pick that port.
-    //
-    app::DnssdServer::Instance().SetSecuredPort(mTransports.GetTransport().GetImplAtIndex<0>().GetBoundPort());
+    app::DnssdServer::Instance().SetSecuredIPv6Port(mTransports.GetTransport().GetImplAtIndex<0>().GetBoundPort());
+#if INET_CONFIG_ENABLE_IPV4
+    app::DnssdServer::Instance().SetSecuredIPv4Port(mTransports.GetTransport().GetImplAtIndex<1>().GetBoundPort());
+#endif // INET_CONFIG_ENABLE_IPV4
 
     app::DnssdServer::Instance().SetUnsecuredPort(mUserDirectedCommissioningPort);
     app::DnssdServer::Instance().SetInterfaceId(mInterfaceId);
