@@ -254,7 +254,6 @@ static_library("interaction-model") {
 
   if (chip_build_controller_dynamic_server) {
     sources += [
-      "clusters/ota-provider/ota-provider.cpp",
       "dynamic_server/AccessControl.cpp",
       "dynamic_server/AccessControl.h",
     ]
@@ -273,6 +272,7 @@ static_library("interaction-model") {
       ":global-attributes",
       "${chip_root}/src/access",
       "${chip_root}/src/access:provider-impl",
+      "${chip_root}/src/app/clusters/ota-provider",
       "${chip_root}/src/app/common:attribute-type",
     ]
 
