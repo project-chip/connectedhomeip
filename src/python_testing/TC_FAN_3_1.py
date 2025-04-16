@@ -71,9 +71,9 @@ class TC_FAN_3_1(MatterBaseTest):
                 TestStep(5, "[FC] TH tests the following scenario: - Attribute to update: PercentSetting - Attribute to verify: PercentSetting, FanMode and SpeedSetting (if present) - Update order: Descending. Actions: * Initialize the DUT to `FanMode` High and read back the value to verify written value. * Individually subscribe to the `PercentSetting`, `FanMode`, and `SpeedSetting` (if supported) attributes * Update the value of the `PercentSetting` attribute iteratively, in descending order, from 99 to 0.",
                          "For each update, the DUT shall return either a SUCCESS or an INVALID_IN_STATE status code. After all updates have been performed, verify that the value of the attribute reports from the subscription of each attribute came in sequencially in descending order (each new value less than the previous one)."),
                 TestStep(6, "[FC] TH tests the following scenario: - Attribute to update: FanMode - Attribute to verify: FanMode, PercentSetting and SpeedSetting (if present) - Update order: Ascending. Actions: * Initialize the DUT to `FanMode` Off and read back the value to verify written value. * Individually subscribe to the `PercentSetting`, `FanMode`, and `SpeedSetting` (if supported) attributes * Update the value of the `FanMode` attribute iteratively, in ascending order, from 0 (Off) to the number of available fan modes specified by the `FanModeSequence` attribute, excluding modes beyond 3 (High).",
-                         "For each update, the DUT shall return either a SUCCESS or an INVALID_IN_STATE status code. After all updates have been performed, verify that the value of the attribute reports from the subscription of each attribute came in sequencially in ascending order (each new value greater than the previous one)."),
+                         "For each update, the DUT shall return either a SUCCESS or an INVALID_IN_STATE status code. After all updates have been performed, verify that the value of the attribute reports from the subscription of each attribute came in sequencially in ascending order (each new value greater than the previous one). Verify that the number of FanMode reports matches the number of PercentSetting reports"),
                 TestStep(7, "[FC] TH tests the following scenario: - Attribute to update: FanMode - Attribute to verify: FanMode, PercentSetting and SpeedSetting (if present) - Update order: Descending. Actions: * Initialize the DUT to `FanMode` High and read back the value to verify written value. * Individually subscribe to the `PercentSetting`, `FanMode`, and `SpeedSetting` (if supported) attributes * Update the value of the `FanMode` attribute iteratively, in ascending order, from the number of available fan modes specified by the `FanModeSequence` attribute, excluding modes beyond 3 (High), to 0 (Off).",
-                         "For each update, the DUT shall return either a SUCCESS or an INVALID_IN_STATE status code. After all updates have been performed, verify that the value of the attribute reports from the subscription of each attribute came in sequencially in descending order (each new value less than the previous one)."),
+                         "For each update, the DUT shall return either a SUCCESS or an INVALID_IN_STATE status code. After all updates have been performed, verify that the value of the attribute reports from the subscription of each attribute came in sequencially in descending order (each new value less than the previous one). Verify that the number of FanMode reports matches the number of PercentSetting reports"),
                 ]
 
     async def read_setting(self, attribute: Any) -> Any:
@@ -191,6 +191,19 @@ class TC_FAN_3_1(MatterBaseTest):
             correct_progression = all(comp(a, b) for a, b in zip(values, values[1:]))
             asserts.assert_true(correct_progression, f"[FC] {sub._expected_attribute.__name__}: {shared_str}")
 
+    def verify_number_of_fan_mode_reports(self) -> None:
+        fan_mode_report_qty = 0
+        percent_setting_report_qty = 0
+
+        for sub in self.subscriptions:
+            if sub._expected_attribute == Clusters.FanControl.Attributes.FanMode:
+                fan_mode_report_qty = len(sub.attribute_queue.queue)
+            if sub._expected_attribute == Clusters.FanControl.Attributes.PercentSetting:
+                percent_setting_report_qty = len(sub.attribute_queue.queue)
+
+        asserts.assert_equal(fan_mode_report_qty, percent_setting_report_qty,
+                             "[FC] Number of FanMode reports doesn't match the number of PercentSetting reports")
+
     async def testing_scenario(self, attr_to_update, order) -> None:
         # Setup
         cluster = Clusters.FanControl
@@ -223,6 +236,11 @@ class TC_FAN_3_1(MatterBaseTest):
 
         # Veirfy attribute progression
         self.verify_attribute_progression(order)
+
+        # When updating FanMode, verify that the number of FanMode
+        # reports matches the number of PercentSetting report
+        if attr_to_update == attr.FanMode:
+            self.verify_number_of_fan_mode_reports()
 
         # Cancel subscriptions
         for sub in self.subscriptions:
