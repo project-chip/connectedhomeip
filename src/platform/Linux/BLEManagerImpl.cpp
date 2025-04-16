@@ -57,9 +57,9 @@ namespace Internal {
 
 namespace {
 
-static constexpr System::Clock::Timeout kNewConnectionScanTimeout = System::Clock::Seconds16(20);
-static constexpr System::Clock::Timeout kConnectTimeout           = System::Clock::Seconds16(20);
-static constexpr System::Clock::Timeout kFastAdvertiseTimeout =
+static constexpr System::Clock::Timeout kNewConnectionScanTimeout   = System::Clock::Seconds16(20);
+static constexpr System::Clock::Timeout kConnectTimeout             = System::Clock::Seconds16(20);
+static constexpr System::Clock::Timeout kFastAdvertiseTimeout       =
     System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
 #if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
 // The CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_CHANGE_TIME_MS specifies the transition time
@@ -753,9 +753,10 @@ void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, uint64_
 {
     mBLEScanConfig.mAppState      = appState;
     mBLEScanConfig.mRecoveryIdentifier = connRecoveryIdentifier;
+    auto scanState = connRecoveryIdentifier == 0 ? BleScanState::kScanForNetworkRecoveryDiscover : BleScanState::kScanForNetworkRecoveryRecover;
 
     // Scan initiation performed async, to ensure that the BLE subsystem is initialized.
-    DeviceLayer::SystemLayer().ScheduleLambda([this] { InitiateScan(BleScanState::kScanForNetworkRecovery); });
+    DeviceLayer::SystemLayer().ScheduleLambda([this, scanState] { InitiateScan(scanState); });
 }
 
 void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator)
@@ -876,23 +877,26 @@ void BLEManagerImpl::OnDeviceScanned(BluezDevice1 & device, const chip::Ble::Chi
     const char * address = bluez_device1_get_address(&device);
     ChipLogProgress(Ble, "New recoverable device scanned: %s", address);
 
-    if (mBLEScanConfig.mBleScanState == BleScanState::kScanForNetworkRecovery)
+    if (mBLEScanConfig.mBleScanState == BleScanState::kScanForNetworkRecoveryRecover)
     {
-        if(mBLEScanConfig.mRecoveryIdentifier != 0)
-        {
-            auto isMatch = (mBLEScanConfig.mRecoveryIdentifier == (info.GetRecoveryIdentifier()));
-            VerifyOrReturn(
-                isMatch,
-                ChipLogError(Ble, "Skip connection: recovery identifier does not match: %lu != %lu", info.GetRecoveryIdentifier(),
-                            mBLEScanConfig.mRecoveryIdentifier));
-            ChipLogProgress(Ble, "Recovery identifier match. Attempting to connect.");
-        }
-        else
-        {
-            ChipLogProgress(Ble, "Recovery identifier: %lu", info.GetRecoveryIdentifier());
-            BleConnectionDelegate::OnDiscoverComplete(mBLEScanConfig.mAppState, info.GetRecoveryIdentifier());
-            return;
-        }
+        auto isMatch = (mBLEScanConfig.mRecoveryIdentifier == (info.GetRecoveryIdentifier()));
+        VerifyOrReturn(
+            isMatch,
+            ChipLogError(Ble, "Skip connection: recovery identifier does not match: %lu != %lu", info.GetRecoveryIdentifier(),
+                        mBLEScanConfig.mRecoveryIdentifier));
+        ChipLogProgress(Ble, "Recovery identifier match. Attempting to connect.");
+    }
+    else
+    {
+        chip::DeviceLayer::PlatformMgr().LockChipStack();
+        // We StartScan in the ChipStack thread.
+        // StopScan should also be performed in the ChipStack thread.
+        // At the same time, the scan timer also needs to be canceled in the ChipStack thread.
+        DeviceLayer::SystemLayer().CancelTimer(HandleScanTimer, this);
+        mDeviceScanner.StopScan();
+        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+        BleConnectionDelegate::OnDiscoverComplete(mBLEScanConfig.mAppState, info.GetRecoveryIdentifier());
+        return;
     }
 
     mBLEScanConfig.mBleScanState = BleScanState::kConnecting;
@@ -929,7 +933,8 @@ void BLEManagerImpl::OnScanComplete()
         break;
     case BleScanState::kScanForAddress:
     case BleScanState::kScanForDiscriminator:
-    case BleScanState::kScanForNetworkRecovery:
+    case BleScanState::kScanForNetworkRecoveryDiscover:
+    case BleScanState::kScanForNetworkRecoveryRecover:
         mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
         ChipLogProgress(Ble, "Scan complete. No matching device found.");
         break;

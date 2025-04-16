@@ -45,7 +45,8 @@ enum class BleScanState : uint8_t
     kScanForDiscriminator,
     kScanForAddress,
     kConnecting,
-    kScanForNetworkRecovery,
+    kScanForNetworkRecoveryDiscover,
+    kScanForNetworkRecoveryRecover,
 };
 
 struct BLEScanConfig

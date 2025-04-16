@@ -147,7 +147,8 @@
         "concepts": "cpp",
         "numbers": "cpp",
         "semaphore": "cpp",
-        "stop_token": "cpp"
+        "stop_token": "cpp",
+        "codecvt": "cpp"
     },
     "[ini]": {
         "editor.formatOnSave": false

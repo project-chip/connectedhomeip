@@ -50,13 +50,13 @@ void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Cal
 
 void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
                                                 Callback::Callback<OnDeviceConnectionFailure> * onFailure,
-                                                RendezvousParameters & params,
+                                                Transport::PeerAddress & addr,
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                                 uint8_t attemptCount, Callback::Callback<OnDeviceConnectionRetry> * onRetry,
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES                                                    
 TransportPayloadCapability transportPayloadCapability)
 {
-    FindOrEstablishSessionHelper(peerId, onConnection, onFailure, nullptr, params,
+    FindOrEstablishSessionHelper(peerId, onConnection, onFailure, nullptr, addr,
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                  attemptCount, onRetry,
 #endif                
@@ -150,7 +150,7 @@ void CASESessionManager::FindOrEstablishSessionHelper(const ScopedNodeId & peerI
                                                       Callback::Callback<OnDeviceConnected> * onConnection,
                                                       Callback::Callback<OnDeviceConnectionFailure> * onFailure,
                                                       Callback::Callback<OperationalSessionSetup::OnSetupFailure> * onSetupFailure,
-                                                      RendezvousParameters & params,
+                                                      Transport::PeerAddress & addr,
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                                       uint8_t attemptCount, Callback::Callback<OnDeviceConnectionRetry> * onRetry,
 #endif       
@@ -193,7 +193,7 @@ void CASESessionManager::FindOrEstablishSessionHelper(const ScopedNodeId & peerI
 
     if (onFailure != nullptr)
     {
-        session->Connect(onConnection, onFailure, params, transportPayloadCapability);
+        session->Connect(onConnection, onFailure, addr, transportPayloadCapability);
     }
 
     if (onSetupFailure != nullptr)

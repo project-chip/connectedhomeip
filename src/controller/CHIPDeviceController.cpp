@@ -534,6 +534,7 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     mSetUpCodePairer.SetSystemLayer(mSystemState->SystemLayer());
+    mNetworkRecover.SetSystemLayer(mSystemState->SystemLayer());
 #if CONFIG_NETWORK_LAYER_BLE
     mSetUpCodePairer.SetBleLayer(mSystemState->BleLayer());
     mNetworkRecover.SetBleLayer(mSystemState->BleLayer());
@@ -3793,9 +3794,9 @@ CHIP_ERROR DeviceController::GetRootPublicKey(Crypto::P256PublicKey & outRootPub
     return fabricTable->FetchRootPubkey(mFabricIndex, outRootPublicKey);
 }
 
-CHIP_ERROR DeviceCommissioner::DiscoverRecoverableNodes(uint64_t recoveryId)
+CHIP_ERROR DeviceCommissioner::DiscoverRecoverableNodes(uint16_t timeout)
 {
-    return mNetworkRecover.Discover(recoveryId);
+    return mNetworkRecover.Discover(timeout);
 }
 
 CHIP_ERROR DeviceCommissioner::RecoverNode(NodeId remoteId, uint64_t recoveryId, WiFiCredentials wiFiCreds, uint64_t breadcrumb)

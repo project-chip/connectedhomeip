@@ -35,7 +35,7 @@ class NetworkRecoveryCommandBase : public CHIPCommand, public chip::Controller::
 public:
     NetworkRecoveryCommandBase(const char * name, CredentialIssuerCommands * credsIssuerConfig) : CHIPCommand(name, credsIssuerConfig) {}
     /////////// NetworkRecoverDelegate Interface /////////
-    void OnNetworkRecoverDiscover(uint64_t recoveryId) override;
+    void OnNetworkRecoverDiscover(std::list<uint64_t> recoveryIds) override;
     void OnNetworkRecoverComplete(NodeId deviceId, CHIP_ERROR error) override;
 
     /////////// CHIPCommand Interface /////////
@@ -54,7 +54,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
     CHIP_ERROR RunCommand() override;
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(30)); }
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(30) + 10); }
 private:
     chip::Optional<uint16_t> mTimeout;
 };

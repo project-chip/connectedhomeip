@@ -44,7 +44,7 @@ CHIP_ERROR ModelCommand::RunCommand()
         ChipLogProgress(chipTool, "commissioneeDeviceProxy is %s", commissioneeDeviceProxy ? "not null" : "null");
         return SendCommand(commissioneeDeviceProxy, mEndPointId);
     }
-    ChipLogProgress(Controller, "%s, %d", __FUNCTION__, __LINE__);
+    
     // Check whether the session needs to allow large payload support.
     TransportPayloadCapability transportPayloadCapability =
         AllowLargePayload() ? TransportPayloadCapability::kLargePayload : TransportPayloadCapability::kMRPPayload;

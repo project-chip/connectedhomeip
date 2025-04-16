@@ -144,14 +144,15 @@ struct ChipBLEDeviceIdentificationInfo
  */
 struct ChipBLENetworkRecoveryInfo
 {
-    constexpr static uint64_t kRecoveryIdentifierMask       = 0xfffffffffffffff;
+    constexpr static uint64_t kRecoveryIdentifierMask       = 0x0;
+    constexpr static uint8_t kPrimaryReasonMask             = 0x0f;
     constexpr static uint8_t kAdditionalDataFlagMask        = 0x1;
     constexpr static uint8_t kAdvertisementVersionMask      = 0xf0;
     constexpr static uint8_t kAdvertisementVersionShiftBits = 4u;
 
     uint8_t OpCode;
 
-    uint8_t AdvertisementVersion;
+    uint8_t PrimaryReasonAndAdvVersion;
     uint8_t RecoveryIdentifier[8];
     uint8_t AdditionalDataFlag;
 
@@ -163,7 +164,7 @@ struct ChipBLENetworkRecoveryInfo
 
     uint8_t GetAdvertisementVersion() const
     {
-        uint8_t advertisementVersion = static_cast<uint8_t>((AdvertisementVersion & kAdvertisementVersionMask) >>
+        uint8_t advertisementVersion = static_cast<uint8_t>((PrimaryReasonAndAdvVersion & kAdvertisementVersionMask) >>
                                                             kAdvertisementVersionShiftBits);
         return advertisementVersion;
     }
@@ -171,8 +172,20 @@ struct ChipBLENetworkRecoveryInfo
     // Use only 4 bits to set advertisement version
     void SetAdvertisementVersion(uint8_t advertisementVersion)
     {
-        // Advertisement Version is 4 bit long from 12th to 15th
-        AdvertisementVersion = static_cast<uint8_t>((advertisementVersion << kAdvertisementVersionShiftBits) & kAdvertisementVersionMask);
+        // Advertisement Version is 4 bit long from 4th to 7th
+        PrimaryReasonAndAdvVersion = static_cast<uint8_t>((advertisementVersion << kAdvertisementVersionShiftBits) & kAdvertisementVersionMask);
+    }
+
+    uint16_t GetPrimaryReason() const
+    {
+        return PrimaryReasonAndAdvVersion & kPrimaryReasonMask;
+    }
+
+    void SetPrimaryReason(uint8_t reason)
+    {
+        // Primary Reason is 4-bit long, so don't overwrite bits 4th through 7th
+        auto advVersion     = static_cast<uint8_t>(PrimaryReasonAndAdvVersion & ~kPrimaryReasonMask);
+        PrimaryReasonAndAdvVersion = static_cast<uint8_t>(advVersion | (reason & kPrimaryReasonMask));
     }
 
     uint8_t GetAdditionalDataFlag() const { return (AdditionalDataFlag & kAdditionalDataFlagMask); }

@@ -87,7 +87,7 @@ public:
                                 TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload);
     void FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
                                     Callback::Callback<OnDeviceConnectionFailure> * onFailure, 
-                                    RendezvousParameters & params,
+                                    Transport::PeerAddress & addr,
     #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                     uint8_t attemptCount = 1, Callback::Callback<OnDeviceConnectionRetry> * onRetry = nullptr,
     #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES     
@@ -189,7 +189,7 @@ private:
     void FindOrEstablishSessionHelper(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
                                         Callback::Callback<OnDeviceConnectionFailure> * onFailure,
                                         Callback::Callback<OperationalSessionSetup::OnSetupFailure> * onSetupFailure,
-                                        RendezvousParameters & params,
+                                        Transport::PeerAddress & addr,
   #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                         uint8_t attemptCount, Callback::Callback<OnDeviceConnectionRetry> * onRetry,
   #endif       

@@ -23,35 +23,16 @@
 namespace chip {
 namespace Controller {
 
-CHIP_ERROR NetworkRecoverBase::RecoverNetwork(NodeId remoteNodeId, RendezvousParameters params, 
-                                              const WiFiCredentials & wiFiCredentials, uint64_t breadcrumb, OnNetworkRecover callback)
+CHIP_ERROR NetworkRecoverBase::RecoverNetwork(NodeId remoteNodeId, Transport::PeerAddress & addr, 
+                                              const WiFiCredentials & wiFiCredentials, uint64_t breadcrumb, chip::Callback::Callback<OnNetworkRecover> * callback )
 {
     mRemoteNodeId           = remoteNodeId;
     mNetworkType            = NetworkType::kWiFi;
-    mWiFiCredentials.SetValue(wiFiCredentials);
     mBreadcrumb             = breadcrumb;
-    // print ssid and password
-    printf("ByteSpan: ");
-    for (size_t i = 0; i < mWiFiCredentials.Value().ssid.size(); ++i)
-    {
-        printf("%c ", mWiFiCredentials.Value().ssid.data()[i]); // Print each byte in hexadecimal format
-    }
-    printf("\n");
-    mOnSuccessNetworkRecoverCallback = callback;
-    ChipLogDetail(Controller, "Start recovering the network");
-    return mController->GetConnectedDevice(remoteNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback, params);
+    mNetworkRecoverCallback = callback;
+    mWiFiCredentials.SetValue(wiFiCredentials);
+    return mController->GetConnectedDevice(remoteNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback, addr);
 }
-
-// CHIP_ERROR NetworkRecoverBase::RecoverNetwork(NodeId remoteNodeId, ByteSpan threadOperationalDataset, uint64_t breadcrumb, Callback::Callback<OnNetworkRecover> * callback)
-// {
-//     mRemoteNodeId               = remoteNodeId;
-//     mNetworkType                = NetworkType::kThread;
-//     mThreadOperationalDataset   = threadOperationalDataset;
-//     mBreadcrumb                  = breadcrumb;
-//     mOnSuccessNetworkRecoverCallback = callback;
-
-//     return mController->GetConnectedDevice(remoteNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
-// }
 
 CHIP_ERROR NetworkRecoverBase::SendArmFailSafe(Messaging::ExchangeManager & exchangeMgr,
                                                         const SessionHandle & sessionHandle)
@@ -65,18 +46,26 @@ CHIP_ERROR NetworkRecoverBase::SendArmFailSafe(Messaging::ExchangeManager & exch
     return cluster.InvokeCommand(request, this, OnArmFailSafeResponse, OnCommandFailure);
 }
 
+CHIP_ERROR NetworkRecoverBase::ReadLastNetworkID(Messaging::ExchangeManager & exchangeMgr,
+    const SessionHandle & sessionHandle)
+{
+    using TypeInfo = NetworkCommissioning::Attributes::LastNetworkID::TypeInfo;
+
+    ClusterBase cluster(exchangeMgr, sessionHandle, kRootEndpointId);
+
+    return cluster.ReadAttribute<TypeInfo>(this, OnSuccessReadLastNetworkID, OnReadAttributeFailure);
+}
+
 CHIP_ERROR NetworkRecoverBase::SendRemoveNetwork(Messaging::ExchangeManager & exchangeMgr,
     const SessionHandle & sessionHandle)
 {
-    return CHIP_NO_ERROR;
-    // const char ssid[] = "ldp";
-    // auto oldssid = chip::ByteSpan(reinterpret_cast<const uint8_t*>(ssid), sizeof(ssid) - 1);
-    // NetworkCommissioning::Commands::RemoveNetwork::Type request;
-    // request.networkID = oldssid;
+    NetworkCommissioning::Commands::RemoveNetwork::Type request;
 
-    // ClusterBase cluster(exchangeMgr, sessionHandle, kRootEndpointId);
+    request.networkID = mLastNetworkID;
 
-    // return cluster.InvokeCommand(request, this, OnNetworkConfigResponse, OnCommandFailure);
+    ClusterBase cluster(exchangeMgr, sessionHandle, kRootEndpointId);
+
+    return cluster.InvokeCommand(request, this, OnNetworkConfigResponse, OnCommandFailure);
 }
 
 CHIP_ERROR NetworkRecoverBase::SendAddOrUpdateNetwork(Messaging::ExchangeManager & exchangeMgr,
@@ -86,13 +75,7 @@ CHIP_ERROR NetworkRecoverBase::SendAddOrUpdateNetwork(Messaging::ExchangeManager
     if(mNetworkType == NetworkType::kWiFi)
     {
         NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Type request;
-        // print ssid and password
-        printf("ByteSpan: ");
-        for (size_t i = 0; i < mWiFiCredentials.Value().ssid.size(); ++i)
-        {
-            printf("%c ", mWiFiCredentials.Value().ssid.data()[i]); // Print each byte in hexadecimal format
-        }
-        printf("\n");
+
         request.ssid        = mWiFiCredentials.Value().ssid;
         request.credentials = mWiFiCredentials.Value().credentials;
         request.breadcrumb.Emplace(mBreadcrumb);
@@ -117,35 +100,31 @@ CHIP_ERROR NetworkRecoverBase::SendConnectNetwork(Messaging::ExchangeManager & e
     NetworkCommissioning::Commands::ConnectNetwork::Type request;
     if(mNetworkType == NetworkType::kWiFi)
     {
-        // print ssid and password
-        printf("ByteSpan: ");
-        for (size_t i = 0; i < mWiFiCredentials.Value().ssid.size(); ++i)
-        {
-            printf("%c ", mWiFiCredentials.Value().ssid.data()[i]); // Print each byte in hexadecimal format
-        }
-        printf("\n");
-        // const char ssid[] = "ldp";
-        // auto newssid = chip::ByteSpan(reinterpret_cast<const uint8_t*>(ssid), sizeof(ssid) - 1);
-        
         request.networkID = mWiFiCredentials.Value().ssid;
         request.breadcrumb.Emplace(mBreadcrumb);
     }
     else
     {
-        ByteSpan extendedPanId;
-        chip::Thread::OperationalDataset operationalDataset;
-        if(operationalDataset.Init(mThreadOperationalDataset) != CHIP_NO_ERROR ||
-           operationalDataset.GetExtendedPanIdAsByteSpan(extendedPanId) != CHIP_NO_ERROR)
-        {
-            ChipLogError(Controller, "Unable to get extended pan ID for thread operational dataset\n");
-            FinishRecoverNetwork(this, CHIP_ERROR_INVALID_ARGUMENT);
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-        request.networkID = extendedPanId;
-        request.breadcrumb.Emplace(mBreadcrumb);
+        // TODO for thread network recovery
     }
 
     return cluster.InvokeCommand(request, this, OnConnectNetworkResponse, OnCommandFailure);
+}
+
+CHIP_ERROR NetworkRecoverBase::ReleaseSessions(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
+{
+    CHIP_ERROR err = mController->ReleaseSession(mRemoteNodeId);
+    if(err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to release session: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    else
+    {
+        mNextStep = Step::kSendCommissioningComplete;
+        err       = mController->GetConnectedDevice(mRemoteNodeId, &mOnDeviceConnectedCallback,
+            &mOnDeviceConnectionFailureCallback);
+    }
+    return err;
 }
 
 CHIP_ERROR NetworkRecoverBase::SendCommissioningComplete(Messaging::ExchangeManager & exchangeMgr,
@@ -172,6 +151,11 @@ void NetworkRecoverBase::OnDeviceConnectedFn(void * context, Messaging::Exchange
         err = self->SendArmFailSafe(exchangeMgr, sessionHandle);
         break;
     }
+    case Step::kReadLastNetworkID: 
+    {
+        err = self->ReadLastNetworkID(exchangeMgr, sessionHandle);
+        break;
+    }
     case Step::kSendRemoveNetwork:
     {
         err = self->SendRemoveNetwork(exchangeMgr, sessionHandle);
@@ -187,10 +171,10 @@ void NetworkRecoverBase::OnDeviceConnectedFn(void * context, Messaging::Exchange
         err = self->SendConnectNetwork(exchangeMgr, sessionHandle);
         break;
     }
-    case Step::kClearCASESessions:
+    case Step::kReleaseSessions:
     {
         // TODO: clear all CASE Sessions for this device
-        self->mController->ReleaseSession(self->mRemoteNodeId);
+        err = self->ReleaseSessions(exchangeMgr, sessionHandle);
         break;
     }
     case Step::kSendCommissioningComplete: 
@@ -205,7 +189,7 @@ void NetworkRecoverBase::OnDeviceConnectedFn(void * context, Messaging::Exchange
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Current Fabric Remover failure : %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Controller, "Network Recovery failure : %" CHIP_ERROR_FORMAT, err.Format());
         FinishRecoverNetwork(context, err);
     }
 }
@@ -235,8 +219,7 @@ void NetworkRecoverBase::OnArmFailSafeResponse(void * context,
     }
     else
     {
-        // self->mNextStep = Step::kSendRemoveNetwork;
-        self->mNextStep = Step::kSendAddOrUpdateNetwork;
+        self->mNextStep = Step::kReadLastNetworkID;
         err             = self->mController->GetConnectedDevice(self->mRemoteNodeId, &self->mOnDeviceConnectedCallback,
                                                                 &self->mOnDeviceConnectionFailureCallback);
     }
@@ -245,6 +228,30 @@ void NetworkRecoverBase::OnArmFailSafeResponse(void * context,
         FinishRecoverNetwork(context, err);
     }
     
+}
+
+void NetworkRecoverBase::OnSuccessReadLastNetworkID(void * context, const chip::app::DataModel::Nullable<chip::ByteSpan> & networkID)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    auto * self = static_cast<NetworkRecoverBase *>(context);
+    VerifyOrReturn(self != nullptr, ChipLogProgress(Controller, "Success Read Last Network ID callback with null context. Ignoring"));
+    
+    if(networkID.IsNull())
+    {
+        self->mNextStep = Step::kSendAddOrUpdateNetwork;
+    }
+    else
+    {
+        self->mLastNetworkID    = networkID.Value();
+        self->mNextStep         = Step::kSendRemoveNetwork;
+    }
+    err = self->mController->GetConnectedDevice(self->mRemoteNodeId, &self->mOnDeviceConnectedCallback,
+                                                &self->mOnDeviceConnectionFailureCallback);
+    if (err != CHIP_NO_ERROR)
+    {
+        FinishRecoverNetwork(context, err);
+    }
 }
 
 void NetworkRecoverBase::OnNetworkConfigResponse(void * context, const NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data)
@@ -256,7 +263,7 @@ void NetworkRecoverBase::OnNetworkConfigResponse(void * context, const NetworkCo
                    ChipLogProgress(Controller, "Success Newtork Configure callback with null context. Ignoring"));
     
     ChipLogProgress(Controller, "Received NetworkConfig response, networkingStatus=%u", to_underlying(data.networkingStatus));
-    if (data.networkingStatus == NetworkCommissioning::NetworkCommissioningStatusEnum::kSuccess)
+    if (data.networkingStatus != NetworkCommissioning::NetworkCommissioningStatusEnum::kSuccess)
     {
         err = CHIP_ERROR_INTERNAL;
     }
@@ -319,6 +326,17 @@ void NetworkRecoverBase::OnCommissioningCompleteResponse(void * context, const G
     FinishRecoverNetwork(context, err);
 }
 
+void NetworkRecoverBase::OnReadAttributeFailure(void * context, CHIP_ERROR err)
+{
+    ChipLogProgress(Controller, "OnReadAttributeFailure %" CHIP_ERROR_FORMAT, err.Format());
+
+    auto * self = static_cast<NetworkRecoverBase *>(context);
+    VerifyOrReturn(self != nullptr, ChipLogProgress(Controller, "Read Attribute failure callback with null context. Ignoring"));
+
+    FinishRecoverNetwork(context, err);
+}
+
+
 void NetworkRecoverBase::OnCommandFailure(void * context, CHIP_ERROR err)
 {
     ChipLogProgress(Controller, "OnCommandFailure %" CHIP_ERROR_FORMAT, err.Format());
@@ -340,56 +358,41 @@ void NetworkRecoverBase::FinishRecoverNetwork(void * context, CHIP_ERROR err)
         ChipLogError(Controller, "Network Recovery failed : %" CHIP_ERROR_FORMAT, err.Format());
     }
     auto * self = static_cast<NetworkRecoverBase *>(context);
-    if (self->mOnSuccessNetworkRecoverCallback != nullptr)
+    if(self->mNetworkRecoverCallback != nullptr)
     {
-        self->mOnSuccessNetworkRecoverCallback(self->mController, self->mRemoteNodeId, err);
+        self->mNetworkRecoverCallback->mCall(self->mNetworkRecoverCallback->mContext, self->mRemoteNodeId, err);
     }
 }
 
 AutoNetworkRecover::AutoNetworkRecover(DeviceController * controller) :
-    NetworkRecoverBase(controller), mOnNetworkRecoverCallback(OnNetworkRecoverHandler, this)
+    NetworkRecoverBase(controller), mOnNetworkRecoverCompleteCallback(OnNetworkRecoverComplete, this)
 {}
 
-CHIP_ERROR AutoNetworkRecover::RecoverNetwork(DeviceController * controller, NodeId remoteNodeId, RendezvousParameters params, 
-                                              const WiFiCredentials & wiFiCredentials, uint64_t breadcrumb, OnNetworkRecover callback)
+CHIP_ERROR AutoNetworkRecover::RecoverNetwork(NetworkRecover * recover, NodeId remoteNodeId, Transport::PeerAddress & addr, 
+                                              const WiFiCredentials & wiFiCredentials, uint64_t breadcrumb)
 {
     // Not using Platform::New because we want to keep our constructor private.
-    auto * remover = new (std::nothrow) AutoNetworkRecover(controller);
-    if (remover == nullptr)
+    auto * autoRecover = new (std::nothrow) AutoNetworkRecover(recover->GetCommissioner());
+    if (autoRecover == nullptr)
     {
         return CHIP_ERROR_NO_MEMORY;
     }
-    CHIP_ERROR err = remover->NetworkRecoverBase::RecoverNetwork(remoteNodeId, params, wiFiCredentials, breadcrumb, callback);
+
+    autoRecover->mNetworkRecover = recover;
+
+    CHIP_ERROR err = autoRecover->NetworkRecoverBase::RecoverNetwork(remoteNodeId, addr, wiFiCredentials, breadcrumb, &autoRecover->mOnNetworkRecoverCompleteCallback);
     if (err != CHIP_NO_ERROR)
     {
-        delete remover;
+        delete autoRecover;
     }
     // Else will clean up when the callback is called.
     return err;
 }
 
-// CHIP_ERROR AutoNetworkRecoverBase::RecoverNetwork(DeviceController * controller, NodeId remoteNodeId, chip::ByteSpan threadOperationalDataset, uint64_t breadcrumb, OnNetworkRecover callback)
-// {
-//     // Not using Platform::New because we want to keep our constructor private.
-//     auto * remover = new (std::nothrow) AutoNetworkRecover(controller);
-//     if (remover == nullptr)
-//     {
-//         return CHIP_ERROR_NO_MEMORY;
-//     }
-
-//     CHIP_ERROR err = remover->NetworkRecoverBase::RecoverNetwork(remoteNodeId, threadOperationalDataset, breadcrumb, callback);
-//     if (err != CHIP_NO_ERROR)
-//     {
-//         delete remover;
-//     }
-//     // Else will clean up when the callback is called.
-//     return err;
-// }
-
-void AutoNetworkRecover::OnNetworkRecoverHandler(void * context, NodeId remoteNodeId, CHIP_ERROR status)
+void AutoNetworkRecover::OnNetworkRecoverComplete(void * context, NodeId remoteNodeId, CHIP_ERROR status)
 {
-    ChipLogDetail(Controller, "AutoNetworkRecover::OnNetworkRecoverHandler: %" CHIP_ERROR_FORMAT, status.Format());
     auto * self = static_cast<AutoNetworkRecover *>(context);
+    self->mNetworkRecover->NetworkRecoverComplete(remoteNodeId, status);
     delete self;
 }
 } // namespace Controller

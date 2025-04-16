@@ -220,7 +220,7 @@ public:
                  TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload);
 
     void Connect(Callback::Callback<OnDeviceConnected> * onConnection, Callback::Callback<OnDeviceConnectionFailure> * onFailure, 
-                 RendezvousParameters & params,
+                 Transport::PeerAddress & addr,
                  TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload);
 
     /*
@@ -317,7 +317,6 @@ private:
 
     typedef Callback::GroupedCallbackList<OnDeviceConnected, OnDeviceConnectionFailure, OnSetupFailure> SuccessFailureCallbackList;
     SuccessFailureCallbackList mCallbacks;
-    uint64_t mRandom;
 
     OperationalSessionReleaseDelegate * mReleaseDelegate;
 
@@ -353,7 +352,7 @@ private:
 
     void MoveToState(State aTargetState);
 
-    CHIP_ERROR EstablishConnection(const ReliableMessageProtocolConfig & config, bool supportsTcpServer = false);
+    CHIP_ERROR EstablishConnection(const AddressResolve::ResolveResult & result);
     /*
      * This checks to see if an existing CASE session exists to the peer within the SessionManager
      * and if one exists, to load that into mSecureSession.

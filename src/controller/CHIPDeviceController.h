@@ -271,12 +271,12 @@ public:
     CHIP_ERROR
     GetConnectedDevice(NodeId peerNodeId, Callback::Callback<OnDeviceConnected> * onConnection,
                        chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure,
-                       RendezvousParameters & params,
+                       Transport::PeerAddress & addr,
                        TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload)
     {
         VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
         mSystemState->CASESessionMgr()->FindOrEstablishSession(ScopedNodeId(peerNodeId, GetFabricIndex()), onConnection, onFailure,
-                                                               params,
+                                                               addr,
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                                                1, nullptr,
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
@@ -868,7 +868,7 @@ public:
      *   Should be called on main loop thread.
      */
 
-     CHIP_ERROR DiscoverRecoverableNodes(uint64_t recoveryId = 0);
+     CHIP_ERROR DiscoverRecoverableNodes(uint16_t timeout);
 
      CHIP_ERROR RecoverNode(NodeId remoteId, uint64_t recoveryId, WiFiCredentials wiFiCreds, uint64_t breadcrumb = 0);
 

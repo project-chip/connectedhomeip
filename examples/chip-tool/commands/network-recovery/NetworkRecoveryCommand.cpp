@@ -23,29 +23,37 @@
 
 using namespace ::chip;
 
-void NetworkRecoveryCommandBase::OnNetworkRecoverDiscover(uint64_t recoveryId)
+void NetworkRecoveryCommandBase::OnNetworkRecoverDiscover(std::list<uint64_t> recoveryIds)
 {
-    ChipLogProgress(chipTool, "found recoverable device:%lu", recoveryId);
+    ChipLogProgress(chipTool, "Find recoverable devices:");
+    for (const auto& recoveryId : recoveryIds)
+    {
+        ChipLogProgress(chipTool, "%lu", recoveryId);
+    }
+    SetCommandExitStatus(CHIP_NO_ERROR);
+    
 }
 
 void NetworkRecoveryCommandBase::OnNetworkRecoverComplete(NodeId deviceId, CHIP_ERROR error)
 {
     if (error == CHIP_NO_ERROR)
     {
-        ChipLogProgress(chipTool, "recovery complete for device:%lu", deviceId);
+        ChipLogProgress(chipTool, "Recovery complete for device:%lu", deviceId);
     }
     else
     {
-        ChipLogError(chipTool, "recovery failed for device:%lu", deviceId);
+        ChipLogError(chipTool, "Recovery failed for device:%lu", deviceId);
     }
-    SetCommandExitStatus(CHIP_NO_ERROR);
+    SetCommandExitStatus(error);
 }
 
 CHIP_ERROR NetworkRecoveryDiscoverCommand::RunCommand()
 {
+    uint16_t timeout = mTimeout.ValueOr(30);
+    ChipLogProgress(chipTool, "Start scanning recoverable nodes, timeout:%d", timeout);
     mCommissioner = &CurrentCommissioner();
     mCommissioner->RegisterNetworkRecoverDelegate(this);
-    return mCommissioner->DiscoverRecoverableNodes();
+    return mCommissioner->DiscoverRecoverableNodes(timeout);
 }
 
 CHIP_ERROR NetworkRecoveryRecoverCommand::RunCommand()

@@ -50,7 +50,6 @@ bool BluezGetChipDeviceInfo(BluezDevice1 & aDevice, chip::Ble::ChipBLEDeviceIden
     VerifyOrReturnError(dataBytes != nullptr && dataLen >= sizeof(aDeviceInfo), false);
 
     memcpy(&aDeviceInfo, dataBytes, sizeof(aDeviceInfo));
-    ChipLogDetail(Ble, "opcode:%d\n", aDeviceInfo.OpCode);
     if(aDeviceInfo.OpCode != 0){
         return false;
     }
@@ -68,11 +67,9 @@ bool BluezGetChipRecoveryInfo(BluezDevice1 & aDevice, chip::Ble::ChipBLENetworkR
 
     size_t dataLen         = 0;
     const void * dataBytes = g_variant_get_fixed_array(dataValue.get(), &dataLen, sizeof(uint8_t));
-    ChipLogDetail(Ble, "recoverable advertising data lenght:%ld", dataLen);
     VerifyOrReturnError(dataBytes != nullptr && dataLen >= sizeof(aRecoveryInfo), false);
 
     memcpy(&aRecoveryInfo, dataBytes, sizeof(aRecoveryInfo));
-    ChipLogDetail(Ble, "opcode:%d\n", aRecoveryInfo.OpCode);
     if(aRecoveryInfo.OpCode != 1){
         return false;
     }
@@ -203,7 +200,7 @@ void ChipDeviceScanner::ReportDevice(BluezDevice1 & device)
 
     if (!BluezGetChipDeviceInfo(device, deviceInfo))
     {
-        ChipLogDetail(Ble, "Device %s does not look like a CHIP device.", bluez_device1_get_address(&device));
+        // ChipLogDetail(Ble, "Device %s does not look like a CHIP device.", bluez_device1_get_address(&device));
         // return;
     } 
     else 
@@ -215,7 +212,7 @@ void ChipDeviceScanner::ReportDevice(BluezDevice1 & device)
 
     if(!BluezGetChipRecoveryInfo(device, recoveryInfo))
     {
-        ChipLogDetail(Ble, "Device %s does not look like a recoverable device.", bluez_device1_get_address(&device));
+        // ChipLogDetail(Ble, "Device %s does not look like a recoverable device.", bluez_device1_get_address(&device));
         // return;
     }
     else
