@@ -58,6 +58,8 @@ CameraDevice::CameraDevice()
 
     // Set the MediaController in WebRTCProviderManager.
     mWebRTCProviderManager.SetMediaController(&mMediaController);
+
+    mCameraAVSettingsUserLevelManager.SetCameraDeviceHAL(this);
 }
 
 CameraDevice::~CameraDevice()
