@@ -162,8 +162,6 @@ static_library("nxp_platform") {
     ]
 
     deps += [
-      "${chip_root}/src/app:app_config",
-      "${chip_root}/src/app/common:ids",
       "${chip_root}/third_party/openthread:openthread",
     ]
 
