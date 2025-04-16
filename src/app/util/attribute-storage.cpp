@@ -1175,7 +1175,7 @@ CHIP_ERROR GetSemanticTagForEndpointAtIndex(EndpointId endpoint, size_t index,
 }
 
 #ifdef CONFIG_USE_ENDPOINT_UNIQUE_ID
-CHIP_ERROR GetEndpointUniqueIdForEndPoint(EndpointId endpoint, MutableCharSpan & epUniqueIdMutSpan)
+CHIP_ERROR emberAfGetEndpointUniqueIdForEndPoint(EndpointId endpoint, MutableCharSpan & epUniqueIdMutSpan)
 {
     uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
 

@@ -216,7 +216,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadEndpointUniqueId(EndpointId endpoint, Attri
 {
     char epUniqueId[Attributes::EndpointUniqueID::TypeInfo::MaxLength()] = { 0 };
     MutableCharSpan epUniqueIdSpan(epUniqueId);
-    GetEndpointUniqueIdForEndPoint(endpoint, epUniqueIdSpan);
+    emberAfGetEndpointUniqueIdForEndPoint(endpoint, epUniqueIdSpan);
 
     return aEncoder.Encode(epUniqueIdSpan);
 }

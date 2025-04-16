@@ -208,7 +208,9 @@ CHIP_ERROR GetSemanticTagForEndpointAtIndex(chip::EndpointId endpoint, size_t in
 CHIP_ERROR SetTagList(chip::EndpointId endpoint,
                       chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> tagList);
 
-CHIP_ERROR GetEndpointUniqueIdForEndPoint(chip::EndpointId endpoint, chip::MutableCharSpan & epUniqueIdMutSpan);
+#ifdef CONFIG_USE_ENDPOINT_UNIQUE_ID
+CHIP_ERROR emberAfGetEndpointUniqueIdForEndPoint(chip::EndpointId endpoint, chip::MutableCharSpan & epUniqueIdMutSpan);
+#endif
 
 // Returns number of clusters put into the passed cluster list
 // for the given endpoint and client/server polarity
