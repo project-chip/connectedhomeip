@@ -54,9 +54,9 @@ CHIP_ERROR OtaProviderServer::AcceptedCommands(const ConcreteClusterPath & path,
                                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     static constexpr DataModel::AcceptedCommandEntry kEntries[] = {
-        QueryImage::kMetatadaEntry,
-        ApplyUpdateRequest::kMetatadaEntry,
-        NotifyUpdateApplied::kMetatadaEntry,
+        QueryImage::kMetadataEntry,
+        ApplyUpdateRequest::kMetadataEntry,
+        NotifyUpdateApplied::kMetadataEntry,
     };
     return builder.ReferenceExisting({ kEntries, MATTER_ARRAY_SIZE(kEntries) });
 }
