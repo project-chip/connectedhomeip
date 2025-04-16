@@ -1039,7 +1039,7 @@ PICS:
 
     - label: "Does the DUT(server) support the ProductAppearance attribute?"
       id: BRBINFO.S.A0014
-    
+
     - label: "Does the DUT(server) support the ConfigurationVersion attribute?"
       id: BRBINFO.S.A0018
 
@@ -2096,7 +2096,7 @@ PICS:
 
     - label: "Does the DUT(server) support the MaxPathsPerInvoke attribute?"
       id: BINFO.S.A0016
-    
+
     - label: "Does the DUT(server) support the ConfigurationVersion attribute?"
       id: BINFO.S.A0018
 
