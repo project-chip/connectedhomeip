@@ -17,6 +17,7 @@
  */
 
 #pragma once
+#include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h>
 #include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
 #include <app/clusters/chime-server/chime-server.h>
 #include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
@@ -114,6 +115,9 @@ public:
     // Getter for CameraAVStreamManagement Delegate
     virtual chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate() = 0;
 
+    // Getter for CameraAVSettingsUserLevelManagement Delegate
+    virtual chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate & GetCameraAVSettingsUserLevelMgmtDelegate() = 0;
+
     // Getter for the Media Controller
     virtual MediaController & GetMediaController() = 0;
 
@@ -139,8 +143,8 @@ public:
         virtual std::vector<SnapshotStream> & GetAvailableSnapshotStreams() = 0;
 
         // Capture a snapshot image
-        virtual CameraError CaptureSnapshot(uint16_t streamID, const VideoResolutionStruct & resolution,
-                                            ImageSnapshot & outImageSnapshot) = 0;
+        virtual CameraError CaptureSnapshot(const chip::app::DataModel::Nullable<uint16_t> streamID,
+                                            const VideoResolutionStruct & resolution, ImageSnapshot & outImageSnapshot) = 0;
         // Start video stream
         virtual CameraError StartVideoStream(uint16_t streamID) = 0;
 
@@ -227,6 +231,16 @@ public:
         // Get the microphone max and min levels.
         virtual uint8_t GetMicrophoneMaxLevel() = 0;
         virtual uint8_t GetMicrophoneMinLevel() = 0;
+
+        virtual int16_t GetPanMin() = 0;
+
+        virtual int16_t GetPanMax() = 0;
+
+        virtual int16_t GetTiltMin() = 0;
+
+        virtual int16_t GetTiltMax() = 0;
+
+        virtual uint8_t GetZoomMax() = 0;
     };
 
     virtual CameraHALInterface & GetCameraHALInterface() = 0;

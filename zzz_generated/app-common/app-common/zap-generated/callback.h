@@ -796,6 +796,16 @@ void emberAfDeviceEnergyManagementModeClusterShutdownCallback(chip::EndpointId e
 /**
  * @param endpoint    Endpoint that is being initialized
  */
+void emberAfElectricalGridConditionsClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfElectricalGridConditionsClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfDoorLockClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -4337,6 +4347,44 @@ chip::Protocols::InteractionModel::Status MatterDeviceEnergyManagementModeCluste
  * @param endpoint  Endpoint that is being served
  */
 void emberAfDeviceEnergyManagementModeClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
+// Electrical Grid Conditions Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfElectricalGridConditionsClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterElectricalGridConditionsClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfElectricalGridConditionsClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterElectricalGridConditionsClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterElectricalGridConditionsClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfElectricalGridConditionsClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
 // Door Lock Cluster

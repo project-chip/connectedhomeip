@@ -281,7 +281,7 @@ void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)
     }
 }
 
-Protocols::InteractionModel::Status CameraAVStreamManager::CaptureSnapshot(const uint16_t streamID,
+Protocols::InteractionModel::Status CameraAVStreamManager::CaptureSnapshot(const Nullable<uint16_t> streamID,
                                                                            const VideoResolutionStruct & resolution,
                                                                            ImageSnapshot & outImageSnapshot)
 {
