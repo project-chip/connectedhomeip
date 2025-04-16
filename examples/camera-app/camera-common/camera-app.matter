@@ -196,6 +196,12 @@ enum PositionTag : enum8 {
   kColumn = 6;
 }
 
+enum PowerThresholdSourceEnum : enum8 {
+  kContract = 0;
+  kRegulator = 1;
+  kEquipment = 2;
+}
+
 enum RelativePositionTag : enum8 {
   kUnder = 0;
   kNextTo = 1;
@@ -204,6 +210,19 @@ enum RelativePositionTag : enum8 {
   kAbove = 4;
   kFrontOf = 5;
   kBehind = 6;
+}
+
+enum TariffPriceTypeEnum : enum8 {
+  kStandard = 0;
+  kCritical = 1;
+  kVirtual = 2;
+  kIncentive = 3;
+  kIncentiveSignal = 4;
+}
+
+enum TariffUnitEnum : enum8 {
+  kKWh = 0;
+  kKVAh = 1;
 }
 
 enum TestGlobalEnum : enum8 {
@@ -224,6 +243,17 @@ bitmap TestGlobalBitmap : bitmap32 {
   kSecondBit = 0x2;
 }
 
+struct CurrencyStruct {
+  int16u currency = 0;
+  int8u decimalPoints = 1;
+}
+
+struct PowerThresholdStruct {
+  optional power_mw powerThreshold = 0;
+  optional power_mva apparentPowerThreshold = 1;
+  nullable PowerThresholdSourceEnum powerThresholdSource = 2;
+}
+
 struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
@@ -234,6 +264,11 @@ struct LocationDescriptorStruct {
   char_string<128> locationName = 0;
   nullable int16s floorNumber = 1;
   nullable AreaTypeTag areaType = 2;
+}
+
+struct PriceStruct {
+  money amount = 0;
+  CurrencyStruct currency = 1;
 }
 
 struct AtomicAttributeStatusStruct {
@@ -376,7 +411,7 @@ cluster Descriptor = 29 {
     kTagList = 0x1;
   }
 
-  struct DeviceTypeStruct {
+  shared struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
   }
@@ -1374,7 +1409,7 @@ cluster SoftwareDiagnostics = 52 {
 
 /** The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems */
 cluster ThreadNetworkDiagnostics = 53 {
-  revision 2;
+  revision 3;
 
   enum ConnectionStatusEnum : enum8 {
     kConnected = 0;
@@ -1527,6 +1562,8 @@ cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute nullable octet_string<4> channelPage0Mask = 60;
   readonly attribute nullable OperationalDatasetComponents operationalDatasetComponents = 61;
   readonly attribute NetworkFaultEnum activeNetworkFaultsList[] = 62;
+  provisional readonly attribute nullable int64u extAddress = 63;
+  provisional readonly attribute nullable int16u rloc16 = 64;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1534,7 +1571,7 @@ cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  /** Reception of this command SHALL reset the OverrunCount attributes to 0 */
+  /** Reception of this command SHALL reset the following attributes to 0: */
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
 }
 
@@ -2087,7 +2124,7 @@ labels. */
 cluster FixedLabel = 64 {
   revision 1; // NOTE: Default/not specifically set
 
-  struct LabelStruct {
+  shared struct LabelStruct {
     char_string<16> label = 0;
     char_string<16> value = 1;
   }
@@ -2105,7 +2142,7 @@ cluster FixedLabel = 64 {
 cluster UserLabel = 65 {
   revision 1; // NOTE: Default/not specifically set
 
-  struct LabelStruct {
+  shared struct LabelStruct {
     char_string<16> label = 0;
     char_string<16> value = 1;
   }
@@ -2132,7 +2169,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
     kJPEG = 0;
   }
 
-  enum StreamUsageEnum : enum8 {
+  shared enum StreamUsageEnum : enum8 {
     kInternal = 0;
     kRecording = 1;
     kAnalysis = 2;
@@ -2197,17 +2234,20 @@ provisional cluster CameraAvStreamManagement = 1361 {
     int16u snapshotStreamID = 0;
     ImageCodecEnum imageCodec = 1;
     int16u frameRate = 2;
-    int32u bitRate = 3;
-    VideoResolutionStruct minResolution = 4;
-    VideoResolutionStruct maxResolution = 5;
-    int8u quality = 6;
-    int8u referenceCount = 7;
+    VideoResolutionStruct minResolution = 3;
+    VideoResolutionStruct maxResolution = 4;
+    int8u quality = 5;
+    int8u referenceCount = 6;
+    boolean encodedPixels = 7;
+    boolean hardwareEncoder = 8;
   }
 
-  struct SnapshotParamsStruct {
+  struct SnapshotCapabilitiesStruct {
     VideoResolutionStruct resolution = 0;
     int16u maxFrameRate = 1;
     ImageCodecEnum imageCodec = 2;
+    boolean requiresEncodedPixels = 3;
+    optional boolean requiresHardwareEncoder = 4;
   }
 
   struct RateDistortionTradeOffPointsStruct {
@@ -2241,14 +2281,14 @@ provisional cluster CameraAvStreamManagement = 1361 {
     optional int16u maxHDRFPS = 3;
   }
 
-  struct ViewportStruct {
+  shared struct ViewportStruct {
     int16u x1 = 0;
     int16u y1 = 1;
     int16u x2 = 2;
     int16u y2 = 3;
   }
 
-  readonly attribute optional int8u maxConcurrentVideoEncoders = 0;
+  readonly attribute optional int8u maxConcurrentEncoders = 0;
   readonly attribute optional int32u maxEncodedPixelRate = 1;
   readonly attribute optional VideoSensorParamsStruct videoSensorParams = 2;
   readonly attribute optional boolean nightVisionCapable = 3;
@@ -2258,7 +2298,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
   readonly attribute optional AudioCapabilitiesStruct microphoneCapabilities = 7;
   readonly attribute optional AudioCapabilitiesStruct speakerCapabilities = 8;
   readonly attribute optional TwoWayTalkSupportTypeEnum twoWayTalkSupport = 9;
-  readonly attribute optional SnapshotParamsStruct supportedSnapshotParams[] = 10;
+  readonly attribute optional SnapshotCapabilitiesStruct snapshotCapabilities[] = 10;
   readonly attribute int32u maxNetworkBandwidth = 11;
   readonly attribute optional int16u currentFrameRate = 12;
   attribute access(read: manage, write: manage) optional boolean HDRModeEnabled = 13;
@@ -2345,12 +2385,11 @@ provisional cluster CameraAvStreamManagement = 1361 {
   request struct SnapshotStreamAllocateRequest {
     ImageCodecEnum imageCodec = 0;
     int16u maxFrameRate = 1;
-    int32u bitRate = 2;
-    VideoResolutionStruct minResolution = 3;
-    VideoResolutionStruct maxResolution = 4;
-    int8u quality = 5;
-    optional boolean watermarkEnabled = 6;
-    optional boolean OSDEnabled = 7;
+    VideoResolutionStruct minResolution = 2;
+    VideoResolutionStruct maxResolution = 3;
+    int8u quality = 4;
+    optional boolean watermarkEnabled = 5;
+    optional boolean OSDEnabled = 6;
   }
 
   response struct SnapshotStreamAllocateResponse = 8 {
@@ -2372,7 +2411,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
   }
 
   request struct CaptureSnapshotRequest {
-    int16u snapshotStreamID = 0;
+    nullable int16u snapshotStreamID = 0;
     VideoResolutionStruct requestedResolution = 1;
   }
 
@@ -2404,18 +2443,118 @@ provisional cluster CameraAvStreamManagement = 1361 {
   command CaptureSnapshot(CaptureSnapshotRequest): CaptureSnapshotResponse = 12;
 }
 
+/** This cluster provides an interface into controls associated with the operation of a device that provides pan, tilt, and zoom functions, either mechanically, or against a digital image. */
+provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
+  revision 1;
+
+  bitmap Feature : bitmap32 {
+    kDigitalPTZ = 0x1;
+    kMechanicalPan = 0x2;
+    kMechanicalTilt = 0x4;
+    kMechanicalZoom = 0x8;
+    kMechanicalPresets = 0x10;
+  }
+
+  struct MPTZStruct {
+    optional int16s pan = 0;
+    optional int16s tilt = 1;
+    optional int8u zoom = 2;
+  }
+
+  struct MPTZPresetStruct {
+    int8u presetID = 0;
+    char_string<32> name = 1;
+    MPTZStruct settings = 2;
+  }
+
+  shared struct ViewportStruct {
+    int16u x1 = 0;
+    int16u y1 = 1;
+    int16u x2 = 2;
+    int16u y2 = 3;
+  }
+
+  readonly attribute optional MPTZStruct MPTZPosition = 0;
+  readonly attribute optional int8u maxPresets = 1;
+  readonly attribute optional MPTZPresetStruct MPTZPresets[] = 2;
+  readonly attribute optional int16u DPTZRelativeMove[] = 3;
+  readonly attribute optional int8u zoomMax = 4;
+  readonly attribute optional int16s tiltMin = 5;
+  readonly attribute optional int16s tiltMax = 6;
+  readonly attribute optional int16s panMin = 7;
+  readonly attribute optional int16s panMax = 8;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct MPTZSetPositionRequest {
+    optional int16s pan = 0;
+    optional int16s tilt = 1;
+    optional int8u zoom = 2;
+  }
+
+  request struct MPTZRelativeMoveRequest {
+    optional int16s panDelta = 0;
+    optional int16s tiltDelta = 1;
+    optional int8s zoomDelta = 2;
+  }
+
+  request struct MPTZMoveToPresetRequest {
+    int8u presetID = 0;
+  }
+
+  request struct MPTZSavePresetRequest {
+    optional int8u presetID = 0;
+    char_string<32> name = 1;
+  }
+
+  request struct MPTZRemovePresetRequest {
+    int8u presetID = 0;
+  }
+
+  request struct DPTZSetViewportRequest {
+    int16u videoStreamID = 0;
+    ViewportStruct viewport = 1;
+  }
+
+  request struct DPTZRelativeMoveRequest {
+    int16u videoStreamID = 0;
+    optional int16s deltaX = 1;
+    optional int16s deltaY = 2;
+    optional int8s zoomDelta = 3;
+  }
+
+  /** This command SHALL set the values for the pan, tilt, and zoom in the mechanical PTZ. */
+  command MPTZSetPosition(MPTZSetPositionRequest): DefaultSuccess = 0;
+  /** This command SHALL move the device by the delta values relative to the currently defined position. */
+  command MPTZRelativeMove(MPTZRelativeMoveRequest): DefaultSuccess = 1;
+  /** This command SHALL move the camera to the positions specified by the Preset passed. */
+  command MPTZMoveToPreset(MPTZMoveToPresetRequest): DefaultSuccess = 2;
+  /** This command allows creating a new preset or updating the values of an existing one. */
+  command MPTZSavePreset(MPTZSavePresetRequest): DefaultSuccess = 3;
+  /** This command SHALL remove a preset entry from the PresetMptzTable. */
+  command MPTZRemovePreset(MPTZRemovePresetRequest): DefaultSuccess = 4;
+  /** This command allows for setting the digital viewport for a specific Video Stream. */
+  command DPTZSetViewport(DPTZSetViewportRequest): DefaultSuccess = 5;
+  /** This command SHALL change the viewports location by the amount specified in a relative fashion. */
+  command DPTZRelativeMove(DPTZRelativeMoveRequest): DefaultSuccess = 6;
+}
+
 /** The WebRTC transport provider cluster provides a way for stream providers (e.g. Cameras) to stream or receive their data through WebRTC. */
 provisional cluster WebRTCTransportProvider = 1363 {
   revision 1;
 
-  enum StreamUsageEnum : enum8 {
+  shared enum StreamUsageEnum : enum8 {
     kInternal = 0;
     kRecording = 1;
     kAnalysis = 2;
     kLiveView = 3;
   }
 
-  enum WebRTCEndReasonEnum : enum8 {
+  shared enum WebRTCEndReasonEnum : enum8 {
     kIceFailed = 0;
     kIceTimeout = 1;
     kUserHangup = 2;
@@ -2430,18 +2569,18 @@ provisional cluster WebRTCTransportProvider = 1363 {
     kUnknownReason = 11;
   }
 
-  bitmap WebRTCMetadataOptionsBitmap : bitmap8 {
+  shared bitmap WebRTCMetadataOptionsBitmap : bitmap8 {
     kDataTLV = 0x1;
   }
 
-  struct ICEServerStruct {
+  shared struct ICEServerStruct {
     char_string urls[] = 1;
     optional char_string username = 2;
     optional char_string credential = 3;
     optional int16u caid = 4;
   }
 
-  fabric_scoped struct WebRTCSessionStruct {
+  shared fabric_scoped struct WebRTCSessionStruct {
     int16u id = 1;
     node_id peerNodeID = 2;
     endpoint_no peerEndpointID = 3;
@@ -2526,14 +2665,14 @@ provisional cluster WebRTCTransportProvider = 1363 {
 provisional cluster WebRTCTransportRequestor = 1364 {
   revision 1;
 
-  enum StreamUsageEnum : enum8 {
+  shared enum StreamUsageEnum : enum8 {
     kInternal = 0;
     kRecording = 1;
     kAnalysis = 2;
     kLiveView = 3;
   }
 
-  enum WebRTCEndReasonEnum : enum8 {
+  shared enum WebRTCEndReasonEnum : enum8 {
     kIceFailed = 0;
     kIceTimeout = 1;
     kUserHangup = 2;
@@ -2548,18 +2687,18 @@ provisional cluster WebRTCTransportRequestor = 1364 {
     kUnknownReason = 11;
   }
 
-  bitmap WebRTCMetadataOptionsBitmap : bitmap8 {
+  shared bitmap WebRTCMetadataOptionsBitmap : bitmap8 {
     kDataTLV = 0x1;
   }
 
-  struct ICEServerStruct {
+  shared struct ICEServerStruct {
     char_string urls[] = 1;
     optional char_string username = 2;
     optional char_string credential = 3;
     optional int16u caid = 4;
   }
 
-  fabric_scoped struct WebRTCSessionStruct {
+  shared fabric_scoped struct WebRTCSessionStruct {
     int16u id = 1;
     node_id peerNodeID = 2;
     endpoint_no peerEndpointID = 3;
@@ -3074,7 +3213,7 @@ endpoint 1 {
   }
 
   server cluster CameraAvStreamManagement {
-    callback attribute maxConcurrentVideoEncoders;
+    callback attribute maxConcurrentEncoders;
     callback attribute maxEncodedPixelRate;
     callback attribute videoSensorParams;
     callback attribute nightVisionCapable;
@@ -3082,7 +3221,7 @@ endpoint 1 {
     callback attribute rateDistortionTradeOffPoints;
     callback attribute maxContentBufferSize;
     callback attribute microphoneCapabilities;
-    callback attribute supportedSnapshotParams;
+    callback attribute snapshotCapabilities;
     callback attribute maxNetworkBandwidth;
     callback attribute currentFrameRate;
     callback attribute HDRModeEnabled;
@@ -3120,12 +3259,37 @@ endpoint 1 {
     handle command CaptureSnapshotResponse;
   }
 
+  server cluster CameraAvSettingsUserLevelManagement {
+    callback attribute MPTZPosition;
+    ram      attribute maxPresets default = 5;
+    callback attribute MPTZPresets;
+    callback attribute DPTZRelativeMove;
+    ram      attribute zoomMax default = 100;
+    ram      attribute tiltMin default = -90;
+    ram      attribute tiltMax default = 90;
+    ram      attribute panMin default = -180;
+    ram      attribute panMax default = 180;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 31;
+    ram      attribute clusterRevision default = 1;
+
+    handle command MPTZSetPosition;
+    handle command MPTZRelativeMove;
+    handle command MPTZMoveToPreset;
+    handle command MPTZSavePreset;
+    handle command MPTZRemovePreset;
+    handle command DPTZSetViewport;
+    handle command DPTZRelativeMove;
+  }
+
   server cluster WebRTCTransportProvider {
     callback attribute currentSessions;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap default = 1;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 1;
 
     handle command SolicitOffer;

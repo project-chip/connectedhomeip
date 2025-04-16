@@ -1,4 +1,6 @@
-struct: struct_qualities "struct"i id "{" (struct_field ";")* "}"
+?shared: "shared"i -> shared_element
+
+struct: [shared] struct_qualities "struct"i id "{" (struct_field ";")* "}"
 struct_quality: "fabric_scoped"i -> struct_fabric_scoped
 struct_qualities: struct_quality*
 
@@ -10,8 +12,9 @@ struct_qualities: struct_quality*
          | "deprecated"i -> deprecated_api_maturity
          | "stable"i -> stable_api_maturity
 
-enum: "enum"i id ":" type "{" constant_entry* "}"
-bitmap: "bitmap"i id ":" type "{" constant_entry* "}"
+
+enum: [shared] "enum"i id ":" type "{" constant_entry* "}"
+bitmap: [shared] "bitmap"i id ":" type "{" constant_entry* "}"
 
 ?access_privilege: "view"i       -> view_privilege
                  | "operate"i    -> operate_privilege

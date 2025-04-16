@@ -75,7 +75,7 @@ public:
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 #if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
-    static void HandleC3ReadRequest(SilabsBleWrapper::sl_wfx_msg_t * rsi_ble_read_req);
+    static void HandleC3ReadRequest(const SilabsBleWrapper::sl_wfx_msg_t & rsi_ble_read_req);
 #else
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     static void HandleC3ReadRequest(volatile sl_bt_msg_t * evt);

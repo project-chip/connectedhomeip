@@ -1158,6 +1158,12 @@ static BOOL AttributeIsSpecifiedInThreadNetworkDiagnosticsCluster(AttributeId aA
     case Attributes::ActiveNetworkFaultsList::Id: {
         return YES;
     }
+    case Attributes::ExtAddress::Id: {
+        return YES;
+    }
+    case Attributes::Rloc16::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -2822,6 +2828,42 @@ static BOOL AttributeIsSpecifiedInWaterHeaterManagementCluster(AttributeId aAttr
     }
     }
 }
+static BOOL AttributeIsSpecifiedInCommodityPriceCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::CommodityPrice;
+    switch (aAttributeId) {
+    case Attributes::TariffUnit::Id: {
+        return YES;
+    }
+    case Attributes::Currency::Id: {
+        return YES;
+    }
+    case Attributes::CurrentPrice::Id: {
+        return YES;
+    }
+    case Attributes::PriceForecast::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInDemandResponseLoadControlCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::DemandResponseLoadControl;
@@ -3466,21 +3508,6 @@ static BOOL AttributeIsSpecifiedInClosureControlCluster(AttributeId aAttributeId
         return YES;
     }
     case Attributes::OverallTarget::Id: {
-        return YES;
-    }
-    case Attributes::RestingProcedure::Id: {
-        return YES;
-    }
-    case Attributes::TriggerCondition::Id: {
-        return YES;
-    }
-    case Attributes::TriggerPosition::Id: {
-        return YES;
-    }
-    case Attributes::WaitingDelay::Id: {
-        return YES;
-    }
-    case Attributes::KickoffTimer::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -5679,7 +5706,7 @@ static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aA
 {
     using namespace Clusters::CameraAvStreamManagement;
     switch (aAttributeId) {
-    case Attributes::MaxConcurrentVideoEncoders::Id: {
+    case Attributes::MaxConcurrentEncoders::Id: {
         return YES;
     }
     case Attributes::MaxEncodedPixelRate::Id: {
@@ -5709,7 +5736,7 @@ static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aA
     case Attributes::TwoWayTalkSupport::Id: {
         return YES;
     }
-    case Attributes::SupportedSnapshotParams::Id: {
+    case Attributes::SnapshotCapabilities::Id: {
         return YES;
     }
     case Attributes::MaxNetworkBandwidth::Id: {
@@ -5993,6 +6020,87 @@ static BOOL AttributeIsSpecifiedInChimeCluster(AttributeId aAttributeId)
     }
     }
 }
+static BOOL AttributeIsSpecifiedInCommodityTariffCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::CommodityTariff;
+    switch (aAttributeId) {
+    case Attributes::TariffInfo::Id: {
+        return YES;
+    }
+    case Attributes::TariffUnit::Id: {
+        return YES;
+    }
+    case Attributes::StartDate::Id: {
+        return YES;
+    }
+    case Attributes::DayEntries::Id: {
+        return YES;
+    }
+    case Attributes::DayPatterns::Id: {
+        return YES;
+    }
+    case Attributes::CalendarPeriods::Id: {
+        return YES;
+    }
+    case Attributes::IndividualDays::Id: {
+        return YES;
+    }
+    case Attributes::CurrentDay::Id: {
+        return YES;
+    }
+    case Attributes::NextDay::Id: {
+        return YES;
+    }
+    case Attributes::CurrentDayEntry::Id: {
+        return YES;
+    }
+    case Attributes::CurrentDayEntryDate::Id: {
+        return YES;
+    }
+    case Attributes::NextDayEntry::Id: {
+        return YES;
+    }
+    case Attributes::NextDayEntryDate::Id: {
+        return YES;
+    }
+    case Attributes::TariffComponents::Id: {
+        return YES;
+    }
+    case Attributes::TariffPeriods::Id: {
+        return YES;
+    }
+    case Attributes::CurrentTariffComponents::Id: {
+        return YES;
+    }
+    case Attributes::NextTariffComponents::Id: {
+        return YES;
+    }
+    case Attributes::DefaultRandomizationOffset::Id: {
+        return YES;
+    }
+    case Attributes::DefaultRandomizationType::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInEcosystemInformationCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::EcosystemInformation;
@@ -6094,6 +6202,78 @@ static BOOL AttributeIsSpecifiedInTLSClientManagementCluster(AttributeId aAttrib
         return YES;
     }
     case Attributes::ProvisionedEndpoints::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInMeterIdentificationCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::MeterIdentification;
+    switch (aAttributeId) {
+    case Attributes::MeterType::Id: {
+        return YES;
+    }
+    case Attributes::PointOfDelivery::Id: {
+        return YES;
+    }
+    case Attributes::MeterSerialNumber::Id: {
+        return YES;
+    }
+    case Attributes::ProtocolVersion::Id: {
+        return YES;
+    }
+    case Attributes::PowerThreshold::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInCommodityMeteringCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::CommodityMetering;
+    switch (aAttributeId) {
+    case Attributes::MeteredQuantity::Id: {
+        return YES;
+    }
+    case Attributes::MeteredQuantityTimestamp::Id: {
+        return YES;
+    }
+    case Attributes::MeasurementType::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -6627,6 +6807,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::WaterHeaterManagement::Id: {
         return AttributeIsSpecifiedInWaterHeaterManagementCluster(aAttributeId);
     }
+    case Clusters::CommodityPrice::Id: {
+        return AttributeIsSpecifiedInCommodityPriceCluster(aAttributeId);
+    }
     case Clusters::DemandResponseLoadControl::Id: {
         return AttributeIsSpecifiedInDemandResponseLoadControlCluster(aAttributeId);
     }
@@ -6807,6 +6990,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::Chime::Id: {
         return AttributeIsSpecifiedInChimeCluster(aAttributeId);
     }
+    case Clusters::CommodityTariff::Id: {
+        return AttributeIsSpecifiedInCommodityTariffCluster(aAttributeId);
+    }
     case Clusters::EcosystemInformation::Id: {
         return AttributeIsSpecifiedInEcosystemInformationCluster(aAttributeId);
     }
@@ -6818,6 +7004,12 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::TlsClientManagement::Id: {
         return AttributeIsSpecifiedInTLSClientManagementCluster(aAttributeId);
+    }
+    case Clusters::MeterIdentification::Id: {
+        return AttributeIsSpecifiedInMeterIdentificationCluster(aAttributeId);
+    }
+    case Clusters::CommodityMetering::Id: {
+        return AttributeIsSpecifiedInCommodityMeteringCluster(aAttributeId);
     }
     case Clusters::UnitTesting::Id: {
         return AttributeIsSpecifiedInUnitTestingCluster(aAttributeId);
