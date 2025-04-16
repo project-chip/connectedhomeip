@@ -83,6 +83,8 @@ not_automated:
       reason: Code/Test not being used or not shared code for any other tests
     - name: modebase_cluster_check.py
       reason: Shared code for Modebase derived clusters, not a standalone test.
+    - name: TC_AVSUMTestBase.py
+      reason: Shared code for Canera AV Settings (TC_AVSUM*), not a standalone test.
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
