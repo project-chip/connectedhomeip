@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,30 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
 
-import("${chip_root}/src/app/chip_data_model.gni")
+import("${chip_root}/build/chip/chip_test_suite.gni")
 
-config("config") {
-  include_dirs = [ ".." ]
-}
 
-chip_data_model("ota-provider-common") {
-  zap_file = "ota-provider-app.zap"
-
-  sources = [
-    "BdxOtaSender.cpp",
-    "BdxOtaSender.h",
-    "OTAProviderExample.cpp",
-    "OTAProviderExample.h",
+chip_test_suite("tests") {
+  test_sources = [
+    "TestOtaProviderCluster.cpp",
   ]
 
-  deps = [
-    "${chip_root}/src/app/clusters/ota-provider:user-consent",
-    "${chip_root}/src/protocols/bdx",
+  sources = []
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    "${chip_root}/src/app/clusters/ota-provider",
+    "${chip_root}/src/lib/core:string-builder-adapters",
+    "${chip_root}/src/lib/support",
   ]
-
-  is_server = true
-
-  public_configs = [ ":config" ]
 }

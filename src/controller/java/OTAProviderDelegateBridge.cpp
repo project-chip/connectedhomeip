@@ -19,7 +19,7 @@
 #include "OTAProviderDelegateBridge.h"
 
 #include <app/MessageDef/StatusIB.h>
-#include <app/clusters/ota-provider/ota-provider.h>
+#include <app/clusters/ota-provider/CodegenIntegration.h>
 #include <app/data-model/List.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>

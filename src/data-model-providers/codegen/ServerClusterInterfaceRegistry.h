@@ -33,9 +33,10 @@ namespace app {
 struct ServerClusterRegistration
 {
     // A single-linked list of clusters registered for the given `endpointId`
-    ServerClusterInterface * const serverClusterInterface;
+    ServerClusterInterface * serverClusterInterface;
     ServerClusterRegistration * next;
 
+    constexpr ServerClusterRegistration() : serverClusterInterface(nullptr), next(nullptr) {}
     constexpr ServerClusterRegistration(ServerClusterInterface & interface, ServerClusterRegistration * next_item = nullptr) :
         serverClusterInterface(&interface), next(next_item)
     {}
@@ -125,6 +126,7 @@ public:
     /// Requirements:
     ///   - entry MUST NOT be part of any other registration
     ///   - paths MUST be part of the same endpoint (requirement for codegen server cluster interface implementations)
+    ///
     ///   - LIFETIME of entry must outlive the Registry (or entry must be unregistered)
     ///
     /// There can be only a single registration for a given `endpointId/clusterId` path.
