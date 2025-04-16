@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace OutputList {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Attributes::OutputList::Id,
+    .attributeId    = OutputList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace OutputList
 namespace CurrentOutput {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Attributes::CurrentOutput::Id,
+    .attributeId    = CurrentOutput::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,

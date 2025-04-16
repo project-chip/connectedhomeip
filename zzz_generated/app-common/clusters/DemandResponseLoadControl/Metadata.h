@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 4;
 namespace Attributes {
 namespace LoadControlPrograms {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Attributes::LoadControlPrograms::Id,
+    .attributeId    = LoadControlPrograms::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace LoadControlPrograms
 namespace NumberOfLoadControlPrograms {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Attributes::NumberOfLoadControlPrograms::Id,
+    .attributeId    = NumberOfLoadControlPrograms::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -37,7 +37,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace NumberOfLoadControlPrograms
 namespace Events {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Attributes::Events::Id,
+    .attributeId    = Events::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -45,7 +45,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace Events
 namespace ActiveEvents {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Attributes::ActiveEvents::Id,
+    .attributeId    = ActiveEvents::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -53,7 +53,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace ActiveEvents
 namespace NumberOfEventsPerProgram {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Attributes::NumberOfEventsPerProgram::Id,
+    .attributeId    = NumberOfEventsPerProgram::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -61,7 +61,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace NumberOfEventsPerProgram
 namespace NumberOfTransitions {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Attributes::NumberOfTransitions::Id,
+    .attributeId    = NumberOfTransitions::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -69,7 +69,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace NumberOfTransitions
 namespace DefaultRandomStart {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Attributes::DefaultRandomStart::Id,
+    .attributeId    = DefaultRandomStart::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
@@ -77,7 +77,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace DefaultRandomStart
 namespace DefaultRandomDuration {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Attributes::DefaultRandomDuration::Id,
+    .attributeId    = DefaultRandomDuration::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,

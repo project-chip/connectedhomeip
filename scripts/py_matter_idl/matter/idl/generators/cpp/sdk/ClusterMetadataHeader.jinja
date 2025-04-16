@@ -22,7 +22,7 @@ namespace Attributes {
 {% for attribute in cluster.attributes | reject("global_attribute") -%}
 namespace {{attribute.definition.name | upfirst}} {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Attributes::{{attribute.definition.name | upfirst}}::Id,
+    .attributeId    = {{attribute.definition.name | upfirst}}::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ {{ attribute | extract_attribute_quality_flags | join(", ") }} },
     .readPrivilege  = {% if attribute.is_readable -%}
         {{attribute.readacl | as_privilege}}

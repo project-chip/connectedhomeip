@@ -27,6 +27,7 @@
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
+#include <lib/support/ReadOnlyBuffer.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -251,7 +252,7 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
     if (startAfterSetting.HasValue())
     {
 
-        DataModel::ListBuilder<DataModel::AcceptedCommandEntry> acceptedCommandsList;
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedCommandsList;
 
         InteractionModelEngine::GetInstance()->GetDataModelProvider()->AcceptedCommands(
             ConcreteClusterPath(mEndpointId, OperationalState::Id), acceptedCommandsList);

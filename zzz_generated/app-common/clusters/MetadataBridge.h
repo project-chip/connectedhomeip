@@ -86,6 +86,8 @@
 #include <clusters/EcosystemInformation/MetadataBridge.h>
 #include <clusters/ElectricalEnergyMeasurement/Ids.h>
 #include <clusters/ElectricalEnergyMeasurement/MetadataBridge.h>
+#include <clusters/ElectricalGridConditions/Ids.h>
+#include <clusters/ElectricalGridConditions/MetadataBridge.h>
 #include <clusters/ElectricalPowerMeasurement/Ids.h>
 #include <clusters/ElectricalPowerMeasurement/MetadataBridge.h>
 #include <clusters/EnergyEvse/Ids.h>
@@ -302,8 +304,9 @@ constexpr Meta::ObjectList<
     chip::app::Clusters::DeviceEnergyManagement::Id, chip::app::Clusters::DeviceEnergyManagementMode::Id,
     chip::app::Clusters::DiagnosticLogs::Id, chip::app::Clusters::DishwasherAlarm::Id, chip::app::Clusters::DishwasherMode::Id,
     chip::app::Clusters::DoorLock::Id, chip::app::Clusters::EcosystemInformation::Id,
-    chip::app::Clusters::ElectricalEnergyMeasurement::Id, chip::app::Clusters::ElectricalPowerMeasurement::Id,
-    chip::app::Clusters::EnergyEvse::Id, chip::app::Clusters::EnergyEvseMode::Id, chip::app::Clusters::EnergyPreference::Id,
+    chip::app::Clusters::ElectricalEnergyMeasurement::Id, chip::app::Clusters::ElectricalGridConditions::Id,
+    chip::app::Clusters::ElectricalPowerMeasurement::Id, chip::app::Clusters::EnergyEvse::Id,
+    chip::app::Clusters::EnergyEvseMode::Id, chip::app::Clusters::EnergyPreference::Id,
     chip::app::Clusters::EthernetNetworkDiagnostics::Id, chip::app::Clusters::FanControl::Id,
     chip::app::Clusters::FaultInjection::Id, chip::app::Clusters::FixedLabel::Id, chip::app::Clusters::FlowMeasurement::Id,
     chip::app::Clusters::FormaldehydeConcentrationMeasurement::Id, chip::app::Clusters::GeneralCommissioning::Id,

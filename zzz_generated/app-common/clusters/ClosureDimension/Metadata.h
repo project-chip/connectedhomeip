@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace Current {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Attributes::Current::Id,
+    .attributeId    = Current::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace Current
 namespace Target {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Attributes::Target::Id,
+    .attributeId    = Target::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -37,7 +37,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace Target
 namespace Resolution {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Attributes::Resolution::Id,
+    .attributeId    = Resolution::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -45,7 +45,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace Resolution
 namespace StepValue {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Attributes::StepValue::Id,
+    .attributeId    = StepValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -53,7 +53,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace StepValue
 namespace Unit {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Attributes::Unit::Id,
+    .attributeId    = Unit::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -61,7 +61,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace Unit
 namespace UnitRange {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Attributes::UnitRange::Id,
+    .attributeId    = UnitRange::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -69,7 +69,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace UnitRange
 namespace LimitRange {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Attributes::LimitRange::Id,
+    .attributeId    = LimitRange::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -77,7 +77,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace LimitRange
 namespace TranslationDirection {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Attributes::TranslationDirection::Id,
+    .attributeId    = TranslationDirection::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -85,7 +85,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace TranslationDirection
 namespace RotationAxis {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Attributes::RotationAxis::Id,
+    .attributeId    = RotationAxis::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -93,7 +93,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace RotationAxis
 namespace Overflow {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Attributes::Overflow::Id,
+    .attributeId    = Overflow::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -101,7 +101,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace Overflow
 namespace ModulationType {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Attributes::ModulationType::Id,
+    .attributeId    = ModulationType::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,

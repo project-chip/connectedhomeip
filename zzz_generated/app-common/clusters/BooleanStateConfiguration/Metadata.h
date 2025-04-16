@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace CurrentSensitivityLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Attributes::CurrentSensitivityLevel::Id,
+    .attributeId    = CurrentSensitivityLevel::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace CurrentSensitivityLevel
 namespace SupportedSensitivityLevels {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Attributes::SupportedSensitivityLevels::Id,
+    .attributeId    = SupportedSensitivityLevels::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -37,7 +37,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace SupportedSensitivityLevels
 namespace DefaultSensitivityLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Attributes::DefaultSensitivityLevel::Id,
+    .attributeId    = DefaultSensitivityLevel::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -45,7 +45,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace DefaultSensitivityLevel
 namespace AlarmsActive {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Attributes::AlarmsActive::Id,
+    .attributeId    = AlarmsActive::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -53,7 +53,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace AlarmsActive
 namespace AlarmsSuppressed {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Attributes::AlarmsSuppressed::Id,
+    .attributeId    = AlarmsSuppressed::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -61,7 +61,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace AlarmsSuppressed
 namespace AlarmsEnabled {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Attributes::AlarmsEnabled::Id,
+    .attributeId    = AlarmsEnabled::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -69,7 +69,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace AlarmsEnabled
 namespace AlarmsSupported {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Attributes::AlarmsSupported::Id,
+    .attributeId    = AlarmsSupported::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -77,7 +77,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace AlarmsSupported
 namespace SensorFault {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Attributes::SensorFault::Id,
+    .attributeId    = SensorFault::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,

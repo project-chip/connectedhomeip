@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster DeviceEnergyManagement (cluster code: 152/0x98)
+// Identifier constant values for cluster DeviceEnergyManagement (cluster code: 152/0x0498)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

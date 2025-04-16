@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster NitrogenDioxideConcentrationMeasurement (cluster code: 1043/0x413)
+// Identifier constant values for cluster NitrogenDioxideConcentrationMeasurement (cluster code: 1043/0x04413)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster OtaSoftwareUpdateRequestor (cluster code: 42/0x2A)
+// Identifier constant values for cluster OtaSoftwareUpdateRequestor (cluster code: 42/0x042A)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

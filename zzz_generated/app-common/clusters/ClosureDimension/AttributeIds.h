@@ -15,51 +15,67 @@ namespace Attributes {
 namespace Current {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace Current
+
 namespace Target {
 inline constexpr AttributeId Id = 0x00000001;
 } // namespace Target
+
 namespace Resolution {
 inline constexpr AttributeId Id = 0x00000002;
 } // namespace Resolution
+
 namespace StepValue {
 inline constexpr AttributeId Id = 0x00000003;
 } // namespace StepValue
+
 namespace Unit {
 inline constexpr AttributeId Id = 0x00000004;
 } // namespace Unit
+
 namespace UnitRange {
 inline constexpr AttributeId Id = 0x00000005;
 } // namespace UnitRange
+
 namespace LimitRange {
 inline constexpr AttributeId Id = 0x00000006;
 } // namespace LimitRange
+
 namespace TranslationDirection {
 inline constexpr AttributeId Id = 0x00000007;
 } // namespace TranslationDirection
+
 namespace RotationAxis {
 inline constexpr AttributeId Id = 0x00000008;
 } // namespace RotationAxis
+
 namespace Overflow {
 inline constexpr AttributeId Id = 0x00000009;
 } // namespace Overflow
+
 namespace ModulationType {
 inline constexpr AttributeId Id = 0x0000000A;
 } // namespace ModulationType
+
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
+
 namespace AcceptedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
 } // namespace AcceptedCommandList
+
 namespace EventList {
 inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
 } // namespace EventList
+
 namespace AttributeList {
 inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
 } // namespace AttributeList
+
 namespace FeatureMap {
 inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
 } // namespace FeatureMap
+
 namespace ClusterRevision {
 inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision

@@ -21,8 +21,8 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::CameraAvStre
         using namespace Clusters::CameraAvStreamManagement::Attributes;
         switch (commandId)
         {
-        case MaxConcurrentVideoEncoders::Id:
-            return MaxConcurrentVideoEncoders::kMetadataEntry;
+        case MaxConcurrentEncoders::Id:
+            return MaxConcurrentEncoders::kMetadataEntry;
         case MaxEncodedPixelRate::Id:
             return MaxEncodedPixelRate::kMetadataEntry;
         case VideoSensorParams::Id:
@@ -41,8 +41,8 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::CameraAvStre
             return SpeakerCapabilities::kMetadataEntry;
         case TwoWayTalkSupport::Id:
             return TwoWayTalkSupport::kMetadataEntry;
-        case SupportedSnapshotParams::Id:
-            return SupportedSnapshotParams::kMetadataEntry;
+        case SnapshotCapabilities::Id:
+            return SnapshotCapabilities::kMetadataEntry;
         case MaxNetworkBandwidth::Id:
             return MaxNetworkBandwidth::kMetadataEntry;
         case CurrentFrameRate::Id:

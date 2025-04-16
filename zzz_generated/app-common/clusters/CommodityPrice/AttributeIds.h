@@ -15,30 +15,39 @@ namespace Attributes {
 namespace TariffUnit {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace TariffUnit
+
 namespace Currency {
 inline constexpr AttributeId Id = 0x00000001;
 } // namespace Currency
+
 namespace CurrentPrice {
 inline constexpr AttributeId Id = 0x00000002;
 } // namespace CurrentPrice
+
 namespace PriceForecast {
 inline constexpr AttributeId Id = 0x00000003;
 } // namespace PriceForecast
+
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
+
 namespace AcceptedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
 } // namespace AcceptedCommandList
+
 namespace EventList {
 inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
 } // namespace EventList
+
 namespace AttributeList {
 inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
 } // namespace AttributeList
+
 namespace FeatureMap {
 inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
 } // namespace FeatureMap
+
 namespace ClusterRevision {
 inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision

@@ -10,7 +10,20 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ClosureControl {
-namespace Events {} // namespace Events
+namespace Events {
+namespace OperationalError {
+inline constexpr EventId Id = 0x00000000;
+} // namespace OperationalError
+namespace MovementCompleted {
+inline constexpr EventId Id = 0x00000001;
+} // namespace MovementCompleted
+namespace EngageStateChanged {
+inline constexpr EventId Id = 0x00000002;
+} // namespace EngageStateChanged
+namespace SecureStateChanged {
+inline constexpr EventId Id = 0x00000003;
+} // namespace SecureStateChanged
+} // namespace Events
 } // namespace ClosureControl
 } // namespace Clusters
 } // namespace app

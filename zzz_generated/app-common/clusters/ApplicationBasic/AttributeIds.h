@@ -15,42 +15,55 @@ namespace Attributes {
 namespace VendorName {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace VendorName
+
 namespace VendorID {
 inline constexpr AttributeId Id = 0x00000001;
 } // namespace VendorID
+
 namespace ApplicationName {
 inline constexpr AttributeId Id = 0x00000002;
 } // namespace ApplicationName
+
 namespace ProductID {
 inline constexpr AttributeId Id = 0x00000003;
 } // namespace ProductID
+
 namespace Application {
 inline constexpr AttributeId Id = 0x00000004;
 } // namespace Application
+
 namespace Status {
 inline constexpr AttributeId Id = 0x00000005;
 } // namespace Status
+
 namespace ApplicationVersion {
 inline constexpr AttributeId Id = 0x00000006;
 } // namespace ApplicationVersion
+
 namespace AllowedVendorList {
 inline constexpr AttributeId Id = 0x00000007;
 } // namespace AllowedVendorList
+
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
+
 namespace AcceptedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
 } // namespace AcceptedCommandList
+
 namespace EventList {
 inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
 } // namespace EventList
+
 namespace AttributeList {
 inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
 } // namespace AttributeList
+
 namespace FeatureMap {
 inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
 } // namespace FeatureMap
+
 namespace ClusterRevision {
 inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision

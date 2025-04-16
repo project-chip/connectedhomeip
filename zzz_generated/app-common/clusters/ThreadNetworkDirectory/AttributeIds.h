@@ -15,27 +15,35 @@ namespace Attributes {
 namespace PreferredExtendedPanID {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace PreferredExtendedPanID
+
 namespace ThreadNetworks {
 inline constexpr AttributeId Id = 0x00000001;
 } // namespace ThreadNetworks
+
 namespace ThreadNetworkTableSize {
 inline constexpr AttributeId Id = 0x00000002;
 } // namespace ThreadNetworkTableSize
+
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
+
 namespace AcceptedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
 } // namespace AcceptedCommandList
+
 namespace EventList {
 inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
 } // namespace EventList
+
 namespace AttributeList {
 inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
 } // namespace AttributeList
+
 namespace FeatureMap {
 inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
 } // namespace FeatureMap
+
 namespace ClusterRevision {
 inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision

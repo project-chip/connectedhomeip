@@ -55,6 +55,8 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::BridgedDevic
             return UniqueID::kMetadataEntry;
         case ProductAppearance::Id:
             return ProductAppearance::kMetadataEntry;
+        case ConfigurationVersion::Id:
+            return ConfigurationVersion::kMetadataEntry;
 
         default:
             return {};

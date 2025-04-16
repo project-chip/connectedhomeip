@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster IlluminanceMeasurement (cluster code: 1024/0x400)
+// Identifier constant values for cluster IlluminanceMeasurement (cluster code: 1024/0x04400)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

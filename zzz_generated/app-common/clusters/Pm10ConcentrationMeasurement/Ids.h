@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster Pm10ConcentrationMeasurement (cluster code: 1069/0x42D)
+// Identifier constant values for cluster Pm10ConcentrationMeasurement (cluster code: 1069/0x0442D)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

@@ -15,36 +15,47 @@ namespace Attributes {
 namespace Condition {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace Condition
+
 namespace DegradationDirection {
 inline constexpr AttributeId Id = 0x00000001;
 } // namespace DegradationDirection
+
 namespace ChangeIndication {
 inline constexpr AttributeId Id = 0x00000002;
 } // namespace ChangeIndication
+
 namespace InPlaceIndicator {
 inline constexpr AttributeId Id = 0x00000003;
 } // namespace InPlaceIndicator
+
 namespace LastChangedTime {
 inline constexpr AttributeId Id = 0x00000004;
 } // namespace LastChangedTime
+
 namespace ReplacementProductList {
 inline constexpr AttributeId Id = 0x00000005;
 } // namespace ReplacementProductList
+
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
+
 namespace AcceptedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
 } // namespace AcceptedCommandList
+
 namespace EventList {
 inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
 } // namespace EventList
+
 namespace AttributeList {
 inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
 } // namespace AttributeList
+
 namespace FeatureMap {
 inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
 } // namespace FeatureMap
+
 namespace ClusterRevision {
 inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
