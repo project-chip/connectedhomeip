@@ -221,9 +221,11 @@ class TC_G_2_2(MatterBaseTest):
         asserts.assert_equal(result.status, Status.ConstraintError, "Returned status is different from expected ConstraintError")
 
         self.step("10")
-        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[4].groupId, group_names[2]))
+        invalid_group_id = maxgroups + 0x0005
+        kGroupName5 = "Gp5"
+        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(invalid_group_id, kGroupName5))
         asserts.assert_equal(result.status, Status.UnsupportedAccess,
-                             "Must be get an UNSUPPORTED_ACCESS as groupID in the AddGroup command does not have the security key")
+                             "Returned status is different from expected UnsupportedAccess since the GroupID does not have the security key")
 
         self.step("11")
         result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.ViewGroup(kGroupId1))
