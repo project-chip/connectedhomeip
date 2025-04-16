@@ -14,22 +14,44 @@
  *    limitations under the License.
  */
 
-#include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/util/attribute-table.h>
-
+#include <app/clusters/ota-provider/ota-provider-cluster.h>
 #include <app/util/af-types.h>
+#include <app/util/attribute-table.h>
 #include <app/util/privilege-storage.h>
 #include <lib/core/Optional.h>
 #include <lib/core/TLVReader.h>
 #include <platform/LockTracker.h>
 #include <protocols/interaction_model/StatusCode.h>
 
+#include <map>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+
+namespace {
+
+// Generally logic for what provides have a delegate set on them.
+// TODO: is a single OTA provider reasonable?
+std::map<EndpointId, OtaProviderLogic> gOtaProviders;
+
+}
+
+namespace chip::app::Clusters::OTAProvider {
+
+void SetDelegate(chip::EndpointId endpointId, OTAProviderDelegate * delegate)
+{
+    if (gOtaProviders.find(endpointId) == gOtaProviders.end()) {
+        gOtaProviders[endpointId] = {};
+        ChipLogProgress(AppServer, "New OTA provider set up on endpoint %d", endpointId);
+    }
+    gOtaProviders[endpointId].SetDelegate(delegate);
+}
+
+} // namespace chip::app::Clusters::OTAProvider
 
 void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
@@ -63,16 +85,26 @@ namespace app {
 
     void DispatchSingleClusterCommand(const ConcreteCommandPath & aPath, TLV::TLVReader & aReader, CommandHandler * aCommandObj)
     {
-        // TODO: Consider having MTRServerCluster register a
-        // CommandHandlerInterface for command dispatch.  But OTA would need
-        // some special-casing in any case, to call into the existing cluster
-        // implementation.
         using Protocols::InteractionModel::Status;
+
+        if (aPath.mClusterId != OtaSoftwareUpdateProvider::Id) {
+            aCommandObj->AddStatus(aPath, Status::UnsupportedCluster);
+            return;
+        }
+
+        if (gOtaProviders.find(aPath.mEndpointId) == gOtaProviders.end()) {
+            // Error here is unclear: we have no delegate, so just give up
+            aCommandObj->AddStatus(aPath, Status::InvalidCommand);
+            return;
+        }
+
+        OtaProviderLogic & logic = gOtaProviders[aPath.mEndpointId];
+
         // This command passed ServerClusterCommandExists so we know it's one of our
         // supported commands.
         using namespace OtaSoftwareUpdateProvider::Commands;
 
-        bool wasHandled = false;
+        std::optional<DataModel::ActionReturnStatus> result;
         CHIP_ERROR err = CHIP_NO_ERROR;
 
         switch (aPath.mCommandId) {
@@ -80,7 +112,7 @@ namespace app {
             QueryImage::DecodableType commandData;
             err = DataModel::Decode(aReader, commandData);
             if (err == CHIP_NO_ERROR) {
-                wasHandled = emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(aCommandObj, aPath, commandData);
+                result = logic.QueryImage(aPath, commandData, aCommandObj);
             }
             break;
         }
@@ -88,7 +120,7 @@ namespace app {
             ApplyUpdateRequest::DecodableType commandData;
             err = DataModel::Decode(aReader, commandData);
             if (err == CHIP_NO_ERROR) {
-                wasHandled = emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(aCommandObj, aPath, commandData);
+                result = logic.ApplyUpdateRequest(aPath, commandData, aCommandObj);
             }
             break;
         }
@@ -96,7 +128,7 @@ namespace app {
             NotifyUpdateApplied::DecodableType commandData;
             err = DataModel::Decode(aReader, commandData);
             if (err == CHIP_NO_ERROR) {
-                wasHandled = emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(aCommandObj, aPath, commandData);
+                result = logic.NotifyUpdateApplied(aPath, commandData, aCommandObj);
             }
             break;
         }
@@ -104,8 +136,13 @@ namespace app {
             break;
         }
 
-        if (CHIP_NO_ERROR != err || !wasHandled) {
+        if (CHIP_NO_ERROR != err) {
             aCommandObj->AddStatus(aPath, Status::InvalidCommand);
+        } else if (result.has_value()) {
+            // Provider indicates that handler status or data was already set (or will be set asynchronously) by
+            // returning std::nullopt. If any other value is returned, it is requesting that a status is set. This
+            // includes CHIP_NO_ERROR: in this case CHIP_NO_ERROR would mean set a `status success on the command`
+            aCommandObj->AddStatus(aPath, result->GetStatusCode());
         }
     }
 
