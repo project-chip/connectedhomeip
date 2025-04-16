@@ -32,6 +32,7 @@ assert(chip_device_platform == "nxp")
 declare_args() {
   # Enable secondary network interface
   chip_enable_secondary_nwk_if = false
+
   # Enable OTA encryption
   chip_with_ota_encryption = false
 
@@ -185,10 +186,8 @@ static_library("nxp_platform") {
       "../../common/ThreadStackManagerImpl.h",
     ]
 
-    deps += [
-      "${chip_root}/third_party/openthread:openthread",
-    ]
-    
+    deps += [ "${chip_root}/third_party/openthread:openthread" ]
+
     public_deps += [ "${chip_root}/third_party/openthread:openthread-platform" ]
 
     if (nxp_enable_matter_cli) {

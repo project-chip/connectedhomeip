@@ -207,10 +207,10 @@ static_library("nxp_platform") {
 
   public_deps += [
     "${chip_root}/examples/platform/nxp/${nxp_platform}/app/support:freertos_memory_utils",
+    "${chip_root}/src/credentials:credentials_header",
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:syscalls_stub",
     "${chip_root}/src/platform/logging:headers",
-    "${chip_root}/src/credentials:credentials_header",
   ]
 
   public_configs = [ ":nxp_platform_config" ]

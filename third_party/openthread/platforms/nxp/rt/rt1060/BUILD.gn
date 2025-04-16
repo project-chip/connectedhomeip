@@ -20,7 +20,6 @@ import("${chip_root}/src/platform/device.gni")
 
 #allows to get common NXP SDK gn options
 import("${nxp_sdk_build_root}/nxp_sdk.gni")
-
 if (!nxp_external_sdk) {
   # Allows to get various RT gn options
   import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
