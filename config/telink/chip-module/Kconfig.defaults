@@ -484,6 +484,10 @@ config MBEDTLS_HKDF_C
 config MBEDTLS_X509_CSR_WRITE_C
     bool "X.509 Certificate Signing Requests writing"
     default y
+
+config PSA_WANT_KEY_TYPE_ECC_PUBLIC_KEY
+	bool "PSA_WANT_KEY_TYPE_ECC_PUBLIC_KEY"
+	default y
 endif # !ZEPHYR_VERSION_3_3
 
 config GETOPT_LONG
