@@ -2460,7 +2460,7 @@ enum class SensitivityEnum : uint8_t
 enum class Feature : uint32_t
 {
     kSmokeAlarm = 0x1,
-    kCOAlarm    = 0x2,
+    kCoAlarm    = 0x2,
 };
 } // namespace SmokeCoAlarm
 
