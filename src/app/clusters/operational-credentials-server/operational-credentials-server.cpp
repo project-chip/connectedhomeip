@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2022 Project CHIP Authors
+ *    Copyright (c) 2021-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@
 
 #include <access/AccessControl.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
@@ -34,6 +33,10 @@
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <clusters/OperationalCredentials/Attributes.h>
+#include <clusters/OperationalCredentials/Commands.h>
+#include <clusters/OperationalCredentials/Events.h>
+#include <clusters/OperationalCredentials/Structs.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/CertificationDeclaration.h>
 #include <credentials/DeviceAttestationConstructor.h>
@@ -333,11 +336,15 @@ void OnPlatformEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, in
 }
 
 // Get the attestation challenge for the current session in progress. Only valid when called
-// synchronously from inside a CommandHandler.
+// synchronously from inside a CommandHandler. If not called in CASE/PASE session context,
+// return an empty span. This will for sure make the procedures that rely on the challenge
+// fail, which is intended as it never should have reached here.
 // TODO: Create an alternative way to retrieve the Attestation Challenge without this huge amount of calls.
 ByteSpan GetAttestationChallengeFromCurrentSession(app::CommandHandler * commandObj)
 {
     VerifyOrDie((commandObj != nullptr) && (commandObj->GetExchangeContext() != nullptr));
+    Transport::Session::SessionType sessionType = commandObj->GetExchangeContext()->GetSessionHandle()->GetSessionType();
+    VerifyOrReturnValue(sessionType == Transport::Session::SessionType::kSecure, ByteSpan{});
 
     ByteSpan attestationChallenge =
         commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
