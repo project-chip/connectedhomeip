@@ -218,7 +218,7 @@ class TC_G_2_2(MatterBaseTest):
         kGroupId = 0x0000
         kGroupName = "Gp0"
         result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(kGroupId, kGroupName))
-        asserts.assert_equal(result.status, Status.ConstraintError, "GroupId is not in the inclusive range of 0x0001 to 0xffff")
+        asserts.assert_equal(result.status, Status.ConstraintError, "Returned status is different from expected ConstraintError")
 
         self.step("10")
         result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[4].groupId, group_names[2]))
