@@ -106,6 +106,9 @@ public:
 
     virtual void OnDone(chip::app::CommandSender * client) override;
 
+    void HandleWebRTCProviderResponse(const chip::app::ConcreteCommandPath & path, const chip::app::StatusIB & status,
+                                      chip::TLV::TLVReader * data);
+
 private:
     static constexpr uint16_t kMaxDeviceLabelLength = 64;
 
