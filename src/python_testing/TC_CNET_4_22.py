@@ -27,7 +27,7 @@
 #       --commissioning-method ble-thread
 #       --discriminator 1234
 #       --passcode 20202021
-#       --thread-dataset-hex <DATASET_HEX>
+#       --thread-dataset-hex 0e0800000000000100004a0300001135060004001fffe00708fd2ebe6d94d078c00c0402a0f7f8051000112233445566778899aabbccddeeff030e4f70656e54687265616444656d6f000300000f02081111111122222222010212340410445f2b5ca6f2a93a55ce570a70efeecb
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
