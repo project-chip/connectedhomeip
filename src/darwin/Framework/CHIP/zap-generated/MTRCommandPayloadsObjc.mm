@@ -22378,7 +22378,7 @@ NS_ASSUME_NONNULL_BEGIN
     {
         if (self.latch != nil) {
             auto & definedValue_0 = encodableStruct.latch.Emplace();
-            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.latch.unsignedCharValue);
+            definedValue_0 = self.latch.boolValue;
         }
     }
     {

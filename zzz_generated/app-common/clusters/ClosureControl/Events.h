@@ -40,7 +40,135 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ClosureControl {
-namespace Events {} // namespace Events
+namespace Events {
+namespace OperationalError {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
+
+enum class Fields : uint8_t
+{
+    kErrorState = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::OperationalError::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    DataModel::List<const ClosureErrorEnum> errorState;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::OperationalError::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
+
+    DataModel::DecodableList<ClosureErrorEnum> errorState;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace OperationalError
+namespace MovementCompleted {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::MovementCompleted::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::MovementCompleted::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace MovementCompleted
+namespace EngageStateChanged {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kEngageValue = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::EngageStateChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    bool engageValue = static_cast<bool>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::EngageStateChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
+
+    bool engageValue = static_cast<bool>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace EngageStateChanged
+namespace SecureStateChanged {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kSecureValue = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::SecureStateChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    bool secureValue = static_cast<bool>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::SecureStateChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
+
+    bool secureValue = static_cast<bool>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace SecureStateChanged
+} // namespace Events
 } // namespace ClosureControl
 } // namespace Clusters
 } // namespace app

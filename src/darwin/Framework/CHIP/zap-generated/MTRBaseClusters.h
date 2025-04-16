@@ -8891,7 +8891,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command Stop
  *
- * On receipt of this command, the device SHALL stop its operation if it is at a position where it is safe to do so and/or permitted.
+ * On receipt of this command, the closure SHALL stop its movement as fast as the closure is able too.
  */
 - (void)stopWithParams:(MTRClosureControlClusterStopParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)stopWithCompletion:(MTRStatusCompletion)completion
@@ -8899,7 +8899,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command MoveTo
  *
- * Upon receipt, this SHALL move the product in the most fitting state following the data as follows:
+ * This command is used to move the device to a specific position, latch and/or perform the movement at specific speed.
  */
 - (void)moveToWithParams:(MTRClosureControlClusterMoveToParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)moveToWithCompletion:(MTRStatusCompletion)completion
@@ -8907,7 +8907,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command Calibrate
  *
- * Upon receipt, this SHALL initiate a calibration.
+ * This command is used to trigger a calibration of the device.
  */
 - (void)calibrateWithParams:(MTRClosureControlClusterCalibrateParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)calibrateWithCompletion:(MTRStatusCompletion)completion
@@ -19809,16 +19809,11 @@ typedef NS_OPTIONS(uint16_t, MTRWindowCoveringSafetyStatus) {
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRClosureControlClosureError) {
-    MTRClosureControlClosureErrorBlocked MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRClosureControlClosureErrorTemperatureLimited MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRClosureControlClosureErrorMaintenanceRequired MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTRClosureControlClosureErrorInternalInterference MTR_PROVISIONALLY_AVAILABLE = 0x03,
-} MTR_PROVISIONALLY_AVAILABLE;
-
-typedef NS_ENUM(uint8_t, MTRClosureControlLatching) {
-    MTRClosureControlLatchingLatchedAndSecured MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRClosureControlLatchingLatchedButNotSecured MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRClosureControlLatchingNotLatched MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRClosureControlClosureErrorPhysicallyBlocked MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRClosureControlClosureErrorBlockedBySensor MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRClosureControlClosureErrorTemperatureLimited MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRClosureControlClosureErrorMaintenanceRequired MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRClosureControlClosureErrorInternalInterference MTR_PROVISIONALLY_AVAILABLE = 0x04,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRClosureControlMainState) {
@@ -19839,11 +19834,6 @@ typedef NS_ENUM(uint8_t, MTRClosureControlPositioning) {
     MTRClosureControlPositioningOpenedForPedestrian MTR_PROVISIONALLY_AVAILABLE = 0x03,
     MTRClosureControlPositioningOpenedForVentilation MTR_PROVISIONALLY_AVAILABLE = 0x04,
     MTRClosureControlPositioningOpenedAtSignature MTR_PROVISIONALLY_AVAILABLE = 0x05,
-} MTR_PROVISIONALLY_AVAILABLE;
-
-typedef NS_ENUM(uint8_t, MTRClosureControlTargetLatch) {
-    MTRClosureControlTargetLatchLatch MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRClosureControlTargetLatchUnlatch MTR_PROVISIONALLY_AVAILABLE = 0x01,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRClosureControlTargetPosition) {
