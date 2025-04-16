@@ -503,7 +503,19 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: linux
-                bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}                
+                bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
 
             - name: Run Build Coverage
               run: ./scripts/build_coverage.sh --yaml
+
+            - name: Convert output file
+              run: |
+                scripts/run_in_build_env.sh 'virtualenv pyenv'
+                source pyenv/bin/activate
+                python -m pip install lcov-cobertura
+                lcov_cobertura out/coverage/coverage/lcov_final.info
+
+            - name: Upload coverage reports to Codecov with GitHub Action
+              uses: codecov/codecov-action@v5
+              env:
+                CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
