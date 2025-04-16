@@ -253,7 +253,8 @@ class TC_G_2_2(MatterBaseTest):
         self.step("16")
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
             dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
-        asserts.assert_is_not(groupTableList[0], kGroupId1, "Unexpected error must not contains GroupID 0x0001")
+        for entry in groupTableList:
+            asserts.assert_not_equal(entry.groupId, kGroupId1, f"GroupID 0x{kGroupId1:04X} should not be present in GroupTable")
 
         self.step("17")
         result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.RemoveGroup(kGroupId))
@@ -266,7 +267,8 @@ class TC_G_2_2(MatterBaseTest):
         self.step("19")
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
             dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
-        asserts.assert_is_not(groupTableList[0], kGroupId1, "Unexpected error must not contains GroupID 0x0001")
+        for entry in groupTableList:
+            asserts.assert_not_equal(entry.groupId, kGroupId1, f"GroupID 0x{kGroupId1:04X} should not be present in GroupTable")
 
         self.step("20")
         await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.RemoveAllGroups())
