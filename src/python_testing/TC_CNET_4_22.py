@@ -89,7 +89,7 @@ class TC_CNET_4_22(MatterBaseTest):
             asserts.assert_equal(len(thread_interface.extendedAddress), expected_len_bytes_extended_address,
                                  f"The hwaddr value is {len(thread_interface.extendedAddress)} bytes long instead of {expected_len_bytes_extended_address}")
             asserts.assert_true(isinstance(thread_interface.extendedAddress, (bytes, bytearray)),
-                                 "ExtendedAddress is not a hwadr instance")
+                                "ExtendedAddress is not a hwadr instance")
 
             # RSSI is an of type int8 with a range of -120 to 0
             assert_int_in_range(thread_interface.rssi, -120, 0, "RSSI")
@@ -131,7 +131,7 @@ class TC_CNET_4_22(MatterBaseTest):
         # Verify that DUT sends ScanNetworksResponse command to the TH with the following fields:
         # NetworkingStatus field value will be any one of the following values: Success, NetworkNotFound, OutOfRange, RegulatoryError, UnknownError
         asserts.assert_true(scan_network_response.networkingStatus in status,
-                             "NetworkingStatus is not Success, NetworkNotFound, OutOfRange, RegulatoryError or UnknownError")
+                            "NetworkingStatus is not Success, NetworkNotFound, OutOfRange, RegulatoryError or UnknownError")
 
         # DebugText is of type string with max length 512 or absent
         if scan_network_response.debugText:
@@ -152,7 +152,7 @@ class TC_CNET_4_22(MatterBaseTest):
         # Verify that DUT sends ScanNetworksResponse command to the TH with the following fields:
         # NetworkingStatus field value will be any one of the following values: Success, NetworkNotFound, OutOfRange, RegulatoryError, UnknownError
         asserts.assert_true(scan_network_response.networkingStatus in status,
-                             "NetworkingStatus is not Success, NetworkNotFound, OutOfRange, RegulatoryError or UnknownError")
+                            "NetworkingStatus is not Success, NetworkNotFound, OutOfRange, RegulatoryError or UnknownError")
 
         # DebugText is of type string with max length 512 or absent
         if scan_network_response.debugText:
@@ -175,7 +175,7 @@ class TC_CNET_4_22(MatterBaseTest):
         # Verify that DUT sends ScanNetworksResponse command to the TH with the following fields:
         # NetworkingStatus field value will be any one of the following values: Success, NetworkNotFound, OutOfRange, RegulatoryError, UnknownError
         asserts.assert_true(scan_network_response.networkingStatus in status,
-                             "NetworkingStatus is not Success, NetworkNotFound, OutOfRange, RegulatoryError or UnknownError")
+                            "NetworkingStatus is not Success, NetworkNotFound, OutOfRange, RegulatoryError or UnknownError")
 
         # DebugText is of type string with max length 512 or absent
         if scan_network_response.debugText:
