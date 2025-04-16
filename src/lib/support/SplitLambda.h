@@ -25,7 +25,7 @@ struct SplittedLambda : detail::SplittedLambdaCallerImpl<decltype(&TLambda::oper
 {
     TLambda callable;
 
-    SplittedLambda(TLambda callable) : callable(callable) {}
+    SplittedLambda(TLambda callable_) : callable(callable_) {}
     SplittedLambda(SplittedLambda &)  = delete; // Cannot be copied
     SplittedLambda(SplittedLambda &&) = delete; // Cannot be moved
 
