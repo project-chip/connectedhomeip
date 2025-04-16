@@ -67,7 +67,7 @@ TEST(DiagnosticStorageTest, StoreRetrieve)
     strncpy(entry1.label, "Entry1", kMaxStringValueSize);
     strncpy(entry1.stringValue, "Value1", kMaxStringValueSize);
     entry1.type                     = ValueType::kCharString;
-    entry1.timestamps_ms_since_boot = 1000;
+    entry1.timestamps_ms_since_boot = 1000U;
 
     CHIP_ERROR err = circularBuffer.Store(entry1);
     EXPECT_EQ(err, CHIP_NO_ERROR);
@@ -91,22 +91,22 @@ TEST(DiagnosticStorageTest, StoreRetrieveMultipleEntries)
     strncpy(entries[0].label, "TestCharStringValue", kMaxStringValueSize);
     strncpy(entries[0].stringValue, "TestValue1", kMaxStringValueSize);
     entries[0].type                     = ValueType::kCharString;
-    entries[0].timestamps_ms_since_boot = 1000;
+    entries[0].timestamps_ms_since_boot = 1000U;
 
     strncpy(entries[1].label, "TestNegativeSignedIntegerValue", kMaxStringValueSize);
     entries[1].intValue                 = -123456;
     entries[1].type                     = ValueType::kSignedInteger;
-    entries[1].timestamps_ms_since_boot = 2000;
+    entries[1].timestamps_ms_since_boot = 2000U;
 
     strncpy(entries[2].label, "TestSignedIntegerValue", kMaxStringValueSize);
     entries[2].intValue                 = 123456;
     entries[2].type                     = ValueType::kSignedInteger;
-    entries[2].timestamps_ms_since_boot = 3000;
+    entries[2].timestamps_ms_since_boot = 3000U;
 
     strncpy(entries[3].label, "TestUnsignedIntegerValue", kMaxStringValueSize);
-    entries[3].uintValue                = 100;
+    entries[3].uintValue                = 100U;
     entries[3].type                     = ValueType::kUnsignedInteger;
-    entries[3].timestamps_ms_since_boot = 4000;
+    entries[3].timestamps_ms_since_boot = 4000U;
 
     strncpy(entries[4].label, "MaxLengthLabel", kMaxStringValueSize);
     char longString[kMaxStringValueSize + 1];
@@ -114,7 +114,7 @@ TEST(DiagnosticStorageTest, StoreRetrieveMultipleEntries)
     longString[kMaxStringValueSize - 1] = '\0';
     strncpy(entries[4].stringValue, longString, kMaxStringValueSize);
     entries[4].type                     = ValueType::kCharString;
-    entries[4].timestamps_ms_since_boot = 5000;
+    entries[4].timestamps_ms_since_boot = 5000U;
 
     ASSERT_TRUE(circularBuffer.DataLength() == 0);
 
@@ -178,23 +178,26 @@ TEST(DiagnosticStorageTest, RetrieveBufferUnderrun)
     uint8_t buffer[256];
     CircularDiagnosticBuffer circularBuffer(buffer, sizeof(buffer));
 
-    DiagnosticEntry entries[10];
-    for (int i = 0; i < 10; ++i)
+    const uint32_t entryCount = 10U;
+    DiagnosticEntry entries[entryCount];
+
+    for (uint32_t i = 0U; i < entryCount; ++i)
     {
-        snprintf(entries[i].label, kMaxStringValueSize, "Entry%d", i);
-        snprintf(entries[i].stringValue, kMaxStringValueSize, "Value%d", i);
+        snprintf(entries[i].label, kMaxStringValueSize, "Entry%" PRIu32, i);
+        snprintf(entries[i].stringValue, kMaxStringValueSize, "Value%" PRIu32, i);
         entries[i].type                     = ValueType::kCharString;
-        entries[i].timestamps_ms_since_boot = 1000 + i;
+        entries[i].timestamps_ms_since_boot = 1000U + i;
 
         CHIP_ERROR err = circularBuffer.Store(entries[i]);
         EXPECT_EQ(err, CHIP_NO_ERROR);
     }
 
-    for (int chunk = 0; chunk < 2; ++chunk)
+    const uint32_t chunkCount = 2U;
+    for (uint32_t chunk = 0U; chunk < chunkCount; ++chunk)
     {
         uint8_t retrieveBuffer[128];
         MutableByteSpan span(retrieveBuffer, sizeof(retrieveBuffer));
-        uint32_t readEntries = 0;
+        uint32_t readEntries = 0U;
 
         CHIP_ERROR err = circularBuffer.Retrieve(span, readEntries);
         EXPECT_EQ(err, CHIP_NO_ERROR);
@@ -203,7 +206,7 @@ TEST(DiagnosticStorageTest, RetrieveBufferUnderrun)
         TLVReader reader;
         reader.Init(retrieveBuffer, span.size());
 
-        for (uint32_t i = 0; i < readEntries; ++i)
+        for (uint32_t i = 0U; i < readEntries; ++i)
         {
             EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
 
@@ -211,11 +214,16 @@ TEST(DiagnosticStorageTest, RetrieveBufferUnderrun)
             err = Decode(reader, decoded);
             EXPECT_EQ(err, CHIP_NO_ERROR);
 
-            EXPECT_STREQ(decoded.label, entries[i + chunk * 5].label);
-            EXPECT_STREQ(decoded.stringValue, entries[i + chunk * 5].stringValue);
-            EXPECT_EQ(decoded.type, entries[i + chunk * 5].type);
-            EXPECT_EQ(decoded.timestamps_ms_since_boot, entries[i + chunk * 5].timestamps_ms_since_boot);
+            const uint32_t index = i + (chunk * 5U);
+
+            ASSERT_LT(index, entryCount);
+
+            EXPECT_STREQ(decoded.label, entries[index].label);
+            EXPECT_STREQ(decoded.stringValue, entries[index].stringValue);
+            EXPECT_EQ(decoded.type, entries[index].type);
+            EXPECT_EQ(decoded.timestamps_ms_since_boot, entries[index].timestamps_ms_since_boot);
         }
+
         err = circularBuffer.ClearBuffer(readEntries);
         EXPECT_EQ(err, CHIP_NO_ERROR);
     }
