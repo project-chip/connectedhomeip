@@ -147,7 +147,7 @@ class TC_DefaultChecker(MatterBaseTest, DefaultChecker):
         super().setup_test()
         self.success = True
 
-    def steps_TC_SOMETHING_1_1(self):
+    def steps_TC_IDM_13_1(self):
         steps = [TestStep(1, "TH performs a wildcard read of all attributes"),
                  TestStep(2, f"If the {FLAG_PRODUCT_NAME} flag is not set, check for \"Test\" in the product name",
                           "\"Test\" does not appear in the product name"),
@@ -168,10 +168,10 @@ class TC_DefaultChecker(MatterBaseTest, DefaultChecker):
                  ]
         return steps
 
-    def desc_TC_SOMETHING_1_1(self):
-        return "[TC-SOMETHING-1.1] Check for accidental defaults - [DUT as Server]"
+    def desc_TC_IDM_13_1(self):
+        return "[TC-IDM-13.1] Accidental defaults check - [DUT as Server]"
 
-    def test_TC_SOMETHING_1_1(self):
+    def test_TC_IDM_13_1(self):
         print(self.user_params)
         self.step(1)
         self.step(2)
