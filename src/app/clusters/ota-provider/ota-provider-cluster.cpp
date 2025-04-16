@@ -51,7 +51,7 @@ DataModel::ActionReturnStatus OtaProviderServer::ReadAttribute(const DataModel::
 }
 
 CHIP_ERROR OtaProviderServer::AcceptedCommands(const ConcreteClusterPath & path,
-                                               DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
+                                               ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     static constexpr DataModel::AcceptedCommandEntry kEntries[] = {
         QueryImage::kMetatadaEntry,
@@ -60,7 +60,7 @@ CHIP_ERROR OtaProviderServer::AcceptedCommands(const ConcreteClusterPath & path,
     };
     return builder.ReferenceExisting({ kEntries, MATTER_ARRAY_SIZE(kEntries) });
 }
-CHIP_ERROR OtaProviderServer::GeneratedCommands(const ConcreteClusterPath & path, DataModel::ListBuilder<CommandId> & builder)
+CHIP_ERROR OtaProviderServer::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
 {
     static constexpr CommandId kEntries[] = {
         OtaSoftwareUpdateProvider::Commands::QueryImageResponse::Id,
