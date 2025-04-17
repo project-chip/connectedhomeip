@@ -32,6 +32,7 @@
 # === END CI TEST ARGUMENTS ===
 
 
+import logging
 import random
 
 import chip.clusters as Clusters
@@ -39,9 +40,7 @@ from chip import ChipDeviceCtrl
 from chip.clusters.Types import Nullable
 from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-import logging
 from mobly import asserts
-
 
 # These below variables are used to test the AccessControl cluster Extension attribute and come from the test plan here: .
 D_OK_EMPTY = bytes.fromhex('1718')
