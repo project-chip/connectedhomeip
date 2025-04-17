@@ -27,8 +27,12 @@
 #include <functional>
 #include <platform/CHIPDeviceError.h>
 
+#ifndef SL_TOKEN_MANAGER_CONFIG_H
 #include "nvm3.h"
 #include "nvm3_hal_flash.h"
+#else
+#include <sl_token_manager_defines.h>
+#endif
 
 #ifndef KVS_MAX_ENTRIES
 #define KVS_MAX_ENTRIES 255 // Available key slot count for Kvs Key mapping.
@@ -57,6 +61,7 @@ namespace Internal {
  * the template class (e.g. the ReadConfigValue() method).
  */
 
+#ifndef SL_TOKEN_MANAGER_CONFIG_H
 // Silabs NVM3 objects use a 20-bit number,
 // NVM3 Key 19:16 Stack region
 // NVM3 Key 15:0 Available NVM3 keys 0x0000 -> 0xFFFF.
@@ -67,13 +72,30 @@ namespace Internal {
 // '01' = the id offset inside the group.
 inline constexpr uint32_t kUserNvm3KeyDomainLoLimit = 0x000000U; // User Domain NVM3 Key Range lower limit
 inline constexpr uint32_t kUserNvm3KeyDomainHiLimit = 0x00FFFFU; // User Domain NVM3 Key Range Maximum limit
-inline constexpr uint32_t kMatterNvm3KeyDomain      = 0x080000U;
-inline constexpr uint32_t kMatterNvm3KeyLoLimit     = 0x087200U; // Do not modify without Silabs GSDK team approval
-inline constexpr uint32_t kMatterNvm3KeyHiLimit     = 0x087FFFU; // Do not modify without Silabs GSDK team approval
+inline constexpr uint32_t kMatterNvm3KeyDomain      = 0x087000U; // Matter specific NVM3 range
 constexpr inline uint32_t SilabsConfigKey(uint8_t keyBaseOffset, uint8_t id)
 {
     return kMatterNvm3KeyDomain | static_cast<uint32_t>(keyBaseOffset) << 8 | id;
 }
+#else
+
+inline constexpr uint32_t kUserNvm3KeyDomainLoLimit = SL_TOKEN_NVM3_REGION_USER;
+inline constexpr uint32_t kUserNvm3KeyDomainHiLimit = SL_TOKEN_NVM3_REGION_ZIGBEE - 1;
+inline constexpr uint32_t kMatterNvm3KeyDomain      = SL_TOKEN_NVM3_REGION_COMMON | 0x007000U; // Matter specific NVM3 range
+
+constexpr inline uint32_t SilabsConfigKey(uint8_t keyBaseOffset, uint8_t id)
+{
+    return SL_TOKEN_TYPE_NVM3 | kMatterNvm3KeyDomain | static_cast<uint32_t>(keyBaseOffset) << 8 | id;
+}
+
+constexpr inline uint32_t SilabsSecureTokenKey(uint8_t keyBaseOffset, uint8_t id)
+{
+    return SL_TOKEN_TYPE_STATIC_SECURE | static_cast<uint32_t>(keyBaseOffset) << 8 | id;
+}
+#endif
+
+inline constexpr uint32_t kMatterNvm3KeyLoLimit = 0x087200U; // Do not modify without Silabs GSDK team approval
+inline constexpr uint32_t kMatterNvm3KeyHiLimit = 0x087FFFU; // Do not modify without Silabs GSDK team approval
 
 class SilabsConfig
 {
@@ -85,14 +107,14 @@ public:
     // NVM3 key base offsets used by the CHIP Device Layer.
     // ** Key base can range from 0x72 to 0x7F **
     // Persistent config values set at manufacturing time. Retained during factory reset.
-    static constexpr uint8_t kMatterFactory_KeyBase = 0x72;
+    static constexpr uint8_t kMatterFactory_KeyBase = 0x2;
     // Persistent config values set at runtime. Cleared during factory reset.
-    static constexpr uint8_t kMatterConfig_KeyBase = 0x73;
+    static constexpr uint8_t kMatterConfig_KeyBase = 0x3;
     // Persistent counter values set at runtime. Retained during factory reset.
-    static constexpr uint8_t kMatterCounter_KeyBase = 0x74;
+    static constexpr uint8_t kMatterCounter_KeyBase = 0x4;
     // Persistent config values set at runtime. Cleared during factory reset.
-    static constexpr uint8_t kMatterKvs_KeyBase       = 0x75;
-    static constexpr uint8_t kMatterKvs_ExtendedRange = 0x76;
+    static constexpr uint8_t kMatterKvs_KeyBase       = 0x5;
+    static constexpr uint8_t kMatterKvs_ExtendedRange = 0x6;
 
     // Key definitions for well-known configuration values.
     // Factory config keys
@@ -202,15 +224,13 @@ public:
     static CHIP_ERROR ReadConfigValue(Key key, uint32_t & val);
     static CHIP_ERROR ReadConfigValue(Key key, uint64_t & val);
     static CHIP_ERROR ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen);
-    static CHIP_ERROR ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen);
-    static CHIP_ERROR ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen, size_t offset);
+    static CHIP_ERROR ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen, size_t offset = 0);
     static CHIP_ERROR ReadConfigValueCounter(uint8_t counterIdx, uint32_t & val);
     static CHIP_ERROR WriteConfigValue(Key key, bool val);
     static CHIP_ERROR WriteConfigValue(Key key, uint16_t val);
     static CHIP_ERROR WriteConfigValue(Key key, uint32_t val);
     static CHIP_ERROR WriteConfigValue(Key key, uint64_t val);
-    static CHIP_ERROR WriteConfigValueStr(Key key, const char * str);
-    static CHIP_ERROR WriteConfigValueStr(Key key, const char * str, size_t strLen);
+    static CHIP_ERROR WriteConfigValueStr(Key key, const char * str, size_t strLen = 0);
     static CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen);
     static CHIP_ERROR WriteConfigValueCounter(uint8_t counterIdx, uint32_t val);
     static CHIP_ERROR ClearConfigValue(Key key);
@@ -225,9 +245,6 @@ public:
 protected:
     using ForEachRecordFunct = std::function<CHIP_ERROR(const Key & nvm3Key, const size_t & length)>;
     static CHIP_ERROR ForEachRecord(Key firstKey, Key lastKey, bool addNewRecord, ForEachRecordFunct funct);
-
-private:
-    static CHIP_ERROR MapNvm3Error(Ecode_t nvm3Res);
 };
 
 } // namespace Internal
