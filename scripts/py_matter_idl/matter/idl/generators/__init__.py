@@ -22,72 +22,7 @@ import jinja2
 from matter.idl.matter_idl_types import Idl
 
 from .filters import RegisterCommonFilters
-
-
-class GeneratorStorage:
-    """
-    Handles file operations for generator output. Specifically can create
-    required files for output.
-
-    Is overriden for unit tests.
-    """
-
-    def __init__(self):
-        self._generated_paths = set()
-
-    @property
-    def generated_paths(self):
-        return self._generated_paths
-
-    def report_output_file(self, relative_path: str):
-        self._generated_paths.add(relative_path)
-
-    def get_existing_data(self, relative_path: str):
-        """Gets the existing data at the given path.
-        If such data does not exist, will return None.
-        """
-        raise NotImplementedError()
-
-    def write_new_data(self, relative_path: str, content: str):
-        """Write new data to the given path."""
-        raise NotImplementedError()
-
-
-class FileSystemGeneratorStorage(GeneratorStorage):
-    """
-    A storage generator which will physically write files to disk into
-    a given output folder.
-    """
-
-    def __init__(self, output_dir: str):
-        super().__init__()
-        self.output_dir = output_dir
-
-    def get_existing_data(self, relative_path: str):
-        """Gets the existing data at the given path.
-        If such data does not exist, will return None.
-        """
-        target = os.path.join(self.output_dir, relative_path)
-
-        if not os.path.exists(target):
-            return None
-
-        logging.info("Checking existing data in %s" % target)
-        with open(target, 'rt') as existing:
-            return existing.read()
-
-    def write_new_data(self, relative_path: str, content: str):
-        """Write new data to the given path."""
-
-        target = os.path.join(self.output_dir, relative_path)
-        target_dir = os.path.dirname(target)
-        if not os.path.exists(target_dir):
-            logging.info("Creating output directory: %s" % target_dir)
-            os.makedirs(target_dir)
-
-        logging.info("Writing new data to: %s" % target)
-        with open(target, "wt") as out:
-            out.write(content)
+from .storage import GeneratorStorage
 
 
 class CodeGenerator:

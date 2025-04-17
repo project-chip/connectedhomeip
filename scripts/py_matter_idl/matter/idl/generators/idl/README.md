@@ -25,8 +25,8 @@ generation works. Actual usage of this generator would be inside XML tools.
 A XML parser will use this code generator to output a human readable view of the
 parsed data:
 
-```
-./scripts/py_matter_idl/matter/idl/zapxml_parser.py \
+```shell
+matter-zapxml-parser \
     ./src/app/zap-templates/zcl/data-model/chip/onoff-cluster.xml \
-    ./src/app/zap-templates/zcl/data-model/chip/global-attributes.xm
+    ./src/app/zap-templates/zcl/data-model/chip/global-attributes.xml
 ```
