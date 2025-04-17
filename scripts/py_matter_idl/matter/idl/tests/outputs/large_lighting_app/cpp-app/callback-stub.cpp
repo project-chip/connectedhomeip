@@ -6,7 +6,17 @@ void __attribute__((weak)) emberAfAccessControlClusterInitCallback(EndpointId en
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfAccessControlClusterShutdownCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfAdministratorCommissioningClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfAdministratorCommissioningClusterShutdownCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -16,7 +26,17 @@ void __attribute__((weak)) emberAfBasicInformationClusterInitCallback(EndpointId
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfBasicInformationClusterShutdownCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfColorControlClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfColorControlClusterShutdownCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -26,7 +46,17 @@ void __attribute__((weak)) emberAfDescriptorClusterInitCallback(EndpointId endpo
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfDescriptorClusterShutdownCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfDiagnosticLogsClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfDiagnosticLogsClusterShutdownCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -36,7 +66,17 @@ void __attribute__((weak)) emberAfEthernetNetworkDiagnosticsClusterInitCallback(
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfEthernetNetworkDiagnosticsClusterShutdownCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfFixedLabelClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfFixedLabelClusterShutdownCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -46,7 +86,17 @@ void __attribute__((weak)) emberAfGeneralCommissioningClusterInitCallback(Endpoi
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfGeneralCommissioningClusterShutdownCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfGeneralDiagnosticsClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfGeneralDiagnosticsClusterShutdownCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -56,7 +106,17 @@ void __attribute__((weak)) emberAfGroupKeyManagementClusterInitCallback(Endpoint
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfGroupKeyManagementClusterShutdownCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfGroupsClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfGroupsClusterShutdownCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -66,7 +126,17 @@ void __attribute__((weak)) emberAfIdentifyClusterInitCallback(EndpointId endpoin
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfIdentifyClusterShutdownCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfLevelControlClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfLevelControlClusterShutdownCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -76,12 +146,17 @@ void __attribute__((weak)) emberAfLocalizationConfigurationClusterInitCallback(E
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfLocalizationConfigurationClusterShutdownCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfNetworkCommissioningClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
 }
-void __attribute__((weak)) emberAfOccupancySensingClusterInitCallback(EndpointId endpoint)
+void __attribute__((weak)) emberAfNetworkCommissioningClusterShutdownCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -91,7 +166,17 @@ void __attribute__((weak)) emberAfOnOffClusterInitCallback(EndpointId endpoint)
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfOnOffClusterShutdownCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfOperationalCredentialsClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfOperationalCredentialsClusterShutdownCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -101,12 +186,17 @@ void __attribute__((weak)) emberAfOtaSoftwareUpdateRequestorClusterInitCallback(
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfOtaSoftwareUpdateRequestorClusterShutdownCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfSoftwareDiagnosticsClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
 }
-void __attribute__((weak)) emberAfSwitchClusterInitCallback(EndpointId endpoint)
+void __attribute__((weak)) emberAfSoftwareDiagnosticsClusterShutdownCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -116,7 +206,7 @@ void __attribute__((weak)) emberAfThreadNetworkDiagnosticsClusterInitCallback(En
     // To prevent warning
     (void) endpoint;
 }
-void __attribute__((weak)) emberAfTimeFormatLocalizationClusterInitCallback(EndpointId endpoint)
+void __attribute__((weak)) emberAfThreadNetworkDiagnosticsClusterShutdownCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -126,7 +216,17 @@ void __attribute__((weak)) emberAfUserLabelClusterInitCallback(EndpointId endpoi
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfUserLabelClusterShutdownCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfWiFiNetworkDiagnosticsClusterShutdownCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

@@ -117,10 +117,6 @@ async def commission_device(
     Returns:
         True if the commissioning process completes successfully. False otherwise,
         except in case of an error which logs the exception details.
-
-    Note:
-        The "on-network-ip" method is deprecated as it's not supported in long-term
-        environments.
     """
 
     if commissioning_info.tc_version_to_simulate is not None and commissioning_info.tc_user_response_to_simulate is not None:
@@ -160,18 +156,6 @@ async def commission_device(
                 node_id,
                 commissioning_info.thread_operational_dataset,
                 isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR),
-            )
-            return True
-        except ChipStackError as e:
-            logging.error("Commissioning failed: %s" % e)
-            return False
-    elif commissioning_info.commissioning_method == "on-network-ip":
-        try:
-            logging.warning("==== USING A DIRECT IP COMMISSIONING METHOD NOT SUPPORTED IN THE LONG TERM ====")
-            await dev_ctrl.CommissionIP(
-                ipaddr=commissioning_info.commissionee_ip_address_just_for_testing,
-                setupPinCode=info.passcode,
-                nodeid=node_id,
             )
             return True
         except ChipStackError as e:
