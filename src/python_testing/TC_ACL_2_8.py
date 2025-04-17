@@ -116,7 +116,7 @@ class TC_ACL_2_8(MatterBaseTest):
         oc_cluster = Clusters.OperationalCredentials
         cfi_attribute = oc_cluster.Attributes.CurrentFabricIndex
         f1 = await self.read_single_attribute_check_success(endpoint=0, cluster=oc_cluster, attribute=cfi_attribute)
-        self.print_step("CurrentFabricIndex F1", str(f1))
+        logging.info(f"CurrentFabricIndex F1 {str(f1)}")
 
         self.step(3)
         # Commission TH2
@@ -135,7 +135,7 @@ class TC_ACL_2_8(MatterBaseTest):
         self.step(4)
         # Read CurrentFabricIndex for TH2
         f2 = await self.read_single_attribute_check_success(dev_ctrl=self.th2, endpoint=0, cluster=oc_cluster, attribute=cfi_attribute)
-        self.print_step("CurrentFabricIndex F2", str(f2))
+        logging.info(f"CurrentFabricIndex F2 {str(f2)}")
 
         self.step(5)
         # TH1 writes ACL attribute
