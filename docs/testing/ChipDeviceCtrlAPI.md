@@ -1,7 +1,7 @@
 # Table of Contents
 
 -   [Table of Contents](#table-of-contents)
--   [matter.ChipDeviceCtrl](#chipchipdevicectrl)
+-   [matter.ChipDeviceCtrl](#matterchipdevicectrl)
     -   [CommissionableNode](#commissionablenode)
         -   [Commission](#commission)
     -   [DeviceProxyWrapper](#deviceproxywrapper)
