@@ -179,7 +179,15 @@ class TC_G_2_2(MatterBaseTest):
         asserts.assert_true(found, f"GroupId {kGroupId2} not found in GroupTable")
 
         self.step("4b")
-        asserts.assert_equal(groupTableList[1].groupName, kGroupName2, "Found groupName does not match written value")
+        if group_name_supported:
+            group_found = False
+            for group in groupTableList:
+                if group.groupName == kGroupName2:
+                    group_found = True
+                    break
+            asserts.assert_true(group_found, f"Group with name '{kGroupName2}' not found in the GroupTable")
+        else:
+            logger.info("Skipping GroupName check: Feature GroupNames not supported by DUT")
 
         self.step("5")
         group_names = [f"Gp{i}" for i in range(3, 13)]  # ["Gp3", "Gp4", ..., "Gp12"]
