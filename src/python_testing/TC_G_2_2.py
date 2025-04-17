@@ -144,7 +144,7 @@ class TC_G_2_2(MatterBaseTest):
         ]
         asserts.assert_true(len(matched_entries) > 0, f"No GroupTable entry found with groupId={expected_group_id}")
 
-        # Verify if support groupName feature
+        # Verify if is supported groupName feature
         feature_map: int = await self.read_single_attribute(
             dev_ctrl=th1,
             node_id=self.dut_node_id,
@@ -202,6 +202,12 @@ class TC_G_2_2(MatterBaseTest):
         self.step("6")
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
             dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
+            #Get the group IDs that were added in step 5
+        added_group_ids = [groupKeyMapStruct[i].groupId for i in range(2, 12)]
+        # Verify that each group ID is present in the GroupTable list
+        for group_id in added_group_ids:
+            found = any(entry.groupId == group_id for entry in groupTableList)
+            asserts.assert_true(found, f"GroupTable does not contain expected groupId 0x{group_id:04X}")
 
         self.step("7a")
         # TH binds GroupID (maxgroups+1) == 13 || 0x000d with GroupKeySetID 1
