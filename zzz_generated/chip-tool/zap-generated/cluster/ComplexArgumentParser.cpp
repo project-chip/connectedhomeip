@@ -462,99 +462,6 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::detail::Structs::Appli
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::detail::Structs::AccessControlTargetStruct::Type & request,
-                                        Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Copy to track which members we already processed.
-    Json::Value valueCopy(value);
-
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("AccessControlTargetStruct.cluster", "cluster", value.isMember("cluster")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("AccessControlTargetStruct.endpoint", "endpoint", value.isMember("endpoint")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("AccessControlTargetStruct.deviceType", "deviceType",
-                                                                  value.isMember("deviceType")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "cluster");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.cluster, value["cluster"]));
-    valueCopy.removeMember("cluster");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "endpoint");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.endpoint, value["endpoint"]));
-    valueCopy.removeMember("endpoint");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "deviceType");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.deviceType, value["deviceType"]));
-    valueCopy.removeMember("deviceType");
-
-    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
-}
-
-void ComplexArgumentParser::Finalize(chip::app::Clusters::detail::Structs::AccessControlTargetStruct::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.cluster);
-    ComplexArgumentParser::Finalize(request.endpoint);
-    ComplexArgumentParser::Finalize(request.deviceType);
-}
-
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::detail::Structs::AccessControlEntryStruct::Type & request,
-                                        Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Copy to track which members we already processed.
-    Json::Value valueCopy(value);
-
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("AccessControlEntryStruct.privilege", "privilege", value.isMember("privilege")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("AccessControlEntryStruct.authMode", "authMode", value.isMember("authMode")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("AccessControlEntryStruct.subjects", "subjects", value.isMember("subjects")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("AccessControlEntryStruct.targets", "targets", value.isMember("targets")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "privilege");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.privilege, value["privilege"]));
-    valueCopy.removeMember("privilege");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "authMode");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.authMode, value["authMode"]));
-    valueCopy.removeMember("authMode");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "subjects");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.subjects, value["subjects"]));
-    valueCopy.removeMember("subjects");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "targets");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.targets, value["targets"]));
-    valueCopy.removeMember("targets");
-
-    if (value.isMember("fabricIndex"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
-    }
-    valueCopy.removeMember("fabricIndex");
-
-    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
-}
-
-void ComplexArgumentParser::Finalize(chip::app::Clusters::detail::Structs::AccessControlEntryStruct::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.privilege);
-    ComplexArgumentParser::Finalize(request.authMode);
-    ComplexArgumentParser::Finalize(request.subjects);
-    ComplexArgumentParser::Finalize(request.targets);
-    ComplexArgumentParser::Finalize(request.fabricIndex);
-}
-
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::Globals::Structs::AtomicAttributeStatusStruct::Type & request,
                                         Json::Value & value)
 {
@@ -1068,6 +975,99 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::AccessControl::Structs
     ComplexArgumentParser::Finalize(request.endpoint);
     ComplexArgumentParser::Finalize(request.cluster);
     ComplexArgumentParser::Finalize(request.restrictions);
+    ComplexArgumentParser::Finalize(request.fabricIndex);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::AccessControl::Structs::AccessControlTargetStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("AccessControlTargetStruct.cluster", "cluster", value.isMember("cluster")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("AccessControlTargetStruct.endpoint", "endpoint", value.isMember("endpoint")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("AccessControlTargetStruct.deviceType", "deviceType",
+                                                                  value.isMember("deviceType")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "cluster");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.cluster, value["cluster"]));
+    valueCopy.removeMember("cluster");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "endpoint");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.endpoint, value["endpoint"]));
+    valueCopy.removeMember("endpoint");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "deviceType");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.deviceType, value["deviceType"]));
+    valueCopy.removeMember("deviceType");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::AccessControl::Structs::AccessControlTargetStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.cluster);
+    ComplexArgumentParser::Finalize(request.endpoint);
+    ComplexArgumentParser::Finalize(request.deviceType);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::AccessControl::Structs::AccessControlEntryStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("AccessControlEntryStruct.privilege", "privilege", value.isMember("privilege")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("AccessControlEntryStruct.authMode", "authMode", value.isMember("authMode")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("AccessControlEntryStruct.subjects", "subjects", value.isMember("subjects")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("AccessControlEntryStruct.targets", "targets", value.isMember("targets")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "privilege");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.privilege, value["privilege"]));
+    valueCopy.removeMember("privilege");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "authMode");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.authMode, value["authMode"]));
+    valueCopy.removeMember("authMode");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "subjects");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.subjects, value["subjects"]));
+    valueCopy.removeMember("subjects");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "targets");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.targets, value["targets"]));
+    valueCopy.removeMember("targets");
+
+    if (value.isMember("fabricIndex"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
+    }
+    valueCopy.removeMember("fabricIndex");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::AccessControl::Structs::AccessControlEntryStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.privilege);
+    ComplexArgumentParser::Finalize(request.authMode);
+    ComplexArgumentParser::Finalize(request.subjects);
+    ComplexArgumentParser::Finalize(request.targets);
     ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 

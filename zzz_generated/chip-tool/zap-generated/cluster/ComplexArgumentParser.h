@@ -77,16 +77,6 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs
 
 static void Finalize(chip::app::Clusters::detail::Structs::ApplicationStruct::Type & request);
 
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::AccessControlTargetStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::detail::Structs::AccessControlTargetStruct::Type & request);
-
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::AccessControlEntryStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::detail::Structs::AccessControlEntryStruct::Type & request);
-
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Structs::AtomicAttributeStatusStruct::Type & request,
                         Json::Value & value);
 
@@ -147,6 +137,16 @@ static CHIP_ERROR Setup(const char * label,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::AccessControl::Structs::AccessRestrictionEntryStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::AccessControl::Structs::AccessControlTargetStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::AccessControl::Structs::AccessControlTargetStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::AccessControl::Structs::AccessControlEntryStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::AccessControl::Structs::AccessControlEntryStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::AccessControl::Structs::AccessControlExtensionStruct::Type & request,

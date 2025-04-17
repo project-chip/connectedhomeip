@@ -398,96 +398,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::detail::Structs::AccessControlTargetStruct::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("Cluster", indent + 1, value.cluster);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Cluster'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Endpoint", indent + 1, value.endpoint);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Endpoint'");
-            return err;
-        }
-    }
-    {
-        if (value.deviceType.IsNull())
-        {
-            CHIP_ERROR err = LogValue("DeviceType", indent + 1, value.deviceType);
-            if (err != CHIP_NO_ERROR)
-            {
-                DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DeviceType'");
-                return err;
-            }
-        }
-        else
-        {
-            std::string item = std::to_string(value.deviceType.Value()) + " (" + DeviceTypeIdToText(value.deviceType.Value()) + ")";
-            DataModelLogger::LogString("DeviceType", indent + 1, item);
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::detail::Structs::AccessControlEntryStruct::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("Privilege", indent + 1, value.privilege);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Privilege'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("AuthMode", indent + 1, value.authMode);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AuthMode'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Subjects", indent + 1, value.subjects);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Subjects'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Targets", indent + 1, value.targets);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Targets'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricIndex'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::Globals::Structs::AtomicAttributeStatusStruct::DecodableType & value)
@@ -928,6 +838,98 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Restrictions'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricIndex'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::AccessControl::Structs::AccessControlTargetStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("Cluster", indent + 1, value.cluster);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Cluster'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Endpoint", indent + 1, value.endpoint);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Endpoint'");
+            return err;
+        }
+    }
+    {
+        if (value.deviceType.IsNull())
+        {
+            CHIP_ERROR err = LogValue("DeviceType", indent + 1, value.deviceType);
+            if (err != CHIP_NO_ERROR)
+            {
+                DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DeviceType'");
+                return err;
+            }
+        }
+        else
+        {
+            std::string item = std::to_string(value.deviceType.Value()) + " (" + DeviceTypeIdToText(value.deviceType.Value()) + ")";
+            DataModelLogger::LogString("DeviceType", indent + 1, item);
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::AccessControl::Structs::AccessControlEntryStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("Privilege", indent + 1, value.privilege);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Privilege'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("AuthMode", indent + 1, value.authMode);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AuthMode'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Subjects", indent + 1, value.subjects);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Subjects'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Targets", indent + 1, value.targets);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Targets'");
             return err;
         }
     }
