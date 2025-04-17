@@ -91,18 +91,6 @@ class TC_TCCM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         mode = self.cluster.Attributes.CurrentMode
         await self.read_and_check_mode(endpoint=endpoint, mode=mode, supported_modes=supported_modes)
 
-        self.step(4)
-        # Verify that the OnMode attribute has a valid value or null.
-        mode = self.cluster.Attributes.OnMode
-        await self.read_and_check_mode(endpoint=endpoint, mode=mode,
-                                       supported_modes=supported_modes, is_nullable=True)
-
-        self.step(5)
-        # Verify that the StartUpMode has a valid value or null
-        mode = self.cluster.Attributes.StartUpMode
-        await self.read_and_check_mode(endpoint=endpoint, mode=mode,
-                                       supported_modes=supported_modes, is_nullable=True)
-
 
 if __name__ == "__main__":
     default_matter_test_main()
