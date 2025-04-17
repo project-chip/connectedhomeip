@@ -33,6 +33,8 @@
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Chime;
 using namespace chip::app::Clusters::CameraAvStreamManagement;
+using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
+
 using namespace Camera;
 
 CameraDevice::CameraDevice()
@@ -50,8 +52,9 @@ CameraDevice::CameraDevice()
     // Initialize WebRTC connnection
     mWebRTCProviderManager.Init();
 
-    // Set the CameraHALInterface in CameraAVStreamManager.
+    // Set the CameraHALInterface in CameraAVStreamManager and CameraAVsettingsUserLevelManager.
     mCameraAVStreamManager.SetCameraDeviceHAL(this);
+    mCameraAVSettingsUserLevelManager.SetCameraDeviceHAL(this);
 }
 
 CameraDevice::~CameraDevice()
@@ -273,14 +276,15 @@ CameraError CameraDevice::SetV4l2Control(uint32_t controlId, int value)
     return CameraError::SUCCESS;
 }
 
-CameraError CameraDevice::CaptureSnapshot(const uint16_t streamID, const VideoResolutionStruct & resolution,
-                                          ImageSnapshot & outImageSnapshot)
+CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<uint16_t> streamID,
+                                          const VideoResolutionStruct & resolution, ImageSnapshot & outImageSnapshot)
 {
-    auto it = std::find_if(snapshotStreams.begin(), snapshotStreams.end(),
-                           [streamID](const SnapshotStream & s) { return s.snapshotStreamParams.snapshotStreamID == streamID; });
+    uint16_t streamId = streamID.IsNull() ? 1 : streamID.Value();
+    auto it           = std::find_if(snapshotStreams.begin(), snapshotStreams.end(),
+                                     [streamId](const SnapshotStream & s) { return s.snapshotStreamParams.snapshotStreamID == streamId; });
     if (it == snapshotStreams.end())
     {
-        ChipLogError(Camera, "Snapshot streamID : %u not found", streamID);
+        ChipLogError(Camera, "Snapshot streamID : %u not found", streamId);
         return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
     }
 
@@ -647,6 +651,31 @@ CameraError CameraDevice::SetMicrophoneVolume(uint8_t microphoneVol)
     return CameraError::SUCCESS;
 }
 
+int16_t CameraDevice::GetPanMin()
+{
+    return -90;
+}
+
+int16_t CameraDevice::GetPanMax()
+{
+    return 90;
+}
+
+int16_t CameraDevice::GetTiltMin()
+{
+    return -90;
+}
+
+int16_t CameraDevice::GetTiltMax()
+{
+    return 90;
+}
+
+uint8_t CameraDevice::GetZoomMax()
+{
+    return 75;
+}
+
 void CameraDevice::InitializeVideoStreams()
 {
     // Create single video stream with typical supported parameters
@@ -688,7 +717,6 @@ void CameraDevice::InitializeSnapshotStreams()
     SnapshotStream snapshotStream = { { 1 /* Id */,
                                         ImageCodecEnum::kJpeg,
                                         30 /* FrameRate */,
-                                        512000 /* BitRate*/,
                                         { 320, 240 } /* MinResolution*/,
                                         { 320, 240 } /* MaxResolution */,
                                         90 /* Quality */,
@@ -712,6 +740,11 @@ WebRTCTransportProvider::Delegate & CameraDevice::GetWebRTCProviderDelegate()
 CameraAVStreamMgmtDelegate & CameraDevice::GetCameraAVStreamMgmtDelegate()
 {
     return mCameraAVStreamManager;
+}
+
+CameraAvSettingsUserLevelManagement::Delegate & CameraDevice::GetCameraAVSettingsUserLevelMgmtDelegate()
+{
+    return mCameraAVSettingsUserLevelManager;
 }
 
 MediaController & CameraDevice::GetMediaController()

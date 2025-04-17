@@ -17,10 +17,10 @@
 
 #pragma once
 
-#include <app-common/zap-generated/ids/Attributes.h>
 #include <app/AppConfig.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/common/GlobalIds.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/Provider.h>
 #include <lib/core/DataModelTypes.h>
