@@ -186,8 +186,8 @@ from matter.testing.global_attribute_ids import (AttributeIdType, ClusterIdType,
 from matter.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest,
                                            TestStep, async_test_body, default_matter_test_main)
 from matter.testing.taglist_and_topology_test import (create_device_type_list_for_root, create_device_type_lists,
-                                                      find_tag_list_problems, find_tree_roots, flat_list_ok, parts_list_problems,
-                                                      get_direct_children_of_root, separate_endpoint_types)
+                                                      find_tag_list_problems, find_tree_roots, flat_list_ok,
+                                                      get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
 
 
 def get_vendor_id(mei: int) -> int:
