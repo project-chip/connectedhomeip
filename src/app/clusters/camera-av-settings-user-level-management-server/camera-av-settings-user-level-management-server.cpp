@@ -487,7 +487,7 @@ void CameraAvSettingsUserLevelMgmtServer::LoadPersistentAttributes()
     MPTZStructType storedMPTZPosition;
     err = LoadMPTZPosition(storedMPTZPosition);
     if (err == CHIP_NO_ERROR)
-    {        
+    {
         mMptzPosition = storedMPTZPosition;
         ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Loaded MPTZPosition", mEndpointId);
     }

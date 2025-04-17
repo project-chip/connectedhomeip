@@ -112,13 +112,13 @@ CHIP_ERROR CameraAVSettingsUserLevelManager::LoadMPTZPresets(std::vector<MPTZPre
 {
     return CHIP_NO_ERROR;
 }
-    
+
 CHIP_ERROR CameraAVSettingsUserLevelManager::LoadDPTZRelativeMove(std::vector<uint16_t> dptzRelativeMove)
 {
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CameraAVSettingsUserLevelManager::PersistentAttributesLoadedCallback() 
+CHIP_ERROR CameraAVSettingsUserLevelManager::PersistentAttributesLoadedCallback()
 {
     return CHIP_NO_ERROR;
 }

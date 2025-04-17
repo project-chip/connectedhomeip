@@ -353,8 +353,8 @@ public:
     /**
      *  Delegate functions to load the Presets and DPTZRelativeMove valid set of video stream IDs.
      *  The delegate application is responsible for creating and persisting this data. The overall
-     *  application is already handling the persistence of the allocated video streams themselves. 
-     *  hese Load APIs would be used to load the known presets and stream ids into the cluster 
+     *  application is already handling the persistence of the allocated video streams themselves.
+     *  hese Load APIs would be used to load the known presets and stream ids into the cluster
      *  server list, at initialization.
      */
     virtual CHIP_ERROR LoadMPTZPresets(std::vector<MPTZPresetHelper> & mptzPresetHelpers) = 0;

@@ -122,13 +122,13 @@ CHIP_ERROR AVSettingsUserLevelManagementDelegate::LoadMPTZPresets(std::vector<MP
 {
     return CHIP_NO_ERROR;
 }
-    
+
 CHIP_ERROR AVSettingsUserLevelManagementDelegate::LoadDPTZRelativeMove(std::vector<uint16_t> dptzRelativeMove)
 {
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AVSettingsUserLevelManagementDelegate::PersistentAttributesLoadedCallback() 
+CHIP_ERROR AVSettingsUserLevelManagementDelegate::PersistentAttributesLoadedCallback()
 {
     return CHIP_NO_ERROR;
 }
