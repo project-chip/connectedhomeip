@@ -135,6 +135,8 @@ def generate_vendor_fabric_binding_message(
     return vendor_fabric_binding_message
 
 # From Matter spec src/crypto_primitives/vid_verify_payload_test_vector.py
+
+
 def generate_vendor_id_verification_tbs(fabric_binding_version: int,
                                         attestation_challenge: bytes,
                                         client_challenge: bytes,
@@ -225,6 +227,7 @@ class test_step(object):
 
     TODO: Port back to matter_testing.py once this whole test suite is complete.
     """
+
     def __init__(self, id=None, description="", verification=None, is_commissioning=False):
         caller = inspect.currentframe().f_back.f_locals.get('self', None)
         if isinstance(caller, MatterBaseTest):
@@ -249,14 +252,15 @@ class test_step(object):
 
     def __enter__(self):
         if self._test_instance.is_aggregating_steps:
-            self._test_instance.aggregated_steps.append(TestStep(self._id, self._description, self._verification, self._is_commissioning))
+            self._test_instance.aggregated_steps.append(
+                TestStep(self._id, self._description, self._verification, self._is_commissioning))
 
             # Let's manipulate the callstack via tracing to skip the entire `with` block in steps extraction mode.
             sys.settrace(lambda *args, **keys: None)
             frame = sys._getframe(1)
             frame.f_trace = self.trace
 
-            ########## NO MORE CALLS CAN BE PAST HERE IN __enter__(). Otherwise, the "skip block" feature doesn't work.
+            # NO MORE CALLS CAN BE PAST HERE IN __enter__(). Otherwise, the "skip block" feature doesn't work.
         else:
             self._test_instance.step(self._id)
 
@@ -429,7 +433,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
                 asserts.assert_in(controller_name, fabric_ids_from_certs.keys(),
                                   f"Did not find {controller_name}'s fabric the NOCs attribute")
                 asserts.assert_equal(fabric_ids_from_certs[controller_name], fabric_id,
-                                    f"Did not find {controller_name}'s fabric ID in the correct NOC")
+                                     f"Did not find {controller_name}'s fabric ID in the correct NOC")
 
         with test_step(description="Read DUT's Fabrics attribute and validate both fabrics have expected values."):
             fabric_roots = {
@@ -454,7 +458,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
                         continue
 
                     asserts.assert_equal(fabric_struct.rootPublicKey, fabric_roots[controller_name],
-                                        f"Did not find matching root public key in Fabrics attribute for {controller_name}")
+                                         f"Did not find matching root public key in Fabrics attribute for {controller_name}")
                     asserts.assert_equal(
                         fabric_struct.vendorID, fabric_vendor_ids[controller_name], f"Did not find matching VendorID in Fabrics attribute for {controller_name}")
                     asserts.assert_equal(
@@ -467,14 +471,14 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
             sign_vid_verification_response = await self.send_single_cmd(cmd=opcreds.Commands.SignVIDVerificationRequest(fabricIndex=cr2_fabric_index, clientChallenge=client_challenge))
 
             asserts.assert_equal(sign_vid_verification_response.fabricIndex, cr2_fabric_index,
-                                "FabricIndex in SignVIDVerificationResponse must match request.")
+                                 "FabricIndex in SignVIDVerificationResponse must match request.")
 
             # Locally generate the vendor_id_verification_tbs to check the signature.
             expected_vendor_fabric_binding_message = generate_vendor_fabric_binding_message(
                 root_public_key_bytes=cr2_root_public_key, fabric_id=cr2_fabricId, vendor_id=cr2_vid)
             attestation_challenge = dev_ctrl.GetConnectedDeviceSync(self.dut_node_id, allowPASE=False).attestationChallenge
             vendor_id_verification_tbs = generate_vendor_id_verification_tbs(sign_vid_verification_response.fabricBindingVersion, attestation_challenge,
-                                                                            client_challenge, sign_vid_verification_response.fabricIndex, expected_vendor_fabric_binding_message, vid_verification_statement=b"")
+                                                                             client_challenge, sign_vid_verification_response.fabricIndex, expected_vendor_fabric_binding_message, vid_verification_statement=b"")
 
             # Check signature against vendor_id_verification_tbs
             noc_cert = MatterCertParser(noc_struct.noc)
@@ -488,14 +492,14 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
                 await self.send_single_cmd(cmd=opcreds.Commands.SignVIDVerificationRequest(fabricIndex=unassigned_fabric_index, clientChallenge=client_challenge))
 
             asserts.assert_equal(exception_context.exception.status, Status.ConstraintError,
-                                f"Expected CONSTRAINT_ERROR from SignVIDVerificationRequest against fabricIndex {unassigned_fabric_index}")
+                                 f"Expected CONSTRAINT_ERROR from SignVIDVerificationRequest against fabricIndex {unassigned_fabric_index}")
 
             # Must fail with correct client challenge but fabricIndex 0.
             with asserts.assert_raises(InteractionModelError) as exception_context:
                 await self.send_single_cmd(cmd=opcreds.Commands.SignVIDVerificationRequest(fabricIndex=0, clientChallenge=client_challenge))
 
             asserts.assert_equal(exception_context.exception.status, Status.ConstraintError,
-                                "Expected CONSTRAINT_ERROR from SignVIDVerificationRequest against fabricIndex 0")
+                                 "Expected CONSTRAINT_ERROR from SignVIDVerificationRequest against fabricIndex 0")
 
             # Must fail with client challenge different than expected length
             CHALLENGE_TOO_SMALL = b"\x01" * (VID_VERIFICATION_CLIENT_CHALLENGE_SIZE_BYTES - 1)
@@ -505,31 +509,31 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
                 await self.send_single_cmd(cmd=opcreds.Commands.SignVIDVerificationRequest(fabricIndex=cr2_fabric_index, clientChallenge=CHALLENGE_TOO_SMALL))
 
             asserts.assert_equal(exception_context.exception.status, Status.ConstraintError,
-                                f"Expected CONSTRAINT_ERROR from SignVIDVerificationRequest with ClientChallenge of length {len(CHALLENGE_TOO_SMALL)}")
+                                 f"Expected CONSTRAINT_ERROR from SignVIDVerificationRequest with ClientChallenge of length {len(CHALLENGE_TOO_SMALL)}")
 
             with asserts.assert_raises(InteractionModelError) as exception_context:
                 await self.send_single_cmd(cmd=opcreds.Commands.SignVIDVerificationRequest(fabricIndex=cr2_fabric_index, clientChallenge=CHALLENGE_TOO_BIG))
 
             asserts.assert_equal(exception_context.exception.status, Status.ConstraintError,
-                                f"Expected CONSTRAINT_ERROR from SignVIDVerificationRequest with ClientChallenge of length {len(CHALLENGE_TOO_BIG)}")
+                                 f"Expected CONSTRAINT_ERROR from SignVIDVerificationRequest with ClientChallenge of length {len(CHALLENGE_TOO_BIG)}")
 
         with test_step(description="Invoke SetVIDVerificationStatement with VVSC, VIDVerificationStatement and VID fields all missing, outside fail-safe. Expect INVALID_COMMAND"):
             with asserts.assert_raises(InteractionModelError) as exception_context:
                 await self.send_single_cmd(cmd=opcreds.Commands.SetVIDVerificationStatement())
             asserts.assert_equal(exception_context.exception.status, Status.InvalidCommand,
-                                "Expected INVALID_COMMAND for SetVIDVerificationStatement with no arguments present")
+                                 "Expected INVALID_COMMAND for SetVIDVerificationStatement with no arguments present")
 
         with test_step(description="Invoke SetVIDVerificationStatement with VVSC field set to a size > 400 bytes, outside fail-safe. Expect CONSTRAINT_ERROR"):
             with asserts.assert_raises(InteractionModelError) as exception_context:
                 await self.send_single_cmd(cmd=opcreds.Commands.SetVIDVerificationStatement(vvsc=(b"\x01" * 401)))
             asserts.assert_equal(exception_context.exception.status, Status.ConstraintError,
-                                "Expected CONSTRAINT_ERROR for SetVIDVerificationStatement with VVSC too large")
+                                 "Expected CONSTRAINT_ERROR for SetVIDVerificationStatement with VVSC too large")
 
         with test_step(description="Invoke SetVIDVerificationStatement with VIDVerificationStatement field set to a size > 85 bytes, outside fail-safe. Expect CONSTRAINT_ERROR"):
             with asserts.assert_raises(InteractionModelError) as exception_context:
                 await self.send_single_cmd(cmd=opcreds.Commands.SetVIDVerificationStatement(VIDVerificationStatement=(b"\x01" * (VID_VERIFICATION_STATEMENT_SIZE_BYTES_V1 + 1))))
             asserts.assert_equal(exception_context.exception.status, Status.ConstraintError,
-                                "Expected CONSTRAINT_ERROR for SetVIDVerificationStatement with VIDVerificationStatement too large")
+                                 "Expected CONSTRAINT_ERROR for SetVIDVerificationStatement with VIDVerificationStatement too large")
 
         with test_step(description="Establish a subscription to Operational Credentials cluster on endpoint 0 from TH1 fabric client, with MinIntervalFloor=0, MaxIntervalCeiling=30"):
             attrib_listener = ClusterAttributeChangeAccumulator(opcreds)
@@ -542,19 +546,24 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
 
             attrib_listener.reset()
             await self.send_single_cmd(dev_ctrl=cr2_dev_ctrl, node_id=cr2_dut_node_id, cmd=opcreds.Commands.SetVIDVerificationStatement(VIDVerificationStatement=VIDVerificationStatement, vvsc=vvsc, vendorID=vendorID))
-            attrib_listener.await_all_expected_report_matches(expected_matchers=[make_vid_matcher(cr2_fabric_index, vendorID), make_vvs_matcher(cr2_fabric_index, VIDVerificationStatement)], timeout_sec=30.0)
+            attrib_listener.await_all_expected_report_matches(expected_matchers=[make_vid_matcher(
+                cr2_fabric_index, vendorID), make_vvs_matcher(cr2_fabric_index, VIDVerificationStatement)], timeout_sec=30.0)
 
             updated_fabrics, updated_nocs = await self.read_updated_fabrics(dev_ctrl=cr1_dev_ctrl, node_id=cr1_dut_node_id)
 
             cr2_fabrics_entry = get_entry_for_fabric(cr2_fabric_index, updated_fabrics)
-            asserts.assert_is_not_none(cr2_fabrics_entry, f"Could not find Fabrics list entry for TH2's fabric index {cr2_fabric_index}")
+            asserts.assert_is_not_none(
+                cr2_fabrics_entry, f"Could not find Fabrics list entry for TH2's fabric index {cr2_fabric_index}")
 
             cr2_nocs_entry = get_entry_for_fabric(cr2_fabric_index, updated_nocs)
             asserts.assert_is_not_none(cr2_nocs_entry, f"Could not find NOCs list entry for TH2's fabric index {cr2_fabric_index}")
 
-            asserts.assert_equal(cr2_nocs_entry.vvsc, vvsc, "Did not get the expected value set for VVSC field of NOCs list for TH2's fabric.")
-            asserts.assert_equal(cr2_fabrics_entry.VIDVerificationStatement, VIDVerificationStatement, "Did not get the expected value set for VIDVerificationStatement field of Fabrics list for TH2's fabric.")
-            asserts.assert_equal(cr2_fabrics_entry.vendorID, vendorID, "Did not get the expected value set for VendorID field of Fabrics list for TH2's fabric.")
+            asserts.assert_equal(cr2_nocs_entry.vvsc, vvsc,
+                                 "Did not get the expected value set for VVSC field of NOCs list for TH2's fabric.")
+            asserts.assert_equal(cr2_fabrics_entry.VIDVerificationStatement, VIDVerificationStatement,
+                                 "Did not get the expected value set for VIDVerificationStatement field of Fabrics list for TH2's fabric.")
+            asserts.assert_equal(cr2_fabrics_entry.vendorID, vendorID,
+                                 "Did not get the expected value set for VendorID field of Fabrics list for TH2's fabric.")
 
         with test_step(description="Invoke SetVIDVerificationStatement with maximum-sized VVSC on TH1's fabric, outside fail-safe. Verify INVALID_COMMAND due to presence of ICAC."):
             vvsc = b"\xaa" * 400
@@ -562,20 +571,23 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
             with asserts.assert_raises(InteractionModelError) as exception_context:
                 await self.send_single_cmd(dev_ctrl=cr1_dev_ctrl, node_id=cr1_dut_node_id, cmd=opcreds.Commands.SetVIDVerificationStatement(vvsc=vvsc))
             asserts.assert_equal(exception_context.exception.status, Status.InvalidCommand,
-                                "Expected INVALID_COMMAND for SetVIDVerificationStatement with VVSC present against DUT on TH1's fabric due to presence of ICAC.")
+                                 "Expected INVALID_COMMAND for SetVIDVerificationStatement with VVSC present against DUT on TH1's fabric due to presence of ICAC.")
 
         with test_step(description="Invoke SetVIDVerificationStatement with setting VID to 0xFFF1 on TH2's fabric, outside fail-safe. Verify VID is now 0xFFF1."):
             vendorID = 0xFFF1
 
             attrib_listener.reset()
             await self.send_single_cmd(dev_ctrl=cr2_dev_ctrl, node_id=cr2_dut_node_id, cmd=opcreds.Commands.SetVIDVerificationStatement(vendorID=vendorID))
-            attrib_listener.await_all_expected_report_matches(expected_matchers=[make_vid_matcher(cr2_fabric_index, vendorID)], timeout_sec=30.0)
+            attrib_listener.await_all_expected_report_matches(
+                expected_matchers=[make_vid_matcher(cr2_fabric_index, vendorID)], timeout_sec=30.0)
 
             updated_fabrics, _ = await self.read_updated_fabrics(dev_ctrl=cr1_dev_ctrl, node_id=cr1_dut_node_id)
 
             cr2_fabrics_entry = get_entry_for_fabric(cr2_fabric_index, updated_fabrics)
-            asserts.assert_is_not_none(cr2_fabrics_entry, f"Could not find Fabrics list entry for TH2's fabric index {cr2_fabric_index}")
-            asserts.assert_equal(cr2_fabrics_entry.vendorID, vendorID, "Did not get the expected value set for VendorID field of Fabrics list for TH2's fabric.")
+            asserts.assert_is_not_none(
+                cr2_fabrics_entry, f"Could not find Fabrics list entry for TH2's fabric index {cr2_fabric_index}")
+            asserts.assert_equal(cr2_fabrics_entry.vendorID, vendorID,
+                                 "Did not get the expected value set for VendorID field of Fabrics list for TH2's fabric.")
 
         with test_step(description="Arm a fail safe for 60s.") as step:
             logging.error("TODO!")
@@ -605,7 +617,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
             with asserts.assert_raises(InteractionModelError) as exception_context:
                 await self.send_single_cmd(cmd=opcreds.Commands.SetVIDVerificationStatement(vendorID=0xFFF5))
             asserts.assert_equal(exception_context.exception.status, Status.ConstraintError,
-                                "Expected CONSTRAINT_ERROR for SetVIDVerificationStatement with invalid VendorID 0xFFF5")
+                                 "Expected CONSTRAINT_ERROR for SetVIDVerificationStatement with invalid VendorID 0xFFF5")
 
         with test_step(description="Invoke SetVIDVerificationStatement with maximum-sized VVSC and VIDVerificationStatement present and setting VID to 0x6a01 on TH2's fabric, outside fail-safe. Expect success."):
             vvsc = b"\x5a" * 400
@@ -620,14 +632,14 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
             sign_vid_verification_response = await self.send_single_cmd(cmd=opcreds.Commands.SignVIDVerificationRequest(fabricIndex=cr2_fabric_index, clientChallenge=client_challenge))
 
             asserts.assert_equal(sign_vid_verification_response.fabricIndex, cr2_fabric_index,
-                                "FabricIndex in SignVIDVerificationResponse must match request.")
+                                 "FabricIndex in SignVIDVerificationResponse must match request.")
 
             # Locally generate the vendor_id_verification_tbs to check the signature.
             expected_vendor_fabric_binding_message = generate_vendor_fabric_binding_message(
                 root_public_key_bytes=cr2_root_public_key, fabric_id=cr2_fabricId, vendor_id=cr2_vid)
             attestation_challenge = dev_ctrl.GetConnectedDeviceSync(self.dut_node_id, allowPASE=False).attestationChallenge
             vendor_id_verification_tbs = generate_vendor_id_verification_tbs(sign_vid_verification_response.fabricBindingVersion, attestation_challenge,
-                                                                            client_challenge, sign_vid_verification_response.fabricIndex, expected_vendor_fabric_binding_message, vid_verification_statement=VIDVerificationStatement)
+                                                                             client_challenge, sign_vid_verification_response.fabricIndex, expected_vendor_fabric_binding_message, vid_verification_statement=VIDVerificationStatement)
 
             # Check signature against vendor_id_verification_tbs
             noc_cert = MatterCertParser(noc_struct.noc)
@@ -639,6 +651,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
             resp = await self.send_single_cmd(cmd=cmd)
             asserts.assert_equal(
                 resp.statusCode, opcreds.Enums.NodeOperationalCertStatusEnum.kOk)
+
 
 if __name__ == "__main__":
     default_matter_test_main()

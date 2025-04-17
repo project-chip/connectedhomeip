@@ -290,6 +290,7 @@ class AttributeValue:
     value: Any
     timestamp_utc: Optional[datetime] = None
 
+
 class AttributeMatcher:
     def __init__(self, description: str):
         self._description: str = description
