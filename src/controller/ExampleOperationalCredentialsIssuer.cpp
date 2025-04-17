@@ -407,7 +407,7 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan 
     // Callback onto commissioner.
     ChipLogProgress(Controller, "Providing certificate chain to the commissioner");
     onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, nocSpan, icacSpan, rcacSpan, MakeOptional(ipkSpan),
-                        Optional<NodeId>());
+                        mNextCaseAdminSubject == kUndefinedNodeId ? Optional<NodeId>() : MakeOptional(mNextCaseAdminSubject));
     return CHIP_NO_ERROR;
 }
 

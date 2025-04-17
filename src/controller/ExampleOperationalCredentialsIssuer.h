@@ -74,6 +74,8 @@ public:
 
     void SetCATValuesForNextNOCRequest(CATValues cats) { mNextCATs = cats; }
 
+    void SetCaseAdminSubjectForNextNOCRequest(NodeId caseAdminSubject) { mNextCaseAdminSubject = caseAdminSubject; }
+
     /**
      * @brief Initialize the issuer with the keypair in the storage.
      *        If the storage doesn't have one, it'll create one, and it to the storage.
@@ -127,11 +129,12 @@ private:
     bool mUseMaximallySizedCerts         = false;
     bool mAlwaysOmitIcac                 = false;
 
-    NodeId mNextRequestedNodeId = 1;
-    FabricId mNextFabricId      = 1;
-    CATValues mNextCATs         = kUndefinedCATs;
-    bool mNodeIdRequested       = false;
-    uint64_t mIndex             = 0;
+    NodeId mNextRequestedNodeId  = 1;
+    FabricId mNextFabricId       = 1;
+    CATValues mNextCATs          = kUndefinedCATs;
+    NodeId mNextCaseAdminSubject = kUndefinedNodeId;
+    bool mNodeIdRequested        = false;
+    uint64_t mIndex              = 0;
 };
 
 } // namespace Controller
