@@ -748,7 +748,10 @@
             "StatusLightBrightness",
             "FeatureMap"
         ],
-        "Camera AV Settings User Level Management": ["MPTZPosition"]
+        "Camera AV Settings User Level Management": ["MPTZPosition"],
+        "Push AV Stream Transport" :[
+            "CurrentConnections"
+        ]
     },
     "mandatoryDeviceTypes": "0x0016",
     "defaultReportingPolicy": "mandatory",

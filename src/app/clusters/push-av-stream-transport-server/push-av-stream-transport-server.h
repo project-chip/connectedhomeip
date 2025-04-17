@@ -29,7 +29,6 @@ namespace app {
 namespace Clusters {
 namespace PushAvStreamTransport {
 
-using MetadataOptionsStruct                   = Structs::MetadataOptionsStruct::Type;
 using CMAFContainerOptionsStruct              = Structs::CMAFContainerOptionsStruct::Type;
 using ContainerOptionsStruct                  = Structs::ContainerOptionsStruct::Type;
 using TransportZoneOptionsStruct              = Structs::TransportZoneOptionsStruct::Type;
@@ -92,11 +91,12 @@ public:
      *   @brief Handle Command Delegate for Stream transport modification.
      *
      *   @param connectionIDList [in]       represent the list of connectionIDs for which new transport status to apply.
+     *   @param transportStatus  [in]       represents the updated status of the connection(s).
      *
      *   @return Success if the stream transport status is successfully set; otherwise, the command SHALL be rejected with an
      * appropriate error.
      */
-    virtual Protocols::InteractionModel::Status SetTransportStatus(const std::vector<uint16_t> connectionIDList) = 0;
+    virtual Protocols::InteractionModel::Status SetTransportStatus(const std::vector<uint16_t> connectionIDList, TransportStatusEnum transportStatus) = 0;
     /**
      *   @brief Handle Command Delegate to request the Node to manually start the specified push transport.
      *
