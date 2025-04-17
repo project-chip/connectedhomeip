@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class CommodityPriceClusterForecastChangeEvent(
   val priceForecast:
-    List<matter.controller.cluster.structs.CommodityPriceClusterCommodityPriceStruct>
+    List<matter.controller.cluster.structs.CommodityPriceClusterCommodityPriceStruct>?
 ) {
   override fun toString(): String = buildString {
     append("CommodityPriceClusterForecastChangeEvent {\n")
@@ -36,11 +36,15 @@ class CommodityPriceClusterForecastChangeEvent(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      startArray(ContextSpecificTag(TAG_PRICE_FORECAST))
-      for (item in priceForecast.iterator()) {
-        item.toTlv(AnonymousTag, this)
+      if (priceForecast != null) {
+        startArray(ContextSpecificTag(TAG_PRICE_FORECAST))
+        for (item in priceForecast.iterator()) {
+          item.toTlv(AnonymousTag, this)
+        }
+        endArray()
+      } else {
+        putNull(ContextSpecificTag(TAG_PRICE_FORECAST))
       }
-      endArray()
       endStructure()
     }
   }
@@ -51,17 +55,22 @@ class CommodityPriceClusterForecastChangeEvent(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): CommodityPriceClusterForecastChangeEvent {
       tlvReader.enterStructure(tlvTag)
       val priceForecast =
-        buildList<matter.controller.cluster.structs.CommodityPriceClusterCommodityPriceStruct> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_PRICE_FORECAST))
-          while (!tlvReader.isEndOfContainer()) {
-            this.add(
-              matter.controller.cluster.structs.CommodityPriceClusterCommodityPriceStruct.fromTlv(
-                AnonymousTag,
-                tlvReader,
+        if (!tlvReader.isNull()) {
+          buildList<matter.controller.cluster.structs.CommodityPriceClusterCommodityPriceStruct> {
+            tlvReader.enterArray(ContextSpecificTag(TAG_PRICE_FORECAST))
+            while (!tlvReader.isEndOfContainer()) {
+              this.add(
+                matter.controller.cluster.structs.CommodityPriceClusterCommodityPriceStruct.fromTlv(
+                  AnonymousTag,
+                  tlvReader,
+                )
               )
-            )
+            }
+            tlvReader.exitContainer()
           }
-          tlvReader.exitContainer()
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_PRICE_FORECAST))
+          null
         }
 
       tlvReader.exitContainer()

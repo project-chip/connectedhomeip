@@ -11622,13 +11622,29 @@
       clusters:
           # In-progress for maybe Matter 1.5
           - ClosureControl
+          - ClosureDimension
+          - CommodityMetering
+          - CommodityPrice
+          - CommodityTariff
+          - MeterIdentification
           - TLSClientManagement
+      attributes:
+          ThreadNetworkDiagnostics:
+              # In-progress for maybe Matter 1.5
+              - ExtAddress
+              - Rloc16
       commands:
           OperationalCredentials:
               # In-progress for Matter 1.5: VID Verification feature
               - SetVIDVerificationStatement
               - SignVIDVerificationRequest
               - SignVIDVerificationResponse
+      structs:
+          Globals:
+              # In-progress for maybe Matter 1.5
+              - CurrencyStruct
+              - PowerThresholdStruct
+              - PriceStruct
       struct fields:
           OperationalCredentials:
               # In-progress for Matter 1.5: VID Verification feature
@@ -11636,6 +11652,23 @@
                   - vidVerificationStatement
               NOCStruct:
                   - vvsc
+      enums:
+          Globals:
+              # In-progress for maybe Matter 1.5
+              - PowerThresholdSourceEnum
+              - TariffPriceTypeEnum
+              - TariffUnitEnum
+      enum values:
+          ElectricalPowerMeasurement:
+              # In-progress for maybe Matter 1.5
+              MeasurementTypeEnum:
+                  - ApparentEnergy
+                  - ReactiveEnergy
+          ElectricalEnergyMeasurement:
+              # In-progress for maybe Matter 1.5
+              MeasurementTypeEnum:
+                  - ApparentEnergy
+                  - ReactiveEnergy
       device types:
           # In-progress for maybe Matter 1.5
           - Awning
@@ -11646,8 +11679,12 @@
           - Blind
           - ClosureBase
           - Curtain
+          - ElectricalEnergyTariff
+          - ElectricalMeter
+          - ElectricalUtilityMeter
           - GarageDoor
           - Gate
+          - MeterReferencePoint
           - MountedDimmableLoadControl
           - MountedOnOffControl
           - Pergola

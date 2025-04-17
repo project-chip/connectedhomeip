@@ -87,6 +87,7 @@ Generally regenerate using one of:
 |        157 |       0x9D | EnergyEvseMode                                          |
 |        158 |       0x9E | WaterHeaterMode                                         |
 |        159 |       0x9F | DeviceEnergyManagementMode                              |
+|        160 |       0xA0 | ElectricalGridConditions                                |
 |        257 |      0x101 | DoorLock                                                |
 |        258 |      0x102 | WindowCovering                                          |
 |        260 |      0x104 | ClosureControl                                          |

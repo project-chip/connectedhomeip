@@ -57,6 +57,7 @@
         "ecosystem-information-cluster.xml",
         "energy-preference-cluster.xml",
         "electrical-energy-measurement-cluster.xml",
+        "electrical-grid-conditions-cluster.xml",
         "electrical-power-measurement-cluster.xml",
         "energy-evse-cluster.xml",
         "energy-evse-mode-cluster.xml",
@@ -206,7 +207,7 @@
         ],
         "Bridged Device Basic Information": ["ProductAppearance"],
         "Chime": ["SelectedChime", "Enabled"],
-        "Closure Control": ["OverallState", "OverallTarget"],
+        "Closure Control": ["CountdownTime", "OverallState", "OverallTarget"],
         "Closure Dimension": ["Current", "Target", "UnitRange", "LimitRange"],
         "Commodity Price": ["Currency", "CurrentPrice"],
         "Commodity Tariff": [
@@ -413,7 +414,9 @@
             "Delay",
             "SecurityPolicy",
             "ChannelPage0Mask",
-            "OperationalDatasetComponents"
+            "OperationalDatasetComponents",
+            "ExtAddress",
+            "Rloc16"
         ],
         "Wi-Fi Network Diagnostics": [
             "BSSID",
@@ -658,6 +661,12 @@
             "CumulativeEnergyReset",
             "FeatureMap"
         ],
+        "Electrical Grid Conditions": [
+            "LocalGenerationAvailable",
+            "CurrentConditions",
+            "ForecastConditions",
+            "FeatureMap"
+        ],
         "Electrical Power Measurement": [
             "PowerMode",
             "NumberOfMeasurementTypes",
@@ -707,13 +716,13 @@
             "MicrophoneCapabilities",
             "SpeakerCapabilities",
             "Viewport",
-            "MaxConcurrentVideoEncoders",
+            "MaxConcurrentEncoders",
             "MaxEncodedPixelRate",
             "NightVisionCapable",
             "RateDistortionTradeOffPoints",
             "MaxContentBufferSize",
             "TwoWayTalkSupport",
-            "SupportedSnapshotParams",
+            "SnapshotCapabilities",
             "MaxNetworkBandwidth",
             "CurrentFrameRate",
             "HDRModeEnabled",

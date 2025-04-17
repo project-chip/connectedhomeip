@@ -270,7 +270,8 @@ def BuildEfr32Target():
         TargetPart('lock', app=Efr32App.LOCK),
         TargetPart('thermostat', app=Efr32App.THERMOSTAT),
         TargetPart('pump', app=Efr32App.PUMP),
-        TargetPart('air-quality-sensor-app', app=Efr32App.AIR_QUALITY_SENSOR)
+        TargetPart('air-quality-sensor-app', app=Efr32App.AIR_QUALITY_SENSOR),
+        TargetPart('closure', app=Efr32App.CLOSURE)
     ])
 
     target.AppendModifier('rpc', enable_rpcs=True)
@@ -816,6 +817,7 @@ def BuildTelinkTarget():
     target.AppendModifier('usb', usb_board_config=True)
     target.AppendModifier('compress-lzma', compress_lzma_config=True)
     target.AppendModifier('thread-analyzer', thread_analyzer_config=True)
+    target.AppendModifier('precompiled-ot', precompiled_ot_config=True)
 
     return target
 
