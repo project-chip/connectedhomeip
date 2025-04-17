@@ -426,6 +426,9 @@ static BOOL AttributeIsSpecifiedInBasicInformationCluster(AttributeId aAttribute
     case Attributes::MaxPathsPerInvoke::Id: {
         return YES;
     }
+    case Attributes::ConfigurationVersion::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -1158,6 +1161,12 @@ static BOOL AttributeIsSpecifiedInThreadNetworkDiagnosticsCluster(AttributeId aA
     case Attributes::ActiveNetworkFaultsList::Id: {
         return YES;
     }
+    case Attributes::ExtAddress::Id: {
+        return YES;
+    }
+    case Attributes::Rloc16::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -1408,6 +1417,9 @@ static BOOL AttributeIsSpecifiedInBridgedDeviceBasicInformationCluster(Attribute
         return YES;
     }
     case Attributes::ProductAppearance::Id: {
+        return YES;
+    }
+    case Attributes::ConfigurationVersion::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -3236,6 +3248,39 @@ static BOOL AttributeIsSpecifiedInDeviceEnergyManagementModeCluster(AttributeId 
     }
     }
 }
+static BOOL AttributeIsSpecifiedInElectricalGridConditionsCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ElectricalGridConditions;
+    switch (aAttributeId) {
+    case Attributes::LocalGenerationAvailable::Id: {
+        return YES;
+    }
+    case Attributes::CurrentConditions::Id: {
+        return YES;
+    }
+    case Attributes::ForecastConditions::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInDoorLockCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::DoorLock;
@@ -3502,21 +3547,6 @@ static BOOL AttributeIsSpecifiedInClosureControlCluster(AttributeId aAttributeId
         return YES;
     }
     case Attributes::OverallTarget::Id: {
-        return YES;
-    }
-    case Attributes::RestingProcedure::Id: {
-        return YES;
-    }
-    case Attributes::TriggerCondition::Id: {
-        return YES;
-    }
-    case Attributes::TriggerPosition::Id: {
-        return YES;
-    }
-    case Attributes::WaitingDelay::Id: {
-        return YES;
-    }
-    case Attributes::KickoffTimer::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -5715,7 +5745,7 @@ static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aA
 {
     using namespace Clusters::CameraAvStreamManagement;
     switch (aAttributeId) {
-    case Attributes::MaxConcurrentVideoEncoders::Id: {
+    case Attributes::MaxConcurrentEncoders::Id: {
         return YES;
     }
     case Attributes::MaxEncodedPixelRate::Id: {
@@ -5745,7 +5775,7 @@ static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aA
     case Attributes::TwoWayTalkSupport::Id: {
         return YES;
     }
-    case Attributes::SupportedSnapshotParams::Id: {
+    case Attributes::SnapshotCapabilities::Id: {
         return YES;
     }
     case Attributes::MaxNetworkBandwidth::Id: {
@@ -6845,6 +6875,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::DeviceEnergyManagementMode::Id: {
         return AttributeIsSpecifiedInDeviceEnergyManagementModeCluster(aAttributeId);
+    }
+    case Clusters::ElectricalGridConditions::Id: {
+        return AttributeIsSpecifiedInElectricalGridConditionsCluster(aAttributeId);
     }
     case Clusters::DoorLock::Id: {
         return AttributeIsSpecifiedInDoorLockCluster(aAttributeId);

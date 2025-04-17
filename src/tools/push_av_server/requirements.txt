@@ -1,0 +1,5 @@
+zeroconf
+cryptography
+uvicorn
+fastapi
+jinja2
