@@ -40,15 +40,15 @@ from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_bod
 from mobly import asserts
 
 
-class TC_CLCTRL_3_4(MatterBaseTest):
+class TC_CLCTRL_5_1(MatterBaseTest):
     async def read_clctrl_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ClosureControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
-    def desc_TC_CLCTRL_3_4(self) -> str:
-        return "[TC_CLCTRL_3_4] Stop Command Primary Functionality with DUT as Server"
+    def desc_TC_CLCTRL_5_1(self) -> str:
+        return "[TC_CLCTRL_5_1] Stop Command Primary Functionality with DUT as Server"
 
-    def steps_TC_CLCTRL_3_4(self) -> list[TestStep]:
+    def steps_TC_CLCTRL_5_1(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", is_commissioning=True),
             TestStep("2a", "TH sends command MoveTo to DUT, with Position = OpenInFull"),
@@ -85,7 +85,7 @@ class TC_CLCTRL_3_4(MatterBaseTest):
         ]
         return steps
 
-    def pics_TC_CLCTRL_3_4(self) -> list[str]:
+    def pics_TC_CLCTRL_5_1(self) -> list[str]:
         pics = [
             "CLCTRL.S",
             "CLCTRL.S.C00.Rsp(Stop)"
@@ -94,7 +94,7 @@ class TC_CLCTRL_3_4(MatterBaseTest):
         return pics
 
     @async_test_body
-    async def test_TC_CLCTRL_3_4(self):
+    async def test_TC_CLCTRL_5_1(self):
         endpoint = self.get_endpoint(default=1)
 
         # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)
