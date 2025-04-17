@@ -393,6 +393,13 @@ TEST_F(TestWriteChunking, TestListChunking_NonEmptyReplaceAllList)
 
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
+        // Ensure that chunking actually occurred in the first iteration. We will iteratively chunk less and less, until chunking
+        // would not occur anymore. Thus, this check is only needed at start.
+        if (reservationReduction == 0)
+        {
+            ASSERT_TRUE(writeClient.IsWriteRequestChunked());
+        }
+
         err = writeClient.SendWriteRequest(sessionHandle);
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
@@ -406,12 +413,6 @@ TEST_F(TestWriteChunking, TestListChunking_NonEmptyReplaceAllList)
             DrainAndServiceIO();
         }
 
-        // Ensure that chunking actually occurred in the first iteration. We will iteratively chunk less and less, until chunking
-        // would not occur anymore. Thus, this check is only needed at start.
-        if (reservationReduction == 0)
-        {
-            ASSERT_TRUE(writeClient.IsWriteRequestChunked());
-        }
         // Due to Write Chunking being done dynamically (fitting as many items as possible into an initial ReplaceAll List, before
         // starting to chunk), it is fragile to try to predict mSuccessCount. It all depends on how much was packed into the initial
         // ReplaceAll List.
@@ -564,6 +565,10 @@ TEST_F(TestWriteChunking, TestBadChunking_NonEmptyReplaceAllList)
 
         atLeastOneRequestSent = true;
 
+        // Ensure that chunking actually occurred. Since chunking is dynamic, it's easy to unintentionally avoid it.
+        // This check guarantees that the test is validating chunked behavior as intended.
+        EXPECT_TRUE(writeClient.IsWriteRequestChunked());
+
         // If we successfully encoded the attribute, then we must be able to send the message.
         err = writeClient.SendWriteRequest(sessionHandle);
         EXPECT_EQ(err, CHIP_NO_ERROR);
@@ -577,10 +582,6 @@ TEST_F(TestWriteChunking, TestBadChunking_NonEmptyReplaceAllList)
         {
             DrainAndServiceIO();
         }
-
-        // Ensure that chunking actually occurred. Since chunking is dynamic, it's easy to unintentionally avoid it.
-        // This check guarantees that the test is validating chunked behavior as intended.
-        EXPECT_TRUE(writeClient.IsWriteRequestChunked());
 
         // Due to the way Write Chunking is done, it is difficult to predict mSuccessCount. It all depends on how much was
         // packed into the initial ReplaceAll List.
@@ -718,6 +719,11 @@ TEST_F(TestWriteChunking, TestConflictWrite_NonEmptyReplaceAllList)
     err = writeClient2.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLength2));
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
+    // Ensure that chunking actually occurred. Since chunking is dynamic, it's easy to unintentionally avoid it.
+    // This check guarantees that the test is validating chunked behavior as intended.
+    EXPECT_TRUE(writeClient1.IsWriteRequestChunked());
+    EXPECT_TRUE(writeClient2.IsWriteRequestChunked());
+
     err = writeClient1.SendWriteRequest(sessionHandle);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
@@ -737,11 +743,6 @@ TEST_F(TestWriteChunking, TestConflictWrite_NonEmptyReplaceAllList)
             writeCallbackRef2 = &writeCallback1;
             writeCallbackRef1 = &writeCallback2;
         }
-
-        // Ensure that chunking actually occurred. Since chunking is dynamic, it's easy to unintentionally avoid it.
-        // This check guarantees that the test is validating chunked behavior as intended.
-        EXPECT_TRUE(writeClient1.IsWriteRequestChunked());
-        EXPECT_TRUE(writeClient2.IsWriteRequestChunked());
 
         // Due to Write Chunking being done dynamically (fitting as many items as possible into an initial ReplaceAll List,
         // before starting to chunk), it is fragile to try to predict mSuccessCount. It all depends on how much was packed into
@@ -864,8 +865,14 @@ TEST_F(TestWriteChunking, TestNonConflictWrite_NonEmptyReplaceAllList)
 
     err = writeClient1.EncodeAttribute(attributePath1, app::DataModel::List<ByteSpan>(list, kTestListLength2));
     EXPECT_EQ(err, CHIP_NO_ERROR);
+
     err = writeClient2.EncodeAttribute(attributePath2, app::DataModel::List<ByteSpan>(list, kTestListLength2));
     EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Ensure that chunking actually occurred. Since chunking is dynamic, it's easy to unintentionally avoid it.
+    // This check guarantees that the test is validating chunked behavior as intended.
+    EXPECT_TRUE(writeClient1.IsWriteRequestChunked());
+    EXPECT_TRUE(writeClient2.IsWriteRequestChunked());
 
     err = writeClient1.SendWriteRequest(sessionHandle);
     EXPECT_EQ(err, CHIP_NO_ERROR);
@@ -876,11 +883,6 @@ TEST_F(TestWriteChunking, TestNonConflictWrite_NonEmptyReplaceAllList)
     DrainAndServiceIO();
 
     {
-
-        // Ensure that chunking actually occurred. Since chunking is dynamic, it's easy to unintentionally avoid it.
-        // This check guarantees that the test is validating chunked behavior as intended.
-        EXPECT_TRUE(writeClient1.IsWriteRequestChunked());
-        EXPECT_TRUE(writeClient2.IsWriteRequestChunked());
 
         // Due to Write Chunking being done dynamically, it is fragile to try to predict mSuccessCount. It all depends on how
         // much was packed into the initial ReplaceAll List. However, we know for sure that writeCallback1 and writeCallback2

@@ -129,7 +129,7 @@ public:
                 bool aSuppressResponse = false) :
         mpExchangeMgr(apExchangeMgr),
         mExchangeCtx(*this), mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs),
-        mSuppressResponse(aSuppressResponse), mIsWriteRequestChunked(false)
+        mSuppressResponse(aSuppressResponse)
     {
         assertChipStackLockedByCurrentThread();
     }
@@ -273,8 +273,11 @@ public:
 
     /**
      *  Returns true if the WriteRequest is Chunked.
+     *  WARNING: This method is only used for UnitTests. It should only be called AFTER a call
+     * EncodeAttribute/PutPreencodedAttribute AND BEFORE a call to SendWriteRequest(); only during this window does
+     * "!mChunks.IsNull()" reliably indicate that the WriteRequest is chunked.
      */
-    bool IsWriteRequestChunked() const { return mIsWriteRequestChunked; };
+    bool IsWriteRequestChunked() const { return !mChunks.IsNull(); };
 
 private:
     friend class TestWriteInteraction;
@@ -497,8 +500,6 @@ private:
 
     // A list of buffers, one buffer for each chunk.
     System::PacketBufferHandle mChunks;
-
-    bool mIsWriteRequestChunked = false;
 
     // TODO: This file might be compiled with different build flags on Darwin platform (when building WriteClient.cpp and
     // CHIPClustersObjc.mm), which will cause undefined behavior when building write requests. Uncomment the #if and #endif after

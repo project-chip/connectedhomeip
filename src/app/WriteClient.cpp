@@ -169,7 +169,6 @@ CHIP_ERROR WriteClient::StartNewMessage()
     if (mState == State::AddAttribute)
     {
         ReturnErrorOnFailure(FinalizeMessage(true));
-        mIsWriteRequestChunked = true;
     }
 
     // Do not allow timed request with chunks.
