@@ -43,7 +43,7 @@ import logging
 from mobly import asserts
 
 
-# These below variables are used to test the AccessControl cluster Extension attribute and come from the test plan here: . 
+# These below variables are used to test the AccessControl cluster Extension attribute and come from the test plan here: .
 D_OK_EMPTY = bytes.fromhex('1718')
 D_OK_SINGLE = bytes.fromhex(
     '17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018')
@@ -81,7 +81,7 @@ class TC_ACL_2_7(MatterBaseTest):
                      "Result is SUCCESS, value is list of AccessControlExtensionChanged containing 1 element"),
             TestStep(11, "TH_CR1 sends RemoveFabric for TH2 fabric command to DUT_CE",
                      "Verify DUT_CE responses with NOCResponse with a StatusCode OK"),
-            ]
+        ]
         return steps
 
     @async_test_body
@@ -156,17 +156,16 @@ class TC_ACL_2_7(MatterBaseTest):
         logging.info("TH1 read result: %s", str(result))
         self.print_step("TH1 read result: %s", str(result))
         asserts.assert_equal(len(result), 1,
-                                "Should have exactly one extension")
-
+                             "Should have exactly one extension")
 
         endpoint_data = result[0]
         self.print_step("TH1 endpoint data: %s", str(endpoint_data))
-        
+
         asserts.assert_equal(
             endpoint_data.data, D_OK_EMPTY, "Extension data should match D_OK_EMPTY")
 
         asserts.assert_equal(endpoint_data.fabricIndex,
-                                f1, "FabricIndex should match F1")
+                             f1, "FabricIndex should match F1")
 
         self.step(8)
         # TH2 reads Extension attribute
@@ -174,7 +173,7 @@ class TC_ACL_2_7(MatterBaseTest):
         result2 = await self.read_single_attribute_check_success(dev_ctrl=self.th2, endpoint=0, cluster=ac_cluster, attribute=extension_attr)
         logging.info("TH2 read result: %s", str(result2))
         asserts.assert_equal(len(result2), 1,
-                                "Should have exactly one extension")
+                             "Should have exactly one extension")
 
         endpoint_data2 = result2[0]
 
@@ -247,7 +246,7 @@ class TC_ACL_2_7(MatterBaseTest):
 
         asserts.assert_true(
             found_valid_event, "Did not find the expected event with specified fields for TH2")
-    
+
         self.step(11)
         # TH_CR1 sends RemoveFabric for TH2 fabric command to DUT_CE
         fabric_idx_cr2_2 = await self.read_currentfabricindex(th=self.th2)
