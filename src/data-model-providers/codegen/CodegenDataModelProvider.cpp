@@ -124,8 +124,6 @@ DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & cluster
     return entry;
 }
 
-const ConcreteCommandPath kInvalidCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
-
 DefaultAttributePersistenceProvider gDefaultAttributePersistence;
 
 } // namespace
