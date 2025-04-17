@@ -49,6 +49,8 @@ from mobly import asserts
 
 
 class TC_I_2_4(MatterBaseTest):
+    def desc_TC_I_2_4(self) -> str:
+        return "[TC-I-2.4] Reporting requirements with server as DUT"
 
     def steps_TC_I_2_4(self) -> list[TestStep]:
         THwrite = "TH writes to the DUT the"
@@ -104,6 +106,12 @@ class TC_I_2_4(MatterBaseTest):
                 TestStep(32, "TH verifies the second entry in reportedIdentifyTimeValuesList is 0",
                          "The second entry in reportedIdentifyTimeValuesList is equal to 0"),
                 ]
+
+    def pics_TC_I_2_4(self) -> list[str]:
+        pics = [
+            "I.S",
+        ]
+        return pics
 
     @run_if_endpoint_matches(has_cluster(Clusters.Identify))
     async def test_TC_I_2_4(self):
