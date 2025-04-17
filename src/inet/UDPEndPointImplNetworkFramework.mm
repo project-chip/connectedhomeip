@@ -29,6 +29,7 @@
 #include <inet/UDPEndPointImplNetworkFramework.h>
 
 #include <lib/support/CHIPMemString.h>
+#include <lib/support/SafeInt.h>
 
 #define INET_PORTSTRLEN 6
 
@@ -43,6 +44,7 @@ constexpr uint64_t kSendTimeoutInSeconds = 10 * NSEC_PER_SEC;
 constexpr uint64_t kConnectTimeoutInSeconds = 10 * NSEC_PER_SEC;
 constexpr uint64_t kConnectionAliveTimeoutInSeconds = 60 * NSEC_PER_SEC;
 constexpr uint64_t kListenerTimeoutInSeconds = 10 * NSEC_PER_SEC;
+constexpr uint64_t kConnectionGroupTimeoutInSeconds = 10 * NSEC_PER_SEC;
 
 class WorkFlag {
 public:
@@ -85,10 +87,56 @@ static void ReleaseConnectionWrapperCallback(CFAllocatorRef allocator, const voi
     delete wrapper;
 }
 
+bool CompareEndPoints(nw_endpoint_t a, nw_endpoint_t b)
+{
+    if (a == nullptr || b == nullptr) {
+        return false;
+    }
+
+    nw_endpoint_type_t typeA = nw_endpoint_get_type(a);
+    nw_endpoint_type_t typeB = nw_endpoint_get_type(b);
+
+    if (typeA != nw_endpoint_type_address || typeB != nw_endpoint_type_address) {
+        return false;
+    }
+
+    const sockaddr * addrA = nw_endpoint_get_address(a);
+    const sockaddr * addrB = nw_endpoint_get_address(b);
+    if (addrA == nullptr || addrB == nullptr) {
+        return false;
+    }
+
+    if (addrA->sa_family != addrB->sa_family) {
+        return false;
+    }
+
+    uint16_t portA = nw_endpoint_get_port(a);
+    uint16_t portB = nw_endpoint_get_port(b);
+
+    if (portA != portB) {
+        return false;
+    }
+
+    if (addrA->sa_family == AF_INET) {
+        const sockaddr_in * inA = reinterpret_cast<const sockaddr_in *>(addrA);
+        const sockaddr_in * inB = reinterpret_cast<const sockaddr_in *>(addrB);
+        return (inA->sin_addr.s_addr == inB->sin_addr.s_addr);
+    }
+
+    if (addrA->sa_family == AF_INET6) {
+        const sockaddr_in6 * in6A = reinterpret_cast<const sockaddr_in6 *>(addrA);
+        const sockaddr_in6 * in6B = reinterpret_cast<const sockaddr_in6 *>(addrB);
+        return (memcmp(&in6A->sin6_addr, &in6B->sin6_addr, sizeof(in6A->sin6_addr)) == 0);
+    }
+
+    return false; // Unknown family
+}
+
 #if !NETWORK_FRAMEWORK_DEBUG
 void DebugPrintListenerState(nw_listener_state_t state) {};
 void DebugPrintConnectionState(nw_connection_state_t state) {};
 void DebugPrintConnection(const nw_connection_t aConnection) {};
+void DebugPrintConnectionGroupState(nw_connection_group_state_t state) {};
 #else
 constexpr const char * kNilConnection = "The connection is nil.";
 constexpr const char * kNilPath = "The connection path is nil.";
@@ -105,12 +153,45 @@ constexpr const char * kListenerStateFailed = "Listener: Failed";
 constexpr const char * kListenerStateReady = "Listener: Ready";
 constexpr const char * kListenerStateCancelled = "Listener: Cancelled";
 
+constexpr const char * kConnectionGroupStateInvalid = "Connection Group: Invalid";
+constexpr const char * kConnectionGroupStateWaiting = "Connection Group: Waiting";
+constexpr const char * kConnectionGroupStateFailed = "Connection Group: Failed";
+constexpr const char * kConnectionGroupStateReady = "Connection Group: Ready";
+constexpr const char * kConnectionGroupStateCancelled = "Connection Group: Cancelled";
+
 constexpr const char * kConnectionStateInvalid = "Connection: Invalid";
 constexpr const char * kConnectionStateWaiting = "Connection: Waiting";
 constexpr const char * kConnectionStatePreparing = "Connection: Preparing";
 constexpr const char * kConnectionStateFailed = "Connection: Failed";
 constexpr const char * kConnectionStateReady = "Connection: Ready";
 constexpr const char * kConnectionStateCancelled = "Connection: Cancelled";
+
+void DebugPrintConnectionGroupState(nw_connection_group_state_t state)
+{
+    const char * str = nullptr;
+
+    switch (state) {
+    case nw_connection_group_state_invalid:
+        str = kConnectionGroupStateInvalid;
+        break;
+    case nw_connection_group_state_waiting:
+        str = kConnectionGroupStateWaiting;
+        break;
+    case nw_connection_group_state_ready:
+        str = kConnectionGroupStateReady;
+        break;
+    case nw_connection_group_state_failed:
+        str = kConnectionGroupStateFailed;
+        break;
+    case nw_connection_group_state_cancelled:
+        str = kConnectionGroupStateCancelled;
+        break;
+    default:
+        chipDie();
+    }
+
+    ChipLogDetail(Inet, "%s", str);
+}
 
 void DebugPrintConnectionState(nw_connection_state_t state)
 {
@@ -231,7 +312,14 @@ namespace Inet {
         ChipLogError(Inet, "%s (%p)", __func__, this);
 #endif
 
-        VerifyOrReturnError(!intfId.IsPresent(), CHIP_ERROR_NOT_IMPLEMENTED);
+        IPAddress targetAddress = address;
+        if (intfId.IsPresent()) {
+            auto allowedInterfaceId = InterfaceId(InterfaceId::PlatformType(kDNSServiceInterfaceIndexLocalOnly));
+            if (allowedInterfaceId != intfId) {
+                return CHIP_ERROR_NOT_IMPLEMENTED;
+            }
+            Inet::IPAddress::FromString("::1", targetAddress);
+        }
 
         __auto_type configure_tls = NW_PARAMETERS_DISABLE_PROTOCOL;
         mParameters = nw_parameters_create_secure_udp(configure_tls, NW_PARAMETERS_DEFAULT_CONFIGURATION);
@@ -265,7 +353,7 @@ namespace Inet {
         }
 #endif // INET_CONFIG_ENABLE_IPV4
 
-        __auto_type endpoint = GetEndPoint(addressType, address, port);
+        __auto_type endpoint = GetEndPoint(addressType, targetAddress, port);
         VerifyOrReturnError(nullptr != endpoint, CHIP_ERROR_INTERNAL, ReleaseAll());
         nw_parameters_set_local_endpoint(mParameters, endpoint);
 
@@ -375,6 +463,7 @@ namespace Inet {
         OnReceiveError = nullptr;
 
         ReleaseConnections();
+        ReleaseConnectionGroup();
         ReleaseListener();
 
         mParameters = nullptr;
@@ -383,6 +472,9 @@ namespace Inet {
 
         mListenerQueue = nullptr;
         mListenerSemaphore = nullptr;
+
+        mConnectionGroupQueue = nullptr;
+        mConnectionGroupSemaphore = nullptr;
 
         mSystemQueue = nullptr;
     }
@@ -393,23 +485,96 @@ namespace Inet {
         Release();
     }
 
-    CHIP_ERROR UDPEndPointImplNetworkFramework::SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback)
+    CHIP_ERROR UDPEndPointImplNetworkFramework::SetMulticastLoopback(IPVersion ipVersion, bool loopback)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    CHIP_ERROR UDPEndPointImplNetworkFramework::IPAnyJoinLeaveMulticastGroup(nw_endpoint_t endpoint, bool join)
+    {
+        ChipLogError(Inet, "%s", __func__);
+
+        if (nullptr == mConnectionGroup) {
+            VerifyOrReturnError(join, CHIP_ERROR_NOT_FOUND); // Nothing ever joined, can't leave!
+
+            __auto_type groupDescriptor = nw_group_descriptor_create_multicast(endpoint);
+            VerifyOrReturnError(nullptr != groupDescriptor, CHIP_ERROR_INCORRECT_STATE);
+
+            return StartConnectionGroup(groupDescriptor);
+        }
+
+        __auto_type previousGroupDescriptor = nw_connection_group_copy_descriptor(mConnectionGroup);
+        ReleaseConnectionGroup();
+
+        __block nw_group_descriptor_t groupDescriptor = nullptr;
+        __block bool found = false;
+        __block size_t endpointCount = 0;
+        __block CHIP_ERROR error = CHIP_NO_ERROR;
+        nw_group_descriptor_enumerate_endpoints(previousGroupDescriptor, ^(nw_endpoint_t previousEndpoint) {
+            if (CompareEndPoints(previousEndpoint, endpoint)) {
+                found = true;
+                if (!join) {
+                    // Leaving -> skip adding this one
+                    return true;
+                }
+            }
+
+            if (nullptr == groupDescriptor) {
+                groupDescriptor = nw_group_descriptor_create_multicast(previousEndpoint);
+                if (nullptr == groupDescriptor) {
+                    error = CHIP_ERROR_INCORRECT_STATE;
+                    return false;
+                }
+            } else {
+                bool added = nw_group_descriptor_add_endpoint(groupDescriptor, previousEndpoint);
+                if (false == added) {
+                    error = CHIP_ERROR_INCORRECT_STATE;
+                    return false;
+                }
+            }
+            endpointCount++;
+            return true;
+        });
+        ReturnErrorOnFailure(error);
+
+        if (!join && endpointCount == 0) {
+            // After removal, if no endpoints remain, fully remove the connection group
+            mConnectionGroup = nullptr;
+            mConnectionGroupSemaphore = nullptr;
+            mConnectionGroupQueue = nullptr;
+            return CHIP_NO_ERROR;
+        }
+
+        if (join && !found) {
+            // If joining and the endpoint wasn't already present, add it
+            VerifyOrReturnError(nw_group_descriptor_add_endpoint(groupDescriptor, endpoint), CHIP_ERROR_INVALID_ARGUMENT);
+        }
+
+        return StartConnectionGroup(groupDescriptor);
     }
 
 #if INET_CONFIG_ENABLE_IPV4
-    CHIP_ERROR UDPEndPointImplNetworkFramework::IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress,
-        bool join)
+    CHIP_ERROR UDPEndPointImplNetworkFramework::IPv4JoinLeaveMulticastGroupImpl(InterfaceId intfId, const IPAddress & address, bool join)
     {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
+        VerifyOrReturnError(!intfId.IsPresent(), CHIP_ERROR_NOT_IMPLEMENTED);
+
+        const uint16_t port = GetBoundPort();
+        __auto_type endpoint = GetEndPoint(IPAddressType::kIPv4, address, port);
+        VerifyOrReturnError(nullptr != endpoint, CHIP_ERROR_INVALID_ARGUMENT);
+
+        return IPAnyJoinLeaveMulticastGroup(endpoint, join);
     }
 #endif // INET_CONFIG_ENABLE_IPV4
 
-    CHIP_ERROR UDPEndPointImplNetworkFramework::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress,
-        bool join)
+    CHIP_ERROR UDPEndPointImplNetworkFramework::IPv6JoinLeaveMulticastGroupImpl(InterfaceId intfId, const IPAddress & address, bool join)
     {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
+        VerifyOrReturnError(!intfId.IsPresent(), CHIP_ERROR_NOT_IMPLEMENTED);
+
+        const uint16_t port = GetBoundPort();
+        __auto_type endpoint = GetEndPoint(IPAddressType::kIPv6, address, port);
+        VerifyOrReturnError(nullptr != endpoint, CHIP_ERROR_INVALID_ARGUMENT);
+
+        return IPAnyJoinLeaveMulticastGroup(endpoint, join);
     }
 
     CHIP_ERROR UDPEndPointImplNetworkFramework::ConfigureProtocol(IPAddressType aAddressType, const nw_parameters_t & aParameters)
@@ -741,6 +906,84 @@ namespace Inet {
         };
 
         nw_connection_receive_message(aConnection, handler);
+    }
+
+    CHIP_ERROR UDPEndPointImplNetworkFramework::StartConnectionGroup(nw_group_descriptor_t groupDescriptor)
+    {
+        __auto_type parameters = nw_parameters_copy(mParameters);
+        VerifyOrReturnError(nullptr != parameters, CHIP_ERROR_NO_MEMORY);
+        nw_parameters_set_local_endpoint(parameters, nil);
+
+        mConnectionGroup = nw_connection_group_create(groupDescriptor, parameters);
+        VerifyOrReturnError(mConnectionGroup != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+        if (mConnectionGroupQueue == nullptr) {
+            mConnectionGroupQueue = dispatch_queue_create("inet_dispatch_group", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        }
+
+        nw_connection_group_set_queue(mConnectionGroup, mConnectionGroupQueue);
+
+        mConnectionGroupSemaphore = dispatch_semaphore_create(0);
+        VerifyOrReturnError(mConnectionGroupSemaphore != nullptr, CHIP_ERROR_NO_MEMORY);
+
+        __block CHIP_ERROR err = CHIP_ERROR_INTERNAL;
+        nw_connection_group_set_state_changed_handler(mConnectionGroup, ^(nw_connection_group_state_t state, nw_error_t error) {
+            DebugPrintConnectionGroupState(state);
+            switch (state) {
+            case nw_connection_group_state_invalid:
+                err = CHIP_ERROR_INCORRECT_STATE;
+                nw_connection_group_cancel(mConnectionGroup);
+                break;
+            case nw_connection_group_state_ready:
+                err = CHIP_NO_ERROR;
+                dispatch_semaphore_signal(mConnectionGroupSemaphore);
+                break;
+            case nw_connection_group_state_failed:
+                err = CHIP_ERROR_POSIX(nw_error_get_error_code(error));
+                ChipLogError(Inet, "Error: %s", chip::ErrorStr(err));
+                break;
+            case nw_connection_group_state_cancelled:
+                if (err == CHIP_NO_ERROR) {
+                    err = CHIP_ERROR_CONNECTION_ABORTED;
+                }
+                dispatch_semaphore_signal(mConnectionGroupSemaphore);
+                break;
+            default:
+                break;
+            }
+        });
+
+        nw_connection_group_set_receive_handler(mConnectionGroup, UINT32_MAX, YES, ^(dispatch_data_t content, nw_content_context_t context, bool is_complete) {
+            ChipLogError(Inet, "%s", __func__);
+        });
+
+        nw_connection_group_start(mConnectionGroup);
+
+        dispatch_time_t timeout = dispatch_time(DISPATCH_TIME_NOW, kConnectionGroupTimeoutInSeconds);
+        dispatch_semaphore_wait(mConnectionGroupSemaphore, timeout);
+
+        nw_connection_group_set_state_changed_handler(mConnectionGroup, nil);
+
+        return err;
+    }
+
+    CHIP_ERROR UDPEndPointImplNetworkFramework::ReleaseConnectionGroup()
+    {
+        VerifyOrReturnError(nullptr != mConnectionGroup, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(nullptr != mConnectionGroupSemaphore, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(nullptr != mConnectionGroupQueue, CHIP_ERROR_INCORRECT_STATE);
+
+        nw_connection_group_set_state_changed_handler(mConnectionGroup, ^(nw_connection_group_state_t state, nw_error_t error) {
+            if (state == nw_connection_group_state_cancelled) {
+                dispatch_semaphore_signal(mConnectionGroupSemaphore);
+            }
+        });
+
+        nw_connection_group_cancel(mConnectionGroup);
+        dispatch_semaphore_wait(mConnectionGroupSemaphore, DISPATCH_TIME_FOREVER);
+        mConnectionGroup = nullptr;
+
+        return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR UDPEndPointImplNetworkFramework::ReleaseListener()

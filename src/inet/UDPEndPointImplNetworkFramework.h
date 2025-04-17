@@ -51,11 +51,14 @@ private:
     CHIP_ERROR SendMsgImpl(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle && msg) override;
     void CloseImpl() override;
 
-    nw_listener_t mListener                 = nullptr;
-    dispatch_semaphore_t mListenerSemaphore = nullptr;
-    dispatch_queue_t mListenerQueue         = nullptr;
-    dispatch_queue_t mConnectionQueue       = nullptr;
-    dispatch_queue_t mSystemQueue           = nullptr;
+    nw_listener_t mListener                        = nullptr;
+    dispatch_semaphore_t mListenerSemaphore        = nullptr;
+    dispatch_queue_t mListenerQueue                = nullptr;
+    dispatch_queue_t mConnectionQueue              = nullptr;
+    dispatch_queue_t mSystemQueue                  = nullptr;
+    nw_connection_group_t mConnectionGroup         = nullptr;
+    dispatch_semaphore_t mConnectionGroupSemaphore = nullptr;
+    dispatch_queue_t mConnectionGroupQueue         = nullptr;
 
     class WorkFlag
     {
@@ -78,6 +81,10 @@ private:
     void HandleDataReceived(nw_connection_t aConnection);
     CHIP_ERROR ReleaseListener();
     void ReleaseAll();
+
+    CHIP_ERROR StartConnectionGroup(nw_group_descriptor_t groupDescriptor);
+    CHIP_ERROR ReleaseConnectionGroup();
+    CHIP_ERROR IPAnyJoinLeaveMulticastGroup(nw_endpoint_t endpoint, bool join);
 
     CFMutableDictionaryRef mConnections = nullptr;
     CHIP_ERROR GetConnection(const IPPacketInfo * aPktInfo);
