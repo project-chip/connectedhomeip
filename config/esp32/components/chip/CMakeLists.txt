@@ -302,6 +302,11 @@ if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
   chip_gn_arg_append("matter_trace_config" "\"${CHIP_ROOT}/src/tracing/esp32_trace:esp32_trace_tracing\"")
 endif()
 
+if (CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE)
+    chip_gn_arg_bool("matter_enable_tracing_support"  "true")
+    chip_gn_arg_append("matter_trace_config" "\"${CHIP_ROOT}/src/tracing/esp32_diagnostic_trace:esp32_diagnostic_tracing\"")
+endif()
+
 if (CONFIG_ENABLE_ESP_INSIGHTS_SYSTEM_STATS)
      chip_gn_arg_append("matter_enable_esp_insights_system_stats"            "true")
 endif()
@@ -312,6 +317,10 @@ endif()
 
 if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
    target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_trace/include")
+endif()
+
+if (CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE)
+    target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_diagnostic_trace/include")
 endif()
 
 if (CONFIG_CHIP_DEVICE_ENABLE_DYNAMIC_SERVER)
@@ -345,8 +354,8 @@ endif()
 
 set(args_gn "${CMAKE_CURRENT_BINARY_DIR}/args.gn")
 add_custom_command(OUTPUT "${args_gn}"
-                   COMMAND ${python} 
-                           ${CMAKE_CURRENT_LIST_DIR}/create_args_gn.py 
+                   COMMAND ${python}
+                           ${CMAKE_CURRENT_LIST_DIR}/create_args_gn.py
                            "${CMAKE_BINARY_DIR}"
                            "${idf_path}"
                            "${CMAKE_CURRENT_LIST_DIR}/chip.c"
@@ -378,6 +387,11 @@ endif()
 if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
   list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libEsp32TracingBackend.a")
 endif()
+
+if (CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE)
+  list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libEsp32DiagnosticsBackend.a")
+endif()
+
 
 # When using the pregenerated files, there is a edge case where an error appears for
 # undeclared argument chip_code_pre_generated_directory. To get around with it we are
@@ -468,10 +482,19 @@ endif()
 
 # Build Matter OTA image
 if (CONFIG_CHIP_OTA_IMAGE_BUILD)
-    chip_ota_image(chip-ota-image
-        INPUT_FILES ${BUILD_DIR}/${CMAKE_PROJECT_NAME}.bin
-        OUTPUT_FILE ${BUILD_DIR}/${CMAKE_PROJECT_NAME}-ota.bin
-    )
-    # Adding dependecy as app target so that this runs after images are ready
-    add_dependencies(chip-ota-image app)
+    if (CONFIG_OPENTHREAD_BORDER_ROUTER AND CONFIG_AUTO_UPDATE_RCP)
+        chip_ota_image(chip-ota-image
+            INPUT_FILES ${BUILD_DIR}/ota_with_rcp_image
+            OUTPUT_FILE ${BUILD_DIR}/ota_with_rcp_image-ota.bin
+        )
+        # Adding dependecy as app target so that this runs after images are ready
+        add_dependencies(chip-ota-image gen_ota_image)
+    else()
+        chip_ota_image(chip-ota-image
+            INPUT_FILES ${BUILD_DIR}/${CMAKE_PROJECT_NAME}.bin
+            OUTPUT_FILE ${BUILD_DIR}/${CMAKE_PROJECT_NAME}-ota.bin
+        )
+        # Adding dependecy as app target so that this runs after images are ready
+        add_dependencies(chip-ota-image app)
+    endif()
 endif()

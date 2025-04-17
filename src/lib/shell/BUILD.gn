@@ -111,6 +111,11 @@ static_library("shell") {
       "MainLoopAmeba.cpp",
       "streamer_ameba.cpp",
     ]
+  } else if (chip_device_platform == "realtek_bee") {
+    sources += [
+      "MainLoopBee.cpp",
+      "streamer_bee.cpp",
+    ]
   } else if (chip_device_platform == "openiotsdk") {
     sources += [
       "MainLoopDefault.cpp",
