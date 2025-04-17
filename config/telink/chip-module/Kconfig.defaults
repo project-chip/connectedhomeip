@@ -158,9 +158,6 @@ config BT_BUF_ACL_TX_SIZE
 config BT_BUF_EVT_RX_COUNT
     default 4
 
-config BT_BUF_ACL_RX_COUNT
-    default 4
-
 config BT_GATT_CACHING
     default n
 
