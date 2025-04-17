@@ -38,6 +38,7 @@ config("config") {
     "include/media-controller",
     "include/network-stream-source",
     "include/transport",
+    "include/uploader",
     "${chip_root}/examples/camera-app/camera-common/include",
     "${chip_root}/examples/camera-app/camera-common/include/media-controller",
     "${chip_root}/examples/camera-app/camera-common/include/transport",
@@ -67,7 +68,8 @@ executable("chip-camera-app") {
     "${chip_root}/examples/camera-app/linux/src/clusters/webrtc_provider/webrtc-provider-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/media-controller/default-media-controller.cpp",
     "${chip_root}/examples/camera-app/linux/src/network-stream-source/network-stream-source.cpp",
-    "${chip_root}/examples/camera-app/linux/src/pushav-transport.cpp",
+    "${chip_root}/examples/camera-app/linux/src/transport/pushav-transport.cpp",
+    "${chip_root}/examples/camera-app/linux/src/uploader/pushav-uploader.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
   ]
