@@ -201,7 +201,7 @@ class TC_G_2_2(MatterBaseTest):
         self.step("6")
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
             dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
-        #Get the group IDs that were added in step 5
+        # Get the group IDs that were added in step 5
         added_group_ids = [groupKeyMapStruct[i].groupId for i in range(2, 12)]
         # Verify that each group ID is present in the GroupTable list
         for group_id in added_group_ids:
