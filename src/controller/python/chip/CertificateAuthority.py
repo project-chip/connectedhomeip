@@ -91,7 +91,7 @@ class CertificateAuthority:
 
         self._persistentStorage = persistentStorage
         self._maximizeCertChains = False
-        self._omitIcacAlways = False
+        self._alwaysOmitIcac = False
         self._certificateValidityPeriodSec = CERTIFICATE_VALIDITY_PERIOD_SEC
 
         self._closure = self._chipStack.Call(
@@ -201,8 +201,8 @@ class CertificateAuthority:
         return self._maximizeCertChains
 
     @property
-    def omitIcacAlways(self) -> bool:
-        return self._omitIcacAlways
+    def alwaysOmitIcac(self) -> bool:
+        return self._alwaysOmitIcac
 
     @property
     def certificateValidityPeriodSec(self) -> int:
@@ -216,13 +216,13 @@ class CertificateAuthority:
 
         self._maximizeCertChains = enabled
 
-    @maximizeCertChains.setter
-    def omitIcacAlways(self, enabled: bool):
+    @alwaysOmitIcac.setter
+    def alwaysOmitIcac(self, enabled: bool):
         self._chipStack.Call(
             lambda: self._Handle().pychip_OpCreds_SetAlwaysOmitIcac(ctypes.c_void_p(self._closure), ctypes.c_bool(enabled))
         ).raise_on_error()
 
-        self._omitIcacAlways = enabled
+        self._alwaysOmitIcac = enabled
 
     @certificateValidityPeriodSec.setter
     def certificateValidityPeriodSec(self, validity: int):
