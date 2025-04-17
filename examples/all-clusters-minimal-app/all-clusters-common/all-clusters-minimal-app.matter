@@ -196,6 +196,12 @@ enum PositionTag : enum8 {
   kColumn = 6;
 }
 
+enum PowerThresholdSourceEnum : enum8 {
+  kContract = 0;
+  kRegulator = 1;
+  kEquipment = 2;
+}
+
 enum RelativePositionTag : enum8 {
   kUnder = 0;
   kNextTo = 1;
@@ -204,6 +210,19 @@ enum RelativePositionTag : enum8 {
   kAbove = 4;
   kFrontOf = 5;
   kBehind = 6;
+}
+
+enum TariffPriceTypeEnum : enum8 {
+  kStandard = 0;
+  kCritical = 1;
+  kVirtual = 2;
+  kIncentive = 3;
+  kIncentiveSignal = 4;
+}
+
+enum TariffUnitEnum : enum8 {
+  kKWh = 0;
+  kKVAh = 1;
 }
 
 enum TestGlobalEnum : enum8 {
@@ -224,6 +243,17 @@ bitmap TestGlobalBitmap : bitmap32 {
   kSecondBit = 0x2;
 }
 
+struct CurrencyStruct {
+  int16u currency = 0;
+  int8u decimalPoints = 1;
+}
+
+struct PowerThresholdStruct {
+  optional power_mw powerThreshold = 0;
+  optional power_mva apparentPowerThreshold = 1;
+  nullable PowerThresholdSourceEnum powerThresholdSource = 2;
+}
+
 struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
@@ -234,6 +264,11 @@ struct LocationDescriptorStruct {
   char_string<128> locationName = 0;
   nullable int16s floorNumber = 1;
   nullable AreaTypeTag areaType = 2;
+}
+
+struct PriceStruct {
+  money amount = 0;
+  CurrencyStruct currency = 1;
 }
 
 struct AtomicAttributeStatusStruct {
@@ -573,7 +608,7 @@ cluster Descriptor = 29 {
     kTagList = 0x1;
   }
 
-  struct DeviceTypeStruct {
+  shared struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
   }
@@ -925,7 +960,7 @@ cluster Actions = 37 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 cluster BasicInformation = 40 {
-  revision 3;
+  revision 5;
 
   enum ColorEnum : enum8 {
     kBlack = 0;
@@ -1008,6 +1043,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute int32u specificationVersion = 21;
   readonly attribute int16u maxPathsPerInvoke = 22;
+  readonly attribute int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2007,7 +2043,7 @@ cluster SoftwareDiagnostics = 52 {
 
 /** The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems */
 cluster ThreadNetworkDiagnostics = 53 {
-  revision 2;
+  revision 3;
 
   enum ConnectionStatusEnum : enum8 {
     kConnected = 0;
@@ -2160,6 +2196,8 @@ cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute nullable octet_string<4> channelPage0Mask = 60;
   readonly attribute nullable OperationalDatasetComponents operationalDatasetComponents = 61;
   readonly attribute NetworkFaultEnum activeNetworkFaultsList[] = 62;
+  provisional readonly attribute nullable int64u extAddress = 63;
+  provisional readonly attribute nullable int16u rloc16 = 64;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2167,7 +2205,7 @@ cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  /** Reception of this command SHALL reset the OverrunCount attributes to 0 */
+  /** Reception of this command SHALL reset the following attributes to 0: */
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
 }
 
@@ -2398,7 +2436,7 @@ cluster AdministratorCommissioning = 60 {
 
 /** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 cluster OperationalCredentials = 62 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum CertificateChainTypeEnum : enum8 {
     kDACCertificate = 1;
@@ -2424,14 +2462,14 @@ cluster OperationalCredentials = 62 {
     fabric_id fabricID = 3;
     node_id nodeID = 4;
     char_string<32> label = 5;
-    optional octet_string<85> vidVerificationStatement = 6;
+    optional octet_string<85> VIDVerificationStatement = 6;
     fabric_idx fabricIndex = 254;
   }
 
   fabric_scoped struct NOCStruct {
-    octet_string noc = 1;
-    nullable octet_string icac = 2;
-    optional octet_string vvsc = 3;
+    octet_string<400> noc = 1;
+    nullable octet_string<400> icac = 2;
+    optional octet_string<400> vvsc = 3;
     fabric_idx fabricIndex = 254;
   }
 
@@ -2453,7 +2491,7 @@ cluster OperationalCredentials = 62 {
   }
 
   response struct AttestationResponse = 1 {
-    octet_string<900> attestationElements = 0;
+    octet_string attestationElements = 0;
     octet_string<64> attestationSignature = 1;
   }
 
@@ -2472,7 +2510,7 @@ cluster OperationalCredentials = 62 {
 
   response struct CSRResponse = 5 {
     octet_string NOCSRElements = 0;
-    octet_string attestationSignature = 1;
+    octet_string<64> attestationSignature = 1;
   }
 
   request struct AddNOCRequest {
@@ -2484,8 +2522,8 @@ cluster OperationalCredentials = 62 {
   }
 
   request struct UpdateNOCRequest {
-    octet_string NOCValue = 0;
-    optional octet_string ICACValue = 1;
+    octet_string<400> NOCValue = 0;
+    optional octet_string<400> ICACValue = 1;
   }
 
   response struct NOCResponse = 8 {
@@ -2503,21 +2541,21 @@ cluster OperationalCredentials = 62 {
   }
 
   request struct AddTrustedRootCertificateRequest {
-    octet_string rootCACertificate = 0;
+    octet_string<400> rootCACertificate = 0;
   }
 
-  request struct SetVidVerificationStatementRequest {
+  request struct SetVIDVerificationStatementRequest {
     optional vendor_id vendorID = 0;
-    optional octet_string vidVerificationStatement = 1;
-    optional octet_string vvsc = 2;
+    optional octet_string<85> VIDVerificationStatement = 1;
+    optional octet_string<400> vvsc = 2;
   }
 
-  request struct SignVidVerificationRequestRequest {
+  request struct SignVIDVerificationRequestRequest {
     fabric_idx fabricIndex = 0;
     octet_string<32> clientChallenge = 1;
   }
 
-  response struct SignVidVerificationResponse = 14 {
+  response struct SignVIDVerificationResponse = 14 {
     fabric_idx fabricIndex = 0;
     int8u fabricBindingVersion = 1;
     octet_string signature = 2;
@@ -2531,7 +2569,7 @@ cluster OperationalCredentials = 62 {
   command access(invoke: administer) CSRRequest(CSRRequestRequest): CSRResponse = 4;
   /** Sender is requesting to add the new node operational certificates. */
   command access(invoke: administer) AddNOC(AddNOCRequest): NOCResponse = 6;
-  /** Sender is requesting to update the node operational certificates. */
+  /** This command SHALL replace the NOC and optional associated ICAC (if present) scoped under the accessing fabric upon successful validation of all arguments and preconditions. */
   fabric command access(invoke: administer) UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
   /** This command SHALL be used by an Administrative Node to set the user-visible Label field for a given Fabric, as reflected by entries in the Fabrics attribute. */
   fabric command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
@@ -2540,9 +2578,9 @@ cluster OperationalCredentials = 62 {
   /** This command SHALL add a Trusted Root CA Certificate, provided as its CHIP Certificate representation. */
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
   /** This command SHALL be used to update any of the accessing fabric's associated VendorID, VidVerificatioNStatement or VVSC (Vendor Verification Signing Certificate). */
-  fabric command access(invoke: administer) SetVidVerificationStatement(SetVidVerificationStatementRequest): DefaultSuccess = 12;
+  fabric command access(invoke: administer) SetVIDVerificationStatement(SetVIDVerificationStatementRequest): DefaultSuccess = 12;
   /** This command SHALL be used to request that the server authenticate the fabric associated with the FabricIndex given. */
-  command access(invoke: administer) SignVidVerificationRequest(SignVidVerificationRequestRequest): SignVidVerificationResponse = 13;
+  command access(invoke: administer) SignVIDVerificationRequest(SignVIDVerificationRequestRequest): SignVIDVerificationResponse = 13;
 }
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
@@ -2628,7 +2666,7 @@ labels. */
 cluster FixedLabel = 64 {
   revision 1; // NOTE: Default/not specifically set
 
-  struct LabelStruct {
+  shared struct LabelStruct {
     char_string<16> label = 0;
     char_string<16> value = 1;
   }
@@ -2646,7 +2684,7 @@ cluster FixedLabel = 64 {
 cluster UserLabel = 65 {
   revision 1; // NOTE: Default/not specifically set
 
-  struct LabelStruct {
+  shared struct LabelStruct {
     char_string<16> label = 0;
     char_string<16> value = 1;
   }
@@ -2773,7 +2811,7 @@ provisional cluster ScenesManagement = 98 {
     optional int64s valueSigned64 = 8;
   }
 
-  struct ExtensionFieldSet {
+  struct ExtensionFieldSetStruct {
     cluster_id clusterID = 0;
     AttributeValuePairStruct attributeValueList[] = 1;
   }
@@ -2787,7 +2825,6 @@ provisional cluster ScenesManagement = 98 {
     fabric_idx fabricIndex = 254;
   }
 
-  readonly attribute optional nullable node_id lastConfiguredBy = 0;
   readonly attribute int16u sceneTableSize = 1;
   readonly attribute SceneInfoStruct fabricSceneInfo[] = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -2801,8 +2838,8 @@ provisional cluster ScenesManagement = 98 {
     group_id groupID = 0;
     int8u sceneID = 1;
     int32u transitionTime = 2;
-    char_string sceneName = 3;
-    ExtensionFieldSet extensionFieldSets[] = 4;
+    char_string<16> sceneName = 3;
+    ExtensionFieldSetStruct extensionFieldSetStructs[] = 4;
   }
 
   response struct AddSceneResponse = 0 {
@@ -2821,8 +2858,8 @@ provisional cluster ScenesManagement = 98 {
     group_id groupID = 1;
     int8u sceneID = 2;
     optional int32u transitionTime = 3;
-    optional char_string sceneName = 4;
-    optional ExtensionFieldSet extensionFieldSets[] = 5;
+    optional char_string<16> sceneName = 4;
+    optional ExtensionFieldSetStruct extensionFieldSetStructs[] = 5;
   }
 
   request struct RemoveSceneRequest {
@@ -2887,7 +2924,7 @@ provisional cluster ScenesManagement = 98 {
     int8u sceneIdentifierFrom = 2;
   }
 
-  /** Add a scene to the scene table. Extension field sets are supported, and are inputed as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeID": VALUE, "Value*": VALUE}]}' */
+  /** Add a scene to the scene table. Extension field sets are input as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeID": VALUE, "Value*": VALUE}]}'. */
   fabric command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
   /** Retrieves the requested scene entry from its Scene table. */
   fabric command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
@@ -2899,9 +2936,9 @@ provisional cluster ScenesManagement = 98 {
   fabric command access(invoke: manage) StoreScene(StoreSceneRequest): StoreSceneResponse = 4;
   /** Set the attributes and corresponding state for each other cluster implemented on the endpoint accordingly to the resquested scene entry in the Scene Table */
   fabric command RecallScene(RecallSceneRequest): DefaultSuccess = 5;
-  /** Get an unused scene identifier when no commissioning tool is in the network, or for a commissioning tool to get the used scene identifiers within a certain group */
+  /** This command can be used to get the used scene identifiers within a certain group, for the endpoint that implements this cluster. */
   fabric command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
-  /** Allows a client to efficiently copy scenes from one group/scene identifier pair to another group/scene identifier pair. */
+  /** This command allows a client to efficiently copy scenes from one group/scene identifier pair to another group/scene identifier pair. */
   fabric command access(invoke: manage) CopyScene(CopySceneRequest): CopySceneResponse = 64;
 }
 
@@ -4692,7 +4729,7 @@ cluster IlluminanceMeasurement = 1024 {
 
 /** Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements. */
 cluster TemperatureMeasurement = 1026 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 4;
 
   readonly attribute nullable temperature measuredValue = 0;
   readonly attribute nullable temperature minMeasuredValue = 1;
@@ -5632,7 +5669,7 @@ cluster ApplicationLauncher = 1292 {
     kApplicationPlatform = 0x1;
   }
 
-  struct ApplicationStruct {
+  shared struct ApplicationStruct {
     int16u catalogVendorID = 0;
     char_string applicationID = 1;
   }
@@ -5688,7 +5725,7 @@ cluster ApplicationBasic = 1293 {
     kActiveVisibleNotFocus = 3;
   }
 
-  struct ApplicationStruct {
+  shared struct ApplicationStruct {
     int16u catalogVendorID = 0;
     char_string applicationID = 1;
   }
@@ -5713,8 +5750,9 @@ cluster ApplicationBasic = 1293 {
 cluster AccountLogin = 1294 {
   revision 2;
 
-  critical event LoggedOut = 0 {
+  fabric_sensitive critical event access(read: administer) LoggedOut = 0 {
     optional node_id node = 0;
+    fabric_idx fabricIndex = 254;
   }
 
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -5742,11 +5780,11 @@ cluster AccountLogin = 1294 {
     optional node_id node = 0;
   }
 
-  /** Upon receipt, the Content App checks if the account associated with the client Temp Account Identifier Rotating ID is the same acount that is active on the given Content App. If the accounts are the same, then the Content App includes the Setup PIN in the GetSetupPIN Response. */
+  /** The purpose of this command is to determine if the active user account of the given Content App matches the active user account of a given Commissionee, and when it does, return a Setup PIN which can be used for password-authenticated session establishment (PASE) with the Commissionee. */
   fabric timed command access(invoke: administer) GetSetupPIN(GetSetupPINRequest): GetSetupPINResponse = 0;
-  /** Upon receipt, the Content App checks if the account associated with the client’s Temp Account Identifier (Rotating ID) has a current active Setup PIN with the given value. If the Setup PIN is valid for the user account associated with the Temp Account Identifier, then the Content App MAY make that user account active. */
+  /** The purpose of this command is to allow the Content App to assume the user account of a given Commissionee by leveraging the Setup PIN input by the user during the commissioning process. */
   fabric timed command access(invoke: administer) Login(LoginRequest): DefaultSuccess = 2;
-  /** The purpose of this command is to instruct the Content App to clear the current user account. This command SHOULD be used by clients of a Content App to indicate the end of a user session. */
+  /** The purpose of this command is to instruct the Content App to clear the current user account. */
   fabric timed command Logout(LogoutRequest): DefaultSuccess = 3;
 }
 
@@ -6340,6 +6378,7 @@ endpoint 0 {
     callback attribute capabilityMinima;
     callback attribute specificationVersion;
     callback attribute maxPathsPerInvoke;
+    callback attribute configurationVersion default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -6566,6 +6605,9 @@ endpoint 0 {
     handle command UpdateFabricLabel;
     handle command RemoveFabric;
     handle command AddTrustedRootCertificate;
+    handle command SetVIDVerificationStatement;
+    handle command SignVIDVerificationRequest;
+    handle command SignVIDVerificationResponse;
   }
 
   server cluster GroupKeyManagement {
@@ -6773,7 +6815,6 @@ endpoint 1 {
   }
 
   server cluster ScenesManagement {
-    ram      attribute lastConfiguredBy;
     ram      attribute sceneTableSize default = 16;
     callback attribute fabricSceneInfo;
     callback attribute generatedCommandList;
@@ -7258,7 +7299,6 @@ endpoint 2 {
   }
 
   server cluster ScenesManagement {
-    ram      attribute lastConfiguredBy;
     ram      attribute sceneTableSize default = 16;
     callback attribute fabricSceneInfo;
     callback attribute generatedCommandList;

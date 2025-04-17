@@ -35,6 +35,7 @@
 #include <lib/core/Optional.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <platform/CHIPDeviceConfig.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/SetupPayload.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -59,6 +60,7 @@ struct LinuxDeviceOptions
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     bool mWiFiPAF                = false;
     const char * mWiFiPAFExtCmds = nullptr;
+    uint32_t mPublishId          = 0;
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE || CHIP_DEVICE_ENABLE_PORT_PARAMS
     uint16_t securedDevicePort         = CHIP_PORT;
@@ -96,6 +98,10 @@ struct LinuxDeviceOptions
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     chip::Optional<uint16_t> tcVersion;
     chip::Optional<uint16_t> tcRequired;
+#endif
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    chip::Optional<chip::System::Clock::Milliseconds32> icdActiveModeDurationMs;
+    chip::Optional<chip::System::Clock::Milliseconds32> icdIdleModeDurationMs;
 #endif
     static LinuxDeviceOptions & GetInstance();
 };

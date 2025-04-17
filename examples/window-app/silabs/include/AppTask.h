@@ -59,9 +59,9 @@ private:
     static AppTask sAppTask;
 
     /**
-     * @brief AppTask initialisation function
+     * @brief Override of BaseApplication::AppInit() virtual method, called by BaseApplication::Init()
      *
      * @return CHIP_ERROR
      */
-    CHIP_ERROR Init();
+    CHIP_ERROR AppInit() override;
 };
