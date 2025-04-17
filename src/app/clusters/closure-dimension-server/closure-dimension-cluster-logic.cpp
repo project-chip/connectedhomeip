@@ -177,7 +177,8 @@ CHIP_ERROR ClusterLogic::SetUnitRange(const DataModel::Nullable<Structs::UnitRan
     {
         // If both the mState unitRange and argument unitRange are null, then just return CHIP_NO_ERROR
         // If the mState unitRange is not null and argument unitRange is null, then set mstate unitRange to null.
-        if (!mState.unitRange.IsNull()) {
+        if (!mState.unitRange.IsNull())
+        {
             mState.unitRange.SetNull();
             mMatterContext.MarkDirty(Attributes::UnitRange::Id);
         }
@@ -518,8 +519,7 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
         newPosition = (currentPosition > delta) ? currentPosition - delta : 0;
         // Position value SHALL be clamped to 0.00% if the LM feature is not supported or LimitRange.Min if the LM feature is
         // supported.
-        newPosition =
-            limitSupported ? std::max(newPosition, static_cast<uint32_t>(limitRange.min)) : newPosition;
+        newPosition = limitSupported ? std::max(newPosition, static_cast<uint32_t>(limitRange.min)) : newPosition;
         break;
 
     case StepDirectionEnum::kIncrease:
@@ -527,8 +527,8 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
         newPosition = (currentPosition > UINT32_MAX - delta) ? UINT32_MAX : currentPosition + delta;
         // Position value SHALL be clamped to 0.00% if the LM feature is not supported or LimitRange.Max if the LM feature is
         // supported.
-        newPosition =
-            limitSupported ? std::min(newPosition, static_cast<uint32_t>(limitRange.max)) : std::min(newPosition, static_cast<uint32_t>(10000));
+        newPosition = limitSupported ? std::min(newPosition, static_cast<uint32_t>(limitRange.max))
+                                     : std::min(newPosition, static_cast<uint32_t>(10000));
         break;
 
     default:
