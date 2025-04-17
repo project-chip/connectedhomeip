@@ -54,7 +54,7 @@ class TC_CNET_4_12(MatterBaseTest):
             dataset_bytes: The dataset to validate, expected to be in byte format.
             dataset_name: The name of the dataset.
         """
-        logger.info(f"Validating {dataset_name}...")
+        logger.info(f"Validating {dataset_name}")
 
         # Validate that the dataset contains valid data (not empty)
         asserts.assert_true(len(dataset_bytes) > 0, f"PIXIT.CNET.{dataset_name} must be supplied.")
@@ -158,8 +158,8 @@ class TC_CNET_4_12(MatterBaseTest):
         # Validate the operational dataset structure (for both datasets)
         logger.info("Precondition 2: Validating THREAD operational datasets")
 
-        self.validate_thread_dataset(th_xpan, "THREAD_1ST_OPERATIONALDATASET")
-        self.validate_thread_dataset(th_xpan_1, "THREAD_2ND_OPERATIONALDATASET")
+        await self.validate_thread_dataset(th_xpan, "THREAD_1ST_OPERATIONALDATASET")
+        await self.validate_thread_dataset(th_xpan_1, "THREAD_2ND_OPERATIONALDATASET")
 
         # The FeatureMap attribute value is 2
         feature_map = await self.read_single_attribute_check_success(
