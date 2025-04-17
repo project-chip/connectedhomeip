@@ -189,7 +189,7 @@
         "CHANNEL_CLUSTER": ["channel-server"],
         "CHIME_CLUSTER": ["chime-server"],
         "CLOSURE_CONTROL_CLUSTER": ["closure-control-server"],
-        "CLOSURE_DIMENSION_CLUSTER": [],
+        "CLOSURE_DIMENSION_CLUSTER": ["closure-dimension-server"],
         "COLOR_CONTROL_CLUSTER": ["color-control-server"],
         "COMMISSIONER_CONTROL_CLUSTER": ["commissioner-control-server"],
         "COMMISSIONING_CLUSTER": [],

@@ -13,7 +13,8 @@
 # limitations under the License.
 import os
 
-from matter.idl.generators import CodeGenerator, GeneratorStorage
+from matter.idl.generators import CodeGenerator
+from matter.idl.generators.storage import GeneratorStorage
 from matter.idl.matter_idl_types import Idl
 
 
