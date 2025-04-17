@@ -35,7 +35,7 @@ namespace Clusters {
 namespace CommodityPrice {
 
 // Spec-defined constraints
-constexpr uint8_t kMaxForecastEntries         = 56;
+constexpr uint8_t kMaxForecastEntries         = 5;
 constexpr uint8_t kMaxComponentsPerPriceEntry = 10;
 
 constexpr uint16_t kMaxCurrencyValue = 999; // From spec
