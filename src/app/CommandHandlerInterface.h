@@ -244,7 +244,7 @@ class CommandHandlerInterfaceShim : public CommandHandlerInterface
     {
         if constexpr (sizeof...(TClusterIds) == 0)
         {
-            return DataModel::AcceptedCommandEntryFor(cluster.mClusterId, command, Clusters::ClusterIdsMetaList);
+            return DataModel::AcceptedCommandEntryFor(cluster.mClusterId, command);
         }
         else
         {
@@ -252,7 +252,6 @@ class CommandHandlerInterfaceShim : public CommandHandlerInterface
         }
     }
 
-    // Implements new interface
     CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
                                          ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override
     {
@@ -279,11 +278,15 @@ class CommandHandlerInterfaceShim : public CommandHandlerInterface
         return CHIP_NO_ERROR;
     }
 
+    // [[deprecated("This interface is only provided to make the transition simpler,"
+    //              "and it might be removed on any subsequent releases")]]
     virtual CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
+    // [[deprecated("This interface is only provided to make the transition simpler,"
+    //              "and it might be removed on any subsequent releases")]]
     virtual CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;

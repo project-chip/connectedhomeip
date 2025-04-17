@@ -21,6 +21,7 @@ template <ClusterId... TClusterIds>
 DataModel::AcceptedCommandEntry AcceptedCommandEntryFor(ClusterId id, CommandId command,
                                                         Meta::ObjectList<TClusterIds...> clusterIdList = {} /*For easy template deduction*/)
 {
+    using namespace chip::app::Clusters; 
     {%- for cluster in clusters | sort(attribute='name') %}
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == {{cluster.name}}::Id) || ...))
     {
