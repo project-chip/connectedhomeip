@@ -281,88 +281,717 @@
 #include <clusters/ZoneManagement/Ids.h>
 #include <clusters/ZoneManagement/MetadataBridge.h>
 #include <lib/support/meta/MetaObjects.h>
-#include <lib/support/meta/MetaSwitch.h>
 
 namespace chip {
 namespace app {
-
-namespace Clusters {
-constexpr Meta::ObjectList<
-    chip::app::Clusters::AccessControl::Id, chip::app::Clusters::AccountLogin::Id, chip::app::Clusters::Actions::Id,
-    chip::app::Clusters::ActivatedCarbonFilterMonitoring::Id, chip::app::Clusters::AdministratorCommissioning::Id,
-    chip::app::Clusters::AirQuality::Id, chip::app::Clusters::ApplicationBasic::Id, chip::app::Clusters::ApplicationLauncher::Id,
-    chip::app::Clusters::AudioOutput::Id, chip::app::Clusters::BallastConfiguration::Id, chip::app::Clusters::BasicInformation::Id,
-    chip::app::Clusters::Binding::Id, chip::app::Clusters::BooleanState::Id, chip::app::Clusters::BooleanStateConfiguration::Id,
-    chip::app::Clusters::BridgedDeviceBasicInformation::Id, chip::app::Clusters::CameraAvSettingsUserLevelManagement::Id,
-    chip::app::Clusters::CameraAvStreamManagement::Id, chip::app::Clusters::CarbonDioxideConcentrationMeasurement::Id,
-    chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::Id, chip::app::Clusters::Channel::Id,
-    chip::app::Clusters::Chime::Id, chip::app::Clusters::ClosureControl::Id, chip::app::Clusters::ClosureDimension::Id,
-    chip::app::Clusters::ColorControl::Id, chip::app::Clusters::CommissionerControl::Id, chip::app::Clusters::CommodityMetering::Id,
-    chip::app::Clusters::CommodityPrice::Id, chip::app::Clusters::CommodityTariff::Id, chip::app::Clusters::ContentAppObserver::Id,
-    chip::app::Clusters::ContentControl::Id, chip::app::Clusters::ContentLauncher::Id,
-    chip::app::Clusters::DemandResponseLoadControl::Id, chip::app::Clusters::Descriptor::Id,
-    chip::app::Clusters::DeviceEnergyManagement::Id, chip::app::Clusters::DeviceEnergyManagementMode::Id,
-    chip::app::Clusters::DiagnosticLogs::Id, chip::app::Clusters::DishwasherAlarm::Id, chip::app::Clusters::DishwasherMode::Id,
-    chip::app::Clusters::DoorLock::Id, chip::app::Clusters::EcosystemInformation::Id,
-    chip::app::Clusters::ElectricalEnergyMeasurement::Id, chip::app::Clusters::ElectricalGridConditions::Id,
-    chip::app::Clusters::ElectricalPowerMeasurement::Id, chip::app::Clusters::EnergyEvse::Id,
-    chip::app::Clusters::EnergyEvseMode::Id, chip::app::Clusters::EnergyPreference::Id,
-    chip::app::Clusters::EthernetNetworkDiagnostics::Id, chip::app::Clusters::FanControl::Id,
-    chip::app::Clusters::FaultInjection::Id, chip::app::Clusters::FixedLabel::Id, chip::app::Clusters::FlowMeasurement::Id,
-    chip::app::Clusters::FormaldehydeConcentrationMeasurement::Id, chip::app::Clusters::GeneralCommissioning::Id,
-    chip::app::Clusters::GeneralDiagnostics::Id, chip::app::Clusters::GroupKeyManagement::Id, chip::app::Clusters::Groups::Id,
-    chip::app::Clusters::HepaFilterMonitoring::Id, chip::app::Clusters::IcdManagement::Id, chip::app::Clusters::Identify::Id,
-    chip::app::Clusters::IlluminanceMeasurement::Id, chip::app::Clusters::KeypadInput::Id,
-    chip::app::Clusters::LaundryDryerControls::Id, chip::app::Clusters::LaundryWasherControls::Id,
-    chip::app::Clusters::LaundryWasherMode::Id, chip::app::Clusters::LevelControl::Id,
-    chip::app::Clusters::LocalizationConfiguration::Id, chip::app::Clusters::LowPower::Id, chip::app::Clusters::MediaInput::Id,
-    chip::app::Clusters::MediaPlayback::Id, chip::app::Clusters::Messages::Id, chip::app::Clusters::MeterIdentification::Id,
-    chip::app::Clusters::MicrowaveOvenControl::Id, chip::app::Clusters::MicrowaveOvenMode::Id, chip::app::Clusters::ModeSelect::Id,
-    chip::app::Clusters::NetworkCommissioning::Id, chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::Id,
-    chip::app::Clusters::OccupancySensing::Id, chip::app::Clusters::OnOff::Id, chip::app::Clusters::OperationalCredentials::Id,
-    chip::app::Clusters::OperationalState::Id, chip::app::Clusters::OtaSoftwareUpdateProvider::Id,
-    chip::app::Clusters::OtaSoftwareUpdateRequestor::Id, chip::app::Clusters::OvenCavityOperationalState::Id,
-    chip::app::Clusters::OvenMode::Id, chip::app::Clusters::OzoneConcentrationMeasurement::Id,
-    chip::app::Clusters::Pm10ConcentrationMeasurement::Id, chip::app::Clusters::Pm1ConcentrationMeasurement::Id,
-    chip::app::Clusters::Pm25ConcentrationMeasurement::Id, chip::app::Clusters::PowerSource::Id,
-    chip::app::Clusters::PowerSourceConfiguration::Id, chip::app::Clusters::PowerTopology::Id,
-    chip::app::Clusters::PressureMeasurement::Id, chip::app::Clusters::ProxyConfiguration::Id,
-    chip::app::Clusters::ProxyDiscovery::Id, chip::app::Clusters::ProxyValid::Id, chip::app::Clusters::PulseWidthModulation::Id,
-    chip::app::Clusters::PumpConfigurationAndControl::Id, chip::app::Clusters::PushAvStreamTransport::Id,
-    chip::app::Clusters::RadonConcentrationMeasurement::Id, chip::app::Clusters::RefrigeratorAlarm::Id,
-    chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id, chip::app::Clusters::RelativeHumidityMeasurement::Id,
-    chip::app::Clusters::RvcCleanMode::Id, chip::app::Clusters::RvcOperationalState::Id, chip::app::Clusters::RvcRunMode::Id,
-    chip::app::Clusters::SampleMei::Id, chip::app::Clusters::ScenesManagement::Id, chip::app::Clusters::ServiceArea::Id,
-    chip::app::Clusters::SmokeCoAlarm::Id, chip::app::Clusters::SoftwareDiagnostics::Id, chip::app::Clusters::Switch::Id,
-    chip::app::Clusters::TargetNavigator::Id, chip::app::Clusters::TemperatureControl::Id,
-    chip::app::Clusters::TemperatureMeasurement::Id, chip::app::Clusters::Thermostat::Id,
-    chip::app::Clusters::ThermostatUserInterfaceConfiguration::Id, chip::app::Clusters::ThreadBorderRouterManagement::Id,
-    chip::app::Clusters::ThreadNetworkDiagnostics::Id, chip::app::Clusters::ThreadNetworkDirectory::Id,
-    chip::app::Clusters::TimeFormatLocalization::Id, chip::app::Clusters::Timer::Id, chip::app::Clusters::TimeSynchronization::Id,
-    chip::app::Clusters::TlsCertificateManagement::Id, chip::app::Clusters::TlsClientManagement::Id,
-    chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id, chip::app::Clusters::UnitLocalization::Id,
-    chip::app::Clusters::UnitTesting::Id, chip::app::Clusters::UserLabel::Id, chip::app::Clusters::ValveConfigurationAndControl::Id,
-    chip::app::Clusters::WakeOnLan::Id, chip::app::Clusters::WaterHeaterManagement::Id, chip::app::Clusters::WaterHeaterMode::Id,
-    chip::app::Clusters::WebRTCTransportProvider::Id, chip::app::Clusters::WebRTCTransportRequestor::Id,
-    chip::app::Clusters::WiFiNetworkDiagnostics::Id, chip::app::Clusters::WiFiNetworkManagement::Id,
-    chip::app::Clusters::WindowCovering::Id, chip::app::Clusters::ZoneManagement::Id>
-    ClusterIdsMetaList;
-} // namespace Clusters
-
 namespace DataModel {
+
 template <ClusterId... TClusterIds>
-DataModel::AcceptedCommandEntry AcceptedCommandEntryFor(ClusterId id, CommandId command,
-                                                        Meta::ObjectList<TClusterIds...> = {} /*For easy template deduction*/)
+DataModel::AcceptedCommandEntry
+AcceptedCommandEntryFor(ClusterId id, CommandId command,
+                        Meta::ObjectList<TClusterIds...> clusterIdList = {} /*For easy template deduction*/)
 {
-    // Dynamically generate the Switch statement with the only the required metadata
-    // clang-format off
-    return Meta::Switch(id,
-        Meta::Case<TClusterIds>([=](){
-            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, TClusterIds>::EntryFor(command);
-        })...,
-        Meta::Default(DataModel::AcceptedCommandEntry{})
-    );
-    // clang-format on
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == AccessControl::Id) || ...))
+    {
+        if (id == AccessControl::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, AccessControl::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == AccountLogin::Id) || ...))
+    {
+        if (id == AccountLogin::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, AccountLogin::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == Actions::Id) || ...))
+    {
+        if (id == Actions::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Actions::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ActivatedCarbonFilterMonitoring::Id) || ...))
+    {
+        if (id == ActivatedCarbonFilterMonitoring::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ActivatedCarbonFilterMonitoring::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == AdministratorCommissioning::Id) || ...))
+    {
+        if (id == AdministratorCommissioning::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, AdministratorCommissioning::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == AirQuality::Id) || ...))
+    {
+        if (id == AirQuality::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, AirQuality::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ApplicationBasic::Id) || ...))
+    {
+        if (id == ApplicationBasic::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ApplicationBasic::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ApplicationLauncher::Id) || ...))
+    {
+        if (id == ApplicationLauncher::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ApplicationLauncher::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == AudioOutput::Id) || ...))
+    {
+        if (id == AudioOutput::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, AudioOutput::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == BallastConfiguration::Id) || ...))
+    {
+        if (id == BallastConfiguration::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, BallastConfiguration::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == BasicInformation::Id) || ...))
+    {
+        if (id == BasicInformation::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, BasicInformation::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == Binding::Id) || ...))
+    {
+        if (id == Binding::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Binding::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == BooleanState::Id) || ...))
+    {
+        if (id == BooleanState::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, BooleanState::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == BooleanStateConfiguration::Id) || ...))
+    {
+        if (id == BooleanStateConfiguration::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, BooleanStateConfiguration::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == BridgedDeviceBasicInformation::Id) || ...))
+    {
+        if (id == BridgedDeviceBasicInformation::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, BridgedDeviceBasicInformation::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == CameraAvSettingsUserLevelManagement::Id) || ...))
+    {
+        if (id == CameraAvSettingsUserLevelManagement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, CameraAvSettingsUserLevelManagement::Id>::EntryFor(
+                command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == CameraAvStreamManagement::Id) || ...))
+    {
+        if (id == CameraAvStreamManagement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, CameraAvStreamManagement::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == CarbonDioxideConcentrationMeasurement::Id) || ...))
+    {
+        if (id == CarbonDioxideConcentrationMeasurement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, CarbonDioxideConcentrationMeasurement::Id>::EntryFor(
+                command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == CarbonMonoxideConcentrationMeasurement::Id) || ...))
+    {
+        if (id == CarbonMonoxideConcentrationMeasurement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, CarbonMonoxideConcentrationMeasurement::Id>::EntryFor(
+                command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == Channel::Id) || ...))
+    {
+        if (id == Channel::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Channel::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == Chime::Id) || ...))
+    {
+        if (id == Chime::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Chime::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ClosureControl::Id) || ...))
+    {
+        if (id == ClosureControl::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ClosureControl::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ClosureDimension::Id) || ...))
+    {
+        if (id == ClosureDimension::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ClosureDimension::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ColorControl::Id) || ...))
+    {
+        if (id == ColorControl::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ColorControl::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == CommissionerControl::Id) || ...))
+    {
+        if (id == CommissionerControl::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, CommissionerControl::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == CommodityMetering::Id) || ...))
+    {
+        if (id == CommodityMetering::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, CommodityMetering::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == CommodityPrice::Id) || ...))
+    {
+        if (id == CommodityPrice::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, CommodityPrice::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == CommodityTariff::Id) || ...))
+    {
+        if (id == CommodityTariff::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, CommodityTariff::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ContentAppObserver::Id) || ...))
+    {
+        if (id == ContentAppObserver::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ContentAppObserver::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ContentControl::Id) || ...))
+    {
+        if (id == ContentControl::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ContentControl::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ContentLauncher::Id) || ...))
+    {
+        if (id == ContentLauncher::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ContentLauncher::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == DemandResponseLoadControl::Id) || ...))
+    {
+        if (id == DemandResponseLoadControl::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, DemandResponseLoadControl::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == Descriptor::Id) || ...))
+    {
+        if (id == Descriptor::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Descriptor::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == DeviceEnergyManagement::Id) || ...))
+    {
+        if (id == DeviceEnergyManagement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, DeviceEnergyManagement::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == DeviceEnergyManagementMode::Id) || ...))
+    {
+        if (id == DeviceEnergyManagementMode::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, DeviceEnergyManagementMode::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == DiagnosticLogs::Id) || ...))
+    {
+        if (id == DiagnosticLogs::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, DiagnosticLogs::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == DishwasherAlarm::Id) || ...))
+    {
+        if (id == DishwasherAlarm::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, DishwasherAlarm::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == DishwasherMode::Id) || ...))
+    {
+        if (id == DishwasherMode::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, DishwasherMode::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == DoorLock::Id) || ...))
+    {
+        if (id == DoorLock::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, DoorLock::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == EcosystemInformation::Id) || ...))
+    {
+        if (id == EcosystemInformation::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, EcosystemInformation::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ElectricalEnergyMeasurement::Id) || ...))
+    {
+        if (id == ElectricalEnergyMeasurement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ElectricalEnergyMeasurement::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ElectricalGridConditions::Id) || ...))
+    {
+        if (id == ElectricalGridConditions::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ElectricalGridConditions::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ElectricalPowerMeasurement::Id) || ...))
+    {
+        if (id == ElectricalPowerMeasurement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ElectricalPowerMeasurement::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == EnergyEvse::Id) || ...))
+    {
+        if (id == EnergyEvse::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, EnergyEvse::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == EnergyEvseMode::Id) || ...))
+    {
+        if (id == EnergyEvseMode::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, EnergyEvseMode::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == EnergyPreference::Id) || ...))
+    {
+        if (id == EnergyPreference::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, EnergyPreference::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == EthernetNetworkDiagnostics::Id) || ...))
+    {
+        if (id == EthernetNetworkDiagnostics::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, EthernetNetworkDiagnostics::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == FanControl::Id) || ...))
+    {
+        if (id == FanControl::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, FanControl::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == FaultInjection::Id) || ...))
+    {
+        if (id == FaultInjection::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, FaultInjection::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == FixedLabel::Id) || ...))
+    {
+        if (id == FixedLabel::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, FixedLabel::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == FlowMeasurement::Id) || ...))
+    {
+        if (id == FlowMeasurement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, FlowMeasurement::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == FormaldehydeConcentrationMeasurement::Id) || ...))
+    {
+        if (id == FormaldehydeConcentrationMeasurement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, FormaldehydeConcentrationMeasurement::Id>::EntryFor(
+                command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == GeneralCommissioning::Id) || ...))
+    {
+        if (id == GeneralCommissioning::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, GeneralCommissioning::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == GeneralDiagnostics::Id) || ...))
+    {
+        if (id == GeneralDiagnostics::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, GeneralDiagnostics::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == GroupKeyManagement::Id) || ...))
+    {
+        if (id == GroupKeyManagement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, GroupKeyManagement::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == Groups::Id) || ...))
+    {
+        if (id == Groups::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Groups::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == HepaFilterMonitoring::Id) || ...))
+    {
+        if (id == HepaFilterMonitoring::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, HepaFilterMonitoring::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == IcdManagement::Id) || ...))
+    {
+        if (id == IcdManagement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, IcdManagement::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == Identify::Id) || ...))
+    {
+        if (id == Identify::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Identify::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == IlluminanceMeasurement::Id) || ...))
+    {
+        if (id == IlluminanceMeasurement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, IlluminanceMeasurement::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == KeypadInput::Id) || ...))
+    {
+        if (id == KeypadInput::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, KeypadInput::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == LaundryDryerControls::Id) || ...))
+    {
+        if (id == LaundryDryerControls::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, LaundryDryerControls::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == LaundryWasherControls::Id) || ...))
+    {
+        if (id == LaundryWasherControls::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, LaundryWasherControls::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == LaundryWasherMode::Id) || ...))
+    {
+        if (id == LaundryWasherMode::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, LaundryWasherMode::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == LevelControl::Id) || ...))
+    {
+        if (id == LevelControl::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, LevelControl::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == LocalizationConfiguration::Id) || ...))
+    {
+        if (id == LocalizationConfiguration::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, LocalizationConfiguration::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == LowPower::Id) || ...))
+    {
+        if (id == LowPower::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, LowPower::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == MediaInput::Id) || ...))
+    {
+        if (id == MediaInput::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, MediaInput::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == MediaPlayback::Id) || ...))
+    {
+        if (id == MediaPlayback::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, MediaPlayback::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == Messages::Id) || ...))
+    {
+        if (id == Messages::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Messages::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == MeterIdentification::Id) || ...))
+    {
+        if (id == MeterIdentification::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, MeterIdentification::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == MicrowaveOvenControl::Id) || ...))
+    {
+        if (id == MicrowaveOvenControl::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, MicrowaveOvenControl::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == MicrowaveOvenMode::Id) || ...))
+    {
+        if (id == MicrowaveOvenMode::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, MicrowaveOvenMode::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ModeSelect::Id) || ...))
+    {
+        if (id == ModeSelect::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ModeSelect::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == NetworkCommissioning::Id) || ...))
+    {
+        if (id == NetworkCommissioning::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, NetworkCommissioning::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == NitrogenDioxideConcentrationMeasurement::Id) || ...))
+    {
+        if (id == NitrogenDioxideConcentrationMeasurement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, NitrogenDioxideConcentrationMeasurement::Id>::EntryFor(
+                command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == OccupancySensing::Id) || ...))
+    {
+        if (id == OccupancySensing::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, OccupancySensing::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == OnOff::Id) || ...))
+    {
+        if (id == OnOff::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, OnOff::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == OperationalCredentials::Id) || ...))
+    {
+        if (id == OperationalCredentials::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, OperationalCredentials::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == OperationalState::Id) || ...))
+    {
+        if (id == OperationalState::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, OperationalState::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == OtaSoftwareUpdateProvider::Id) || ...))
+    {
+        if (id == OtaSoftwareUpdateProvider::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, OtaSoftwareUpdateProvider::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == OtaSoftwareUpdateRequestor::Id) || ...))
+    {
+        if (id == OtaSoftwareUpdateRequestor::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, OtaSoftwareUpdateRequestor::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == OvenCavityOperationalState::Id) || ...))
+    {
+        if (id == OvenCavityOperationalState::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, OvenCavityOperationalState::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == OvenMode::Id) || ...))
+    {
+        if (id == OvenMode::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, OvenMode::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == OzoneConcentrationMeasurement::Id) || ...))
+    {
+        if (id == OzoneConcentrationMeasurement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, OzoneConcentrationMeasurement::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == Pm10ConcentrationMeasurement::Id) || ...))
+    {
+        if (id == Pm10ConcentrationMeasurement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Pm10ConcentrationMeasurement::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == Pm1ConcentrationMeasurement::Id) || ...))
+    {
+        if (id == Pm1ConcentrationMeasurement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Pm1ConcentrationMeasurement::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == Pm25ConcentrationMeasurement::Id) || ...))
+    {
+        if (id == Pm25ConcentrationMeasurement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Pm25ConcentrationMeasurement::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == PowerSource::Id) || ...))
+    {
+        if (id == PowerSource::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, PowerSource::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == PowerSourceConfiguration::Id) || ...))
+    {
+        if (id == PowerSourceConfiguration::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, PowerSourceConfiguration::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == PowerTopology::Id) || ...))
+    {
+        if (id == PowerTopology::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, PowerTopology::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == PressureMeasurement::Id) || ...))
+    {
+        if (id == PressureMeasurement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, PressureMeasurement::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ProxyConfiguration::Id) || ...))
+    {
+        if (id == ProxyConfiguration::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ProxyConfiguration::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ProxyDiscovery::Id) || ...))
+    {
+        if (id == ProxyDiscovery::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ProxyDiscovery::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ProxyValid::Id) || ...))
+    {
+        if (id == ProxyValid::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ProxyValid::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == PulseWidthModulation::Id) || ...))
+    {
+        if (id == PulseWidthModulation::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, PulseWidthModulation::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == PumpConfigurationAndControl::Id) || ...))
+    {
+        if (id == PumpConfigurationAndControl::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, PumpConfigurationAndControl::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == PushAvStreamTransport::Id) || ...))
+    {
+        if (id == PushAvStreamTransport::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, PushAvStreamTransport::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == RadonConcentrationMeasurement::Id) || ...))
+    {
+        if (id == RadonConcentrationMeasurement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, RadonConcentrationMeasurement::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == RefrigeratorAlarm::Id) || ...))
+    {
+        if (id == RefrigeratorAlarm::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, RefrigeratorAlarm::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == RefrigeratorAndTemperatureControlledCabinetMode::Id) || ...))
+    {
+        if (id == RefrigeratorAndTemperatureControlledCabinetMode::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry,
+                                           RefrigeratorAndTemperatureControlledCabinetMode::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == RelativeHumidityMeasurement::Id) || ...))
+    {
+        if (id == RelativeHumidityMeasurement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, RelativeHumidityMeasurement::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == RvcCleanMode::Id) || ...))
+    {
+        if (id == RvcCleanMode::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, RvcCleanMode::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == RvcOperationalState::Id) || ...))
+    {
+        if (id == RvcOperationalState::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, RvcOperationalState::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == RvcRunMode::Id) || ...))
+    {
+        if (id == RvcRunMode::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, RvcRunMode::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == SampleMei::Id) || ...))
+    {
+        if (id == SampleMei::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, SampleMei::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ScenesManagement::Id) || ...))
+    {
+        if (id == ScenesManagement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ScenesManagement::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ServiceArea::Id) || ...))
+    {
+        if (id == ServiceArea::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ServiceArea::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == SmokeCoAlarm::Id) || ...))
+    {
+        if (id == SmokeCoAlarm::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, SmokeCoAlarm::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == SoftwareDiagnostics::Id) || ...))
+    {
+        if (id == SoftwareDiagnostics::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, SoftwareDiagnostics::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == Switch::Id) || ...))
+    {
+        if (id == Switch::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Switch::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == TargetNavigator::Id) || ...))
+    {
+        if (id == TargetNavigator::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, TargetNavigator::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == TemperatureControl::Id) || ...))
+    {
+        if (id == TemperatureControl::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, TemperatureControl::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == TemperatureMeasurement::Id) || ...))
+    {
+        if (id == TemperatureMeasurement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, TemperatureMeasurement::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == Thermostat::Id) || ...))
+    {
+        if (id == Thermostat::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Thermostat::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ThermostatUserInterfaceConfiguration::Id) || ...))
+    {
+        if (id == ThermostatUserInterfaceConfiguration::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ThermostatUserInterfaceConfiguration::Id>::EntryFor(
+                command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ThreadBorderRouterManagement::Id) || ...))
+    {
+        if (id == ThreadBorderRouterManagement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ThreadBorderRouterManagement::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ThreadNetworkDiagnostics::Id) || ...))
+    {
+        if (id == ThreadNetworkDiagnostics::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ThreadNetworkDiagnostics::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ThreadNetworkDirectory::Id) || ...))
+    {
+        if (id == ThreadNetworkDirectory::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ThreadNetworkDirectory::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == TimeFormatLocalization::Id) || ...))
+    {
+        if (id == TimeFormatLocalization::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, TimeFormatLocalization::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == Timer::Id) || ...))
+    {
+        if (id == Timer::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Timer::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == TimeSynchronization::Id) || ...))
+    {
+        if (id == TimeSynchronization::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, TimeSynchronization::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == TlsCertificateManagement::Id) || ...))
+    {
+        if (id == TlsCertificateManagement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, TlsCertificateManagement::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == TlsClientManagement::Id) || ...))
+    {
+        if (id == TlsClientManagement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, TlsClientManagement::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 ||
+                  ((TClusterIds == TotalVolatileOrganicCompoundsConcentrationMeasurement::Id) || ...))
+    {
+        if (id == TotalVolatileOrganicCompoundsConcentrationMeasurement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry,
+                                           TotalVolatileOrganicCompoundsConcentrationMeasurement::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == UnitLocalization::Id) || ...))
+    {
+        if (id == UnitLocalization::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, UnitLocalization::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == UnitTesting::Id) || ...))
+    {
+        if (id == UnitTesting::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, UnitTesting::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == UserLabel::Id) || ...))
+    {
+        if (id == UserLabel::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, UserLabel::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ValveConfigurationAndControl::Id) || ...))
+    {
+        if (id == ValveConfigurationAndControl::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ValveConfigurationAndControl::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == WakeOnLan::Id) || ...))
+    {
+        if (id == WakeOnLan::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, WakeOnLan::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == WaterHeaterManagement::Id) || ...))
+    {
+        if (id == WaterHeaterManagement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, WaterHeaterManagement::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == WaterHeaterMode::Id) || ...))
+    {
+        if (id == WaterHeaterMode::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, WaterHeaterMode::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == WebRTCTransportProvider::Id) || ...))
+    {
+        if (id == WebRTCTransportProvider::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, WebRTCTransportProvider::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == WebRTCTransportRequestor::Id) || ...))
+    {
+        if (id == WebRTCTransportRequestor::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, WebRTCTransportRequestor::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == WiFiNetworkDiagnostics::Id) || ...))
+    {
+        if (id == WiFiNetworkDiagnostics::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, WiFiNetworkDiagnostics::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == WiFiNetworkManagement::Id) || ...))
+    {
+        if (id == WiFiNetworkManagement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, WiFiNetworkManagement::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == WindowCovering::Id) || ...))
+    {
+        if (id == WindowCovering::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, WindowCovering::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ZoneManagement::Id) || ...))
+    {
+        if (id == ZoneManagement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ZoneManagement::Id>::EntryFor(command);
+    }
+
+    return DataModel::AcceptedCommandEntry{};
 }
 
 } // namespace DataModel
