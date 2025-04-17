@@ -1238,7 +1238,7 @@ bool emberAfOperationalCredentialsClusterSetVIDVerificationStatementCallback(
 
     FabricIndex fabricIndex = commandObj->GetAccessingFabricIndex();
     ChipLogProgress(Zcl, "OpCreds: Received a SetVIDVerificationStatement Command for FabricIndex 0x%x",
-        static_cast<unsigned>(fabricIndex));
+                    static_cast<unsigned>(fabricIndex));
 
     if (!commandData.vendorID.HasValue() && !commandData.VIDVerificationStatement.HasValue() && !commandData.vvsc.HasValue())
     {
@@ -1255,7 +1255,8 @@ bool emberAfOperationalCredentialsClusterSetVIDVerificationStatementCallback(
     auto & fabricTable = Server::GetInstance().GetFabricTable();
 
     bool fabricChangesOccurred = false;
-    CHIP_ERROR err = fabricTable.SetVIDVerificationStatementElements(fabricIndex, commandData.vendorID, commandData.VIDVerificationStatement, commandData.vvsc, fabricChangesOccurred);
+    CHIP_ERROR err             = fabricTable.SetVIDVerificationStatementElements(
+        fabricIndex, commandData.vendorID, commandData.VIDVerificationStatement, commandData.vvsc, fabricChangesOccurred);
     if (err == CHIP_ERROR_INVALID_ARGUMENT)
     {
         commandObj->AddStatus(commandPath, Status::ConstraintError);
@@ -1279,7 +1280,7 @@ bool emberAfOperationalCredentialsClusterSetVIDVerificationStatementCallback(
     if (fabricChangesOccurred)
     {
         MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
-          OperationalCredentials::Attributes::Fabrics::Id);
+                                               OperationalCredentials::Attributes::Fabrics::Id);
     }
 
     if (err != CHIP_NO_ERROR)

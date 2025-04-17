@@ -37,7 +37,7 @@ public:
     enum class VidVerificationElement : uint8_t
     {
         kVidVerificationStatement = 0,
-        kVvsc = 1,
+        kVvsc                     = 1,
     };
 
     virtual ~OperationalCertificateStore() {}

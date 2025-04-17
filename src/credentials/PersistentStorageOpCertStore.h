@@ -113,17 +113,17 @@ public:
 
     CHIP_ERROR GetCertificate(FabricIndex fabricIndex, CertChainElement element, MutableByteSpan & outCertificate) const override;
     CHIP_ERROR GetVidVerificationElement(FabricIndex fabricIndex, VidVerificationElement element,
-                                                 MutableByteSpan & outElement) const override;
+                                         MutableByteSpan & outElement) const override;
 
 protected:
     enum class StateFlags : uint8_t
     {
         // Below are flags to assist interlock logic
-        kAddNewOpCertsCalled     = (1u << 0),
-        kAddNewTrustedRootCalled = (1u << 1),
-        kUpdateOpCertsCalled     = (1u << 2),
+        kAddNewOpCertsCalled             = (1u << 0),
+        kAddNewTrustedRootCalled         = (1u << 1),
+        kUpdateOpCertsCalled             = (1u << 2),
         kVidVerificationStatementUpdated = (1u << 3),
-        kVvscUpdated = (1u << 4),
+        kVvscUpdated                     = (1u << 4),
     };
 
     // Returns CHIP_ERROR_NOT_FOUND if a pending certificate couldn't be found, otherwise status of pending copy

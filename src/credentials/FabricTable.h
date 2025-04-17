@@ -104,10 +104,7 @@ public:
 
     CHIP_ERROR FetchRootPubkey(Crypto::P256PublicKey & outPublicKey) const;
 
-    void SetVendorId(VendorId vendorId)
-    {
-        mVendorId = vendorId;
-    }
+    void SetVendorId(VendorId vendorId) { mVendorId = vendorId; }
     VendorId GetVendorId() const { return mVendorId; }
 
     bool IsInitialized() const { return (mFabricIndex != kUndefinedFabricIndex) && IsOperationalNodeId(mNodeId); }
@@ -1117,7 +1114,9 @@ public:
      * @retval CHIP_ERROR_INVALID_ARGUMENT if vendorID, VVSC or VIDVerificationStatement are not correct (maps to CONSTRAINT_ERROR)
      * @retval CHIP_ERROR_INCORRECT_STATE if VVSC cannot be set due to ICAC presence (maps to INVALID_COMMAND)
      */
-    CHIP_ERROR SetVIDVerificationStatementElements(FabricIndex fabricIndex, Optional<uint16_t> vendorId, Optional<ByteSpan> VIDVerificationStatement, Optional<ByteSpan> VVSC, bool & outFabricTableWasChanged);
+    CHIP_ERROR SetVIDVerificationStatementElements(FabricIndex fabricIndex, Optional<uint16_t> vendorId,
+                                                   Optional<ByteSpan> VIDVerificationStatement, Optional<ByteSpan> VVSC,
+                                                   bool & outFabricTableWasChanged);
 
 private:
     enum class StateFlags : uint16_t

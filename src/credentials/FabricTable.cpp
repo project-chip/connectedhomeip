@@ -2180,14 +2180,16 @@ CHIP_ERROR FabricTable::SetShouldAdvertiseIdentity(FabricIndex fabricIndex, Adve
 CHIP_ERROR FabricTable::FetchVIDVerificationStatement(FabricIndex fabricIndex, MutableByteSpan & outVIDVerificationStatement) const
 {
     VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    return mOpCertStore->GetVidVerificationElement(fabricIndex, OperationalCertificateStore::VidVerificationElement::kVidVerificationStatement, outVIDVerificationStatement);
+    return mOpCertStore->GetVidVerificationElement(
+        fabricIndex, OperationalCertificateStore::VidVerificationElement::kVidVerificationStatement, outVIDVerificationStatement);
 }
 
 CHIP_ERROR FabricTable::FetchVVSC(FabricIndex fabricIndex, MutableByteSpan & outVVSC) const
 {
     VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    return mOpCertStore->GetVidVerificationElement(fabricIndex, OperationalCertificateStore::VidVerificationElement::kVvsc, outVVSC);
+    return mOpCertStore->GetVidVerificationElement(fabricIndex, OperationalCertificateStore::VidVerificationElement::kVvsc,
+                                                   outVVSC);
     return CHIP_NO_ERROR;
 }
 
@@ -2238,7 +2240,9 @@ CHIP_ERROR FabricTable::SignVIDVerificationRequest(FabricIndex fabricIndex, Byte
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FabricTable::SetVIDVerificationStatementElements(FabricIndex fabricIndex, Optional<uint16_t> vendorId, Optional<ByteSpan> VIDVerificationStatement, Optional<ByteSpan> VVSC, bool & outFabricTableWasChanged)
+CHIP_ERROR FabricTable::SetVIDVerificationStatementElements(FabricIndex fabricIndex, Optional<uint16_t> vendorId,
+                                                            Optional<ByteSpan> VIDVerificationStatement, Optional<ByteSpan> VVSC,
+                                                            bool & outFabricTableWasChanged)
 {
     VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_ARGUMENT);
@@ -2246,7 +2250,8 @@ CHIP_ERROR FabricTable::SetVIDVerificationStatementElements(FabricIndex fabricIn
     FabricInfo * fabricInfo = GetMutableFabricByIndex(fabricIndex);
     VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    bool isTargetFabricPending = (GetPendingNewFabricIndex() == fabricIndex) || ((GetShadowPendingFabricEntry() != nullptr) && (GetShadowPendingFabricEntry()->GetFabricIndex() == fabricIndex));
+    bool isTargetFabricPending = (GetPendingNewFabricIndex() == fabricIndex) ||
+        ((GetShadowPendingFabricEntry() != nullptr) && (GetShadowPendingFabricEntry()->GetFabricIndex() == fabricIndex));
 
     outFabricTableWasChanged = false;
 
@@ -2262,14 +2267,17 @@ CHIP_ERROR FabricTable::SetVIDVerificationStatementElements(FabricIndex fabricIn
         {
             // This is in a scope to save stack space from getting too deep.
             uint8_t vidVerificationStatementBuffer[Crypto::kVendorIdVerificationStatementV1Size];
-            MutableByteSpan vidVerificationStatementSpan{vidVerificationStatementBuffer};
-            ReturnErrorOnFailure(mOpCertStore->GetVidVerificationElement(fabricIndex, OperationalCertificateStore::VidVerificationElement::kVidVerificationStatement, vidVerificationStatementSpan));
+            MutableByteSpan vidVerificationStatementSpan{ vidVerificationStatementBuffer };
+            ReturnErrorOnFailure(mOpCertStore->GetVidVerificationElement(
+                fabricIndex, OperationalCertificateStore::VidVerificationElement::kVidVerificationStatement,
+                vidVerificationStatementSpan));
             wasVvsEqual = vidVerificationStatementSpan.data_equal(VIDVerificationStatement.Value());
         }
 
         if (!wasVvsEqual)
         {
-            ReturnErrorOnFailure(mOpCertStore->UpdateVidVerificationStatementForFabric(fabricIndex, VIDVerificationStatement.Value()));
+            ReturnErrorOnFailure(
+                mOpCertStore->UpdateVidVerificationStatementForFabric(fabricIndex, VIDVerificationStatement.Value()));
             outFabricTableWasChanged = true;
         }
     }
