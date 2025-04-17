@@ -74,7 +74,10 @@ void AirPurifierManager::PostAttributeChangeCallback(EndpointId endpoint, Cluste
         HandleThermostatAttributeChange(attributeId, type, size, value);
         break;
     }
-
+    case OnOff::Id: {
+        HandleOnOff(attributeId, type, size, value);
+        break;
+    }
     default:
         break;
     }
@@ -189,6 +192,67 @@ void AirPurifierManager::HandleFanControlAttributeChange(AttributeId attributeId
         break;
     }
     }
+}
+
+void AirPurifierManager::HandleOnOff(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)
+{
+    if (attributeId != OnOff::Attributes::OnOff::Id)
+    {
+        return;
+    }
+    bool on = static_cast<bool>(*value);
+    uint8_t new_speed;
+    uint8_t new_percent;
+    if (on)
+    {
+        ChipLogProgress(NotSpecified, "======================== Handle ON");
+        // If either of these come back as NULL, that should mean the fan is operating in auto mode.
+        // I have no idea what that means for this case, so I'll just set them to high because this
+        // is just an example.
+        // In theory these should always be NULL together or not all all, so hopefully the last
+        // error is more theoretical than practical.
+        DataModel::Nullable<Percent> percent = GetPercentSetting();
+        DataModel::Nullable<uint8_t> speed   = GetSpeedSetting();
+        uint8_t speedMax                     = 100;
+        FanControl::Attributes::SpeedMax::Get(mEndpointId, &speedMax);
+        if (percent.IsNull() && speed.IsNull())
+        {
+            // Operating in auto mode, set to 100
+            new_percent = 100;
+            new_speed   = speedMax;
+        }
+        else if (percent.IsNull())
+        {
+            // This should never happen, but nonetheless, let's check and warn.
+            ChipLogError(NotSpecified,
+                         "AirPurifierManager::HandleOnOff: PercentSetting is null when SpeedSetting is not. Setting PercentCurrent "
+                         "from Speed");
+            new_speed   = speed.Value();
+            new_percent = static_cast<uint8_t>(speedCurrent * 100u / speedMax);
+        }
+        else if (speed.IsNull())
+        {
+            // This should never happen, but nonetheless, let's check and warn.
+            ChipLogError(NotSpecified,
+                         "AirPurifierManager::HandleOnOff: SpeedSetting is null when PercentSetting is not. Setting SpeedCurrent "
+                         "from Percent");
+            new_percent = percent.Value();
+            new_speed   = static_cast<uint8_t>(percentCurrent * speedMax / 100u);
+        }
+        else
+        {
+            new_percent = percent.Value();
+            new_speed   = speed.Value();
+        }
+    }
+    else
+    {
+        ChipLogProgress(NotSpecified, "======================== Handle OFF");
+        new_percent = 0;
+        new_speed   = 0;
+    }
+    FanControl::Attributes::SpeedCurrent::Set(mEndpointId, new_speed, MarkAttributeDirty::kYes);
+    FanControl::Attributes::PercentCurrent::Set(mEndpointId, new_percent, MarkAttributeDirty::kYes);
 }
 
 void AirPurifierManager::PercentSettingWriteCallback(uint8_t aNewPercentSetting)

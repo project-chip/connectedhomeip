@@ -118,6 +118,9 @@ private:
     RelativeHumiditySensorManager mHumiditySensorManager;
     ThermostatManager mThermostatManager;
 
+    // This gets initialized properly in the init function from the On/Off cluster
+    bool mOnOffClusterOn = True;
+
     // Fan Mode Limits
     static constexpr int FAN_MODE_LOW_LOWER_BOUND    = 1;
     static constexpr int FAN_MODE_LOW_UPPER_BOUND    = 3;
@@ -135,8 +138,7 @@ private:
      */
     AirPurifierManager(EndpointId aEndpointId, EndpointId aAirQualitySensorEndpointId, EndpointId aTemperatureSensorEndpointId,
                        EndpointId aHumiditySensorEndpointId, EndpointId aThermostatEndpointId) :
-        FanControl::Delegate(aEndpointId),
-        mEndpointId(aEndpointId),
+        FanControl::Delegate(aEndpointId), mEndpointId(aEndpointId),
         activatedCarbonFilterInstance(&activatedCarbonFilterDelegate, mEndpointId, ActivatedCarbonFilterMonitoring::Id,
                                       static_cast<uint32_t>(gActivatedCarbonFeatureMap.to_ulong()),
                                       ResourceMonitoring::DegradationDirectionEnum::kDown, true),
@@ -168,6 +170,8 @@ private:
     void HandleThermostatAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value);
     void ThermostatHeatingSetpointWriteCallback(int16_t aNewHeatingSetpoint);
     void ThermostatSystemModeWriteCallback(uint8_t aNewSystemMode);
+
+    void HandleOnOff(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value);
 };
 
 } // namespace Clusters
