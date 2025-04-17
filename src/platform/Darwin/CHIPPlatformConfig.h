@@ -38,6 +38,10 @@ extern "C" int __cxa_atexit(void (*f)(void *), void * p, void * d);
 #define CHIP_CONFIG_ERROR_FORMAT_AS_STRING 1
 #define CHIP_CONFIG_ERROR_SOURCE 1
 
+#ifndef CHIP_CONFIG_ERROR_SOURCE_FULL
+#define CHIP_CONFIG_ERROR_SOURCE_FULL (__cplusplus >= 202002L)
+#endif
+
 #define CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE 1
 
 #define CHIP_CONFIG_IM_STATUS_CODE_VERBOSE_FORMAT 1

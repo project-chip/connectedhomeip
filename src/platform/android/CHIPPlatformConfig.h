@@ -35,6 +35,10 @@ using CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE = const char *;
 #define CHIP_CONFIG_ERROR_FORMAT_AS_STRING 1
 #define CHIP_CONFIG_ERROR_SOURCE 1
 
+#ifndef CHIP_CONFIG_ERROR_SOURCE_FULL
+#define CHIP_CONFIG_ERROR_SOURCE_FULL (__cplusplus >= 202002L)
+#endif
+
 // ==================== Security Adaptations ====================
 
 // ==================== General Configuration Overrides ====================
