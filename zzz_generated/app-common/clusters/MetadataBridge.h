@@ -280,8 +280,8 @@
 #include <clusters/WindowCovering/MetadataBridge.h>
 #include <clusters/ZoneManagement/Ids.h>
 #include <clusters/ZoneManagement/MetadataBridge.h>
-#include <lib/meta/MetaObjects.h>
-#include <lib/meta/MetaSwitch.h>
+#include <lib/support/meta/MetaObjects.h>
+#include <lib/support/meta/MetaSwitch.h>
 
 namespace chip {
 namespace app {

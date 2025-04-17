@@ -29,6 +29,7 @@ source_set("data-model-provider") {
     "ActionContext.h",
     "ActionReturnStatus.cpp",
     "ActionReturnStatus.h",
+    "ClusterMetadataProvider.h",
     "Context.h",
     "EventsGenerator.h",
     "MetadataLookup.cpp",
