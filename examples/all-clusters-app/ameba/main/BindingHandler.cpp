@@ -60,6 +60,11 @@ void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, Operation
         // It should always enter here if isReadAttribute is true
         if (binding.type == MATTER_UNICAST_BINDING && !data->isGroup)
         {
+            if (!peer_device)
+            {
+                ChipLogProgress(NotSpecified, "Binding to self");
+                return;
+            }
             switch (data->clusterId)
             {
             case Clusters::Identify::Id:
@@ -105,6 +110,11 @@ void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, Operation
         }
         else if (binding.type == MATTER_UNICAST_BINDING && !data->isGroup)
         {
+            if (!peer_device)
+            {
+                ChipLogProgress(NotSpecified, "Binding to self");
+                return;
+            }
             switch (data->clusterId)
             {
             case Clusters::Identify::Id:
