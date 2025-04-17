@@ -88,7 +88,6 @@ class TC_G_2_2(MatterBaseTest):
         if self.matter_test_config.endpoint is None or self.matter_test_config.endpoint != 0:
             self.matter_test_config.endpoint = 0
         #self.endpoint = self.get_endpoint()
-        #asserts.assert_false(self.endpoint is None, "--endpoint <endpoint> must be included on the command line in.")
 
         # Pre-Conditions: Comissioning
         self.step(0)
