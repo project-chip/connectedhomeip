@@ -164,6 +164,10 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR=${chip_enable_ota_requestor}",
     ]
 
+    if (chip_enable_nfc_based_commissioning) {
+      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING=1" ]
+    }
+
     if (chip_device_project_config_include != "") {
       defines += [ "CHIP_DEVICE_PROJECT_CONFIG_INCLUDE=${chip_device_project_config_include}" ]
     }
