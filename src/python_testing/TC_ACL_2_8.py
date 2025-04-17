@@ -99,9 +99,9 @@ class TC_ACL_2_8(MatterBaseTest):
             TestStep(8, "TH2 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
                      "Result is SUCCESS, value is list of AccessControlEntryStruct containing 1 element, and MUST NOT contain an element with FabricIndex F1"),
             TestStep(9, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
-                     "Result is SUCCESS, value is list of AccessControlEntryChanged containing 3 elements, and MUST NOT contain any element with FabricIndex F2"),
+                     "Result is SUCCESS, value is list of AccessControlEntryChanged containing 2 elements, and MUST NOT contain any element with FabricIndex F2"),
             TestStep(10, "TH2 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
-                     "Result is SUCCESS, value is list of AccessControlEntryChanged containing 3 elements, and MUST NOT contain any element with FabricIndex F1"),
+                     "Result is SUCCESS, value is list of AccessControlEntryChanged containing 2 elements, and MUST NOT contain any element with FabricIndex F1"),
         ]
         return steps
 
