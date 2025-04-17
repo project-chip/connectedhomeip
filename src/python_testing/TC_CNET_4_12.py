@@ -17,25 +17,7 @@
 
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
-#
-# === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs:
-#   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --commissioning-method on-network
-#       --discriminator 1234
-#       --passcode 20202021
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --string-arg PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET:${THREAD_1ST}
-#       --string-arg PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET:${THREAD_2ND}
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factory-reset: true
-#     quiet: true
-# === END CI TEST ARGUMENTS ===
+# N/A - Test will not run on CI
 
 import logging
 
@@ -52,7 +34,35 @@ class TC_CNET_4_12(MatterBaseTest):
     CLUSTER_DESC = Clusters.Descriptor
     CLUSTER_CGEN = Clusters.GeneralCommissioning
     failsafe_expiration_seconds = 900
-    default_network_id = 'Thread'
+
+    async def validate_thread_dataset(self, dataset_bytes, dataset_name):
+        """
+        Validates the structure of a Thread operational dataset (formatted).
+
+        Args:
+            dataset_bytes: The dataset to validate, expected to be in byte format.
+            dataset_name: The name of the dataset.
+        """
+        logger.info(f"Validating {dataset_name}...")
+
+        # Validate that the dataset contains valid data (not empty)
+        asserts.assert_true(len(dataset_bytes) > 0, f"PIXIT.CNET.{dataset_name} must be supplied.")
+
+        # Validate that the ExtPANID TLV exists in the dataset
+        ext_pan_id_marker = b'\x02\x08'
+        marker_index = dataset_bytes.find(ext_pan_id_marker)
+
+        asserts.assert_true(
+            marker_index != -1 and len(dataset_bytes) >= marker_index + len(ext_pan_id_marker) + 8,
+            f"Could not find ExtPANID marker in PIXIT dataset: {dataset_name} or dataset too short in PIXIT bytes."
+        )
+
+        ext_pan_id_start = marker_index + len(ext_pan_id_marker)
+        thread_network_id_bytes = dataset_bytes[ext_pan_id_start: ext_pan_id_start + 8]
+
+        asserts.assert_equal(len(thread_network_id_bytes), 8, f"Extracted ExtPANID from {dataset_name} must be 8 bytes long.")
+
+        logger.info(f"Extracted Network ID (ExtPANID) from {dataset_name}: {thread_network_id_bytes.hex()}")
 
     def def_TC_CNET_4_12(self):
         return '[TC-CNET-4.12] [Thread] Verification for ConnectNetwork Command [DUT-Server]'
@@ -68,9 +78,6 @@ class TC_CNET_4_12(MatterBaseTest):
         steps = [
             TestStep('precondition-1', 'DUT supports CNET.S.F01(TH)'),
             TestStep('precondition-2', 'DUT has a Network Commissioning cluster on endpoint PIXIT.CNET.ENDPOINT_THREAD with FeatureMap attribute of 2', is_commissioning=True),
-            TestStep('precondition-3', 'DUT is commissioned on PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET'),
-            TestStep('precondition-4', 'TH has can communicate to two valid thread PANs: PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET and PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET'),
-            TestStep('precondition-5', 'XPANID of PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET is saved as th_xpan and the XPANID of PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET is saved as th_xpan1'),
             TestStep(1, 'TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900'),
             TestStep(2, 'TH reads Networks attribute from the DUT and saves the number of entries as NumNetworks'),
             TestStep(3, 'TH saves the index of the Networks list entry from step 2 as Userth_netidx'),
@@ -115,9 +122,33 @@ class TC_CNET_4_12(MatterBaseTest):
 
         # Pre-Conditions
         self.step('precondition-1')
+        logger.info('Precondition 1: DUT supports CNET.S.F01(TH)')
+
         self.step('precondition-2')
         # By running this test from the terminal, it commissions the device.
-        logger.info('Pre-Conditions #1: DUT has a Network Commissioning cluster on endpoint PIXIT.CNET.ENDPOINT_THREAD ')
+        logger.info('Precondition 2: DUT has a Network Commissioning cluster on the correct endpoint.')
+
+        # Assign required PIXITs
+        endpoint = self.user_params.get('PIXIT.CNET.ENDPOINT_THREAD')
+        th_xpan = self.user_params.get('PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET')
+        th_xpan_1 = self.user_params.get('PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET')
+
+        # Validate required PIXIT
+        asserts.assert_true(endpoint is not None, "Missing required PIXIT: PIXIT.CNET.ENDPOINT_THREAD")
+        asserts.assert_true(th_xpan is not None, "Missing required PIXIT: PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET")
+        asserts.assert_true(th_xpan_1 is not None, "Missing required PIXIT: PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET")
+
+        # All required PIXITs are present and assigned
+        logger.info('Precondition 2: All required PIXITs are present and assigned: '
+                    f'PIXIT.CNET.ENDPOINT_THREAD = {endpoint}, '
+                    f'PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET = {th_xpan}, '
+                    f'PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET = {th_xpan_1}')
+
+        # Validate the operational dataset structure (for both datasets)
+        logger.info("Precondition 2: Validating THREAD operational datasets")
+
+        self.validate_thread_dataset(th_xpan, "THREAD_1ST_OPERATIONALDATASET")
+        self.validate_thread_dataset(th_xpan_1, "THREAD_2ND_OPERATIONALDATASET")
 
         # The FeatureMap attribute value is 2
         feature_map = await self.read_single_attribute_check_success(
@@ -126,15 +157,6 @@ class TC_CNET_4_12(MatterBaseTest):
         asserts.assert_true(feature_map == 2,
                             msg="Verify that feature_map is equal to 1")
         logger.info(f'Pre-Conditions #3: The FeatureMap attribute value is: {feature_map}')
-
-        self.step('precondition-3')
-        # TODO: Implement precondition-3
-        self.step('precondition-4')
-        # TODO: Implement precondition-4
-        self.step('precondition-5')
-        # TODO: Implement precondition-5
-        th_xpan = self.user_params.get('PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET', self.default_network_id)
-        th_xpan_1 = self.user_params.get('PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET', self.default_network_id)
 
         # Steps
 
