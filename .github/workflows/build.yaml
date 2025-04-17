@@ -339,9 +339,9 @@ jobs:
                   scripts/run_in_build_env.sh 'virtualenv pyenv'
                   source pyenv/bin/activate
                   python -m ensurepip --upgrade
-                  python -m pip install ./out/controller/python/matter_core-0.0-cp37-abi3-linux_x86_64.whl
-                  python -m pip install ./out/controller/python/matter_clusters-0.0-py3-none-any.whl
-                  python -m pip install ./out/controller/python/matter_repl-0.0-py3-none-any.whl
+                  python -m pip install ./out/controller/python/matter_core-1.0.0-cp37-abi3-linux_x86_64.whl
+                  python -m pip install ./out/controller/python/matter_clusters-1.0.0-py3-none-any.whl
+                  python -m pip install ./out/controller/python/matter_repl-1.0.0-py3-none-any.whl
 
             - name: Run Python tests
               shell: bash
