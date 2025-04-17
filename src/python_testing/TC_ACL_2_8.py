@@ -289,6 +289,5 @@ class TC_ACL_2_8(MatterBaseTest):
                 "Should not contain event with FabricIndex F1")
 
 
-
 if __name__ == "__main__":
     default_matter_test_main()
