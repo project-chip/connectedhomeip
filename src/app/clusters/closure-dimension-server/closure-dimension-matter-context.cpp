@@ -1,5 +1,6 @@
 /*
- *    Copyright (c) 2024-2025 Project CHIP Authors
+ *
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,17 +16,22 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include "closure-dimension-matter-context.h"
 
-#include <crypto/OperationalKeystore.h>
-#include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/reporting/reporting.h>
 
-namespace chip::NXP::App::DiagnosticLogsDemo {
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ClosureDimension {
 
-/**
- * @brief Display a demo usage of the diagnostic logs provider.
- *
- */
-CHIP_ERROR DisplayUsage();
+void MatterContext::MarkDirty(const AttributeId attributeId)
+{
+    MatterReportingAttributeChangeCallback(mEndpoint, Id, attributeId);
+}
 
-} // namespace chip::NXP::App::DiagnosticLogsDemo
+} // namespace ClosureDimension
+} // namespace Clusters
+} // namespace app
+} // namespace chip
