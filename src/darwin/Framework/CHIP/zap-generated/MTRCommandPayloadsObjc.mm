@@ -22378,7 +22378,7 @@ NS_ASSUME_NONNULL_BEGIN
     {
         if (self.latch != nil) {
             auto & definedValue_0 = encodableStruct.latch.Emplace();
-            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.latch.unsignedCharValue);
+            definedValue_0 = self.latch.boolValue;
         }
     }
     {
@@ -33691,8 +33691,6 @@ NS_ASSUME_NONNULL_BEGIN
 
         _maxFrameRate = @(0);
 
-        _bitRate = @(0);
-
         _minResolution = [MTRCameraAVStreamManagementClusterVideoResolutionStruct new];
 
         _maxResolution = [MTRCameraAVStreamManagementClusterVideoResolutionStruct new];
@@ -33714,7 +33712,6 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.imageCodec = self.imageCodec;
     other.maxFrameRate = self.maxFrameRate;
-    other.bitRate = self.bitRate;
     other.minResolution = self.minResolution;
     other.maxResolution = self.maxResolution;
     other.quality = self.quality;
@@ -33728,7 +33725,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: imageCodec:%@; maxFrameRate:%@; bitRate:%@; minResolution:%@; maxResolution:%@; quality:%@; watermarkEnabled:%@; osdEnabled:%@; >", NSStringFromClass([self class]), _imageCodec, _maxFrameRate, _bitRate, _minResolution, _maxResolution, _quality, _watermarkEnabled, _osdEnabled];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: imageCodec:%@; maxFrameRate:%@; minResolution:%@; maxResolution:%@; quality:%@; watermarkEnabled:%@; osdEnabled:%@; >", NSStringFromClass([self class]), _imageCodec, _maxFrameRate, _minResolution, _maxResolution, _quality, _watermarkEnabled, _osdEnabled];
     return descriptionString;
 }
 
@@ -33745,9 +33742,6 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         encodableStruct.maxFrameRate = self.maxFrameRate.unsignedShortValue;
-    }
-    {
-        encodableStruct.bitRate = self.bitRate.unsignedIntValue;
     }
     {
         encodableStruct.minResolution.width = self.minResolution.width.unsignedShortValue;
@@ -34172,7 +34166,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _snapshotStreamID = @(0);
+        _snapshotStreamID = nil;
 
         _requestedResolution = [MTRCameraAVStreamManagementClusterVideoResolutionStruct new];
         _timedInvokeTimeoutMs = nil;
@@ -34208,7 +34202,12 @@ NS_ASSUME_NONNULL_BEGIN
     chip::app::Clusters::CameraAvStreamManagement::Commands::CaptureSnapshot::Type encodableStruct;
     ListFreer listFreer;
     {
-        encodableStruct.snapshotStreamID = self.snapshotStreamID.unsignedShortValue;
+        if (self.snapshotStreamID == nil) {
+            encodableStruct.snapshotStreamID.SetNull();
+        } else {
+            auto & nonNullValue_0 = encodableStruct.snapshotStreamID.SetNonNull();
+            nonNullValue_0 = self.snapshotStreamID.unsignedShortValue;
+        }
     }
     {
         encodableStruct.requestedResolution.width = self.requestedResolution.width.unsignedShortValue;
