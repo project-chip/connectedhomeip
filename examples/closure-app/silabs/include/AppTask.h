@@ -28,7 +28,6 @@
 
 #include "AppEvent.h"
 #include "BaseApplication.h"
-#include "ClosureDimensionManager.h"
 
 #include "FreeRTOS.h"
 #include "timers.h" // provides FreeRTOS timer support
@@ -78,8 +77,6 @@ public:
      *                  SL_SIMPLE_BUTTON_RELEASED or SL_SIMPLE_BUTTON_DISABLED
      */
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
-    static void ActionInitiated(chip::app::Clusters::ClosureDimension::ClosureDimensionDelegate::Action_t aAction);
-    static void ActionCompleted(chip::app::Clusters::ClosureDimension::ClosureDimensionDelegate::Action_t aAction);
 
 private:
     static AppTask sAppTask;
