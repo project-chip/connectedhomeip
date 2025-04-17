@@ -42,12 +42,13 @@ constexpr bool operator!=(const Globals::Structs::CurrencyStruct::Type & lhs, co
 #define X(attrName, attrType) \
 class attrName##DataClass : public CTC_BaseDataClass<attrType> { \
 public: \
-    attrName##DataClass() \
-        : CommodityTariff::CTC_BaseDataClass<attrType>() {} \
+    attrName##DataClass(attrType& aValueStorage) \
+        : CTC_BaseDataClass<attrType>(aValueStorage) { mValue = aValueStorage; }\
     ~attrName##DataClass() override = default; \
-    bool LoadFromJson(const Json::Value& json); \
+    CHIP_ERROR LoadFromJson(const Json::Value& json) override; \
 protected:    \
-    void UpdateValue(const attrType& aValue) override; \
+    CHIP_ERROR UpdateValue(const attrType& aValue) override; \
+    void CleanupValue() override; \
 };
 // Generate all classes
 COMMODITY_TARIFF_PRIMARY_ATTRIBUTES_STUBS
@@ -72,20 +73,43 @@ COMMODITY_TARIFF_PRIMARY_ATTRIBUTES_STUBS
 COMMODITY_TARIFF_CURRENT_ATTRIBUTES_STUBS
 #undef X
 */
-class CommodityTariffPrimaryData {  
-    public:
-    #define X(attrName, attrType) \
-        attrName##DataClass attrName;
-        COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
-    #undef X
+class CommodityTariffPrimaryData {
+private:
+// 1. First declare storage
+#define X(attrName, attrType) \
+    attrType attrName##Storage;
+COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+#undef X
+
+public:
+// 2. Then declare DataClass objects initialized with storage
+#define X(attrName, attrType) \
+    attrName##DataClass attrName{attrName##Storage};
+COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+#undef X
+
+    CommodityTariffPrimaryData() = default;
+    ~CommodityTariffPrimaryData() = default;
+
+    CHIP_ERROR LoadJson(Json::Value& root);
 };
 
 class CommodityTariffCurrentData {
-    public:
-    #define X(attrName, attrType) \
-        attrName##DataClass attrName;
-        COMMODITY_TARIFF_CURRENT_ATTRIBUTES
-    #undef X
+private:
+// 1. First declare storage
+#define X(attrName, attrType) \
+    attrType attrName##Storage;
+    COMMODITY_TARIFF_CURRENT_ATTRIBUTES
+#undef X
+
+public:
+#define X(attrName, attrType) \
+    attrName##DataClass attrName{attrName##Storage};
+    COMMODITY_TARIFF_CURRENT_ATTRIBUTES
+#undef X
+
+    CommodityTariffCurrentData() = default;
+    ~CommodityTariffCurrentData() = default;
 };
 
 // --- Tariff Data Updater ---
@@ -97,17 +121,10 @@ public:
     ~TariffDataUpdater(); 
 
 
-    CHIP_ERROR LoadJson(Json::Value & root);
+    CHIP_ERROR LoadJson(Json::Value & root) { return mTariffData.LoadJson(root); };
 private:
-    CommodityTariffPrimaryData TariffData;
+    CommodityTariffPrimaryData mTariffData;
     Callback callback;
-
-    template<typename T>
-    using ValidationRule = std::function<bool(const T&)>;
-    template<typename T>
-    T JsonTo(const Json::Value& json) { /* Conversion logic */ }
-    template<typename T>
-    bool Validate(const T& data) { /* Validation logic */ }
 };
 
 class CommodityTariffDelegate : public CommodityTariff::Delegate

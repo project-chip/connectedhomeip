@@ -43,13 +43,16 @@ namespace CommodityTariff {
     X(DefaultRandomizationType,     DataModel::Nullable<DayEntryRandomizationTypeEnum>) \
     X(CalendarPeriods,              DataModel::List<Structs::CalendarPeriodStruct::Type>) \
     X(DayPatterns,                  DataModel::List<Structs::DayPatternStruct::Type>) \
-    X(IndividualDays,               DataModel::List<Structs::DayStruct::Type>) \
-    X(DayEntries,                   DataModel::List<Structs::DayEntryStruct::Type>) \
+    X(IndividualDays,               DataModel::List<Structs::DayStruct::Type>)
+    /*X(DayEntries,                   DataModel::List<Structs::DayEntryStruct::Type>) \
     X(TariffPeriods,                DataModel::List<Structs::TariffPeriodStruct::Type>) \
-    X(TariffComponents,             DataModel::List<Structs::TariffComponentStruct::Type>)
+    X(TariffComponents,             DataModel::List<Structs::TariffComponentStruct::Type>)*/
 
 #define COMMODITY_TARIFF_PRIMARY_ATTRIBUTES_DEV \
-    X(TariffInfo,                   DataModel::Nullable<Structs::TariffInformationStruct::Type>)
+    X(TariffInfo,                   DataModel::Nullable<Structs::TariffInformationStruct::Type>) \
+    X(TariffPeriods,                DataModel::List<Structs::TariffPeriodStruct::Type>) \
+    X(DayEntries,                   DataModel::List<Structs::DayEntryStruct::Type>) \
+    X(TariffComponents,             DataModel::List<Structs::TariffComponentStruct::Type>)
 
 // Centralized attribute declaration (Current attrs)
 #define COMMODITY_TARIFF_CURRENT_ATTRIBUTES_STUBS \
