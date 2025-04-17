@@ -242,7 +242,8 @@ has a set of objects that map ID to the code generated object.
 `matter.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS/ALL_GENERATED_COMMANDS`
 
 -   dict[int, dict[int, ClusterCommand]]
--   cmd = matter.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id][cmd_id]
+-   cmd =
+    matter.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id][cmd_id]
 
 ## ChipDeviceCtrl API
 
