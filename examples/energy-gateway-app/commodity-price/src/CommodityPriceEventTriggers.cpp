@@ -32,16 +32,6 @@ using namespace chip::app::Clusters::CommodityPrice::Structs;
 static constexpr char kExVATStr[] = "ExVAT";
 static constexpr char kVATStr[]   = "VAT";
 
-CommodityPriceDelegate * GetCommodityPriceDelegate()
-{
-    CommodityPriceInstance * mInst = GetCommodityPriceInstance();
-    VerifyOrDieWithMsg(mInst != nullptr, AppServer, "CommodityPriceInstance is null");
-    CommodityPriceDelegate * dg = mInst->GetDelegate();
-    VerifyOrDieWithMsg(dg != nullptr, AppServer, "CommodityPriceDelegate is null");
-
-    return dg;
-}
-
 void SetTestEventTrigger_PriceUpdate()
 {
     // Change the value of CurrentPrice
@@ -105,9 +95,10 @@ void SetTestEventTrigger_ForecastUpdate()
         return;
     }
 
-    constexpr size_t kForecastSize      = 4;
-    constexpr uint16_t kMinPrice        = 4000;
-    constexpr uint16_t kMaxPrice        = 32000;
+    constexpr size_t kForecastSize = 4; // TODO this should be bigger
+    // but causes issues when too large in attribute and command encoding
+    constexpr uint16_t kMinPrice        = 4000;  // 4p / kWh
+    constexpr uint16_t kMaxPrice        = 32000; // 32p / kWh
     constexpr uint32_t k30MinsInSeconds = 30 * 60;
 
     static Structs::CommodityPriceStruct::Type sForecastEntries[kForecastSize];
