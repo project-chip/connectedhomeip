@@ -211,7 +211,7 @@ class TC_G_2_2(MatterBaseTest):
 
         self.step("7a")
         # TH binds GroupID (maxgroups+1) == 13 || 0x000d with GroupKeySetID 1
-        kGroupId13 = 13
+        kGroupId13 = maxgroups + 1
         groupKeyMapStructMaxGroup: Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct = [
             {"groupId": kGroupId13, "groupKeySetID": kGroupKeySetID, "fabricIndex": 1}]
         resp = await th1.WriteAttribute(self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(groupKeyMapStructMaxGroup))])
@@ -220,7 +220,7 @@ class TC_G_2_2(MatterBaseTest):
         self.step("7b")
         kGroupName13 = "Gp13"
         result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(kGroupId13, kGroupName13))
-        asserts.assert_equal(result.status, Status.ResourceExhausted, "Adding Group 0x000D failed")
+        asserts.assert_equal(result.status, Status.ResourceExhausted, "Returned status is different from expected ResourceExhausted")
 
         self.step("8")
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
