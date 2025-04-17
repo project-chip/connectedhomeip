@@ -48,6 +48,10 @@ public:
 
 private:
     OTAProviderDelegate * mDelegate = nullptr;
+
+    /// Convenience method that returns if the internal delegate is null and will log
+    /// an error if the check returns true
+    bool IsNullDelegateWithLogging(EndpointId endpointIdForLogging);
 };
 
 /// Integration of OTA provider logic within the matter data model

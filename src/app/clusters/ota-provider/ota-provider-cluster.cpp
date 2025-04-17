@@ -30,6 +30,7 @@ constexpr size_t kLocationLen          = 2;   // The expected length of the loca
 constexpr size_t kMaxMetadataLen       = 512; // The maximum length of Metadata in any OTA Provider command
 constexpr size_t kUpdateTokenMaxLength = 32;  // The expected length of the Update Token parameter used in multiple commands
 constexpr size_t kUpdateTokenMinLength = 8;   // The expected length of the Update Token parameter used in multiple commands
+
 } // namespace
 
 using Protocols::InteractionModel::Status;
@@ -95,14 +96,24 @@ std::optional<DataModel::ActionReturnStatus> OtaProviderServer::InvokeCommand(co
     return Status::UnsupportedCommand;
 }
 
+bool OtaProviderLogic::IsNullDelegateWithLogging(EndpointId endpointIdForLogging)
+{
+
+    if (mDelegate == nullptr)
+    {
+        ChipLogError(Zcl, "No OTAProviderDelegate set for ep:%u", endpointIdForLogging);
+        return true;
+    }
+    return false;
+}
+
 std::optional<DataModel::ActionReturnStatus>
 OtaProviderLogic::ApplyUpdateRequest(const ConcreteCommandPath & commandPath,
                                      const OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::DecodableType & commandData,
                                      app::CommandHandler * handler)
 {
-    if (mDelegate == nullptr)
+    if (IsNullDelegateWithLogging(commandPath.mEndpointId))
     {
-        ChipLogError(Zcl, "No OTAProviderDelegate set for ep:%u", commandPath.mEndpointId);
         return Status::UnsupportedCommand;
     }
     auto & updateToken = commandData.updateToken;
@@ -127,9 +138,8 @@ OtaProviderLogic::NotifyUpdateApplied(const ConcreteCommandPath & commandPath,
                                       const OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData,
                                       app::CommandHandler * handler)
 {
-    if (mDelegate == nullptr)
+    if (IsNullDelegateWithLogging(commandPath.mEndpointId))
     {
-        ChipLogError(Zcl, "No OTAProviderDelegate set for ep:%u", commandPath.mEndpointId);
         return Status::UnsupportedCommand;
     }
 
@@ -155,11 +165,11 @@ OtaProviderLogic::QueryImage(const ConcreteCommandPath & commandPath,
                              const OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData,
                              app::CommandHandler * handler)
 {
-    if (mDelegate == nullptr)
+    if (IsNullDelegateWithLogging(commandPath.mEndpointId))
     {
-        ChipLogError(Zcl, "No OTAProviderDelegate set for ep:%u", commandPath.mEndpointId);
         return Status::UnsupportedCommand;
     }
+
     auto & vendorId            = commandData.vendorID;
     auto & productId           = commandData.productID;
     auto & hardwareVersion     = commandData.hardwareVersion;
