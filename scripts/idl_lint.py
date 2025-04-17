@@ -23,7 +23,6 @@ import coloredlogs
 import matter.idl.lint
 from matter.idl import matter_idl_parser
 
-
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
 __LOG_LEVELS__ = {
