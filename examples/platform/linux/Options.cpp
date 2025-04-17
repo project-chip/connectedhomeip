@@ -143,7 +143,7 @@ constexpr unsigned kAppUsageLength = 64;
 
 OptionDef sDeviceOptionDefs[] = {
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-    { "ble-device", kArgumentRequired, kDeviceOption_BleDevice },
+    { "ble-controller", kArgumentRequired, kDeviceOption_BleDevice },
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     { "wifi", kNoArgument, kDeviceOption_WiFi },
@@ -226,8 +226,8 @@ OptionDef sDeviceOptionDefs[] = {
 
 const char * sDeviceOptionHelp =
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-    "  --ble-device <number>\n"
-    "       The device number for CHIPoBLE, without 'hci' prefix, can be found by hciconfig.\n"
+    "  --ble-controller <selector>\n"
+    "       BLE controller selector, see example or platform docs for details\n"
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     "\n"

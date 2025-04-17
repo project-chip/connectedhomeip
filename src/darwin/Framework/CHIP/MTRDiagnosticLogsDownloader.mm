@@ -27,6 +27,7 @@
 #import "MTRDeviceController_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
+#import "MTRUnfairLock.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
 
@@ -95,7 +96,9 @@ NS_ASSUME_NONNULL_BEGIN
                     completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
                           done:(void (^)(MTRDownload * finishedDownload))done;
 
-- (void)abortDownloadsForController:(MTRDeviceController_Concrete *)controller;
+// Abort either all downloads for the given controller (if nodeID is nil), or
+// just the ones for the relevant node ID.
+- (void)abortDownloadsForController:(MTRDeviceController_Concrete *)controller nodeID:(nullable NSNumber *)nodeID;
 
 @end
 
@@ -153,7 +156,10 @@ private:
     MTRDiagnosticLogsDownloader * __weak mDelegate;
 };
 
-@implementation MTRDownload
+@implementation MTRDownload {
+    // Guards access to _finalize to make sure we only finalize once.
+    os_unfair_lock _lock;
+}
 
 static void OnTransferTimeout(chip::System::Layer * layer, void * context)
 {
@@ -186,18 +192,30 @@ static void OnTransferTimeout(chip::System::Layer * layer, void * context)
         auto * fileDesignator = [self _toFileDesignatorString:type nodeID:nodeID];
         auto * fileURL = [self _toFileURL:type nodeID:nodeID];
 
-        __weak typeof(self) weakSelf = self;
+        mtr_weakify(self);
         auto bdxTransferDone = ^(NSError * bdxError) {
-            dispatch_async(queue, ^{
-                MTRDownload * strongSelf = weakSelf;
-                if (strongSelf) {
-                    // If a fileHandle exists, it means that the BDX session has been initiated and a file has
-                    // been created to host the data of the session. So even if there is an error there may be some
-                    // data in the logs that the caller may find useful. For this reason, fileURL is passed in even
-                    // when there is an error but fileHandle is not nil.
-                    completion(strongSelf->_fileHandle ? fileURL : nil, bdxError);
+            mtr_strongify(self);
+            // Hold strong ref to fileHandle here across the async dispatch, so we do the right thing with our
+            // completion even if "self" goes away in the meantime.
+            auto * fileHandle = self->_fileHandle;
 
-                    done(strongSelf);
+            dispatch_async(queue, ^{
+                // Make sure to invoke our completion even if this objects was destroyed between queueing this block
+                // and it running.  This is needed because when we cancel a transfer we remove the object from the
+                // list, dropping the last ref, immediately after calling _finalize, but we should still call our
+                // overall API consumer's completion.
+                //
+                // If a fileHandle exists, it means that the BDX session has been initiated and a file has
+                // been created to host the data of the session. So even if there is an error there may be some
+                // data in the logs that the caller may find useful. For this reason, fileURL is passed in even
+                // when there is an error but fileHandle is not nil.
+                completion(fileHandle ? fileURL : nil, bdxError);
+
+                // On the other hand, all "done" does is remove us from the list in MTRDownloads.  If we're gone, we're
+                // already not in that list.
+                mtr_strongify(self);
+                if (self) {
+                    done(self);
                 }
             });
         };
@@ -208,6 +226,7 @@ static void OnTransferTimeout(chip::System::Layer * layer, void * context)
         _fileURL = fileURL;
         _fileHandle = nil;
         _finalize = bdxTransferDone;
+        _lock = OS_UNFAIR_LOCK_INIT;
 
         if (timeout <= 0) {
             timeout = 0;
@@ -299,15 +318,31 @@ static void OnTransferTimeout(chip::System::Layer * layer, void * context)
     return [_fileDesignator isEqualToString:fileDesignator] && [_fabricIndex isEqualToNumber:fabricIndex] && [_nodeID isEqualToNumber:nodeID];
 }
 
+- (void)_callFinalize:(nullable NSError *)error
+{
+    // Ensure we only call our finalize hook once.
+    MTRStatusCompletion finalize;
+    {
+        std::lock_guard lock(_lock);
+        finalize = _finalize;
+        _finalize = nil;
+    }
+
+    if (finalize) {
+        finalize(error);
+    }
+}
+
 - (void)failure:(NSError *)error
 {
     MTR_LOG("%@ Diagnostic log transfer failure: %@", self, error);
-    _finalize(error);
+
+    [self _callFinalize:error];
 }
 
 - (void)success
 {
-    _finalize(nil);
+    [self _callFinalize:nil];
 }
 
 - (void)cancelTimeoutTimer
@@ -421,13 +456,17 @@ static void OnTransferTimeout(chip::System::Layer * layer, void * context)
     return download;
 }
 
-- (void)abortDownloadsForController:(MTRDeviceController_Concrete *)controller
+- (void)abortDownloadsForController:(MTRDeviceController_Concrete *)controller nodeID:(nullable NSNumber *)nodeID
 {
     assertChipStackLockedByCurrentThread();
 
     auto fabricIndex = @(controller.fabricIndex);
     for (MTRDownload * download in [_downloads copy]) {
         if (![download.fabricIndex isEqual:fabricIndex]) {
+            continue;
+        }
+
+        if (nodeID && ![download.nodeID isEqual:nodeID]) {
             continue;
         }
 
@@ -483,13 +522,13 @@ static void OnTransferTimeout(chip::System::Layer * layer, void * context)
                              type:(MTRDiagnosticLogType)type
                           timeout:(NSTimeInterval)timeout
                             queue:(dispatch_queue_t)queue
-                       completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion;
+                       completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
 {
     assertChipStackLockedByCurrentThread();
 
-    // Fow now, we only support one download at a time per controller; abort
+    // Fow now, we only support one download at a time per target device; abort
     // any existing ones so we can start this new one.
-    [self abortDownloadsForController:controller];
+    [self _abortDownloadsForController:controller nodeID:nodeID];
 
     // This block is always called when a download is finished.
     auto done = ^(MTRDownload * finishedDownload) {
@@ -521,18 +560,23 @@ static void OnTransferTimeout(chip::System::Layer * layer, void * context)
         controller.compressedFabricID.unsignedLongLongValue, nodeID.unsignedLongLongValue, nodeID.unsignedLongLongValue);
 }
 
-- (void)abortDownloadsForController:(MTRDeviceController_Concrete *)controller;
+- (void)abortDownloadsForController:(MTRDeviceController_Concrete *)controller
+{
+    [self _abortDownloadsForController:controller nodeID:nil];
+}
+
+- (void)_abortDownloadsForController:(MTRDeviceController_Concrete *)controller nodeID:(nullable NSNumber *)nodeID
 {
     assertChipStackLockedByCurrentThread();
 
-    [_downloads abortDownloadsForController:controller];
+    [_downloads abortDownloadsForController:controller nodeID:nodeID];
 }
 
 - (void)handleBDXTransferSessionBeginForFileDesignator:(NSString *)fileDesignator
                                            fabricIndex:(NSNumber *)fabricIndex
                                                 nodeID:(NSNumber *)nodeID
                                             completion:(MTRStatusCompletion)completion
-                                          abortHandler:(AbortHandler)abortHandler;
+                                          abortHandler:(AbortHandler)abortHandler
 {
     assertChipStackLockedByCurrentThread();
 
