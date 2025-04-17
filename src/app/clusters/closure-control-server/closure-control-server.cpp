@@ -14,14 +14,14 @@
  *    limitations under the License.
  */
 
-#include "closure-control-server.h"
-
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
+#include <app/clusters/closure-control-server/closure-control-server.h>
 #include <app/util/attribute-storage.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -52,9 +52,9 @@ namespace ClosureControl {
 
 CHIP_ERROR Interface::Init()
 {
-    VerifyOrDieWithMsg(AttributeAccessInterfaceRegistry::Instance().Register(this), NotSpecified,
+    VerifyOrDieWithMsg(AttributeAccessInterfaceRegistry::Instance().Register(this), AppServer,
                        "Failed to register attribute access");
-    VerifyOrDieWithMsg(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this) == CHIP_NO_ERROR, NotSpecified,
+    VerifyOrDieWithMsg(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this) == CHIP_NO_ERROR, AppServer,
                        "Failed to register command handler");
 
     return CHIP_NO_ERROR;
@@ -62,7 +62,7 @@ CHIP_ERROR Interface::Init()
 
 CHIP_ERROR Interface::Shutdown()
 {
-    VerifyOrDieWithMsg(CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this) == CHIP_NO_ERROR, NotSpecified,
+    VerifyOrDieWithMsg(CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this) == CHIP_NO_ERROR, AppServer,
                        "Failed to unregister command handler");
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 
