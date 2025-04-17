@@ -285,12 +285,12 @@ class TC_G_2_2(MatterBaseTest):
 
         self.step("23")
         kGroupNameOverflow = "Gp123456789123456"
-        try:
+        if group_name_supported:
             result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(kGroupId, kGroupNameOverflow))
             asserts.assert_equal(result.status, Status.ConstraintError,
                                  "Unexpected error status must be CONSTRAINT_ERROR as the groupName is of length > 16")
-        except Exception as e:
-            logging.exception('Error while adding groupName: %s', e)
+        else:
+            logger.info("Skipping GroupName check: Feature GroupNames not supported by DUT")
 
         self.step("24")
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
