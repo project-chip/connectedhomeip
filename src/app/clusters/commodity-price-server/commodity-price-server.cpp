@@ -75,6 +75,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     case Currency::Id:
         return aEncoder.Encode(mCurrency);
     case CurrentPrice::Id:
+        // Call GetDetailedPriceRequest with details = 0 to strip out .components and .description if present
         pPriceStruct = GetDetailedPriceRequest(0);
         if (pPriceStruct == nullptr)
         {
@@ -93,6 +94,8 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
 
+        // Call GetDetailedForecastRequest with details = 0 to
+        // strip out .components and .description if present
         pPriceForecast = GetDetailedForecastRequest(0);
         if (pPriceForecast == nullptr)
         {
@@ -346,19 +349,9 @@ CHIP_ERROR Instance::SetCurrentPrice(const DataModel::Nullable<Structs::Commodit
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
-
-        tempValue.periodStart = newValue.Value().periodStart;
-        tempValue.periodEnd   = newValue.Value().periodEnd;
-        tempValue.price       = newValue.Value().price;
-        tempValue.description.ClearValue(); // CurrentPrice Attribute does not have a description
-        tempValue.components.ClearValue();  // CurrentPrice Attribute does not have a List of components
-
-        mCurrentPrice.SetNonNull(tempValue);
     }
-    else
-    {
-        mCurrentPrice.SetNull();
-    }
+
+    mCurrentPrice = newValue;
 
     ChipLogDetail(AppServer, "mCurrentPrice updated");
     MatterReportingAttributeChangeCallback(mEndpointId, CommodityPrice::Id, CurrentPrice::Id);

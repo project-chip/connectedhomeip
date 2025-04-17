@@ -29,6 +29,9 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::CommodityPrice;
 using namespace chip::app::Clusters::CommodityPrice::Structs;
 
+static constexpr char kExVATStr[] = "ExVAT";
+static constexpr char kVATStr[]   = "VAT";
+
 CommodityPriceDelegate * GetCommodityPriceDelegate()
 {
     CommodityPriceInstance * mInst = GetCommodityPriceInstance();
@@ -57,10 +60,28 @@ void SetTestEventTrigger_PriceUpdate()
     newPriceStruct.periodEnd.SetNonNull(newPriceStruct.periodStart + 30 * 60);
 
     price.amount                 = 15916; // 15.916 p/kWh
-    price.currency.currency      = 981;
+    price.currency.currency      = kCurrencyGBP;
     price.currency.decimalPoints = 5;
     newPriceStruct.price.SetValue(price);
     newPriceStruct.priceLevel.SetValue(3);
+
+    // Main price description
+    const char * desc = (price.amount < 10000) ? "Low" : (price.amount < 24000) ? "Medium" : "High";
+    newPriceStruct.description.SetValue(chip::Span<const char>(desc, strlen(desc)));
+
+    // Components
+    static Structs::CommodityPriceComponentStruct::Type sComponents[2];
+
+    sComponents[0].source = Globals::TariffPriceTypeEnum::kStandard;
+    sComponents[0].price.SetValue(static_cast<Money>(price.amount * 95 / 100));
+    sComponents[0].description.SetValue(chip::Span<const char>(kExVATStr, strlen(kExVATStr)));
+
+    sComponents[1].source = Globals::TariffPriceTypeEnum::kStandard;
+    sComponents[1].price.SetValue(static_cast<Money>(price.amount * 5 / 100));
+    sComponents[1].description.SetValue(chip::Span<const char>(kVATStr, strlen(kVATStr)));
+
+    // Assign the component span to the
+    newPriceStruct.components.SetValue(chip::Span<const Structs::CommodityPriceComponentStruct::Type>(sComponents, 2));
 
     newPrice.SetNonNull(newPriceStruct);
 
@@ -92,9 +113,6 @@ void SetTestEventTrigger_ForecastUpdate()
     static Structs::CommodityPriceStruct::Type sForecastEntries[kForecastSize];
     static Structs::CommodityPriceComponentStruct::Type sComponentBuffers[kForecastSize][2]; // Per-entry
 
-    static constexpr char kExVATStr[] = "ExVAT";
-    static constexpr char kVATStr[]   = "VAT";
-
     uint32_t currentStart = chipEpoch;
 
     for (size_t i = 0; i < kForecastSize; ++i)
@@ -102,12 +120,12 @@ void SetTestEventTrigger_ForecastUpdate()
         Structs::CommodityPriceStruct::Type & newPriceStruct = sForecastEntries[i];
 
         Globals::Structs::PriceStruct::Type price;
-        price.currency.currency      = 981; // GBP
+        price.currency.currency      = kCurrencyGBP;
         price.currency.decimalPoints = 5;
         price.amount                 = kMinPrice + rand() % (kMaxPrice - kMinPrice + 1);
 
         newPriceStruct.price.SetValue(price);
-        newPriceStruct.priceLevel.SetValue(3);
+        newPriceStruct.priceLevel.SetValue((price.amount < 10000) ? 1 : (price.amount < 24000) ? 2 : 3);
 
         newPriceStruct.periodStart = currentStart;
         newPriceStruct.periodEnd.SetNonNull(currentStart + k30MinsInSeconds - 1);

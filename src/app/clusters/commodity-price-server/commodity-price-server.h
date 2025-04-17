@@ -35,7 +35,7 @@ namespace Clusters {
 namespace CommodityPrice {
 
 // Spec-defined constraints
-constexpr uint8_t kMaxForecastEntries         = 5;
+constexpr uint8_t kMaxForecastEntries         = 5; // TODO this should be 56 but issues with ReadAttribute at present
 constexpr uint8_t kMaxComponentsPerPriceEntry = 10;
 
 constexpr uint16_t kMaxCurrencyValue = 999; // From spec
@@ -59,29 +59,9 @@ public:
 
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
 
-    // ------------------------------------------------------------------
-    // Get attribute methods
-    // virtual Globals::TariffUnitEnum GetTariffUnit()                                            = 0;
-    // virtual Globals::Structs::CurrencyStruct::Type GetCurrency()                               = 0;
-    // virtual const DataModel::Nullable<Structs::CommodityPriceStruct::Type> & GetCurrentPrice() = 0;
-    // virtual const DataModel::List<const Structs::CommodityPriceStruct::Type> &
-    // GetPriceForecast(CommodityPriceDetailBitmap bitmap) = 0;
-
-    // TODO GetPriceForecast returns a List of CommodityPriceStruct with simple details, unlike the command which can ask for
-    // specific details.
-
-    /**
-     * @brief Returns the current Forecast object
-     *
-     * The reference returned from GetForecast() is only valid until the next Matter event
-     * is processed.  Callers must not hold on to that reference for any asynchronous processing.
-     *
-     * Once another Matter event has had a chance to run, the memory associated with the
-     * ForecastStruct is likely to change or be re-allocated, so would become invalid.
-     *
-     * @return  The current Forecast object
-     */
-    // virtual const DataModel::Nullable<Structs::CommodityPriceStruct::Type> & GetDetailedForecast() = 0;
+    // For now this is a place holder and the Delegate could be removed
+    // There is no delegated methods since these are largely implemented in the
+    // commodity-price-server.cpp Instance class
 
 protected:
     EndpointId mEndpointId = 0;
@@ -116,9 +96,6 @@ public:
 
     // Send Price Change event
     Status SendPriceChangeEvent();
-
-private:
-    Protocols::InteractionModel::Status GetMatterEpochTimeFromUnixTime(uint32_t & currentUtcTime) const;
 
 private:
     Delegate & mDelegate;

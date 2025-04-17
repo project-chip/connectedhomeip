@@ -17,7 +17,6 @@
  */
 #pragma once
 
-#include "CommodityPriceMemMgr.h"
 #include <app/clusters/commodity-price-server/commodity-price-server.h>
 #include <app/util/af-types.h>
 #include <lib/core/CHIPError.h>
@@ -34,30 +33,10 @@ public:
     CommodityPriceDelegate();
     ~CommodityPriceDelegate() = default;
 
-    // Attribute Accessors
-
-    /* These functions are called by the ReadAttribute handler to iterate through lists
-     * The cluster server will call Start<Type>Read to allow the delegate to create a temporary
-     * lock on the data.
-     * The delegate is expected to not change these values once Start<Type>Read has been called
-     * until the End<Type>Read() has been called (e.g. releasing a lock on the data)
+    /* This class is a placeholder - most of the functionality is in the
+     * cluster server. Consider removing this.
      */
-    // CHIP_ERROR StartPriceForecastRead(CommodityPriceDetailBitmap bitmap) override;
-    // CHIP_ERROR GetPriceForecastByIndex(uint8_t, Structs::CommodityPriceStruct::Type &) override;
-    // CHIP_ERROR EndPriceForecastRead() override;
-
-    // TODO work out how to set forecast data and retrieve it
-
-    const PriceForecastMemMgr & GetPriceForecastMemMgr() { return mPriceForecastMemMgr; }
-
 private:
-    // This storage is only needed if the FORE (forecast) feature is supported
-    // ------------
-    // Object to handle the allocation of memory for the price components list
-    PriceForecastMemMgr mPriceForecastMemMgr;
-
-    // actual storage of price entries as an array
-    Structs::CommodityPriceStruct::Type mPriceEntryArray[kMaxForecastEntries];
 };
 
 class CommodityPriceInstance : public Instance
