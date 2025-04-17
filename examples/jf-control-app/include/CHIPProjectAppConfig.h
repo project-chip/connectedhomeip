@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *      Project configuration for CHIP Tool.
+ *      Project configuration for jf-control-app.
  *
  */
 #ifndef CHIPPROJECTCONFIG_H
@@ -61,5 +61,11 @@
 
 // Allow us, for test purposes, to encode invalid enum values.
 #define CHIP_CONFIG_IM_ENABLE_ENCODING_SENTINEL_ENUM_VALUES 1
+
+// initial version for the Administrator CAT
+#define CHIP_CONFIG_ADMINISTRATOR_CAT_INITIAL_VERSION 0x0001
+
+//initial version for the Anchor CAT
+#define CHIP_CONFIG_ANCHOR_CAT_INITIAL_VERSION 0x0001
 
 #endif /* CHIPPROJECTCONFIG_H */

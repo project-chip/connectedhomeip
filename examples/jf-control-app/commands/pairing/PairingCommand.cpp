@@ -40,6 +40,8 @@ using namespace ::chip::Controller;
 CHIP_ERROR PairingCommand::RunCommand()
 {
     CurrentCommissioner().RegisterPairingDelegate(this);
+    chip::CASEAuthTag administratorCAT = GetAdminCATHavingVersion(CHIP_CONFIG_ADMINISTRATOR_CAT_INITIAL_VERSION);
+    NodeId administratorCaseAdminSubject = NodeIdFromCASEAuthTag(administratorCAT);
 
     if (mAnchorNodeId == chip::kUndefinedNodeId)
     {
@@ -48,6 +50,13 @@ CHIP_ERROR PairingCommand::RunCommand()
             ChipLogError(chipTool,
                 "Please first commission the Anchor Administrator: add `--anchor true` parameter");
             return CHIP_ERROR_NOT_CONNECTED;
+        }
+        else
+        {
+            chip::CASEAuthTag anchorCAT = GetAnchorCATHavingVersion(CHIP_CONFIG_ANCHOR_CAT_INITIAL_VERSION);
+
+            // JFA will be issued a NOC with Anchor CAT and Administrator CAT
+            mCASEAuthTags = MakeOptional(std::vector<uint32_t>{administratorCAT, anchorCAT});
         }
     }
     else if (mAnchor.ValueOr(false))
@@ -63,6 +72,10 @@ CHIP_ERROR PairingCommand::RunCommand()
 
     // Clear the CATs in OperationalCredentialsIssuer
     mCredIssuerCmds->SetCredentialIssuerCATValues(kUndefinedCATs);
+
+    // All the AddNOC commands invoked by JFC will have
+    // the value below for the CaseAdminSubject field
+    mCredIssuerCmds->SetCredentialIssuerCaseAdminSubject(administratorCaseAdminSubject);
 
     mDeviceIsICD = false;
 

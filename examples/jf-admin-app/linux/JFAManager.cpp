@@ -63,8 +63,11 @@ void JFAManager::HandleCommissioningCompleteEvent()
 
         if ((jfFabricIndex == kUndefinedFabricId) && mServer->GetFabricTable().FetchCATs(fabricIndex, cats) == CHIP_NO_ERROR)
         {
-            /* TODO: check for Anchor CAT before assignment */
-            jfFabricIndex = fabricIndex;
+            /* When JFA is commissioned, it has to be issued with Anchor CAT and Administrator CAT */
+            if (cats.ContainsIdentifier(kAdminCATIdentifier) && cats.ContainsIdentifier(kAnchorCATIdentifier))
+            {
+                jfFabricIndex = fabricIndex;
+            }
         }
     }
 }
