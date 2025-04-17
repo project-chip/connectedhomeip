@@ -60,8 +60,6 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const GenericCurrentStateStruct & curre
     if (currentState.latch.HasValue())
     {
         VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-        VerifyOrReturnError(currentState.latch.Value() == true || currentState.latch.Value() == false,
-                            CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     if (currentState.speed.HasValue())
@@ -95,8 +93,6 @@ CHIP_ERROR ClusterLogic::SetTarget(const GenericTargetStruct & target)
     if (target.latch.HasValue())
     {
         VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-        VerifyOrReturnError(target.latch.Value() == true || target.latch.Value() == false,
-                            CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     if (target.speed.HasValue())
@@ -429,7 +425,6 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
 
     if (latch.HasValue())
     {
-        VerifyOrReturnError(latch.Value() == true || latch.Value() == false, Status::ConstraintError);
         VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), Status::Success);
         // TODO: If the device supports the Latching(LT) feature, the device dimension SHALL either fulfill the latch order and
         // update Target.Latch or, if manual intervention is required to latch, respond with INVALID_ACTION and remain in its
