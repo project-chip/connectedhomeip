@@ -1818,14 +1818,13 @@ endpoint 1 {
   server cluster CommodityPrice {
     emits event PriceChange;
     emits event ForecastChange;
-    ram      attribute tariffUnit;
+    callback attribute tariffUnit;
     callback attribute currency;
     callback attribute currentPrice;
     callback attribute priceForecast;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
 
     handle command GetDetailedPriceRequest;
