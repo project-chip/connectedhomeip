@@ -291,6 +291,7 @@ DataModel::AcceptedCommandEntry
 AcceptedCommandEntryFor(ClusterId id, CommandId command,
                         Meta::ObjectList<TClusterIds...> clusterIdList = {} /*For easy template deduction*/)
 {
+    using namespace chip::app::Clusters;
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == AccessControl::Id) || ...))
     {
         if (id == AccessControl::Id)
