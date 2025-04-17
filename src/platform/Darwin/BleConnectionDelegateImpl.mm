@@ -387,7 +387,7 @@ namespace DeviceLayer {
     if (opCode == 1) {
         auto delegate = _scannerDelegate;
         if (delegate) {
-            ChipBLEDeviceNetworkRecoveryIdentificationInfo info;
+            ChipBLENetworkRecoveryInfo info;
             memcpy(&info, [serviceData bytes], sizeof(info));
             delegate->OnBleScanAdd(BleConnObjectFromCBPeripheral(peripheral), info);
         }
