@@ -1,0 +1,148 @@
+#
+#    Copyright (c) 2025 Project CHIP Authors
+#    All rights reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+
+import logging
+
+import chip.clusters as Clusters
+import test_plan_support
+from chip.clusters.Types import NullValue
+from chip.testing import matter_asserts
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from mobly import asserts
+
+
+class TC_CNET_4_2(MatterBaseTest):
+
+    def desc_TC_CNET_4_2(self) -> str:
+        return "[TC-CNET-4.2] [Thread] Verification for attributes check [DUT-Server]"
+
+    def steps_TC_CNET_4_2(self) -> list[TestStep]:
+        steps = [
+            TestStep(1, test_plan_support.commission_if_required(), "", is_commissioning=True),
+            TestStep(2, "read Networks attribute on all endpoints", "expected result"),
+            TestStep(3, "current_cluster_connected", "expected result"),
+            TestStep(4, "read MaxNetworks attribute", "expected result"),
+            TestStep(5, "read ScanMaxTimeSeconds attribute", "expected result"),
+            TestStep(6, "read ConnectMaxTimeSeconds attribute", "expected result"),
+            TestStep(7, "TH reads InterfaceEnabled attribute from the DUT.",
+                     "Verify that InterfaceEnabled attribute value is true"),
+            TestStep(8, "TH reads LastNetworkingStatus attribute from the DUT.",
+                     "Verify that LastNetworkingStatus attribute value is Success."),
+            TestStep(9, "TH reads the LastNetworkID attribute from the DUT.",
+                     "Verify that LastNetworkID attribute matches the NetworkID value of one of the entries in the Networks attribute list."),
+            TestStep(10, "read SupportedThreadFeatures attribute", "expected result"),
+            TestStep(11, "read ThreadVersion attribute", "expected result")
+        ]
+        return steps
+
+    def pics_TC_CNET_4_2(self) -> list[str]:
+        """Return the PICS definitions associated with this test."""
+        return ["CNET.S.F01"]
+
+    @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning,
+                                         Clusters.NetworkCommissioning.Bitmaps.Feature.kThreadNetworkInterface))
+    async def test_TC_CNET_4_2(self):
+        # Commissioning already done
+        self.step(1)
+
+        self.step(2)
+        networks_dict = await self.read_single_attribute_all_endpoints(
+            cluster=Clusters.NetworkCommissioning,
+            attribute=Clusters.NetworkCommissioning.Attributes.Networks)
+        logging.info(f"Networks by endpoint: {networks_dict}")
+        connected_network_count = {}
+        for ep in networks_dict:
+            connected_network_count[ep] = sum(map(lambda x: x.connected, networks_dict[ep]))
+        logging.info(f"Connected networks count by endpoint: {connected_network_count}")
+        asserts.assert_equal(sum(connected_network_count.values()), 1,
+                             "Verify that only one entry has connected status as TRUE across ALL endpoints")
+
+        self.step(3)
+        current_cluster_connected = connected_network_count[self.get_endpoint()] == 1
+        if not current_cluster_connected:
+            logging.info("Current cluster is not connected, skipping all remaining test steps")
+            self.skip_all_remaining_steps()
+            return
+
+        self.step(4)
+        max_networks_count = await self.read_single_attribute_check_success(
+            cluster=Clusters.NetworkCommissioning,
+            attribute=Clusters.NetworkCommissioning.Attributes.MaxNetworks)
+        matter_asserts.assert_int_in_range(max_networks_count, min_value=1, max_value=255, description="MaxNetworks")
+
+        self.step(5)
+        scan_max_time_seconds = await self.read_single_attribute_check_success(
+            cluster=Clusters.NetworkCommissioning,
+            attribute=Clusters.NetworkCommissioning.Attributes.ScanMaxTimeSeconds)
+        matter_asserts.assert_int_in_range(scan_max_time_seconds, min_value=1, max_value=255, description="ScanMaxTimeSeconds")
+
+        self.step(6)
+        connect_max_time_seconds = await self.read_single_attribute_check_success(
+            cluster=Clusters.NetworkCommissioning,
+            attribute=Clusters.NetworkCommissioning.Attributes.ConnectMaxTimeSeconds)
+        matter_asserts.assert_int_in_range(connect_max_time_seconds, min_value=1,
+                                           max_value=255, description="ConnectMaxTimeSeconds")
+
+        self.step(7)
+        interface_enabled = await self.read_single_attribute_check_success(
+            cluster=Clusters.NetworkCommissioning,
+            attribute=Clusters.NetworkCommissioning.Attributes.InterfaceEnabled)
+        asserts.assert_true(interface_enabled, "Verify that InterfaceEnabled attribute value is true")
+
+        self.step(8)
+        last_networking_status = await self.read_single_attribute_check_success(
+            cluster=Clusters.NetworkCommissioning,
+            attribute=Clusters.NetworkCommissioning.Attributes.LastNetworkingStatus)
+        expected_status = Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess
+        asserts.assert_is(last_networking_status, expected_status, "Verify that LastNetworkingStatus attribute value is success")
+
+        self.step(9)
+        networks = networks_dict[self.get_endpoint()]
+        last_network_id = await self.read_single_attribute_check_success(
+            cluster=Clusters.NetworkCommissioning,
+            attribute=Clusters.NetworkCommissioning.Attributes.LastNetworkID)
+        matching_networks_count = sum(map(lambda x: x.networkID == last_network_id, networks))
+        logging.info(f"last network id: {last_network_id}")
+        asserts.assert_equal(matching_networks_count, 1,
+                             "Verify that LastNetworkID attribute matches the NetworkID value of one of the entries")
+        asserts.assert_true(isinstance(last_network_id, bytes) and 1 <= len(last_network_id) <= 32,
+                            "Verify LastNetworkID attribute value will be of type octstr with a length range of 1 to 32")
+
+        # Verify that Bit 4 (IsSynchronizedSleepyEndDeviceCapable) is only set if bit 2 (IsSleepyEndDeviceCapable) is also set expects value 20
+        # Verify that Bit 0 (IsBorderRouterCapable) is only set if bit 3 (IsFullThreadDevice) is also set expected value 9
+        # Verify that Bit 1 (IsRouterCapable) is only set if bit 3 (IsFullThreadDevice) is also set expected value 10
+        # Verify that at least one of the following bits is set:
+        #  - Bit 4 (IsSynchronizedSleepyEndDeviceCapable),
+        #  - Bit 2 (IsSleepyEndDeviceCapable),
+        #  - Bit 3 (IsFullThreadDevice).
+        # So the possibilites of value here are in the range of 0-20 expected value as per test-plan [0, 4, 8, 9, 10, 20]
+        self.step(10)
+        support_thread_features_expected_values = [0, 4, 8, 9, 10, 20]
+        supported_thread_features = await self.read_single_attribute_check_success(
+            cluster=Clusters.NetworkCommissioning,
+            attribute=Clusters.NetworkCommissioning.Attributes.SupportedThreadFeatures)
+        logging.info(f"support thred features: {supported_thread_features}")
+        asserts.assert_in(supported_thread_features, support_thread_features_expected_values, "SupportedThreadFeatures")
+
+        self.step(11)
+        thread_version = await self.read_single_attribute_check_success(
+            cluster=Clusters.NetworkCommissioning,
+            attribute=Clusters.NetworkCommissioning.Attributes.ThreadVersion)
+        asserts.assert_greater_equal(thread_version, 4, "ThreadVersion")
+
+
+if __name__ == "__main__":
+    default_matter_test_main()
