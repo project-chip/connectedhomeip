@@ -547,7 +547,7 @@ class MatterTestConfig:
     storage_path: pathlib.Path = pathlib.Path(".")
     logs_path: pathlib.Path = pathlib.Path(".")
     paa_trust_store_path: Optional[pathlib.Path] = None
-    ble_interface_id: Optional[int] = None
+    ble_controller: Optional[int] = None
     commission_only: bool = False
 
     admin_vendor_id: int = _DEFAULT_ADMIN_VENDOR_ID
@@ -773,7 +773,7 @@ class MatterStackState:
         self._config = config
 
         if not hasattr(builtins, "chipStack"):
-            chip.native.Init(bluetoothAdapter=config.ble_interface_id)
+            chip.native.Init(bluetoothAdapter=config.ble_controller)
             if config.storage_path is None:
                 raise ValueError("Must have configured a MatterTestConfig.storage_path")
             self._init_stack(already_initialized=False, persistentStoragePath=config.storage_path)
@@ -1110,6 +1110,27 @@ class MatterBaseTest(base_test.BaseTestClass):
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabricFiltered)
         data = result[endpoint]
         return list(data.values())[0][attribute]
+
+    async def read_single_attribute_all_endpoints(
+            self, cluster: Clusters.ClusterObjects.ClusterCommand, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
+            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None):
+        """Reads a single attribute of a specified cluster across all endpoints.
+
+        Returns:
+            dict: endpoint to attribute value
+
+        """
+        if dev_ctrl is None:
+            dev_ctrl = self.default_controller
+        if node_id is None:
+            node_id = self.dut_node_id
+
+        read_response = await dev_ctrl.ReadAttribute(node_id, [(attribute)])
+        attrs = {}
+        for endpoint in read_response:
+            attr_ret = read_response[endpoint][cluster][attribute]
+            attrs[endpoint] = attr_ret
+        return attrs
 
     async def read_single_attribute_check_success(
             self, cluster: Clusters.ClusterObjects.ClusterCommand, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
@@ -1853,7 +1874,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.storage_path = pathlib.Path(_DEFAULT_STORAGE_PATH) if args.storage_path is None else args.storage_path
     config.logs_path = pathlib.Path(_DEFAULT_LOG_PATH) if args.logs_path is None else args.logs_path
     config.paa_trust_store_path = args.paa_trust_store_path
-    config.ble_interface_id = args.ble_interface_id
+    config.ble_controller = args.ble_controller
     config.pics = {} if args.PICS is None else read_pics_from_file(args.PICS)
     config.tests = list(chain.from_iterable(args.tests or []))
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
@@ -1904,8 +1925,8 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                              help="PAA trust store path (default: %s)" % str(paa_path_default))
     basic_group.add_argument('--dac-revocation-set-path', action="store", type=pathlib.Path, metavar="PATH",
                              help="Path to JSON file containing the device attestation revocation set.")
-    basic_group.add_argument('--ble-interface-id', action="store", type=int,
-                             metavar="INTERFACE_ID", help="ID of BLE adapter (from hciconfig)")
+    basic_group.add_argument('--ble-controller', action="store", type=int,
+                             metavar="CONTROLLER_ID", help="BLE controller selector, see example or platform docs for details")
     basic_group.add_argument('-N', '--controller-node-id', type=int_decimal_or_hex,
                              metavar='NODE_ID',
                              default=_DEFAULT_CONTROLLER_NODE_ID,

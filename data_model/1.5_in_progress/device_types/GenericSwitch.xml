@@ -60,8 +60,8 @@ Davis, CA 95616, USA
 <deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x000F" name="Generic Switch" revision="3">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
-    <revision revision="2" summary="Removed requirement for Fixed Label cluster (can use TagList which was added in Descriptor cluster)"/>
-    <revision revision="3" summary="Updated the Scenes cluster to Scenes Management with Cluster ID: 0x0062"/>
+    <revision revision="2" summary="Removed requirement for Fixed Label cluster (instead use TagList which was added in Descriptor cluster)"/>
+    <revision revision="3" summary="Updated the Scenes cluster to Scenes Management with Cluster ID: 0x0062; note that this cluster is not used in this device type (only mentioned in the informative section related to On/Off Light Switch)"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <clusters>
