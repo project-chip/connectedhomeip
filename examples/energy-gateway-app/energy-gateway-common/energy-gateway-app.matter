@@ -1825,6 +1825,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 4;
 
     handle command GetDetailedPriceRequest;
