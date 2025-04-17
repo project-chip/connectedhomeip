@@ -41,6 +41,42 @@ private:
     DataModel::Nullable<CharSpan> mProtocolVersion;
     DataModel::Nullable<Globals::Structs::PowerThresholdStruct::Type> mPowerThreshold;
 
+    struct DataPresets_s {
+        DataModel::Nullable<MeterTypeEnum>                                meterType;
+        DataModel::Nullable<CharSpan>                                     pointOfDelivery;
+        DataModel::Nullable<CharSpan>                                     meterSerialNumber;
+        DataModel::Nullable<CharSpan>                                     protocolVersion;
+        DataModel::Nullable<Globals::Structs::PowerThresholdStruct::Type> powerThreshold;
+    };
+
+    static constexpr uint8_t kMaxPresetItems = 3u;
+    uint8_t mPresetsIterator;
+
+    const DataPresets_s TestsDataPresets[kMaxPresetItems] = {
+        { // First element
+            .meterType = DataModel::Nullable<MeterTypeEnum>(),
+            .pointOfDelivery = DataModel::Nullable<CharSpan>(),
+            .meterSerialNumber = DataModel::Nullable<CharSpan>(),
+            .protocolVersion = DataModel::Nullable<CharSpan>(),
+            .powerThreshold = DataModel::Nullable<Globals::Structs::PowerThresholdStruct::Type>()
+        },
+        { // Second element
+            .meterType = DataModel::MakeNullable(MeterTypeEnum::kUtility),
+            .pointOfDelivery = DataModel::MakeNullable(CharSpan::fromCharString("Test delivery point")),
+            .meterSerialNumber = DataModel::MakeNullable(CharSpan::fromCharString("TST-123456789")),
+            .protocolVersion = DataModel::MakeNullable(CharSpan::fromCharString("1.2.3")),
+            .powerThreshold = DataModel::MakeNullable(Globals::Structs::PowerThresholdStruct::Type({Optional<int64_t>(2400000), Optional<int64_t>(120), Globals::PowerThresholdSourceEnum::kContract }))
+        },
+        { // Third element
+            .meterType = DataModel::MakeNullable(MeterTypeEnum::kGeneric),
+            .pointOfDelivery = DataModel::MakeNullable(CharSpan::fromCharString("New delivery point")),
+            .meterSerialNumber = DataModel::MakeNullable(CharSpan::fromCharString("NEW-987654321")),
+            .protocolVersion = DataModel::MakeNullable(CharSpan::fromCharString("3.4.5")),
+            .powerThreshold = DataModel::MakeNullable(Globals::Structs::PowerThresholdStruct::Type({Optional<int64_t>(4800000),
+                Optional<int64_t>(240), Globals::PowerThresholdSourceEnum::kRegulator}))
+        }
+    };
+
     static bool NullableCharSpansEqual(const DataModel::Nullable<CharSpan> & a, const DataModel::Nullable<CharSpan> & b)
     {
         if (a.IsNull() && b.IsNull())
@@ -249,7 +285,22 @@ private:
         }
     }
 
+    void UpdAttrsByPresetIdx()
+    {
+        VerifyOrDieWithMsg(mPresetsIterator < kMaxPresetItems, AppServer, "Invalid index of data samples preset");
+
+        mInstance->SetMeterType(TestsDataPresets[mPresetsIterator].meterType);
+        mInstance->SetPointOfDelivery(TestsDataPresets[mPresetsIterator].pointOfDelivery);
+        mInstance->SetMeterSerialNumber(TestsDataPresets[mPresetsIterator].meterSerialNumber);
+        mInstance->SetProtocolVersion(TestsDataPresets[mPresetsIterator].protocolVersion);
+        mInstance->SetPowerThreshold(TestsDataPresets[mPresetsIterator].powerThreshold);
+
+        mPresetsIterator < (kMaxPresetItems-1) ? mPresetsIterator++ : (mPresetsIterator = 0);
+    }
+
 public:
+    OldMeterIdentificationAttributes() { mPresetsIterator=0; };
+    ~OldMeterIdentificationAttributes() = default;
 
     void Update()
     {
@@ -258,7 +309,7 @@ public:
             SaveAttributes();
         }
 
-        IncreaseAttributes();
+        UpdAttrsByPresetIdx();
     }
 
     void Clear()
