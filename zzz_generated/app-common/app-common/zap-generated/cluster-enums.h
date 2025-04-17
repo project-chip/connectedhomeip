@@ -61,6 +61,7 @@
 #include <clusters/DoorLock/Enums.h>
 #include <clusters/EcosystemInformation/Enums.h>
 #include <clusters/ElectricalEnergyMeasurement/Enums.h>
+#include <clusters/ElectricalGridConditions/Enums.h>
 #include <clusters/ElectricalPowerMeasurement/Enums.h>
 #include <clusters/EnergyEvse/Enums.h>
 #include <clusters/EnergyEvseMode/Enums.h>

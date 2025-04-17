@@ -61,6 +61,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Administrator Commissioning
     - Actions
     - Closure Control
+    - Closure Dimension
     - OTA Software Update Provider
 
 # We need a more configurable way of deciding which clusters have which init functions....

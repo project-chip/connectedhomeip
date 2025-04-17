@@ -426,6 +426,9 @@ static BOOL AttributeIsSpecifiedInBasicInformationCluster(AttributeId aAttribute
     case Attributes::MaxPathsPerInvoke::Id: {
         return YES;
     }
+    case Attributes::ConfigurationVersion::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -1414,6 +1417,9 @@ static BOOL AttributeIsSpecifiedInBridgedDeviceBasicInformationCluster(Attribute
         return YES;
     }
     case Attributes::ProductAppearance::Id: {
+        return YES;
+    }
+    case Attributes::ConfigurationVersion::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -3220,6 +3226,39 @@ static BOOL AttributeIsSpecifiedInDeviceEnergyManagementModeCluster(AttributeId 
         return YES;
     }
     case Attributes::CurrentMode::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInElectricalGridConditionsCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ElectricalGridConditions;
+    switch (aAttributeId) {
+    case Attributes::LocalGenerationAvailable::Id: {
+        return YES;
+    }
+    case Attributes::CurrentConditions::Id: {
+        return YES;
+    }
+    case Attributes::ForecastConditions::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -6836,6 +6875,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::DeviceEnergyManagementMode::Id: {
         return AttributeIsSpecifiedInDeviceEnergyManagementModeCluster(aAttributeId);
+    }
+    case Clusters::ElectricalGridConditions::Id: {
+        return AttributeIsSpecifiedInElectricalGridConditionsCluster(aAttributeId);
     }
     case Clusters::DoorLock::Id: {
         return AttributeIsSpecifiedInDoorLockCluster(aAttributeId);

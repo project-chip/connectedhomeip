@@ -146,7 +146,7 @@ class ClosureControlCluster(
 
   suspend fun moveTo(
     position: UByte?,
-    latch: UByte?,
+    latch: Boolean?,
     speed: UByte?,
     timedInvokeTimeout: Duration? = null,
   ) {

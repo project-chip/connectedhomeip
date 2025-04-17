@@ -156,6 +156,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeEnergyEVSEModeID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x0000009D,
     MTRClusterIDTypeWaterHeaterModeID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x0000009E,
     MTRClusterIDTypeDeviceEnergyManagementModeID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x0000009F,
+    MTRClusterIDTypeElectricalGridConditionsID MTR_PROVISIONALLY_AVAILABLE = 0x000000A0,
     MTRClusterIDTypeDoorLockID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000101,
     MTRClusterIDTypeWindowCoveringID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000102,
     MTRClusterIDTypeClosureControlID MTR_PROVISIONALLY_AVAILABLE = 0x00000104,
@@ -717,6 +718,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterBasicInformationAttributeProductAppearanceID MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x00000014,
     MTRAttributeIDTypeClusterBasicInformationAttributeSpecificationVersionID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000015,
     MTRAttributeIDTypeClusterBasicInformationAttributeMaxPathsPerInvokeID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000016,
+    MTRAttributeIDTypeClusterBasicInformationAttributeConfigurationVersionID MTR_PROVISIONALLY_AVAILABLE = 0x00000018,
     MTRAttributeIDTypeClusterBasicInformationAttributeGeneratedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterBasicInformationAttributeAcceptedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterBasicInformationAttributeAttributeListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAttributeListID,
@@ -1857,6 +1859,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeReachableID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000011,
     MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeUniqueIDID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000012,
     MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeProductAppearanceID MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x00000014,
+    MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeConfigurationVersionID MTR_PROVISIONALLY_AVAILABLE = 0x00000018,
     MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeGeneratedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeAcceptedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeAttributeListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAttributeListID,
@@ -2629,6 +2632,16 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeAttributeListID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = MTRAttributeIDTypeGlobalAttributeAttributeListID,
     MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeFeatureMapID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeClusterRevisionID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster ElectricalGridConditions attributes
+    MTRAttributeIDTypeClusterElectricalGridConditionsAttributeLocalGenerationAvailableID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterElectricalGridConditionsAttributeCurrentConditionsID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterElectricalGridConditionsAttributeForecastConditionsID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterElectricalGridConditionsAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterElectricalGridConditionsAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterElectricalGridConditionsAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterElectricalGridConditionsAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterElectricalGridConditionsAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster DoorLock deprecated attribute names
     MTRClusterDoorLockAttributeLockStateID
@@ -7608,6 +7621,10 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterEnergyEVSEEventFaultID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000004,
     MTREventIDTypeClusterEnergyEVSEEventRFIDID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000005,
 
+    // Cluster ElectricalGridConditions events
+    MTREventIDTypeClusterElectricalGridConditionsEventCurrentConditionsChangedID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTREventIDTypeClusterElectricalGridConditionsEventForecastConditionsChangedID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+
     // Cluster DoorLock deprecated event names
     MTRClusterDoorLockEventDoorLockAlarmID
         MTR_DEPRECATED("Please use MTREventIDTypeClusterDoorLockEventDoorLockAlarmID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -7631,6 +7648,12 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterDoorLockEventLockOperationID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000002,
     MTREventIDTypeClusterDoorLockEventLockOperationErrorID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000003,
     MTREventIDTypeClusterDoorLockEventLockUserChangeID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000004,
+
+    // Cluster ClosureControl events
+    MTREventIDTypeClusterClosureControlEventOperationalErrorID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTREventIDTypeClusterClosureControlEventMovementCompletedID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTREventIDTypeClusterClosureControlEventEngageStateChangedID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTREventIDTypeClusterClosureControlEventSecureStateChangedID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
 
     // Cluster PumpConfigurationAndControl deprecated event names
     MTRClusterPumpConfigurationAndControlEventSupplyVoltageLowID

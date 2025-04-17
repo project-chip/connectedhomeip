@@ -186,6 +186,10 @@
 #include <clusters/ElectricalEnergyMeasurement/Commands.ipp>
 #include <clusters/ElectricalEnergyMeasurement/Events.ipp>
 #include <clusters/ElectricalEnergyMeasurement/Structs.ipp>
+#include <clusters/ElectricalGridConditions/Attributes.ipp>
+#include <clusters/ElectricalGridConditions/Commands.ipp>
+#include <clusters/ElectricalGridConditions/Events.ipp>
+#include <clusters/ElectricalGridConditions/Structs.ipp>
 #include <clusters/ElectricalPowerMeasurement/Attributes.ipp>
 #include <clusters/ElectricalPowerMeasurement/Commands.ipp>
 #include <clusters/ElectricalPowerMeasurement/Events.ipp>

@@ -58,6 +58,7 @@
         "ecosystem-information-cluster.xml",
         "energy-preference-cluster.xml",
         "electrical-energy-measurement-cluster.xml",
+        "electrical-grid-conditions-cluster.xml",
         "electrical-power-measurement-cluster.xml",
         "energy-evse-cluster.xml",
         "energy-evse-mode-cluster.xml",
@@ -659,6 +660,12 @@
             "PeriodicEnergyImported",
             "PeriodicEnergyExported",
             "CumulativeEnergyReset",
+            "FeatureMap"
+        ],
+        "Electrical Grid Conditions": [
+            "LocalGenerationAvailable",
+            "CurrentConditions",
+            "ForecastConditions",
             "FeatureMap"
         ],
         "Electrical Power Measurement": [
