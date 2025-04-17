@@ -57,10 +57,10 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const GenericCurrentStateStruct & curre
         VerifyOrReturnError(currentState.position.Value() <= PERCENT100THS_MAX_VALUE, CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    if (currentState.latching.HasValue())
+    if (currentState.latch.HasValue())
     {
         VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-        VerifyOrReturnError(EnsureKnownEnumValue(currentState.latching.Value()) != LatchingEnum::kUnknownEnumValue,
+        VerifyOrReturnError(currentState.latch.Value() == true || currentState.latch.Value() == false,
                             CHIP_ERROR_INVALID_ARGUMENT);
     }
 
@@ -76,7 +76,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const GenericCurrentStateStruct & curre
     if (currentState != mState.currentState)
     {
         mState.currentState = currentState;
-        mMatterContext.MarkDirty(Attributes::Current::Id);
+        mMatterContext.MarkDirty(Attributes::CurrentState::Id);
     }
 
     return CHIP_NO_ERROR;
@@ -95,7 +95,7 @@ CHIP_ERROR ClusterLogic::SetTarget(const GenericTargetStruct & target)
     if (target.latch.HasValue())
     {
         VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-        VerifyOrReturnError(EnsureKnownEnumValue(target.latch.Value()) != TargetLatchEnum::kUnknownEnumValue,
+        VerifyOrReturnError(target.latch.Value() == true || target.latch.Value() == false,
                             CHIP_ERROR_INVALID_ARGUMENT);
     }
 
@@ -404,7 +404,7 @@ CHIP_ERROR ClusterLogic::GetClusterRevision(Attributes::ClusterRevision::TypeInf
     return CHIP_NO_ERROR;
 }
 
-Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Optional<TargetLatchEnum> latch,
+Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Optional<bool> latch,
                                             Optional<Globals::ThreeLevelAutoEnum> speed)
 {
     VerifyOrDieWithMsg(mInitialized, NotSpecified, "Unexpected command received when device is yet to be initialized");
@@ -429,7 +429,7 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
 
     if (latch.HasValue())
     {
-        VerifyOrReturnError(latch.Value() != TargetLatchEnum::kUnknownEnumValue, Status::ConstraintError);
+        VerifyOrReturnError(latch.Value() == true || latch.Value() == false, Status::ConstraintError);
         VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), Status::Success);
         // TODO: If the device supports the Latching(LT) feature, the device dimension SHALL either fulfill the latch order and
         // update Target.Latch or, if manual intervention is required to latch, respond with INVALID_ACTION and remain in its
@@ -528,7 +528,7 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
         // Position value SHALL be clamped to 0.00% if the LM feature is not supported or LimitRange.Max if the LM feature is
         // supported.
         newPosition = limitSupported ? std::min(newPosition, static_cast<uint32_t>(limitRange.max))
-                                     : std::min(newPosition, static_cast<uint32_t>(10000));
+                                     : std::min(newPosition, static_cast<uint32_t>(PERCENT100THS_MAX_VALUE));
         break;
 
     default:
@@ -538,7 +538,7 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
     }
 
     // set the target position
-    stepTarget.position.SetValue(newPosition);
+    stepTarget.position.SetValue(static_cast<Percent100ths>(newPosition));
 
     if (speed.HasValue())
     {

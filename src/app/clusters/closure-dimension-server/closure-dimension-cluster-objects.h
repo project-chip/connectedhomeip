@@ -28,39 +28,39 @@ namespace ClosureDimension {
 /**
  * Structure represents the current state struct of a closure dimension cluster derivation instance.
  */
-struct GenericCurrentStateStruct : public Structs::CurrentStruct::Type
+struct GenericCurrentStateStruct : public Structs::CurrentStateStruct::Type
 {
     GenericCurrentStateStruct(Optional<Percent100ths> positionValue            = NullOptional,
-                              Optional<LatchingEnum> latchingValue             = NullOptional,
+                              Optional<bool> latchValue                        = NullOptional,
                               Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
     {
-        Set(positionValue, latchingValue, speedValue);
+        Set(positionValue, latchValue, speedValue);
     }
 
     GenericCurrentStateStruct(const GenericCurrentStateStruct & currentState) { *this = currentState; }
 
     GenericCurrentStateStruct & operator=(const GenericCurrentStateStruct & current)
     {
-        Set(current.position, current.latching, current.speed);
+        Set(current.position, current.latch, current.speed);
         return *this;
     }
 
-    void Set(Optional<Percent100ths> positioningValue = NullOptional, Optional<LatchingEnum> latchingValue = NullOptional,
+    void Set(Optional<Percent100ths> positioningValue = NullOptional, Optional<bool> latchValue = NullOptional,
              Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
     {
         position = positioningValue;
-        latching = latchingValue;
+        latch    = latchValue;
         speed    = speedValue;
     }
 
     bool operator==(const GenericCurrentStateStruct & rhs) const
     {
-        return position == rhs.position && latching == rhs.latching && speed == rhs.speed;
+        return position == rhs.position && latch == rhs.latch && speed == rhs.speed;
     }
 
     bool operator!=(const GenericCurrentStateStruct & rhs) const
     {
-        return position != rhs.position || latching != rhs.latching || speed != rhs.speed;
+        return position != rhs.position || latch != rhs.latch || speed != rhs.speed;
     }
 };
 
@@ -69,7 +69,7 @@ struct GenericCurrentStateStruct : public Structs::CurrentStruct::Type
  */
 struct GenericTargetStruct : public Structs::TargetStruct::Type
 {
-    GenericTargetStruct(Optional<Percent100ths> positionValue = NullOptional, Optional<TargetLatchEnum> latchValue = NullOptional,
+    GenericTargetStruct(Optional<Percent100ths> positionValue = NullOptional, Optional<bool> latchValue = NullOptional,
                         Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
     {
         Set(positionValue, latchValue, speedValue);
@@ -83,7 +83,7 @@ struct GenericTargetStruct : public Structs::TargetStruct::Type
         return *this;
     }
 
-    void Set(Optional<Percent100ths> positionValue = NullOptional, Optional<TargetLatchEnum> latchValue = NullOptional,
+    void Set(Optional<Percent100ths> positionValue = NullOptional, Optional<bool> latchValue = NullOptional,
              Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
     {
         position = positionValue;
