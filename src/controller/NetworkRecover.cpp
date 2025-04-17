@@ -26,8 +26,8 @@
 
 #include <controller/NetworkRecover.h>
 
-#include <controller/CHIPDeviceController.h>
 #include <controller/AutoNetworkRecover.h>
+#include <controller/CHIPDeviceController.h>
 #include <lib/support/CodeUtils.h>
 #include <memory>
 #include <system/SystemClock.h>
@@ -56,12 +56,12 @@ NetworkRecoverParameters::NetworkRecoverParameters(const uint64_t recoveryId) : 
 CHIP_ERROR NetworkRecover::Discover(uint16_t timeout)
 {
     VerifyOrReturnErrorWithMetric(kMetricNetworkRecover, mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    
-    mDiscoverTimeout = false;
+
+    mDiscoverTimeout         = false;
     mNetworkRecoverBehaviour = NetworkRecoverBehaviour::kDiscover;
     ReturnErrorOnFailureWithMetric(kMetricNetworkRecover, StartDiscoverOverBle(0));
-    auto errorCode =
-        mSystemLayer->StartTimer(System::Clock::Milliseconds32(timeout * chip::kMillisecondsPerSecond), OnRecoverableDiscoveredTimeoutCallback, this);
+    auto errorCode = mSystemLayer->StartTimer(System::Clock::Milliseconds32(timeout * chip::kMillisecondsPerSecond),
+                                              OnRecoverableDiscoveredTimeoutCallback, this);
     if (CHIP_NO_ERROR == errorCode)
     {
         MATTER_LOG_METRIC_BEGIN(kMetricNetworkRecover);
@@ -73,7 +73,7 @@ CHIP_ERROR NetworkRecover::Recover(NodeId remoteId, uint64_t recoveryId, WiFiCre
 {
     mRemoteId = remoteId;
     mWiFiCreds.SetValue(wiFiCreds);
-    mBreadcrumb = breadcrumb;
+    mBreadcrumb              = breadcrumb;
     mNetworkRecoverBehaviour = NetworkRecoverBehaviour::kRecover;
     ReturnErrorOnFailureWithMetric(kMetricNetworkRecover, StartDiscoverOverBle(recoveryId));
     return CHIP_NO_ERROR;
@@ -81,30 +81,27 @@ CHIP_ERROR NetworkRecover::Recover(NodeId remoteId, uint64_t recoveryId, WiFiCre
 
 CHIP_ERROR NetworkRecover::StartDiscoverOverBle(uint64_t recoveryId)
 {
-    if(mNetworkRecoverBehaviour == NetworkRecoverBehaviour::kDiscover && mDiscoverTimeout)
+    if (mNetworkRecoverBehaviour == NetworkRecoverBehaviour::kDiscover && mDiscoverTimeout)
     {
         // stop recoverable scanning
         return CHIP_NO_ERROR;
     }
-    #if CONFIG_NETWORK_LAYER_BLE
-    #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-        VerifyOrReturnError(mCommissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        mCommissioner->ConnectBleTransportToSelf();
-    #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-        VerifyOrReturnError(mBleLayer != nullptr, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    
-        ChipLogProgress(Controller, "Starting recoverable discovery over BLE");
-    
-        // Handle possibly-sync callbacks.
-        CHIP_ERROR err =
-         mBleLayer->NewBleConnectionByRecoveryIdentifier(recoveryId, this, 
-                                                         OnDiscoveredDeviceOverBleConnected,
-                                                         OnDiscoveredDeviceOverBleError, 
-                                                         OnDiscoveredDeviceOverBle);
-        return err;
-    #else
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-    #endif // CONFIG_NETWORK_LAYER_BLE
+#if CONFIG_NETWORK_LAYER_BLE
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    VerifyOrReturnError(mCommissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    mCommissioner->ConnectBleTransportToSelf();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    VerifyOrReturnError(mBleLayer != nullptr, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
+    ChipLogProgress(Controller, "Starting recoverable discovery over BLE");
+
+    // Handle possibly-sync callbacks.
+    CHIP_ERROR err = mBleLayer->NewBleConnectionByRecoveryIdentifier(recoveryId, this, OnDiscoveredDeviceOverBleConnected,
+                                                                     OnDiscoveredDeviceOverBleError, OnDiscoveredDeviceOverBle);
+    return err;
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif // CONFIG_NETWORK_LAYER_BLE
 }
 
 CHIP_ERROR NetworkRecover::StopConnectOverBle()
@@ -140,7 +137,7 @@ bool NetworkRecover::NotifyOrConnectToDiscoveredDevice()
             // notify to application
             ChipLogProgress(Controller, "Notify recoverable devices " ChipLogFormatX64, ChipLogValueX64(params.GetRecoveryId()));
             auto iter = std::find(mDiscoveredRecoveryIds.begin(), mDiscoveredRecoveryIds.end(), params.GetRecoveryId());
-            if(iter == mDiscoveredRecoveryIds.end())
+            if (iter == mDiscoveredRecoveryIds.end())
             {
                 mDiscoveredRecoveryIds.push_back(params.GetRecoveryId());
             }
@@ -158,9 +155,8 @@ bool NetworkRecover::NotifyOrConnectToDiscoveredDevice()
                 break;
             }
 #endif // CONFIG_NETWORK_LAYER_BLE
-            auto addr = params.GetPeerAddress(); 
-            err = AutoNetworkRecover::RecoverNetwork(this, mRemoteId, addr, mWiFiCreds.Value(),
-                                                mBreadcrumb);
+            auto addr = params.GetPeerAddress();
+            err       = AutoNetworkRecover::RecoverNetwork(this, mRemoteId, addr, mWiFiCreds.Value(), mBreadcrumb);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Controller, "Failed to recover device: %" CHIP_ERROR_FORMAT, err.Format());
@@ -231,7 +227,7 @@ void NetworkRecover::OnBLEDiscoveryError(CHIP_ERROR err)
 {
     ChipLogError(Controller, "discovery over BLE failed: %" CHIP_ERROR_FORMAT, err.Format());
     LogErrorOnFailure(err);
-    if(mNetworkRecoverBehaviour == NetworkRecoverBehaviour::kRecover)
+    if (mNetworkRecoverBehaviour == NetworkRecoverBehaviour::kRecover)
     {
         // finish recover connection
         NetworkRecoverComplete(mRemoteId, err);

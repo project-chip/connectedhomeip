@@ -34,10 +34,10 @@
 #include <app/InteractionModelEngine.h>
 #include <app/OperationalSessionSetup.h>
 #include <app/server/Dnssd.h>
+#include <controller/AutoNetworkRecover.h>
 #include <controller/CurrentFabricRemover.h>
 #include <controller/InvokeInteraction.h>
 #include <controller/WriteInteraction.h>
-#include <controller/AutoNetworkRecover.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -653,7 +653,7 @@ CHIP_ERROR DeviceCommissioner::GetDeviceBeingCommissioned(NodeId deviceId, Commi
     CommissioneeDeviceProxy * device = FindCommissioneeDevice(deviceId);
 
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    
+
     *out_device = device;
 
     return CHIP_NO_ERROR;

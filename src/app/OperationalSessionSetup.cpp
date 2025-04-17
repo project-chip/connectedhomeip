@@ -190,11 +190,11 @@ void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * on
     Connect(onConnection, onFailure, nullptr, transportPayloadCapability);
 }
 
-void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * onConnection, Callback::Callback<OnDeviceConnectionFailure> * onFailure, 
-                                      Transport::PeerAddress & addr,
+void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * onConnection,
+                                      Callback::Callback<OnDeviceConnectionFailure> * onFailure, Transport::PeerAddress & addr,
                                       TransportPayloadCapability transportPayloadCapability)
 {
-    mState = State::ResolvingAddress;
+    mState                      = State::ResolvingAddress;
     mTransportPayloadCapability = transportPayloadCapability;
     AddressResolve::ResolveResult result;
     result.address = addr;
@@ -204,7 +204,6 @@ void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * on
     UpdateDeviceData(result);
 }
 
-    
 void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * onConnection,
                                       Callback::Callback<OnSetupFailure> * onSetupFailure,
                                       TransportPayloadCapability transportPayloadCapability)
@@ -364,7 +363,7 @@ void OperationalSessionSetup::DequeueConnectionCallbacks(CHIP_ERROR error, Sessi
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     // Clear out mConnectionRetry, so that those cancelables are not holding
     // pointers to us, since we're about to go away.
-    if(!mConnectionRetry.IsEmpty())
+    if (!mConnectionRetry.IsEmpty())
     {
         while (auto * cb = mConnectionRetry.First())
         {

@@ -751,9 +751,10 @@ void BLEManagerImpl::CleanScanConfig()
 
 void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, uint64_t connRecoveryIdentifier)
 {
-    mBLEScanConfig.mAppState      = appState;
+    mBLEScanConfig.mAppState           = appState;
     mBLEScanConfig.mRecoveryIdentifier = connRecoveryIdentifier;
-    auto scanState = connRecoveryIdentifier == 0 ? BleScanState::kScanForNetworkRecoveryDiscover : BleScanState::kScanForNetworkRecoveryRecover;
+    auto scanState =
+        connRecoveryIdentifier == 0 ? BleScanState::kScanForNetworkRecoveryDiscover : BleScanState::kScanForNetworkRecoveryRecover;
 
     // Scan initiation performed async, to ensure that the BLE subsystem is initialized.
     DeviceLayer::SystemLayer().ScheduleLambda([this, scanState] { InitiateScan(scanState); });
@@ -853,7 +854,7 @@ void BLEManagerImpl::OnDeviceScanned(BluezDevice1 & device, const chip::Ble::Chi
         ChipLogError(Ble, "Unknown discovery type. Ignoring scanned device.");
         return;
     }
-    
+
     mBLEScanConfig.mBleScanState = BleScanState::kConnecting;
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
@@ -880,10 +881,9 @@ void BLEManagerImpl::OnDeviceScanned(BluezDevice1 & device, const chip::Ble::Chi
     if (mBLEScanConfig.mBleScanState == BleScanState::kScanForNetworkRecoveryRecover)
     {
         auto isMatch = (mBLEScanConfig.mRecoveryIdentifier == (info.GetRecoveryIdentifier()));
-        VerifyOrReturn(
-            isMatch,
-            ChipLogError(Ble, "Skip connection: recovery identifier does not match: %lu != %lu", info.GetRecoveryIdentifier(),
-                        mBLEScanConfig.mRecoveryIdentifier));
+        VerifyOrReturn(isMatch,
+                       ChipLogError(Ble, "Skip connection: recovery identifier does not match: %lu != %lu",
+                                    info.GetRecoveryIdentifier(), mBLEScanConfig.mRecoveryIdentifier));
         ChipLogProgress(Ble, "Recovery identifier match. Attempting to connect.");
     }
     else

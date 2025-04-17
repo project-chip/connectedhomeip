@@ -16,21 +16,21 @@
  *
  */
 
- #pragma once
+#pragma once
 
- #include "NetworkRecoveryCommand.h"
- #include <commands/common/Commands.h>
- 
- void registerCommandsNetworkRecovery(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
- {
-     const char * clusterName = "networkrecovery";
- 
-     commands_list clusterCommands = { 
+#include "NetworkRecoveryCommand.h"
+#include <commands/common/Commands.h>
+
+void registerCommandsNetworkRecovery(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    const char * clusterName = "networkrecovery";
+
+    commands_list clusterCommands = {
         make_unique<NetworkRecoveryDiscoverCommand>(credsIssuerConfig),
         make_unique<NetworkRecoveryRecoverCommand>("recover-wifi", RecoveryNetworkType::WiFi, credsIssuerConfig),
         make_unique<NetworkRecoveryRecoverCommand>("recover-thread", RecoveryNetworkType::Thread, credsIssuerConfig),
     };
- 
-     commands.RegisterCommandSet(clusterName, clusterCommands, "Commands for discovering and recovering recoverable devices by chip-tool.");
- }
- 
+
+    commands.RegisterCommandSet(clusterName, clusterCommands,
+                                "Commands for discovering and recovering recoverable devices by chip-tool.");
+}

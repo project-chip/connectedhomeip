@@ -53,13 +53,13 @@ void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Cal
                                                 Transport::PeerAddress & addr,
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                                 uint8_t attemptCount, Callback::Callback<OnDeviceConnectionRetry> * onRetry,
-#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES                                                    
-TransportPayloadCapability transportPayloadCapability)
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                                TransportPayloadCapability transportPayloadCapability)
 {
     FindOrEstablishSessionHelper(peerId, onConnection, onFailure, nullptr, addr,
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                  attemptCount, onRetry,
-#endif                
+#endif
                                  transportPayloadCapability);
 }
 
@@ -153,11 +153,11 @@ void CASESessionManager::FindOrEstablishSessionHelper(const ScopedNodeId & peerI
                                                       Transport::PeerAddress & addr,
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                                       uint8_t attemptCount, Callback::Callback<OnDeviceConnectionRetry> * onRetry,
-#endif       
+#endif
                                                       TransportPayloadCapability transportPayloadCapability)
 {
     ChipLogDetail(CASESessionManager, "FindOrEstablishSession: PeerId = [%d:" ChipLogFormatX64 "]", peerId.GetFabricIndex(),
-    ChipLogValueX64(peerId.GetNodeId()));
+                  ChipLogValueX64(peerId.GetNodeId()));
 
     bool forAddressUpdate             = false;
     OperationalSessionSetup * session = FindExistingSessionSetup(peerId, forAddressUpdate);
@@ -176,10 +176,10 @@ void CASESessionManager::FindOrEstablishSessionHelper(const ScopedNodeId & peerI
             if (onSetupFailure != nullptr)
             {
                 OperationalSessionSetup::ConnectionFailureInfo failureInfo(peerId, CHIP_ERROR_NO_MEMORY,
-                                        SessionEstablishmentStage::kUnknown);
+                                                                           SessionEstablishmentStage::kUnknown);
                 onSetupFailure->mCall(onSetupFailure->mContext, failureInfo);
             }
-        return;
+            return;
         }
     }
 

@@ -20,10 +20,10 @@
 
 #include <list>
 
+#include <controller/CommissioningDelegate.h>
 #include <lib/support/DLLUtil.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
-#include <controller/CommissioningDelegate.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/Ble.h>
@@ -47,6 +47,7 @@ public:
 
     bool HasRecoveryId() { return mRecoveryId != 0; }
     uint64_t GetRecoveryId() { return mRecoveryId; }
+
 private:
     uint64_t mRecoveryId;
 };
@@ -56,7 +57,7 @@ class DLL_EXPORT NetworkRecoverDelegate
 {
 public:
     virtual ~NetworkRecoverDelegate() {}
-    virtual void OnNetworkRecoverDiscover(std::list<uint64_t> recoveryIds) = 0;
+    virtual void OnNetworkRecoverDiscover(std::list<uint64_t> recoveryIds)   = 0;
     virtual void OnNetworkRecoverComplete(NodeId deviceId, CHIP_ERROR error) = 0;
 };
 
@@ -73,30 +74,16 @@ public:
     virtual ~NetworkRecover() {}
 
     CHIP_ERROR Discover(uint16_t timeout);
-    CHIP_ERROR Recover(NodeId remoteId, uint64_t recoveryId,
-                       WiFiCredentials wiFiCreds,
-                       uint64_t breadcrumb = 0);
-    
+    CHIP_ERROR Recover(NodeId remoteId, uint64_t recoveryId, WiFiCredentials wiFiCreds, uint64_t breadcrumb = 0);
+
     DeviceCommissioner * GetCommissioner() { return mCommissioner; }
-    
-    void SetSystemLayer(System::Layer * systemLayer)
-    {
-        mSystemLayer = systemLayer;
-    }
+
+    void SetSystemLayer(System::Layer * systemLayer) { mSystemLayer = systemLayer; }
 #if CONFIG_NETWORK_LAYER_BLE
-    void SetBleLayer(Ble::BleLayer * bleLayer)
-    {
-        mBleLayer = bleLayer;
-    }
+    void SetBleLayer(Ble::BleLayer * bleLayer) { mBleLayer = bleLayer; }
 #endif
-    void SetNetworkRecoverDelegate(NetworkRecoverDelegate * delegate)
-    {
-        mNetworkRecoverDelegate = delegate;
-    }
-    NetworkRecoverDelegate * GetNetworkRecoverDelegate() const
-    {
-        return mNetworkRecoverDelegate;
-    }
+    void SetNetworkRecoverDelegate(NetworkRecoverDelegate * delegate) { mNetworkRecoverDelegate = delegate; }
+    NetworkRecoverDelegate * GetNetworkRecoverDelegate() const { return mNetworkRecoverDelegate; }
 
     void NetworkRecoverComplete(NodeId deviceId, CHIP_ERROR error);
 
@@ -125,13 +112,12 @@ private:
 
     NetworkRecoverBehaviour mNetworkRecoverBehaviour = NetworkRecoverBehaviour::kDiscover;
     NetworkRecoverDelegate * mNetworkRecoverDelegate = nullptr;
-    DeviceCommissioner * mCommissioner = nullptr;
+    DeviceCommissioner * mCommissioner               = nullptr;
     std::deque<NetworkRecoverParameters> mNetworkRecoverParameters;
     System::Layer * mSystemLayer = nullptr;
     std::list<uint64_t> mDiscoveredRecoveryIds;
     bool mDiscoverTimeout;
 };
-
 
 } // namespace Controller
 } // namespace chip

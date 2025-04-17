@@ -22,8 +22,6 @@
 #include <controller/CHIPDeviceController.h>
 #include <lib/core/CHIPCallback.h>
 
-using namespace chip::app::Clusters;
-
 namespace chip {
 namespace Controller {
 
@@ -36,8 +34,7 @@ class NetworkRecoverBase
 {
 public:
     NetworkRecoverBase(DeviceController * controller) :
-        mController(controller),
-        mOnDeviceConnectedCallback(&OnDeviceConnectedFn, this),
+        mController(controller), mOnDeviceConnectedCallback(&OnDeviceConnectedFn, this),
         mOnDeviceConnectionFailureCallback(&OnDeviceConnectionFailureFn, this)
     {}
     ~NetworkRecoverBase() {}
@@ -64,13 +61,13 @@ public:
         kReleaseSessions,
         // Need to send Commissioning Complete Command.
         kSendCommissioningComplete,
+        // Need to send DisArmFailSafe Command.
+        kSendDisArmFailSafe,
     };
 
-    CHIP_ERROR RecoverNetwork(NodeId remoteNodeId,
-                              Transport::PeerAddress & addr,  
-                              const WiFiCredentials & wiFiCredentials,
-                              uint64_t breadcrumb,
-                              chip::Callback::Callback<OnNetworkRecover> * callback);
+    CHIP_ERROR RecoverNetwork(NodeId remoteNodeId, Transport::PeerAddress & addr, const WiFiCredentials & wiFiCredentials,
+                              uint64_t breadcrumb, chip::Callback::Callback<OnNetworkRecover> * callback);
+
 private:
     DeviceController * mController;
 
@@ -87,7 +84,7 @@ private:
 
     Step mNextStep = Step::kSendArmFailSafe;
 
-    CHIP_ERROR SendArmFailSafe(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
+    CHIP_ERROR SendArmFailSafe(uint16_t timeout, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
     CHIP_ERROR ReadLastNetworkID(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
     CHIP_ERROR SendRemoveNetwork(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
     CHIP_ERROR SendAddOrUpdateNetwork(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
@@ -98,11 +95,18 @@ private:
     static void OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
     static void OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
-    static void OnArmFailSafeResponse(void * context, const GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
+    static void
+    OnArmFailSafeResponse(void * context,
+                          const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
     static void OnSuccessReadLastNetworkID(void * context, const chip::app::DataModel::Nullable<chip::ByteSpan> & networkID);
-    static void OnNetworkConfigResponse(void * context, const NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data);
-    static void OnConnectNetworkResponse(void * context, const NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data);
-    static void OnCommissioningCompleteResponse(void * context, const GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & data);
+    static void
+    OnNetworkConfigResponse(void * context,
+                            const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data);
+    static void OnConnectNetworkResponse(
+        void * context, const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data);
+    static void OnCommissioningCompleteResponse(
+        void * context,
+        const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & data);
 
     static void OnReadAttributeFailure(void * context, CHIP_ERROR error);
     static void OnCommandFailure(void * context, CHIP_ERROR error);
@@ -118,7 +122,8 @@ private:
 class AutoNetworkRecover : private NetworkRecoverBase
 {
 public:
-    static CHIP_ERROR RecoverNetwork(NetworkRecover * recover, NodeId remoteNodeId, Transport::PeerAddress & addr, const WiFiCredentials & wiFiCredentials, uint64_t breadcrumb = 0);
+    static CHIP_ERROR RecoverNetwork(NetworkRecover * recover, NodeId remoteNodeId, Transport::PeerAddress & addr,
+                                     const WiFiCredentials & wiFiCredentials, uint64_t breadcrumb = 0);
 
 private:
     NetworkRecover * mNetworkRecover = nullptr;

@@ -41,9 +41,9 @@
 #include <controller/CommissioneeDeviceProxy.h>
 #include <controller/CommissioningDelegate.h>
 #include <controller/DevicePairingDelegate.h>
+#include <controller/NetworkRecover.h>
 #include <controller/OperationalCredentialsDelegate.h>
 #include <controller/SetUpCodePairer.h>
-#include <controller/NetworkRecover.h>
 #include <credentials/FabricTable.h>
 #include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
@@ -270,8 +270,7 @@ public:
 
     CHIP_ERROR
     GetConnectedDevice(NodeId peerNodeId, Callback::Callback<OnDeviceConnected> * onConnection,
-                       chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure,
-                       Transport::PeerAddress & addr,
+                       chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure, Transport::PeerAddress & addr,
                        TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload)
     {
         VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
@@ -284,10 +283,16 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR ReleaseSession(NodeId peerNodeId) 
+    CHIP_ERROR ReleaseSession(NodeId peerNodeId)
     {
         VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
         mSystemState->CASESessionMgr()->ReleaseSession(ScopedNodeId(peerNodeId, GetFabricIndex()));
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR ExpireAllSessions(NodeId peerNodeId)
+    {
+        mSystemState->SessionMgr()->ExpireAllSessions(ScopedNodeId(peerNodeId, GetFabricIndex()));
         return CHIP_NO_ERROR;
     }
 
@@ -858,9 +863,7 @@ public:
                                          /* fireAndForget = */ true);
     }
 
-    void RegisterNetworkRecoverDelegate(NetworkRecoverDelegate * delegate) {
-        mNetworkRecover.SetNetworkRecoverDelegate(delegate);
-    }
+    void RegisterNetworkRecoverDelegate(NetworkRecoverDelegate * delegate) { mNetworkRecover.SetNetworkRecoverDelegate(delegate); }
 
     /**
      * @brief
@@ -868,9 +871,9 @@ public:
      *   Should be called on main loop thread.
      */
 
-     CHIP_ERROR DiscoverRecoverableNodes(uint16_t timeout);
+    CHIP_ERROR DiscoverRecoverableNodes(uint16_t timeout);
 
-     CHIP_ERROR RecoverNode(NodeId remoteId, uint64_t recoveryId, WiFiCredentials wiFiCreds, uint64_t breadcrumb = 0);
+    CHIP_ERROR RecoverNode(NodeId remoteId, uint64_t recoveryId, WiFiCredentials wiFiCreds, uint64_t breadcrumb = 0);
 
 private:
     DevicePairingDelegate * mPairingDelegate = nullptr;

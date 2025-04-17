@@ -26,12 +26,11 @@ using namespace ::chip;
 void NetworkRecoveryCommandBase::OnNetworkRecoverDiscover(std::list<uint64_t> recoveryIds)
 {
     ChipLogProgress(chipTool, "Find recoverable devices:");
-    for (const auto& recoveryId : recoveryIds)
+    for (const auto & recoveryId : recoveryIds)
     {
         ChipLogProgress(chipTool, "0x" ChipLogFormatX64, ChipLogValueX64(recoveryId));
     }
     SetCommandExitStatus(CHIP_NO_ERROR);
-    
 }
 
 void NetworkRecoveryCommandBase::OnNetworkRecoverComplete(NodeId deviceId, CHIP_ERROR error)
