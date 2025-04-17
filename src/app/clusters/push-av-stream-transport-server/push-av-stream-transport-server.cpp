@@ -45,8 +45,8 @@ namespace Clusters {
 namespace PushAvStreamTransport {
 
 PushAvStreamTransportServer::PushAvStreamTransportServer(EndpointId aEndpointId, PushAvStreamTransportDelegate & aDelegate) :
-    CommandHandlerInterface(MakeOptional(aEndpointId), CameraAvStreamManagement::Id),
-    AttributeAccessInterface(MakeOptional(aEndpointId), CameraAvStreamManagement::Id), mDelegate(aDelegate)
+    CommandHandlerInterface(MakeOptional(aEndpointId), PushAvStreamTransport::Id),
+    AttributeAccessInterface(MakeOptional(aEndpointId), PushAvStreamTransport::Id), mDelegate(aDelegate)
 {}
 
 PushAvStreamTransportServer::~PushAvStreamTransportServer()
@@ -396,7 +396,7 @@ void PushAvStreamTransportServer::HandleSetTransportStatus(HandlerContext & ctx,
     }
 
     // Call the delegate
-    status = mDelegate.SetTransportStatus(connectionIDList);
+    status = mDelegate.SetTransportStatus(connectionIDList, transportStatus);
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
