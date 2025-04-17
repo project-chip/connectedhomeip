@@ -21,9 +21,9 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
-#include <protocols/interaction_model/StatusCode.h>
 #include <app/SafeAttributePersistenceProvider.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <protocols/interaction_model/StatusCode.h>
 #include <string>
 #include <vector>
 
@@ -358,7 +358,7 @@ public:
      *  server list, at initialization.
      */
     virtual CHIP_ERROR LoadMPTZPresets(std::vector<MPTZPresetHelper> & mptzPresetHelpers) = 0;
-    virtual CHIP_ERROR LoadDPTZRelativeMove(std::vector<uint16_t> dptzRelativeMove) = 0;
+    virtual CHIP_ERROR LoadDPTZRelativeMove(std::vector<uint16_t> dptzRelativeMove)       = 0;
 
     CameraAvSettingsUserLevelMgmtServer * mServer = nullptr;
 
