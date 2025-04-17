@@ -16,29 +16,21 @@
 
 namespace chip {
 namespace app {
-
-namespace Clusters {
-constexpr Meta::ObjectList<
-    {%- for cluster in clusters | sort(attribute='name') %}
-    chip::app::Clusters::{{cluster.name}}::Id{{ "" if loop.last else ", " }}
-    {%- endfor%}
-> ClusterIdsMetaList;
-} // namespace Clusters
-
 namespace DataModel {
+
 template <ClusterId... TClusterIds>
 DataModel::AcceptedCommandEntry AcceptedCommandEntryFor(ClusterId id, CommandId command,
-                                                        Meta::ObjectList<TClusterIds...>  = {} /*For easy template deduction*/)
+                                                        Meta::ObjectList<TClusterIds...> clusterIdList = {} /*For easy template deduction*/)
 {
-    // Dynamically generate the Switch statement with the only the required metadata
-    // clang-format off
-    return Meta::Switch(id,
-        Meta::Case<TClusterIds>([=](){
-            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, TClusterIds>::EntryFor(command);
-        })...,
-        Meta::Default(DataModel::AcceptedCommandEntry{})
-    );
-    // clang-format on
+    {%- for cluster in clusters | sort(attribute='name') %}
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == {{cluster.name}}::Id) || ...))
+    {
+        if(id == {{cluster.name}}::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, {{cluster.name}}::Id>::EntryFor(command);
+    }
+    {%- endfor%}
+
+    return DataModel::AcceptedCommandEntry{};
 }
 
 } // namespace DataModel
