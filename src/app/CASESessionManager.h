@@ -142,29 +142,6 @@ public:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                 TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload);
 
-    /**
-     * Find an existing session for the given node ID or trigger a new session request.
-     *
-     * The caller can optionally provide `onConnection`
-     * callback objects. If provided, these will be used to inform the caller about successful connection establishment.
-     *
-     * If the connection is already established, the `onConnection` callback will be immediately called,
-     * before `FindOrEstablishSession` returns.
-     *
-     * The `onFailure` callback may be called before the FindOrEstablishSession
-     * call returns, for error cases that are detected synchronously.
-     *
-     * @note This API uses default values for automatic CASE retries, if enabled.
-     *
-     * @param peerId The node ID to find or establish a session with.
-     * @param onConnection A callback to be called upon successful connection establishment.
-     * @param onSetupFailure A callback to be called upon an extended device connection failure.
-     * @param transportPayloadCapability An indicator of what payload types the session needs to be able to transport.
-     */
-    void FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                Callback::Callback<OnDeviceConnectionFailure> * onFailure,
-                                TransportPayloadCapability transportPayloadCapability);
-
     void ReleaseSession(const ScopedNodeId & peerId);
     void ReleaseSessionsForFabric(FabricIndex fabricIndex);
 
