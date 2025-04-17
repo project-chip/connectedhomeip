@@ -120,11 +120,13 @@ Status AVSettingsUserLevelManagementDelegate::DPTZRelativeMove(uint16_t aVideoSt
 
 CHIP_ERROR AVSettingsUserLevelManagementDelegate::LoadMPTZPresets(std::vector<MPTZPresetHelper> & mptzPresetHelpers)
 {
+    mptzPresetHelpers.clear();
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR AVSettingsUserLevelManagementDelegate::LoadDPTZRelativeMove(std::vector<uint16_t> dptzRelativeMove)
 {
+    dptzRelativeMove.clear();
     return CHIP_NO_ERROR;
 }
 

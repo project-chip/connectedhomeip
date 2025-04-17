@@ -110,11 +110,13 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
 
 CHIP_ERROR CameraAVSettingsUserLevelManager::LoadMPTZPresets(std::vector<MPTZPresetHelper> & mptzPresetHelpers)
 {
+    mptzPresetHelpers.clear();
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CameraAVSettingsUserLevelManager::LoadDPTZRelativeMove(std::vector<uint16_t> dptzRelativeMove)
 {
+    dptzRelativeMove.clear();
     return CHIP_NO_ERROR;
 }
 
