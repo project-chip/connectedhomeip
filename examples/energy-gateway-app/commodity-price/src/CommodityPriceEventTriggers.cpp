@@ -70,80 +70,65 @@ void SetTestEventTrigger_PriceUpdate()
 
 void SetTestEventTrigger_ForecastUpdate()
 {
-    //  CommodityPriceInstance * inst = GetCommodityPriceInstance();
-
-    uint32_t chipEpoch = 0;
-
-    CHIP_ERROR err = DeviceEnergyManagement::GetEpochTS(chipEpoch);
-    if (err != CHIP_NO_ERROR)
+    CommodityPriceInstance * inst = GetCommodityPriceInstance();
+    if (inst == nullptr)
     {
-        ChipLogError(Support, "SetTestEventTrigger_ForecastUpdate() could not get time");
+        ChipLogError(Support, "CommodityPriceInstance not available.");
+        return;
     }
 
-    Structs::CommodityPriceStruct::Type newPriceStruct;
-    Globals::Structs::PriceStruct::Type price; // Contains .amount  and .currency
-
-    newPriceStruct.periodEnd.SetNonNull(chipEpoch - 1); // 1st time through the start period will be 'now' - see below
-
-    price.currency.currency      = 981; // We'll always use GBP
-    price.currency.decimalPoints = 5;   // We'll always use 1000th of a pence
-
-    constexpr uint16_t kMinPrice        = 4000;    // 4 p/kWh
-    constexpr uint16_t kMaxPrice        = 32000;   // 32 p/kWh
-    constexpr uint16_t k30MinsInSeconds = 30 * 60; // seconds in 30 mins
-
-    for (uint8_t i = 0; i < 50; i++)
+    uint32_t chipEpoch = 0;
+    if (DeviceEnergyManagement::GetEpochTS(chipEpoch) != CHIP_NO_ERROR)
     {
-        // Make up a price
-        price.amount = kMinPrice + rand() % (kMaxPrice - kMinPrice + 1);
+        ChipLogError(Support, "SetTestEventTrigger_ForecastUpdate() could not get time");
+        return;
+    }
+
+    constexpr size_t kForecastSize      = 50;
+    constexpr uint16_t kMinPrice        = 4000;
+    constexpr uint16_t kMaxPrice        = 32000;
+    constexpr uint32_t k30MinsInSeconds = 30 * 60;
+
+    static Structs::CommodityPriceStruct::Type sForecastEntries[kForecastSize];
+
+    uint32_t currentStart = chipEpoch;
+
+    for (size_t i = 0; i < kForecastSize; ++i)
+    {
+        Structs::CommodityPriceStruct::Type & newPriceStruct = sForecastEntries[i];
+
+        Globals::Structs::PriceStruct::Type price;
+        price.currency.currency      = 981;
+        price.currency.decimalPoints = 5;
+        price.amount                 = kMinPrice + rand() % (kMaxPrice - kMinPrice + 1);
+
         newPriceStruct.price.SetValue(price);
         newPriceStruct.priceLevel.SetValue(3);
 
-        // Set the start and end time (non overlapping)
-        newPriceStruct.periodStart = newPriceStruct.periodEnd.Value() + 1;
-        newPriceStruct.periodEnd.SetNonNull(newPriceStruct.periodStart + (k30MinsInSeconds - 1)); // 29mins 59secs
+        newPriceStruct.periodStart = currentStart;
+        newPriceStruct.periodEnd.SetNonNull(currentStart + k30MinsInSeconds - 1);
+        currentStart += k30MinsInSeconds;
 
-        // Set a description based on price level
-        if (price.amount < 10000)
-        {
-            // priceDescription = "Low";
-        }
-        else if (price.amount < 24000)
-        {
-            // priceDescription = "Medium";
-        }
-        else
-        {
-            // priceDescription = "High";
-        }
+        const char * desc = (price.amount < 10000) ? "Low" : (price.amount < 24000) ? "Medium" : "High";
 
-        // newPriceStruct.description.SetValue(//TODO);
+        newPriceStruct.description.SetValue(chip::Span<const char>(desc, strlen(desc)));
 
-        // Create 2 component entries
-        // PriceForecastMemMgr memMgr = dg->GetPriceForecastMemMgr();
+        static Structs::CommodityPriceComponentStruct::Type componentBuffer[2];
 
-        // Structs::CommodityPriceComponentStruct::Type newPriceComponent;
+        componentBuffer[0].source = Globals::TariffPriceTypeEnum::kStandard;
+        componentBuffer[0].price.SetValue(static_cast<Money>(price.amount * 95 / 100));
 
-        // newPriceComponent.source = Globals::TariffPriceTypeEnum::kStandard;
-        // newPriceComponent.tariffComponentID.ClearValue(); // We don't have a tariff componentID
+        componentBuffer[1].source = Globals::TariffPriceTypeEnum::kStandard;
+        componentBuffer[1].price.SetValue(static_cast<Money>(price.amount * 5 / 100));
 
-        // newPriceComponent.price.SetValue(static_cast<Money>(price.amount * 95 / 100)); // exVAT
-        // // newPriceComponent.description.SetValue(//TODO ("ExVAT)"));
-        // memMgr.PreparePriceEntry(0);
-        // memMgr.AddPriceComponent(newPriceComponent);
-
-        // newPriceComponent.price.SetValue(static_cast<Money>(price.amount * 5 / 100)); // VAT (5%)
-        // // newPriceComponent.description.SetValue(//TODO ("VAT)"));
-
-        // memMgr.PreparePriceEntry(1);
-        // memMgr.AddPriceComponent(newPriceComponent);
+        newPriceStruct.components.SetValue(chip::Span<const Structs::CommodityPriceComponentStruct::Type>(componentBuffer, 2));
     }
 
-    //     DataModel::List<const Structs::CommodityPriceStruct::Type> myPriceForecast;
-    //     myPriceForecast = DataModel::List<const Structs::CommodityPriceStruct::Type>(HERE!!!!!!!!!!
-    //     This is wrong - we need to have an array here but it could be too big for the stack
-    // Consider another list management class.)
-    // inst->SetForecast()
+    // Create list from the static array
+    DataModel::List<Structs::CommodityPriceStruct::Type> forecastList(
+        chip::Span<Structs::CommodityPriceStruct::Type>(sForecastEntries, kForecastSize));
+
+    inst->SetForecast(forecastList); // Assumes copy is taken
 }
 
 bool HandleCommodityPriceTestEventTrigger(uint64_t eventTrigger)
