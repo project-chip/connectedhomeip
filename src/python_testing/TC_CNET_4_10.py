@@ -25,7 +25,16 @@ from mobly import asserts
 
 
 class TC_CNET_4_10(MatterBaseTest):
-    def def_TC_CNET_4_10(self):
+    """
+    This test verifies the behavior of the RemoveNetwork command specifically for Thread networks,
+    including interactions with fail-safe mechanisms and subsequent commissioning steps.
+
+    Requires the following PIXITs:  
+    - PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET: The Thread operational dataset(hex string)
+    used for initial commissioning. This is passed via the - -hex-arg command line argument.
+    """
+
+    def desc_TC_CNET_4_10(self):
         return '[TC-CNET-4.10] [Thread] Verification for RemoveNetwork Command [DUT-Server]'
 
     def pics_TC_CNET_4_10(self):
