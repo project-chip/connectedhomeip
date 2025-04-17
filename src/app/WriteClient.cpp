@@ -256,7 +256,6 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
     // ListIndex is missing and the data is an array -- we are writing a whole list.
     if (!attributePath.IsListOperation() && data.GetType() == TLV::TLVType::kTLVType_Array)
     {
-
         TLV::TLVReader dataReader;
         TLV::TLVReader valueReader;
         uint16_t encodedItemCount      = 0;
@@ -398,12 +397,7 @@ WriteClient::TryPutPreencodedAttributeWritePayloadIntoList(const ConcreteDataAtt
             err               = CHIP_NO_ERROR;
             break;
         }
-        // Make sure that we undo the buffer reservation made in EnsureListStarted()
-        if (err != CHIP_NO_ERROR)
-        {
-            ReturnErrorOnFailure(EnsureListEnded());
-            return err;
-        }
+        ReturnErrorOnFailure(err);
         outEncodedItemCount++;
     }
     VerifyOrReturnError(err == CHIP_END_OF_TLV || err == CHIP_NO_ERROR, err);

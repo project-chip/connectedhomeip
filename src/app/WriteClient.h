@@ -165,10 +165,10 @@ public:
     /**
      *  Encode a possibly-chunked list attribute value.  Will create a new chunk when necessary.
      *
-     *  Note: As an exception, for attributes in the AccessControl Clusters, this method will attempt to encode as many list items
-     * as possible into a SingleAttributeDataIB, which will be handled by cluster server as a ReplaceAll Item operation.
-     * If the list is too large, the WriteRequest will be chunked and remaining items will be encoded as AppendItem operations,
-     chunking them as needed.
+     * Note: As an exception, for attributes in the Access Control cluster, this method will attempt to encode as many list items
+     * as possible into a single AttributeDataIB with Change set to REPLACE.
+     * If the list is too large, the WriteRequest will be chunked and remaining items will be encoded as individual AttributeDataIBs
+     * with Change set to ADD, chunking them as needed.
      *
      */
     template <class T>
@@ -298,21 +298,23 @@ private:
     CHIP_ERROR ProcessAttributeStatusIB(AttributeStatusIB::Parser & aAttributeStatusIB);
     const char * GetStateStr() const;
 
+    // TODO (#38453) Clarify and fix the API contract of EnsureListStarted and EnsureListEnded; in the case of encoding failure,
+    // should we just undo buffer reservation? rollback to a checkpoint that we create within EnsureListStarted? or just leave the
+    // WriteClient in a bad state.
     /**
      * Prepare the Encoding of an Attribute with List DataType into an AttributeDataIB.
      *
      * @note Must always be followed by a call to EnsureListEnded(), to undo buffer reservation that took place within
      * it, and properly close TLV Containers.
      */
-
     CHIP_ERROR EnsureListStarted(const ConcreteDataAttributePath & attributePath);
+
     /**
      * Complete the Encoding of an Attribute with List DataType into an AttributeDataIB.
      *
      * @note Must always be called after EnsureListStarted(), even in cases of encoding failures; to undo buffer reservation that
      * took place in EnsureListStarted.
      */
-
     CHIP_ERROR EnsureListEnded();
 
     /**
@@ -354,7 +356,6 @@ private:
 
         AttributeDataIB::Builder & attributeDataIB = mWriteRequestBuilder.GetWriteRequests().GetAttributeDataIBBuilder();
         TLV::TLVWriter backupWriter;
-        CHIP_ERROR err      = CHIP_NO_ERROR;
         outEncodedItemCount = 0;
 
         for (auto & item : list)
@@ -363,6 +364,8 @@ private:
             // or run out of space.
             // Make sure that if we run out of space we don't leave a partially-encoded list item around.
             attributeDataIB.Checkpoint(backupWriter);
+            CHIP_ERROR err = CHIP_NO_ERROR;
+
             if constexpr (DataModel::IsFabricScoped<T>::value)
             {
                 err = DataModel::EncodeForWrite(*attributeDataIB.GetWriter(), TLV::AnonymousTag(), item);
@@ -380,12 +383,7 @@ private:
                 outChunkingNeeded = true;
                 break;
             }
-            // Make sure that we undo the buffer reservation made in EnsureListStarted()
-            if (err != CHIP_NO_ERROR)
-            {
-                ReturnErrorOnFailure(EnsureListEnded());
-                return err;
-            }
+            ReturnErrorOnFailure(err);
             outEncodedItemCount++;
         }
 
@@ -438,7 +436,7 @@ private:
                                                         const TLV::TLVReader & data);
 
     /**
-     * Encodes preencoded attribute data into a list, that will be decoded by Cluster Servers as a "ReplaceAll ListOperation".
+     * Encodes preencoded attribute data into a list, that will be decoded by cluster servers as a REPLACE Change.
      * Returns outChunkingNeeded = true if it was not possible to fit all the data into a single list.
      */
     CHIP_ERROR TryPutPreencodedAttributeWritePayloadIntoList(const chip::app::ConcreteDataAttributePath & attributePath,

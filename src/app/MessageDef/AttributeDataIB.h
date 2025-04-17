@@ -106,9 +106,9 @@ public:
     CHIP_ERROR EndOfAttributeDataIB();
 
     /**
-     *  @brief Get number of bytes required in the buffer to reserve the EndOfContainer of EndOfAttributeDataIB()
+     *  @brief Get number of bytes required in the buffer to allow EndOfAttributeDataIB() to succeed.
      *
-     *  @return Expected number of bytes required in the buffer to reserve the EndOfContainer of EndOfAttributeDataIB()
+     *  @return Expected number of bytes required in the buffer to successfully execute EndOfAttributeDataIB()
      */
     static constexpr uint16_t GetSizeToEndAttributeDataIB()
     {
