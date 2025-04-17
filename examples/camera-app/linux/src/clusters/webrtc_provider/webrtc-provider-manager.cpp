@@ -226,7 +226,9 @@ void WebRTCProviderManager::ScheduleAnswerSend()
         CASESessionManager * caseSessionMgr = Server::GetInstance().GetCASESessionManager();
         VerifyOrDie(caseSessionMgr != nullptr);
 
-        caseSessionMgr->FindOrEstablishSession(mPeerId, &mOnConnectedCallback, &mOnConnectionFailureCallback);
+        // WebRTC Answer requires a large payload session establishment.
+        caseSessionMgr->FindOrEstablishSession(mPeerId, &mOnConnectedCallback, &mOnConnectionFailureCallback,
+                                               TransportPayloadCapability::kLargePayload);
     });
 }
 
