@@ -141,6 +141,9 @@ private:
     ConnectCallback * mpConnectCallback;
     NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
     int32_t mLastDisconnectedReason;
+
+    char mScanSSID[DeviceLayer::Internal::kMaxWiFiSSIDLength + 1];
+    int mScanSSIDlength;
 };
 
 } // namespace NetworkCommissioning
