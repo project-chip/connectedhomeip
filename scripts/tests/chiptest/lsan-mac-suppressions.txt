@@ -73,3 +73,6 @@ leak:CRYPTO_set_thread_local
 
 # Not our leak, clearly:
 leak:CFXNotificationRegistrarFind
+
+# TODO: Lots of ICU leaks under here, plus
+leak:chip::DeviceLayer::PersistedStorage::KeyValueStoreManagerImpl::Init
