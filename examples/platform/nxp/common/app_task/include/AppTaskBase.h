@@ -207,7 +207,7 @@ private:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_TBR
     static constexpr EndpointId kThreadBRMgmtEndpoint = 2;
-    bool mTbrmClusterEnabled = false;
+    bool mTbrmClusterEnabled                          = false;
 #endif
 };
 

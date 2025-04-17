@@ -482,12 +482,12 @@ void chip::NXP::App::AppTaskBase::EnableTbrManagementCluster()
 {
     if (mTbrmClusterEnabled == false)
     {
-        mTbrmClusterEnabled = true;
+        mTbrmClusterEnabled      = true;
         auto * persistentStorage = &Server::GetInstance().GetPersistentStorage();
 
         static ThreadBorderRouterManagement::GenericOpenThreadBorderRouterDelegate sThreadBRDelegate(persistentStorage);
         static ThreadBorderRouterManagement::ServerInstance sThreadBRMgmtInstance(kThreadBRMgmtEndpoint, &sThreadBRDelegate,
-                                                                                Server::GetInstance().GetFailSafeContext());
+                                                                                  Server::GetInstance().GetFailSafeContext());
 
         // Initialize TBR name
         CharSpan brName(baseServiceInstanceName, strlen(baseServiceInstanceName));
