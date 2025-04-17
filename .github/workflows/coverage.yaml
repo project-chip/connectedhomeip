@@ -75,6 +75,21 @@ jobs:
                 cd src/controller/python/test/unit_tests/
                 python -m coverage run -m unittest -v
                 coverage xml
+            - name: Clean previous outputs
+              run: rm -rf out pyenv
+            - name: Run Python Setup Payload Generator Test
+              shell: bash
+              run: |
+                  scripts/run_in_build_env.sh 'scripts/examples/gn_build_example.sh examples/chip-tool out/'
+                  scripts/run_in_build_env.sh 'virtualenv pyenv'
+                  source pyenv/bin/activate
+                  python -m ensurepip --upgrade
+                  python -m pip install -r scripts/setup/requirements.setuppayload.txt
+                  python3 src/setup_payload/tests/run_python_setup_payload_test.py out/chip-tool
+            - name: Run revocation set generation tests
+              run: |
+                scripts/run_in_build_env.sh 'python3 -m coverage run -m unittest -v credentials/generate_revocation_set.py'
+                coverage xml
             - name: Upload coverage reports to Codecov with GitHub Action
               uses: codecov/codecov-action@v5
               env:
