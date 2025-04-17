@@ -22,8 +22,6 @@
 #       --discriminator 3840
 #       --passcode 20202021
 #       --thread-dataset-hex <DATASET_HEX>
-#       --int-arg PIXIT.CNET.ENDPOINT_THREAD:0
-#       --string-arg PIXIT_CNET_THREAD_1ST_OPERATIONALDATASET:"dead1111dead2222"
 #       --string-arg PIXIT_CNET_THREAD_2ND_OPERATIONALDATASET:"1111111122222222"
 #       --storage-path admin_storage.json
 #       --trace-to json:${TRACE_TEST_JSON}.json
@@ -42,8 +40,6 @@ import logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-# PIXIT_CNET_THREAD_2ND_OPERATIONALDATASET = bytes.fromhex("1111111122222222")
-
 
 class TC_CNET_4_16(MatterBaseTest):
 
@@ -57,52 +53,31 @@ class TC_CNET_4_16(MatterBaseTest):
     def desc_TC_CNET_4_16(self):
         return '[TC-CNET-4.16] [Thread] NetworkIDNotFound returned in LastNetworkingStatus field validation [DUT-Server]'
 
-    # @async_test_body
     @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kThreadNetworkInterface))
     async def test_TC_CNET_4_16(self):
 
-        cnet = Clusters.NetworkCommissioning
-        attr = cnet.Attributes
-        endpoint = self.get_endpoint(default=0)
-        thread_1st_operationaldataset = self.matter_test_config.thread_operational_dataset
-
-        asserts.assert_true("PIXIT.CNET.ENDPOINT_THREAD" in self.matter_test_config.global_test_params,
-                            "PIXIT.CNET.ENDPOINT_THREAD must be included in the command line with "
-                            "the --int-arg flag as PIXIT.CNET.ENDPOINT_THREAD:<endpoint>")
         asserts.assert_true("PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET" in self.matter_test_config.global_test_params,
                             "PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET must be included in the command line with "
                             "the --string-arg flag as PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET:<operational_dataset>")
 
-        endpoint_thread = self.matter_test_config.global_test_params["PIXIT.CNET.ENDPOINT_THREAD"]
-        thread_2nd_operationaldataset = self.matter_test_config.global_test_params[
+        cnet = Clusters.NetworkCommissioning
+        attr = cnet.Attributes
+        thread_1st = self.matter_test_config.thread_operational_dataset
+        thread_2nd_operational_dataset = self.matter_test_config.global_test_params[
             "PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET"]
-        thread_2nd = bytes.fromhex(thread_2nd_operationaldataset)
-
-        asserts.assert_equal(endpoint, endpoint_thread, f"PIXIT.CNET.ENDPOINT_THREAD must equal {endpoint}")
-
-        thread_1st = bytes.fromhex(thread_1st_operationaldataset)
-        logger.info(f" --- PIXIT.CNET.ENDPOINT_THREAD: {endpoint_thread}")
-        logger.info(f" --- PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET: {thread_1st.hex()}")
-        logger.info(f" --- PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET: {thread_2nd.hex()}")
+        thread_2nd = bytes.fromhex(thread_2nd_operational_dataset)
 
         # Commissioning is already done
         self.step("precondition")
 
-        # Precondition 1: DUT has a Network Commissioning cluster on endpoint PIXIT.CNET.ENDPOINT_THREAD with FeatureMap attribute of 2
-        # feature_map = await self.read_single_attribute_check_success(cluster=cnet, endpoint=endpoint, attribute=attr.FeatureMap)
-        # if not (feature_map & cnet.Bitmaps.Feature.kThreadNetworkInterface):
-        #     logging.info('Device does not support Thread on endpoint, skipping remaining steps')
-        #     self.skip_all_remaining_steps(1)
-        #     return
-
-        # Precondition 2: DUT is commissioned on PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET
-        # Precondition 3: TH can communicate with the DUT on PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET
+        # Precondition 1: DUT is commissioned on PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET
+        # Precondition 2: TH can communicate with the DUT on PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET
         networkID = await self.read_single_attribute_check_success(cluster=cnet, attribute=attr.LastNetworkID)
         logger.info(f" --- NetworkID: {networkID.hex()}")
-        asserts.assert_in(networkID.hex(), thread_1st_operationaldataset.hex(),
-                          f"NetworkID: {networkID.hex()} not in {thread_1st_operationaldataset.hex()}")
+        asserts.assert_in(networkID.hex(), thread_1st.hex(),
+                          f"NetworkID: {networkID.hex()} not in {thread_1st.hex()}")
 
-        # Precondition 4: DUT MaxNetworks attribute value is at least 1 and is saved as 'MaxNetworksValue' for future use
+        # Precondition 3: DUT MaxNetworks attribute value is at least 1 and is saved as 'MaxNetworksValue' for future use
         maxNetworksValue = 0
         maxNetworksValue = await self.read_single_attribute_check_success(cluster=cnet, attribute=attr.MaxNetworks)
         logger.info(f" --- maxNetworksValue: {maxNetworksValue}")
