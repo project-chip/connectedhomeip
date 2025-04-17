@@ -19,7 +19,8 @@ import logging
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.decorators import has_feature, run_if_endpoint_matches
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
 
 
@@ -36,26 +37,25 @@ class TC_CNET_4_10(MatterBaseTest):
     def steps_TC_CNET_4_10(self):
         return [
             TestStep("preconditions", "TH is commissioned", is_commissioning=True),
-            TestStep(1, "TH reads from the DUT the Network Commissioning Cluster FeatureMap to verify Thread support"),
-            TestStep(2, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900"),
-            TestStep(3, "TH reads Networks attribute from the DUT and save the number of entries as 'NumNetworks'"),
-            TestStep(4, "TH sends RemoveNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET and Breadcrumb field set to 1"),
-            TestStep(5, "TH reads Networks attribute from the DUT"),
-            TestStep(6, "TH reads LastNetworkingStatus attribute from the DUT"),
-            TestStep(7, "TH reads LastNetworkID attribute from the DUT"),
-            TestStep(8, "TH reads Breadcrumb attribute from the General Commissioning cluster"),
-            TestStep(9, "TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET"),
-            TestStep(10, "TH reads Breadcrumb attribute from the General Commissioning cluster"),
-            TestStep(11, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 0"),
-            TestStep(12, "TH reads Networks attribute from the DUT"),
-            TestStep(13, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900"),
-            TestStep(14, "TH sends RemoveNetwork Command to the DUT"),
-            TestStep(15, "TH sends CommissioningComplete command to the DUT"),
-            TestStep(16, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 0"),
-            TestStep(17, "TH reads Networks attribute from the DUT")
+            TestStep(1, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900"),
+            TestStep(2, "TH reads Networks attribute from the DUT and save the number of entries as 'NumNetworks'"),
+            TestStep(3, "TH sends RemoveNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET and Breadcrumb field set to 1"),
+            TestStep(4, "TH reads Networks attribute from the DUT"),
+            TestStep(5, "TH reads LastNetworkingStatus attribute from the DUT"),
+            TestStep(6, "TH reads LastNetworkID attribute from the DUT"),
+            TestStep(7, "TH reads Breadcrumb attribute from the General Commissioning cluster"),
+            TestStep(8, "TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET"),
+            TestStep(9, "TH reads Breadcrumb attribute from the General Commissioning cluster"),
+            TestStep(10, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 0"),
+            TestStep(11, "TH reads Networks attribute from the DUT"),
+            TestStep(12, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900"),
+            TestStep(13, "TH sends RemoveNetwork Command to the DUT"),
+            TestStep(14, "TH sends CommissioningComplete command to the DUT"),
+            TestStep(15, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 0"),
+            TestStep(16, "TH reads Networks attribute from the DUT")
         ]
 
-    @async_test_body
+    @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kThreadNetworkInterface))
     async def test_TC_CNET_4_10(self):
         # Commissioning is already done
         self.step("preconditions")
@@ -65,9 +65,8 @@ class TC_CNET_4_10(MatterBaseTest):
 
         # Get NetworkID from PIXIT operational dataset (stored as bytes)
         pixit_dataset_bytes = self.matter_test_config.global_test_params['PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET']
-        logging.info(f"Retrieved PIXIT Dataset (type: {type(pixit_dataset_bytes)}): {pixit_dataset_bytes!r}")
-        asserts.assert_is_instance(pixit_dataset_bytes, bytes, "Expected PIXIT dataset from global_test_params to be bytes")
-        asserts.assert_true(len(pixit_dataset_bytes) > 0, "PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET must be configured.")
+
+        asserts.assert_true(len(pixit_dataset_bytes) > 0, "--hex-arg PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET must be supplied.")
 
         # Find the ExtPANID TLV (Context Tag 2, Length 8) in the bytes
         # Marker sequence seems to be 0x02 (Tag) followed by 0x08 (Length)
@@ -82,23 +81,15 @@ class TC_CNET_4_10(MatterBaseTest):
         asserts.assert_equal(len(thread_network_id_bytes), 8, "Extracted ExtPANID must be 8 bytes long")
         logging.info(f"Extracted Network ID (ExtPANID): {thread_network_id_bytes.hex()}")
 
-        # Step 1: Verify FeatureMap indicates Thread support
+        # Step 1: Arm failsafe and verify response
         self.step(1)
-        feature_map = await self.read_single_attribute_check_success(
-            cluster=cnet,
-            attribute=cnet.Attributes.FeatureMap
-        )
-        asserts.assert_equal(feature_map, 2, "FeatureMap must be 2 for Thread interface")
-
-        # Step 2: Arm failsafe and verify response
-        self.step(2)
         await self.send_single_cmd(
             cmd=gen_comm.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=0)
         )
         # Successful command execution is implied if no exception is raised.
 
-        # Step 3: Read Networks and verify thread network
-        self.step(3)
+        # Step 2: Read Networks and verify thread network
+        self.step(2)
         networks = await self.read_single_attribute_check_success(
             cluster=cnet,
             attribute=cnet.Attributes.Networks
@@ -114,8 +105,8 @@ class TC_CNET_4_10(MatterBaseTest):
                 break
         asserts.assert_true(userth_netidx is not None, "Thread network not found")
 
-        # Step 4: Remove network
-        self.step(4)
+        # Step 3: Remove network
+        self.step(3)
         response = await self.send_single_cmd(
             cmd=cnet.Commands.RemoveNetwork(
                 networkID=thread_network_id_bytes,
@@ -127,8 +118,8 @@ class TC_CNET_4_10(MatterBaseTest):
         asserts.assert_equal(response.networkIndex, userth_netidx,
                              "Incorrect network index in response")
 
-        # Step 5: Verify network count reduced and store the result
-        self.step(5)
+        # Step 4: Verify network count reduced and store the result
+        self.step(4)
         networks_after_removal = await self.read_single_attribute_check_success(
             cluster=cnet,
             attribute=cnet.Attributes.Networks
@@ -136,8 +127,8 @@ class TC_CNET_4_10(MatterBaseTest):
         asserts.assert_equal(len(networks_after_removal), num_networks - 1,
                              "Network count not reduced")
 
-        # Step 6: Check LastNetworkingStatus
-        self.step(6)
+        # Step 5: Check LastNetworkingStatus
+        self.step(5)
         status = await self.read_single_attribute_check_success(
             cluster=cnet,
             attribute=cnet.Attributes.LastNetworkingStatus
@@ -148,8 +139,8 @@ class TC_CNET_4_10(MatterBaseTest):
             expected_status = cnet.Enums.NetworkCommissioningStatusEnum.kSuccess
             asserts.assert_equal(status, expected_status, "LastNetworkingStatus should be Success when Networks list is not empty")
 
-        # Step 7: Check LastNetworkID
-        self.step(7)
+        # Step 6: Check LastNetworkID
+        self.step(6)
         last_network_id = await self.read_single_attribute_check_success(
             cluster=cnet,
             attribute=cnet.Attributes.LastNetworkID
@@ -160,16 +151,16 @@ class TC_CNET_4_10(MatterBaseTest):
             expected_network_id = thread_network_id_bytes
             asserts.assert_equal(last_network_id, expected_network_id, "LastNetworkID incorrect when Networks list is not empty")
 
-        # Step 8: Verify breadcrumb
-        self.step(8)
+        # Step 7: Verify breadcrumb
+        self.step(7)
         breadcrumb = await self.read_single_attribute_check_success(
             cluster=gen_comm,
             attribute=gen_comm.Attributes.Breadcrumb
         )
         asserts.assert_equal(breadcrumb, 1)
 
-        # Step 9: Try to connect to removed network
-        self.step(9)
+        # Step 8: Try to connect to removed network
+        self.step(8)
         response = await self.send_single_cmd(
             cmd=cnet.Commands.ConnectNetwork(
                 networkID=thread_network_id_bytes,
@@ -179,23 +170,23 @@ class TC_CNET_4_10(MatterBaseTest):
         asserts.assert_equal(response.networkingStatus,
                              cnet.Enums.NetworkCommissioningStatusEnum.kNetworkIDNotFound)
 
-        # Step 10: Verify breadcrumb unchanged
-        self.step(10)
+        # Step 9: Verify breadcrumb unchanged
+        self.step(9)
         breadcrumb = await self.read_single_attribute_check_success(
             cluster=gen_comm,
             attribute=gen_comm.Attributes.Breadcrumb
         )
         asserts.assert_equal(breadcrumb, 1)
 
-        # Step 11: Disable failsafe
-        self.step(11)
+        # Step 10: Disable failsafe
+        self.step(10)
         await self.send_single_cmd(
             cmd=gen_comm.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=0)
         )
         # Successful command execution is implied if no exception is raised.
 
-        # Step 12: Verify network restored
-        self.step(12)
+        # Step 11: Verify network restored
+        self.step(11)
         networks = await self.read_single_attribute_check_success(
             cluster=cnet,
             attribute=cnet.Attributes.Networks
@@ -210,15 +201,15 @@ class TC_CNET_4_10(MatterBaseTest):
                 break
         asserts.assert_true(found, "Thread network not restored")
 
-        # Step 13: Re-arm failsafe
-        self.step(13)
+        # Step 12: Re-arm failsafe
+        self.step(12)
         await self.send_single_cmd(
             cmd=gen_comm.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=0)
         )
         # Successful command execution is implied if no exception is raised.
 
-        # Step 14: Remove network again
-        self.step(14)
+        # Step 13: Remove network again
+        self.step(13)
         response = await self.send_single_cmd(
             cmd=cnet.Commands.RemoveNetwork(
                 networkID=thread_network_id_bytes,
@@ -229,22 +220,22 @@ class TC_CNET_4_10(MatterBaseTest):
                              cnet.Enums.NetworkCommissioningStatusEnum.kSuccess)
         asserts.assert_equal(response.networkIndex, userth_netidx)
 
-        # Step 15: Complete commissioning
-        self.step(15)
+        # Step 14: Complete commissioning
+        self.step(14)
         await self.send_single_cmd(
             cmd=gen_comm.Commands.CommissioningComplete()
         )
         # Successful command execution is implied if no exception is raised.
 
-        # Step 16: Verify failsafe disabled
-        self.step(16)
+        # Step 15: Verify failsafe disabled
+        self.step(15)
         await self.send_single_cmd(
             cmd=gen_comm.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=0)
         )
         # Successful command execution is implied if no exception is raised.
 
-        # Step 17: Verify network remains removed
-        self.step(17)
+        # Step 16: Verify network remains removed
+        self.step(16)
         networks = await self.read_single_attribute_check_success(
             cluster=cnet,
             attribute=cnet.Attributes.Networks
