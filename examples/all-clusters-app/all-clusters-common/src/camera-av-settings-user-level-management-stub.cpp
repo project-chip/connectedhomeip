@@ -118,6 +118,21 @@ Status AVSettingsUserLevelManagementDelegate::DPTZRelativeMove(uint16_t aVideoSt
     return Status::Success;
 }
 
+CHIP_ERROR AVSettingsUserLevelManagementDelegate::LoadMPTZPresets(std::vector<MPTZPresetHelper> & mptzPresetHelpers)
+{
+    return CHIP_NO_ERROR;
+}
+    
+CHIP_ERROR AVSettingsUserLevelManagementDelegate::LoadDPTZRelativeMove(std::vector<uint16_t> dptzRelativeMove)
+{
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AVSettingsUserLevelManagementDelegate::PersistentAttributesLoadedCallback() 
+{
+    return CHIP_NO_ERROR;
+}
+
 void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::EndpointId aEndpointId)
 {
     VerifyOrDie(aEndpointId == 1); // this cluster is only enabled for endpoint 1.

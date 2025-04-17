@@ -159,6 +159,8 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
     SetTilt(MakeOptional(kDefaultTilt));
     SetZoom(MakeOptional(kDefaultZoom));
 
+    LoadPersistentAttributes();
+
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INTERNAL);
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     return CHIP_NO_ERROR;
@@ -177,6 +179,38 @@ bool CameraAvSettingsUserLevelMgmtServer::SupportsOptAttr(OptionalAttributes aOp
 void CameraAvSettingsUserLevelMgmtServer::MarkDirty(AttributeId aAttributeId)
 {
     MatterReportingAttributeChangeCallback(mEndpointId, CameraAvSettingsUserLevelManagement::Id, aAttributeId);
+}
+
+CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::StoreMPTZPosition(const MPTZStructType & mptzPosition)
+{
+    uint8_t buffer[kMptzPositionStructMaxSerializedSize];
+    MutableByteSpan bufferSpan(buffer);
+    TLV::TLVWriter writer;
+
+    writer.Init(bufferSpan);
+    ReturnErrorOnFailure(mptzPosition.Encode(writer, TLV::AnonymousTag()));
+
+    auto path = ConcreteAttributePath(mEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPosition::Id);
+    bufferSpan.reduce_size(writer.GetLengthWritten());
+
+    return GetSafeAttributePersistenceProvider()->SafeWriteValue(path, bufferSpan);
+}
+
+CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::LoadMPTZPosition(MPTZStructType & mptzPosition)
+{
+    uint8_t buffer[kMptzPositionStructMaxSerializedSize];
+    MutableByteSpan bufferSpan(buffer);
+
+    auto path = ConcreteAttributePath(mEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPosition::Id);
+    ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->SafeReadValue(path, bufferSpan));
+
+    TLV::TLVReader reader;
+
+    reader.Init(bufferSpan);
+    ReturnErrorOnFailure(reader.Next(TLV::AnonymousTag()));
+    ReturnErrorOnFailure(mptzPosition.Decode(reader));
+
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -304,6 +338,7 @@ void CameraAvSettingsUserLevelMgmtServer::SetPan(Optional<int16_t> aPan)
         if (aPan.HasValue())
         {
             mMptzPosition.pan = aPan;
+            StoreMPTZPosition(mMptzPosition);
             MarkDirty(Attributes::MPTZPosition::Id);
         }
     }
@@ -316,6 +351,7 @@ void CameraAvSettingsUserLevelMgmtServer::SetTilt(Optional<int16_t> aTilt)
         if (aTilt.HasValue())
         {
             mMptzPosition.tilt = aTilt;
+            StoreMPTZPosition(mMptzPosition);
             MarkDirty(Attributes::MPTZPosition::Id);
         }
     }
@@ -328,6 +364,7 @@ void CameraAvSettingsUserLevelMgmtServer::SetZoom(Optional<uint8_t> aZoom)
         if (aZoom.HasValue())
         {
             mMptzPosition.zoom = aZoom;
+            StoreMPTZPosition(mMptzPosition);
             MarkDirty(Attributes::MPTZPosition::Id);
         }
     }
@@ -441,6 +478,40 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::ReadAndEncodeDPTZRelativeMove(At
 
         return CHIP_NO_ERROR;
     });
+}
+
+void CameraAvSettingsUserLevelMgmtServer::LoadPersistentAttributes()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    // Load MPTZPosition
+    MPTZStructType storedMPTZPosition;
+    err = LoadMPTZPosition(storedMPTZPosition);
+    if (err == CHIP_NO_ERROR)
+    {        
+        mMptzPosition = storedMPTZPosition;
+        ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Loaded MPTZPosition", mEndpointId);
+    }
+    else
+    {
+        ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Unable to load the MPTZPosition from the KVS.", mEndpointId);
+    }
+
+    // Load MPTZPresets
+    err = mDelegate.LoadMPTZPresets(mMptzPresetHelpers);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Unable to load the MPTZPresets from the KVS.", mEndpointId);
+    }
+
+    // Load DPTZRelativeMove
+    err = mDelegate.LoadDPTZRelativeMove(mDptzRelativeMove);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Unable to load the DPTZRelativeMove from the KVS.", mEndpointId);
+    }
+
+    // Signal delegate that all persistent configuration attributes have been loaded.
+    mDelegate.PersistentAttributesLoadedCallback();
 }
 
 /**

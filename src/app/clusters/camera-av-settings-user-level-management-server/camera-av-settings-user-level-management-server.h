@@ -22,6 +22,8 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <app/SafeAttributePersistenceProvider.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <string>
 #include <vector>
 
@@ -44,6 +46,9 @@ constexpr uint8_t kMaxZoomValue = 100;
 constexpr int16_t kDefaultPan  = 0;
 constexpr int16_t kDefaultTilt = 0;
 constexpr uint8_t kDefaultZoom = 1;
+
+constexpr size_t kMptzPositionStructMaxSerializedSize =
+    TLV::EstimateStructOverhead(sizeof(int16_t), sizeof(int16_t), sizeof(uint8_t));
 
 class Delegate;
 
@@ -205,6 +210,14 @@ private:
     CHIP_ERROR ReadAndEncodeMPTZPresets(AttributeValueEncoder & encoder);
     CHIP_ERROR ReadAndEncodeDPTZRelativeMove(AttributeValueEncoder & encoder);
 
+    CHIP_ERROR StoreMPTZPosition(const MPTZStructType & mptzPosition);
+    CHIP_ERROR LoadMPTZPosition(MPTZStructType & mptzPosition);
+
+    /**
+     * Helper function that loads all the persistent attributes from the KVS.
+     */
+    void LoadPersistentAttributes();
+
     // Command handler interface
     void InvokeCommand(HandlerContext & ctx) override;
     void HandleMPTZSetPosition(HandlerContext & ctx, const Commands::MPTZSetPosition::DecodableType & commandData);
@@ -331,8 +344,21 @@ public:
     virtual Protocols::InteractionModel::Status DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX,
                                                                  Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta) = 0;
 
-private:
-    friend class CameraAvSettingsUserLevelMgmtServer;
+    /**
+     *  @brief Callback into the delegate once persistent attributes managed by
+     *  the Cluster have been loaded from Storage.
+     */
+    virtual CHIP_ERROR PersistentAttributesLoadedCallback() = 0;
+
+    /**
+     *  Delegate functions to load the Presets and DPTZRelativeMove valid set of video stream IDs.
+     *  The delegate application is responsible for creating and persisting this data. The overall
+     *  application is already handling the persistence of the allocated video streams themselves. 
+     *  hese Load APIs would be used to load the known presets and stream ids into the cluster 
+     *  server list, at initialization.
+     */
+    virtual CHIP_ERROR LoadMPTZPresets(std::vector<MPTZPresetHelper> & mptzPresetHelpers) = 0;
+    virtual CHIP_ERROR LoadDPTZRelativeMove(std::vector<uint16_t> dptzRelativeMove) = 0;
 
     CameraAvSettingsUserLevelMgmtServer * mServer = nullptr;
 
