@@ -1806,6 +1806,7 @@ private:
 | * ProductAppearance                                                 | 0x0014 |
 | * SpecificationVersion                                              | 0x0015 |
 | * MaxPathsPerInvoke                                                 | 0x0016 |
+| * ConfigurationVersion                                              | 0x0018 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -3448,6 +3449,7 @@ private:
 | * Reachable                                                         | 0x0011 |
 | * UniqueID                                                          | 0x0012 |
 | * ProductAppearance                                                 | 0x0014 |
+| * ConfigurationVersion                                              | 0x0018 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -9366,6 +9368,10 @@ private:
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
+| * OperationalError                                                  | 0x0000 |
+| * MovementCompleted                                                 | 0x0001 |
+| * EngageStateChanged                                                | 0x0002 |
+| * SecureStateChanged                                                | 0x0003 |
 \*----------------------------------------------------------------------------*/
 
 /*
@@ -9413,7 +9419,7 @@ public:
     ClosureControlMoveTo(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("move-to", credsIssuerConfig)
     {
         AddArgument("Position", 0, UINT8_MAX, &mRequest.position);
-        AddArgument("Latch", 0, UINT8_MAX, &mRequest.latch);
+        AddArgument("Latch", 0, 1, &mRequest.latch);
         AddArgument("Speed", 0, UINT8_MAX, &mRequest.speed);
         ClusterCommand::AddArguments();
     }
@@ -14178,7 +14184,7 @@ private:
 | * CaptureSnapshot                                                   |   0x0C |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * MaxConcurrentVideoEncoders                                        | 0x0000 |
+| * MaxConcurrentEncoders                                             | 0x0000 |
 | * MaxEncodedPixelRate                                               | 0x0001 |
 | * VideoSensorParams                                                 | 0x0002 |
 | * NightVisionCapable                                                | 0x0003 |
@@ -14188,7 +14194,7 @@ private:
 | * MicrophoneCapabilities                                            | 0x0007 |
 | * SpeakerCapabilities                                               | 0x0008 |
 | * TwoWayTalkSupport                                                 | 0x0009 |
-| * SupportedSnapshotParams                                           | 0x000A |
+| * SnapshotCapabilities                                              | 0x000A |
 | * MaxNetworkBandwidth                                               | 0x000B |
 | * CurrentFrameRate                                                  | 0x000C |
 | * HDRModeEnabled                                                    | 0x000D |
@@ -14453,7 +14459,6 @@ public:
     {
         AddArgument("ImageCodec", 0, UINT8_MAX, &mRequest.imageCodec);
         AddArgument("MaxFrameRate", 0, UINT16_MAX, &mRequest.maxFrameRate);
-        AddArgument("BitRate", 0, UINT32_MAX, &mRequest.bitRate);
         AddArgument("MinResolution", &mComplex_MinResolution);
         AddArgument("MaxResolution", &mComplex_MaxResolution);
         AddArgument("Quality", 0, UINT8_MAX, &mRequest.quality);
@@ -18580,6 +18585,7 @@ void registerClusterBasicInformation(Commands & commands, CredentialIssuerComman
         make_unique<ReadAttribute>(Id, "product-appearance", Attributes::ProductAppearance::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "specification-version", Attributes::SpecificationVersion::Id, credsIssuerConfig),    //
         make_unique<ReadAttribute>(Id, "max-paths-per-invoke", Attributes::MaxPathsPerInvoke::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "configuration-version", Attributes::ConfigurationVersion::Id, credsIssuerConfig),    //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //
@@ -18632,6 +18638,8 @@ void registerClusterBasicInformation(Commands & commands, CredentialIssuerComman
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "max-paths-per-invoke", 0, UINT16_MAX, Attributes::MaxPathsPerInvoke::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "configuration-version", 0, UINT32_MAX, Attributes::ConfigurationVersion::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -18667,6 +18675,7 @@ void registerClusterBasicInformation(Commands & commands, CredentialIssuerComman
         make_unique<SubscribeAttribute>(Id, "product-appearance", Attributes::ProductAppearance::Id, credsIssuerConfig),          //
         make_unique<SubscribeAttribute>(Id, "specification-version", Attributes::SpecificationVersion::Id, credsIssuerConfig),    //
         make_unique<SubscribeAttribute>(Id, "max-paths-per-invoke", Attributes::MaxPathsPerInvoke::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "configuration-version", Attributes::ConfigurationVersion::Id, credsIssuerConfig),    //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //
@@ -20364,6 +20373,7 @@ void registerClusterBridgedDeviceBasicInformation(Commands & commands, Credentia
         make_unique<ReadAttribute>(Id, "reachable", Attributes::Reachable::Id, credsIssuerConfig),                           //
         make_unique<ReadAttribute>(Id, "unique-id", Attributes::UniqueID::Id, credsIssuerConfig),                            //
         make_unique<ReadAttribute>(Id, "product-appearance", Attributes::ProductAppearance::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "configuration-version", Attributes::ConfigurationVersion::Id, credsIssuerConfig),    //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //
@@ -20405,6 +20415,8 @@ void registerClusterBridgedDeviceBasicInformation(Commands & commands, Credentia
         make_unique<
             WriteAttributeAsComplex<chip::app::Clusters::BridgedDeviceBasicInformation::Structs::ProductAppearanceStruct::Type>>(
             Id, "product-appearance", Attributes::ProductAppearance::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "configuration-version", 0, UINT32_MAX, Attributes::ConfigurationVersion::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -20434,6 +20446,7 @@ void registerClusterBridgedDeviceBasicInformation(Commands & commands, Credentia
         make_unique<SubscribeAttribute>(Id, "reachable", Attributes::Reachable::Id, credsIssuerConfig),                           //
         make_unique<SubscribeAttribute>(Id, "unique-id", Attributes::UniqueID::Id, credsIssuerConfig),                            //
         make_unique<SubscribeAttribute>(Id, "product-appearance", Attributes::ProductAppearance::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "configuration-version", Attributes::ConfigurationVersion::Id, credsIssuerConfig),    //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //
@@ -24748,8 +24761,16 @@ void registerClusterClosureControl(Commands & commands, CredentialIssuerCommands
         //
         // Events
         //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                              //
+        make_unique<ReadEvent>(Id, "operational-error", Events::OperationalError::Id, credsIssuerConfig),           //
+        make_unique<ReadEvent>(Id, "movement-completed", Events::MovementCompleted::Id, credsIssuerConfig),         //
+        make_unique<ReadEvent>(Id, "engage-state-changed", Events::EngageStateChanged::Id, credsIssuerConfig),      //
+        make_unique<ReadEvent>(Id, "secure-state-changed", Events::SecureStateChanged::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                         //
+        make_unique<SubscribeEvent>(Id, "operational-error", Events::OperationalError::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, "movement-completed", Events::MovementCompleted::Id, credsIssuerConfig),    //
+        make_unique<SubscribeEvent>(Id, "engage-state-changed", Events::EngageStateChanged::Id, credsIssuerConfig), //
+        make_unique<SubscribeEvent>(Id, "secure-state-changed", Events::SecureStateChanged::Id, credsIssuerConfig), //
     };
 
     commands.RegisterCluster(clusterName, clusterCommands);
@@ -28814,26 +28835,25 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "max-concurrent-video-encoders", Attributes::MaxConcurrentVideoEncoders::Id,
-                                   credsIssuerConfig),                                                                    //
-        make_unique<ReadAttribute>(Id, "max-encoded-pixel-rate", Attributes::MaxEncodedPixelRate::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "video-sensor-params", Attributes::VideoSensorParams::Id, credsIssuerConfig),      //
-        make_unique<ReadAttribute>(Id, "night-vision-capable", Attributes::NightVisionCapable::Id, credsIssuerConfig),    //
-        make_unique<ReadAttribute>(Id, "min-viewport", Attributes::MinViewport::Id, credsIssuerConfig),                   //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                   //
+        make_unique<ReadAttribute>(Id, "max-concurrent-encoders", Attributes::MaxConcurrentEncoders::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "max-encoded-pixel-rate", Attributes::MaxEncodedPixelRate::Id, credsIssuerConfig),    //
+        make_unique<ReadAttribute>(Id, "video-sensor-params", Attributes::VideoSensorParams::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "night-vision-capable", Attributes::NightVisionCapable::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "min-viewport", Attributes::MinViewport::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "rate-distortion-trade-off-points", Attributes::RateDistortionTradeOffPoints::Id,
-                                   credsIssuerConfig),                                                                           //
-        make_unique<ReadAttribute>(Id, "max-content-buffer-size", Attributes::MaxContentBufferSize::Id, credsIssuerConfig),      //
-        make_unique<ReadAttribute>(Id, "microphone-capabilities", Attributes::MicrophoneCapabilities::Id, credsIssuerConfig),    //
-        make_unique<ReadAttribute>(Id, "speaker-capabilities", Attributes::SpeakerCapabilities::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "two-way-talk-support", Attributes::TwoWayTalkSupport::Id, credsIssuerConfig),            //
-        make_unique<ReadAttribute>(Id, "supported-snapshot-params", Attributes::SupportedSnapshotParams::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "max-network-bandwidth", Attributes::MaxNetworkBandwidth::Id, credsIssuerConfig),         //
-        make_unique<ReadAttribute>(Id, "current-frame-rate", Attributes::CurrentFrameRate::Id, credsIssuerConfig),               //
-        make_unique<ReadAttribute>(Id, "hdrmode-enabled", Attributes::HDRModeEnabled::Id, credsIssuerConfig),                    //
-        make_unique<ReadAttribute>(Id, "supported-stream-usages", Attributes::SupportedStreamUsages::Id, credsIssuerConfig),     //
-        make_unique<ReadAttribute>(Id, "allocated-video-streams", Attributes::AllocatedVideoStreams::Id, credsIssuerConfig),     //
-        make_unique<ReadAttribute>(Id, "allocated-audio-streams", Attributes::AllocatedAudioStreams::Id, credsIssuerConfig),     //
+                                   credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "max-content-buffer-size", Attributes::MaxContentBufferSize::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "microphone-capabilities", Attributes::MicrophoneCapabilities::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "speaker-capabilities", Attributes::SpeakerCapabilities::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "two-way-talk-support", Attributes::TwoWayTalkSupport::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "snapshot-capabilities", Attributes::SnapshotCapabilities::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "max-network-bandwidth", Attributes::MaxNetworkBandwidth::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "current-frame-rate", Attributes::CurrentFrameRate::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "hdrmode-enabled", Attributes::HDRModeEnabled::Id, credsIssuerConfig),                 //
+        make_unique<ReadAttribute>(Id, "supported-stream-usages", Attributes::SupportedStreamUsages::Id, credsIssuerConfig),  //
+        make_unique<ReadAttribute>(Id, "allocated-video-streams", Attributes::AllocatedVideoStreams::Id, credsIssuerConfig),  //
+        make_unique<ReadAttribute>(Id, "allocated-audio-streams", Attributes::AllocatedAudioStreams::Id, credsIssuerConfig),  //
         make_unique<ReadAttribute>(Id, "allocated-snapshot-streams", Attributes::AllocatedSnapshotStreams::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "ranked-video-stream-priorities-list", Attributes::RankedVideoStreamPrioritiesList::Id,
@@ -28870,9 +28890,8 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                        //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),              //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                //
-        make_unique<WriteAttribute<uint8_t>>(Id, "max-concurrent-video-encoders", 0, UINT8_MAX,
-                                             Attributes::MaxConcurrentVideoEncoders::Id, WriteCommandType::kForceWrite,
-                                             credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "max-concurrent-encoders", 0, UINT8_MAX, Attributes::MaxConcurrentEncoders::Id,
+                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint32_t>>(Id, "max-encoded-pixel-rate", 0, UINT32_MAX, Attributes::MaxEncodedPixelRate::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::Clusters::CameraAvStreamManagement::Structs::VideoSensorParamsStruct::Type>>(
@@ -28895,10 +28914,9 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
         make_unique<WriteAttribute<chip::app::Clusters::CameraAvStreamManagement::TwoWayTalkSupportTypeEnum>>(
             Id, "two-way-talk-support", 0, UINT8_MAX, Attributes::TwoWayTalkSupport::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::List<const chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotParamsStruct::Type>>>(
-            Id, "supported-snapshot-params", Attributes::SupportedSnapshotParams::Id, WriteCommandType::kForceWrite,
-            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
+            const chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotCapabilitiesStruct::Type>>>(
+            Id, "snapshot-capabilities", Attributes::SnapshotCapabilities::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint32_t>>(Id, "max-network-bandwidth", 0, UINT32_MAX, Attributes::MaxNetworkBandwidth::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "current-frame-rate", 0, UINT16_MAX, Attributes::CurrentFrameRate::Id,
@@ -28984,23 +29002,21 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
         make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
-                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                  //
-        make_unique<SubscribeAttribute>(Id, "max-concurrent-video-encoders", Attributes::MaxConcurrentVideoEncoders::Id,
-                                        credsIssuerConfig),                                                                    //
-        make_unique<SubscribeAttribute>(Id, "max-encoded-pixel-rate", Attributes::MaxEncodedPixelRate::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "video-sensor-params", Attributes::VideoSensorParams::Id, credsIssuerConfig),      //
-        make_unique<SubscribeAttribute>(Id, "night-vision-capable", Attributes::NightVisionCapable::Id, credsIssuerConfig),    //
-        make_unique<SubscribeAttribute>(Id, "min-viewport", Attributes::MinViewport::Id, credsIssuerConfig),                   //
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                  //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                   //
+        make_unique<SubscribeAttribute>(Id, "max-concurrent-encoders", Attributes::MaxConcurrentEncoders::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "max-encoded-pixel-rate", Attributes::MaxEncodedPixelRate::Id, credsIssuerConfig),    //
+        make_unique<SubscribeAttribute>(Id, "video-sensor-params", Attributes::VideoSensorParams::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "night-vision-capable", Attributes::NightVisionCapable::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "min-viewport", Attributes::MinViewport::Id, credsIssuerConfig),                      //
         make_unique<SubscribeAttribute>(Id, "rate-distortion-trade-off-points", Attributes::RateDistortionTradeOffPoints::Id,
                                         credsIssuerConfig),                                                                      //
         make_unique<SubscribeAttribute>(Id, "max-content-buffer-size", Attributes::MaxContentBufferSize::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "microphone-capabilities", Attributes::MicrophoneCapabilities::Id,
-                                        credsIssuerConfig),                                                                  //
-        make_unique<SubscribeAttribute>(Id, "speaker-capabilities", Attributes::SpeakerCapabilities::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "two-way-talk-support", Attributes::TwoWayTalkSupport::Id, credsIssuerConfig),   //
-        make_unique<SubscribeAttribute>(Id, "supported-snapshot-params", Attributes::SupportedSnapshotParams::Id,
                                         credsIssuerConfig),                                                                       //
+        make_unique<SubscribeAttribute>(Id, "speaker-capabilities", Attributes::SpeakerCapabilities::Id, credsIssuerConfig),      //
+        make_unique<SubscribeAttribute>(Id, "two-way-talk-support", Attributes::TwoWayTalkSupport::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "snapshot-capabilities", Attributes::SnapshotCapabilities::Id, credsIssuerConfig),    //
         make_unique<SubscribeAttribute>(Id, "max-network-bandwidth", Attributes::MaxNetworkBandwidth::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "current-frame-rate", Attributes::CurrentFrameRate::Id, credsIssuerConfig),           //
         make_unique<SubscribeAttribute>(Id, "hdrmode-enabled", Attributes::HDRModeEnabled::Id, credsIssuerConfig),                //

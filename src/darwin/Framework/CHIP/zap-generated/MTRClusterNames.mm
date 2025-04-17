@@ -974,6 +974,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"MaxPathsPerInvoke";
             break;
 
+        case MTRAttributeIDTypeClusterBasicInformationAttributeConfigurationVersionID:
+            result = @"ConfigurationVersion";
+            break;
+
         case MTRAttributeIDTypeClusterBasicInformationAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -2275,6 +2279,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeProductAppearanceID:
             result = @"ProductAppearance";
+            break;
+
+        case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeConfigurationVersionID:
+            result = @"ConfigurationVersion";
             break;
 
         case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeGeneratedCommandListID:
@@ -7948,8 +7956,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         switch (attributeID) {
 
             // Cluster CameraAVStreamManagement attributes
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMaxConcurrentVideoEncodersID:
-            result = @"MaxConcurrentVideoEncoders";
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMaxConcurrentEncodersID:
+            result = @"MaxConcurrentEncoders";
             break;
 
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMaxEncodedPixelRateID:
@@ -7988,8 +7996,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"TwoWayTalkSupport";
             break;
 
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeSupportedSnapshotParamsID:
-            result = @"SupportedSnapshotParams";
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeSnapshotCapabilitiesID:
+            result = @"SnapshotCapabilities";
             break;
 
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMaxNetworkBandwidthID:
@@ -14900,6 +14908,23 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
     case MTRClusterIDTypeClosureControlID:
 
         switch (eventID) {
+
+            // Cluster ClosureControl events
+        case MTREventIDTypeClusterClosureControlEventOperationalErrorID:
+            result = @"OperationalError";
+            break;
+
+        case MTREventIDTypeClusterClosureControlEventMovementCompletedID:
+            result = @"MovementCompleted";
+            break;
+
+        case MTREventIDTypeClusterClosureControlEventEngageStateChangedID:
+            result = @"EngageStateChanged";
+            break;
+
+        case MTREventIDTypeClusterClosureControlEventSecureStateChangedID:
+            result = @"SecureStateChanged";
+            break;
 
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];

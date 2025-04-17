@@ -476,7 +476,7 @@ LogValue(const char * label, size_t indent,
 
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
-         const chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotParamsStruct::DecodableType & value);
+         const chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotCapabilitiesStruct::DecodableType & value);
 
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
@@ -804,6 +804,14 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::DoorLock::Events::LockOperationError::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::DoorLock::Events::LockUserChange::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::ClosureControl::Events::OperationalError::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::ClosureControl::Events::MovementCompleted::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::ClosureControl::Events::EngageStateChanged::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::ClosureControl::Events::SecureStateChanged::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::PumpConfigurationAndControl::Events::SupplyVoltageLow::DecodableType & value);
 static CHIP_ERROR

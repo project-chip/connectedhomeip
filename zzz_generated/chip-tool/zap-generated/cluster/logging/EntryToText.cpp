@@ -588,6 +588,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SpecificationVersion";
         case chip::app::Clusters::BasicInformation::Attributes::MaxPathsPerInvoke::Id:
             return "MaxPathsPerInvoke";
+        case chip::app::Clusters::BasicInformation::Attributes::ConfigurationVersion::Id:
+            return "ConfigurationVersion";
         case chip::app::Clusters::BasicInformation::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::BasicInformation::Attributes::AcceptedCommandList::Id:
@@ -1265,6 +1267,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "UniqueID";
         case chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::ProductAppearance::Id:
             return "ProductAppearance";
+        case chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::ConfigurationVersion::Id:
+            return "ConfigurationVersion";
         case chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::AcceptedCommandList::Id:
@@ -4307,8 +4311,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
     case chip::app::Clusters::CameraAvStreamManagement::Id: {
         switch (id)
         {
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxConcurrentVideoEncoders::Id:
-            return "MaxConcurrentVideoEncoders";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxConcurrentEncoders::Id:
+            return "MaxConcurrentEncoders";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxEncodedPixelRate::Id:
             return "MaxEncodedPixelRate";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::VideoSensorParams::Id:
@@ -4327,8 +4331,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SpeakerCapabilities";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::TwoWayTalkSupport::Id:
             return "TwoWayTalkSupport";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::SupportedSnapshotParams::Id:
-            return "SupportedSnapshotParams";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::SnapshotCapabilities::Id:
+            return "SnapshotCapabilities";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxNetworkBandwidth::Id:
             return "MaxNetworkBandwidth";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::CurrentFrameRate::Id:

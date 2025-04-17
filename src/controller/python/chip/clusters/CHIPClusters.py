@@ -1059,6 +1059,12 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x00000018: {
+                "attributeName": "ConfigurationVersion",
+                "attributeId": 0x00000018,
+                "type": "int",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -3109,6 +3115,12 @@ class ChipClusters:
                 "attributeName": "ProductAppearance",
                 "attributeId": 0x00000014,
                 "type": "",
+                "reportable": True,
+            },
+            0x00000018: {
+                "attributeName": "ConfigurationVersion",
+                "attributeId": 0x00000018,
+                "type": "int",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -7941,7 +7953,7 @@ class ChipClusters:
                 "commandName": "MoveTo",
                 "args": {
                     "position": "int",
-                    "latch": "int",
+                    "latch": "bool",
                     "speed": "int",
                 },
             },
@@ -12814,7 +12826,6 @@ class ChipClusters:
                 "args": {
                     "imageCodec": "int",
                     "maxFrameRate": "int",
-                    "bitRate": "int",
                     "minResolution": "VideoResolutionStruct",
                     "maxResolution": "VideoResolutionStruct",
                     "quality": "int",
@@ -12856,7 +12867,7 @@ class ChipClusters:
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "MaxConcurrentVideoEncoders",
+                "attributeName": "MaxConcurrentEncoders",
                 "attributeId": 0x00000000,
                 "type": "int",
                 "reportable": True,
@@ -12916,7 +12927,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x0000000A: {
-                "attributeName": "SupportedSnapshotParams",
+                "attributeName": "SnapshotCapabilities",
                 "attributeId": 0x0000000A,
                 "type": "",
                 "reportable": True,

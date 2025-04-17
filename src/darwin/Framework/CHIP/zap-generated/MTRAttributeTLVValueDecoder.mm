@@ -1397,6 +1397,17 @@ static id _Nullable DecodeAttributeValueForBasicInformationCluster(AttributeId a
         value = [NSNumber numberWithUnsignedShort:cppValue];
         return value;
     }
+    case Attributes::ConfigurationVersion::Id: {
+        using TypeInfo = Attributes::ConfigurationVersion::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedInt:cppValue];
+        return value;
+    }
     default: {
         break;
     }
@@ -4512,6 +4523,17 @@ static id _Nullable DecodeAttributeValueForBridgedDeviceBasicInformationCluster(
         } else {
             value.primaryColor = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.primaryColor.Value())];
         }
+        return value;
+    }
+    case Attributes::ConfigurationVersion::Id: {
+        using TypeInfo = Attributes::ConfigurationVersion::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedInt:cppValue];
         return value;
     }
     default: {
@@ -11092,14 +11114,14 @@ static id _Nullable DecodeAttributeValueForClosureControlCluster(AttributeId aAt
             } else {
                 value.positioning = nil;
             }
-            if (cppValue.Value().latching.HasValue()) {
-                if (cppValue.Value().latching.Value().IsNull()) {
-                    value.latching = nil;
+            if (cppValue.Value().latch.HasValue()) {
+                if (cppValue.Value().latch.Value().IsNull()) {
+                    value.latch = nil;
                 } else {
-                    value.latching = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().latching.Value().Value())];
+                    value.latch = [NSNumber numberWithBool:cppValue.Value().latch.Value().Value()];
                 }
             } else {
-                value.latching = nil;
+                value.latch = nil;
             }
             if (cppValue.Value().speed.HasValue()) {
                 if (cppValue.Value().speed.Value().IsNull()) {
@@ -11110,14 +11132,14 @@ static id _Nullable DecodeAttributeValueForClosureControlCluster(AttributeId aAt
             } else {
                 value.speed = nil;
             }
-            if (cppValue.Value().extraInfo.HasValue()) {
-                if (cppValue.Value().extraInfo.Value().IsNull()) {
-                    value.extraInfo = nil;
+            if (cppValue.Value().secureState.HasValue()) {
+                if (cppValue.Value().secureState.Value().IsNull()) {
+                    value.secureState = nil;
                 } else {
-                    value.extraInfo = [NSNumber numberWithUnsignedInt:cppValue.Value().extraInfo.Value().Value()];
+                    value.secureState = [NSNumber numberWithBool:cppValue.Value().secureState.Value().Value()];
                 }
             } else {
-                value.extraInfo = nil;
+                value.secureState = nil;
             }
         }
         return value;
@@ -11140,7 +11162,7 @@ static id _Nullable DecodeAttributeValueForClosureControlCluster(AttributeId aAt
                 value.position = nil;
             }
             if (cppValue.Value().latch.HasValue()) {
-                value.latch = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().latch.Value())];
+                value.latch = [NSNumber numberWithBool:cppValue.Value().latch.Value()];
             } else {
                 value.latch = nil;
             }
@@ -17465,8 +17487,8 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
 {
     using namespace Clusters::CameraAvStreamManagement;
     switch (aAttributeId) {
-    case Attributes::MaxConcurrentVideoEncoders::Id: {
-        using TypeInfo = Attributes::MaxConcurrentVideoEncoders::TypeInfo;
+    case Attributes::MaxConcurrentEncoders::Id: {
+        using TypeInfo = Attributes::MaxConcurrentEncoders::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -17703,8 +17725,8 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
         value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
-    case Attributes::SupportedSnapshotParams::Id: {
-        using TypeInfo = Attributes::SupportedSnapshotParams::TypeInfo;
+    case Attributes::SnapshotCapabilities::Id: {
+        using TypeInfo = Attributes::SnapshotCapabilities::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -17716,13 +17738,19 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                MTRCameraAVStreamManagementClusterSnapshotParamsStruct * newElement_0;
-                newElement_0 = [MTRCameraAVStreamManagementClusterSnapshotParamsStruct new];
+                MTRCameraAVStreamManagementClusterSnapshotCapabilitiesStruct * newElement_0;
+                newElement_0 = [MTRCameraAVStreamManagementClusterSnapshotCapabilitiesStruct new];
                 newElement_0.resolution = [MTRCameraAVStreamManagementClusterVideoResolutionStruct new];
                 newElement_0.resolution.width = [NSNumber numberWithUnsignedShort:entry_0.resolution.width];
                 newElement_0.resolution.height = [NSNumber numberWithUnsignedShort:entry_0.resolution.height];
                 newElement_0.maxFrameRate = [NSNumber numberWithUnsignedShort:entry_0.maxFrameRate];
                 newElement_0.imageCodec = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.imageCodec)];
+                newElement_0.requiresEncodedPixels = [NSNumber numberWithBool:entry_0.requiresEncodedPixels];
+                if (entry_0.requiresHardwareEncoder.HasValue()) {
+                    newElement_0.requiresHardwareEncoder = [NSNumber numberWithBool:entry_0.requiresHardwareEncoder.Value()];
+                } else {
+                    newElement_0.requiresHardwareEncoder = nil;
+                }
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -17897,7 +17925,6 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
                 newElement_0.snapshotStreamID = [NSNumber numberWithUnsignedShort:entry_0.snapshotStreamID];
                 newElement_0.imageCodec = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.imageCodec)];
                 newElement_0.frameRate = [NSNumber numberWithUnsignedShort:entry_0.frameRate];
-                newElement_0.bitRate = [NSNumber numberWithUnsignedInt:entry_0.bitRate];
                 newElement_0.minResolution = [MTRCameraAVStreamManagementClusterVideoResolutionStruct new];
                 newElement_0.minResolution.width = [NSNumber numberWithUnsignedShort:entry_0.minResolution.width];
                 newElement_0.minResolution.height = [NSNumber numberWithUnsignedShort:entry_0.minResolution.height];
@@ -17906,6 +17933,8 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
                 newElement_0.maxResolution.height = [NSNumber numberWithUnsignedShort:entry_0.maxResolution.height];
                 newElement_0.quality = [NSNumber numberWithUnsignedChar:entry_0.quality];
                 newElement_0.referenceCount = [NSNumber numberWithUnsignedChar:entry_0.referenceCount];
+                newElement_0.encodedPixels = [NSNumber numberWithBool:entry_0.encodedPixels];
+                newElement_0.hardwareEncoder = [NSNumber numberWithBool:entry_0.hardwareEncoder];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();

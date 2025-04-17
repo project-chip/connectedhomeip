@@ -5533,6 +5533,172 @@ public static class DoorLockClusterLockUserChangeEvent {
     return output.toString();
   }
 }
+public static class ClosureControlClusterOperationalErrorEvent {
+  public ArrayList<Integer> errorState;
+  private static final long ERROR_STATE_ID = 0L;
+
+  public ClosureControlClusterOperationalErrorEvent(
+    ArrayList<Integer> errorState
+  ) {
+    this.errorState = errorState;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ERROR_STATE_ID, ArrayType.generateArrayType(errorState, (elementerrorState) -> new UIntType(elementerrorState))));
+
+    return new StructType(values);
+  }
+
+  public static ClosureControlClusterOperationalErrorEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    ArrayList<Integer> errorState = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ERROR_STATE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          errorState = castingValue.map((elementcastingValue) -> elementcastingValue.value(Integer.class));
+        }
+      }
+    }
+    return new ClosureControlClusterOperationalErrorEvent(
+      errorState
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ClosureControlClusterOperationalErrorEvent {\n");
+    output.append("\terrorState: ");
+    output.append(errorState);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ClosureControlClusterMovementCompletedEvent {
+
+  public ClosureControlClusterMovementCompletedEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static ClosureControlClusterMovementCompletedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new ClosureControlClusterMovementCompletedEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ClosureControlClusterMovementCompletedEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ClosureControlClusterEngageStateChangedEvent {
+  public Boolean engageValue;
+  private static final long ENGAGE_VALUE_ID = 0L;
+
+  public ClosureControlClusterEngageStateChangedEvent(
+    Boolean engageValue
+  ) {
+    this.engageValue = engageValue;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ENGAGE_VALUE_ID, new BooleanType(engageValue)));
+
+    return new StructType(values);
+  }
+
+  public static ClosureControlClusterEngageStateChangedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Boolean engageValue = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ENGAGE_VALUE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          engageValue = castingValue.value(Boolean.class);
+        }
+      }
+    }
+    return new ClosureControlClusterEngageStateChangedEvent(
+      engageValue
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ClosureControlClusterEngageStateChangedEvent {\n");
+    output.append("\tengageValue: ");
+    output.append(engageValue);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ClosureControlClusterSecureStateChangedEvent {
+  public Boolean secureValue;
+  private static final long SECURE_VALUE_ID = 0L;
+
+  public ClosureControlClusterSecureStateChangedEvent(
+    Boolean secureValue
+  ) {
+    this.secureValue = secureValue;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(SECURE_VALUE_ID, new BooleanType(secureValue)));
+
+    return new StructType(values);
+  }
+
+  public static ClosureControlClusterSecureStateChangedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Boolean secureValue = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == SECURE_VALUE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          secureValue = castingValue.value(Boolean.class);
+        }
+      }
+    }
+    return new ClosureControlClusterSecureStateChangedEvent(
+      secureValue
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ClosureControlClusterSecureStateChangedEvent {\n");
+    output.append("\tsecureValue: ");
+    output.append(secureValue);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class PumpConfigurationAndControlClusterSupplyVoltageLowEvent {
 
   public PumpConfigurationAndControlClusterSupplyVoltageLowEvent(

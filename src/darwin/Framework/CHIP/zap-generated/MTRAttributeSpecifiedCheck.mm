@@ -426,6 +426,9 @@ static BOOL AttributeIsSpecifiedInBasicInformationCluster(AttributeId aAttribute
     case Attributes::MaxPathsPerInvoke::Id: {
         return YES;
     }
+    case Attributes::ConfigurationVersion::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -1414,6 +1417,9 @@ static BOOL AttributeIsSpecifiedInBridgedDeviceBasicInformationCluster(Attribute
         return YES;
     }
     case Attributes::ProductAppearance::Id: {
+        return YES;
+    }
+    case Attributes::ConfigurationVersion::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -5739,7 +5745,7 @@ static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aA
 {
     using namespace Clusters::CameraAvStreamManagement;
     switch (aAttributeId) {
-    case Attributes::MaxConcurrentVideoEncoders::Id: {
+    case Attributes::MaxConcurrentEncoders::Id: {
         return YES;
     }
     case Attributes::MaxEncodedPixelRate::Id: {
@@ -5769,7 +5775,7 @@ static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aA
     case Attributes::TwoWayTalkSupport::Id: {
         return YES;
     }
-    case Attributes::SupportedSnapshotParams::Id: {
+    case Attributes::SnapshotCapabilities::Id: {
         return YES;
     }
     case Attributes::MaxNetworkBandwidth::Id: {

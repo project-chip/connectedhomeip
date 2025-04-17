@@ -1979,6 +1979,7 @@ public class ClusterIDMapping {
             ProductAppearance(20L),
             SpecificationVersion(21L),
             MaxPathsPerInvoke(22L),
+            ConfigurationVersion(24L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -4301,6 +4302,7 @@ public class ClusterIDMapping {
             Reachable(17L),
             UniqueID(18L),
             ProductAppearance(20L),
+            ConfigurationVersion(24L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -11640,7 +11642,11 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Event {;
+        public enum Event {
+            OperationalError(0L),
+            MovementCompleted(1L),
+            EngageStateChanged(2L),
+            SecureStateChanged(3L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -17662,7 +17668,7 @@ public class ClusterIDMapping {
         }
 
         public enum Attribute {
-            MaxConcurrentVideoEncoders(0L),
+            MaxConcurrentEncoders(0L),
             MaxEncodedPixelRate(1L),
             VideoSensorParams(2L),
             NightVisionCapable(3L),
@@ -17672,7 +17678,7 @@ public class ClusterIDMapping {
             MicrophoneCapabilities(7L),
             SpeakerCapabilities(8L),
             TwoWayTalkSupport(9L),
-            SupportedSnapshotParams(10L),
+            SnapshotCapabilities(10L),
             MaxNetworkBandwidth(11L),
             CurrentFrameRate(12L),
             HDRModeEnabled(13L),
@@ -17861,7 +17867,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum SnapshotStreamAllocateCommandField {ImageCodec(0),MaxFrameRate(1),BitRate(2),MinResolution(3),MaxResolution(4),Quality(5),WatermarkEnabled(6),OSDEnabled(7),;
+                }public enum SnapshotStreamAllocateCommandField {ImageCodec(0),MaxFrameRate(1),MinResolution(2),MaxResolution(3),Quality(4),WatermarkEnabled(5),OSDEnabled(6),;
                     private final int id;
                     SnapshotStreamAllocateCommandField(int id) {
                         this.id = id;

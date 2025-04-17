@@ -1163,6 +1163,12 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 + (void)readAttributeMaxPathsPerInvokeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
+- (void)readAttributeConfigurationVersionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeConfigurationVersionWithParams:(MTRSubscribeParams *)params
+                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                           reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeConfigurationVersionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -3382,7 +3388,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 /**
  * Command KeepActive
  *
- * The server SHALL attempt to keep the devices specified active for StayActiveDuration milliseconds when they are next active.
+ * Upon receipt, the server SHALL attempt to keep the bridged device active for the duration specified by the command, when the device is next active.
  */
 - (void)keepActiveWithParams:(MTRBridgedDeviceBasicInformationClusterKeepActiveParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
@@ -3489,6 +3495,12 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(MTRBridgedDeviceBasicInformationClusterProductAppearanceStruct * _Nullable value, NSError * _Nullable error))reportHandler MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 + (void)readAttributeProductAppearanceWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(MTRBridgedDeviceBasicInformationClusterProductAppearanceStruct * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+
+- (void)readAttributeConfigurationVersionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeConfigurationVersionWithParams:(MTRSubscribeParams *)params
+                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                           reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeConfigurationVersionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
@@ -8966,7 +8978,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command Stop
  *
- * On receipt of this command, the device SHALL stop its operation if it is at a position where it is safe to do so and/or permitted.
+ * On receipt of this command, the closure SHALL stop its movement as fast as the closure is able too.
  */
 - (void)stopWithParams:(MTRClosureControlClusterStopParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)stopWithCompletion:(MTRStatusCompletion)completion
@@ -8974,7 +8986,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command MoveTo
  *
- * Upon receipt, this SHALL move the product in the most fitting state following the data as follows:
+ * This command is used to move the device to a specific position, latch and/or perform the movement at specific speed.
  */
 - (void)moveToWithParams:(MTRClosureControlClusterMoveToParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)moveToWithCompletion:(MTRStatusCompletion)completion
@@ -8982,7 +8994,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command Calibrate
  *
- * Upon receipt, this SHALL initiate a calibration.
+ * This command is used to trigger a calibration of the device.
  */
 - (void)calibrateWithParams:(MTRClosureControlClusterCalibrateParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)calibrateWithCompletion:(MTRStatusCompletion)completion
@@ -14559,11 +14571,11 @@ MTR_PROVISIONALLY_AVAILABLE
  */
 - (void)captureSnapshotWithParams:(MTRCameraAVStreamManagementClusterCaptureSnapshotParams *)params completion:(void (^)(MTRCameraAVStreamManagementClusterCaptureSnapshotResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeMaxConcurrentVideoEncodersWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeMaxConcurrentVideoEncodersWithParams:(MTRSubscribeParams *)params
-                                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeMaxConcurrentVideoEncodersWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeMaxConcurrentEncodersWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeMaxConcurrentEncodersWithParams:(MTRSubscribeParams *)params
+                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                            reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeMaxConcurrentEncodersWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeMaxEncodedPixelRateWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeMaxEncodedPixelRateWithParams:(MTRSubscribeParams *)params
@@ -14619,11 +14631,11 @@ MTR_PROVISIONALLY_AVAILABLE
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeTwoWayTalkSupportWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeSupportedSnapshotParamsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeSupportedSnapshotParamsWithParams:(MTRSubscribeParams *)params
-                                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                              reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeSupportedSnapshotParamsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeSnapshotCapabilitiesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeSnapshotCapabilitiesWithParams:(MTRSubscribeParams *)params
+                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                           reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeSnapshotCapabilitiesWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeMaxNetworkBandwidthWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeMaxNetworkBandwidthWithParams:(MTRSubscribeParams *)params
@@ -19894,16 +19906,11 @@ typedef NS_OPTIONS(uint16_t, MTRWindowCoveringSafetyStatus) {
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRClosureControlClosureError) {
-    MTRClosureControlClosureErrorBlocked MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRClosureControlClosureErrorTemperatureLimited MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRClosureControlClosureErrorMaintenanceRequired MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTRClosureControlClosureErrorInternalInterference MTR_PROVISIONALLY_AVAILABLE = 0x03,
-} MTR_PROVISIONALLY_AVAILABLE;
-
-typedef NS_ENUM(uint8_t, MTRClosureControlLatching) {
-    MTRClosureControlLatchingLatchedAndSecured MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRClosureControlLatchingLatchedButNotSecured MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRClosureControlLatchingNotLatched MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRClosureControlClosureErrorPhysicallyBlocked MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRClosureControlClosureErrorBlockedBySensor MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRClosureControlClosureErrorTemperatureLimited MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRClosureControlClosureErrorMaintenanceRequired MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRClosureControlClosureErrorInternalInterference MTR_PROVISIONALLY_AVAILABLE = 0x04,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRClosureControlMainState) {
@@ -19924,11 +19931,6 @@ typedef NS_ENUM(uint8_t, MTRClosureControlPositioning) {
     MTRClosureControlPositioningOpenedForPedestrian MTR_PROVISIONALLY_AVAILABLE = 0x03,
     MTRClosureControlPositioningOpenedForVentilation MTR_PROVISIONALLY_AVAILABLE = 0x04,
     MTRClosureControlPositioningOpenedAtSignature MTR_PROVISIONALLY_AVAILABLE = 0x05,
-} MTR_PROVISIONALLY_AVAILABLE;
-
-typedef NS_ENUM(uint8_t, MTRClosureControlTargetLatch) {
-    MTRClosureControlTargetLatchLatch MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRClosureControlTargetLatchUnlatch MTR_PROVISIONALLY_AVAILABLE = 0x01,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRClosureControlTargetPosition) {
