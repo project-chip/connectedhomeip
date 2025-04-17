@@ -485,6 +485,11 @@ CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Build
 void ReadClient::OnActiveModeNotification()
 {
     VerifyOrDie(mpImEngine->InActiveReadClientList(this));
+
+    // Note: this API only works when issuing subscription via SendAutoResubscribeRequest. When SendAutoResubscribeRequest is
+    // called, either mEventPathParamsListSize or mAttributePathParamsListSize is not 0.
+    VerifyOrReturn(mReadPrepareParams.mEventPathParamsListSize != 0 || mReadPrepareParams.mAttributePathParamsListSize != 0);
+
     // When we reach here, the subscription definitely exceeded the liveness timeout. Just continue the unfinished resubscription
     // logic in `OnLivenessTimeoutCallback`.
     if (IsInactiveICDSubscription())
@@ -493,6 +498,20 @@ void ReadClient::OnActiveModeNotification()
         return;
     }
 
+    // If this API has been called, that means the subscription for this ReadClient is gone
+    // on the server side (because otherwise the server would not have checked in with us).
+    // Even if we think we have a live subscription, we are wrong, and should just forcibly time it
+    // out and schedule a new one.
+    if (!mIsResubscriptionScheduled)
+    {
+        // Closing will ultimately trigger ScheduleResubscription with the aReestablishCASE argument set to true, effectively
+        // rendering the session defunct.
+        Close(CHIP_ERROR_TIMEOUT);
+        return;
+    }
+
+    // If we have already detected subscription loss and are waiting to try to re-subscribe,
+    // now is a really good time to do it, since the server is listening.
     TriggerResubscribeIfScheduled("check-in message");
 }
 
@@ -504,10 +523,11 @@ void ReadClient::OnPeerTypeChange(PeerType aType)
 
     ChipLogProgress(DataManagement, "Peer is now %s LIT ICD.", mIsPeerLIT ? "a" : "not a");
 
-    // If the peer is no longer LIT, try to wake up the subscription and do resubscribe when necessary.
-    if (!mIsPeerLIT)
+    // If the peer is no longer LIT and we were waiting for a check-in to try to resubscribe,
+    // just try to resubscribe now, because a SIT is not going to send a check-in.
+    if (!mIsPeerLIT && IsInactiveICDSubscription())
     {
-        OnActiveModeNotification();
+        TriggerResubscriptionForLivenessTimeout(CHIP_ERROR_TIMEOUT);
     }
 }
 
@@ -989,12 +1009,15 @@ CHIP_ERROR ReadClient::ComputeLivenessCheckTimerTimeout(System::Clock::Timeout *
     // So recompute the round-trip timeout directly.  Assume MRP, since in practice that is likely what is happening.
     auto & peerMRPConfig = mReadPrepareParams.mSessionHolder->GetRemoteMRPConfig();
     // Peer will assume we are idle (hence we pass kZero to GetMessageReceiptTimeout()), but will assume we treat it as active
-    // for the response, so to match the retransmission timeout computation for the message back to the peeer, we should treat
-    // it as active.
-    auto roundTripTimeout = mReadPrepareParams.mSessionHolder->GetMessageReceiptTimeout(System::Clock::kZero) +
+    // for the response, so to match the retransmission timeout computation for the message back to the peer, we should treat
+    // it as active and handling non-initial message, isFirstMessageOnExchange needs to be set as false for
+    // GetRetransmissionTimeout.
+    auto roundTripTimeout =
+        mReadPrepareParams.mSessionHolder->GetMessageReceiptTimeout(System::Clock::kZero, true /*isFirstMessageOnExchange*/) +
         kExpectedIMProcessingTime +
         GetRetransmissionTimeout(peerMRPConfig.mActiveRetransTimeout, peerMRPConfig.mIdleRetransTimeout,
-                                 System::SystemClock().GetMonotonicTimestamp(), peerMRPConfig.mActiveThresholdTime);
+                                 System::SystemClock().GetMonotonicTimestamp(), peerMRPConfig.mActiveThresholdTime,
+                                 false /*isFirstMessageOnExchange*/);
     *aTimeout = System::Clock::Seconds16(mMaxInterval) + roundTripTimeout;
     return CHIP_NO_ERROR;
 }
@@ -1260,6 +1283,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadP
                                                 Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse)));
 
     mPeer = aReadPrepareParams.mSessionHolder->AsSecureSession()->GetPeer();
+
     MoveToState(ClientState::AwaitingInitialReport);
 
     return CHIP_NO_ERROR;
