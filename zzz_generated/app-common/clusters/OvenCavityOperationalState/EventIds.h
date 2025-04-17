@@ -14,9 +14,11 @@ namespace Events {
 namespace OperationalError {
 inline constexpr EventId Id = 0x00000000;
 } // namespace OperationalError
+
 namespace OperationCompletion {
 inline constexpr EventId Id = 0x00000001;
 } // namespace OperationCompletion
+
 } // namespace Events
 } // namespace OvenCavityOperationalState
 } // namespace Clusters

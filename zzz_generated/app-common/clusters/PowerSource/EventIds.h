@@ -14,12 +14,15 @@ namespace Events {
 namespace WiredFaultChange {
 inline constexpr EventId Id = 0x00000000;
 } // namespace WiredFaultChange
+
 namespace BatFaultChange {
 inline constexpr EventId Id = 0x00000001;
 } // namespace BatFaultChange
+
 namespace BatChargeFaultChange {
 inline constexpr EventId Id = 0x00000002;
 } // namespace BatChargeFaultChange
+
 } // namespace Events
 } // namespace PowerSource
 } // namespace Clusters

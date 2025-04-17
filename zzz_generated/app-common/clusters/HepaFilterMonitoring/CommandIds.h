@@ -14,6 +14,7 @@ namespace Commands {
 namespace ResetCondition {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace ResetCondition
+
 } // namespace Commands
 } // namespace HepaFilterMonitoring
 } // namespace Clusters

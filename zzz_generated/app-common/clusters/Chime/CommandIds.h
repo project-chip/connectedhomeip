@@ -14,6 +14,7 @@ namespace Commands {
 namespace PlayChimeSound {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace PlayChimeSound
+
 } // namespace Commands
 } // namespace Chime
 } // namespace Clusters

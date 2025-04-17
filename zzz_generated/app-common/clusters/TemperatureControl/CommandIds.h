@@ -14,6 +14,7 @@ namespace Commands {
 namespace SetTemperature {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace SetTemperature
+
 } // namespace Commands
 } // namespace TemperatureControl
 } // namespace Clusters

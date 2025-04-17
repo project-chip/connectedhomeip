@@ -14,9 +14,11 @@ namespace Commands {
 namespace Identify {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace Identify
+
 namespace TriggerEffect {
 inline constexpr CommandId Id = 0x00000040;
 } // namespace TriggerEffect
+
 } // namespace Commands
 } // namespace Identify
 } // namespace Clusters

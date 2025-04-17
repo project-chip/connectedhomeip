@@ -14,12 +14,15 @@ namespace Events {
 namespace StateTransition {
 inline constexpr EventId Id = 0x00000000;
 } // namespace StateTransition
+
 namespace VersionApplied {
 inline constexpr EventId Id = 0x00000001;
 } // namespace VersionApplied
+
 namespace DownloadError {
 inline constexpr EventId Id = 0x00000002;
 } // namespace DownloadError
+
 } // namespace Events
 } // namespace OtaSoftwareUpdateRequestor
 } // namespace Clusters

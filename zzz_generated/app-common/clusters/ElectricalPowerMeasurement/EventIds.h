@@ -14,6 +14,7 @@ namespace Events {
 namespace MeasurementPeriodRanges {
 inline constexpr EventId Id = 0x00000000;
 } // namespace MeasurementPeriodRanges
+
 } // namespace Events
 } // namespace ElectricalPowerMeasurement
 } // namespace Clusters

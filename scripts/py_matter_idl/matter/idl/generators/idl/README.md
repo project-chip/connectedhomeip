@@ -28,5 +28,5 @@ parsed data:
 ```
 ./scripts/py_matter_idl/matter/idl/zapxml_parser.py \
     ./src/app/zap-templates/zcl/data-model/chip/onoff-cluster.xml \
-    ./src/app/zap-templates/zcl/data-model/chip/global-attributes.xm
+    ./src/app/zap-templates/zcl/data-model/chip/global-attributes.xml
 ```

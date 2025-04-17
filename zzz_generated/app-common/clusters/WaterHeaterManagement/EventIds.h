@@ -14,9 +14,11 @@ namespace Events {
 namespace BoostStarted {
 inline constexpr EventId Id = 0x00000000;
 } // namespace BoostStarted
+
 namespace BoostEnded {
 inline constexpr EventId Id = 0x00000001;
 } // namespace BoostEnded
+
 } // namespace Events
 } // namespace WaterHeaterManagement
 } // namespace Clusters

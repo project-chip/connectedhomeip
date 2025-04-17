@@ -15,6 +15,7 @@ namespace Events {
 namespace {{event.name | name_for_id_usage}} {
 inline constexpr EventId Id = {{ "0x%08X" | format(event.code)}};
 } // namespace {{event.name | name_for_id_usage}}
+
 {% endfor -%}
 } // namespace Events
 } // namespace {{cluster.name}}

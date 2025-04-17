@@ -14,9 +14,11 @@ namespace Events {
 namespace ValveStateChanged {
 inline constexpr EventId Id = 0x00000000;
 } // namespace ValveStateChanged
+
 namespace ValveFault {
 inline constexpr EventId Id = 0x00000001;
 } // namespace ValveFault
+
 } // namespace Events
 } // namespace ValveConfigurationAndControl
 } // namespace Clusters

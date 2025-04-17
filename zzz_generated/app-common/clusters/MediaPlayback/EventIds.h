@@ -14,6 +14,7 @@ namespace Events {
 namespace StateChanged {
 inline constexpr EventId Id = 0x00000000;
 } // namespace StateChanged
+
 } // namespace Events
 } // namespace MediaPlayback
 } // namespace Clusters

@@ -286,12 +286,12 @@ public:
     void SetHandleCommands(bool handle) { mHandleCommand = handle; }
 
     CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                         DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder) override
+                                         ReadOnlyBuffer<DataModel::AcceptedCommandEntry> & builder) override
     {
         return builder.ReferenceExisting({ mAccepted.data(), mAccepted.size() });
     }
 
-    CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, DataModel::ListBuilder<CommandId> & builder) override
+    CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, ReadOnlyBuffer<CommandId> & builder) override
     {
         VerifyOrReturnError(mOverrideGenerated, CHIP_ERROR_NOT_IMPLEMENTED);
         return builder.AppendElements({ mGenerated.data(), mGenerated.size() });

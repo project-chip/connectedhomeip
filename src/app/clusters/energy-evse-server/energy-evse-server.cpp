@@ -183,7 +183,7 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeVal
 
 // CommandHandlerInterface
 CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                               DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
+                                               ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Commands;
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(7));

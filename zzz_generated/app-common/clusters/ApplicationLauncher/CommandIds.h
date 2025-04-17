@@ -14,15 +14,19 @@ namespace Commands {
 namespace LaunchApp {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace LaunchApp
+
 namespace StopApp {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace StopApp
+
 namespace HideApp {
 inline constexpr CommandId Id = 0x00000002;
 } // namespace HideApp
+
 namespace LauncherResponse {
 inline constexpr CommandId Id = 0x00000003;
 } // namespace LauncherResponse
+
 } // namespace Commands
 } // namespace ApplicationLauncher
 } // namespace Clusters

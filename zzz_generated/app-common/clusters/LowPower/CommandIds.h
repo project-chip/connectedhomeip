@@ -14,6 +14,7 @@ namespace Commands {
 namespace Sleep {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace Sleep
+
 } // namespace Commands
 } // namespace LowPower
 } // namespace Clusters

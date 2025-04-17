@@ -21,13 +21,12 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/data-model-provider/MetadataList.h>
-#include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model/Decode.h>
 #include <app/data-model/List.h> // So we can encode lists
 #include <clusters/MetadataBridge.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Iterators.h>
+#include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/SplitLambda.h>
 
 namespace chip {
@@ -126,7 +125,7 @@ public:
      * list.
      */
     virtual CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                                 DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
+                                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
@@ -150,7 +149,7 @@ public:
      * This is used by callbacks that just look for a particular value in the
      * list.
      */
-    virtual CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, DataModel::ListBuilder<CommandId> & builder)
+    virtual CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, ReadOnlyBufferBuilder<CommandId> & builder)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
@@ -255,7 +254,7 @@ class CommandHandlerInterfaceShim : public CommandHandlerInterface
 
     // Implements new interface
     CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                         DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder) override
+                                         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override
     {
         size_t commandCount = 0;
         CHIP_ERROR err      = CHIP_NO_ERROR;
@@ -290,7 +289,7 @@ class CommandHandlerInterfaceShim : public CommandHandlerInterface
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
-    CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, DataModel::ListBuilder<CommandId> & builder) override
+    CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, ReadOnlyBufferBuilder<CommandId> & builder) override
     {
         size_t commandCount = 0;
         CHIP_ERROR err      = CHIP_NO_ERROR;

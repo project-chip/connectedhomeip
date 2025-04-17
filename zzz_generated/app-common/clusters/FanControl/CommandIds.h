@@ -14,6 +14,7 @@ namespace Commands {
 namespace Step {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace Step
+
 } // namespace Commands
 } // namespace FanControl
 } // namespace Clusters

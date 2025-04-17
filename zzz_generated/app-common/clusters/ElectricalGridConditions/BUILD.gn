@@ -22,7 +22,9 @@ source_set("enums") {
     "Enums.h",
     "EnumsCheck.h",
   ]
-  deps = [ "${chip_root}/zzz_generated/app-common/clusters/shared:enums" ]
+  deps = [
+    "${chip_root}/zzz_generated/app-common/clusters/shared:enums",
+  ]
 }
 
 source_set("headers") {
@@ -81,9 +83,9 @@ source_set("metadata") {
 
 source_set("ElectricalGridConditions") {
   public_deps = [
-    ":elements",
-    ":enums",
     ":ids",
     ":metadata",
+    ":enums",
+    ":elements",
   ]
 }

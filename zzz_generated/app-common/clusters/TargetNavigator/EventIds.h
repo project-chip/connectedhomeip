@@ -14,6 +14,7 @@ namespace Events {
 namespace TargetUpdated {
 inline constexpr EventId Id = 0x00000000;
 } // namespace TargetUpdated
+
 } // namespace Events
 } // namespace TargetNavigator
 } // namespace Clusters

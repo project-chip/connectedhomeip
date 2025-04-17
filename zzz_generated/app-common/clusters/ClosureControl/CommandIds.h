@@ -14,12 +14,15 @@ namespace Commands {
 namespace Stop {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace Stop
+
 namespace MoveTo {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace MoveTo
+
 namespace Calibrate {
 inline constexpr CommandId Id = 0x00000002;
 } // namespace Calibrate
+
 } // namespace Commands
 } // namespace ClosureControl
 } // namespace Clusters

@@ -188,7 +188,7 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
 
 // List the commands supported by this instance.
 CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                               DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
+                                               ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace ResourceMonitoring::Commands;
 

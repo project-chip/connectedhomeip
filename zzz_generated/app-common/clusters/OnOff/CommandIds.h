@@ -14,21 +14,27 @@ namespace Commands {
 namespace Off {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace Off
+
 namespace On {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace On
+
 namespace Toggle {
 inline constexpr CommandId Id = 0x00000002;
 } // namespace Toggle
+
 namespace OffWithEffect {
 inline constexpr CommandId Id = 0x00000040;
 } // namespace OffWithEffect
+
 namespace OnWithRecallGlobalScene {
 inline constexpr CommandId Id = 0x00000041;
 } // namespace OnWithRecallGlobalScene
+
 namespace OnWithTimedOff {
 inline constexpr CommandId Id = 0x00000042;
 } // namespace OnWithTimedOff
+
 } // namespace Commands
 } // namespace OnOff
 } // namespace Clusters

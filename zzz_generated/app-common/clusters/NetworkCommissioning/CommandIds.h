@@ -14,36 +14,47 @@ namespace Commands {
 namespace ScanNetworks {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace ScanNetworks
+
 namespace AddOrUpdateWiFiNetwork {
 inline constexpr CommandId Id = 0x00000002;
 } // namespace AddOrUpdateWiFiNetwork
+
 namespace AddOrUpdateThreadNetwork {
 inline constexpr CommandId Id = 0x00000003;
 } // namespace AddOrUpdateThreadNetwork
+
 namespace RemoveNetwork {
 inline constexpr CommandId Id = 0x00000004;
 } // namespace RemoveNetwork
+
 namespace ConnectNetwork {
 inline constexpr CommandId Id = 0x00000006;
 } // namespace ConnectNetwork
+
 namespace ReorderNetwork {
 inline constexpr CommandId Id = 0x00000008;
 } // namespace ReorderNetwork
+
 namespace QueryIdentity {
 inline constexpr CommandId Id = 0x00000009;
 } // namespace QueryIdentity
+
 namespace ScanNetworksResponse {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace ScanNetworksResponse
+
 namespace NetworkConfigResponse {
 inline constexpr CommandId Id = 0x00000005;
 } // namespace NetworkConfigResponse
+
 namespace ConnectNetworkResponse {
 inline constexpr CommandId Id = 0x00000007;
 } // namespace ConnectNetworkResponse
+
 namespace QueryIdentityResponse {
 inline constexpr CommandId Id = 0x0000000A;
 } // namespace QueryIdentityResponse
+
 } // namespace Commands
 } // namespace NetworkCommissioning
 } // namespace Clusters

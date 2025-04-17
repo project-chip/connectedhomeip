@@ -14,12 +14,15 @@ namespace Events {
 namespace Disconnection {
 inline constexpr EventId Id = 0x00000000;
 } // namespace Disconnection
+
 namespace AssociationFailure {
 inline constexpr EventId Id = 0x00000001;
 } // namespace AssociationFailure
+
 namespace ConnectionStatus {
 inline constexpr EventId Id = 0x00000002;
 } // namespace ConnectionStatus
+
 } // namespace Events
 } // namespace WiFiNetworkDiagnostics
 } // namespace Clusters

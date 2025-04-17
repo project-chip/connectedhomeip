@@ -14,6 +14,7 @@ namespace Commands {
 namespace ResetWatermarks {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace ResetWatermarks
+
 } // namespace Commands
 } // namespace SoftwareDiagnostics
 } // namespace Clusters

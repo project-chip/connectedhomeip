@@ -63,7 +63,7 @@ public:
     void InvokeCommand(HandlerContext & handlerContext) override;
 
     CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                         DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+                                         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 };
 
 SoftwareDiagnosticsAttrAccess gAttrAccess;
@@ -171,7 +171,7 @@ void SoftwareDiagnosticsCommandHandler::InvokeCommand(HandlerContext & handlerCo
 
 CHIP_ERROR
 SoftwareDiagnosticsCommandHandler::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                                             DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
+                                                             ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Commands;
     using Priv = Access::Privilege;

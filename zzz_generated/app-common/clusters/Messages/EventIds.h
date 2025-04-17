@@ -14,12 +14,15 @@ namespace Events {
 namespace MessageQueued {
 inline constexpr EventId Id = 0x00000000;
 } // namespace MessageQueued
+
 namespace MessagePresented {
 inline constexpr EventId Id = 0x00000001;
 } // namespace MessagePresented
+
 namespace MessageComplete {
 inline constexpr EventId Id = 0x00000002;
 } // namespace MessageComplete
+
 } // namespace Events
 } // namespace Messages
 } // namespace Clusters

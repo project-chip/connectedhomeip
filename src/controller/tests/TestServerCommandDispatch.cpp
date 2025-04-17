@@ -70,7 +70,7 @@ public:
 private:
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext & handlerContext) final;
     CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                         DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder) final;
+                                         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) final;
 
     bool mOverrideAcceptedCommands = false;
     bool mClaimNoCommands          = false;
@@ -106,7 +106,7 @@ void TestClusterCommandHandler::InvokeCommand(chip::app::CommandHandlerInterface
 }
 
 CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                                                DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
+                                                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Clusters::UnitTesting::Commands;
     using Priv = Access::Privilege;

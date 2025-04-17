@@ -14,15 +14,19 @@ namespace Commands {
 namespace GetDetailedPriceRequest {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace GetDetailedPriceRequest
+
 namespace GetDetailedForecastRequest {
 inline constexpr CommandId Id = 0x00000002;
 } // namespace GetDetailedForecastRequest
+
 namespace GetDetailedPriceResponse {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace GetDetailedPriceResponse
+
 namespace GetDetailedForecastResponse {
 inline constexpr CommandId Id = 0x00000003;
 } // namespace GetDetailedForecastResponse
+
 } // namespace Commands
 } // namespace CommodityPrice
 } // namespace Clusters

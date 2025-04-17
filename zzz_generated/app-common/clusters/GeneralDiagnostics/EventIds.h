@@ -14,15 +14,19 @@ namespace Events {
 namespace HardwareFaultChange {
 inline constexpr EventId Id = 0x00000000;
 } // namespace HardwareFaultChange
+
 namespace RadioFaultChange {
 inline constexpr EventId Id = 0x00000001;
 } // namespace RadioFaultChange
+
 namespace NetworkFaultChange {
 inline constexpr EventId Id = 0x00000002;
 } // namespace NetworkFaultChange
+
 namespace BootReason {
 inline constexpr EventId Id = 0x00000003;
 } // namespace BootReason
+
 } // namespace Events
 } // namespace GeneralDiagnostics
 } // namespace Clusters

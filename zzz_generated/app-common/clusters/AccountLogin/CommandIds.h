@@ -14,15 +14,19 @@ namespace Commands {
 namespace GetSetupPIN {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace GetSetupPIN
+
 namespace Login {
 inline constexpr CommandId Id = 0x00000002;
 } // namespace Login
+
 namespace Logout {
 inline constexpr CommandId Id = 0x00000003;
 } // namespace Logout
+
 namespace GetSetupPINResponse {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace GetSetupPINResponse
+
 } // namespace Commands
 } // namespace AccountLogin
 } // namespace Clusters
