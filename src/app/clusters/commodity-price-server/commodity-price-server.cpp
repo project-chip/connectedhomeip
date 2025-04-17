@@ -256,31 +256,35 @@ void Instance::FreeCurrentPrice(const DataModel::Nullable<Structs::CommodityPric
 const DataModel::List<const Structs::CommodityPriceStruct::Type> *
 Instance::GetDetailedForecastRequest(chip::BitMask<CommodityPriceDetailBitmap> details)
 {
-    // Based on the bitmap we make a copy of mPriceForecast with/without the .description and/or .components
-    DataModel::List<const Structs::CommodityPriceStruct::Type> * pPriceForecast = nullptr;
 
-    // Make a copy of the mCurrentPrice
-    pPriceForecast = new DataModel::List<const Structs::CommodityPriceStruct::Type>(mPriceForecast);
+    // Allocate backing storage for the copy
+    auto * buffer = new Structs::CommodityPriceStruct::Type[kMaxForecastEntries];
 
-    if (!pPriceForecast->empty())
+    size_t count = 0;
+
+    for (const auto & srcPrice : mPriceForecast)
     {
-        for (chip::Span<const Structs::CommodityPriceStruct::Type>::pointer iter = pPriceForecast->begin();
-             iter != pPriceForecast->end(); iter++)
+        if (count >= kMaxForecastEntries)
+            break; // Avoid overflow
+
+        Structs::CommodityPriceStruct::Type copy = srcPrice;
+
+        if (!details.Has(CommodityPriceDetailBitmap::kComponents))
         {
-
-            if (!details.Has(CommodityPriceDetailBitmap::kComponents))
-            {
-                // Remove the components
-                // iter->components.ClearValue();
-            }
-
-            if (!details.Has(CommodityPriceDetailBitmap::kDescription))
-            {
-                // Remove the description
-                // iter->description.ClearValue();
-            }
+            copy.components.ClearValue();
         }
+
+        if (!details.Has(CommodityPriceDetailBitmap::kDescription))
+        {
+            copy.description.ClearValue();
+        }
+
+        buffer[count++] = copy;
     }
+
+    // Now wrap in Span + List
+    auto * pPriceForecast = new DataModel::List<const Structs::CommodityPriceStruct::Type>(
+        chip::Span<Structs::CommodityPriceStruct::Type>(buffer, count));
 
     return pPriceForecast;
 }

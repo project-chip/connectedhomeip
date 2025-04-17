@@ -77,7 +77,10 @@ CHIP_ERROR CommodityPriceInit(EndpointId endpointId)
         return err;
     }
 
-    return CHIP_NO_ERROR;
+    // Call example application initialisation to fill in required data
+    err = gCommodityPriceInstance->AppInit();
+
+    return err;
 }
 
 CHIP_ERROR CommodityPriceShutdown()

@@ -34,7 +34,7 @@ PriceForecastMemMgr::PriceForecastMemMgr() : mPriceEntryIdx(0), mNumPriceCompone
 PriceForecastMemMgr::~PriceForecastMemMgr()
 {
     // Free all memory allocated for the price components
-    for (uint16_t idx = 0; idx < kMaxCommodityPriceEntries; idx++)
+    for (uint16_t idx = 0; idx < kMaxForecastEntries; idx++)
     {
         if (mpListOfPriceEntries[idx] != nullptr)
         {
@@ -49,7 +49,7 @@ void PriceForecastMemMgr::PreparePriceEntry(uint16_t priceEntryIdx)
     mNumPriceComponents = 0;
 
     // Should not occur but just to be safe
-    if (priceEntryIdx >= kMaxCommodityPriceEntries)
+    if (priceEntryIdx >= kMaxForecastEntries)
     {
         ChipLogError(AppServer, "PreparePriceEntry bad priceEntryIdx %u", priceEntryIdx);
         return;

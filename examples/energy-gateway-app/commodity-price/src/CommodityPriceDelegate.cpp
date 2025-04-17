@@ -51,6 +51,17 @@ void CommodityPriceInstance::Shutdown()
     Instance::Shutdown();
 }
 
+CHIP_ERROR CommodityPriceInstance::AppInit()
+{
+    ReturnErrorOnFailure(Instance::SetCurrency(currencyGBP));
+    ReturnErrorOnFailure(Instance::SetTariffUnit(TariffUnitEnum::kKWh));
+
+    /* Manufacturers can optionally populate the CurrentPrice and
+       Forecast attributes here, or set up some logic to do this periodically */
+
+    return CHIP_NO_ERROR;
+}
+
 CommodityPriceDelegate::CommodityPriceDelegate() {}
 
 //     Instance::SetTariffUnit(TariffUnitEnum::kKWh);

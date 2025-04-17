@@ -157,7 +157,7 @@ public:
     uint16_t GetNumPriceComponents() const;
 
 private:
-    CommodityPrice::Structs::CommodityPriceComponentStruct::Type * mpListOfPriceEntries[kMaxCommodityPriceEntries];
+    CommodityPrice::Structs::CommodityPriceComponentStruct::Type * mpListOfPriceEntries[kMaxForecastEntries];
     CommodityPrice::Structs::CommodityPriceComponentStruct::Type mPriceComponents[kMaxComponentsPerPriceEntry];
     uint16_t mPriceEntryIdx;
     uint16_t mNumPriceComponents;

@@ -35,12 +35,6 @@ public:
     ~CommodityPriceDelegate() = default;
 
     // Attribute Accessors
-    // Globals::TariffUnitEnum GetTariffUnit() override { return mTariffUnit; }
-    // Globals::Structs::CurrencyStruct::Type GetCurrency() override { return mCurrencyStruct; }
-    // // TODO think about a better way to do this in a delegate without needing mCurrentPrice copy
-    // const DataModel::Nullable<Structs::CommodityPriceStruct::Type> & GetCurrentPrice() override { return mCurrentPrice; }
-    // const DataModel::List<const Structs::CommodityPriceStruct::Type> & GetPriceForecast(CommodityPriceDetailBitmap bitmap)
-    // override;
 
     /* These functions are called by the ReadAttribute handler to iterate through lists
      * The cluster server will call Start<Type>Read to allow the delegate to create a temporary
@@ -63,7 +57,7 @@ private:
     PriceForecastMemMgr mPriceForecastMemMgr;
 
     // actual storage of price entries as an array
-    Structs::CommodityPriceStruct::Type mPriceEntryArray[kMaxCommodityPriceEntries];
+    Structs::CommodityPriceStruct::Type mPriceEntryArray[kMaxForecastEntries];
 };
 
 class CommodityPriceInstance : public Instance
@@ -82,6 +76,7 @@ public:
 
     CHIP_ERROR Init();
     void Shutdown();
+    CHIP_ERROR AppInit();
 
     CommodityPriceDelegate * GetDelegate() { return mDelegate; };
 
