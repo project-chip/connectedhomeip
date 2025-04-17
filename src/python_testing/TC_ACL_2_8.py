@@ -260,37 +260,34 @@ class TC_ACL_2_8(MatterBaseTest):
 
         self.step(10)
         # TH2 reads AccessControlEntryChanged events
-        try:
-            events = await self.th2.ReadEvent(
-                self.dut_node_id,
-                [(0, Clusters.AccessControl.Events.AccessControlEntryChanged)],
-                fabricFiltered=True
-            )
+        events = await self.th2.ReadEvent(
+            self.dut_node_id,
+            [(0, Clusters.AccessControl.Events.AccessControlEntryChanged)],
+            fabricFiltered=True
+        )
 
-            asserts.assert_equal(
-                len(events), 2, "Should have exactly 2 events")
+        asserts.assert_equal(
+            len(events), 2, "Should have exactly 2 events")
 
-            # Verify event contents match expected sequence
-            self._verify_acl_event(
-                events[0],
-                None,
-                0,
-                Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
-                self.th2.nodeId,
-                f2)
+        # Verify event contents match expected sequence
+        self._verify_acl_event(
+            events[0],
+            None,
+            0,
+            Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
+            self.th2.nodeId,
+            f2)
 
-            self._verify_acl_event(
-                events[1], self.th2.nodeId, None, Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged, [
-                    self.th2.nodeId, 2222], f2)
+        self._verify_acl_event(
+            events[1], self.th2.nodeId, None, Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged, [
+                self.th2.nodeId, 2222], f2)
 
-            for event in events:
-                asserts.assert_not_equal(
-                    event.Data.fabricIndex,
-                    f1,
-                    "Should not contain event with FabricIndex F1")
+        for event in events:
+            asserts.assert_not_equal(
+                event.Data.fabricIndex,
+                f1,
+                "Should not contain event with FabricIndex F1")
 
-        except Exception as e:
-            asserts.fail(f"Failed to read events: {e}")
 
 
 if __name__ == "__main__":
