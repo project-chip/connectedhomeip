@@ -29,6 +29,17 @@ logger = logging.getLogger(__name__)
 
 
 class TC_CNET_4_12(MatterBaseTest):
+    """
+    This test verifies the DUT connectivity to the Thread network using the ConnectNetwork Command, 
+    including validation for two Thread operational datasets.
+
+    Requires the following PIXITs:
+    - PIXIT.CNET.ENDPOINT_THREAD: Required endpoint for the Thread network.
+    - PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET: First operational dataset for the Thread network.
+    - PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET: Second operational dataset for the Thread network.
+
+    If any of the above PIXITs are missing, the test will raise an error.
+    """
 
     CLUSTER_CNET = Clusters.NetworkCommissioning
     CLUSTER_DESC = Clusters.Descriptor
