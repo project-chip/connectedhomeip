@@ -30,8 +30,8 @@ namespace {
 static constexpr size_t kOtaProviderMaxClusterCount =
     OtaSoftwareUpdateProvider::StaticApplicationConfig::kFixedClusterConfig.size() + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-std::array<OtaProviderServer, kOtaProviderMaxClusterCount> mClusters;
-std::array<ServerClusterRegistration, kOtaProviderMaxClusterCount> mRegistrations;
+OtaProviderServer mClusters[kOtaProviderMaxClusterCount];
+ServerClusterRegistration mRegistrations[kOtaProviderMaxClusterCount];
 
 // Find the 0-based array index corresponding to the given endpoint id.
 // Log an error if not found.
@@ -83,7 +83,7 @@ void emberAfOtaSoftwareUpdateProviderClusterShutdownCallback(chip::EndpointId en
 
 void MatterOtaSoftwareUpdateProviderPluginServerInitCallback()
 {
-    for (unsigned i = 0; i < mClusters.size(); i++)
+    for (unsigned i = 0; i < kOtaProviderMaxClusterCount; i++)
     {
         mRegistrations[i].serverClusterInterface = &mClusters[i];
     }
