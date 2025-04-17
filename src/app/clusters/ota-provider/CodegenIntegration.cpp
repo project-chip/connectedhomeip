@@ -50,7 +50,7 @@ bool findEndpoint(chip::EndpointId endpointId, uint16_t & outArrayIndex)
 
 } // namespace
 
-void emberAfOtaSoftwareUpdateProviderClusterServerInitCallback(chip::EndpointId endpointId)
+void emberAfOtaSoftwareUpdateProviderClusterInitCallback(chip::EndpointId endpointId)
 {
     uint16_t arrayIndex = 0;
     if (!findEndpoint(endpointId, arrayIndex))
