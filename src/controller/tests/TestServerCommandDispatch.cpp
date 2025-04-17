@@ -57,7 +57,7 @@ ResponseDirective responseDirective;
 class TestClusterCommandHandler : public chip::app::CommandHandlerInterface
 {
 public:
-    TestClusterCommandHandler() : chip::app::CommandHandlerInterface(Optional<EndpointId>::Missing(), Clusters::UnitTesting::Id)
+    TestClusterCommandHandler() : chip::app::CommandHandlerInterfaceB(Optional<EndpointId>::Missing(), Clusters::UnitTesting::Id)
     {
         CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this);
     }
@@ -68,7 +68,7 @@ public:
     void ClaimNoCommands() { mClaimNoCommands = true; }
 
 private:
-    void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext & handlerContext) final;
+    void InvokeCommand(chip::app::CommandHandlerInterfaceB::HandlerContext & handlerContext) final;
     CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
                                          ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) final;
 
@@ -76,10 +76,10 @@ private:
     bool mClaimNoCommands          = false;
 };
 
-void TestClusterCommandHandler::InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext & handlerContext)
+void TestClusterCommandHandler::InvokeCommand(chip::app::CommandHandlerInterfaceB::HandlerContext & handlerContext)
 {
     HandleCommand<Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::DecodableType>(
-        handlerContext, [](chip::app::CommandHandlerInterface::HandlerContext & ctx, const auto & requestPayload) {
+        handlerContext, [](chip::app::CommandHandlerInterfaceB::HandlerContext & ctx, const auto & requestPayload) {
             if (responseDirective == kSendDataResponse)
             {
                 Clusters::UnitTesting::Commands::TestStructArrayArgumentResponse::Type dataResponse;

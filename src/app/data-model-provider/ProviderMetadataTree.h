@@ -87,7 +87,7 @@ public:
     /// This is a workaround function as we cannot notify the attribute change to the data model provider. The provider
     /// should own its data and versions.
     ///
-    /// TODO: We should remove this function when the AttributeAccessInterface/CommandHandlerInterface is able to report
+    /// TODO: We should remove this function when the AttributeAccessInterface/CommandHandlerInterfaceB is able to report
     /// the attribute changes.
     virtual void Temporary_ReportAttributeChanged(const AttributePathParams & path) = 0;
 

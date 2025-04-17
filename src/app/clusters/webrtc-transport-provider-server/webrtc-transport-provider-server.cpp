@@ -61,7 +61,7 @@ namespace WebRTCTransportProvider {
 
 WebRTCTransportProviderServer::WebRTCTransportProviderServer(Delegate & delegate, EndpointId endpointId) :
     AttributeAccessInterface(MakeOptional(endpointId), WebRTCTransportProvider::Id),
-    CommandHandlerInterface(MakeOptional(endpointId), WebRTCTransportProvider::Id), mDelegate(delegate)
+    CommandHandlerInterfaceB(MakeOptional(endpointId), WebRTCTransportProvider::Id), mDelegate(delegate)
 {}
 
 WebRTCTransportProviderServer::~WebRTCTransportProviderServer()
@@ -112,27 +112,27 @@ void WebRTCTransportProviderServer::InvokeCommand(HandlerContext & ctx)
     switch (ctx.mRequestPath.mCommandId)
     {
     case Commands::SolicitOffer::Id:
-        CommandHandlerInterface::HandleCommand<Commands::SolicitOffer::DecodableType>(
+        CommandHandlerInterfaceB::HandleCommand<Commands::SolicitOffer::DecodableType>(
             ctx, [this](HandlerContext & subCtx, const auto & req) { HandleSolicitOffer(subCtx, req); });
         break;
 
     case Commands::ProvideOffer::Id:
-        CommandHandlerInterface::HandleCommand<Commands::ProvideOffer::DecodableType>(
+        CommandHandlerInterfaceB::HandleCommand<Commands::ProvideOffer::DecodableType>(
             ctx, [this](HandlerContext & subCtx, const auto & req) { HandleProvideOffer(subCtx, req); });
         break;
 
     case Commands::ProvideAnswer::Id:
-        CommandHandlerInterface::HandleCommand<Commands::ProvideAnswer::DecodableType>(
+        CommandHandlerInterfaceB::HandleCommand<Commands::ProvideAnswer::DecodableType>(
             ctx, [this](HandlerContext & subCtx, const auto & req) { HandleProvideAnswer(subCtx, req); });
         break;
 
     case Commands::ProvideICECandidates::Id:
-        CommandHandlerInterface::HandleCommand<Commands::ProvideICECandidates::DecodableType>(
+        CommandHandlerInterfaceB::HandleCommand<Commands::ProvideICECandidates::DecodableType>(
             ctx, [this](HandlerContext & subCtx, const auto & req) { HandleProvideICECandidates(subCtx, req); });
         break;
 
     case Commands::EndSession::Id:
-        CommandHandlerInterface::HandleCommand<Commands::EndSession::DecodableType>(
+        CommandHandlerInterfaceB::HandleCommand<Commands::EndSession::DecodableType>(
             ctx, [this](HandlerContext & subCtx, const auto & req) { HandleEndSession(subCtx, req); });
         break;
 

@@ -29,7 +29,7 @@ CommandHandlerInterfaceRegistry & CommandHandlerInterfaceRegistry::Instance()
 void CommandHandlerInterfaceRegistry::UnregisterAllHandlers()
 {
 
-    CommandHandlerInterface * handlerIter = mCommandHandlerList;
+    CommandHandlerInterfaceB * handlerIter = mCommandHandlerList;
 
     //
     // Walk our list of command handlers and de-register them, before finally
@@ -37,7 +37,7 @@ void CommandHandlerInterfaceRegistry::UnregisterAllHandlers()
     //
     while (handlerIter)
     {
-        CommandHandlerInterface * nextHandler = handlerIter->GetNext();
+        CommandHandlerInterfaceB * nextHandler = handlerIter->GetNext();
         handlerIter->SetNext(nullptr);
         handlerIter = nextHandler;
     }
@@ -45,7 +45,7 @@ void CommandHandlerInterfaceRegistry::UnregisterAllHandlers()
     mCommandHandlerList = nullptr;
 }
 
-CHIP_ERROR CommandHandlerInterfaceRegistry::RegisterCommandHandler(CommandHandlerInterface * handler)
+CHIP_ERROR CommandHandlerInterfaceRegistry::RegisterCommandHandler(CommandHandlerInterfaceB * handler)
 {
     VerifyOrReturnError(handler != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -66,7 +66,7 @@ CHIP_ERROR CommandHandlerInterfaceRegistry::RegisterCommandHandler(CommandHandle
 
 void CommandHandlerInterfaceRegistry::UnregisterAllCommandHandlersForEndpoint(EndpointId endpointId)
 {
-    CommandHandlerInterface * prev = nullptr;
+    CommandHandlerInterfaceB * prev = nullptr;
 
     for (auto * cur = mCommandHandlerList; cur;)
     {
@@ -95,10 +95,10 @@ void CommandHandlerInterfaceRegistry::UnregisterAllCommandHandlersForEndpoint(En
     }
 }
 
-CHIP_ERROR CommandHandlerInterfaceRegistry::UnregisterCommandHandler(CommandHandlerInterface * handler)
+CHIP_ERROR CommandHandlerInterfaceRegistry::UnregisterCommandHandler(CommandHandlerInterfaceB * handler)
 {
     VerifyOrReturnError(handler != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    CommandHandlerInterface * prev = nullptr;
+    CommandHandlerInterfaceB * prev = nullptr;
 
     for (auto * cur = mCommandHandlerList; cur; cur = cur->GetNext())
     {
@@ -124,7 +124,7 @@ CHIP_ERROR CommandHandlerInterfaceRegistry::UnregisterCommandHandler(CommandHand
     return CHIP_ERROR_KEY_NOT_FOUND;
 }
 
-CommandHandlerInterface * CommandHandlerInterfaceRegistry::GetCommandHandler(EndpointId endpointId, ClusterId clusterId)
+CommandHandlerInterfaceB * CommandHandlerInterfaceRegistry::GetCommandHandler(EndpointId endpointId, ClusterId clusterId)
 {
     for (auto * cur = mCommandHandlerList; cur; cur = cur->GetNext())
     {

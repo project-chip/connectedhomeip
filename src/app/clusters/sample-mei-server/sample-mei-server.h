@@ -46,7 +46,7 @@ public:
     // Register on all endpoints.
     SampleMeiServer() :
         AttributeAccessInterface(Optional<EndpointId>::Missing(), SampleMei::Id),
-        CommandHandlerInterface(Optional<EndpointId>(), Id)
+        CommandHandlerInterfaceB(Optional<EndpointId>(), Id)
     {}
     static SampleMeiServer & Instance();
 

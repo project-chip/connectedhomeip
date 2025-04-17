@@ -54,7 +54,7 @@ public:
     // Register for the AdministratorCommissioning cluster on all endpoints.
     AdministratorCommissioningServer() :
         AttributeAccessInterface(Optional<EndpointId>::Missing(), Clusters::AdministratorCommissioning::Id),
-        CommandHandlerInterface(Optional<EndpointId>::Missing(), Clusters::AdministratorCommissioning::Id)
+        CommandHandlerInterfaceB(Optional<EndpointId>::Missing(), Clusters::AdministratorCommissioning::Id)
     {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
@@ -174,7 +174,7 @@ exit:
 
 #ifdef ADMINISTRATOR_COMMISSIONING_ENABLE_OPEN_BASIC_COMMISSIONING_WINDOW_CMD
 void AdministratorCommissioningServer::OpenBasicCommissioningWindow(
-    CommandHandlerInterface::HandlerContext & context, const Commands::OpenBasicCommissioningWindow::DecodableType & commandData)
+    CommandHandlerInterfaceB::HandlerContext & context, const Commands::OpenBasicCommissioningWindow::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("OpenBasicCommissioningWindow", "AdministratorCommissioning");
     auto commissioningTimeout = System::Clock::Seconds16(commandData.commissioningTimeout);
@@ -217,7 +217,7 @@ exit:
 }
 #endif
 
-void AdministratorCommissioningServer::RevokeCommissioning(CommandHandlerInterface::HandlerContext & context,
+void AdministratorCommissioningServer::RevokeCommissioning(CommandHandlerInterfaceB::HandlerContext & context,
                                                            const Commands::RevokeCommissioning::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("RevokeCommissioning", "AdministratorCommissioning");

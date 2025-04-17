@@ -58,7 +58,7 @@ class SoftwareDiagnosticsCommandHandler : public CommandHandlerInterface
 {
 public:
     // Register for the SoftwareDiagnostics cluster on all endpoints.
-    SoftwareDiagnosticsCommandHandler() : CommandHandlerInterface(Optional<EndpointId>::Missing(), SoftwareDiagnostics::Id) {}
+    SoftwareDiagnosticsCommandHandler() : CommandHandlerInterfaceB(Optional<EndpointId>::Missing(), SoftwareDiagnostics::Id) {}
 
     void InvokeCommand(HandlerContext & handlerContext) override;
 

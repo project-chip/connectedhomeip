@@ -47,7 +47,7 @@ namespace ThreadBorderRouterManagement {
 
 using Protocols::InteractionModel::Status;
 
-bool ServerInstance::IsCommandOverCASESession(CommandHandlerInterface::HandlerContext & ctx)
+bool ServerInstance::IsCommandOverCASESession(CommandHandlerInterfaceB::HandlerContext & ctx)
 {
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     if (mSkipCASESessionCheck)
@@ -60,7 +60,7 @@ bool ServerInstance::IsCommandOverCASESession(CommandHandlerInterface::HandlerCo
         exchangeCtx->GetSessionHandle()->AsSecureSession()->GetSecureSessionType() == Transport::SecureSession::Type::kCASE;
 }
 
-Status ServerInstance::HandleGetDatasetRequest(CommandHandlerInterface::HandlerContext & ctx, Delegate::DatasetType type,
+Status ServerInstance::HandleGetDatasetRequest(CommandHandlerInterfaceB::HandlerContext & ctx, Delegate::DatasetType type,
                                                Thread::OperationalDataset & dataset)
 {
     VerifyOrDie(mDelegate);
@@ -74,7 +74,7 @@ Status ServerInstance::HandleGetDatasetRequest(CommandHandlerInterface::HandlerC
     return Status::Success;
 }
 
-Status ServerInstance::HandleSetActiveDatasetRequest(CommandHandlerInterface::HandlerContext & ctx,
+Status ServerInstance::HandleSetActiveDatasetRequest(CommandHandlerInterfaceB::HandlerContext & ctx,
                                                      const Commands::SetActiveDatasetRequest::DecodableType & req)
 {
     // The SetActiveDatasetRequest command SHALL be FailSafeArmed. Upon receiving this command, the Thread BR will set its
@@ -114,7 +114,7 @@ Status ServerInstance::HandleSetActiveDatasetRequest(CommandHandlerInterface::Ha
     return Status::Success;
 }
 
-Status ServerInstance::HandleSetPendingDatasetRequest(CommandHandlerInterface::HandlerContext & ctx,
+Status ServerInstance::HandleSetPendingDatasetRequest(CommandHandlerInterfaceB::HandlerContext & ctx,
                                                       const Commands::SetPendingDatasetRequest::DecodableType & req)
 {
     VerifyOrDie(mDelegate);
@@ -131,7 +131,7 @@ Status ServerInstance::HandleSetPendingDatasetRequest(CommandHandlerInterface::H
     return StatusIB(err).mStatus;
 }
 
-void AddDatasetResponse(CommandHandlerInterface::HandlerContext & ctx, Status status, const Thread::OperationalDataset & dataset)
+void AddDatasetResponse(CommandHandlerInterfaceB::HandlerContext & ctx, Status status, const Thread::OperationalDataset & dataset)
 {
     if (status != Status::Success)
     {

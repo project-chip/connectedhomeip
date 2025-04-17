@@ -285,7 +285,7 @@ enum class OptionalAttribute : uint32_t
     kStatusLightBrightness = 0x0100,
 };
 
-class CameraAVStreamMgmtServer : public CommandHandlerInterface, public AttributeAccessInterface
+class CameraAVStreamMgmtServer : public CommandHandlerInterfaceB, public AttributeAccessInterface
 {
 public:
     /**

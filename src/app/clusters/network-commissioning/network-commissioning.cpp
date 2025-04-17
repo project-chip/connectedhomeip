@@ -341,25 +341,23 @@ Instance::NetworkInstanceList Instance::sInstances;
 #endif
 
 Instance::Instance(EndpointId aEndpointId, WiFiDriver * apDelegate) :
-    CommandHandlerInterfaceShim(Optional<EndpointId>(aEndpointId), Id),
-    AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id), mEndpointId(aEndpointId),
-    mFeatureFlags(WiFiFeatures(apDelegate)), mpWirelessDriver(apDelegate), mpBaseDriver(apDelegate)
+    CommandHandlerInterface(Optional<EndpointId>(aEndpointId), Id), AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id),
+    mEndpointId(aEndpointId), mFeatureFlags(WiFiFeatures(apDelegate)), mpWirelessDriver(apDelegate), mpBaseDriver(apDelegate)
 {
     mpDriver.Set<WiFiDriver *>(apDelegate);
 }
 
 Instance::Instance(EndpointId aEndpointId, ThreadDriver * apDelegate) :
-    CommandHandlerInterfaceShim(Optional<EndpointId>(aEndpointId), Id),
-    AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id), mEndpointId(aEndpointId),
-    mFeatureFlags(Feature::kThreadNetworkInterface), mpWirelessDriver(apDelegate), mpBaseDriver(apDelegate)
+    CommandHandlerInterface(Optional<EndpointId>(aEndpointId), Id), AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id),
+    mEndpointId(aEndpointId), mFeatureFlags(Feature::kThreadNetworkInterface), mpWirelessDriver(apDelegate),
+    mpBaseDriver(apDelegate)
 {
     mpDriver.Set<ThreadDriver *>(apDelegate);
 }
 
 Instance::Instance(EndpointId aEndpointId, EthernetDriver * apDelegate) :
-    CommandHandlerInterfaceShim(Optional<EndpointId>(aEndpointId), Id),
-    AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id), mEndpointId(aEndpointId),
-    mFeatureFlags(Feature::kEthernetNetworkInterface), mpWirelessDriver(nullptr), mpBaseDriver(apDelegate)
+    CommandHandlerInterface(Optional<EndpointId>(aEndpointId), Id), AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id),
+    mEndpointId(aEndpointId), mFeatureFlags(Feature::kEthernetNetworkInterface), mpWirelessDriver(nullptr), mpBaseDriver(apDelegate)
 {}
 
 CHIP_ERROR Instance::Init()
@@ -767,7 +765,7 @@ void FillDebugTextAndNetworkIndex(Commands::NetworkConfigResponse::Type & respon
     }
 }
 
-bool CheckFailSafeArmed(CommandHandlerInterface::HandlerContext & ctx)
+bool CheckFailSafeArmed(CommandHandlerInterfaceB::HandlerContext & ctx)
 {
     auto & failSafeContext = chip::Server::GetInstance().GetFailSafeContext();
 

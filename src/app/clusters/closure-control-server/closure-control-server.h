@@ -38,7 +38,7 @@ class Interface : public AttributeAccessInterface, public CommandHandlerInterfac
 {
 public:
     Interface(EndpointId endpoint, ClusterLogic & clusterLogic) :
-        AttributeAccessInterface(Optional<EndpointId>(endpoint), Id), CommandHandlerInterface(Optional<EndpointId>(endpoint), Id),
+        AttributeAccessInterface(Optional<EndpointId>(endpoint), Id), CommandHandlerInterfaceB(Optional<EndpointId>(endpoint), Id),
         mClusterLogic(clusterLogic)
     {}
 

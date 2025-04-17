@@ -209,7 +209,7 @@ class Instance : public AttributeAccessInterface, public CommandHandlerInterface
 {
 public:
     Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature) :
-        AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterface(MakeOptional(aEndpointId), Id),
+        AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterfaceB(MakeOptional(aEndpointId), Id),
         mDelegate(aDelegate), mFeature(aFeature)
     {
         /* set the base class delegates endpointId */

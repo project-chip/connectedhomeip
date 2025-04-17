@@ -40,7 +40,7 @@ namespace app {
 namespace Clusters {
 
 ChimeServer::ChimeServer(EndpointId endpointId, ChimeDelegate & delegate) :
-    AttributeAccessInterface(MakeOptional(endpointId), Chime::Id), CommandHandlerInterface(MakeOptional(endpointId), Chime::Id),
+    AttributeAccessInterface(MakeOptional(endpointId), Chime::Id), CommandHandlerInterfaceB(MakeOptional(endpointId), Chime::Id),
     mDelegate(delegate), mSelectedChime(0), mEnabled(true)
 {
     mDelegate.SetChimeServer(this);
@@ -251,7 +251,7 @@ void ChimeServer::InvokeCommand(HandlerContext & ctx)
     switch (ctx.mRequestPath.mCommandId)
     {
     case Commands::PlayChimeSound::Id:
-        CommandHandlerInterface::HandleCommand<Commands::PlayChimeSound::DecodableType>(
+        CommandHandlerInterfaceB::HandleCommand<Commands::PlayChimeSound::DecodableType>(
             ctx, [this](HandlerContext & innerCtx, const auto & req) { HandlePlayChimeSound(innerCtx, req); });
         break;
     }

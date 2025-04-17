@@ -74,7 +74,7 @@ bool isValidJson(const char * response)
     return true;
 }
 
-void ContentAppCommandDelegate::InvokeCommand(CommandHandlerInterface::HandlerContext & handlerContext)
+void ContentAppCommandDelegate::InvokeCommand(CommandHandlerInterfaceB::HandlerContext & handlerContext)
 {
     if (handlerContext.mRequestPath.mEndpointId >= FIXED_ENDPOINT_COUNT)
     {
@@ -216,7 +216,7 @@ Status ContentAppCommandDelegate::InvokeCommand(EndpointId epId, ClusterId clust
     }
 }
 
-void ContentAppCommandDelegate::FormatResponseData(CommandHandlerInterface::HandlerContext & handlerContext, const char * response)
+void ContentAppCommandDelegate::FormatResponseData(CommandHandlerInterfaceB::HandlerContext & handlerContext, const char * response)
 {
     handlerContext.SetCommandHandled();
     Json::Reader reader;

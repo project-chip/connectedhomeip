@@ -39,7 +39,7 @@ constexpr uint8_t kDefaultPowerStepNum = 10u;
 
 class Delegate;
 
-class Instance : public CommandHandlerInterface, public AttributeAccessInterface
+class Instance : public CommandHandlerInterfaceB, public AttributeAccessInterface
 {
 public:
     /**

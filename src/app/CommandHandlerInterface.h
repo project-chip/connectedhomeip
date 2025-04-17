@@ -40,7 +40,7 @@ namespace app {
  * instead.
  *
  */
-class CommandHandlerInterface
+class CommandHandlerInterfaceB
 {
 public:
     struct HandlerContext
@@ -78,11 +78,11 @@ public:
      * aEndpointId can be Missing to indicate that this object is meant to be
      * used with all endpoints.
      */
-    CommandHandlerInterface(Optional<EndpointId> aEndpointId, ClusterId aClusterId) :
+    CommandHandlerInterfaceB(Optional<EndpointId> aEndpointId, ClusterId aClusterId) :
         mEndpointId(aEndpointId), mClusterId(aClusterId)
     {}
 
-    virtual ~CommandHandlerInterface() {}
+    virtual ~CommandHandlerInterfaceB() {}
 
     /**
      * Callback that must be implemented to handle an invoke request.
@@ -155,14 +155,14 @@ public:
     }
 
     /**
-     * Mechanism for keeping track of a chain of CommandHandlerInterface.
+     * Mechanism for keeping track of a chain of CommandHandlerInterfaceB.
      */
-    void SetNext(CommandHandlerInterface * aNext) { mNext = aNext; }
-    CommandHandlerInterface * GetNext() const { return mNext; }
+    void SetNext(CommandHandlerInterfaceB * aNext) { mNext = aNext; }
+    CommandHandlerInterfaceB * GetNext() const { return mNext; }
 
     /**
-     * Check whether a this CommandHandlerInterface is relevant for a
-     * particular endpoint+cluster.  An CommandHandlerInterface will be used
+     * Check whether a this CommandHandlerInterfaceB is relevant for a
+     * particular endpoint+cluster.  An CommandHandlerInterfaceB will be used
      * for an invoke from a particular cluster only when this function returns
      * true.
      */
@@ -172,17 +172,17 @@ public:
     }
 
     /**
-     * Check whether an CommandHandlerInterface is relevant for a particular
+     * Check whether an CommandHandlerInterfaceB is relevant for a particular
      * specific endpoint.  This is used to clean up overrides registered for an
      * endpoint that becomes disabled.
      */
     bool MatchesEndpoint(EndpointId aEndpointId) const { return mEndpointId.HasValue() && mEndpointId.Value() == aEndpointId; }
 
     /**
-     * Check whether another CommandHandlerInterface wants to handle the same set of
+     * Check whether another CommandHandlerInterfaceB wants to handle the same set of
      * commands as we do.
      */
-    bool Matches(const CommandHandlerInterface & aOther) const
+    bool Matches(const CommandHandlerInterfaceB & aOther) const
     {
         return mClusterId == aOther.mClusterId &&
             (!mEndpointId.HasValue() || !aOther.mEndpointId.HasValue() || mEndpointId.Value() == aOther.mEndpointId.Value());
@@ -232,25 +232,11 @@ protected:
 private:
     Optional<EndpointId> mEndpointId;
     ClusterId mClusterId;
-    CommandHandlerInterface * mNext = nullptr;
+    CommandHandlerInterfaceB * mNext = nullptr;
 };
 
-template <ClusterId... TClusterIds>
-class CommandHandlerInterfaceShim : public CommandHandlerInterface
+class CommandHandlerInterface : public CommandHandlerInterfaceB
 {
-
-    using CommandHandlerInterface::CommandHandlerInterface;
-    DataModel::AcceptedCommandEntry GetEntry(const ConcreteClusterPath & cluster, CommandId command)
-    {
-        if constexpr (sizeof...(TClusterIds) == 0)
-        {
-            return DataModel::AcceptedCommandEntryFor(cluster.mClusterId, command, Clusters::ClusterIdsMetaList);
-        }
-        else
-        {
-            return DataModel::AcceptedCommandEntryFor<TClusterIds...>(cluster.mClusterId, command);
-        }
-    }
 
     // Implements new interface
     CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
@@ -268,7 +254,9 @@ class CommandHandlerInterfaceShim : public CommandHandlerInterface
         ReturnErrorOnFailure(builder.EnsureAppendCapacity(commandCount));
 
         auto appender = SplitLambda([&](CommandId commandId) {
-            err = builder.Append(GetEntry(cluster, commandId));
+            const auto entry = DataModel::AcceptedCommandEntryFor(cluster.mClusterId, commandId, Clusters::ClusterIdsMetaList);
+
+            err = builder.Append(entry);
             return err == CHIP_NO_ERROR ? Loop::Continue : Loop::Break;
         });
 

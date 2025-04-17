@@ -259,12 +259,12 @@ public:
     Messaging::ExchangeContext * GetExchangeContext() const override { return nullptr; }
 };
 
-/// Overrides Enumerate*Commands in the CommandHandlerInterface to allow
+/// Overrides Enumerate*Commands in the CommandHandlerInterfaceB to allow
 /// testing of behaviors when command enumeration is done in the interace.
 class CustomListCommandHandler : public CommandHandlerInterface
 {
 public:
-    CustomListCommandHandler(Optional<EndpointId> endpointId, ClusterId clusterId) : CommandHandlerInterface(endpointId, clusterId)
+    CustomListCommandHandler(Optional<EndpointId> endpointId, ClusterId clusterId) : CommandHandlerInterfaceB(endpointId, clusterId)
     {
         CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this);
     }

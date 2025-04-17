@@ -36,7 +36,7 @@
 namespace chip {
 namespace AppPlatform {
 
-using CommandHandlerInterface    = chip::app::CommandHandlerInterface;
+using CommandHandlerInterfaceB   = chip::app::CommandHandlerInterfaceB;
 using Status                     = chip::Protocols::InteractionModel::Status;
 using LaunchResponseType         = chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::Type;
 using PlaybackResponseType       = chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type;
@@ -46,7 +46,7 @@ using GetSetupPINResponseType    = chip::app::Clusters::AccountLogin::Commands::
 class ContentAppCommandDelegate : public CommandHandlerInterface
 {
 public:
-    ContentAppCommandDelegate(jobject manager, ClusterId aClusterId) : CommandHandlerInterface(Optional<EndpointId>(), aClusterId)
+    ContentAppCommandDelegate(jobject manager, ClusterId aClusterId) : CommandHandlerInterfaceB(Optional<EndpointId>(), aClusterId)
     {
         if (manager == nullptr)
         {
@@ -56,7 +56,8 @@ public:
         InitializeJNIObjects(manager);
     };
 
-    ContentAppCommandDelegate(jobject manager) : CommandHandlerInterface(Optional<EndpointId>(), app::Clusters::ContentLauncher::Id)
+    ContentAppCommandDelegate(jobject manager) :
+        CommandHandlerInterfaceB(Optional<EndpointId>(), app::Clusters::ContentLauncher::Id)
     {
 
         if (manager == nullptr)
@@ -67,7 +68,7 @@ public:
         InitializeJNIObjects(manager);
     };
 
-    void InvokeCommand(CommandHandlerInterface::HandlerContext & handlerContext) override;
+    void InvokeCommand(CommandHandlerInterfaceB::HandlerContext & handlerContext) override;
 
     Status InvokeCommand(EndpointId epId, ClusterId clusterId, CommandId commandId, std::string payload, bool & commandHandled,
                          Json::Value & value);
@@ -100,7 +101,7 @@ private:
         }
     }
 
-    void FormatResponseData(CommandHandlerInterface::HandlerContext & handlerContext, const char * response);
+    void FormatResponseData(CommandHandlerInterfaceB::HandlerContext & handlerContext, const char * response);
 
     chip::JniGlobalReference mContentAppEndpointManager;
     jmethodID mSendCommandMethod = nullptr;

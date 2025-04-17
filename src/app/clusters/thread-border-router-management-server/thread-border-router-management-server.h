@@ -32,7 +32,7 @@ namespace app {
 namespace Clusters {
 namespace ThreadBorderRouterManagement {
 
-class ServerInstance : public CommandHandlerInterface,
+class ServerInstance : public CommandHandlerInterfaceB,
                        public AttributeAccessInterface,
                        public Delegate::ActivateDatasetCallback,
                        public Delegate::AttributeChangeCallback
@@ -40,7 +40,7 @@ class ServerInstance : public CommandHandlerInterface,
 public:
     using Status = Protocols::InteractionModel::Status;
     ServerInstance(EndpointId endpointId, Delegate * delegate, FailSafeContext & failSafeContext) :
-        CommandHandlerInterface(Optional<EndpointId>(endpointId), Id),
+        CommandHandlerInterfaceB(Optional<EndpointId>(endpointId), Id),
         AttributeAccessInterface(Optional<EndpointId>(endpointId), Id), mDelegate(delegate), mServerEndpointId(endpointId),
         mFailsafeContext(failSafeContext)
     {}
@@ -87,7 +87,7 @@ private:
     void SetSkipCASESessionCheck(bool skipCheck) { mSkipCASESessionCheck = skipCheck; }
     bool mSkipCASESessionCheck;
 #endif
-    bool IsCommandOverCASESession(CommandHandlerInterface::HandlerContext & ctx);
+    bool IsCommandOverCASESession(CommandHandlerInterfaceB::HandlerContext & ctx);
     static void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     void OnFailSafeTimerExpired();
     void CommitSavedBreadcrumb();

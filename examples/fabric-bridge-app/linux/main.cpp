@@ -119,7 +119,7 @@ class AdministratorCommissioningCommandHandler : public CommandHandlerInterface
 public:
     // Register for the AdministratorCommissioning cluster on all endpoints.
     AdministratorCommissioningCommandHandler() :
-        CommandHandlerInterface(Optional<EndpointId>::Missing(), AdministratorCommissioning::Id)
+        CommandHandlerInterfaceB(Optional<EndpointId>::Missing(), AdministratorCommissioning::Id)
     {}
 
     CHIP_ERROR Init();
@@ -127,15 +127,15 @@ public:
     void InvokeCommand(HandlerContext & handlerContext) override;
 
 private:
-    CommandHandlerInterface * mOriginalCommandHandlerInterface = nullptr;
+    CommandHandlerInterfaceB * mOriginalCommandHandlerInterfaceB = nullptr;
 };
 
 CHIP_ERROR AdministratorCommissioningCommandHandler::Init()
 {
-    mOriginalCommandHandlerInterface =
+    mOriginalCommandHandlerInterfaceB =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(kRootEndpointId, AdministratorCommissioning::Id);
-    VerifyOrReturnError(mOriginalCommandHandlerInterface, CHIP_ERROR_INTERNAL);
-    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(mOriginalCommandHandlerInterface));
+    VerifyOrReturnError(mOriginalCommandHandlerInterfaceB, CHIP_ERROR_INTERNAL);
+    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(mOriginalCommandHandlerInterfaceB));
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     return CHIP_NO_ERROR;
 }
@@ -151,7 +151,7 @@ void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & ha
         endpointId == kRootEndpointId)
     {
         // Proceed with default handling in Administrator Commissioning Server
-        mOriginalCommandHandlerInterface->InvokeCommand(handlerContext);
+        mOriginalCommandHandlerInterfaceB->InvokeCommand(handlerContext);
         return;
     }
 
@@ -199,7 +199,7 @@ class BridgedDeviceInformationCommandHandler : public CommandHandlerInterface
 public:
     // Register for the BridgedDeviceBasicInformation cluster on all endpoints.
     BridgedDeviceInformationCommandHandler() :
-        CommandHandlerInterface(Optional<EndpointId>::Missing(), BridgedDeviceBasicInformation::Id)
+        CommandHandlerInterfaceB(Optional<EndpointId>::Missing(), BridgedDeviceBasicInformation::Id)
     {}
 
     void InvokeCommand(HandlerContext & handlerContext) override;

@@ -18,7 +18,7 @@ EnumsNotUsedAsTypeInXML:
 
 CommandHandlerInterfaceOnlyClusters:
     # List of clusters that are implemented entirely with
-    # CommandHandlerInterface and hence do not need generated command dispatch.
+    # CommandHandlerInterfaceB and hence do not need generated command dispatch.
     # This uses asUpperCamelCase versions of the cluster name.
     - Network Commissioning
     - Scenes Management

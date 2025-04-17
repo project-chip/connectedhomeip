@@ -47,7 +47,7 @@ namespace MicrowaveOvenControl {
 Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId,
                    BitMask<MicrowaveOvenControl::Feature> aFeature, Clusters::OperationalState::Instance & aOpStateInstance,
                    Clusters::ModeBase::Instance & aMicrowaveOvenModeInstance) :
-    CommandHandlerInterface(MakeOptional(aEndpointId), aClusterId),
+    CommandHandlerInterfaceB(MakeOptional(aEndpointId), aClusterId),
     AttributeAccessInterface(MakeOptional(aEndpointId), aClusterId), mDelegate(aDelegate), mEndpointId(aEndpointId),
     mClusterId(aClusterId), mFeature(aFeature), mOpStateInstance(aOpStateInstance),
     mMicrowaveOvenModeInstance(aMicrowaveOvenModeInstance)
@@ -218,14 +218,14 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
     case Commands::SetCookingParameters::Id:
         ChipLogDetail(Zcl, "Microwave Oven Control: Entering SetCookingParameters");
 
-        CommandHandlerInterface::HandleCommand<Commands::SetCookingParameters::DecodableType>(
+        CommandHandlerInterfaceB::HandleCommand<Commands::SetCookingParameters::DecodableType>(
             handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleSetCookingParameters(ctx, req); });
         break;
 
     case Commands::AddMoreTime::Id:
         ChipLogDetail(Zcl, "Microwave Oven Control: Entering AddMoreTime");
 
-        CommandHandlerInterface::HandleCommand<Commands::AddMoreTime::DecodableType>(
+        CommandHandlerInterfaceB::HandleCommand<Commands::AddMoreTime::DecodableType>(
             handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleAddMoreTime(ctx, req); });
         break;
     }

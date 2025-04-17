@@ -42,7 +42,7 @@ namespace Clusters {
 namespace ModeBase {
 
 Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature) :
-    CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),
+    CommandHandlerInterfaceB(Optional<EndpointId>(aEndpointId), aClusterId),
     AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId), mDelegate(aDelegate), mEndpointId(aEndpointId),
     mClusterId(aClusterId),
     mCurrentMode(0), // This is a temporary value and may not be valid. We will change this to the value of the first

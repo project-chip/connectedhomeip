@@ -39,7 +39,7 @@
 using SceneTableEntry   = chip::scenes::DefaultSceneTableImpl::SceneTableEntry;
 using SceneStorageId    = chip::scenes::DefaultSceneTableImpl::SceneStorageId;
 using SceneData         = chip::scenes::DefaultSceneTableImpl::SceneData;
-using HandlerContext    = chip::app::CommandHandlerInterface::HandlerContext;
+using HandlerContext    = chip::app::CommandHandlerInterfaceB::HandlerContext;
 using ExtensionFieldSet = chip::scenes::ExtensionFieldSet;
 using GroupDataProvider = chip::Credentials::GroupDataProvider;
 using SceneTable        = chip::scenes::SceneTable<chip::scenes::ExtensionFieldSetsImpl>;
@@ -80,7 +80,7 @@ Protocols::InteractionModel::Status ResponseStatus(CHIP_ERROR err)
 /// @param status Status to verify
 /// @return CHIP_ERROR
 template <typename ResponseType>
-CHIP_ERROR AddResponseOnError(CommandHandlerInterface::HandlerContext & ctx, ResponseType & resp, CHIP_ERROR err)
+CHIP_ERROR AddResponseOnError(CommandHandlerInterfaceB::HandlerContext & ctx, ResponseType & resp, CHIP_ERROR err)
 {
     if (CHIP_NO_ERROR != err)
     {
@@ -97,7 +97,7 @@ CHIP_ERROR AddResponseOnError(CommandHandlerInterface::HandlerContext & ctx, Res
 /// @param status Status to verify
 /// @return InteractionModel::Status -> CHIP_ERROR
 template <typename ResponseType>
-CHIP_ERROR AddResponseOnError(CommandHandlerInterface::HandlerContext & ctx, ResponseType & resp, Status status)
+CHIP_ERROR AddResponseOnError(CommandHandlerInterfaceB::HandlerContext & ctx, ResponseType & resp, Status status)
 {
     // TODO: this seems odd: we convert `status` to a CHIP_ERROR and then back to status. This seems
     //       potentially lossy and not ideal.
@@ -349,7 +349,7 @@ void ScenesServer::Shutdown()
 }
 
 template <typename CommandData, typename ResponseType>
-void AddSceneParse(CommandHandlerInterface::HandlerContext & ctx, const CommandData & req, GroupDataProvider * groupProvider)
+void AddSceneParse(CommandHandlerInterfaceB::HandlerContext & ctx, const CommandData & req, GroupDataProvider * groupProvider)
 {
     ResponseType response;
     uint16_t endpointTableSize = 0;

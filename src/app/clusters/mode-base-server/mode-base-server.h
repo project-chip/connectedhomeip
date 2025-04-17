@@ -31,7 +31,7 @@ namespace ModeBase {
 
 class Delegate;
 
-class Instance : public CommandHandlerInterface, public AttributeAccessInterface, public IntrusiveListNodeBase<>
+class Instance : public CommandHandlerInterfaceB, public AttributeAccessInterface, public IntrusiveListNodeBase<>
 {
 public:
     /**

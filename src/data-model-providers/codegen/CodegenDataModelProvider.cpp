@@ -181,12 +181,12 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::InvokeCom
         return cluster->InvokeCommand(request, input_arguments, handler);
     }
 
-    CommandHandlerInterface * handler_interface =
+    CommandHandlerInterfaceB * handler_interface =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(request.path.mEndpointId, request.path.mClusterId);
 
     if (handler_interface)
     {
-        CommandHandlerInterface::HandlerContext context(*handler, request.path, input_arguments);
+        CommandHandlerInterfaceB::HandlerContext context(*handler, request.path, input_arguments);
         handler_interface->InvokeCommand(context);
 
         // If the command was handled, don't proceed any further and return successfully.
@@ -441,13 +441,13 @@ CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath 
         return cluster->AcceptedCommands(path, builder);
     }
 
-    // Some CommandHandlerInterface instances are registered of ALL endpoints, so make sure first that
-    // the cluster actually exists on this endpoint before asking the CommandHandlerInterface what commands
+    // Some CommandHandlerInterfaceB instances are registered of ALL endpoints, so make sure first that
+    // the cluster actually exists on this endpoint before asking the CommandHandlerInterfaceB what commands
     // it claims to support.
     const EmberAfCluster * serverCluster = FindServerCluster(path);
     VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
 
-    CommandHandlerInterface * interface =
+    CommandHandlerInterfaceB * interface =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
     if (interface != nullptr)
     {
@@ -486,13 +486,13 @@ CHIP_ERROR CodegenDataModelProvider::GeneratedCommands(const ConcreteClusterPath
         return cluster->GeneratedCommands(path, builder);
     }
 
-    // Some CommandHandlerInterface instances are registered of ALL endpoints, so make sure first that
-    // the cluster actually exists on this endpoint before asking the CommandHandlerInterface what commands
+    // Some CommandHandlerInterfaceB instances are registered of ALL endpoints, so make sure first that
+    // the cluster actually exists on this endpoint before asking the CommandHandlerInterfaceB what commands
     // it claims to support.
     const EmberAfCluster * serverCluster = FindServerCluster(path);
     VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
 
-    CommandHandlerInterface * interface =
+    CommandHandlerInterfaceB * interface =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
     if (interface != nullptr)
     {

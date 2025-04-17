@@ -48,7 +48,7 @@ public:
     // Register for the WiFiNetworkDiagnostics cluster on all endpoints.
     WiFiDiagnosticsGlobalInstance(DiagnosticDataProvider & diagnosticProvider) :
         AttributeAccessInterface(Optional<EndpointId>::Missing(), WiFiNetworkDiagnostics::Id),
-        CommandHandlerInterface(Optional<EndpointId>::Missing(), WiFiNetworkDiagnostics::Id),
+        CommandHandlerInterfaceB(Optional<EndpointId>::Missing(), WiFiNetworkDiagnostics::Id),
         mDiagnosticProvider(diagnosticProvider)
     {}
 
@@ -258,7 +258,7 @@ void WiFiDiagnosticsGlobalInstance::InvokeCommand(HandlerContext & handlerContex
     {
 #ifdef WI_FI_NETWORK_DIAGNOSTICS_ENABLE_RESET_COUNTS_CMD
     case Commands::ResetCounts::Id:
-        CommandHandlerInterface::HandleCommand<Commands::ResetCounts::DecodableType>(
+        CommandHandlerInterfaceB::HandleCommand<Commands::ResetCounts::DecodableType>(
             handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleResetCounts(ctx, commandData); });
         break;
 #endif

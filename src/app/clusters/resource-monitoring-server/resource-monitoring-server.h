@@ -39,7 +39,7 @@ namespace ResourceMonitoring {
 // forward declarations
 class Delegate;
 
-class Instance : public CommandHandlerInterface, public AttributeAccessInterface
+class Instance : public CommandHandlerInterfaceB, public AttributeAccessInterface
 {
 
 public:

@@ -59,7 +59,7 @@ bool IsValidWpaPersonalCredential(ByteSpan credential)
 
 WiFiNetworkManagementServer::WiFiNetworkManagementServer(EndpointId endpoint) :
     AttributeAccessInterface(MakeOptional(endpoint), WiFiNetworkManagement::Id),
-    CommandHandlerInterface(MakeOptional(endpoint), WiFiNetworkManagement::Id)
+    CommandHandlerInterfaceB(MakeOptional(endpoint), WiFiNetworkManagement::Id)
 {}
 
 WiFiNetworkManagementServer::~WiFiNetworkManagementServer()

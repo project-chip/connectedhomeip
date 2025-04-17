@@ -75,7 +75,7 @@ public:
     // Register for the GeneralCommissioning cluster on all endpoints.
     GeneralCommissioningGlobalInstance() :
         AttributeAccessInterface(Optional<EndpointId>::Missing(), GeneralCommissioning::Id),
-        CommandHandlerInterface(Optional<EndpointId>::Missing(), GeneralCommissioning::Id)
+        CommandHandlerInterfaceB(Optional<EndpointId>::Missing(), GeneralCommissioning::Id)
     {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
@@ -232,25 +232,25 @@ void GeneralCommissioningGlobalInstance::InvokeCommand(HandlerContext & handlerC
     switch (handlerContext.mRequestPath.mCommandId)
     {
     case Commands::ArmFailSafe::Id:
-        CommandHandlerInterface::HandleCommand<Commands::ArmFailSafe::DecodableType>(
+        CommandHandlerInterfaceB::HandleCommand<Commands::ArmFailSafe::DecodableType>(
             handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleArmFailSafe(ctx, commandData); });
         break;
 
     case Commands::CommissioningComplete::Id:
-        CommandHandlerInterface::HandleCommand<Commands::CommissioningComplete::DecodableType>(
+        CommandHandlerInterfaceB::HandleCommand<Commands::CommissioningComplete::DecodableType>(
             handlerContext,
             [this](HandlerContext & ctx, const auto & commandData) { HandleCommissioningComplete(ctx, commandData); });
         break;
 
     case Commands::SetRegulatoryConfig::Id:
-        CommandHandlerInterface::HandleCommand<Commands::SetRegulatoryConfig::DecodableType>(
+        CommandHandlerInterfaceB::HandleCommand<Commands::SetRegulatoryConfig::DecodableType>(
             handlerContext,
             [this](HandlerContext & ctx, const auto & commandData) { HandleSetRegulatoryConfig(ctx, commandData); });
         break;
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     case Commands::SetTCAcknowledgements::Id:
-        CommandHandlerInterface::HandleCommand<Commands::SetTCAcknowledgements::DecodableType>(
+        CommandHandlerInterfaceB::HandleCommand<Commands::SetTCAcknowledgements::DecodableType>(
             handlerContext,
             [this](HandlerContext & ctx, const auto & commandData) { HandleSetTCAcknowledgements(ctx, commandData); });
         break;

@@ -28,11 +28,11 @@ namespace app {
 
 namespace {
 
-class TestCommandHandlerInterface : public CommandHandlerInterface
+class TestCommandHandlerInterfaceB : public CommandHandlerInterface
 {
 public:
-    TestCommandHandlerInterface(Optional<EndpointId> endpointId, ClusterId clusterId) :
-        CommandHandlerInterface(endpointId, clusterId)
+    TestCommandHandlerInterfaceB(Optional<EndpointId> endpointId, ClusterId clusterId) :
+        CommandHandlerInterfaceB(endpointId, clusterId)
     {}
 
     // Just need this to compile
@@ -43,10 +43,10 @@ public:
 
 TEST(TestCommandHandlerInterfaceRegistry, TestRegisterUnregister)
 {
-    TestCommandHandlerInterface a(Optional<EndpointId>(1), 1);
-    TestCommandHandlerInterface b(Optional<EndpointId>(1), 2);
-    TestCommandHandlerInterface c(Optional<EndpointId>(2), 1);
-    TestCommandHandlerInterface d(NullOptional, 3);
+    TestCommandHandlerInterfaceB a(Optional<EndpointId>(1), 1);
+    TestCommandHandlerInterfaceB b(Optional<EndpointId>(1), 2);
+    TestCommandHandlerInterfaceB c(Optional<EndpointId>(2), 1);
+    TestCommandHandlerInterfaceB d(NullOptional, 3);
 
     CommandHandlerInterfaceRegistry registry;
     EXPECT_EQ(registry.RegisterCommandHandler(&a), CHIP_NO_ERROR);
@@ -73,10 +73,10 @@ TEST(TestCommandHandlerInterfaceRegistry, TestRegisterUnregister)
 
 TEST(TestCommandHandlerInterfaceRegistry, TestUnregisterAll)
 {
-    TestCommandHandlerInterface a(Optional<EndpointId>(1), 1);
-    TestCommandHandlerInterface b(Optional<EndpointId>(1), 2);
-    TestCommandHandlerInterface c(Optional<EndpointId>(2), 1);
-    TestCommandHandlerInterface d(NullOptional, 3);
+    TestCommandHandlerInterfaceB a(Optional<EndpointId>(1), 1);
+    TestCommandHandlerInterfaceB b(Optional<EndpointId>(1), 2);
+    TestCommandHandlerInterfaceB c(Optional<EndpointId>(2), 1);
+    TestCommandHandlerInterfaceB d(NullOptional, 3);
 
     CommandHandlerInterfaceRegistry registry;
     EXPECT_EQ(registry.RegisterCommandHandler(&a), CHIP_NO_ERROR);

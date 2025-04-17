@@ -45,7 +45,7 @@ CameraAvSettingsUserLevelMgmtServer::CameraAvSettingsUserLevelMgmtServer(Endpoin
                                                                          BitFlags<OptionalAttributes> aOptionalAttrs,
                                                                          uint8_t aMaxPresets) :
     AttributeAccessInterface(MakeOptional(aEndpointId), CameraAvSettingsUserLevelManagement::Id),
-    CommandHandlerInterface(MakeOptional(aEndpointId), CameraAvSettingsUserLevelManagement::Id), mDelegate(aDelegate),
+    CommandHandlerInterfaceB(MakeOptional(aEndpointId), CameraAvSettingsUserLevelManagement::Id), mDelegate(aDelegate),
     mEndpointId(aEndpointId), mFeatures(aFeatures), mOptionalAttrs(aOptionalAttrs), mMaxPresets(aMaxPresets)
 {
     mDelegate.SetServer(this);

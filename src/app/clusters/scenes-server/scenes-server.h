@@ -33,7 +33,7 @@ namespace app {
 namespace Clusters {
 namespace ScenesManagement {
 
-class ScenesServer : public CommandHandlerInterface, public AttributeAccessInterface
+class ScenesServer : public CommandHandlerInterfaceB, public AttributeAccessInterface
 {
 public:
     static constexpr size_t kScenesServerMaxEndpointCount =
@@ -105,7 +105,7 @@ public:
     void RemoveFabric(EndpointId aEndpointId, FabricIndex aFabricIndex);
 
 private:
-    ScenesServer() : CommandHandlerInterface(Optional<EndpointId>(), Id), AttributeAccessInterface(Optional<EndpointId>(), Id) {}
+    ScenesServer() : CommandHandlerInterfaceB(Optional<EndpointId>(), Id), AttributeAccessInterface(Optional<EndpointId>(), Id) {}
     ~ScenesServer() { Shutdown(); }
 
     bool mIsInitialized = false;

@@ -47,7 +47,7 @@ namespace ResourceMonitoring {
 Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeatureMap,
                    ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
                    bool aResetConditionCommandSupported) :
-    CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),
+    CommandHandlerInterfaceB(Optional<EndpointId>(aEndpointId), aClusterId),
     AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId), mDelegate(aDelegate), mEndpointId(aEndpointId),
     mClusterId(aClusterId), mDegradationDirection(aDegradationDirection), mFeatureMap(aFeatureMap),
     mResetConditionCommandSupported(aResetConditionCommandSupported)
