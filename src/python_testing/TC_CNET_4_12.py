@@ -158,8 +158,8 @@ class TC_CNET_4_12(MatterBaseTest):
         # Validate the operational dataset structure (for both datasets)
         logger.info("Precondition 2: Validating THREAD operational datasets")
 
-        await self.validate_thread_dataset(th_xpan, "THREAD_1ST_OPERATIONALDATASET")
-        await self.validate_thread_dataset(th_xpan_1, "THREAD_2ND_OPERATIONALDATASET")
+        await self.validate_thread_dataset(bytes.fromhex(th_xpan), "THREAD_1ST_OPERATIONALDATASET")
+        await self.validate_thread_dataset(bytes.fromhex(th_xpan_1), "THREAD_2ND_OPERATIONALDATASET")
 
         # The FeatureMap attribute value is 2
         feature_map = await self.read_single_attribute_check_success(
