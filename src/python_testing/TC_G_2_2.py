@@ -201,7 +201,7 @@ class TC_G_2_2(MatterBaseTest):
         self.step("6")
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
             dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
-            #Get the group IDs that were added in step 5
+        #Get the group IDs that were added in step 5
         added_group_ids = [groupKeyMapStruct[i].groupId for i in range(2, 12)]
         # Verify that each group ID is present in the GroupTable list
         for group_id in added_group_ids:
@@ -219,7 +219,8 @@ class TC_G_2_2(MatterBaseTest):
         self.step("7b")
         kGroupName13 = "Gp13"
         result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(kGroupId13, kGroupName13))
-        asserts.assert_equal(result.status, Status.ResourceExhausted, "Returned status is different from expected ResourceExhausted")
+        asserts.assert_equal(result.status, Status.ResourceExhausted,
+                             "Returned status is different from expected ResourceExhausted")
 
         self.step("8")
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
