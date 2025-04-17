@@ -38,6 +38,7 @@ CHIP_ERROR ClusterLogic::Init(const ClusterConformance & conformance)
     // TODO: Add logic to inital State form device or set it to fallback values
     VerifyOrReturnError(!mInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(conformance.Valid(), CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
+    // TODO: Add logic to set inital mState to fallback values.
     mConformance = conformance;
     mInitialized = true;
     return CHIP_NO_ERROR;
@@ -174,15 +175,19 @@ CHIP_ERROR ClusterLogic::SetUnitRange(const DataModel::Nullable<Structs::UnitRan
 
     if (unitRange.IsNull())
     {
-        mState.unitRange.SetNull();
-        mMatterContext.MarkDirty(Attributes::UnitRange::Id);
+        // If both the mState unitRange and argument unitRange are null, then just return CHIP_NO_ERROR
+        // If the mState unitRange is not null and argument unitRange is null, then set mstate unitRange to null.
+        if (!mState.unitRange.IsNull()) {
+            mState.unitRange.SetNull();
+            mMatterContext.MarkDirty(Attributes::UnitRange::Id);
+        }
         return CHIP_NO_ERROR;
     }
 
-    // If the unit range is invalid, we need to return an error
+    // Return error if unitRange is invalid
     VerifyOrReturnError(unitRange.Value().min <= unitRange.Value().max, CHIP_ERROR_INVALID_ARGUMENT);
 
-    // If the mState unit range is null, we need to set it to the new value
+    // If the mState unitRange is null, we need to set it to the new value
     if (mState.unitRange.IsNull())
     {
         mState.unitRange.SetNonNull(unitRange.Value());
@@ -190,7 +195,7 @@ CHIP_ERROR ClusterLogic::SetUnitRange(const DataModel::Nullable<Structs::UnitRan
         return CHIP_NO_ERROR;
     }
 
-    // If the unit range is not null, we need to check if the values are different
+    // If both the mState unitRange and unitRange are not null, we need to update mState unitRange if the values are different
     if ((unitRange.Value().min != mState.unitRange.Value().min) || (unitRange.Value().max != mState.unitRange.Value().max))
     {
         mState.unitRange.Value().min = unitRange.Value().min;
@@ -401,7 +406,7 @@ CHIP_ERROR ClusterLogic::GetClusterRevision(Attributes::ClusterRevision::TypeInf
 Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Optional<TargetLatchEnum> latch,
                                             Optional<Globals::ThreeLevelAutoEnum> speed)
 {
-    VerifyOrDieWithMsg(mInitialized, NotSpecified, "Unexpected command recieved when device is yet to be initialized");
+    VerifyOrDieWithMsg(mInitialized, NotSpecified, "Unexpected command received when device is yet to be initialized");
     // TODO: If this command is sent while the device is in a non-compatible internal-state, a status code of INVALID_IN_STATE SHALL
     // be returned.
 
@@ -449,6 +454,7 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
 
     VerifyOrReturnError(SetTarget(target) == CHIP_NO_ERROR, Status::Failure);
 
+    // TODO: Should the Target value set to CurrentState if HandleSetTarget fails
     return mClusterDriver.HandleSetTarget(target.position, target.latch, target.speed);
 }
 
@@ -513,15 +519,16 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
         // Position value SHALL be clamped to 0.00% if the LM feature is not supported or LimitRange.Min if the LM feature is
         // supported.
         newPosition =
-            limitSupported ? std::max(newPosition, static_cast<uint32_t>(limitRange.min)) : std::max(newPosition, (uint32_t) 0);
+            limitSupported ? std::max(newPosition, static_cast<uint32_t>(limitRange.min)) : newPosition;
         break;
 
     case StepDirectionEnum::kIncrease:
-        newPosition = currentPosition + delta;
+        // To avoid overflow, newPosition will be set to UINT32_MAX if sum of currentPosition and delta is greater than UINT32_MAX
+        newPosition = (currentPosition > UINT32_MAX - delta) ? UINT32_MAX : currentPosition + delta;
         // Position value SHALL be clamped to 0.00% if the LM feature is not supported or LimitRange.Max if the LM feature is
         // supported.
         newPosition =
-            limitSupported ? std::min(newPosition, static_cast<uint32_t>(limitRange.max)) : std::min(newPosition, (uint32_t) 10000);
+            limitSupported ? std::min(newPosition, static_cast<uint32_t>(limitRange.max)) : std::min(newPosition, static_cast<uint32_t>(10000));
         break;
 
     default:
@@ -540,6 +547,7 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
 
     VerifyOrReturnError(SetTarget(stepTarget) == CHIP_NO_ERROR, Status::Failure);
 
+    // TODO: Should the Target value set to CurrentState if HandleStep fails
     return mClusterDriver.HandleStep(direction, numberOfSteps, speed);
 }
 } // namespace ClosureDimension
