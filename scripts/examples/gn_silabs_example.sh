@@ -321,11 +321,7 @@ else
         } &>/dev/null
     fi
 
-    if [ "$USE_SLC" == false ]; then
-        # Activation needs to be after SLC generation which is done in gn gen.
-        # Zap generation requires activation and is done in the build phase
-        source "$CHIP_ROOT/scripts/activate.sh"
-    fi
+    source "$CHIP_ROOT/scripts/activate.sh"
 
     if [ "$USE_WIFI" == true ]; then
         DOTFILE="$ROOT/build_for_wifi_gnfile.gn"
