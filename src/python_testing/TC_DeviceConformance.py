@@ -365,9 +365,9 @@ class DeviceConformanceTests(BasicCompositionTests):
                         continue
 
                     cluster = Clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]
-                    feature_map = endpoint[cluster][GlobalAttributeIds.FEATURE_MAP_ID]
-                    attribute_list = endpoint[cluster][GlobalAttributeIds.ATTRIBUTE_LIST_ID]
-                    cmd_list = endpoint[cluster][GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID]
+                    feature_map = endpoint[cluster][cluster.Attributes.FeatureMap]
+                    attribute_list = endpoint[cluster][cluster.Attributes.AttributeList]
+                    cmd_list = endpoint[cluster][cluster.Attributes.AcceptedCommandList]
                     for mask, conformance in cluster_requirement.feature_overrides.items():
                         conformance_decision_with_choice = conformance(feature_map, attribute_list, cmd_list)
                         if conformance_decision_with_choice.decision == ConformanceDecision.MANDATORY and (feature_map & mask == 0):

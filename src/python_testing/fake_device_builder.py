@@ -34,22 +34,35 @@ def _get_field_by_label(cl_object: Clusters.ClusterObjects.ClusterObject, label:
     return None
 
 
-def _create_minimal_cluster(xml_clusters: dict[uint, XmlCluster], cluster_id: int) -> dict[int, Any]:
+def _create_minimal_cluster(xml_clusters: dict[uint, XmlCluster], cluster_id: int, is_tlv_endpoint: bool) -> dict[int, Any]:
     attrs = {}
-    attrs[GlobalAttributeIds.FEATURE_MAP_ID] = 0
 
     mandatory_attributes = [id for id, a in xml_clusters[cluster_id].attributes.items() if _is_mandatory(a.conformance)]
-    for m in mandatory_attributes:
-        # dummy versions - we're not using the values in this test
-        attrs[m] = 0
-    attrs[GlobalAttributeIds.ATTRIBUTE_LIST_ID] = mandatory_attributes
     mandatory_accepted_commands = [id for id, a in xml_clusters[cluster_id].accepted_commands.items()
                                    if _is_mandatory(a.conformance)]
-    attrs[GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID] = mandatory_accepted_commands
     mandatory_generated_commands = [id for id, a in xml_clusters[cluster_id].generated_commands.items()
                                     if _is_mandatory(a.conformance)]
-    attrs[GlobalAttributeIds.GENERATED_COMMAND_LIST_ID] = mandatory_generated_commands
-    attrs[GlobalAttributeIds.CLUSTER_REVISION_ID] = xml_clusters[cluster_id].revision
+    revision = xml_clusters[cluster_id].revision
+    if is_tlv_endpoint:
+        for m in mandatory_attributes:
+            # dummy versions - we're not using the values in this test
+            attrs[m] = 0
+        attrs[GlobalAttributeIds.FEATURE_MAP_ID] = 0
+        attrs[GlobalAttributeIds.ATTRIBUTE_LIST_ID] = mandatory_attributes
+        attrs[GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID] = mandatory_accepted_commands
+        attrs[GlobalAttributeIds.GENERATED_COMMAND_LIST_ID] = mandatory_generated_commands
+        attrs[GlobalAttributeIds.CLUSTER_REVISION_ID] = revision
+    else:
+        cluster_cls: Clusters.ClusterObject.Cluster = Clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]
+        for m in mandatory_attributes:
+            attr_cls = Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id][m]
+            attrs[attr_cls] = 0
+        attrs[cluster_cls.Attributes.FeatureMap] = 0
+        attrs[cluster_cls.Attributes.AttributeList] = mandatory_attributes
+        attrs[cluster_cls.Attributes.AcceptedCommandList] = mandatory_accepted_commands
+        attrs[cluster_cls.Attributes.GeneratedCommandList] = mandatory_generated_commands
+        attrs[cluster_cls.Attributes.ClusterRevision] = revision
+
     return attrs
 
 
@@ -65,7 +78,8 @@ def create_minimal_dt(xml_clusters: dict[uint, XmlCluster], xml_device_types: di
     device_type_revision = xml_device_types[device_type_id].revision
 
     for s in required_servers:
-        endpoint[s if is_tlv_endpoint else Clusters.ClusterObjects.ALL_CLUSTERS[s]] = _create_minimal_cluster(xml_clusters, s)
+        endpoint[s if is_tlv_endpoint else Clusters.ClusterObjects.ALL_CLUSTERS[s]
+                 ] = _create_minimal_cluster(xml_clusters, s, is_tlv_endpoint)
 
     # Descriptor
     attr = Clusters.Descriptor.Attributes
