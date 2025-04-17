@@ -89,7 +89,6 @@ static_library("controller") {
       "CommissioningDelegate.cpp",
       "ExampleOperationalCredentialsIssuer.cpp",
       "SetUpCodePairer.cpp",
-      "AutoNetworkRecover.cpp",
       "NetworkRecover.cpp",
     ]
 
@@ -101,6 +100,7 @@ static_library("controller") {
         "CHIPDeviceController.cpp",
         "CommissioningWindowOpener.cpp",
         "CurrentFabricRemover.cpp",
+        "AutoNetworkRecover.cpp",
       ]
     }
   }

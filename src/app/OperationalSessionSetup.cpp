@@ -304,12 +304,14 @@ void OperationalSessionSetup::UpdateDeviceData(const ResolveResult & result)
 
     // No need to reset mTryingNextResultDueToSessionEstablishmentError here,
     // because we're about to delete ourselves.
+
     DequeueConnectionCallbacks(err);
     // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }
 
-CHIP_ERROR OperationalSessionSetup::EstablishConnection(const AddressResolve::ResolveResult & result)
+CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & result)
 {
+    auto & config = result.mrpRemoteConfig;
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (mTransportPayloadCapability == TransportPayloadCapability::kLargePayload)
     {
@@ -334,7 +336,7 @@ CHIP_ERROR OperationalSessionSetup::EstablishConnection(const AddressResolve::Re
     VerifyOrReturnError(mCASEClient != nullptr, CHIP_ERROR_NO_MEMORY);
 
     MATTER_LOG_METRIC_BEGIN(kMetricDeviceCASESession);
-    CHIP_ERROR err = mCASEClient->EstablishSession(mInitParams, mPeerId, mDeviceAddress, result.mrpRemoteConfig, this);
+    CHIP_ERROR err = mCASEClient->EstablishSession(mInitParams, mPeerId, mDeviceAddress, config, this);
     if (err != CHIP_NO_ERROR)
     {
         MATTER_LOG_METRIC_END(kMetricDeviceCASESession, err);
@@ -343,7 +345,7 @@ CHIP_ERROR OperationalSessionSetup::EstablishConnection(const AddressResolve::Re
     }
 
     MoveToState(State::Connecting);
-    
+
     return CHIP_NO_ERROR;
 }
 
@@ -370,6 +372,7 @@ void OperationalSessionSetup::DequeueConnectionCallbacks(CHIP_ERROR error, Sessi
         }
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+
     // Gather up state we will need for our notifications.
     SuccessFailureCallbackList readyCallbacks;
     readyCallbacks.EnqueueTakeAll(mCallbacks);
@@ -382,6 +385,7 @@ void OperationalSessionSetup::DequeueConnectionCallbacks(CHIP_ERROR error, Sessi
 #else
         System::Clock::kZero;
 #endif // CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP
+
     if (releaseBehavior == ReleaseBehavior::Release)
     {
         VerifyOrDie(mReleaseDelegate != nullptr);
@@ -502,6 +506,7 @@ void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error, Sess
     // Session failed to be established. This is when discovery is also stopped
     MATTER_LOG_METRIC_END(kMetricDeviceOperationalDiscovery, error);
     MATTER_LOG_METRIC_END(kMetricDeviceCASESession, error);
+
     DequeueConnectionCallbacks(error, stage);
     // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }
@@ -517,7 +522,6 @@ void OperationalSessionSetup::OnResponderBusy(System::Clock::Milliseconds16 requ
 
 void OperationalSessionSetup::OnSessionEstablished(const SessionHandle & session)
 {
-    ChipLogDetail(Discovery, "OnSessionEstablished, the mCallbacks is empty:%s", mCallbacks.IsEmpty() ? "true" : "false");
     VerifyOrReturn(mState == State::Connecting,
                    ChipLogError(Discovery, "OnSessionEstablished was called while we were not connecting"));
 
@@ -528,7 +532,6 @@ void OperationalSessionSetup::OnSessionEstablished(const SessionHandle & session
 
     if (!mSecureSession.Grab(session))
     {
-        ChipLogDetail(Discovery, "!mSecureSession.Grab(session)");
         // Got an invalid session, just dispatch an error.  We have to do this
         // so we don't leak.
         DequeueConnectionCallbacks(CHIP_ERROR_INCORRECT_STATE);
@@ -578,6 +581,7 @@ OperationalSessionSetup::~OperationalSessionSetup()
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     CancelSessionSetupReattempt();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+
     DequeueConnectionCallbacks(CHIP_ERROR_CANCELLED, ReleaseBehavior::DoNotRelease);
 }
 
@@ -627,7 +631,6 @@ CHIP_ERROR OperationalSessionSetup::LookupPeerAddress()
 
 void OperationalSessionSetup::PerformAddressUpdate()
 {
-    ChipLogDetail(Discovery, "PerformAddressUpdate, mPerformingAddressUpdate:%d", mPerformingAddressUpdate);
     if (mPerformingAddressUpdate)
     {
         // We are already in the middle of a lookup from a previous call to
@@ -635,10 +638,10 @@ void OperationalSessionSetup::PerformAddressUpdate()
         // we are already looking to update the results from the previous lookup.
         return;
     }
-    ChipLogDetail(Discovery, "mState == State::NeedsAddress:%s", mState == State::NeedsAddress ? "true" : "false");
+
     // We must be newly-allocated to handle this address lookup, so must be in the NeedsAddress state.
     VerifyOrDie(mState == State::NeedsAddress);
-    
+
     // We are doing an address lookup whether we have an active session for this peer or not.
     mPerformingAddressUpdate = true;
     MoveToState(State::ResolvingAddress);
@@ -704,6 +707,7 @@ void OperationalSessionSetup::OnNodeAddressResolutionFailed(const PeerId & peerI
 #endif
 
     MATTER_LOG_METRIC_END(kMetricDeviceOperationalDiscovery, reason);
+
     // No need to modify any variables in `this` since call below releases `this`.
     DequeueConnectionCallbacks(reason);
     // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
@@ -824,7 +828,6 @@ void OperationalSessionSetup::CancelSessionSetupReattempt()
 
 void OperationalSessionSetup::TrySetupAgain(System::Layer * systemLayer, void * state)
 {
-    ChipLogDetail(Discovery, "TrySetupAgain");
     auto * self = static_cast<OperationalSessionSetup *>(state);
 
     self->MoveToState(State::ResolvingAddress);

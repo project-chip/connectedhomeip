@@ -145,6 +145,8 @@ public:
         }
     }
 
+    void OnDeviceScanned(BluezDevice1 & device, const chip::Ble::ChipBLENetworkRecoveryInfo & info) override {}
+
     void OnScanComplete() override
     {
         if (mCompleteCallback)

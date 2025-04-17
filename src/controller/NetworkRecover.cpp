@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -138,7 +138,7 @@ bool NetworkRecover::NotifyOrConnectToDiscoveredDevice()
         if (mNetworkRecoverBehaviour == NetworkRecoverBehaviour::kDiscover)
         {
             // notify to application
-            ChipLogProgress(Controller, "Notify recoverable devices:%lu", params.GetRecoveryId());
+            ChipLogProgress(Controller, "Notify recoverable devices " ChipLogFormatX64, ChipLogValueX64(params.GetRecoveryId()));
             auto iter = std::find(mDiscoveredRecoveryIds.begin(), mDiscoveredRecoveryIds.end(), params.GetRecoveryId());
             if(iter == mDiscoveredRecoveryIds.end())
             {

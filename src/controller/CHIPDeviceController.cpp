@@ -651,7 +651,9 @@ CHIP_ERROR DeviceCommissioner::GetDeviceBeingCommissioned(NodeId deviceId, Commi
 {
     VerifyOrReturnError(out_device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     CommissioneeDeviceProxy * device = FindCommissioneeDevice(deviceId);
+
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    
     *out_device = device;
 
     return CHIP_NO_ERROR;

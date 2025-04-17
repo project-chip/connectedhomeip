@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2021 Project CHIP Authors
+ *   Copyright (c) 2025 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,7 +28,7 @@ void NetworkRecoveryCommandBase::OnNetworkRecoverDiscover(std::list<uint64_t> re
     ChipLogProgress(chipTool, "Find recoverable devices:");
     for (const auto& recoveryId : recoveryIds)
     {
-        ChipLogProgress(chipTool, "%lu", recoveryId);
+        ChipLogProgress(chipTool, "0x" ChipLogFormatX64, ChipLogValueX64(recoveryId));
     }
     SetCommandExitStatus(CHIP_NO_ERROR);
     
@@ -38,11 +38,11 @@ void NetworkRecoveryCommandBase::OnNetworkRecoverComplete(NodeId deviceId, CHIP_
 {
     if (error == CHIP_NO_ERROR)
     {
-        ChipLogProgress(chipTool, "Recovery complete for device:%lu", deviceId);
+        ChipLogProgress(chipTool, "Recovery complete for devicice " ChipLogFormatX64, ChipLogValueX64(deviceId));
     }
     else
     {
-        ChipLogError(chipTool, "Recovery failed for device:%lu", deviceId);
+        ChipLogError(chipTool, "Recovery failed for device " ChipLogFormatX64, ChipLogValueX64(deviceId));
     }
     SetCommandExitStatus(error);
 }
