@@ -475,6 +475,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
     commissioner->SetUdcListenPort(udcListenPort);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     chip::Controller::SetupParams commissionerParams;
+    chip::CASEAuthTag administratorCAT = chip::GetAdminCATHavingVersion(CHIP_CONFIG_ADMINISTRATOR_CAT_INITIAL_VERSION);
 
     ReturnLogErrorOnFailure(mCredIssuerCmds->SetupDeviceAttestation(commissionerParams, sTrustStore, sRevocationDelegate));
 
@@ -494,6 +495,9 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
         }
 
         ReturnLogErrorOnFailure(mCredIssuerCmds->InitializeCredentialsIssuer(mCommissionerStorage));
+
+        /* a NOC with Administrator CAT will be issued to JFC */
+        mCommissionerStorage.SetCommissionerCATs({ {administratorCAT} });
 
         chip::MutableByteSpan nocSpan(identity.mNOC);
         chip::MutableByteSpan icacSpan(identity.mICAC);
