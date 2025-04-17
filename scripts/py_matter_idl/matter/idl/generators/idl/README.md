@@ -10,7 +10,7 @@ It is useful for tools that ingest non-idl data but convert into idl data (e.g.
 
 A no-op usage can be:
 
-```
+```shell
 ./scripts/codegen.py -g idl --output-dir out/idlgen examples/all-clusters-app/all-clusters-common/all-clusters-app.matter
 ```
 
