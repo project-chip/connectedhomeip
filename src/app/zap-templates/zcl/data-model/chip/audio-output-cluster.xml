@@ -38,7 +38,7 @@ Git:
     </features>
     <attribute side="server" code="0x0000" name="OutputList" define="AUDIO_OUTPUT_LIST" type="array" entryType="OutputInfoStruct"/>
     <attribute side="server" code="0x0001" name="CurrentOutput" define="AUDIO_OUTPUT_CURRENT_OUTPUT" type="int8u"/>
-    <command source="client" code="0x00" name="SelectOutput" optional="false">
+    <command source="client" code="0x00" name="SelectOutput">
       <description>Upon receipt, this SHALL change the output on the device to the output at a specific index in the Output List.</description>
       <arg id="0" name="Index" type="int8u"/>
     </command>
