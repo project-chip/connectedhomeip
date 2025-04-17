@@ -332,10 +332,23 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
 
 CHIP_ERROR WriteClient::EnsureListStarted(const ConcreteDataAttributePath & attributePath)
 {
-    if (mMessageWriter.GetRemainingFreeLength() < kReservedSizeForEndOfListAttributeIB)
+    TLV::TLVWriter backupWriter;
+    mWriteRequestBuilder.GetWriteRequests().Checkpoint(backupWriter);
+
+    CHIP_ERROR err = TryToStartList(attributePath);
+    if (err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL)
     {
-        StartNewMessage();
+        // If it failed with no memory, then we create a new chunk for it.
+        mWriteRequestBuilder.GetWriteRequests().Rollback(backupWriter);
+        ReturnErrorOnFailure(StartNewMessage());
+        ReturnErrorOnFailure(TryToStartList(attributePath));
     }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WriteClient::TryToStartList(const ConcreteDataAttributePath & attributePath)
+{
 
     // TODO (#38414) : Move reservation/unreservtion of Buffer for TLV Writing to AttributeDataIB Builder instead of WriteClient
     ReturnErrorOnFailure(mMessageWriter.ReserveBuffer(kReservedSizeForEndOfListAttributeIB));

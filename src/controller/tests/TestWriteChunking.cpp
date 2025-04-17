@@ -1284,6 +1284,30 @@ TEST_F(TestWriteChunking, TestTransactionalList_NonEmptyReplaceAllList)
         .expectedStatus = { false },
     });
 
+    // This TestCase tests corner cases when we Encode many attributes into the same WriteRequest, up to 10 Attributes will be
+    // Encoded.
+    for (int nullableListCount = 1; nullableListCount <= 10; nullableListCount++)
+    {
+        ChipLogProgress(Zcl, "Test 10.%d: Encoding %d nullable lists following a single non-nullable list", nullableListCount,
+                        nullableListCount);
+
+        Instructions test;
+
+        // Add the single non-nullable list
+        test.paths.push_back(ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id));
+        test.data.push_back(ListData::kList);
+
+        // Add the nullable lists
+        for (int i = 0; i < nullableListCount; i++)
+        {
+            test.paths.push_back(ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id));
+            test.data.push_back(ListData::kNull);
+        }
+
+        test.expectedStatus = { true };
+        RunTest_NonEmptyReplaceAll(test);
+    }
+
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 
     emberAfClearDynamicEndpoint(0);

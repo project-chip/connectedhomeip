@@ -301,16 +301,23 @@ private:
     CHIP_ERROR ProcessAttributeStatusIB(AttributeStatusIB::Parser & aAttributeStatusIB);
     const char * GetStateStr() const;
 
-    // TODO (#38453) Clarify and fix the API contract of EnsureListStarted and EnsureListEnded; in the case of encoding failure,
-    // should we just undo buffer reservation? rollback to a checkpoint that we create within EnsureListStarted? or just leave the
-    // WriteClient in a bad state.
+    // TODO (#38453) Clarify and fix the API contract of EnsureListStarted, TryToStartList and EnsureListEnded; in the case of
+    // encoding failure, should we just undo buffer reservation? rollback to a checkpoint that we create within EnsureListStarted?
+    // or just leave the WriteClient in a bad state.
     /**
-     * Prepare the Encoding of an Attribute with List DataType into an AttributeDataIB.
+     *     A wrapper for TryToStartList which will start a new chunk when TryToStartList fails with CHIP_ERROR_NO_MEMORY or
+     * CHIP_ERROR_BUFFER_TOO_SMALL.
      *
      * @note Must always be followed by a call to EnsureListEnded(), to undo buffer reservation that took place within
      * it, and properly close TLV Containers.
      */
     CHIP_ERROR EnsureListStarted(const ConcreteDataAttributePath & attributePath);
+
+    /**
+     * Prepare the Encoding of an Attribute with List DataType into an AttributeDataIB.
+     *
+     */
+    CHIP_ERROR TryToStartList(const ConcreteDataAttributePath & attributePath);
 
     /**
      * Complete the Encoding of an Attribute with List DataType into an AttributeDataIB.
