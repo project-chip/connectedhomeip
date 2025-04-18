@@ -89,6 +89,7 @@ static_library("chip-tool-utils") {
     "commands/discover/DiscoverCommissionersCommand.cpp",
     "commands/icd/ICDCommand.cpp",
     "commands/icd/ICDCommand.h",
+    "commands/network-recovery/NetworkRecoveryCommand.cpp",
     "commands/pairing/OpenCommissioningWindowCommand.cpp",
     "commands/pairing/OpenCommissioningWindowCommand.h",
     "commands/pairing/PairingCommand.cpp",
@@ -100,7 +101,6 @@ static_library("chip-tool-utils") {
     "commands/session-management/CloseSessionCommand.cpp",
     "commands/session-management/CloseSessionCommand.h",
     "commands/storage/StorageManagementCommand.cpp",
-    "commands/network-recovery/NetworkRecoveryCommand.cpp",
   ]
 
   deps = [ "${chip_root}/src/app:events" ]

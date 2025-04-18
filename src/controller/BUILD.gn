@@ -58,6 +58,7 @@ static_library("controller") {
     # dependencies
     "AbstractDnssdDiscoveryController.h",
     "AutoCommissioner.h",
+    "AutoNetworkRecover.h",
     "CHIPCommissionableNodeController.h",
     "CHIPDeviceController.h",
     "CHIPDeviceControllerSystemState.h",
@@ -69,9 +70,8 @@ static_library("controller") {
     "DeviceDiscoveryDelegate.h",
     "DevicePairingDelegate.h",
     "ExampleOperationalCredentialsIssuer.h",
-    "SetUpCodePairer.h",
-    "AutoNetworkRecover.h",
     "NetworkRecover.h",
+    "SetUpCodePairer.h",
   ]
 
   deps = [ "${chip_root}/src/lib/address_resolve" ]
@@ -88,8 +88,8 @@ static_library("controller") {
       "CommissionerDiscoveryController.h",
       "CommissioningDelegate.cpp",
       "ExampleOperationalCredentialsIssuer.cpp",
-      "SetUpCodePairer.cpp",
       "NetworkRecover.cpp",
+      "SetUpCodePairer.cpp",
     ]
 
     # ExampleOperationalCredentialsIssuer uses TestGroupData
@@ -97,10 +97,10 @@ static_library("controller") {
 
     if (chip_enable_read_client) {
       sources += [
+        "AutoNetworkRecover.cpp",
         "CHIPDeviceController.cpp",
         "CommissioningWindowOpener.cpp",
         "CurrentFabricRemover.cpp",
-        "AutoNetworkRecover.cpp",
       ]
     }
   }
