@@ -261,7 +261,7 @@ public:
 
 /// Overrides Enumerate*Commands in the CommandHandlerInterfaceB to allow
 /// testing of behaviors when command enumeration is done in the interace.
-class CustomListCommandHandler : public CommandHandlerInterface
+class CustomListCommandHandler : public CommandHandlerInterfaceB
 {
 public:
     CustomListCommandHandler(Optional<EndpointId> endpointId, ClusterId clusterId) : CommandHandlerInterfaceB(endpointId, clusterId)

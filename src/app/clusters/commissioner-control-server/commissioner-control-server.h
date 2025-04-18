@@ -101,7 +101,7 @@ public:
     virtual ~Delegate() = default;
 };
 
-class CommissionerControlServer : public CommandHandlerInterface
+class CommissionerControlServer : public CommandHandlerInterfaceB
 {
 public:
     /**

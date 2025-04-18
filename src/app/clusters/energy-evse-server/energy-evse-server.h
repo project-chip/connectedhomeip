@@ -172,9 +172,8 @@ class Instance : public AttributeAccessInterface, public CommandHandlerInterface
 public:
     Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature, OptionalAttributes aOptionalAttrs,
              OptionalCommands aOptionalCmds) :
-        AttributeAccessInterface(MakeOptional(aEndpointId), Id),
-        CommandHandlerInterfaceB(MakeOptional(aEndpointId), Id), mDelegate(aDelegate), mFeature(aFeature),
-        mOptionalAttrs(aOptionalAttrs), mOptionalCmds(aOptionalCmds)
+        AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterfaceB(MakeOptional(aEndpointId), Id),
+        mDelegate(aDelegate), mFeature(aFeature), mOptionalAttrs(aOptionalAttrs), mOptionalCmds(aOptionalCmds)
     {
         /* set the base class delegates endpointId */
         mDelegate.SetEndpointId(aEndpointId);

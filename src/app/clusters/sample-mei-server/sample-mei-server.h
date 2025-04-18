@@ -40,7 +40,7 @@ public:
 // *****************************************************************************
 // SampleMeiServer implements both Attributes and Commands
 
-class SampleMeiServer : public AttributeAccessInterface, public CommandHandlerInterface
+class SampleMeiServer : public AttributeAccessInterface, public CommandHandlerInterfaceB
 {
 public:
     // Register on all endpoints.

@@ -28,7 +28,7 @@ namespace app {
 
 namespace {
 
-class TestCommandHandlerInterfaceB : public CommandHandlerInterface
+class TestCommandHandlerInterfaceB : public CommandHandlerInterfaceB
 {
 public:
     TestCommandHandlerInterfaceB(Optional<EndpointId> endpointId, ClusterId clusterId) :

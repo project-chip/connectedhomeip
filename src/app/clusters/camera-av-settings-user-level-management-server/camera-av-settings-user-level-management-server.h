@@ -94,7 +94,7 @@ public:
     void SetMptzPosition(MPTZStructType aPosition) { mMptzPosition = aPosition; }
 };
 
-class CameraAvSettingsUserLevelMgmtServer : public AttributeAccessInterface, public CommandHandlerInterface
+class CameraAvSettingsUserLevelMgmtServer : public AttributeAccessInterface, public CommandHandlerInterfaceB
 {
 public:
     /**

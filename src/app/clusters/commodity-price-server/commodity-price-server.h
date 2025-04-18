@@ -67,7 +67,7 @@ protected:
     EndpointId mEndpointId = 0;
 };
 
-class Instance : public AttributeAccessInterface, public CommandHandlerInterface
+class Instance : public AttributeAccessInterface, public CommandHandlerInterfaceB
 {
 public:
     Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature) :

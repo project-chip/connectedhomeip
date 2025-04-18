@@ -205,7 +205,7 @@ public:
                                            const Optional<DataModel::Nullable<uint16_t>> & audioStreamId) = 0;
 };
 
-class WebRTCTransportProviderServer : public AttributeAccessInterface, public CommandHandlerInterface
+class WebRTCTransportProviderServer : public AttributeAccessInterface, public CommandHandlerInterfaceB
 {
 public:
     /**

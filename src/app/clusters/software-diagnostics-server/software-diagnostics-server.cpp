@@ -54,7 +54,7 @@ private:
     CHIP_ERROR ReadThreadMetrics(AttributeValueEncoder & aEncoder);
 };
 
-class SoftwareDiagnosticsCommandHandler : public CommandHandlerInterface
+class SoftwareDiagnosticsCommandHandler : public CommandHandlerInterfaceB
 {
 public:
     // Register for the SoftwareDiagnostics cluster on all endpoints.

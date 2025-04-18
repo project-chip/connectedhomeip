@@ -42,7 +42,7 @@ using chip::DeviceLayer::GetDiagnosticDataProvider;
 
 namespace {
 
-class WiFiDiagnosticsGlobalInstance : public AttributeAccessInterface, public CommandHandlerInterface
+class WiFiDiagnosticsGlobalInstance : public AttributeAccessInterface, public CommandHandlerInterfaceB
 {
 public:
     // Register for the WiFiNetworkDiagnostics cluster on all endpoints.

@@ -45,7 +45,7 @@ namespace ServiceArea {
  * Custom implementations of the Service Area cluster override functions in the Delegate class
  * must be provided to operate with specific devices.
  */
-class Instance : public AttributeAccessInterface, public CommandHandlerInterface
+class Instance : public AttributeAccessInterface, public CommandHandlerInterfaceB
 {
 public:
     /**
