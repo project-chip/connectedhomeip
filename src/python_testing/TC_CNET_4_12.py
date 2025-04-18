@@ -75,6 +75,8 @@ class TC_CNET_4_12(MatterBaseTest):
 
         logger.info(f"Extracted Network ID (ExtPANID) from {dataset_name}: {thread_network_id_bytes.hex()}")
 
+        return thread_network_id_bytes
+
     def def_TC_CNET_4_12(self):
         return '[TC-CNET-4.12] [Thread] Verification for ConnectNetwork Command [DUT-Server]'
 
@@ -158,8 +160,8 @@ class TC_CNET_4_12(MatterBaseTest):
         # Validate the operational dataset structure (for both datasets)
         logger.info("Precondition 2: Validating THREAD operational datasets")
 
-        await self.validate_thread_dataset(bytes.fromhex(th_xpan), "THREAD_1ST_OPERATIONALDATASET")
-        await self.validate_thread_dataset(bytes.fromhex(th_xpan_1), "THREAD_2ND_OPERATIONALDATASET")
+        thread_network_id_bytes_th1 = await self.validate_thread_dataset(bytes.fromhex(th_xpan), "THREAD_1ST_OPERATIONALDATASET")
+        thread_network_id_bytes_th2 = await self.validate_thread_dataset(bytes.fromhex(th_xpan_1), "THREAD_2ND_OPERATIONALDATASET")
 
         # The FeatureMap attribute value is 2
         feature_map = await self.read_single_attribute_check_success(
@@ -194,40 +196,32 @@ class TC_CNET_4_12(MatterBaseTest):
         logger.info(f'Step #2: Number of Networks entries (NumNetworks): {num_networks}')
         asserts.assert_true(num_networks > 0, "Error: No networks found")
 
-        # TODO: Implement proper validation to verify the the Networks attribute "NetworkID" and "Connected"
-        for cnet in networks:
-            if cnet.networkID.decode('utf-8') == th_xpan and cnet.connected:
-                network_found = True
-                break
-        logger.info(f'Step #2: Found network with ID {th_xpan} and connected={network_found}.')
-        asserts.assert_true(
-            network_found, f"Error: Network with ID {th_xpan} and connected=True not found.")
-
         self.step(3)
-        # TODO: Implement proper validation to verify the the Networks index
+        # Find network index
         userth_netidx = None
-        for index, network in enumerate(networks):
-            if network['networkID'] == th_xpan:
-                userth_netidx = index
+        for idx, network in enumerate(networks):
+            if network.networkID == thread_network_id_bytes_th1:
+                userth_netidx = idx
+                asserts.assert_true(network.connected, "Thread network not connected")
                 break
-        asserts.assert_true(userth_netidx is not None, "")
+        asserts.assert_true(userth_netidx is not None, "Thread network not found")
         logger.info(f'Step #3: Networks attribute: {userth_netidx}')
 
         self.step(4)
-        cmd = Clusters.NetworkCommissioning.Commands.RemoveNetwork(networkID=th_xpan, breadcrumb=1)
+        cmd = Clusters.NetworkCommissioning.Commands.RemoveNetwork(networkID=thread_network_id_bytes_th1, breadcrumb=1)
         resp = await self.send_single_cmd(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
             cmd=cmd
         )
-        network_index = resp.networkIndex
+        # network_index = resp.networkIndex
         logger.info(f'Step #4: RemoveNetwork Status is success ({resp.networkingStatus})')
         logger.info(f'Step #4: Network index: ({network_index})')
 
         # Verify that the DUT responds with Remove Network with NetworkingStatus as 'Success'(0)
         asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
-                             "Failure status returned from ReordeRemove Network")
-        asserts.assert_equal(network_index, 0, "The network index is not as expected.")
+                             "Network was not removed")
+        asserts.assert_equal(resp.networkIndex, userth_netidx, "The network index is not as expected.")
 
         self.step(5)
         cmd = Clusters.NetworkCommissioning.Commands.AddOrUpdateThreadNetwork(operationalDataset=th_xpan_1, breadcrumb=1)
