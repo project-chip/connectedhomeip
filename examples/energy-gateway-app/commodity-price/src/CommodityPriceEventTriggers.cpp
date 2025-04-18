@@ -45,29 +45,26 @@ void SetTestEventTrigger_PriceUpdate()
         ChipLogError(Support, "SetTestEventTrigger_PriceUpdate() could not get time");
     }
 
-    Globals::Structs::PriceStruct::Type price; // Contains .amount  and .currency
     newPriceStruct.periodStart = chipEpoch;
     newPriceStruct.periodEnd.SetNonNull(newPriceStruct.periodStart + 30 * 60);
 
-    price.amount                 = 15916; // 15.916 p/kWh
-    price.currency.currency      = kCurrencyGBP;
-    price.currency.decimalPoints = 5;
-    newPriceStruct.price.SetValue(price);
+    Money amount = 15916; // 15.916 p/kWh
+    newPriceStruct.price.SetValue(amount);
     newPriceStruct.priceLevel.SetValue(3);
 
     // Main price description
-    const char * desc = (price.amount < 10000) ? "Low" : (price.amount < 24000) ? "Medium" : "High";
+    const char * desc = (amount < 10000) ? "Low" : (amount < 24000) ? "Medium" : "High";
     newPriceStruct.description.SetValue(chip::Span<const char>(desc, strlen(desc)));
 
     // Components
     static Structs::CommodityPriceComponentStruct::Type sComponents[2];
 
     sComponents[0].source = Globals::TariffPriceTypeEnum::kStandard;
-    sComponents[0].price.SetValue(static_cast<Money>(price.amount * 95 / 100));
+    sComponents[0].price  = static_cast<Money>(amount * 95 / 100);
     sComponents[0].description.SetValue(chip::Span<const char>(kExVATStr, strlen(kExVATStr)));
 
     sComponents[1].source = Globals::TariffPriceTypeEnum::kStandard;
-    sComponents[1].price.SetValue(static_cast<Money>(price.amount * 5 / 100));
+    sComponents[1].price  = static_cast<Money>(amount * 5 / 100);
     sComponents[1].description.SetValue(chip::Span<const char>(kVATStr, strlen(kVATStr)));
 
     // Assign the component span to the
@@ -110,31 +107,28 @@ void SetTestEventTrigger_ForecastUpdate()
     {
         Structs::CommodityPriceStruct::Type & newPriceStruct = sForecastEntries[i];
 
-        Globals::Structs::PriceStruct::Type price;
-        price.currency.currency      = kCurrencyGBP;
-        price.currency.decimalPoints = 5;
-        price.amount                 = kMinPrice + rand() % (kMaxPrice - kMinPrice + 1);
+        Money amount = kMinPrice + rand() % (kMaxPrice - kMinPrice + 1);
 
-        newPriceStruct.price.SetValue(price);
-        newPriceStruct.priceLevel.SetValue((price.amount < 10000) ? 1 : (price.amount < 24000) ? 2 : 3);
+        newPriceStruct.price.SetValue(amount);
+        newPriceStruct.priceLevel.SetValue((amount < 10000) ? 1 : (amount < 24000) ? 2 : 3);
 
         newPriceStruct.periodStart = currentStart;
         newPriceStruct.periodEnd.SetNonNull(currentStart + k30MinsInSeconds - 1);
         currentStart += k30MinsInSeconds;
 
         // Main price description
-        const char * desc = (price.amount < 10000) ? "Low" : (price.amount < 24000) ? "Medium" : "High";
+        const char * desc = (amount < 10000) ? "Low" : (amount < 24000) ? "Medium" : "High";
         newPriceStruct.description.SetValue(chip::Span<const char>(desc, strlen(desc)));
 
         // Fill in components for this entry
         auto & components = sComponentBuffers[i];
 
         components[0].source = Globals::TariffPriceTypeEnum::kStandard;
-        components[0].price.SetValue(static_cast<Money>(price.amount * 95 / 100));
+        components[0].price  = static_cast<Money>(amount * 95 / 100);
         components[0].description.SetValue(chip::Span<const char>(kExVATStr, strlen(kExVATStr)));
 
         components[1].source = Globals::TariffPriceTypeEnum::kStandard;
-        components[1].price.SetValue(static_cast<Money>(price.amount * 5 / 100));
+        components[1].price  = static_cast<Money>(amount * 5 / 100);
         components[1].description.SetValue(chip::Span<const char>(kVATStr, strlen(kVATStr)));
 
         // Assign the component span to the forecast entry
