@@ -275,8 +275,6 @@ public:
     // Iterators
     using SceneEntryIterator = CommonIterator<SceneTableEntry>;
 
-    virtual SceneEntryIterator * IterateSceneEntries(FabricIndex fabric_index) = 0;
-
     // Handlers
     virtual bool HandlerListEmpty() { return mHandlerList.Empty(); }
 

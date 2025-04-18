@@ -57,9 +57,6 @@ public:
     CHIP_ERROR RemoveFabric(FabricIndex fabric_index);
     CHIP_ERROR RemoveEndpoint();
 
-    // Iterators
-    EntryIterator * IterateTableEntries(FabricIndex fabric_index);
-
     void SetEndpoint(EndpointId endpoint);
     void SetTableSize(uint16_t endpointEntryTableSize, uint16_t maxPerFabric);
     bool IsInitialized() { return (mStorage != nullptr); }
