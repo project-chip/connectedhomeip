@@ -32,6 +32,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
+import logging
 import random
 
 import chip.clusters as Clusters
@@ -54,7 +55,7 @@ class TC_ACL_2_6(MatterBaseTest):
                      "Result is SUCCESS value is list of AccessControlEntryChangedEvent events containing 1 element"),
             TestStep(4, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 2 elements", "Result is SUCCESS"),
             TestStep(5, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
-                     "Result is SUCCESS, value is list of AccessControlEntryChanged events containing at least 3 new elements"),
+                     "Result is SUCCESS, value is list of AccessControlEntryChanged events containing 2 new elements"),
             TestStep(6, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 2 elements. The first item is valid, the second item is invalid due to group ID 0 being used, which is illegal.", "Result is CONSTRAINT_ERROR"),
             TestStep(7, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
                      "value is empty list (received ReportData Message should have no/empty EventReportIB list) since the entire list of Test Step 6 was rejected."),
@@ -85,8 +86,8 @@ class TC_ACL_2_6(MatterBaseTest):
         
         found_initial_event = False
         for event_data in events_response:
-            self.print_step("Examining initial event", str(event_data))
-            
+            logging.info(f"Examining initial event {str(event_data)}")
+
             if hasattr(event_data, 'Data') and hasattr(event_data.Data, 'changeType'):
                 if (event_data.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and
                     event_data.Data.adminNodeID is NullValue and
@@ -102,11 +103,15 @@ class TC_ACL_2_6(MatterBaseTest):
                         latest_value.targets is NullValue and
                         latest_value.fabricIndex == f1):
                         found_initial_event = True
-                        self.print_step("Found initial admin ACL entry event", "")
+                        logging.info("Found initial admin ACL entry event")
                         break
 
-        self.print_step("Initial event search result", f"Found: {found_initial_event}")
+        logging.info(f"Initial event search result Found: {found_initial_event}")
         asserts.assert_true(found_initial_event, "Did not find expected initial ACL event")
+
+        event_path = [(self.matter_test_config.endpoint, acec_event, 1)]  
+        initial_events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
+        initial_event_num = [e.Header.EventNumber for e in initial_events]
 
         self.step(4)
         # Write ACL attribute
@@ -135,40 +140,28 @@ class TC_ACL_2_6(MatterBaseTest):
         await asyncio.sleep(1)
 
         self.step(5)
-        events_response = await self.th1.ReadEvent(
-            self.dut_node_id,
-            events=[(0, acec_event)],
-            fabricFiltered=True
+        # Create correct event path with endpoint 0
+        events_response2 = await self.default_controller.ReadEvent(
+            nodeid=self.dut_node_id,  
+            events=event_path,
+            fabricFiltered=True,
+            eventNumberFilter=max(initial_event_num)+1
         )
-        asserts.assert_true(len(events_response) >= 3, "Expected at least 3 events")
+                    
+        logging.info(f"Events response: {events_response2}")
+        logging.info(f"Event response length: {len(events_response2)}")        
+        asserts.assert_true(len(events_response2) == 2, "Expected 2 events")
 
-        found_admin_entry = False
         found_view_entry = False
         found_changed_entry = False
         
-        for event_data in events_response:
-            self.print_step("Examining event", str(event_data))
-            
-            if hasattr(event_data, 'Data') and hasattr(event_data.Data, 'changeType'):
-                # Check for initial admin entry (first event)
-                if (event_data.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and
-                    event_data.Data.adminNodeID is NullValue and
-                    event_data.Data.adminPasscodeID == 0 and
-                    hasattr(event_data.Data, 'latestValue')):
-                    
-                    latest_value = event_data.Data.latestValue
-                    if (latest_value.privilege == Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister and
-                        latest_value.authMode == Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase and
-                        self.th1.nodeId in latest_value.subjects and
-                        latest_value.targets is NullValue):
-                        found_admin_entry = True
-                        self.print_step("Found initial admin ACL entry event", "")
-
-                # Check for changed admin entry (second event)
-                elif (event_data.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged and
-                      event_data.Data.adminNodeID == self.th1.nodeId and
-                      event_data.Data.adminPasscodeID is NullValue and
-                      hasattr(event_data.Data, 'latestValue')):
+        for event_data in events_response2:
+            logging.info(f"Examining event {str(event_data)}")
+            # Check for changed admin entry (first event)
+            if (event_data.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged and
+                event_data.Data.adminNodeID == self.th1.nodeId and
+                event_data.Data.adminPasscodeID is NullValue and
+                hasattr(event_data.Data, 'latestValue')):
                     
                     latest_value = event_data.Data.latestValue
                     if (latest_value.privilege == Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister and
@@ -176,26 +169,25 @@ class TC_ACL_2_6(MatterBaseTest):
                         self.th1.nodeId in latest_value.subjects and
                         latest_value.targets is NullValue):
                         found_changed_entry = True
-                        self.print_step("Found changed admin ACL entry event", "")
+                        logging.info("Found changed admin ACL entry event")
+
+            # Check for added view entry (second event)
+            elif (event_data.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and
+                    event_data.Data.adminNodeID == self.th1.nodeId and
+                    event_data.Data.adminPasscodeID is NullValue and
+                    hasattr(event_data.Data, 'latestValue')):
                 
-                # Check for added view entry (third event)
-                elif (event_data.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and
-                      event_data.Data.adminNodeID == self.th1.nodeId and
-                      event_data.Data.adminPasscodeID is NullValue and
-                      hasattr(event_data.Data, 'latestValue')):
-                    
                     latest_value = event_data.Data.latestValue
                     if (latest_value.privilege == Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView and
                         latest_value.authMode == Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase and
                         self.th1.nodeId in latest_value.subjects and
                         latest_value.targets is NullValue):
                         found_view_entry = True
-                        self.print_step("Found view ACL entry event", "")
+                        logging.info("Found view ACL entry event")
 
-        asserts.assert_true(found_admin_entry, "Did not find initial admin ACL entry event")
         asserts.assert_true(found_changed_entry, "Did not find changed admin ACL entry event")
         asserts.assert_true(found_view_entry, "Did not find view ACL entry event")
-        asserts.assert_true(len(events_response) >= 3, f"Expected at least 3 events, found {len(events_response)}")
+        asserts.assert_true(len(events_response2) == 2, f"Expected 2 events, found {len(events_response2)}")
 
         self.step(6)
         # Write invalid ACL attribute
@@ -214,16 +206,11 @@ class TC_ACL_2_6(MatterBaseTest):
             )
         ]
 
-        try:
-            result = await self.th1.WriteAttribute(
-                self.dut_node_id,
-                [(0, acl_attr(value=invalid_acl_entries))]
-            )
-            self.print_step("Write should have failed with CONSTRAINT_ERROR", str(result))
-            asserts.fail("Write should have failed with CONSTRAINT_ERROR")
-        except Exception as e:
-            self.print_step("Expected CONSTRAINT_ERROR", str(e))
-            asserts.assert_true("CONSTRAINT_ERROR" in str(e), "Expected CONSTRAINT_ERROR")
+        result = await self.th1.WriteAttribute(
+            self.dut_node_id,
+            [(0, acl_attr(value=invalid_acl_entries))]
+        )
+        asserts.assert_equal(result[0].Status, Status.ConstraintError, "Write should have failed with CONSTRAINT_ERROR")
 
         self.step(7)
         # Read AccessControlEntryChanged event again
