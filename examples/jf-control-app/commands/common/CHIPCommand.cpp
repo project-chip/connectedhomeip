@@ -497,7 +497,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
         ReturnLogErrorOnFailure(mCredIssuerCmds->InitializeCredentialsIssuer(mCommissionerStorage));
 
         /* a NOC with Administrator CAT will be issued to JFC */
-        mCommissionerStorage.SetCommissionerCATs({ {administratorCAT} });
+        mCommissionerStorage.SetCommissionerCATs({ { administratorCAT } });
 
         chip::MutableByteSpan nocSpan(identity.mNOC);
         chip::MutableByteSpan icacSpan(identity.mICAC);

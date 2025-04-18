@@ -32,9 +32,8 @@
 
 #include <zap-generated/cluster/Commands.h>
 
-
 static std::string rpcServerIp = "127.0.0.1";
-static uint16_t rpcServerPort = 33000;
+static uint16_t rpcServerPort  = 33000;
 CHIP_ERROR RpcConnect();
 
 CHIP_ERROR RpcConnect(void)
@@ -51,15 +50,15 @@ int main(int argc, char * argv[])
 {
     // Convert command line arguments to a vector of strings for easier manipulation
     std::vector<std::string> args(argv, argv + argc);
- 
-     // Check if "interactive" and "start" are not in the arguments
-     if (args.size() < 3 || args[1] != "interactive" || args[2] != "start")
-     {
-         // Insert "interactive" and "start" after the executable name
-         args.insert(args.begin() + 1, "interactive");
-         args.insert(args.begin() + 2, "start");
-     }
-     
+
+    // Check if "interactive" and "start" are not in the arguments
+    if (args.size() < 3 || args[1] != "interactive" || args[2] != "start")
+    {
+        // Insert "interactive" and "start" after the executable name
+        args.insert(args.begin() + 1, "interactive");
+        args.insert(args.begin() + 2, "start");
+    }
+
     ExampleCredentialIssuerCommands credIssuerCommands;
     Commands commands;
     registerCommandsICD(commands, &credIssuerCommands);
@@ -68,19 +67,18 @@ int main(int argc, char * argv[])
     registerClusters(commands, &credIssuerCommands);
     registerCommandsSubscriptions(commands, &credIssuerCommands);
 
-
     std::vector<char *> c_args;
     for (auto & arg : args)
     {
         c_args.push_back(const_cast<char *>(arg.c_str()));
     }
-    
+
     /* connect to the jf-admin-app RPC server (ownership transfer) */
     if (RpcConnect() != CHIP_NO_ERROR)
     {
         ChipLogProgress(NotSpecified, "RPC: Unable to connect to the jf-admin-app@%s:%d", rpcServerIp.c_str(), rpcServerPort);
         return -1;
     }
- 
+
     return commands.Run(static_cast<int>(c_args.size()), c_args.data());
 }

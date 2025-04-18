@@ -65,7 +65,7 @@
 // initial version for the Administrator CAT
 #define CHIP_CONFIG_ADMINISTRATOR_CAT_INITIAL_VERSION 0x0001
 
-//initial version for the Anchor CAT
+// initial version for the Anchor CAT
 #define CHIP_CONFIG_ANCHOR_CAT_INITIAL_VERSION 0x0001
 
 #endif /* CHIPPROJECTCONFIG_H */

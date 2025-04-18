@@ -1,14 +1,15 @@
 #include "pigweed/rpc_services/JointFabric.h"
 
-#include <lib/support/logging/CHIPLogging.h>
-#include <app/server/Server.h>
 #include <app/server/CommissioningWindowManager.h>
+#include <app/server/Server.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 
 namespace joint_fabric_service {
 
-::pw::Status JointFabric::TransferOwnership( const ::OwnershipContext& request, ::pw_protobuf_Empty& response) {
+::pw::Status JointFabric::TransferOwnership(const ::OwnershipContext & request, ::pw_protobuf_Empty & response)
+{
     ChipLogProgress(chipTool, "Ownership Transfer for NodeId: " ChipLogFormatX64, ChipLogValueX64(request.node_id));
 
     OwnershipTransferContext * data = Platform::New<OwnershipTransferContext>(request.node_id);

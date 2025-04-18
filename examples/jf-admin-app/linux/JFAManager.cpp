@@ -32,9 +32,9 @@ using namespace chip::Controller;
 
 JFAManager JFAManager::sJFA;
 
-CHIP_ERROR JFAManager::Init(Server& server)
+CHIP_ERROR JFAManager::Init(Server & server)
 {
-    mServer = &server;
+    mServer             = &server;
     mCASESessionManager = server.GetCASESessionManager();
 
     return CHIP_NO_ERROR;
@@ -90,8 +90,7 @@ void JFAManager::ConnectToNode(ScopedNodeId scopedNodeId, OnConnectedAction onCo
 {
     VerifyOrDie(mServer != nullptr);
 
-    if ((scopedNodeId.GetFabricIndex() == kUndefinedFabricIndex) ||
-        (scopedNodeId.GetNodeId() == kUndefinedNodeId))
+    if ((scopedNodeId.GetFabricIndex() == kUndefinedFabricIndex) || (scopedNodeId.GetNodeId() == kUndefinedNodeId))
     {
         ChipLogError(NotSpecified, "Invalid node location!");
         return;
@@ -118,8 +117,7 @@ void JFAManager::OnConnected(void * context, Messaging::ExchangeManager & exchan
 
     switch (jfaManager->mOnConnectedAction)
     {
-    case kStandardCommissioningComplete:
-    {
+    case kStandardCommissioningComplete: {
         jfaManager->SendCommissioningComplete();
         break;
     }
@@ -135,7 +133,7 @@ void JFAManager::OnConnectionFailure(void * context, const ScopedNodeId & peerId
     VerifyOrDie(jfaManager != nullptr);
 
     ChipLogError(NotSpecified, "Failed to establish connection to 0x" ChipLogFormatX64 " on fabric index %d",
-                  ChipLogValueX64(peerId.GetNodeId()), peerId.GetFabricIndex());
+                 ChipLogValueX64(peerId.GetNodeId()), peerId.GetFabricIndex());
 
     jfaManager->ReleaseSession();
 }
