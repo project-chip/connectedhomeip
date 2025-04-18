@@ -93,7 +93,11 @@ def get_sizes(p: Path, no_demangle: bool):
         size = int(size, 10)
 
         if not no_demangle:
-            name = cxxfilt.demangle(name)
+            try:
+                name = cxxfilt.demangle(name)
+            except cxxfilt.InvalidName:
+                # Keep non-demangled name if we cannot have a nice name
+                pass
 
         result[name] = Symbol(symbol_type=t, name=name, size=size)
 

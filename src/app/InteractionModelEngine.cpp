@@ -1837,7 +1837,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(co
     if (entry.flags.Has(DataModel::CommandQualityFlags::kLargeMessage) &&
         !CurrentExchange()->GetSessionHandle()->AllowsLargePayload())
     {
-        return Status::InvalidAction;
+        return Status::InvalidTransportType;
     }
 
     return Status::Success;
