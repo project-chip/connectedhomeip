@@ -22,6 +22,8 @@
 
 #ifdef MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
 
+using namespace chip;
+
 namespace chef {
 namespace OvenCavityOperationalState {
 
