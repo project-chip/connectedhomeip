@@ -31,8 +31,11 @@ class TC_CNET_4_2(MatterBaseTest):
 
     def steps_TC_CNET_4_2(self) -> list[TestStep]:
         steps = [
-            TestStep(1, test_plan_support.commission_if_required(), "", is_commissioning=True),
-            TestStep(2, "read Networks attribute on all endpoints", "expected result"),
+            TestStep(1, test_plan_support.commission_if_required(),
+                     "DUT is commisioned on thread dataset provided in --thread-dataset-hex parameter.", is_commissioning=True),
+            TestStep(2, "TH reads the Networks attribute list from the DUT on all endpoints (all network commissioning clusters of the DUT).",
+                     "Verify that there is a single connected network across ALL network commissioning clusters. "
+                     "If the connected network is on the cluster currently being verified, mark a variable as true (current_cluster_connected)."),
             TestStep(3, "current_cluster_connected", "expected result"),
             TestStep(4, "read MaxNetworks attribute", "expected result"),
             TestStep(5, "read ScanMaxTimeSeconds attribute", "expected result"),
