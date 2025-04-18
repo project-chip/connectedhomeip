@@ -28,44 +28,55 @@ namespace {
 TEST(ChipErrorTest, RangeConstructor)
 {
     ChipError error(ChipError::Range::kSDK, /*value=*/1, __FILE__, __LINE__);
+
+    EXPECT_EQ(error.AsInteger(), 1u);
+
 #if CHIP_CONFIG_ERROR_SOURCE
     EXPECT_EQ(error.GetFile(), __FILE__);
     EXPECT_EQ(error.GetLine(), 30u);
-#if __cplusplus >= 202002L
+#endif // CHIP_CONFIG_ERROR_SOURCE
+
+#if CHIP_CONFIG_ERROR_SOURCE_FULL
     std::source_location location = error.GetSourceLocation();
     EXPECT_EQ(location.line(), 30u);
     EXPECT_EQ(location.file_name(), __FILE__);
-#endif // __cplusplus >= 202002L
-#endif // CHIP_CONFIG_ERROR_SOURCE
+#endif // CHIP_CONFIG_ERROR_SOURCE_FULL
 }
 
 TEST(ChipErrorTest, SdkPartConstructor)
 {
     ChipError error(ChipError::SdkPart::kCore, /*code=*/1, __FILE__, __LINE__);
+
+    EXPECT_EQ(error.AsInteger(), 1u);
+
 #if CHIP_CONFIG_ERROR_SOURCE
     EXPECT_EQ(error.GetFile(), __FILE__);
-    EXPECT_EQ(error.GetLine(), 44u);
-#if __cplusplus >= 202002L
-    std::source_location location = error.GetSourceLocation();
-    EXPECT_EQ(location.line(), 44u);
-    EXPECT_EQ(location.file_name(), __FILE__);
-#endif // __cplusplus >= 202002L
+    EXPECT_EQ(error.GetLine(), 48u);
 #endif // CHIP_CONFIG_ERROR_SOURCE
+
+#if CHIP_CONFIG_ERROR_SOURCE_FULL
+    std::source_location location = error.GetSourceLocation();
+    EXPECT_EQ(location.line(), 48u);
+    EXPECT_EQ(location.file_name(), __FILE__);
+#endif // CHIP_CONFIG_ERROR_SOURCE_FULL
 }
 
 TEST(ChipErrorTest, StorageTypeConstructor)
 {
     ChipError error(/*error=*/1, __FILE__, __LINE__);
+
     EXPECT_EQ(error.AsInteger(), 1u);
+
 #if CHIP_CONFIG_ERROR_SOURCE
     EXPECT_EQ(error.GetFile(), __FILE__);
-    EXPECT_EQ(error.GetLine(), 58u);
-#if __cplusplus >= 202002L
-    std::source_location location = error.GetSourceLocation();
-    EXPECT_EQ(location.line(), 58u);
-    EXPECT_EQ(location.file_name(), __FILE__);
-#endif // __cplusplus >= 202002L
+    EXPECT_EQ(error.GetLine(), 66u);
 #endif // CHIP_CONFIG_ERROR_SOURCE
+
+#if CHIP_CONFIG_ERROR_SOURCE_FULL
+    std::source_location location = error.GetSourceLocation();
+    EXPECT_EQ(location.line(), 66u);
+    EXPECT_EQ(location.file_name(), __FILE__);
+#endif // CHIP_CONFIG_ERROR_SOURCE_FULL
 }
 
 } // namespace
