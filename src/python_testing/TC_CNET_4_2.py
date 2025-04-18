@@ -32,22 +32,26 @@ class TC_CNET_4_2(MatterBaseTest):
     def steps_TC_CNET_4_2(self) -> list[TestStep]:
         steps = [
             TestStep(1, test_plan_support.commission_if_required(),
-                     "DUT is commisioned on thread dataset provided in --thread-dataset-hex parameter.", is_commissioning=True),
-            TestStep(2, "TH reads the Networks attribute list from the DUT on all endpoints (all network commissioning clusters of the DUT).",
-                     "Verify that there is a single connected network across ALL network commissioning clusters. "
-                     "If the connected network is on the cluster currently being verified, mark a variable as true (current_cluster_connected)."),
-            TestStep(3, "current_cluster_connected", "expected result"),
+                     "DUT is commisioned, TH can communicate with the DUT on thread dataset provided in --thread-dataset-hex parameter.", is_commissioning=True),
+            TestStep(2, "TH reads the Networks attribute list from the DUT on all endpoints (all network commissioning clusters).",
+                     "Verify that there is a single connected network across ALL network commissioning clusters. "),
+            TestStep(3, "Skip remaining steps if the connected network is NOT on the cluster currently being verified."),
             TestStep(4, "read MaxNetworks attribute", "expected result"),
-            TestStep(5, "read ScanMaxTimeSeconds attribute", "expected result"),
-            TestStep(6, "read ConnectMaxTimeSeconds attribute", "expected result"),
-            TestStep(7, "TH reads InterfaceEnabled attribute from the DUT.",
+            TestStep(5, "TH reads the Networks attribute list from the DUT on current endpoint.",
+                     "Verify that each element in the Networks attribute list has the following fields: 'NetworkID', 'connected'."
+                     "NetworkID field is of type octstr with a length range 1 to 32."
+                     "The connected field is of type bool."
+                     "Verify that the number of entries in the Networks attribute is less than or equal to 'MaxNetworksValue'."),
+            TestStep(6, "read ScanMaxTimeSeconds attribute", "expected result"),
+            TestStep(7, "read ConnectMaxTimeSeconds attribute", "expected result"),
+            TestStep(8, "TH reads InterfaceEnabled attribute from the DUT.",
                      "Verify that InterfaceEnabled attribute value is true"),
-            TestStep(8, "TH reads LastNetworkingStatus attribute from the DUT.",
+            TestStep(9, "TH reads LastNetworkingStatus attribute from the DUT.",
                      "Verify that LastNetworkingStatus attribute value is Success."),
-            TestStep(9, "TH reads the LastNetworkID attribute from the DUT.",
+            TestStep(10, "TH reads the LastNetworkID attribute from the DUT.",
                      "Verify that LastNetworkID attribute matches the NetworkID value of one of the entries in the Networks attribute list."),
-            TestStep(10, "read SupportedThreadFeatures attribute", "expected result"),
-            TestStep(11, "read ThreadVersion attribute", "expected result")
+            TestStep(11, "read SupportedThreadFeatures attribute", "expected result"),
+            TestStep(12, "read ThreadVersion attribute", "expected result")
         ]
         return steps
 
@@ -87,33 +91,42 @@ class TC_CNET_4_2(MatterBaseTest):
         matter_asserts.assert_int_in_range(max_networks_count, min_value=1, max_value=255, description="MaxNetworks")
 
         self.step(5)
+        networks = networks_dict[self.get_endpoint()]
+        asserts.assert_true(networks, "NetworkInfoStruct list should not be empty")
+        matter_asserts.assert_list_element_type(networks, Clusters.NetworkCommissioning.Structs.NetworkInfoStruct,
+                                                "All elements in list are of type NetworkInfoStruct")
+        matter_asserts.assert_all(networks, lambda x: isinstance(x.networkID, bytes) and 1 <= len(x.networkID) <= 32,
+                                  "NetworkID field is an octet string within a length range 1 to 32")
+        asserts.assert_less_equal(len(networks), max_networks_count,
+                                  "Number of entries in the Networks attribute is less than or equal to 'MaxNetworksValue'")
+
+        self.step(6)
         scan_max_time_seconds = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.ScanMaxTimeSeconds)
         matter_asserts.assert_int_in_range(scan_max_time_seconds, min_value=1, max_value=255, description="ScanMaxTimeSeconds")
 
-        self.step(6)
+        self.step(7)
         connect_max_time_seconds = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.ConnectMaxTimeSeconds)
         matter_asserts.assert_int_in_range(connect_max_time_seconds, min_value=1,
                                            max_value=255, description="ConnectMaxTimeSeconds")
 
-        self.step(7)
+        self.step(8)
         interface_enabled = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.InterfaceEnabled)
         asserts.assert_true(interface_enabled, "Verify that InterfaceEnabled attribute value is true")
 
-        self.step(8)
+        self.step(9)
         last_networking_status = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.LastNetworkingStatus)
         expected_status = Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess
         asserts.assert_is(last_networking_status, expected_status, "Verify that LastNetworkingStatus attribute value is success")
 
-        self.step(9)
-        networks = networks_dict[self.get_endpoint()]
+        self.step(10)
         last_network_id = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.LastNetworkID)
@@ -132,7 +145,7 @@ class TC_CNET_4_2(MatterBaseTest):
         #  - Bit 2 (IsSleepyEndDeviceCapable),
         #  - Bit 3 (IsFullThreadDevice).
         # So the possibilites of value here are in the range of 0-20 expected value as per test-plan [0, 4, 8, 9, 10, 20]
-        self.step(10)
+        self.step(11)
         support_thread_features_expected_values = [0, 4, 8, 9, 10, 20]
         supported_thread_features = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
@@ -140,7 +153,7 @@ class TC_CNET_4_2(MatterBaseTest):
         logging.info(f"support thred features: {supported_thread_features}")
         asserts.assert_in(supported_thread_features, support_thread_features_expected_values, "SupportedThreadFeatures")
 
-        self.step(11)
+        self.step(12)
         thread_version = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.ThreadVersion)
