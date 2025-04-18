@@ -36,22 +36,32 @@ class TC_CNET_4_2(MatterBaseTest):
             TestStep(2, "TH reads the Networks attribute list from the DUT on all endpoints (all network commissioning clusters).",
                      "Verify that there is a single connected network across ALL network commissioning clusters. "),
             TestStep(3, "Skip remaining steps if the connected network is NOT on the cluster currently being verified."),
-            TestStep(4, "read MaxNetworks attribute", "expected result"),
+            TestStep(4, "TH reads the MaxNetworks attribute from the DUT.",
+                     "Verify that MaxNetworks attribute value is within a range of 1 to 255."),
             TestStep(5, "TH reads the Networks attribute list from the DUT on current endpoint.",
                      "Verify that each element in the Networks attribute list has the following fields: 'NetworkID', 'connected'."
                      "NetworkID field is of type octstr with a length range 1 to 32."
                      "The connected field is of type bool."
                      "Verify that the number of entries in the Networks attribute is less than or equal to 'MaxNetworksValue'."),
-            TestStep(6, "read ScanMaxTimeSeconds attribute", "expected result"),
-            TestStep(7, "read ConnectMaxTimeSeconds attribute", "expected result"),
+            TestStep(6, "TH reads ScanMaxTimeSeconds attribute from the DUT.",
+                     "Verify that ScanMaxTimeSeconds attribute value is within the range of 1 to 255 seconds."),
+            TestStep(7, "TH reads ConnectMaxTimeSeconds Attribute from the DUT.",
+                     "Verify that ConnectMaxTimeSeconds attribute value is within the range of 1 to 255 seconds."),
             TestStep(8, "TH reads InterfaceEnabled attribute from the DUT.",
-                     "Verify that InterfaceEnabled attribute value is true"),
+                     "Verify that InterfaceEnabled attribute value is true."),
             TestStep(9, "TH reads LastNetworkingStatus attribute from the DUT.",
                      "Verify that LastNetworkingStatus attribute value is Success."),
             TestStep(10, "TH reads the LastNetworkID attribute from the DUT.",
                      "Verify that LastNetworkID attribute matches the NetworkID value of one of the entries in the Networks attribute list."),
-            TestStep(11, "read SupportedThreadFeatures attribute", "expected result"),
-            TestStep(12, "read ThreadVersion attribute", "expected result")
+            TestStep(11, "TH reads the SupportedThreadFeatures attribute from the DUT.",
+                     "Verify that SupportedThreadFeatures attribute value is an empty bitmap (value 0)."
+                     "Verify that Bit 4 (IsSynchronizedSleepyEndDeviceCapable) is only set if bit 2 (IsSleepyEndDeviceCapable) is also set."
+                     "Verify that Bit 0 (IsBorderRouterCapable) is only set if bit 3 (IsFullThreadDevice) is also set."
+                     "Verify that Bit 1 (IsRouterCapable) is only set if bit 3 (IsFullThreadDevice) is also set."
+                     "Verify that at least one of the following bits is set: Bit 4 (IsSynchronizedSleepyEndDeviceCapable), "
+                     "Bit 2 (IsSleepyEndDeviceCapable), Bit 3 (IsFullThreadDevice)."),
+            TestStep(12, "TH reads the ThreadVersion attribute from the DUT.",
+                     "Verify that ThreadVersion attribute value is greater than or equal to 4.")
         ]
         return steps
 
@@ -150,7 +160,7 @@ class TC_CNET_4_2(MatterBaseTest):
         supported_thread_features = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.SupportedThreadFeatures)
-        logging.info(f"support thred features: {supported_thread_features}")
+        logging.info(f"Supported thread features: {supported_thread_features}")
         asserts.assert_in(supported_thread_features, support_thread_features_expected_values, "SupportedThreadFeatures")
 
         self.step(12)
