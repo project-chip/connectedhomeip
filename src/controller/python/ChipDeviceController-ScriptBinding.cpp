@@ -427,8 +427,26 @@ PyChipError pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommission
 }
 
 PyChipError pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceCommissioner * devCtrl, const char * onboardingPayload,
-                                                    chip::NodeId nodeid, uint8_t discoveryType)
+                                                    chip::NodeId nodeid, uint8_t discoveryType
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+                                                    , bool useNFC
+#endif
+                                                    )
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    if (useNFC) {
+        // Trick to force NTL usage: other discovery bits (RendezvousInformationFlag) are cleared.
+        SetupPayload payload;
+        PyReturnErrorOnFailure(ToPyChipError(QRCodeSetupPayloadParser(onboardingPayload).populatePayload(payload)));
+        VerifyOrReturnError(payload.isValidQRCodePayload(), ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+        payload.rendezvousInformation.ClearAll();
+        payload.rendezvousInformation.Set(kNFC);
+        std::string maskedOnboardingPayload;
+        CHIP_ERROR err = QRCodeSetupPayloadGenerator(payload).payloadBase38Representation(maskedOnboardingPayload);
+        VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
+        onboardingPayload = maskedOnboardingPayload.c_str();
+    }
+#endif
     return ToPyChipError(devCtrl->PairDevice(nodeid, onboardingPayload, sCommissioningParameters,
                                              static_cast<chip::Controller::DiscoveryType>(discoveryType)));
 }

@@ -2617,10 +2617,11 @@ class ChipDeviceController(ChipDeviceControllerBase):
             return None
         return rcac_bytes
 
-    async def CommissionWithCode(self, setupPayload: str, nodeid: int, discoveryType: DiscoveryType = DiscoveryType.DISCOVERY_ALL) -> int:
+    async def CommissionWithCode(self, setupPayload: str, nodeid: int, discoveryType: DiscoveryType = DiscoveryType.DISCOVERY_ALL, useNFC: bool = False) -> int:
         ''' 
         Commission with the given nodeid from the setupPayload.
         setupPayload may be a QR or manual code.
+        If useNFC is True, the commissioning should use NTL as temporary channel
 
         Raises: 
             ChipStackError: On failure.
@@ -2634,7 +2635,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
             self._enablePairingCompleteCallback(True)
             await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_ConnectWithCode(
-                    self.devCtrl, setupPayload.encode("utf-8"), nodeid, discoveryType.value)
+                    self.devCtrl, setupPayload.encode("utf-8"), nodeid, discoveryType.value, useNFC)
             )
 
             return await asyncio.futures.wrap_future(ctx.future)

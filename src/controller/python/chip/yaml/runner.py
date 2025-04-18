@@ -649,11 +649,15 @@ class CommissionerCommandAction(BaseAction):
         if test_step.command == 'GetCommissionerNodeId':
             # Just setting the self._command is enough for run_action below.
             pass
-        elif test_step.command in ('PairWithCode', 'EstablishPASESession'):
+        elif test_step.command in ('PairWithCode', 'EstablishPASESession', 'PairWithCodeThruNFC'):
             args = test_step.arguments['values']
             request_data_as_dict = Converter.convert_list_of_name_value_pair_to_dict(args)
             self._setup_payload = request_data_as_dict['payload']
             self._node_id = request_data_as_dict['nodeId']
+            if test_step.command == 'PairWithCodeThruNFC':
+                self._use_nfc = True
+            else:
+                self._use_nfc = False
         else:
             raise UnexpectedActionCreationError(f'Unexpected CommisionerCommand {test_step.command}')
 
@@ -662,8 +666,8 @@ class CommissionerCommandAction(BaseAction):
             return _ActionResult(status=_ActionStatus.SUCCESS, response=_GetCommissionerNodeIdResult(dev_ctrl.nodeId))
 
         try:
-            if self._command == 'PairWithCode':
-                await dev_ctrl.CommissionWithCode(self._setup_payload, self._node_id)
+            if self._command == 'PairWithCode' or self._command == 'PairWithCodeThruNFC':
+                   await dev_ctrl.CommissionWithCode(self._setup_payload, self._node_id, self._use_nfc)
             elif self._command == 'EstablishPASESession':
                 await dev_ctrl.EstablishPASESession(self._setup_payload, self._node_id)
             return _ActionResult(status=_ActionStatus.SUCCESS, response=None)
