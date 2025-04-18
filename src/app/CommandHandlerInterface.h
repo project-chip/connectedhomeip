@@ -254,7 +254,7 @@ class CommandHandlerInterface : public CommandHandlerInterfaceB
         ReturnErrorOnFailure(builder.EnsureAppendCapacity(commandCount));
 
         auto appender = SplitLambda([&](CommandId commandId) {
-            const auto entry = DataModel::AcceptedCommandEntryFor(cluster.mClusterId, commandId, Clusters::ClusterIdsMetaList);
+            const auto entry = DataModel::AcceptedCommandEntryFor(cluster.mClusterId, commandId);
 
             err = builder.Append(entry);
             return err == CHIP_NO_ERROR ? Loop::Continue : Loop::Break;
