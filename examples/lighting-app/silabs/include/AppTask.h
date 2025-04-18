@@ -78,7 +78,7 @@ public:
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
     void PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction);
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
-    void PostLightControlActionRequest(int32_t aActor, LightingManager::Action_t aAction, uint16_t aValue);
+    void PostLightControlActionRequest(int32_t aActor, LightingManager::Action_t aAction, ColorData_t * aValue);
 #endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)
 
 private:

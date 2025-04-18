@@ -38,7 +38,6 @@ void LEDWidget::Init(const uint8_t led)
     mBlinkOffTimeMS   = 0;
     mLed              = led;
     mLedStatus        = false;
-
     Set(false);
 }
 
@@ -99,11 +98,14 @@ uint8_t RGBLEDWidget::GetLevel()
 {
     return mLevel;
 }
-void RGBLEDWidget::SetColor(uint8_t red, uint8_t blue, uint8_t green)
+void RGBLEDWidget::SetColor(uint8_t red, uint8_t green, uint8_t blue)
 {
+    /* ChipLogProgress(Zcl, "SetColor : %u|%u|%u", red, green, blue);
+     GetPlatform().SetLedColor(GetLED(), red, green, blue);*/
     if (GetLEDStatus(GetLED()))
     {
-        GetPlatform().SetLedColor(GetLED(), red, blue, green);
+        ChipLogProgress(Zcl, "SetColor : %u|%u|%u", red, green, blue);
+        GetPlatform().SetLedColor(GetLED(), red, green, blue);
     }
 }
 void RGBLEDWidget::GetColor(uint16_t r, uint16_t g, uint16_t b)
@@ -113,15 +115,17 @@ void RGBLEDWidget::GetColor(uint16_t r, uint16_t g, uint16_t b)
 void RGBLEDWidget::SetColorFromHSV(uint8_t hue, uint8_t saturation)
 {
     HsvColor_t hsv;
-    hsv.h          = hue;
-    hsv.s          = saturation;
-    hsv.v          = GetLevel();
+    hsv.h = hue;
+    hsv.s = saturation;
+    hsv.v = mLevel;
+    ChipLogProgress(Zcl, "SetColorFromHSV : %u|%u", hsv.h, hsv.s);
     RgbColor_t rgb = ColorConverter::HsvToRgb(hsv);
     SetColor(rgb.r, rgb.g, rgb.b);
 }
 
 void RGBLEDWidget::SetColorFromXY(uint16_t currentX, uint16_t currentY)
 {
+    ChipLogProgress(Zcl, "SetColorFromXY: %u|%u", currentX, currentY);
     RgbColor_t rgb = ColorConverter::XYToRgb(GetLevel(), currentX, currentY);
     SetColor(rgb.r, rgb.g, rgb.b);
 }
@@ -129,6 +133,7 @@ void RGBLEDWidget::SetColorFromXY(uint16_t currentX, uint16_t currentY)
 void RGBLEDWidget::SetColorFromCT(CtColor_t ct)
 {
     RgbColor_t rgb = ColorConverter::CTToRgb(ct);
+    ChipLogProgress(Zcl, "SetColorFromCT: %u", ct.ctMireds);
     SetColor(rgb.r, rgb.g, rgb.b);
 }
 #endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)

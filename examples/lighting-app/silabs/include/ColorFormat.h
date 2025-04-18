@@ -19,7 +19,12 @@
 #pragma once
 
 #include <stdint.h>
-
+enum ColorFormat
+{
+    COLOR_FORMAT_HSV,
+    COLOR_FORMAT_XY,
+    COLOR_FORMAT_TEMP
+};
 struct RgbColor_t
 {
     uint8_t r;
@@ -43,6 +48,13 @@ struct XyColor_t
 struct CtColor_t
 {
     uint16_t ctMireds;
+};
+// Union of possible color formats
+union ColorData_t
+{
+    HsvColor_t hsv;
+    XyColor_t xy;
+    CtColor_t ct;
 };
 class ColorConverter
 {

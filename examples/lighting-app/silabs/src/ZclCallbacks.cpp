@@ -65,45 +65,39 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
                         ChipLogValueMEI(attributeId), type, *value, size);
 // WIP Apply attribute change to Light
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+
+        ColorData_t colorData;
         /* XY color space */
         if (attributeId == ColorControl::Attributes::CurrentX::Id || attributeId == ColorControl::Attributes::CurrentY::Id)
         {
-            XyColor_t xy;
+            colorData.xy = {};
             if (size != sizeof(uint16_t))
             {
                 ChipLogError(Zcl, "Wrong length for ColorControl value: %d", size);
                 return;
             }
-            Protocols::InteractionModel::Status status_x = ColorControl::Attributes::CurrentY::Get(endpoint, &xy.y);
+            Protocols::InteractionModel::Status status_x = ColorControl::Attributes::CurrentY::Get(endpoint, &colorData.xy.y);
             assert(status_x == Protocols::InteractionModel::Status::Success);
-            Protocols::InteractionModel::Status status_y = ColorControl::Attributes::CurrentX::Get(endpoint, &xy.x);
+            Protocols::InteractionModel::Status status_y = ColorControl::Attributes::CurrentX::Get(endpoint, &colorData.xy.x);
             assert(status_y == Protocols::InteractionModel::Status::Success);
-            if (attributeId == ColorControl::Attributes::CurrentX::Id)
-            {
-                xy.x = *reinterpret_cast<uint16_t *>(value);
-                // get Y from cluster value storage
-            }
-            if (attributeId == ColorControl::Attributes::CurrentY::Id)
-            {
-                xy.y = *reinterpret_cast<uint16_t *>(value);
-            }
-            ChipLogProgress(Zcl, "New XY color: %u|%u", xy.x, xy.y);
-            LightMgr().InitiateLightAction(AppEvent::kEventType_Light, LightingManager::COLOR_ACTION_XY, sizeof(xy),
-                                           (uint8_t *) &xy);
+
+            ChipLogProgress(Zcl, "New XY color: %u|%u", colorData.xy.x, colorData.xy.y);
+            LightMgr().InitiateLightAction(AppEvent::kEventType_Light, LightingManager::COLOR_ACTION_XY, sizeof(colorData),
+                                           (ColorData_t *) &colorData);
         }
         /* HSV color space */
         else if (attributeId == ColorControl::Attributes::CurrentHue::Id ||
-                 attributeId == ColorControl::Attributes::CurrentSaturation::Id ||
-                 attributeId == ColorControl::Attributes::EnhancedCurrentHue::Id)
+                 attributeId == ColorControl::Attributes::CurrentSaturation::Id)
         {
-            HsvColor_t hsv                                = {};
-            Protocols::InteractionModel::Status statusHue = ColorControl::Attributes::CurrentHue::Get(endpoint, &hsv.h);
+            colorData.hsv                                 = {};
+            Protocols::InteractionModel::Status statusHue = ColorControl::Attributes::CurrentHue::Get(endpoint, &colorData.hsv.h);
             assert(statusHue == Protocols::InteractionModel::Status::Success);
-            Protocols::InteractionModel::Status statusSat = ColorControl::Attributes::CurrentSaturation::Get(endpoint, &hsv.s);
-            ChipLogProgress(Zcl, "New HSV color: %u|%u", hsv.h, hsv.s);
+            Protocols::InteractionModel::Status statusSat =
+                ColorControl::Attributes::CurrentSaturation::Get(endpoint, &colorData.hsv.s);
+            ChipLogProgress(Zcl, "New HSV color: %u|%u", colorData.hsv.h, colorData.hsv.s);
             assert(statusSat == Protocols::InteractionModel::Status::Success);
-            LightMgr().InitiateLightAction(AppEvent::kEventType_Light, LightingManager::COLOR_ACTION_HSV, sizeof(hsv),
-                                           (uint8_t *) &hsv);
+            LightMgr().InitiateLightAction(AppEvent::kEventType_Light, LightingManager::COLOR_ACTION_HSV, sizeof(colorData),
+                                           (ColorData_t *) &colorData);
         }
 
         else if (attributeId == ColorControl::Attributes::ColorTemperatureMireds::Id)
@@ -113,12 +107,10 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
                 ChipLogError(Zcl, "Wrong length for ColorControl value: %d", size);
                 return;
             }
-            CtColor_t ct;
-            ct.ctMireds = *(uint16_t *) value;
-            ChipLogProgress(Zcl, "New Temperature Mireds color = %u", *(uint16_t *) value);
-            ChipLogProgress(Zcl, "New ColorTemperatureMireds: : %u", ct.ctMireds);
-            LightMgr().InitiateLightAction(AppEvent::kEventType_Light, LightingManager::COLOR_ACTION_CT, sizeof(ct),
-                                           (uint8_t *) &ct);
+            colorData.ct.ctMireds = *(uint16_t *) value;
+            ChipLogProgress(Zcl, "New ColorTemperatureMireds: %u", colorData.ct.ctMireds);
+            LightMgr().InitiateLightAction(AppEvent::kEventType_Light, LightingManager::COLOR_ACTION_CT, sizeof(colorData),
+                                           (ColorData_t *) &colorData);
         }
 
 #endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
