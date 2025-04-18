@@ -29,7 +29,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-class WiFiNetworkManagementServer : private AttributeAccessInterface, private CommandHandlerInterface
+class WiFiNetworkManagementServer : private AttributeAccessInterface, private CommandHandlerInterfaceB
 {
 public:
     WiFiNetworkManagementServer(EndpointId endpoint);

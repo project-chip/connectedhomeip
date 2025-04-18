@@ -32,7 +32,7 @@ namespace Clusters {
 
 class ChimeDelegate;
 
-class ChimeServer : private AttributeAccessInterface, private CommandHandlerInterface
+class ChimeServer : private AttributeAccessInterface, private CommandHandlerInterfaceB
 {
 public:
     /**
