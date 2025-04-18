@@ -15,7 +15,9 @@
 action("build_libdatachannel") {
   script = "scripts/build_libdatachannel.py"
   outputs = [ "$target_gen_dir/repo/build/libdatachannel.so" ]
-  args = []
+  args = [
+    "--target_cpu_type="+current_cpu,
+  ]
 }
 
 config("datachannel_config") {

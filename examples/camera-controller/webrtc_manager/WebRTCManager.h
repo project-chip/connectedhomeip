@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <rtc/rtc.hpp>
+#include <sys/socket.h>
 #include <webrtc_manager/WebRTCProviderClient.h>
 #include <webrtc_manager/WebRTCRequestorDelegate.h>
 
@@ -59,4 +60,12 @@ private:
 
     std::string mLocalDescription;
     std::vector<std::string> mLocalCandidates;
+
+    rtc::Description::Video mMedia;
+    std::shared_ptr<rtc::Track> mTrack;
+    std::shared_ptr<rtc::H264RtpDepacketizer> mDepacketizer;
+    int sock;
+    sockaddr_in socket_address;
+
+    void initializeSocket();
 };

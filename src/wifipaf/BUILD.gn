@@ -34,7 +34,7 @@ if (chip_device_config_enable_wifipaf) {
       "WiFiPAFTP.h",
     ]
 
-    cflags = [ "-Wconversion" ]
+    cflags = [ "-Wno-conversion" ]
 
     public_deps = [
       "${chip_root}/src/lib/core",
