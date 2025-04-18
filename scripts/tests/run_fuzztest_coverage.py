@@ -21,6 +21,7 @@ class FuzzTestMode(enum.Enum):
 @dataclass
 class FuzzTestContext:
     fuzz_test_binary_path: str
+    fuzz_test_binary_name: str
     build_target_name: str
     is_coverage_instrumented: bool
     selected_fuzz_test_case: Optional[str] = None
@@ -84,6 +85,14 @@ def run_fuzz_test(context):
     # Create build-specific profile folder
     build_profile_folder = f"{profile_output_folder}/{context.build_target_name}"
     os.makedirs(build_profile_folder, exist_ok=True)
+
+    if context.run_mode == FuzzTestMode.CONTINUOUS_FUZZ_MODE:
+        # Use the FuzzTest (Test Case) Name  as the name for coverage output
+        context.coverage_output_base_name = "{}".format(context.selected_fuzz_test_case.replace('.', "_"))
+    elif context.run_mode == FuzzTestMode.UNIT_TEST_MODE:
+        # Use the FuzzTest Binary Name  as the name for coverage output
+        context.coverage_output_base_name = "{}".format(context.fuzz_test_binary_name)
+
     env = os.environ.copy()
     if context.is_coverage_instrumented:
         profraw_file = f"{build_profile_folder}/{context.coverage_output_base_name}.profraw"
@@ -187,9 +196,12 @@ def generate_coverage_report(context, output_dir_arg):
 
 @click.command(add_help_option=False)
 @click.option("--fuzz-test", help="Specific FuzzTest binary to run. If not provided, all available FuzzTest binaries in 'out' are listed.")
+@click.option("--test-case", help="Optional: Specific test case to run in continuous mode.")
+@click.option("--list-test-cases", is_flag=True, help="List available test cases for the given FuzzTest binary and exit.")
+@click.option("--interactive", is_flag=True, help="Run Script in Interactive Mode (automatically lists FuzzTests, TestCases and allows choosing easily).")
 @click.option('--help', is_flag=True, help="Show this message and exit.")
 @click.option("--output", help="Optional directory for coverage report (auto-generated if not provided).")
-def main(fuzz_test, output, help):
+def main(fuzz_test, test_case, list_test_cases, interactive, output, help):
 
     coloredlogs.install(
         level="INFO",
@@ -223,7 +235,7 @@ def main(fuzz_test, output, help):
         return
 
     if help or not fuzz_test:
-        logging.info("\nAVAILABLE FUZZTEST BINARIES in 'out' directory(each Binary can have multiple FUZZ_TESTs/TestCases): \n")
+        logging.info("\nAVAILABLE FUZZTEST BINARIES in 'out' directory (each Binary can have multiple FUZZ_TESTs/TestCases): \n")
         previous_build_target_dir = ""
         for test in fuzz_tests:
             build_target_dir = extract_build_target_name(test)
@@ -235,6 +247,7 @@ def main(fuzz_test, output, help):
                     logging.info("\n----------- FuzzTests without coverage-instrumentation -----------\n")
                 previous_build_target_dir = build_target_dir
             print(f"   {test}")
+        print("\n")
         return
 
     # --fuzz-test was passed to script
@@ -243,6 +256,7 @@ def main(fuzz_test, output, help):
 
     context = FuzzTestContext(
         fuzz_test_binary_path=fuzz_test,
+        fuzz_test_binary_name=fuzz_test.split(os.sep)[-1],
         build_target_name=extract_build_target_name(fuzz_test),
         is_coverage_instrumented="-coverage" in extract_build_target_name(fuzz_test)
     )
@@ -254,9 +268,26 @@ def main(fuzz_test, output, help):
 
     test_cases = get_fuzz_test_cases(context)
 
-    if not test_cases:
-        logging.info("No FUZZ_TESTs (TestCases) found")
+    if list_test_cases and test_cases:
+        logging.info(f"List of Test Cases for {context.fuzz_test_binary_name}: \n")
+        for case in test_cases:
+            print(case)
+        print("\n")
         return
+
+    if not test_cases:
+        logging.info(f"No FUZZ_TESTs (TestCases) found in {fuzz_test}")
+        return
+
+    if not interactive and not test_case:
+        logging.error("Please either choose TestCase to run or choose 'all' for unit test mode")
+        return
+    elif not interactive and test_case:
+        if "all" in test_case:
+            context.run_mode = FuzzTestMode.UNIT_TEST_MODE
+        else:
+            context.run_mode = FuzzTestMode.CONTINUOUS_FUZZ_MODE
+            context.selected_fuzz_test_case = test_case
     else:
         print("=" * 70 + "\n")
         logging.info("AVAILABLE TEST CASES --> Choose a number to run in 'Continuous Mode', continues until interrupted:\n")
@@ -271,17 +302,18 @@ def main(fuzz_test, output, help):
             context.selected_fuzz_test_case = test_cases[choice - 1]
 
             # Use the FuzzTest (Test Case) Name  as the name for coverage output
-            context.coverage_output_base_name = "{}".format(context.selected_fuzz_test_case.replace('.', "_"))
+          #  context.coverage_output_base_name = "{}".format(context.selected_fuzz_test_case.replace('.', "_"))
 
         elif choice == 0:
 
             context.run_mode = FuzzTestMode.UNIT_TEST_MODE
 
             # Use the FuzzTest Suite Name as the name for coverage output
-            context.coverage_output_base_name = f"{test_cases[0].split('.')[0]}"
+      #      context.coverage_output_base_name = f"{test_cases[0].split('.')[0]}"
         else:
             logging.info("Invalid choice")
             return
+
     try:
         run_fuzz_test(context)
     finally:
