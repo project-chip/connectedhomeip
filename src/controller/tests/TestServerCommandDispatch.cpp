@@ -54,7 +54,7 @@ enum ResponseDirective
 
 ResponseDirective responseDirective;
 
-class TestClusterCommandHandler : public chip::app::CommandHandlerInterface
+class TestClusterCommandHandler : public chip::app::CommandHandlerInterfaceB
 {
 public:
     TestClusterCommandHandler() : chip::app::CommandHandlerInterfaceB(Optional<EndpointId>::Missing(), Clusters::UnitTesting::Id)
