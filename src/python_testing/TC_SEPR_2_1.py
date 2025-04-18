@@ -44,19 +44,21 @@
 
 
 import logging
-import sys
-import time
 
 import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body,
-                                         default_matter_test_main)
+from chip.clusters import Globals
+from chip.clusters.Types import NullValue
+from chip.testing import matter_asserts
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
+from TC_SEPRTestBase import CommodityPriceTestBaseHelper
 
 logger = logging.getLogger(__name__)
 
+cluster = Clusters.CommodityPrice
 
-class TC_SEPR_2_1(MatterBaseTest):
+
+class TC_SEPR_2_1(CommodityPriceTestBaseHelper, MatterBaseTest):
     """Implementation of test case TC_SEPR_2_1."""
 
     def desc_TC_SEPR_2_1(self) -> str:
@@ -75,7 +77,7 @@ class TC_SEPR_2_1(MatterBaseTest):
         steps = [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)."),
             TestStep("2", "TH reads from the DUT the TariffUnit attribute.",
-                     "Verify that the DUT response contains an enum8 value."),
+                     "Verify that the DUT response contains a TariffUnitEnum value."),
             TestStep("3", "TH reads from the DUT the Currency attribute.",
                      "Verify that the DUT response contains either null or a CurrencyStruct value."),
             TestStep("4", "TH reads from the DUT the CurrentPrice attribute.",
@@ -86,14 +88,50 @@ class TC_SEPR_2_1(MatterBaseTest):
 
         return steps
 
-    @async_test_body
+    @run_if_endpoint_matches(has_cluster(cluster))
     async def test_TC_SEPR_2_1(self):
         # pylint: disable=too-many-locals, too-many-statements
         """Run the test steps."""
+        endpoint = self.get_endpoint()
+        attributes = cluster.Attributes
+
         self.step("1")
         # Commission DUT - already done
 
         self.step("2")
+        val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
+                                                             attribute=cluster.Attributes.TariffUnit)
+        matter_asserts.assert_valid_enum(
+            val, "TariffUnit attribute must return a TariffUnitEnum", Globals.Enums.TariffUnitEnum)
+
+        self.step("3")
+        val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
+                                                             attribute=cluster.Attributes.Currency)
+        if val is not NullValue:
+            asserts.assert_true(isinstance(
+                val, Globals.Structs.CurrencyStruct), "val must be of type CurrencyStruct")
+            await self.test_checkCurrencyStruct(endpoint=endpoint, cluster=cluster, struct=val)
+
+        self.step("4")
+        val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
+                                                             attribute=cluster.Attributes.CurrentPrice)
+        if val is not NullValue:
+            asserts.assert_true(isinstance(
+                val, cluster.Structs.CommodityPriceStruct), "val must be of type CommodityPriceStruct")
+            await self.test_checkCommodityPriceStruct(endpoint=endpoint, cluster=cluster, struct=val)
+
+        self.step("5")
+        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.PriceForecast):
+            val = await self.read_single_attribute_check_success(endpoint=endpoint,
+                                                                 cluster=cluster,
+                                                                 attribute=cluster.Attributes.PriceForecast)
+            matter_asserts.assert_list(val, "PriceForecast attribute must return a list")
+            matter_asserts.assert_list_element_type(
+                val, "PriceForecast attribute must contain CommodityPriceStruct elements",
+                cluster.Structs.CommodityPriceStruct, allow_empty=True)
+            for item in val:
+                # In the PriceForecast attribute we must not have Description or Components in this returned list
+                await self.test_checkCommodityPriceStruct(endpoint=endpoint, cluster=cluster, struct=item, details=0)
 
 
 if __name__ == "__main__":
