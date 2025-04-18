@@ -57,7 +57,7 @@ class TC_CNET_4_2(MatterBaseTest):
     def steps_TC_CNET_4_2(self) -> list[TestStep]:
         steps = [
             TestStep(1, test_plan_support.commission_if_required(),
-                     "DUT is commisioned, TH can communicate with the DUT on thread dataset provided in --thread-dataset-hex parameter.", is_commissioning=True),
+                     "DUT is commissioned, TH can communicate with the DUT on thread dataset provided in --thread-dataset-hex parameter.", is_commissioning=True),
             TestStep(2, "TH reads the Networks attribute list from the DUT on all endpoints (all network commissioning clusters).",
                      "Verify that there is a single connected network across ALL network commissioning clusters. "),
             TestStep(3, "Skip remaining steps if the connected network is NOT on the cluster currently being verified."),
