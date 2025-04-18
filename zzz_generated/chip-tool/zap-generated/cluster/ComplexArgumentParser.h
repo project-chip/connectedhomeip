@@ -87,6 +87,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs
 
 static void Finalize(chip::app::Clusters::detail::Structs::ErrorStateStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::ICECandidateStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::detail::Structs::ICECandidateStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::ICEServerStruct::Type & request,
                         Json::Value & value);
 

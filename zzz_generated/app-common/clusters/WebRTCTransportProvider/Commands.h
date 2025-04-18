@@ -91,7 +91,7 @@ enum class Fields : uint8_t
     kAudioStreamID         = 3,
     kICEServers            = 4,
     kICETransportPolicy    = 5,
-    kMetadataOptions       = 6,
+    kMetadataEnabled       = 6,
 };
 
 struct Type
@@ -107,7 +107,7 @@ public:
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     Optional<DataModel::List<const Structs::ICEServerStruct::Type>> ICEServers;
     Optional<chip::CharSpan> ICETransportPolicy;
-    Optional<chip::BitMask<WebRTCMetadataOptionsBitmap>> metadataOptions;
+    Optional<bool> metadataEnabled;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -128,7 +128,7 @@ public:
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     Optional<DataModel::DecodableList<Structs::ICEServerStruct::DecodableType>> ICEServers;
     Optional<chip::CharSpan> ICETransportPolicy;
-    Optional<chip::BitMask<WebRTCMetadataOptionsBitmap>> metadataOptions;
+    Optional<bool> metadataEnabled;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SolicitOffer
@@ -184,7 +184,7 @@ enum class Fields : uint8_t
     kAudioStreamID         = 5,
     kICEServers            = 6,
     kICETransportPolicy    = 7,
-    kMetadataOptions       = 8,
+    kMetadataEnabled       = 8,
 };
 
 struct Type
@@ -202,7 +202,7 @@ public:
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     Optional<DataModel::List<const Structs::ICEServerStruct::Type>> ICEServers;
     Optional<chip::CharSpan> ICETransportPolicy;
-    Optional<chip::BitMask<WebRTCMetadataOptionsBitmap>> metadataOptions;
+    Optional<bool> metadataEnabled;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -225,7 +225,7 @@ public:
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     Optional<DataModel::DecodableList<Structs::ICEServerStruct::DecodableType>> ICEServers;
     Optional<chip::CharSpan> ICETransportPolicy;
-    Optional<chip::BitMask<WebRTCMetadataOptionsBitmap>> metadataOptions;
+    Optional<bool> metadataEnabled;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ProvideOffer
@@ -317,7 +317,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
-    DataModel::List<const chip::CharSpan> ICECandidates;
+    DataModel::List<const Structs::ICECandidateStruct::Type> ICECandidates;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -333,7 +333,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
-    DataModel::DecodableList<chip::CharSpan> ICECandidates;
+    DataModel::DecodableList<Structs::ICECandidateStruct::DecodableType> ICECandidates;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ProvideICECandidates

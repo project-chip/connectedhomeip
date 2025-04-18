@@ -158,7 +158,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportRequestor::Id; }
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
-    DataModel::List<const chip::CharSpan> ICECandidates;
+    DataModel::List<const Structs::ICECandidateStruct::Type> ICECandidates;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -174,7 +174,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportRequestor::Id; }
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
-    DataModel::DecodableList<chip::CharSpan> ICECandidates;
+    DataModel::DecodableList<Structs::ICECandidateStruct::DecodableType> ICECandidates;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ICECandidates

@@ -48355,23 +48355,38 @@ class WebRTCTransportProvider(Cluster):
             kUnknownEnumValue = 12
 
     class Bitmaps:
-        class WebRTCMetadataOptionsBitmap(IntFlag):
-            kDataTLV = 0x1
+        class Feature(IntFlag):
+            kMetadata = 0x1
 
     class Structs:
+        @dataclass
+        class ICECandidateStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="candidate", Tag=0, Type=str),
+                        ClusterObjectFieldDescriptor(Label="SDPMid", Tag=1, Type=typing.Union[Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="SDPMLineIndex", Tag=2, Type=typing.Union[Nullable, uint]),
+                    ])
+
+            candidate: 'str' = ""
+            SDPMid: 'typing.Union[Nullable, str]' = NullValue
+            SDPMLineIndex: 'typing.Union[Nullable, uint]' = NullValue
+
         @dataclass
         class ICEServerStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="urls", Tag=1, Type=typing.List[str]),
-                        ClusterObjectFieldDescriptor(Label="username", Tag=2, Type=typing.Optional[str]),
-                        ClusterObjectFieldDescriptor(Label="credential", Tag=3, Type=typing.Optional[str]),
-                        ClusterObjectFieldDescriptor(Label="caid", Tag=4, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="URLs", Tag=0, Type=typing.List[str]),
+                        ClusterObjectFieldDescriptor(Label="username", Tag=1, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="credential", Tag=2, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="caid", Tag=3, Type=typing.Optional[uint]),
                     ])
 
-            urls: 'typing.List[str]' = field(default_factory=lambda: [])
+            URLs: 'typing.List[str]' = field(default_factory=lambda: [])
             username: 'typing.Optional[str]' = None
             credential: 'typing.Optional[str]' = None
             caid: 'typing.Optional[uint]' = None
@@ -48382,13 +48397,13 @@ class WebRTCTransportProvider(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="id", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="peerNodeID", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="peerEndpointID", Tag=3, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="streamUsage", Tag=4, Type=WebRTCTransportProvider.Enums.StreamUsageEnum),
-                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=5, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=6, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="metadataOptions", Tag=7, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="id", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="peerNodeID", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="peerEndpointID", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="streamUsage", Tag=3, Type=WebRTCTransportProvider.Enums.StreamUsageEnum),
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=4, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=5, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="metadataEnabled", Tag=6, Type=typing.Optional[bool]),
                         ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
@@ -48398,14 +48413,14 @@ class WebRTCTransportProvider(Cluster):
             streamUsage: 'WebRTCTransportProvider.Enums.StreamUsageEnum' = 0
             videoStreamID: 'typing.Union[Nullable, uint]' = NullValue
             audioStreamID: 'typing.Union[Nullable, uint]' = NullValue
-            metadataOptions: 'uint' = 0
+            metadataEnabled: 'typing.Optional[bool]' = None
             fabricIndex: 'uint' = 0
 
     class Commands:
         @dataclass
         class SolicitOffer(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000553
-            command_id: typing.ClassVar[int] = 0x00000001
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'SolicitOfferResponse'
 
@@ -48419,7 +48434,7 @@ class WebRTCTransportProvider(Cluster):
                         ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=3, Type=typing.Union[None, Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="ICEServers", Tag=4, Type=typing.Optional[typing.List[WebRTCTransportProvider.Structs.ICEServerStruct]]),
                         ClusterObjectFieldDescriptor(Label="ICETransportPolicy", Tag=5, Type=typing.Optional[str]),
-                        ClusterObjectFieldDescriptor(Label="metadataOptions", Tag=6, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="metadataEnabled", Tag=6, Type=typing.Optional[bool]),
                     ])
 
             streamUsage: WebRTCTransportProvider.Enums.StreamUsageEnum = 0
@@ -48428,12 +48443,12 @@ class WebRTCTransportProvider(Cluster):
             audioStreamID: typing.Union[None, Nullable, uint] = None
             ICEServers: typing.Optional[typing.List[WebRTCTransportProvider.Structs.ICEServerStruct]] = None
             ICETransportPolicy: typing.Optional[str] = None
-            metadataOptions: typing.Optional[uint] = None
+            metadataEnabled: typing.Optional[bool] = None
 
         @dataclass
         class SolicitOfferResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000553
-            command_id: typing.ClassVar[int] = 0x00000002
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[typing.Optional[str]] = None
 
@@ -48455,7 +48470,7 @@ class WebRTCTransportProvider(Cluster):
         @dataclass
         class ProvideOffer(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000553
-            command_id: typing.ClassVar[int] = 0x00000003
+            command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'ProvideOfferResponse'
 
@@ -48471,7 +48486,7 @@ class WebRTCTransportProvider(Cluster):
                         ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=5, Type=typing.Union[None, Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="ICEServers", Tag=6, Type=typing.Optional[typing.List[WebRTCTransportProvider.Structs.ICEServerStruct]]),
                         ClusterObjectFieldDescriptor(Label="ICETransportPolicy", Tag=7, Type=typing.Optional[str]),
-                        ClusterObjectFieldDescriptor(Label="metadataOptions", Tag=8, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="metadataEnabled", Tag=8, Type=typing.Optional[bool]),
                     ])
 
             webRTCSessionID: typing.Union[Nullable, uint] = NullValue
@@ -48482,12 +48497,12 @@ class WebRTCTransportProvider(Cluster):
             audioStreamID: typing.Union[None, Nullable, uint] = None
             ICEServers: typing.Optional[typing.List[WebRTCTransportProvider.Structs.ICEServerStruct]] = None
             ICETransportPolicy: typing.Optional[str] = None
-            metadataOptions: typing.Optional[uint] = None
+            metadataEnabled: typing.Optional[bool] = None
 
         @dataclass
         class ProvideOfferResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000553
-            command_id: typing.ClassVar[int] = 0x00000004
+            command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[typing.Optional[str]] = None
 
@@ -48507,7 +48522,7 @@ class WebRTCTransportProvider(Cluster):
         @dataclass
         class ProvideAnswer(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000553
-            command_id: typing.ClassVar[int] = 0x00000005
+            command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[typing.Optional[str]] = None
 
@@ -48525,7 +48540,7 @@ class WebRTCTransportProvider(Cluster):
         @dataclass
         class ProvideICECandidates(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000553
-            command_id: typing.ClassVar[int] = 0x00000006
+            command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[typing.Optional[str]] = None
 
@@ -48534,16 +48549,16 @@ class WebRTCTransportProvider(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="ICECandidates", Tag=1, Type=typing.List[str]),
+                        ClusterObjectFieldDescriptor(Label="ICECandidates", Tag=1, Type=typing.List[WebRTCTransportProvider.Structs.ICECandidateStruct]),
                     ])
 
             webRTCSessionID: uint = 0
-            ICECandidates: typing.List[str] = field(default_factory=lambda: [])
+            ICECandidates: typing.List[WebRTCTransportProvider.Structs.ICECandidateStruct] = field(default_factory=lambda: [])
 
         @dataclass
         class EndSession(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000553
-            command_id: typing.ClassVar[int] = 0x00000007
+            command_id: typing.ClassVar[int] = 0x00000006
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[typing.Optional[str]] = None
 
@@ -48710,24 +48725,35 @@ class WebRTCTransportRequestor(Cluster):
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 12
 
-    class Bitmaps:
-        class WebRTCMetadataOptionsBitmap(IntFlag):
-            kDataTLV = 0x1
-
     class Structs:
+        @dataclass
+        class ICECandidateStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="candidate", Tag=0, Type=str),
+                        ClusterObjectFieldDescriptor(Label="SDPMid", Tag=1, Type=typing.Union[Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="SDPMLineIndex", Tag=2, Type=typing.Union[Nullable, uint]),
+                    ])
+
+            candidate: 'str' = ""
+            SDPMid: 'typing.Union[Nullable, str]' = NullValue
+            SDPMLineIndex: 'typing.Union[Nullable, uint]' = NullValue
+
         @dataclass
         class ICEServerStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="urls", Tag=1, Type=typing.List[str]),
-                        ClusterObjectFieldDescriptor(Label="username", Tag=2, Type=typing.Optional[str]),
-                        ClusterObjectFieldDescriptor(Label="credential", Tag=3, Type=typing.Optional[str]),
-                        ClusterObjectFieldDescriptor(Label="caid", Tag=4, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="URLs", Tag=0, Type=typing.List[str]),
+                        ClusterObjectFieldDescriptor(Label="username", Tag=1, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="credential", Tag=2, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="caid", Tag=3, Type=typing.Optional[uint]),
                     ])
 
-            urls: 'typing.List[str]' = field(default_factory=lambda: [])
+            URLs: 'typing.List[str]' = field(default_factory=lambda: [])
             username: 'typing.Optional[str]' = None
             credential: 'typing.Optional[str]' = None
             caid: 'typing.Optional[uint]' = None
@@ -48738,13 +48764,13 @@ class WebRTCTransportRequestor(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="id", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="peerNodeID", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="peerEndpointID", Tag=3, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="streamUsage", Tag=4, Type=WebRTCTransportRequestor.Enums.StreamUsageEnum),
-                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=5, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=6, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="metadataOptions", Tag=7, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="id", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="peerNodeID", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="peerEndpointID", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="streamUsage", Tag=3, Type=WebRTCTransportRequestor.Enums.StreamUsageEnum),
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=4, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=5, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="metadataEnabled", Tag=6, Type=typing.Optional[bool]),
                         ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
@@ -48754,14 +48780,14 @@ class WebRTCTransportRequestor(Cluster):
             streamUsage: 'WebRTCTransportRequestor.Enums.StreamUsageEnum' = 0
             videoStreamID: 'typing.Union[Nullable, uint]' = NullValue
             audioStreamID: 'typing.Union[Nullable, uint]' = NullValue
-            metadataOptions: 'uint' = 0
+            metadataEnabled: 'typing.Optional[bool]' = None
             fabricIndex: 'uint' = 0
 
     class Commands:
         @dataclass
         class Offer(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000554
-            command_id: typing.ClassVar[int] = 0x00000001
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[typing.Optional[str]] = None
 
@@ -48783,7 +48809,7 @@ class WebRTCTransportRequestor(Cluster):
         @dataclass
         class Answer(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000554
-            command_id: typing.ClassVar[int] = 0x00000002
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[typing.Optional[str]] = None
 
@@ -48801,7 +48827,7 @@ class WebRTCTransportRequestor(Cluster):
         @dataclass
         class ICECandidates(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000554
-            command_id: typing.ClassVar[int] = 0x00000003
+            command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[typing.Optional[str]] = None
 
@@ -48810,16 +48836,16 @@ class WebRTCTransportRequestor(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="ICECandidates", Tag=1, Type=typing.List[str]),
+                        ClusterObjectFieldDescriptor(Label="ICECandidates", Tag=1, Type=typing.List[WebRTCTransportRequestor.Structs.ICECandidateStruct]),
                     ])
 
             webRTCSessionID: uint = 0
-            ICECandidates: typing.List[str] = field(default_factory=lambda: [])
+            ICECandidates: typing.List[WebRTCTransportRequestor.Structs.ICECandidateStruct] = field(default_factory=lambda: [])
 
         @dataclass
         class End(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000554
-            command_id: typing.ClassVar[int] = 0x00000004
+            command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[typing.Optional[str]] = None
 

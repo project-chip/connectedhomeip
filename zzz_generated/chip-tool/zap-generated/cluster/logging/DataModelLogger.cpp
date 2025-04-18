@@ -458,14 +458,47 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::detail::Structs::ICECandidateStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("Candidate", indent + 1, value.candidate);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Candidate'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("SDPMid", indent + 1, value.SDPMid);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'SDPMid'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("SDPMLineIndex", indent + 1, value.SDPMLineIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'SDPMLineIndex'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::detail::Structs::ICEServerStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = LogValue("Urls", indent + 1, value.urls);
+        CHIP_ERROR err = LogValue("URLs", indent + 1, value.URLs);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Urls'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'URLs'");
             return err;
         }
     }
@@ -642,10 +675,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("MetadataOptions", indent + 1, value.metadataOptions);
+        CHIP_ERROR err = LogValue("MetadataEnabled", indent + 1, value.metadataEnabled);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MetadataOptions'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MetadataEnabled'");
             return err;
         }
     }

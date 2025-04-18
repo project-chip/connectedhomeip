@@ -343,11 +343,53 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
 } // namespace ErrorStateStruct
 
+namespace ICECandidateStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kCandidate), candidate);
+    encoder.Encode(to_underlying(Fields::kSDPMid), SDPMid);
+    encoder.Encode(to_underlying(Fields::kSDPMLineIndex), SDPMLineIndex);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kCandidate))
+        {
+            err = DataModel::Decode(reader, candidate);
+        }
+        else if (__context_tag == to_underlying(Fields::kSDPMid))
+        {
+            err = DataModel::Decode(reader, SDPMid);
+        }
+        else if (__context_tag == to_underlying(Fields::kSDPMLineIndex))
+        {
+            err = DataModel::Decode(reader, SDPMLineIndex);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace ICECandidateStruct
+
 namespace ICEServerStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kUrls), urls);
+    encoder.Encode(to_underlying(Fields::kURLs), URLs);
     encoder.Encode(to_underlying(Fields::kUsername), username);
     encoder.Encode(to_underlying(Fields::kCredential), credential);
     encoder.Encode(to_underlying(Fields::kCaid), caid);
@@ -364,9 +406,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
         ReturnErrorOnFailure(err);
 
-        if (__context_tag == to_underlying(Fields::kUrls))
+        if (__context_tag == to_underlying(Fields::kURLs))
         {
-            err = DataModel::Decode(reader, urls);
+            err = DataModel::Decode(reader, URLs);
         }
         else if (__context_tag == to_underlying(Fields::kUsername))
         {
@@ -533,7 +575,7 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optiona
     encoder.Encode(to_underlying(Fields::kStreamUsage), streamUsage);
     encoder.Encode(to_underlying(Fields::kVideoStreamID), videoStreamID);
     encoder.Encode(to_underlying(Fields::kAudioStreamID), audioStreamID);
-    encoder.Encode(to_underlying(Fields::kMetadataOptions), metadataOptions);
+    encoder.Encode(to_underlying(Fields::kMetadataEnabled), metadataEnabled);
     if (aAccessingFabricIndex.HasValue())
     {
         encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
@@ -576,9 +618,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, audioStreamID);
         }
-        else if (__context_tag == to_underlying(Fields::kMetadataOptions))
+        else if (__context_tag == to_underlying(Fields::kMetadataEnabled))
         {
-            err = DataModel::Decode(reader, metadataOptions);
+            err = DataModel::Decode(reader, metadataEnabled);
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
