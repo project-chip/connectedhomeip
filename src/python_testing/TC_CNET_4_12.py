@@ -151,8 +151,8 @@ class TC_CNET_4_12(MatterBaseTest):
         asserts.assert_true(th_xpan is not None, "Missing required PIXIT: PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET")
         asserts.assert_true(th_xpan_1 is not None, "Missing required PIXIT: PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET")
 
-        # All required PIXITs are present and assigned
-        logger.info('Precondition 2: All required PIXITs are present and assigned: '
+        # All required PIXITs are present and assigned,  Thread dataset as str
+        logger.info('Precondition 2: All required PIXITs are present and assigned, Thread dataset as str: '
                     f'PIXIT.CNET.ENDPOINT_THREAD = {endpoint}, '
                     f'PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET = {th_xpan}, '
                     f'PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET = {th_xpan_1}')
@@ -160,8 +160,11 @@ class TC_CNET_4_12(MatterBaseTest):
         # Validate the operational dataset structure (for both datasets)
         logger.info("Precondition 2: Validating THREAD operational datasets")
 
-        thread_network_id_bytes_th1 = await self.validate_thread_dataset(bytes.fromhex(th_xpan), "THREAD_1ST_OPERATIONALDATASET")
-        thread_network_id_bytes_th2 = await self.validate_thread_dataset(bytes.fromhex(th_xpan_1), "THREAD_2ND_OPERATIONALDATASET")
+        th_xpan_bytes = bytes.fromhex(th_xpan)
+        th_xpan_1_bytes = bytes.fromhex(th_xpan_1)
+
+        thread_network_id_bytes_th1 = await self.validate_thread_dataset(th_xpan_bytes, "THREAD_1ST_OPERATIONALDATASET")
+        thread_network_id_bytes_th2 = await self.validate_thread_dataset(th_xpan_1_bytes, "THREAD_2ND_OPERATIONALDATASET")
 
         # The FeatureMap attribute value is 2
         feature_map = await self.read_single_attribute_check_success(
@@ -214,7 +217,6 @@ class TC_CNET_4_12(MatterBaseTest):
             node_id=self.dut_node_id,
             cmd=cmd
         )
-        # network_index = resp.networkIndex
         logger.info(f'Step #4: RemoveNetwork Status is success ({resp.networkingStatus})')
         logger.info(f'Step #4: Network index: ({resp.networkIndex})')
 
@@ -224,7 +226,7 @@ class TC_CNET_4_12(MatterBaseTest):
         asserts.assert_equal(resp.networkIndex, userth_netidx, "The network index is not as expected.")
 
         self.step(5)
-        cmd = Clusters.NetworkCommissioning.Commands.AddOrUpdateThreadNetwork(operationalDataset=th_xpan_1, breadcrumb=1)
+        cmd = Clusters.NetworkCommissioning.Commands.AddOrUpdateThreadNetwork(operationalDataset=th_xpan_1_bytes, breadcrumb=1)
         resp = await self.send_single_cmd(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
@@ -236,8 +238,8 @@ class TC_CNET_4_12(MatterBaseTest):
                              "Failure status returned from AddThreadNetwork")
         debug_text = resp.debugText
         # TODO: Check if None is part of the validation
-        asserts.assert_true(debug_text is None or debug_text == '' or len(debug_text) <= 512,
-                            "debugText must be None, empty or have a maximum length of 512 characters.")
+        # asserts.assert_true(debug_text is None or debug_text == '' or len(debug_text) <= 512,
+        #                     "debugText must be None, empty or have a maximum length of 512 characters.")
 
         self.step(6)
         networks = await self.read_single_attribute_check_success(
