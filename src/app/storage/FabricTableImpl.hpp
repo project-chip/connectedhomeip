@@ -477,9 +477,7 @@ CHIP_ERROR FabricTableImpl<StorageId, StorageData, kIteratorsMax>::Init(Persiste
 
 template <class StorageId, class StorageData, size_t kIteratorsMax>
 void FabricTableImpl<StorageId, StorageData, kIteratorsMax>::Finish()
-{
-    mEntryIterators.ReleaseAll();
-}
+{}
 
 template <class StorageId, class StorageData, size_t kIteratorsMax>
 CHIP_ERROR FabricTableImpl<StorageId, StorageData, kIteratorsMax>::GetFabricEntryCount(FabricIndex fabric_index,
@@ -764,14 +762,6 @@ void FabricTableImpl<StorageId, StorageData, kIteratorsMax>::SetTableSize(uint16
 }
 
 template <class StorageId, class StorageData, size_t kIteratorsMax>
-typename FabricTableImpl<StorageId, StorageData, kIteratorsMax>::EntryIterator *
-FabricTableImpl<StorageId, StorageData, kIteratorsMax>::IterateTableEntries(FabricIndex fabric)
-{
-    VerifyOrReturnError(IsInitialized(), nullptr);
-    return mEntryIterators.CreateObject(*this, fabric, mEndpointId, mMaxPerFabric, mMaxPerEndpoint);
-}
-
-template <class StorageId, class StorageData, size_t kIteratorsMax>
 FabricTableImpl<StorageId, StorageData, kIteratorsMax>::EntryIteratorImpl::EntryIteratorImpl(
     FabricTableImpl & provider, FabricIndex fabricIdx, EndpointId endpoint, uint16_t maxPerFabric, uint16_t maxPerEndpoint) :
     mProvider(provider),
@@ -828,9 +818,7 @@ bool FabricTableImpl<StorageId, StorageData, kIteratorsMax>::EntryIteratorImpl::
 
 template <class StorageId, class StorageData, size_t kIteratorsMax>
 void FabricTableImpl<StorageId, StorageData, kIteratorsMax>::EntryIteratorImpl::Release()
-{
-    mProvider.mEntryIterators.ReleaseObject(this);
-}
+{}
 } // namespace Storage
 } // namespace app
 } // namespace chip

@@ -93,9 +93,6 @@ public:
     CHIP_ERROR RemoveFabric(FabricIndex fabric_index) override;
     CHIP_ERROR RemoveEndpoint() override;
 
-    // Iterators
-    SceneEntryIterator * IterateSceneEntries(FabricIndex fabric_index) override;
-
     void SetTableSize(uint16_t endpointSceneTableSize);
 
 protected:

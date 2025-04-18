@@ -16,30 +16,12 @@
  */
 
 #include <app/clusters/scenes-server/SceneTableImpl.h>
-#include <app/storage/FabricTableImpl.hpp>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <stdlib.h>
 
 using namespace chip;
 using namespace chip::scenes;
 using namespace chip::app::Storage;
-
-template class FabricTableImpl<SceneTableBase::SceneStorageId, SceneTableBase::SceneData, kIteratorsMax>;
-
-namespace {
-/// @brief Tags Used to serialize Scenes so they can be stored in flash memory.
-/// kGroupID: Tag for GroupID if the Scene is a Group Scene
-/// kSceneID: Tag for the scene ID together with the two previous tag, forms the SceneStorageID
-/// kName: Tag for the name of the scene
-/// kTransitionTime: Tag for the transition time of the scene in miliseconds
-enum class TagScene : uint8_t
-{
-    kGroupID = static_cast<uint8_t>(TagEntry::kNextFabricTableTag),
-    kSceneID,
-    kName,
-    kTransitionTimeMs,
-};
-} // namespace
 
 using SceneTableEntry = DefaultSceneTableImpl::SceneTableEntry;
 using SceneStorageId  = DefaultSceneTableImpl::SceneStorageId;
@@ -100,9 +82,28 @@ constexpr EndpointId DefaultSceneTableImpl::Super::kEntryEndpointClusterID()
     return chip::app::Clusters::ScenesManagement::Id;
 }
 
+#include <app/storage/FabricTableImpl.hpp>
+
+namespace {
+/// @brief Tags Used to serialize Scenes so they can be stored in flash memory.
+/// kGroupID: Tag for GroupID if the Scene is a Group Scene
+/// kSceneID: Tag for the scene ID together with the two previous tag, forms the SceneStorageID
+/// kName: Tag for the name of the scene
+/// kTransitionTime: Tag for the transition time of the scene in miliseconds
+enum class TagScene : uint8_t
+{
+    kGroupID = static_cast<uint8_t>(TagEntry::kNextFabricTableTag),
+    kSceneID,
+    kName,
+    kTransitionTimeMs,
+};
+} // namespace
+
 using SceneTableData  = TableEntryData<SceneStorageId, SceneData, Serializer::kPersistentStorageDataBufferMax()>;
 using FabricSceneData = FabricEntryData<SceneStorageId, SceneData, Serializer::kPersistentStorageDataBufferMax(),
                                         Serializer::kPersistentFabricBufferMax(), kMaxScenesPerFabric>;
+
+template class chip::app::Storage::FabricTableImpl<SceneTableBase::SceneStorageId, SceneTableBase::SceneData, kIteratorsMax>;
 
 CHIP_ERROR DefaultSceneTableImpl::Init(PersistentStorageDelegate * storage)
 {
@@ -317,11 +318,6 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveEndpoint()
 void DefaultSceneTableImpl::SetTableSize(uint16_t endpointSceneTableSize)
 {
     FabricTableImpl::SetTableSize(endpointSceneTableSize, static_cast<uint16_t>((endpointSceneTableSize - 1) / 2));
-}
-
-DefaultSceneTableImpl::SceneEntryIterator * DefaultSceneTableImpl::IterateSceneEntries(FabricIndex fabric)
-{
-    return this->IterateTableEntries(fabric);
 }
 
 namespace {

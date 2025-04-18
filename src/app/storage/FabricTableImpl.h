@@ -57,9 +57,6 @@ public:
     CHIP_ERROR RemoveFabric(FabricIndex fabric_index);
     CHIP_ERROR RemoveEndpoint();
 
-    // Iterators
-    EntryIterator * IterateTableEntries(FabricIndex fabric_index);
-
     void SetEndpoint(EndpointId endpoint);
     void SetTableSize(uint16_t endpointEntryTableSize, uint16_t maxPerFabric);
     bool IsInitialized() { return (mStorage != nullptr); }
@@ -108,7 +105,6 @@ protected:
     uint16_t mMaxPerEndpoint;
     EndpointId mEndpointId                     = kInvalidEndpointId;
     chip::PersistentStorageDelegate * mStorage = nullptr;
-    ObjectPool<EntryIteratorImpl, kIteratorsMax> mEntryIterators;
 }; // class FabricTableImpl
 
 template <class StorageId, class StorageData>
