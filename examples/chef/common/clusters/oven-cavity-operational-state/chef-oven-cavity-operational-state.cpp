@@ -26,7 +26,7 @@
 namespace chef {
 namespace OvenCavityOperationalState {
 
-constexpr size_t kOvenCavityOperationalStateTableSize = MATTER_DM_OVEN_CAVITY_OPERATIONAL_STATE_SERVER_ENDPOINT_COUNT;
+constexpr size_t kOvenCavityOperationalStateTableSize = MATTER_DM_OPERATIONAL_STATE_OVEN_CLUSTER_CLIENT_ENDPOINT_COUNT;
 static_assert(kOvenCavityOperationalStateTableSize <= kEmberInvalidEndpointIndex, "OvenCavityOperationalState table size error");
 
 std::unique_ptr<Delegate> gDelegateTable[kOvenCavityOperationalStateTableSize];
