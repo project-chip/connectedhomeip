@@ -20,13 +20,13 @@
 #pragma once
 
 #include <mutex>
-#include <transport.h>
+#include <transport/transport.h>
 #include <vector>
 
 // Connection object to store transport and stream IDs
 struct Connection
 {
-    Transport * transport;
+    camera::Transport * transport;
     uint16_t videoStreamID;
     uint16_t audioStreamID;
 };

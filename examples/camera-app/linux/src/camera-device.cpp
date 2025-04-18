@@ -55,6 +55,9 @@ CameraDevice::CameraDevice()
     // Set the CameraHALInterface in CameraAVStreamManager and CameraAVsettingsUserLevelManager.
     mCameraAVStreamManager.SetCameraDeviceHAL(this);
     mCameraAVSettingsUserLevelManager.SetCameraDeviceHAL(this);
+
+    // Set the CameraHALInterface in PushAVTransportManager.
+    // mPushAVTransportManager.SetCameraDeviceHAL(this);
 }
 
 CameraDevice::~CameraDevice()
@@ -63,6 +66,11 @@ CameraDevice::~CameraDevice()
     {
         close(videoDeviceFd);
     }
+}
+
+void CameraDevice::RegisterTransport(camera::Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID)
+{
+    mMediaController.RegisterTransport(transport, videoStreamID, audioStreamID);
 }
 
 CameraError CameraDevice::InitializeCameraDevice()
@@ -735,6 +743,11 @@ ChimeDelegate & CameraDevice::GetChimeDelegate()
 WebRTCTransportProvider::Delegate & CameraDevice::GetWebRTCProviderDelegate()
 {
     return mWebRTCProviderManager;
+}
+
+PushAvStreamTransport::PushAvStreamTransportDelegate & CameraDevice::GetPushAVDelegate()
+{
+    return mPushAVTransportManager;
 }
 
 CameraAVStreamMgmtDelegate & CameraDevice::GetCameraAVStreamMgmtDelegate()
