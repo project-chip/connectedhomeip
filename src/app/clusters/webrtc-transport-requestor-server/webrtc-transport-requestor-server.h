@@ -104,7 +104,7 @@ public:
     virtual CHIP_ERROR HandleEnd(uint16_t sessionId, WebRTCEndReasonEnum reasonCode) = 0;
 };
 
-class WebRTCTransportRequestorServer : private AttributeAccessInterface, private CommandHandlerInterface
+class WebRTCTransportRequestorServer : private AttributeAccessInterface, private CommandHandlerInterfaceB
 {
 public:
     enum class UpsertResultEnum : uint8_t

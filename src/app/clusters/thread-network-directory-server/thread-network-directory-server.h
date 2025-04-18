@@ -31,7 +31,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-class ThreadNetworkDirectoryServer : private AttributeAccessInterface, private CommandHandlerInterface
+class ThreadNetworkDirectoryServer : private AttributeAccessInterface, private CommandHandlerInterfaceB
 {
 public:
     ThreadNetworkDirectoryServer(EndpointId endpoint, ThreadNetworkDirectoryStorage & storage);
@@ -73,8 +73,7 @@ class DefaultThreadNetworkDirectoryServer final : public ThreadNetworkDirectoryS
 public:
     DefaultThreadNetworkDirectoryServer(EndpointId endpoint,
                                         PersistentStorageDelegate & storage = Server::GetInstance().GetPersistentStorage()) :
-        ThreadNetworkDirectoryServer(endpoint, mStorage),
-        mStorage(storage)
+        ThreadNetworkDirectoryServer(endpoint, mStorage), mStorage(storage)
     {}
 
 private:
