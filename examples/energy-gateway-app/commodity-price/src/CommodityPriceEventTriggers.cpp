@@ -92,8 +92,8 @@ void SetTestEventTrigger_ForecastUpdate()
         return;
     }
 
-    constexpr size_t kForecastSize = 4; // TODO this should be bigger
-    // but causes issues when too large in attribute and command encoding
+    constexpr size_t kForecastSize = 56;
+
     constexpr uint16_t kMinPrice        = 4000;  // 4p / kWh
     constexpr uint16_t kMaxPrice        = 32000; // 32p / kWh
     constexpr uint32_t k30MinsInSeconds = 30 * 60;

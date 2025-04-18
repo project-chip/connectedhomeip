@@ -263,24 +263,68 @@ Instance::GetDetailedForecastRequest(chip::BitMask<CommodityPriceDetailBitmap> d
 
     size_t count = 0;
 
+    // Try to dynamically size the response so it will fit based on what is requested
+    size_t maxEntries = kMaxForecastEntries;
+
+    constexpr size_t kMaxByteCount = 900; // TODO work out what the max udp packet size is
+    size_t estimatedByteCount      = 0;
     for (const auto & srcPrice : mPriceForecast)
     {
-        if (count >= kMaxForecastEntries)
+        if (count >= maxEntries)
             break; // Avoid overflow
 
         Structs::CommodityPriceStruct::Type copy = srcPrice;
 
+        estimatedByteCount += 4 + 1; // periodStart (epoch_s)
+        if (!copy.periodEnd.IsNull())
+            estimatedByteCount += 4 + 1; // periodEnd (epoch_s) is optional
+        if (copy.price.HasValue())
+            estimatedByteCount += 8 + 1; // price (int64_t) is optional
+        if (copy.priceLevel.HasValue())
+            estimatedByteCount += 2 + 1; // priceLevel (int16_t) is optional
+
         if (!details.Has(CommodityPriceDetailBitmap::kComponents))
         {
             copy.components.ClearValue();
+        }
+        else
+        {
+            for (const auto & component : copy.components.Value())
+            {
+                if (component.tariffComponentID.HasValue())
+                {
+                    estimatedByteCount += 4 + 1;
+                }
+                if (component.description.HasValue())
+                {
+                    estimatedByteCount += component.description.Value().size() + 2;
+                }
+                // price is int64_t, tariffPriceEnum is unit8 + tags
+                estimatedByteCount += 8 + 1 + 2;
+            }
         }
 
         if (!details.Has(CommodityPriceDetailBitmap::kDescription))
         {
             copy.description.ClearValue();
         }
+        else
+        {
+            if (copy.description.HasValue())
+            {
+                estimatedByteCount += copy.description.Value().size() + 2;
+            }
+        }
 
-        buffer[count++] = copy;
+        if (estimatedByteCount < kMaxByteCount)
+        {
+            buffer[count++] = copy;
+        }
+        else
+        {
+            // Packet is likely to be full now so stop
+            break;
+        }
     }
 
     // Now wrap in Span + List
