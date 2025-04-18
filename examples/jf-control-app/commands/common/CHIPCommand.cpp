@@ -359,7 +359,7 @@ std::string CHIPCommand::GetIdentity()
             // normalize name since it is used in persistent storage
 
             char s[24];
-            sprintf(s, "%" PRIu64, fabricId);
+            sprintf(s, "%lx", fabricId);
 
             name = s;
         }
@@ -475,7 +475,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
     commissioner->SetUdcListenPort(udcListenPort);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     chip::Controller::SetupParams commissionerParams;
-    chip::CASEAuthTag administratorCAT = chip::GetAdminCATHavingVersion(CHIP_CONFIG_ADMINISTRATOR_CAT_INITIAL_VERSION);
+    chip::CASEAuthTag administratorCAT = chip::GetAdminCATWithVersion(CHIP_CONFIG_ADMINISTRATOR_CAT_INITIAL_VERSION);
 
     ReturnLogErrorOnFailure(mCredIssuerCmds->SetupDeviceAttestation(commissionerParams, sTrustStore, sRevocationDelegate));
 

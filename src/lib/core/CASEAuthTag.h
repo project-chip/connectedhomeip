@@ -63,12 +63,12 @@ constexpr uint16_t GetCASEAuthTagVersion(CASEAuthTag aCAT)
     return static_cast<uint16_t>(aCAT & kTagVersionMask);
 }
 
-constexpr CASEAuthTag GetAdminCATHavingVersion(uint16_t version)
+constexpr CASEAuthTag GetAdminCATWithVersion(uint16_t version)
 {
     return ((static_cast<uint32_t>(kAdminCATIdentifier) << 16) | version);
 }
 
-constexpr CASEAuthTag GetAnchorCATHavingVersion(uint16_t version)
+constexpr CASEAuthTag GetAnchorCATWithVersion(uint16_t version)
 {
     return ((static_cast<uint32_t>(kAnchorCATIdentifier) << 16) | version);
 }

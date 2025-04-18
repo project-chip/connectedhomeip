@@ -84,6 +84,8 @@ static_library("jfc-utils") {
     "commands/common/HexConversion.h",
     "commands/common/RemoteDataModelLogger.cpp",
     "commands/common/RemoteDataModelLogger.h",
+    "commands/example/ExampleOperationalCredentialsIssuer.cpp",
+    "commands/example/ExampleOperationalCredentialsIssuer.h",
     "commands/icd/ICDCommand.cpp",
     "commands/icd/ICDCommand.h",
     "commands/pairing/OpenCommissioningWindowCommand.cpp",

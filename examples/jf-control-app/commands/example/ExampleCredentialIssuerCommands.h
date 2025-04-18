@@ -20,11 +20,12 @@
 
 #include <commands/common/CredentialIssuerCommands.h>
 #include <controller/CHIPDeviceControllerFactory.h>
-#include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+
+#include "commands/example/ExampleOperationalCredentialsIssuer.h"
 
 class ExampleCredentialIssuerCommands : public CredentialIssuerCommands
 {
@@ -112,6 +113,6 @@ protected:
     bool mAllowTestCdSigningKey = true;
 
 private:
-    chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
+    chip::CustomCredentialsIssuer::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
     chip::Credentials::DeviceAttestationVerifier * mDacVerifier;
 };

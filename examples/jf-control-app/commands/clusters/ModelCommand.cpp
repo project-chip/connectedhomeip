@@ -35,7 +35,7 @@ CHIP_ERROR ModelCommand::RunCommand()
         return SendGroupCommand(GroupIdFromNodeId(mDestinationId), fabricIndex);
     }
 
-    ChipLogProgress(chipTool, "Sending command to node 0x%" PRIx64, mDestinationId);
+    ChipLogProgress(chipTool, "Sending command to node " ChipLogFormatX64, ChipLogValueX64(mDestinationId));
     CheckPeerICDType();
 
     CommissioneeDeviceProxy * commissioneeDeviceProxy = nullptr;

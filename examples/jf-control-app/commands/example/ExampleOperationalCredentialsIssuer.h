@@ -38,9 +38,9 @@
 #include <lib/support/Span.h>
 
 namespace chip {
-namespace Controller {
+namespace CustomCredentialsIssuer {
 
-class DLL_EXPORT ExampleOperationalCredentialsIssuer : public OperationalCredentialsDelegate
+class DLL_EXPORT ExampleOperationalCredentialsIssuer : public chip::Controller::OperationalCredentialsDelegate
 {
 public:
     //
@@ -57,7 +57,7 @@ public:
 
     CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce, const ByteSpan & attestationSignature,
                                 const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI,
-                                Callback::Callback<OnNOCChainGeneration> * onCompletion) override;
+                                Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion) override;
 
     void SetNodeIdForNextNOCRequest(NodeId nodeId) override
     {
@@ -67,12 +67,11 @@ public:
 
     void SetMaximallyLargeCertsUsed(bool areMaximallyLargeCertsUsed) { mUseMaximallySizedCerts = areMaximallyLargeCertsUsed; }
 
-    // When enabled, chains will be Root -> NOC, for the given fabric ID, and not include an ICAC.
-    void SetAlwaysOmitIcac(bool enabled) { mAlwaysOmitIcac = enabled; }
-
     void SetFabricIdForNextNOCRequest(FabricId fabricId) override { mNextFabricId = fabricId; }
 
     void SetCATValuesForNextNOCRequest(CATValues cats) { mNextCATs = cats; }
+
+    void SetCaseAdminSubjectForNextNOCRequest(NodeId caseAdminSubject) { mNextCaseAdminSubject = caseAdminSubject; }
 
     /**
      * @brief Initialize the issuer with the keypair in the storage.
@@ -87,7 +86,7 @@ public:
     [[deprecated("This class stores the encryption key in clear storage. Don't use it for production code.")]] CHIP_ERROR
     Initialize(PersistentStorageDelegate & storage);
 
-    void SetIssuerId(uint32_t id) { mRootIssuerId = id; }
+    void SetIssuerId(uint32_t id) { mIssuerId = id; }
 
     void SetCurrentEpoch(uint32_t epoch) { mNow = epoch; }
 
@@ -112,12 +111,14 @@ public:
                                                MutableByteSpan & noc);
 
 private:
-    Crypto::P256Keypair mRootIssuer;
+    Crypto::P256Keypair mIssuer;
     Crypto::P256Keypair mIntermediateIssuer;
-    bool mInitialized              = false;
-    uint32_t mRootIssuerId         = 1;
-    uint32_t mIntermediateIssuerId = 2;
-    uint32_t mNow                  = 0;
+    Crypto::P256Keypair mAnchorIntermediateIssuer;
+    bool mInitialized                    = false;
+    uint32_t mIssuerId                   = 1;
+    uint32_t mIntermediateIssuerId       = 2;
+    uint32_t mAnchorIntermediateIssuerId = 3;
+    uint32_t mNow                        = 0;
 
     // By default, let's set validity to 10 years
     uint32_t mValidity = 365 * 24 * 60 * 60 * 10;
@@ -125,14 +126,14 @@ private:
     NodeId mNextAvailableNodeId          = 1;
     PersistentStorageDelegate * mStorage = nullptr;
     bool mUseMaximallySizedCerts         = false;
-    bool mAlwaysOmitIcac                 = false;
 
-    NodeId mNextRequestedNodeId = 1;
-    FabricId mNextFabricId      = 1;
-    CATValues mNextCATs         = kUndefinedCATs;
-    bool mNodeIdRequested       = false;
-    uint64_t mIndex             = 0;
+    NodeId mNextRequestedNodeId  = 1;
+    FabricId mNextFabricId       = 1;
+    CATValues mNextCATs          = kUndefinedCATs;
+    NodeId mNextCaseAdminSubject = kUndefinedNodeId;
+    bool mNodeIdRequested        = false;
+    uint64_t mIndex              = 0;
 };
 
-} // namespace Controller
+} // namespace CustomCredentialsIssuer
 } // namespace chip

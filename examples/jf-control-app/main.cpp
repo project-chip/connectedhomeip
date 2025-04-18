@@ -32,6 +32,9 @@
 
 #include <zap-generated/cluster/Commands.h>
 
+/* RPC params can also be changed through command line arguments
+ * see --rpc-server-ip/--rpc-server-port arguments
+ */
 static std::string rpcServerIp = "127.0.0.1";
 static uint16_t rpcServerPort  = 33000;
 CHIP_ERROR RpcConnect();
@@ -50,6 +53,7 @@ int main(int argc, char * argv[])
 {
     // Convert command line arguments to a vector of strings for easier manipulation
     std::vector<std::string> args(argv, argv + argc);
+    std::vector<char *> c_args;
 
     // Check if "interactive" and "start" are not in the arguments
     if (args.size() < 3 || args[1] != "interactive" || args[2] != "start")
@@ -59,6 +63,34 @@ int main(int argc, char * argv[])
         args.insert(args.begin() + 2, "start");
     }
 
+    for (size_t i = 0; i < args.size(); i++)
+    {
+        if (args[i] == "--rpc-server-ip" && ((i + 1) < args.size()))
+        {
+            rpcServerIp = args[i + 1];
+            ++i;
+        }
+        else if (args[i] == "--rpc-server-port" && ((i + 1) < args.size()))
+        {
+            rpcServerPort = static_cast<uint16_t>(atoi(args[i + 1].c_str()));
+            ++i;
+        }
+        else
+        {
+            // do not propagate the RPC details to the interactive engine
+            c_args.push_back(const_cast<char *>(args[i].c_str()));
+        }
+    }
+
+    /* connect to the jf-admin-app RPC server */
+    if (RpcConnect() != CHIP_NO_ERROR)
+    {
+        ChipLogError(JointFabric, "RPC: Unable to connect to the jf-admin-app@%s:%d", rpcServerIp.c_str(), rpcServerPort);
+        ChipLogError(JointFabric,
+                     "RPC: Try specifying a different IP Address/Port using --rpc-server-ip/rpc-server-port arguments!");
+        return -1;
+    }
+
     ExampleCredentialIssuerCommands credIssuerCommands;
     Commands commands;
     registerCommandsICD(commands, &credIssuerCommands);
@@ -66,19 +98,6 @@ int main(int argc, char * argv[])
     registerCommandsPairing(commands, &credIssuerCommands);
     registerClusters(commands, &credIssuerCommands);
     registerCommandsSubscriptions(commands, &credIssuerCommands);
-
-    std::vector<char *> c_args;
-    for (auto & arg : args)
-    {
-        c_args.push_back(const_cast<char *>(arg.c_str()));
-    }
-
-    /* connect to the jf-admin-app RPC server (ownership transfer) */
-    if (RpcConnect() != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(NotSpecified, "RPC: Unable to connect to the jf-admin-app@%s:%d", rpcServerIp.c_str(), rpcServerPort);
-        return -1;
-    }
 
     return commands.Run(static_cast<int>(c_args.size()), c_args.data());
 }

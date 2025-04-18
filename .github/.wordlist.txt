@@ -755,6 +755,7 @@ itsfoss
 IW
 JDK
 jinja
+JCM
 JLink
 JLinkExe
 JLinkRTTClient
