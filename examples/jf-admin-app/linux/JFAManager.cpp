@@ -92,14 +92,14 @@ void JFAManager::ConnectToNode(ScopedNodeId scopedNodeId, OnConnectedAction onCo
 
     if ((scopedNodeId.GetFabricIndex() == kUndefinedFabricIndex) || (scopedNodeId.GetNodeId() == kUndefinedNodeId))
     {
-        ChipLogError(NotSpecified, "Invalid node location!");
+        ChipLogError(JointFabric, "Invalid node location!");
         return;
     }
 
     // Set the action to take once connection is successfully established
     mOnConnectedAction = onConnectedAction;
 
-    ChipLogDetail(NotSpecified, "Establishing session to node ID 0x" ChipLogFormatX64 " on fabric index %d",
+    ChipLogDetail(JointFabric, "Establishing session to node ID 0x" ChipLogFormatX64 " on fabric index %d",
                   ChipLogValueX64(scopedNodeId.GetNodeId()), scopedNodeId.GetFabricIndex());
 
     mCASESessionManager->FindOrEstablishSession(scopedNodeId, &mOnConnectedCallback, &mOnConnectionFailureCallback);
@@ -113,7 +113,7 @@ void JFAManager::OnConnected(void * context, Messaging::ExchangeManager & exchan
     jfaManager->mSessionHolder.Grab(sessionHandle);
     jfaManager->mExchangeMgr = &exchangeMgr;
 
-    ChipLogProgress(NotSpecified, "Established CASE");
+    ChipLogProgress(JointFabric, "Established CASE");
 
     switch (jfaManager->mOnConnectedAction)
     {
@@ -132,7 +132,7 @@ void JFAManager::OnConnectionFailure(void * context, const ScopedNodeId & peerId
     JFAManager * jfaManager = static_cast<JFAManager *>(context);
     VerifyOrDie(jfaManager != nullptr);
 
-    ChipLogError(NotSpecified, "Failed to establish connection to 0x" ChipLogFormatX64 " on fabric index %d",
+    ChipLogError(JointFabric, "Failed to establish connection to 0x" ChipLogFormatX64 " on fabric index %d",
                  ChipLogValueX64(peerId.GetNodeId()), peerId.GetFabricIndex());
 
     jfaManager->ReleaseSession();
@@ -147,7 +147,7 @@ CHIP_ERROR JFAManager::SendCommissioningComplete()
         return CHIP_ERROR_UNINITIALIZED;
     }
 
-    ChipLogProgress(NotSpecified, "SendCommissioningComplete: invoke cluster command.");
+    ChipLogProgress(JointFabric, "SendCommissioningComplete: invoke cluster command.");
     Controller::ClusterBase cluster(*mExchangeMgr, mSessionHolder.Get().Value(), kRootEndpointId);
     return cluster.InvokeCommand(request, this, OnCommissioningCompleteResponse, OnCommissioningCompleteFailure);
 }
@@ -159,7 +159,7 @@ void JFAManager::OnCommissioningCompleteResponse(
     VerifyOrDie(jfaManagerCore != nullptr);
     jfaManagerCore->ReleaseSession();
 
-    ChipLogProgress(NotSpecified, "OnCommissioningCompleteResponse, Code=%u", to_underlying(data.errorCode));
+    ChipLogProgress(JointFabric, "OnCommissioningCompleteResponse, Code=%u", to_underlying(data.errorCode));
 
     if (data.errorCode != GeneralCommissioning::CommissioningErrorEnum::kOk)
     {
@@ -179,5 +179,5 @@ void JFAManager::OnCommissioningCompleteFailure(void * context, CHIP_ERROR error
     VerifyOrDie(jfaManagerCore != nullptr);
     jfaManagerCore->ReleaseSession();
 
-    ChipLogError(NotSpecified, "Received failure response %s\n", chip::ErrorStr(error));
+    ChipLogError(JointFabric, "Received failure response %s\n", chip::ErrorStr(error));
 }

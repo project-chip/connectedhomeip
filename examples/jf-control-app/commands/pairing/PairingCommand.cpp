@@ -47,7 +47,7 @@ CHIP_ERROR PairingCommand::RunCommand()
     {
         if (!mAnchor.ValueOr(false))
         {
-            ChipLogError(chipTool, "Please first commission the Anchor Administrator: add `--anchor true` parameter");
+            ChipLogError(JointFabric, "Please first commission the Anchor Administrator: add `--anchor true` parameter");
             return CHIP_ERROR_NOT_CONNECTED;
         }
         else
@@ -60,7 +60,7 @@ CHIP_ERROR PairingCommand::RunCommand()
     }
     else if (mAnchor.ValueOr(false))
     {
-        ChipLogError(chipTool, "Anchor Administrator already commissioned as Node ID: " ChipLogFormatX64,
+        ChipLogError(JointFabric, "Anchor Administrator already commissioned as Node ID: " ChipLogFormatX64,
                      ChipLogValueX64(mAnchorNodeId));
         return CHIP_ERROR_BAD_REQUEST;
     }
@@ -506,11 +506,11 @@ void OnOwnershipTransferDone(const _pw_protobuf_Empty & response, ::pw::Status s
 
     if (status.ok())
     {
-        ChipLogProgress(chipTool, "OnOwnershipTransferDone RPC call succeeded!");
+        ChipLogProgress(JointFabric, "OnOwnershipTransferDone RPC call succeeded!");
     }
     else
     {
-        ChipLogProgress(chipTool, "OnOwnershipTransferDone RPC call failed with status: %d\n", status.code());
+        ChipLogProgress(JointFabric, "OnOwnershipTransferDone RPC call failed with status: %d\n", status.code());
     }
 }
 
@@ -522,7 +522,7 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
     {
         if (!mSkipCommissioningComplete.ValueOr(false))
         {
-            ChipLogProgress(chipTool, "Anchor Administrator commissioned with sucess");
+            ChipLogProgress(JointFabric, "Anchor Administrator commissioned with sucess");
             mAnchorNodeId = nodeId;
         }
         else
@@ -535,14 +535,14 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
             auto call = rpcClient.TransferOwnership(request, OnOwnershipTransferDone);
             if (!call.active())
             {
-                ChipLogError(chipTool, "RPC: OwnershipTransfer Call Error");
+                ChipLogError(JointFabric, "RPC: OwnershipTransfer Call Error");
                 // The RPC call was not sent. This could occur due to, for example, an invalid channel ID. Handle if necessary.
             }
 
             err = WaitForResponse(call);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(chipTool, "RPC: OwnershipTransfer Timeout Error");
+                ChipLogError(JointFabric, "RPC: OwnershipTransfer Timeout Error");
             }
         }
     }
