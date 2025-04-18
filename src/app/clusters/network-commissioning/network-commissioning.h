@@ -40,7 +40,7 @@ class InstanceListNode : public IntrusiveListNodeBase<>
 };
 
 // TODO: Use macro to disable some wifi or thread
-class Instance : public CommandHandlerInterface,
+class Instance : public CommandHandlerInterfaceShim,
                  public AttributeAccessInterface,
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
                  private InstanceListNode,

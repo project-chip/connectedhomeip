@@ -172,9 +172,8 @@ class Instance : public AttributeAccessInterface, public CommandHandlerInterface
 public:
     Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature, OptionalAttributes aOptionalAttrs,
              OptionalCommands aOptionalCmds) :
-        AttributeAccessInterface(MakeOptional(aEndpointId), Id),
-        CommandHandlerInterface(MakeOptional(aEndpointId), Id), mDelegate(aDelegate), mFeature(aFeature),
-        mOptionalAttrs(aOptionalAttrs), mOptionalCmds(aOptionalCmds)
+        AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterface(MakeOptional(aEndpointId), Id),
+        mDelegate(aDelegate), mFeature(aFeature), mOptionalAttrs(aOptionalAttrs), mOptionalCmds(aOptionalCmds)
     {
         /* set the base class delegates endpointId */
         mDelegate.SetEndpointId(aEndpointId);
@@ -200,7 +199,8 @@ private:
 
     // CommandHandlerInterface
     void InvokeCommand(HandlerContext & handlerContext) override;
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
+    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                                         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
     void HandleDisable(HandlerContext & ctx, const Commands::Disable::DecodableType & commandData);
     void HandleEnableCharging(HandlerContext & ctx, const Commands::EnableCharging::DecodableType & commandData);
