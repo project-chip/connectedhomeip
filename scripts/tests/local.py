@@ -860,8 +860,7 @@ def python_tests(
             for script in to_run:
                 bar.text(script)
                 cmd = [
-                    "scripts/run_in_python_env.sh",
-                    "out/venv",
+                    "out/venv/bin/python",
                     f"./scripts/tests/run_python_test.py --load-from-env out/test_env.yaml --script {script}",
                 ]
 
