@@ -82,7 +82,7 @@ class TC_SEPR_2_2(CommodityPriceTestBaseHelper, MatterBaseTest):
                      """Verify that the DUT response contains GetDetailedPriceResponse with CurrentPrice is a CommodityPriceStruct or is null. If not null:
                         - verify that the PeriodStart is in the past.
                         - verify that the PeriodEnd is in the future or is null.
-                        - verify that the Price is null or a PriceStruct with a valid Amount as a signed integer and Currency contains a CurrencyStruct with a valid Currency.Currency (unsigned integer max 999) and Currency.DecimalPoints.
+                        - verify that the Price is null or Money type
                         - verify that the PriceLevel is null or a valid signed integer.
                         - verify that either or both of Price, PriceLevel are not null.
                         - verify that the Description is a string with max length of 32.
@@ -91,18 +91,47 @@ class TC_SEPR_2_2(CommodityPriceTestBaseHelper, MatterBaseTest):
                      """Verify that the DUT response contains GetDetailedPriceResponse with CurrentPrice is a CommodityPriceStruct or is null. If not null:
                         - verify that the PeriodStart is in the past.
                         - verify that the PeriodEnd is in the future or is null.
-                        - verify that the Price is null or a PriceStruct with a valid Amount as a signed integer and Currency which contains a CurrencyStruct with a valid Currency.Currency (unsigned integer max 999) and Currency.DecimalPoints.
+                        - verify that the Price is null or Money type.
                         - verify that the PriceLevel is null or a valid signed integer.
                         - verify that either or both of Price, PriceLevel are not null.
                         - verify that the Description field is not included.
                         - verify that the Components field is included. It may be an empty list but shall have no more than 10 entries.
-                             Each entry shall have a valid value of Price (money) or PriceLevel (signed int16) or both, Source (a valid TariffPriceTypeEnum), it may include an optional Description (a string of max length 32) and may include an optional TariffComponentID (unsigned integer value)."""),
+                             Each entry shall have a valid value of Price (money), Source (a valid TariffPriceTypeEnum), it may include an optional Description (a string of max length 32) and may include an optional TariffComponentID (unsigned integer value)."""),
             TestStep("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.SEPR.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.SEPR.TESTEVENTTRIGGER for Price Update Test Event",
                      """Verify DUT responds w/ status SUCCESS(0x00) and event SEPR.S.E0000(PriceChange) sent.
                         Store the event's CurrentPrice field as NewCurrentPrice.
-                        Verify that CurrentPrice is a CommodityPriceStruct or is null. If not null verify it includes a PeriodStart that is within 10s of the event timestamp."""),
+                        Verify that CurrentPrice is a CommodityPriceStruct or is null."""),
             TestStep("6a", "TH reads CurrentPrice attribute.",
                      "Verify that the DUT response contains a CommodityPriceStruct value. Verify that the value matches the NewCurrentPrice from step 6."),
+            TestStep("7", "TH sends command GetDetailedPriceRequest with Details=CommodityPriceDetailBitmap.Description set to True, and Components set to False.",
+                     """Verify that the DUT response contains GetDetailedPriceResponse with CurrentPrice is a CommodityPriceStruct or is null. If not null:
+                        - verify that the PeriodStart is in the past.
+                        - verify that the PeriodEnd is in the future or is null.
+                        - verify that the Price is null or Money type
+                        - verify that the PriceLevel is null or a valid signed integer.
+                        - verify that either or both of Price, PriceLevel are not null.
+                        - verify that the Description is a string with max length of 32.
+                        - verify that the Components list is not included."""),
+            TestStep("8", "TH sends command GetDetailedPriceRequest with Details=CommodityPriceDetailBitmap.Description set to False and Components set to True.",
+                     """Verify that the DUT response contains GetDetailedPriceResponse with CurrentPrice is a CommodityPriceStruct or is null. If not null:
+                        - verify that the PeriodStart is in the past.
+                        - verify that the PeriodEnd is in the future or is null.
+                        - verify that the Price is null or Money type.
+                        - verify that the PriceLevel is null or a valid signed integer.
+                        - verify that either or both of Price, PriceLevel are not null.
+                        - verify that the Description field is not included.
+                        - verify that the Components field is included. It may be an empty list but shall have no more than 10 entries.
+                             Each entry shall have a valid value of Price (money), Source (a valid TariffPriceTypeEnum), it may include an optional Description (a string of max length 32) and may include an optional TariffComponentID (unsigned integer value)."""),
+            TestStep("9", "TH sends command GetDetailedPriceRequest with Details=CommodityPriceDetailBitmap.Description set to True and Components set to True.",
+                     """Verify that the DUT response contains GetDetailedPriceResponse with CurrentPrice is a CommodityPriceStruct or is null. If not null:
+                        - verify that the PeriodStart is in the past.
+                        - verify that the PeriodEnd is in the future or is null.
+                        - verify that the Price is null or Money type.
+                        - verify that the PriceLevel is null or a valid signed integer.
+                        - verify that either or both of Price, PriceLevel are not null.
+                        - verify that the Description is a string with max length of 32.
+                        - verify that the Components field is included. It may be an empty list but shall have no more than 10 entries.
+                             Each entry shall have a valid value of Price (money), Source (a valid TariffPriceTypeEnum), it may include an optional Description (a string of max length 32) and may include an optional TariffComponentID (unsigned integer value)."""),
 
         ]
 
@@ -128,23 +157,113 @@ class TC_SEPR_2_2(CommodityPriceTestBaseHelper, MatterBaseTest):
         await self.check_test_event_triggers_enabled()
 
         self.step("4")
-        # TH sends command GetDetailedPriceRequest with Details=CommodityPriceDetailBitmap.Description set to True, and Components set to False.
-        val = await self.send_get_detailed_price_request(details=cluster.Bitmaps.CommodityPriceDetailBitmap.kDescription)
+        # TH sends command GetDetailedPriceRequest with Details=CommodityPriceDetailBitmap.Description set to True,
+        # and Components set to False.
+        details = cluster.Bitmaps.CommodityPriceDetailBitmap.kDescription
+        val = await self.send_get_detailed_price_request(details=details)
 
-        # Verify that the DUT response contains GetDetailedPriceResponse with CurrentPrice is a CommodityPriceStruct or is null.
+        # Verify that the DUT response contains GetDetailedPriceResponse with
+        # CurrentPrice is a CommodityPriceStruct or is null.
+        if val.currentPrice is not NullValue:
+            asserts.assert_true(isinstance(
+                val.currentPrice, cluster.Structs.CommodityPriceStruct), "val must be of type CommodityPriceStruct")
+
+            # The other aspects of this verification are handled by the helper
+            await self.test_checkCommodityPriceStruct(endpoint=endpoint, cluster=cluster, struct=val.CurrentPrice,
+                                                      details=details)
+
+        self.step("5")
+        # TH sends command GetDetailedPriceRequest with Details=CommodityPriceDetailBitmap.Description set to False
+        # and Components set to True.
+        details = cluster.Bitmaps.CommodityPriceDetailBitmap.kComponents
+        val = await self.send_get_detailed_price_request(details=details)
+
+        if val.currentPrice is not NullValue:
+            asserts.assert_true(isinstance(
+                val.currentPrice, cluster.Structs.CommodityPriceStruct), "val must be of type CommodityPriceStruct")
+
+            # The other aspects of this verification are handled by the helper
+            await self.test_checkCommodityPriceStruct(endpoint=endpoint, cluster=cluster, struct=val.CurrentPrice,
+                                                      details=details)
+
+        self.step("6")
+        # TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.SEPR.TESTEVENT_TRIGGERKEY
+        # and EventTrigger field set to PIXIT.SEPR.TESTEVENTTRIGGER for Price Update Test Event
+        # Verify DUT responds w/ status SUCCESS(0x00) and event SEPR.S.E0000(PriceChange) sent.
+        # Store the event's CurrentPrice field as NewCurrentPrice.
+        # Verify that CurrentPrice is a CommodityPriceStruct or is null
+        await self.send_test_event_trigger_price_update()
+
+        event_data = events_callback.wait_for_event_report(
+            Clusters.CommodityPrice.Events.PriceChange)
+
+        details = 0  # In an event we should not have any description or components
+        newCurrentPrice = event_data.currentPrice
+        if newCurrentPrice is not NullValue:
+            asserts.assert_true(isinstance(
+                newCurrentPrice, cluster.Structs.CommodityPriceStruct), "val must be of type CommodityPriceStruct")
+
+            # The other aspects of this verification are handled by the helper
+            await self.test_checkCommodityPriceStruct(endpoint=endpoint, cluster=cluster,
+                                                      struct=newCurrentPrice,
+                                                      details=details)
+
+        self.step("6a")
+        # TH reads CurrentPrice attribute.
+        # Verify that the DUT response contains a CommodityPriceStruct value.
+        # Verify that the value matches the NewCurrentPrice from step 6
+        val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
+                                                             attribute=cluster.Attributes.CurrentPrice)
         if val is not NullValue:
             asserts.assert_true(isinstance(
                 val, cluster.Structs.CommodityPriceStruct), "val must be of type CommodityPriceStruct")
+            await self.test_checkCommodityPriceStruct(endpoint=endpoint, cluster=cluster, struct=val)
 
-            # - verify that the PeriodStart is in the past.
-            # - verify that the PeriodEnd is in the future or is null.
-            # - verify that the Price is null or a PriceStruct with a valid Amount as a signed integer and Currency contains a CurrencyStruct with a valid Currency.Currency (unsigned integer max 999) and Currency.DecimalPoints.
-            # - verify that the PriceLevel is null or a valid signed integer.
-            # - verify that either or both of Price, PriceLevel are not null.
-            # - verify that the Description is a string with max length of 32.
-            # - verify that the Components list is not included
+        asserts.assert_equal(val, newCurrentPrice, "CurrentPrice is not equal to NewCurrentPrice")
 
-        print(val)
+        self.step("7")
+        # TH sends command GetDetailedPriceRequest with Details=CommodityPriceDetailBitmap.Description set to True,
+        # and Components set to False.
+        details = cluster.Bitmaps.CommodityPriceDetailBitmap.kDescription
+        val = await self.send_get_detailed_price_request(details=details)
+
+        # Verify that the DUT response contains GetDetailedPriceResponse with CurrentPrice is
+        # a CommodityPriceStruct or is null.
+        if val.currentPrice is not NullValue:
+            asserts.assert_true(isinstance(
+                val.currentPrice, cluster.Structs.CommodityPriceStruct), "val must be of type CommodityPriceStruct")
+
+            # The other aspects of this verification are handled by the helper
+            await self.test_checkCommodityPriceStruct(endpoint=endpoint, cluster=cluster, struct=val.currentPrice,
+                                                      details=details)
+
+        self.step("8")
+        # TH sends command GetDetailedPriceRequest with Details=CommodityPriceDetailBitmap.Description set to False
+        # and Components set to True.
+        details = cluster.Bitmaps.CommodityPriceDetailBitmap.kComponents
+        val = await self.send_get_detailed_price_request(details=details)
+
+        if val.currentPrice is not NullValue:
+            asserts.assert_true(isinstance(
+                val.currentPrice, cluster.Structs.CommodityPriceStruct), "val must be of type CommodityPriceStruct")
+
+            # The other aspects of this verification are handled by the helper
+            await self.test_checkCommodityPriceStruct(endpoint=endpoint, cluster=cluster, struct=val.currentPrice,
+                                                      details=details)
+
+        self.step("9")
+        # TH sends command GetDetailedPriceRequest with Details=CommodityPriceDetailBitmap.Description set to True
+        # and Components set to True.
+        details = cluster.Bitmaps.CommodityPriceDetailBitmap.kComponents | cluster.Bitmaps.CommodityPriceDetailBitmap.kDescription
+        val = await self.send_get_detailed_price_request(details=details)
+
+        if val.currentPrice is not NullValue:
+            asserts.assert_true(isinstance(
+                val.currentPrice, cluster.Structs.CommodityPriceStruct), "val must be of type CommodityPriceStruct")
+
+            # The other aspects of this verification are handled by the helper
+            await self.test_checkCommodityPriceStruct(endpoint=endpoint, cluster=cluster, struct=val.currentPrice,
+                                                      details=details)
 
 
 if __name__ == "__main__":

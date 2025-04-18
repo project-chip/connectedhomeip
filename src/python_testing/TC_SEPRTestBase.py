@@ -17,6 +17,8 @@
 
 import logging
 
+from datetime import datetime, timedelta, timezone
+
 import chip.clusters as Clusters
 from chip.clusters import Globals
 from chip.clusters.Types import NullValue
@@ -33,18 +35,26 @@ class CommodityPriceTestBaseHelper:
                                              endpoint: int = None,
                                              cluster: Clusters.CommodityPrice = None,
                                              struct: Clusters.CommodityPrice.Structs.CommodityPriceStruct = None,
-                                             bitmap: Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap = 0):
+                                             details: Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap = 0):
+
         matter_asserts.assert_valid_uint32(struct.periodStart, 'PeriodStart')
+
+        # - verify that the PeriodStart is in the past.
+        now_time_epoch_s = self.get_current_time_as_epoch_s()
+        asserts.assert_less_equal(struct.periodStart, now_time_epoch_s,
+                                  "PeriodStart must not be in the past")
+
+        # - verify that the PeriodEnd is in the future or is null.
         if struct.periodEnd is not NullValue:
             matter_asserts.assert_valid_uint32(struct.periodEnd, 'PeriodEnd')
+            asserts.assert_greater_equal(struct.periodEnd, now_time_epoch_s,
+                                         "PeriodEnd must be in the future")
 
         bPriceIncluded = False
         bPriceLevelIncluded = False
 
         if struct.price is not NullValue:
-            asserts.assert_true(isinstance(
-                struct.price, Globals.Structs.PriceStruct), "struct.price must be of type PriceStruct")
-            await self.test_checkPriceStruct(endpoint=endpoint, cluster=cluster, struct=struct.price)
+            matter_asserts.assert_valid_int64(struct.price, 'Price')
             bPriceIncluded = True
 
         if struct.priceLevel is not NullValue:
@@ -54,20 +64,23 @@ class CommodityPriceTestBaseHelper:
         asserts.assert_true(bPriceIncluded or bPriceLevelIncluded, "Either Price or PriceLevel must be included")
 
         # In the attribute description and components must not be included based on Bitmap (default 0)
-        if bitmap & cluster.Bitmaps.CommodityPriceDetailBitmap.kDescription:
+        if details & cluster.Bitmaps.CommodityPriceDetailBitmap.kDescription:
             if struct.description is not None:
                 matter_asserts.assert_is_string(struct.description, "Description must be a string")
                 asserts.assert_less_equal(len(struct.description), 32, "Description must have length at most 32!")
         else:
             asserts.assert_is_none(struct.description)
 
-        if bitmap & cluster.Bitmaps.CommodityPriceDetailBitmap.kComponents:
+        logger.info(f"PRICE: from: {self.convert_epoch_s_to_time(struct.periodStart, tz=None)} to {self.convert_epoch_s_to_time(struct.periodEnd, tz=None)} : Price: {struct.price} / PriceLevel: {struct.priceLevel} / Description: {struct.description}")
+
+        if details & cluster.Bitmaps.CommodityPriceDetailBitmap.kComponents:
             if struct.components is not None:
-                matter_asserts.assert_list(struct.components, "Components attribute must return a list")
+                matter_asserts.assert_list(struct.components,  "Components attribute must return a list")
                 matter_asserts.assert_list_element_type(
                     struct.components,
+                    cluster.Structs.CommodityPriceComponentStruct,
                     "Components attribute must contain CommodityPriceComponentStruct elements",
-                    cluster.Structs.CommodityPriceComponentStruct, allow_empty=True)
+                    allow_empty=True)
                 for item in struct.components:
                     await self.test_checkCommodityPriceComponentStruct(endpoint=endpoint, cluster=cluster, struct=item)
                 asserts.assert_less_equal(len(struct.components), 10, "Components must have at most 10 entries!")
@@ -82,15 +95,6 @@ class CommodityPriceTestBaseHelper:
         asserts.assert_less_equal(struct.currency, 999)
         matter_asserts.assert_valid_uint8(struct.decimalPoints, 'DecimalPoints')
 
-    async def test_checkPriceStruct(self,
-                                    endpoint: int = None,
-                                    cluster: Clusters.CommodityPrice = None,
-                                    struct: Globals.Structs.PriceStruct = None):
-        matter_asserts.assert_valid_int64(struct.amount, 'Amount')
-        asserts.assert_true(isinstance(
-            struct.currency, Globals.Structs.CurrencyStruct), "struct.currency must be of type CurrencyStruct")
-        await self.test_checkCurrencyStruct(endpoint=endpoint, cluster=cluster, struct=struct.currency)
-
     async def test_checkCommodityPriceComponentStruct(self,
                                                       endpoint: int = None,
                                                       cluster: Clusters.CommodityPrice = None,
@@ -101,8 +105,11 @@ class CommodityPriceTestBaseHelper:
         if struct.description is not None:
             matter_asserts.assert_is_string(struct.description, "Description must be a string")
             asserts.assert_less_equal(len(struct.description), 32, "Description must have length at most 32!")
-        if struct.tariffComponentId is not None:
+        if struct.tariffComponentID is not None:
             matter_asserts.assert_valid_uint32(struct.tariffComponentID, 'TariffComponentID')
+
+        logger.info(
+            f"  Component: price: {struct.price} source: {struct.source}, desc: {struct.description} tariffComponentID: {struct.tariffComponentID}")
 
     async def send_get_detailed_price_request(self, endpoint: int = None, details: Clusters.CommodityPrice.Bitmaps = 0,
                                               timedRequestTimeoutMs: int = 3000,
@@ -133,3 +140,33 @@ class CommodityPriceTestBaseHelper:
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status,
                                  "Unexpected error returned")
+
+    async def send_test_event_trigger_price_update(self):
+        await self.send_test_event_triggers(eventTrigger=0x0095000000000000)
+
+    async def send_test_event_trigger_forecast_update(self):
+        await self.send_test_event_triggers(eventTrigger=0x0095000000000001)
+
+    def get_current_time_as_epoch_s(self):
+        """Returns current time in UTC in Matter Epoch_S"""
+        # Matter epoch is 0 hours, 0 minutes, 0 seconds on Jan 1, 2000 UTC
+        now_time = datetime.now()     # Get time in local time
+
+        # Shift to UTC so we can use timezone aware subtraction from Matter epoch in UTC
+        now_time = now_time.astimezone(timezone.utc)
+
+        matter_base_time = datetime(2000, 1, 1, 0, 0, 0, 0, tzinfo=timezone.utc)
+
+        now_time_delta = now_time - matter_base_time
+
+        now_time_epoch_s = int(now_time_delta.total_seconds())
+        return now_time_epoch_s
+
+    def convert_epoch_s_to_time(self, epoch_s, tz=timezone.utc):
+        if epoch_s is not NullValue:
+            delta_from_epoch = timedelta(seconds=epoch_s)
+            matter_epoch = datetime(2000, 1, 1, 0, 0, 0, 0, tz)
+
+            return matter_epoch + delta_from_epoch
+        else:
+            return "None"

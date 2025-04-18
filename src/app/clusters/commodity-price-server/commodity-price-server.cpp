@@ -77,15 +77,11 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     case CurrentPrice::Id:
         // Call GetDetailedPriceRequest with details = 0 to strip out .components and .description if present
         pPriceStruct = GetDetailedPriceRequest(0);
-        if (pPriceStruct == nullptr)
-        {
-            err = CHIP_ERROR_NO_MEMORY;
-        }
-        else
-        {
-            err = aEncoder.Encode(*pPriceStruct);
-            FreeCurrentPrice(pPriceStruct);
-        }
+        VerifyOrReturnError(pPriceStruct != nullptr, CHIP_ERROR_NO_MEMORY);
+
+        err = aEncoder.Encode(*pPriceStruct);
+        FreeCurrentPrice(pPriceStruct);
+
         return err;
     case PriceForecast::Id:
         /* FORE - Forecasting */
@@ -97,15 +93,11 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         // Call GetDetailedForecastRequest with details = 0 to
         // strip out .components and .description if present
         pPriceForecast = GetDetailedForecastRequest(0);
-        if (pPriceForecast == nullptr)
-        {
-            err = CHIP_ERROR_NO_MEMORY;
-        }
-        else
-        {
-            err = aEncoder.Encode(*pPriceForecast);
-            FreePriceForecast(pPriceForecast);
-        }
+        VerifyOrReturnError(pPriceStruct != nullptr, CHIP_ERROR_NO_MEMORY);
+
+        err = aEncoder.Encode(*pPriceForecast);
+        FreePriceForecast(pPriceForecast);
+
         return err;
 
     /* FeatureMap - is held locally */
@@ -406,12 +398,25 @@ CHIP_ERROR Instance::SetCurrentPrice(const DataModel::Nullable<Structs::Commodit
 
 Status Instance::SendPriceChangeEvent()
 {
+
+    CHIP_ERROR err;
+    const DataModel::Nullable<Structs::CommodityPriceStruct::Type> * pPriceStruct = nullptr;
     Events::PriceChange::Type event;
     EventNumber eventNumber;
 
-    event.currentPrice = mCurrentPrice;
+    /*
+     * The Event's CurrentPrice must not include .description or .components
+     * call our function to copy the CurrentPrice without these
+     */
+    pPriceStruct = GetDetailedPriceRequest(0);
+    VerifyOrReturnError(pPriceStruct != nullptr, Status::Failure);
 
-    CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
+    event.currentPrice = *pPriceStruct;
+
+    err = LogEvent(event, mEndpointId, eventNumber);
+    /* Free the copy after the LogEvent call has made its internal copy */
+    FreeCurrentPrice(pPriceStruct);
+
     if (CHIP_NO_ERROR != err)
     {
         ChipLogError(AppServer, "Unable to send notify event: %" CHIP_ERROR_FORMAT, err.Format());
