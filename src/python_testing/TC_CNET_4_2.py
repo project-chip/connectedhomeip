@@ -18,7 +18,6 @@ import logging
 
 import chip.clusters as Clusters
 import test_plan_support
-from chip.clusters.Types import NullValue
 from chip.testing import matter_asserts
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
