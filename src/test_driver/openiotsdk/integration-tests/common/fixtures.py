@@ -20,10 +20,11 @@ import os
 import pathlib
 import shutil
 
-import chip.CertificateAuthority
-import chip.native
 import pytest
-from chip import exceptions
+
+import matter.CertificateAuthority
+import matter.native
+from matter import exceptions
 
 from .fvp_device import FvpDevice
 from .telnet_connection import TelnetConnection
@@ -96,10 +97,10 @@ def device(fvp, fvpConfig, binaryPath, telnetPort, networkInterface):
 @pytest.fixture(scope="session")
 def controller(controllerConfig):
     try:
-        chip.native.Init()
-        chipStack = chip.ChipStack.ChipStack(
+        matter.native.Init()
+        chipStack = matter.ChipStack.ChipStack(
             persistentStoragePath=controllerConfig['persistentStoragePath'], enableServerInteractions=False)
-        certificateAuthorityManager = chip.CertificateAuthority.CertificateAuthorityManager(
+        certificateAuthorityManager = matter.CertificateAuthority.CertificateAuthorityManager(
             chipStack, chipStack.GetStorageManager())
         certificateAuthorityManager.LoadAuthoritiesFromStorage()
         if (len(certificateAuthorityManager.activeCaList) == 0):
