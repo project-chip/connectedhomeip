@@ -183,7 +183,6 @@ void Instance::HandleGetDetailedPriceRequest(HandlerContext & ctx,
     {
         response.currentPrice = *pPriceStruct;
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
     }
     FreeCurrentPrice(pPriceStruct);
 }
@@ -218,7 +217,6 @@ void Instance::HandleGetDetailedForecastRequest(HandlerContext & ctx,
     {
         response.priceForecast = *pPriceForecast;
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
     }
     FreePriceForecast(pPriceForecast);
 }
