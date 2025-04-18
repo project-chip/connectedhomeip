@@ -65,7 +65,7 @@ idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}
 
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 chip_configure_data_model(${COMPONENT_LIB}
-    ZAP_FILE ${LIGHT_COMMON_DIR}/lighting-app.zap
+    ZAP_FILE ${CMAKE_SOURCE_DIR}/data_model/lighting-app.zap
 )
 
 if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
