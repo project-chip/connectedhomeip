@@ -2745,12 +2745,12 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_closurebase = 560, version 1;
+  device type ma_closure = 560, version 1;
 
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0;
-    ram      attribute identifyType default = 0x05;
+    ram      attribute identifyType default = 0x00;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2769,12 +2769,12 @@ endpoint 1 {
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
 
-    handle command AddGroup;
     handle command AddGroupResponse;
-    handle command ViewGroup;
+    handle command AddGroup;
     handle command ViewGroupResponse;
-    handle command GetGroupMembership;
+    handle command ViewGroup;
     handle command GetGroupMembershipResponse;
+    handle command GetGroupMembership;
     handle command RemoveGroup;
     handle command RemoveGroupResponse;
     handle command RemoveAllGroups;
