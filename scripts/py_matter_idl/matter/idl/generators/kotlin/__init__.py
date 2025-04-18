@@ -624,7 +624,7 @@ class __KotlinCodeGenerator(CodeGenerator):
 
     def __init__(self, storage: GeneratorStorage, idl: Idl, **kargs):
         """
-        Inintialization is specific for kotlin generation and will add
+        Initialization is specific for kotlin generation and will add
         filters as required by the kotlin .jinja templates to function.
         """
         super().__init__(storage, idl, fs_loader_searchpath=os.path.dirname(__file__))
