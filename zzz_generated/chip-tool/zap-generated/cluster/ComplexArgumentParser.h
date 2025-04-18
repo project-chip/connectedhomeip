@@ -32,6 +32,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Struct
 
 static void Finalize(chip::app::Clusters::Globals::Structs::PowerThresholdStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Structs::PriceStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Globals::Structs::PriceStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Structs::TestGlobalStruct::Type & request,
                         Json::Value & value);
 
@@ -66,11 +71,6 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::detail::Structs::DeviceTypeStruct::Type & request);
-
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Structs::PriceStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::Globals::Structs::PriceStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::ApplicationStruct::Type & request,
                         Json::Value & value);
