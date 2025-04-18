@@ -21,6 +21,7 @@ import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.testing.decorators import has_feature, run_if_endpoint_matches
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
+from chip.tlv import TLVReader
 from mobly import asserts
 
 
@@ -76,19 +77,20 @@ class TC_CNET_4_10(MatterBaseTest):
         pixit_dataset_bytes = self.matter_test_config.global_test_params.get('PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET')
         asserts.assert_is_not_none(pixit_dataset_bytes, "PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET must be supplied via --hex-arg.")
 
-        asserts.assert_true(len(pixit_dataset_bytes) > 0, "--hex-arg PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET must be supplied.")
+        # Parse the Thread operational dataset TLV to find the ExtPANID (Context Tag 2)
+        try:
+            reader = TLVReader(pixit_dataset_bytes)
+            decoded_tlv = reader.get()
+            # Thread ExtPANID is Context Tag 2, expected to be bytes
+            thread_network_id_bytes = decoded_tlv.get(2)
+        except Exception as e:
+            asserts.fail(f"Failed to parse TLV from PIXIT dataset: {pixit_dataset_bytes.hex()}. Error: {e}")
 
-        # Find the ExtPANID TLV (Context Tag 2, Length 8) in the bytes
-        # Marker sequence seems to be 0x02 (Tag) followed by 0x08 (Length)
-        ext_pan_id_marker = b'\x02\x08'
-        marker_index = pixit_dataset_bytes.find(ext_pan_id_marker)
-        asserts.assert_true(marker_index != -1 and len(pixit_dataset_bytes) >= marker_index + len(ext_pan_id_marker) + 8,
-                            f"Could not find ExtPANID marker {ext_pan_id_marker!r} or dataset too short in PIXIT bytes")
-
-        ext_pan_id_start = marker_index + len(ext_pan_id_marker)
-        thread_network_id_bytes = pixit_dataset_bytes[ext_pan_id_start: ext_pan_id_start + 8]
-
-        asserts.assert_equal(len(thread_network_id_bytes), 8, "Extracted ExtPANID must be 8 bytes long")
+        asserts.assert_is_not_none(thread_network_id_bytes,
+                                   f"Could not find ExtPANID (Context Tag 2) in PIXIT dataset TLV: {decoded_tlv}")
+        asserts.assert_is_instance(thread_network_id_bytes, bytes, "ExtPANID (Context Tag 2) should be bytes")
+        asserts.assert_equal(len(thread_network_id_bytes), 8,
+                             f"Extracted ExtPANID should be 8 bytes long, but got {len(thread_network_id_bytes)} bytes: {thread_network_id_bytes.hex()}")
         logging.info(f"Extracted Network ID (ExtPANID): {thread_network_id_bytes.hex()}")
 
         # Step 1: Arm failsafe and verify response
