@@ -25,7 +25,7 @@
 namespace chef {
 namespace OvenCavityOperationalState {
 
-class Delegate : public chip::app::clusters::OperationalState::OperationalStateDelegate
+class Delegate : public chip::app::Clusters::OperationalState::OperationalStateDelegate
 {
 private:
     const CharSpan kPhaseList[3] = { "pre-heating"_span, "pre-heated"_span, "cooling down"_span };
