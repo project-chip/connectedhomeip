@@ -28,7 +28,7 @@ using namespace chip;
 namespace chef {
 namespace OvenCavityOperationalState {
 
-constexpr size_t kOvenCavityOperationalStateTableSize = MATTER_DM_OPERATIONAL_STATE_OVEN_CLUSTER_CLIENT_ENDPOINT_COUNT;
+constexpr size_t kOvenCavityOperationalStateTableSize = MATTER_DM_OPERATIONAL_STATE_OVEN_CLUSTER_SERVER_ENDPOINT_COUNT;
 static_assert(kOvenCavityOperationalStateTableSize <= kEmberInvalidEndpointIndex, "OvenCavityOperationalState table size error");
 
 std::unique_ptr<Delegate> gDelegateTable[kOvenCavityOperationalStateTableSize];
@@ -51,7 +51,7 @@ void InitChefOvenCavityOperationalStateCluster()
 
         // Check if endpoint has OvenCavityOperationalState cluster enabled
         uint16_t epIndex = emberAfGetClusterServerEndpointIndex(endpointId, chip::app::Clusters::OvenCavityOperationalState::Id,
-                                                                MATTER_DM_OVEN_CAVITY_OPERATIONAL_STATE_SERVER_ENDPOINT_COUNT);
+                                                                MATTER_DM_OPERATIONAL_STATE_OVEN_CLUSTER_SERVER_ENDPOINT_COUNT);
         if (epIndex >= kOvenCavityOperationalStateTableSize)
             continue;
 
