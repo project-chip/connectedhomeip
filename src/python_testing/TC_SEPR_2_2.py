@@ -82,7 +82,7 @@ class TC_SEPR_2_2(CommodityPriceTestBaseHelper, MatterBaseTest):
                      """Verify that the DUT response contains GetDetailedPriceResponse with CurrentPrice is a CommodityPriceStruct or is null. If not null:
                         - verify that the PeriodStart is in the past.
                         - verify that the PeriodEnd is in the future or is null.
-                        - verify that the Price is null or Money type
+                        - verify that the Price is null or Money type.
                         - verify that the PriceLevel is null or a valid signed integer.
                         - verify that either or both of Price, PriceLevel are not null.
                         - verify that the Description is a string with max length of 32.
@@ -96,7 +96,7 @@ class TC_SEPR_2_2(CommodityPriceTestBaseHelper, MatterBaseTest):
                         - verify that either or both of Price, PriceLevel are not null.
                         - verify that the Description field is not included.
                         - verify that the Components field is included. It may be an empty list but shall have no more than 10 entries.
-                             Each entry shall have a valid value of Price (money), Source (a valid TariffPriceTypeEnum), it may include an optional Description (a string of max length 32) and may include an optional TariffComponentID (unsigned integer value)."""),
+                             Each entry shall have a valid value of Price (Money), Source (a valid TariffPriceTypeEnum), it may include an optional Description (a string of max length 32) and may include an optional TariffComponentID (unsigned integer value)."""),
             TestStep("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.SEPR.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.SEPR.TESTEVENTTRIGGER for Price Update Test Event",
                      """Verify DUT responds w/ status SUCCESS(0x00) and event SEPR.S.E0000(PriceChange) sent.
                         Store the event's CurrentPrice field as NewCurrentPrice.
@@ -107,7 +107,7 @@ class TC_SEPR_2_2(CommodityPriceTestBaseHelper, MatterBaseTest):
                      """Verify that the DUT response contains GetDetailedPriceResponse with CurrentPrice is a CommodityPriceStruct or is null. If not null:
                         - verify that the PeriodStart is in the past.
                         - verify that the PeriodEnd is in the future or is null.
-                        - verify that the Price is null or Money type
+                        - verify that the Price is null or Money type.
                         - verify that the PriceLevel is null or a valid signed integer.
                         - verify that either or both of Price, PriceLevel are not null.
                         - verify that the Description is a string with max length of 32.
@@ -121,7 +121,7 @@ class TC_SEPR_2_2(CommodityPriceTestBaseHelper, MatterBaseTest):
                         - verify that either or both of Price, PriceLevel are not null.
                         - verify that the Description field is not included.
                         - verify that the Components field is included. It may be an empty list but shall have no more than 10 entries.
-                             Each entry shall have a valid value of Price (money), Source (a valid TariffPriceTypeEnum), it may include an optional Description (a string of max length 32) and may include an optional TariffComponentID (unsigned integer value)."""),
+                             Each entry shall have a valid value of Price (Money), Source (a valid TariffPriceTypeEnum), it may include an optional Description (a string of max length 32) and may include an optional TariffComponentID (unsigned integer value)."""),
             TestStep("9", "TH sends command GetDetailedPriceRequest with Details=CommodityPriceDetailBitmap.Description set to True and Components set to True.",
                      """Verify that the DUT response contains GetDetailedPriceResponse with CurrentPrice is a CommodityPriceStruct or is null. If not null:
                         - verify that the PeriodStart is in the past.
@@ -131,7 +131,7 @@ class TC_SEPR_2_2(CommodityPriceTestBaseHelper, MatterBaseTest):
                         - verify that either or both of Price, PriceLevel are not null.
                         - verify that the Description is a string with max length of 32.
                         - verify that the Components field is included. It may be an empty list but shall have no more than 10 entries.
-                             Each entry shall have a valid value of Price (money), Source (a valid TariffPriceTypeEnum), it may include an optional Description (a string of max length 32) and may include an optional TariffComponentID (unsigned integer value)."""),
+                             Each entry shall have a valid value of Price (Money), Source (a valid TariffPriceTypeEnum), it may include an optional Description (a string of max length 32) and may include an optional TariffComponentID (unsigned integer value)."""),
 
         ]
 

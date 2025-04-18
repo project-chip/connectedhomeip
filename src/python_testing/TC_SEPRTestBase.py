@@ -31,24 +31,48 @@ logger = logging.getLogger(__name__)
 
 class CommodityPriceTestBaseHelper:
 
+    async def test_priceForecast(self,
+                                 endpoint: int = None,
+                                 cluster: Clusters.CommodityPrice = None,
+                                 priceForecast: list = None,
+                                 details: Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap = 0):
+
+        # Verify that the DUT response contains GetDetailedForecastResponse with a
+        # list of CommodityPriceStruct entries (it may be empty) and shall have not more than 56 entries.
+        matter_asserts.assert_list(priceForecast, "PriceForecast must be a list")
+        matter_asserts.assert_list_element_type(
+            priceForecast, cluster.Structs.CommodityPriceStruct,
+            "PriceForecast list must contain CommodityPriceStruct elements",
+            allow_empty=True)
+
+        asserts.assert_less_equal(len(priceForecast),
+                                  56, "PriceForecast list must be less than 56 entries")
+        for item in priceForecast:
+            # The other aspects of this verification are handled by the helper
+            await self.test_checkCommodityPriceStruct(endpoint=endpoint, cluster=cluster, struct=item,
+                                                      details=details,
+                                                      check_time=False)  # Do not check time limits for forecast
+
     async def test_checkCommodityPriceStruct(self,
                                              endpoint: int = None,
                                              cluster: Clusters.CommodityPrice = None,
                                              struct: Clusters.CommodityPrice.Structs.CommodityPriceStruct = None,
-                                             details: Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap = 0):
+                                             details: Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap = 0,
+                                             check_time: bool = True):
 
         matter_asserts.assert_valid_uint32(struct.periodStart, 'PeriodStart')
 
-        # - verify that the PeriodStart is in the past.
-        now_time_epoch_s = self.get_current_time_as_epoch_s()
-        asserts.assert_less_equal(struct.periodStart, now_time_epoch_s,
-                                  "PeriodStart must not be in the past")
+        if check_time:  # Only check time limits when dealing with current price (not list of Forecast)
+            # - verify that the PeriodStart is in the past.
+            now_time_epoch_s = self.get_current_time_as_epoch_s()
+            asserts.assert_less_equal(struct.periodStart, now_time_epoch_s,
+                                      "PeriodStart must not be in the past")
 
-        # - verify that the PeriodEnd is in the future or is null.
-        if struct.periodEnd is not NullValue:
-            matter_asserts.assert_valid_uint32(struct.periodEnd, 'PeriodEnd')
-            asserts.assert_greater_equal(struct.periodEnd, now_time_epoch_s,
-                                         "PeriodEnd must be in the future")
+            # - verify that the PeriodEnd is in the future or is null.
+            if struct.periodEnd is not NullValue:
+                matter_asserts.assert_valid_uint32(struct.periodEnd, 'PeriodEnd')
+                asserts.assert_greater_equal(struct.periodEnd, now_time_epoch_s,
+                                             "PeriodEnd must be in the future")
 
         bPriceIncluded = False
         bPriceLevelIncluded = False
