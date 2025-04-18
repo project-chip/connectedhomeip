@@ -82,7 +82,8 @@ void RvcOperationalStateDelegate::HandlePauseStateCallback(GenericOperationalErr
 
     if (current_state == RvcOperationalState::OperationalStateEnum::kRunning)
     {
-        auto error = gRvcOperationalStateInstance->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kPaused));
+        auto error =
+            gRvcOperationalStateInstance->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kPaused));
         if (error == CHIP_NO_ERROR)
         {
             err.Set(to_underlying(RvcOperationalState::ErrorStateEnum::kNoError));
@@ -96,7 +97,8 @@ void RvcOperationalStateDelegate::HandlePauseStateCallback(GenericOperationalErr
 
     if (current_state == RvcOperationalState::OperationalStateEnum::kSeekingCharger)
     {
-        auto error = gRvcOperationalStateInstance->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kPaused));
+        auto error =
+            gRvcOperationalStateInstance->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kPaused));
         if (error == CHIP_NO_ERROR)
         {
             err.Set(to_underlying(RvcOperationalState::ErrorStateEnum::kNoError));
@@ -132,7 +134,8 @@ void RvcOperationalStateDelegate::HandleResumeStateCallback(GenericOperationalEr
 
     if (current_state == RvcOperationalState::OperationalStateEnum::kPaused)
     {
-        auto error = gRvcOperationalStateInstance->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kRunning));
+        auto error =
+            gRvcOperationalStateInstance->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kRunning));
         if (error == CHIP_NO_ERROR)
         {
             err.Set(to_underlying(RvcOperationalState::ErrorStateEnum::kNoError));
