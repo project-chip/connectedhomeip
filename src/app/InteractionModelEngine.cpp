@@ -1814,11 +1814,6 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(co
     const bool commandNeedsTimedInvoke = entry.flags.Has(DataModel::CommandQualityFlags::kTimed);
     const bool commandIsFabricScoped   = entry.flags.Has(DataModel::CommandQualityFlags::kFabricScoped);
 
-    if (commandNeedsTimedInvoke && !aRequest.invokeFlags.Has(DataModel::InvokeFlags::kTimed))
-    {
-        return Status::NeedsTimedInteraction;
-    }
-
     if (commandIsFabricScoped)
     {
         // SPEC: Else if the command in the path is fabric-scoped and there is no accessing fabric,
@@ -1830,6 +1825,11 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(co
         {
             return Status::UnsupportedAccess;
         }
+    }
+
+    if (commandNeedsTimedInvoke && !aRequest.invokeFlags.Has(DataModel::InvokeFlags::kTimed))
+    {
+        return Status::NeedsTimedInteraction;
     }
 
     // Command that is marked as having a large payload must be sent over a

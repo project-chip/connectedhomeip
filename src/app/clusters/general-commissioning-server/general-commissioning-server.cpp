@@ -69,7 +69,7 @@ using Transport::Session;
 
 namespace {
 
-class GeneralCommissioningGlobalInstance : public AttributeAccessInterface, public CommandHandlerInterface
+class GeneralCommissioningGlobalInstance : public AttributeAccessInterface, public CommandHandlerInterfaceB
 {
 public:
     // Register for the GeneralCommissioning cluster on all endpoints.
