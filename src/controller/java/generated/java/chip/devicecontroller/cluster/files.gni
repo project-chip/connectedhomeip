@@ -51,7 +51,6 @@ structs_sources = [
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/CommodityPriceClusterCommodityPriceComponentStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/CommodityPriceClusterCommodityPriceStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/CommodityPriceClusterCurrencyStruct.kt",
-  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/CommodityPriceClusterPriceStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/CommodityTariffClusterAuxiliaryLoadSwitchSettingsStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/CommodityTariffClusterCalendarPeriodStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/CommodityTariffClusterCurrencyStruct.kt",

@@ -497,6 +497,19 @@ class Globals:
             powerThresholdSource: 'typing.Union[Nullable, Globals.Enums.PowerThresholdSourceEnum]' = NullValue
 
         @dataclass
+        class PriceStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="amount", Tag=0, Type=int),
+                        ClusterObjectFieldDescriptor(Label="currency", Tag=1, Type=Globals.Structs.CurrencyStruct),
+                    ])
+
+            amount: 'int' = 0
+            currency: 'Globals.Structs.CurrencyStruct' = field(default_factory=lambda: Globals.Structs.CurrencyStruct())
+
+        @dataclass
         class TestGlobalStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -525,19 +538,6 @@ class Globals:
             locationName: 'str' = ""
             floorNumber: 'typing.Union[Nullable, int]' = NullValue
             areaType: 'typing.Union[Nullable, Globals.Enums.AreaTypeTag]' = NullValue
-
-        @dataclass
-        class PriceStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="amount", Tag=0, Type=int),
-                        ClusterObjectFieldDescriptor(Label="currency", Tag=1, Type=Globals.Structs.CurrencyStruct),
-                    ])
-
-            amount: 'int' = 0
-            currency: 'Globals.Structs.CurrencyStruct' = field(default_factory=lambda: Globals.Structs.CurrencyStruct())
 
         @dataclass
         class AtomicAttributeStatusStruct(ClusterObject):
@@ -23039,15 +23039,13 @@ class CommodityPrice(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="price", Tag=0, Type=typing.Optional[int]),
-                        ClusterObjectFieldDescriptor(Label="priceLevel", Tag=1, Type=typing.Optional[int]),
-                        ClusterObjectFieldDescriptor(Label="source", Tag=2, Type=Globals.Enums.TariffPriceTypeEnum),
-                        ClusterObjectFieldDescriptor(Label="description", Tag=3, Type=typing.Optional[str]),
-                        ClusterObjectFieldDescriptor(Label="tariffComponentID", Tag=4, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="price", Tag=0, Type=int),
+                        ClusterObjectFieldDescriptor(Label="source", Tag=1, Type=Globals.Enums.TariffPriceTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="description", Tag=2, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="tariffComponentID", Tag=3, Type=typing.Optional[uint]),
                     ])
 
-            price: 'typing.Optional[int]' = None
-            priceLevel: 'typing.Optional[int]' = None
+            price: 'int' = 0
             source: 'Globals.Enums.TariffPriceTypeEnum' = 0
             description: 'typing.Optional[str]' = None
             tariffComponentID: 'typing.Optional[uint]' = None
@@ -23060,7 +23058,7 @@ class CommodityPrice(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="periodStart", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="periodEnd", Tag=1, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="price", Tag=2, Type=typing.Optional[Globals.Structs.PriceStruct]),
+                        ClusterObjectFieldDescriptor(Label="price", Tag=2, Type=typing.Optional[int]),
                         ClusterObjectFieldDescriptor(Label="priceLevel", Tag=3, Type=typing.Optional[int]),
                         ClusterObjectFieldDescriptor(Label="description", Tag=4, Type=typing.Optional[str]),
                         ClusterObjectFieldDescriptor(Label="components", Tag=5, Type=typing.Optional[typing.List[CommodityPrice.Structs.CommodityPriceComponentStruct]]),
@@ -23068,7 +23066,7 @@ class CommodityPrice(Cluster):
 
             periodStart: 'uint' = 0
             periodEnd: 'typing.Union[Nullable, uint]' = NullValue
-            price: 'typing.Optional[Globals.Structs.PriceStruct]' = None
+            price: 'typing.Optional[int]' = None
             priceLevel: 'typing.Optional[int]' = None
             description: 'typing.Optional[str]' = None
             components: 'typing.Optional[typing.List[CommodityPrice.Structs.CommodityPriceComponentStruct]]' = None

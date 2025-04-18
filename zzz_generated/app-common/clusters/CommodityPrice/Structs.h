@@ -39,17 +39,15 @@ namespace CommodityPriceComponentStruct {
 enum class Fields : uint8_t
 {
     kPrice             = 0,
-    kPriceLevel        = 1,
-    kSource            = 2,
-    kDescription       = 3,
-    kTariffComponentID = 4,
+    kSource            = 1,
+    kDescription       = 2,
+    kTariffComponentID = 3,
 };
 
 struct Type
 {
 public:
-    Optional<int64_t> price;
-    Optional<int16_t> priceLevel;
+    int64_t price                       = static_cast<int64_t>(0);
     Globals::TariffPriceTypeEnum source = static_cast<Globals::TariffPriceTypeEnum>(0);
     Optional<chip::CharSpan> description;
     Optional<uint32_t> tariffComponentID;
@@ -80,7 +78,7 @@ struct Type
 public:
     uint32_t periodStart = static_cast<uint32_t>(0);
     DataModel::Nullable<uint32_t> periodEnd;
-    Optional<Globals::Structs::PriceStruct::Type> price;
+    Optional<int64_t> price;
     Optional<int16_t> priceLevel;
     Optional<chip::CharSpan> description;
     Optional<DataModel::List<const Structs::CommodityPriceComponentStruct::Type>> components;
@@ -95,7 +93,7 @@ struct DecodableType
 public:
     uint32_t periodStart = static_cast<uint32_t>(0);
     DataModel::Nullable<uint32_t> periodEnd;
-    Optional<Globals::Structs::PriceStruct::DecodableType> price;
+    Optional<int64_t> price;
     Optional<int16_t> priceLevel;
     Optional<chip::CharSpan> description;
     Optional<DataModel::DecodableList<Structs::CommodityPriceComponentStruct::DecodableType>> components;
