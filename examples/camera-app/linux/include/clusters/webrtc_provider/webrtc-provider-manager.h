@@ -48,7 +48,9 @@ public:
 
     CHIP_ERROR HandleProvideAnswer(uint16_t sessionId, const std::string & sdpAnswer) override;
 
-    CHIP_ERROR HandleProvideICECandidates(uint16_t sessionId, const std::vector<std::string> & candidates) override;
+    CHIP_ERROR HandleProvideICECandidates(
+        uint16_t sessionId,
+        const std::vector<chip::app::Clusters::WebRTCTransportProvider::ICECandidateDecodableStruct> & candidates) override;
 
     CHIP_ERROR HandleEndSession(uint16_t sessionId, chip::app::Clusters::WebRTCTransportProvider::WebRTCEndReasonEnum reasonCode,
                                 chip::app::DataModel::Nullable<uint16_t> videoStreamID,
