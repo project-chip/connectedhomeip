@@ -16,7 +16,6 @@
 
 
 import logging
-
 from datetime import datetime, timedelta, timezone
 
 import chip.clusters as Clusters
