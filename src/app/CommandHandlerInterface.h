@@ -238,9 +238,11 @@ private:
 class CommandHandlerInterface : public CommandHandlerInterfaceB
 {
 
+    using CommandHandlerInterfaceB::CommandHandlerInterfaceB;
     // Implements new interface
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override
+    CHIP_ERROR
+    EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                              ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override
     {
         size_t commandCount = 0;
         CHIP_ERROR err      = CHIP_NO_ERROR;
