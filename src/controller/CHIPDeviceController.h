@@ -447,9 +447,11 @@ protected:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 using UdcTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
+#if !CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 #if INET_CONFIG_ENABLE_IPV4
                                      ,
                                      Transport::UDP /* IPv4 */
+#endif
 #endif
                                      >;
 #endif

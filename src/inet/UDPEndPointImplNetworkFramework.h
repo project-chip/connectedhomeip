@@ -51,26 +51,44 @@ private:
     CHIP_ERROR SendMsgImpl(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle && msg) override;
     void CloseImpl() override;
 
-    nw_listener_t mListener;
-    dispatch_semaphore_t mListenerSemaphore;
-    dispatch_queue_t mListenerQueue;
-    nw_connection_t mConnection;
-    dispatch_semaphore_t mConnectionSemaphore;
-    dispatch_queue_t mConnectionQueue;
-    dispatch_semaphore_t mSendSemaphore;
-    dispatch_queue_t mSystemQueue;
+    nw_listener_t mListener                 = nullptr;
+    dispatch_semaphore_t mListenerSemaphore = nullptr;
+    dispatch_queue_t mListenerQueue         = nullptr;
+    dispatch_queue_t mConnectionQueue       = nullptr;
+    dispatch_queue_t mSystemQueue           = nullptr;
+
+    class WorkFlag
+    {
+    public:
+        void MarkDead() { mAlive = false; }
+        bool IsAlive() const { return mAlive; }
+
+    private:
+        std::atomic<bool> mAlive{ true };
+    };
+
+    Platform::WeakPtr<WorkFlag> mWorkFlagWeak;
+    Platform::SharedPtr<WorkFlag> mWorkFlagStrong;
 
     CHIP_ERROR ConfigureProtocol(IPAddressType aAddressType, const nw_parameters_t & aParameters);
     CHIP_ERROR StartListener();
-    CHIP_ERROR GetConnection(const IPPacketInfo * aPktInfo);
     nw_endpoint_t GetEndPoint(const IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort,
                               InterfaceId interfaceIndex = InterfaceId::Null());
-    CHIP_ERROR StartConnection(nw_connection_t aConnection);
-    void GetPacketInfo(const nw_connection_t & aConnection, IPPacketInfo & aPacketInfo);
-    void HandleDataReceived(const nw_connection_t & aConnection);
+    CHIP_ERROR GetPacketInfo(const nw_connection_t & aConnection, IPPacketInfo & aPacketInfo);
+    void HandleDataReceived(nw_connection_t aConnection);
     CHIP_ERROR ReleaseListener();
-    CHIP_ERROR ReleaseConnection();
     void ReleaseAll();
+
+    CFMutableDictionaryRef mConnections = nullptr;
+    CHIP_ERROR GetConnection(const IPPacketInfo * aPktInfo);
+    CHIP_ERROR StartConnection(nw_connection_t aConnection);
+    CHIP_ERROR StartConnectionFromListener(nw_connection_t connection);
+    void PrepareConnections();
+    CHIP_ERROR ReleaseConnections();
+    bool RefreshConnectionTimeout(nw_connection_t connection);
+    bool CreateConnectionWrapper(nw_connection_t connection);
+    bool ClearConnectionWrapper(nw_connection_t connection);
+    nw_connection_t FindConnection(const IPPacketInfo & pktInfo);
 };
 
 using UDPEndPointImpl = UDPEndPointImplNetworkFramework;

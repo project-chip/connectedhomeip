@@ -219,6 +219,16 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     //
     // The logic below expects that the IPv6 transport is at index 0. Keep that logic in sync with
     // this code.
+#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+    err = mTransports.Init(UdpListenParameters(DeviceLayer::UDPEndPointManager())
+#if INET_CONFIG_ENABLE_IPV4
+                               .SetAddressType(IPAddressType::kAny)
+#else
+                               .SetAddressType(IPAddressType::kIPv6)
+#endif // INET_CONFIG_ENABLE_IPV4
+                               .SetListenPort(mOperationalServicePort)
+                               .SetNativeParams(initParams.endpointNativeParams)
+#else // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     err = mTransports.Init(UdpListenParameters(DeviceLayer::UDPEndPointManager())
                                .SetAddressType(IPAddressType::kIPv6)
                                .SetListenPort(mOperationalServicePort)
@@ -230,7 +240,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                            UdpListenParameters(DeviceLayer::UDPEndPointManager())
                                .SetAddressType(IPAddressType::kIPv4)
                                .SetListenPort(mOperationalServicePort)
-#endif
+#endif // INET_CONFIG_ENABLE_IPV4
+#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 #if CONFIG_NETWORK_LAYER_BLE
                                ,
                            BleListenParameters(DeviceLayer::ConnectivityMgr().GetBleLayer())
@@ -325,9 +336,11 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #endif
 
     app::DnssdServer::Instance().SetSecuredIPv6Port(mTransports.GetTransport().GetImplAtIndex<0>().GetBoundPort());
+#if !CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 #if INET_CONFIG_ENABLE_IPV4
     app::DnssdServer::Instance().SetSecuredIPv4Port(mTransports.GetTransport().GetImplAtIndex<1>().GetBoundPort());
 #endif // INET_CONFIG_ENABLE_IPV4
+#endif // !CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
     app::DnssdServer::Instance().SetUnsecuredPort(mUserDirectedCommissioningPort);
     app::DnssdServer::Instance().SetInterfaceId(mInterfaceId);
@@ -472,6 +485,15 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT // support UDC port for commissioner declaration msgs
     mUdcTransportMgr = Platform::New<UdcTransportMgr>();
+#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+    ReturnErrorOnFailure(mUdcTransportMgr->Init(Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
+#if INET_CONFIG_ENABLE_IPV4
+                                                    .SetAddressType(Inet::IPAddressType::kAny)
+#else
+                                                    .SetAddressType(Inet::IPAddressType::kIPv6)
+#endif // INET_CONFIG_ENABLE_IPV4
+                                                    .SetListenPort(static_cast<uint16_t>(mCdcListenPort))
+#else
     ReturnErrorOnFailure(mUdcTransportMgr->Init(Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
                                                     .SetAddressType(Inet::IPAddressType::kIPv6)
                                                     .SetListenPort(static_cast<uint16_t>(mCdcListenPort))
@@ -481,6 +503,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                                                     .SetAddressType(Inet::IPAddressType::kIPv4)
                                                     .SetListenPort(static_cast<uint16_t>(mCdcListenPort))
 #endif // INET_CONFIG_ENABLE_IPV4
+#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
                                                     ));
 
     gUDCClient = Platform::New<Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient>();

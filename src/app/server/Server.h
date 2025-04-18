@@ -96,9 +96,11 @@ inline constexpr size_t kMaxTcpPendingPackets = CHIP_CONFIG_MAX_TCP_PENDING_PACK
 //       in the Server impl depends on this.
 //
 using ServerTransportMgr = chip::TransportMgr<chip::Transport::UDP
+#if !CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 #if INET_CONFIG_ENABLE_IPV4
                                               ,
                                               chip::Transport::UDP
+#endif
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
                                               ,
@@ -116,9 +118,11 @@ using ServerTransportMgr = chip::TransportMgr<chip::Transport::UDP
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 using UdcTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
+#if !CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 #if INET_CONFIG_ENABLE_IPV4
                                      ,
                                      Transport::UDP /* IPv4 */
+#endif
 #endif
                                      >;
 #endif
