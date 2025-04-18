@@ -216,7 +216,7 @@ class TC_CNET_4_12(MatterBaseTest):
         )
         # network_index = resp.networkIndex
         logger.info(f'Step #4: RemoveNetwork Status is success ({resp.networkingStatus})')
-        logger.info(f'Step #4: Network index: ({network_index})')
+        logger.info(f'Step #4: Network index: ({resp.networkIndex})')
 
         # Verify that the DUT responds with Remove Network with NetworkingStatus as 'Success'(0)
         asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
