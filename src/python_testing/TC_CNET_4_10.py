@@ -73,7 +73,8 @@ class TC_CNET_4_10(MatterBaseTest):
         gen_comm = Clusters.GeneralCommissioning
 
         # Get NetworkID from PIXIT operational dataset (stored as bytes)
-        pixit_dataset_bytes = self.matter_test_config.global_test_params['PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET']
+        pixit_dataset_bytes = self.matter_test_config.global_test_params.get('PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET')
+        asserts.assert_is_not_none(pixit_dataset_bytes, "PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET must be supplied via --hex-arg.")
 
         asserts.assert_true(len(pixit_dataset_bytes) > 0, "--hex-arg PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET must be supplied.")
 
