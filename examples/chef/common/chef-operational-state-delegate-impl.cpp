@@ -19,7 +19,7 @@
 #include <chef-operational-state-delegate-impl.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#ifdef MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER || MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
+#if defined(MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER) || defined(MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER)
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
