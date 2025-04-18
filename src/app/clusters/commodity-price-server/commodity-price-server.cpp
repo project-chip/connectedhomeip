@@ -93,7 +93,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         // Call GetDetailedForecastRequest with details = 0 to
         // strip out .components and .description if present
         pPriceForecast = GetDetailedForecastRequest(0);
-        VerifyOrReturnError(pPriceStruct != nullptr, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(pPriceForecast != nullptr, CHIP_ERROR_NO_MEMORY);
 
         err = aEncoder.Encode(*pPriceForecast);
         FreePriceForecast(pPriceForecast);
