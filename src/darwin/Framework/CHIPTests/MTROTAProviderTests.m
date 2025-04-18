@@ -23,6 +23,7 @@
 #import "MTRTestCase+ServerAppRunner.h"
 #import "MTRTestCase.h"
 #import "MTRTestControllerDelegate.h"
+#import "MTRTestDeclarations.h"
 #import "MTRTestKeys.h"
 #import "MTRTestStorage.h"
 
@@ -582,6 +583,12 @@ static BOOL sStackInitRan = NO;
     factoryParams.port = @(kLocalPort);
     factoryParams.otaProviderDelegate = sOTAProviderDelegate;
     factoryParams.shouldStartServer = YES;
+
+#ifdef DEBUG
+    // Force our controllers to only advertise on localhost, to avoid DNS-SD
+    // crosstalk.
+    [MTRDeviceController forceLocalhostAdvertisingOnly];
+#endif // DEBUG
 
     BOOL ok = [factory startControllerFactory:factoryParams error:nil];
     XCTAssertTrue(ok);
