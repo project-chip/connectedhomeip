@@ -143,33 +143,33 @@ class TC_CNET_4_12(MatterBaseTest):
 
         # Assign required PIXITs
         endpoint = self.user_params.get('PIXIT.CNET.ENDPOINT_THREAD')
-        th_xpan = self.user_params.get('PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET')
-        th_xpan_1 = self.user_params.get('PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET')
+        thread_dataset_1 = self.user_params.get('PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET')
+        thread_dataset_2 = self.user_params.get('PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET')
 
         # Validate required PIXIT
         asserts.assert_true(endpoint is not None, "Missing required PIXIT: PIXIT.CNET.ENDPOINT_THREAD")
-        asserts.assert_true(th_xpan is not None, "Missing required PIXIT: PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET")
-        asserts.assert_true(th_xpan_1 is not None, "Missing required PIXIT: PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET")
+        asserts.assert_true(thread_dataset_1 is not None, "Missing required PIXIT: PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET")
+        asserts.assert_true(thread_dataset_2 is not None, "Missing required PIXIT: PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET")
 
         # All required PIXITs are present and assigned,  Thread dataset as str
         logger.info('Precondition 2: All required PIXITs are present and assigned, Thread dataset as str: '
                     f'PIXIT.CNET.ENDPOINT_THREAD = {endpoint}, '
-                    f'PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET = {th_xpan}, '
-                    f'PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET = {th_xpan_1}')
+                    f'PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET = {thread_dataset_1}, '
+                    f'PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET = {thread_dataset_2}')
 
-        th_xpan_bytes = bytes.fromhex(th_xpan)
-        th_xpan_1_bytes = bytes.fromhex(th_xpan_1)
+        thread_dataset_1_bytes = bytes.fromhex(thread_dataset_1)
+        thread_dataset_2_bytes = bytes.fromhex(thread_dataset_2)
 
         # All required PIXITs are present and assigned,  Thread dataset as bytes
         logger.info('Precondition 2: All required PIXITs are present and assigned, Thread dataset as bytes: '
-                    f'PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET = {th_xpan_bytes}, '
-                    f'PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET = {th_xpan_1_bytes}')
+                    f'PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET = {thread_dataset_1_bytes}, '
+                    f'PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET = {thread_dataset_2_bytes}')
 
         # Validate the operational dataset structure (for both datasets)
         logger.info("Precondition 2: Validating THREAD operational datasets")
 
-        thread_network_id_bytes_th1 = await self.validate_thread_dataset(th_xpan_bytes, "THREAD_1ST_OPERATIONALDATASET")
-        thread_network_id_bytes_th2 = await self.validate_thread_dataset(th_xpan_1_bytes, "THREAD_2ND_OPERATIONALDATASET")
+        thread_network_id_bytes_th1 = await self.validate_thread_dataset(thread_dataset_1_bytes, "THREAD_1ST_OPERATIONALDATASET")
+        thread_network_id_bytes_th2 = await self.validate_thread_dataset(thread_dataset_2_bytes, "THREAD_2ND_OPERATIONALDATASET")
 
         # The FeatureMap attribute value is 2
         feature_map = await self.read_single_attribute_check_success(
@@ -198,7 +198,10 @@ class TC_CNET_4_12(MatterBaseTest):
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.Networks
         )
+
         logger.info(f'Step #2: Networks attribute: {networks}')
+        logger.info(f'Step #2: Networks attribute - networkID: ({networks.networkID})')
+        logger.info(f'Step #2: Networks attribute - connected: ({networks.connected})')
 
         num_networks = len(networks)
         logger.info(f'Step #2: Number of Networks entries (NumNetworks): {num_networks}')
@@ -213,6 +216,8 @@ class TC_CNET_4_12(MatterBaseTest):
                 asserts.assert_true(network.connected, "Thread network not connected")
                 break
         asserts.assert_true(userth_netidx is not None, "Thread network not found")
+        logger.info(f'Step #3: Networks attribute: {network.networkID}')
+        logger.info(f'Step #3: Networks attribute: {thread_network_id_bytes_th1}')
         logger.info(f'Step #3: Networks attribute: {userth_netidx}')
 
         self.step(4)
@@ -222,8 +227,9 @@ class TC_CNET_4_12(MatterBaseTest):
             node_id=self.dut_node_id,
             cmd=cmd
         )
+        logger.info(f'Step #4: RemoveNetwor response ({vars(resp)})')
         logger.info(f'Step #4: RemoveNetwork Status is success ({resp.networkingStatus})')
-        logger.info(f'Step #4: Network index: ({resp.networkIndex})')
+        logger.info(f'Step #4: RemoveNetwork NetworkIndex: ({resp.networkIndex})')
 
         # Verify that the DUT responds with Remove Network with NetworkingStatus as 'Success'(0)
         asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
@@ -231,13 +237,14 @@ class TC_CNET_4_12(MatterBaseTest):
         asserts.assert_equal(resp.networkIndex, userth_netidx, "The network index is not as expected.")
 
         self.step(5)
-        cmd = Clusters.NetworkCommissioning.Commands.AddOrUpdateThreadNetwork(operationalDataset=th_xpan_1_bytes, breadcrumb=1)
+        cmd = Clusters.NetworkCommissioning.Commands.AddOrUpdateThreadNetwork(
+            operationalDataset=thread_dataset_2_bytes, breadcrumb=1)
         resp = await self.send_single_cmd(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
             cmd=cmd
         )
-        logger.info(f'Step #5: AddOrUpdateThreadNetwork Status RESPONSE VARS ({vars(resp)})')
+        logger.info(f'Step #5: AddOrUpdateThreadNetwork response ({vars(resp)})')
         logger.info(f'Step #5: AddOrUpdateThreadNetwork Status is success ({resp.networkingStatus})')
         # Verify that the DUT responds with AddThreadNetwork with NetworkingStatus as 'Success'(0)
         asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
@@ -259,7 +266,7 @@ class TC_CNET_4_12(MatterBaseTest):
         self.step(7)
         network_name = b"OpenThread-55dc"
 
-        cmd = Clusters.NetworkCommissioning.Commands.ConnectNetwork(networkID=network_name, breadcrumb=2)
+        cmd = Clusters.NetworkCommissioning.Commands.ConnectNetwork(networkID=thread_network_id_bytes_th2, breadcrumb=2)
         resp = await self.send_single_cmd(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
