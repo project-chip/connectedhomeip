@@ -31,7 +31,11 @@ private:
     const CharSpan kPhaseList[3] = { "pre-heating"_span, "pre-heated"_span, "cooling down"_span };
 
 public:
-    Delegate() { GenericOperationalStateDelegateImpl::mOperationalPhaseList = Span<const CharSpan>(kPhaseList); }
+    Delegate()
+    {
+        chip::app::Clusters::OperationalState::GenericOperationalStateDelegateImpl::mOperationalPhaseList =
+            Span<const CharSpan>(kPhaseList);
+    }
 };
 
 void InitChefOvenCavityOperationalStateCluster();
