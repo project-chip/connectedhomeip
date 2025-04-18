@@ -157,11 +157,16 @@ class TC_CNET_4_12(MatterBaseTest):
                     f'PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET = {th_xpan}, '
                     f'PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET = {th_xpan_1}')
 
-        # Validate the operational dataset structure (for both datasets)
-        logger.info("Precondition 2: Validating THREAD operational datasets")
-
         th_xpan_bytes = bytes.fromhex(th_xpan)
         th_xpan_1_bytes = bytes.fromhex(th_xpan_1)
+
+        # All required PIXITs are present and assigned,  Thread dataset as bytes
+        logger.info('Precondition 2: All required PIXITs are present and assigned, Thread dataset as bytes: '
+                    f'PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET = {th_xpan_bytes}, '
+                    f'PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET = {th_xpan_1_bytes}')
+
+        # Validate the operational dataset structure (for both datasets)
+        logger.info("Precondition 2: Validating THREAD operational datasets")
 
         thread_network_id_bytes_th1 = await self.validate_thread_dataset(th_xpan_bytes, "THREAD_1ST_OPERATIONALDATASET")
         thread_network_id_bytes_th2 = await self.validate_thread_dataset(th_xpan_1_bytes, "THREAD_2ND_OPERATIONALDATASET")
@@ -232,6 +237,8 @@ class TC_CNET_4_12(MatterBaseTest):
             node_id=self.dut_node_id,
             cmd=cmd
         )
+        logger.info(f'Step #5: AddOrUpdateThreadNetwork Status RESPONSE ({resp})')
+        logger.info(f'Step #5: AddOrUpdateThreadNetwork Status RESPONSE VARS ({vars(resp)})')
         logger.info(f'Step #5: AddOrUpdateThreadNetwork Status is success ({resp.networkingStatus})')
         # Verify that the DUT responds with AddThreadNetwork with NetworkingStatus as 'Success'(0)
         asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
@@ -251,12 +258,13 @@ class TC_CNET_4_12(MatterBaseTest):
         # TODO: Why th_xpan? should be th_xpan_1
 
         self.step(7)
-        cmd = Clusters.NetworkCommissioning.Commands.ConnectNetwork(operationalDataset=th_xpan_1, breadcrumb=2)
+        cmd = Clusters.NetworkCommissioning.Commands.ConnectNetwork(networkID=th_xpan_1_bytes, breadcrumb=2)
         resp = await self.send_single_cmd(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
             cmd=cmd
         )
+        logger.info(f'Step #7: ConnectNetwork resp VARS ({vars(resp)})')
         logger.info(f'Step #7: ConnectNetwork Status is success ({resp.networkingStatus})')
         # Verify that the DUT responds with AddThreadNConnectNetworketwork with NetworkingStatus as 'Success'(0)
         asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
