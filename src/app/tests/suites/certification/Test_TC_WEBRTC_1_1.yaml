@@ -13,7 +13,9 @@
 # limitations under the License.
 
 #TODO: Replace PIC
-name: 2.2.2 [TC-WEBRTC-1.1] Validate that setting an SDP Offer successfully initiates a new WebRTC session.
+name:
+    2.2.2 [TC-WEBRTC-1.1] Validate that setting an SDP Offer successfully
+    initiates a new WebRTC session.
 
 config:
     nodeId: 0x12344321
@@ -51,7 +53,9 @@ tests:
               - name: "responseValue"
                 saveAs: OfferSdp
 
-    - label: "TH sends the ProvideOffer command with an SDP Offer and null WebRTCSessionID to the DUT."
+    - label:
+          "TH sends the ProvideOffer command with an SDP Offer and null
+          WebRTCSessionID to the DUT."
       command: "ProvideOffer"
       arguments:
           values:
