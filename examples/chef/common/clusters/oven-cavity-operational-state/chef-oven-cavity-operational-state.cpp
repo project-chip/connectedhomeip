@@ -29,7 +29,7 @@ namespace OvenCavityOperationalState {
 constexpr size_t kOvenCavityOperationalStateTableSize = MATTER_DM_OPERATIONAL_STATE_OVEN_CLUSTER_CLIENT_ENDPOINT_COUNT;
 static_assert(kOvenCavityOperationalStateTableSize <= kEmberInvalidEndpointIndex, "OvenCavityOperationalState table size error");
 
-std::unique_ptr<Delegate> gDelegateTable[kOvenCavityOperationalStateTableSize];
+std::unique_ptr<chef::OvenCavityOperationalState::Delegate> gDelegateTable[kOvenCavityOperationalStateTableSize];
 std::unique_ptr<chip::app::Clusters::OvenCavityOperationalState::Instance> gInstanceTable[kOvenCavityOperationalStateTableSize];
 
 /**
