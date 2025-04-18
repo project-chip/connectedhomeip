@@ -180,11 +180,11 @@ gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="$tracing_options chip_detail_l
 # Compile Python wheels
 ninja -C "$OUTPUT_ROOT" python_wheels
 
-# Add wheels from chip_python_wheel_action templates.
-WHEEL=("$OUTPUT_ROOT"/controller/python/chip*.whl)
+# Add wheels from matter_python_wheel_action templates.
+WHEEL=("$OUTPUT_ROOT"/controller/python/matter*.whl)
 
 # Add the matter_testing_infrastructure wheel
-WHEEL+=("$OUTPUT_ROOT"/obj/src/python_testing/matter_testing_infrastructure/chip-testing._build_wheel/chip_testing*.whl)
+WHEEL+=("$OUTPUT_ROOT"/obj/src/python_testing/matter_testing_infrastructure/matter-testing._build_wheel/matter_testing*.whl)
 
 if [ "$install_pytest_requirements" = "yes" ]; then
     # Add the matter_yamltests_distribution wheel

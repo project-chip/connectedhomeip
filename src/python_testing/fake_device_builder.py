@@ -16,11 +16,11 @@
 #
 from typing import Any, Optional
 
-import chip.clusters as Clusters
-from chip.testing.conformance import ConformanceDecision
-from chip.testing.global_attribute_ids import GlobalAttributeIds
-from chip.testing.spec_parsing import XmlCluster, XmlDeviceType
-from chip.tlv import uint
+import matter.clusters as Clusters
+from matter.testing.conformance import ConformanceDecision
+from matter.testing.global_attribute_ids import GlobalAttributeIds
+from matter.testing.spec_parsing import XmlCluster, XmlDeviceType
+from matter.tlv import uint
 
 
 def _is_mandatory(conformance):

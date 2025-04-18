@@ -17,8 +17,8 @@
 
 import unittest
 
-from chip.tlv import TLVList, TLVReader, TLVWriter
-from chip.tlv import uint as tlvUint
+from matter.tlv import TLVList, TLVReader, TLVWriter
+from matter.tlv import uint as tlvUint
 
 
 class TestTLVWriter(unittest.TestCase):

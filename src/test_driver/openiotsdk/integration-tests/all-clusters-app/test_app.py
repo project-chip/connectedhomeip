@@ -19,12 +19,13 @@ import logging
 import os
 import re
 
-import chip.interaction_model
 import pytest
-from chip.clusters.Objects import AccessControl
-from chip.clusters.Types import NullValue
 from common.utils import (connect_device, disconnect_device, discover_device, get_setup_payload, read_zcl_attribute,
                           write_zcl_attribute)
+
+import matter.interaction_model
+from matter.clusters.Objects import AccessControl
+from matter.clusters.Types import NullValue
 
 log = logging.getLogger(__name__)
 
@@ -126,7 +127,7 @@ def test_clusters_ctrl(device, controller):
     err, res = write_zcl_attribute(devCtrl, "AccessControl", "Acl", nodeId,  ALL_CLUSTERS_CTRL_TEST_ENDPOINT_ID,
                                    [entry0, entry1, entry2, entry3])
     assert err == 0
-    assert res[0].Status == chip.interaction_model.Status.Success
+    assert res[0].Status == matter.interaction_model.Status.Success
 
     err, res = read_zcl_attribute(devCtrl, "AccessControl", "Acl", nodeId, ALL_CLUSTERS_CTRL_TEST_ENDPOINT_ID)
     assert err == 0

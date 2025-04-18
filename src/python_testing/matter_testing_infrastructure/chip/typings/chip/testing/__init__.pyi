@@ -1,2 +1,2 @@
-# This file is a stub for the chip.testing package
+# This file is a stub for the matter.testing package
 

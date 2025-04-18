@@ -34,11 +34,12 @@
 
 import time
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_VALCC_4_5(MatterBaseTest):

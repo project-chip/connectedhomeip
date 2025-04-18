@@ -31,20 +31,21 @@ import time
 from dataclasses import dataclass
 from typing import Any
 
-import chip.CertificateAuthority
-import chip.clusters as Clusters
-import chip.clusters.Attribute as Attribute
-import chip.discovery
-import chip.FabricAdmin
-import chip.interaction_model as IM
-import chip.native
-from chip import ChipDeviceCtrl
-from chip.ChipStack import ChipStack
-from chip.crypto import p256keypair
-from chip.exceptions import ChipStackException
-from chip.utils import CommissioningBuildingBlocks
 from cirque_restart_remote_device import restartRemoteDevice
 from ecdsa import NIST256p
+
+import matter.CertificateAuthority
+import matter.clusters as Clusters
+import matter.clusters.Attribute as Attribute
+import matter.discovery
+import matter.FabricAdmin
+import matter.interaction_model as IM
+import matter.native
+from matter import ChipDeviceCtrl
+from matter.ChipStack import ChipStack
+from matter.crypto import p256keypair
+from matter.exceptions import ChipStackException
+from matter.utils import CommissioningBuildingBlocks
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
@@ -85,7 +86,7 @@ def TestFail(message, doCrash=False):
         # Cause a crash to happen so that we can actually get a meaningful
         # backtrace when run through GDB.
         #
-        chip.native.GetLibraryHandle().pychip_CauseCrash()
+        matter.native.GetLibraryHandle().pychip_CauseCrash()
     else:
         os._exit(1)
 
@@ -182,10 +183,10 @@ class TestTimeout(threading.Thread):
 class BaseTestHelper:
     def __init__(self, nodeid: int, paaTrustStorePath: str, testCommissioner: bool = False,
                  keypair: p256keypair.P256Keypair = None):
-        chip.native.Init()
+        matter.native.Init()
 
         self.chipStack = ChipStack('/tmp/repl_storage.json', enableServerInteractions=True)
-        self.certificateAuthorityManager = chip.CertificateAuthority.CertificateAuthorityManager(chipStack=self.chipStack)
+        self.certificateAuthorityManager = matter.CertificateAuthority.CertificateAuthorityManager(chipStack=self.chipStack)
         self.certificateAuthority = self.certificateAuthorityManager.NewCertificateAuthority()
         self.fabricAdmin = self.certificateAuthority.NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
         self.devCtrl = self.fabricAdmin.NewController(
@@ -214,7 +215,7 @@ class BaseTestHelper:
         self.logger.info(
             f"Discovering commissionable nodes with discriminator {discriminator}")
         res = await self.devCtrl.DiscoverCommissionableNodes(
-            chip.discovery.FilterType.LONG_DISCRIMINATOR, discriminator, stopOnFirst=True, timeoutSecond=3)
+            matter.discovery.FilterType.LONG_DISCRIMINATOR, discriminator, stopOnFirst=True, timeoutSecond=3)
         if not res:
             self.logger.info(
                 "Device not found")
@@ -327,7 +328,7 @@ class BaseTestHelper:
     async def TestCommissioningWithSetupPayload(self, setupPayload: str, nodeid: int, discoveryType: int = 2):
         self.logger.info("Commissioning device with setup payload {}".format(setupPayload))
         try:
-            await self.devCtrl.CommissionWithCode(setupPayload, nodeid, chip.discovery.DiscoveryType(discoveryType))
+            await self.devCtrl.CommissionWithCode(setupPayload, nodeid, matter.discovery.DiscoveryType(discoveryType))
         except ChipStackException:
             self.logger.exception(
                 "Failed to finish commissioning device {}".format(setupPayload))
@@ -808,7 +809,7 @@ class BaseTestHelper:
 
         self.logger.info("Shutdown completed, starting new controllers...")
 
-        self.certificateAuthorityManager = chip.CertificateAuthority.CertificateAuthorityManager(chipStack=self.chipStack)
+        self.certificateAuthorityManager = matter.CertificateAuthority.CertificateAuthorityManager(chipStack=self.chipStack)
         self.certificateAuthority = self.certificateAuthorityManager.NewCertificateAuthority()
         self.fabricAdmin = self.certificateAuthority.NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
 
@@ -1205,7 +1206,7 @@ class BaseTestHelper:
         return True
 
     async def TestWriteBasicAttributes(self, nodeid: int, endpoint: int):
-        @ dataclass
+        @dataclass
         class AttributeWriteRequest:
             cluster: Clusters.ClusterObjects.Cluster
             attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor

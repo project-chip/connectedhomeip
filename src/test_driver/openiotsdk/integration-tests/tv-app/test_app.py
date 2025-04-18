@@ -19,12 +19,13 @@ import logging
 import os
 import re
 
-import chip.native
 import pytest
-from chip import exceptions
-from chip.clusters.Objects import ApplicationLauncher, Channel, ContentLauncher, KeypadInput, MediaPlayback, TargetNavigator
 from common.utils import (connect_device, disconnect_device, discover_device, get_log_messages_from_response, get_setup_payload,
                           get_shell_commands_from_help_response, read_zcl_attribute, send_zcl_command)
+
+import matter.native
+from matter import exceptions
+from matter.clusters.Objects import ApplicationLauncher, Channel, ContentLauncher, KeypadInput, MediaPlayback, TargetNavigator
 
 cecKeyCode = KeypadInput.Enums.CecKeyCode
 log = logging.getLogger(__name__)
@@ -99,7 +100,7 @@ TV_CTRL_TEST_APP_ADMIN_VENDOR_ID = 65521
 @pytest.mark.ctrltest
 def test_command_check(device):
     try:
-        chip.native.Init()
+        matter.native.Init()
     except exceptions.ChipStackException as ex:
         log.error("CHIP initialization failed {}".format(ex))
         assert False

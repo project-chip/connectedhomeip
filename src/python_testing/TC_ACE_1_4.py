@@ -40,10 +40,11 @@
 
 import sys
 
-import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import Status
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 
 # This test requires several additional command line arguments
 # run with
@@ -52,7 +53,7 @@ from mobly import asserts
 
 
 def str_to_cluster(str):
-    return getattr(sys.modules["chip.clusters.Objects"], str)
+    return getattr(sys.modules["matter.clusters.Objects"], str)
 
 
 def str_to_attribute(cluster, str):
