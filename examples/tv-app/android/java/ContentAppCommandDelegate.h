@@ -43,7 +43,7 @@ using PlaybackResponseType       = chip::app::Clusters::MediaPlayback::Commands:
 using NavigateTargetResponseType = chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Type;
 using GetSetupPINResponseType    = chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::Type;
 
-class ContentAppCommandDelegate : public CommandHandlerInterface
+class ContentAppCommandDelegate : public CommandHandlerInterfaceB
 {
 public:
     ContentAppCommandDelegate(jobject manager, ClusterId aClusterId) : CommandHandlerInterfaceB(Optional<EndpointId>(), aClusterId)

@@ -45,7 +45,7 @@ namespace bridge {
 
 namespace {
 
-class AdministratorCommissioningCommandHandler : public CommandHandlerInterface
+class AdministratorCommissioningCommandHandler : public CommandHandlerInterfaceB
 {
 public:
     // Register for the AdministratorCommissioning cluster on all endpoints.
@@ -138,7 +138,7 @@ void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & ha
     handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, status);
 }
 
-class BridgedDeviceInformationCommandHandler : public CommandHandlerInterface
+class BridgedDeviceInformationCommandHandler : public CommandHandlerInterfaceB
 {
 public:
     // Register for the BridgedDeviceBasicInformation cluster on all endpoints.

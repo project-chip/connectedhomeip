@@ -48,7 +48,7 @@ using namespace chip::Protocols;
 using namespace chip::Crypto;
 using chip::Protocols::InteractionModel::Status;
 
-class AdministratorCommissioningServer : public AttributeAccessInterface, public CommandHandlerInterface
+class AdministratorCommissioningServer : public AttributeAccessInterface, public CommandHandlerInterfaceB
 {
 public:
     // Register for the AdministratorCommissioning cluster on all endpoints.
