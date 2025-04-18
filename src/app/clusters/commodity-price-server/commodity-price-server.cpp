@@ -92,7 +92,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 
         // Call GetDetailedForecastRequest with details = 0 to
         // strip out .components and .description if present
-        pPriceForecast = GetDetailedForecastRequest(0);
+        pPriceForecast = GetDetailedForecastRequest(0, false);
         VerifyOrReturnError(pPriceForecast != nullptr, CHIP_ERROR_NO_MEMORY);
 
         err = aEncoder.Encode(*pPriceForecast);
@@ -199,7 +199,7 @@ void Instance::HandleGetDetailedForecastRequest(HandlerContext & ctx,
     }
 
     Commands::GetDetailedForecastResponse::Type response;
-    const DataModel::List<const Structs::CommodityPriceStruct::Type> * pPriceForecast = GetDetailedForecastRequest(details);
+    const DataModel::List<const Structs::CommodityPriceStruct::Type> * pPriceForecast = GetDetailedForecastRequest(details, false);
     if (pPriceForecast == nullptr)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
@@ -247,7 +247,7 @@ void Instance::FreeCurrentPrice(const DataModel::Nullable<Structs::CommodityPric
 }
 
 const DataModel::List<const Structs::CommodityPriceStruct::Type> *
-Instance::GetDetailedForecastRequest(chip::BitMask<CommodityPriceDetailBitmap> details)
+Instance::GetDetailedForecastRequest(chip::BitMask<CommodityPriceDetailBitmap> details, bool isEvent)
 {
 
     // Allocate backing storage for the copy
@@ -258,8 +258,11 @@ Instance::GetDetailedForecastRequest(chip::BitMask<CommodityPriceDetailBitmap> d
     // Try to dynamically size the response so it will fit based on what is requested
     size_t maxEntries = kMaxForecastEntries;
 
-    constexpr size_t kMaxByteCount = 900; // TODO work out what the max udp packet size is
-    size_t estimatedByteCount      = 0;
+    // TODO work out what the max udp packet size is
+    // For events this needs to be about 500
+    // Without events it can be 900
+    size_t kMaxByteCount      = (isEvent) ? 500 : 900;
+    size_t estimatedByteCount = 0;
     for (const auto & srcPrice : mPriceForecast)
     {
         if (count >= maxEntries)
@@ -431,9 +434,43 @@ CHIP_ERROR Instance::SetForecast(const DataModel::List<const Structs::CommodityP
 
     mPriceForecast = priceForecast;
 
+    ChipLogDetail(AppServer, "mPriceForecast updated");
+
     MatterReportingAttributeChangeCallback(mEndpointId, CommodityPrice::Id, PriceForecast::Id);
 
+    // generate a ForecastChange Event
+    SendForecastChangeEvent();
+
     return CHIP_NO_ERROR;
+}
+
+Status Instance::SendForecastChangeEvent()
+{
+
+    CHIP_ERROR err;
+    const DataModel::List<const Structs::CommodityPriceStruct::Type> * pPriceForecast = nullptr;
+    Events::ForecastChange::Type event;
+    EventNumber eventNumber;
+
+    /*
+     * The Event's PriceForecast must not include .description or .components
+     * call our function to copy the PriceForecast attribute without these
+     */
+    pPriceForecast = GetDetailedForecastRequest(0, true);
+    VerifyOrReturnError(pPriceForecast != nullptr, Status::Failure);
+
+    event.priceForecast = *pPriceForecast;
+
+    err = LogEvent(event, mEndpointId, eventNumber);
+    /* Free the copy after the LogEvent call has made its internal copy */
+    FreePriceForecast(pPriceForecast);
+
+    if (CHIP_NO_ERROR != err)
+    {
+        ChipLogError(AppServer, "Unable to send notify event: %" CHIP_ERROR_FORMAT, err.Format());
+        return Status::Failure;
+    }
+    return Status::Success;
 }
 
 } // namespace CommodityPrice

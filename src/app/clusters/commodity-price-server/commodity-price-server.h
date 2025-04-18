@@ -94,8 +94,9 @@ public:
     CHIP_ERROR SetCurrentPrice(const DataModel::Nullable<Structs::CommodityPriceStruct::Type>);
     CHIP_ERROR SetForecast(const DataModel::List<const Structs::CommodityPriceStruct::Type> &);
 
-    // Send Price Change event
+    // Send Price Change & ForecastChange events
     Status SendPriceChangeEvent();
+    Status SendForecastChangeEvent();
 
 private:
     Delegate & mDelegate;
@@ -121,7 +122,7 @@ private:
     void FreeCurrentPrice(const DataModel::Nullable<Structs::CommodityPriceStruct::Type> *);
 
     const DataModel::List<const Structs::CommodityPriceStruct::Type> *
-    GetDetailedForecastRequest(chip::BitMask<CommodityPriceDetailBitmap> details);
+    GetDetailedForecastRequest(chip::BitMask<CommodityPriceDetailBitmap> details, bool isEvent);
     void FreePriceForecast(const DataModel::List<const Structs::CommodityPriceStruct::Type> *);
 
     // Attribute storage
