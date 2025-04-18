@@ -81,6 +81,5 @@ constexpr MetricKey kMetricDeviceSubscriptionSetup = "core_dev_subscription_setu
 // Network Recovery
 constexpr MetricKey kMetricNetworkRecover = "core_dev_network_recover";
 
-
 } // namespace Tracing
 } // namespace chip

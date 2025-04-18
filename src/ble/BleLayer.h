@@ -242,10 +242,11 @@ public:
     void Shutdown();
 
     CHIP_ERROR CancelBleIncompleteConnection();
-    CHIP_ERROR NewBleConnectionByRecoveryIdentifier(uint64_t connRecoveryIdentifier, void * appState = nullptr,
-        BleConnectionDelegate::OnConnectionCompleteFunct onSuccess = OnConnectionComplete,
-        BleConnectionDelegate::OnConnectionErrorFunct onError      = OnConnectionError,
-        BleConnectionDelegate::OnDiscoverCompleteFunct onDiscover  = OnDiscoverComplete);
+    CHIP_ERROR
+    NewBleConnectionByRecoveryIdentifier(uint64_t connRecoveryIdentifier, void * appState = nullptr,
+                                         BleConnectionDelegate::OnConnectionCompleteFunct onSuccess = OnConnectionComplete,
+                                         BleConnectionDelegate::OnConnectionErrorFunct onError      = OnConnectionError,
+                                         BleConnectionDelegate::OnDiscoverCompleteFunct onDiscover  = OnDiscoverComplete);
     CHIP_ERROR NewBleConnectionByDiscriminator(const SetupDiscriminator & connDiscriminator, void * appState = nullptr,
                                                BleConnectionDelegate::OnConnectionCompleteFunct onSuccess = OnConnectionComplete,
                                                BleConnectionDelegate::OnConnectionErrorFunct onError      = OnConnectionError);

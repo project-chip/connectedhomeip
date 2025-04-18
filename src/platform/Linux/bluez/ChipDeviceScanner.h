@@ -41,7 +41,7 @@ public:
     virtual ~ChipDeviceScannerDelegate() {}
 
     // Called when a CHIP device was found
-    virtual void OnDeviceScanned(BluezDevice1 & device, const chip::Ble::ChipBLENetworkRecoveryInfo & info) = 0;
+    virtual void OnDeviceScanned(BluezDevice1 & device, const chip::Ble::ChipBLENetworkRecoveryInfo & info)      = 0;
     virtual void OnDeviceScanned(BluezDevice1 & device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) = 0;
     // Called when a scan was completed (stopped or timed out)
     virtual void OnScanComplete() = 0;

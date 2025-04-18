@@ -368,9 +368,9 @@ CHIP_ERROR BleLayer::CancelBleIncompleteConnection()
 }
 
 CHIP_ERROR BleLayer::NewBleConnectionByRecoveryIdentifier(uint64_t connRecoveryIdentifier, void * appState,
-                                                    BleConnectionDelegate::OnConnectionCompleteFunct onSuccess,
-                                                    BleConnectionDelegate::OnConnectionErrorFunct onError,
-                                                    BleConnectionDelegate::OnDiscoverCompleteFunct onDiscover)
+                                                          BleConnectionDelegate::OnConnectionCompleteFunct onSuccess,
+                                                          BleConnectionDelegate::OnConnectionErrorFunct onError,
+                                                          BleConnectionDelegate::OnDiscoverCompleteFunct onDiscover)
 {
     VerifyOrReturnError(mState == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mConnectionDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);

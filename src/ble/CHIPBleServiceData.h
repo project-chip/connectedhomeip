@@ -135,7 +135,6 @@ struct ChipBLEDeviceIdentificationInfo
 
 } __attribute__((packed));
 
-
 /**
  * chip BLE Network Recovery Information Block
  *
@@ -160,12 +159,15 @@ struct ChipBLENetworkRecoveryInfo
 
     uint64_t GetRecoveryIdentifier() const { return chip::Encoding::LittleEndian::Get64(RecoveryIdentifier); }
 
-    void SetRecoveryIdentifier(uint64_t recoveryIdentifier) { chip::Encoding::LittleEndian::Put64(RecoveryIdentifier, recoveryIdentifier); }
+    void SetRecoveryIdentifier(uint64_t recoveryIdentifier)
+    {
+        chip::Encoding::LittleEndian::Put64(RecoveryIdentifier, recoveryIdentifier);
+    }
 
     uint8_t GetAdvertisementVersion() const
     {
-        uint8_t advertisementVersion = static_cast<uint8_t>((PrimaryReasonAndAdvVersion & kAdvertisementVersionMask) >>
-                                                            kAdvertisementVersionShiftBits);
+        uint8_t advertisementVersion =
+            static_cast<uint8_t>((PrimaryReasonAndAdvVersion & kAdvertisementVersionMask) >> kAdvertisementVersionShiftBits);
         return advertisementVersion;
     }
 
@@ -173,18 +175,16 @@ struct ChipBLENetworkRecoveryInfo
     void SetAdvertisementVersion(uint8_t advertisementVersion)
     {
         // Advertisement Version is 4 bit long from 4th to 7th
-        PrimaryReasonAndAdvVersion = static_cast<uint8_t>((advertisementVersion << kAdvertisementVersionShiftBits) & kAdvertisementVersionMask);
+        PrimaryReasonAndAdvVersion =
+            static_cast<uint8_t>((advertisementVersion << kAdvertisementVersionShiftBits) & kAdvertisementVersionMask);
     }
 
-    uint16_t GetPrimaryReason() const
-    {
-        return PrimaryReasonAndAdvVersion & kPrimaryReasonMask;
-    }
+    uint16_t GetPrimaryReason() const { return PrimaryReasonAndAdvVersion & kPrimaryReasonMask; }
 
     void SetPrimaryReason(uint8_t reason)
     {
         // Primary Reason is 4-bit long, so don't overwrite bits 4th through 7th
-        auto advVersion     = static_cast<uint8_t>(PrimaryReasonAndAdvVersion & ~kPrimaryReasonMask);
+        auto advVersion            = static_cast<uint8_t>(PrimaryReasonAndAdvVersion & ~kPrimaryReasonMask);
         PrimaryReasonAndAdvVersion = static_cast<uint8_t>(advVersion | (reason & kPrimaryReasonMask));
     }
 
