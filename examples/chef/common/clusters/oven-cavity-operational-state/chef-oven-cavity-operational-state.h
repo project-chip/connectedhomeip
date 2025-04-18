@@ -34,6 +34,8 @@ public:
     Delegate() { GenericOperationalStateDelegateImpl::mOperationalPhaseList = Span<const CharSpan>(kPhaseList); }
 }
 
+void InitChefOvenCavityOperationalStateCluster();
+
 } // namespace OvenCavityOperationalState
 } // namespace chef
 
