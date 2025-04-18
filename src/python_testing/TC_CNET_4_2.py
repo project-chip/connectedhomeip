@@ -25,6 +25,31 @@ from mobly import asserts
 
 
 class TC_CNET_4_2(MatterBaseTest):
+    """
+    [TC-CNET-4.2] [Thread] Verification for attributes check [DUT-Server].
+
+    Pre-Conditions:
+        1. DUT supports CNET.S.F01(TH).
+        2. DUT has a Network Commissioning cluster on the endpoint specified
+           in the --endpoint command-line argument, with a FeatureMap attribute of 2.
+        3. DUT is commissioned on the operational network specified
+           in the --thread-dataset-hex command-line argument.
+        4. TH can communicate with the DUT on the operational network specified
+           in the --thread-dataset-hex command-line argument. 
+
+    Example Usage:
+        To run the test case, use the following command:
+
+        ```bash
+        python src/python_testing/TC_CNET_4_2.py --commissioning-method ble-thread -d <discriminator> -p <passcode> \
+               --endpoint <endpoint_value> --thread-dataset-hex <dataset_value>
+        ```
+
+        Where `<endpoint_value>` should be replaced with the actual endpoint
+        number for the Network Commissioning cluster on the DUT, and
+        `<dataset_value>` should be replaced with the Thread Operational Dataset
+        in hexadecimal format.
+    """
 
     def desc_TC_CNET_4_2(self) -> str:
         return "[TC-CNET-4.2] [Thread] Verification for attributes check [DUT-Server]"
