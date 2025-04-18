@@ -22,7 +22,7 @@ import typing
 import xml.etree.ElementTree as ElementTree
 import zipfile
 from copy import deepcopy
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum, auto
 from importlib.abc import Traversable
 from typing import Callable, Optional, Union
@@ -134,7 +134,10 @@ class XmlDeviceTypeClusterRequirements:
     name: str
     side: ClusterSide
     conformance: ConformanceCallable
-    # TODO: add element requirements
+    # mask to conformance
+    feature_overrides: dict[uint, Callable] = field(default_factory=dict)
+    attribute_overrides: dict[uint, Callable] = field(default_factory=dict)
+    command_overrides: dict[uint, Callable] = field(default_factory=dict)
 
     def __str__(self):
         return f'{self.name}: {str(self.conformance)}'
@@ -188,19 +191,24 @@ CLUSTER_NAME_FIXES = {0x0036: 'WiFi Network Diagnostics', 0x042a: 'PM25 Concentr
 DEVICE_TYPE_NAME_FIXES = {0x010b: 'Dimmable Plug-In Unit', 0x010a: 'On/Off Plug-in Unit'}
 
 
-def get_location_from_element(element: ElementTree.Element, cluster_id: Optional[int]) -> ProblemLocation:
+def get_location_from_element(element: ElementTree.Element, cluster_id: Optional[int]):
     if cluster_id is None:
         cluster_id = 0
-    if element.tag == 'feature':
-        return FeaturePathLocation(endpoint_id=0, cluster_id=cluster_id, feature_code=element.attrib['code'])
-    elif element.tag == 'command':
-        return CommandPathLocation(endpoint_id=0, cluster_id=cluster_id, command_id=int(element.attrib['id'], 0))
-    elif element.tag == 'attribute':
-        return AttributePathLocation(endpoint_id=0, cluster_id=cluster_id, attribute_id=int(element.attrib['id'], 0))
-    elif element.tag == 'event':
-        return EventPathLocation(endpoint_id=0, cluster_id=cluster_id, event_id=int(element.attrib['id'], 0))
-    else:
-        return ClusterPathLocation(endpoint_id=0, cluster_id=cluster_id)
+    cluster_location = ClusterPathLocation(endpoint_id=0, cluster_id=cluster_id)
+    try:
+        if element.tag == 'feature':
+            return FeaturePathLocation(endpoint_id=0, cluster_id=cluster_id, feature_code=element.attrib['code'])
+        elif element.tag == 'command':
+            return CommandPathLocation(endpoint_id=0, cluster_id=cluster_id, command_id=int(element.attrib['id'], 0))
+        elif element.tag == 'attribute':
+            return AttributePathLocation(endpoint_id=0, cluster_id=cluster_id, attribute_id=int(element.attrib['id'], 0))
+        elif element.tag == 'event':
+            return EventPathLocation(endpoint_id=0, cluster_id=cluster_id, event_id=int(element.attrib['id'], 0))
+        else:
+            return cluster_location
+    except (KeyError, ValueError):
+        # If we can't find the id or can't parse it
+        return cluster_location
 
 
 def get_conformance(element: ElementTree.Element, cluster_id: Optional[uint]) -> tuple[ElementTree.Element, typing.Optional[ProblemNotice]]:
@@ -786,7 +794,7 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
             xml_clusters[id] = new
 
 
-def parse_single_device_type(root: ElementTree.Element) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
+def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: dict[uint, XmlCluster]) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
     problems: list[ProblemNotice] = []
     device_types: dict[int, XmlDeviceType] = {}
     device = root.iter('deviceType')
@@ -813,6 +821,9 @@ def parse_single_device_type(root: ElementTree.Element) -> tuple[dict[int, XmlDe
             break
         if id in DEVICE_TYPE_NAME_FIXES:
             name = DEVICE_TYPE_NAME_FIXES[id]
+
+        location = DeviceTypePathLocation(device_type_id=id)
+
         try:
             classification = next(d.iter('classification'))
             scope = classification.attrib['scope']
@@ -838,10 +849,13 @@ def parse_single_device_type(root: ElementTree.Element) -> tuple[dict[int, XmlDe
                     location = DeviceTypePathLocation(device_type_id=id)
                     problems.append(ProblemNotice("Parse Device Type XML", location=location,
                                     severity=ProblemSeverity.WARNING, problem=f"Unknown cluster id {c.attrib['id']}"))
+                # TODO: remove this once we get a new DM XML scrape after https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/10214 goes in
+                if cid == 0x0005:
                     continue
                 conformance_xml, tmp_problem = get_conformance(c, cid)
                 if tmp_problem:
                     problems.append(tmp_problem)
+                    continue
                 conformance = parse_device_type_callable_from_xml(conformance_xml)
                 side_dict = {'server': ClusterSide.SERVER, 'client': ClusterSide.CLIENT}
                 side = side_dict[c.attrib['side']]
@@ -849,24 +863,85 @@ def parse_single_device_type(root: ElementTree.Element) -> tuple[dict[int, XmlDe
                 if cid in CLUSTER_NAME_FIXES:
                     name = CLUSTER_NAME_FIXES[cid]
                 cluster = XmlDeviceTypeClusterRequirements(name=name, side=side, conformance=conformance)
+
+                def append_overrides(override_element_type: str):
+                    # Workaround for 1.3 device types with zigbee clusters and old scenes
+                    if cid not in cluster_definition_xml:
+                        return
+                    if override_element_type == 'feature':
+                        # The device types use feature name rather than feature code. So we need to build a new map.
+                        map = {f.name: id for id, f in cluster_definition_xml[cid].features.items()}
+                        # But also...that's not universal, so let's be tolerant to using the code too.
+                        map.update(cluster_definition_xml[cid].feature_map)
+                        override = cluster.feature_overrides
+                    elif override_element_type == 'attribute':
+                        map = cluster_definition_xml[cid].attribute_map
+                        override = cluster.attribute_overrides
+                    elif override_element_type == 'command':
+                        map = cluster_definition_xml[cid].command_map
+                        override = cluster.command_overrides
+                    else:
+                        problems.append(ProblemNotice("Parse Device Type XML", location=location,
+                                        severity=ProblemSeverity.WARNING, problem=f"Request for unknown element override type {override_element_type} - this is a script error"))
+                        return
+
+                    container = c.find(f'{override_element_type}s')
+                    if not container:
+                        return
+
+                    elements = container.iter(override_element_type)
+                    for e in elements:
+                        try:
+                            name = e.attrib['name']
+                        except KeyError:
+                            problems.append(ProblemNotice("Parse Device Type XML", location=location,
+                                            severity=ProblemSeverity.WARNING, problem=f"Missing {override_element_type} name for override in cluster 0x{cid:04X}, e={str(e)}"))
+                            continue
+
+                        try:
+                            conformance_xml, tmp_problem = get_conformance(e, cid)
+                            if tmp_problem:
+                                # It's not actually a problem if there is no conformance override - it might be a constraint override. Just continue
+                                continue
+                            conformance_override = parse_device_type_callable_from_xml(conformance_xml)
+                            override[map[name]] = conformance_override
+                        except KeyError as ex:
+                            # The thermostat in particular explicitly disallows some zigbee things that don't appear in the spec due to
+                            # ifdefs. We can ignore problems if the device type spec disallows things that don't exist.
+                            if is_disallowed(conformance_override):
+                                logging.info(
+                                    f"Ignoring unknown {override_element_type} {name} in cluster {cid} because the conformance is disallowed")
+                                continue
+                            problems.append(ProblemNotice("Parse Device Type XML", location=location,
+                                            severity=ProblemSeverity.WARNING, problem=f"Unknown {override_element_type} {name} in cluster {cid} - map = {map} {ex}"))
+                        except ConformanceException as ex:
+                            problems.append(ProblemNotice("Parse Device Type XML", location=location,
+                                            severity=ProblemSeverity.WARNING, problem=f"Unable to parse {override_element_type} conformance for {name} in cluster {cid}"))
+
+                append_overrides('feature')
+                append_overrides('attribute')
+                append_overrides('command')
+
                 if side == ClusterSide.SERVER:
                     device_types[id].server_clusters[cid] = cluster
                 else:
                     device_types[id].client_clusters[cid] = cluster
+
             except ConformanceException:
                 location = DeviceTypePathLocation(device_type_id=id, cluster_id=cid)
                 problems.append(ProblemNotice("Parse Device Type XML", location=location,
                                 severity=ProblemSeverity.WARNING, problem="Unable to parse conformance for cluster"))
-            # TODO: Check for features, attributes and commands as element requirements
             # NOTE: Spec currently does a bad job of matching these exactly to the names and codes
             # so this will need a bit of fancy handling here to get this right.
     return device_types, problems
 
 
-def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelDirectory, Traversable]) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
+def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelDirectory, Traversable], cluster_definition_xml: Optional[dict[uint, XmlCluster]] = None) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
     top = get_data_model_directory(data_model_directory, DataModelLevel.kDeviceType)
     device_types: dict[int, XmlDeviceType] = {}
     problems: list[ProblemNotice] = []
+    if not cluster_definition_xml:
+        cluster_definition_xml, _ = build_xml_clusters(data_model_directory)
 
     found_xmls = 0
 
@@ -877,7 +952,7 @@ def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelD
         found_xmls += 1
         with file.open('r', encoding="utf8") as xml:
             root = ElementTree.parse(xml).getroot()
-            tmp_device_types, tmp_problems = parse_single_device_type(root)
+            tmp_device_types, tmp_problems = parse_single_device_type(root, cluster_definition_xml)
             problems = problems + tmp_problems
             device_types.update(tmp_device_types)
 
