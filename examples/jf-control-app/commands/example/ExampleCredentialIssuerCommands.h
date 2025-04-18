@@ -48,7 +48,10 @@ public:
 
     chip::Controller::OperationalCredentialsDelegate * GetCredentialIssuer() override { return &mOpCredsIssuer; }
     void SetCredentialIssuerCATValues(chip::CATValues cats) override { mOpCredsIssuer.SetCATValuesForNextNOCRequest(cats); }
-    void SetCredentialIssuerCaseAdminSubject(chip::NodeId caseAdminSubject) override { mOpCredsIssuer.SetCaseAdminSubjectForNextNOCRequest(caseAdminSubject); }
+    void SetCredentialIssuerCaseAdminSubject(chip::NodeId caseAdminSubject) override
+    {
+        mOpCredsIssuer.SetCaseAdminSubjectForNextNOCRequest(caseAdminSubject);
+    }
     CHIP_ERROR GenerateControllerNOCChain(chip::NodeId nodeId, chip::FabricId fabricId, const chip::CATValues & cats,
                                           chip::Crypto::P256Keypair & keypair, chip::MutableByteSpan & rcac,
                                           chip::MutableByteSpan & icac, chip::MutableByteSpan & noc) override

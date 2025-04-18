@@ -36,10 +36,10 @@ config("includes") {
 
 executable("jfa-app") {
   sources = [
+    "JFAManager.cpp",
     "include/CHIPProjectAppConfig.h",
     "include/JFAManager.h",
     "main.cpp",
-    "JFAManager.cpp",
   ]
 
   deps = [
@@ -77,8 +77,8 @@ executable("jfa-app") {
       "$dir_pw_trace_tokenized",
       "$dir_pw_trace_tokenized:trace_rpc_service",
       "${chip_root}/config/linux/lib/pw_rpc:pw_rpc",
-      "${chip_root}/examples/common/pigweed:rpc_services",
       "${chip_root}/examples/common/pigweed:joint_fabric_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:rpc_services",
     ]
 
     deps += pw_build_LINK_DEPS

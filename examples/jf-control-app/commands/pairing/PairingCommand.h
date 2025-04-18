@@ -271,7 +271,7 @@ private:
     const PairingNetworkType mNetworkType;
     const chip::Dnssd::DiscoveryFilterType mFilterType;
     Command::AddressWithInterface mRemoteAddr;
-    NodeId mNodeId = chip::kUndefinedNodeId;
+    NodeId mNodeId       = chip::kUndefinedNodeId;
     NodeId mAnchorNodeId = chip::kUndefinedNodeId;
     chip::Optional<uint16_t> mTimeout;
     chip::Optional<bool> mDiscoverOnce;

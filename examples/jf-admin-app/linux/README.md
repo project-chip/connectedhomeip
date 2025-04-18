@@ -1,6 +1,6 @@
 # Matter Joint Fabric Admin Example
 
-An example showcasing a Joint Fabric Administrator Applicaton. TODO.
+An example showcasing a Joint Fabric Administrator Application. TODO.
 
 <hr>
 
@@ -41,11 +41,11 @@ An example showcasing a Joint Fabric Administrator Applicaton. TODO.
 
 ## Commandline arguments
 
-- TODO
+-   TODO
 
 ## Running the Complete Example on Raspberry Pi 4
 
-- TODO
+-   TODO
 
 ## Device Tracing
 

@@ -19,8 +19,8 @@
 #include "PairingCommand.h"
 #include "platform/PlatformManager.h"
 
-#include "joint_fabric_service/joint_fabric_service.rpc.pb.h"
 #include "RpcClientProcessor.h"
+#include "joint_fabric_service/joint_fabric_service.rpc.pb.h"
 
 #include <commands/common/DeviceScanner.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
@@ -40,15 +40,14 @@ using namespace ::chip::Controller;
 CHIP_ERROR PairingCommand::RunCommand()
 {
     CurrentCommissioner().RegisterPairingDelegate(this);
-    chip::CASEAuthTag administratorCAT = GetAdminCATHavingVersion(CHIP_CONFIG_ADMINISTRATOR_CAT_INITIAL_VERSION);
+    chip::CASEAuthTag administratorCAT   = GetAdminCATHavingVersion(CHIP_CONFIG_ADMINISTRATOR_CAT_INITIAL_VERSION);
     NodeId administratorCaseAdminSubject = NodeIdFromCASEAuthTag(administratorCAT);
 
     if (mAnchorNodeId == chip::kUndefinedNodeId)
     {
         if (!mAnchor.ValueOr(false))
         {
-            ChipLogError(chipTool,
-                "Please first commission the Anchor Administrator: add `--anchor true` parameter");
+            ChipLogError(chipTool, "Please first commission the Anchor Administrator: add `--anchor true` parameter");
             return CHIP_ERROR_NOT_CONNECTED;
         }
         else
@@ -56,13 +55,13 @@ CHIP_ERROR PairingCommand::RunCommand()
             chip::CASEAuthTag anchorCAT = GetAnchorCATHavingVersion(CHIP_CONFIG_ANCHOR_CAT_INITIAL_VERSION);
 
             // JFA will be issued a NOC with Anchor CAT and Administrator CAT
-            mCASEAuthTags = MakeOptional(std::vector<uint32_t>{administratorCAT, anchorCAT});
+            mCASEAuthTags = MakeOptional(std::vector<uint32_t>{ administratorCAT, anchorCAT });
         }
     }
     else if (mAnchor.ValueOr(false))
     {
-        ChipLogError(chipTool, "Anchor Administrator already commissioned as Node ID: "
-                                      ChipLogFormatX64, ChipLogValueX64(mAnchorNodeId));
+        ChipLogError(chipTool, "Anchor Administrator already commissioned as Node ID: " ChipLogFormatX64,
+                     ChipLogValueX64(mAnchorNodeId));
         return CHIP_ERROR_BAD_REQUEST;
     }
     else
@@ -97,7 +96,7 @@ CHIP_ERROR PairingCommand::RunCommand()
 CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    
+
     switch (mPairingMode)
     {
     case PairingMode::None:
@@ -465,8 +464,6 @@ void PairingCommand::OnPairingDeleted(CHIP_ERROR err)
     SetCommandExitStatus(err);
 }
 
-
-
 namespace {
 
 // Constants
@@ -500,7 +497,7 @@ CHIP_ERROR WaitForResponse(CallType & call)
 }
 
 // Callback function to be called when the RPC response is received
-void OnOwnershipTransferDone(const _pw_protobuf_Empty& response, ::pw::Status status)
+void OnOwnershipTransferDone(const _pw_protobuf_Empty & response, ::pw::Status status)
 {
     std::lock_guard<std::mutex> lock(responseMutex);
     responseReceived = true;
@@ -517,7 +514,7 @@ void OnOwnershipTransferDone(const _pw_protobuf_Empty& response, ::pw::Status st
     }
 }
 
-}
+} // namespace
 
 void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
 {

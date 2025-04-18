@@ -759,6 +759,7 @@ JLink
 JLinkExe
 JLinkRTTClient
 JN
+jf
 jni
 jpg
 jre

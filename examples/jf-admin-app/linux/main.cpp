@@ -17,8 +17,8 @@
  */
 
 #include "JFAManager.h"
-#include <AppMain.h>
 #include "rpc/RpcServer.h"
+#include <AppMain.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -34,8 +34,7 @@ using namespace chip::app::Clusters;
 
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
-{
-}
+{}
 
 void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
@@ -53,9 +52,7 @@ void ApplicationInit()
     DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0);
 }
 
-void ApplicationShutdown()
-{
-}
+void ApplicationShutdown() {}
 
 #ifdef __NuttX__
 // NuttX requires the main function to be defined with C-linkage. However, marking
