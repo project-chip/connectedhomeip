@@ -21,9 +21,9 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include "BLEManagerImpl.h"
 #include <ble/Ble.h>
 #include <platform/ConfigurationManager.h>
+#include <platform/internal/BLEManager.h>
 #include <zephyr/bluetooth/gatt.h>
 
 #define ADV_LEN 2

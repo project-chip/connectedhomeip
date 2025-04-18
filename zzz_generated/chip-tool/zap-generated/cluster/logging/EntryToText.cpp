@@ -177,6 +177,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "WaterHeaterMode";
     case chip::app::Clusters::DeviceEnergyManagementMode::Id:
         return "DeviceEnergyManagementMode";
+    case chip::app::Clusters::ElectricalGridConditions::Id:
+        return "ElectricalGridConditions";
     case chip::app::Clusters::DoorLock::Id:
         return "DoorLock";
     case chip::app::Clusters::WindowCovering::Id:
@@ -586,6 +588,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SpecificationVersion";
         case chip::app::Clusters::BasicInformation::Attributes::MaxPathsPerInvoke::Id:
             return "MaxPathsPerInvoke";
+        case chip::app::Clusters::BasicInformation::Attributes::ConfigurationVersion::Id:
+            return "ConfigurationVersion";
         case chip::app::Clusters::BasicInformation::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::BasicInformation::Attributes::AcceptedCommandList::Id:
@@ -1263,6 +1267,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "UniqueID";
         case chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::ProductAppearance::Id:
             return "ProductAppearance";
+        case chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::ConfigurationVersion::Id:
+            return "ConfigurationVersion";
         case chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::AcceptedCommandList::Id:
@@ -2589,6 +2595,29 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::DeviceEnergyManagementMode::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::DeviceEnergyManagementMode::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ElectricalGridConditions::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ElectricalGridConditions::Attributes::LocalGenerationAvailable::Id:
+            return "LocalGenerationAvailable";
+        case chip::app::Clusters::ElectricalGridConditions::Attributes::CurrentConditions::Id:
+            return "CurrentConditions";
+        case chip::app::Clusters::ElectricalGridConditions::Attributes::ForecastConditions::Id:
+            return "ForecastConditions";
+        case chip::app::Clusters::ElectricalGridConditions::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::ElectricalGridConditions::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::ElectricalGridConditions::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::ElectricalGridConditions::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::ElectricalGridConditions::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -6983,33 +7012,11 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
     case 0x00000203:
         return "Window Covering Controller";
     case 0x00000230:
-        return "ClosureBase";
+        return "Closure";
     case 0x00000231:
-        return "Window";
-    case 0x00000232:
-        return "Shutter";
-    case 0x00000233:
-        return "Shade";
-    case 0x00000234:
-        return "Curtain";
-    case 0x00000235:
-        return "Blind";
-    case 0x00000236:
-        return "Screen";
-    case 0x00000237:
-        return "Awning";
-    case 0x00000238:
-        return "Pergola";
-    case 0x00000239:
-        return "Door";
-    case 0x0000023A:
-        return "GarageDoor";
-    case 0x0000023B:
-        return "Gate";
-    case 0x0000023C:
-        return "Barrier";
-    case 0x0000023D:
-        return "Cabinet";
+        return "Closure Panel";
+    case 0x0000023E:
+        return "Closure Controller";
     case 0x00000300:
         return "Heating/Cooling Unit";
     case 0x00000301:
