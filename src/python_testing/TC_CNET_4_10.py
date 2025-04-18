@@ -16,7 +16,6 @@
 #
 
 import logging
-import struct
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
@@ -63,7 +62,8 @@ class TC_CNET_4_10(MatterBaseTest):
             TestStep(13, "TH sends RemoveNetwork Command to the DUT"),
             TestStep(14, "TH sends CommissioningComplete command to the DUT"),
             TestStep(15, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 0"),
-            TestStep(16, "TH reads Networks attribute from the DUT")
+            TestStep(16, "TH reads Networks attribute from the DUT"),
+            TestStep(17, "(Cleanup) TH adds the Thread network back to the DUT.")
         ]
 
     @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kThreadNetworkInterface))
@@ -75,7 +75,6 @@ class TC_CNET_4_10(MatterBaseTest):
         gen_comm = Clusters.GeneralCommissioning
 
         # Get NetworkID (Extended PAN ID) directly from PIXIT
-        # --hex-arg already converts the hex string to bytes
         thread_network_id_bytes = self.matter_test_config.global_test_params.get('PIXIT.CNET.THREAD_1ST_EXTPANID')
         asserts.assert_is_not_none(thread_network_id_bytes, "PIXIT.CNET.THREAD_1ST_EXTPANID must be supplied via --hex-arg.")
         # Ensure it's bytes and the correct length (8 bytes)
@@ -249,6 +248,51 @@ class TC_CNET_4_10(MatterBaseTest):
         for network in networks:
             asserts.assert_not_equal(network.networkID, thread_network_id_bytes,
                                      "Network still present after removal")
+
+        # Step 17: (Cleanup) Add the network back.
+        logging.info("Adding network back as cleanup step.")
+        self.step(17)
+
+        # Retrieve the operational dataset provided via command line
+        operational_dataset = self.matter_test_config.thread_operational_dataset
+
+        # Need to re-arm failsafe to add network
+        await self.send_single_cmd(
+            cmd=gen_comm.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=0)
+        )
+
+        # Use AddOrUpdateThreadNetwork with the dataset
+        add_resp = await self.send_single_cmd(
+            cmd=cnet.Commands.AddOrUpdateThreadNetwork(
+                operationalDataset=operational_dataset,
+                breadcrumb=1  # Use a new breadcrumb for this operation
+            )
+        )
+        asserts.assert_equal(add_resp.networkingStatus, cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
+                             "Failed to add/update Thread network during cleanup")
+
+        # Commit the change by completing commissioning
+        await self.send_single_cmd(
+            cmd=gen_comm.Commands.CommissioningComplete()
+        )
+
+        # Verify network added and is the one we intended to add
+        networks_after_add = await self.read_single_attribute_check_success(
+            cluster=cnet,
+            attribute=cnet.Attributes.Networks
+        )
+        # Check count increases back to original count
+        asserts.assert_equal(len(networks_after_add), num_networks, "Network count incorrect after re-adding")
+        found = False
+        for network in networks_after_add:
+            # We compare against the NetworkID extracted earlier from the PIXIT
+            if network.networkID == thread_network_id_bytes:
+                found = True
+                # Check if connected status is True, although this might take time
+                # asserts.assert_true(network.connected, "Re-added network is not connected")
+                logging.info(f"Network {network.networkID.hex()} found. Connected: {network.connected}")
+                break
+        asserts.assert_true(found, "Added network (matching PIXIT NetworkID) not found in Networks list after cleanup")
 
 
 if __name__ == "__main__":
