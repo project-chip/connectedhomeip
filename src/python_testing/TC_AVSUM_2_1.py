@@ -130,7 +130,7 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
             asserts.assert_in(attributes.ZoomMax.attribute_id, attribute_list,
                               "ZoomMax attribute is a mandatory attribute if MZOOM.")
             zoom_max_dut = await self.read_avsum_attribute_expect_success(endpoint=endpoint, attribute="ZoomMax")
-            asserts.assert_less_equal(zoom_max_dut, 100, "ZoomMaz is not in valid range.")
+            asserts.assert_less_equal(zoom_max_dut, 100, "ZoomMax is not in valid range.")
             asserts.assert_greater_equal(zoom_max_dut, 1, "ZoomMax is not in valid range.")
         else:
             logging.info("MZOOM Feature not supported. Test step skipped")
