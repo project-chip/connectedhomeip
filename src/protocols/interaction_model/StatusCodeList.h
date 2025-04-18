@@ -75,5 +75,6 @@ CHIP_IM_STATUS_CODE(TimedRequestMismatch  , TIMED_REQUEST_MISMATCH  , 0xc9)
 CHIP_IM_STATUS_CODE(FailsafeRequired      , FAILSAFE_REQUIRED       , 0xca)
 CHIP_IM_STATUS_CODE(InvalidInState        , INVALID_IN_STATE        , 0xcb)
 CHIP_IM_STATUS_CODE(NoCommandResponse     , NO_COMMAND_RESPONSE     , 0xcc)
+CHIP_IM_STATUS_CODE(InvalidTransportType  , INVALID_TRANSPORT_TYPE  , 0xd1)
 CHIP_IM_STATUS_CODE(WriteIgnored          , WRITE_IGNORED           , 0xF0) // non-spec error code and use only internally
 // clang-format on
