@@ -123,7 +123,6 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
         self.step(2)
         if not (self.has_feature_mpan | self.has_feature_mtilt | self.has_feature_mzoom):
             asserts.fail("One of MPAN, MTILT, or MZOOM is mandatory")
-            self.skip_all_remaining_steps(3)
 
         if self.has_feature_mzoom:
             self.step(3)
@@ -205,6 +204,8 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
                     asserts.assert_less_equal(len(mptzpreset.name), 32, "Preset name is too long")
                     self.ptz_range_validation(mptzpreset.settings, tilt_min_dut, tilt_max_dut,
                                               pan_min_dut, pan_max_dut, zoom_max_dut)
+            else:
+                asserts.fail("No Presets found despite one being set.")
         else:
             logging.info("MPRESETS Feature not supported. Test steps skipped")
             self.skip_step(9)

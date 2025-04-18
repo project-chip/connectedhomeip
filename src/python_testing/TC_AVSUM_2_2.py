@@ -84,7 +84,6 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
 
         if not (self.has_feature_mpan | self.has_feature_mtilt | self.has_feature_mzoom):
             asserts.fail("One of MPAN, MTILT, or MZOOM is mandatory")
-            self.skip_all_remaining_steps(2)
 
         self.step(2)
         asserts.assert_in(attributes.MPTZPosition.attribute_id, attribute_list, "MPTZPosition attribute is mandatory.")
