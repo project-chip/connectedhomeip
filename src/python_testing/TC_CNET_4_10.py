@@ -16,12 +16,12 @@
 #
 
 import logging
+import struct
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.testing.decorators import has_feature, run_if_endpoint_matches
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
-from chip.tlv import TLVReader
 from mobly import asserts
 
 
@@ -30,9 +30,10 @@ class TC_CNET_4_10(MatterBaseTest):
     This test verifies the behavior of the RemoveNetwork command specifically for Thread networks,
     including interactions with fail-safe mechanisms and subsequent commissioning steps.
 
-    Requires the following PIXITs:  
-    - PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET: The Thread operational dataset(hex string)
-    used for initial commissioning. This is passed via the - -hex-arg command line argument.
+    Requires the following PIXITs:
+    - PIXIT.CNET.THREAD_1ST_EXTPANID: The 8-byte Thread Extended PAN ID (hex string)
+      of the network used for initial commissioning. This is passed via the --hex-arg command line argument
+      (e.g., --hex-arg PIXIT.CNET.THREAD_1ST_EXTPANID:1122334455667788).
     """
 
     def desc_TC_CNET_4_10(self):
@@ -46,15 +47,15 @@ class TC_CNET_4_10(MatterBaseTest):
 
     def steps_TC_CNET_4_10(self):
         return [
-            TestStep("preconditions", "TH is commissioned", is_commissioning=True),
+            TestStep("preconditions", "TH is commissioned", "Commissioning is successful",  is_commissioning=True),
             TestStep(1, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900"),
             TestStep(2, "TH reads Networks attribute from the DUT and save the number of entries as 'NumNetworks'"),
-            TestStep(3, "TH sends RemoveNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET and Breadcrumb field set to 1"),
+            TestStep(3, "TH sends RemoveNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.THREAD_1ST_EXTPANID and Breadcrumb field set to 1"),
             TestStep(4, "TH reads Networks attribute from the DUT"),
             TestStep(5, "TH reads LastNetworkingStatus attribute from the DUT"),
             TestStep(6, "TH reads LastNetworkID attribute from the DUT"),
             TestStep(7, "TH reads Breadcrumb attribute from the General Commissioning cluster"),
-            TestStep(8, "TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET"),
+            TestStep(8, "TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.THREAD_1ST_EXTPANID"),
             TestStep(9, "TH reads Breadcrumb attribute from the General Commissioning cluster"),
             TestStep(10, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 0"),
             TestStep(11, "TH reads Networks attribute from the DUT"),
@@ -73,25 +74,16 @@ class TC_CNET_4_10(MatterBaseTest):
         cnet = Clusters.NetworkCommissioning
         gen_comm = Clusters.GeneralCommissioning
 
-        # Get NetworkID from PIXIT operational dataset (stored as bytes)
-        pixit_dataset_bytes = self.matter_test_config.global_test_params.get('PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET')
-        asserts.assert_is_not_none(pixit_dataset_bytes, "PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET must be supplied via --hex-arg.")
-
-        # Parse the Thread operational dataset TLV to find the ExtPANID (Context Tag 2)
-        try:
-            reader = TLVReader(pixit_dataset_bytes)
-            decoded_tlv = reader.get()
-            # Thread ExtPANID is Context Tag 2, expected to be bytes
-            thread_network_id_bytes = decoded_tlv.get(2)
-        except Exception as e:
-            asserts.fail(f"Failed to parse TLV from PIXIT dataset: {pixit_dataset_bytes.hex()}. Error: {e}")
-
-        asserts.assert_is_not_none(thread_network_id_bytes,
-                                   f"Could not find ExtPANID (Context Tag 2) in PIXIT dataset TLV: {decoded_tlv}")
-        asserts.assert_is_instance(thread_network_id_bytes, bytes, "ExtPANID (Context Tag 2) should be bytes")
+        # Get NetworkID (Extended PAN ID) directly from PIXIT
+        # --hex-arg already converts the hex string to bytes
+        thread_network_id_bytes = self.matter_test_config.global_test_params.get('PIXIT.CNET.THREAD_1ST_EXTPANID')
+        asserts.assert_is_not_none(thread_network_id_bytes, "PIXIT.CNET.THREAD_1ST_EXTPANID must be supplied via --hex-arg.")
+        # Ensure it's bytes and the correct length (8 bytes)
+        asserts.assert_is_instance(thread_network_id_bytes, bytes,
+                                   "PIXIT.CNET.THREAD_1ST_EXTPANID should be delivered as bytes by --hex-arg.")
         asserts.assert_equal(len(thread_network_id_bytes), 8,
-                             f"Extracted ExtPANID should be 8 bytes long, but got {len(thread_network_id_bytes)} bytes: {thread_network_id_bytes.hex()}")
-        logging.info(f"Extracted Network ID (ExtPANID): {thread_network_id_bytes.hex()}")
+                             f"PIXIT.CNET.THREAD_1ST_EXTPANID must be 8 bytes (16 hex chars), received {len(thread_network_id_bytes)} bytes.")
+        logging.info(f"Using Network ID (ExtPANID) from PIXIT: {thread_network_id_bytes.hex()}")
 
         # Step 1: Arm failsafe and verify response
         self.step(1)
