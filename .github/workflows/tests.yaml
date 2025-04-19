@@ -192,6 +192,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/scene.xml \
                       src/app/zap-templates/zcl/data-model/chip/smoke-co-alarm-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/software-diagnostics-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/soil-measurement-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/switch-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/target-navigator-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/temperature-control-cluster.xml \

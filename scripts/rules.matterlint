@@ -100,6 +100,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/service-area-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/scene.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/smoke-co-alarm-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/software-diagnostics-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/soil-measurement-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/switch-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/target-navigator-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/temperature-measurement-cluster.xml";
