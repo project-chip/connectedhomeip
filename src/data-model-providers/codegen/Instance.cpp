@@ -21,16 +21,22 @@
 namespace chip {
 namespace app {
 
-DataModel::Provider * CodegenDataModelProviderInstance(PersistentStorageDelegate * delegate)
+CodegenDataModelProvider & CodegenDataModelProvider::Instance()
 {
     static CodegenDataModelProvider gCodegenModel;
+    return gCodegenModel;
+}
+
+DataModel::Provider * CodegenDataModelProviderInstance(PersistentStorageDelegate * delegate)
+{
+    auto instance = &CodegenDataModelProvider::Instance();
 
     if (delegate != nullptr)
     {
-        gCodegenModel.SetPersistentStorageDelegate(delegate);
+        instance->SetPersistentStorageDelegate(delegate);
     }
 
-    return &gCodegenModel;
+    return instance;
 }
 
 } // namespace app

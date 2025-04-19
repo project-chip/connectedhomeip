@@ -14,13 +14,12 @@
  *    limitations under the License.
  */
 
-#include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/util/attribute-table.h>
-
+#include <app/clusters/ota-provider/ota-provider-cluster.h>
 #include <app/util/af-types.h>
+#include <app/util/attribute-table.h>
 #include <app/util/privilege-storage.h>
 #include <lib/core/Optional.h>
 #include <lib/core/TLVReader.h>
@@ -30,6 +29,27 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+
+namespace {
+
+// Code assumes there is only a single OTA provider and it lives on EP0
+constexpr EndpointId kOtaProviderEndpointId = 0;
+OtaProviderLogic gOtaProviderLogic;
+
+} // anonymous namespace
+
+namespace chip::app::Clusters::OTAProvider {
+
+void SetDelegate(EndpointId endpointId, OTAProviderDelegate * delegate)
+{
+    if (endpointId != kOtaProviderEndpointId) {
+        ChipLogError(AppServer, "Cannot set OTA provider for endpoint %d: not a valid OTA provider endpoint.", endpointId);
+        return;
+    }
+    gOtaProviderLogic.SetDelegate(delegate);
+}
+
+} // namespace chip::app::Clusters::OTAProvider
 
 void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
@@ -63,16 +83,23 @@ namespace app {
 
     void DispatchSingleClusterCommand(const ConcreteCommandPath & aPath, TLV::TLVReader & aReader, CommandHandler * aCommandObj)
     {
-        // TODO: Consider having MTRServerCluster register a
-        // CommandHandlerInterface for command dispatch.  But OTA would need
-        // some special-casing in any case, to call into the existing cluster
-        // implementation.
         using Protocols::InteractionModel::Status;
+
+        if (aPath.mClusterId != OtaSoftwareUpdateProvider::Id) {
+            aCommandObj->AddStatus(aPath, Status::UnsupportedCluster);
+            return;
+        }
+
+        if (aPath.mEndpointId != kOtaProviderEndpointId) {
+            aCommandObj->AddStatus(aPath, Status::UnsupportedCluster);
+            return;
+        }
+
         // This command passed ServerClusterCommandExists so we know it's one of our
         // supported commands.
         using namespace OtaSoftwareUpdateProvider::Commands;
 
-        bool wasHandled = false;
+        std::optional<DataModel::ActionReturnStatus> result;
         CHIP_ERROR err = CHIP_NO_ERROR;
 
         switch (aPath.mCommandId) {
@@ -80,7 +107,7 @@ namespace app {
             QueryImage::DecodableType commandData;
             err = DataModel::Decode(aReader, commandData);
             if (err == CHIP_NO_ERROR) {
-                wasHandled = emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(aCommandObj, aPath, commandData);
+                result = gOtaProviderLogic.QueryImage(aPath, commandData, aCommandObj);
             }
             break;
         }
@@ -88,7 +115,7 @@ namespace app {
             ApplyUpdateRequest::DecodableType commandData;
             err = DataModel::Decode(aReader, commandData);
             if (err == CHIP_NO_ERROR) {
-                wasHandled = emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(aCommandObj, aPath, commandData);
+                result = gOtaProviderLogic.ApplyUpdateRequest(aPath, commandData, aCommandObj);
             }
             break;
         }
@@ -96,7 +123,7 @@ namespace app {
             NotifyUpdateApplied::DecodableType commandData;
             err = DataModel::Decode(aReader, commandData);
             if (err == CHIP_NO_ERROR) {
-                wasHandled = emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(aCommandObj, aPath, commandData);
+                result = gOtaProviderLogic.NotifyUpdateApplied(aPath, commandData, aCommandObj);
             }
             break;
         }
@@ -104,8 +131,13 @@ namespace app {
             break;
         }
 
-        if (CHIP_NO_ERROR != err || !wasHandled) {
+        if (CHIP_NO_ERROR != err) {
             aCommandObj->AddStatus(aPath, Status::InvalidCommand);
+        } else if (result.has_value()) {
+            // Provider indicates that handler status or data was already set (or will be set asynchronously) by
+            // returning std::nullopt. If any other value is returned, it is requesting that a status is set. This
+            // includes CHIP_NO_ERROR: in this case CHIP_NO_ERROR would mean set a `status success on the command`
+            aCommandObj->AddStatus(aPath, result->GetStatusCode());
         }
     }
 
