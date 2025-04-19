@@ -255,7 +255,8 @@ struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInf
 
 namespace Commands {
 namespace ResetCondition {
-static constexpr CommandId Id = 0x00000000;
+static constexpr CommandId Id                                   = 0x00000000;
+static constexpr DataModel::AcceptedCommandEntry kMetadataEntry = { ResetCondition::Id, {}, Access::Privilege::kOperate };
 
 struct DecodableType
 {

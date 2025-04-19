@@ -33,35 +33,35 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace SolicitOffer {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = WebRTCTransportProvider::Commands::SolicitOffer::Id,
+    .commandId       = Commands::SolicitOffer::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace SolicitOffer
 namespace ProvideOffer {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = WebRTCTransportProvider::Commands::ProvideOffer::Id,
+    .commandId       = Commands::ProvideOffer::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace ProvideOffer
 namespace ProvideAnswer {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = WebRTCTransportProvider::Commands::ProvideAnswer::Id,
+    .commandId       = Commands::ProvideAnswer::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace ProvideAnswer
 namespace ProvideICECandidates {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = WebRTCTransportProvider::Commands::ProvideICECandidates::Id,
+    .commandId       = Commands::ProvideICECandidates::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace ProvideICECandidates
 namespace EndSession {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = WebRTCTransportProvider::Commands::EndSession::Id,
+    .commandId       = Commands::EndSession::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kOperate,
 };

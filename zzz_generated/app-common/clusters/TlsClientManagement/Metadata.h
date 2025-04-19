@@ -41,21 +41,21 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace ProvisionEndpoint {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = TlsClientManagement::Commands::ProvisionEndpoint::Id,
+    .commandId       = Commands::ProvisionEndpoint::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace ProvisionEndpoint
 namespace FindEndpoint {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = TlsClientManagement::Commands::FindEndpoint::Id,
+    .commandId       = Commands::FindEndpoint::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace FindEndpoint
 namespace RemoveEndpoint {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = TlsClientManagement::Commands::RemoveEndpoint::Id,
+    .commandId       = Commands::RemoveEndpoint::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kAdminister,
 };

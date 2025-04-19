@@ -57,7 +57,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace AnnounceOTAProvider {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id,
+    .commandId       = Commands::AnnounceOTAProvider::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

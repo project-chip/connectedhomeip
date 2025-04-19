@@ -353,70 +353,70 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace AudioStreamAllocate {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CameraAvStreamManagement::Commands::AudioStreamAllocate::Id,
+    .commandId       = Commands::AudioStreamAllocate::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace AudioStreamAllocate
 namespace AudioStreamDeallocate {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CameraAvStreamManagement::Commands::AudioStreamDeallocate::Id,
+    .commandId       = Commands::AudioStreamDeallocate::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace AudioStreamDeallocate
 namespace VideoStreamAllocate {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CameraAvStreamManagement::Commands::VideoStreamAllocate::Id,
+    .commandId       = Commands::VideoStreamAllocate::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace VideoStreamAllocate
 namespace VideoStreamModify {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CameraAvStreamManagement::Commands::VideoStreamModify::Id,
+    .commandId       = Commands::VideoStreamModify::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace VideoStreamModify
 namespace VideoStreamDeallocate {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CameraAvStreamManagement::Commands::VideoStreamDeallocate::Id,
+    .commandId       = Commands::VideoStreamDeallocate::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace VideoStreamDeallocate
 namespace SnapshotStreamAllocate {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CameraAvStreamManagement::Commands::SnapshotStreamAllocate::Id,
+    .commandId       = Commands::SnapshotStreamAllocate::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace SnapshotStreamAllocate
 namespace SnapshotStreamModify {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CameraAvStreamManagement::Commands::SnapshotStreamModify::Id,
+    .commandId       = Commands::SnapshotStreamModify::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace SnapshotStreamModify
 namespace SnapshotStreamDeallocate {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CameraAvStreamManagement::Commands::SnapshotStreamDeallocate::Id,
+    .commandId       = Commands::SnapshotStreamDeallocate::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace SnapshotStreamDeallocate
 namespace SetStreamPriorities {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CameraAvStreamManagement::Commands::SetStreamPriorities::Id,
+    .commandId       = Commands::SetStreamPriorities::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace SetStreamPriorities
 namespace CaptureSnapshot {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CameraAvStreamManagement::Commands::CaptureSnapshot::Id,
+    .commandId       = Commands::CaptureSnapshot::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

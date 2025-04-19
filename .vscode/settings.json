@@ -137,7 +137,8 @@
         "any": "cpp",
         "future": "cpp",
         "list": "cpp",
-        "unordered_set": "cpp"
+        "unordered_set": "cpp",
+        "text_encoding": "cpp"
     },
     "[ini]": {
         "editor.formatOnSave": false
