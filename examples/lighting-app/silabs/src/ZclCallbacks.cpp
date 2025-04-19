@@ -21,8 +21,10 @@
  */
 
 #include "AppConfig.h"
+#include "ColorFormat.h"
 #include "LightingManager.h"
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
@@ -40,6 +42,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 {
     ClusterId clusterId     = attributePath.mClusterId;
     AttributeId attributeId = attributePath.mAttributeId;
+    EndpointId endpoint     = attributePath.mEndpointId;
     ChipLogProgress(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
 
     if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::OnOff::Id)
@@ -60,8 +63,57 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     {
         ChipLogProgress(Zcl, "Color Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);
+// WIP Apply attribute change to Light
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
 
-        // WIP Apply attribute change to Light
+        ColorData_t colorData;
+        /* XY color space */
+        if (attributeId == ColorControl::Attributes::CurrentX::Id || attributeId == ColorControl::Attributes::CurrentY::Id)
+        {
+            colorData.xy = {};
+            if (size != sizeof(uint16_t))
+            {
+                ChipLogError(Zcl, "Wrong length for ColorControl value: %d", size);
+                return;
+            }
+            Protocols::InteractionModel::Status status_x = ColorControl::Attributes::CurrentY::Get(endpoint, &colorData.xy.y);
+            assert(status_x == Protocols::InteractionModel::Status::Success);
+            Protocols::InteractionModel::Status status_y = ColorControl::Attributes::CurrentX::Get(endpoint, &colorData.xy.x);
+            assert(status_y == Protocols::InteractionModel::Status::Success);
+
+            ChipLogProgress(Zcl, "New XY color: %u|%u", colorData.xy.x, colorData.xy.y);
+            LightMgr().InitiateLightAction(AppEvent::kEventType_Light, LightingManager::COLOR_ACTION_XY, sizeof(colorData),
+                                           (ColorData_t *) &colorData);
+        }
+        /* HSV color space */
+        else if (attributeId == ColorControl::Attributes::CurrentHue::Id ||
+                 attributeId == ColorControl::Attributes::CurrentSaturation::Id)
+        {
+            colorData.hsv                                 = {};
+            Protocols::InteractionModel::Status statusHue = ColorControl::Attributes::CurrentHue::Get(endpoint, &colorData.hsv.h);
+            assert(statusHue == Protocols::InteractionModel::Status::Success);
+            Protocols::InteractionModel::Status statusSat =
+                ColorControl::Attributes::CurrentSaturation::Get(endpoint, &colorData.hsv.s);
+            ChipLogProgress(Zcl, "New HSV color: %u|%u", colorData.hsv.h, colorData.hsv.s);
+            assert(statusSat == Protocols::InteractionModel::Status::Success);
+            LightMgr().InitiateLightAction(AppEvent::kEventType_Light, LightingManager::COLOR_ACTION_HSV, sizeof(colorData),
+                                           (ColorData_t *) &colorData);
+        }
+
+        else if (attributeId == ColorControl::Attributes::ColorTemperatureMireds::Id)
+        {
+            if (size != sizeof(uint16_t))
+            {
+                ChipLogError(Zcl, "Wrong length for ColorControl value: %d", size);
+                return;
+            }
+            colorData.ct.ctMireds = *(uint16_t *) value;
+            ChipLogProgress(Zcl, "New ColorTemperatureMireds: %u", colorData.ct.ctMireds);
+            LightMgr().InitiateLightAction(AppEvent::kEventType_Light, LightingManager::COLOR_ACTION_CT, sizeof(colorData),
+                                           (ColorData_t *) &colorData);
+        }
+
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
     }
     else if (clusterId == Identify::Id)
     {

@@ -18,7 +18,7 @@
  */
 
 #pragma once
-
+#include "ColorFormat.h"
 struct AppEvent;
 typedef void (*EventHandler)(AppEvent *);
 
@@ -49,6 +49,12 @@ struct AppEvent
             uint8_t Action;
             int32_t Actor;
         } LightEvent;
+        struct
+        {
+            uint8_t Action;
+            int32_t Actor;
+            ColorData_t Value;
+        } LightControlEvent;
     };
 
     EventHandler Handler;
