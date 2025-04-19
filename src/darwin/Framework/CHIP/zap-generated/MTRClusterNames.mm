@@ -5102,8 +5102,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         switch (attributeID) {
 
             // Cluster ClosureDimension attributes
-        case MTRAttributeIDTypeClusterClosureDimensionAttributeCurrentID:
-            result = @"Current";
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeCurrentStateID:
+            result = @"CurrentState";
             break;
 
         case MTRAttributeIDTypeClusterClosureDimensionAttributeTargetID:
