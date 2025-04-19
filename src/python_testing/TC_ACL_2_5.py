@@ -31,13 +31,10 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
-import logging
-
 import chip.clusters as Clusters
-from chip.clusters.Types import Nullable
 from chip.interaction_model import Status
 from chip.testing.matter_testing import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+import logging
 from mobly import asserts
 
 
