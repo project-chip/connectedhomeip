@@ -103,7 +103,7 @@ class TC_ACL_2_5(MatterBaseTest):
             fabricFiltered=True
         )
         logging.info(f"Initial events response {str(events_response)}")
-        
+
         # Extract events from the response
         events = events_response
         logging.info(f"Found {len(events)} initial events")
@@ -136,26 +136,26 @@ class TC_ACL_2_5(MatterBaseTest):
         # Wait for and verify the event
         logging.info("Waiting for AccessControlExtensionChanged event...")
         event_data = events_callback.wait_for_event_report(acec_event, timeout_sec=15)
-        
+
         # Verify event data
         logging.info(f"Event data: {event_data}")
-        asserts.assert_equal(event_data.changeType, 
-            Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded, 
-            "Expected Added change type")
-        asserts.assert_in('chip.clusters.Types.Nullable', str(type(event_data.adminPasscodeID)), 
-            "AdminPasscodeID should be Null")
-        asserts.assert_equal(event_data.adminNodeID, 
-            self.default_controller.nodeId, 
-            "AdminNodeID should be the controller node ID")
-        asserts.assert_equal(event_data.latestValue.data, 
-            b'\x17\x18', 
-            "LatestValue.Data should be 1718")
-        asserts.assert_equal(event_data.latestValue.fabricIndex, 
-            f1, 
-            "LatestValue.FabricIndex should be the current fabric index")
-        asserts.assert_equal(event_data.fabricIndex, 
-            f1, 
-            "FabricIndex should be the current fabric index")
+        asserts.assert_equal(event_data.changeType,
+                             Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
+                             "Expected Added change type")
+        asserts.assert_in('chip.clusters.Types.Nullable', str(type(event_data.adminPasscodeID)),
+                          "AdminPasscodeID should be Null")
+        asserts.assert_equal(event_data.adminNodeID,
+                             self.default_controller.nodeId,
+                             "AdminNodeID should be the controller node ID")
+        asserts.assert_equal(event_data.latestValue.data,
+                             b'\x17\x18',
+                             "LatestValue.Data should be 1718")
+        asserts.assert_equal(event_data.latestValue.fabricIndex,
+                             f1,
+                             "LatestValue.FabricIndex should be the current fabric index")
+        asserts.assert_equal(event_data.fabricIndex,
+                             f1,
+                             "FabricIndex should be the current fabric index")
 
         self.step(6)
         # Create a new extension with different data to replace the existing one
@@ -177,30 +177,29 @@ class TC_ACL_2_5(MatterBaseTest):
         asserts.assert_equal(
             result[0].Status, Status.Success, "Write should have succeeded")
 
-
         self.step(7)
         # Wait for and verify the event
         logging.info("Waiting for AccessControlExtensionChanged event...")
         event_data = events_callback.wait_for_event_report(acec_event, timeout_sec=15)
-        
+
         # Verify event data
-        asserts.assert_equal(event_data.changeType, 
-            Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged, 
-            "Expected Changed change type")
-        asserts.assert_in('chip.clusters.Types.Nullable', str(type(event_data.adminPasscodeID)), 
-            "AdminPasscodeID should be Null")
-        asserts.assert_equal(event_data.adminNodeID, 
-            self.default_controller.nodeId, 
-            "AdminNodeID should be the controller node ID")
-        asserts.assert_equal(event_data.latestValue.data, 
-            D_OK_SINGLE, 
-            "LatestValue.Data should match D_OK_SINGLE")
-        asserts.assert_equal(event_data.latestValue.fabricIndex, 
-            f1, 
-            "LatestValue.FabricIndex should be the current fabric index")
-        asserts.assert_equal(event_data.fabricIndex, 
-            f1, 
-            "FabricIndex should be the current fabric index")
+        asserts.assert_equal(event_data.changeType,
+                             Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged,
+                             "Expected Changed change type")
+        asserts.assert_in('chip.clusters.Types.Nullable', str(type(event_data.adminPasscodeID)),
+                          "AdminPasscodeID should be Null")
+        asserts.assert_equal(event_data.adminNodeID,
+                             self.default_controller.nodeId,
+                             "AdminNodeID should be the controller node ID")
+        asserts.assert_equal(event_data.latestValue.data,
+                             D_OK_SINGLE,
+                             "LatestValue.Data should match D_OK_SINGLE")
+        asserts.assert_equal(event_data.latestValue.fabricIndex,
+                             f1,
+                             "LatestValue.FabricIndex should be the current fabric index")
+        asserts.assert_equal(event_data.fabricIndex,
+                             f1,
+                             "FabricIndex should be the current fabric index")
 
         self.step(8)
         # Try to write an extension that exceeds max length (128 bytes)
@@ -220,8 +219,7 @@ class TC_ACL_2_5(MatterBaseTest):
         )
         logging.info(f"Write result {str(a)}")
         asserts.assert_equal(a[0].Status, Status.ConstraintError,
-                                "Write should have failed with CONSTRAINT_ERROR 135")
-
+                             "Write should have failed with CONSTRAINT_ERROR 135")
 
         self.step(9)
         # Verify no event was generated for the failed write
@@ -241,7 +239,6 @@ class TC_ACL_2_5(MatterBaseTest):
         logging.info(f"Found {len(events)} events")
         asserts.assert_equal(len(events), 0, "There should be no events found")
 
-
         self.step(10)
         # This should fail with CONSTRAINT_ERROR
         logging.info("Attempting to write multiple extensions (should fail)")
@@ -253,7 +250,7 @@ class TC_ACL_2_5(MatterBaseTest):
         )
         logging.info(f"Write result {str(b)}")
         asserts.assert_equal(b[0].Status, Status.ConstraintError,
-                                "Write should have failed with CONSTRAINT_ERROR")
+                             "Write should have failed with CONSTRAINT_ERROR")
 
         self.step(11)
         # Verify no event was generated at all, since the whole extensions list was rejected.
@@ -289,25 +286,25 @@ class TC_ACL_2_5(MatterBaseTest):
         self.step(13)
         logging.info("Waiting for AccessControlExtensionChanged event...")
         event_data = events_callback.wait_for_event_report(acec_event, timeout_sec=15)
-        
+
         # Verify event data
-        asserts.assert_equal(event_data.changeType, 
-            Clusters.AccessControl.Enums.ChangeTypeEnum.kRemoved, 
-            "Expected Removed change type")
-        asserts.assert_in('chip.clusters.Types.Nullable', str(type(event_data.adminPasscodeID)), 
-            "AdminPasscodeID should be Null")
-        asserts.assert_equal(event_data.adminNodeID, 
-            self.default_controller.nodeId, 
-            "AdminNodeID should be the controller node ID")
-        asserts.assert_equal(event_data.latestValue.data, 
-            D_OK_SINGLE, 
-            "LatestValue.Data should match D_OK_SINGLE")
-        asserts.assert_equal(event_data.latestValue.fabricIndex, 
-            f1, 
-            "LatestValue.FabricIndex should be the current fabric index")
-        asserts.assert_equal(event_data.fabricIndex, 
-            f1, 
-            "FabricIndex should be the current fabric index")
+        asserts.assert_equal(event_data.changeType,
+                             Clusters.AccessControl.Enums.ChangeTypeEnum.kRemoved,
+                             "Expected Removed change type")
+        asserts.assert_in('chip.clusters.Types.Nullable', str(type(event_data.adminPasscodeID)),
+                          "AdminPasscodeID should be Null")
+        asserts.assert_equal(event_data.adminNodeID,
+                             self.default_controller.nodeId,
+                             "AdminNodeID should be the controller node ID")
+        asserts.assert_equal(event_data.latestValue.data,
+                             D_OK_SINGLE,
+                             "LatestValue.Data should match D_OK_SINGLE")
+        asserts.assert_equal(event_data.latestValue.fabricIndex,
+                             f1,
+                             "LatestValue.FabricIndex should be the current fabric index")
+        asserts.assert_equal(event_data.fabricIndex,
+                             f1,
+                             "FabricIndex should be the current fabric index")
 
         # After all attempts, check if we found the valid event
         asserts.assert_true(
