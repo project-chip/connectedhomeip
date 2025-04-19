@@ -144,19 +144,16 @@ class TC_ACL_2_8(MatterBaseTest):
             authMode=2,
             subjects=[self.th1.nodeId, 1111]
         )
-        try:
-            acl_attr = Clusters.AccessControl.Attributes.Acl
-            acl_list = [acl_struct]
-            result = await self.th1.WriteAttribute(
-                self.dut_node_id,
-                [(0, acl_attr(value=acl_list))]
-            )
-            asserts.assert_equal(
-                result[0].Status,
-                Status.Success,
-                "Write should have succeeded")
-        except Exception as e:
-            asserts.fail(f"Failed to write ACL: {e}")
+        acl_attr = Clusters.AccessControl.Attributes.Acl
+        acl_list = [acl_struct]
+        result = await self.th1.WriteAttribute(
+            self.dut_node_id,
+            [(0, acl_attr(value=acl_list))]
+        )
+        asserts.assert_equal(
+            result[0].Status,
+            Status.Success,
+            "Write should have succeeded")
 
         self.step(6)
         # TH2 writes ACL attribute
@@ -165,18 +162,15 @@ class TC_ACL_2_8(MatterBaseTest):
             authMode=2,
             subjects=[self.th2.nodeId, 2222]
         )
-        try:
-            acl_list = [acl_struct_th2]
-            result = await self.th2.WriteAttribute(
-                self.dut_node_id,
-                [(0, acl_attr(value=acl_list))]
-            )
-            asserts.assert_equal(
-                result[0].Status,
-                Status.Success,
-                "Write should have succeeded")
-        except Exception as e:
-            asserts.fail(f"Failed to write ACL: {e}")
+        acl_list = [acl_struct_th2]
+        result = await self.th2.WriteAttribute(
+            self.dut_node_id,
+            [(0, acl_attr(value=acl_list))]
+        )
+        asserts.assert_equal(
+            result[0].Status,
+            Status.Success,
+            "Write should have succeeded")
 
         self.step(7)
         # TH1 reads ACL attribute
