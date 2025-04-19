@@ -262,6 +262,14 @@
 #include <clusters/IlluminanceMeasurement/Commands.h>
 #include <clusters/IlluminanceMeasurement/Events.h>
 #include <clusters/IlluminanceMeasurement/Structs.h>
+#include <clusters/JointFabricAdministrator/Attributes.h>
+#include <clusters/JointFabricAdministrator/Commands.h>
+#include <clusters/JointFabricAdministrator/Events.h>
+#include <clusters/JointFabricAdministrator/Structs.h>
+#include <clusters/JointFabricDatastore/Attributes.h>
+#include <clusters/JointFabricDatastore/Commands.h>
+#include <clusters/JointFabricDatastore/Events.h>
+#include <clusters/JointFabricDatastore/Structs.h>
 #include <clusters/KeypadInput/Attributes.h>
 #include <clusters/KeypadInput/Commands.h>
 #include <clusters/KeypadInput/Events.h>

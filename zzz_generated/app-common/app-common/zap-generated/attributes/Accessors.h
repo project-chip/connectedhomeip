@@ -6003,6 +6003,72 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace Attributes
 } // namespace CommissionerControl
 
+namespace JointFabricDatastore {
+namespace Attributes {
+
+namespace AnchorRootCa {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableByteSpan & value); // octet_string
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::ByteSpan value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::ByteSpan value, MarkAttributeDirty markDirty);
+} // namespace AnchorRootCa
+
+namespace AnchorNodeID {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::NodeId * value); // node_id
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::NodeId value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::NodeId value, MarkAttributeDirty markDirty);
+} // namespace AnchorNodeID
+
+namespace AnchorVendorID {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::VendorId * value); // vendor_id
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::VendorId value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::VendorId value, MarkAttributeDirty markDirty);
+} // namespace AnchorVendorID
+
+namespace FriendlyName {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableCharSpan & value); // char_string
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty);
+} // namespace FriendlyName
+
+namespace FeatureMap {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace JointFabricDatastore
+
+namespace JointFabricAdministrator {
+namespace Attributes {
+
+namespace AdministratorFabricIndex {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::FabricIndex * value); // fabric_idx
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::FabricIndex value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::FabricIndex value, MarkAttributeDirty markDirty);
+} // namespace AdministratorFabricIndex
+
+namespace FeatureMap {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace JointFabricAdministrator
+
 namespace TlsCertificateManagement {
 namespace Attributes {
 

@@ -156,6 +156,8 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/group-key-mgmt-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/identify-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/illuminance-measurement-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/joint-fabric-datastore-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/joint-fabric-administrator-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/keypad-input-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/laundry-washer-mode-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/laundry-dryer-controls-cluster.xml \
