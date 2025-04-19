@@ -30,6 +30,7 @@ declare_args() {
   chip_enable_smoke_co_trigger = false
   chip_enable_boolean_state_configuration_trigger = false
   chip_enable_energy_evse_trigger = false
+  chip_enable_electrical_grid_conditions_trigger = false
   chip_enable_energy_reporting_trigger = false
   chip_enable_water_heater_management_trigger = false
   chip_enable_device_energy_management_trigger = false
@@ -154,6 +155,7 @@ source_set("app-main") {
     "CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_DIAGNOSTIC_TRIGGER=${chip_enable_software_diagnostics_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_SMOKE_CO_TRIGGER=${chip_enable_smoke_co_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_BOOLEAN_STATE_CONFIGURATION_TRIGGER=${chip_enable_boolean_state_configuration_trigger}",
+    "CHIP_DEVICE_CONFIG_ENABLE_ELECTRICAL_GRID_CONDITIONS_TRIGGER=${chip_enable_energy_evse_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER=${chip_enable_energy_evse_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER=${chip_enable_energy_reporting_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_WATER_HEATER_MANAGEMENT_TRIGGER=${chip_enable_water_heater_management_trigger}",
