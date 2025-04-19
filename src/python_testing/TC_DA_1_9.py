@@ -205,7 +205,7 @@ class TC_DA_1_9(MatterBaseTest):
                             discoveryType=ChipDeviceCtrl.DiscoveryType.DISCOVERY_NETWORK_ONLY,
                         )
                         resp = 'Y'
-                    except Exception as e:
+                    except Exception:
                         resp = 'N'
                 else:
                     resp = self.wait_for_user_input(prompt_msg)
