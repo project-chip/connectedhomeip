@@ -88,8 +88,8 @@ jobs:
             - name: Build Java Matter Controller and all clusters app
               run: |
                   scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
-                  out/venv/pip install -r scripts/setup/requirements.build.txt
-                  out/venv/pip install colorama
+                  out/venv/bin/pip install -r scripts/setup/requirements.build.txt
+                  out/venv/bin/pip install colorama
                   ./scripts/run_in_build_env.sh \
                    "./scripts/build/build_examples.py \
                       --target linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test \
