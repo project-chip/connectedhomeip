@@ -169,7 +169,6 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
 
     chainForAddNOC = await newFabricDevCtrl.IssueNOCChain(csrForAddNOC, newNodeId)
     if (chainForAddNOC.rcacBytes is None or
-            chainForAddNOC.icacBytes is None or
             chainForAddNOC.nocBytes is None or chainForAddNOC.ipkBytes is None):
         # Expiring the failsafe timer in an attempt to clean up.
         await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
@@ -179,7 +178,7 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
     nocResp = await commissionerDevCtrl.SendCommand(existingNodeId,
                                                     0,
                                                     opCreds.Commands.AddNOC(chainForAddNOC.nocBytes,
-                                                                            chainForAddNOC.icacBytes,
+                                                                            chainForAddNOC.icacBytes if chainForAddNOC.icacBytes else None,
                                                                             chainForAddNOC.ipkBytes,
                                                                             newFabricDevCtrl.nodeId,
                                                                             newFabricDevCtrl.fabricAdmin.vendorId))
