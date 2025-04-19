@@ -103,7 +103,7 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type kLeftTagList[] = { 
 #endif // MATTER_DM_PLUGIN_OVEN_MODE_SERVER
 
 #ifdef MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
-#include "chef-oven-cavity-operational-state.h"
+#include "oven-cavity-operational-state/chef-oven-cavity-operational-state.h"
 #endif // MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
 
 Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
