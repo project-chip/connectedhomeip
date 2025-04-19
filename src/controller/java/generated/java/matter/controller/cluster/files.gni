@@ -51,7 +51,6 @@ matter_structs_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/CommodityPriceClusterCommodityPriceComponentStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/CommodityPriceClusterCommodityPriceStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/CommodityPriceClusterCurrencyStruct.kt",
-  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/CommodityPriceClusterPriceStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/CommodityTariffClusterAuxiliaryLoadSwitchSettingsStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/CommodityTariffClusterCalendarPeriodStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/CommodityTariffClusterCurrencyStruct.kt",

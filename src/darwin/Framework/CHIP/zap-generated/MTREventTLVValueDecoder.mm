@@ -2854,11 +2854,7 @@ static id _Nullable DecodeEventPayloadForCommodityPriceCluster(EventId aEventId,
                     memberValue.periodEnd = [NSNumber numberWithUnsignedInt:cppValue.currentPrice.Value().periodEnd.Value()];
                 }
                 if (cppValue.currentPrice.Value().price.HasValue()) {
-                    memberValue.price = [MTRDataTypePriceStruct new];
-                    memberValue.price.amount = [NSNumber numberWithLongLong:cppValue.currentPrice.Value().price.Value().amount];
-                    memberValue.price.currency = [MTRDataTypeCurrencyStruct new];
-                    memberValue.price.currency.currency = [NSNumber numberWithUnsignedShort:cppValue.currentPrice.Value().price.Value().currency.currency];
-                    memberValue.price.currency.decimalPoints = [NSNumber numberWithUnsignedChar:cppValue.currentPrice.Value().price.Value().currency.decimalPoints];
+                    memberValue.price = [NSNumber numberWithLongLong:cppValue.currentPrice.Value().price.Value()];
                 } else {
                     memberValue.price = nil;
                 }
@@ -2885,16 +2881,7 @@ static id _Nullable DecodeEventPayloadForCommodityPriceCluster(EventId aEventId,
                             auto & entry_3 = iter_3.GetValue();
                             MTRCommodityPriceClusterCommodityPriceComponentStruct * newElement_3;
                             newElement_3 = [MTRCommodityPriceClusterCommodityPriceComponentStruct new];
-                            if (entry_3.price.HasValue()) {
-                                newElement_3.price = [NSNumber numberWithLongLong:entry_3.price.Value()];
-                            } else {
-                                newElement_3.price = nil;
-                            }
-                            if (entry_3.priceLevel.HasValue()) {
-                                newElement_3.priceLevel = [NSNumber numberWithShort:entry_3.priceLevel.Value()];
-                            } else {
-                                newElement_3.priceLevel = nil;
-                            }
+                            newElement_3.price = [NSNumber numberWithLongLong:entry_3.price];
                             newElement_3.source = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_3.source)];
                             if (entry_3.description.HasValue()) {
                                 newElement_3.descriptionString = AsString(entry_3.description.Value());
@@ -2957,11 +2944,7 @@ static id _Nullable DecodeEventPayloadForCommodityPriceCluster(EventId aEventId,
                             newElement_1.periodEnd = [NSNumber numberWithUnsignedInt:entry_1.periodEnd.Value()];
                         }
                         if (entry_1.price.HasValue()) {
-                            newElement_1.price = [MTRDataTypePriceStruct new];
-                            newElement_1.price.amount = [NSNumber numberWithLongLong:entry_1.price.Value().amount];
-                            newElement_1.price.currency = [MTRDataTypeCurrencyStruct new];
-                            newElement_1.price.currency.currency = [NSNumber numberWithUnsignedShort:entry_1.price.Value().currency.currency];
-                            newElement_1.price.currency.decimalPoints = [NSNumber numberWithUnsignedChar:entry_1.price.Value().currency.decimalPoints];
+                            newElement_1.price = [NSNumber numberWithLongLong:entry_1.price.Value()];
                         } else {
                             newElement_1.price = nil;
                         }
@@ -2988,16 +2971,7 @@ static id _Nullable DecodeEventPayloadForCommodityPriceCluster(EventId aEventId,
                                     auto & entry_4 = iter_4.GetValue();
                                     MTRCommodityPriceClusterCommodityPriceComponentStruct * newElement_4;
                                     newElement_4 = [MTRCommodityPriceClusterCommodityPriceComponentStruct new];
-                                    if (entry_4.price.HasValue()) {
-                                        newElement_4.price = [NSNumber numberWithLongLong:entry_4.price.Value()];
-                                    } else {
-                                        newElement_4.price = nil;
-                                    }
-                                    if (entry_4.priceLevel.HasValue()) {
-                                        newElement_4.priceLevel = [NSNumber numberWithShort:entry_4.priceLevel.Value()];
-                                    } else {
-                                        newElement_4.priceLevel = nil;
-                                    }
+                                    newElement_4.price = [NSNumber numberWithLongLong:entry_4.price];
                                     newElement_4.source = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_4.source)];
                                     if (entry_4.description.HasValue()) {
                                         newElement_4.descriptionString = AsString(entry_4.description.Value());

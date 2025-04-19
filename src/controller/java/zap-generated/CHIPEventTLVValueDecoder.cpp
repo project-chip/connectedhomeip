@@ -5273,89 +5273,14 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 else
                 {
                     jobject value_currentPrice_priceInsideOptional;
-                    jobject value_currentPrice_priceInsideOptional_amount;
-                    std::string value_currentPrice_priceInsideOptional_amountClassName     = "java/lang/Long";
-                    std::string value_currentPrice_priceInsideOptional_amountCtorSignature = "(J)V";
-                    jlong jnivalue_currentPrice_priceInsideOptional_amount =
-                        static_cast<jlong>(cppValue.currentPrice.Value().price.Value().amount);
+                    std::string value_currentPrice_priceInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_currentPrice_priceInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_currentPrice_priceInsideOptional =
+                        static_cast<jlong>(cppValue.currentPrice.Value().price.Value());
                     chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                        value_currentPrice_priceInsideOptional_amountClassName.c_str(),
-                        value_currentPrice_priceInsideOptional_amountCtorSignature.c_str(),
-                        jnivalue_currentPrice_priceInsideOptional_amount, value_currentPrice_priceInsideOptional_amount);
-                    jobject value_currentPrice_priceInsideOptional_currency;
-                    jobject value_currentPrice_priceInsideOptional_currency_currency;
-                    std::string value_currentPrice_priceInsideOptional_currency_currencyClassName     = "java/lang/Integer";
-                    std::string value_currentPrice_priceInsideOptional_currency_currencyCtorSignature = "(I)V";
-                    jint jnivalue_currentPrice_priceInsideOptional_currency_currency =
-                        static_cast<jint>(cppValue.currentPrice.Value().price.Value().currency.currency);
-                    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                        value_currentPrice_priceInsideOptional_currency_currencyClassName.c_str(),
-                        value_currentPrice_priceInsideOptional_currency_currencyCtorSignature.c_str(),
-                        jnivalue_currentPrice_priceInsideOptional_currency_currency,
-                        value_currentPrice_priceInsideOptional_currency_currency);
-                    jobject value_currentPrice_priceInsideOptional_currency_decimalPoints;
-                    std::string value_currentPrice_priceInsideOptional_currency_decimalPointsClassName     = "java/lang/Integer";
-                    std::string value_currentPrice_priceInsideOptional_currency_decimalPointsCtorSignature = "(I)V";
-                    jint jnivalue_currentPrice_priceInsideOptional_currency_decimalPoints =
-                        static_cast<jint>(cppValue.currentPrice.Value().price.Value().currency.decimalPoints);
-                    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                        value_currentPrice_priceInsideOptional_currency_decimalPointsClassName.c_str(),
-                        value_currentPrice_priceInsideOptional_currency_decimalPointsCtorSignature.c_str(),
-                        jnivalue_currentPrice_priceInsideOptional_currency_decimalPoints,
-                        value_currentPrice_priceInsideOptional_currency_decimalPoints);
-
-                    {
-                        jclass currencyStructStructClass_4;
-                        err = chip::JniReferences::GetInstance().GetLocalClassRef(
-                            env, "chip/devicecontroller/ChipStructs$CommodityPriceClusterCurrencyStruct",
-                            currencyStructStructClass_4);
-                        if (err != CHIP_NO_ERROR)
-                        {
-                            ChipLogError(Zcl, "Could not find class ChipStructs$CommodityPriceClusterCurrencyStruct");
-                            return nullptr;
-                        }
-
-                        jmethodID currencyStructStructCtor_4;
-                        err = chip::JniReferences::GetInstance().FindMethod(env, currencyStructStructClass_4, "<init>",
-                                                                            "(Ljava/lang/Integer;Ljava/lang/Integer;)V",
-                                                                            &currencyStructStructCtor_4);
-                        if (err != CHIP_NO_ERROR || currencyStructStructCtor_4 == nullptr)
-                        {
-                            ChipLogError(Zcl, "Could not find ChipStructs$CommodityPriceClusterCurrencyStruct constructor");
-                            return nullptr;
-                        }
-
-                        value_currentPrice_priceInsideOptional_currency =
-                            env->NewObject(currencyStructStructClass_4, currencyStructStructCtor_4,
-                                           value_currentPrice_priceInsideOptional_currency_currency,
-                                           value_currentPrice_priceInsideOptional_currency_decimalPoints);
-                    }
-
-                    {
-                        jclass priceStructStructClass_3;
-                        err = chip::JniReferences::GetInstance().GetLocalClassRef(
-                            env, "chip/devicecontroller/ChipStructs$CommodityPriceClusterPriceStruct", priceStructStructClass_3);
-                        if (err != CHIP_NO_ERROR)
-                        {
-                            ChipLogError(Zcl, "Could not find class ChipStructs$CommodityPriceClusterPriceStruct");
-                            return nullptr;
-                        }
-
-                        jmethodID priceStructStructCtor_3;
-                        err = chip::JniReferences::GetInstance().FindMethod(
-                            env, priceStructStructClass_3, "<init>",
-                            "(Ljava/lang/Long;Lchip/devicecontroller/ChipStructs$CommodityPriceClusterCurrencyStruct;)V",
-                            &priceStructStructCtor_3);
-                        if (err != CHIP_NO_ERROR || priceStructStructCtor_3 == nullptr)
-                        {
-                            ChipLogError(Zcl, "Could not find ChipStructs$CommodityPriceClusterPriceStruct constructor");
-                            return nullptr;
-                        }
-
-                        value_currentPrice_priceInsideOptional = env->NewObject(priceStructStructClass_3, priceStructStructCtor_3,
-                                                                                value_currentPrice_priceInsideOptional_amount,
-                                                                                value_currentPrice_priceInsideOptional_currency);
-                    }
+                        value_currentPrice_priceInsideOptionalClassName.c_str(),
+                        value_currentPrice_priceInsideOptionalCtorSignature.c_str(), jnivalue_currentPrice_priceInsideOptional,
+                        value_currentPrice_priceInsideOptional);
                     chip::JniReferences::GetInstance().CreateOptional(value_currentPrice_priceInsideOptional,
                                                                       value_currentPrice_price);
                 }
@@ -5408,40 +5333,12 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                         auto & entry_3 = iter_value_currentPrice_componentsInsideOptional_3.GetValue();
                         jobject newElement_3;
                         jobject newElement_3_price;
-                        if (!entry_3.price.HasValue())
-                        {
-                            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_3_price);
-                        }
-                        else
-                        {
-                            jobject newElement_3_priceInsideOptional;
-                            std::string newElement_3_priceInsideOptionalClassName     = "java/lang/Long";
-                            std::string newElement_3_priceInsideOptionalCtorSignature = "(J)V";
-                            jlong jninewElement_3_priceInsideOptional                 = static_cast<jlong>(entry_3.price.Value());
-                            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                                newElement_3_priceInsideOptionalClassName.c_str(),
-                                newElement_3_priceInsideOptionalCtorSignature.c_str(), jninewElement_3_priceInsideOptional,
-                                newElement_3_priceInsideOptional);
-                            chip::JniReferences::GetInstance().CreateOptional(newElement_3_priceInsideOptional, newElement_3_price);
-                        }
-                        jobject newElement_3_priceLevel;
-                        if (!entry_3.priceLevel.HasValue())
-                        {
-                            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_3_priceLevel);
-                        }
-                        else
-                        {
-                            jobject newElement_3_priceLevelInsideOptional;
-                            std::string newElement_3_priceLevelInsideOptionalClassName     = "java/lang/Integer";
-                            std::string newElement_3_priceLevelInsideOptionalCtorSignature = "(I)V";
-                            jint jninewElement_3_priceLevelInsideOptional = static_cast<jint>(entry_3.priceLevel.Value());
-                            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                                newElement_3_priceLevelInsideOptionalClassName.c_str(),
-                                newElement_3_priceLevelInsideOptionalCtorSignature.c_str(),
-                                jninewElement_3_priceLevelInsideOptional, newElement_3_priceLevelInsideOptional);
-                            chip::JniReferences::GetInstance().CreateOptional(newElement_3_priceLevelInsideOptional,
-                                                                              newElement_3_priceLevel);
-                        }
+                        std::string newElement_3_priceClassName     = "java/lang/Long";
+                        std::string newElement_3_priceCtorSignature = "(J)V";
+                        jlong jninewElement_3_price                 = static_cast<jlong>(entry_3.price);
+                        chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(newElement_3_priceClassName.c_str(),
+                                                                                    newElement_3_priceCtorSignature.c_str(),
+                                                                                    jninewElement_3_price, newElement_3_price);
                         jobject newElement_3_source;
                         std::string newElement_3_sourceClassName     = "java/lang/Integer";
                         std::string newElement_3_sourceCtorSignature = "(I)V";
@@ -5497,8 +5394,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                             jmethodID commodityPriceComponentStructStructCtor_4;
                             err = chip::JniReferences::GetInstance().FindMethod(
                                 env, commodityPriceComponentStructStructClass_4, "<init>",
-                                "(Ljava/util/Optional;Ljava/util/Optional;Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/"
-                                "Optional;)V",
+                                "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;)V",
                                 &commodityPriceComponentStructStructCtor_4);
                             if (err != CHIP_NO_ERROR || commodityPriceComponentStructStructCtor_4 == nullptr)
                             {
@@ -5508,10 +5404,9 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                 return nullptr;
                             }
 
-                            newElement_3 = env->NewObject(commodityPriceComponentStructStructClass_4,
-                                                          commodityPriceComponentStructStructCtor_4, newElement_3_price,
-                                                          newElement_3_priceLevel, newElement_3_source, newElement_3_description,
-                                                          newElement_3_tariffComponentID);
+                            newElement_3 = env->NewObject(
+                                commodityPriceComponentStructStructClass_4, commodityPriceComponentStructStructCtor_4,
+                                newElement_3_price, newElement_3_source, newElement_3_description, newElement_3_tariffComponentID);
                         }
                         chip::JniReferences::GetInstance().AddToList(value_currentPrice_componentsInsideOptional, newElement_3);
                     }
@@ -5622,89 +5517,13 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                     else
                     {
                         jobject newElement_1_priceInsideOptional;
-                        jobject newElement_1_priceInsideOptional_amount;
-                        std::string newElement_1_priceInsideOptional_amountClassName     = "java/lang/Long";
-                        std::string newElement_1_priceInsideOptional_amountCtorSignature = "(J)V";
-                        jlong jninewElement_1_priceInsideOptional_amount = static_cast<jlong>(entry_1.price.Value().amount);
+                        std::string newElement_1_priceInsideOptionalClassName     = "java/lang/Long";
+                        std::string newElement_1_priceInsideOptionalCtorSignature = "(J)V";
+                        jlong jninewElement_1_priceInsideOptional                 = static_cast<jlong>(entry_1.price.Value());
                         chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                            newElement_1_priceInsideOptional_amountClassName.c_str(),
-                            newElement_1_priceInsideOptional_amountCtorSignature.c_str(),
-                            jninewElement_1_priceInsideOptional_amount, newElement_1_priceInsideOptional_amount);
-                        jobject newElement_1_priceInsideOptional_currency;
-                        jobject newElement_1_priceInsideOptional_currency_currency;
-                        std::string newElement_1_priceInsideOptional_currency_currencyClassName     = "java/lang/Integer";
-                        std::string newElement_1_priceInsideOptional_currency_currencyCtorSignature = "(I)V";
-                        jint jninewElement_1_priceInsideOptional_currency_currency =
-                            static_cast<jint>(entry_1.price.Value().currency.currency);
-                        chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                            newElement_1_priceInsideOptional_currency_currencyClassName.c_str(),
-                            newElement_1_priceInsideOptional_currency_currencyCtorSignature.c_str(),
-                            jninewElement_1_priceInsideOptional_currency_currency,
-                            newElement_1_priceInsideOptional_currency_currency);
-                        jobject newElement_1_priceInsideOptional_currency_decimalPoints;
-                        std::string newElement_1_priceInsideOptional_currency_decimalPointsClassName     = "java/lang/Integer";
-                        std::string newElement_1_priceInsideOptional_currency_decimalPointsCtorSignature = "(I)V";
-                        jint jninewElement_1_priceInsideOptional_currency_decimalPoints =
-                            static_cast<jint>(entry_1.price.Value().currency.decimalPoints);
-                        chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                            newElement_1_priceInsideOptional_currency_decimalPointsClassName.c_str(),
-                            newElement_1_priceInsideOptional_currency_decimalPointsCtorSignature.c_str(),
-                            jninewElement_1_priceInsideOptional_currency_decimalPoints,
-                            newElement_1_priceInsideOptional_currency_decimalPoints);
-
-                        {
-                            jclass currencyStructStructClass_5;
-                            err = chip::JniReferences::GetInstance().GetLocalClassRef(
-                                env, "chip/devicecontroller/ChipStructs$CommodityPriceClusterCurrencyStruct",
-                                currencyStructStructClass_5);
-                            if (err != CHIP_NO_ERROR)
-                            {
-                                ChipLogError(Zcl, "Could not find class ChipStructs$CommodityPriceClusterCurrencyStruct");
-                                return nullptr;
-                            }
-
-                            jmethodID currencyStructStructCtor_5;
-                            err = chip::JniReferences::GetInstance().FindMethod(env, currencyStructStructClass_5, "<init>",
-                                                                                "(Ljava/lang/Integer;Ljava/lang/Integer;)V",
-                                                                                &currencyStructStructCtor_5);
-                            if (err != CHIP_NO_ERROR || currencyStructStructCtor_5 == nullptr)
-                            {
-                                ChipLogError(Zcl, "Could not find ChipStructs$CommodityPriceClusterCurrencyStruct constructor");
-                                return nullptr;
-                            }
-
-                            newElement_1_priceInsideOptional_currency =
-                                env->NewObject(currencyStructStructClass_5, currencyStructStructCtor_5,
-                                               newElement_1_priceInsideOptional_currency_currency,
-                                               newElement_1_priceInsideOptional_currency_decimalPoints);
-                        }
-
-                        {
-                            jclass priceStructStructClass_4;
-                            err = chip::JniReferences::GetInstance().GetLocalClassRef(
-                                env, "chip/devicecontroller/ChipStructs$CommodityPriceClusterPriceStruct",
-                                priceStructStructClass_4);
-                            if (err != CHIP_NO_ERROR)
-                            {
-                                ChipLogError(Zcl, "Could not find class ChipStructs$CommodityPriceClusterPriceStruct");
-                                return nullptr;
-                            }
-
-                            jmethodID priceStructStructCtor_4;
-                            err = chip::JniReferences::GetInstance().FindMethod(
-                                env, priceStructStructClass_4, "<init>",
-                                "(Ljava/lang/Long;Lchip/devicecontroller/ChipStructs$CommodityPriceClusterCurrencyStruct;)V",
-                                &priceStructStructCtor_4);
-                            if (err != CHIP_NO_ERROR || priceStructStructCtor_4 == nullptr)
-                            {
-                                ChipLogError(Zcl, "Could not find ChipStructs$CommodityPriceClusterPriceStruct constructor");
-                                return nullptr;
-                            }
-
-                            newElement_1_priceInsideOptional =
-                                env->NewObject(priceStructStructClass_4, priceStructStructCtor_4,
-                                               newElement_1_priceInsideOptional_amount, newElement_1_priceInsideOptional_currency);
-                        }
+                            newElement_1_priceInsideOptionalClassName.c_str(),
+                            newElement_1_priceInsideOptionalCtorSignature.c_str(), jninewElement_1_priceInsideOptional,
+                            newElement_1_priceInsideOptional);
                         chip::JniReferences::GetInstance().CreateOptional(newElement_1_priceInsideOptional, newElement_1_price);
                     }
                     jobject newElement_1_priceLevel;
@@ -5754,41 +5573,12 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                             auto & entry_4 = iter_newElement_1_componentsInsideOptional_4.GetValue();
                             jobject newElement_4;
                             jobject newElement_4_price;
-                            if (!entry_4.price.HasValue())
-                            {
-                                chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_4_price);
-                            }
-                            else
-                            {
-                                jobject newElement_4_priceInsideOptional;
-                                std::string newElement_4_priceInsideOptionalClassName     = "java/lang/Long";
-                                std::string newElement_4_priceInsideOptionalCtorSignature = "(J)V";
-                                jlong jninewElement_4_priceInsideOptional = static_cast<jlong>(entry_4.price.Value());
-                                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                                    newElement_4_priceInsideOptionalClassName.c_str(),
-                                    newElement_4_priceInsideOptionalCtorSignature.c_str(), jninewElement_4_priceInsideOptional,
-                                    newElement_4_priceInsideOptional);
-                                chip::JniReferences::GetInstance().CreateOptional(newElement_4_priceInsideOptional,
-                                                                                  newElement_4_price);
-                            }
-                            jobject newElement_4_priceLevel;
-                            if (!entry_4.priceLevel.HasValue())
-                            {
-                                chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_4_priceLevel);
-                            }
-                            else
-                            {
-                                jobject newElement_4_priceLevelInsideOptional;
-                                std::string newElement_4_priceLevelInsideOptionalClassName     = "java/lang/Integer";
-                                std::string newElement_4_priceLevelInsideOptionalCtorSignature = "(I)V";
-                                jint jninewElement_4_priceLevelInsideOptional = static_cast<jint>(entry_4.priceLevel.Value());
-                                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                                    newElement_4_priceLevelInsideOptionalClassName.c_str(),
-                                    newElement_4_priceLevelInsideOptionalCtorSignature.c_str(),
-                                    jninewElement_4_priceLevelInsideOptional, newElement_4_priceLevelInsideOptional);
-                                chip::JniReferences::GetInstance().CreateOptional(newElement_4_priceLevelInsideOptional,
-                                                                                  newElement_4_priceLevel);
-                            }
+                            std::string newElement_4_priceClassName     = "java/lang/Long";
+                            std::string newElement_4_priceCtorSignature = "(J)V";
+                            jlong jninewElement_4_price                 = static_cast<jlong>(entry_4.price);
+                            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(newElement_4_priceClassName.c_str(),
+                                                                                        newElement_4_priceCtorSignature.c_str(),
+                                                                                        jninewElement_4_price, newElement_4_price);
                             jobject newElement_4_source;
                             std::string newElement_4_sourceClassName     = "java/lang/Integer";
                             std::string newElement_4_sourceCtorSignature = "(I)V";
@@ -5844,8 +5634,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                 jmethodID commodityPriceComponentStructStructCtor_5;
                                 err = chip::JniReferences::GetInstance().FindMethod(
                                     env, commodityPriceComponentStructStructClass_5, "<init>",
-                                    "(Ljava/util/Optional;Ljava/util/Optional;Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/"
-                                    "Optional;)V",
+                                    "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;)V",
                                     &commodityPriceComponentStructStructCtor_5);
                                 if (err != CHIP_NO_ERROR || commodityPriceComponentStructStructCtor_5 == nullptr)
                                 {
@@ -5855,10 +5644,10 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                     return nullptr;
                                 }
 
-                                newElement_4 = env->NewObject(commodityPriceComponentStructStructClass_5,
-                                                              commodityPriceComponentStructStructCtor_5, newElement_4_price,
-                                                              newElement_4_priceLevel, newElement_4_source,
-                                                              newElement_4_description, newElement_4_tariffComponentID);
+                                newElement_4 =
+                                    env->NewObject(commodityPriceComponentStructStructClass_5,
+                                                   commodityPriceComponentStructStructCtor_5, newElement_4_price,
+                                                   newElement_4_source, newElement_4_description, newElement_4_tariffComponentID);
                             }
                             chip::JniReferences::GetInstance().AddToList(newElement_1_componentsInsideOptional, newElement_4);
                         }
