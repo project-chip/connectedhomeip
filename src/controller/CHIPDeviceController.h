@@ -75,6 +75,10 @@
 #include <ble/Ble.h>
 #endif
 #include <controller/DeviceDiscoveryDelegate.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#include <wifipaf/WiFiPAFConfig.h>
+#include <wifipaf/WiFiPAFRole.h>
+#endif
 
 namespace chip {
 
@@ -866,6 +870,7 @@ private:
     static void OnWiFiPAFSubscribeComplete(void * appState);
     static void OnWiFiPAFSubscribeError(void * appState, CHIP_ERROR err);
     RendezvousParameters mRendezvousParametersForDeviceDiscoveredOverWiFiPAF;
+    WiFiPAF::PafSessionId_t mPafSessionId[WIFIPAF_LAYER_NUM_PAF_ENDPOINTS];
 #endif
 
     static void OnBasicFailure(void * context, CHIP_ERROR err);

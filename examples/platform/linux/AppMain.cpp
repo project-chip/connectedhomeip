@@ -29,6 +29,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/NodeId.h>
 #include <lib/core/Optional.h>
+#include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 
@@ -385,7 +386,7 @@ public:
         "freq_list=[freq#1],[freq#2]...[freq#n]"
             [freq#1] - [freq#n]: frequence number, separated by ','
 */
-static uint16_t WiFiPAFGet_FreqList(const char * args, std::unique_ptr<uint16_t[]> & freq_list)
+static uint16_t WiFiPAFGet_FreqList(const char * args, ReadOnlyBufferBuilder<uint16_t> & knownFreqListBuilder)
 {
     const char hdstr[] = "freq_list=";
     std::vector<uint16_t> freq_vect;
@@ -403,10 +404,12 @@ static uint16_t WiFiPAFGet_FreqList(const char * args, std::unique_ptr<uint16_t[
         freq_vect.push_back(std::stoi(item));
     }
     uint16_t freq_size = freq_vect.size();
-    freq_list          = std::make_unique<uint16_t[]>(freq_size);
+    CHIP_ERROR err     = knownFreqListBuilder.EnsureAppendCapacity(freq_size);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, 0);
     for (int i = 0; i < freq_size; i++)
     {
-        freq_list.get()[i] = freq_vect[i];
+        err = knownFreqListBuilder.Append(freq_vect[i]);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, i);
     }
     return freq_size;
 }
@@ -545,14 +548,13 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
         if (EnsureWiFiIsStarted())
         {
             ChipLogProgress(WiFiPAF, "Wi-Fi Management started");
-            DeviceLayer::ConnectivityManager::WiFiPAFAdvertiseParam args;
 
-            args.enable        = LinuxDeviceOptions::GetInstance().mWiFiPAF;
-            args.freq_list_len = WiFiPAFGet_FreqList(LinuxDeviceOptions::GetInstance().mWiFiPAFExtCmds, args.freq_list);
-            DeviceLayer::ConnectivityMgr().WiFiPAFPublish(args);
-            LinuxDeviceOptions::GetInstance().mPublishId = args.publish_id;
+            ReadOnlyBufferBuilder<uint16_t> knownFreqListBuilder;
+            WiFiPAFGet_FreqList(LinuxDeviceOptions::GetInstance().mWiFiPAFExtCmds, knownFreqListBuilder);
+            DeviceLayer::ConnectivityMgr().SetWiFiPAFPublishParam(knownFreqListBuilder);
         }
     }
+
 #endif
 
 #if CHIP_ENABLE_OPENTHREAD
@@ -723,14 +725,6 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     {
         // This example use of the ARL feature proactively installs the provided entries on fabric index 1
         exampleAccessRestrictionProvider->SetEntries(1, LinuxDeviceOptions::GetInstance().arlEntries.Value());
-    }
-#endif
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    if (Server::GetInstance().GetFabricTable().FabricCount() != 0)
-    {
-        ChipLogProgress(AppServer, "Fabric already commissioned. Canceling publishing");
-        DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(LinuxDeviceOptions::GetInstance().mPublishId,
-                                                       chip::WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher);
     }
 #endif
 
