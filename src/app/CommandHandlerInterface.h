@@ -25,6 +25,8 @@
 #include <app/data-model/List.h> // So we can encode lists
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Iterators.h>
+#include <lib/support/ReadOnlyBuffer.h>
+#include <lib/support/SplitLambda.h>
 
 namespace chip {
 namespace app {
@@ -101,8 +103,6 @@ public:
      */
     virtual void InvokeCommand(HandlerContext & handlerContext) = 0;
 
-    typedef Loop (*CommandIdCallback)(CommandId id, void * context);
-
     /**
      * Function that may be implemented to enumerate accepted (client-to-server)
      * commands for the given cluster.
@@ -122,7 +122,8 @@ public:
      * This is used by callbacks that just look for a particular value in the
      * list.
      */
-    virtual CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+    virtual CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
@@ -146,7 +147,7 @@ public:
      * This is used by callbacks that just look for a particular value in the
      * list.
      */
-    virtual CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+    virtual CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, ReadOnlyBufferBuilder<CommandId> & builder)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
@@ -230,6 +231,79 @@ private:
     Optional<EndpointId> mEndpointId;
     ClusterId mClusterId;
     CommandHandlerInterface * mNext = nullptr;
+};
+
+class CommandHandlerInterfaceShim : public CommandHandlerInterface
+{
+
+    using CommandHandlerInterface::CommandHandlerInterface;
+    typedef Loop (*CommandIdCallback)(CommandId id, void * context);
+    typedef Loop (*CommandEntryCallback)(DataModel::AcceptedCommandEntry id, void * context);
+
+    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                                         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override
+    {
+        size_t commandCount = 0;
+        CHIP_ERROR err      = CHIP_NO_ERROR;
+
+        auto counter = SplitLambda([&](CommandId commandId) {
+            commandCount++;
+            return Loop::Continue;
+        });
+
+        ReturnErrorOnFailure(EnumerateAcceptedCommands(cluster, counter.Caller(), counter.Context()));
+        ReturnErrorOnFailure(builder.EnsureAppendCapacity(commandCount));
+
+        auto appender = SplitLambda([&](CommandId commandId) {
+            err = builder.Append(GetEntry(cluster, commandId));
+            return err == CHIP_NO_ERROR ? Loop::Continue : Loop::Break;
+        });
+
+        ReturnErrorOnFailure(EnumerateAcceptedCommands(cluster, appender.Caller(), appender.Context()));
+        ReturnErrorOnFailure(err);
+        // the two invocations MUST return the same sizes
+        VerifyOrReturnError(builder.Size() == commandCount, CHIP_ERROR_INTERNAL);
+        return CHIP_NO_ERROR;
+    }
+
+    // [[deprecated("This interface is only provided to make the transition simpler,"
+    //              "and it might be removed on any subsequent releases")]]
+    virtual CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandEntryCallback callback, void * context)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    // [[deprecated("This interface is only provided to make the transition simpler,"
+    //              "and it might be removed on any subsequent releases")]]
+    virtual CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, ReadOnlyBufferBuilder<CommandId> & builder) override
+    {
+        size_t commandCount = 0;
+        CHIP_ERROR err      = CHIP_NO_ERROR;
+
+        auto counter = SplitLambda([&](CommandId commandId) {
+            commandCount++;
+            return Loop::Continue;
+        });
+
+        ReturnErrorOnFailure(this->EnumerateGeneratedCommands(cluster, counter.Caller(), counter.Context()));
+        ReturnErrorOnFailure(builder.EnsureAppendCapacity(commandCount));
+
+        auto appender = SplitLambda([&](CommandId commandId) {
+            err = builder.Append(commandId);
+            return err == CHIP_NO_ERROR ? Loop::Continue : Loop::Break;
+        });
+
+        ReturnErrorOnFailure(this->EnumerateGeneratedCommands(cluster, appender.Caller(), appender.Context()));
+        ReturnErrorOnFailure(err);
+        // the two invocations MUST return the same sizes
+        VerifyOrReturnError(builder.Size() == commandCount, CHIP_ERROR_INTERNAL);
+        return CHIP_NO_ERROR;
+    }
 };
 
 } // namespace app
