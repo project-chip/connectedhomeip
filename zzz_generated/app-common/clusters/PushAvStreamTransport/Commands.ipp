@@ -61,9 +61,7 @@ namespace AllocatePushTransportResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kConnectionID), connectionID);
-    encoder.Encode(to_underlying(Fields::kTransportOptions), transportOptions);
-    encoder.Encode(to_underlying(Fields::kTransportStatus), transportStatus);
+    encoder.Encode(to_underlying(Fields::kTransportConfiguration), transportConfiguration);
     return encoder.Finalize();
 }
 
@@ -77,17 +75,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
         ReturnErrorOnFailure(err);
 
-        if (__context_tag == to_underlying(Fields::kConnectionID))
+        if (__context_tag == to_underlying(Fields::kTransportConfiguration))
         {
-            err = DataModel::Decode(reader, connectionID);
-        }
-        else if (__context_tag == to_underlying(Fields::kTransportOptions))
-        {
-            err = DataModel::Decode(reader, transportOptions);
-        }
-        else if (__context_tag == to_underlying(Fields::kTransportStatus))
-        {
-            err = DataModel::Decode(reader, transportStatus);
+            err = DataModel::Decode(reader, transportConfiguration);
         }
         else
         {
@@ -271,7 +261,7 @@ namespace FindTransportResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kStreamConfigurations), streamConfigurations);
+    encoder.Encode(to_underlying(Fields::kTransportConfigurations), transportConfigurations);
     return encoder.Finalize();
 }
 
@@ -285,9 +275,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
         ReturnErrorOnFailure(err);
 
-        if (__context_tag == to_underlying(Fields::kStreamConfigurations))
+        if (__context_tag == to_underlying(Fields::kTransportConfigurations))
         {
-            err = DataModel::Decode(reader, streamConfigurations);
+            err = DataModel::Decode(reader, transportConfigurations);
         }
         else
         {

@@ -36368,11 +36368,21 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.transportOptions.streamUsage = static_cast<std::remove_reference_t<decltype(encodableStruct.transportOptions.streamUsage)>>(self.transportOptions.streamUsage.unsignedCharValue);
         if (self.transportOptions.videoStreamID != nil) {
             auto & definedValue_1 = encodableStruct.transportOptions.videoStreamID.Emplace();
-            definedValue_1 = self.transportOptions.videoStreamID.unsignedShortValue;
+            if (self.transportOptions.videoStreamID == nil) {
+                definedValue_1.SetNull();
+            } else {
+                auto & nonNullValue_2 = definedValue_1.SetNonNull();
+                nonNullValue_2 = self.transportOptions.videoStreamID.unsignedShortValue;
+            }
         }
         if (self.transportOptions.audioStreamID != nil) {
             auto & definedValue_1 = encodableStruct.transportOptions.audioStreamID.Emplace();
-            definedValue_1 = self.transportOptions.audioStreamID.unsignedShortValue;
+            if (self.transportOptions.audioStreamID == nil) {
+                definedValue_1.SetNull();
+            } else {
+                auto & nonNullValue_2 = definedValue_1.SetNonNull();
+                nonNullValue_2 = self.transportOptions.audioStreamID.unsignedShortValue;
+            }
         }
         encodableStruct.transportOptions.endpointID = self.transportOptions.endpointID.unsignedShortValue;
         encodableStruct.transportOptions.url = AsCharSpan(self.transportOptions.url);
@@ -36447,12 +36457,10 @@ NS_ASSUME_NONNULL_BEGIN
                 auto & definedValue_4 = definedValue_2.CENCKey.Emplace();
                 definedValue_4 = AsByteSpan(self.transportOptions.containerOptions.cmafContainerOptions.cencKey);
             }
-        }
-        if (self.transportOptions.metadataOptions != nil) {
-            auto & definedValue_1 = encodableStruct.transportOptions.metadataOptions.Emplace();
-            definedValue_1.multiplexing = static_cast<std::remove_reference_t<decltype(definedValue_1.multiplexing)>>(self.transportOptions.metadataOptions.multiplexing.unsignedCharValue);
-            definedValue_1.includeMotionZones = self.transportOptions.metadataOptions.includeMotionZones.boolValue;
-            definedValue_1.enableMetadataPrivacySensitive = self.transportOptions.metadataOptions.enableMetadataPrivacySensitive.boolValue;
+            if (self.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled != nil) {
+                auto & definedValue_4 = definedValue_2.metadataEnabled.Emplace();
+                definedValue_4 = self.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled.boolValue;
+            }
         }
         if (self.transportOptions.expiryTime != nil) {
             auto & definedValue_1 = encodableStruct.transportOptions.expiryTime.Emplace();
@@ -36503,11 +36511,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _connectionID = @(0);
-
-        _transportOptions = [MTRPushAVStreamTransportClusterTransportOptionsStruct new];
-
-        _transportStatus = @(0);
+        _transportConfiguration = [MTRPushAVStreamTransportClusterTransportConfigurationStruct new];
     }
     return self;
 }
@@ -36516,16 +36520,14 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRPushAVStreamTransportClusterAllocatePushTransportResponseParams alloc] init];
 
-    other.connectionID = self.connectionID;
-    other.transportOptions = self.transportOptions;
-    other.transportStatus = self.transportStatus;
+    other.transportConfiguration = self.transportConfiguration;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: connectionID:%@; transportOptions:%@; transportStatus:%@; >", NSStringFromClass([self class]), _connectionID, _transportOptions, _transportStatus];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: transportConfiguration:%@; >", NSStringFromClass([self class]), _transportConfiguration];
     return descriptionString;
 }
 
@@ -36576,116 +36578,123 @@ NS_ASSUME_NONNULL_BEGIN
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::PushAvStreamTransport::Commands::AllocatePushTransportResponse::DecodableType &)decodableStruct
 {
     {
-        self.connectionID = [NSNumber numberWithUnsignedShort:decodableStruct.connectionID];
-    }
-    {
-        self.transportOptions = [MTRPushAVStreamTransportClusterTransportOptionsStruct new];
-        self.transportOptions.streamUsage = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.transportOptions.streamUsage)];
-        if (decodableStruct.transportOptions.videoStreamID.HasValue()) {
-            self.transportOptions.videoStreamID = [NSNumber numberWithUnsignedShort:decodableStruct.transportOptions.videoStreamID.Value()];
-        } else {
-            self.transportOptions.videoStreamID = nil;
-        }
-        if (decodableStruct.transportOptions.audioStreamID.HasValue()) {
-            self.transportOptions.audioStreamID = [NSNumber numberWithUnsignedShort:decodableStruct.transportOptions.audioStreamID.Value()];
-        } else {
-            self.transportOptions.audioStreamID = nil;
-        }
-        self.transportOptions.endpointID = [NSNumber numberWithUnsignedShort:decodableStruct.transportOptions.endpointID];
-        self.transportOptions.url = AsString(decodableStruct.transportOptions.url);
-        if (self.transportOptions.url == nil) {
-            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-            return err;
-        }
-        self.transportOptions.triggerOptions = [MTRPushAVStreamTransportClusterTransportTriggerOptionsStruct new];
-        self.transportOptions.triggerOptions.triggerType = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.transportOptions.triggerOptions.triggerType)];
-        if (decodableStruct.transportOptions.triggerOptions.motionZones.HasValue()) {
-            if (decodableStruct.transportOptions.triggerOptions.motionZones.Value().IsNull()) {
-                self.transportOptions.triggerOptions.motionZones = nil;
-            } else {
-                { // Scope for our temporary variables
-                    auto * array_4 = [NSMutableArray new];
-                    auto iter_4 = decodableStruct.transportOptions.triggerOptions.motionZones.Value().Value().begin();
-                    while (iter_4.Next()) {
-                        auto & entry_4 = iter_4.GetValue();
-                        MTRPushAVStreamTransportClusterTransportZoneOptionsStruct * newElement_4;
-                        newElement_4 = [MTRPushAVStreamTransportClusterTransportZoneOptionsStruct new];
-                        if (entry_4.zone.IsNull()) {
-                            newElement_4.zone = nil;
-                        } else {
-                            newElement_4.zone = [NSNumber numberWithUnsignedShort:entry_4.zone.Value()];
-                        }
-                        if (entry_4.sensitivity.HasValue()) {
-                            newElement_4.sensitivity = [NSNumber numberWithUnsignedChar:entry_4.sensitivity.Value()];
-                        } else {
-                            newElement_4.sensitivity = nil;
-                        }
-                        [array_4 addObject:newElement_4];
-                    }
-                    CHIP_ERROR err = iter_4.GetStatus();
-                    if (err != CHIP_NO_ERROR) {
-                        return err;
-                    }
-                    self.transportOptions.triggerOptions.motionZones = array_4;
+        self.transportConfiguration = [MTRPushAVStreamTransportClusterTransportConfigurationStruct new];
+        self.transportConfiguration.connectionID = [NSNumber numberWithUnsignedShort:decodableStruct.transportConfiguration.connectionID];
+        self.transportConfiguration.transportStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.transportConfiguration.transportStatus)];
+        if (decodableStruct.transportConfiguration.transportOptions.HasValue()) {
+            self.transportConfiguration.transportOptions = [MTRPushAVStreamTransportClusterTransportOptionsStruct new];
+            self.transportConfiguration.transportOptions.streamUsage = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.transportConfiguration.transportOptions.Value().streamUsage)];
+            if (decodableStruct.transportConfiguration.transportOptions.Value().videoStreamID.HasValue()) {
+                if (decodableStruct.transportConfiguration.transportOptions.Value().videoStreamID.Value().IsNull()) {
+                    self.transportConfiguration.transportOptions.videoStreamID = nil;
+                } else {
+                    self.transportConfiguration.transportOptions.videoStreamID = [NSNumber numberWithUnsignedShort:decodableStruct.transportConfiguration.transportOptions.Value().videoStreamID.Value().Value()];
                 }
-            }
-        } else {
-            self.transportOptions.triggerOptions.motionZones = nil;
-        }
-        if (decodableStruct.transportOptions.triggerOptions.motionSensitivity.HasValue()) {
-            if (decodableStruct.transportOptions.triggerOptions.motionSensitivity.Value().IsNull()) {
-                self.transportOptions.triggerOptions.motionSensitivity = nil;
             } else {
-                self.transportOptions.triggerOptions.motionSensitivity = [NSNumber numberWithUnsignedChar:decodableStruct.transportOptions.triggerOptions.motionSensitivity.Value().Value()];
+                self.transportConfiguration.transportOptions.videoStreamID = nil;
             }
-        } else {
-            self.transportOptions.triggerOptions.motionSensitivity = nil;
-        }
-        if (decodableStruct.transportOptions.triggerOptions.motionTimeControl.HasValue()) {
-            self.transportOptions.triggerOptions.motionTimeControl = [MTRPushAVStreamTransportClusterTransportMotionTriggerTimeControlStruct new];
-            self.transportOptions.triggerOptions.motionTimeControl.initialDuration = [NSNumber numberWithUnsignedShort:decodableStruct.transportOptions.triggerOptions.motionTimeControl.Value().initialDuration];
-            self.transportOptions.triggerOptions.motionTimeControl.augmentationDuration = [NSNumber numberWithUnsignedShort:decodableStruct.transportOptions.triggerOptions.motionTimeControl.Value().augmentationDuration];
-            self.transportOptions.triggerOptions.motionTimeControl.maxDuration = [NSNumber numberWithUnsignedInt:decodableStruct.transportOptions.triggerOptions.motionTimeControl.Value().maxDuration];
-            self.transportOptions.triggerOptions.motionTimeControl.blindDuration = [NSNumber numberWithUnsignedShort:decodableStruct.transportOptions.triggerOptions.motionTimeControl.Value().blindDuration];
-        } else {
-            self.transportOptions.triggerOptions.motionTimeControl = nil;
-        }
-        if (decodableStruct.transportOptions.triggerOptions.maxPreRollLen.HasValue()) {
-            self.transportOptions.triggerOptions.maxPreRollLen = [NSNumber numberWithUnsignedShort:decodableStruct.transportOptions.triggerOptions.maxPreRollLen.Value()];
-        } else {
-            self.transportOptions.triggerOptions.maxPreRollLen = nil;
-        }
-        self.transportOptions.ingestMethod = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.transportOptions.ingestMethod)];
-        self.transportOptions.containerFormat = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.transportOptions.containerFormat)];
-        self.transportOptions.containerOptions = [MTRPushAVStreamTransportClusterContainerOptionsStruct new];
-        self.transportOptions.containerOptions.containerType = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.transportOptions.containerOptions.containerType)];
-        if (decodableStruct.transportOptions.containerOptions.CMAFContainerOptions.HasValue()) {
-            self.transportOptions.containerOptions.cmafContainerOptions = [MTRPushAVStreamTransportClusterCMAFContainerOptionsStruct new];
-            self.transportOptions.containerOptions.cmafContainerOptions.chunkDuration = [NSNumber numberWithUnsignedShort:decodableStruct.transportOptions.containerOptions.CMAFContainerOptions.Value().chunkDuration];
-            if (decodableStruct.transportOptions.containerOptions.CMAFContainerOptions.Value().CENCKey.HasValue()) {
-                self.transportOptions.containerOptions.cmafContainerOptions.cencKey = AsData(decodableStruct.transportOptions.containerOptions.CMAFContainerOptions.Value().CENCKey.Value());
+            if (decodableStruct.transportConfiguration.transportOptions.Value().audioStreamID.HasValue()) {
+                if (decodableStruct.transportConfiguration.transportOptions.Value().audioStreamID.Value().IsNull()) {
+                    self.transportConfiguration.transportOptions.audioStreamID = nil;
+                } else {
+                    self.transportConfiguration.transportOptions.audioStreamID = [NSNumber numberWithUnsignedShort:decodableStruct.transportConfiguration.transportOptions.Value().audioStreamID.Value().Value()];
+                }
             } else {
-                self.transportOptions.containerOptions.cmafContainerOptions.cencKey = nil;
+                self.transportConfiguration.transportOptions.audioStreamID = nil;
+            }
+            self.transportConfiguration.transportOptions.endpointID = [NSNumber numberWithUnsignedShort:decodableStruct.transportConfiguration.transportOptions.Value().endpointID];
+            self.transportConfiguration.transportOptions.url = AsString(decodableStruct.transportConfiguration.transportOptions.Value().url);
+            if (self.transportConfiguration.transportOptions.url == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
+            self.transportConfiguration.transportOptions.triggerOptions = [MTRPushAVStreamTransportClusterTransportTriggerOptionsStruct new];
+            self.transportConfiguration.transportOptions.triggerOptions.triggerType = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.transportConfiguration.transportOptions.Value().triggerOptions.triggerType)];
+            if (decodableStruct.transportConfiguration.transportOptions.Value().triggerOptions.motionZones.HasValue()) {
+                if (decodableStruct.transportConfiguration.transportOptions.Value().triggerOptions.motionZones.Value().IsNull()) {
+                    self.transportConfiguration.transportOptions.triggerOptions.motionZones = nil;
+                } else {
+                    { // Scope for our temporary variables
+                        auto * array_6 = [NSMutableArray new];
+                        auto iter_6 = decodableStruct.transportConfiguration.transportOptions.Value().triggerOptions.motionZones.Value().Value().begin();
+                        while (iter_6.Next()) {
+                            auto & entry_6 = iter_6.GetValue();
+                            MTRPushAVStreamTransportClusterTransportZoneOptionsStruct * newElement_6;
+                            newElement_6 = [MTRPushAVStreamTransportClusterTransportZoneOptionsStruct new];
+                            if (entry_6.zone.IsNull()) {
+                                newElement_6.zone = nil;
+                            } else {
+                                newElement_6.zone = [NSNumber numberWithUnsignedShort:entry_6.zone.Value()];
+                            }
+                            if (entry_6.sensitivity.HasValue()) {
+                                newElement_6.sensitivity = [NSNumber numberWithUnsignedChar:entry_6.sensitivity.Value()];
+                            } else {
+                                newElement_6.sensitivity = nil;
+                            }
+                            [array_6 addObject:newElement_6];
+                        }
+                        CHIP_ERROR err = iter_6.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            return err;
+                        }
+                        self.transportConfiguration.transportOptions.triggerOptions.motionZones = array_6;
+                    }
+                }
+            } else {
+                self.transportConfiguration.transportOptions.triggerOptions.motionZones = nil;
+            }
+            if (decodableStruct.transportConfiguration.transportOptions.Value().triggerOptions.motionSensitivity.HasValue()) {
+                if (decodableStruct.transportConfiguration.transportOptions.Value().triggerOptions.motionSensitivity.Value().IsNull()) {
+                    self.transportConfiguration.transportOptions.triggerOptions.motionSensitivity = nil;
+                } else {
+                    self.transportConfiguration.transportOptions.triggerOptions.motionSensitivity = [NSNumber numberWithUnsignedChar:decodableStruct.transportConfiguration.transportOptions.Value().triggerOptions.motionSensitivity.Value().Value()];
+                }
+            } else {
+                self.transportConfiguration.transportOptions.triggerOptions.motionSensitivity = nil;
+            }
+            if (decodableStruct.transportConfiguration.transportOptions.Value().triggerOptions.motionTimeControl.HasValue()) {
+                self.transportConfiguration.transportOptions.triggerOptions.motionTimeControl = [MTRPushAVStreamTransportClusterTransportMotionTriggerTimeControlStruct new];
+                self.transportConfiguration.transportOptions.triggerOptions.motionTimeControl.initialDuration = [NSNumber numberWithUnsignedShort:decodableStruct.transportConfiguration.transportOptions.Value().triggerOptions.motionTimeControl.Value().initialDuration];
+                self.transportConfiguration.transportOptions.triggerOptions.motionTimeControl.augmentationDuration = [NSNumber numberWithUnsignedShort:decodableStruct.transportConfiguration.transportOptions.Value().triggerOptions.motionTimeControl.Value().augmentationDuration];
+                self.transportConfiguration.transportOptions.triggerOptions.motionTimeControl.maxDuration = [NSNumber numberWithUnsignedInt:decodableStruct.transportConfiguration.transportOptions.Value().triggerOptions.motionTimeControl.Value().maxDuration];
+                self.transportConfiguration.transportOptions.triggerOptions.motionTimeControl.blindDuration = [NSNumber numberWithUnsignedShort:decodableStruct.transportConfiguration.transportOptions.Value().triggerOptions.motionTimeControl.Value().blindDuration];
+            } else {
+                self.transportConfiguration.transportOptions.triggerOptions.motionTimeControl = nil;
+            }
+            if (decodableStruct.transportConfiguration.transportOptions.Value().triggerOptions.maxPreRollLen.HasValue()) {
+                self.transportConfiguration.transportOptions.triggerOptions.maxPreRollLen = [NSNumber numberWithUnsignedShort:decodableStruct.transportConfiguration.transportOptions.Value().triggerOptions.maxPreRollLen.Value()];
+            } else {
+                self.transportConfiguration.transportOptions.triggerOptions.maxPreRollLen = nil;
+            }
+            self.transportConfiguration.transportOptions.ingestMethod = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.transportConfiguration.transportOptions.Value().ingestMethod)];
+            self.transportConfiguration.transportOptions.containerFormat = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.transportConfiguration.transportOptions.Value().containerFormat)];
+            self.transportConfiguration.transportOptions.containerOptions = [MTRPushAVStreamTransportClusterContainerOptionsStruct new];
+            self.transportConfiguration.transportOptions.containerOptions.containerType = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.containerType)];
+            if (decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.HasValue()) {
+                self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions = [MTRPushAVStreamTransportClusterCMAFContainerOptionsStruct new];
+                self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.chunkDuration = [NSNumber numberWithUnsignedShort:decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().chunkDuration];
+                if (decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CENCKey.HasValue()) {
+                    self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.cencKey = AsData(decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CENCKey.Value());
+                } else {
+                    self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.cencKey = nil;
+                }
+                if (decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().metadataEnabled.HasValue()) {
+                    self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled = [NSNumber numberWithBool:decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().metadataEnabled.Value()];
+                } else {
+                    self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled = nil;
+                }
+            } else {
+                self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions = nil;
+            }
+            if (decodableStruct.transportConfiguration.transportOptions.Value().expiryTime.HasValue()) {
+                self.transportConfiguration.transportOptions.expiryTime = [NSNumber numberWithUnsignedInt:decodableStruct.transportConfiguration.transportOptions.Value().expiryTime.Value()];
+            } else {
+                self.transportConfiguration.transportOptions.expiryTime = nil;
             }
         } else {
-            self.transportOptions.containerOptions.cmafContainerOptions = nil;
+            self.transportConfiguration.transportOptions = nil;
         }
-        if (decodableStruct.transportOptions.metadataOptions.HasValue()) {
-            self.transportOptions.metadataOptions = [MTRPushAVStreamTransportClusterMetadataOptionsStruct new];
-            self.transportOptions.metadataOptions.multiplexing = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.transportOptions.metadataOptions.Value().multiplexing)];
-            self.transportOptions.metadataOptions.includeMotionZones = [NSNumber numberWithBool:decodableStruct.transportOptions.metadataOptions.Value().includeMotionZones];
-            self.transportOptions.metadataOptions.enableMetadataPrivacySensitive = [NSNumber numberWithBool:decodableStruct.transportOptions.metadataOptions.Value().enableMetadataPrivacySensitive];
-        } else {
-            self.transportOptions.metadataOptions = nil;
-        }
-        if (decodableStruct.transportOptions.expiryTime.HasValue()) {
-            self.transportOptions.expiryTime = [NSNumber numberWithUnsignedInt:decodableStruct.transportOptions.expiryTime.Value()];
-        } else {
-            self.transportOptions.expiryTime = nil;
-        }
-    }
-    {
-        self.transportStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.transportStatus)];
+        self.transportConfiguration.fabricIndex = [NSNumber numberWithUnsignedChar:decodableStruct.transportConfiguration.fabricIndex];
     }
     return CHIP_NO_ERROR;
 }
@@ -36818,11 +36827,21 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.transportOptions.streamUsage = static_cast<std::remove_reference_t<decltype(encodableStruct.transportOptions.streamUsage)>>(self.transportOptions.streamUsage.unsignedCharValue);
         if (self.transportOptions.videoStreamID != nil) {
             auto & definedValue_1 = encodableStruct.transportOptions.videoStreamID.Emplace();
-            definedValue_1 = self.transportOptions.videoStreamID.unsignedShortValue;
+            if (self.transportOptions.videoStreamID == nil) {
+                definedValue_1.SetNull();
+            } else {
+                auto & nonNullValue_2 = definedValue_1.SetNonNull();
+                nonNullValue_2 = self.transportOptions.videoStreamID.unsignedShortValue;
+            }
         }
         if (self.transportOptions.audioStreamID != nil) {
             auto & definedValue_1 = encodableStruct.transportOptions.audioStreamID.Emplace();
-            definedValue_1 = self.transportOptions.audioStreamID.unsignedShortValue;
+            if (self.transportOptions.audioStreamID == nil) {
+                definedValue_1.SetNull();
+            } else {
+                auto & nonNullValue_2 = definedValue_1.SetNonNull();
+                nonNullValue_2 = self.transportOptions.audioStreamID.unsignedShortValue;
+            }
         }
         encodableStruct.transportOptions.endpointID = self.transportOptions.endpointID.unsignedShortValue;
         encodableStruct.transportOptions.url = AsCharSpan(self.transportOptions.url);
@@ -36897,12 +36916,10 @@ NS_ASSUME_NONNULL_BEGIN
                 auto & definedValue_4 = definedValue_2.CENCKey.Emplace();
                 definedValue_4 = AsByteSpan(self.transportOptions.containerOptions.cmafContainerOptions.cencKey);
             }
-        }
-        if (self.transportOptions.metadataOptions != nil) {
-            auto & definedValue_1 = encodableStruct.transportOptions.metadataOptions.Emplace();
-            definedValue_1.multiplexing = static_cast<std::remove_reference_t<decltype(definedValue_1.multiplexing)>>(self.transportOptions.metadataOptions.multiplexing.unsignedCharValue);
-            definedValue_1.includeMotionZones = self.transportOptions.metadataOptions.includeMotionZones.boolValue;
-            definedValue_1.enableMetadataPrivacySensitive = self.transportOptions.metadataOptions.enableMetadataPrivacySensitive.boolValue;
+            if (self.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled != nil) {
+                auto & definedValue_4 = definedValue_2.metadataEnabled.Emplace();
+                definedValue_4 = self.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled.boolValue;
+            }
         }
         if (self.transportOptions.expiryTime != nil) {
             auto & definedValue_1 = encodableStruct.transportOptions.expiryTime.Emplace();
@@ -36953,7 +36970,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _connectionID = @(0);
+        _connectionID = nil;
 
         _transportStatus = @(0);
         _timedInvokeTimeoutMs = nil;
@@ -36989,7 +37006,12 @@ NS_ASSUME_NONNULL_BEGIN
     chip::app::Clusters::PushAvStreamTransport::Commands::SetTransportStatus::Type encodableStruct;
     ListFreer listFreer;
     {
-        encodableStruct.connectionID = self.connectionID.unsignedShortValue;
+        if (self.connectionID == nil) {
+            encodableStruct.connectionID.SetNull();
+        } else {
+            auto & nonNullValue_0 = encodableStruct.connectionID.SetNonNull();
+            nonNullValue_0 = self.connectionID.unsignedShortValue;
+        }
     }
     {
         encodableStruct.transportStatus = static_cast<std::remove_reference_t<decltype(encodableStruct.transportStatus)>>(self.transportStatus.unsignedCharValue);
@@ -37222,7 +37244,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _streamConfigurations = [NSArray array];
+        _transportConfigurations = [NSArray array];
     }
     return self;
 }
@@ -37231,14 +37253,14 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRPushAVStreamTransportClusterFindTransportResponseParams alloc] init];
 
-    other.streamConfigurations = self.streamConfigurations;
+    other.transportConfigurations = self.transportConfigurations;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamConfigurations:%@; >", NSStringFromClass([self class]), _streamConfigurations];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: transportConfigurations:%@; >", NSStringFromClass([self class]), _transportConfigurations];
     return descriptionString;
 }
 
@@ -37291,124 +37313,134 @@ NS_ASSUME_NONNULL_BEGIN
     {
         { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
-            auto iter_0 = decodableStruct.streamConfigurations.begin();
+            auto iter_0 = decodableStruct.transportConfigurations.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
                 MTRPushAVStreamTransportClusterTransportConfigurationStruct * newElement_0;
                 newElement_0 = [MTRPushAVStreamTransportClusterTransportConfigurationStruct new];
                 newElement_0.connectionID = [NSNumber numberWithUnsignedShort:entry_0.connectionID];
                 newElement_0.transportStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportStatus)];
-                newElement_0.transportOptions = [MTRPushAVStreamTransportClusterTransportOptionsStruct new];
-                newElement_0.transportOptions.streamUsage = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.streamUsage)];
-                if (entry_0.transportOptions.videoStreamID.HasValue()) {
-                    newElement_0.transportOptions.videoStreamID = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.videoStreamID.Value()];
-                } else {
-                    newElement_0.transportOptions.videoStreamID = nil;
-                }
-                if (entry_0.transportOptions.audioStreamID.HasValue()) {
-                    newElement_0.transportOptions.audioStreamID = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.audioStreamID.Value()];
-                } else {
-                    newElement_0.transportOptions.audioStreamID = nil;
-                }
-                newElement_0.transportOptions.endpointID = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.endpointID];
-                newElement_0.transportOptions.url = AsString(entry_0.transportOptions.url);
-                if (newElement_0.transportOptions.url == nil) {
-                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                    return err;
-                }
-                newElement_0.transportOptions.triggerOptions = [MTRPushAVStreamTransportClusterTransportTriggerOptionsStruct new];
-                newElement_0.transportOptions.triggerOptions.triggerType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.triggerOptions.triggerType)];
-                if (entry_0.transportOptions.triggerOptions.motionZones.HasValue()) {
-                    if (entry_0.transportOptions.triggerOptions.motionZones.Value().IsNull()) {
-                        newElement_0.transportOptions.triggerOptions.motionZones = nil;
-                    } else {
-                        { // Scope for our temporary variables
-                            auto * array_6 = [NSMutableArray new];
-                            auto iter_6 = entry_0.transportOptions.triggerOptions.motionZones.Value().Value().begin();
-                            while (iter_6.Next()) {
-                                auto & entry_6 = iter_6.GetValue();
-                                MTRPushAVStreamTransportClusterTransportZoneOptionsStruct * newElement_6;
-                                newElement_6 = [MTRPushAVStreamTransportClusterTransportZoneOptionsStruct new];
-                                if (entry_6.zone.IsNull()) {
-                                    newElement_6.zone = nil;
-                                } else {
-                                    newElement_6.zone = [NSNumber numberWithUnsignedShort:entry_6.zone.Value()];
-                                }
-                                if (entry_6.sensitivity.HasValue()) {
-                                    newElement_6.sensitivity = [NSNumber numberWithUnsignedChar:entry_6.sensitivity.Value()];
-                                } else {
-                                    newElement_6.sensitivity = nil;
-                                }
-                                [array_6 addObject:newElement_6];
-                            }
-                            CHIP_ERROR err = iter_6.GetStatus();
-                            if (err != CHIP_NO_ERROR) {
-                                return err;
-                            }
-                            newElement_0.transportOptions.triggerOptions.motionZones = array_6;
+                if (entry_0.transportOptions.HasValue()) {
+                    newElement_0.transportOptions = [MTRPushAVStreamTransportClusterTransportOptionsStruct new];
+                    newElement_0.transportOptions.streamUsage = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.Value().streamUsage)];
+                    if (entry_0.transportOptions.Value().videoStreamID.HasValue()) {
+                        if (entry_0.transportOptions.Value().videoStreamID.Value().IsNull()) {
+                            newElement_0.transportOptions.videoStreamID = nil;
+                        } else {
+                            newElement_0.transportOptions.videoStreamID = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.Value().videoStreamID.Value().Value()];
                         }
+                    } else {
+                        newElement_0.transportOptions.videoStreamID = nil;
                     }
-                } else {
-                    newElement_0.transportOptions.triggerOptions.motionZones = nil;
-                }
-                if (entry_0.transportOptions.triggerOptions.motionSensitivity.HasValue()) {
-                    if (entry_0.transportOptions.triggerOptions.motionSensitivity.Value().IsNull()) {
+                    if (entry_0.transportOptions.Value().audioStreamID.HasValue()) {
+                        if (entry_0.transportOptions.Value().audioStreamID.Value().IsNull()) {
+                            newElement_0.transportOptions.audioStreamID = nil;
+                        } else {
+                            newElement_0.transportOptions.audioStreamID = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.Value().audioStreamID.Value().Value()];
+                        }
+                    } else {
+                        newElement_0.transportOptions.audioStreamID = nil;
+                    }
+                    newElement_0.transportOptions.endpointID = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.Value().endpointID];
+                    newElement_0.transportOptions.url = AsString(entry_0.transportOptions.Value().url);
+                    if (newElement_0.transportOptions.url == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        return err;
+                    }
+                    newElement_0.transportOptions.triggerOptions = [MTRPushAVStreamTransportClusterTransportTriggerOptionsStruct new];
+                    newElement_0.transportOptions.triggerOptions.triggerType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.Value().triggerOptions.triggerType)];
+                    if (entry_0.transportOptions.Value().triggerOptions.motionZones.HasValue()) {
+                        if (entry_0.transportOptions.Value().triggerOptions.motionZones.Value().IsNull()) {
+                            newElement_0.transportOptions.triggerOptions.motionZones = nil;
+                        } else {
+                            { // Scope for our temporary variables
+                                auto * array_7 = [NSMutableArray new];
+                                auto iter_7 = entry_0.transportOptions.Value().triggerOptions.motionZones.Value().Value().begin();
+                                while (iter_7.Next()) {
+                                    auto & entry_7 = iter_7.GetValue();
+                                    MTRPushAVStreamTransportClusterTransportZoneOptionsStruct * newElement_7;
+                                    newElement_7 = [MTRPushAVStreamTransportClusterTransportZoneOptionsStruct new];
+                                    if (entry_7.zone.IsNull()) {
+                                        newElement_7.zone = nil;
+                                    } else {
+                                        newElement_7.zone = [NSNumber numberWithUnsignedShort:entry_7.zone.Value()];
+                                    }
+                                    if (entry_7.sensitivity.HasValue()) {
+                                        newElement_7.sensitivity = [NSNumber numberWithUnsignedChar:entry_7.sensitivity.Value()];
+                                    } else {
+                                        newElement_7.sensitivity = nil;
+                                    }
+                                    [array_7 addObject:newElement_7];
+                                }
+                                CHIP_ERROR err = iter_7.GetStatus();
+                                if (err != CHIP_NO_ERROR) {
+                                    return err;
+                                }
+                                newElement_0.transportOptions.triggerOptions.motionZones = array_7;
+                            }
+                        }
+                    } else {
+                        newElement_0.transportOptions.triggerOptions.motionZones = nil;
+                    }
+                    if (entry_0.transportOptions.Value().triggerOptions.motionSensitivity.HasValue()) {
+                        if (entry_0.transportOptions.Value().triggerOptions.motionSensitivity.Value().IsNull()) {
+                            newElement_0.transportOptions.triggerOptions.motionSensitivity = nil;
+                        } else {
+                            newElement_0.transportOptions.triggerOptions.motionSensitivity = [NSNumber numberWithUnsignedChar:entry_0.transportOptions.Value().triggerOptions.motionSensitivity.Value().Value()];
+                        }
+                    } else {
                         newElement_0.transportOptions.triggerOptions.motionSensitivity = nil;
+                    }
+                    if (entry_0.transportOptions.Value().triggerOptions.motionTimeControl.HasValue()) {
+                        newElement_0.transportOptions.triggerOptions.motionTimeControl = [MTRPushAVStreamTransportClusterTransportMotionTriggerTimeControlStruct new];
+                        newElement_0.transportOptions.triggerOptions.motionTimeControl.initialDuration = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.Value().triggerOptions.motionTimeControl.Value().initialDuration];
+                        newElement_0.transportOptions.triggerOptions.motionTimeControl.augmentationDuration = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.Value().triggerOptions.motionTimeControl.Value().augmentationDuration];
+                        newElement_0.transportOptions.triggerOptions.motionTimeControl.maxDuration = [NSNumber numberWithUnsignedInt:entry_0.transportOptions.Value().triggerOptions.motionTimeControl.Value().maxDuration];
+                        newElement_0.transportOptions.triggerOptions.motionTimeControl.blindDuration = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.Value().triggerOptions.motionTimeControl.Value().blindDuration];
                     } else {
-                        newElement_0.transportOptions.triggerOptions.motionSensitivity = [NSNumber numberWithUnsignedChar:entry_0.transportOptions.triggerOptions.motionSensitivity.Value().Value()];
+                        newElement_0.transportOptions.triggerOptions.motionTimeControl = nil;
+                    }
+                    if (entry_0.transportOptions.Value().triggerOptions.maxPreRollLen.HasValue()) {
+                        newElement_0.transportOptions.triggerOptions.maxPreRollLen = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.Value().triggerOptions.maxPreRollLen.Value()];
+                    } else {
+                        newElement_0.transportOptions.triggerOptions.maxPreRollLen = nil;
+                    }
+                    newElement_0.transportOptions.ingestMethod = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.Value().ingestMethod)];
+                    newElement_0.transportOptions.containerFormat = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.Value().containerFormat)];
+                    newElement_0.transportOptions.containerOptions = [MTRPushAVStreamTransportClusterContainerOptionsStruct new];
+                    newElement_0.transportOptions.containerOptions.containerType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.Value().containerOptions.containerType)];
+                    if (entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.HasValue()) {
+                        newElement_0.transportOptions.containerOptions.cmafContainerOptions = [MTRPushAVStreamTransportClusterCMAFContainerOptionsStruct new];
+                        newElement_0.transportOptions.containerOptions.cmafContainerOptions.chunkDuration = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().chunkDuration];
+                        if (entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CENCKey.HasValue()) {
+                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.cencKey = AsData(entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CENCKey.Value());
+                        } else {
+                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.cencKey = nil;
+                        }
+                        if (entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().metadataEnabled.HasValue()) {
+                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled = [NSNumber numberWithBool:entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().metadataEnabled.Value()];
+                        } else {
+                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled = nil;
+                        }
+                    } else {
+                        newElement_0.transportOptions.containerOptions.cmafContainerOptions = nil;
+                    }
+                    if (entry_0.transportOptions.Value().expiryTime.HasValue()) {
+                        newElement_0.transportOptions.expiryTime = [NSNumber numberWithUnsignedInt:entry_0.transportOptions.Value().expiryTime.Value()];
+                    } else {
+                        newElement_0.transportOptions.expiryTime = nil;
                     }
                 } else {
-                    newElement_0.transportOptions.triggerOptions.motionSensitivity = nil;
+                    newElement_0.transportOptions = nil;
                 }
-                if (entry_0.transportOptions.triggerOptions.motionTimeControl.HasValue()) {
-                    newElement_0.transportOptions.triggerOptions.motionTimeControl = [MTRPushAVStreamTransportClusterTransportMotionTriggerTimeControlStruct new];
-                    newElement_0.transportOptions.triggerOptions.motionTimeControl.initialDuration = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.triggerOptions.motionTimeControl.Value().initialDuration];
-                    newElement_0.transportOptions.triggerOptions.motionTimeControl.augmentationDuration = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.triggerOptions.motionTimeControl.Value().augmentationDuration];
-                    newElement_0.transportOptions.triggerOptions.motionTimeControl.maxDuration = [NSNumber numberWithUnsignedInt:entry_0.transportOptions.triggerOptions.motionTimeControl.Value().maxDuration];
-                    newElement_0.transportOptions.triggerOptions.motionTimeControl.blindDuration = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.triggerOptions.motionTimeControl.Value().blindDuration];
-                } else {
-                    newElement_0.transportOptions.triggerOptions.motionTimeControl = nil;
-                }
-                if (entry_0.transportOptions.triggerOptions.maxPreRollLen.HasValue()) {
-                    newElement_0.transportOptions.triggerOptions.maxPreRollLen = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.triggerOptions.maxPreRollLen.Value()];
-                } else {
-                    newElement_0.transportOptions.triggerOptions.maxPreRollLen = nil;
-                }
-                newElement_0.transportOptions.ingestMethod = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.ingestMethod)];
-                newElement_0.transportOptions.containerFormat = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.containerFormat)];
-                newElement_0.transportOptions.containerOptions = [MTRPushAVStreamTransportClusterContainerOptionsStruct new];
-                newElement_0.transportOptions.containerOptions.containerType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.containerOptions.containerType)];
-                if (entry_0.transportOptions.containerOptions.CMAFContainerOptions.HasValue()) {
-                    newElement_0.transportOptions.containerOptions.cmafContainerOptions = [MTRPushAVStreamTransportClusterCMAFContainerOptionsStruct new];
-                    newElement_0.transportOptions.containerOptions.cmafContainerOptions.chunkDuration = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.containerOptions.CMAFContainerOptions.Value().chunkDuration];
-                    if (entry_0.transportOptions.containerOptions.CMAFContainerOptions.Value().CENCKey.HasValue()) {
-                        newElement_0.transportOptions.containerOptions.cmafContainerOptions.cencKey = AsData(entry_0.transportOptions.containerOptions.CMAFContainerOptions.Value().CENCKey.Value());
-                    } else {
-                        newElement_0.transportOptions.containerOptions.cmafContainerOptions.cencKey = nil;
-                    }
-                } else {
-                    newElement_0.transportOptions.containerOptions.cmafContainerOptions = nil;
-                }
-                if (entry_0.transportOptions.metadataOptions.HasValue()) {
-                    newElement_0.transportOptions.metadataOptions = [MTRPushAVStreamTransportClusterMetadataOptionsStruct new];
-                    newElement_0.transportOptions.metadataOptions.multiplexing = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.metadataOptions.Value().multiplexing)];
-                    newElement_0.transportOptions.metadataOptions.includeMotionZones = [NSNumber numberWithBool:entry_0.transportOptions.metadataOptions.Value().includeMotionZones];
-                    newElement_0.transportOptions.metadataOptions.enableMetadataPrivacySensitive = [NSNumber numberWithBool:entry_0.transportOptions.metadataOptions.Value().enableMetadataPrivacySensitive];
-                } else {
-                    newElement_0.transportOptions.metadataOptions = nil;
-                }
-                if (entry_0.transportOptions.expiryTime.HasValue()) {
-                    newElement_0.transportOptions.expiryTime = [NSNumber numberWithUnsignedInt:entry_0.transportOptions.expiryTime.Value()];
-                } else {
-                    newElement_0.transportOptions.expiryTime = nil;
-                }
+                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
                 return err;
             }
-            self.streamConfigurations = array_0;
+            self.transportConfigurations = array_0;
         }
     }
     return CHIP_NO_ERROR;
