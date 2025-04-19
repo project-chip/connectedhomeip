@@ -11671,6 +11671,22 @@
               MeasurementTypeEnum:
                   - ApparentEnergy
                   - ReactiveEnergy
+          RVCOperationalState:
+              # Additional error and operational states:
+              # in-progress for maybe Matter 1.5
+              ErrorStateEnum:
+                  - LowBattery
+                  - CannotReachTargetArea
+                  - DirtyWaterTankFull
+                  - DirtyWaterTankMissing
+                  - WheelsJammed
+                  - BrushJammed
+                  - NavigationSensorObscured
+              OperationalStateEnum:
+                  - EmptyingDustBin
+                  - CleaningMop
+                  - FillingWaterTank
+                  - UpdatingMaps
       device types:
           # In-progress for maybe Matter 1.5
           - Awning

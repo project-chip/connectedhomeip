@@ -1474,6 +1474,13 @@ cluster RvcOperationalState = 97 {
     kWaterTankMissing = 69;
     kWaterTankLidOpen = 70;
     kMopCleaningPadMissing = 71;
+    kLowBattery = 72;
+    kCannotReachTargetArea = 73;
+    kDirtyWaterTankFull = 74;
+    kDirtyWaterTankMissing = 75;
+    kWheelsJammed = 76;
+    kBrushJammed = 77;
+    kNavigationSensorObscured = 78;
   }
 
   enum OperationalStateEnum : enum8 {
@@ -1484,6 +1491,10 @@ cluster RvcOperationalState = 97 {
     kSeekingCharger = 64;
     kCharging = 65;
     kDocked = 66;
+    kEmptyingDustBin = 67;
+    kCleaningMop = 68;
+    kFillingWaterTank = 69;
+    kUpdatingMaps = 70;
   }
 
   shared struct ErrorStateStruct {
