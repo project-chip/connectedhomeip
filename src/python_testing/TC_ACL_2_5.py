@@ -37,7 +37,7 @@ import logging
 import chip.clusters as Clusters
 from chip.clusters.Types import Nullable
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, EventChangeCallback
+from chip.testing.matter_testing import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
