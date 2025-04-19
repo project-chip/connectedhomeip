@@ -227,7 +227,9 @@ jobs:
                     "
             - name: Build Apps
               run: |
-                  scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
+                  scripts/run_in_build_env.sh './scripts/build_python.sh \
+                    --install_virtual_env out/venv\
+                    --include_pytest_deps yes'
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \

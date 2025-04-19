@@ -41,13 +41,14 @@ import asyncio
 import os
 
 import base
-import chip.logging
 import click
 import coloredlogs
 from base import BaseTestHelper, FailIfNot, SetTestSet, TestFail, TestTimeout, logger
-from chip.tracing import TracingContext
 from cluster_objects import ClusterObjectTests
 from network_commissioning import NetworkCommissioningTests
+
+import matter.logging
+from matter.tracing import TracingContext
 
 # The thread network dataset tlv for testing, splitted into T-L-V.
 
@@ -179,7 +180,7 @@ def do_tests(controller_nodeid, device_nodeid, address, timeout, discriminator, 
     test = BaseTestHelper(nodeid=controller_nodeid,
                           paaTrustStorePath=paa_trust_store_path)
 
-    chip.logging.RedirectToPythonLogging()
+    matter.logging.RedirectToPythonLogging()
 
     asyncio.run(ethernet_commissioning(test, discriminator, setup_pin, address,
                                        device_nodeid))

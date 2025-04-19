@@ -14,17 +14,18 @@
 
 # isort: off
 
-from chip import ChipDeviceCtrl  # Needed before chip.FabricAdmin # noqa: F401
-import chip.FabricAdmin  # Needed before chip.CertificateAuthority
+from matter import ChipDeviceCtrl  # Needed before matter.FabricAdmin # noqa: F401
+import matter.FabricAdmin  # Needed before matter.CertificateAuthority
 
 # isort: on
 
-import chip.CertificateAuthority
-import chip.logging
-import chip.native
-from chip.ChipStack import ChipStack
-from chip.yaml.runner import ReplTestRunner
 from matter_yamltests.runner import TestRunner
+
+import matter.CertificateAuthority
+import matter.logging
+import matter.native
+from matter.ChipStack import ChipStack
+from matter.yaml.runner import ReplTestRunner
 
 
 class Runner(TestRunner):
@@ -36,10 +37,10 @@ class Runner(TestRunner):
         self._node_id_to_commission = node_id_to_commission
 
     async def start(self):
-        chip.native.Init()
-        chip.logging.RedirectToPythonLogging()
+        matter.native.Init()
+        matter.logging.RedirectToPythonLogging()
         chip_stack = ChipStack(self._repl_storage_path)
-        certificate_authority_manager = chip.CertificateAuthority.CertificateAuthorityManager(
+        certificate_authority_manager = matter.CertificateAuthority.CertificateAuthorityManager(
             chip_stack, chip_stack.GetStorageManager())
         certificate_authority_manager.LoadAuthoritiesFromStorage()
 

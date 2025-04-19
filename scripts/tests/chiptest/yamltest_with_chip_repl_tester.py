@@ -26,8 +26,8 @@ import traceback
 
 # F401 is "Module imported but unused" line will be ignored by linter
 # ChipDeviceCtrl is not used directly in this file but it is needed
-from chip import ChipDeviceCtrl  # noqa: F401 # Needed before chip.FabricAdmin
-import chip.FabricAdmin  # Needed before chip.CertificateAuthority
+from matter import ChipDeviceCtrl  # noqa: F401 # Needed before matter.FabricAdmin
+import matter.FabricAdmin  # Needed before matter.CertificateAuthority
 
 # isort: on
 
@@ -46,13 +46,14 @@ except ImportError:
     __ALL__ = (matter_idl_types)
 
 
-import chip.CertificateAuthority
-import chip.native
 import click
-from chip.ChipStack import ChipStack
-from chip.yaml.runner import ReplTestRunner
 from matter_yamltests.definitions import SpecDefinitionsFromPaths
 from matter_yamltests.parser import PostProcessCheckStatus, TestParser, TestParserConfig
+
+import matter.CertificateAuthority
+import matter.native
+from matter.ChipStack import ChipStack
+from matter.yaml.runner import ReplTestRunner
 
 _DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", ".."))
@@ -113,9 +114,9 @@ def asyncio_executor(f):
 async def main(setup_code, yaml_path, node_id, pics_file):
     # Setting up python environment for running YAML CI tests using python parser.
     with tempfile.NamedTemporaryFile() as chip_stack_storage:
-        chip.native.Init()
+        matter.native.Init()
         chip_stack = ChipStack(chip_stack_storage.name)
-        certificate_authority_manager = chip.CertificateAuthority.CertificateAuthorityManager(
+        certificate_authority_manager = matter.CertificateAuthority.CertificateAuthorityManager(
             chip_stack, chip_stack.GetStorageManager())
         certificate_authority_manager.LoadAuthoritiesFromStorage()
 

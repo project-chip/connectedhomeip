@@ -466,9 +466,9 @@ await devCtrl.ReadAttribute(1, [ (0, Clusters.AccessControl.Attributes.Acl ) ] )
 ```
 {
 │   0: {
-│   │   <class 'chip.clusters.Objects.AccessControl'>: {
-│   │   │   <class 'chip.clusters.Attribute.DataVersion'>: 556798280,
-│   │   │   <class 'chip.clusters.Objects.AccessControl.Attributes.Acl'>: [
+│   │   <class 'matter.clusters.Objects.AccessControl'>: {
+│   │   │   <class 'matter.clusters.Attribute.DataVersion'>: 556798280,
+│   │   │   <class 'matter.clusters.Objects.AccessControl.Attributes.Acl'>: [
 │   │   │   │   AccessControlEntry(
 │   │   │   │   │   fabricIndex=1,
 │   │   │   │   │   privilege=<Privilege.kAdminister: 5>,
@@ -504,9 +504,9 @@ await devCtrl.WriteAttribute(1, [ (0, Clusters.AccessControl.Attributes.Acl( [
 ```
 {
 │   0: {
-│   │   <class 'chip.clusters.Objects.AccessControl'>: {
-│   │   │   <class 'chip.clusters.Attribute.DataVersion'>: 556798289,
-│   │   │   <class 'chip.clusters.Objects.AccessControl.Attributes.Acl'>: [
+│   │   <class 'matter.clusters.Objects.AccessControl'>: {
+│   │   │   <class 'matter.clusters.Attribute.DataVersion'>: 556798289,
+│   │   │   <class 'matter.clusters.Objects.AccessControl.Attributes.Acl'>: [
 │   │   │   │   AccessControlEntry(
 │   │   │   │   │   fabricIndex=1,
 │   │   │   │   │   privilege=<Privilege.kAdminister: 5>,
@@ -570,9 +570,9 @@ await devCtrl.WriteAttribute(1, [ (0, Clusters.AccessControl.Attributes.Acl( [
 ```
 {
 │   0: {
-│   │   <class 'chip.clusters.Objects.AccessControl'>: {
-│   │   │   <class 'chip.clusters.Attribute.DataVersion'>: 556798301,
-│   │   │   <class 'chip.clusters.Objects.AccessControl.Attributes.Acl'>: [
+│   │   <class 'matter.clusters.Objects.AccessControl'>: {
+│   │   │   <class 'matter.clusters.Attribute.DataVersion'>: 556798301,
+│   │   │   <class 'matter.clusters.Objects.AccessControl.Attributes.Acl'>: [
 │   │   │   │   AccessControlEntry(
 │   │   │   │   │   fabricIndex=1,
 │   │   │   │   │   privilege=<Privilege.kAdminister: 5>,
