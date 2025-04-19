@@ -240,19 +240,44 @@ public:
 using DecodableType = Type;
 
 } // namespace ErrorStateStruct
-namespace ICEServerStruct {
+namespace ICECandidateStruct {
 enum class Fields : uint8_t
 {
-    kUrls       = 1,
-    kUsername   = 2,
-    kCredential = 3,
-    kCaid       = 4,
+    kCandidate     = 0,
+    kSDPMid        = 1,
+    kSDPMLineIndex = 2,
 };
 
 struct Type
 {
 public:
-    DataModel::List<const chip::CharSpan> urls;
+    chip::CharSpan candidate;
+    DataModel::Nullable<chip::CharSpan> SDPMid;
+    DataModel::Nullable<uint16_t> SDPMLineIndex;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ICECandidateStruct
+namespace ICEServerStruct {
+enum class Fields : uint8_t
+{
+    kURLs       = 0,
+    kUsername   = 1,
+    kCredential = 2,
+    kCaid       = 3,
+};
+
+struct Type
+{
+public:
+    DataModel::List<const chip::CharSpan> URLs;
     Optional<chip::CharSpan> username;
     Optional<chip::CharSpan> credential;
     Optional<uint16_t> caid;
@@ -265,7 +290,7 @@ public:
 struct DecodableType
 {
 public:
-    DataModel::DecodableList<chip::CharSpan> urls;
+    DataModel::DecodableList<chip::CharSpan> URLs;
     Optional<chip::CharSpan> username;
     Optional<chip::CharSpan> credential;
     Optional<uint16_t> caid;
@@ -352,13 +377,13 @@ using DecodableType = Type;
 namespace WebRTCSessionStruct {
 enum class Fields : uint8_t
 {
-    kId              = 1,
-    kPeerNodeID      = 2,
-    kPeerEndpointID  = 3,
-    kStreamUsage     = 4,
-    kVideoStreamID   = 5,
-    kAudioStreamID   = 6,
-    kMetadataOptions = 7,
+    kId              = 0,
+    kPeerNodeID      = 1,
+    kPeerEndpointID  = 2,
+    kStreamUsage     = 3,
+    kVideoStreamID   = 4,
+    kAudioStreamID   = 5,
+    kMetadataEnabled = 6,
     kFabricIndex     = 254,
 };
 
@@ -371,8 +396,8 @@ public:
     StreamUsageEnum streamUsage     = static_cast<StreamUsageEnum>(0);
     DataModel::Nullable<uint16_t> videoStreamID;
     DataModel::Nullable<uint16_t> audioStreamID;
-    chip::BitMask<WebRTCMetadataOptionsBitmap> metadataOptions = static_cast<chip::BitMask<WebRTCMetadataOptionsBitmap>>(0);
-    chip::FabricIndex fabricIndex                              = static_cast<chip::FabricIndex>(0);
+    Optional<bool> metadataEnabled;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

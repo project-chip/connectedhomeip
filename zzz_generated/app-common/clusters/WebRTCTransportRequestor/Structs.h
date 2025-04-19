@@ -35,6 +35,7 @@ namespace app {
 namespace Clusters {
 namespace WebRTCTransportRequestor {
 namespace Structs {
+namespace ICECandidateStruct  = Clusters::detail::Structs::ICECandidateStruct;
 namespace ICEServerStruct     = Clusters::detail::Structs::ICEServerStruct;
 namespace WebRTCSessionStruct = Clusters::detail::Structs::WebRTCSessionStruct;
 } // namespace Structs

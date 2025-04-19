@@ -30,7 +30,11 @@ using StreamUsageEnum = Clusters::detail::StreamUsageEnum;
 
 using WebRTCEndReasonEnum = Clusters::detail::WebRTCEndReasonEnum;
 
-using WebRTCMetadataOptionsBitmap = Clusters::detail::WebRTCMetadataOptionsBitmap;
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kMetadata = 0x1,
+};
 } // namespace WebRTCTransportProvider
 } // namespace Clusters
 } // namespace app

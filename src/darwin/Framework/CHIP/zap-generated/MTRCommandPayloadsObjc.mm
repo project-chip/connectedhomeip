@@ -35002,7 +35002,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _iceTransportPolicy = nil;
 
-        _metadataOptions = nil;
+        _metadataEnabled = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -35019,7 +35019,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.audioStreamID = self.audioStreamID;
     other.iceServers = self.iceServers;
     other.iceTransportPolicy = self.iceTransportPolicy;
-    other.metadataOptions = self.metadataOptions;
+    other.metadataEnabled = self.metadataEnabled;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -35028,7 +35028,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; originatingEndpointID:%@; videoStreamID:%@; audioStreamID:%@; iceServers:%@; iceTransportPolicy:%@; metadataOptions:%@; >", NSStringFromClass([self class]), _streamUsage, _originatingEndpointID, _videoStreamID, _audioStreamID, _iceServers, _iceTransportPolicy, _metadataOptions];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; originatingEndpointID:%@; videoStreamID:%@; audioStreamID:%@; iceServers:%@; iceTransportPolicy:%@; metadataEnabled:%@; >", NSStringFromClass([self class]), _streamUsage, _originatingEndpointID, _videoStreamID, _audioStreamID, _iceServers, _iceTransportPolicy, _metadataEnabled];
     return descriptionString;
 }
 
@@ -35088,26 +35088,26 @@ NS_ASSUME_NONNULL_BEGIN
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
                         {
-                            using ListType_3 = std::remove_reference_t<decltype(listHolder_1->mList[i_1].urls)>;
+                            using ListType_3 = std::remove_reference_t<decltype(listHolder_1->mList[i_1].URLs)>;
                             using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
-                            if (element_1.urls.count != 0) {
-                                auto * listHolder_3 = new ListHolder<ListMemberType_3>(element_1.urls.count);
+                            if (element_1.urLs.count != 0) {
+                                auto * listHolder_3 = new ListHolder<ListMemberType_3>(element_1.urLs.count);
                                 if (listHolder_3 == nullptr || listHolder_3->mList == nullptr) {
                                     return CHIP_ERROR_INVALID_ARGUMENT;
                                 }
                                 listFreer.add(listHolder_3);
-                                for (size_t i_3 = 0; i_3 < element_1.urls.count; ++i_3) {
-                                    auto element_3 = MTR_SAFE_CAST(element_1.urls[i_3], NSString);
+                                for (size_t i_3 = 0; i_3 < element_1.urLs.count; ++i_3) {
+                                    auto element_3 = MTR_SAFE_CAST(element_1.urLs[i_3], NSString);
                                     if (!element_3) {
                                         // Wrong kind of value.
-                                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_1.urls[i_3], NSStringFromClass(NSString.class));
+                                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_1.urLs[i_3], NSStringFromClass(NSString.class));
                                         return CHIP_ERROR_INVALID_ARGUMENT;
                                     }
                                     listHolder_3->mList[i_3] = AsCharSpan(element_3);
                                 }
-                                listHolder_1->mList[i_1].urls = ListType_3(listHolder_3->mList, element_1.urls.count);
+                                listHolder_1->mList[i_1].URLs = ListType_3(listHolder_3->mList, element_1.urLs.count);
                             } else {
-                                listHolder_1->mList[i_1].urls = ListType_3();
+                                listHolder_1->mList[i_1].URLs = ListType_3();
                             }
                         }
                         if (element_1.username != nil) {
@@ -35137,9 +35137,9 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
     {
-        if (self.metadataOptions != nil) {
-            auto & definedValue_0 = encodableStruct.metadataOptions.Emplace();
-            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.metadataOptions.unsignedCharValue);
+        if (self.metadataEnabled != nil) {
+            auto & definedValue_0 = encodableStruct.metadataEnabled.Emplace();
+            definedValue_0 = self.metadataEnabled.boolValue;
         }
     }
 
@@ -35315,7 +35315,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _iceTransportPolicy = nil;
 
-        _metadataOptions = nil;
+        _metadataEnabled = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -35334,7 +35334,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.audioStreamID = self.audioStreamID;
     other.iceServers = self.iceServers;
     other.iceTransportPolicy = self.iceTransportPolicy;
-    other.metadataOptions = self.metadataOptions;
+    other.metadataEnabled = self.metadataEnabled;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -35343,7 +35343,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: webRTCSessionID:%@; sdp:%@; streamUsage:%@; originatingEndpointID:%@; videoStreamID:%@; audioStreamID:%@; iceServers:%@; iceTransportPolicy:%@; metadataOptions:%@; >", NSStringFromClass([self class]), _webRTCSessionID, _sdp, _streamUsage, _originatingEndpointID, _videoStreamID, _audioStreamID, _iceServers, _iceTransportPolicy, _metadataOptions];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: webRTCSessionID:%@; sdp:%@; streamUsage:%@; originatingEndpointID:%@; videoStreamID:%@; audioStreamID:%@; iceServers:%@; iceTransportPolicy:%@; metadataEnabled:%@; >", NSStringFromClass([self class]), _webRTCSessionID, _sdp, _streamUsage, _originatingEndpointID, _videoStreamID, _audioStreamID, _iceServers, _iceTransportPolicy, _metadataEnabled];
     return descriptionString;
 }
 
@@ -35414,26 +35414,26 @@ NS_ASSUME_NONNULL_BEGIN
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
                         {
-                            using ListType_3 = std::remove_reference_t<decltype(listHolder_1->mList[i_1].urls)>;
+                            using ListType_3 = std::remove_reference_t<decltype(listHolder_1->mList[i_1].URLs)>;
                             using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
-                            if (element_1.urls.count != 0) {
-                                auto * listHolder_3 = new ListHolder<ListMemberType_3>(element_1.urls.count);
+                            if (element_1.urLs.count != 0) {
+                                auto * listHolder_3 = new ListHolder<ListMemberType_3>(element_1.urLs.count);
                                 if (listHolder_3 == nullptr || listHolder_3->mList == nullptr) {
                                     return CHIP_ERROR_INVALID_ARGUMENT;
                                 }
                                 listFreer.add(listHolder_3);
-                                for (size_t i_3 = 0; i_3 < element_1.urls.count; ++i_3) {
-                                    auto element_3 = MTR_SAFE_CAST(element_1.urls[i_3], NSString);
+                                for (size_t i_3 = 0; i_3 < element_1.urLs.count; ++i_3) {
+                                    auto element_3 = MTR_SAFE_CAST(element_1.urLs[i_3], NSString);
                                     if (!element_3) {
                                         // Wrong kind of value.
-                                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_1.urls[i_3], NSStringFromClass(NSString.class));
+                                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_1.urLs[i_3], NSStringFromClass(NSString.class));
                                         return CHIP_ERROR_INVALID_ARGUMENT;
                                     }
                                     listHolder_3->mList[i_3] = AsCharSpan(element_3);
                                 }
-                                listHolder_1->mList[i_1].urls = ListType_3(listHolder_3->mList, element_1.urls.count);
+                                listHolder_1->mList[i_1].URLs = ListType_3(listHolder_3->mList, element_1.urLs.count);
                             } else {
-                                listHolder_1->mList[i_1].urls = ListType_3();
+                                listHolder_1->mList[i_1].URLs = ListType_3();
                             }
                         }
                         if (element_1.username != nil) {
@@ -35463,9 +35463,9 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
     {
-        if (self.metadataOptions != nil) {
-            auto & definedValue_0 = encodableStruct.metadataOptions.Emplace();
-            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.metadataOptions.unsignedCharValue);
+        if (self.metadataEnabled != nil) {
+            auto & definedValue_0 = encodableStruct.metadataEnabled.Emplace();
+            definedValue_0 = self.metadataEnabled.boolValue;
         }
     }
 
@@ -35753,13 +35753,25 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_0);
                 for (size_t i_0 = 0; i_0 < self.iceCandidates.count; ++i_0) {
-                    auto element_0 = MTR_SAFE_CAST(self.iceCandidates[i_0], NSString);
+                    auto element_0 = MTR_SAFE_CAST(self.iceCandidates[i_0], MTRWebRTCTransportProviderClusterICECandidateStruct);
                     if (!element_0) {
                         // Wrong kind of value.
-                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.iceCandidates[i_0], NSStringFromClass(NSString.class));
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.iceCandidates[i_0], NSStringFromClass(MTRWebRTCTransportProviderClusterICECandidateStruct.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    listHolder_0->mList[i_0] = AsCharSpan(element_0);
+                    listHolder_0->mList[i_0].candidate = AsCharSpan(element_0.candidate);
+                    if (element_0.sdpMid == nil) {
+                        listHolder_0->mList[i_0].SDPMid.SetNull();
+                    } else {
+                        auto & nonNullValue_2 = listHolder_0->mList[i_0].SDPMid.SetNonNull();
+                        nonNullValue_2 = AsCharSpan(element_0.sdpMid);
+                    }
+                    if (element_0.sdpmLineIndex == nil) {
+                        listHolder_0->mList[i_0].SDPMLineIndex.SetNull();
+                    } else {
+                        auto & nonNullValue_2 = listHolder_0->mList[i_0].SDPMLineIndex.SetNonNull();
+                        nonNullValue_2 = element_0.sdpmLineIndex.unsignedShortValue;
+                    }
                 }
                 encodableStruct.ICECandidates = ListType_0(listHolder_0->mList, self.iceCandidates.count);
             } else {
@@ -35963,26 +35975,26 @@ NS_ASSUME_NONNULL_BEGIN
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
                         {
-                            using ListType_3 = std::remove_reference_t<decltype(listHolder_1->mList[i_1].urls)>;
+                            using ListType_3 = std::remove_reference_t<decltype(listHolder_1->mList[i_1].URLs)>;
                             using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
-                            if (element_1.urls.count != 0) {
-                                auto * listHolder_3 = new ListHolder<ListMemberType_3>(element_1.urls.count);
+                            if (element_1.urLs.count != 0) {
+                                auto * listHolder_3 = new ListHolder<ListMemberType_3>(element_1.urLs.count);
                                 if (listHolder_3 == nullptr || listHolder_3->mList == nullptr) {
                                     return CHIP_ERROR_INVALID_ARGUMENT;
                                 }
                                 listFreer.add(listHolder_3);
-                                for (size_t i_3 = 0; i_3 < element_1.urls.count; ++i_3) {
-                                    auto element_3 = MTR_SAFE_CAST(element_1.urls[i_3], NSString);
+                                for (size_t i_3 = 0; i_3 < element_1.urLs.count; ++i_3) {
+                                    auto element_3 = MTR_SAFE_CAST(element_1.urLs[i_3], NSString);
                                     if (!element_3) {
                                         // Wrong kind of value.
-                                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_1.urls[i_3], NSStringFromClass(NSString.class));
+                                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_1.urLs[i_3], NSStringFromClass(NSString.class));
                                         return CHIP_ERROR_INVALID_ARGUMENT;
                                     }
                                     listHolder_3->mList[i_3] = AsCharSpan(element_3);
                                 }
-                                listHolder_1->mList[i_1].urls = ListType_3(listHolder_3->mList, element_1.urls.count);
+                                listHolder_1->mList[i_1].URLs = ListType_3(listHolder_3->mList, element_1.urLs.count);
                             } else {
-                                listHolder_1->mList[i_1].urls = ListType_3();
+                                listHolder_1->mList[i_1].URLs = ListType_3();
                             }
                         }
                         if (element_1.username != nil) {
@@ -36189,13 +36201,25 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_0);
                 for (size_t i_0 = 0; i_0 < self.iceCandidates.count; ++i_0) {
-                    auto element_0 = MTR_SAFE_CAST(self.iceCandidates[i_0], NSString);
+                    auto element_0 = MTR_SAFE_CAST(self.iceCandidates[i_0], MTRWebRTCTransportRequestorClusterICECandidateStruct);
                     if (!element_0) {
                         // Wrong kind of value.
-                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.iceCandidates[i_0], NSStringFromClass(NSString.class));
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.iceCandidates[i_0], NSStringFromClass(MTRWebRTCTransportRequestorClusterICECandidateStruct.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    listHolder_0->mList[i_0] = AsCharSpan(element_0);
+                    listHolder_0->mList[i_0].candidate = AsCharSpan(element_0.candidate);
+                    if (element_0.sdpMid == nil) {
+                        listHolder_0->mList[i_0].SDPMid.SetNull();
+                    } else {
+                        auto & nonNullValue_2 = listHolder_0->mList[i_0].SDPMid.SetNonNull();
+                        nonNullValue_2 = AsCharSpan(element_0.sdpMid);
+                    }
+                    if (element_0.sdpmLineIndex == nil) {
+                        listHolder_0->mList[i_0].SDPMLineIndex.SetNull();
+                    } else {
+                        auto & nonNullValue_2 = listHolder_0->mList[i_0].SDPMLineIndex.SetNonNull();
+                        nonNullValue_2 = element_0.sdpmLineIndex.unsignedShortValue;
+                    }
                 }
                 encodableStruct.ICECandidates = ListType_0(listHolder_0->mList, self.iceCandidates.count);
             } else {

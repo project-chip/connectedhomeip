@@ -177,12 +177,6 @@ enum class WebRTCEndReasonEnum : uint8_t
 
 // Bitmaps shared across multiple clusters.
 
-// Bitmap for WebRTCMetadataOptionsBitmap
-enum class WebRTCMetadataOptionsBitmap : uint8_t
-{
-    kDataTLV = 0x1,
-};
-
 } // namespace detail
 
 namespace Globals {
