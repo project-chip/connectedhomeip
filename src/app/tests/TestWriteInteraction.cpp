@@ -637,6 +637,8 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteHandlerReceiveInvalidMessage)
 
     EXPECT_EQ(writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLength)), CHIP_NO_ERROR);
 
+    EXPECT_TRUE(writeClient.IsWriteRequestChunked());
+
     GetLoopback().mSentMessageCount                 = 0;
     GetLoopback().mNumMessagesToDrop                = 1;
     GetLoopback().mNumMessagesToAllowBeforeDropping = 2;
@@ -703,6 +705,8 @@ TEST_F(TestWriteInteraction, TestWriteHandlerInvalidateFabric)
     ByteSpan list[kTestListLength];
 
     EXPECT_EQ(writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLength)), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(writeClient.IsWriteRequestChunked());
 
     GetLoopback().mDroppedMessageCount              = 0;
     GetLoopback().mSentMessageCount                 = 0;
