@@ -31,6 +31,7 @@
 #       --endpoint 1
 # === END CI TEST ARGUMENTS ===
 
+import logging
 import random
 
 import chip.clusters as Clusters
@@ -38,11 +39,6 @@ from chip.clusters.Types import Nullable, NullValue
 from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
-
-# Add these constants at the top of the file after imports
-D_OK_EMPTY = bytes.fromhex('1718')
-D_OK_SINGLE = bytes.fromhex(
-    '17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018')
 
 
 class TC_ACL_2_4(MatterBaseTest):
@@ -149,7 +145,7 @@ class TC_ACL_2_4(MatterBaseTest):
             cluster=oc_cluster,
             attribute=cfi_attribute
         )
-        self.print_step("CurrentFabricIndex", f1)
+        logging.info(f"CurrentFabricIndex: {f1}")
 
         # Step 3: Read initial ACL attribute
         self.step(3)
@@ -220,16 +216,13 @@ class TC_ACL_2_4(MatterBaseTest):
             )
         ]
 
-        try:
-            result = await self.default_controller.WriteAttribute(
-                self.dut_node_id,
-                [(0, acl_attribute(value=new_acl))]
-            )
-            # Add explicit check for unexpected errors
-            if result[0].Status != Status.Success:
-                asserts.fail(f"Expected Success but got {result[0].Status}")
-        except Exception as e:
-            asserts.fail(f"Expected Success but got exception: {e}")
+        result = await self.default_controller.WriteAttribute(
+            self.dut_node_id,
+            [(0, acl_attribute(value=new_acl))]
+        )
+        # Add explicit check for unexpected errors
+        if result[0].Status != Status.Success:
+            asserts.fail(f"Expected Success but got {result[0].Status}")
 
         # Step 5: Read back and verify ACL
         self.step(5)
@@ -238,7 +231,7 @@ class TC_ACL_2_4(MatterBaseTest):
             cluster=acl_cluster,
             attribute=acl_attribute
         )
-        self.print_step("Read ACL", read_acl)
+        logging.info(f"Read ACL: {read_acl}")
 
         # Verify ACL contents match what we wrote
         asserts.assert_equal(len(read_acl), 3, "ACL should contain exactly 3 entries")
@@ -331,7 +324,7 @@ class TC_ACL_2_4(MatterBaseTest):
             cluster=acl_cluster,
             attribute=acl_attribute
         )
-        self.print_step("Read Modified ACL", read_modified_acl)
+        logging.info(f"Read Modified ACL: {read_modified_acl}")
 
         # Verify modified ACL contents
         asserts.assert_equal(len(read_modified_acl), 3, "ACL should contain exactly 3 entries")
@@ -417,16 +410,12 @@ class TC_ACL_2_4(MatterBaseTest):
             )
         ]
 
-        try:
-            result = await self.default_controller.WriteAttribute(
-                self.dut_node_id,
-                [(0, acl_attribute(value=updated_targets_acl))]
-            )
-            asserts.assert_equal(result[0].Status, Status.Success,
-                                 "Write ACL with updated targets should succeed")
-        except Exception as e:
-            self.print_step("Error writing updated targets ACL", str(e))
-            asserts.fail(f"Failed to write updated targets ACL: {e}")
+        result = await self.default_controller.WriteAttribute(
+            self.dut_node_id,
+            [(0, acl_attribute(value=updated_targets_acl))]
+        )
+        asserts.assert_equal(result[0].Status, Status.Success,
+                                "Write ACL with updated targets should succeed")
 
         # Step 9: Read and verify updated targets ACL
         self.step(9)
@@ -435,14 +424,14 @@ class TC_ACL_2_4(MatterBaseTest):
             cluster=acl_cluster,
             attribute=acl_attribute
         )
-        self.print_step("Read Updated Targets ACL", read_updated_targets_acl)
+        logging.info(f"Read Updated Targets ACL: {read_updated_targets_acl}")
 
         # Verify updated targets ACL contents
         asserts.assert_equal(len(read_updated_targets_acl), 3, "ACL should contain exactly 3 entries")
 
         for i, entry in enumerate(read_updated_targets_acl):
             expected_entry = updated_targets_acl[i]
-            self.print_step(f"Verifying entry {i}", "")
+            logging.info(f"Verifying entry {i}")
 
             # Verify basic fields
             asserts.assert_equal(entry.privilege, expected_entry.privilege,
@@ -456,18 +445,18 @@ class TC_ACL_2_4(MatterBaseTest):
 
             # Verify targets field
             if isinstance(expected_entry.targets, Nullable):
-                self.print_step(f"Entry {i} expecting Nullable targets", "")
+                logging.info(f"Entry {i} expecting Nullable targets")
                 asserts.assert_true(isinstance(entry.targets, Nullable),
                                     f"Entry {i} targets should be Nullable")
             else:
-                self.print_step(f"Entry {i} expecting non-Nullable targets", "")
+                logging.info(f"Entry {i} expecting non-Nullable targets")
                 asserts.assert_false(isinstance(entry.targets, Nullable),
                                      f"Entry {i} targets should not be Nullable")
 
                 # Verify each target in the entry
                 for j, target in enumerate(entry.targets):
                     expected_target = expected_entry.targets[j]
-                    self.print_step(f"Verifying target {j} in entry {i}", "")
+                    logging.info(f"Verifying target {j} in entry {i}")
 
                     # Verify cluster field
                     if isinstance(expected_target.cluster, Nullable):
@@ -544,16 +533,12 @@ class TC_ACL_2_4(MatterBaseTest):
             )
         ]
 
-        try:
-            result = await self.default_controller.WriteAttribute(
-                self.dut_node_id,
-                [(0, acl_attribute(value=null_subjects_acl))]
-            )
-            asserts.assert_equal(result[0].Status, Status.Success,
-                                 "Write ACL with null subjects should succeed")
-        except Exception as e:
-            self.print_step("Error writing null subjects ACL", str(e))
-            asserts.fail(f"Failed to write null subjects ACL: {e}")
+        result = await self.default_controller.WriteAttribute(
+            self.dut_node_id,
+            [(0, acl_attribute(value=null_subjects_acl))]
+        )
+        asserts.assert_equal(result[0].Status, Status.Success,
+                                "Write ACL with null subjects should succeed")
 
         # Step 11: Read and verify null subjects ACL
         self.step(11)
@@ -562,7 +547,7 @@ class TC_ACL_2_4(MatterBaseTest):
             cluster=acl_cluster,
             attribute=acl_attribute
         )
-        self.print_step("Read Null Subjects ACL", read_null_subjects_acl)
+        logging.info(f"Read Null Subjects ACL: {read_null_subjects_acl}")
 
         # Verify null subjects ACL contents
         asserts.assert_equal(len(read_null_subjects_acl), 3, "ACL should contain exactly 3 entries")
@@ -636,16 +621,12 @@ class TC_ACL_2_4(MatterBaseTest):
             )
         ]
 
-        try:
-            result = await self.default_controller.WriteAttribute(
-                self.dut_node_id,
-                [(0, acl_attribute(value=null_targets_acl))]
-            )
-            asserts.assert_equal(result[0].Status, Status.Success,
-                                 "Write ACL with null targets should succeed")
-        except Exception as e:
-            self.print_step("Error writing null targets ACL", str(e))
-            asserts.fail(f"Failed to write null targets ACL: {e}")
+        result = await self.default_controller.WriteAttribute(
+            self.dut_node_id,
+            [(0, acl_attribute(value=null_targets_acl))]
+        )
+        asserts.assert_equal(result[0].Status, Status.Success,
+                                "Write ACL with null targets should succeed")
 
         # Step 13: Read and verify null targets ACL
         self.step(13)
@@ -654,7 +635,7 @@ class TC_ACL_2_4(MatterBaseTest):
             cluster=acl_cluster,
             attribute=acl_attribute
         )
-        self.print_step("Read Null Targets ACL", read_null_targets_acl)
+        logging.info(f"Read Null Targets ACL: {read_null_targets_acl}")
 
         # Verify null targets ACL contents
         asserts.assert_equal(len(read_null_targets_acl), 3, "ACL should contain exactly 3 entries")
@@ -671,7 +652,6 @@ class TC_ACL_2_4(MatterBaseTest):
             asserts.assert_equal(entry.fabricIndex, expected_entry.fabricIndex,
                                  f"Entry {i} fabricIndex mismatch")
 
-            # Verify targets field
             asserts.assert_true(isinstance(entry.targets, Nullable),
                                 f"Entry {i} targets should be Nullable")
 
@@ -696,16 +676,12 @@ class TC_ACL_2_4(MatterBaseTest):
             )
         ]
 
-        try:
-            result = await self.default_controller.WriteAttribute(
-                self.dut_node_id,
-                [(0, acl_attribute(value=two_element_acl))]
-            )
-            asserts.assert_equal(result[0].Status, Status.Success,
-                                 "Write ACL with 2 elements should succeed")
-        except Exception as e:
-            self.print_step("Error writing two element ACL", str(e))
-            asserts.fail(f"Failed to write two element ACL: {e}")
+        result = await self.default_controller.WriteAttribute(
+            self.dut_node_id,
+            [(0, acl_attribute(value=two_element_acl))]
+        )
+        asserts.assert_equal(result[0].Status, Status.Success,
+                                "Write ACL with 2 elements should succeed")
 
         # Step 15: Read and verify two element ACL
         self.step(15)
@@ -714,7 +690,7 @@ class TC_ACL_2_4(MatterBaseTest):
             cluster=acl_cluster,
             attribute=acl_attribute
         )
-        self.print_step("Read Two Element ACL", read_two_element_acl)
+        logging.info(f"Read Two Element ACL: {read_two_element_acl}")
 
         # Verify two element ACL contents
         asserts.assert_equal(len(read_two_element_acl), 2, "ACL should contain exactly 2 entries")
@@ -762,16 +738,12 @@ class TC_ACL_2_4(MatterBaseTest):
             )
         ]
 
-        try:
-            result = await self.default_controller.WriteAttribute(
-                self.dut_node_id,
-                [(0, acl_attribute(value=proxy_view_acl))]
-            )
-            asserts.assert_equal(result[0].Status, Status.Success,
-                                 "Write ACL with ProxyView privilege should succeed")
-        except Exception as e:
-            self.print_step("Error writing ProxyView ACL", str(e))
-            asserts.fail(f"Failed to write ProxyView ACL: {e}")
+        result = await self.default_controller.WriteAttribute(
+            self.dut_node_id,
+            [(0, acl_attribute(value=proxy_view_acl))]
+        )
+        asserts.assert_equal(result[0].Status, Status.Success,
+                                "Write ACL with ProxyView privilege should succeed")
 
         # Step 17: Read and verify ProxyView ACL
         self.step(17)
@@ -780,7 +752,7 @@ class TC_ACL_2_4(MatterBaseTest):
             cluster=acl_cluster,
             attribute=acl_attribute
         )
-        self.print_step("Read ProxyView ACL", read_proxy_view_acl)
+        logging.info(f"Read ProxyView ACL: {read_proxy_view_acl}")
 
         # Verify ProxyView ACL contents
         asserts.assert_equal(len(read_proxy_view_acl), 2, "ACL should contain exactly 2 entries")
@@ -815,7 +787,7 @@ class TC_ACL_2_4(MatterBaseTest):
             cluster=acl_cluster,
             attribute=subjects_per_entry_attr
         )
-        self.print_step("SubjectsPerAccessControlEntry value", max_subjects)
+        logging.info(f"SubjectsPerAccessControlEntry value: {max_subjects}")
 
         # Step 19: Write ACL with max subjects
         self.step(19)
@@ -840,16 +812,12 @@ class TC_ACL_2_4(MatterBaseTest):
             )
         ]
 
-        try:
-            result = await self.default_controller.WriteAttribute(
-                self.dut_node_id,
-                [(0, acl_attribute(value=max_subjects_acl))]
-            )
-            asserts.assert_equal(result[0].Status, Status.Success,
-                                 "Write ACL with max subjects should succeed")
-        except Exception as e:
-            self.print_step("Error writing max subjects ACL", str(e))
-            asserts.fail(f"Failed to write max subjects ACL: {e}")
+        result = await self.default_controller.WriteAttribute(
+            self.dut_node_id,
+            [(0, acl_attribute(value=max_subjects_acl))]
+        )
+        asserts.assert_equal(result[0].Status, Status.Success,
+                                "Write ACL with max subjects should succeed")
 
         # Step 20: Read and verify max subjects ACL
         self.step(20)
@@ -858,7 +826,7 @@ class TC_ACL_2_4(MatterBaseTest):
             cluster=acl_cluster,
             attribute=acl_attribute
         )
-        self.print_step("Read Max Subjects ACL", read_max_subjects_acl)
+        logging.info(f"Read Max Subjects ACL: {read_max_subjects_acl}")
 
         # Verify max subjects ACL contents
         asserts.assert_equal(len(read_max_subjects_acl), 2, "ACL should contain exactly 2 entries")
@@ -912,16 +880,12 @@ class TC_ACL_2_4(MatterBaseTest):
             )
         ]
 
-        try:
-            result = await self.default_controller.WriteAttribute(
-                self.dut_node_id,
-                [(0, acl_attribute(value=specific_subjects_acl))]
-            )
-            asserts.assert_equal(result[0].Status, Status.Success,
-                                 "Write ACL with specific subjects should succeed")
-        except Exception as e:
-            self.print_step("Error writing specific subjects ACL", str(e))
-            asserts.fail(f"Failed to write specific subjects ACL: {e}")
+        result = await self.default_controller.WriteAttribute(
+            self.dut_node_id,
+            [(0, acl_attribute(value=specific_subjects_acl))]
+        )
+        asserts.assert_equal(result[0].Status, Status.Success,
+                                "Write ACL with specific subjects should succeed")
 
         # Step 22: Read and verify specific subjects ACL
         self.step(22)
@@ -930,7 +894,7 @@ class TC_ACL_2_4(MatterBaseTest):
             cluster=acl_cluster,
             attribute=acl_attribute
         )
-        self.print_step("Read Specific Subjects ACL", read_specific_subjects_acl)
+        logging.info(f"Read Specific Subjects ACL: {read_specific_subjects_acl}")
 
         # Verify specific subjects ACL contents
         asserts.assert_equal(len(read_specific_subjects_acl), 2, "ACL should contain exactly 2 entries")
@@ -950,7 +914,7 @@ class TC_ACL_2_4(MatterBaseTest):
             cluster=acl_cluster,
             attribute=targets_per_entry_attr
         )
-        self.print_step("TargetsPerAccessControlEntry value", max_targets)
+        logging.info(f"TargetsPerAccessControlEntry value: {max_targets}")
 
         # Step 24: Write ACL with max targets
         self.step(24)
@@ -1000,16 +964,12 @@ class TC_ACL_2_4(MatterBaseTest):
             )
         ]
 
-        try:
-            result = await self.default_controller.WriteAttribute(
-                self.dut_node_id,
-                [(0, acl_attribute(value=max_targets_acl))]
-            )
-            asserts.assert_equal(result[0].Status, Status.Success,
-                                 "Write ACL with max targets should succeed")
-        except Exception as e:
-            self.print_step("Error writing max targets ACL", str(e))
-            asserts.fail(f"Failed to write max targets ACL: {e}")
+        result = await self.default_controller.WriteAttribute(
+            self.dut_node_id,
+            [(0, acl_attribute(value=max_targets_acl))]
+        )
+        asserts.assert_equal(result[0].Status, Status.Success,
+                                "Write ACL with max targets should succeed")
 
         # Step 25: Read and verify max targets ACL
         self.step(25)
@@ -1018,13 +978,13 @@ class TC_ACL_2_4(MatterBaseTest):
             cluster=acl_cluster,
             attribute=acl_attribute
         )
-        self.print_step("Read Max Targets ACL", read_max_targets_acl)
+        logging.info(f"Read Max Targets ACL: {read_max_targets_acl}")
 
         # Verify max targets ACL contents
         asserts.assert_equal(len(read_max_targets_acl), 2, "ACL should contain exactly 2 entries")
         for i, entry in enumerate(read_max_targets_acl):
             expected_entry = max_targets_acl[i]
-            self.print_step(f"Verifying entry {i}", "")
+            logging.info(f"Verifying entry {i}")
 
             # Verify basic fields
             asserts.assert_equal(entry.privilege, expected_entry.privilege,
@@ -1051,7 +1011,7 @@ class TC_ACL_2_4(MatterBaseTest):
                                      f"Entry {i} should have same number of targets")
                 for j, target in enumerate(entry.targets):
                     expected_target = expected_entry.targets[j]
-                    self.print_step(f"Verifying target {j} in entry {i}", "")
+                    logging.info(f"Verifying target {j} in entry {i}")
 
                     # For each target field, verify either the value matches or both are Nullable
                     if isinstance(expected_target.cluster, Nullable):
@@ -1083,7 +1043,7 @@ class TC_ACL_2_4(MatterBaseTest):
             cluster=acl_cluster,
             attribute=entries_per_fabric_attr
         )
-        self.print_step("AccessControlEntriesPerFabric value", max_entries)
+        logging.info(f"AccessControlEntriesPerFabric value: {max_entries}")
 
         # Step 27: Write ACL with MAXENTRIES elements
         self.step(27)
@@ -1109,16 +1069,12 @@ class TC_ACL_2_4(MatterBaseTest):
             )
             max_entries_acl.append(entry)
 
-        try:
-            result = await self.default_controller.WriteAttribute(
-                self.dut_node_id,
-                [(0, acl_attribute(value=max_entries_acl))]
-            )
-            asserts.assert_equal(result[0].Status, Status.Success,
-                                 "Write ACL with max entries should succeed")
-        except Exception as e:
-            self.print_step("Error writing max entries ACL", str(e))
-            asserts.fail(f"Failed to write max entries ACL: {e}")
+        result = await self.default_controller.WriteAttribute(
+            self.dut_node_id,
+            [(0, acl_attribute(value=max_entries_acl))]
+        )
+        asserts.assert_equal(result[0].Status, Status.Success,
+                                "Write ACL with max entries should succeed")
 
         # Step 28: Read and verify max entries ACL
         self.step(28)
@@ -1127,14 +1083,14 @@ class TC_ACL_2_4(MatterBaseTest):
             cluster=acl_cluster,
             attribute=acl_attribute
         )
-        self.print_step("Read Max Entries ACL", read_max_entries_acl)
+        logging.info(f"Read Max Entries ACL: {read_max_entries_acl}")
 
         # Verify max entries ACL contents
         asserts.assert_equal(len(read_max_entries_acl), max_entries,
                              f"ACL should contain exactly {max_entries} entries")
         for i, entry in enumerate(read_max_entries_acl):
             expected_entry = max_entries_acl[i]
-            self.print_step(f"Verifying entry {i}", "")
+            logging.info(f"Verifying entry {i}")
 
             asserts.assert_equal(entry.privilege, expected_entry.privilege,
                                  f"Entry {i} privilege mismatch")
@@ -1167,16 +1123,12 @@ class TC_ACL_2_4(MatterBaseTest):
         ]
 
         # Reset to admin-only ACL first
-        try:
-            result = await self.default_controller.WriteAttribute(
-                self.dut_node_id,
-                [(0, acl_attribute(value=admin_only_acl))]
-            )
-            asserts.assert_equal(result[0].Status, Status.Success,
-                                 "Write admin-only ACL should succeed")
-        except Exception as e:
-            self.print_step("Error resetting to admin-only ACL", str(e))
-            asserts.fail(f"Failed to reset to admin-only ACL: {e}")
+        result = await self.default_controller.WriteAttribute(
+            self.dut_node_id,
+            [(0, acl_attribute(value=admin_only_acl))]
+        )
+        asserts.assert_equal(result[0].Status, Status.Success,
+                                "Write admin-only ACL should succeed")
 
         # Verify reset was successful
         read_admin_only = await self.read_single_attribute_check_success(
@@ -1207,16 +1159,13 @@ class TC_ACL_2_4(MatterBaseTest):
             )
         ]
 
-        try:
-            result = await self.default_controller.WriteAttribute(
-                self.dut_node_id,
-                [(0, acl_attribute(value=pase_acl))]
-            )
-            # Should fail with CONSTRAINT_ERROR
-            asserts.assert_equal(result[0].Status, Status.ConstraintError,
+        result = await self.default_controller.WriteAttribute(
+            self.dut_node_id,
+            [(0, acl_attribute(value=pase_acl))]
+        )
+        # Should fail with CONSTRAINT_ERROR
+        asserts.assert_equal(result[0].Status, Status.ConstraintError,
                                  "Write ACL with PASE auth mode should fail with CONSTRAINT_ERROR")
-        except Exception as e:
-            asserts.fail(f"Got unexpected error for PASE auth mode {str(e)}")
 
         # Step 30: Read and verify ACL after failed PASE write
         self.step(30)
@@ -1225,7 +1174,7 @@ class TC_ACL_2_4(MatterBaseTest):
             cluster=acl_cluster,
             attribute=acl_attribute
         )
-        self.print_step("Read ACL after PASE attempt", read_after_pase_acl)
+        logging.info(f"Read ACL after failed PASE write: {read_after_pase_acl}")
 
         # Verify only admin entry remains
         asserts.assert_equal(len(read_after_pase_acl), 1,
@@ -1271,15 +1220,12 @@ class TC_ACL_2_4(MatterBaseTest):
             )
         ]
 
-        try:
-            result = await self.default_controller.WriteAttribute(
-                self.dut_node_id,
-                [(0, acl_attribute(value=group_admin_acl))]
-            )
-            asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                                 "Write ACL with Group auth mode for admin should fail with CONSTRAINT_ERROR")
-        except Exception as e:
-            self.print_step("Got expected error for Group auth mode admin", str(e))
+        result = await self.default_controller.WriteAttribute(
+            self.dut_node_id,
+            [(0, acl_attribute(value=group_admin_acl))]
+        )
+        asserts.assert_equal(result[0].Status, Status.ConstraintError,
+                                "Write ACL with Group auth mode for admin should fail with CONSTRAINT_ERROR")
 
         # Step 32: Test invalid privilege value (should fail)
         self.step(32)
@@ -1302,15 +1248,12 @@ class TC_ACL_2_4(MatterBaseTest):
             )
         ]
 
-        try:
-            result = await self.default_controller.WriteAttribute(
-                self.dut_node_id,
-                [(0, acl_attribute(value=invalid_privilege_acl))]
-            )
-            asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                                 "Write ACL with invalid privilege should fail with CONSTRAINT_ERROR")
-        except Exception as e:
-            self.print_step("Got expected error for invalid privilege", str(e))
+        result = await self.default_controller.WriteAttribute(
+            self.dut_node_id,
+            [(0, acl_attribute(value=invalid_privilege_acl))]
+        )
+        asserts.assert_equal(result[0].Status, Status.ConstraintError,
+                                "Write ACL with invalid privilege should fail with CONSTRAINT_ERROR")
 
         # Step 33: Test invalid auth mode value (should fail)
         self.step(33)
@@ -1333,15 +1276,12 @@ class TC_ACL_2_4(MatterBaseTest):
             )
         ]
 
-        try:
-            result = await self.default_controller.WriteAttribute(
-                self.dut_node_id,
-                [(0, acl_attribute(value=invalid_auth_mode_acl))]
-            )
-            asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                                 "Write ACL with invalid auth mode should fail with CONSTRAINT_ERROR")
-        except Exception as e:
-            self.print_step("Got expected error for invalid auth mode", str(e))
+        result = await self.default_controller.WriteAttribute(
+            self.dut_node_id,
+            [(0, acl_attribute(value=invalid_auth_mode_acl))]
+        )
+        asserts.assert_equal(result[0].Status, Status.ConstraintError,
+                                "Write ACL with invalid auth mode should fail with CONSTRAINT_ERROR")
 
         # Step 34: Test invalid subject ID 0 (should fail)
         self.step(34)
@@ -1364,15 +1304,12 @@ class TC_ACL_2_4(MatterBaseTest):
             )
         ]
 
-        try:
-            result = await self.default_controller.WriteAttribute(
-                self.dut_node_id,
-                [(0, acl_attribute(value=invalid_subject_acl))]
-            )
-            asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                                 "Write ACL with invalid subject ID should fail with CONSTRAINT_ERROR")
-        except Exception as e:
-            self.print_step("Got expected error for invalid subject ID", str(e))
+        result = await self.default_controller.WriteAttribute(
+            self.dut_node_id,
+            [(0, acl_attribute(value=invalid_subject_acl))]
+        )
+        asserts.assert_equal(result[0].Status, Status.ConstraintError,
+                                "Write ACL with invalid subject ID should fail with CONSTRAINT_ERROR")
 
         # Step 35: Test max node ID (should fail)
         self.step(35)
@@ -1395,15 +1332,12 @@ class TC_ACL_2_4(MatterBaseTest):
             )
         ]
 
-        try:
-            result = await self.default_controller.WriteAttribute(
-                self.dut_node_id,
-                [(0, acl_attribute(value=max_node_id_acl))]
-            )
-            asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                                 "Write ACL with max node ID should fail with CONSTRAINT_ERROR")
-        except Exception as e:
-            self.print_step("Got expected error for max node ID", str(e))
+        result = await self.default_controller.WriteAttribute(
+            self.dut_node_id,
+            [(0, acl_attribute(value=max_node_id_acl))]
+        )
+        asserts.assert_equal(result[0].Status, Status.ConstraintError,
+                                "Write ACL with max node ID should fail with CONSTRAINT_ERROR")
 
         # Step 36: Test invalid CAT (Case-Authenticated Tag) as subject (should fail)
         self.step(36)
@@ -1426,15 +1360,12 @@ class TC_ACL_2_4(MatterBaseTest):
             )
         ]
 
-        try:
-            result = await self.default_controller.WriteAttribute(
-                self.dut_node_id,
-                [(0, acl_attribute(value=group_id_range_acl))]
-            )
-            asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                                 "Write ACL with an invalid CAT as subject should fail with CONSTRAINT_ERROR")
-        except Exception as e:
-            self.print_step("Got expected error for an invalid CAT as subject", str(e))
+        result = await self.default_controller.WriteAttribute(
+            self.dut_node_id,
+            [(0, acl_attribute(value=group_id_range_acl))]
+        )
+        asserts.assert_equal(result[0].Status, Status.ConstraintError,
+                                "Write ACL with an invalid CAT as subject should fail with CONSTRAINT_ERROR")
 
         # Step 37: Test invalid Group Node ID (should fail)
         self.step(37)
@@ -1457,15 +1388,12 @@ class TC_ACL_2_4(MatterBaseTest):
             )
         ]
 
-        try:
-            result = await self.default_controller.WriteAttribute(
-                self.dut_node_id,
-                [(0, acl_attribute(value=fabric_scoped_id_acl))]
-            )
-            asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                                 "Write ACL with invalid Group Node ID should fail with CONSTRAINT_ERROR")
-        except Exception as e:
-            self.print_step("Got expected error for invalid Group Node ID", str(e))
+        result = await self.default_controller.WriteAttribute(
+            self.dut_node_id,
+            [(0, acl_attribute(value=fabric_scoped_id_acl))]
+        )
+        asserts.assert_equal(result[0].Status, Status.ConstraintError,
+                                "Write ACL with invalid Group Node ID should fail with CONSTRAINT_ERROR")
 
         # Step 38: Test empty target (should fail)
         self.step(38)
@@ -1494,15 +1422,12 @@ class TC_ACL_2_4(MatterBaseTest):
             )
         ]
 
-        try:
-            result = await self.default_controller.WriteAttribute(
-                self.dut_node_id,
-                [(0, acl_attribute(value=empty_target_acl))]
-            )
-            asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                                 "Write ACL with empty target should fail with CONSTRAINT_ERROR")
-        except Exception as e:
-            self.print_step("Got expected error for empty target", str(e))
+        result = await self.default_controller.WriteAttribute(
+            self.dut_node_id,
+            [(0, acl_attribute(value=empty_target_acl))]
+        )
+        asserts.assert_equal(result[0].Status, Status.ConstraintError,
+                                "Write ACL with empty target should fail with CONSTRAINT_ERROR")
 
         # Step 39: Test invalid cluster ID (should fail)
         self.step(39)
@@ -1531,15 +1456,12 @@ class TC_ACL_2_4(MatterBaseTest):
             )
         ]
 
-        try:
-            result = await self.default_controller.WriteAttribute(
-                self.dut_node_id,
-                [(0, acl_attribute(value=invalid_cluster_acl))]
-            )
-            asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                                 "Write ACL with invalid cluster ID should fail with CONSTRAINT_ERROR")
-        except Exception as e:
-            self.print_step("Got expected error for invalid cluster ID", str(e))
+        result = await self.default_controller.WriteAttribute(
+            self.dut_node_id,
+            [(0, acl_attribute(value=invalid_cluster_acl))]
+        )
+        asserts.assert_equal(result[0].Status, Status.ConstraintError,
+                                "Write ACL with invalid cluster ID should fail with CONSTRAINT_ERROR")
 
         # Step 40: Test invalid endpoint ID (should fail)
         self.step(40)
@@ -1568,15 +1490,12 @@ class TC_ACL_2_4(MatterBaseTest):
             )
         ]
 
-        try:
-            result = await self.default_controller.WriteAttribute(
-                self.dut_node_id,
-                [(0, acl_attribute(value=invalid_endpoint_acl))]
-            )
-            asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                                 "Write ACL with invalid endpoint ID should fail with CONSTRAINT_ERROR")
-        except Exception as e:
-            self.print_step("Got expected error for invalid endpoint ID", str(e))
+        result = await self.default_controller.WriteAttribute(
+            self.dut_node_id,
+            [(0, acl_attribute(value=invalid_endpoint_acl))]
+        )
+        asserts.assert_equal(result[0].Status, Status.ConstraintError,
+                                "Write ACL with invalid endpoint ID should fail with CONSTRAINT_ERROR")
 
         # Step 41: Test invalid device type (should fail)
         self.step(41)
@@ -1605,15 +1524,12 @@ class TC_ACL_2_4(MatterBaseTest):
             )
         ]
 
-        try:
-            result = await self.default_controller.WriteAttribute(
-                self.dut_node_id,
-                [(0, acl_attribute(value=invalid_device_type_acl))]
-            )
-            asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                                 "Write ACL with invalid device type should fail with CONSTRAINT_ERROR")
-        except Exception as e:
-            self.print_step("Got expected error for invalid device type", str(e))
+        result = await self.default_controller.WriteAttribute(
+            self.dut_node_id,
+            [(0, acl_attribute(value=invalid_device_type_acl))]
+        )
+        asserts.assert_equal(result[0].Status, Status.ConstraintError,
+                                "Write ACL with invalid device type should fail with CONSTRAINT_ERROR")
 
         # Step 42: Test endpoint with device type (should fail)
         self.step(42)
@@ -1642,15 +1558,12 @@ class TC_ACL_2_4(MatterBaseTest):
             )
         ]
 
-        try:
-            result = await self.default_controller.WriteAttribute(
-                self.dut_node_id,
-                [(0, acl_attribute(value=endpoint_with_device_type_acl))]
-            )
-            asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                                 "Write ACL with both endpoint and device type should fail with CONSTRAINT_ERROR")
-        except Exception as e:
-            self.print_step("Got expected error for endpoint with device type", str(e))
+        result = await self.default_controller.WriteAttribute(
+            self.dut_node_id,
+            [(0, acl_attribute(value=endpoint_with_device_type_acl))]
+        )
+        asserts.assert_equal(result[0].Status, Status.ConstraintError,
+                                "Write ACL with both endpoint and device type should fail with CONSTRAINT_ERROR")
 
         # Step 43: Test all target fields (should fail)
         self.step(43)
@@ -1679,29 +1592,22 @@ class TC_ACL_2_4(MatterBaseTest):
             )
         ]
 
-        try:
-            result = await self.default_controller.WriteAttribute(
-                self.dut_node_id,
-                [(0, acl_attribute(value=all_target_fields_acl))]
-            )
-            asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                                 "Write ACL with all target fields should fail with CONSTRAINT_ERROR")
-        except Exception as e:
-            self.print_step("Got expected error for all target fields", str(e))
+        result = await self.default_controller.WriteAttribute(
+            self.dut_node_id,
+            [(0, acl_attribute(value=all_target_fields_acl))]
+        )
+        asserts.assert_equal(result[0].Status, Status.ConstraintError,
+                                "Write ACL with all target fields should fail with CONSTRAINT_ERROR")
 
         # Step 44: Write minimum required ACL (admin only)
         self.step(44)
-        try:
-            result = await self.default_controller.WriteAttribute(
-                self.dut_node_id,
-                [(0, acl_attribute(value=acl_original))]
-            )
-            asserts.assert_equal(result[0].Status, Status.Success,
-                                 "Write admin-only ACL should succeed")
-            self.print_step("Successfully reset ACL to admin-only entry", "")
-        except Exception as e:
-            self.print_step("Error writing admin-only ACL", str(e))
-            asserts.fail(f"Failed to write admin-only ACL: {e}")
+        result = await self.default_controller.WriteAttribute(
+            self.dut_node_id,
+            [(0, acl_attribute(value=acl_original))]
+        )
+        asserts.assert_equal(result[0].Status, Status.Success,
+                                "Write admin-only ACL should succeed")
+        logging.info("Successfully reset ACL to admin-only entry")
 
         # Final verification that ACL contains only admin entry
         final_acl = await self.read_single_attribute_check_success(
