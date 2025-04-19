@@ -60,7 +60,7 @@ RUN set -x \
     libdbus-glib-1-dev \
     libdmalloc-dev \
     libgif-dev \
-    libgirepository-1.0-1 \
+    libgirepository-2.0 \
     libglib2.0-dev \
     libgstreamer1.0-0 \
     libgstreamer1.0-dev \
@@ -174,7 +174,7 @@ RUN case ${TARGETPLATFORM} in \
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy --fix-missing --no-install-recommends \
-    libgirepository1.0-dev \
+    libgirepository-2.0-dev \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
