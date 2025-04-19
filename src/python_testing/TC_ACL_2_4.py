@@ -415,7 +415,7 @@ class TC_ACL_2_4(MatterBaseTest):
             [(0, acl_attribute(value=updated_targets_acl))]
         )
         asserts.assert_equal(result[0].Status, Status.Success,
-                                "Write ACL with updated targets should succeed")
+                             "Write ACL with updated targets should succeed")
 
         # Step 9: Read and verify updated targets ACL
         self.step(9)
@@ -538,7 +538,7 @@ class TC_ACL_2_4(MatterBaseTest):
             [(0, acl_attribute(value=null_subjects_acl))]
         )
         asserts.assert_equal(result[0].Status, Status.Success,
-                                "Write ACL with null subjects should succeed")
+                             "Write ACL with null subjects should succeed")
 
         # Step 11: Read and verify null subjects ACL
         self.step(11)
@@ -626,7 +626,7 @@ class TC_ACL_2_4(MatterBaseTest):
             [(0, acl_attribute(value=null_targets_acl))]
         )
         asserts.assert_equal(result[0].Status, Status.Success,
-                                "Write ACL with null targets should succeed")
+                             "Write ACL with null targets should succeed")
 
         # Step 13: Read and verify null targets ACL
         self.step(13)
@@ -681,7 +681,7 @@ class TC_ACL_2_4(MatterBaseTest):
             [(0, acl_attribute(value=two_element_acl))]
         )
         asserts.assert_equal(result[0].Status, Status.Success,
-                                "Write ACL with 2 elements should succeed")
+                             "Write ACL with 2 elements should succeed")
 
         # Step 15: Read and verify two element ACL
         self.step(15)
@@ -743,7 +743,7 @@ class TC_ACL_2_4(MatterBaseTest):
             [(0, acl_attribute(value=proxy_view_acl))]
         )
         asserts.assert_equal(result[0].Status, Status.Success,
-                                "Write ACL with ProxyView privilege should succeed")
+                             "Write ACL with ProxyView privilege should succeed")
 
         # Step 17: Read and verify ProxyView ACL
         self.step(17)
@@ -817,7 +817,7 @@ class TC_ACL_2_4(MatterBaseTest):
             [(0, acl_attribute(value=max_subjects_acl))]
         )
         asserts.assert_equal(result[0].Status, Status.Success,
-                                "Write ACL with max subjects should succeed")
+                             "Write ACL with max subjects should succeed")
 
         # Step 20: Read and verify max subjects ACL
         self.step(20)
@@ -885,7 +885,7 @@ class TC_ACL_2_4(MatterBaseTest):
             [(0, acl_attribute(value=specific_subjects_acl))]
         )
         asserts.assert_equal(result[0].Status, Status.Success,
-                                "Write ACL with specific subjects should succeed")
+                             "Write ACL with specific subjects should succeed")
 
         # Step 22: Read and verify specific subjects ACL
         self.step(22)
@@ -969,7 +969,7 @@ class TC_ACL_2_4(MatterBaseTest):
             [(0, acl_attribute(value=max_targets_acl))]
         )
         asserts.assert_equal(result[0].Status, Status.Success,
-                                "Write ACL with max targets should succeed")
+                             "Write ACL with max targets should succeed")
 
         # Step 25: Read and verify max targets ACL
         self.step(25)
@@ -1074,7 +1074,7 @@ class TC_ACL_2_4(MatterBaseTest):
             [(0, acl_attribute(value=max_entries_acl))]
         )
         asserts.assert_equal(result[0].Status, Status.Success,
-                                "Write ACL with max entries should succeed")
+                             "Write ACL with max entries should succeed")
 
         # Step 28: Read and verify max entries ACL
         self.step(28)
@@ -1128,7 +1128,7 @@ class TC_ACL_2_4(MatterBaseTest):
             [(0, acl_attribute(value=admin_only_acl))]
         )
         asserts.assert_equal(result[0].Status, Status.Success,
-                                "Write admin-only ACL should succeed")
+                             "Write admin-only ACL should succeed")
 
         # Verify reset was successful
         read_admin_only = await self.read_single_attribute_check_success(
@@ -1165,7 +1165,7 @@ class TC_ACL_2_4(MatterBaseTest):
         )
         # Should fail with CONSTRAINT_ERROR
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                                 "Write ACL with PASE auth mode should fail with CONSTRAINT_ERROR")
+                             "Write ACL with PASE auth mode should fail with CONSTRAINT_ERROR")
 
         # Step 30: Read and verify ACL after failed PASE write
         self.step(30)
@@ -1225,7 +1225,7 @@ class TC_ACL_2_4(MatterBaseTest):
             [(0, acl_attribute(value=group_admin_acl))]
         )
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                                "Write ACL with Group auth mode for admin should fail with CONSTRAINT_ERROR")
+                             "Write ACL with Group auth mode for admin should fail with CONSTRAINT_ERROR")
 
         # Step 32: Test invalid privilege value (should fail)
         self.step(32)
@@ -1253,7 +1253,7 @@ class TC_ACL_2_4(MatterBaseTest):
             [(0, acl_attribute(value=invalid_privilege_acl))]
         )
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                                "Write ACL with invalid privilege should fail with CONSTRAINT_ERROR")
+                             "Write ACL with invalid privilege should fail with CONSTRAINT_ERROR")
 
         # Step 33: Test invalid auth mode value (should fail)
         self.step(33)
@@ -1281,7 +1281,7 @@ class TC_ACL_2_4(MatterBaseTest):
             [(0, acl_attribute(value=invalid_auth_mode_acl))]
         )
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                                "Write ACL with invalid auth mode should fail with CONSTRAINT_ERROR")
+                             "Write ACL with invalid auth mode should fail with CONSTRAINT_ERROR")
 
         # Step 34: Test invalid subject ID 0 (should fail)
         self.step(34)
@@ -1309,7 +1309,7 @@ class TC_ACL_2_4(MatterBaseTest):
             [(0, acl_attribute(value=invalid_subject_acl))]
         )
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                                "Write ACL with invalid subject ID should fail with CONSTRAINT_ERROR")
+                             "Write ACL with invalid subject ID should fail with CONSTRAINT_ERROR")
 
         # Step 35: Test max node ID (should fail)
         self.step(35)
@@ -1337,7 +1337,7 @@ class TC_ACL_2_4(MatterBaseTest):
             [(0, acl_attribute(value=max_node_id_acl))]
         )
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                                "Write ACL with max node ID should fail with CONSTRAINT_ERROR")
+                             "Write ACL with max node ID should fail with CONSTRAINT_ERROR")
 
         # Step 36: Test invalid CAT (Case-Authenticated Tag) as subject (should fail)
         self.step(36)
@@ -1365,7 +1365,7 @@ class TC_ACL_2_4(MatterBaseTest):
             [(0, acl_attribute(value=group_id_range_acl))]
         )
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                                "Write ACL with an invalid CAT as subject should fail with CONSTRAINT_ERROR")
+                             "Write ACL with an invalid CAT as subject should fail with CONSTRAINT_ERROR")
 
         # Step 37: Test invalid Group Node ID (should fail)
         self.step(37)
@@ -1393,7 +1393,7 @@ class TC_ACL_2_4(MatterBaseTest):
             [(0, acl_attribute(value=fabric_scoped_id_acl))]
         )
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                                "Write ACL with invalid Group Node ID should fail with CONSTRAINT_ERROR")
+                             "Write ACL with invalid Group Node ID should fail with CONSTRAINT_ERROR")
 
         # Step 38: Test empty target (should fail)
         self.step(38)
@@ -1427,7 +1427,7 @@ class TC_ACL_2_4(MatterBaseTest):
             [(0, acl_attribute(value=empty_target_acl))]
         )
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                                "Write ACL with empty target should fail with CONSTRAINT_ERROR")
+                             "Write ACL with empty target should fail with CONSTRAINT_ERROR")
 
         # Step 39: Test invalid cluster ID (should fail)
         self.step(39)
@@ -1461,7 +1461,7 @@ class TC_ACL_2_4(MatterBaseTest):
             [(0, acl_attribute(value=invalid_cluster_acl))]
         )
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                                "Write ACL with invalid cluster ID should fail with CONSTRAINT_ERROR")
+                             "Write ACL with invalid cluster ID should fail with CONSTRAINT_ERROR")
 
         # Step 40: Test invalid endpoint ID (should fail)
         self.step(40)
@@ -1495,7 +1495,7 @@ class TC_ACL_2_4(MatterBaseTest):
             [(0, acl_attribute(value=invalid_endpoint_acl))]
         )
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                                "Write ACL with invalid endpoint ID should fail with CONSTRAINT_ERROR")
+                             "Write ACL with invalid endpoint ID should fail with CONSTRAINT_ERROR")
 
         # Step 41: Test invalid device type (should fail)
         self.step(41)
@@ -1529,7 +1529,7 @@ class TC_ACL_2_4(MatterBaseTest):
             [(0, acl_attribute(value=invalid_device_type_acl))]
         )
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                                "Write ACL with invalid device type should fail with CONSTRAINT_ERROR")
+                             "Write ACL with invalid device type should fail with CONSTRAINT_ERROR")
 
         # Step 42: Test endpoint with device type (should fail)
         self.step(42)
@@ -1563,7 +1563,7 @@ class TC_ACL_2_4(MatterBaseTest):
             [(0, acl_attribute(value=endpoint_with_device_type_acl))]
         )
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                                "Write ACL with both endpoint and device type should fail with CONSTRAINT_ERROR")
+                             "Write ACL with both endpoint and device type should fail with CONSTRAINT_ERROR")
 
         # Step 43: Test all target fields (should fail)
         self.step(43)
@@ -1597,7 +1597,7 @@ class TC_ACL_2_4(MatterBaseTest):
             [(0, acl_attribute(value=all_target_fields_acl))]
         )
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                                "Write ACL with all target fields should fail with CONSTRAINT_ERROR")
+                             "Write ACL with all target fields should fail with CONSTRAINT_ERROR")
 
         # Step 44: Write minimum required ACL (admin only)
         self.step(44)
@@ -1606,7 +1606,7 @@ class TC_ACL_2_4(MatterBaseTest):
             [(0, acl_attribute(value=acl_original))]
         )
         asserts.assert_equal(result[0].Status, Status.Success,
-                                "Write admin-only ACL should succeed")
+                             "Write admin-only ACL should succeed")
         logging.info("Successfully reset ACL to admin-only entry")
 
         # Final verification that ACL contains only admin entry
