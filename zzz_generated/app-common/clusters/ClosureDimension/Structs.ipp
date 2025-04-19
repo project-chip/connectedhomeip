@@ -27,12 +27,12 @@ namespace Clusters {
 namespace ClosureDimension {
 namespace Structs {
 
-namespace CurrentStruct {
+namespace CurrentStateStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kPosition), position);
-    encoder.Encode(to_underlying(Fields::kLatching), latching);
+    encoder.Encode(to_underlying(Fields::kLatch), latch);
     encoder.Encode(to_underlying(Fields::kSpeed), speed);
     return encoder.Finalize();
 }
@@ -51,9 +51,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, position);
         }
-        else if (__context_tag == to_underlying(Fields::kLatching))
+        else if (__context_tag == to_underlying(Fields::kLatch))
         {
-            err = DataModel::Decode(reader, latching);
+            err = DataModel::Decode(reader, latch);
         }
         else if (__context_tag == to_underlying(Fields::kSpeed))
         {
@@ -67,7 +67,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 
-} // namespace CurrentStruct
+} // namespace CurrentStateStruct
 
 namespace RangePercent100thsStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const

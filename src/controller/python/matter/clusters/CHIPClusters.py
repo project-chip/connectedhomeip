@@ -8036,7 +8036,7 @@ class ChipClusters:
                 "commandName": "SetTarget",
                 "args": {
                     "position": "int",
-                    "latch": "int",
+                    "latch": "bool",
                     "speed": "int",
                 },
             },
@@ -8052,7 +8052,7 @@ class ChipClusters:
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "Current",
+                "attributeName": "CurrentState",
                 "attributeId": 0x00000000,
                 "type": "",
                 "reportable": True,
