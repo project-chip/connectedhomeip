@@ -146,10 +146,6 @@
 #include <clusters/ContentLauncher/Commands.h>
 #include <clusters/ContentLauncher/Events.h>
 #include <clusters/ContentLauncher/Structs.h>
-#include <clusters/DemandResponseLoadControl/Attributes.h>
-#include <clusters/DemandResponseLoadControl/Commands.h>
-#include <clusters/DemandResponseLoadControl/Events.h>
-#include <clusters/DemandResponseLoadControl/Structs.h>
 #include <clusters/Descriptor/Attributes.h>
 #include <clusters/Descriptor/Commands.h>
 #include <clusters/Descriptor/Events.h>

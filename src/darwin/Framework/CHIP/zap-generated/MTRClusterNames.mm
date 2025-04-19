@@ -219,9 +219,6 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeCommodityPriceID:
         result = @"CommodityPrice";
         break;
-    case MTRClusterIDTypeDemandResponseLoadControlID:
-        result = @"DemandResponseLoadControl";
-        break;
     case MTRClusterIDTypeMessagesID:
         result = @"Messages";
         break;
@@ -4169,69 +4166,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             break;
 
         case MTRAttributeIDTypeClusterCommodityPriceAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
-
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
-            break;
-        }
-        break;
-
-    case MTRClusterIDTypeDemandResponseLoadControlID:
-
-        switch (attributeID) {
-
-            // Cluster DemandResponseLoadControl attributes
-        case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeLoadControlProgramsID:
-            result = @"LoadControlPrograms";
-            break;
-
-        case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeNumberOfLoadControlProgramsID:
-            result = @"NumberOfLoadControlPrograms";
-            break;
-
-        case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeEventsID:
-            result = @"Events";
-            break;
-
-        case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeActiveEventsID:
-            result = @"ActiveEvents";
-            break;
-
-        case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeNumberOfEventsPerProgramID:
-            result = @"NumberOfEventsPerProgram";
-            break;
-
-        case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeNumberOfTransitionsID:
-            result = @"NumberOfTransitions";
-            break;
-
-        case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeDefaultRandomStartID:
-            result = @"DefaultRandomStart";
-            break;
-
-        case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeDefaultRandomDurationID:
-            result = @"DefaultRandomDuration";
-            break;
-
-        case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
-
-        case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
-
-        case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeClusterRevisionID:
             result = @"ClusterRevision";
             break;
 
@@ -10324,36 +10258,6 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
-    case MTRClusterIDTypeDemandResponseLoadControlID:
-
-        switch (commandID) {
-
-        case MTRCommandIDTypeClusterDemandResponseLoadControlCommandRegisterLoadControlProgramRequestID:
-            result = @"RegisterLoadControlProgramRequest";
-            break;
-
-        case MTRCommandIDTypeClusterDemandResponseLoadControlCommandUnregisterLoadControlProgramRequestID:
-            result = @"UnregisterLoadControlProgramRequest";
-            break;
-
-        case MTRCommandIDTypeClusterDemandResponseLoadControlCommandAddLoadControlEventRequestID:
-            result = @"AddLoadControlEventRequest";
-            break;
-
-        case MTRCommandIDTypeClusterDemandResponseLoadControlCommandRemoveLoadControlEventRequestID:
-            result = @"RemoveLoadControlEventRequest";
-            break;
-
-        case MTRCommandIDTypeClusterDemandResponseLoadControlCommandClearLoadControlEventsRequestID:
-            result = @"ClearLoadControlEventsRequest";
-            break;
-
-        default:
-            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
-            break;
-        }
-        break;
-
     case MTRClusterIDTypeMessagesID:
 
         switch (commandID) {
@@ -12762,16 +12666,6 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
-    case MTRClusterIDTypeDemandResponseLoadControlID:
-
-        switch (commandID) {
-
-        default:
-            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
-            break;
-        }
-        break;
-
     case MTRClusterIDTypeMessagesID:
 
         switch (commandID) {
@@ -14687,21 +14581,6 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
 
         case MTREventIDTypeClusterCommodityPriceEventForecastChangeID:
             result = @"ForecastChange";
-            break;
-
-        default:
-            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
-            break;
-        }
-        break;
-
-    case MTRClusterIDTypeDemandResponseLoadControlID:
-
-        switch (eventID) {
-
-            // Cluster DemandResponseLoadControl events
-        case MTREventIDTypeClusterDemandResponseLoadControlEventLoadControlEventStatusChangeID:
-            result = @"LoadControlEventStatusChange";
             break;
 
         default:

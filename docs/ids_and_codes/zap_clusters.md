@@ -79,7 +79,6 @@ Generally regenerate using one of:
 |        145 |       0x91 | ElectricalEnergyMeasurement                             |
 |        148 |       0x94 | WaterHeaterManagement                                   |
 |        149 |       0x95 | CommodityPrice                                          |
-|        150 |       0x96 | DemandResponseLoadControl                               |
 |        151 |       0x97 | Messages                                                |
 |        152 |       0x98 | DeviceEnergyManagement                                  |
 |        153 |       0x99 | EnergyEvse                                              |
