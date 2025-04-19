@@ -191,6 +191,20 @@ void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * on
 }
 
 void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * onConnection,
+                                      Callback::Callback<OnDeviceConnectionFailure> * onFailure, Transport::PeerAddress & addr,
+                                      TransportPayloadCapability transportPayloadCapability)
+{
+    mState                      = State::ResolvingAddress;
+    mTransportPayloadCapability = transportPayloadCapability;
+    AddressResolve::ResolveResult result;
+    result.address = addr;
+
+    EnqueueConnectionCallbacks(onConnection, onFailure, nullptr);
+
+    UpdateDeviceData(result);
+}
+
+void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * onConnection,
                                       Callback::Callback<OnSetupFailure> * onSetupFailure,
                                       TransportPayloadCapability transportPayloadCapability)
 {
@@ -346,13 +360,15 @@ void OperationalSessionSetup::DequeueConnectionCallbacks(CHIP_ERROR error, Sessi
 {
     // We expect that we only have callbacks if we are not performing just address update.
     VerifyOrDie(!mPerformingAddressUpdate || mCallbacks.IsEmpty());
-
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     // Clear out mConnectionRetry, so that those cancelables are not holding
     // pointers to us, since we're about to go away.
-    while (auto * cb = mConnectionRetry.First())
+    if (!mConnectionRetry.IsEmpty())
     {
-        cb->Cancel();
+        while (auto * cb = mConnectionRetry.First())
+        {
+            cb->Cancel();
+        }
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
