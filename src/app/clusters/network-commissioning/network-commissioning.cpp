@@ -765,7 +765,7 @@ void FillDebugTextAndNetworkIndex(Commands::NetworkConfigResponse::Type & respon
     }
 }
 
-bool CheckFailSafeArmed(CommandHandlerInterface::HandlerContext & ctx)
+bool CheckFailSafeArmed(CommandHandlerInterfaceB::HandlerContext & ctx)
 {
     auto & failSafeContext = chip::Server::GetInstance().GetFailSafeContext();
 

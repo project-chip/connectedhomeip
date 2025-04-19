@@ -275,7 +275,7 @@ TEST_F_FROM_FIXTURE(TestThreadBorderRouterManagementCluster, TestCommandHandle)
     using Status      = Protocols::InteractionModel::Status;
     ConcreteCommandPath testPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
     TLV::TLVReader testTLVReader;
-    CommandHandlerInterface::HandlerContext ctx(sTestCommandHandler, testPath, testTLVReader);
+    CommandHandlerInterfaceB::HandlerContext ctx(sTestCommandHandler, testPath, testTLVReader);
     // All the command should be over CASE session.
     EXPECT_EQ(sTestSeverInstance.HandleGetDatasetRequest(ctx, DatasetType::kActive, dataset), Status::UnsupportedAccess);
     EXPECT_EQ(sTestSeverInstance.HandleGetDatasetRequest(ctx, DatasetType::kPending, dataset), Status::UnsupportedAccess);

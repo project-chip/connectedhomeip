@@ -48,9 +48,9 @@ class Delegate;
 
 /**
  * Instance is a class that represents an instance of a derivation of the operational state cluster.
- * It implements CommandHandlerInterface so it can generically handle commands for any derivation cluster id.
+ * It implements CommandHandlerInterfaceB so it can generically handle commands for any derivation cluster id.
  */
-class Instance : public CommandHandlerInterface, public AttributeAccessInterface, public Uncopyable
+class Instance : public CommandHandlerInterfaceB, public AttributeAccessInterface, public Uncopyable
 {
 public:
     /**

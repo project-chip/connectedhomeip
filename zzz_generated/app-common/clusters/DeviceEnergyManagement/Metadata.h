@@ -89,56 +89,56 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace PowerAdjustRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DeviceEnergyManagement::Commands::PowerAdjustRequest::Id,
+    .commandId       = Commands::PowerAdjustRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace PowerAdjustRequest
 namespace CancelPowerAdjustRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DeviceEnergyManagement::Commands::CancelPowerAdjustRequest::Id,
+    .commandId       = Commands::CancelPowerAdjustRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace CancelPowerAdjustRequest
 namespace StartTimeAdjustRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DeviceEnergyManagement::Commands::StartTimeAdjustRequest::Id,
+    .commandId       = Commands::StartTimeAdjustRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace StartTimeAdjustRequest
 namespace PauseRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DeviceEnergyManagement::Commands::PauseRequest::Id,
+    .commandId       = Commands::PauseRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace PauseRequest
 namespace ResumeRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DeviceEnergyManagement::Commands::ResumeRequest::Id,
+    .commandId       = Commands::ResumeRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace ResumeRequest
 namespace ModifyForecastRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DeviceEnergyManagement::Commands::ModifyForecastRequest::Id,
+    .commandId       = Commands::ModifyForecastRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace ModifyForecastRequest
 namespace RequestConstraintBasedForecast {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DeviceEnergyManagement::Commands::RequestConstraintBasedForecast::Id,
+    .commandId       = Commands::RequestConstraintBasedForecast::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace RequestConstraintBasedForecast
 namespace CancelRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DeviceEnergyManagement::Commands::CancelRequest::Id,
+    .commandId       = Commands::CancelRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

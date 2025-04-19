@@ -30,7 +30,7 @@ namespace ClosureDimension {
  *  @brief Class implements the client facing APIs to read, write and process incoming commands
  *          App should instantiate and init one Interface per endpoint
  */
-class Interface : public AttributeAccessInterface, public CommandHandlerInterface
+class Interface : public AttributeAccessInterface, public CommandHandlerInterfaceB
 {
 public:
     Interface(EndpointId endpoint, ClusterLogic & clusterLogic) :

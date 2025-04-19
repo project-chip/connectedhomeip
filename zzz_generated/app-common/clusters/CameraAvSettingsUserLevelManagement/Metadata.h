@@ -97,49 +97,49 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace MPTZSetPosition {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CameraAvSettingsUserLevelManagement::Commands::MPTZSetPosition::Id,
+    .commandId       = Commands::MPTZSetPosition::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace MPTZSetPosition
 namespace MPTZRelativeMove {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CameraAvSettingsUserLevelManagement::Commands::MPTZRelativeMove::Id,
+    .commandId       = Commands::MPTZRelativeMove::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace MPTZRelativeMove
 namespace MPTZMoveToPreset {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CameraAvSettingsUserLevelManagement::Commands::MPTZMoveToPreset::Id,
+    .commandId       = Commands::MPTZMoveToPreset::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace MPTZMoveToPreset
 namespace MPTZSavePreset {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CameraAvSettingsUserLevelManagement::Commands::MPTZSavePreset::Id,
+    .commandId       = Commands::MPTZSavePreset::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace MPTZSavePreset
 namespace MPTZRemovePreset {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CameraAvSettingsUserLevelManagement::Commands::MPTZRemovePreset::Id,
+    .commandId       = Commands::MPTZRemovePreset::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace MPTZRemovePreset
 namespace DPTZSetViewport {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CameraAvSettingsUserLevelManagement::Commands::DPTZSetViewport::Id,
+    .commandId       = Commands::DPTZSetViewport::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace DPTZSetViewport
 namespace DPTZRelativeMove {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CameraAvSettingsUserLevelManagement::Commands::DPTZRelativeMove::Id,
+    .commandId       = Commands::DPTZRelativeMove::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

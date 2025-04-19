@@ -31,7 +31,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-class ThreadNetworkDirectoryServer : private AttributeAccessInterface, private CommandHandlerInterface
+class ThreadNetworkDirectoryServer : private AttributeAccessInterface, private CommandHandlerInterfaceB
 {
 public:
     ThreadNetworkDirectoryServer(EndpointId endpoint, ThreadNetworkDirectoryStorage & storage);

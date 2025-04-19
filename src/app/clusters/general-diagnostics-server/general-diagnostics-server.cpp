@@ -113,14 +113,14 @@ TestEventTriggerDelegate * GetTriggerDelegateOnMatchingKey(ByteSpan enableKey)
 }
 
 class GeneralDiagnosticsGlobalInstance : public AttributeAccessInterface,
-                                         public CommandHandlerInterface,
+                                         public CommandHandlerInterfaceB,
                                          public DeviceLayer::ConnectivityManagerDelegate
 {
 public:
     // Register for the GeneralDiagnostics cluster on all endpoints.
     GeneralDiagnosticsGlobalInstance() :
         AttributeAccessInterface(Optional<EndpointId>::Missing(), GeneralDiagnostics::Id),
-        CommandHandlerInterface(Optional<EndpointId>::Missing(), GeneralDiagnostics::Id)
+        CommandHandlerInterfaceB(Optional<EndpointId>::Missing(), GeneralDiagnostics::Id)
     {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
@@ -215,18 +215,18 @@ void GeneralDiagnosticsGlobalInstance::InvokeCommand(HandlerContext & handlerCon
     switch (handlerContext.mRequestPath.mCommandId)
     {
     case Commands::TestEventTrigger::Id:
-        CommandHandlerInterface::HandleCommand<Commands::TestEventTrigger::DecodableType>(
+        CommandHandlerInterfaceB::HandleCommand<Commands::TestEventTrigger::DecodableType>(
             handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleTestEventTrigger(ctx, commandData); });
         break;
 
     case Commands::TimeSnapshot::Id:
-        CommandHandlerInterface::HandleCommand<Commands::TimeSnapshot::DecodableType>(
+        CommandHandlerInterfaceB::HandleCommand<Commands::TimeSnapshot::DecodableType>(
             handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleTimeSnapshot(ctx, commandData); });
         break;
 
 #ifdef GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD
     case Commands::PayloadTestRequest::Id:
-        CommandHandlerInterface::HandleCommand<Commands::PayloadTestRequest::DecodableType>(
+        CommandHandlerInterfaceB::HandleCommand<Commands::PayloadTestRequest::DecodableType>(
             handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandlePayloadTestRequest(ctx, commandData); });
         break;
 #endif

@@ -34,11 +34,11 @@ namespace ClosureControl {
  *        Applications should instantiate and init one Interface per endpoint
  *
  */
-class Interface : public AttributeAccessInterface, public CommandHandlerInterface
+class Interface : public AttributeAccessInterface, public CommandHandlerInterfaceB
 {
 public:
     Interface(EndpointId endpoint, ClusterLogic & clusterLogic) :
-        AttributeAccessInterface(Optional<EndpointId>(endpoint), Id), CommandHandlerInterface(Optional<EndpointId>(endpoint), Id),
+        AttributeAccessInterface(Optional<EndpointId>(endpoint), Id), CommandHandlerInterfaceB(Optional<EndpointId>(endpoint), Id),
         mClusterLogic(clusterLogic)
     {}
 

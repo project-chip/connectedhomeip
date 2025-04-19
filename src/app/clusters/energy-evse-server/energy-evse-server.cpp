@@ -182,41 +182,29 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeVal
 }
 
 // CommandHandlerInterface
-CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                                               ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Commands;
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(7));
 
-    for (auto && cmd : {
-             Disable::Id,
-             EnableCharging::Id,
-         })
-    {
-        VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
-    }
+    ReturnErrorOnFailure(builder.AppendElements({ Disable::kMetadataEntry, EnableCharging::kMetadataEntry }));
 
     if (HasFeature(Feature::kV2x))
     {
-        VerifyOrExit(callback(EnableDischarging::Id, context) == Loop::Continue, /**/);
+        ReturnErrorOnFailure(builder.Append(EnableDischarging::kMetadataEntry));
     }
 
     if (HasFeature(Feature::kChargingPreferences))
     {
-        for (auto && cmd : {
-                 SetTargets::Id,
-                 GetTargets::Id,
-                 ClearTargets::Id,
-             })
-        {
-            VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
-        }
+        ReturnErrorOnFailure(
+            builder.AppendElements({ SetTargets::kMetadataEntry, GetTargets::kMetadataEntry, ClearTargets::kMetadataEntry }));
     }
 
     if (SupportsOptCmd(OptionalCommands::kSupportsStartDiagnostics))
     {
-        callback(StartDiagnostics::Id, context);
+        ReturnErrorOnFailure(builder.Append(StartDiagnostics::kMetadataEntry));
     }
-
-exit:
     return CHIP_NO_ERROR;
 }
 

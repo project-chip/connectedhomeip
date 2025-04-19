@@ -505,49 +505,49 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace SetpointRaiseLower {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Thermostat::Commands::SetpointRaiseLower::Id,
+    .commandId       = Commands::SetpointRaiseLower::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace SetpointRaiseLower
 namespace SetWeeklySchedule {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Thermostat::Commands::SetWeeklySchedule::Id,
+    .commandId       = Commands::SetWeeklySchedule::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace SetWeeklySchedule
 namespace GetWeeklySchedule {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Thermostat::Commands::GetWeeklySchedule::Id,
+    .commandId       = Commands::GetWeeklySchedule::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace GetWeeklySchedule
 namespace ClearWeeklySchedule {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Thermostat::Commands::ClearWeeklySchedule::Id,
+    .commandId       = Commands::ClearWeeklySchedule::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace ClearWeeklySchedule
 namespace SetActiveScheduleRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Thermostat::Commands::SetActiveScheduleRequest::Id,
+    .commandId       = Commands::SetActiveScheduleRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace SetActiveScheduleRequest
 namespace SetActivePresetRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Thermostat::Commands::SetActivePresetRequest::Id,
+    .commandId       = Commands::SetActivePresetRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace SetActivePresetRequest
 namespace AtomicRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Thermostat::Commands::AtomicRequest::Id,
+    .commandId       = Commands::AtomicRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };

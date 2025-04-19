@@ -27,6 +27,7 @@
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/ReadOnlyBuffer.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -204,11 +205,11 @@ protected:
     EndpointId mEndpointId = 0;
 };
 
-class Instance : public AttributeAccessInterface, public CommandHandlerInterface
+class Instance : public AttributeAccessInterface, public CommandHandlerInterfaceB
 {
 public:
     Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature) :
-        AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterface(MakeOptional(aEndpointId), Id),
+        AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterfaceB(MakeOptional(aEndpointId), Id),
         mDelegate(aDelegate), mFeature(aFeature)
     {
         /* set the base class delegates endpointId */
@@ -235,7 +236,8 @@ private:
 
     // CommandHandlerInterface
     void InvokeCommand(HandlerContext & handlerContext) override;
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
+    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                                         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
     Protocols::InteractionModel::Status CheckOptOutAllowsRequest(AdjustmentCauseEnum adjustmentCause);
     void HandlePowerAdjustRequest(HandlerContext & ctx, const Commands::PowerAdjustRequest::DecodableType & commandData);

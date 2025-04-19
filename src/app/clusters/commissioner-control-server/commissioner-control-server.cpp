@@ -70,7 +70,7 @@ namespace Clusters {
 namespace CommissionerControl {
 
 CommissionerControlServer::CommissionerControlServer(Delegate * delegate, EndpointId endpointId) :
-    CommandHandlerInterface(MakeOptional(endpointId), Id)
+    CommandHandlerInterfaceB(MakeOptional(endpointId), Id)
 {
     mDelegate = delegate;
 }
@@ -135,14 +135,14 @@ void CommissionerControlServer::InvokeCommand(HandlerContext & handlerContext)
     case Commands::RequestCommissioningApproval::Id:
         ChipLogDetail(Zcl, "CommissionerControl: Entering RequestCommissioningApproval");
 
-        CommandHandlerInterface::HandleCommand<Commands::RequestCommissioningApproval::DecodableType>(
+        CommandHandlerInterfaceB::HandleCommand<Commands::RequestCommissioningApproval::DecodableType>(
             handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleRequestCommissioningApproval(ctx, req); });
         break;
 
     case Commands::CommissionNode::Id:
         ChipLogDetail(Zcl, "CommissionerControl: Entering CommissionNode");
 
-        CommandHandlerInterface::HandleCommand<Commands::CommissionNode::DecodableType>(
+        CommandHandlerInterfaceB::HandleCommand<Commands::CommissionNode::DecodableType>(
             handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleCommissionNode(ctx, req); });
         break;
     }

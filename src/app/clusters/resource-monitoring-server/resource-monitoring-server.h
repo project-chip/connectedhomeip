@@ -39,7 +39,7 @@ namespace ResourceMonitoring {
 // forward declarations
 class Delegate;
 
-class Instance : public CommandHandlerInterface, public AttributeAccessInterface
+class Instance : public CommandHandlerInterfaceB, public AttributeAccessInterface
 {
 
 public:
@@ -132,7 +132,8 @@ private:
 
     // CommandHandlerInterface
     void InvokeCommand(HandlerContext & ctx) override;
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
+    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                                         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;

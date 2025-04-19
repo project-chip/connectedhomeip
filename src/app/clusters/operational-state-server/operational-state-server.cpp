@@ -40,8 +40,9 @@ using namespace chip::app::Clusters::OperationalState::Attributes;
 using Status = Protocols::InteractionModel::Status;
 
 Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId) :
-    CommandHandlerInterface(MakeOptional(aEndpointId), aClusterId), AttributeAccessInterface(MakeOptional(aEndpointId), aClusterId),
-    mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(aClusterId)
+    CommandHandlerInterfaceB(MakeOptional(aEndpointId), aClusterId),
+    AttributeAccessInterface(MakeOptional(aEndpointId), aClusterId), mDelegate(aDelegate), mEndpointId(aEndpointId),
+    mClusterId(aClusterId)
 {
     mDelegate->SetInstance(this);
     mCountdownTime.policy()
@@ -524,7 +525,8 @@ bool RvcOperationalState::Instance::IsDerivedClusterStateResumeCompatible(uint8_
 }
 
 // This function is called by the base operational state cluster when a command in the derived cluster number-space is received.
-void RvcOperationalState::Instance::InvokeDerivedClusterCommand(chip::app::CommandHandlerInterface::HandlerContext & handlerContext)
+void RvcOperationalState::Instance::InvokeDerivedClusterCommand(
+    chip::app::CommandHandlerInterfaceB::HandlerContext & handlerContext)
 {
     ChipLogDetail(Zcl, "RvcOperationalState: InvokeDerivedClusterCommand");
     switch (handlerContext.mRequestPath.mCommandId)
@@ -532,7 +534,7 @@ void RvcOperationalState::Instance::InvokeDerivedClusterCommand(chip::app::Comma
     case RvcOperationalState::Commands::GoHome::Id:
         ChipLogDetail(Zcl, "RvcOperationalState: Entering handling GoHome command");
 
-        CommandHandlerInterface::HandleCommand<Commands::GoHome::DecodableType>(
+        CommandHandlerInterfaceB::HandleCommand<Commands::GoHome::DecodableType>(
             handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleGoHomeCommand(ctx, req); });
         break;
     }

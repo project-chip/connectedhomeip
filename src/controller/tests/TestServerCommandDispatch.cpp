@@ -54,10 +54,10 @@ enum ResponseDirective
 
 ResponseDirective responseDirective;
 
-class TestClusterCommandHandler : public chip::app::CommandHandlerInterface
+class TestClusterCommandHandler : public chip::app::CommandHandlerInterfaceB
 {
 public:
-    TestClusterCommandHandler() : chip::app::CommandHandlerInterface(Optional<EndpointId>::Missing(), Clusters::UnitTesting::Id)
+    TestClusterCommandHandler() : chip::app::CommandHandlerInterfaceB(Optional<EndpointId>::Missing(), Clusters::UnitTesting::Id)
     {
         CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this);
     }
@@ -68,17 +68,18 @@ public:
     void ClaimNoCommands() { mClaimNoCommands = true; }
 
 private:
-    void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext & handlerContext) final;
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) final;
+    void InvokeCommand(chip::app::CommandHandlerInterfaceB::HandlerContext & handlerContext) final;
+    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                                         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) final;
 
     bool mOverrideAcceptedCommands = false;
     bool mClaimNoCommands          = false;
 };
 
-void TestClusterCommandHandler::InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext & handlerContext)
+void TestClusterCommandHandler::InvokeCommand(chip::app::CommandHandlerInterfaceB::HandlerContext & handlerContext)
 {
     HandleCommand<Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::DecodableType>(
-        handlerContext, [](chip::app::CommandHandlerInterface::HandlerContext & ctx, const auto & requestPayload) {
+        handlerContext, [](chip::app::CommandHandlerInterfaceB::HandlerContext & ctx, const auto & requestPayload) {
             if (responseDirective == kSendDataResponse)
             {
                 Clusters::UnitTesting::Commands::TestStructArrayArgumentResponse::Type dataResponse;
@@ -105,8 +106,11 @@ void TestClusterCommandHandler::InvokeCommand(chip::app::CommandHandlerInterface
 }
 
 CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                                                CommandHandlerInterface::CommandIdCallback callback, void * context)
+                                                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
+    using namespace Clusters::UnitTesting::Commands;
+    using Priv = Access::Privilege;
+
     if (!mOverrideAcceptedCommands)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
@@ -117,9 +121,8 @@ CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteCl
         return CHIP_NO_ERROR;
     }
 
-    // We just have one command id.
-    callback(Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Id, context);
-    return CHIP_NO_ERROR;
+    static constexpr DataModel::AcceptedCommandEntry entries[] = { { TestSimpleArgumentRequest::Id, {}, Priv::kOperate } };
+    return builder.ReferenceExisting({ entries, std::size(entries) });
 }
 
 } // namespace

@@ -23,12 +23,14 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Decode.h>
 #include <app/data-model/List.h> // So we can encode lists
+#include <clusters/MetadataBridge.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Iterators.h>
+#include <lib/support/ReadOnlyBuffer.h>
+#include <lib/support/SplitLambda.h>
 
 namespace chip {
 namespace app {
-
 /*
  * This interface permits applications to register a server-side command handler
  * at run-time for a given cluster. The handler can either be configured to handle all endpoints
@@ -38,7 +40,7 @@ namespace app {
  * instead.
  *
  */
-class CommandHandlerInterface
+class CommandHandlerInterfaceB
 {
 public:
     struct HandlerContext
@@ -76,11 +78,11 @@ public:
      * aEndpointId can be Missing to indicate that this object is meant to be
      * used with all endpoints.
      */
-    CommandHandlerInterface(Optional<EndpointId> aEndpointId, ClusterId aClusterId) :
+    CommandHandlerInterfaceB(Optional<EndpointId> aEndpointId, ClusterId aClusterId) :
         mEndpointId(aEndpointId), mClusterId(aClusterId)
     {}
 
-    virtual ~CommandHandlerInterface() {}
+    virtual ~CommandHandlerInterfaceB() {}
 
     /**
      * Callback that must be implemented to handle an invoke request.
@@ -122,7 +124,8 @@ public:
      * This is used by callbacks that just look for a particular value in the
      * list.
      */
-    virtual CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+    virtual CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
@@ -146,20 +149,20 @@ public:
      * This is used by callbacks that just look for a particular value in the
      * list.
      */
-    virtual CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+    virtual CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, ReadOnlyBufferBuilder<CommandId> & builder)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
     /**
-     * Mechanism for keeping track of a chain of CommandHandlerInterface.
+     * Mechanism for keeping track of a chain of CommandHandlerInterfaceB.
      */
-    void SetNext(CommandHandlerInterface * aNext) { mNext = aNext; }
-    CommandHandlerInterface * GetNext() const { return mNext; }
+    void SetNext(CommandHandlerInterfaceB * aNext) { mNext = aNext; }
+    CommandHandlerInterfaceB * GetNext() const { return mNext; }
 
     /**
-     * Check whether a this CommandHandlerInterface is relevant for a
-     * particular endpoint+cluster.  An CommandHandlerInterface will be used
+     * Check whether a this CommandHandlerInterfaceB is relevant for a
+     * particular endpoint+cluster.  An CommandHandlerInterfaceB will be used
      * for an invoke from a particular cluster only when this function returns
      * true.
      */
@@ -169,17 +172,17 @@ public:
     }
 
     /**
-     * Check whether an CommandHandlerInterface is relevant for a particular
+     * Check whether an CommandHandlerInterfaceB is relevant for a particular
      * specific endpoint.  This is used to clean up overrides registered for an
      * endpoint that becomes disabled.
      */
     bool MatchesEndpoint(EndpointId aEndpointId) const { return mEndpointId.HasValue() && mEndpointId.Value() == aEndpointId; }
 
     /**
-     * Check whether another CommandHandlerInterface wants to handle the same set of
+     * Check whether another CommandHandlerInterfaceB wants to handle the same set of
      * commands as we do.
      */
-    bool Matches(const CommandHandlerInterface & aOther) const
+    bool Matches(const CommandHandlerInterfaceB & aOther) const
     {
         return mClusterId == aOther.mClusterId &&
             (!mEndpointId.HasValue() || !aOther.mEndpointId.HasValue() || mEndpointId.Value() == aOther.mEndpointId.Value());
@@ -229,7 +232,77 @@ protected:
 private:
     Optional<EndpointId> mEndpointId;
     ClusterId mClusterId;
-    CommandHandlerInterface * mNext = nullptr;
+    CommandHandlerInterfaceB * mNext = nullptr;
+};
+
+class CommandHandlerInterface : public CommandHandlerInterfaceB
+{
+
+    using CommandHandlerInterfaceB::CommandHandlerInterfaceB;
+    // Implements new interface
+    CHIP_ERROR
+    EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                              ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override
+    {
+        size_t commandCount = 0;
+        CHIP_ERROR err      = CHIP_NO_ERROR;
+
+        auto counter = SplitLambda([&](CommandId commandId) {
+            commandCount++;
+            return Loop::Continue;
+        });
+
+        ReturnErrorOnFailure(EnumerateAcceptedCommands(cluster, counter.Caller(), counter.Context()));
+        ReturnErrorOnFailure(builder.EnsureAppendCapacity(commandCount));
+
+        auto appender = SplitLambda([&](CommandId commandId) {
+            const auto entry = DataModel::AcceptedCommandEntryFor(cluster.mClusterId, commandId);
+
+            err = builder.Append(entry);
+            return err == CHIP_NO_ERROR ? Loop::Continue : Loop::Break;
+        });
+
+        ReturnErrorOnFailure(EnumerateAcceptedCommands(cluster, appender.Caller(), appender.Context()));
+        ReturnErrorOnFailure(err);
+        // the two invocations MUST return the same sizes
+        VerifyOrReturnError(builder.Size() == commandCount, CHIP_ERROR_INTERNAL);
+        return CHIP_NO_ERROR;
+    }
+
+    virtual CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    virtual CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, ReadOnlyBufferBuilder<CommandId> & builder) override
+    {
+        size_t commandCount = 0;
+        CHIP_ERROR err      = CHIP_NO_ERROR;
+
+        auto counter = SplitLambda([&](CommandId commandId) {
+            commandCount++;
+            return Loop::Continue;
+        });
+
+        ReturnErrorOnFailure(this->EnumerateGeneratedCommands(cluster, counter.Caller(), counter.Context()));
+        ReturnErrorOnFailure(builder.EnsureAppendCapacity(commandCount));
+
+        auto appender = SplitLambda([&](CommandId commandId) {
+            err = builder.Append(commandId);
+            return err == CHIP_NO_ERROR ? Loop::Continue : Loop::Break;
+        });
+
+        ReturnErrorOnFailure(this->EnumerateGeneratedCommands(cluster, appender.Caller(), appender.Context()));
+        ReturnErrorOnFailure(err);
+        // the two invocations MUST return the same sizes
+        VerifyOrReturnError(builder.Size() == commandCount, CHIP_ERROR_INTERNAL);
+        return CHIP_NO_ERROR;
+    }
 };
 
 } // namespace app
