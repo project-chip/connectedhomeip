@@ -305,8 +305,7 @@ jobs:
                      --lit-icd-app ./out/linux-x64-lit-icd-${BUILD_VARIANT}/lit-icd-app \
                      --microwave-oven-app ./out/linux-x64-microwave-oven-${BUILD_VARIANT}/chip-microwave-oven-app \
                      --rvc-app ./out/linux-x64-rvc-${BUILD_VARIANT}/chip-rvc-app \
-                     --network-manager-app ./out/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
-                     ''
+                     --network-manager-app ./out/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app
             - name: Run Tests using chip-repl (including slow)
               if: github.event_name == 'push'
               run: |
@@ -325,8 +324,7 @@ jobs:
                      --lit-icd-app ./out/linux-x64-lit-icd-${BUILD_VARIANT}/lit-icd-app \
                      --microwave-oven-app ./out/linux-x64-microwave-oven-${BUILD_VARIANT}/chip-microwave-oven-app \
                      --rvc-app ./out/linux-x64-rvc-${BUILD_VARIANT}/chip-rvc-app \
-                     --network-manager-app ./out/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
-                     ''
+                     --network-manager-app ./out/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app
             - name: Uploading core files
               uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}
@@ -574,8 +572,7 @@ jobs:
                   jupyter execute docs/development_controllers/chip-repl/Matter_REPL_Intro.ipynb \
                   docs/development_controllers/chip-repl/Matter_Basic_Interactions.ipynb \
                   docs/development_controllers/chip-repl/Matter_Access_Control.ipynb \
-                  docs/development_controllers/chip-repl/Matter_Multi_Fabric_Commissioning.ipynb \
-                  ''
+                  docs/development_controllers/chip-repl/Matter_Multi_Fabric_Commissioning.ipynb
 
             - name: Uploading core files
               uses: actions/upload-artifact@v4

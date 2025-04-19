@@ -116,8 +116,7 @@ jobs:
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "discover" \
                      --tool-args "commissionables" \
-                     --factoryreset \
-                     ''
+                     --factoryreset
             - name: Run Pairing Onnetwork Test
               # Generally completes in seconds
               timeout-minutes: 2
@@ -129,8 +128,7 @@ jobs:
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "pairing" \
                      --tool-args "onnetwork-long --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
-                     --factoryreset \
-                     ''
+                     --factoryreset
             - name: Run IM Invoke Test
               # Generally completes in seconds
               timeout-minutes: 2
@@ -142,8 +140,7 @@ jobs:
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "im" \
                      --tool-args "onnetwork-long-im-invoke --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
-                     --factoryreset \
-                     ''
+                     --factoryreset
             - name: Run IM Extendable Invoke Test
               # Generally completes in seconds
               timeout-minutes: 2
@@ -155,8 +152,7 @@ jobs:
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "im" \
                      --tool-args "onnetwork-long-im-extendable-invoke --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
-                     --factoryreset \
-                     ''
+                     --factoryreset
             - name: Run IM Read Test
               # Generally completes in seconds
               timeout-minutes: 2
@@ -168,8 +164,7 @@ jobs:
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "im" \
                      --tool-args "onnetwork-long-im-read --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 3000" \
-                     --factoryreset \
-                     ''
+                     --factoryreset
             - name: Run IM Write Test
               # Generally completes in seconds
               timeout-minutes: 2
@@ -181,8 +176,7 @@ jobs:
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "im" \
                      --tool-args "onnetwork-long-im-write --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
-                     --factoryreset \
-                     ''
+                     --factoryreset
             - name: Run IM Subscribe Test
               # Generally completes in seconds
               timeout-minutes: 2
@@ -194,8 +188,7 @@ jobs:
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "im" \
                      --tool-args "onnetwork-long-im-subscribe --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 3000" \
-                     --factoryreset \
-                     ''
+                     --factoryreset
             - name: Run Pairing AlreadyDiscovered Test
               # Generally completes in seconds
               timeout-minutes: 2
@@ -207,8 +200,7 @@ jobs:
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "pairing" \
                      --tool-args "already-discovered --nodeid 1 --setup-pin-code 20202021 --address ::1 --port 5540 -t 1000" \
-                     --factoryreset \
-                     ''
+                     --factoryreset
             - name: Run Pairing Address-PaseOnly Test
               # Disabled due to failure: https://github.com/project-chip/connectedhomeip/issues/27361
               if: false
@@ -220,8 +212,7 @@ jobs:
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "pairing" \
                      --tool-args "address-paseonly --nodeid 1 --setup-pin-code 20202021 --address ::1 --port 5540 -t 1000" \
-                     --factoryreset \
-                     ''
+                     --factoryreset
             - name: Run Pairing SetupQRCode Test
               # Generally completes in seconds
               timeout-minutes: 2
@@ -233,8 +224,7 @@ jobs:
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "pairing" \
                      --tool-args "code --nodeid 1 --setup-payload MT:-24J0AFN00KA0648G00 --discover-once 1 --use-only-onnetwork-discovery 0 -t 1000" \
-                     --factoryreset \
-                     ''
+                     --factoryreset
             - name: Run Pairing ManualCode Test
               # Generally completes in seconds
               timeout-minutes: 2
@@ -246,8 +236,7 @@ jobs:
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "pairing" \
                      --tool-args "code --nodeid 1 --setup-payload 34970112332 --discover-once 1 --use-only-onnetwork-discovery 0 -t 1000" \
-                     --factoryreset \
-                     ''
+                     --factoryreset
             - name: Run Pairing ICD Onnetwork Test
               # Generally completes in seconds
               timeout-minutes: 2
@@ -259,8 +248,7 @@ jobs:
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "pairing" \
                      --tool-args "onnetwork-long --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
-                     --factoryreset \
-                     ''
+                     --factoryreset
             - name: Run Pairing ICD Onnetwork and OTA test
               # Generally completes in seconds
               timeout-minutes: 2
@@ -272,8 +260,7 @@ jobs:
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "ota" \
                      --tool-args "onnetwork-long-ota-over-bdx  --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
-                     --factoryreset \
-                     ''
+                     --factoryreset
             - name: Run Pairing Onnetwork and get diagnostic log Test
               run: |
                   out/venv/bin/python \
@@ -283,8 +270,7 @@ jobs:
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "bdx" \
                      --tool-args "onnetwork-long-downloadLog --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 3000 --logType CrashLogs --fileName ./crashLog.log" \
-                     --factoryreset \
-                     ''
+                     --factoryreset
             - name: Run Pairing Onnetwork Test
               # Generally completes in seconds
               timeout-minutes: 2
@@ -296,8 +282,7 @@ jobs:
                      --tool-path out/linux-x64-kotlin-matter-controller \
                      --tool-cluster "pairing" \
                      --tool-args "onnetwork-long --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
-                     --factoryreset \
-                     ''
+                     --factoryreset
             - name: Run Kotlin IM Invoke Test
               # Generally completes in seconds
               timeout-minutes: 2
@@ -309,8 +294,7 @@ jobs:
                      --tool-path out/linux-x64-kotlin-matter-controller \
                      --tool-cluster "im" \
                      --tool-args "onnetwork-long-im-invoke --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
-                     --factoryreset \
-                     ''
+                     --factoryreset
             - name: Run Kotlin IM Read Test
               # Generally completes in seconds
               timeout-minutes: 2
@@ -322,8 +306,7 @@ jobs:
                      --tool-path out/linux-x64-kotlin-matter-controller \
                      --tool-cluster "im" \
                      --tool-args "onnetwork-long-im-read --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 3000" \
-                     --factoryreset \
-                     ''
+                     --factoryreset
             - name: Run Kotlin IM Write Test
               # Generally completes in seconds
               timeout-minutes: 2
@@ -335,8 +318,7 @@ jobs:
                      --tool-path out/linux-x64-kotlin-matter-controller \
                      --tool-cluster "im" \
                      --tool-args "onnetwork-long-im-write --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
-                     --factoryreset \
-                     ''
+                     --factoryreset
             - name: Run Kotlin IM Subscribe Test
               # Generally completes in seconds
               timeout-minutes: 2
@@ -348,8 +330,7 @@ jobs:
                      --tool-path out/linux-x64-kotlin-matter-controller \
                      --tool-cluster "im" \
                      --tool-args "onnetwork-long-im-subscribe --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 3000" \
-                     --factoryreset \
-                     ''
+                     --factoryreset
             - name: Uploading core files
               uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}
