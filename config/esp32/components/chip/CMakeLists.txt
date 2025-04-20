@@ -173,10 +173,6 @@ if (CONFIG_BUILD_CHIP_TESTS)
     chip_gn_arg_bool("chip_build_tests"     "true")
 endif()
 
-if (CONFIG_IM_PRETTY_PRINT)
-    chip_gn_arg_bool("enable_im_pretty_print"	"true")
-endif()
-
 if (NOT CONFIG_USE_MINIMAL_MDNS)
     chip_gn_arg_append("chip_mdns"                          "\"platform\"")
 else()
