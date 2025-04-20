@@ -50,6 +50,8 @@ not_automated:
       reason: Unit test - does not run against an app
     - name: TC_DEMTestBase.py
       reason: Shared code for TC_DEM, not a standalone test
+    - name: TC_EGCTestBase.py
+      reason: Shared code for TC_EGC, not a standalone test      
     - name: TestConformanceTest.py
       reason:
           Unit test of the conformance test (TC_DeviceConformance) - does not
