@@ -36,13 +36,11 @@ import random
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
-from chip.clusters.Types import Nullable
 from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
-# These below variables are used to test the AccessControl cluster
-# Extension attribute and come from the test plan here:
+# These below variables are used to test the AccessControl clusters Extension attribute and come from the test plan here:
 # https://github.com/CHIP-Specifications/chip-test-plans/blob/59e8c45b8e7c24d5ce130b166520ff4f7bd935b6/src/cluster/AccessControl.adoc#tc-acl-2-6-accesscontrolentrychanged-event:~:text=D_OK_EMPTY%3A%20%221718%22%20which%20is%20an%20octstr%20of%20length%202%20containing%20valid%20TLV%3A
 D_OK_EMPTY = bytes.fromhex('1718')
 D_OK_SINGLE = bytes.fromhex(
@@ -148,7 +146,7 @@ class TC_ACL_2_3(MatterBaseTest):
         )
         logging.info(f"Write result: {str(result1)}")
         asserts.assert_equal(
-            result1[0].Status, Status.Success, f"Write should have succeeded")
+            result1[0].Status, Status.Success, "Write should have succeeded")
 
         self.step(5)
         # Read AccessControlExtension attribute for TH1 value is D_OK_EMPTY
@@ -167,7 +165,7 @@ class TC_ACL_2_3(MatterBaseTest):
         )
         logging.info(f"Write result: {str(result2)}")
         asserts.assert_equal(
-            result2[0].Status, Status.Success, f"Write should have succeeded")
+            result2[0].Status, Status.Success, "Write should have succeeded")
 
         self.step(7)
         # Read AccessControlExtension attribute for TH1 value is D_OK_SINGLE
@@ -186,7 +184,7 @@ class TC_ACL_2_3(MatterBaseTest):
         )
         logging.info(f"Write result: {str(result3)}")
         asserts.assert_equal(
-            result3[0].Status, Status.Success, f"Write should have succeeded")
+            result3[0].Status, Status.Success, "Write should have succeeded")
 
         self.step(9)
         # Read AccessControlExtension attribute for TH1 value is D_OK_FULL
@@ -205,7 +203,7 @@ class TC_ACL_2_3(MatterBaseTest):
         )
         logging.info(f"Write result: {str(result4)}")
         asserts.assert_equal(
-            result4[0].Status, Status.ConstraintError, f"Write should have returned a CONSTRAINT_ERROR")
+            result4[0].Status, Status.ConstraintError, "Write should have returned a CONSTRAINT_ERROR")
 
         self.step(11)
         # Write AccessControlExtension attribute for TH1 value is D_BAD_STRUCT
@@ -218,7 +216,7 @@ class TC_ACL_2_3(MatterBaseTest):
         )
         logging.info(f"Write result: {str(result5)}")
         asserts.assert_equal(
-            result5[0].Status, Status.ConstraintError, f"Write should have returned a CONSTRAINT_ERROR")
+            result5[0].Status, Status.ConstraintError, "Write should have returned a CONSTRAINT_ERROR")
 
         self.step(12)
         # Write AccessControlExtension attribute for TH1 value is D_BAD_LIST
@@ -231,7 +229,7 @@ class TC_ACL_2_3(MatterBaseTest):
         )
         logging.info(f"Write result: {str(result6)}")
         asserts.assert_equal(
-            result6[0].Status, Status.ConstraintError, f"Write should have returned a CONSTRAINT_ERROR")
+            result6[0].Status, Status.ConstraintError, "Write should have returned a CONSTRAINT_ERROR")
 
         self.step(13)
         # Write AccessControlExtension attribute for TH1 value is D_BAD_ELEM
@@ -244,7 +242,7 @@ class TC_ACL_2_3(MatterBaseTest):
         )
         logging.info(f"Write result: {str(result7)}")
         asserts.assert_equal(
-            result7[0].Status, Status.ConstraintError, f"Write should have returned a CONSTRAINT_ERROR")
+            result7[0].Status, Status.ConstraintError, "Write should have returned a CONSTRAINT_ERROR")
 
         self.step(14)
         # Write AccessControlExtension attribute for TH1 value is D_BAD_OVERFLOW
@@ -257,7 +255,7 @@ class TC_ACL_2_3(MatterBaseTest):
         )
         logging.info(f"Write result: {str(result8)}")
         asserts.assert_equal(
-            result8[0].Status, Status.ConstraintError, f"Write should have returned a CONSTRAINT_ERROR")
+            result8[0].Status, Status.ConstraintError, "Write should have returned a CONSTRAINT_ERROR")
 
         self.step(15)
         # Write AccessControlExtension attribute for TH1 value is D_BAD_UNDERFLOW
@@ -270,7 +268,7 @@ class TC_ACL_2_3(MatterBaseTest):
         )
         logging.info(f"Write result: {str(result9)}")
         asserts.assert_equal(
-            result9[0].Status, Status.ConstraintError, f"Write should have returned a CONSTRAINT_ERROR")
+            result9[0].Status, Status.ConstraintError, "Write should have returned a CONSTRAINT_ERROR")
 
         self.step(16)
         # Write AccessControlExtension attribute for TH1 value is D_BAD_NONE
@@ -283,7 +281,7 @@ class TC_ACL_2_3(MatterBaseTest):
         )
         logging.info(f"Write result: {str(result10)}")
         asserts.assert_equal(
-            result10[0].Status, Status.ConstraintError, f"Write should have returned a CONSTRAINT_ERROR")
+            result10[0].Status, Status.ConstraintError, "Write should have returned a CONSTRAINT_ERROR")
 
         self.step(17)
         # Write AccessControlExtension attribute for TH1 value is D_OK_EMPTY, D_OK_SINGLE
@@ -300,7 +298,7 @@ class TC_ACL_2_3(MatterBaseTest):
         asserts.assert_equal(
             result11[0].Status,
             Status.ConstraintError,
-            f"Write should have returned a SUCCESS for struct 1, CONSTRAINT_ERROR for struct 2")
+            "Write should have returned a SUCCESS for struct 1, CONSTRAINT_ERROR for struct 2")
 
         self.step(18)
         # Read AccessControlExtension attribute for TH1 value is D_OK_FULL
@@ -320,7 +318,7 @@ class TC_ACL_2_3(MatterBaseTest):
         )
         logging.info(f"Write result: {str(result12)}")
         asserts.assert_equal(
-            result12[0].Status, Status.Success, f"Write should have returned a SUCCESS")
+            result12[0].Status, Status.Success, "Write should have returned a SUCCESS")
 
         self.step(20)
         # Read AccessControlExtension attribute for TH1 value is an empty list
