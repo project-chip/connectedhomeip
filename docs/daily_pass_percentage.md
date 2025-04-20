@@ -1,21 +1,21 @@
 |                                         |   Pass Rate |
 |:----------------------------------------|------------:|
 | codeql                                  |           0 |
-| darwin                                  |          71 |
-| build-example-esp32                     |         100 |
 | tv-casting-example-darwin               |         100 |
+| build-example-esp32                     |         100 |
+| build-example-nuttx                     |         100 |
 | cirque                                  |         100 |
 | tests                                   |         100 |
 | build-example-ti-cc13xx-26xx            |         100 |
-| build-example-nuttx                     |         100 |
-| build-example-infineon                  |         100 |
-| run-misspell                            |         100 |
-| lint-code-base                          |         100 |
+| build-example-nxp                       |         100 |
 | build-example-nrf-connect-sdk           |         100 |
+| lint-code-base                          |         100 |
 | build-example-efr32                     |         100 |
+| darwin                                  |         100 |
 | recent-fail-summary                     |         100 |
 | build-example-linux-arm                 |         100 |
-| build-example-nxp                       |         100 |
+| full-builds-android                     |         100 |
+| build-example-infineon                  |         100 |
 | cancel-workflows-on-failing-ci          |         100 |
 | unit-integration-tests                  |         100 |
 | build-example-stm32                     |         100 |
@@ -31,7 +31,7 @@
 | build-example-ameba                     |         100 |
 | build-example-qpg                       |         100 |
 | build-chef-ci-examples-on-all-platforms |         100 |
-| full-builds-android                     |         100 |
+| issue-labeler                           |         100 |
 | build-example-linux-standalone          |         100 |
 | validate-gradle-wrapper                 |         100 |
 | build-example-tizen                     |         100 |
