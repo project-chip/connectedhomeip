@@ -101,13 +101,17 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="SpinSpeeds" type="list">
       <entry type="string">
-        <constraint type="maxLength" value="64"/>
+        <constraint>
+          <maxLength value="64"/>
+        </constraint>
       </entry>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="SPIN"/>
       </mandatoryConform>
-      <constraint type="maxCount" value="16"/>
+      <constraint>
+        <maxCount value="16"/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="SpinSpeedCurrent" type="uint8" default="desc">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
@@ -115,14 +119,18 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="SPIN"/>
       </mandatoryConform>
-      <constraint type="max" value="15"/>
+      <constraint>
+        <max value="15"/>
+      </constraint>
     </attribute>
     <attribute id="0x0002" name="NumberOfRinses" type="NumberOfRinsesEnum" default="1">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <mandatoryConform>
         <feature name="RINSE"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0003" name="SupportedRinses" type="list">
       <entry type="NumberOfRinsesEnum"/>
@@ -130,7 +138,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="RINSE"/>
       </mandatoryConform>
-      <constraint type="maxCount" value="4"/>
+      <constraint>
+        <maxCount value="4"/>
+      </constraint>
     </attribute>
   </attributes>
 </cluster>
