@@ -101,9 +101,6 @@ private:
 
     EndpointId mEndpointId;
 
-    uint8_t percentCurrent;
-    uint8_t speedCurrent;
-
     // Set up for Activated Carbon Filter Monitoring
     ActivatedCarbonFilterMonitoringDelegate activatedCarbonFilterDelegate;
     ResourceMonitoring::Instance activatedCarbonFilterInstance;
@@ -119,7 +116,7 @@ private:
     ThermostatManager mThermostatManager;
 
     // This gets initialized properly in the init function from the On/Off cluster
-    bool mOnOffClusterOn = True;
+    bool mOnOffClusterOn = true;
 
     // Fan Mode Limits
     static constexpr int FAN_MODE_LOW_LOWER_BOUND    = 1;
