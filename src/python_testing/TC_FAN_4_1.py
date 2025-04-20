@@ -139,8 +139,7 @@ class TC_FAN_2_4(MatterBaseTest):
         # Wait for the entire duration of the test because this valve may be slow. The test will time out before this does. That's fine.
         timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
 
-        # TODO: make this a pixit
-        wait_s = 1
+        wait_s = self.user_params.get('pixit_fan_start_time', 1)
 
         self.step(2)
         sub = ClusterAttributeChangeAccumulator(Clusters.FanControl)
