@@ -137,7 +137,7 @@ enum
     kDeviceOption_icdActiveModeDurationMs,
     kDeviceOption_icdIdleModeDuration,
 #endif
-#if CHIP_CONFIG_ENABLE_CAMERA_SERVER
+#if ENABLE_CAMERA_SERVER
     kDeviceOption_Camera_DeferredOffer,
 #endif
 };
@@ -224,7 +224,7 @@ OptionDef sDeviceOptionDefs[] = {
     { "icdActiveModeDurationMs", kArgumentRequired, kDeviceOption_icdActiveModeDurationMs },
     { "icdIdleModeDuration", kArgumentRequired, kDeviceOption_icdIdleModeDuration },
 #endif
-#if CHIP_CONFIG_ENABLE_CAMERA_SERVER
+#if ENABLE_CAMERA_SERVER
     { "camera-deferred-offer", kNoArgument, kDeviceOption_Camera_DeferredOffer },
 #endif
     {}
@@ -409,11 +409,11 @@ const char * sDeviceOptionHelp =
     "       Sets the ICD idle mode durations (in seconds). (Default: 300)\n"
     "       This defines the how long the ICD server can stay in idle mode.\n"
 #endif
-#if CHIP_CONFIG_ENABLE_CAMERA_SERVER
+#if ENABLE_CAMERA_SERVER
     "\n"
     "  --camera-deferred-offer\n"
     "       Indicates the delayed processing hint of the WebRTC Provider.\n"
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#endif
     "\n";
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
@@ -833,7 +833,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         break;
     }
 #endif
-#if CHIP_CONFIG_ENABLE_CAMERA_SERVER
+#if ENABLE_CAMERA_SERVER
     case kDeviceOption_Camera_DeferredOffer: {
         LinuxDeviceOptions::GetInstance().cameraDeferredOffer = true;
         break;
