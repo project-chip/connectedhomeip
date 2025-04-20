@@ -37,13 +37,14 @@ public:
         AttributeAccessInterface(Optional<EndpointId>(endpoint), Id), CommandHandlerInterface(Optional<EndpointId>(endpoint), Id),
         mClusterLogic(clusterLogic)
     {}
+    
+    virtual ~Interface() = default;
 
     // AttributeAccessInterface implementation
-
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
-    // CommandHandlerInterface implementation
 
+    // CommandHandlerInterface implementation
     void InvokeCommand(HandlerContext & handlerContext) override;
 
     /**

@@ -451,7 +451,7 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
     VerifyOrReturnError(SetTarget(target) == CHIP_NO_ERROR, Status::Failure);
 
     // TODO: Should the Target value set to CurrentState if HandleSetTarget fails
-    return mClusterDriver.HandleSetTarget(target.position, target.latch, target.speed);
+    return mDelegate.HandleSetTarget(target.position, target.latch, target.speed);
 }
 
 Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t numberOfSteps,
@@ -543,7 +543,7 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
     VerifyOrReturnError(SetTarget(stepTarget) == CHIP_NO_ERROR, Status::Failure);
 
     // TODO: Should the Target value set to CurrentState if HandleStep fails
-    return mClusterDriver.HandleStep(direction, numberOfSteps, speed);
+    return mDelegate.HandleStep(direction, numberOfSteps, speed);
 }
 } // namespace ClosureDimension
 } // namespace Clusters

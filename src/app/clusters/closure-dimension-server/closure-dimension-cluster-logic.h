@@ -82,9 +82,14 @@ public:
      *  @brief Instantiates a ClusterLogic class. The caller maintains ownership of the driver and the context,
      *           but provides them for use by the ClusterLogic class.
      */
-    ClusterLogic(DelegateBase & clusterDriver, MatterContext & matterContext) :
-        mClusterDriver(clusterDriver), mMatterContext(matterContext)
-    {}
+    ClusterLogic(DelegateBase & delegate, MatterContext & matterContext) :
+        mDelegate(delegate), mMatterContext(matterContext)
+    {
+        // TODO remove this
+        (void) mDelegate;
+    }
+    
+    virtual ~ClusterLogic() = default;
 
     const ClusterState & GetState() { return mState; }
 
@@ -264,7 +269,7 @@ private:
     bool mInitialized;
     ClusterState mState;
     ClusterConformance mConformance;
-    DelegateBase & mClusterDriver;
+    DelegateBase & mDelegate;
     MatterContext & mMatterContext;
 };
 

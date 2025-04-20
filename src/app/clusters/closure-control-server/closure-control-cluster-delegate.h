@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#pragma once
+
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -33,8 +35,12 @@ public:
     // TODO: Delagte only has the default three APIs for now. This will be refined when the updated cluster structure is integrated
     // in the Closure Sample app
     virtual Protocols::InteractionModel::Status HandleStopCommand()      = 0;
-    virtual Protocols::InteractionModel::Status HandleMoveToCommand()    = 0;
+    virtual Protocols::InteractionModel::Status HandleMoveToCommand(const Optional<TargetPositionEnum> & tag, const Optional<bool> & latch,
+                                                       const Optional<Globals::ThreeLevelAutoEnum> & speed) = 0;
     virtual Protocols::InteractionModel::Status HandleCalibrateCommand() = 0;
+    
+    virtual bool IsManualLatchingNeeded() = 0;
+    virtual bool IsReadyToMove() = 0;
 };
 
 } // namespace ClosureControl

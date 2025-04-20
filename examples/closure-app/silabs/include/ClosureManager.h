@@ -15,21 +15,27 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+ 
+ /*
+  * @class ClosureManager
+  * @brief Manages the initialization and operations related to closure and
+  *        closure panel endpoints in the application.
+  *
+  * @note This class is part of the closure application example 
+  */
+ 
+ class ClosureManager
+ {
+ public:
+ 
+    static ClosureManager sClosureMgr;
+ 
+    /**
+    * @brief Initializes the ClosureManager.
+    *
+    * This method sets up the necessary resources and configurations required
+    * for the Closure Application to function properly.
+    */
+    void Init();
 
-#pragma once
-
-#include <lib/core/CHIPError.h>
-#include <lib/core/DataModelTypes.h>
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace ClosureControl {
-
-CHIP_ERROR ClosureControlInit(chip::EndpointId endpointId);
-CHIP_ERROR ClosureControlShutdown();
-
-} // namespace ClosureControl
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+ };

@@ -171,7 +171,7 @@ public:
     CHIP_ERROR GetOverallState(DataModel::Nullable<GenericOverallState> & overallState);
     CHIP_ERROR GetOverallTarget(DataModel::Nullable<GenericOverallTarget> & overallTarget);
 
-    // TODO: Add ErrorList guetter with its implementation
+    // TODO: Add ErrorList getter with its implementation
 
     // All Set functions
     // Return CHIP_ERROR_INCORRECT_STATE if the class has not been initialized.
@@ -185,6 +185,72 @@ public:
 
     CHIP_ERROR SetMainState(MainStateEnum mainState);
     CHIP_ERROR SetOverallState(const DataModel::Nullable<GenericOverallState> & overallState);
+    CHIP_ERROR SetOverallTarget(const DataModel::Nullable<GenericOverallTarget> & overallTarget);
+    
+    /**
+     *  @brief Calls delegate HandleStopCommand function after validating the parameters and conformance.
+     *  @return Exits if the cluster is not initialized.
+     *          Returns InvalidInState if the Stop command not supported from present Mainstate.
+     *          Returns Success on succesful handling.
+     */
+    chip::Protocols::InteractionModel::Status HandleStop();
+    
+    /**
+     *  @brief Calls delegate HandleMoveToCommand function after validating the parameters and conformance.
+     *  @param [in] position target position
+     *  @param [in] latch Target latch
+     *  @param [in] speed Target speed
+     *  @return Exits if the cluster is not initialized.
+     *          Returns ConstraintError if the input values are out is out of range.
+     *          Returns InvalidInState iif the MoveTo command not supported from present Mainstate.
+     *          Returns Success if arguments don't match the feature conformance.
+     *          Returns Success on succesful handling.
+     */
+    chip::Protocols::InteractionModel::Status HandleMoveTo(Optional<TargetPositionEnum> position, Optional<bool> latch,
+                                                           Optional<Globals::ThreeLevelAutoEnum> speed);
+    
+    /**
+     *  @brief Calls delegate HandleCalibrateCommand function after validating the parameters and conformance.
+     *  @return Exits if the cluster is not initialized.
+     *          Returns ConstraintError if the input values are out is out of range.
+     *          Returns InvalidInState if the Calibrate command not supported from present Mainstate.
+     *          Returns Success on succesful handling.
+     */
+    chip::Protocols::InteractionModel::Status HandleCalibrate();
+    
+    /**
+     * @brief Post event when a reportable error condition is detected
+     * @param [in] errorState current error list
+     * @return CHIP_NO_ERROR if event posted succesfully
+     *         Return error recieved from LogEvent.
+     */
+    CHIP_ERROR PostOperationalErrorEvent(const DataModel::List<const ClosureErrorEnum> errorState);
+
+    /**
+     * @brief Post event, if supported, when the overall operation ends, either successfully or otherwise
+     * @return CHIP_NO_ERROR if event posted succesfully
+     *         CHIP_NO_ERROR if positioning feature is not supported.
+     *         Return error recieved from LogEvent.
+     */
+    CHIP_ERROR PostMovementCompletedEvent();
+
+    /**
+     * @brief Post event, if supported,when the MainStateEnum attribute changes state to and from disengaged
+     * @param[in] EngageValue will indicate if the actuator is Engaged or Disengaged
+     * @return CHIP_NO_ERROR if event posted succesfully
+     *         CHIP_NO_ERROR if manuallyOperable feature is not supported.
+     *         Return error recieved from LogEvent.
+     */
+    CHIP_ERROR PostEngageStateChangedEvent(const bool engageValue);
+
+    /**
+     * @brief Post event, if supported, when the SecureState field in the OverallState attribute changes.
+     * @param[in] secureValue will indicate whether a closure is securing a space against possible unauthorized entry.
+     * @return CHIP_NO_ERROR if event posted succesfully
+     *         CHIP_NO_ERROR if feature conformance is not supported
+     *         Return error recieved from LogEvent.
+     */
+    CHIP_ERROR PostSecureStateChangedEvent(const bool secureValue);
 
     /**
      * @brief Public API to trigger countdown time update from the delegate (application layer).
@@ -227,7 +293,7 @@ private:
     bool IsValidMainStateTransition(MainStateEnum mainState);
 
     /**
-     * @brief Function validates if the requested positioning is supported by the device.
+     * @brief Function validates if the requested overallState positioning is supported by the device.
      *        Function validates agaisnt the FeatureMap conformance to validate support.
      *
      *        - FullyClosed, FullyOpened, PartiallyOpened and OpenedAtSignature always return true since they are mandatory.
@@ -239,7 +305,22 @@ private:
      * @return true if the requested Positioning is supported
      *        false, otherwise
      */
-    bool IsSupportedPositioning(PositioningEnum positioning);
+    bool IsSupportedOverallStatePositioning(PositioningEnum positioning);
+    
+    /**
+     * @brief Function validates if the requested OverallTarget positioning is supported by the device.
+     *        Function validates agaisnt the FeatureMap conformance to validate support.
+     *
+     *        - CloseInFull, OpenInFull and Signaturealways return true since they are mandatory.
+     *        - Pedestrian returns true if the Pedestrian feature is supported, false otherwise.
+     *        - Ventilation returns true if the Ventilation feature is supported, false otherwise.
+     *
+     * @param positioning requested Positioning to validate
+     *
+     * @return true if the requested Positioning is supported
+     *        false, otherwise
+     */
+    bool IsSupportedOverallTargetPositioning(TargetPositionEnum positioning);
 
     /**
      * @brief Update the stored countdown time
@@ -265,14 +346,6 @@ private:
     {
         return SetCountdownTime(countdownTime, false);
     }
-
-    /**
-     * @brief Set the Overall Target object
-     *
-     * @param overallTarget
-     * @return CHIP_ERROR
-     */
-    CHIP_ERROR SetOverallTarget(const DataModel::Nullable<GenericOverallTarget> & overallTarget);
 
     bool mIsInitialized = false;
     DelegateBase & mDelegate;
