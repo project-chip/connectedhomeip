@@ -66,17 +66,19 @@ class TC_FAN_3_2(MatterBaseTest):
         return [TestStep(1, "[FC] Commissioning already done.", is_commissioning=True),
                 TestStep(2, "[FC] TH reads the SpeedMax attribute from the DUT. This attribute specifies the the maximum value for SpeedSetting.",
                          "[FC] Verify that the DUT response contains a uint8 value no greater than 100 and store."),
-                TestStep(3, "[FC] Initialize the DUT to `FanMode` Off.",
+                TestStep(3, "[FC] TH reads the FanModeSequence attribute from the DUT. This attribute specifies the available fan modes.",
+                         "Verify that the DUT response contains a FanModeSequenceEnum and store."),
+                TestStep(4, "[FC] Initialize the DUT to `FanMode` Off.",
                          "[FC] * Read back and verify the written value. * The DUT shall return either a SUCCESS or an INVALID_IN_STATE status code."),
-                TestStep(4, "[FC] Individually subscribe to the PercentSetting, PercentCurrent, FanMode, SpeedSetting, and SpeedCurrent attributes.",
+                TestStep(5, "[FC] Individually subscribe to the PercentSetting, PercentCurrent, FanMode, SpeedSetting, and SpeedCurrent attributes.",
                          "[FC] This will receive updates for the attributes when the SpeedSetting attribute is updated."),
-                TestStep(5, "[FC] Update the value of the `SpeedSetting` attribute iteratively, in ascending order, from 1 to SpeedMax.",
+                TestStep(6, "[FC] Update the value of the `SpeedSetting` attribute iteratively, in ascending order, from 1 to SpeedMax.",
                          "[FC] For each update, the DUT shall return either a SUCCESS or an INVALID_IN_STATE status code. After all updates have been performed, verify: If no INVALID_IN_STATE write status was returned during the SpeedSetting updates: -- Verify that if the number of reports received for SpeedSetting is greater than or equal to the number of reports received for FanMode, then the number of reports received for FanMode should be equal to the number of available FanModes - 1 (since the first FanMode is Off due to initialization). -- Verify that the number of reports received for PercentSetting matches the number of reports received for SpeedSetting. * The value of the attribute reports from the subscription of each attribute came in sequencially in ascending order (each new value greater than the previous one)."),
-                TestStep(6, "[FC] Initialize the DUT to `FanMode` High.",
+                TestStep(7, "[FC] Initialize the DUT to `FanMode` High.",
                          "[FC] * Read back and verify the written value. * The DUT shall return either a SUCCESS or an INVALID_IN_STATE status code."),
-                TestStep(7, "[FC] Individually subscribe to the PercentSetting, PercentCurrent, FanMode, SpeedSetting, and SpeedCurrent attributes.",
+                TestStep(8, "[FC] Individually subscribe to the PercentSetting, PercentCurrent, FanMode, SpeedSetting, and SpeedCurrent attributes.",
                          "[FC] This will receive updates for the attributes when the SpeedSetting attribute is updated."),
-                TestStep(8, "[FC] Update the value of the `SpeedSetting` attribute iteratively, in descending order, from SpeedMax - 1 to 0.",
+                TestStep(9, "[FC] Update the value of the `SpeedSetting` attribute iteratively, in descending order, from SpeedMax - 1 to 0.",
                          "[FC] For each update, the DUT shall return either a SUCCESS or an INVALID_IN_STATE status code. After all updates have been performed, verify: If no INVALID_IN_STATE write status was returned during the SpeedSetting updates: -- Verify that if the number of reports received for SpeedSetting is greater than or equal to the number of reports received for FanMode, then the number of reports received for FanMode should be equal to the number of available FanModes - 1 (since the first FanMode is High due to initialization). -- Verify that the number of reports received for PercentSetting matches the number of reports received for SpeedSetting. * The value of the attribute reports from the subscription of each attribute came in sequencially in descending order (each new value less than the previous one)."),
                 ]
 
@@ -263,6 +265,10 @@ class TC_FAN_3_2(MatterBaseTest):
         self.speed_max = await self.read_setting(attr.SpeedMax)
         assert_valid_uint8(self.speed_max, "SpeedMax")
 
+        # *** STEP 3 ***
+        # TH reads the FanModeSequence attribute from the DUT
+        # to get the available fan modes
+        self.step(3)
         await self.get_fan_modes(remove_auto=True)
 
         # *** NEXT STEPS ***
