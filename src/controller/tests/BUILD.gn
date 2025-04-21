@@ -30,7 +30,6 @@ chip_test_suite("tests") {
 
   if (chip_device_platform != "mbed" && chip_device_platform != "esp32") {
     test_sources += [
-      "TestAutoCommissioner.cpp",
       "TestEventCaching.cpp",
       "TestEventChunking.cpp",
       "TestEventNumberCaching.cpp",
@@ -49,6 +48,7 @@ chip_test_suite("tests") {
     # Not supported on efr32.
     if (chip_device_platform != "efr32") {
       test_sources += [
+        "TestAutoCommissioner.cpp",
         "TestCommissioningWindowOpener.cpp",
         "TestExampleOperationalCredentialsIssuer.cpp",
       ]
