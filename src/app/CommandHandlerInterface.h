@@ -21,6 +21,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model/Decode.h>
 #include <app/data-model/List.h> // So we can encode lists
 #include <lib/core/DataModelTypes.h>
@@ -246,7 +247,7 @@ class CommandHandlerInterfaceShim : public CommandHandlerInterface
         size_t commandCount = 0;
         CHIP_ERROR err      = CHIP_NO_ERROR;
 
-        auto counter = SplitLambda([&](CommandId commandId) {
+        auto counter = SplitLambda([&](DataModel::AcceptedCommandEntry commandId) {
             commandCount++;
             return Loop::Continue;
         });
@@ -254,7 +255,7 @@ class CommandHandlerInterfaceShim : public CommandHandlerInterface
         ReturnErrorOnFailure(EnumerateAcceptedCommands(cluster, counter.Caller(), counter.Context()));
         ReturnErrorOnFailure(builder.EnsureAppendCapacity(commandCount));
 
-        auto appender = SplitLambda([&](CommandId commandId) {
+        auto appender = SplitLambda([&](DataModel::AcceptedCommandEntry commandId) {
             err = builder.Append(GetEntry(cluster, commandId));
             return err == CHIP_NO_ERROR ? Loop::Continue : Loop::Break;
         });
