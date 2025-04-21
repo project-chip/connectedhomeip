@@ -118,14 +118,14 @@ void ApplicationInit()
 {
     ESP_LOGD(TAG, "Energy Gateway App: ApplicationInit()");
 
-    ElectricalPriceApplicationInit();
+    ElectricalEnergyTariffInit();
 }
 
 void ApplicationShutdown()
 {
     ESP_LOGD(TAG, "Energy Gateway App: ApplicationShutdown()");
 
-    ElectricalPriceApplicationShutdown();
+    ElectricalEnergyTariffShutdown();
 }
 
 static void InitServer(intptr_t context)

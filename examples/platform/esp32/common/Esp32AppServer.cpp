@@ -41,6 +41,10 @@
 #if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 #endif
+#if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_PRICE_TRIGGER
+#include <app/clusters/commodity-price-server/CommodityPriceTestEventTriggerHandler.h>
+#endif
+
 
 #ifdef CONFIG_ENABLE_CHIP_SHELL
 #include <lib/shell/commands/WiFi.h>
@@ -144,6 +148,10 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
 #if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER
     static DeviceEnergyManagementTestEventTriggerHandler sDeviceEnergyManagementTestEventTriggerHandler;
     sTestEventTriggerDelegate.AddHandler(&sDeviceEnergyManagementTestEventTriggerHandler);
+#endif
+#if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_PRICE_TRIGGER
+    static CommodityPriceTestEventTriggerHandler sCommodityPriceTestEventTriggerHandler;
+    sTestEventTriggerDelegate.AddHandler(&sCommodityPriceTestEventTriggerHandler);
 #endif
 
 #if CONFIG_ENABLE_OTA_REQUESTOR
