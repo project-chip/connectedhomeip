@@ -4,7 +4,7 @@ not_automated:
     - name: MinimalRepresentation.py
       reason: Code/Test not being used or not shared code for any other tests
     - name: TC_CNET_4_2.py
-      reason: It has no CI execution blcok, it not executed in CI
+      reason: It has no CI execution block, it not executed in CI
     - name: TC_CNET_4_3.py
       reason:
           network commissioning cluster does not return expected values on linux
