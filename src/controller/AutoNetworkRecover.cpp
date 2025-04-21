@@ -26,14 +26,27 @@ namespace chip {
 namespace Controller {
 
 CHIP_ERROR NetworkRecoverBase::RecoverNetwork(NodeId remoteNodeId, Transport::PeerAddress & addr,
-                                              const WiFiCredentials & wiFiCredentials, uint64_t breadcrumb,
+                                              const Optional<WiFiCredentials> & wiFiCredentials,
+                                              const Optional<ByteSpan> & operationalDataset, uint64_t breadcrumb,
                                               chip::Callback::Callback<OnNetworkRecover> * callback)
 {
+    if (wiFiCredentials.HasValue())
+    {
+        mNetworkType     = NetworkType::kWiFi;
+        mWiFiCredentials = wiFiCredentials;
+    }
+    else if (operationalDataset.HasValue())
+    {
+        mNetworkType        = NetworkType::kThread;
+        mOperationalDataset = operationalDataset;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
     mRemoteNodeId           = remoteNodeId;
-    mNetworkType            = NetworkType::kWiFi;
     mBreadcrumb             = breadcrumb;
     mNetworkRecoverCallback = callback;
-    mWiFiCredentials.SetValue(wiFiCredentials);
     return mController->GetConnectedDevice(remoteNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback, addr);
 }
 
@@ -71,6 +84,7 @@ CHIP_ERROR NetworkRecoverBase::SendRemoveNetwork(Messaging::ExchangeManager & ex
 
 CHIP_ERROR NetworkRecoverBase::SendAddOrUpdateNetwork(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
+    CHIP_ERROR err;
     ClusterBase cluster(exchangeMgr, sessionHandle, kRootEndpointId);
     if (mNetworkType == NetworkType::kWiFi)
     {
@@ -80,16 +94,17 @@ CHIP_ERROR NetworkRecoverBase::SendAddOrUpdateNetwork(Messaging::ExchangeManager
         request.credentials = mWiFiCredentials.Value().credentials;
         request.breadcrumb.Emplace(mBreadcrumb);
 
-        return cluster.InvokeCommand(request, this, OnNetworkConfigResponse, OnCommandFailure);
+        err = cluster.InvokeCommand(request, this, OnNetworkConfigResponse, OnCommandFailure);
     }
     else
     {
         NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::Type request;
-        request.operationalDataset = mThreadOperationalDataset;
+        request.operationalDataset = mOperationalDataset.Value();
         request.breadcrumb.Emplace(mBreadcrumb);
 
-        return cluster.InvokeCommand(request, this, OnNetworkConfigResponse, OnCommandFailure);
+        err = cluster.InvokeCommand(request, this, OnNetworkConfigResponse, OnCommandFailure);
     }
+    return err;
 }
 
 CHIP_ERROR NetworkRecoverBase::SendConnectNetwork(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
@@ -100,12 +115,12 @@ CHIP_ERROR NetworkRecoverBase::SendConnectNetwork(Messaging::ExchangeManager & e
     if (mNetworkType == NetworkType::kWiFi)
     {
         request.networkID = mWiFiCredentials.Value().ssid;
-        request.breadcrumb.Emplace(mBreadcrumb);
     }
     else
     {
-        // TODO for thread network recovery
+        request.networkID = mOperationalDataset.Value();
     }
+    request.breadcrumb.Emplace(mBreadcrumb);
 
     return cluster.InvokeCommand(request, this, OnConnectNetworkResponse, OnCommandFailure);
 }
@@ -380,7 +395,8 @@ AutoNetworkRecover::AutoNetworkRecover(DeviceController * controller) :
 {}
 
 CHIP_ERROR AutoNetworkRecover::RecoverNetwork(NetworkRecover * recover, NodeId remoteNodeId, Transport::PeerAddress & addr,
-                                              const WiFiCredentials & wiFiCredentials, uint64_t breadcrumb)
+                                              const Optional<WiFiCredentials> & wiFiCredentials,
+                                              const Optional<ByteSpan> & operationalDataset, uint64_t breadcrumb)
 {
     // Not using Platform::New because we want to keep our constructor private.
     auto * autoRecover = new (std::nothrow) AutoNetworkRecover(recover->GetCommissioner());
@@ -391,8 +407,8 @@ CHIP_ERROR AutoNetworkRecover::RecoverNetwork(NetworkRecover * recover, NodeId r
 
     autoRecover->mNetworkRecover = recover;
 
-    CHIP_ERROR err = autoRecover->NetworkRecoverBase::RecoverNetwork(remoteNodeId, addr, wiFiCredentials, breadcrumb,
-                                                                     &autoRecover->mOnNetworkRecoverCompleteCallback);
+    CHIP_ERROR err = autoRecover->NetworkRecoverBase::RecoverNetwork(remoteNodeId, addr, wiFiCredentials, operationalDataset,
+                                                                     breadcrumb, &autoRecover->mOnNetworkRecoverCompleteCallback);
     if (err != CHIP_NO_ERROR)
     {
         delete autoRecover;

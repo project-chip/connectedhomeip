@@ -875,9 +875,6 @@ void BLEManagerImpl::OnDeviceScanned(BluezDevice1 & device, const chip::Ble::Chi
 
 void BLEManagerImpl::OnDeviceScanned(BluezDevice1 & device, const chip::Ble::ChipBLENetworkRecoveryInfo & info)
 {
-    const char * address = bluez_device1_get_address(&device);
-    ChipLogProgress(Ble, "New recoverable device scanned: %s", address);
-
     if (mBLEScanConfig.mBleScanState == BleScanState::kScanForNetworkRecoveryRecover)
     {
         auto isMatch = (mBLEScanConfig.mRecoveryIdentifier == (info.GetRecoveryIdentifier()));
@@ -914,7 +911,7 @@ void BLEManagerImpl::OnDeviceScanned(BluezDevice1 & device, const chip::Ble::Chi
     CHIP_ERROR err = mEndpoint.ConnectDevice(device);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Ble, "Device connection failed: %" CHIP_ERROR_FORMAT, err.Format()));
 
-    ChipLogProgress(Ble, "New device connected: %s", address);
+    ChipLogProgress(Ble, "New device connected: %s", bluez_device1_get_address(&device));
 }
 
 void BLEManagerImpl::HandleConnectTimer(chip::System::Layer *, void * appState)

@@ -874,6 +874,7 @@ public:
     CHIP_ERROR DiscoverRecoverableNodes(uint16_t timeout);
 
     CHIP_ERROR RecoverNode(NodeId remoteId, uint64_t recoveryId, WiFiCredentials wiFiCreds, uint64_t breadcrumb = 0);
+    CHIP_ERROR RecoverNode(NodeId remoteId, uint64_t recoveryId, ByteSpan operationaDataset, uint64_t breadcrumb = 0);
 
 private:
     DevicePairingDelegate * mPairingDelegate = nullptr;

@@ -75,6 +75,7 @@ public:
 
     CHIP_ERROR Discover(uint16_t timeout);
     CHIP_ERROR Recover(NodeId remoteId, uint64_t recoveryId, WiFiCredentials wiFiCreds, uint64_t breadcrumb = 0);
+    CHIP_ERROR Recover(NodeId remoteId, uint64_t recoveryId, ByteSpan operationalDataset, uint64_t breadcrumb = 0);
 
     DeviceCommissioner * GetCommissioner() { return mCommissioner; }
 
@@ -107,7 +108,7 @@ private:
 
     NodeId mRemoteId;
     Optional<WiFiCredentials> mWiFiCreds;
-    Optional<ByteSpan> threadOperationalDataset;
+    Optional<ByteSpan> mOperationalDataset;
     uint64_t mBreadcrumb;
 
     NetworkRecoverBehaviour mNetworkRecoverBehaviour = NetworkRecoverBehaviour::kDiscover;

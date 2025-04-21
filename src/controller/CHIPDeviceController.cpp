@@ -3801,5 +3801,10 @@ CHIP_ERROR DeviceCommissioner::RecoverNode(NodeId remoteId, uint64_t recoveryId,
     return mNetworkRecover.Recover(remoteId, recoveryId, wiFiCreds, breadcrumb);
 }
 
+CHIP_ERROR DeviceCommissioner::RecoverNode(NodeId remoteId, uint64_t recoveryId, ByteSpan operationalDataset, uint64_t breadcrumb)
+{
+    return mNetworkRecover.Recover(remoteId, recoveryId, operationalDataset, breadcrumb);
+}
+
 } // namespace Controller
 } // namespace chip

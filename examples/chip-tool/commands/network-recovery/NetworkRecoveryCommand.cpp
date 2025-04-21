@@ -57,8 +57,17 @@ CHIP_ERROR NetworkRecoveryDiscoverCommand::RunCommand()
 
 CHIP_ERROR NetworkRecoveryRecoverCommand::RunCommand()
 {
+    CHIP_ERROR err;
     mCommissioner = &CurrentCommissioner();
     mCommissioner->RegisterNetworkRecoverDelegate(this);
-    chip::Controller::WiFiCredentials wiFiCreds(mSSID, mPassword);
-    return mCommissioner->RecoverNode(mNodeId, mRecoveryId, wiFiCreds, mBreadcrumb);
+    if (mOperationalDataset.empty())
+    {
+        chip::Controller::WiFiCredentials wiFiCreds(mSSID, mPassword);
+        err = mCommissioner->RecoverNode(mNodeId, mRecoveryId, wiFiCreds, mBreadcrumb);
+    }
+    else
+    {
+        err = mCommissioner->RecoverNode(mNodeId, mRecoveryId, mOperationalDataset, mBreadcrumb);
+    }
+    return err;
 }

@@ -166,7 +166,7 @@ limitations under the License.
     </command>
     <command source="server" code="0x07" name="SetTCAcknowledgementsResponse" optional="true" cli="chip fabric_commissioning settcacknowledgementsresponse" apiMaturity="provisional">
       <description>This command is used to convey the result from SetTCAcknowledgements.</description>
-      <arg name="ErrorCode" type="CommissioningErrorEnum"/>
+      <arg name="ErrorCode" type=" CommissioningErrorEnum"/>
       <otherwiseConform>
         <provisionalConform/>
         <mandatoryConform>

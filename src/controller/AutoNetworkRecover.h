@@ -65,8 +65,9 @@ public:
         kSendDisArmFailSafe,
     };
 
-    CHIP_ERROR RecoverNetwork(NodeId remoteNodeId, Transport::PeerAddress & addr, const WiFiCredentials & wiFiCredentials,
-                              uint64_t breadcrumb, chip::Callback::Callback<OnNetworkRecover> * callback);
+    CHIP_ERROR RecoverNetwork(NodeId remoteNodeId, Transport::PeerAddress & addr, const Optional<WiFiCredentials> & wiFiCredentials,
+                              const Optional<ByteSpan> & operationalDataset, uint64_t breadcrumb,
+                              chip::Callback::Callback<OnNetworkRecover> * callback);
 
 private:
     DeviceController * mController;
@@ -78,7 +79,7 @@ private:
     NodeId mRemoteNodeId;
     NetworkType mNetworkType;
     Optional<WiFiCredentials> mWiFiCredentials;
-    chip::ByteSpan mThreadOperationalDataset;
+    Optional<chip::ByteSpan> mOperationalDataset;
     uint64_t mBreadcrumb;
     chip::ByteSpan mLastNetworkID;
 
@@ -123,7 +124,8 @@ class AutoNetworkRecover : private NetworkRecoverBase
 {
 public:
     static CHIP_ERROR RecoverNetwork(NetworkRecover * recover, NodeId remoteNodeId, Transport::PeerAddress & addr,
-                                     const WiFiCredentials & wiFiCredentials, uint64_t breadcrumb = 0);
+                                     const Optional<WiFiCredentials> & wiFiCredentials,
+                                     const Optional<ByteSpan> & operationalDataset, uint64_t breadcrumb = 0);
 
 private:
     NetworkRecover * mNetworkRecover = nullptr;

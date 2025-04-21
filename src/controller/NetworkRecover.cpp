@@ -79,6 +79,16 @@ CHIP_ERROR NetworkRecover::Recover(NodeId remoteId, uint64_t recoveryId, WiFiCre
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR NetworkRecover::Recover(NodeId remoteId, uint64_t recoveryId, ByteSpan operationalDataset, uint64_t breadcrumb)
+{
+    mRemoteId = remoteId;
+    mOperationalDataset.SetValue(operationalDataset);
+    mBreadcrumb              = breadcrumb;
+    mNetworkRecoverBehaviour = NetworkRecoverBehaviour::kRecover;
+    ReturnErrorOnFailureWithMetric(kMetricNetworkRecover, StartDiscoverOverBle(recoveryId));
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR NetworkRecover::StartDiscoverOverBle(uint64_t recoveryId)
 {
     if (mNetworkRecoverBehaviour == NetworkRecoverBehaviour::kDiscover && mDiscoverTimeout)
@@ -156,7 +166,15 @@ bool NetworkRecover::NotifyOrConnectToDiscoveredDevice()
             }
 #endif // CONFIG_NETWORK_LAYER_BLE
             auto addr = params.GetPeerAddress();
-            err       = AutoNetworkRecover::RecoverNetwork(this, mRemoteId, addr, mWiFiCreds.Value(), mBreadcrumb);
+            if (mWiFiCreds.HasValue())
+            {
+                err = AutoNetworkRecover::RecoverNetwork(this, mRemoteId, addr, mWiFiCreds, chip::NullOptional, mBreadcrumb);
+            }
+            else
+            {
+                err =
+                    AutoNetworkRecover::RecoverNetwork(this, mRemoteId, addr, chip::NullOptional, mOperationalDataset, mBreadcrumb);
+            }
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Controller, "Failed to recover device: %" CHIP_ERROR_FORMAT, err.Format());
