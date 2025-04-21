@@ -9088,7 +9088,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command SetTarget
  *
- * Upon receipt, this SHALL move the product's dimension in the most fitting state following the data as follows:
+ * This command is used to move a dimension of the device to a target position.
  */
 - (void)setTargetWithParams:(MTRClosureDimensionClusterSetTargetParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)setTargetWithCompletion:(MTRStatusCompletion)completion
@@ -9096,15 +9096,15 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command Step
  *
- * Upon receipt, this SHALL update the Target.Position attribute value e.g. by sending multiple commands with short step by step or a single command with multiple steps.
+ * This command is used to move a dimension of the device to a target position by a number of steps.
  */
 - (void)stepWithParams:(MTRClosureDimensionClusterStepParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeCurrentWithCompletion:(void (^)(MTRClosureDimensionClusterCurrentStruct * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeCurrentWithParams:(MTRSubscribeParams *)params
-                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                              reportHandler:(void (^)(MTRClosureDimensionClusterCurrentStruct * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeCurrentWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(MTRClosureDimensionClusterCurrentStruct * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeCurrentStateWithCompletion:(void (^)(MTRClosureDimensionClusterCurrentStateStruct * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeCurrentStateWithParams:(MTRSubscribeParams *)params
+                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                   reportHandler:(void (^)(MTRClosureDimensionClusterCurrentStateStruct * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeCurrentStateWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(MTRClosureDimensionClusterCurrentStateStruct * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeTargetWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(MTRClosureDimensionClusterTargetStruct * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeTargetWithParams:(MTRSubscribeParams *)params
@@ -19958,12 +19958,6 @@ typedef NS_ENUM(uint8_t, MTRClosureDimensionClosureUnit) {
     MTRClosureDimensionClosureUnitDegree MTR_PROVISIONALLY_AVAILABLE = 0x01,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_ENUM(uint8_t, MTRClosureDimensionLatching) {
-    MTRClosureDimensionLatchingLatchedAndSecured MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRClosureDimensionLatchingLatchedButNotSecured MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRClosureDimensionLatchingNotLatched MTR_PROVISIONALLY_AVAILABLE = 0x02,
-} MTR_PROVISIONALLY_AVAILABLE;
-
 typedef NS_ENUM(uint8_t, MTRClosureDimensionModulationType) {
     MTRClosureDimensionModulationTypeSlatsOrientation MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRClosureDimensionModulationTypeSlatsOpenwork MTR_PROVISIONALLY_AVAILABLE = 0x01,
@@ -20003,11 +19997,6 @@ typedef NS_ENUM(uint8_t, MTRClosureDimensionRotationAxis) {
 typedef NS_ENUM(uint8_t, MTRClosureDimensionStepDirection) {
     MTRClosureDimensionStepDirectionDecrease MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRClosureDimensionStepDirectionIncrease MTR_PROVISIONALLY_AVAILABLE = 0x01,
-} MTR_PROVISIONALLY_AVAILABLE;
-
-typedef NS_ENUM(uint8_t, MTRClosureDimensionTargetLatch) {
-    MTRClosureDimensionTargetLatchLatch MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRClosureDimensionTargetLatchUnlatch MTR_PROVISIONALLY_AVAILABLE = 0x01,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRClosureDimensionTranslationDirection) {

@@ -30338,7 +30338,7 @@ class ClosureDimension(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="current", Tag=0x00000000, Type=typing.Union[Nullable, ClosureDimension.Structs.CurrentStruct]),
+                ClusterObjectFieldDescriptor(Label="currentState", Tag=0x00000000, Type=typing.Union[Nullable, ClosureDimension.Structs.CurrentStateStruct]),
                 ClusterObjectFieldDescriptor(Label="target", Tag=0x00000001, Type=typing.Union[Nullable, ClosureDimension.Structs.TargetStruct]),
                 ClusterObjectFieldDescriptor(Label="resolution", Tag=0x00000002, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="stepValue", Tag=0x00000003, Type=typing.Optional[uint]),
@@ -30356,7 +30356,7 @@ class ClosureDimension(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    current: typing.Union[Nullable, ClosureDimension.Structs.CurrentStruct] = NullValue
+    currentState: typing.Union[Nullable, ClosureDimension.Structs.CurrentStateStruct] = NullValue
     target: typing.Union[Nullable, ClosureDimension.Structs.TargetStruct] = NullValue
     resolution: typing.Optional[uint] = None
     stepValue: typing.Optional[uint] = None
@@ -30382,16 +30382,6 @@ class ClosureDimension(Cluster):
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2
-
-        class LatchingEnum(MatterIntEnum):
-            kLatchedAndSecured = 0x00
-            kLatchedButNotSecured = 0x01
-            kNotLatched = 0x02
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3
 
         class ModulationTypeEnum(MatterIntEnum):
             kSlatsOrientation = 0x00
@@ -30450,15 +30440,6 @@ class ClosureDimension(Cluster):
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2
 
-        class TargetLatchEnum(MatterIntEnum):
-            kLatch = 0x00
-            kUnlatch = 0x01
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2
-
         class TranslationDirectionEnum(MatterIntEnum):
             kDownward = 0x00
             kUpward = 0x01
@@ -30495,18 +30476,18 @@ class ClosureDimension(Cluster):
 
     class Structs:
         @dataclass
-        class CurrentStruct(ClusterObject):
+        class CurrentStateStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="position", Tag=0, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="latching", Tag=1, Type=typing.Optional[ClosureDimension.Enums.LatchingEnum]),
+                        ClusterObjectFieldDescriptor(Label="latch", Tag=1, Type=typing.Optional[bool]),
                         ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
                     ])
 
             position: 'typing.Optional[uint]' = None
-            latching: 'typing.Optional[ClosureDimension.Enums.LatchingEnum]' = None
+            latch: 'typing.Optional[bool]' = None
             speed: 'typing.Optional[Globals.Enums.ThreeLevelAutoEnum]' = None
 
         @dataclass
@@ -30529,12 +30510,12 @@ class ClosureDimension(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="position", Tag=0, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="latch", Tag=1, Type=typing.Optional[ClosureDimension.Enums.TargetLatchEnum]),
+                        ClusterObjectFieldDescriptor(Label="latch", Tag=1, Type=typing.Optional[bool]),
                         ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
                     ])
 
             position: 'typing.Optional[uint]' = None
-            latch: 'typing.Optional[ClosureDimension.Enums.TargetLatchEnum]' = None
+            latch: 'typing.Optional[bool]' = None
             speed: 'typing.Optional[Globals.Enums.ThreeLevelAutoEnum]' = None
 
         @dataclass
@@ -30563,12 +30544,12 @@ class ClosureDimension(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="position", Tag=0, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="latch", Tag=1, Type=typing.Optional[ClosureDimension.Enums.TargetLatchEnum]),
+                        ClusterObjectFieldDescriptor(Label="latch", Tag=1, Type=typing.Optional[bool]),
                         ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
                     ])
 
             position: typing.Optional[uint] = None
-            latch: typing.Optional[ClosureDimension.Enums.TargetLatchEnum] = None
+            latch: typing.Optional[bool] = None
             speed: typing.Optional[Globals.Enums.ThreeLevelAutoEnum] = None
 
         @dataclass
@@ -30593,7 +30574,7 @@ class ClosureDimension(Cluster):
 
     class Attributes:
         @dataclass
-        class Current(ClusterAttributeDescriptor):
+        class CurrentState(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000105
@@ -30604,9 +30585,9 @@ class ClosureDimension(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, ClosureDimension.Structs.CurrentStruct])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, ClosureDimension.Structs.CurrentStateStruct])
 
-            value: typing.Union[Nullable, ClosureDimension.Structs.CurrentStruct] = NullValue
+            value: typing.Union[Nullable, ClosureDimension.Structs.CurrentStateStruct] = NullValue
 
         @dataclass
         class Target(ClusterAttributeDescriptor):
