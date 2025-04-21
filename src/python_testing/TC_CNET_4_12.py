@@ -19,6 +19,7 @@
 # for details about the block below.
 # N/A - Test will not run on CI
 
+import asyncio
 import logging
 
 import chip.clusters as Clusters
@@ -285,6 +286,12 @@ class TC_CNET_4_12(MatterBaseTest):
         # TODO: Verify that the TH successfully connects to the DUT
 
         self.step(9)
+        wait_time_reboot = 5
+        # Expire the session and re-establish the new session
+        resp = self.default_controller.ExpireSessions(self.dut_node_id)
+        logger.info(f'Step #9: Expire the session and re-establish the new session: {resp}')
+        await asyncio.sleep(wait_time_reboot)
+
         breadcrumb_info = await self.read_single_attribute_check_success(
             cluster=Clusters.GeneralCommissioning,
             attribute=Clusters.GeneralCommissioning.Attributes.Breadcrumb
@@ -324,7 +331,7 @@ class TC_CNET_4_12(MatterBaseTest):
         logger.info(f'Step #1b - ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
 
         self.step(14)
-        cmd = Clusters.NetworkCommissioning.Commands.RemoveNetwork(networkID=th_xpan, breadcrumb=1)
+        cmd = Clusters.NetworkCommissioning.Commands.RemoveNetwork(networkID=thread_network_id_bytes_th1, breadcrumb=1)
         resp = await self.send_single_cmd(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
@@ -340,7 +347,8 @@ class TC_CNET_4_12(MatterBaseTest):
         asserts.assert_equal(network_index, 0, "The network index is not as expected.")
 
         self.step(15)
-        cmd = Clusters.NetworkCommissioning.Commands.AddOrUpdateThreadNetwork(operationalDataset=th_xpan_1, breadcrumb=3)
+        cmd = Clusters.NetworkCommissioning.Commands.AddOrUpdateThreadNetwork(
+            operationalDataset=thread_network_id_bytes_th2, breadcrumb=3)
         resp = await self.send_single_cmd(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
@@ -356,7 +364,7 @@ class TC_CNET_4_12(MatterBaseTest):
         #                     "debugText must be None, empty or have a maximum length of 512 characters.")
 
         self.step(16)
-        cmd = Clusters.NetworkCommissioning.Commands.ConnectNetwork(operationalDataset=th_xpan_1, breadcrumb=3)
+        cmd = Clusters.NetworkCommissioning.Commands.ConnectNetwork(operationalDataset=thread_network_id_bytes_th1, breadcrumb=3)
         resp = await self.send_single_cmd(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
