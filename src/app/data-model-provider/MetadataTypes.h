@@ -29,8 +29,9 @@
 // Without the use of these macros, the compiler would not allow
 // the narrowing and conversion of input values during the settings
 // of the variables inside of both 'AttributeEntry.mask' and 'AcceptedCommandEntry.mask'.
-#define StartBitFieldInit \
-_Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\"") _Pragma("GCC diagnostic ignored \"-Wnarrowing\"")
+#define StartBitFieldInit                                                                                                          \
+    _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\"")                                              \
+        _Pragma("GCC diagnostic ignored \"-Wnarrowing\"")
 #define EndBitFieldInit _Pragma("GCC diagnostic pop")
 
 namespace chip {
@@ -103,13 +104,13 @@ struct AttributeEntry
 
     StartBitFieldInit
 
-    constexpr AttributeEntry(
-        AttributeId id = 0,                                                           // attributeId initial value,
-                                                                                      // this could be altered later
-        AttributeQualityFlags attrQualityFlags = AttributeQualityFlags::kNoAttribute, // mask.flags initial value
-        Access::Privilege readPriv             = Access::Privilege::kNoPrivilege,     // mask.readPrivilege initial value
-        Access::Privilege writePriv            = Access::Privilege::kNoPrivilege      // mask.writePrivilege initial value
-        ) :
+        constexpr AttributeEntry(
+            AttributeId id = 0,                                                           // attributeId initial value,
+                                                                                          // this could be altered later
+            AttributeQualityFlags attrQualityFlags = AttributeQualityFlags::kNoAttribute, // mask.flags initial value
+            Access::Privilege readPriv             = Access::Privilege::kNoPrivilege,     // mask.readPrivilege initial value
+            Access::Privilege writePriv            = Access::Privilege::kNoPrivilege      // mask.writePrivilege initial value
+            ) :
         attributeId{ id },
         mask{ to_underlying(attrQualityFlags) & ((1 << 7) - 1), // Narrowing expression to 7 bits
               to_underlying(readPriv) & ((1 << 5) - 1),         // Narrowing expression to 5 bits
@@ -118,8 +119,12 @@ struct AttributeEntry
 
     EndBitFieldInit
 
-    // Getter for mask.readPrivilege
-    constexpr Access::Privilege GetReadPrivilege() const { return static_cast<Access::Privilege>(mask.readPrivilege); }
+        // Getter for mask.readPrivilege
+        constexpr Access::Privilege
+        GetReadPrivilege() const
+    {
+        return static_cast<Access::Privilege>(mask.readPrivilege);
+    }
 
     // Getter for mask.writePrivilege
     constexpr Access::Privilege GetWritePrivilege() const { return static_cast<Access::Privilege>(mask.writePrivilege); }
@@ -184,12 +189,12 @@ struct AcceptedCommandEntry
 
     StartBitFieldInit
 
-    constexpr AcceptedCommandEntry(
-        CommandId id = 0,                                                        // commandId initial value,
-                                                                                 // this could be altered later
-        CommandQualityFlags cmdQualityFlags = CommandQualityFlags::kNoAttribute, // mask.flags initial value
-        Access::Privilege invokePriv        = Access::Privilege::kView           // mask.invokePrivilege initial value
-        ) :
+        constexpr AcceptedCommandEntry(
+            CommandId id = 0,                                                        // commandId initial value,
+                                                                                     // this could be altered later
+            CommandQualityFlags cmdQualityFlags = CommandQualityFlags::kNoAttribute, // mask.flags initial value
+            Access::Privilege invokePriv        = Access::Privilege::kView           // mask.invokePrivilege initial value
+            ) :
         commandId(id),
         mask{ to_underlying(cmdQualityFlags) & ((1 << 3) - 1), // Narrowing expression to 3 bits
               to_underlying(invokePriv) & ((1 << 5) - 1) }     // Narrowing expression to 5 bits
@@ -197,8 +202,12 @@ struct AcceptedCommandEntry
 
     EndBitFieldInit
 
-    // Getter for mask.invokePrivilege
-    constexpr Access::Privilege GetInvokePrivilege() const { return static_cast<Access::Privilege>(mask.invokePrivilege); }
+        // Getter for mask.invokePrivilege
+        constexpr Access::Privilege
+        GetInvokePrivilege() const
+    {
+        return static_cast<Access::Privilege>(mask.invokePrivilege);
+    }
 
     constexpr bool HasFlags(CommandQualityFlags f) const { return (mask.flags & chip::to_underlying(f)) != 0; }
 
