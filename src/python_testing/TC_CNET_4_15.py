@@ -67,7 +67,7 @@ class TC_CNET_4_15(MatterBaseTest):
         # TH sends ConnectNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID,
         # which does not match the provisioned network, and Breadcrumb field set to 1
         send_connect = await self.send_single_cmd(
-            cmd=cnet.Commands.ConnectNetwsork(
+            cmd=cnet.Commands.ConnectNetwork(
                 networkID=network_id,
                 breadcrumb=2
             )
