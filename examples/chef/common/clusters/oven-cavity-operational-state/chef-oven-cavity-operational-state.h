@@ -39,20 +39,20 @@ namespace OvenCavityOperationalState {
 class Delegate : public OperationalState::Delegate
 {
 private:
-    constexpr CharSpan kPhaseList[3]       = { "pre-heating"_span, "pre-heated"_span, "cooling down"_span };
-    constexpr uint32_t kPreHeatingSeconds  = 10;
-    constexpr uint32_t kPreHeatedSeconds   = 50;
-    constexpr uint32_t kCoolingDownSeconds = 10;
-    constexpr uint32_t kCycleSeconds       = kPreHeatingSeconds + kPreHeatedSeconds + kCoolingDownSeconds;
-    constexpr OvenCavityOperationalState::OperationalStateEnum kOpStateList[4] = {
+    const CharSpan kPhaseList[3]       = { "pre-heating"_span, "pre-heated"_span, "cooling down"_span };
+    const uint32_t kPreHeatingSeconds  = 10;
+    const uint32_t kPreHeatedSeconds   = 50;
+    const uint32_t kCoolingDownSeconds = 10;
+    const uint32_t kCycleSeconds       = kPreHeatingSeconds + kPreHeatedSeconds + kCoolingDownSeconds;
+    const OvenCavityOperationalState::OperationalStateEnum kOpStateList[4] = {
         OperationalStateEnum::kStopped,
         OperationalStateEnum::kRunning,
         OperationalStateEnum::kPaused,
         OperationalStateEnum::kError,
     };
 
-    Span<constexpr OvenCavityOperationalState::OperationalStateEnum> mOperationalStateList;
-    Span<constexpr CharSpan> mOperationalPhaseList;
+    Span<const OvenCavityOperationalState::OperationalStateEnum> mOperationalStateList;
+    Span<const CharSpan> mOperationalPhaseList;
 
     // Non-null when cycle is in progress.
     app::DataModel::Nullable<uint32_t> mRunningTime;
@@ -63,8 +63,8 @@ public:
     {
         mRunningTime.SetNull();
         mPausedTime.SetNull();
-        mOperationalStateList = Span<constexpr OvenCavityOperationalState::OperationalStateEnum>(kOpStateList);
-        mOperationalPhaseList = Span<constexpr CharSpan>(kPhaseList);
+        mOperationalStateList = Span<const OvenCavityOperationalState::OperationalStateEnum>(kOpStateList);
+        mOperationalPhaseList = Span<const CharSpan>(kPhaseList);
     }
 
     app::DataModel::Nullable<uint32_t> GetCountdownTime() override;
