@@ -170,6 +170,9 @@ class TC_CNET_4_12(MatterBaseTest):
 
         thread_network_id_bytes_th1 = await self.validate_thread_dataset(thread_dataset_1_bytes, "THREAD_1ST_OPERATIONALDATASET")
         thread_network_id_bytes_th2 = await self.validate_thread_dataset(thread_dataset_2_bytes, "THREAD_2ND_OPERATIONALDATASET")
+        logger.info('Precondition 2: NetworkID : '
+                    f'NetworkID_THREAD_1ST_OPERATIONALDATASET = {thread_network_id_bytes_th1}, '
+                    f'NetworkID_THREAD_2ND_OPERATIONALDATASET = {thread_network_id_bytes_th2}')
 
         # The FeatureMap attribute value is 2
         feature_map = await self.read_single_attribute_check_success(
@@ -224,7 +227,7 @@ class TC_CNET_4_12(MatterBaseTest):
             node_id=self.dut_node_id,
             cmd=cmd
         )
-        logger.info(f'Step #4: RemoveNetwor response ({vars(resp)})')
+        logger.info(f'Step #4: RemoveNetwork response ({vars(resp)})')
         logger.info(f'Step #4: RemoveNetwork Status is success ({resp.networkingStatus})')
         logger.info(f'Step #4: RemoveNetwork NetworkIndex: ({resp.networkIndex})')
 
@@ -261,8 +264,6 @@ class TC_CNET_4_12(MatterBaseTest):
         # TODO: Why th_xpan? should be th_xpan_1
 
         self.step(7)
-        network_name = b"OpenThread-55dc"
-
         cmd = Clusters.NetworkCommissioning.Commands.ConnectNetwork(networkID=thread_network_id_bytes_th2, breadcrumb=2)
         resp = await self.send_single_cmd(
             dev_ctrl=self.default_controller,
@@ -276,7 +277,12 @@ class TC_CNET_4_12(MatterBaseTest):
                              "Failure status returned from ConnectNetwork")
 
         self.step(8)
-        # TODO: Verify that the TH successfully connects to the DUT from previous step
+        networks = await self.read_single_attribute_check_success(
+            cluster=Clusters.NetworkCommissioning,
+            attribute=Clusters.NetworkCommissioning.Attributes.Networks
+        )
+        logger.info(f'Step #8: Networks attribute: {networks}')
+        # TODO: Verify that the TH successfully connects to the DUT
 
         self.step(9)
         breadcrumb_info = await self.read_single_attribute_check_success(
