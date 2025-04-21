@@ -36,14 +36,19 @@ class TC_CNET_4_15(MatterBaseTest):
         return ['CNET.S.F00(WI)']
 
     @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning,
-                                         Clusters.NetworkCommissioning.Bitmaps.Features.kWiFiNetworkInterface))
+                                         Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
     async def test_TC_CNET_4_15(self):
         cnet = Clusters.NetworkCommissioning
         # Commissioning is already done
         self.step("precondition")
         self.step(1)
         # TH sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds field set to 900
-        send_arm = await self.send_arm_failsafe_command(900)
+        send_arm = await self.send_single_cmd(
+            Clusters.GeneralCommissioning.Commands.ArmFailSafe(
+                expiryLengthSeconds=900,
+                breadcrumb=0
+            )
+        )
         # Verify that DUT sends ArmFailSafeResponse command to the TH
         await self.expect_command(Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse, send_arm)
         self.step(2)
