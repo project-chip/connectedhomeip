@@ -38,7 +38,7 @@ executable("chip-energy-gateway-app") {
     "${chip_root}/examples/energy-gateway-app/commodity-price/src/CommodityPriceEventTriggers.cpp",
     "${chip_root}/examples/energy-gateway-app/commodity-price/src/CommodityPriceMain.cpp",
     "${chip_root}/examples/energy-gateway-app/common/src/EnergyGatewayAppCommonMain.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/common/src/EnergyTimeUtils.cpp",
+    "${chip_root}/examples/energy-gateway-app/common/src/EnergyTimeUtils.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
   ]
