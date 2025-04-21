@@ -69,7 +69,7 @@ class TC_CNET_4_15(MatterBaseTest):
         send_connect = await self.send_single_cmd(
             cmd=cnet.Commands.ConnectNetwork(
                 networkID=network_id,
-                breadcrumb=2
+                breadcrumb=1
             )
         )
         # Verify that DUT sends ConnectNetworkResponse command to the TH with NetworkingStatus field set as NetworkIDNotFound which is '3'
