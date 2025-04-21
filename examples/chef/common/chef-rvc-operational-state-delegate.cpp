@@ -95,20 +95,6 @@ void RvcOperationalStateDelegate::HandlePauseStateCallback(GenericOperationalErr
         return;
     }
 
-    if (current_state == RvcOperationalState::OperationalStateEnum::kSeekingCharger)
-    {
-        auto error =
-            gRvcOperationalStateInstance->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kPaused));
-        if (error == CHIP_NO_ERROR)
-        {
-            err.Set(to_underlying(RvcOperationalState::ErrorStateEnum::kNoError));
-        }
-        else
-        {
-            err.Set(to_underlying(RvcOperationalState::ErrorStateEnum::kUnableToCompleteOperation));
-        }
-        return;
-    }
 
     err.Set(to_underlying(RvcOperationalState::ErrorStateEnum::kCommandInvalidInState));
 }
@@ -119,8 +105,7 @@ void RvcOperationalStateDelegate::HandleResumeStateCallback(GenericOperationalEr
         static_cast<RvcOperationalState::OperationalStateEnum>(gRvcOperationalStateInstance->GetCurrentOperationalState());
 
     if (current_state == RvcOperationalState::OperationalStateEnum::kStopped ||
-        current_state == RvcOperationalState::OperationalStateEnum::kError ||
-        current_state == RvcOperationalState::OperationalStateEnum::kSeekingCharger)
+        current_state == RvcOperationalState::OperationalStateEnum::kError)
     {
         err.Set(to_underlying(RvcOperationalState::ErrorStateEnum::kUnableToStartOrResume));
         return;
@@ -147,15 +132,11 @@ void RvcOperationalStateDelegate::HandleResumeStateCallback(GenericOperationalEr
         return;
     }
 
-    if (current_state == RvcOperationalState::OperationalStateEnum::kCharging)
+    if (current_state == RvcOperationalState::OperationalStateEnum::kCharging ||
+        current_state == RvcOperationalState::OperationalStateEnum::kDocked)
     {
         err.Set(to_underlying(RvcOperationalState::ErrorStateEnum::kCommandInvalidInState));
         return;
-    }
-
-    if (current_state == RvcOperationalState::OperationalStateEnum::kDocked)
-    {
-        err.Set(to_underlying(RvcOperationalState::ErrorStateEnum::kCommandInvalidInState));
     }
 }
 
