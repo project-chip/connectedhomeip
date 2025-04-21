@@ -60,6 +60,8 @@ public:
     const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
     Status HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
         const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
+        
+   bool IsManualLatchingNeeded() override;
 
    /**
     * @brief Initializes the PrintOnlyDelegate instance.

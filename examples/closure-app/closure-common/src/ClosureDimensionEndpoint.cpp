@@ -50,14 +50,28 @@ Status PrintOnlyDelegate::HandleStep(const StepDirectionEnum & direction, const 
     return Status::Success;
     
 }
+
+bool PrintOnlyDelegate::IsManualLatchingNeeded()
+{
+    ChipLogProgress(AppServer, "IsManualLatchingNeeded");
+    // Add the IsManualLatchingNeeded  logic here
+    return false;
+}
  
 CHIP_ERROR ClosureDimensionEndpoint::Init()
 {
     ChipLogProgress(AppServer, "ClosureDimensionEndpoint::Init start");
     
-    ClusterConformance conformance = { .featureMap = 255, .supportsOverflow = true };
+    ClusterConformance conformance;
+    conformance.FeatureMap() = 255;
+    conformance.OptionalAttributes().Set(OptionalAttributeEnum::kOverflow);
+    
+    ClusterInitParameters clusterInitParameters;
+    clusterInitParameters.modulationType = ModulationTypeEnum::kVentilation;
+    clusterInitParameters.rotationAxis = RotationAxisEnum::kTop;
+    clusterInitParameters.translationDirection = TranslationDirectionEnum::kDownward;
      
-    ReturnErrorOnFailure(mLogic.Init(conformance));
+    ReturnErrorOnFailure(mLogic.Init(conformance, clusterInitParameters));
     ReturnErrorOnFailure(mInterface.Init());
     ReturnErrorOnFailure(mDelegate.Init());
       

@@ -70,6 +70,54 @@ bool PrintOnlyDelegate::IsReadyToMove()
     return false;
 }
 
+ElapsedS PrintOnlyDelegate::GetCalibrationCountdownTime()
+{
+    ChipLogProgress(AppServer, "GetCalibrationCountdownTime");
+    // Add the GetCalibrationCountdownTime logic here
+    return static_cast<ElapsedS>(5);
+}
+
+ElapsedS PrintOnlyDelegate::GetMovingCountdownTime()
+{
+    ChipLogProgress(AppServer, "GetMovingCountdownTime");
+    // Add the GetMovingCountdownTime logic here
+    return static_cast<ElapsedS>(10);
+}
+
+ElapsedS PrintOnlyDelegate::GetWaitingForMotionCountdownTime()
+{
+    ChipLogProgress(AppServer, "GetWaitingForMotionCountdownTime");
+    // Add the GetWaitingForMotionCountdownTime logic here
+    return static_cast<ElapsedS>(3);
+}
+
+CHIP_ERROR PrintOnlyDelegate::GetCurrentErrorAtIndex(size_t index, ClosureErrorEnum & closureError)
+{
+    if (index >= currentErrors.size()) {
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED; // Invalid index
+    }
+    
+    auto it = currentErrors.begin();
+    std::advance(it, index);
+    closureError = *it;
+    
+    return CHIP_NO_ERROR;     
+}
+
+CHIP_ERROR PrintOnlyDelegate::SetCurrentErrorInList(const ClosureErrorEnum & closureError)
+{
+    if (currentErrors.size() >= 10) {
+        return CHIP_ERROR_INVALID_LIST_LENGTH; // List is full
+    }
+
+    if (currentErrors.find(closureError) != currentErrors.end()) {
+        return CHIP_ERROR_DUPLICATE_KEY_ID; // Duplicate error
+    }
+    
+    currentErrors.insert(closureError);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ClosureControlEndpoint::Init()
 {
     ChipLogProgress(AppServer, "ClosureControlEndpoint::Init start");
@@ -82,6 +130,8 @@ CHIP_ERROR ClosureControlEndpoint::Init()
     ReturnErrorOnFailure(mLogic.Init(conformance));
     ReturnErrorOnFailure(mInterface.Init());
     ReturnErrorOnFailure(mDelegate.Init());
+    
+    
      
     ChipLogProgress(AppServer, "ClosureControlEndpoint::Init end");
      

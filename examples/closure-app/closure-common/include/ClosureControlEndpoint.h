@@ -25,6 +25,7 @@
 #include <app/clusters/closure-control-server/closure-control-server.h>
  
 #include <lib/core/CHIPError.h>
+#include <unordered_set>
 #include <lib/core/DataModelTypes.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -59,8 +60,14 @@ public:
                                                             const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
     Protocols::InteractionModel::Status HandleCalibrateCommand() override;
     
+    CHIP_ERROR GetCurrentErrorAtIndex(size_t index, ClosureErrorEnum & closureError) override;
+    CHIP_ERROR SetCurrentErrorInList(const ClosureErrorEnum & closureError) override;
+    
     bool IsManualLatchingNeeded() override;
     bool IsReadyToMove() override;
+    ElapsedS GetCalibrationCountdownTime() override;
+    ElapsedS GetMovingCountdownTime() override;
+    ElapsedS GetWaitingForMotionCountdownTime() override;
 
     /**
      * @brief Initializes the PrintOnlyDelegate instance.
@@ -71,6 +78,7 @@ public:
 
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
+    std::unordered_set<ClosureErrorEnum> currentErrors;
 };
 
 /**
