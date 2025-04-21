@@ -57,12 +57,13 @@ DataModel::AcceptedCommandEntry AcceptedCommandEntryFor(const ConcreteCommandPat
 {
     const CommandId commandId = path.mCommandId;
 
-    DataModel::AcceptedCommandEntry entry(path.mCommandId, DataModel::CommandQualityFlags::kFabricScoped,
-                                          RequiredPrivilege::ForInvokeCommand(path));
-
-    entry.SetFlags(DataModel::CommandQualityFlags::kTimed, CommandNeedsTimedInvoke(path.mClusterId, commandId));
-    entry.SetFlags(DataModel::CommandQualityFlags::kFabricScoped, CommandIsFabricScoped(path.mClusterId, commandId));
-    entry.SetFlags(DataModel::CommandQualityFlags::kLargeMessage, CommandHasLargePayload(path.mClusterId, commandId));
+    DataModel::AcceptedCommandEntry entry(
+        path.mCommandId,
+        BitFlags<DataModel::CommandQualityFlags>{}
+            .Set(DataModel::CommandQualityFlags::kTimed, CommandNeedsTimedInvoke(path.mClusterId, commandId))
+            .Set(DataModel::CommandQualityFlags::kFabricScoped, CommandIsFabricScoped(path.mClusterId, commandId))
+            .Set(DataModel::CommandQualityFlags::kLargeMessage, CommandHasLargePayload(path.mClusterId, commandId)),
+        RequiredPrivilege::ForInvokeCommand(path));
 
     return entry;
 }
@@ -97,12 +98,15 @@ DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & cluster
 {
     const ConcreteAttributePath attributePath(clusterPath.mEndpointId, clusterPath.mClusterId, attribute.attributeId);
 
-    DataModel::AttributeEntry entry(
-        attribute.attributeId, DataModel::AttributeQualityFlags::kNoAttribute, RequiredPrivilege::ForReadAttribute(attributePath),
-        !attribute.IsReadOnly() ? RequiredPrivilege::ForWriteAttribute(attributePath) : Access::Privilege::kNoPrivilege);
+    using DataModel::AttributeQualityFlags;
 
-    entry.SetFlags(DataModel::AttributeQualityFlags::kListAttribute, (attribute.attributeType == ZCL_ARRAY_ATTRIBUTE_TYPE));
-    entry.SetFlags(DataModel::AttributeQualityFlags::kTimed, attribute.MustUseTimedWrite());
+    DataModel::AttributeEntry entry(
+        attribute.attributeId,
+        BitFlags<DataModel::AttributeQualityFlags>{}
+            .Set(AttributeQualityFlags::kListAttribute, (attribute.attributeType == ZCL_ARRAY_ATTRIBUTE_TYPE))
+            .Set(DataModel::AttributeQualityFlags::kTimed, attribute.MustUseTimedWrite()),
+        RequiredPrivilege::ForReadAttribute(attributePath),
+        !attribute.IsReadOnly() ? RequiredPrivilege::ForWriteAttribute(attributePath) : Access::Privilege::kNoPrivilege);
 
     // NOTE: we do NOT provide additional info for:
     //    - IsExternal/IsSingleton/IsAutomaticallyPersisted is not used by IM handling
@@ -366,7 +370,7 @@ CHIP_ERROR CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path
     //   - read-only, with read privilege view
     //   - fixed value (no such flag exists, so this is not a quality flag we set/track)
     DataModel::AttributeEntry globalListEntry(0, /* default initial value, attributeId is assigned later */
-                                              DataModel::AttributeQualityFlags::kListAttribute, Access::Privilege::kView,
+                                              DataModel::AttributeQualityFlags::kNoAttribute, Access::Privilege::kView,
                                               Access::Privilege::kNoPrivilege);
 
     for (auto & attribute : GlobalAttributesNotInMetadata)

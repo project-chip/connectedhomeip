@@ -23,19 +23,17 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
 
-// Pragma macros to disable the "conversion" and "narrowing" warnings.
+// Pragma macro to disable the "conversion" and "narrowing" warnings.
 // This is done in some sections of the code in order to allow
 // the use of narrowing masks when assigning values to bitfields variables.
 // Without the use of these macros, the compiler would not allow
 // the narrowing and conversion of input values during the settings
 // of the variables inside of both 'AttributeEntry.mask' and 'AcceptedCommandEntry.mask'.
-#define StartBitFieldInit_1
-_Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\"") _Pragma("GCC diagnostic ignored \"-Wnarrowing\"")
-#define EndBitFieldInit_1 _Pragma("GCC diagnostic pop")
-#define StartBitFieldInit_2
-    _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\"")
-        _Pragma("GCC diagnostic ignored \"-Wnarrowing\"")
-#define EndBitFieldInit_2 _Pragma("GCC diagnostic pop")
+#if defined(__clang__) || defined(__gcc__)
+#define  BitfieldAssignment(code)  _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\"") _Pragma("GCC diagnostic ignored \"-Wnarrowing\"") code _Pragma("GCC diagnostic pop") 
+#else
+#define  BitfieldAssignment(code) 
+#endif
 
             namespace chip
 {
@@ -104,8 +102,6 @@ _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\""
     {
         AttributeId attributeId;
 
-        StartBitFieldInit_1 // Start disabling conversion and narrowing warnings
-
             // Constructor
             constexpr AttributeEntry(
                 AttributeId id = 0,                                                           // attributeId initial value,
@@ -115,23 +111,11 @@ _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\""
                 Access::Privilege writePriv            = Access::Privilege::kNoPrivilege      // mask.writePrivilege initial value
                 ) :
             attributeId{ id },
-            mask{ to_underlying(attrQualityFlags) & ((1 << 7) - 1), // Narrowing expression to 7 bits
-                  to_underlying(readPriv) & ((1 << 5) - 1),         // Narrowing expression to 5 bits
-                  to_underlying(writePriv) & ((1 << 5) - 1) }       // Narrowing expression to 5 bits
+            mask{ BitfieldAssignment(to_underlying(attrQualityFlags) & ((1 << 7) - 1)), // Narrowing expression to 7 bits
+                  BitfieldAssignment(to_underlying(readPriv) & ((1 << 5) - 1)),         // Narrowing expression to 5 bits
+                  BitfieldAssignment(to_underlying(writePriv) & ((1 << 5) - 1)) }       // Narrowing expression to 5 bits
         {}
 
-        AttributeQualityFlags SetFlags(AttributeQualityFlags f)
-        {
-            return static_cast<AttributeQualityFlags>(mask.flags |= (chip::to_underlying(f) & ((1 << 7) - 1)));
-        }
-
-        AttributeQualityFlags SetFlags(AttributeQualityFlags f, bool isSet)
-        {
-            return isSet ? SetFlags(f)
-                         : static_cast<AttributeQualityFlags>(mask.flags &= ~(chip::to_underlying(f) & ((1 << 7) - 1)));
-        }
-
-        EndBitFieldInit_1 // Start enabling conversion and narrowing warnings
 
             // Getter for mask.readPrivilege
             constexpr Access::Privilege
@@ -189,6 +173,7 @@ _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\""
     // Bitmask values for different Command qualities.
     enum class CommandQualityFlags : uint32_t
     {
+        kNoAttribute  = 0x0000, // No attribute value
         kFabricScoped = 0x0001,
         kTimed        = 0x0002, // `T` quality on commands
         kLargeMessage = 0x0004, // `L` quality on commands
@@ -198,32 +183,20 @@ _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\""
     {
         CommandId commandId;
 
-        StartBitFieldInit_2 // Start disabling conversion and narrowing warnings
 
             // Constructor
             constexpr AcceptedCommandEntry(
                 CommandId id = 0,                                                         // commandId initial value,
                                                                                           // this could be altered later
-                CommandQualityFlags cmdQualityFlags = CommandQualityFlags::kFabricScoped, // mask.flags initial value
+                CommandQualityFlags cmdQualityFlags = CommandQualityFlags::kNoAttribute,  // mask.flags initial value
                 Access::Privilege invokePriv        = Access::Privilege::kView            // mask.invokePrivilege initial value
                 ) :
             commandId(id),
-            mask{ to_underlying(cmdQualityFlags) & ((1 << 3) - 1), // Narrowing expression to 3 bits
-                  to_underlying(invokePriv) & ((1 << 5) - 1) }     // Narrowing expression to 5 bits
+            mask{ BitfieldAssignment(to_underlying(cmdQualityFlags) & ((1 << 3) - 1)), // Narrowing expression to 3 bits
+                  BitfieldAssignment(to_underlying(invokePriv) & ((1 << 5) - 1)) }     // Narrowing expression to 5 bits
         {}
 
-        CommandQualityFlags SetFlags(CommandQualityFlags f)
-        {
-            return static_cast<CommandQualityFlags>(mask.flags |= (chip::to_underlying(f) & ((1 << 3) - 1)));
-        }
-
-        CommandQualityFlags SetFlags(CommandQualityFlags f, bool isSet)
-        {
-            return isSet ? SetFlags(f) : static_cast<CommandQualityFlags>(mask.flags &= ~(chip::to_underlying(f) & ((1 << 3) - 1)));
-        }
-
-        EndBitFieldInit_2 // Start enabling conversion and narrowing warnings
-
+        
             // Getter for mask.invokePrivilege
             constexpr Access::Privilege
             GetInvokePrivilege() const
@@ -268,7 +241,4 @@ _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\""
     } // namespace app
 } // namespace chip
 
-#undef StartBitFieldInit_1
-#undef EndBitFieldInit_1
-#undef StartBitFieldInit_2
-#undef EndBitFieldInit_2
+#undef BitfieldAssignment
