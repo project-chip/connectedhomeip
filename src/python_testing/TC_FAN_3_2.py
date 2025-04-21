@@ -187,8 +187,6 @@ class TC_FAN_3_2(MatterBaseTest):
             asserts.assert_equal(len(percent_setting_sub.attribute_queue.queue), len(speed_setting_sub.attribute_queue.queue),
                                  f"[FC] PercentSetting attribute report count ({len(percent_setting_sub.attribute_queue.queue)}) does not match SpeedSetting attribute report count ({len(speed_setting_sub.attribute_queue.queue)})")
 
-            logging.info(f"[FC]")
-
         for sub in self.subscriptions:
             values = [q.value for q in sub.attribute_queue.queue]
             correct_progression = all(comp(a, b) for a, b in zip(values, values[1:]))
@@ -196,7 +194,7 @@ class TC_FAN_3_2(MatterBaseTest):
 
         logging.info(
             f"[FC] All attribute values progressed as expected ({order.name.lower()} order - current value {comp_str} than previous value).")
-        logging.info(f"[FC]")
+        logging.info("[FC]")
 
     async def testing_scenario_update_speed_setting(self, order) -> None:
         # Setup
