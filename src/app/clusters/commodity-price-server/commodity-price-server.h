@@ -34,6 +34,24 @@ namespace app {
 namespace Clusters {
 namespace CommodityPrice {
 
+// Spec-defined constraints
+constexpr uint8_t kMaxForecastEntries         = 56;
+constexpr uint8_t kMaxComponentsPerPriceEntry = 10;
+
+constexpr uint16_t kMaxCurrencyValue = 999; // From spec
+// From ISO 4217 (non exhaustive selection)
+constexpr uint16_t kCurrencyCHF  = 756;
+constexpr uint16_t kCurrencyEURO = 978;
+constexpr uint16_t kCurrencyGBP  = 826;
+constexpr uint16_t kCurrencyNOK  = 578;
+constexpr uint16_t kCurrencySEK  = 752;
+constexpr uint16_t kCurrencyUSD  = 840;
+
+constexpr bool operator!=(const Globals::Structs::CurrencyStruct::Type & lhs, const Globals::Structs::CurrencyStruct::Type & rhs)
+{
+    return ((lhs.currency != rhs.currency) || (lhs.decimalPoints != rhs.decimalPoints));
+}
+
 class Delegate
 {
 public:
@@ -41,31 +59,15 @@ public:
 
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
 
-    // ------------------------------------------------------------------
-    // Get attribute methods
-    virtual Globals::TariffUnitEnum GetTariffUnit()                                            = 0;
-    virtual Globals::Structs::CurrencyStruct::Type GetCurrency()                               = 0;
-    virtual const DataModel::Nullable<Structs::CommodityPriceStruct::Type> & GetCurrentPrice() = 0;
-    virtual int64_t GetPriceForecast()                                                         = 0;
-    // TODO GetPriceForecast returns a List of CommodityPriceStruct with simple details, unlike the command which can ask for
-    // specific details.
-
-    /**
-     * @brief Returns the current Forecast object
-     *
-     * The reference returned from GetForecast() is only valid until the next Matter event
-     * is processed.  Callers must not hold on to that reference for any asynchronous processing.
-     *
-     * Once another Matter event has had a chance to run, the memory associated with the
-     * ForecastStruct is likely to change or be re-allocated, so would become invalid.
-     *
-     * @return  The current Forecast object
-     */
-    // virtual const DataModel::Nullable<Structs::CommodityPriceStruct::Type> & GetDetailedForecast() = 0;
+    // For now this is a place holder and the Delegate could be removed
+    // There is no delegated methods since these are largely implemented in the
+    // commodity-price-server.cpp Instance class
 
 protected:
     EndpointId mEndpointId = 0;
 };
+
+using chip::Protocols::InteractionModel::Status;
 
 class Instance : public AttributeAccessInterface, public CommandHandlerInterface
 {
@@ -76,6 +78,7 @@ public:
     {
         /* set the base class delegates endpointId */
         mDelegate.SetEndpointId(aEndpointId);
+        mEndpointId = aEndpointId;
     }
 
     ~Instance() { Shutdown(); }
@@ -85,12 +88,21 @@ public:
 
     bool HasFeature(Feature aFeature) const;
 
-private:
-    Protocols::InteractionModel::Status GetMatterEpochTimeFromUnixTime(uint32_t & currentUtcTime) const;
+    // Set attribute methods
+    CHIP_ERROR SetTariffUnit(Globals::TariffUnitEnum);
+    CHIP_ERROR SetCurrency(Globals::Structs::CurrencyStruct::Type);
+    CHIP_ERROR SetCurrentPrice(const DataModel::Nullable<Structs::CommodityPriceStruct::Type>);
+    CHIP_ERROR SetForecast(const DataModel::List<const Structs::CommodityPriceStruct::Type> &);
+
+    // Send Price Change & ForecastChange events
+    Status SendPriceChangeEvent();
+    Status SendForecastChangeEvent();
 
 private:
     Delegate & mDelegate;
     BitMask<Feature> mFeature;
+
+    EndpointId mEndpointId;
 
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
@@ -103,6 +115,26 @@ private:
     void HandleGetDetailedPriceRequest(HandlerContext & ctx, const Commands::GetDetailedPriceRequest::DecodableType & commandData);
     void HandleGetDetailedForecastRequest(HandlerContext & ctx,
                                           const Commands::GetDetailedForecastRequest::DecodableType & commandData);
+
+    // Helper function to create a copy of the data for sending to client with the .description or .components knocked out
+    const DataModel::Nullable<Structs::CommodityPriceStruct::Type> *
+    GetDetailedPriceRequest(chip::BitMask<CommodityPriceDetailBitmap> details);
+    void FreeCurrentPrice(const DataModel::Nullable<Structs::CommodityPriceStruct::Type> *);
+
+    const DataModel::List<const Structs::CommodityPriceStruct::Type> *
+    GetDetailedForecastRequest(chip::BitMask<CommodityPriceDetailBitmap> details, bool isEvent);
+    void FreePriceForecast(const DataModel::List<const Structs::CommodityPriceStruct::Type> *);
+
+    // Attribute storage
+    Globals::TariffUnitEnum mTariffUnit;
+    Globals::Structs::CurrencyStruct::Type mCurrency;
+
+    // NOTE the CurrentPrice and PriceForecast are stored here with description and components
+    // When read as an attribute the description and components should not be included
+    // When the GetDetailedPriceRequest or GetDetailedForecastRequest are called these may need
+    // munging to remove one or other elements
+    DataModel::Nullable<Structs::CommodityPriceStruct::Type> mCurrentPrice;
+    DataModel::List<const Structs::CommodityPriceStruct::Type> mPriceForecast;
 };
 
 } // namespace CommodityPrice
