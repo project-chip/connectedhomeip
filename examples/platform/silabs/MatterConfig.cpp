@@ -27,6 +27,10 @@
 #ifdef SL_WIFI
 #include <platform/silabs/wifi/WifiInterface.h>
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <platform/silabs/wifi/icd/WifiSleepManager.h> // nogncheck
+#endif                                                 // CHIP_CONFIG_ENABLE_ICD_SERVER
+
 // TODO: We shouldn't need any platform specific includes in this file
 #if (defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1)
 #include <platform/silabs/SiWx917/SiWxPlatformInterface.h>
@@ -199,6 +203,8 @@ void SilabsMatterConfig::AppInit()
 
 CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 {
+    using namespace chip::DeviceLayer::Silabs;
+
     CHIP_ERROR err;
 #ifdef SL_WIFI
     // Because OpenThread needs to use memory allocation during its Key operations, we initialize the memory management for thread
@@ -228,7 +234,11 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     // See comment above about OpenThread memory allocation as to why this is WIFI only here.
     ReturnErrorOnFailure(chip::Platform::MemoryInit());
     ReturnErrorOnFailure(InitWiFi());
-#endif
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    ReturnErrorOnFailure(WifiSleepManager::GetInstance().Init(&WifiInterface::GetInstance(), &WifiInterface::GetInstance()));
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+#endif // SL_WIFI
 
     ReturnErrorOnFailure(PlatformMgr().InitChipStack());
 
@@ -264,6 +274,8 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
 #ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
     static SilabsTestEventTriggerDelegate sTestEventTriggerDelegate;
+    sTestEventTriggerDelegate.Init(&provision.GetStorage());
+
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 #endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 
@@ -308,7 +320,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 #ifdef SL_WIFI
 CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
 {
-    return InitWiFiStack();
+    return WifiInterface::GetInstance().InitWiFiStack();
 }
 #endif // SL_WIFI
 

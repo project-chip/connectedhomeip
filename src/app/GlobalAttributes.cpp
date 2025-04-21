@@ -44,7 +44,7 @@ DataModel::ActionReturnStatus ReadGlobalAttributeFromMetadata(DataModel::Provide
     switch (path.mAttributeId)
     {
     case Clusters::Globals::Attributes::GeneratedCommandList::Id: {
-        DataModel::ListBuilder<CommandId> builder;
+        ReadOnlyBufferBuilder<CommandId> builder;
         err = provider->GeneratedCommands(path, builder);
         if (err != CHIP_NO_ERROR)
         {
@@ -63,7 +63,7 @@ DataModel::ActionReturnStatus ReadGlobalAttributeFromMetadata(DataModel::Provide
         });
     }
     case Clusters::Globals::Attributes::AcceptedCommandList::Id: {
-        DataModel::ListBuilder<DataModel::AcceptedCommandEntry> builder;
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> builder;
         err = provider->AcceptedCommands(path, builder);
         if (err != CHIP_NO_ERROR)
         {
@@ -82,7 +82,7 @@ DataModel::ActionReturnStatus ReadGlobalAttributeFromMetadata(DataModel::Provide
         });
     }
     case Clusters::Globals::Attributes::AttributeList::Id: {
-        DataModel::ListBuilder<DataModel::AttributeEntry> builder;
+        ReadOnlyBufferBuilder<DataModel::AttributeEntry> builder;
         err = provider->Attributes(path, builder);
         if (err != CHIP_NO_ERROR)
         {
@@ -97,14 +97,6 @@ DataModel::ActionReturnStatus ReadGlobalAttributeFromMetadata(DataModel::Provide
                 //       and this reduces template variants for Encode, saving flash.
                 ReturnErrorOnFailure(listEncodeHelper.Encode(static_cast<uint64_t>(entry.attributeId)));
             }
-
-            for (auto id : GlobalAttributesNotInMetadata)
-            {
-                // NOTE: cast to u64 because TLV encodes all numbers the same (no TLV sideffects)
-                //       and this reduces template variants for Encode, saving flash.
-                ReturnErrorOnFailure(listEncodeHelper.Encode(static_cast<uint64_t>(id)));
-            }
-
             return CHIP_NO_ERROR;
         });
     }

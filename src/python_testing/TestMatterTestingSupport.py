@@ -22,13 +22,13 @@ from datetime import datetime, timedelta, timezone
 
 import chip.clusters as Clusters
 from chip.clusters.Types import Nullable, NullValue
-from chip.testing.matter_testing import (MatterBaseTest, async_test_body, compare_time, default_matter_test_main,
-                                         get_wait_seconds_from_set_time, parse_matter_test_args, type_matches,
-                                         utc_time_in_matter_epoch)
+from chip.testing.matter_testing import (MatterBaseTest, async_test_body, default_matter_test_main, parse_matter_test_args,
+                                         type_matches)
 from chip.testing.pics import parse_pics, parse_pics_xml
 from chip.testing.taglist_and_topology_test import (TagProblem, create_device_type_list_for_root, create_device_type_lists,
                                                     find_tag_list_problems, find_tree_roots, flat_list_ok, get_all_children,
-                                                    get_direct_children_of_root, parts_list_cycles, separate_endpoint_types)
+                                                    get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
+from chip.testing.timeoperations import compare_time, get_wait_seconds_from_set_time, utc_time_in_matter_epoch
 from chip.tlv import uint
 from mobly import asserts, signals
 
@@ -268,42 +268,59 @@ class TestMatterTestingSupport(MatterBaseTest):
         asserts.assert_equal(set(flat), {11}, "Aggregator node not found in list")
         asserts.assert_equal(set(tree), {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21})
 
-        cycles = parts_list_cycles(tree, endpoints)
-        asserts.assert_equal(len(cycles), 0, "Found cycles in the example tree")
+        problems = parts_list_problems(tree, endpoints)
+        asserts.assert_equal(len(problems), 0, "Found problems in the example tree")
 
         # Add in several cycles and make sure we detect them all
         # ep 10 refers back to itself (0 level cycle) on 10
         endpoints[10][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].append(10)
-        cycles = parts_list_cycles(tree, endpoints)
-        asserts.assert_equal(cycles, [10])
+        problems = parts_list_problems(tree, endpoints)
+        asserts.assert_equal(problems, [10])
         endpoints[10][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].remove(10)
         print(endpoints[10])
 
         # ep 4 refers back to 3 (1 level cycle) on 3 (will include 2, 3 and 4 in the cycles list)
         endpoints[4][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].append(3)
-        cycles = parts_list_cycles(tree, endpoints)
-        asserts.assert_equal(cycles, [2, 3, 4])
+        problems = parts_list_problems(tree, endpoints)
+        asserts.assert_equal(problems, [2, 3, 4])
         endpoints[4][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].remove(3)
 
         # ep 16 refers back to 13 (2 level cycle) on 13 (will include 13, 14 and 16 in cycles)
         endpoints[16][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].append(13)
-        cycles = parts_list_cycles(tree, endpoints)
-        asserts.assert_equal(cycles, [13, 14, 16])
+        problems = parts_list_problems(tree, endpoints)
+        asserts.assert_equal(problems, [13, 14, 16])
         endpoints[16][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].remove(13)
 
         # ep 9 refers back to 2 (3 level cycle) on 2 (includes 2, 3, 5, and 9)
         endpoints[9][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].append(2)
-        cycles = parts_list_cycles(tree, endpoints)
-        asserts.assert_equal(cycles, [2, 3, 5, 9])
+        problems = parts_list_problems(tree, endpoints)
+        asserts.assert_equal(problems, [2, 3, 5, 9])
         endpoints[9][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].remove(2)
 
-        # make sure we get them all
+        # Problem on ep17, where its children (18 and 19) both list the same endpoint
+        endpoints[18][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].append(21)
+        endpoints[19][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].append(21)
+        problems = parts_list_problems(tree, endpoints)
+        asserts.assert_equal(problems, [17])
+        endpoints[18][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].remove(21)
+        endpoints[19][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].remove(21)
+
+        # Part list with non-existent endpoint listed
+        endpoints[20][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].append(100)
+        problems = parts_list_problems(tree, endpoints)
+        asserts.assert_equal(problems, [20])
+        endpoints[20][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].remove(100)
+
+        # make sure we get multiple problems
         endpoints[10][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].append(10)
         endpoints[4][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].append(3)
         endpoints[16][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].append(13)
         endpoints[9][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].append(2)
-        cycles = parts_list_cycles(tree, endpoints)
-        asserts.assert_equal(cycles, [2, 3, 4, 5, 9, 10, 13, 14, 16])
+        endpoints[18][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].append(21)
+        endpoints[19][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].append(21)
+        endpoints[20][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].append(100)
+        problems = parts_list_problems(tree, endpoints)
+        asserts.assert_equal(problems, [2, 3, 4, 5, 9, 10, 13, 14, 16, 17, 20])
 
     def test_flat_list(self):
         endpoints = self.create_example_topology()

@@ -95,7 +95,7 @@ void OTAProviderCommands::Register()
           "Usage: OTAProvider applyUpdateAction <proceed/awaitNextAction/discontinue>" },
     };
 
-    sSubShell.RegisterCommands(subCommands, ArraySize(subCommands));
+    sSubShell.RegisterCommands(subCommands, MATTER_ARRAY_SIZE(subCommands));
 
     // Register the root `OTA Provider` command in the top-level shell.
     static const shell_command_t otaProviderCommand = { &OTAProviderHandler, "OTAProvider", "OTA Provider commands" };

@@ -40,7 +40,11 @@
 #include <zephyr/bluetooth/addr.h>
 #include <zephyr/bluetooth/gatt.h>
 #include <zephyr/drivers/flash.h>
+#if defined(CONFIG_ZEPHYR_VERSION_3_3)
 #include <zephyr/random/rand32.h>
+#else
+#include <zephyr/random/random.h>
+#endif
 #include <zephyr/storage/flash_map.h>
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/sys/util.h>
@@ -156,6 +160,7 @@ BLEManagerImpl BLEManagerImpl::sInstance;
 CHIP_ERROR BLEManagerImpl::_Init(void)
 {
     mBLERadioInitialized  = false;
+    mReadyToAttachThread  = false;
     mconId                = NULL;
     mInternalScanCallback = new InternalScanCallback(this);
 
@@ -917,13 +922,35 @@ CHIP_ERROR BLEManagerImpl::HandleOperationalNetworkEnabled(const ChipDeviceEvent
 {
     ChipLogDetail(DeviceLayer, "HandleOperationalNetworkEnabled");
 
-    int error = bt_conn_disconnect(BLEMgrImpl().mconId, BT_HCI_ERR_LOCALHOST_TERM_CONN);
-    if (error)
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    /* On first commissioning BLE disconnects before switching to Thread operational network.
+       All subsequent Thread operational network changes are handled in a bit different way */
+    if (!mReadyToAttachThread)
     {
-        ChipLogError(DeviceLayer, "Close BLEConn err: %d", error);
+        error = MapErrorZephyr(bt_conn_disconnect(BLEMgrImpl().mconId, BT_HCI_ERR_LOCALHOST_TERM_CONN));
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Close BLEConn err: %" CHIP_ERROR_FORMAT, error.Format());
+        }
+        mReadyToAttachThread = true;
+    }
+    else
+    {
+        ThreadStackMgrImpl().SetThreadEnabled(false);
+        SwitchToIeee802154();
+
+        ChipDeviceEvent attachEvent;
+        attachEvent.Type                            = DeviceEventType::kThreadConnectivityChange;
+        attachEvent.ThreadConnectivityChange.Result = kConnectivity_Established;
+
+        error = PlatformMgr().PostEvent(&attachEvent);
+        VerifyOrExit(error == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "PostEvent err: %" CHIP_ERROR_FORMAT, error.Format()));
+
+        ThreadStackMgrImpl().CommitConfiguration();
     }
 
-    return MapErrorZephyr(error);
+exit:
+    return error;
 }
 
 CHIP_ERROR BLEManagerImpl::HandleThreadStateChange(const ChipDeviceEvent * event)

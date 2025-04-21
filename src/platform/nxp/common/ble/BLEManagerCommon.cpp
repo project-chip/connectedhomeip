@@ -743,7 +743,7 @@ CHIP_ERROR BLEManagerCommon::StartAdvertising(void)
 
     if (mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
-        StartBleAdvTimeoutTimer(CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT);
+        StartBleAdvTimeoutTimer(CONFIG_CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT);
     }
 
     err = ConfigureAdvertisingData();

@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2020-2022 Project CHIP Authors
+#    Copyright (c) 2020-2025 Project CHIP Authors
 #    Copyright (c) 2019-2020 Google, LLC.
 #    Copyright (c) 2013-2018 Nest Labs, Inc.
 #    All rights reserved.
@@ -61,6 +61,8 @@ __all__ = ["ChipDeviceController", "CommissioningParameters"]
 
 # Defined in $CHIP_ROOT/src/lib/core/CHIPError.h
 CHIP_ERROR_TIMEOUT: int = 50
+
+_RCACCallbackType = CFUNCTYPE(None, POINTER(c_uint8), c_size_t)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -479,6 +481,7 @@ class ChipDeviceControllerBase():
 
             if err.is_success:
                 self._commissioning_context.future.set_result(nodeId)
+
             else:
                 self._commissioning_context.future.set_exception(err.to_exception())
 
@@ -550,6 +553,7 @@ class ChipDeviceControllerBase():
 
         self.cbHandleCommissioningCompleteFunct = _DevicePairingDelegate_OnCommissioningCompleteFunct(
             HandleCommissioningComplete)
+
         self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback(
             self.pairingDelegate, self.cbHandleCommissioningCompleteFunct)
 
@@ -598,8 +602,15 @@ class ChipDeviceControllerBase():
         return self._isActive
 
     def Shutdown(self):
-        ''' Shuts down this controller and reclaims any used resources, including the bound
-            C++ constructor instance in the SDK.
+        ''' 
+        Shuts down this controller and reclaims any used resources, including the bound
+        C++ constructor instance in the SDK.
+
+        Raises: 
+            ChipStackError: On failure.
+
+        Returns:
+            None
         '''
         if not self._isActive:
             return
@@ -635,6 +646,12 @@ class ChipDeviceControllerBase():
         ChipDeviceController.activeList.clear()
 
     def CheckIsActive(self):
+        '''
+        Checks if the device controller is active.
+
+        Raises: 
+            RuntimeError: On failure.
+        '''
         if (not self._isActive):
             raise RuntimeError(
                 "DeviceCtrl instance was already shutdown previously!")
@@ -643,6 +660,15 @@ class ChipDeviceControllerBase():
         self.Shutdown()
 
     def IsConnected(self):
+        '''
+        Checks if the device controller is connected.
+
+        Returns:
+            bool: True if is connected, False if not connected.
+
+        Raises: 
+            RuntimeError: If '_isActive' is False (from the call to CheckIsActive).
+        '''
         self.CheckIsActive()
 
         return self._ChipStack.Call(
@@ -651,11 +677,12 @@ class ChipDeviceControllerBase():
         )
 
     async def ConnectBLE(self, discriminator: int, setupPinCode: int, nodeid: int, isShortDiscriminator: bool = False) -> int:
-        """Connect to a BLE device using the given discriminator and setup pin code.
+        '''
+        Connect to a BLE device via PASE using the given discriminator and setup pin code.
 
         Returns:
-            - Effective Node ID of the device (as defined by the assigned NOC)
-        """
+            Effective Node ID of the device (as defined by the assigned NOC)
+        '''
         self.CheckIsActive()
 
         async with self._commissioning_context as ctx:
@@ -668,6 +695,12 @@ class ChipDeviceControllerBase():
             return await asyncio.futures.wrap_future(ctx.future)
 
     async def UnpairDevice(self, nodeid: int) -> None:
+        '''
+        Unpairs the device with the specified node ID.
+
+        Returns:
+            None.
+        '''
         self.CheckIsActive()
 
         async with self._unpair_device_context as ctx:
@@ -679,6 +712,12 @@ class ChipDeviceControllerBase():
             return await asyncio.futures.wrap_future(ctx.future)
 
     def CloseBLEConnection(self):
+        '''
+        Closes the BLE connection for the device controller.
+
+        Raises: 
+            ChipStackError: On failure.
+        '''
         self.CheckIsActive()
 
         self._ChipStack.Call(
@@ -687,23 +726,67 @@ class ChipDeviceControllerBase():
         ).raise_on_error()
 
     def ExpireSessions(self, nodeid):
-        """Close all sessions with `nodeid` (if any existed) so that sessions get re-established.
+        '''
+        Close all sessions with `nodeid` (if any existed) so that sessions get re-established.
 
         This is needed to properly handle operations that invalidate a node's state, such as
         UpdateNOC.
 
         WARNING: ONLY CALL THIS IF YOU UNDERSTAND THE SIDE-EFFECTS
-        """
+
+        Raises: 
+            ChipStackError: On failure.
+        '''
         self.CheckIsActive()
 
         self._ChipStack.Call(lambda: self._dmLib.pychip_ExpireSessions(self.devCtrl, nodeid)).raise_on_error()
 
-    # TODO: This needs to be called MarkSessionDefunct
-    def CloseSession(self, nodeid):
+    def MarkSessionDefunct(self, nodeid):
+        '''
+        Marks a previously active session with the specified node as defunct to temporarily prevent it
+        from being used with new exchanges to send or receive messages. This should be called when there
+        is suspicion of a loss-of-sync with the session state on the associated peer, such as evidence
+        of transport failure.
+
+        If messages are received thereafter on this session, the session will be put back into the Active state.
+
+        This function should only be called on an active session.
+        This will NOT detach any existing SessionHolders.
+
+        Parameters:
+            nodeid (int): The node ID of the device whose session should be marked as defunct.
+
+        Raises:
+            RuntimeError: If the controller is not active.
+            PyChipError: If the operation fails.
+        '''
         self.CheckIsActive()
 
         self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_CloseSession(
+            lambda: self._dmLib.pychip_DeviceController_MarkSessionDefunct(
+                self.devCtrl, nodeid)
+        ).raise_on_error()
+
+    def MarkSessionForEviction(self, nodeid):
+        '''
+        Marks the session with the specified node for eviction. It will first detach all SessionHolders
+        attached to this session by calling 'OnSessionReleased' on each of them. This will force them
+        to release their reference to the session. If there are no more references left, the session
+        will then be de-allocated.
+
+        Once marked for eviction, the session SHALL NOT ever become active again.
+
+        Parameters:
+            nodeid (int): The node ID of the device whose session should be marked for eviction.
+
+        Raises:
+            RuntimeError: If the controller is not active.
+            PyChipError: If the operation fails.
+        '''
+        self.CheckIsActive()
+
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_MarkSessionForEviction(
                 self.devCtrl, nodeid)
         ).raise_on_error()
 
@@ -734,6 +817,12 @@ class ChipDeviceControllerBase():
         )
 
     def GetTestCommissionerUsed(self):
+        '''
+        Get the status of test commissioner in use.
+
+        Returns:
+            bool: True if the test commissioner is in use, False if not.
+        '''
         return self._ChipStack.Call(
             lambda: self._dmLib.pychip_TestCommissionerUsed()
         )
@@ -742,28 +831,64 @@ class ChipDeviceControllerBase():
         self._dmLib.pychip_ResetCommissioningTests()
 
     def SetTestCommissionerSimulateFailureOnStage(self, stage: int):
+        '''
+        Simulates a failure on a specific stage of the test commissioner.
+
+        Returns:
+            bool: True if the failure simulate success, False if not.
+        '''
         return self._dmLib.pychip_SetTestCommissionerSimulateFailureOnStage(
             stage)
 
     def SetTestCommissionerSimulateFailureOnReport(self, stage: int):
+        '''
+        Simulates a failure on report of the test commissioner.
+
+        Returns:
+            bool: True if the failure simulate success, False if not.
+        '''
         return self._dmLib.pychip_SetTestCommissionerSimulateFailureOnReport(
             stage)
 
     def SetTestCommissionerPrematureCompleteAfter(self, stage: int):
+        '''
+        Premature complete of the test commissioner.
+
+        Returns:
+            bool: True if the premature complete success, False if not.
+        '''
         return self._dmLib.pychip_SetTestCommissionerPrematureCompleteAfter(
             stage)
 
     def CheckTestCommissionerCallbacks(self):
+        '''
+        Check the test commissioner callbacks.
+
+        Returns:
+            bool: True if the test commissioner callbacks success, False if not.
+        '''
         return self._ChipStack.Call(
             lambda: self._dmLib.pychip_TestCommissioningCallbacks()
         )
 
     def CheckStageSuccessful(self, stage: int):
+        '''
+        Check the test commissioner stage sucess.
+
+        Returns:
+            bool: True if test commissioner stage success, False if not.
+        '''
         return self._ChipStack.Call(
             lambda: self._dmLib.pychip_TestCommissioningStageSuccessful(stage)
         )
 
     def CheckTestCommissionerPaseConnection(self, nodeid):
+        '''
+        Check the test commissioner Pase connection sucess.
+
+        Returns:
+            bool: True if test commissioner Pase connection success, False if not.
+        '''
         return self._dmLib.pychip_TestPaseConnection(nodeid)
 
     def ResolveNode(self, nodeid):
@@ -772,6 +897,12 @@ class ChipDeviceControllerBase():
         self.GetConnectedDeviceSync(nodeid, allowPASE=False)
 
     def GetAddressAndPort(self, nodeid):
+        '''
+        Get the address and port.
+
+        Returns:
+            tuple: The address and port if no error occurs or None on failure.
+        '''
         self.CheckIsActive()
 
         address = create_string_buffer(64)
@@ -802,6 +933,9 @@ class ChipDeviceControllerBase():
 
             This function will always return a list of CommissionableDevice. When stopOnFirst is set,
             this function will return when at least one device is discovered or on timeout.
+
+        Returns:
+            list: A list of discovered devices.
         '''
         self.CheckIsActive()
 
@@ -836,6 +970,12 @@ class ChipDeviceControllerBase():
             return await self.GetDiscoveredDevices()
 
     async def GetDiscoveredDevices(self):
+        '''
+        Get the discovered devices.
+
+        Returns:
+            list: A list of discovered devices.
+        '''
         def GetDevices(devCtrl):
             devices = []
 
@@ -852,6 +992,12 @@ class ChipDeviceControllerBase():
         return await self._ChipStack.CallAsyncWithResult(lambda: GetDevices(self))
 
     def GetIPForDiscoveredDevice(self, idx, addrStr, length):
+        '''
+        Get the IP address for a discovered device.
+
+        Returns:
+            bool: True if IP for discovered device success, False if not.
+        '''
         self.CheckIsActive()
 
         return self._ChipStack.Call(
@@ -876,7 +1022,8 @@ class ChipDeviceControllerBase():
             option:        0 = kOriginalSetupCode
                            1 = kTokenWithRandomPIN
 
-            Returns CommissioningParameters
+            Returns:
+                CommissioningParameters
         '''
         self.CheckIsActive()
 
@@ -889,6 +1036,15 @@ class ChipDeviceControllerBase():
             return await asyncio.futures.wrap_future(ctx.future)
 
     def GetCompressedFabricId(self):
+        '''
+        Get compressed fabric Id.
+
+        Returns:
+            int: The compressed fabric ID as a 64-bit integer.
+
+        Raises: 
+            ChipStackError: On failure.
+        '''
         self.CheckIsActive()
 
         fabricid = c_uint64(0)
@@ -901,7 +1057,15 @@ class ChipDeviceControllerBase():
         return fabricid.value
 
     def GetFabricIdInternal(self):
-        """Get the fabric ID from the object. Only used to validate cached value from property."""
+        '''
+        Get the fabric ID from the object. Only used to validate cached value from property.
+
+        Returns:
+            int: The compressed fabric ID as a 64-bit integer.
+
+        Raises: 
+            ChipStackError: On failure.
+        '''
         self.CheckIsActive()
 
         fabricid = c_uint64(0)
@@ -914,7 +1078,15 @@ class ChipDeviceControllerBase():
         return fabricid.value
 
     def GetFabricIndexInternal(self):
-        """Get the fabric index from the object. Only used to validate cached value from property."""
+        '''
+        Get the fabric index from the object. Only used to validate cached value from property.
+
+        Returns:
+            int: The compressed fabric ID as a 64-bit integer.
+
+        Raises: 
+            ChipStackError: On failure.
+        '''
         self.CheckIsActive()
 
         fabricindex = c_uint8(0)
@@ -927,7 +1099,15 @@ class ChipDeviceControllerBase():
         return fabricindex.value
 
     def GetNodeIdInternal(self) -> int:
-        """Get the node ID from the object. Only used to validate cached value from property."""
+        '''
+        Get the node ID from the object. Only used to validate cached value from property.
+
+        Returns:
+            int: The compressed fabric ID as a 64-bit integer.
+
+        Raises: 
+            ChipStackError: On failure.
+        '''
         self.CheckIsActive()
 
         nodeid = c_uint64(0)
@@ -940,12 +1120,23 @@ class ChipDeviceControllerBase():
         return nodeid.value
 
     def GetClusterHandler(self):
+        '''
+        Get cluster handler
+
+        Returns:
+            ChipClusters: An instance of the ChipClusters class.        
+        '''
         self.CheckIsActive()
 
         return self._Cluster
 
     async def FindOrEstablishPASESession(self, setupCode: str, nodeid: int, timeoutMs: typing.Optional[int] = None) -> typing.Optional[DeviceProxyWrapper]:
-        ''' Returns CommissioneeDeviceProxy if we can find or establish a PASE connection to the specified device'''
+        ''' 
+        Returns CommissioneeDeviceProxy if we can find or establish a PASE connection to the specified device
+
+        Returns:
+            DeviceProxyWrapper on success, if not is None.
+        '''
         self.CheckIsActive()
         returnDevice = c_void_p(None)
         res = await self._ChipStack.CallAsyncWithResult(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
@@ -963,14 +1154,16 @@ class ChipDeviceControllerBase():
         return None
 
     def GetConnectedDeviceSync(self, nodeid, allowPASE=True, timeoutMs: typing.Optional[int] = None, payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
-        ''' Gets an OperationalDeviceProxy or CommissioneeDeviceProxy for the specified Node.
+        ''' 
+        Gets an OperationalDeviceProxy or CommissioneeDeviceProxy for the specified Node.
 
-        nodeId: Target's Node ID
-        allowPASE: Get a device proxy of a device being commissioned.
-        timeoutMs: Timeout for a timed invoke request. Omit or set to 'None' to indicate a non-timed request.
+        Arg:
+            nodeId: Target's Node ID
+            allowPASE: Get a device proxy of a device being commissioned.
+            timeoutMs: Timeout for a timed invoke request. Omit or set to 'None' to indicate a non-timed request.
 
         Returns:
-            - DeviceProxyWrapper on success
+            DeviceProxyWrapper on success.
         '''
         self.CheckIsActive()
 
@@ -1020,27 +1213,31 @@ class ChipDeviceControllerBase():
         return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.OPERATIONAL, self._dmLib)
 
     async def WaitForActive(self, nodeid, *, timeoutSeconds=30.0, stayActiveDurationMs=30000):
-        ''' Waits a LIT ICD device to become active. Will send a StayActive command to the device on active to allow human operations.
+        ''' 
+        Waits a LIT ICD device to become active. Will send a StayActive command to the device on active to allow human operations.
 
-        nodeId: Node ID of the LID ICD
-        stayActiveDurationMs: The duration in the StayActive command, in milliseconds
+        Args:
+            nodeId: Node ID of the LID ICD
+            stayActiveDurationMs: The duration in the StayActive command, in milliseconds
 
         Returns:
-            - StayActiveResponse on success
+            StayActiveResponse on success
         '''
         await WaitForCheckIn(ScopedNodeId(nodeid, self._fabricIndex), timeoutSeconds=timeoutSeconds)
         return await self.SendCommand(nodeid, 0, Clusters.IcdManagement.Commands.StayActiveRequest(stayActiveDuration=stayActiveDurationMs))
 
     async def GetConnectedDevice(self, nodeid, allowPASE: bool = True, timeoutMs: typing.Optional[int] = None,
                                  payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
-        ''' Gets an OperationalDeviceProxy or CommissioneeDeviceProxy for the specified Node.
+        ''' 
+        Gets an OperationalDeviceProxy or CommissioneeDeviceProxy for the specified Node.
 
-        nodeId: Target's Node ID
-        allowPASE: Get a device proxy of a device being commissioned.
-        timeoutMs: Timeout for a timed invoke request. Omit or set to 'None' to indicate a non-timed request.
+        Args:
+            nodeId: Target's Node ID
+            allowPASE: Get a device proxy of a device being commissioned.
+            timeoutMs: Timeout for a timed invoke request. Omit or set to 'None' to indicate a non-timed request.
 
         Returns:
-            - DeviceProxyWrapper on success
+            DeviceProxyWrapper on success
         '''
         self.CheckIsActive()
 
@@ -1093,12 +1290,16 @@ class ChipDeviceControllerBase():
         return DeviceProxyWrapper(future.result(), DeviceProxyWrapper.DeviceProxyType.OPERATIONAL, self._dmLib)
 
     def ComputeRoundTripTimeout(self, nodeid, upperLayerProcessingTimeoutMs: int = 0):
-        ''' Returns a computed timeout value based on the round-trip time it takes for the peer at the other end of the session to
-            receive a message, process it and send it back. This is computed based on the session type, the type of transport,
-            sleepy characteristics of the target and a caller-provided value for the time it takes to process a message
-            at the upper layer on the target For group sessions.
+        ''' 
+        Returns a computed timeout value based on the round-trip time it takes for the peer at the other end of the session to
+        receive a message, process it and send it back. This is computed based on the session type, the type of transport,
+        sleepy characteristics of the target and a caller-provided value for the time it takes to process a message
+        at the upper layer on the target For group sessions.
 
-            This will result in a session being established if one wasn't already.
+        This will result in a session being established if one wasn't already.
+
+        Returns:
+            int: The computed timeout value in milliseconds, representing the round-trip time.
         '''
         device = self.GetConnectedDeviceSync(nodeid)
         res = self._ChipStack.Call(lambda: self._dmLib.pychip_DeviceProxy_ComputeRoundTripTimeout(
@@ -1106,10 +1307,14 @@ class ChipDeviceControllerBase():
         return res
 
     def GetRemoteSessionParameters(self, nodeid) -> typing.Optional[SessionParameters]:
-        ''' Returns the SessionParameters of reported by the remote node associated with `nodeid`.
-            If there is some error in getting SessionParameters None is returned.
+        ''' 
+        Returns the SessionParameters of reported by the remote node associated with `nodeid`.
+        If there is some error in getting SessionParameters None is returned.
 
-            This will result in a session being established if one wasn't already established.
+        This will result in a session being established if one wasn't already established.
+
+        Returns:
+            SessionParameters: The session parameters.
         '''
 
         # First creating the struct to make building the ByteArray to be sent to CFFI easier.
@@ -1143,7 +1348,7 @@ class ChipDeviceControllerBase():
             commandRefsOverride: List of commandRefs to use for each command with the same index in `commands`.
 
         Returns:
-            - TestOnlyBatchCommandResponse
+            TestOnlyBatchCommandResponse
         '''
         self.CheckIsActive()
 
@@ -1163,8 +1368,13 @@ class ChipDeviceControllerBase():
     async def TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(self, nodeid: int, endpoint: int,
                                                                    payload: ClusterObjects.ClusterCommand, responseType=None):
         '''
-
         Please see SendCommand for description.
+
+        Returns:
+            Command response. The type of the response is defined by the command.
+
+        Raises:
+            InteractionModelError on error
         '''
         self.CheckIsActive()
 
@@ -1195,9 +1405,10 @@ class ChipDeviceControllerBase():
                               right timeout value based on transport characteristics as well as the responsiveness of the target.
 
         Returns:
-            - command response. The type of the response is defined by the command.
+            command response. The type of the response is defined by the command.
+
         Raises:
-            - InteractionModelError on error
+            InteractionModelError on error
         '''
         self.CheckIsActive()
 
@@ -1260,10 +1471,12 @@ class ChipDeviceControllerBase():
         '''
         Send a group cluster-object encapsulated command to a group_id and get returned a future
         that can be awaited upon to get confirmation command was sent.
+
         Returns:
-            - None: responses are not sent to group commands
+            None: responses are not sent to group commands.
+
         Raises:
-            - InteractionModelError on error
+            InteractionModelError on error.
         '''
         self.CheckIsActive()
 
@@ -1292,7 +1505,10 @@ class ChipDeviceControllerBase():
             to the XYZ attribute on the test cluster to endpoint 1
 
         Returns:
-            - [AttributeStatus] (list - one for each path)
+            [AttributeStatus] (list - one for each path).
+
+        Raises:
+            InteractionModelError on error.
         '''
         self.CheckIsActive()
 
@@ -1324,7 +1540,13 @@ class ChipDeviceControllerBase():
         attributes: A list of tuples of type (cluster-object, data-version). The data-version can be omitted.
 
         E.g
-            (Clusters.UnitTesting.Attributes.XYZAttribute('hello'), 1) -- Group Write 'hello' with data version 1
+            (Clusters.UnitTesting.Attributes.XYZAttribute('hello'), 1) -- Group Write 'hello' with data version 1.
+
+        Returns:
+            list = An empty list
+
+        Raises:
+            InteractionModelError on error.
         '''
         self.CheckIsActive()
 
@@ -1349,7 +1571,10 @@ class ChipDeviceControllerBase():
         Sets up the system to expect a node to initiate a BDX transfer. The transfer will send data here.
 
         Returns:
-            - a future that will yield a BdxTransfer with the init message from the transfer.
+            a future that will yield a BdxTransfer with the init message from the transfer.
+
+        Raises:
+            InteractionModelError on error.
         '''
         self.CheckIsActive()
 
@@ -1364,7 +1589,10 @@ class ChipDeviceControllerBase():
         Sets up the system to expect a node to initiate a BDX transfer. The transfer will send data to the node.
 
         Returns:
-            - a future that will yield a BdxTransfer with the init message from the transfer.
+            A future that will yield a BdxTransfer with the init message from the transfer.
+
+        Raises:
+            InteractionModelError on error.
         '''
         self.CheckIsActive()
 
@@ -1748,12 +1976,23 @@ class ChipDeviceControllerBase():
             return res.events
 
     def SetIpk(self, ipk: bytes):
+        '''
+        Sets the Identity Protection Key (IPK) for the device controller.
+
+        Raises: 
+            ChipStackError: On failure.
+        '''
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetIpk(self.devCtrl, ipk, len(ipk))
         ).raise_on_error()
 
     def InitGroupTestingData(self):
-        """Populates the Device Controller's GroupDataProvider with known test group info and keys."""
+        '''
+        Populates the Device Controller's GroupDataProvider with known test group info and keys.
+
+        Raises: 
+            ChipStackError: On failure.
+        '''
         self.CheckIsActive()
 
         self._ChipStack.Call(
@@ -1762,7 +2001,14 @@ class ChipDeviceControllerBase():
         ).raise_on_error()
 
     def CreateManualCode(self, discriminator: int, passcode: int) -> str:
-        """ Creates a standard flow manual code from the given discriminator and passcode."""
+        '''
+        Creates a standard flow manual code from the given discriminator and passcode.
+
+        Returns:
+            str: The decoded string from the buffer.
+        Raises:
+            MemoryError: If the output size is invalid during manual code creation.
+        '''
         # 64 bytes is WAY more than required, but let's be safe
         in_size = 64
         out_size = c_size_t(0)
@@ -1869,9 +2115,13 @@ class ChipDeviceControllerBase():
                 c_void_p, c_uint64, _DeviceUnpairingCompleteFunct]
             self._dmLib.pychip_DeviceController_UnpairDevice.restype = PyChipError
 
-            self._dmLib.pychip_DeviceController_CloseSession.argtypes = [
+            self._dmLib.pychip_DeviceController_MarkSessionDefunct.argtypes = [
                 c_void_p, c_uint64]
-            self._dmLib.pychip_DeviceController_CloseSession.restype = PyChipError
+            self._dmLib.pychip_DeviceController_MarkSessionDefunct.restype = PyChipError
+
+            self._dmLib.pychip_DeviceController_MarkSessionForEviction.argtypes = [
+                c_void_p, c_uint64]
+            self._dmLib.pychip_DeviceController_MarkSessionForEviction.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_GetAddressAndPort.argtypes = [
                 c_void_p, c_uint64, c_char_p, c_uint64, POINTER(c_uint16)]
@@ -1957,6 +2207,10 @@ class ChipDeviceControllerBase():
 
             self._dmLib.pychip_GetCompletionError.argtypes = []
             self._dmLib.pychip_GetCompletionError.restype = PyChipError
+
+            self._dmLib.pychip_GetCommissioningRCACData.argtypes = [ctypes.POINTER(
+                ctypes.c_uint8), ctypes.POINTER(ctypes.c_size_t), ctypes.c_size_t]
+            self._dmLib.pychip_GetCommissioningRCACData.restype = None
 
             self._dmLib.pychip_DeviceController_IssueNOCChain.argtypes = [
                 c_void_p, py_object, c_char_p, c_size_t, c_uint64]
@@ -2074,10 +2328,11 @@ class ChipDeviceController(ChipDeviceControllerBase):
         auto-commissioning should use the supplied "CommissionWithCode" function, which will
         establish the PASE connection and commission automatically.
 
-        Raises a ChipStackError on failure.
+        Raises:
+            - A ChipStackError on failure.
 
         Returns:
-            - Effective Node ID of the device (as defined by the assigned NOC)
+            - Effective Node ID of the device (as defined by the assigned NOC).
         '''
         self.CheckIsActive()
 
@@ -2091,19 +2346,32 @@ class ChipDeviceController(ChipDeviceControllerBase):
             return await asyncio.futures.wrap_future(ctx.future)
 
     async def CommissionThread(self, discriminator, setupPinCode, nodeId, threadOperationalDataset: bytes, isShortDiscriminator: bool = False) -> int:
-        ''' Commissions a Thread device over BLE
+        ''' 
+        Commissions a Thread device over BLE.
+
+        Returns:
+            int: Effective Node ID of the device (as defined by the assigned NOC).
         '''
         self.SetThreadOperationalDataset(threadOperationalDataset)
         return await self.ConnectBLE(discriminator, setupPinCode, nodeId, isShortDiscriminator)
 
     async def CommissionWiFi(self, discriminator, setupPinCode, nodeId, ssid: str, credentials: str, isShortDiscriminator: bool = False) -> int:
-        ''' Commissions a Wi-Fi device over BLE.
+        ''' 
+        Commissions a Wi-Fi device over BLE.
+
+        Returns:
+            int: Effective Node ID of the device (as defined by the assigned NOC).
         '''
         self.SetWiFiCredentials(ssid, credentials)
         return await self.ConnectBLE(discriminator, setupPinCode, nodeId, isShortDiscriminator)
 
     def SetWiFiCredentials(self, ssid: str, credentials: str):
-        ''' Set the Wi-Fi credentials to set during commissioning.'''
+        ''' 
+        Set the Wi-Fi credentials to set during commissioning.
+
+        Raises: 
+            ChipStackError: On failure.
+        '''
         self.CheckIsActive()
 
         self._ChipStack.Call(
@@ -2112,7 +2380,12 @@ class ChipDeviceController(ChipDeviceControllerBase):
         ).raise_on_error()
 
     def SetThreadOperationalDataset(self, threadOperationalDataset):
-        ''' Set the Thread operational dataset to set during commissioning.'''
+        ''' 
+        Set the Thread operational dataset to set during commissioning.
+
+        Raises: 
+            ChipStackError: On failure.
+        '''
         self.CheckIsActive()
 
         self._ChipStack.Call(
@@ -2121,63 +2394,110 @@ class ChipDeviceController(ChipDeviceControllerBase):
         ).raise_on_error()
 
     def ResetCommissioningParameters(self):
-        ''' Sets the commissioning parameters back to the default values.'''
+        ''' 
+        Sets the commissioning parameters back to the default values.
+
+        Raises: 
+            ChipStackError: On failure.
+        '''
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_ResetCommissioningParameters()
         ).raise_on_error()
 
     def SetTimeZone(self, offset: int, validAt: int, name: str = ""):
-        ''' Set the time zone to set during commissioning. Currently only one time zone entry is supported'''
+        ''' 
+        Set the time zone to set during commissioning. Currently only one time zone entry is supported.
+
+        Raises: 
+            ChipStackError: On failure.
+        '''
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetTimeZone(offset, validAt, name.encode("utf-8"))
         ).raise_on_error()
 
     def SetDSTOffset(self, offset: int, validStarting: int, validUntil: int):
-        ''' Set the DST offset to set during commissioning. Currently only one DST entry is supported'''
+        ''' 
+        Set the DST offset to set during commissioning. Currently only one DST entry is supported.
+
+        Raises: 
+            ChipStackError: On failure.
+        '''
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetDSTOffset(offset, validStarting, validUntil)
         ).raise_on_error()
 
     def SetTCAcknowledgements(self, tcAcceptedVersion: int, tcUserResponse: int):
-        ''' Set the TC acknowledgements to set during commissioning'''
+        ''' 
+        Set the TC acknowledgements to set during commissioning.
+
+        Raises: 
+            ChipStackError: On failure.
+        '''
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetTermsAcknowledgements(tcAcceptedVersion, tcUserResponse)
         ).raise_on_error()
 
     def SetSkipCommissioningComplete(self, skipCommissioningComplete: bool):
-        ''' Set whether to skip the commissioning complete callback'''
+        ''' 
+        Set whether to skip the commissioning complete callback.
+
+        Raises: 
+            ChipStackError: On failure.
+        '''
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetSkipCommissioningComplete(skipCommissioningComplete)
         ).raise_on_error()
 
     def SetDefaultNTP(self, defaultNTP: str):
-        ''' Set the DefaultNTP to set during commissioning'''
+        ''' 
+        Set the DefaultNTP to set during commissioning.
+
+        Raises: 
+            ChipStackError: On failure.
+        '''
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetDefaultNtp(defaultNTP.encode("utf-8"))
         ).raise_on_error()
 
     def SetTrustedTimeSource(self, nodeId: int, endpoint: int):
-        ''' Set the trusted time source nodeId to set during commissioning. This must be a node on the commissioner fabric.'''
+        ''' 
+        Set the trusted time source nodeId to set during commissioning. This must be a node on the commissioner fabric.
+
+        Raises: 
+            ChipStackError: On failure.
+        '''
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetTrustedTimeSource(nodeId, endpoint)
         ).raise_on_error()
 
     def SetCheckMatchingFabric(self, check: bool):
-        ''' Instructs the auto-commissioner to perform a matching fabric check before commissioning.'''
+        '''
+        Instructs the auto-commissioner to perform a matching fabric check before commissioning.
+
+        Raises: 
+            ChipStackError: On failure.
+        '''
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetCheckMatchingFabric(check)
         ).raise_on_error()
 
     def GenerateICDRegistrationParameters(self):
-        ''' Generates ICD registration parameters for this controller. '''
+        ''' 
+        Generates ICD registration parameters for this controller. 
+
+        Returns:
+            ICDRegistrationParameters: An object containing the generated parameters 
+            including symmetricKey, checkInNodeId, monitoredSubject, stayActiveMs, 
+            and clientType.
+        '''
         return ICDRegistrationParameters(
             secrets.token_bytes(16),
             self._nodeId,
@@ -2190,6 +2510,9 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         Args:
             parameters: A ICDRegistrationParameters for the parameters used for ICD registration, or None for default arguments.
+
+        Raises: 
+            ChipStackError: On failure.
         '''
         if parameters is None:
             raise ValueError("ICD registration parameter required.")
@@ -2203,14 +2526,24 @@ class ChipDeviceController(ChipDeviceControllerBase):
         ).raise_on_error()
 
     def DisableICDRegistration(self):
-        ''' Disables ICD registration. '''
+        ''' 
+        Disables ICD registration. 
+
+        Raises: 
+            ChipStackError: On failure.
+        '''
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetIcdRegistrationParameters(False, None)
         ).raise_on_error()
 
     def GetFabricCheckResult(self) -> int:
-        ''' Returns the fabric check result if SetCheckMatchingFabric was used.'''
+        ''' 
+        Returns the fabric check result if SetCheckMatchingFabric was used.
+
+        Returns:
+            int: The fabric check result, or `-1` if no check was performed.
+        '''
         return self._fabricCheckNodeId
 
     async def CommissionOnNetwork(self, nodeId: int, setupPinCode: int,
@@ -2232,7 +2565,8 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         The filter can be an integer, a string or None depending on the actual type of selected filter.
 
-        Raises a ChipStackError on failure.
+        Raises: 
+            ChipStackError: On failure.       
 
         Returns:
             - Effective Node ID of the device (as defined by the assigned NOC)
@@ -2252,14 +2586,47 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
             return await asyncio.futures.wrap_future(ctx.future)
 
-    async def CommissionWithCode(self, setupPayload: str, nodeid: int, discoveryType: DiscoveryType = DiscoveryType.DISCOVERY_ALL) -> int:
-        ''' Commission with the given nodeid from the setupPayload.
-            setupPayload may be a QR or manual code.
-
-            Raises a ChipStackError on failure.
+    def get_rcac(self):
+        '''
+        Passes captured RCAC data back to Python test modules for validation
+        - Setting buffer size to max size mentioned in spec:
+        - Ref: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/06c4d55962954546ecf093c221fe1dab57645028/policies/matter_certificate_policy.adoc#615-key-sizes
 
         Returns:
-            - Effective Node ID of the device (as defined by the assigned NOC)
+             bytes: A bytes sentence representing the RCAC, or None if no data.
+        '''
+        rcac_size = 400
+        rcac_buffer = (ctypes.c_uint8 * rcac_size)()  # Allocate buffer
+
+        actual_rcac_size = ctypes.c_size_t()
+
+        # Now calling the C++ function with the buffer size set as an additional parameter
+        self._dmLib.pychip_GetCommissioningRCACData(
+            ctypes.cast(rcac_buffer, ctypes.POINTER(ctypes.c_uint8)),
+            ctypes.byref(actual_rcac_size),
+            ctypes.c_size_t(rcac_size)  # Pass the buffer size
+        )
+
+        # Check if data is available
+        if actual_rcac_size.value > 0:
+            # Convert the data to a Python bytes object
+            rcac_data = bytearray(rcac_buffer[:actual_rcac_size.value])
+            rcac_bytes = bytes(rcac_data)
+        else:
+            LOGGER.exception("RCAC returned from C++ did not contain any data")
+            return None
+        return rcac_bytes
+
+    async def CommissionWithCode(self, setupPayload: str, nodeid: int, discoveryType: DiscoveryType = DiscoveryType.DISCOVERY_ALL) -> int:
+        ''' 
+        Commission with the given nodeid from the setupPayload.
+        setupPayload may be a QR or manual code.
+
+        Raises: 
+            ChipStackError: On failure.
+
+        Returns:
+            Effective Node ID of the device (as defined by the assigned NOC)
         '''
         self.CheckIsActive()
 
@@ -2273,13 +2640,15 @@ class ChipDeviceController(ChipDeviceControllerBase):
             return await asyncio.futures.wrap_future(ctx.future)
 
     async def CommissionIP(self, ipaddr: str, setupPinCode: int, nodeid: int) -> int:
-        """ DEPRECATED, DO NOT USE! Use `CommissionOnNetwork` or `CommissionWithCode`
+        ''' 
+        DEPRECATED, DO NOT USE! Use `CommissionOnNetwork` or `CommissionWithCode`
 
-        Raises a ChipStackError on failure.
+        Raises: 
+            ChipStackError: On failure.
 
         Returns:
-            - Effective Node ID of the device (as defined by the assigned NOC)
-        """
+            Effective Node ID of the device (as defined by the assigned NOC)
+        '''
         self.CheckIsActive()
 
         async with self._commissioning_context as ctx:
@@ -2292,6 +2661,12 @@ class ChipDeviceController(ChipDeviceControllerBase):
             return await asyncio.futures.wrap_future(ctx.future)
 
     def NOCChainCallback(self, nocChain):
+        '''
+        Callback function for handling the NOC chain result.
+
+        Returns:
+            None
+        '''
         if self._issue_node_chain_context.future is None:
             LOGGER.exception("NOCChainCallback while not expecting a callback")
             return
@@ -2299,8 +2674,13 @@ class ChipDeviceController(ChipDeviceControllerBase):
         return
 
     async def IssueNOCChain(self, csr: Clusters.OperationalCredentials.Commands.CSRResponse, nodeId: int):
-        """Issue an NOC chain using the associated OperationalCredentialsDelegate.
-        The NOC chain will be provided in TLV cert format."""
+        '''
+        Issue an NOC chain using the associated OperationalCredentialsDelegate.
+        The NOC chain will be provided in TLV cert format.
+
+        Returns:
+            asyncio.Future: A future object that is the result of the NOC Chain operation.
+        '''
         self.CheckIsActive()
 
         async with self._issue_node_chain_context as ctx:
@@ -2312,10 +2692,14 @@ class ChipDeviceController(ChipDeviceControllerBase):
             return await asyncio.futures.wrap_future(ctx.future)
 
     def SetDACRevocationSetPath(self, dacRevocationSetPath: typing.Optional[str]):
-        ''' Set the path to the device attestation revocation set JSON file.
+        ''' 
+        Set the path to the device attestation revocation set JSON file.
 
         Args:
-            dacRevocationSetPath: Path to the JSON file containing the device attestation revocation set
+            dacRevocationSetPath: Path to the JSON file containing the device attestation revocation set.
+
+        Raises: 
+            ChipStackError: On failure.
         '''
         self.CheckIsActive()
         self._ChipStack.Call(
@@ -2325,12 +2709,14 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
 
 class BareChipDeviceController(ChipDeviceControllerBase):
-    ''' A bare device controller without AutoCommissioner support.
+    ''' 
+    A bare device controller without AutoCommissioner support.
     '''
 
     def __init__(self, operationalKey: p256keypair.P256Keypair, noc: bytes,
                  icac: typing.Union[bytes, None], rcac: bytes, ipk: typing.Union[bytes, None], adminVendorId: int, name: typing.Optional[str] = None):
-        '''Creates a controller without AutoCommissioner.
+        '''
+        Creates a controller without AutoCommissioner.
 
         The allocated controller uses the noc, icac, rcac and ipk instead of the default,
         random generated certificates / keys. Which is suitable for creating a controller
@@ -2345,6 +2731,9 @@ class BareChipDeviceController(ChipDeviceControllerBase):
                 will be used.
             adminVendorId: The adminVendorId of the controller.
             name: The name of the controller, for debugging use only.
+
+        Raises: 
+            ChipStackError: On failure
         '''
         super().__init__(name or f"ctrl(v/{adminVendorId})")
 

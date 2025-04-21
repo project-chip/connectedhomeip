@@ -157,6 +157,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
 
     def steps_TC_MCORE_FS_1_5(self) -> list[TestStep]:
         return [
+            TestStep(0, "Commission DUT if not done", is_commissioning=True),
             TestStep(1, "TH subscribes to PartsList attribute of the Descriptor cluster of DUT_FSA endpoint 0."),
             TestStep(2, "Follow manufacturer provided instructions to have DUT_FSA commission TH_SERVER"),
             TestStep(3, "TH waits up to 30 seconds for subscription report from the PartsList attribute of the Descriptor to contain new endpoint"),
@@ -177,6 +178,9 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
 
     @async_test_body
     async def test_TC_MCORE_FS_1_5(self):
+
+        # Commissioning - done
+        self.step(0)
 
         min_report_interval_sec = 0
         max_report_interval_sec = 30

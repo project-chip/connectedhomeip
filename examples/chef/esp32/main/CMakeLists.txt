@@ -27,7 +27,6 @@ get_filename_component(CHEF ${CHIP_ROOT}/examples/chef REALPATH)
 set(CHIP_SHELL_DIR "${CHIP_ROOT}/examples/shell")
 
 set(PRIV_INCLUDE_DIRS_LIST
-                      "${CHIP_ROOT}/zzz_generated/"
                       "${CHIP_ROOT}/zzz_generated/app-common"
                       "${CHIP_ROOT}/examples/platform/esp32/"
                       "${CHIP_ROOT}/third_party/nlio/repo/include"
@@ -48,12 +47,14 @@ set(SRC_DIRS_LIST
                       "${CHEF}/common/clusters/low-power/"
                       "${CHEF}/common/clusters/media-input/"
                       "${CHEF}/common/clusters/media-playback/"
+                      "${CHEF}/common/clusters/oven-mode/"
                       "${CHEF}/common/clusters/refrigerator-and-temperature-controlled-cabinet-mode/"
                       "${CHEF}/common/clusters/resource-monitoring/"
                       "${CHEF}/common/clusters/switch/"
                       "${CHEF}/common/clusters/target-navigator/"
                       "${CHEF}/common/clusters/temperature-control/"
                       "${CHEF}/common/clusters/wake-on-lan/"
+                      "${CHEF}/common/clusters/window-covering/"
                       "${CHIP_ROOT}/zzz_generated/app-common/app-common/zap-generated/attributes"
 )
 

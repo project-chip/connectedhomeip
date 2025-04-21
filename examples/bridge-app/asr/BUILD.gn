@@ -72,13 +72,13 @@ asr_executable("bridge_app") {
   output_name = "chip-asr-bridge-example.out"
 
   sources = [
+    "${chip_root}/examples/bridge-app/bridge-common/src/bridged-actions-stub.cpp",
     "${examples_plat_dir}/CHIPDeviceManager.cpp",
     "${examples_plat_dir}/init_Matter.cpp",
     "${examples_plat_dir}/init_asrPlatform.cpp",
     "${examples_plat_dir}/shell/matter_shell.cpp",
     "src/AppTask.cpp",
     "src/DeviceCallbacks.cpp",
-    "src/bridged-actions-stub.cpp",
     "src/main.cpp",
     "subdevice/SubDevice.cpp",
     "subdevice/SubDeviceManager.cpp",
@@ -105,6 +105,7 @@ asr_executable("bridge_app") {
     "${examples_plat_dir}",
     "${asr_project_dir}/include",
     "${chip_root}/src/lib",
+    "${chip_root}/examples/bridge-app/bridge-common/include",
   ]
 
   defines = [ "ASR_NETWORK_LAYER_BLE=${chip_config_network_layer_ble}" ]
