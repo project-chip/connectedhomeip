@@ -35,19 +35,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureDimension::Closu
         return EnumType::kUnknownEnumValue;
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureDimension::LatchingEnum val)
-{
-    using EnumType = ClosureDimension::LatchingEnum;
-    switch (val)
-    {
-    case EnumType::kLatchedAndSecured:
-    case EnumType::kLatchedButNotSecured:
-    case EnumType::kNotLatched:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
 static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureDimension::ModulationTypeEnum val)
 {
     using EnumType = ClosureDimension::ModulationTypeEnum;
@@ -112,18 +99,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureDimension::StepD
     {
     case EnumType::kDecrease:
     case EnumType::kIncrease:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureDimension::TargetLatchEnum val)
-{
-    using EnumType = ClosureDimension::TargetLatchEnum;
-    switch (val)
-    {
-    case EnumType::kLatch:
-    case EnumType::kUnlatch:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

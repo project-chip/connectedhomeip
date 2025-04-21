@@ -6770,12 +6770,6 @@ provisional cluster ClosureDimension = 261 {
     kDegree = 1;
   }
 
-  enum LatchingEnum : enum8 {
-    kLatchedAndSecured = 0;
-    kLatchedButNotSecured = 1;
-    kNotLatched = 2;
-  }
-
   enum ModulationTypeEnum : enum8 {
     kSlatsOrientation = 0;
     kSlatsOpenwork = 1;
@@ -6817,11 +6811,6 @@ provisional cluster ClosureDimension = 261 {
     kIncrease = 1;
   }
 
-  enum TargetLatchEnum : enum8 {
-    kLatch = 0;
-    kUnlatch = 1;
-  }
-
   enum TranslationDirectionEnum : enum8 {
     kDownward = 0;
     kUpward = 1;
@@ -6852,9 +6841,9 @@ provisional cluster ClosureDimension = 261 {
     kModulation = 0x80;
   }
 
-  struct CurrentStruct {
+  struct CurrentStateStruct {
     optional percent100ths position = 0;
-    optional LatchingEnum latching = 1;
+    optional boolean latch = 1;
     optional ThreeLevelAutoEnum speed = 2;
   }
 
@@ -6865,7 +6854,7 @@ provisional cluster ClosureDimension = 261 {
 
   struct TargetStruct {
     optional percent100ths position = 0;
-    optional TargetLatchEnum latch = 1;
+    optional boolean latch = 1;
     optional ThreeLevelAutoEnum speed = 2;
   }
 
@@ -6874,7 +6863,7 @@ provisional cluster ClosureDimension = 261 {
     int16s max = 1;
   }
 
-  readonly attribute nullable CurrentStruct current = 0;
+  readonly attribute nullable CurrentStateStruct currentState = 0;
   readonly attribute nullable TargetStruct target = 1;
   readonly attribute optional percent100ths resolution = 2;
   readonly attribute optional percent100ths stepValue = 3;
@@ -6894,7 +6883,7 @@ provisional cluster ClosureDimension = 261 {
 
   request struct SetTargetRequest {
     optional percent100ths position = 0;
-    optional TargetLatchEnum latch = 1;
+    optional boolean latch = 1;
     optional ThreeLevelAutoEnum speed = 2;
   }
 
@@ -6904,9 +6893,9 @@ provisional cluster ClosureDimension = 261 {
     optional ThreeLevelAutoEnum speed = 2;
   }
 
-  /** Upon receipt, this SHALL move the product's dimension in the most fitting state following the data as follows: */
+  /** This command is used to move a dimension of the device to a target position. */
   command SetTarget(SetTargetRequest): DefaultSuccess = 0;
-  /** Upon receipt, this SHALL update the Target.Position attribute value e.g. by sending multiple commands with short step by step or a single command with multiple steps. */
+  /** This command is used to move a dimension of the device to a target position by a number of steps. */
   command Step(StepRequest): DefaultSuccess = 1;
 }
 
