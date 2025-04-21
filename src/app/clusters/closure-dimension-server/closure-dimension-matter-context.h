@@ -33,14 +33,15 @@ class MatterContext
 {
 public:
     MatterContext(EndpointId endpoint) : mEndpoint(endpoint) {}
-    virtual ~MatterContext() = default;
 
     /**
      * @brief calls the attribute change callback
      * @param[in] attributeId Attribute ID whose value needs to be marked dirty.
      */
-    void MarkDirty(AttributeId attributeId);
-    
+    virtual void MarkDirty(AttributeId attributeId);
+
+    virtual ~MatterContext() = default;
+
 private:
     EndpointId mEndpoint;
 };
