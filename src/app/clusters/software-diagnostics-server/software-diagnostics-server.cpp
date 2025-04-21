@@ -182,7 +182,7 @@ SoftwareDiagnosticsCommandHandler::EnumerateAcceptedCommands(const ConcreteClust
         return CHIP_NO_ERROR;
     }
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
-    return builder.Append({ ResetWatermarks::Id, {}, Priv::kManage });
+    return builder.Append(ResetWatermarks::kMetadataEntry);
 }
 
 } // anonymous namespace
