@@ -97,7 +97,8 @@ class TC_CNET_4_16(MatterBaseTest):
             "ArmFailSafeResponse error code is not OK.",
         )
 
-        # TH sends RemoveNetwork Command to the DUT with NetworkID field set to the extended PAN ID of PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET,
+        # TH sends RemoveNetwork Command to the DUT with NetworkID field set to
+        # the extended PAN ID of PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET,
         # which does not match the commissioned network, and Breadcrumb field set to 1
         self.step(2)
 
