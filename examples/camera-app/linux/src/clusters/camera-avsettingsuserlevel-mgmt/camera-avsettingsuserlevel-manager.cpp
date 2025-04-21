@@ -52,7 +52,7 @@ bool CameraAVSettingsUserLevelManager::IsValidVideoStreamID(uint16_t aVideoStrea
             return true;
         }
     }
-    
+
     return false;
 }
 
@@ -72,11 +72,11 @@ Status CameraAVSettingsUserLevelManager::MPTZSetPosition(Optional<int16_t> aPan,
         mCameraDeviceHAL->SetTilt(aTilt.Value());
     }
 
-    if (aZoom.HasValue()) 
+    if (aZoom.HasValue())
     {
         mCameraDeviceHAL->SetZoom(aZoom.Value());
     }
-    
+
     return Status::Success;
 }
 
@@ -96,11 +96,11 @@ Status CameraAVSettingsUserLevelManager::MPTZRelativeMove(Optional<int16_t> aPan
         mCameraDeviceHAL->SetTilt(aTilt.Value());
     }
 
-    if (aZoom.HasValue()) 
+    if (aZoom.HasValue())
     {
         mCameraDeviceHAL->SetZoom(aZoom.Value());
     }
-    
+
     return Status::Success;
 }
 
@@ -120,7 +120,7 @@ Status CameraAVSettingsUserLevelManager::MPTZMoveToPreset(uint8_t aPreset, Optio
         mCameraDeviceHAL->SetTilt(aTilt.Value());
     }
 
-    if (aZoom.HasValue()) 
+    if (aZoom.HasValue())
     {
         mCameraDeviceHAL->SetZoom(aZoom.Value());
     }
@@ -159,17 +159,17 @@ Status CameraAVSettingsUserLevelManager::DPTZSetViewport(uint16_t aVideoStreamID
         {
             streamFound = true;
             // Validate the received viewport dimensions
-            // 
+            //
             // Ensure pixel count is > min pixels
             // Esnure width does not exceed sensor width
             // Ensure height does not exceed sensor height
             //
             uint16_t requestedWidth = aViewport.x2 - aViewport.x1;
-            uint16_t requestedHeight = aViewport.y2 - aViewport.y1; 
+            uint16_t requestedHeight = aViewport.y2 - aViewport.y1;
             VideoResolutionStruct minResolution = mCameraDeviceHAL->GetMinViewport();
             VideoSensorParamsStruct sensorParms = mCameraDeviceHAL->GetVideoSensorParams();
             if ((requestedWidth < minResolution.width) ||
-                (requestedHeight < minResolution.height) || 
+                (requestedHeight < minResolution.height) ||
                 (requestedWidth > sensorParms.sensorWidth) ||
                 (requestedHeight > sensorParms.sensorHeight))
             {
@@ -178,7 +178,7 @@ Status CameraAVSettingsUserLevelManager::DPTZSetViewport(uint16_t aVideoStreamID
                 break;
             }
 
-            // Get the ARs to no more than 2DP.  Otherwise you get mismatches e.g. 16:9 ratio calculation for 480p isn't the same as 
+            // Get the ARs to no more than 2DP.  Otherwise you get mismatches e.g. 16:9 ratio calculation for 480p isn't the same as
             // 1080p beyond 2DP.
             float requestedAR = floorf((static_cast<float>(requestedWidth)/requestedHeight)*100)/100;
             float streamAR    = floorf((static_cast<float>(stream.videoStreamParams.maxResolution.width)/
@@ -196,7 +196,7 @@ Status CameraAVSettingsUserLevelManager::DPTZSetViewport(uint16_t aVideoStreamID
         }
     }
 
-    if (!streamFound) 
+    if (!streamFound)
     {
         status = Status::InvalidCommand;
     }
@@ -226,10 +226,10 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
             if (aDeltaX.HasValue())
             {
                 int16_t deltaX = aDeltaX.Value();
-                if (deltaX != 0) 
+                if (deltaX != 0)
                 {
                     // if the delta would move us out of the cartesian plane of the sensor, limit to the left hand edge
-                    // 
+                    //
                     uint16_t x1Movement = ((deltaX < 0) && (abs(deltaX) > viewport.x1))? -viewport.x1: deltaX;
                     viewport.x1 = static_cast<uint16_t>(viewport.x1 + x1Movement);
 
@@ -241,10 +241,10 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
             if (aDeltaY.HasValue())
             {
                 int16_t deltaY = aDeltaY.Value();
-                if (deltaY != 0) 
+                if (deltaY != 0)
                 {
                     // if the delta would move us out of the cartesian plane of the sensor, limit to the top hand edge
-                    // 
+                    //
                     uint16_t y1Movement = ((deltaY < 0) && (abs(deltaY) > viewport.y1))? -viewport.y1: deltaY;
                     viewport.y1 = static_cast<uint16_t>(viewport.y1 + y1Movement);
 
@@ -256,10 +256,10 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
             if (aZoomDelta.HasValue())
             {
                 int8_t zoomDelta = aZoomDelta.Value();
-                if (zoomDelta != 0) 
+                if (zoomDelta != 0)
                 {
                     // Scale the current values by the given zoom
-                    // 
+                    //
                     uint16_t originalWidth = viewport.x2 - viewport.x1;
                     uint16_t originalHeight = viewport.y2 - viewport.y1;
                     uint32_t originalSize = originalWidth * originalHeight;

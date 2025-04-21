@@ -638,7 +638,7 @@ CameraError CameraDevice::SetViewport(const ViewportStruct & viewPort)
 CameraError CameraDevice::SetViewport(VideoStream & stream, const ViewportStruct & viewport)
 {
     ChipLogDetail(Camera,"Setting per stream viewport for stream %d.", stream.videoStreamParams.videoStreamID);
-    ChipLogDetail(Camera,"New viewport. x1=%d, x2=%d, y1=%d, y2=%d.", 
+    ChipLogDetail(Camera,"New viewport. x1=%d, x2=%d, y1=%d, y2=%d.",
                           viewport.x1, viewport.x2, viewport.y1, viewport.y2);
     stream.viewport = viewport;
     return CameraError::SUCCESS;
