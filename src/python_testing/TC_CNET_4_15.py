@@ -55,13 +55,23 @@ class TC_CNET_4_15(MatterBaseTest):
         # TH sends RemoveNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID,
         # which does not match the provisioned network, and Breadcrumb field set to 1
         network_id = self.matter_test_config.global_test_params['PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID']
-        send_remove = await self.send_remove_network_command(network_id, 1)
+        send_remove = await self.send_single_cmd(
+            cmd=cnet.Commands.RemoveNetwork(
+                networkID=network_id,
+                breadcrumb=1
+            )
+        )
         # Verify that DUT sends NetworkConfigResponse command to the TH1 with NetworkingStatus field set as NetworkIDNotFound which is '3'
         await self.expect_command(cnet.Commands.NetworkConfigResponse, send_remove)
         self.step(3)
         # TH sends ConnectNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID,
         # which does not match the provisioned network, and Breadcrumb field set to 1
-        send_connect = await self.send_connect_network_command(network_id, 1)
+        send_connect = await self.send_single_cmd(
+            cmd=cnet.Commands.ConnectNetwsork(
+                networkID=network_id,
+                breadcrumb=2
+            )
+        )
         # Verify that DUT sends ConnectNetworkResponse command to the TH with NetworkingStatus field set as NetworkIDNotFound which is '3'
         await self.expect_command(Clusters.GeneralCommissioning.Commands.ConnectNetworkResponse, send_connect)
 
