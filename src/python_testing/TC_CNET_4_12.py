@@ -180,7 +180,6 @@ class TC_CNET_4_12(MatterBaseTest):
         logger.info(f'Pre-Conditions #3: The FeatureMap attribute value is: {feature_map}')
 
         # Steps
-
         self.step(1)
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=self.failsafe_expiration_seconds, breadcrumb=1)
         resp = await self.send_single_cmd(
