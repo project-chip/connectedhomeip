@@ -168,7 +168,8 @@ class TC_FAN_3_2(MatterBaseTest):
 
         # If no INVALID_IN_STATE write status was returned during the SpeedSetting updates:
         if not invalid_in_state_occurred:
-            subs = {name: next(sub for sub in self.subscriptions if sub._expected_attribute.__name__ == name) for name in ["SpeedSetting", "FanMode", "PercentSetting"]}
+            subs = {name: next(sub for sub in self.subscriptions if sub._expected_attribute.__name__ == name)
+                    for name in ["SpeedSetting", "FanMode", "PercentSetting"]}
             speed_setting_sub = subs["SpeedSetting"]
             fan_mode_sub = subs["FanMode"]
             percent_setting_sub = subs["PercentSetting"]
@@ -192,8 +193,9 @@ class TC_FAN_3_2(MatterBaseTest):
             values = [q.value for q in sub.attribute_queue.queue]
             correct_progression = all(comp(a, b) for a, b in zip(values, values[1:]))
             asserts.assert_true(correct_progression, f"[FC] {sub._expected_attribute.__name__}: {shared_str}")
-        
-        logging.info(f"[FC] All attribute values progressed as expected ({order.name.lower()} order - current value {comp_str} than previous value).")
+
+        logging.info(
+            f"[FC] All attribute values progressed as expected ({order.name.lower()} order - current value {comp_str} than previous value).")
         logging.info(f"[FC]")
 
     async def testing_scenario_update_speed_setting(self, order) -> None:
