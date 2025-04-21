@@ -200,8 +200,6 @@ class TC_CNET_4_12(MatterBaseTest):
         )
 
         logger.info(f'Step #2: Networks attribute: {networks}')
-        logger.info(f'Step #2: Networks attribute - networkID: ({networks.networkID})')
-        logger.info(f'Step #2: Networks attribute - connected: ({networks.connected})')
 
         num_networks = len(networks)
         logger.info(f'Step #2: Number of Networks entries (NumNetworks): {num_networks}')
