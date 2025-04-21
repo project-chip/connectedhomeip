@@ -56,8 +56,12 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;
 
 namespace {
-RGBLEDWidget sLightLED;
-}
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+RGBLEDWidget sLightLED; // Use RGBLEDWidget if RGB LED functionality is enabled
+#else
+LEDWidget sLightLED; // Use LEDWidget for basic LED functionality
+#endif
+} // namespace
 
 using namespace chip::TLV;
 using namespace ::chip::DeviceLayer;
