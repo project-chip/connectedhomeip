@@ -29,7 +29,7 @@
 // Without the use of these macros, the compiler would not allow
 // the narrowing and conversion of input values during the settings
 // of the variables inside of both 'AttributeEntry.mask' and 'AcceptedCommandEntry.mask'.
-#if defined(__clang__) || defined(__gcc__)
+#if defined(__clang__) || defined(__gcc__) || defined(__gxx_tag__)
 #define BitfieldAssignment(code)                                                                                                   \
     _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\"")                                              \
         _Pragma("GCC diagnostic ignored \"-Wnarrowing\"")(code) _Pragma("GCC diagnostic pop")
