@@ -97,6 +97,33 @@ class TC_FAN_3_2(MatterBaseTest):
                                  f"[FC] Mismatch between written and read attribute value ({attribute.__name__} - written: {value}, read: {value_read})")
         return write_status
 
+    async def get_fan_modes(self, remove_auto: bool = False):
+        # Read FanModeSequence attribute value
+        fan_mode_sequence_attr = Clusters.FanControl.Attributes.FanModeSequence
+        fm_enum = Clusters.FanControl.Enums.FanModeEnum
+        fms_enum = Clusters.FanControl.Enums.FanModeSequenceEnum
+        self.fan_mode_sequence = await self.read_setting(fan_mode_sequence_attr)
+
+        # Verify response contains a FanModeSequenceEnum
+        asserts.assert_is_instance(self.fan_mode_sequence, fms_enum,
+                                   f"[FC] FanModeSequence result isn't of enum type {fms_enum.__name__}")
+
+        fan_modes = None
+        if self.fan_mode_sequence == 0:
+            fan_modes = [fm_enum.kOff, fm_enum.kLow, fm_enum.kMedium, fm_enum.kHigh]
+        elif self.fan_mode_sequence == 1:
+            fan_modes = [fm_enum.kOff, fm_enum.kLow, fm_enum.kHigh]
+        elif self.fan_mode_sequence == 2:
+            fan_modes = [fm_enum.kOff, fm_enum.kLow, fm_enum.kMedium, fm_enum.kHigh, fm_enum.kAuto]
+        elif self.fan_mode_sequence == 3:
+            fan_modes = [fm_enum.kOff, fm_enum.kLow, fm_enum.kHigh, fm_enum.kAuto]
+        elif self.fan_mode_sequence == 4:
+            fan_modes = [fm_enum.kOff, fm_enum.kHigh, fm_enum.kAuto]
+        elif self.fan_mode_sequence == 5:
+            fan_modes = [fm_enum.kOff, fm_enum.kHigh]
+
+        self.fan_modes = [f for f in fan_modes if not (remove_auto and f == fm_enum.kAuto)]
+
     def log_scenario(self, value_range, order) -> None:
         # Logging support info
         logging.info("[FC] ====================================================================")
@@ -133,11 +160,33 @@ class TC_FAN_3_2(MatterBaseTest):
                 logging.info(f"[FC] {q.attribute.__name__}: {q.value}")
             logging.info("[FC]")
 
-    def verify_attribute_progression(self, order) -> None:
+    def verify_attribute_progression(self, order: OrderEnum, invalid_in_state_occurred: bool) -> None:
         # Setup
         comp = operator.le if order == OrderEnum.Ascending else operator.ge
         comp_str = "greater" if order == OrderEnum.Ascending else "less"
         shared_str = f"not all attribute values progressed in {order.name.lower()} order (current value {comp_str} than previous value)."
+
+        # If no INVALID_IN_STATE write status was returned during the SpeedSetting updates:
+        if not invalid_in_state_occurred:
+            subs = {name: next(sub for sub in self.subscriptions if sub._expected_attribute.__name__ == name) for name in ["SpeedSetting", "FanMode", "PercentSetting"]}
+            speed_setting_sub = subs["SpeedSetting"]
+            fan_mode_sub = subs["FanMode"]
+            percent_setting_sub = subs["PercentSetting"]
+
+            # Verify that if the number of reports received for SpeedSetting is greater than or equal to the
+            # number of reports received for FanMode, then the number of reports received for FanMode should be
+            # equal to the number of FanModes - 1 (since the first FanMode is Off/High due to initialization)
+            if len(speed_setting_sub.attribute_queue.queue) >= len(fan_mode_sub.attribute_queue.queue):
+                expected_fan_mode_qty = len(self.fan_modes) - 1
+                asserts.assert_equal(len(fan_mode_sub.attribute_queue.queue), expected_fan_mode_qty,
+                                     f"[FC] FanMode attribute report count ({len(fan_mode_sub.attribute_queue.queue)}) does not match expected count ({expected_fan_mode_qty})")
+
+            # Verify that the number of reports received for PercentSetting
+            # matches the number of reports received for SpeedSetting
+            asserts.assert_equal(len(percent_setting_sub.attribute_queue.queue), len(speed_setting_sub.attribute_queue.queue),
+                                 f"[FC] PercentSetting attribute report count ({len(percent_setting_sub.attribute_queue.queue)}) does not match SpeedSetting attribute report count ({len(speed_setting_sub.attribute_queue.queue)})")
+
+            logging.info(f"[FC]")
 
         for sub in self.subscriptions:
             values = [q.value for q in sub.attribute_queue.queue]
@@ -152,6 +201,7 @@ class TC_FAN_3_2(MatterBaseTest):
         cluster = Clusters.FanControl
         attr = cluster.Attributes
         fm_enum = cluster.Enums.FanModeEnum
+        invalid_in_state_occurred = False
 
         # *** NEXT STEP ***
         # Initialize FanMode to Off or High based on update order
@@ -174,7 +224,11 @@ class TC_FAN_3_2(MatterBaseTest):
         # Update the value of the `SpeedSetting` attribute iteratively, in the specified order
         self.step(self.current_step_index + 1)
         for value_to_write in value_range:
-            await self.write_and_verify_attribute(attr.SpeedSetting, value_to_write)
+            write_status = await self.write_and_verify_attribute(attr.SpeedSetting, value_to_write)
+            if not invalid_in_state_occurred:
+                if write_status == Status.InvalidInState:
+                    invalid_in_state_occurred = True
+                    logging.info(f"[FC] InvalidInState occurred for SpeedSetting attribute write ({value_to_write})")
 
         # Log results of attribute reports per subscription
         self.log_results()
@@ -182,7 +236,7 @@ class TC_FAN_3_2(MatterBaseTest):
         # After all updates have been performed, verify that the value of the
         # attribute reports from each subscription came in sequencially in the
         # specified order (each new value greater or less than the previous one)
-        self.verify_attribute_progression(order)
+        self.verify_attribute_progression(order, invalid_in_state_occurred)
 
         # Cancel subscriptions
         for sub in self.subscriptions:
@@ -207,6 +261,8 @@ class TC_FAN_3_2(MatterBaseTest):
         self.step(2)
         self.speed_max = await self.read_setting(attr.SpeedMax)
         assert_valid_uint8(self.speed_max, "SpeedMax")
+
+        await self.get_fan_modes(remove_auto=True)
 
         # *** NEXT STEPS ***
         # TH tests the following scenarios and verifies the correct progression of the PercentSetting,
