@@ -255,8 +255,8 @@ class CommandHandlerInterfaceShim : public CommandHandlerInterface
         ReturnErrorOnFailure(EnumerateAcceptedCommands(cluster, counter.Caller(), counter.Context()));
         ReturnErrorOnFailure(builder.EnsureAppendCapacity(commandCount));
 
-        auto appender = SplitLambda([&](DataModel::AcceptedCommandEntry commandId) {
-            err = builder.Append(GetEntry(cluster, commandId));
+        auto appender = SplitLambda([&](DataModel::AcceptedCommandEntry entry) {
+            err = builder.Append(entry);
             return err == CHIP_NO_ERROR ? Loop::Continue : Loop::Break;
         });
 
