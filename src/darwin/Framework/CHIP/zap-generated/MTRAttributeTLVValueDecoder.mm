@@ -11186,27 +11186,27 @@ static id _Nullable DecodeAttributeValueForClosureDimensionCluster(AttributeId a
 {
     using namespace Clusters::ClosureDimension;
     switch (aAttributeId) {
-    case Attributes::Current::Id: {
-        using TypeInfo = Attributes::Current::TypeInfo;
+    case Attributes::CurrentState::Id: {
+        using TypeInfo = Attributes::CurrentState::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        MTRClosureDimensionClusterCurrentStruct * _Nullable value;
+        MTRClosureDimensionClusterCurrentStateStruct * _Nullable value;
         if (cppValue.IsNull()) {
             value = nil;
         } else {
-            value = [MTRClosureDimensionClusterCurrentStruct new];
+            value = [MTRClosureDimensionClusterCurrentStateStruct new];
             if (cppValue.Value().position.HasValue()) {
                 value.position = [NSNumber numberWithUnsignedShort:cppValue.Value().position.Value()];
             } else {
                 value.position = nil;
             }
-            if (cppValue.Value().latching.HasValue()) {
-                value.latching = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().latching.Value())];
+            if (cppValue.Value().latch.HasValue()) {
+                value.latch = [NSNumber numberWithBool:cppValue.Value().latch.Value()];
             } else {
-                value.latching = nil;
+                value.latch = nil;
             }
             if (cppValue.Value().speed.HasValue()) {
                 value.speed = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().speed.Value())];
@@ -11234,7 +11234,7 @@ static id _Nullable DecodeAttributeValueForClosureDimensionCluster(AttributeId a
                 value.position = nil;
             }
             if (cppValue.Value().latch.HasValue()) {
-                value.latch = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().latch.Value())];
+                value.latch = [NSNumber numberWithBool:cppValue.Value().latch.Value()];
             } else {
                 value.latch = nil;
             }

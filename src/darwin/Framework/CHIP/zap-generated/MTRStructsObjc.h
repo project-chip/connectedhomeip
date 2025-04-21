@@ -1712,9 +1712,9 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRClosureDimensionClusterCurrentStruct : NSObject <NSCopying>
+@interface MTRClosureDimensionClusterCurrentStateStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nullable position MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable latching MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable latch MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable speed MTR_PROVISIONALLY_AVAILABLE;
 @end
 
