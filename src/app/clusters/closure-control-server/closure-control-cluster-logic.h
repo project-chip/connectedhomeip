@@ -27,6 +27,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <app/AttributeAccessInterface.h>
 
 namespace chip {
 namespace app {
@@ -170,8 +171,7 @@ public:
     CHIP_ERROR GetMainState(MainStateEnum & mainState);
     CHIP_ERROR GetOverallState(DataModel::Nullable<GenericOverallState> & overallState);
     CHIP_ERROR GetOverallTarget(DataModel::Nullable<GenericOverallTarget> & overallTarget);
-
-    // TODO: Add ErrorList getter with its implementation
+    CHIP_ERROR GetCurrentErrorList(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
 
     // All Set functions
     // Return CHIP_ERROR_INCORRECT_STATE if the class has not been initialized.
@@ -186,6 +186,29 @@ public:
     CHIP_ERROR SetMainState(MainStateEnum mainState);
     CHIP_ERROR SetOverallState(const DataModel::Nullable<GenericOverallState> & overallState);
     CHIP_ERROR SetOverallTarget(const DataModel::Nullable<GenericOverallTarget> & overallTarget);
+    CHIP_ERROR SetCurrentErrorList(const ClosureErrorEnum error);
+    
+    /**
+     * @brief Public API to trigger countdown time update from the delegate (application layer).
+     *        Function calls the SetCountdownTime function with the fromDelegate parameter set to true.
+     *
+     *        See SetCountdownTime function comment below
+     */
+    inline CHIP_ERROR SetCountdownTimeFromDelegate(const DataModel::Nullable<ElapsedS> & countdownTime)
+    {
+        return SetCountdownTime(countdownTime, true);
+    }
+    
+    /**
+     * @brief API to trigger countdown time update from the cluster logic.
+     *        Function calls the SetCountdownTime function with the fromDelegate parameter set to false.
+     *
+     *        See SetCountdownTime function comment above
+     */
+    inline CHIP_ERROR SetCountdownTimeFromCluster(const DataModel::Nullable<ElapsedS> & countdownTime)
+    {
+        return SetCountdownTime(countdownTime, false);
+    }
     
     /**
      *  @brief Calls delegate HandleStopCommand function after validating the parameters and conformance.
@@ -251,17 +274,14 @@ public:
      *         Return error recieved from LogEvent.
      */
     CHIP_ERROR PostSecureStateChangedEvent(const bool secureValue);
-
+    
     /**
-     * @brief Public API to trigger countdown time update from the delegate (application layer).
-     *        Function calls the SetCountdownTime function with the fromDelegate parameter set to true.
-     *
-     *        See SetCountdownTime function comment below
+     * @brief Causes reporting of CurrentErrorList.
+     *        Whenever application wants to report a change in Errorlist, call this method.
      */
-    inline CHIP_ERROR SetCountdownTimeFromDelegate(const DataModel::Nullable<ElapsedS> & countdownTime)
-    {
-        return SetCountdownTime(countdownTime, true);
-    }
+    void ReportCurrentErrorListChange();
+    
+    void HandleCountdownTimeExpired();
 
 private:
     /**
@@ -335,17 +355,6 @@ private:
      * @param fromDelegate true if the coutdown time is being configured by the delegate, false otherwise
      */
     CHIP_ERROR SetCountdownTime(const DataModel::Nullable<ElapsedS> & countdownTime, bool fromDelegate);
-
-    /**
-     * @brief API to trigger countdown time update from the cluster logic.
-     *        Function calls the SetCountdownTime function with the fromDelegate parameter set to false.
-     *
-     *        See SetCountdownTime function comment above
-     */
-    inline CHIP_ERROR SetCountdownTimeFromCluster(const DataModel::Nullable<ElapsedS> & countdownTime)
-    {
-        return SetCountdownTime(countdownTime, false);
-    }
 
     bool mIsInitialized = false;
     DelegateBase & mDelegate;

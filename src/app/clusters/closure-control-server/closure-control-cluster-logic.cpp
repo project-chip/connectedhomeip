@@ -18,6 +18,7 @@
 #include <app/clusters/closure-control-server/closure-control-cluster-logic.h>
 #include <app/EventLogging.h>
 #include <platform/LockTracker.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -78,6 +79,7 @@ bool ClusterLogic::IsSupportedMainState(MainStateEnum mainState)
 
     return isSupported;
 }
+
 
 bool ClusterLogic::IsValidMainStateTransition(MainStateEnum mainState)
 {
@@ -181,6 +183,57 @@ CHIP_ERROR ClusterLogic::SetCountdownTime(const DataModel::Nullable<ElapsedS> & 
     return CHIP_NO_ERROR;
 }
 
+static void onCountdownTimerTick(System::Layer * systemLayer, void * context)
+{
+    assertChipStackLockedByCurrentThread();
+    
+    auto * logic = static_cast<ClusterLogic *>(context);
+    
+    ClusterState state = logic->GetState();
+    
+    if (state.mCountdownTime.value().IsNull())
+    {
+        // I think this might be an error state - if mCountdownTime is NULL, this timer shouldn't be on.
+        return;
+    }
+
+    ElapsedS countdownTime = state.mCountdownTime.value().Value();
+
+    if (countdownTime)
+    {
+        countdownTime--;
+        logic->SetCountdownTimeFromCluster(countdownTime);
+    }
+    else 
+    {
+        (void) DeviceLayer::SystemLayer().CancelTimer(onCountdownTimerTick, logic);
+        logic->HandleCountdownTimeExpired();
+    }
+
+    (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onCountdownTimerTick, logic);
+}
+
+void ClusterLogic::HandleCountdownTimeExpired()
+{
+    ClusterState state = GetState();
+
+    if (state.mMainState == MainStateEnum::kWaitingForMotion)
+    {
+        if (mDelegate.IsReadyToMove())
+        {
+            DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onCountdownTimerTick, this);
+            Status status = mDelegate.HandleMoveToCommand(state.mOverallTarget.Value().position, state.mOverallTarget.Value().latch, state.mOverallTarget.Value().speed);
+            if (status == Status::Success)
+            {
+                SetMainState(MainStateEnum::kMoving);
+            } 
+        } 
+    }
+    
+    PostMovementCompletedEvent();
+    HandleStop();
+}
+
 CHIP_ERROR ClusterLogic::SetMainState(MainStateEnum mainState)
 {
     assertChipStackLockedByCurrentThread();
@@ -190,11 +243,42 @@ CHIP_ERROR ClusterLogic::SetMainState(MainStateEnum mainState)
     VerifyOrReturnError(IsValidMainStateTransition(mainState), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnValue(mainState != mState.mMainState, CHIP_NO_ERROR);
 
+    // EngageStateChanged event SHALL be generated when the MainStateEnum attribute changes state to and from disengaged
+    // Present state is Disengaged and will be changed to new state, so trigger EngageStateChangedEvent 
+    if (mState.mMainState == MainStateEnum::kDisengaged)
+    {
+        // As Closure is transition from Disengaged state to new State, EngageValue should be true.
+        PostEngageStateChangedEvent(true);
+    }
+    // New state will be Disengaged , so trigger EngageStateChangedEvent
+    if (mainState == MainStateEnum::kDisengaged)
+    {
+        // As Closure is transition to Disengaged state, EngageValue should be false.  
+        PostEngageStateChangedEvent(false);
+    }
+
     mState.mMainState = mainState;
     mMatterContext.MarkDirty(Attributes::MainState::Id);
-
-    // TODO: Trigger CountdownTime update
-
+    
+    
+    if (mConformance.HasFeature(Feature::kInstantaneous)) {
+        
+        if (mainState == MainStateEnum::kCalibrating){
+            SetCountdownTimeFromCluster(mDelegate.GetCalibrationCountdownTime());
+        } else if (mainState == MainStateEnum::kMoving) {
+            SetCountdownTimeFromCluster(mDelegate.GetMovingCountdownTime());
+        } else if (mainState == MainStateEnum::kWaitingForMotion) {
+            SetCountdownTimeFromCluster(mDelegate.GetWaitingForMotionCountdownTime());
+        } else {
+            SetCountdownTimeFromCluster(DataModel::NullNullable);
+        }
+    
+        if (mainState == MainStateEnum::kCalibrating || mainState == MainStateEnum::kMoving || mainState == MainStateEnum::kWaitingForMotion)
+        {
+            (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onCountdownTimerTick, this);
+        }   
+    }
+    
     return CHIP_NO_ERROR;
 }
 
@@ -377,6 +461,11 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
     {
         currentOverallState.SetNonNull(overallState.Value());
         mMatterContext.MarkDirty(Attributes::OverallState::Id);
+        
+        //SecureStateChangedEvent SHALL be generated when the SecureState field in the OverallState attribute changes
+        if (requiredSecureStateUpdate) {
+            PostSecureStateChangedEvent(overallState.Value().secureState.Value().Value());
+        }
     }
 
     return CHIP_NO_ERROR;
@@ -534,6 +623,29 @@ CHIP_ERROR ClusterLogic::SetOverallTarget(const DataModel::Nullable<GenericOvera
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ClusterLogic::SetCurrentErrorList(const ClosureErrorEnum error)
+{
+    assertChipStackLockedByCurrentThread();
+    
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+    
+    VerifyOrReturnError(EnsureKnownEnumValue(error) != ClosureErrorEnum::kUnknownEnumValue,
+                                CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorOnFailure(mDelegate.SetCurrentErrorInList(error));
+    ReportCurrentErrorListChange();
+    
+    //TODO: GetErrorList and PostErrorEvent
+    
+    ReturnErrorOnFailure(SetMainState(MainStateEnum::kError));
+    
+    return CHIP_NO_ERROR;
+}
+
+void ClusterLogic::ReportCurrentErrorListChange()
+{
+    mMatterContext.MarkDirty(Attributes::CurrentErrorList::Id);
+}
+
 CHIP_ERROR ClusterLogic::GetCountdownTime(DataModel::Nullable<ElapsedS> & countdownTime)
 {
     assertChipStackLockedByCurrentThread();
@@ -587,6 +699,37 @@ CHIP_ERROR ClusterLogic::GetOverallTarget(DataModel::Nullable<GenericOverallTarg
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ClusterLogic::GetCurrentErrorList(const AttributeValueEncoder::ListEncodeHelper & encoder)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    
+    for (size_t i = 0; true; i++)
+    {
+        ClosureErrorEnum error;
+
+        err = mDelegate.GetCurrentErrorAtIndex(i, error);
+
+        // Convert CHIP_ERROR_PROVIDER_LIST_EXHAUSTED to CHIP_NO_ERROR
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+        {
+            err = CHIP_NO_ERROR;
+            goto exit;
+        }
+
+        // Exit for other errors occurred apart from CHIP_ERROR_PROVIDER_LIST_EXHAUSTED
+        SuccessOrExit(err);
+
+        // Encode the error
+        err = encoder.Encode(error);
+
+        // Check if error occurred while trying to encode
+        SuccessOrExit(err);
+    }
+
+exit:
+    return err;
+}
+
 chip::Protocols::InteractionModel::Status ClusterLogic::HandleStop() 
 {
     Status status = Status::Success;
@@ -622,6 +765,8 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<Ta
     
     MainStateEnum state;
     VerifyOrReturnValue(GetMainState(state) == CHIP_NO_ERROR,Status::Failure);
+    
+    DataModel::Nullable<GenericOverallTarget> target;
 
     // If all command parameters don't have a value, return InvalidCommand
     VerifyOrReturnValue(position.HasValue() || latch.HasValue() || speed.HasValue(), Status::InvalidCommand);
@@ -633,6 +778,7 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<Ta
         // If Positioning(PS) feature is not supported, it SHALL return a status code SUCCESS.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), Status::Success);
 
+        target.Value().position = position;
     }
 
     if (latch.HasValue())
@@ -645,6 +791,8 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<Ta
         {
             return Status::InvalidAction;
         }
+        
+        target.Value().latch = latch;
     }
 
     if (speed.HasValue())
@@ -653,6 +801,8 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<Ta
 
         // If Speed (SP) feature is not supported, the server SHALL return a status code SUCCESS,
         VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), Status::Success);
+        
+        target.Value().speed = speed;
     }
 
     // If MoveTo command is received in any state other than Moving, WaitingForMotion or Stopped, an error code INVALID_IN_STATE SHALL be returned
@@ -670,8 +820,12 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<Ta
 
     status = mDelegate.HandleMoveToCommand(position, latch, speed);
     
-    // once moveTo action is successful.Server will set MainState to Moving or WaitingforMotion based on closure.
-    if (status == Status::Success) {
+    // once MoveTo action is successful.Server will set OverallTarget and the MainState.
+    if (status == Status::Success) 
+    {
+        VerifyOrReturnValue(SetOverallTarget(target) == CHIP_NO_ERROR, Status::Failure);
+        
+        // MainState is set to Moving or WaitingforMotion based on closure.
         if (mDelegate.IsReadyToMove())
         {
             // If the closure is ready to move, set MainState to Moving
@@ -728,8 +882,6 @@ CHIP_ERROR ClusterLogic::PostOperationalErrorEvent(const DataModel::List<const C
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     err            = SetMainState(MainStateEnum::kError);
-
-    // TODO: Should CurrentErrorList attribute updated here.
 
     if (CHIP_NO_ERROR != err)
     {

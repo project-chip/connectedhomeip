@@ -88,11 +88,8 @@ CHIP_ERROR Interface::Read(const ConcreteReadAttributePath & aPath, AttributeVal
     }
 
     case Attributes::CurrentErrorList::Id: {
-
-        typedef Attributes::CurrentErrorList::TypeInfo::Type T;
-        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR {
-            // TODO: Use the correct getter
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+        return aEncoder.EncodeList([&logic = mClusterLogic](const auto & encoder) -> CHIP_ERROR {
+            return logic.GetCurrentErrorList(encoder); 
         });
     }
 
