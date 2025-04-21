@@ -30,6 +30,7 @@
 #include <app/reporting/reporting.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <clusters/NetworkCommissioning/Metadata.h>
 #include <credentials/CHIPCert.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/SafeInt.h>

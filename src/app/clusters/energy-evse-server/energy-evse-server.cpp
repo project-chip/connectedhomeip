@@ -22,6 +22,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
+#include <clusters/EnergyEvse/Metadata.h>
 
 using namespace chip;
 using namespace chip::app;

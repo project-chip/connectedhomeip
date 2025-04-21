@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/util/util.h>
+#include <clusters/Resou
 #include <cstdint>
 #include <utility>
 
