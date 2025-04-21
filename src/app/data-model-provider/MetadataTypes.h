@@ -196,7 +196,7 @@ struct AcceptedCommandEntry
     {}
 
     EndBitFieldInit
-    
+
     // Getter for mask.invokePrivilege
     constexpr Access::Privilege GetInvokePrivilege() const { return static_cast<Access::Privilege>(mask.invokePrivilege); }
 
