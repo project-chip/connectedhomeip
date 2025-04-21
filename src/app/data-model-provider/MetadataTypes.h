@@ -30,9 +30,9 @@
 // the narrowing and conversion of input values during the settings
 // of the variables inside of both 'AttributeEntry.mask' and 'AcceptedCommandEntry.mask'.
 #if defined(__clang__) || defined(__gcc__)
-#define  BitfieldAssignment(code)  _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\"") _Pragma("GCC diagnostic ignored \"-Wnarrowing\"") code _Pragma("GCC diagnostic pop") 
+#define  BitfieldAssignment(code)  _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\"") _Pragma("GCC diagnostic ignored \"-Wnarrowing\"") code _Pragma("GCC diagnostic pop")
 #else
-#define  BitfieldAssignment(code) 
+#define  BitfieldAssignment(code)
 #endif
 
             namespace chip
@@ -196,7 +196,7 @@
                   BitfieldAssignment(to_underlying(invokePriv) & ((1 << 5) - 1)) }     // Narrowing expression to 5 bits
         {}
 
-        
+
             // Getter for mask.invokePrivilege
             constexpr Access::Privilege
             GetInvokePrivilege() const
