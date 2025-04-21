@@ -42,6 +42,9 @@ public:
     CHIP_ERROR DeviceTypes(EndpointId endpointId, ListBuilder<app::DataModel::DeviceTypeEntry> & builder) override;
     CHIP_ERROR ClientClusters(EndpointId endpointId, ListBuilder<ClusterId> & builder) override;
     CHIP_ERROR ServerClusters(EndpointId endpointId, ListBuilder<app::DataModel::ServerClusterEntry> & builder) override;
+#ifdef CONFIG_USE_ENDPOINT_UNIQUE_ID
+    CHIP_ERROR EndpointUniqueID(EndpointId endpointId, ListBuilder<MutableCharSpan> & builder) override;
+#endif
     CHIP_ERROR Attributes(const app::ConcreteClusterPath & path, ListBuilder<app::DataModel::AttributeEntry> & builder) override;
     CHIP_ERROR GeneratedCommands(const app::ConcreteClusterPath & path, ListBuilder<CommandId> & builder) override;
     CHIP_ERROR AcceptedCommands(const app::ConcreteClusterPath & path,

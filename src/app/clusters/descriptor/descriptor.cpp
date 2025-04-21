@@ -214,11 +214,14 @@ CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, Attrib
 #ifdef CONFIG_USE_ENDPOINT_UNIQUE_ID
 CHIP_ERROR DescriptorAttrAccess::ReadEndpointUniqueId(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    char epUniqueId[Attributes::EndpointUniqueID::TypeInfo::MaxLength()] = { 0 };
-    MutableCharSpan epUniqueIdSpan(epUniqueId);
-    emberAfGetEndpointUniqueIdForEndPoint(endpoint, epUniqueIdSpan);
+    DataModel::ListBuilder<MutableCharSpan> epUniqueId;
 
-    return aEncoder.Encode(epUniqueIdSpan);
+    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointUniqueID(endpoint, epUniqueId));
+
+    auto readOnlyBuffer = epUniqueId.TakeBuffer();
+    return aEncoder.Encode(readOnlyBuffer[0]);
+    
+    return CHIP_NO_ERROR;
 }
 #endif
 

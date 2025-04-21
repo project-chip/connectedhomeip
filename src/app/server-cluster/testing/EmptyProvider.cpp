@@ -51,6 +51,13 @@ CHIP_ERROR EmptyProvider::ServerClusters(EndpointId endpointId, ListBuilder<app:
     return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
 }
 
+#ifdef CONFIG_USE_ENDPOINT_UNIQUE_ID
+CHIP_ERROR EmptyProvider::EndpointUniqueID(EndpointId endpointId, ListBuilder<MutableCharSpan> & builder)
+{
+    return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
+}
+#endif
+
 CHIP_ERROR EmptyProvider::Attributes(const app::ConcreteClusterPath & path, ListBuilder<app::DataModel::AttributeEntry> & builder)
 {
     return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
