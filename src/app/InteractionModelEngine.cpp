@@ -37,7 +37,6 @@
 #include <app/EventPathParams.h>
 #include <app/RequiredPrivilege.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
-#include <app/data-model-provider/MetadataList.h>
 #include <app/data-model-provider/MetadataLookup.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
@@ -52,6 +51,7 @@
 #include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/FibonacciUtils.h>
+#include <lib/support/ReadOnlyBuffer.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -1081,14 +1081,19 @@ void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
 }
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
-void InteractionModelEngine::OnActiveModeNotification(ScopedNodeId aPeer)
+void InteractionModelEngine::OnActiveModeNotification(ScopedNodeId aPeer, uint64_t aMonitoredSubject)
 {
     for (ReadClient * pListItem = mpActiveReadClientList; pListItem != nullptr;)
     {
         auto pNextItem = pListItem->GetNextClient();
         // It is possible that pListItem is destroyed by the app in OnActiveModeNotification.
         // Get the next item before invoking `OnActiveModeNotification`.
-        if (ScopedNodeId(pListItem->GetPeerNodeId(), pListItem->GetFabricIndex()) == aPeer)
+        CATValues cats;
+
+        mpFabricTable->FetchCATs(pListItem->GetFabricIndex(), cats);
+        if (ScopedNodeId(pListItem->GetPeerNodeId(), pListItem->GetFabricIndex()) == aPeer &&
+            (cats.CheckSubjectAgainstCATs(aMonitoredSubject) ||
+             aMonitoredSubject == mpFabricTable->FindFabricWithIndex(pListItem->GetFabricIndex())->GetNodeId()))
         {
             pListItem->OnActiveModeNotification();
         }
@@ -1809,11 +1814,6 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(co
     const bool commandNeedsTimedInvoke = entry.flags.Has(DataModel::CommandQualityFlags::kTimed);
     const bool commandIsFabricScoped   = entry.flags.Has(DataModel::CommandQualityFlags::kFabricScoped);
 
-    if (commandNeedsTimedInvoke && !aRequest.invokeFlags.Has(DataModel::InvokeFlags::kTimed))
-    {
-        return Status::NeedsTimedInteraction;
-    }
-
     if (commandIsFabricScoped)
     {
         // SPEC: Else if the command in the path is fabric-scoped and there is no accessing fabric,
@@ -1827,6 +1827,19 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(co
         }
     }
 
+    if (commandNeedsTimedInvoke && !aRequest.invokeFlags.Has(DataModel::InvokeFlags::kTimed))
+    {
+        return Status::NeedsTimedInteraction;
+    }
+
+    // Command that is marked as having a large payload must be sent over a
+    // session that supports it.
+    if (entry.flags.Has(DataModel::CommandQualityFlags::kLargeMessage) &&
+        !CurrentExchange()->GetSessionHandle()->AllowsLargePayload())
+    {
+        return Status::InvalidTransportType;
+    }
+
     return Status::Success;
 }
 
@@ -1835,7 +1848,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandExistenc
 {
     auto provider = GetDataModelProvider();
 
-    DataModel::ListBuilder<DataModel::AcceptedCommandEntry> acceptedCommands;
+    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedCommands;
     (void) provider->AcceptedCommands(aCommandPath, acceptedCommands);
     for (auto & existing : acceptedCommands.TakeBuffer())
     {
