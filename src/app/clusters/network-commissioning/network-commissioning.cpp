@@ -20,12 +20,13 @@
 
 #include "network-commissioning.h"
 
+#include <app-common/clusters/NetworkCommissioning/Metadata.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/clusters/general-commissioning-server/general-commissioning-server.h>
+
 #include <app/data-model/Nullable.h>
 #include <app/reporting/reporting.h>
 #include <app/server/Server.h>
@@ -1362,18 +1363,18 @@ void Instance::OnFailSafeTimerExpired()
     }
 }
 
-CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandEntryCallback callback, void * context)
 {
     using namespace Clusters::NetworkCommissioning::Commands;
 
     if (mFeatureFlags.Has(Feature::kThreadNetworkInterface))
     {
         for (auto && cmd : {
-                 ScanNetworks::Id,
-                 AddOrUpdateThreadNetwork::Id,
-                 RemoveNetwork::Id,
-                 ConnectNetwork::Id,
-                 ReorderNetwork::Id,
+                 ScanNetworks::kMetadataEntry,
+                 AddOrUpdateThreadNetwork::kMetadataEntry,
+                 RemoveNetwork::kMetadataEntry,
+                 ConnectNetwork::kMetadataEntry,
+                 ReorderNetwork::kMetadataEntry,
              })
         {
             VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
@@ -1382,11 +1383,11 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
     else if (mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
     {
         for (auto && cmd : {
-                 ScanNetworks::Id,
-                 AddOrUpdateWiFiNetwork::Id,
-                 RemoveNetwork::Id,
-                 ConnectNetwork::Id,
-                 ReorderNetwork::Id,
+                 ScanNetworks::kMetadataEntry,
+                 AddOrUpdateWiFiNetwork::kMetadataEntry,
+                 RemoveNetwork::kMetadataEntry,
+                 ConnectNetwork::kMetadataEntry,
+                 ReorderNetwork::kMetadataEntry,
              })
         {
             VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
@@ -1395,7 +1396,7 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
 
     if (mFeatureFlags.Has(Feature::kPerDeviceCredentials))
     {
-        VerifyOrExit(callback(QueryIdentity::Id, context) == Loop::Continue, /**/);
+        VerifyOrExit(callback(QueryIdentity::kMetadataEntry, context) == Loop::Continue, /**/);
     }
 
 exit:
