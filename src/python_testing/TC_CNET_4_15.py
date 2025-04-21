@@ -17,13 +17,8 @@
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 import chip.clusters as Clusters
-from matter_testing_infrastructure.chip.testing.matter_testing import (
-    MatterBaseTest,
-    TestStep,
-    run_if_endpoint_matches,
-    has_feature,
-    default_matter_test_main,
-)
+from matter_testing_infrastructure.chip.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main,
+                                                                       has_feature, run_if_endpoint_matches)
 
 
 class TC_CNET_4_15(MatterBaseTest):
