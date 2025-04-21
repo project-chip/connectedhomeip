@@ -34,9 +34,10 @@ using chip::app::Clusters::CameraAvStreamManagement::ViewportStruct;
 struct VideoStream
 {
     VideoStreamStruct videoStreamParams;
-    bool isAllocated;    // Flag to indicate if the stream is allocated.
-    void * videoContext; // Platform-specific context object associated with
-                         // video stream;
+    bool isAllocated;        // Flag to indicate if the stream is allocated.
+    ViewportStruct viewport; // Stream specific viewport, defaults to the camera viewport
+    void * videoContext;     // Platform-specific context object associated with
+                             // video stream;
 
     bool IsCompatible(const VideoStreamStruct & inputParams) const
     {
@@ -207,6 +208,9 @@ public:
         // Get the current camera viewport.
         virtual const ViewportStruct & GetViewport() = 0;
 
+        // Set the viewport for a specific stream
+        virtual CameraError SetViewport(VideoStream & stream, const ViewportStruct & viewPort) = 0;
+
         // Mute/Unmute speaker.
         virtual CameraError SetSpeakerMuted(bool muteSpeaker) = 0;
 
@@ -232,14 +236,16 @@ public:
         virtual uint8_t GetMicrophoneMaxLevel() = 0;
         virtual uint8_t GetMicrophoneMinLevel() = 0;
 
+        // Set Pan, Tilt, and Zoom
+        virtual CameraError SetPan(int16_t aPan) = 0;
+        virtual CameraError SetTilt(int16_t aTilt) = 0;
+        virtual CameraError SetZoom(uint8_t aZoom) = 0;
+
+        // Get device defined limits for Pan, Tilt, and Zoom
         virtual int16_t GetPanMin() = 0;
-
         virtual int16_t GetPanMax() = 0;
-
         virtual int16_t GetTiltMin() = 0;
-
         virtual int16_t GetTiltMax() = 0;
-
         virtual uint8_t GetZoomMax() = 0;
     };
 

@@ -635,6 +635,15 @@ CameraError CameraDevice::SetViewport(const ViewportStruct & viewPort)
     return CameraError::SUCCESS;
 }
 
+CameraError CameraDevice::SetViewport(VideoStream & stream, const ViewportStruct & viewport)
+{
+    ChipLogDetail(Camera,"Setting per stream viewport for stream %d.", stream.videoStreamParams.videoStreamID);
+    ChipLogDetail(Camera,"New viewport. x1=%d, x2=%d, y1=%d, y2=%d.", 
+                          viewport.x1, viewport.x2, viewport.y1, viewport.y2);
+    stream.viewport = viewport;
+    return CameraError::SUCCESS;
+}
+
 // Mute/Unmute microphone.
 CameraError CameraDevice::SetMicrophoneMuted(bool muteMicrophone)
 {
@@ -653,27 +662,48 @@ CameraError CameraDevice::SetMicrophoneVolume(uint8_t microphoneVol)
 
 int16_t CameraDevice::GetPanMin()
 {
-    return -90;
+    return kMyMinPanValue;
 }
 
 int16_t CameraDevice::GetPanMax()
 {
-    return 90;
+    return kMyMaxPanValue;
 }
 
 int16_t CameraDevice::GetTiltMin()
 {
-    return -90;
+    return kMyMinTiltValue;
 }
 
 int16_t CameraDevice::GetTiltMax()
 {
-    return 90;
+    return kMyMaxTiltValue;
 }
 
 uint8_t CameraDevice::GetZoomMax()
 {
-    return 75;
+    return kMyMaxZoomValue;
+}
+
+// Set the Pan level
+CameraError CameraDevice::SetPan(int16_t aPan)
+{
+    mPan = aPan;
+    return CameraError::SUCCESS;
+}
+
+// Set the Tilt level
+CameraError CameraDevice::SetTilt(int16_t aTilt)
+{
+    mTilt = aTilt;
+    return CameraError::SUCCESS;
+}
+
+// Set the Zoom level
+CameraError CameraDevice::SetZoom(uint8_t aZoom)
+{
+    mZoom = aZoom;
+    return CameraError::SUCCESS;
 }
 
 void CameraDevice::InitializeVideoStreams()
@@ -694,6 +724,7 @@ void CameraDevice::InitializeVideoStreams()
                                   chip::MakeOptional(static_cast<bool>(false)) /* OSD */,
                                   0 /* RefCount */ },
                                 false,
+                                { mViewport.x1, mViewport.y1, mViewport.x2, mViewport.y2 },
                                 nullptr };
 
     videoStreams.push_back(videoStream);

@@ -40,8 +40,18 @@
 #define MICROPHONE_MIN_LEVEL (1)
 #define MICROPHONE_MAX_LEVEL (254)
 #define INVALID_SPKR_LEVEL (0)
+#define DEFAULT_PAN (0)
+#define DEFAULT_TILT (0)
+#define DEFAULT_ZOOM (1)
 
 namespace Camera {
+
+// Camera defined constants for Pan, Tilt, Zoom bounding values
+constexpr int16_t kMyMinPanValue  = -90;
+constexpr int16_t kMyMaxPanValue  = 90;
+constexpr int16_t kMyMinTiltValue = -90;
+constexpr int16_t kMyMaxTiltValue = 90;
+constexpr uint8_t kMyMaxZoomValue = 75;
 
 class CameraDevice : public CameraDeviceInterface, public CameraDeviceInterface::CameraHALInterface
 {
@@ -102,8 +112,12 @@ public:
     CameraError SetHDRMode(bool hdrMode);
     bool GetHDRMode() { return mHDREnabled; }
 
+    // Sets the Default Camera Viewport
     CameraError SetViewport(const ViewportStruct & viewPort);
     const ViewportStruct & GetViewport() { return mViewport; }
+
+    // Sets the Viewport for a specific stream
+    CameraError SetViewport(VideoStream & stream, const ViewportStruct & viewPort);
 
     // Currently, defaulting to not supporting speaker.
     bool HasSpeaker() { return false; }
@@ -142,6 +156,10 @@ public:
     int16_t GetTiltMax();
 
     uint8_t GetZoomMax();
+
+    CameraError SetPan(int16_t aPan);
+    CameraError SetTilt(int16_t aTilt);
+    CameraError SetZoom(uint8_t aZoom);
 
     std::vector<VideoStream> & GetAvailableVideoStreams() { return videoStreams; }
 
@@ -183,7 +201,11 @@ private:
     uint8_t mMicrophoneMinLevel                                             = MICROPHONE_MIN_LEVEL;
     uint8_t mMicrophoneMaxLevel                                             = MICROPHONE_MAX_LEVEL;
     uint8_t mMicrophoneVol                                                  = MICROPHONE_MIN_LEVEL;
-    chip::app::Clusters::CameraAvStreamManagement::ViewportStruct mViewport = { 325, 585, 2244, 1664 };
+    uint16_t mPan                                                           = DEFAULT_PAN;
+    uint16_t mTilt                                                          = DEFAULT_TILT;
+    int8_t mZoom                                                            = DEFAULT_ZOOM;
+    // Use a standard 1080p aspect ratio
+    chip::app::Clusters::CameraAvStreamManagement::ViewportStruct mViewport = { 320, 585, 2240, 1665 };
 };
 
 } // namespace Camera
