@@ -29,13 +29,9 @@
 // Without the use of these macros, the compiler would not allow
 // the narrowing and conversion of input values during the settings
 // of the variables inside of both 'AttributeEntry.mask' and 'AcceptedCommandEntry.mask'.
-#if defined(__clang__) || defined(__gcc__) || defined(__gxx_tag__)
-#define BitfieldAssignment(code)                                                                                                   \
-    _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\"")                                              \
-        _Pragma("GCC diagnostic ignored \"-Wnarrowing\"")(code) _Pragma("GCC diagnostic pop")
-#else
-#define BitfieldAssignment(code) (code)
-#endif
+#define StartBitFieldInit \
+_Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\"") _Pragma("GCC diagnostic ignored \"-Wnarrowing\"")
+#define EndBitFieldInit _Pragma("GCC diagnostic pop")
 
 namespace chip {
 namespace app {
@@ -104,6 +100,9 @@ struct AttributeEntry
     AttributeId attributeId;
 
     // Constructor
+
+    StartBitFieldInit
+
     constexpr AttributeEntry(
         AttributeId id = 0,                                                           // attributeId initial value,
                                                                                       // this could be altered later
@@ -112,10 +111,12 @@ struct AttributeEntry
         Access::Privilege writePriv            = Access::Privilege::kNoPrivilege      // mask.writePrivilege initial value
         ) :
         attributeId{ id },
-        mask{ BitfieldAssignment(to_underlying(attrQualityFlags) & ((1 << 7) - 1)), // Narrowing expression to 7 bits
-              BitfieldAssignment(to_underlying(readPriv) & ((1 << 5) - 1)),         // Narrowing expression to 5 bits
-              BitfieldAssignment(to_underlying(writePriv) & ((1 << 5) - 1)) }       // Narrowing expression to 5 bits
+        mask{ to_underlying(attrQualityFlags) & ((1 << 7) - 1), // Narrowing expression to 7 bits
+              to_underlying(readPriv) & ((1 << 5) - 1),         // Narrowing expression to 5 bits
+              to_underlying(writePriv) & ((1 << 5) - 1) }       // Narrowing expression to 5 bits
     {}
+
+    EndBitFieldInit
 
     // Getter for mask.readPrivilege
     constexpr Access::Privilege GetReadPrivilege() const { return static_cast<Access::Privilege>(mask.readPrivilege); }
@@ -180,6 +181,9 @@ struct AcceptedCommandEntry
     CommandId commandId;
 
     // Constructor
+
+    StartBitFieldInit
+
     constexpr AcceptedCommandEntry(
         CommandId id = 0,                                                        // commandId initial value,
                                                                                  // this could be altered later
@@ -187,10 +191,12 @@ struct AcceptedCommandEntry
         Access::Privilege invokePriv        = Access::Privilege::kView           // mask.invokePrivilege initial value
         ) :
         commandId(id),
-        mask{ BitfieldAssignment(to_underlying(cmdQualityFlags) & ((1 << 3) - 1)), // Narrowing expression to 3 bits
-              BitfieldAssignment(to_underlying(invokePriv) & ((1 << 5) - 1)) }     // Narrowing expression to 5 bits
+        mask{ to_underlying(cmdQualityFlags) & ((1 << 3) - 1), // Narrowing expression to 3 bits
+              to_underlying(invokePriv) & ((1 << 5) - 1) }     // Narrowing expression to 5 bits
     {}
 
+    EndBitFieldInit
+    
     // Getter for mask.invokePrivilege
     constexpr Access::Privilege GetInvokePrivilege() const { return static_cast<Access::Privilege>(mask.invokePrivilege); }
 
@@ -231,4 +237,4 @@ struct DeviceTypeEntry
 } // namespace app
 } // namespace chip
 
-#undef BitfieldAssignment
+#undef StartBitFieldInit
