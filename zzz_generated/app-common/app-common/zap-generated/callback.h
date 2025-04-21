@@ -7363,18 +7363,6 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::DecodableType & commandData);
 /**
- * @brief Closure Dimension Cluster SetTarget Command callback (from client)
- */
-bool emberAfClosureDimensionClusterSetTargetCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ClosureDimension::Commands::SetTarget::DecodableType & commandData);
-/**
- * @brief Closure Dimension Cluster Step Command callback (from client)
- */
-bool emberAfClosureDimensionClusterStepCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ClosureDimension::Commands::Step::DecodableType & commandData);
-/**
  * @brief Thermostat Cluster SetpointRaiseLower Command callback (from client)
  */
 bool emberAfThermostatClusterSetpointRaiseLowerCallback(

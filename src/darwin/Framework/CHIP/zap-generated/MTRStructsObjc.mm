@@ -7208,14 +7208,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRClosureDimensionClusterCurrentStruct
+@implementation MTRClosureDimensionClusterCurrentStateStruct
 - (instancetype)init
 {
     if (self = [super init]) {
 
         _position = nil;
 
-        _latching = nil;
+        _latch = nil;
 
         _speed = nil;
     }
@@ -7224,10 +7224,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRClosureDimensionClusterCurrentStruct alloc] init];
+    auto other = [[MTRClosureDimensionClusterCurrentStateStruct alloc] init];
 
     other.position = self.position;
-    other.latching = self.latching;
+    other.latch = self.latch;
     other.speed = self.speed;
 
     return other;
@@ -7235,7 +7235,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: position:%@; latching:%@; speed:%@; >", NSStringFromClass([self class]), _position, _latching, _speed];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: position:%@; latch:%@; speed:%@; >", NSStringFromClass([self class]), _position, _latch, _speed];
     return descriptionString;
 }
 

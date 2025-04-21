@@ -13337,7 +13337,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedClosureDimensionClusterCurrentAttributeCallback implements ChipClusters.ClosureDimensionCluster.CurrentAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedClosureDimensionClusterCurrentStateAttributeCallback implements ChipClusters.ClosureDimensionCluster.CurrentStateAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -13345,9 +13345,9 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(@Nullable ChipStructs.ClosureDimensionClusterCurrentStruct value) {
+    public void onSuccess(@Nullable ChipStructs.ClosureDimensionClusterCurrentStateStruct value) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ClosureDimensionClusterCurrentStruct");
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ClosureDimensionClusterCurrentStateStruct");
       responseValues.put(commandResponseInfo, value);
       callback.onSuccess(responseValues);
     }
@@ -29975,7 +29975,7 @@ public class ClusterInfoMapping {
     CommandParameterInfo closureDimensionsetTargetpositionCommandParameterInfo = new CommandParameterInfo("position", Optional.class, Integer.class);
     closureDimensionsetTargetCommandParams.put("position",closureDimensionsetTargetpositionCommandParameterInfo);
 
-    CommandParameterInfo closureDimensionsetTargetlatchCommandParameterInfo = new CommandParameterInfo("latch", Optional.class, Integer.class);
+    CommandParameterInfo closureDimensionsetTargetlatchCommandParameterInfo = new CommandParameterInfo("latch", Optional.class, Boolean.class);
     closureDimensionsetTargetCommandParams.put("latch",closureDimensionsetTargetlatchCommandParameterInfo);
 
     CommandParameterInfo closureDimensionsetTargetspeedCommandParameterInfo = new CommandParameterInfo("speed", Optional.class, Integer.class);
@@ -29986,7 +29986,7 @@ public class ClusterInfoMapping {
         .setTarget((DefaultClusterCallback) callback
         , (Optional<Integer>)
         commandArguments.get("position")
-        , (Optional<Integer>)
+        , (Optional<Boolean>)
         commandArguments.get("latch")
         , (Optional<Integer>)
         commandArguments.get("speed")

@@ -30,7 +30,7 @@
 
 #include <vector>
 
-#include "CHIPPlatformConfig.h"
+#include CHIP_PLATFORM_CONFIG_INCLUDE
 
 namespace chip {
 namespace DeviceLayer {
