@@ -32,7 +32,7 @@
 #if defined(__clang__) || defined(__gcc__)
 #define BitfieldAssignment(code)                                                                                                   \
     _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\"")                                              \
-        _Pragma("GCC diagnostic ignored \"-Wnarrowing\"") (code) _Pragma("GCC diagnostic pop")
+        _Pragma("GCC diagnostic ignored \"-Wnarrowing\"")(code) _Pragma("GCC diagnostic pop")
 #else
 #define BitfieldAssignment(code) (code)
 #endif
