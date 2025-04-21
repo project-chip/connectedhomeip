@@ -77,9 +77,12 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
                 return;
             }
             Protocols::InteractionModel::Status status_x = ColorControl::Attributes::CurrentY::Get(endpoint, &colorData.xy.y);
-            assert(status_x == Protocols::InteractionModel::Status::Success);
+            VerifyOrReturn(Protocols::InteractionModel::status::Success == statusx,
+                           ChipLogError(NotSpecified, "Failed to get CurrentX attribute"));
+
             Protocols::InteractionModel::Status status_y = ColorControl::Attributes::CurrentX::Get(endpoint, &colorData.xy.x);
-            assert(status_y == Protocols::InteractionModel::Status::Success);
+            VerifyOrReturn(Protocols::InteractionModel::status::Success == statusy,
+                           ChipLogError(NotSpecified, "Failed to get CurrentY attribute"));
 
             ChipLogProgress(Zcl, "New XY color: %u|%u", colorData.xy.x, colorData.xy.y);
             LightMgr().InitiateLightAction(AppEvent::kEventType_Light, LightingManager::COLOR_ACTION_XY, sizeof(colorData),
@@ -91,11 +94,16 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         {
             colorData.hsv                                 = {};
             Protocols::InteractionModel::Status statusHue = ColorControl::Attributes::CurrentHue::Get(endpoint, &colorData.hsv.h);
-            assert(statusHue == Protocols::InteractionModel::Status::Success);
+            VerifyOrReturn(Protocols::InteractionModel::status::Success == statusHue,
+                           ChipLogError(NotSpecified, "Failed to get CurrentHue attribute"));
+
             Protocols::InteractionModel::Status statusSat =
                 ColorControl::Attributes::CurrentSaturation::Get(endpoint, &colorData.hsv.s);
+            VerifyOrReturn(Protocols::InteractionModel::status::Success == statusSat,
+                           ChipLogError(NotSpecified, "Failed to get CurrentSaturation attribute"));
+
             ChipLogProgress(Zcl, "New HSV color: %u|%u", colorData.hsv.h, colorData.hsv.s);
-            assert(statusSat == Protocols::InteractionModel::Status::Success);
+
             LightMgr().InitiateLightAction(AppEvent::kEventType_Light, LightingManager::COLOR_ACTION_HSV, sizeof(colorData),
                                            (ColorData_t *) &colorData);
         }
@@ -108,6 +116,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
                 return;
             }
             colorData.ct.ctMireds = *(uint16_t *) value;
+
             ChipLogProgress(Zcl, "New ColorTemperatureMireds: %u", colorData.ct.ctMireds);
             LightMgr().InitiateLightAction(AppEvent::kEventType_Light, LightingManager::COLOR_ACTION_CT, sizeof(colorData),
                                            (ColorData_t *) &colorData);

@@ -19,12 +19,6 @@
 #pragma once
 
 #include <stdint.h>
-enum ColorFormat
-{
-    COLOR_FORMAT_HSV,
-    COLOR_FORMAT_XY,
-    COLOR_FORMAT_TEMP
-};
 struct RgbColor_t
 {
     uint8_t r;

@@ -23,6 +23,17 @@
 // define a clamp macro to substitute the std::clamp macro which is available from C++17 onwards
 #define clamp(a, min, max) ((a) < (min) ? (min) : ((a) > (max) ? (max) : (a)))
 
+// Constant values
+constexpr float kMaxChromaticity    = 65535.0f;
+constexpr float kMaxBrightnessLevel = 254.0f;
+constexpr float kGammaThreshold     = 0.00304f;
+constexpr float kGammaMultiplier    = 12.92f;
+constexpr float kGammaExponent      = 1.0f / 2.4f;
+constexpr float kGammaOffset        = 0.055f;
+constexpr float kHueRegionDivider   = 43.0f;
+constexpr float kHueScaleFactor     = 6.0f;
+constexpr uint8_t kMaxColorValue    = 255;
+
 // to the specified range given as min and max
 RgbColor_t ColorConverter::RgbClamp(uint8_t r, uint8_t g, uint8_t b, uint8_t min, uint8_t max)
 {
@@ -36,45 +47,57 @@ RgbColor_t ColorConverter::RgbClamp(uint8_t r, uint8_t g, uint8_t b, uint8_t min
 // Calculate the red component based on color temperature in centiKelvin
 float ColorConverter::CalculateRed(float ctCentiKelvin)
 {
-    if (ctCentiKelvin <= 66)
+    constexpr float kRedThreshold  = 66.0f;
+    constexpr float kRedMultiplier = 329.698727446f;
+    constexpr float kRedExponent   = -0.1332047592f;
+    if (ctCentiKelvin <= kRedThreshold)
     {
-        return 255;
+        return kMaxColorValue;
     }
     else
     {
-        return 329.698727446f * pow(ctCentiKelvin - 60, -0.1332047592f);
+        return kRedMultiplier * pow(ctCentiKelvin - 60, kRedExponent);
     }
 }
 
 // Calculate the green component based on color temperature in centiKelvin
 float ColorConverter::CalculateGreen(float ctCentiKelvin)
 {
-    if (ctCentiKelvin <= 66)
+    constexpr float kGreenThreshold      = 66.0f;
+    constexpr float kGreenMultiplierLow  = 99.4708025861f;
+    constexpr float kGreenOffsetLow      = -161.1195681661f;
+    constexpr float kGreenMultiplierHigh = 288.1221695283f;
+    constexpr float kGreenExponentHigh   = -0.0755148492f;
+    if (ctCentiKelvin <= kGreenThreshold)
     {
-        return 99.4708025861f * log(ctCentiKelvin) - 161.1195681661f;
+        return kGreenMultiplierLow * log(ctCentiKelvin) - kGreenOffsetLow;
     }
     else
     {
-        return 288.1221695283f * pow(ctCentiKelvin - 60, -0.0755148492f);
+        return kGreenMultiplierHigh * pow(ctCentiKelvin - 60, kGreenExponentHigh);
     }
 }
 
 // Calculate the blue component based on color temperature in centiKelvin
 float ColorConverter::CalculateBlue(float ctCentiKelvin)
 {
-    if (ctCentiKelvin >= 66)
+    constexpr float kBlueThresholdHigh = 66.0f;
+    constexpr float kBlueThresholdLow  = 19.0f;
+    constexpr float kBlueMultiplier    = 138.5177312231f;
+    constexpr float kBlueOffset        = -305.0447927307f;
+    if (ctCentiKelvin >= kBlueThresholdHigh)
     {
-        return 255;
+        return kMaxColorValue;
     }
     else
     {
-        if (ctCentiKelvin <= 19)
+        if (ctCentiKelvin <= kBlueThresholdLow)
         {
             return 0;
         }
         else
         {
-            return 138.5177312231f * log(ctCentiKelvin - 10) - 305.0447927307f;
+            return kBlueMultiplier * log(ctCentiKelvin - 10) - kBlueOffset;
         }
     }
 }
@@ -82,15 +105,18 @@ float ColorConverter::CalculateBlue(float ctCentiKelvin)
 // Apply gamma correction to the given value
 float ColorConverter::ApplyGammaCorrection(float value)
 {
-    return (value <= 0.00304f) ? 12.92f * value : (1.055f * std::pow(value, 1.0f / 2.4f)) - 0.055f;
+    // If the values are below a certain threshold (0.00304), the correction is simple (12.92 * value), otherwise, the gamma curve
+    // is applied
+    // This step ensures that the colors look good when displayed on typical RGB devices
+    return (value <= kGammaThreshold) ? kGammaMultiplier * value : (1.055f * std::pow(value, kGammaExponent)) - kGammaOffset;
 }
 
 RgbColor_t ColorConverter::NormalizeRgb(float r, float g, float b)
 {
     RgbColor_t rgb;
-    rgb.r = static_cast<uint8_t>(r * 255);
-    rgb.g = static_cast<uint8_t>(g * 255);
-    rgb.b = static_cast<uint8_t>(b * 255);
+    rgb.r = static_cast<uint8_t>(r * kMaxColorValue);
+    rgb.g = static_cast<uint8_t>(g * kMaxColorValue);
+    rgb.b = static_cast<uint8_t>(b * kMaxColorValue);
     return rgb;
 }
 
@@ -98,11 +124,24 @@ RgbColor_t ColorConverter::NormalizeRgb(float r, float g, float b)
 RgbColor_t ColorConverter::ConvertXYZToRGB(float X, float Y, float Z)
 {
     // X, Y and Z input refer to a D65/2° standard illuminant.
-    // sR, sG and sB (standard RGB) output range = 0 ÷ 255
-    // convert XYZ to RGB - CIE XYZ to sRGB
-    float r = (X * 3.2410f) - (Y * 1.5374f) - (Z * 0.4986f);
-    float g = -(X * 0.9692f) + (Y * 1.8760f) + (Z * 0.0416f);
-    float b = (X * 0.0556f) - (Y * 0.2040f) + (Z * 1.0570f);
+    // The XYZ values are then converted to RGB values using a standard transformation matrix for the sRGB color space (D65
+    // illuminant, 2° observer):
+    // These coefficients come from a linear transformation from XYZ to sRGB color space, which is based on how human vision
+    // perceives color.
+    constexpr float kMatrixR1 = 3.2410f;
+    constexpr float kMatrixR2 = -1.5374f;
+    constexpr float kMatrixR3 = -0.4986f;
+    constexpr float kMatrixG1 = -0.9692f;
+    constexpr float kMatrixG2 = 1.8760f;
+    constexpr float kMatrixG3 = 0.0416f;
+    constexpr float kMatrixB1 = 0.0556f;
+    constexpr float kMatrixB2 = -0.2040f;
+    constexpr float kMatrixB3 = 1.0570f;
+
+    // Convert XYZ to RGB using the transformation matrix
+    float r = (X * kMatrixR1) + (Y * kMatrixR2) + (Z * kMatrixR3);
+    float g = (X * kMatrixG1) + (Y * kMatrixG2) + (Z * kMatrixG3);
+    float b = (X * kMatrixB1) + (Y * kMatrixB2) + (Z * kMatrixB3);
 
     // Apply gamma 2.2 correction
     r = ApplyGammaCorrection(r);
@@ -124,14 +163,14 @@ RgbColor_t ColorConverter::ConvertXYZToRGB(float X, float Y, float Z)
 uint8_t ColorConverter::CalculateP(uint8_t v, uint8_t s)
 {
     // RGB value when the hue is at its minimum for the current region.
-    return (v * (255 - s)) >> 8;
+    return (v * (kMaxColorValue - s)) >> 8;
 }
 
 // Calculate the Q value for HSV to RGB conversion
 uint8_t ColorConverter::CalculateQ(uint8_t v, uint8_t s, uint32_t remainder)
 {
     // RGB value when the hue is transitioning from one primary color to another within the current region.
-    return (v * (255 - ((s * remainder) >> 8))) >> 8;
+    return (v * (kMaxColorValue - ((s * remainder) >> 8))) >> 8;
 }
 
 // Calculate the T value for HSV to RGB conversion
@@ -140,7 +179,7 @@ uint8_t ColorConverter::CalculateT(uint8_t v, uint8_t s, uint32_t remainder)
     // RGB value when the hue is transitioning from one primary color to another within the current region, but in the opposite
     // direction of q.
 
-    return (v * (255 - ((s * (255 - remainder)) >> 8))) >> 8;
+    return (v * (kMaxColorValue - ((s * (kMaxColorValue - remainder)) >> 8))) >> 8;
 }
 
 // Set RGB values based on the region for HSV to RGB conversion
@@ -179,7 +218,7 @@ RgbColor_t ColorConverter::CTToRgb(CtColor_t ct)
     float g = CalculateGreen(ctCentiKelvin);
     float b = CalculateBlue(ctCentiKelvin);
 
-    rgb = RgbClamp(r, g, b, 0, 255);
+    rgb = RgbClamp(r, g, b, 0, kMaxColorValue);
 
     return rgb;
 }
@@ -190,7 +229,7 @@ RgbColor_t ColorConverter::HsvToRgb(HsvColor_t hsv)
     RgbColor_t rgb;
 
     uint8_t region, p, q, t;
-    uint32_t h, s, v, remainder;
+    uint32_t remainder;
 
     if (hsv.s == 0)
     {
@@ -198,24 +237,20 @@ RgbColor_t ColorConverter::HsvToRgb(HsvColor_t hsv)
     }
     else
     {
-        h = hsv.h;
-        s = hsv.s;
-        v = hsv.v;
-
         // region variable is calculated by dividing the hue value by 43 (since the hue value ranges from 0 to 255, and there are 6
         // regions, each region spans approximately 43 units)
-        region = h / 43;
+        region = hsv.h / 43;
 
         // Calculates the position of h within the current region.Multiplying by 6 scales this position to a range of 0 to 255,
         // which is used to calculate intermediate RGB values.
-        remainder = (h - (region * 43)) * 6;
+        remainder = (hsv.h - (region * 43)) * 6;
 
         // p,q and t intermediate values used to calculate the final RGB values
-        p = CalculateP(v, s);
-        q = CalculateQ(v, s, remainder);
-        t = CalculateT(v, s, remainder);
+        p = CalculateP(hsv.v, hsv.s);
+        q = CalculateQ(hsv.v, hsv.s, remainder);
+        t = CalculateT(hsv.v, hsv.s, remainder);
 
-        SetRgbByRegion(region, v, p, q, t, rgb);
+        SetRgbByRegion(region, hsv.v, p, q, t, rgb);
     }
 
     return rgb;
@@ -224,15 +259,33 @@ RgbColor_t ColorConverter::HsvToRgb(HsvColor_t hsv)
 // Convert XY color space to RGB color space
 RgbColor_t ColorConverter::XYToRgb(uint8_t Level, uint16_t currentX, uint16_t currentY)
 {
-    // Converts the 16 - bit currentY value to a normalized y value in the range 0.0 to 1.0
-    float x = static_cast<float>(currentX) / 65535.0f;
-    float y = static_cast<float>(currentY) / 65535.0f;
+    // convert xyY color space to RGB
+
+    // https://www.easyrgb.com/en/math.php
+    // https://en.wikipedia.org/wiki/SRGB
+    // refer https://en.wikipedia.org/wiki/CIE_1931_color_space#CIE_xy_chromaticity_diagram_and_the_CIE_xyY_color_space
+
+    // The currentX/currentY attribute contains the current value of the normalized chromaticity value of x/y.
+    // The value of x/y shall be related to the currentX/currentY attribute by the relationship
+    // x = currentX/65536
+    // y = currentY/65536
+    // z = 1-x-y
+
+    // Converts the 16 - bit currentX,currentY value to a normalized y value in the range 0.0 to 1.0
+    constexpr float kMaxChromaticity    = 65535.0f;
+    constexpr float kMaxBrightnessLevel = 254.0f;
+
+    float x = static_cast<float>(currentX) / kMaxChromaticity;
+    float y = static_cast<float>(currentY) / kMaxChromaticity;
 
     // Calculates the z value as 1.0 - x - y, ensuring the sum of x, y, and z equals 1.0.
+    // Needed to convert the xy values to full XYZ format
     float z = 1.0f - x - y;
 
     // Converts the brightness level Level to a normalized Y value in the range 0.0 to 1.0.
-    float Y = static_cast<float>(Level) / 254.0f;
+    float Y = static_cast<float>(Level) / kMaxBrightnessLevel;
+
+    // chromaticity (x and y) to get the full XYZ color space
     float X = (Y / y) * x;
     float Z = (Y / y) * z;
 

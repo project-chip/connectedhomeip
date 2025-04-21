@@ -311,16 +311,8 @@ void LightingManager::OnTriggerOffWithEffect(OnOffEffect * effect)
 bool LightingManager::InitiateLightAction(int32_t aActor, Action_t aAction, uint16_t size, ColorData_t * aValue)
 {
     bool action_initiated = false;
-    switch (aAction)
-    {
-    case COLOR_ACTION_XY:
-    case COLOR_ACTION_HSV:
-    case COLOR_ACTION_CT:
-        action_initiated = true;
-        AppTask::GetAppTask().PostLightControlActionRequest(aActor, aAction, aValue);
-    default:
-        break;
-    }
+    VerifyOrReturnError(aAction == COLOR_ACTION_XY || aAction == COLOR_ACTION_HSV || aAction == COLOR_ACTION_CT, action_initiated);
+    AppTask::GetAppTask().PostLightControlActionRequest(aActor, aAction, aValue);
     return action_initiated;
 }
 #endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
