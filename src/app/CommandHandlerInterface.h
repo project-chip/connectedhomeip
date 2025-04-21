@@ -236,13 +236,13 @@ private:
 
 class CommandHandlerInterfaceShim : public CommandHandlerInterface
 {
-
+public:
     using CommandHandlerInterface::CommandHandlerInterface;
     typedef Loop (*CommandIdCallback)(CommandId id, void * context);
     typedef Loop (*CommandEntryCallback)(DataModel::AcceptedCommandEntry id, void * context);
 
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override
+    inline CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override
     {
         size_t commandCount = 0;
         CHIP_ERROR err      = CHIP_NO_ERROR;
@@ -281,7 +281,8 @@ class CommandHandlerInterfaceShim : public CommandHandlerInterface
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
-    CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, ReadOnlyBufferBuilder<CommandId> & builder) override
+    inline CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster,
+                                                 ReadOnlyBufferBuilder<CommandId> & builder) override
     {
         size_t commandCount = 0;
         CHIP_ERROR err      = CHIP_NO_ERROR;
