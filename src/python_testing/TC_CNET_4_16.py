@@ -23,6 +23,7 @@
 #       --passcode 20202021
 #       --thread-dataset-hex <DATASET_HEX>
 #       --string-arg PIXIT_CNET_THREAD_2ND_OPERATIONALDATASET:"1111111122222222"
+#       -- endpoint <ENDPOINT>
 #       --storage-path admin_storage.json
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -106,7 +107,8 @@ class TC_CNET_4_16(MatterBaseTest):
             res = await self.send_single_cmd(cmd=cmd)
             logger.info(f" --- NetworkingStatus on RemoveNetwork: {res.networkingStatus}")
             # Verify that DUT sends NetworkConfigResponse command to the TH1 with NetworkingStatus field set to NetworkIDNotFound
-            assert isinstance(res, cnet.Commands.NetworkConfigResponse)
+            asserts.assert_true(isinstance(res, cnet.Commands.NetworkConfigResponse),
+                                f"{res} must be of type NetworkConfigResponse")
             asserts.assert_equal(res.networkingStatus,
                                  cnet.Enums.NetworkCommissioningStatusEnum.kNetworkIDNotFound,
                                  f"Expected kNetworkIDNotFound but got: {res.networkingStatus}")
@@ -121,7 +123,7 @@ class TC_CNET_4_16(MatterBaseTest):
         res = await self.send_single_cmd(cmd=cmd)
         logger.info(f" --- NetworkingStatus on ConnectNetwork: {res.networkingStatus}")
         # Verify that DUT sends ConnectNetworkResponse command to the TH1 with NetworkingStatus field set to NetworkIDNotFound
-        assert isinstance(res, cnet.Commands.ConnectNetworkResponse)
+        asserts.assert_true(isinstance(res, cnet.Commands.ConnectNetworkResponse), f"{res} must be of type ConnectNetworkResponse")
         asserts.assert_equal(res.networkingStatus,
                              cnet.Enums.NetworkCommissioningStatusEnum.kNetworkIDNotFound,
                              f"Expected NetworkIDNotFound but got {res.networkingStatus}")
