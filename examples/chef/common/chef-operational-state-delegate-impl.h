@@ -24,8 +24,7 @@
 #include <app/util/attribute-metadata.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-#if defined(MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER) || defined(MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER)
-
+#ifdef MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
 using chip::Protocols::InteractionModel::Status;
 
 namespace chip {
@@ -161,4 +160,4 @@ chip::Protocols::InteractionModel::Status chefOperationalStateReadCallback(chip:
                                                                            const EmberAfAttributeMetadata * attributeMetadata,
                                                                            uint8_t * buffer, uint16_t maxReadLength);
 
-#endif // MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER || MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
+#endif // MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
