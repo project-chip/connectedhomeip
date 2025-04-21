@@ -100,8 +100,6 @@ uint8_t RGBLEDWidget::GetLevel()
 }
 void RGBLEDWidget::SetColor(uint8_t red, uint8_t green, uint8_t blue)
 {
-    /* ChipLogProgress(Zcl, "SetColor : %u|%u|%u", red, green, blue);
-     GetPlatform().SetLedColor(GetLED(), red, green, blue);*/
     if (GetLEDStatus(GetLED()))
     {
         ChipLogProgress(Zcl, "SetColor : %u|%u|%u", red, green, blue);
