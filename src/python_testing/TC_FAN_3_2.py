@@ -66,9 +66,17 @@ class TC_FAN_3_2(MatterBaseTest):
         return [TestStep(1, "[FC] Commissioning already done.", is_commissioning=True),
                 TestStep(2, "[FC] TH reads the SpeedMax attribute from the DUT. This attribute specifies the the maximum value for SpeedSetting.",
                          "Verify that the DUT response contains a uint8 value no greater than 100 and store."),
-                TestStep(3, "[FC] TH tests the following scenario: - Attribute to update: SpeedSetting - Attribute to verify: PercentSetting, FanMode and SpeedSetting - Update order: Ascending. Actions: * Initialize the DUT to `FanMode` Off and read back the value to verify written value. * Individually subscribe to the `PercentSetting`, `FanMode`, and `SpeedSetting` (if supported) attributes * Update the value of the `SpeedSetting` attribute iteratively, in ascending order, from 1 to SpeedMax.",
+                TestStep(3, "Initialize the DUT to `FanMode` Off.",
+                         "* Read back and verify the written value. * The DUT shall return either a SUCCESS or an INVALID_IN_STATE status code."),
+                TestStep(4, "Individually subscribe to the PercentSetting, PercentCurrent, FanMode, SpeedSetting, and SpeedCurrent attributes.",
+                         "This will receive updates for the attributes when the SpeedSetting attribute is updated."),
+                TestStep(5, "Update the value of the `SpeedSetting` attribute iteratively, in ascending order, from 1 to SpeedMax.",
                          "For each update, the DUT shall return either a SUCCESS or an INVALID_IN_STATE status code. After all updates have been performed, verify that the value of the attribute reports from the subscription of each attribute came in sequencially in ascending order (each new value greater than the previous one)."),
-                TestStep(4, "[FC] TH tests the following scenario: - Attribute to update: SpeedSetting - Attribute to verify: PercentSetting, FanMode and SpeedSetting - Update order: Descending. Actions: * Initialize the DUT to `FanMode` High and read back the value to verify written value. * Individually subscribe to the `PercentSetting`, `FanMode`, and `SpeedSetting` (if supported) attributes * Update the value of the `SpeedSetting` attribute iteratively, in descending order, from SpeedMax to 0.",
+                TestStep(6, "Initialize the DUT to `FanMode` High.",
+                         "* Read back and verify the written value. * The DUT shall return either a SUCCESS or an INVALID_IN_STATE status code."),
+                TestStep(7, "Individually subscribe to the PercentSetting, PercentCurrent, FanMode, SpeedSetting, and SpeedCurrent attributes.",
+                         "This will receive updates for the attributes when the SpeedSetting attribute is updated."),
+                TestStep(8, "Update the value of the `SpeedSetting` attribute iteratively, in descending order, from SpeedMax - 1 to 0.",
                          "For each update, the DUT shall return either a SUCCESS or an INVALID_IN_STATE status code. After all updates have been performed, verify that the value of the attribute reports from the subscription of each attribute came in sequencially in descending order (each new value less than the previous one)."),
                 ]
 
@@ -135,6 +143,9 @@ class TC_FAN_3_2(MatterBaseTest):
             values = [q.value for q in sub.attribute_queue.queue]
             correct_progression = all(comp(a, b) for a, b in zip(values, values[1:]))
             asserts.assert_true(correct_progression, f"[FC] {sub._expected_attribute.__name__}: {shared_str}")
+        
+        logging.info(f"[FC] All attribute values progressed as expected ({order.name.lower()} order - current value {comp_str} than previous value).")
+        logging.info(f"[FC]")
 
     async def testing_scenario_update_speed_setting(self, order) -> None:
         # Setup
@@ -143,14 +154,14 @@ class TC_FAN_3_2(MatterBaseTest):
         fm_enum = cluster.Enums.FanModeEnum
 
         # *** NEXT STEP ***
-        # TH performs the requested testing scenario
+        # Initialize FanMode to Off or High based on update order
         self.step(self.current_step_index + 1)
-
-        # Initialize FanMode to Off or High based on the order
         init_fan_mode = fm_enum.kOff if order == OrderEnum.Ascending else fm_enum.kHigh
         await self.write_and_verify_attribute(attr.FanMode, init_fan_mode)
 
-        # Subscribe to the PercentSetting, PercentCurrent, FanMode, and if supported, SpeedSetting and SpeedCurrent attributes
+        # *** NEXT STEP ***
+        # Individually subscribe to the PercentSetting, PercentCurrent, FanMode, SpeedSetting, and SpeedCurrent attributes
+        self.step(self.current_step_index + 1)
         await self.subscribe_to_attributes()
 
         # Get the range of values to write
@@ -159,14 +170,18 @@ class TC_FAN_3_2(MatterBaseTest):
         # Logging the scenario being tested
         self.log_scenario(value_range, order)
 
-        # Write value to attribute and read back to verify the result
+        # *** NEXT STEP ***
+        # Update the value of the `SpeedSetting` attribute iteratively, in the specified order
+        self.step(self.current_step_index + 1)
         for value_to_write in value_range:
             await self.write_and_verify_attribute(attr.SpeedSetting, value_to_write)
 
         # Log results of attribute reports per subscription
         self.log_results()
 
-        # Veirfy attribute progression
+        # After all updates have been performed, verify that the value of the
+        # attribute reports from each subscription came in sequencially in the
+        # specified order (each new value greater or less than the previous one)
         self.verify_attribute_progression(order)
 
         # Cancel subscriptions
