@@ -121,9 +121,11 @@ private:
     GetDetailedPriceRequest(chip::BitMask<CommodityPriceDetailBitmap> details);
     void FreeCurrentPrice(const DataModel::Nullable<Structs::CommodityPriceStruct::Type> *);
 
-    const DataModel::List<const Structs::CommodityPriceStruct::Type> *
-    GetDetailedForecastRequest(chip::BitMask<CommodityPriceDetailBitmap> details, bool isEvent);
-    void FreePriceForecast(const DataModel::List<const Structs::CommodityPriceStruct::Type> *);
+    CHIP_ERROR GetDetailedForecastRequest(chip::BitMask<CommodityPriceDetailBitmap> details,
+                                          chip::Platform::ScopedMemoryBuffer<Structs::CommodityPriceStruct::Type> & forecastBuffer,
+                                          size_t bufferSize,
+                                          DataModel::List<const Structs::CommodityPriceStruct::Type> & forecastList, bool isEvent,
+                                          bool isCommand);
 
     // Attribute storage
     Globals::TariffUnitEnum mTariffUnit;
