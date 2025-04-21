@@ -110,6 +110,8 @@ class TC_CNET_4_1(MatterBaseTest):
         matter_asserts.assert_list_element_type(network, Clusters.NetworkCommissioning.Structs.NetworkInfoStruct,
                                                 "All elements in list are of type NetworkInfoStruct")
         matter_asserts.assert_all(network, lambda x: isinstance(x.networkID, bytes) and 1 <= len(x.networkID) <= 32,
+                                  "connected field is an instance of bool")
+        matter_asserts.assert_all(network, lambda x: isinstance(x.connected, bool),
                                   "NetworkID field is an octet string within a length range 1 to 32")
         network_count = {}
         network_ids = []
@@ -152,7 +154,7 @@ class TC_CNET_4_1(MatterBaseTest):
         last_network_id = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.LastNetworkID)
-        matching_networks_count = sum(map(lambda x: x.networkID == last_network_id, networks))
+        matching_networks_count = sum(map(lambda x: x.networkID == last_network_id, networks_dict))
         asserts.assert_equal(matching_networks_count, 1,
                              "Verify that LastNetworkID attribute matches the NetworkID value of one of the entries")
         asserts.assert_in(last_network_id, network_ids,
