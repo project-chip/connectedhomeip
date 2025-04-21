@@ -195,15 +195,15 @@ private:
 
     DefaultMediaController mMediaController;
 
-    uint16_t mCurrentVideoFrameRate                                         = 0;
-    bool mHDREnabled                                                        = false;
-    bool mMicrophoneMuted                                                   = false;
-    uint8_t mMicrophoneMinLevel                                             = MICROPHONE_MIN_LEVEL;
-    uint8_t mMicrophoneMaxLevel                                             = MICROPHONE_MAX_LEVEL;
-    uint8_t mMicrophoneVol                                                  = MICROPHONE_MIN_LEVEL;
-    uint16_t mPan                                                           = DEFAULT_PAN;
-    uint16_t mTilt                                                          = DEFAULT_TILT;
-    int8_t mZoom                                                            = DEFAULT_ZOOM;
+    uint16_t mCurrentVideoFrameRate = 0;
+    bool mHDREnabled                = false;
+    bool mMicrophoneMuted           = false;
+    uint8_t mMicrophoneMinLevel     = MICROPHONE_MIN_LEVEL;
+    uint8_t mMicrophoneMaxLevel     = MICROPHONE_MAX_LEVEL;
+    uint8_t mMicrophoneVol          = MICROPHONE_MIN_LEVEL;
+    uint16_t mPan                   = DEFAULT_PAN;
+    uint16_t mTilt                  = DEFAULT_TILT;
+    int8_t mZoom                    = DEFAULT_ZOOM;
     // Use a standard 1080p aspect ratio
     chip::app::Clusters::CameraAvStreamManagement::ViewportStruct mViewport = { 320, 585, 2240, 1665 };
 };

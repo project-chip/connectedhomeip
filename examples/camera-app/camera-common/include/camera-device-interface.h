@@ -237,13 +237,13 @@ public:
         virtual uint8_t GetMicrophoneMinLevel() = 0;
 
         // Set Pan, Tilt, and Zoom
-        virtual CameraError SetPan(int16_t aPan) = 0;
+        virtual CameraError SetPan(int16_t aPan)   = 0;
         virtual CameraError SetTilt(int16_t aTilt) = 0;
         virtual CameraError SetZoom(uint8_t aZoom) = 0;
 
         // Get device defined limits for Pan, Tilt, and Zoom
-        virtual int16_t GetPanMin() = 0;
-        virtual int16_t GetPanMax() = 0;
+        virtual int16_t GetPanMin()  = 0;
+        virtual int16_t GetPanMax()  = 0;
         virtual int16_t GetTiltMin() = 0;
         virtual int16_t GetTiltMax() = 0;
         virtual uint8_t GetZoomMax() = 0;

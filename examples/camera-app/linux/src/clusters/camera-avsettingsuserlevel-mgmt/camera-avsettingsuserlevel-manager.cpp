@@ -150,7 +150,7 @@ Status CameraAVSettingsUserLevelManager::DPTZSetViewport(uint16_t aVideoStreamID
     // The application needs to interact with iHAL to access the stream, validate the viewport
     // and set the new viewport value.
     //
-    Status status = Status::Success;
+    Status status    = Status::Success;
     bool streamFound = false;
 
     for (VideoStream & stream : mCameraDeviceHAL->GetAvailableVideoStreams())
@@ -164,31 +164,31 @@ Status CameraAVSettingsUserLevelManager::DPTZSetViewport(uint16_t aVideoStreamID
             // Esnure width does not exceed sensor width
             // Ensure height does not exceed sensor height
             //
-            uint16_t requestedWidth = aViewport.x2 - aViewport.x1;
-            uint16_t requestedHeight = aViewport.y2 - aViewport.y1;
+            uint16_t requestedWidth             = aViewport.x2 - aViewport.x1;
+            uint16_t requestedHeight            = aViewport.y2 - aViewport.y1;
             VideoResolutionStruct minResolution = mCameraDeviceHAL->GetMinViewport();
             VideoSensorParamsStruct sensorParms = mCameraDeviceHAL->GetVideoSensorParams();
-            if ((requestedWidth < minResolution.width) ||
-                (requestedHeight < minResolution.height) ||
-                (requestedWidth > sensorParms.sensorWidth) ||
-                (requestedHeight > sensorParms.sensorHeight))
+            if ((requestedWidth < minResolution.width) || (requestedHeight < minResolution.height) ||
+                (requestedWidth > sensorParms.sensorWidth) || (requestedHeight > sensorParms.sensorHeight))
             {
-                ChipLogError(Camera,"CameraApp: DPTZSetViewport with invalid viewport dimensions");
+                ChipLogError(Camera, "CameraApp: DPTZSetViewport with invalid viewport dimensions");
                 status = Status::ConstraintError;
                 break;
             }
 
             // Get the ARs to no more than 2DP.  Otherwise you get mismatches e.g. 16:9 ratio calculation for 480p isn't the same as
             // 1080p beyond 2DP.
-            float requestedAR = floorf((static_cast<float>(requestedWidth)/requestedHeight)*100)/100;
-            float streamAR    = floorf((static_cast<float>(stream.videoStreamParams.maxResolution.width)/
-                                                    stream.videoStreamParams.maxResolution.height)*100)/100;
+            float requestedAR = floorf((static_cast<float>(requestedWidth) / requestedHeight) * 100) / 100;
+            float streamAR    = floorf((static_cast<float>(stream.videoStreamParams.maxResolution.width) /
+                                     stream.videoStreamParams.maxResolution.height) *
+                                       100) /
+                100;
 
-            ChipLogDetail(Camera,"DPTZSetViewpoort. AR of viewport %f, AR of stream %f.", requestedAR, streamAR);
+            ChipLogDetail(Camera, "DPTZSetViewpoort. AR of viewport %f, AR of stream %f.", requestedAR, streamAR);
             // Ensure that the aspect ration of the viewport matches the aspect ratio of the stream
             if (requestedAR != streamAR)
             {
-                ChipLogError(Camera,"CameraApp: DPTZSetViewport with mismatching aspect ratio.");
+                ChipLogError(Camera, "CameraApp: DPTZSetViewport with mismatching aspect ratio.");
                 status = Status::ConstraintError;
                 break;
             }
@@ -202,7 +202,6 @@ Status CameraAVSettingsUserLevelManager::DPTZSetViewport(uint16_t aVideoStreamID
     }
 
     return status;
-
 }
 
 Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX,
@@ -212,14 +211,14 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
     // The application needs to interact with its instance of AVStreamManagement to access the stream, validate the viewport
     // and set the new values for the viewpoort based on the pixel movement requested
     //
-    Status status = Status::Success;
+    Status status    = Status::Success;
     bool streamFound = false;
 
     for (VideoStream & stream : mCameraDeviceHAL->GetAvailableVideoStreams())
     {
         if (stream.videoStreamParams.videoStreamID == aVideoStreamID && stream.isAllocated)
         {
-            ViewportStruct viewport = stream.viewport;
+            ViewportStruct viewport             = stream.viewport;
             VideoResolutionStruct minResolution = mCameraDeviceHAL->GetMinViewport();
             VideoSensorParamsStruct sensorParms = mCameraDeviceHAL->GetVideoSensorParams();
 
@@ -230,11 +229,11 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
                 {
                     // if the delta would move us out of the cartesian plane of the sensor, limit to the left hand edge
                     //
-                    uint16_t x1Movement = ((deltaX < 0) && (abs(deltaX) > viewport.x1))? -viewport.x1: deltaX;
-                    viewport.x1 = static_cast<uint16_t>(viewport.x1 + x1Movement);
+                    uint16_t x1Movement = ((deltaX < 0) && (abs(deltaX) > viewport.x1)) ? -viewport.x1 : deltaX;
+                    viewport.x1         = static_cast<uint16_t>(viewport.x1 + x1Movement);
 
-                    uint16_t x2Movement = ((deltaX < 0) && (abs(deltaX) > viewport.x2))? -viewport.x2: deltaX;
-                    viewport.x2 = static_cast<uint16_t>(viewport.x2 + x2Movement);
+                    uint16_t x2Movement = ((deltaX < 0) && (abs(deltaX) > viewport.x2)) ? -viewport.x2 : deltaX;
+                    viewport.x2         = static_cast<uint16_t>(viewport.x2 + x2Movement);
                 }
             }
 
@@ -245,11 +244,11 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
                 {
                     // if the delta would move us out of the cartesian plane of the sensor, limit to the top hand edge
                     //
-                    uint16_t y1Movement = ((deltaY < 0) && (abs(deltaY) > viewport.y1))? -viewport.y1: deltaY;
-                    viewport.y1 = static_cast<uint16_t>(viewport.y1 + y1Movement);
+                    uint16_t y1Movement = ((deltaY < 0) && (abs(deltaY) > viewport.y1)) ? -viewport.y1 : deltaY;
+                    viewport.y1         = static_cast<uint16_t>(viewport.y1 + y1Movement);
 
-                    uint16_t y2Movement = ((deltaY < 0) && (abs(deltaY) > viewport.y2))? -viewport.y2: deltaY;
-                    viewport.y2 = static_cast<uint16_t>(viewport.y2 + y2Movement);
+                    uint16_t y2Movement = ((deltaY < 0) && (abs(deltaY) > viewport.y2)) ? -viewport.y2 : deltaY;
+                    viewport.y2         = static_cast<uint16_t>(viewport.y2 + y2Movement);
                 }
             }
 
@@ -260,11 +259,11 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
                 {
                     // Scale the current values by the given zoom
                     //
-                    uint16_t originalWidth = viewport.x2 - viewport.x1;
-                    uint16_t originalHeight = viewport.y2 - viewport.y1;
-                    uint32_t originalSize = originalWidth * originalHeight;
-                    uint32_t zoomDeltaInPixels = static_cast<uint32_t>(originalSize * abs(zoomDelta)/100);
-                    uint32_t newSize = (zoomDelta < 0)? originalSize - zoomDeltaInPixels: originalSize + zoomDeltaInPixels;
+                    uint16_t originalWidth     = viewport.x2 - viewport.x1;
+                    uint16_t originalHeight    = viewport.y2 - viewport.y1;
+                    uint32_t originalSize      = originalWidth * originalHeight;
+                    uint32_t zoomDeltaInPixels = static_cast<uint32_t>(originalSize * abs(zoomDelta) / 100);
+                    uint32_t newSize = (zoomDelta < 0) ? originalSize - zoomDeltaInPixels : originalSize + zoomDeltaInPixels;
 
                     // If the new viewport after zoom would be less than the min, scale it to the min
                     //
@@ -276,9 +275,9 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
                     // The new width of a rectangle with a defined aspect ratio is the square root of the new size
                     // of that rectangle multiplied by the aspect ratio
                     //
-                    double viewportAR = floorf((static_cast<float>(originalWidth)/originalHeight)*100)/100;
+                    double viewportAR = floorf((static_cast<float>(originalWidth) / originalHeight) * 100) / 100;
 
-                    uint16_t newWidth = static_cast<uint16_t>(round(sqrt(newSize * viewportAR)));
+                    uint16_t newWidth  = static_cast<uint16_t>(round(sqrt(newSize * viewportAR)));
                     uint16_t newHeight = static_cast<uint16_t>(newWidth / viewportAR);
 
                     viewport.x1 = static_cast<uint16_t>(viewport.x1 - (newWidth - originalWidth));
@@ -289,7 +288,7 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
             }
             // Is the requested viewport smaller than the minimum, if yes scale to the minimum size, starting at x1, y1.
             //
-            if (((viewport.x2 - viewport.x1) < minResolution.width) || ((viewport.y2-viewport.y1) < minResolution.height))
+            if (((viewport.x2 - viewport.x1) < minResolution.width) || ((viewport.y2 - viewport.y1) < minResolution.height))
             {
                 viewport.x2 = viewport.x1 + minResolution.width;
                 viewport.y2 = viewport.y1 + minResolution.height;
