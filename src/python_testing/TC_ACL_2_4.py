@@ -96,36 +96,38 @@ class TC_ACL_2_4(MatterBaseTest):
             TestStep(28, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
                      "Result is SUCCESS, value is list of AccessControlEntryStruct containing MAXENTRIES elements"),
             TestStep(29, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing PASE auth mode",
-                     "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
-            TestStep(30, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
+                     "Result is SUCCESS"),
+            TestStep(30, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing PASE auth mode",
+                     "Result is CONSTRAINT_ERROR.  Second invalid element is rejected "),
+            TestStep(31, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
                      "Result is SUCCESS, value contains only the admin entry"),
-            TestStep(31, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing invalid combination of Group auth mode with admin privilege",
+            TestStep(32, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing invalid combination of Group auth mode with admin privilege",
                      "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
-            TestStep(32, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing invalid privilege",
+            TestStep(33, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing invalid privilege",
                      "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
-            TestStep(33, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing invalid auth mode",
+            TestStep(34, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing invalid auth mode",
                      "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
-            TestStep(34, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing invalid subject ID 0",
+            TestStep(35, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing invalid subject ID 0",
                      "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
-            TestStep(35, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing max node ID",
+            TestStep(36, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing max node ID",
                      "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
-            TestStep(36, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing an invalid CAT as subject",
+            TestStep(37, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing an invalid CAT as subject",
                      "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
-            TestStep(37, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing invalid Group Node ID",
+            TestStep(38, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing invalid Group Node ID",
                      "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
-            TestStep(38, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing empty target",
+            TestStep(39, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing empty target",
                      "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
-            TestStep(39, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing invalid cluster ID",
+            TestStep(40, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing invalid cluster ID",
                      "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
-            TestStep(40, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing invalid endpoint ID",
+            TestStep(41, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing invalid endpoint ID",
                      "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
-            TestStep(41, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing invalid device type",
+            TestStep(42, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing invalid device type",
                      "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
-            TestStep(42, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing an invalid target entry containing both endpoint and device type fields in the same entry",
+            TestStep(43, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing an invalid target entry containing both endpoint and device type fields in the same entry",
                      "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
-            TestStep(43, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing an invalid target entry containing endpoint, device type and cluster fields in the same entry",
+            TestStep(44, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing an invalid target entry containing endpoint, device type and cluster fields in the same entry",
                      "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
-            TestStep(44, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute value is acl_original",
+            TestStep(45, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute value is acl_original",
                      "Result is SUCCESS"),
         ]
         return steps
@@ -1139,7 +1141,9 @@ class TC_ACL_2_4(MatterBaseTest):
         asserts.assert_equal(len(read_admin_only), 1,
                              "ACL should contain only admin entry after reset")
 
+
         # Now test PASE auth mode (should fail)
+        self.step(30)
         pase_acl = [
             # Admin entry (unchanged)
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
@@ -1167,8 +1171,8 @@ class TC_ACL_2_4(MatterBaseTest):
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
                              "Write ACL with PASE auth mode should fail with CONSTRAINT_ERROR")
 
-        # Step 30: Read and verify ACL after failed PASE write
-        self.step(30)
+        # Step 31: Read and verify ACL after failed PASE write
+        self.step(31)
         read_after_pase_acl = await self.read_single_attribute_check_success(
             endpoint=0,
             cluster=acl_cluster,
@@ -1199,8 +1203,8 @@ class TC_ACL_2_4(MatterBaseTest):
         asserts.assert_equal(verify_acl[0].subjects, [self.th1.nodeId],
                              "Admin entry must have correct node ID")
 
-        # Step 31: Test Group auth mode for admin (should fail)
-        self.step(31)
+        # Step 32: Test Group auth mode for admin (should fail)
+        self.step(32)
         group_admin_acl = [
             # Admin entry (unchanged)
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
@@ -1227,8 +1231,8 @@ class TC_ACL_2_4(MatterBaseTest):
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
                              "Write ACL with Group auth mode for admin should fail with CONSTRAINT_ERROR")
 
-        # Step 32: Test invalid privilege value (should fail)
-        self.step(32)
+        # Step 33: Test invalid privilege value (should fail)
+        self.step(33)
         invalid_privilege_acl = [
             # Admin entry (unchanged)
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
@@ -1255,8 +1259,8 @@ class TC_ACL_2_4(MatterBaseTest):
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
                              "Write ACL with invalid privilege should fail with CONSTRAINT_ERROR")
 
-        # Step 33: Test invalid auth mode value (should fail)
-        self.step(33)
+        # Step 34: Test invalid auth mode value (should fail)
+        self.step(34)
         invalid_auth_mode_acl = [
             # Admin entry (unchanged)
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
@@ -1283,8 +1287,8 @@ class TC_ACL_2_4(MatterBaseTest):
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
                              "Write ACL with invalid auth mode should fail with CONSTRAINT_ERROR")
 
-        # Step 34: Test invalid subject ID 0 (should fail)
-        self.step(34)
+        # Step 35: Test invalid subject ID 0 (should fail)
+        self.step(35)
         invalid_subject_acl = [
             # Admin entry (unchanged)
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
@@ -1311,8 +1315,8 @@ class TC_ACL_2_4(MatterBaseTest):
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
                              "Write ACL with invalid subject ID should fail with CONSTRAINT_ERROR")
 
-        # Step 35: Test max node ID (should fail)
-        self.step(35)
+        # Step 36: Test max node ID (should fail)
+        self.step(36)
         max_node_id_acl = [
             # Admin entry (unchanged)
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
@@ -1339,8 +1343,8 @@ class TC_ACL_2_4(MatterBaseTest):
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
                              "Write ACL with max node ID should fail with CONSTRAINT_ERROR")
 
-        # Step 36: Test invalid CAT (Case-Authenticated Tag) as subject (should fail)
-        self.step(36)
+        # Step 37: Test invalid CAT (Case-Authenticated Tag) as subject (should fail)
+        self.step(37)
         group_id_range_acl = [
             # Admin entry (unchanged)
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
@@ -1367,8 +1371,8 @@ class TC_ACL_2_4(MatterBaseTest):
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
                              "Write ACL with an invalid CAT as subject should fail with CONSTRAINT_ERROR")
 
-        # Step 37: Test invalid Group Node ID (should fail)
-        self.step(37)
+        # Step 38: Test invalid Group Node ID (should fail)
+        self.step(38)
         fabric_scoped_id_acl = [
             # Admin entry (unchanged)
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
@@ -1395,8 +1399,8 @@ class TC_ACL_2_4(MatterBaseTest):
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
                              "Write ACL with invalid Group Node ID should fail with CONSTRAINT_ERROR")
 
-        # Step 38: Test empty target (should fail)
-        self.step(38)
+        # Step 39: Test empty target (should fail)
+        self.step(39)
         empty_target_acl = [
             # Admin entry (unchanged)
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
@@ -1429,8 +1433,8 @@ class TC_ACL_2_4(MatterBaseTest):
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
                              "Write ACL with empty target should fail with CONSTRAINT_ERROR")
 
-        # Step 39: Test invalid cluster ID (should fail)
-        self.step(39)
+        # Step 40: Test invalid cluster ID (should fail)
+        self.step(40)
         invalid_cluster_acl = [
             # Admin entry (unchanged)
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
@@ -1463,8 +1467,8 @@ class TC_ACL_2_4(MatterBaseTest):
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
                              "Write ACL with invalid cluster ID should fail with CONSTRAINT_ERROR")
 
-        # Step 40: Test invalid endpoint ID (should fail)
-        self.step(40)
+        # Step 41: Test invalid endpoint ID (should fail)
+        self.step(41)
         invalid_endpoint_acl = [
             # Admin entry (unchanged)
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
@@ -1497,8 +1501,8 @@ class TC_ACL_2_4(MatterBaseTest):
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
                              "Write ACL with invalid endpoint ID should fail with CONSTRAINT_ERROR")
 
-        # Step 41: Test invalid device type (should fail)
-        self.step(41)
+        # Step 42: Test invalid device type (should fail)
+        self.step(42)
         invalid_device_type_acl = [
             # Admin entry (unchanged)
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
@@ -1531,8 +1535,8 @@ class TC_ACL_2_4(MatterBaseTest):
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
                              "Write ACL with invalid device type should fail with CONSTRAINT_ERROR")
 
-        # Step 42: Test endpoint with device type (should fail)
-        self.step(42)
+        # Step 43: Test endpoint with device type (should fail)
+        self.step(43)
         endpoint_with_device_type_acl = [
             # Admin entry (unchanged)
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
@@ -1565,8 +1569,8 @@ class TC_ACL_2_4(MatterBaseTest):
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
                              "Write ACL with both endpoint and device type should fail with CONSTRAINT_ERROR")
 
-        # Step 43: Test all target fields (should fail)
-        self.step(43)
+        # Step 44: Test all target fields (should fail)
+        self.step(44)
         all_target_fields_acl = [
             # Admin entry (unchanged)
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
@@ -1599,8 +1603,8 @@ class TC_ACL_2_4(MatterBaseTest):
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
                              "Write ACL with all target fields should fail with CONSTRAINT_ERROR")
 
-        # Step 44: Write minimum required ACL (admin only)
-        self.step(44)
+        # Step 45: Write minimum required ACL (admin only)
+        self.step(45)
         result = await self.default_controller.WriteAttribute(
             self.dut_node_id,
             [(0, acl_attribute(value=acl_original))]
