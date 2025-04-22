@@ -555,7 +555,8 @@ def BuildNxpTarget():
     target.AppendModifier(name="matter-shell", enable_shell=True).ExceptIfRe('k32w0|k32w1')
     target.AppendModifier(name="factory-build", enable_factory_data_build=True).OnlyIfRe('rt1060|rt1170|rw61x')
     target.AppendModifier(name="frdm", board_variant=NxpBoardVariant.FRDM).OnlyIfRe('rw61x')
-    target.AppendModifier(name="cmake", build_system=NxpBuildSystem.CMAKE).ExceptIfRe('laundry-washer|lock-app').OnlyIfRe('rt1060|rt1170|rw61x|mcxw71')
+    target.AppendModifier(name="cmake", build_system=NxpBuildSystem.CMAKE).ExceptIfRe(
+        'laundry-washer|lock-app').OnlyIfRe('rt1060|rt1170|rw61x|mcxw71')
     target.AppendModifier(name="evkc", board_variant=NxpBoardVariant.EVKC).OnlyIfRe('rt1060')
     target.AppendModifier(name="iw416", iw416_transceiver=True).OnlyIfRe('rt1060')
     target.AppendModifier(name="w8801", w8801_transceiver=True).OnlyIfRe('rt1060')
