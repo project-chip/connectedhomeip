@@ -66,7 +66,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     DataModel::Nullable<Structs::CommodityPriceStruct::Type> priceStruct;
-    chip::Platform::ScopedMemoryBuffer<Structs::CommodityPriceStruct::Type> forecastBuffer;
+    Platform::ScopedMemoryBuffer<Structs::CommodityPriceStruct::Type> forecastBuffer;
     DataModel::List<const Structs::CommodityPriceStruct::Type> forecastList;
 
     switch (aPath.mAttributeId)
@@ -163,9 +163,8 @@ void Instance::HandleGetDetailedPriceRequest(HandlerContext & ctx,
 {
     DataModel::Nullable<Structs::CommodityPriceStruct::Type> priceStruct;
 
-    chip::BitMask<CommodityPriceDetailBitmap> details = commandData.details;
-    if (!details.HasOnly(
-            BitMask<CommodityPriceDetailBitmap>(CommodityPriceDetailBitmap::kDescription, CommodityPriceDetailBitmap::kComponents)))
+    BitMask<CommodityPriceDetailBitmap> details = commandData.details;
+    if (!details.HasOnly(CommodityPriceDetailBitmap::kDescription, CommodityPriceDetailBitmap::kComponents))
     {
         ChipLogError(Zcl, "Invalid details bitmap recvd in GetDetailedPriceRequest");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
@@ -200,9 +199,8 @@ void Instance::HandleGetDetailedForecastRequest(HandlerContext & ctx,
         return;
     }
 
-    chip::BitMask<CommodityPriceDetailBitmap> details = commandData.details;
-    if (!details.HasOnly(
-            BitMask<CommodityPriceDetailBitmap>(CommodityPriceDetailBitmap::kDescription, CommodityPriceDetailBitmap::kComponents)))
+    BitMask<CommodityPriceDetailBitmap> details = commandData.details;
+    if (!details.HasOnly(CommodityPriceDetailBitmap::kDescription, CommodityPriceDetailBitmap::kComponents))
     {
         ChipLogError(Zcl, "Invalid details bitmap recvd in GetDetailedForecastRequest");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);

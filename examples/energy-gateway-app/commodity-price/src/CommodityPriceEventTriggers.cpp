@@ -68,7 +68,7 @@ void SetTestEventTrigger_PriceUpdate()
     sComponents[1].description.SetValue(chip::Span<const char>(kVATStr, strlen(kVATStr)));
 
     // Assign the component span to the
-    newPriceStruct.components.SetValue(chip::Span<const Structs::CommodityPriceComponentStruct::Type>(sComponents, 2));
+    newPriceStruct.components.SetValue(chip::Span<const Structs::CommodityPriceComponentStruct::Type>(sComponents));
 
     newPrice.SetNonNull(newPriceStruct);
 
