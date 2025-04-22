@@ -215,7 +215,8 @@ TEST_F(TestServerCommandDispatch, TestNoHandler)
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-static const int kDescriptorAttributeArraySize = 254;
+// Use 8 so that we don't exceed the size of ATTRIBUTE_LARGEST defined by ZAP
+static const int kDescriptorAttributeArraySize = 8;
 
 // Declare Descriptor cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(descriptorAttrs)
@@ -279,7 +280,7 @@ void TestServerCommandDispatch::TestDataResponseHelper(const EmberAfEndpointType
     //
     // All our endpoints have the same number of clusters, so just pick one.
     //
-    DataVersion dataVersionStorage[ArraySize(testEndpointClusters1)];
+    DataVersion dataVersionStorage[MATTER_ARRAY_SIZE(testEndpointClusters1)];
     emberAfSetDynamicEndpoint(0, kTestEndpointId, aEndpoint, Span<DataVersion>(dataVersionStorage));
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's

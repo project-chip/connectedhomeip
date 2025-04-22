@@ -19,12 +19,12 @@ import logging
 import os
 import typing
 
-import chip.clusters as Clusters
-from chip.ChipDeviceCtrl import ChipDeviceController, NOCChain
-from chip.clusters import GeneralCommissioning as generalCommissioning
-from chip.clusters import OperationalCredentials as opCreds
-from chip.clusters.Types import NullValue
-from chip.FabricAdmin import FabricAdmin as FabricAdmin
+from .. import clusters as Clusters
+from ..ChipDeviceCtrl import ChipDeviceController, NOCChain
+from ..clusters import GeneralCommissioning as generalCommissioning
+from ..clusters import OperationalCredentials as opCreds
+from ..clusters.Types import NullValue
+from ..FabricAdmin import FabricAdmin as FabricAdmin
 
 _UINT16_MAX = 65535
 
@@ -169,7 +169,6 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
 
     chainForAddNOC = await newFabricDevCtrl.IssueNOCChain(csrForAddNOC, newNodeId)
     if (chainForAddNOC.rcacBytes is None or
-            chainForAddNOC.icacBytes is None or
             chainForAddNOC.nocBytes is None or chainForAddNOC.ipkBytes is None):
         # Expiring the failsafe timer in an attempt to clean up.
         await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
@@ -179,7 +178,7 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
     nocResp = await commissionerDevCtrl.SendCommand(existingNodeId,
                                                     0,
                                                     opCreds.Commands.AddNOC(chainForAddNOC.nocBytes,
-                                                                            chainForAddNOC.icacBytes,
+                                                                            chainForAddNOC.icacBytes if chainForAddNOC.icacBytes else None,
                                                                             chainForAddNOC.ipkBytes,
                                                                             newFabricDevCtrl.nodeId,
                                                                             newFabricDevCtrl.fabricAdmin.vendorId))

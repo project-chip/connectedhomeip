@@ -120,6 +120,7 @@ class TelinkBoard(Enum):
     TLSR9528A = auto()
     TLSR9528A_RETENTION = auto()
     TL3218X = auto()
+    TL3218X_RETENTION = auto()
     TL7218X = auto()
     TL7218X_RETENTION = auto()
 
@@ -134,6 +135,8 @@ class TelinkBoard(Enum):
             return 'tlsr9528a_retention'
         elif self == TelinkBoard.TL3218X:
             return 'tl3218x'
+        elif self == TelinkBoard.TL3218X_RETENTION:
+            return 'tl3218x_retention'
         elif self == TelinkBoard.TL7218X:
             return 'tl7218x'
         elif self == TelinkBoard.TL7218X_RETENTION:
@@ -159,6 +162,7 @@ class TelinkBuilder(Builder):
                  usb_board_config: bool = False,
                  compress_lzma_config: bool = False,
                  thread_analyzer_config: bool = False,
+                 precompiled_ot_config: bool = False,
                  ):
         super(TelinkBuilder, self).__init__(root, runner)
         self.app = app
@@ -173,6 +177,7 @@ class TelinkBuilder(Builder):
         self.usb_board_config = usb_board_config
         self.compress_lzma_config = compress_lzma_config
         self.thread_analyzer_config = thread_analyzer_config
+        self.precompiled_ot_config = precompiled_ot_config
 
     def get_cmd_prefixes(self):
         if not self._runner.dry_run:
@@ -222,6 +227,9 @@ class TelinkBuilder(Builder):
 
         if self.thread_analyzer_config:
             flags.append("-DCONFIG_THREAD_ANALYZER=y")
+
+        if self.precompiled_ot_config:
+            flags.append("-DCONFIG_OPENTHREAD_TELINK_LIBRARY=y -DCONFIG_LOG_MODE_DEFERRED=y")
 
         if self.options.pregen_dir:
             flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")

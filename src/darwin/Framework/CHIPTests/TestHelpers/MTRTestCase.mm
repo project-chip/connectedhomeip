@@ -14,14 +14,18 @@
  *    limitations under the License.
  */
 
+#import "MTRTestCase.h"
+
+#import "MTRMockCB.h"
+#import "MTRTestKeys.h"
+#import "MTRTestStorage.h"
+
 #include <stdlib.h>
 #include <unistd.h>
 
-#import "MTRTestCase.h"
-
 #if HAVE_NSTASK
 // Tasks that are not scoped to a specific test, but rather to a specific test suite.
-static NSMutableSet<NSTask *> * runningCrossTestTasks;
+static NSMutableSet<NSTask *> * sRunningCrossTestTasks;
 
 static void ClearTaskSet(NSMutableSet<NSTask *> * __strong & tasks)
 {
@@ -33,26 +37,58 @@ static void ClearTaskSet(NSMutableSet<NSTask *> * __strong & tasks)
 }
 #endif // HAVE_NSTASK
 
+static void ClearControllerSet(NSMutableSet<MTRDeviceController *> * __strong & controllers)
+{
+    if (controllers.count != 0) {
+        for (MTRDeviceController * controller in controllers) {
+            [controller shutdown];
+            XCTAssertFalse([controller isRunning]);
+        }
+
+        // Stop the factory, since we auto-started it when bringing up the controllers.
+        [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
+    }
+
+    controllers = nil;
+}
+
+static MTRMockCB * sMockCB;
+static NSMutableSet<MTRDeviceController *> * sStartedControllers;
+
 @implementation MTRTestCase {
 #if HAVE_NSTASK
     NSMutableSet<NSTask *> * _runningTasks;
 #endif // NSTask
+    NSMutableSet<MTRDeviceController *> * _startedControllers;
 }
 
 + (void)setUp
 {
     [super setUp];
 
+    sMockCB = [[MTRMockCB alloc] init];
+    sStartedControllers = [[NSMutableSet alloc] init];
+
 #if HAVE_NSTASK
-    runningCrossTestTasks = [[NSMutableSet alloc] init];
+    sRunningCrossTestTasks = [[NSMutableSet alloc] init];
 #endif // HAVE_NSTASK
 }
 
 + (void)tearDown
 {
 #if HAVE_NSTASK
-    ClearTaskSet(runningCrossTestTasks);
+    ClearTaskSet(sRunningCrossTestTasks);
 #endif // HAVE_NSTASK
+
+    ClearControllerSet(sStartedControllers);
+
+    [sMockCB stopMocking];
+    sMockCB = nil;
+}
+
++ (MTRMockCB *)mockCoreBluetooth
+{
+    return sMockCB;
 }
 
 - (void)setUp
@@ -60,6 +96,7 @@ static void ClearTaskSet(NSMutableSet<NSTask *> * __strong & tasks)
 #if HAVE_NSTASK
     _runningTasks = [[NSMutableSet alloc] init];
 #endif // HAVE_NSTASK
+    _startedControllers = [[NSMutableSet alloc] init];
 }
 
 - (void)tearDown
@@ -103,7 +140,39 @@ static void ClearTaskSet(NSMutableSet<NSTask *> * __strong & tasks)
     ClearTaskSet(_runningTasks);
 #endif // HAVE_NSTASK
 
+    ClearControllerSet(_startedControllers);
+
     [super tearDown];
+}
+
++ (MTRDeviceController *)_createControllerOnTestFabric
+{
+    __auto_type * storage = [[MTRTestStorage alloc] init];
+    __auto_type * factoryParams = [[MTRDeviceControllerFactoryParams alloc] initWithStorage:storage];
+    __auto_type * factory = MTRDeviceControllerFactory.sharedInstance;
+    XCTAssertTrue([factory startControllerFactory:factoryParams error:nil]);
+
+    __auto_type * testKeys = [[MTRTestKeys alloc] init];
+    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithIPK:testKeys.ipk fabricID:@1 nocSigner:testKeys];
+    params.vendorID = @0xFFF1;
+    MTRDeviceController * controller = [factory createControllerOnNewFabric:params error:nil];
+    XCTAssertNotNil(controller);
+
+    return controller;
+}
+
++ (MTRDeviceController *)createControllerOnTestFabric
+{
+    MTRDeviceController * controller = [self _createControllerOnTestFabric];
+    [sStartedControllers addObject:controller];
+    return controller;
+}
+
+- (MTRDeviceController *)createControllerOnTestFabric
+{
+    MTRDeviceController * controller = [self.class _createControllerOnTestFabric];
+    [_startedControllers addObject:controller];
+    return controller;
 }
 
 #if HAVE_NSTASK
@@ -147,7 +216,7 @@ static void ClearTaskSet(NSMutableSet<NSTask *> * __strong & tasks)
 {
     [self doLaunchTask:task];
 
-    [runningCrossTestTasks addObject:task];
+    [sRunningCrossTestTasks addObject:task];
 }
 #endif // HAVE_NSTASK
 

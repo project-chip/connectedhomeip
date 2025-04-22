@@ -54,13 +54,40 @@ class TlsCertificateManagementCluster(
 
   class TLSClientCSRResponse(val ccdid: UShort, val csr: ByteArray, val nonce: ByteArray)
 
-  class ProvisionClientCertificateResponse(val ccdid: UShort)
-
   class FindClientCertificateResponse(
     val certificateDetails: List<TlsCertificateManagementClusterTLSClientCertificateDetailStruct>
   )
 
   class LookupClientCertificateResponse(val ccdid: UShort)
+
+  class ProvisionedRootCertificatesAttribute(
+    val value: List<TlsCertificateManagementClusterTLSCertStruct>
+  )
+
+  sealed class ProvisionedRootCertificatesAttributeSubscriptionState {
+    data class Success(val value: List<TlsCertificateManagementClusterTLSCertStruct>) :
+      ProvisionedRootCertificatesAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) :
+      ProvisionedRootCertificatesAttributeSubscriptionState()
+
+    object SubscriptionEstablished : ProvisionedRootCertificatesAttributeSubscriptionState()
+  }
+
+  class ProvisionedClientCertificatesAttribute(
+    val value: List<TlsCertificateManagementClusterTLSClientCertificateDetailStruct>
+  )
+
+  sealed class ProvisionedClientCertificatesAttributeSubscriptionState {
+    data class Success(
+      val value: List<TlsCertificateManagementClusterTLSClientCertificateDetailStruct>
+    ) : ProvisionedClientCertificatesAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) :
+      ProvisionedClientCertificatesAttributeSubscriptionState()
+
+    object SubscriptionEstablished : ProvisionedClientCertificatesAttributeSubscriptionState()
+  }
 
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
@@ -348,7 +375,7 @@ class TlsCertificateManagementCluster(
     ccdid: UShort,
     clientCertificateDetails: TlsCertificateManagementClusterTLSClientCertificateDetailStruct,
     timedInvokeTimeout: Duration? = null,
-  ): ProvisionClientCertificateResponse {
+  ) {
     val commandId: UInt = 9u
 
     val tlvWriter = TlvWriter()
@@ -373,42 +400,19 @@ class TlsCertificateManagementCluster(
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
-
-    val tlvReader = TlvReader(response.payload)
-    tlvReader.enterStructure(AnonymousTag)
-    val TAG_CCDID: Int = 0
-    var ccdid_decoded: UShort? = null
-
-    while (!tlvReader.isEndOfContainer()) {
-      val tag = tlvReader.peekElement().tag
-
-      if (tag == ContextSpecificTag(TAG_CCDID)) {
-        ccdid_decoded = tlvReader.getUShort(tag)
-      } else {
-        tlvReader.skipElement()
-      }
-    }
-
-    if (ccdid_decoded == null) {
-      throw IllegalStateException("ccdid not found in TLV")
-    }
-
-    tlvReader.exitContainer()
-
-    return ProvisionClientCertificateResponse(ccdid_decoded)
   }
 
   suspend fun findClientCertificate(
-    ccdid: UShort,
+    ccdid: UShort?,
     timedInvokeTimeout: Duration? = null,
   ): FindClientCertificateResponse {
-    val commandId: UInt = 11u
+    val commandId: UInt = 10u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
     val TAG_CCDID_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_CCDID_REQ), ccdid)
+    ccdid?.let { tlvWriter.put(ContextSpecificTag(TAG_CCDID_REQ), ccdid) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -463,7 +467,7 @@ class TlsCertificateManagementCluster(
     fingerprint: ByteArray,
     timedInvokeTimeout: Duration? = null,
   ): LookupClientCertificateResponse {
-    val commandId: UInt = 13u
+    val commandId: UInt = 12u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -507,7 +511,7 @@ class TlsCertificateManagementCluster(
   }
 
   suspend fun removeClientCertificate(ccdid: UShort, timedInvokeTimeout: Duration? = null) {
-    val commandId: UInt = 15u
+    val commandId: UInt = 14u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -610,7 +614,7 @@ class TlsCertificateManagementCluster(
     }
   }
 
-  suspend fun readCurrentRootCertificatesAttribute(): UByte {
+  suspend fun readProvisionedRootCertificatesAttribute(): ProvisionedRootCertificatesAttribute {
     val ATTRIBUTE_ID: UInt = 1u
 
     val attributePath =
@@ -632,19 +636,26 @@ class TlsCertificateManagementCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Currentrootcertificates attribute not found in response" }
+    requireNotNull(attributeData) { "Provisionedrootcertificates attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
+    val decodedValue: List<TlsCertificateManagementClusterTLSCertStruct> =
+      buildList<TlsCertificateManagementClusterTLSCertStruct> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(TlsCertificateManagementClusterTLSCertStruct.fromTlv(AnonymousTag, tlvReader))
+        }
+        tlvReader.exitContainer()
+      }
 
-    return decodedValue
+    return ProvisionedRootCertificatesAttribute(decodedValue)
   }
 
-  suspend fun subscribeCurrentRootCertificatesAttribute(
+  suspend fun subscribeProvisionedRootCertificatesAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<UByteSubscriptionState> {
+  ): Flow<ProvisionedRootCertificatesAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
       listOf(
@@ -663,7 +674,7 @@ class TlsCertificateManagementCluster(
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            UByteSubscriptionState.Error(
+            ProvisionedRootCertificatesAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -677,17 +688,24 @@ class TlsCertificateManagementCluster(
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
-            "Currentrootcertificates attribute not found in Node State update"
+            "Provisionedrootcertificates attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
+          val decodedValue: List<TlsCertificateManagementClusterTLSCertStruct> =
+            buildList<TlsCertificateManagementClusterTLSCertStruct> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(TlsCertificateManagementClusterTLSCertStruct.fromTlv(AnonymousTag, tlvReader))
+              }
+              tlvReader.exitContainer()
+            }
 
-          emit(UByteSubscriptionState.Success(decodedValue))
+          emit(ProvisionedRootCertificatesAttributeSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(UByteSubscriptionState.SubscriptionEstablished)
+          emit(ProvisionedRootCertificatesAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }
@@ -776,7 +794,7 @@ class TlsCertificateManagementCluster(
     }
   }
 
-  suspend fun readCurrentClientCertificatesAttribute(): UByte {
+  suspend fun readProvisionedClientCertificatesAttribute(): ProvisionedClientCertificatesAttribute {
     val ATTRIBUTE_ID: UInt = 3u
 
     val attributePath =
@@ -798,19 +816,33 @@ class TlsCertificateManagementCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Currentclientcertificates attribute not found in response" }
+    requireNotNull(attributeData) {
+      "Provisionedclientcertificates attribute not found in response"
+    }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
+    val decodedValue: List<TlsCertificateManagementClusterTLSClientCertificateDetailStruct> =
+      buildList<TlsCertificateManagementClusterTLSClientCertificateDetailStruct> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(
+            TlsCertificateManagementClusterTLSClientCertificateDetailStruct.fromTlv(
+              AnonymousTag,
+              tlvReader,
+            )
+          )
+        }
+        tlvReader.exitContainer()
+      }
 
-    return decodedValue
+    return ProvisionedClientCertificatesAttribute(decodedValue)
   }
 
-  suspend fun subscribeCurrentClientCertificatesAttribute(
+  suspend fun subscribeProvisionedClientCertificatesAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<UByteSubscriptionState> {
+  ): Flow<ProvisionedClientCertificatesAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 3u
     val attributePaths =
       listOf(
@@ -829,7 +861,7 @@ class TlsCertificateManagementCluster(
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            UByteSubscriptionState.Error(
+            ProvisionedClientCertificatesAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -843,17 +875,29 @@ class TlsCertificateManagementCluster(
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
-            "Currentclientcertificates attribute not found in Node State update"
+            "Provisionedclientcertificates attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
+          val decodedValue: List<TlsCertificateManagementClusterTLSClientCertificateDetailStruct> =
+            buildList<TlsCertificateManagementClusterTLSClientCertificateDetailStruct> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(
+                  TlsCertificateManagementClusterTLSClientCertificateDetailStruct.fromTlv(
+                    AnonymousTag,
+                    tlvReader,
+                  )
+                )
+              }
+              tlvReader.exitContainer()
+            }
 
-          emit(UByteSubscriptionState.Success(decodedValue))
+          emit(ProvisionedClientCertificatesAttributeSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(UByteSubscriptionState.SubscriptionEstablished)
+          emit(ProvisionedClientCertificatesAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }
