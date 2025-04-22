@@ -92,10 +92,10 @@ TEST_F(TestOtaProviderLogic, QueryImageValidation)
     }
 
     // valid values, will set some logic
-    input.hardwareVersion = MakeOptional(static_cast<uint16_t>(1234u));
+    input.hardwareVersion     = MakeOptional(static_cast<uint16_t>(1234u));
     input.requestorCanConsent = MakeOptional(true);
 
-    uint8_t someMeta[] = {1,2,3,4,5};
+    uint8_t someMeta[]        = { 1, 2, 3, 4, 5 };
     input.metadataForProvider = MakeOptional<Span<uint8_t>>(someMeta);
     EXPECT_EQ(logic.QueryImage(kCommandPath, input, nullptr /* handler */), std::nullopt);
 }
@@ -116,10 +116,10 @@ TEST_F(TestOtaProviderLogic, NotifyUpdateApplied)
     // update token is not valid
     EXPECT_EQ(logic.NotifyUpdateApplied(kCommandPath, input, nullptr /* handler not used */), Status::InvalidCommand);
 
-    constexpr uint8_t kUpdateToken[] = {1,2,3,4,5,6,7, 8};
+    constexpr uint8_t kUpdateToken[] = { 1, 2, 3, 4, 5, 6, 7, 8 };
 
     input.softwareVersion = 123;
-    input.updateToken = Span<const uint8_t>(kUpdateToken);
+    input.updateToken     = Span<const uint8_t>(kUpdateToken);
     EXPECT_EQ(logic.NotifyUpdateApplied(kCommandPath, input, nullptr /* handler not used */), std::nullopt);
 }
 
@@ -139,9 +139,9 @@ TEST_F(TestOtaProviderLogic, ApplyUpdateRequest)
     // update token is not valid
     EXPECT_EQ(logic.ApplyUpdateRequest(kCommandPath, input, nullptr /* handler not used */), Status::InvalidCommand);
 
-    constexpr uint8_t kUpdateToken[] = {1,2,3,4,5,6,7, 8};
-    input.newVersion = 124;
-    input.updateToken = Span<const uint8_t>(kUpdateToken);
+    constexpr uint8_t kUpdateToken[] = { 1, 2, 3, 4, 5, 6, 7, 8 };
+    input.newVersion                 = 124;
+    input.updateToken                = Span<const uint8_t>(kUpdateToken);
     EXPECT_EQ(logic.ApplyUpdateRequest(kCommandPath, input, nullptr /* handler not used */), std::nullopt);
 }
 
