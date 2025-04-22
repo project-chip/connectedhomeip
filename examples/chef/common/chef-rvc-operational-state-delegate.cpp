@@ -132,12 +132,7 @@ void RvcOperationalStateDelegate::HandleResumeStateCallback(GenericOperationalEr
         return;
     }
 
-    if (current_state == RvcOperationalState::OperationalStateEnum::kCharging ||
-        current_state == RvcOperationalState::OperationalStateEnum::kDocked)
-    {
-        err.Set(to_underlying(RvcOperationalState::ErrorStateEnum::kCommandInvalidInState));
-        return;
-    }
+    err.Set(to_underlying(RvcOperationalState::ErrorStateEnum::kCommandInvalidInState));
 }
 
 void RvcOperationalStateDelegate::HandleStartStateCallback(GenericOperationalError & err)
