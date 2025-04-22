@@ -45,7 +45,6 @@
 #include <app/clusters/commodity-price-server/CommodityPriceTestEventTriggerHandler.h>
 #endif
 
-
 #ifdef CONFIG_ENABLE_CHIP_SHELL
 #include <lib/shell/commands/WiFi.h>
 #endif
