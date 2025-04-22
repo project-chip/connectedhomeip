@@ -28,7 +28,7 @@
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --endpoint 1
+#       --endpoint 0
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
@@ -108,6 +108,9 @@ class TC_ACL_2_6(MatterBaseTest):
 
         logging.info(f"Initial event search result Found: {found_initial_event}")
         asserts.assert_true(found_initial_event, "Did not find expected initial ACL event")
+
+        # Add a small delay before reading events again
+        await asyncio.sleep(5)
 
         event_path = [(self.matter_test_config.endpoint, acec_event, 1)]
         initial_events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
