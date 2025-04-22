@@ -56,7 +56,8 @@ static void onOvenCavityOperationalStateTimerTick(System::Layer * systemLayer, v
         return;
     }
 
-    if (!delegate->CheckCycleActive()) return;
+    if (!delegate->CheckCycleActive())
+        return;
 
     delegate->CycleSecondTick();
 
