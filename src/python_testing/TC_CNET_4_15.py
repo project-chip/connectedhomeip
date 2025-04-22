@@ -76,7 +76,13 @@ class TC_CNET_4_15(MatterBaseTest):
         self.step(2)
         # TH sends RemoveNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID,
         # which does not match the provisioned network, and Breadcrumb field set to 1
-        network_id = self.matter_test_config.global_test_params['PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID']
+        network_id = self.matter_test_config.global_test_params['PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID'].encode('utf-8')
+        send_remove = await self.send_single_cmd(
+            cmd=cnet.Commands.RemoveNetwork(
+                networkID=network_id,
+                breadcrumb=1
+            )
+        )
         send_remove = await self.send_single_cmd(
             cmd=cnet.Commands.RemoveNetwork(
                 networkID=network_id,
@@ -88,7 +94,7 @@ class TC_CNET_4_15(MatterBaseTest):
         # Verify NetworkConfigResponse has NetworkIDNotFound status
         asserts.assert_equal(
             send_remove.status,
-            Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kNetworkIDNotFound,
+            cnet.Enums.NetworkCommissioningStatus.kNetworkIDNotFound,
             "Expected NetworkIDNotFound status for non-existent network"
         )
 
@@ -101,10 +107,12 @@ class TC_CNET_4_15(MatterBaseTest):
                 breadcrumb=1
             )
         )
+        # Log response structure
+        logging.info(f"ConnectNetwork response: {send_connect}")
         # Verify ConnectNetworkResponse has NetworkIDNotFound status
         asserts.assert_equal(
             send_connect.status,
-            Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kNetworkIDNotFound,
+            cnet.Enums.NetworkCommissioningStatus.kNetworkIDNotFound,
             "Expected NetworkIDNotFound status for non-existent network"
         )
 
