@@ -40,18 +40,15 @@
 #define MICROPHONE_MIN_LEVEL (1)
 #define MICROPHONE_MAX_LEVEL (254)
 #define INVALID_SPKR_LEVEL (0)
-#define DEFAULT_PAN (0)
-#define DEFAULT_TILT (0)
-#define DEFAULT_ZOOM (1)
 
 namespace Camera {
 
 // Camera defined constants for Pan, Tilt, Zoom bounding values
-constexpr int16_t kMyMinPanValue  = -90;
-constexpr int16_t kMyMaxPanValue  = 90;
-constexpr int16_t kMyMinTiltValue = -90;
-constexpr int16_t kMyMaxTiltValue = 90;
-constexpr uint8_t kMyMaxZoomValue = 75;
+constexpr int16_t kMinPanValue  = -90;
+constexpr int16_t kMaxPanValue  = 90;
+constexpr int16_t kMinTiltValue = -90;
+constexpr int16_t kMaxTiltValue = 90;
+constexpr uint8_t kMaxZoomValue = 75;
 
 class CameraDevice : public CameraDeviceInterface, public CameraDeviceInterface::CameraHALInterface
 {
@@ -201,9 +198,9 @@ private:
     uint8_t mMicrophoneMinLevel     = MICROPHONE_MIN_LEVEL;
     uint8_t mMicrophoneMaxLevel     = MICROPHONE_MAX_LEVEL;
     uint8_t mMicrophoneVol          = MICROPHONE_MIN_LEVEL;
-    uint16_t mPan                   = DEFAULT_PAN;
-    uint16_t mTilt                  = DEFAULT_TILT;
-    int8_t mZoom                    = DEFAULT_ZOOM;
+    uint16_t mPan                   = chip::app::Clusters::CameraAvSettingsUserLevelManagement::kDefaultPan;
+    uint16_t mTilt                  = chip::app::Clusters::CameraAvSettingsUserLevelManagement::kDefaultTilt;
+    int8_t mZoom                    = chip::app::Clusters::CameraAvSettingsUserLevelManagement::kDefaultZoom;
     // Use a standard 1080p aspect ratio
     chip::app::Clusters::CameraAvStreamManagement::ViewportStruct mViewport = { 320, 585, 2240, 1665 };
 };

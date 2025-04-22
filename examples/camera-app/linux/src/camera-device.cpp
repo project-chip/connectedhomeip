@@ -661,27 +661,27 @@ CameraError CameraDevice::SetMicrophoneVolume(uint8_t microphoneVol)
 
 int16_t CameraDevice::GetPanMin()
 {
-    return kMyMinPanValue;
+    return kMinPanValue;
 }
 
 int16_t CameraDevice::GetPanMax()
 {
-    return kMyMaxPanValue;
+    return kMaxPanValue;
 }
 
 int16_t CameraDevice::GetTiltMin()
 {
-    return kMyMinTiltValue;
+    return kMinTiltValue;
 }
 
 int16_t CameraDevice::GetTiltMax()
 {
-    return kMyMaxTiltValue;
+    return kMaxTiltValue;
 }
 
 uint8_t CameraDevice::GetZoomMax()
 {
-    return kMyMaxZoomValue;
+    return kMaxZoomValue;
 }
 
 // Set the Pan level

@@ -150,14 +150,10 @@ Status CameraAVSettingsUserLevelManager::DPTZSetViewport(uint16_t aVideoStreamID
     // The application needs to interact with iHAL to access the stream, validate the viewport
     // and set the new viewport value.
     //
-    Status status    = Status::Success;
-    bool streamFound = false;
-
     for (VideoStream & stream : mCameraDeviceHAL->GetAvailableVideoStreams())
     {
         if (stream.videoStreamParams.videoStreamID == aVideoStreamID && stream.isAllocated)
         {
-            streamFound = true;
             // Validate the received viewport dimensions
             //
             // Ensure pixel count is > min pixels
@@ -172,8 +168,7 @@ Status CameraAVSettingsUserLevelManager::DPTZSetViewport(uint16_t aVideoStreamID
                 (requestedWidth > sensorParms.sensorWidth) || (requestedHeight > sensorParms.sensorHeight))
             {
                 ChipLogError(Camera, "CameraApp: DPTZSetViewport with invalid viewport dimensions");
-                status = Status::ConstraintError;
-                break;
+                return Status::ConstraintError;
             }
 
             // Get the ARs to no more than 2DP.  Otherwise you get mismatches e.g. 16:9 ratio calculation for 480p isn't the same as
@@ -181,27 +176,22 @@ Status CameraAVSettingsUserLevelManager::DPTZSetViewport(uint16_t aVideoStreamID
             float requestedAR = floorf((static_cast<float>(requestedWidth) / requestedHeight) * 100) / 100;
             float streamAR    = floorf((static_cast<float>(stream.videoStreamParams.maxResolution.width) /
                                      stream.videoStreamParams.maxResolution.height) *
-                                       100) /
-                100;
+                                       100) / 100;
 
             ChipLogDetail(Camera, "DPTZSetViewpoort. AR of viewport %f, AR of stream %f.", requestedAR, streamAR);
             // Ensure that the aspect ration of the viewport matches the aspect ratio of the stream
             if (requestedAR != streamAR)
             {
                 ChipLogError(Camera, "CameraApp: DPTZSetViewport with mismatching aspect ratio.");
-                status = Status::ConstraintError;
-                break;
+                return Status::ConstraintError;
             }
             mCameraDeviceHAL->SetViewport(stream, aViewport);
+            return Status::Success;
         }
     }
 
-    if (!streamFound)
-    {
-        status = Status::InvalidCommand;
-    }
-
-    return status;
+    ChipLogError(Camera, "CameraApp: DPTZSetViewport with no matching video stream ID.");
+    return Status::NotFound;
 }
 
 Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX,
@@ -211,9 +201,6 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
     // The application needs to interact with its instance of AVStreamManagement to access the stream, validate the viewport
     // and set the new values for the viewpoort based on the pixel movement requested
     //
-    Status status    = Status::Success;
-    bool streamFound = false;
-
     for (VideoStream & stream : mCameraDeviceHAL->GetAvailableVideoStreams())
     {
         if (stream.videoStreamParams.videoStreamID == aVideoStreamID && stream.isAllocated)
@@ -300,20 +287,16 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
             {
                 viewport.x1 = 0;
                 viewport.y1 = 0;
-                viewport.x2 = sensorParms.sensorWidth;
-                viewport.y2 = sensorParms.sensorHeight;
+                viewport.x2 = sensorParms.sensorWidth-1;
+                viewport.y2 = sensorParms.sensorHeight-1;
             }
-            streamFound = true;
             mCameraDeviceHAL->SetViewport(stream, viewport);
+            return Status::Success;
         }
     }
 
-    if (!streamFound)
-    {
-        status = Status::InvalidCommand;
-    }
-
-    return status;
+    ChipLogError(Camera, "CameraApp: DPTZRelativeMove with no matching video stream ID.");
+    return Status::NotFound;
 }
 
 CHIP_ERROR CameraAVSettingsUserLevelManager::LoadMPTZPresets(std::vector<MPTZPresetHelper> & mptzPresetHelpers)
