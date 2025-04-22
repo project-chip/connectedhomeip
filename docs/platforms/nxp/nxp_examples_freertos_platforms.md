@@ -85,7 +85,7 @@ user@ubuntu:~/Desktop/git$ third_party/nxp/nxp_matter_support/scripts/update_nxp
 user@ubuntu:~/Desktop/git/connectedhomeip$ source <path to mcux sdk>/mcux-env.sh
 ```
 
--   Step 5 : Export the ARMGCC_DIR environment variable (only applicable to
+-   Step 5 : Export the `ARMGCC_DIR` environment variable (only applicable to
     CMake build)
 
 The CMake build system requires the `ARMGCC_DIR` environment variable to point
@@ -215,8 +215,8 @@ _gn gen_ command when building an application.
 | `chip_enable_ble=false`                                                                   | This argument is used to disable BLE in the application. Note that BLE is enabled by default.                                                                                                                                                                                                                                                            |
 | `chip_enable_secondary_nwk_if=true` and `chip_device_config_thread_network_endpoint_id=2` | These arguments can be added to enable the [secondary network commissioning interface](./nxp_otbr_guide.md#using-the-secondary-network-commissioning-interface). Note that this is only supported when building the Matter over Wifi + OpenThread Border Router configuration. Note that is only supported on the on the thermostat application for now. |
 | `nxp_enable_matter_cli=true`                                                              | This argument enables the [Matter-CLI](./nxp_examples_freertos_platforms.md#testing-the-example-application-with-matter-cli-enabled).                                                                                                                                                                                                                    |
-| `is_debug=true optimize_debug=false`                                                      | These argumenst are used to build the application in debug mode.                                                                                                                                                                                                                                                                                         |
-| `nxp_use_factory_data=true`                                                               | This argumnet can be used to build with the option to have Matter certificates/keys pre-loaded in a specific flash area. For more information see [Guide for writing manufacturing data on NXP devices](./nxp_manufacturing_flow.md).                                                                                                                    |
+| `is_debug=true optimize_debug=false`                                                      | These arguments are used to build the application in debug mode.                                                                                                                                                                                                                                                                                         |
+| `nxp_use_factory_data=true`                                                               | This argument can be used to build with the option to have Matter certificates/keys pre-loaded in a specific flash area. For more information see [Guide for writing manufacturing data on NXP devices](./nxp_manufacturing_flow.md).                                                                                                                    |
 | `chip_enable_ota_requestor=true`                                                          | This argument can be used to enable the OTA Requestor feature. For RT1170, RT1060 nd RW61x, make sure to also add the argument `no_mcuboot=false` when enabling the OTA.                                                                                                                                                                                 |
 
 > For more information about platform-specific GN options, please refer to the
@@ -307,7 +307,7 @@ matterreset             Reset the device
 -   `matterreset` enables the device to reboot without erasing the settings.
 
 To test the application with the CLI, you will need to connect to UART1 and
-UART2 of your device. These UARTS are used for :
+UART2 of your device. These `UART` are used for :
 
 -   UART1 : Primary communication interface where the commands can be input.
 -   UART2 : Secondary communication interface where Matter logs will be printed.

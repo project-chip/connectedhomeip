@@ -176,7 +176,7 @@ west build -d build_matter -b rdrw612bga path/to/out-of-tree/application -DCONF_
     `<build_directory>/FreeRTOSConfig_Gen.h`. The default values of FreeRTOS
     Kconfig symbols, which are required by Matter, are defined in
     `third_party/nxp/nxp_matter_support/cmake/<platform>/Kconfig.defconfig`.
-    These values can be overriden by the application from the `prj.conf`, to be
+    These values can be overridden by the application from the `prj.conf`, to be
     adapted to its specific needs.
 
 ### How to create an out-of-tree application from Matter in-tree application
@@ -217,7 +217,7 @@ in the command-line with
 _Step 3_ : Specify in the build command line the path to the `connectedhomeip`
 repository, and the path of `nxp_sdk_reconfig.cmake`.
 
-The build command has the following struture for an out-of-tree application :
+The build command has the following structure for an out-of-tree application :
 
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ west build -d <build_dir> -b <board> /path/to/out-of-tree_example -DCONF_FILE=/absolute/path/to/custom/prj.conf -DCHIP_ROOT=/path/to/connectedhomeip -DNXP_SDK_RECONFIG_CMAKE_DIR=/path/to/out-of-tree_example/nxp_sdk_reconfig.cmake

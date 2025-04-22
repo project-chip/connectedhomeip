@@ -522,7 +522,7 @@ additional UART, here are more details to follow for RT1060 platforms :
 
 ## OTA Software Update
 
-Over-The-Air software updates are supported with the RT1060-EVKC examples. The
+Over-The-Air software updates are supported with the `RT1060-EVKC` examples. The
 process to follow in order to perform a software update is described in the
 dedicated guide
 ['Matter Over-The-Air Software Update with NXP RT example applications'](./nxp_RTs_ota_software_update.md).
