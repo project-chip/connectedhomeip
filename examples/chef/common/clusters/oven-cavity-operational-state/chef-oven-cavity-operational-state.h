@@ -42,7 +42,7 @@ private:
     const uint32_t kPreHeatedSeconds           = 50;
     const uint32_t kCoolingDownSeconds         = 10;
     const uint32_t kCycleSeconds               = kPreHeatingSeconds + kPreHeatedSeconds + kCoolingDownSeconds;
-    const OperationalStateEnum kOpStateList[4] = {
+    const OperationalStateEnum kOpStateList[3] = {
         OperationalStateEnum::kStopped,
         OperationalStateEnum::kRunning,
         OperationalStateEnum::kError,
