@@ -591,7 +591,7 @@ CHIP_ERROR ClusterLogic::GetClusterRevision(Attributes::ClusterRevision::TypeInf
 }
 
 Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Optional<bool> latch,
-    Optional<Globals::ThreeLevelAutoEnum> speed)
+                                            Optional<Globals::ThreeLevelAutoEnum> speed)
 {
     VerifyOrDieWithMsg(mInitialized, NotSpecified, "Unexpected command received when device is yet to be initialized");
 
@@ -600,8 +600,8 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
     // If all command parameters don't have a value, return InvalidCommand
     VerifyOrReturnValue(position.HasValue() || latch.HasValue() || speed.HasValue(), Status::InvalidCommand);
 
-    // TODO: SpecIssue If this command is sent while the device is in a non-compatible internal-state, a status code of INVALID_IN_STATE SHALL
-    // be returned.
+    // TODO: SpecIssue If this command is sent while the device is in a non-compatible internal-state, a status code of
+    // INVALID_IN_STATE SHALL be returned.
 
     GenericTargetStruct target{};
 
@@ -625,13 +625,11 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
             }
 
             target.position.SetValue(adjustedPosition);
-
         }
         else
         {
-           target.position.SetValue(position.Value());
+            target.position.SetValue(position.Value());
         }
-
     }
 
     if (latch.HasValue())
@@ -677,7 +675,7 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
 }
 
 Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t numberOfSteps,
-Optional<Globals::ThreeLevelAutoEnum> speed)
+                                       Optional<Globals::ThreeLevelAutoEnum> speed)
 {
     VerifyOrDieWithMsg(mInitialized, NotSpecified, "Unexpected command recieved when device is yet to be initialized");
 
@@ -700,8 +698,8 @@ Optional<Globals::ThreeLevelAutoEnum> speed)
         stepTarget.speed = speed;
     }
 
-    // TODO: SpecIssue: If the server is in a state where it cannot support the command, the server SHALL respond with an INVALID_IN_STATE
-    // response and the Target attribute value SHALL remain unchanged.
+    // TODO: SpecIssue: If the server is in a state where it cannot support the command, the server SHALL respond with an
+    // INVALID_IN_STATE response and the Target attribute value SHALL remain unchanged.
 
     // Check if the current position is valid or else return InvalidInState
     DataModel::Nullable<GenericCurrentStateStruct> currentState;
@@ -747,7 +745,7 @@ Optional<Globals::ThreeLevelAutoEnum> speed)
         // Position value SHALL be clamped to 0.00% if the LM feature is not supported or LimitRange.Max if the LM feature is
         // supported.
         newPosition = limitSupported ? std::min(newPosition, static_cast<uint32_t>(limitRange.max))
-                      : std::min(newPosition, static_cast<uint32_t>(PERCENT100THS_MAX_VALUE));
+                                     : std::min(newPosition, static_cast<uint32_t>(PERCENT100THS_MAX_VALUE));
         break;
 
     default:
