@@ -60,7 +60,7 @@ class TC_WebRTCProvider_2_4(MatterBaseTest):
             TestStep(3, "Send ProvideOffer with null session/video/audio IDs => expect ProvideOfferResponse (allocated IDs)"),
             TestStep(4, "Read CurrentSessions => expect 1 (save IDs)"),
             TestStep(5, "Send ProvideOffer with (saved WebRTCSessionID + 1) => expect NotFound error"),
-            TestStep(6, "Send ProvideOffer with saved WebRTCSessionID (re‑offer) => expect ProvideOfferResponse with same IDs"),            
+            TestStep(6, "Send ProvideOffer with saved WebRTCSessionID (re‑offer) => expect ProvideOfferResponse with same IDs"),
         ]
         return steps
 
@@ -83,7 +83,7 @@ class TC_WebRTCProvider_2_4(MatterBaseTest):
 
         self.step(2)
         nonexistent_session_id = 1
-        cmd=cluster.Commands.ProvideOffer(
+        cmd = cluster.Commands.ProvideOffer(
             webRTCSessionID=nonexistent_session_id,
             sdp=(
                 "v=0\n"
@@ -108,12 +108,12 @@ class TC_WebRTCProvider_2_4(MatterBaseTest):
             originatingEndpointID=endpoint,
             videoStreamID=NullValue,
             audioStreamID=NullValue,
-        )        
+        )
         try:
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
             asserts.fail("Unexpected success on ProvideOffer")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.NotFound, "ProvideOffer should return NotFound for unknown session")            
+            asserts.assert_equal(e.status, Status.NotFound, "ProvideOffer should return NotFound for unknown session")
 
         self.step(3)
         cmd = cluster.Commands.ProvideOffer(
@@ -166,7 +166,7 @@ class TC_WebRTCProvider_2_4(MatterBaseTest):
 
         self.step(5)
         wrong_session_id = saved_session_id + 1
-        cmd=cluster.Commands.ProvideOffer(
+        cmd = cluster.Commands.ProvideOffer(
             webRTCSessionID=wrong_session_id,
             sdp=(
                 "v=0\n"
@@ -191,15 +191,15 @@ class TC_WebRTCProvider_2_4(MatterBaseTest):
             originatingEndpointID=endpoint,
             videoStreamID=saved_video_id,
             audioStreamID=saved_audio_id,
-        )        
+        )
         try:
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
             asserts.fail("ProvideOffer unexpectedly succeeded for wrong session ID")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.NotFound, "ProvideOffer should return NotFound for wrong session ID")            
+            asserts.assert_equal(e.status, Status.NotFound, "ProvideOffer should return NotFound for wrong session ID")
 
         self.step(6)
-        cmd=cluster.Commands.ProvideOffer(
+        cmd = cluster.Commands.ProvideOffer(
             webRTCSessionID=saved_session_id,
             sdp=(
                 "v=0\n"
@@ -227,7 +227,7 @@ class TC_WebRTCProvider_2_4(MatterBaseTest):
         )
         resp = await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
         asserts.assert_equal(type(resp), Clusters.WebRTCTransportProvider.Commands.ProvideOfferResponse,
-                             "Incorrect response type")        
+                             "Incorrect response type")
         asserts.assert_equal(
             resp.webRTCSessionID,
             saved_session_id,
