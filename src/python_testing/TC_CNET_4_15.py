@@ -35,11 +35,11 @@ class TC_CNET_4_15(MatterBaseTest):
             TestStep("precondition", "DUT is commissioned", is_commissioning=True),
             TestStep(1, 'TH sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds field set to 900'),
             TestStep(2, 'TH sends RemoveNetwork Command to the DUT with NetworkID field set to '
-                    'PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID, which does not match the provisioned network, '
-                    'and Breadcrumb field set to 1'),
+                     'PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID, which does not match the provisioned network, '
+                     'and Breadcrumb field set to 1'),
             TestStep(3, 'TH sends ConnectNetwork Command to the DUT with NetworkID field set to '
-                    'PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID, which does not match the provisioned network, '
-                    'and Breadcrumb field set to 1')
+                     'PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID, which does not match the provisioned network, '
+                     'and Breadcrumb field set to 1')
         ]
 
     def def_TC_CNET_4_15(self):
@@ -49,7 +49,7 @@ class TC_CNET_4_15(MatterBaseTest):
         return ['CNET.S.F00(WI)']
 
     @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning,
-                                       Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
+                                         Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
     async def test_TC_CNET_4_15(self):
         cnet = Clusters.NetworkCommissioning
 
@@ -81,11 +81,11 @@ class TC_CNET_4_15(MatterBaseTest):
         logging.info(f"Attempting to remove network with ID: {network_id}")
 
         read_networks = await self.read_single_attribute(
-                    dev_ctrl=self.default_controller,
-                    node_id=self.dut_node_id,
-                    endpoint=0,
-                    attribute=cnet.Attributes.Networks
-                )
+            dev_ctrl=self.default_controller,
+            node_id=self.dut_node_id,
+            endpoint=0,
+            attribute=cnet.Attributes.Networks
+        )
         logging.info(f"Current networks on device: {read_networks}")
 
         send_remove = await self.send_single_cmd(
