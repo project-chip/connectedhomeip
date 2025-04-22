@@ -38,6 +38,9 @@ class ChefDelegate : public OperationalState::Delegate
 {
 private:
     const CharSpan kPhaseList[3]               = { "pre-heating"_span, "pre-heated"_span, "cooling down"_span };
+    const uint8_t kPreHeatingIndex             = 0;
+    const uint8_t kPreHeatedIndex              = 1;
+    const uint8_t kCoolingDownIndex            = 2;
     const uint32_t kPreHeatingSeconds          = 10;
     const uint32_t kPreHeatedSeconds           = 50;
     const uint32_t kCoolingDownSeconds         = 10;

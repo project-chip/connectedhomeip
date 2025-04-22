@@ -29,11 +29,22 @@ namespace Clusters {
 namespace OvenCavityOperationalState {
 
 constexpr size_t kOvenCavityOperationalStateTableSize = MATTER_DM_OPERATIONAL_STATE_OVEN_CLUSTER_SERVER_ENDPOINT_COUNT;
-static_assert(kOvenCavityOperationalStateTableSize <= kEmberInvalidEndpointIndex, "OvenCavityOperationalState table size error");
+static_assert(kOvenCavityOperationalStateTableSize < kEmberInvalidEndpointIndex, "OvenCavityOperationalState table size error");
 
 std::unique_ptr<ChefDelegate> gDelegateTable[kOvenCavityOperationalStateTableSize];
 std::unique_ptr<Instance> gInstanceTable[kOvenCavityOperationalStateTableSize];
 
+/**
+ * Timer mechanism -
+ *   1. Call StartTimer with input of one second and function onOvenCavityOperationalStateTimerTick to start the timer.
+ *      This will call onOvenCavityOperationalStateTimerTick after one second.
+ *   2. onOvenCavityOperationalStateTimerTick is the timer tick function. It decides whether to run another one second iteration
+ *      (if there are seconds left to run) or just return and end the timer (when state is invalid or cycle is complete).
+ * Timer usage -
+ *   * Timer is started on receiving start commmand.
+ *   * Timer continues to run until running time has surpassed cycle time (cycle is compleye) OR operational state is non-running.
+ *   * Stop command handler ends an ongoing timer.
+ */
 static void onOvenCavityOperationalStateTimerTick(System::Layer * systemLayer, void * data)
 {
     ChefDelegate * delegate = reinterpret_cast<ChefDelegate *>(data);
@@ -87,7 +98,7 @@ bool ChefDelegate::StartCycle()
         ChipLogError(DeviceLayer, "StartCycle: Phase did't update to non-NULL.");
         return false;
     }
-    if (phase.Value() != 0)
+    if (phase.Value() != kPreHeatingIndex)
     {
         ChipLogError(DeviceLayer, "StartCycle: Unexpected start phase: %d.", phase.Value());
         return false;
@@ -109,7 +120,7 @@ void ChefDelegate::CycleSecondTick()
     DataModel::Nullable<uint8_t> oldPhase = GetRunningPhase();
     if (opState == to_underlying(OperationalStateEnum::kRunning))
     {
-        mRunningTime.SetNonNull(mRunningTime.Value() + 1);
+        mRunningTime.SetNonNull(mRunningTime.ValueOr(0) + 1);
     }
     else
     {
@@ -127,7 +138,7 @@ void ChefDelegate::CycleSecondTick()
     }
     GetInstance()->UpdateCountdownTimeFromDelegate();
 
-    ChipLogDetail(DeviceLayer, "CycleSecondTick: Running time: %d.", mRunningTime.Value());
+    ChipLogDetail(DeviceLayer, "CycleSecondTick: Running time: %d.", mRunningTime.ValueOr(0));
     if (newPhase.IsNull())
     {
         ChipLogDetail(DeviceLayer, "CycleSecondTick: Phase: NULL");
@@ -144,11 +155,11 @@ DataModel::Nullable<uint8_t> ChefDelegate::GetRunningPhase()
         return DataModel::NullNullable;
 
     if (mRunningTime.Value() >= kPreHeatingSeconds + kPreHeatedSeconds)
-        return 2; // cooling down
+        return kCoolingDownIndex;
     else if (mRunningTime.Value() >= kPreHeatingSeconds)
-        return 1; // pre-heated
+        return kPreHeatedIndex;
     else
-        return 0; // pre-heating
+        return kPreHeatingIndex;
 }
 
 bool ChefDelegate::CheckCycleComplete()
@@ -218,7 +229,7 @@ void ChefDelegate::HandleStartStateCallback(OperationalState::GenericOperational
 
 void ChefDelegate::HandleStopStateCallback(OperationalState::GenericOperationalError & err)
 {
-    uint32_t RunningTime = mRunningTime.IsNull() ? 0 : mRunningTime.Value();
+    uint32_t RunningTime = mRunningTime.ValueOr(0);
     uint8_t opState      = GetCurrentOperationalState();
     if (CheckCycleActive())
     {
