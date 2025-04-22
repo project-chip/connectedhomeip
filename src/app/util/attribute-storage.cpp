@@ -216,8 +216,23 @@ void emberAfEndpointConfigure()
         emAfEndpoints[ep].dataVersions     = currentDataVersions;
         emAfEndpoints[ep].parentEndpointId = fixedParentEndpoints[ep];
 
+        constexpr const DeviceTypeId kRootnodeId   = 0x0016;
+        constexpr const DeviceTypeId kAggregatorId = 0x000E;
+        constexpr const DeviceTypeId kBridgedNode  = 0x0013;
         emAfEndpoints[ep].bitmask.Set(EmberAfEndpointOptions::isEnabled);
-        emAfEndpoints[ep].bitmask.Set(EmberAfEndpointOptions::isFlatComposition);
+        for (const auto & deviceType : emAfEndpoints[ep].deviceTypeList)
+        {
+            // Default composition for all device types is set to tree. Except rootnode, aggregator and
+            // bridgednode, which are full-family. Clients can manually override these defaults using
+            // SetFlatCompositionForEndpoint / SetTreeCompositionForEndpoint at application init.
+            // TODO: This information should come from the schema XML, not be hardcoded.
+            if ((deviceType.deviceTypeId == kRootnodeId) || (deviceType.deviceTypeId == kAggregatorId) ||
+                (deviceType.deviceTypeId == kBridgedNode))
+            {
+                emAfEndpoints[ep].bitmask.Set(EmberAfEndpointOptions::isFlatComposition);
+                break;
+            }
+        }
 
         // Increment currentDataVersions by 1 (slot) for every server cluster
         // this endpoint has.
@@ -1519,7 +1534,6 @@ CHIP_ERROR SetFlatCompositionForEndpoint(EndpointId endpoint)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isTreeComposition);
     emAfEndpoints[index].bitmask.Set(EmberAfEndpointOptions::isFlatComposition);
     return CHIP_NO_ERROR;
 }
@@ -1532,7 +1546,6 @@ CHIP_ERROR SetTreeCompositionForEndpoint(EndpointId endpoint)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isFlatComposition);
-    emAfEndpoints[index].bitmask.Set(EmberAfEndpointOptions::isTreeComposition);
     return CHIP_NO_ERROR;
 }
 
@@ -1553,7 +1566,7 @@ bool IsTreeCompositionForEndpoint(EndpointId endpoint)
     {
         return false;
     }
-    return emAfEndpoints[index].bitmask.Has(EmberAfEndpointOptions::isTreeComposition);
+    return !emAfEndpoints[index].bitmask.Has(EmberAfEndpointOptions::isFlatComposition);
 }
 
 EndpointComposition GetCompositionForEndpointIndex(uint16_t endpointIndex)
@@ -1563,11 +1576,7 @@ EndpointComposition GetCompositionForEndpointIndex(uint16_t endpointIndex)
     {
         return EndpointComposition::kFullFamily;
     }
-    if (emAfEndpoints[endpointIndex].bitmask.Has(EmberAfEndpointOptions::isTreeComposition))
-    {
-        return EndpointComposition::kTree;
-    }
-    return EndpointComposition::kInvalid;
+    return EndpointComposition::kTree;
 }
 
 } // namespace app

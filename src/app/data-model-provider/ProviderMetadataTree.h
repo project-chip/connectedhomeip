@@ -21,9 +21,9 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/data-model-provider/MetadataList.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model/List.h>
+#include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/Span.h>
 
 namespace chip {
@@ -53,14 +53,14 @@ public:
 
     using SemanticTag = Clusters::Descriptor::Structs::SemanticTagStruct::Type;
 
-    virtual CHIP_ERROR Endpoints(ListBuilder<EndpointEntry> & builder) = 0;
+    virtual CHIP_ERROR Endpoints(ReadOnlyBufferBuilder<EndpointEntry> & builder) = 0;
 
-    virtual CHIP_ERROR SemanticTags(EndpointId endpointId, ListBuilder<SemanticTag> & builder)          = 0;
-    virtual CHIP_ERROR DeviceTypes(EndpointId endpointId, ListBuilder<DeviceTypeEntry> & builder)       = 0;
-    virtual CHIP_ERROR ClientClusters(EndpointId endpointId, ListBuilder<ClusterId> & builder)          = 0;
-    virtual CHIP_ERROR ServerClusters(EndpointId endpointId, ListBuilder<ServerClusterEntry> & builder) = 0;
+    virtual CHIP_ERROR SemanticTags(EndpointId endpointId, ReadOnlyBufferBuilder<SemanticTag> & builder)          = 0;
+    virtual CHIP_ERROR DeviceTypes(EndpointId endpointId, ReadOnlyBufferBuilder<DeviceTypeEntry> & builder)       = 0;
+    virtual CHIP_ERROR ClientClusters(EndpointId endpointId, ReadOnlyBufferBuilder<ClusterId> & builder)          = 0;
+    virtual CHIP_ERROR ServerClusters(EndpointId endpointId, ReadOnlyBufferBuilder<ServerClusterEntry> & builder) = 0;
 #ifdef CONFIG_USE_ENDPOINT_UNIQUE_ID
-    virtual CHIP_ERROR EndpointUniqueID(EndpointId endpointId, ListBuilder<MutableCharSpan> & builder)  = 0;
+    virtual CHIP_ERROR EndpointUniqueID(EndpointId endpointId, ReadOnlyBufferBuilder<MutableCharSpan> & builder)  = 0;
 #endif
 
     /// Attribute lists contain all attributes. This MUST include all global
@@ -71,9 +71,10 @@ public:
     ///    - ClusterRevision::Id
     ///    - FeatureMap::Id
     ///    - GeneratedCommandList::Id
-    virtual CHIP_ERROR Attributes(const ConcreteClusterPath & path, ListBuilder<AttributeEntry> & builder)             = 0;
-    virtual CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ListBuilder<CommandId> & builder)           = 0;
-    virtual CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path, ListBuilder<AcceptedCommandEntry> & builder) = 0;
+    virtual CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<AttributeEntry> & builder)   = 0;
+    virtual CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) = 0;
+    virtual CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                        ReadOnlyBufferBuilder<AcceptedCommandEntry> & builder)                         = 0;
 
     /// Workaround function to report attribute change.
     ///
@@ -94,7 +95,7 @@ public:
     virtual void Temporary_ReportAttributeChanged(const AttributePathParams & path) = 0;
 
     // "convenience" functions that just return the data and ignore the error
-    // This returns the `ListBuilder<..>::TakeBuffer` from their equivalent fuctions as-is,
+    // This returns the `ReadOnlyBufferBuilder<..>::TakeBuffer` from their equivalent fuctions as-is,
     // even after an error (e.g. not found would return empty data).
     //
     // Usage of these indicates no error handling (not even logging) and code should
@@ -107,3 +108,4 @@ public:
 } // namespace DataModel
 } // namespace app
 } // namespace chip
+

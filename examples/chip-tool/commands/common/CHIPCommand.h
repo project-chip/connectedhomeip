@@ -96,7 +96,8 @@ public:
         AddArgument("trace_decode", 0, 1, &mTraceDecode);
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
         AddArgument("trace-to", &mTraceTo, "Trace destinations, comma-separated (" SUPPORTED_COMMAND_LINE_TRACING_TARGETS ")");
-        AddArgument("ble-adapter", 0, UINT16_MAX, &mBleAdapterId);
+        AddArgument("ble-controller", 0, UINT16_MAX, &mBleAdapterId,
+                    "BLE controller selector, see example or platform docs for details");
         AddArgument("storage-directory", &mStorageDirectory,
                     "Directory to place chip-tool's storage files in.  Defaults to $TMPDIR, with fallback to /tmp");
         AddArgument(

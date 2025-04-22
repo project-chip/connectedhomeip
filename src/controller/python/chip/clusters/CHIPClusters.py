@@ -1065,6 +1065,12 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x00000018: {
+                "attributeName": "ConfigurationVersion",
+                "attributeId": 0x00000018,
+                "type": "int",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -2583,6 +2589,18 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x0000003F: {
+                "attributeName": "ExtAddress",
+                "attributeId": 0x0000003F,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000040: {
+                "attributeName": "Rloc16",
+                "attributeId": 0x00000040,
+                "type": "int",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -3103,6 +3121,12 @@ class ChipClusters:
                 "attributeName": "ProductAppearance",
                 "attributeId": 0x00000014,
                 "type": "",
+                "reportable": True,
+            },
+            0x00000018: {
+                "attributeName": "ConfigurationVersion",
+                "attributeId": 0x00000018,
+                "type": "int",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -6210,6 +6234,82 @@ class ChipClusters:
             },
         },
     }
+    _COMMODITY_PRICE_CLUSTER_INFO = {
+        "clusterName": "CommodityPrice",
+        "clusterId": 0x00000095,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "GetDetailedPriceRequest",
+                "args": {
+                    "details": "int",
+                },
+            },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "GetDetailedForecastRequest",
+                "args": {
+                    "details": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "TariffUnit",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "Currency",
+                "attributeId": 0x00000001,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "CurrentPrice",
+                "attributeId": 0x00000002,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "PriceForecast",
+                "attributeId": 0x00000003,
+                "type": "",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_INFO = {
         "clusterName": "DemandResponseLoadControl",
         "clusterId": 0x00000096,
@@ -7067,6 +7167,63 @@ class ChipClusters:
             },
         },
     }
+    _ELECTRICAL_GRID_CONDITIONS_CLUSTER_INFO = {
+        "clusterName": "ElectricalGridConditions",
+        "clusterId": 0x000000A0,
+        "commands": {
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "LocalGenerationAvailable",
+                "attributeId": 0x00000000,
+                "type": "bool",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000001: {
+                "attributeName": "CurrentConditions",
+                "attributeId": 0x00000001,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "ForecastConditions",
+                "attributeId": 0x00000002,
+                "type": "",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _DOOR_LOCK_CLUSTER_INFO = {
         "clusterName": "DoorLock",
         "clusterId": 0x00000101,
@@ -7801,30 +7958,14 @@ class ChipClusters:
                 "commandId": 0x00000001,
                 "commandName": "MoveTo",
                 "args": {
-                    "tag": "int",
-                    "latch": "int",
+                    "position": "int",
+                    "latch": "bool",
                     "speed": "int",
                 },
             },
             0x00000002: {
                 "commandId": 0x00000002,
                 "commandName": "Calibrate",
-                "args": {
-                },
-            },
-            0x00000003: {
-                "commandId": 0x00000003,
-                "commandName": "ConfigureFallback",
-                "args": {
-                    "restingProcedure": "int",
-                    "triggerCondition": "int",
-                    "triggerPosition": "int",
-                    "waitingDelay": "int",
-                },
-            },
-            0x00000004: {
-                "commandId": 0x00000004,
-                "commandName": "CancelFallback",
                 "args": {
                 },
             },
@@ -7860,33 +8001,125 @@ class ChipClusters:
                 "type": "",
                 "reportable": True,
             },
-            0x00000005: {
-                "attributeName": "RestingProcedure",
-                "attributeId": 0x00000005,
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
                 "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _CLOSURE_DIMENSION_CLUSTER_INFO = {
+        "clusterName": "ClosureDimension",
+        "clusterId": 0x00000105,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "SetTarget",
+                "args": {
+                    "position": "int",
+                    "latch": "bool",
+                    "speed": "int",
+                },
+            },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "Step",
+                "args": {
+                    "direction": "int",
+                    "numberOfSteps": "int",
+                    "speed": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "CurrentState",
+                "attributeId": 0x00000000,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "Target",
+                "attributeId": 0x00000001,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "Resolution",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "StepValue",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "Unit",
+                "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "UnitRange",
+                "attributeId": 0x00000005,
+                "type": "",
                 "reportable": True,
             },
             0x00000006: {
-                "attributeName": "TriggerCondition",
+                "attributeName": "LimitRange",
                 "attributeId": 0x00000006,
-                "type": "int",
+                "type": "",
                 "reportable": True,
             },
             0x00000007: {
-                "attributeName": "TriggerPosition",
+                "attributeName": "TranslationDirection",
                 "attributeId": 0x00000007,
                 "type": "int",
                 "reportable": True,
             },
             0x00000008: {
-                "attributeName": "WaitingDelay",
+                "attributeName": "RotationAxis",
                 "attributeId": 0x00000008,
                 "type": "int",
                 "reportable": True,
             },
             0x00000009: {
-                "attributeName": "KickoffTimer",
+                "attributeName": "Overflow",
                 "attributeId": 0x00000009,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000000A: {
+                "attributeName": "ModulationType",
+                "attributeId": 0x0000000A,
                 "type": "int",
                 "reportable": True,
             },
@@ -12599,7 +12832,6 @@ class ChipClusters:
                 "args": {
                     "imageCodec": "int",
                     "maxFrameRate": "int",
-                    "bitRate": "int",
                     "minResolution": "VideoResolutionStruct",
                     "maxResolution": "VideoResolutionStruct",
                     "quality": "int",
@@ -12641,7 +12873,7 @@ class ChipClusters:
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "MaxConcurrentVideoEncoders",
+                "attributeName": "MaxConcurrentEncoders",
                 "attributeId": 0x00000000,
                 "type": "int",
                 "reportable": True,
@@ -12701,7 +12933,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x0000000A: {
-                "attributeName": "SupportedSnapshotParams",
+                "attributeName": "SnapshotCapabilities",
                 "attributeId": 0x0000000A,
                 "type": "",
                 "reportable": True,
@@ -13426,6 +13658,172 @@ class ChipClusters:
             },
         },
     }
+    _COMMODITY_TARIFF_CLUSTER_INFO = {
+        "clusterName": "CommodityTariff",
+        "clusterId": 0x00000700,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "GetTariffComponent",
+                "args": {
+                    "tariffComponentID": "int",
+                },
+            },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "GetDayEntry",
+                "args": {
+                    "dayEntryID": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "TariffInfo",
+                "attributeId": 0x00000000,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "TariffUnit",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "StartDate",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "DayEntries",
+                "attributeId": 0x00000003,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "DayPatterns",
+                "attributeId": 0x00000004,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "CalendarPeriods",
+                "attributeId": 0x00000005,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000006: {
+                "attributeName": "IndividualDays",
+                "attributeId": 0x00000006,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000007: {
+                "attributeName": "CurrentDay",
+                "attributeId": 0x00000007,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000008: {
+                "attributeName": "NextDay",
+                "attributeId": 0x00000008,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000009: {
+                "attributeName": "CurrentDayEntry",
+                "attributeId": 0x00000009,
+                "type": "",
+                "reportable": True,
+            },
+            0x0000000A: {
+                "attributeName": "CurrentDayEntryDate",
+                "attributeId": 0x0000000A,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000000B: {
+                "attributeName": "NextDayEntry",
+                "attributeId": 0x0000000B,
+                "type": "",
+                "reportable": True,
+            },
+            0x0000000C: {
+                "attributeName": "NextDayEntryDate",
+                "attributeId": 0x0000000C,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000000D: {
+                "attributeName": "TariffComponents",
+                "attributeId": 0x0000000D,
+                "type": "",
+                "reportable": True,
+            },
+            0x0000000E: {
+                "attributeName": "TariffPeriods",
+                "attributeId": 0x0000000E,
+                "type": "",
+                "reportable": True,
+            },
+            0x0000000F: {
+                "attributeName": "CurrentTariffComponents",
+                "attributeId": 0x0000000F,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000010: {
+                "attributeName": "NextTariffComponents",
+                "attributeId": 0x00000010,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000011: {
+                "attributeName": "DefaultRandomizationOffset",
+                "attributeId": 0x00000011,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000012: {
+                "attributeName": "DefaultRandomizationType",
+                "attributeId": 0x00000012,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _ECOSYSTEM_INFORMATION_CLUSTER_INFO = {
         "clusterName": "EcosystemInformation",
         "clusterId": 0x00000750,
@@ -13706,6 +14104,130 @@ class ChipClusters:
                 "attributeName": "ProvisionedEndpoints",
                 "attributeId": 0x00000001,
                 "type": "",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _METER_IDENTIFICATION_CLUSTER_INFO = {
+        "clusterName": "MeterIdentification",
+        "clusterId": 0x00000B06,
+        "commands": {
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "MeterType",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "PointOfDelivery",
+                "attributeId": 0x00000001,
+                "type": "str",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "MeterSerialNumber",
+                "attributeId": 0x00000002,
+                "type": "str",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "ProtocolVersion",
+                "attributeId": 0x00000003,
+                "type": "str",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "PowerThreshold",
+                "attributeId": 0x00000004,
+                "type": "",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _COMMODITY_METERING_CLUSTER_INFO = {
+        "clusterName": "CommodityMetering",
+        "clusterId": 0x00000B07,
+        "commands": {
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "MeteredQuantity",
+                "attributeId": 0x00000000,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "MeteredQuantityTimestamp",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "MeasurementType",
+                "attributeId": 0x00000002,
+                "type": "int",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -14795,6 +15317,7 @@ class ChipClusters:
         0x00000090: _ELECTRICAL_POWER_MEASUREMENT_CLUSTER_INFO,
         0x00000091: _ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_INFO,
         0x00000094: _WATER_HEATER_MANAGEMENT_CLUSTER_INFO,
+        0x00000095: _COMMODITY_PRICE_CLUSTER_INFO,
         0x00000096: _DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_INFO,
         0x00000097: _MESSAGES_CLUSTER_INFO,
         0x00000098: _DEVICE_ENERGY_MANAGEMENT_CLUSTER_INFO,
@@ -14804,9 +15327,11 @@ class ChipClusters:
         0x0000009D: _ENERGY_EVSE_MODE_CLUSTER_INFO,
         0x0000009E: _WATER_HEATER_MODE_CLUSTER_INFO,
         0x0000009F: _DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER_INFO,
+        0x000000A0: _ELECTRICAL_GRID_CONDITIONS_CLUSTER_INFO,
         0x00000101: _DOOR_LOCK_CLUSTER_INFO,
         0x00000102: _WINDOW_COVERING_CLUSTER_INFO,
         0x00000104: _CLOSURE_CONTROL_CLUSTER_INFO,
+        0x00000105: _CLOSURE_DIMENSION_CLUSTER_INFO,
         0x00000150: _SERVICE_AREA_CLUSTER_INFO,
         0x00000200: _PUMP_CONFIGURATION_AND_CONTROL_CLUSTER_INFO,
         0x00000201: _THERMOSTAT_CLUSTER_INFO,
@@ -14854,10 +15379,13 @@ class ChipClusters:
         0x00000554: _WEB_RTC_TRANSPORT_REQUESTOR_CLUSTER_INFO,
         0x00000555: _PUSH_AV_STREAM_TRANSPORT_CLUSTER_INFO,
         0x00000556: _CHIME_CLUSTER_INFO,
+        0x00000700: _COMMODITY_TARIFF_CLUSTER_INFO,
         0x00000750: _ECOSYSTEM_INFORMATION_CLUSTER_INFO,
         0x00000751: _COMMISSIONER_CONTROL_CLUSTER_INFO,
         0x00000801: _TLS_CERTIFICATE_MANAGEMENT_CLUSTER_INFO,
         0x00000802: _TLS_CLIENT_MANAGEMENT_CLUSTER_INFO,
+        0x00000B06: _METER_IDENTIFICATION_CLUSTER_INFO,
+        0x00000B07: _COMMODITY_METERING_CLUSTER_INFO,
         0xFFF1FC05: _UNIT_TESTING_CLUSTER_INFO,
         0xFFF1FC06: _FAULT_INJECTION_CLUSTER_INFO,
         0xFFF1FC20: _SAMPLE_MEI_CLUSTER_INFO,
@@ -14930,6 +15458,7 @@ class ChipClusters:
         "ElectricalPowerMeasurement": _ELECTRICAL_POWER_MEASUREMENT_CLUSTER_INFO,
         "ElectricalEnergyMeasurement": _ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_INFO,
         "WaterHeaterManagement": _WATER_HEATER_MANAGEMENT_CLUSTER_INFO,
+        "CommodityPrice": _COMMODITY_PRICE_CLUSTER_INFO,
         "DemandResponseLoadControl": _DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_INFO,
         "Messages": _MESSAGES_CLUSTER_INFO,
         "DeviceEnergyManagement": _DEVICE_ENERGY_MANAGEMENT_CLUSTER_INFO,
@@ -14939,9 +15468,11 @@ class ChipClusters:
         "EnergyEvseMode": _ENERGY_EVSE_MODE_CLUSTER_INFO,
         "WaterHeaterMode": _WATER_HEATER_MODE_CLUSTER_INFO,
         "DeviceEnergyManagementMode": _DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER_INFO,
+        "ElectricalGridConditions": _ELECTRICAL_GRID_CONDITIONS_CLUSTER_INFO,
         "DoorLock": _DOOR_LOCK_CLUSTER_INFO,
         "WindowCovering": _WINDOW_COVERING_CLUSTER_INFO,
         "ClosureControl": _CLOSURE_CONTROL_CLUSTER_INFO,
+        "ClosureDimension": _CLOSURE_DIMENSION_CLUSTER_INFO,
         "ServiceArea": _SERVICE_AREA_CLUSTER_INFO,
         "PumpConfigurationAndControl": _PUMP_CONFIGURATION_AND_CONTROL_CLUSTER_INFO,
         "Thermostat": _THERMOSTAT_CLUSTER_INFO,
@@ -14989,10 +15520,13 @@ class ChipClusters:
         "WebRTCTransportRequestor": _WEB_RTC_TRANSPORT_REQUESTOR_CLUSTER_INFO,
         "PushAvStreamTransport": _PUSH_AV_STREAM_TRANSPORT_CLUSTER_INFO,
         "Chime": _CHIME_CLUSTER_INFO,
+        "CommodityTariff": _COMMODITY_TARIFF_CLUSTER_INFO,
         "EcosystemInformation": _ECOSYSTEM_INFORMATION_CLUSTER_INFO,
         "CommissionerControl": _COMMISSIONER_CONTROL_CLUSTER_INFO,
         "TlsCertificateManagement": _TLS_CERTIFICATE_MANAGEMENT_CLUSTER_INFO,
         "TlsClientManagement": _TLS_CLIENT_MANAGEMENT_CLUSTER_INFO,
+        "MeterIdentification": _METER_IDENTIFICATION_CLUSTER_INFO,
+        "CommodityMetering": _COMMODITY_METERING_CLUSTER_INFO,
         "UnitTesting": _UNIT_TESTING_CLUSTER_INFO,
         "FaultInjection": _FAULT_INJECTION_CLUSTER_INFO,
         "SampleMei": _SAMPLE_MEI_CLUSTER_INFO,

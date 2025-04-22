@@ -157,6 +157,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "ElectricalEnergyMeasurement";
     case chip::app::Clusters::WaterHeaterManagement::Id:
         return "WaterHeaterManagement";
+    case chip::app::Clusters::CommodityPrice::Id:
+        return "CommodityPrice";
     case chip::app::Clusters::DemandResponseLoadControl::Id:
         return "DemandResponseLoadControl";
     case chip::app::Clusters::Messages::Id:
@@ -175,12 +177,16 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "WaterHeaterMode";
     case chip::app::Clusters::DeviceEnergyManagementMode::Id:
         return "DeviceEnergyManagementMode";
+    case chip::app::Clusters::ElectricalGridConditions::Id:
+        return "ElectricalGridConditions";
     case chip::app::Clusters::DoorLock::Id:
         return "DoorLock";
     case chip::app::Clusters::WindowCovering::Id:
         return "WindowCovering";
     case chip::app::Clusters::ClosureControl::Id:
         return "ClosureControl";
+    case chip::app::Clusters::ClosureDimension::Id:
+        return "ClosureDimension";
     case chip::app::Clusters::ServiceArea::Id:
         return "ServiceArea";
     case chip::app::Clusters::PumpConfigurationAndControl::Id:
@@ -275,6 +281,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "PushAvStreamTransport";
     case chip::app::Clusters::Chime::Id:
         return "Chime";
+    case chip::app::Clusters::CommodityTariff::Id:
+        return "CommodityTariff";
     case chip::app::Clusters::EcosystemInformation::Id:
         return "EcosystemInformation";
     case chip::app::Clusters::CommissionerControl::Id:
@@ -283,6 +291,10 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "TlsCertificateManagement";
     case chip::app::Clusters::TlsClientManagement::Id:
         return "TlsClientManagement";
+    case chip::app::Clusters::MeterIdentification::Id:
+        return "MeterIdentification";
+    case chip::app::Clusters::CommodityMetering::Id:
+        return "CommodityMetering";
     case chip::app::Clusters::UnitTesting::Id:
         return "UnitTesting";
     case chip::app::Clusters::FaultInjection::Id:
@@ -578,6 +590,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SpecificationVersion";
         case chip::app::Clusters::BasicInformation::Attributes::MaxPathsPerInvoke::Id:
             return "MaxPathsPerInvoke";
+        case chip::app::Clusters::BasicInformation::Attributes::ConfigurationVersion::Id:
+            return "ConfigurationVersion";
         case chip::app::Clusters::BasicInformation::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::BasicInformation::Attributes::AcceptedCommandList::Id:
@@ -1079,6 +1093,10 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "OperationalDatasetComponents";
         case chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::Id:
             return "ActiveNetworkFaultsList";
+        case chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ExtAddress::Id:
+            return "ExtAddress";
+        case chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::Rloc16::Id:
+            return "Rloc16";
         case chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::AcceptedCommandList::Id:
@@ -1251,6 +1269,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "UniqueID";
         case chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::ProductAppearance::Id:
             return "ProductAppearance";
+        case chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::ConfigurationVersion::Id:
+            return "ConfigurationVersion";
         case chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::AcceptedCommandList::Id:
@@ -2296,6 +2316,31 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::CommodityPrice::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::CommodityPrice::Attributes::TariffUnit::Id:
+            return "TariffUnit";
+        case chip::app::Clusters::CommodityPrice::Attributes::Currency::Id:
+            return "Currency";
+        case chip::app::Clusters::CommodityPrice::Attributes::CurrentPrice::Id:
+            return "CurrentPrice";
+        case chip::app::Clusters::CommodityPrice::Attributes::PriceForecast::Id:
+            return "PriceForecast";
+        case chip::app::Clusters::CommodityPrice::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::CommodityPrice::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::CommodityPrice::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::CommodityPrice::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::CommodityPrice::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::DemandResponseLoadControl::Id: {
         switch (id)
         {
@@ -2557,6 +2602,29 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::ElectricalGridConditions::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ElectricalGridConditions::Attributes::LocalGenerationAvailable::Id:
+            return "LocalGenerationAvailable";
+        case chip::app::Clusters::ElectricalGridConditions::Attributes::CurrentConditions::Id:
+            return "CurrentConditions";
+        case chip::app::Clusters::ElectricalGridConditions::Attributes::ForecastConditions::Id:
+            return "ForecastConditions";
+        case chip::app::Clusters::ElectricalGridConditions::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::ElectricalGridConditions::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::ElectricalGridConditions::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::ElectricalGridConditions::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::ElectricalGridConditions::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::DoorLock::Id: {
         switch (id)
         {
@@ -2738,16 +2806,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "OverallState";
         case chip::app::Clusters::ClosureControl::Attributes::OverallTarget::Id:
             return "OverallTarget";
-        case chip::app::Clusters::ClosureControl::Attributes::RestingProcedure::Id:
-            return "RestingProcedure";
-        case chip::app::Clusters::ClosureControl::Attributes::TriggerCondition::Id:
-            return "TriggerCondition";
-        case chip::app::Clusters::ClosureControl::Attributes::TriggerPosition::Id:
-            return "TriggerPosition";
-        case chip::app::Clusters::ClosureControl::Attributes::WaitingDelay::Id:
-            return "WaitingDelay";
-        case chip::app::Clusters::ClosureControl::Attributes::KickoffTimer::Id:
-            return "KickoffTimer";
         case chip::app::Clusters::ClosureControl::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::ClosureControl::Attributes::AcceptedCommandList::Id:
@@ -2757,6 +2815,45 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::ClosureControl::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::ClosureControl::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ClosureDimension::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ClosureDimension::Attributes::CurrentState::Id:
+            return "CurrentState";
+        case chip::app::Clusters::ClosureDimension::Attributes::Target::Id:
+            return "Target";
+        case chip::app::Clusters::ClosureDimension::Attributes::Resolution::Id:
+            return "Resolution";
+        case chip::app::Clusters::ClosureDimension::Attributes::StepValue::Id:
+            return "StepValue";
+        case chip::app::Clusters::ClosureDimension::Attributes::Unit::Id:
+            return "Unit";
+        case chip::app::Clusters::ClosureDimension::Attributes::UnitRange::Id:
+            return "UnitRange";
+        case chip::app::Clusters::ClosureDimension::Attributes::LimitRange::Id:
+            return "LimitRange";
+        case chip::app::Clusters::ClosureDimension::Attributes::TranslationDirection::Id:
+            return "TranslationDirection";
+        case chip::app::Clusters::ClosureDimension::Attributes::RotationAxis::Id:
+            return "RotationAxis";
+        case chip::app::Clusters::ClosureDimension::Attributes::Overflow::Id:
+            return "Overflow";
+        case chip::app::Clusters::ClosureDimension::Attributes::ModulationType::Id:
+            return "ModulationType";
+        case chip::app::Clusters::ClosureDimension::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::ClosureDimension::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::ClosureDimension::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::ClosureDimension::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::ClosureDimension::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -4216,8 +4313,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
     case chip::app::Clusters::CameraAvStreamManagement::Id: {
         switch (id)
         {
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxConcurrentVideoEncoders::Id:
-            return "MaxConcurrentVideoEncoders";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxConcurrentEncoders::Id:
+            return "MaxConcurrentEncoders";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxEncodedPixelRate::Id:
             return "MaxEncodedPixelRate";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::VideoSensorParams::Id:
@@ -4236,8 +4333,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SpeakerCapabilities";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::TwoWayTalkSupport::Id:
             return "TwoWayTalkSupport";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::SupportedSnapshotParams::Id:
-            return "SupportedSnapshotParams";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::SnapshotCapabilities::Id:
+            return "SnapshotCapabilities";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxNetworkBandwidth::Id:
             return "MaxNetworkBandwidth";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::CurrentFrameRate::Id:
@@ -4431,6 +4528,61 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::CommodityTariff::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::CommodityTariff::Attributes::TariffInfo::Id:
+            return "TariffInfo";
+        case chip::app::Clusters::CommodityTariff::Attributes::TariffUnit::Id:
+            return "TariffUnit";
+        case chip::app::Clusters::CommodityTariff::Attributes::StartDate::Id:
+            return "StartDate";
+        case chip::app::Clusters::CommodityTariff::Attributes::DayEntries::Id:
+            return "DayEntries";
+        case chip::app::Clusters::CommodityTariff::Attributes::DayPatterns::Id:
+            return "DayPatterns";
+        case chip::app::Clusters::CommodityTariff::Attributes::CalendarPeriods::Id:
+            return "CalendarPeriods";
+        case chip::app::Clusters::CommodityTariff::Attributes::IndividualDays::Id:
+            return "IndividualDays";
+        case chip::app::Clusters::CommodityTariff::Attributes::CurrentDay::Id:
+            return "CurrentDay";
+        case chip::app::Clusters::CommodityTariff::Attributes::NextDay::Id:
+            return "NextDay";
+        case chip::app::Clusters::CommodityTariff::Attributes::CurrentDayEntry::Id:
+            return "CurrentDayEntry";
+        case chip::app::Clusters::CommodityTariff::Attributes::CurrentDayEntryDate::Id:
+            return "CurrentDayEntryDate";
+        case chip::app::Clusters::CommodityTariff::Attributes::NextDayEntry::Id:
+            return "NextDayEntry";
+        case chip::app::Clusters::CommodityTariff::Attributes::NextDayEntryDate::Id:
+            return "NextDayEntryDate";
+        case chip::app::Clusters::CommodityTariff::Attributes::TariffComponents::Id:
+            return "TariffComponents";
+        case chip::app::Clusters::CommodityTariff::Attributes::TariffPeriods::Id:
+            return "TariffPeriods";
+        case chip::app::Clusters::CommodityTariff::Attributes::CurrentTariffComponents::Id:
+            return "CurrentTariffComponents";
+        case chip::app::Clusters::CommodityTariff::Attributes::NextTariffComponents::Id:
+            return "NextTariffComponents";
+        case chip::app::Clusters::CommodityTariff::Attributes::DefaultRandomizationOffset::Id:
+            return "DefaultRandomizationOffset";
+        case chip::app::Clusters::CommodityTariff::Attributes::DefaultRandomizationType::Id:
+            return "DefaultRandomizationType";
+        case chip::app::Clusters::CommodityTariff::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::CommodityTariff::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::CommodityTariff::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::CommodityTariff::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::CommodityTariff::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::EcosystemInformation::Id: {
         switch (id)
         {
@@ -4512,6 +4664,56 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::TlsClientManagement::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::TlsClientManagement::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::MeterIdentification::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::MeterIdentification::Attributes::MeterType::Id:
+            return "MeterType";
+        case chip::app::Clusters::MeterIdentification::Attributes::PointOfDelivery::Id:
+            return "PointOfDelivery";
+        case chip::app::Clusters::MeterIdentification::Attributes::MeterSerialNumber::Id:
+            return "MeterSerialNumber";
+        case chip::app::Clusters::MeterIdentification::Attributes::ProtocolVersion::Id:
+            return "ProtocolVersion";
+        case chip::app::Clusters::MeterIdentification::Attributes::PowerThreshold::Id:
+            return "PowerThreshold";
+        case chip::app::Clusters::MeterIdentification::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::MeterIdentification::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::MeterIdentification::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::MeterIdentification::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::MeterIdentification::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::CommodityMetering::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::CommodityMetering::Attributes::MeteredQuantity::Id:
+            return "MeteredQuantity";
+        case chip::app::Clusters::CommodityMetering::Attributes::MeteredQuantityTimestamp::Id:
+            return "MeteredQuantityTimestamp";
+        case chip::app::Clusters::CommodityMetering::Attributes::MeasurementType::Id:
+            return "MeasurementType";
+        case chip::app::Clusters::CommodityMetering::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::CommodityMetering::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::CommodityMetering::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::CommodityMetering::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::CommodityMetering::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -5325,6 +5527,17 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
+    case chip::app::Clusters::CommodityPrice::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::CommodityPrice::Commands::GetDetailedPriceRequest::Id:
+            return "GetDetailedPriceRequest";
+        case chip::app::Clusters::CommodityPrice::Commands::GetDetailedForecastRequest::Id:
+            return "GetDetailedForecastRequest";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::DemandResponseLoadControl::Id: {
         switch (id)
         {
@@ -5503,10 +5716,17 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "MoveTo";
         case chip::app::Clusters::ClosureControl::Commands::Calibrate::Id:
             return "Calibrate";
-        case chip::app::Clusters::ClosureControl::Commands::ConfigureFallback::Id:
-            return "ConfigureFallback";
-        case chip::app::Clusters::ClosureControl::Commands::CancelFallback::Id:
-            return "CancelFallback";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ClosureDimension::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ClosureDimension::Commands::SetTarget::Id:
+            return "SetTarget";
+        case chip::app::Clusters::ClosureDimension::Commands::Step::Id:
+            return "Step";
         default:
             return "Unknown";
         }
@@ -5937,6 +6157,17 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
+    case chip::app::Clusters::CommodityTariff::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::CommodityTariff::Commands::GetTariffComponent::Id:
+            return "GetTariffComponent";
+        case chip::app::Clusters::CommodityTariff::Commands::GetDayEntry::Id:
+            return "GetDayEntry";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::CommissionerControl::Id: {
         switch (id)
         {
@@ -6313,6 +6544,17 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "Unknown";
         }
     }
+    case chip::app::Clusters::CommodityPrice::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::CommodityPrice::Commands::GetDetailedPriceResponse::Id:
+            return "GetDetailedPriceResponse";
+        case chip::app::Clusters::CommodityPrice::Commands::GetDetailedForecastResponse::Id:
+            return "GetDetailedForecastResponse";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::EnergyEvse::Id: {
         switch (id)
         {
@@ -6548,6 +6790,17 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "Unknown";
         }
     }
+    case chip::app::Clusters::CommodityTariff::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::CommodityTariff::Commands::GetTariffComponentResponse::Id:
+            return "GetTariffComponentResponse";
+        case chip::app::Clusters::CommodityTariff::Commands::GetDayEntryResponse::Id:
+            return "GetDayEntryResponse";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::CommissionerControl::Id: {
         switch (id)
         {
@@ -6761,33 +7014,11 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
     case 0x00000203:
         return "Window Covering Controller";
     case 0x00000230:
-        return "ClosureBase";
+        return "Closure";
     case 0x00000231:
-        return "Window";
-    case 0x00000232:
-        return "Shutter";
-    case 0x00000233:
-        return "Shade";
-    case 0x00000234:
-        return "Curtain";
-    case 0x00000235:
-        return "Blind";
-    case 0x00000236:
-        return "Screen";
-    case 0x00000237:
-        return "Awning";
-    case 0x00000238:
-        return "Pergola";
-    case 0x00000239:
-        return "Door";
-    case 0x0000023A:
-        return "GarageDoor";
-    case 0x0000023B:
-        return "Gate";
-    case 0x0000023C:
-        return "Barrier";
-    case 0x0000023D:
-        return "Cabinet";
+        return "Closure Panel";
+    case 0x0000023E:
+        return "Closure Controller";
     case 0x00000300:
         return "Heating/Cooling Unit";
     case 0x00000301:
@@ -6816,6 +7047,14 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Water Heater";
     case 0x00000510:
         return "Electrical Sensor";
+    case 0x00000511:
+        return "Electrical Utility Meter";
+    case 0x00000512:
+        return "Meter Reference Point";
+    case 0x00000513:
+        return "Electrical Energy Tariff";
+    case 0x00000514:
+        return "Electrical Meter";
     case 0x00000840:
         return "Control Bridge";
     case 0x00000850:

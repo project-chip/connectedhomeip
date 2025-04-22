@@ -187,7 +187,7 @@ from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocat
                                          async_test_body, default_matter_test_main)
 from chip.testing.taglist_and_topology_test import (create_device_type_list_for_root, create_device_type_lists,
                                                     find_tag_list_problems, find_tree_roots, flat_list_ok,
-                                                    get_direct_children_of_root, parts_list_cycles, separate_endpoint_types)
+                                                    get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
 from chip.tlv import uint
 from mobly import asserts
 
@@ -750,12 +750,12 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         flat, tree = separate_endpoint_types(self.endpoints)
 
         self.print_step(5, "Check for cycles in the tree endpoints")
-        cycles = parts_list_cycles(tree, self.endpoints)
-        if len(cycles) != 0:
-            for id in cycles:
+        part_list_errors = parts_list_problems(tree, self.endpoints)
+        if len(part_list_errors) != 0:
+            for id in part_list_errors:
                 location = AttributePathLocation(endpoint_id=id, cluster_id=cluster_id, attribute_id=attribute_id)
                 self.record_error(self.get_test_name(), location=location,
-                                  problem=f"Endpoint {id} parts list includes a cycle", spec_location="PartsList Attribute")
+                                  problem=f"Endpoint {id} parts list includes a cycle or endpoint with multiple paths to the root or non-existent endpoint", spec_location="PartsList Attribute")
             self.fail_current_test()
 
         self.print_step(6, "Check flat lists include all sub ids")

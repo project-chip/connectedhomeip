@@ -63,6 +63,6 @@ Protocols::InteractionModel::Status ChimeManager::PlayChimeSound()
     auto selectedChime = mChimeServer->GetSelectedChime();
 
     // Play chime sound
-    ChipLogDetail(Zcl, "Playing Chime with sound ID: %u", unsigned(selectedChime));
+    ChipLogDetail(Camera, "Playing Chime with sound ID: %u", unsigned(selectedChime));
     return Protocols::InteractionModel::Status::Success;
 }
