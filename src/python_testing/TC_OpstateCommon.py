@@ -1062,7 +1062,7 @@ class TC_OPSTATE_BASE():
         if not opcomplete_pics:
             self.skip_all_remaining_steps(2)
             return
-            
+
         self.step(2)
         # Subscribe to Events and when they are sent push them to a queue for checking later
         events_callback = EventSpecificChangeCallback(events.OperationCompletion)
