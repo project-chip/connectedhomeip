@@ -174,7 +174,6 @@ static_assert(sizeof(AttributeEntry) <= 8, "Size of AttributeEntry is not as exp
 // Bitmask values for different Command qualities.
 enum class CommandQualityFlags : uint32_t
 {
-    kNoAttribute  = 0x0000, // No attribute value
     kFabricScoped = 0x0001,
     kTimed        = 0x0002, // `T` quality on commands
     kLargeMessage = 0x0004, // `L` quality on commands
@@ -189,10 +188,10 @@ struct AcceptedCommandEntry
     StartBitFieldInit
 
         constexpr AcceptedCommandEntry(
-            CommandId id = 0,                                                        // commandId initial value,
-                                                                                     // this could be altered later
-            CommandQualityFlags cmdQualityFlags = CommandQualityFlags::kNoAttribute, // mask.flags initial value
-            Access::Privilege invokePriv        = Access::Privilege::kView           // mask.invokePrivilege initial value
+            CommandId id = 0,                                                          // commandId initial value,
+                                                                                       // this could be altered later
+            CommandQualityFlags cmdQualityFlags = static_cast<CommandQualityFlags>(0), // mask.flags initial value
+            Access::Privilege invokePriv        = Access::Privilege::kView             // mask.invokePrivilege initial value
             ) :
         commandId(id),
         mask{ to_underlying(cmdQualityFlags) & ((1 << 3) - 1), // Narrowing expression to 3 bits
