@@ -134,9 +134,11 @@ CHIP_ERROR EnergyEvseManager::Init()
 void EnergyEvseManager::Shutdown()
 {
     EnergyEvseDelegate * dg = GetDelegate();
-    if(dg) {
+    if (dg)
+    {
         EvseTargetsDelegate * targetsStore = dg->GetEvseTargetsDelegate();
-        if(targetsStore) {
+        if (targetsStore)
+        {
             targetsStore->Shutdown();
         }
     }
