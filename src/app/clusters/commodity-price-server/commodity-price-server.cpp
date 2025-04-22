@@ -88,14 +88,9 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
 
-        if (!forecastBuffer.Calloc(kMaxForecastEntries))
-        {
-            ChipLogError(AppServer, "Memory allocation failed for forecast buffer");
-            return CHIP_ERROR_NO_MEMORY;
-        }
         // Call GetDetailedForecastRequest with details = 0 to
         // strip out .components and .description if present
-        ReturnErrorOnFailure(GetDetailedForecastRequest(0, forecastBuffer, kMaxForecastEntries, forecastList, false, false));
+        ReturnErrorOnFailure(GetDetailedForecastRequest(0, forecastBuffer, forecastList, false));
 
         err = aEncoder.EncodeList([=](const auto & encoder) -> CHIP_ERROR {
             for (auto const & entry : forecastList)
@@ -161,8 +156,6 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
 void Instance::HandleGetDetailedPriceRequest(HandlerContext & ctx,
                                              const Commands::GetDetailedPriceRequest::DecodableType & commandData)
 {
-    DataModel::Nullable<Structs::CommodityPriceStruct::Type> priceStruct;
-
     BitMask<CommodityPriceDetailBitmap> details = commandData.details;
     if (!details.HasOnly(CommodityPriceDetailBitmap::kDescription, CommodityPriceDetailBitmap::kComponents))
     {
@@ -173,15 +166,13 @@ void Instance::HandleGetDetailedPriceRequest(HandlerContext & ctx,
 
     Commands::GetDetailedPriceResponse::Type response;
 
-    CHIP_ERROR err = GetDetailedPriceRequest(details, priceStruct);
+    CHIP_ERROR err = GetDetailedPriceRequest(details, response.currentPrice);
     if (err != CHIP_NO_ERROR)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
-        return;
     }
     else
     {
-        response.currentPrice = priceStruct;
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
     }
 }
@@ -189,9 +180,6 @@ void Instance::HandleGetDetailedPriceRequest(HandlerContext & ctx,
 void Instance::HandleGetDetailedForecastRequest(HandlerContext & ctx,
                                                 const Commands::GetDetailedForecastRequest::DecodableType & commandData)
 {
-    chip::Platform::ScopedMemoryBuffer<Structs::CommodityPriceStruct::Type> forecastBuffer;
-    DataModel::List<const Structs::CommodityPriceStruct::Type> forecastList;
-
     if (!HasFeature(Feature::kForecasting))
     {
         ChipLogError(Zcl, "GetDetailedForecastRequest not supported");
@@ -207,15 +195,9 @@ void Instance::HandleGetDetailedForecastRequest(HandlerContext & ctx,
         return;
     }
 
-    if (!forecastBuffer.Calloc(kMaxForecastEntries))
-    {
-        ChipLogError(AppServer, "Memory allocation failed for forecast buffer");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ResourceExhausted);
-        return;
-    }
-
+    chip::Platform::ScopedMemoryBuffer<Structs::CommodityPriceStruct::Type> forecastBuffer;
     Commands::GetDetailedForecastResponse::Type response;
-    CHIP_ERROR err = GetDetailedForecastRequest(details, forecastBuffer, kMaxForecastEntries, forecastList, false, true);
+    CHIP_ERROR err = GetDetailedForecastRequest(details, forecastBuffer, response.priceForecast, true);
     if (err != CHIP_NO_ERROR)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
@@ -223,7 +205,6 @@ void Instance::HandleGetDetailedForecastRequest(HandlerContext & ctx,
     }
     else
     {
-        response.priceForecast = forecastList;
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
     }
 }
@@ -236,7 +217,6 @@ Instance::GetDetailedPriceRequest(chip::BitMask<CommodityPriceDetailBitmap> deta
     if (mCurrentPrice.IsNull())
     {
         priceStruct.SetNull();
-        return CHIP_NO_ERROR;
     }
     else
     {
@@ -260,16 +240,21 @@ Instance::GetDetailedPriceRequest(chip::BitMask<CommodityPriceDetailBitmap> deta
 CHIP_ERROR
 Instance::GetDetailedForecastRequest(chip::BitMask<CommodityPriceDetailBitmap> details,
                                      chip::Platform::ScopedMemoryBuffer<Structs::CommodityPriceStruct::Type> & forecastBuffer,
-                                     size_t bufferSize, DataModel::List<const Structs::CommodityPriceStruct::Type> & forecastList,
-                                     bool isEvent, bool isCommand)
+                                     DataModel::List<const Structs::CommodityPriceStruct::Type> & forecastList, bool isCommand)
 {
 
-    size_t count = 0;
+    size_t count      = 0;
+    size_t bufferSize = mPriceForecast.size();
+
+    if (!forecastBuffer.Calloc(bufferSize))
+    {
+        ChipLogError(AppServer, "Memory allocation failed for forecast buffer");
+        return CHIP_ERROR_NO_MEMORY;
+    }
 
     // TODO work out what the max udp packet size is
-    // For events this needs to be about 500
-    // Without events it can be 900
-    size_t kMaxByteCount      = (isEvent) ? 500 : 900;
+    // For commands it can be 900
+    size_t kMaxByteCount      = 900;
     size_t estimatedByteCount = 0;
     for (const auto & srcPrice : mPriceForecast)
     {
@@ -319,9 +304,9 @@ Instance::GetDetailedForecastRequest(chip::BitMask<CommodityPriceDetailBitmap> d
             }
         }
 
-        if ((!isCommand && !isEvent) || (estimatedByteCount < kMaxByteCount))
+        if ((!isCommand) || (estimatedByteCount < kMaxByteCount))
         {
-            // For Events and Commands we need to check the size,
+            // For Commands we need to check the size,
             // for Attributes we can rely on chunking which needs
             // to be handled by the parent calling EncodeList
             forecastBuffer[count++] = copy;
@@ -353,7 +338,8 @@ CHIP_ERROR Instance::SetTariffUnit(TariffUnitEnum newValue)
     mTariffUnit = newValue;
     if (oldValue != newValue)
     {
-        ChipLogDetail(AppServer, "mTariffUnit updated to %d", static_cast<int>(mTariffUnit));
+        ChipLogDetail(AppServer, "Endpoint: %d - mTariffUnit updated to %d", static_cast<int>(mEndpointId),
+                      to_underlying(mTariffUnit));
         MatterReportingAttributeChangeCallback(mEndpointId, CommodityPrice::Id, TariffUnit::Id);
     }
 
@@ -373,7 +359,8 @@ CHIP_ERROR Instance::SetCurrency(CurrencyStruct::Type newValue)
     mCurrency = newValue;
     if (oldValue != newValue)
     {
-        ChipLogDetail(AppServer, "mCurrency updated to Currency: %d DecimalPoints: %d", static_cast<int>(mCurrency.currency),
+        ChipLogDetail(AppServer, "Endpoint: %d - mCurrency updated to Currency: %d DecimalPoints: %d",
+                      static_cast<int>(mEndpointId), static_cast<int>(mCurrency.currency),
                       static_cast<int>(mCurrency.decimalPoints));
         MatterReportingAttributeChangeCallback(mEndpointId, CommodityPrice::Id, Currency::Id);
     }
@@ -386,29 +373,31 @@ CHIP_ERROR Instance::SetCurrentPrice(const DataModel::Nullable<Structs::Commodit
     // Check PeriodStart  < PeriodEnd (if not null)
     if (!newValue.IsNull())
     {
-        Structs::CommodityPriceStruct::Type tempValue;
         if (!newValue.Value().periodEnd.IsNull() && (newValue.Value().periodStart > newValue.Value().periodEnd.Value()))
         {
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        }
+
+        if (!newValue.Value().price.HasValue() && !newValue.Value().priceLevel.HasValue())
+        {
+            // Must have Price or PriceLevel
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
     }
 
     mCurrentPrice = newValue;
 
-    ChipLogDetail(AppServer, "mCurrentPrice updated");
+    ChipLogDetail(AppServer, "Endpoint: %d - mCurrentPrice updated", static_cast<int>(mEndpointId));
     MatterReportingAttributeChangeCallback(mEndpointId, CommodityPrice::Id, CurrentPrice::Id);
 
     // generate a PriceChange Event
-    SendPriceChangeEvent();
+    GeneratePriceChangeEvent();
 
     return CHIP_NO_ERROR;
 }
 
-Status Instance::SendPriceChangeEvent()
+Status Instance::GeneratePriceChangeEvent()
 {
-
-    CHIP_ERROR err;
-    DataModel::Nullable<Structs::CommodityPriceStruct::Type> priceStruct;
     Events::PriceChange::Type event;
     EventNumber eventNumber;
 
@@ -416,16 +405,14 @@ Status Instance::SendPriceChangeEvent()
      * The Event's CurrentPrice must not include .description or .components
      * call our function to copy the CurrentPrice without these
      */
-    err = GetDetailedPriceRequest(0, priceStruct);
+    CHIP_ERROR err = GetDetailedPriceRequest(0, event.currentPrice);
     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::Failure);
 
-    event.currentPrice = priceStruct;
-
     err = LogEvent(event, mEndpointId, eventNumber);
-
     if (CHIP_NO_ERROR != err)
     {
-        ChipLogError(AppServer, "Unable to send notify event: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(AppServer, "Unable to generate PriceChange event (endpoint %d): %" CHIP_ERROR_FORMAT,
+                     static_cast<int>(mEndpointId), err.Format());
         return Status::Failure;
     }
     return Status::Success;

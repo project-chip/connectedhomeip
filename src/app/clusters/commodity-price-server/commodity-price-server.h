@@ -95,7 +95,7 @@ public:
     CHIP_ERROR SetForecast(const DataModel::List<const Structs::CommodityPriceStruct::Type> &);
 
     // Send Price Change events
-    Status SendPriceChangeEvent();
+    Status GeneratePriceChangeEvent();
 
 private:
     Delegate & mDelegate;
@@ -121,8 +121,7 @@ private:
 
     CHIP_ERROR GetDetailedForecastRequest(chip::BitMask<CommodityPriceDetailBitmap> details,
                                           chip::Platform::ScopedMemoryBuffer<Structs::CommodityPriceStruct::Type> & forecastBuffer,
-                                          size_t bufferSize,
-                                          DataModel::List<const Structs::CommodityPriceStruct::Type> & forecastList, bool isEvent,
+                                          DataModel::List<const Structs::CommodityPriceStruct::Type> & forecastList,
                                           bool isCommand);
 
     // Attribute storage
