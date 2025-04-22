@@ -65,7 +65,7 @@ class TC_CNET_4_15(MatterBaseTest):
         )
         # Verify that DUT sends ArmFailSafeResponse command with success status
         asserts.assert_equal(
-            send_arm.status,
+            send_arm.errorCode,
             Clusters.GeneralCommissioning.Enums.CommissioningError.kOk,
             "ArmFailSafe command failed"
         )
