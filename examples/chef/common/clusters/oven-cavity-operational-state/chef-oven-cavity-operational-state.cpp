@@ -245,7 +245,7 @@ void ChefDelegate::HandleStopStateCallback(OperationalState::GenericOperationalE
 
     Optional<DataModel::Nullable<uint32_t>> totalTime((DataModel::Nullable<uint32_t>(RunningTime)));
 
-    GetInstance()->OnOperationCompletionDetected(static_cast<uint8_t>(current_err.errorStateID), totalTime, std::nullopt);
+    GetInstance()->OnOperationCompletionDetected(static_cast<uint8_t>(current_err.errorStateID), totalTime, NullOptionalType());
     err.Set(to_underlying(ErrorStateEnum::kNoError));
 }
 
