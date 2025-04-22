@@ -16,7 +16,7 @@ namespace app {
 namespace Clusters {
 namespace BasicInformation {
 
-inline constexpr uint32_t kRevision = 3;
+inline constexpr uint32_t kRevision = 5;
 
 namespace Attributes {
 namespace DataModelRevision {
@@ -203,6 +203,14 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .writePrivilege = std::nullopt,
 };
 } // namespace MaxPathsPerInvoke
+namespace ConfigurationVersion {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
+    .attributeId    = ConfigurationVersion::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+} // namespace ConfigurationVersion
 
 } // namespace Attributes
 

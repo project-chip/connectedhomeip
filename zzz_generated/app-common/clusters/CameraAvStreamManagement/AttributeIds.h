@@ -12,9 +12,9 @@ namespace app {
 namespace Clusters {
 namespace CameraAvStreamManagement {
 namespace Attributes {
-namespace MaxConcurrentVideoEncoders {
+namespace MaxConcurrentEncoders {
 inline constexpr AttributeId Id = 0x00000000;
-} // namespace MaxConcurrentVideoEncoders
+} // namespace MaxConcurrentEncoders
 
 namespace MaxEncodedPixelRate {
 inline constexpr AttributeId Id = 0x00000001;
@@ -52,9 +52,9 @@ namespace TwoWayTalkSupport {
 inline constexpr AttributeId Id = 0x00000009;
 } // namespace TwoWayTalkSupport
 
-namespace SupportedSnapshotParams {
+namespace SnapshotCapabilities {
 inline constexpr AttributeId Id = 0x0000000A;
-} // namespace SupportedSnapshotParams
+} // namespace SnapshotCapabilities
 
 namespace MaxNetworkBandwidth {
 inline constexpr AttributeId Id = 0x0000000B;

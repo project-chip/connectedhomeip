@@ -924,6 +924,8 @@ class TC_SwitchTests(MatterBaseTest):
         # subscription is already established
         self.step("7b")
 
+        self._ask_for_switch_idle(endpoint_id)
+
         test_multi_press_sequence("8a", count=2, short_long=True)
 
         self.step("9a")

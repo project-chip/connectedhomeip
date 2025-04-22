@@ -19,14 +19,14 @@ namespace ClosureDimension {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-namespace Current {
+namespace CurrentState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Current::Id,
+    .attributeId    = CurrentState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-} // namespace Current
+} // namespace CurrentState
 namespace Target {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = Target::Id,

@@ -586,7 +586,7 @@ cluster AccessControl = 31 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 cluster BasicInformation = 40 {
-  revision 3;
+  revision 5;
 
   enum ColorEnum : enum8 {
     kBlack = 0;
@@ -669,6 +669,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute int32u specificationVersion = 21;
   readonly attribute int16u maxPathsPerInvoke = 22;
+  readonly attribute int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2234,17 +2235,20 @@ provisional cluster CameraAvStreamManagement = 1361 {
     int16u snapshotStreamID = 0;
     ImageCodecEnum imageCodec = 1;
     int16u frameRate = 2;
-    int32u bitRate = 3;
-    VideoResolutionStruct minResolution = 4;
-    VideoResolutionStruct maxResolution = 5;
-    int8u quality = 6;
-    int8u referenceCount = 7;
+    VideoResolutionStruct minResolution = 3;
+    VideoResolutionStruct maxResolution = 4;
+    int8u quality = 5;
+    int8u referenceCount = 6;
+    boolean encodedPixels = 7;
+    boolean hardwareEncoder = 8;
   }
 
-  struct SnapshotParamsStruct {
+  struct SnapshotCapabilitiesStruct {
     VideoResolutionStruct resolution = 0;
     int16u maxFrameRate = 1;
     ImageCodecEnum imageCodec = 2;
+    boolean requiresEncodedPixels = 3;
+    optional boolean requiresHardwareEncoder = 4;
   }
 
   struct RateDistortionTradeOffPointsStruct {
@@ -2285,7 +2289,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
     int16u y2 = 3;
   }
 
-  readonly attribute optional int8u maxConcurrentVideoEncoders = 0;
+  readonly attribute optional int8u maxConcurrentEncoders = 0;
   readonly attribute optional int32u maxEncodedPixelRate = 1;
   readonly attribute optional VideoSensorParamsStruct videoSensorParams = 2;
   readonly attribute optional boolean nightVisionCapable = 3;
@@ -2295,7 +2299,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
   readonly attribute optional AudioCapabilitiesStruct microphoneCapabilities = 7;
   readonly attribute optional AudioCapabilitiesStruct speakerCapabilities = 8;
   readonly attribute optional TwoWayTalkSupportTypeEnum twoWayTalkSupport = 9;
-  readonly attribute optional SnapshotParamsStruct supportedSnapshotParams[] = 10;
+  readonly attribute optional SnapshotCapabilitiesStruct snapshotCapabilities[] = 10;
   readonly attribute int32u maxNetworkBandwidth = 11;
   readonly attribute optional int16u currentFrameRate = 12;
   attribute access(read: manage, write: manage) optional boolean HDRModeEnabled = 13;
@@ -2382,12 +2386,11 @@ provisional cluster CameraAvStreamManagement = 1361 {
   request struct SnapshotStreamAllocateRequest {
     ImageCodecEnum imageCodec = 0;
     int16u maxFrameRate = 1;
-    int32u bitRate = 2;
-    VideoResolutionStruct minResolution = 3;
-    VideoResolutionStruct maxResolution = 4;
-    int8u quality = 5;
-    optional boolean watermarkEnabled = 6;
-    optional boolean OSDEnabled = 7;
+    VideoResolutionStruct minResolution = 2;
+    VideoResolutionStruct maxResolution = 3;
+    int8u quality = 4;
+    optional boolean watermarkEnabled = 5;
+    optional boolean OSDEnabled = 6;
   }
 
   response struct SnapshotStreamAllocateResponse = 8 {
@@ -2409,7 +2412,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
   }
 
   request struct CaptureSnapshotRequest {
-    int16u snapshotStreamID = 0;
+    nullable int16u snapshotStreamID = 0;
     VideoResolutionStruct requestedResolution = 1;
   }
 
@@ -2832,6 +2835,7 @@ endpoint 0 {
     callback attribute capabilityMinima;
     callback attribute specificationVersion;
     callback attribute maxPathsPerInvoke;
+    callback attribute configurationVersion default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -3211,7 +3215,7 @@ endpoint 1 {
   }
 
   server cluster CameraAvStreamManagement {
-    callback attribute maxConcurrentVideoEncoders;
+    callback attribute maxConcurrentEncoders;
     callback attribute maxEncodedPixelRate;
     callback attribute videoSensorParams;
     callback attribute nightVisionCapable;
@@ -3219,7 +3223,7 @@ endpoint 1 {
     callback attribute rateDistortionTradeOffPoints;
     callback attribute maxContentBufferSize;
     callback attribute microphoneCapabilities;
-    callback attribute supportedSnapshotParams;
+    callback attribute snapshotCapabilities;
     callback attribute maxNetworkBandwidth;
     callback attribute currentFrameRate;
     callback attribute HDRModeEnabled;

@@ -37,6 +37,7 @@ jobs:
         name: Linux
 
         env:
+            PW_PROJECT_ROOT: ${{ github.workspace }}
             TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
 
         if: github.actor != 'restyled-io[bot]'

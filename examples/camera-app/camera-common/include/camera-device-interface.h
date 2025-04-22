@@ -143,8 +143,8 @@ public:
         virtual std::vector<SnapshotStream> & GetAvailableSnapshotStreams() = 0;
 
         // Capture a snapshot image
-        virtual CameraError CaptureSnapshot(uint16_t streamID, const VideoResolutionStruct & resolution,
-                                            ImageSnapshot & outImageSnapshot) = 0;
+        virtual CameraError CaptureSnapshot(const chip::app::DataModel::Nullable<uint16_t> streamID,
+                                            const VideoResolutionStruct & resolution, ImageSnapshot & outImageSnapshot) = 0;
         // Start video stream
         virtual CameraError StartVideoStream(uint16_t streamID) = 0;
 

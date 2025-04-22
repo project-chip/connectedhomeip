@@ -15,7 +15,8 @@
 import os
 from typing import Union
 
-from matter.idl.generators import CodeGenerator, GeneratorStorage
+from matter.idl.generators import CodeGenerator
+from matter.idl.generators.storage import GeneratorStorage
 from matter.idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute, AttributeQuality, AttributeStorage, Command,
                                          CommandQuality, Event, EventPriority, EventQuality, FieldQuality, Idl, StructQuality,
                                          StructTag)

@@ -35,6 +35,7 @@ jobs:
          run: |
            python3 -m venv venv
            venv/bin/pip3 install click coloredlogs lark
+           venv/bin/pip3 install -e scripts/py_matter_idl
        - name: Create old/new copies
          run: |
            mkdir -p out

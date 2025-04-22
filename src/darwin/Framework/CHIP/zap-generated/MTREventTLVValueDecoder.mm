@@ -3648,6 +3648,95 @@ static id _Nullable DecodeEventPayloadForDeviceEnergyManagementModeCluster(Event
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForElectricalGridConditionsCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::ElectricalGridConditions;
+    switch (aEventId) {
+    case Events::CurrentConditionsChanged::Id: {
+        Events::CurrentConditionsChanged::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRElectricalGridConditionsClusterCurrentConditionsChangedEvent new];
+
+        do {
+            MTRElectricalGridConditionsClusterElectricalGridConditionsStruct * _Nullable memberValue;
+            if (cppValue.currentConditions.IsNull()) {
+                memberValue = nil;
+            } else {
+                memberValue = [MTRElectricalGridConditionsClusterElectricalGridConditionsStruct new];
+                memberValue.periodStart = [NSNumber numberWithUnsignedInt:cppValue.currentConditions.Value().periodStart];
+                if (cppValue.currentConditions.Value().periodEnd.IsNull()) {
+                    memberValue.periodEnd = nil;
+                } else {
+                    memberValue.periodEnd = [NSNumber numberWithUnsignedInt:cppValue.currentConditions.Value().periodEnd.Value()];
+                }
+                memberValue.gridCarbonIntensity = [NSNumber numberWithShort:cppValue.currentConditions.Value().gridCarbonIntensity];
+                memberValue.gridCarbonLevel = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.currentConditions.Value().gridCarbonLevel)];
+                memberValue.localCarbonIntensity = [NSNumber numberWithShort:cppValue.currentConditions.Value().localCarbonIntensity];
+                memberValue.localCarbonLevel = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.currentConditions.Value().localCarbonLevel)];
+            }
+            value.currentConditions = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::ForecastConditionsChanged::Id: {
+        Events::ForecastConditionsChanged::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRElectricalGridConditionsClusterForecastConditionsChangedEvent new];
+
+        do {
+            NSArray * _Nullable memberValue;
+            if (cppValue.forecastConditions.IsNull()) {
+                memberValue = nil;
+            } else {
+                { // Scope for our temporary variables
+                    auto * array_1 = [NSMutableArray new];
+                    auto iter_1 = cppValue.forecastConditions.Value().begin();
+                    while (iter_1.Next()) {
+                        auto & entry_1 = iter_1.GetValue();
+                        MTRElectricalGridConditionsClusterElectricalGridConditionsStruct * newElement_1;
+                        newElement_1 = [MTRElectricalGridConditionsClusterElectricalGridConditionsStruct new];
+                        newElement_1.periodStart = [NSNumber numberWithUnsignedInt:entry_1.periodStart];
+                        if (entry_1.periodEnd.IsNull()) {
+                            newElement_1.periodEnd = nil;
+                        } else {
+                            newElement_1.periodEnd = [NSNumber numberWithUnsignedInt:entry_1.periodEnd.Value()];
+                        }
+                        newElement_1.gridCarbonIntensity = [NSNumber numberWithShort:entry_1.gridCarbonIntensity];
+                        newElement_1.gridCarbonLevel = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.gridCarbonLevel)];
+                        newElement_1.localCarbonIntensity = [NSNumber numberWithShort:entry_1.localCarbonIntensity];
+                        newElement_1.localCarbonLevel = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.localCarbonLevel)];
+                        [array_1 addObject:newElement_1];
+                    }
+                    CHIP_ERROR err = iter_1.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
+                    }
+                    memberValue = array_1;
+                }
+            }
+            value.forecastConditions = memberValue;
+        } while (0);
+
+        return value;
+    }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForDoorLockCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::DoorLock;
@@ -3936,6 +4025,83 @@ static id _Nullable DecodeEventPayloadForClosureControlCluster(EventId aEventId,
 {
     using namespace Clusters::ClosureControl;
     switch (aEventId) {
+    case Events::OperationalError::Id: {
+        Events::OperationalError::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRClosureControlClusterOperationalErrorEvent new];
+
+        do {
+            NSArray * _Nonnull memberValue;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.errorState.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
+                    [array_0 addObject:newElement_0];
+                }
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                memberValue = array_0;
+            }
+            value.errorState = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::MovementCompleted::Id: {
+        Events::MovementCompleted::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRClosureControlClusterMovementCompletedEvent new];
+
+        return value;
+    }
+    case Events::EngageStateChanged::Id: {
+        Events::EngageStateChanged::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRClosureControlClusterEngageStateChangedEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithBool:cppValue.engageValue];
+            value.engageValue = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::SecureStateChanged::Id: {
+        Events::SecureStateChanged::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRClosureControlClusterSecureStateChangedEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithBool:cppValue.secureValue];
+            value.secureValue = memberValue;
+        } while (0);
+
+        return value;
+    }
     default: {
         break;
     }
@@ -5539,6 +5705,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::DeviceEnergyManagementMode::Id: {
         return DecodeEventPayloadForDeviceEnergyManagementModeCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::ElectricalGridConditions::Id: {
+        return DecodeEventPayloadForElectricalGridConditionsCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::DoorLock::Id: {
         return DecodeEventPayloadForDoorLockCluster(aPath.mEventId, aReader, aError);

@@ -72,7 +72,7 @@ target_sources(app
 
 if(CONFIG_CHIP_CUSTOM_BLE_ADV_DATA)
     target_sources(app PRIVATE
-                    ${THERMOSTAT_NXP_COMMON_DIR}/main/BleZephyrManagerApp.cpp
+                    ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_ble/source/BleZephyrManagerApp.cpp
     )
 else()
     target_sources(app PRIVATE

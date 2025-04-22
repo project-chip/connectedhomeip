@@ -104,6 +104,10 @@ namespace MaxPathsPerInvoke {
 inline constexpr AttributeId Id = 0x00000016;
 } // namespace MaxPathsPerInvoke
 
+namespace ConfigurationVersion {
+inline constexpr AttributeId Id = 0x00000018;
+} // namespace ConfigurationVersion
+
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList

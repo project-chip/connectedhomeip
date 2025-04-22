@@ -19,14 +19,14 @@ namespace CameraAvStreamManagement {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-namespace MaxConcurrentVideoEncoders {
+namespace MaxConcurrentEncoders {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MaxConcurrentVideoEncoders::Id,
+    .attributeId    = MaxConcurrentEncoders::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-} // namespace MaxConcurrentVideoEncoders
+} // namespace MaxConcurrentEncoders
 namespace MaxEncodedPixelRate {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = MaxEncodedPixelRate::Id,
@@ -99,14 +99,14 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .writePrivilege = std::nullopt,
 };
 } // namespace TwoWayTalkSupport
-namespace SupportedSnapshotParams {
+namespace SnapshotCapabilities {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = SupportedSnapshotParams::Id,
+    .attributeId    = SnapshotCapabilities::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-} // namespace SupportedSnapshotParams
+} // namespace SnapshotCapabilities
 namespace MaxNetworkBandwidth {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = MaxNetworkBandwidth::Id,
