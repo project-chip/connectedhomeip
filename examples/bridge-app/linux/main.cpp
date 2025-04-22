@@ -262,8 +262,7 @@ DataVersion gComposedTempSensor2DataVersions[MATTER_ARRAY_SIZE(bridgedTempSensor
 
 #ifndef CONFIG_USE_ENDPOINT_UNIQUE_ID
 int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const EmberAfDeviceType> & deviceTypeList,
-                      const Span<DataVersion> & dataVersionStorage,
-                      chip::EndpointId parentEndpointId = chip::kInvalidEndpointId)
+                      const Span<DataVersion> & dataVersionStorage, chip::EndpointId parentEndpointId = chip::kInvalidEndpointId)
 #else
 
 int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const EmberAfDeviceType> & deviceTypeList,
@@ -285,8 +284,8 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const E
                 dev->SetEndpointId(gCurrentEndpointId);
                 dev->SetParentEndpointId(parentEndpointId);
 #ifndef CONFIG_USE_ENDPOINT_UNIQUE_ID
-                err = emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, dataVersionStorage, deviceTypeList,
-                                                parentEndpointId);
+                err =
+                    emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, dataVersionStorage, deviceTypeList, parentEndpointId);
 #else
                 err = emberAfSetDynamicEndpointWithEpUniqueId(index, gCurrentEndpointId, ep, dataVersionStorage, deviceTypeList,
                                                               epUniqueId, parentEndpointId);
@@ -995,12 +994,10 @@ void ApplicationInit()
                       Span<DataVersion>(gComposedDeviceDataVersions), 1);
     AddDeviceEndpoint(&ComposedTempSensor1, &bridgedTempSensorEndpoint,
                       Span<const EmberAfDeviceType>(gComposedTempSensorDeviceTypes),
-                      Span<DataVersion>(gComposedTempSensor1DataVersions),
-                      gComposedDevice.GetEndpointId());
+                      Span<DataVersion>(gComposedTempSensor1DataVersions), gComposedDevice.GetEndpointId());
     AddDeviceEndpoint(&ComposedTempSensor2, &bridgedTempSensorEndpoint,
                       Span<const EmberAfDeviceType>(gComposedTempSensorDeviceTypes),
-                      Span<DataVersion>(gComposedTempSensor2DataVersions),
-                      gComposedDevice.GetEndpointId());
+                      Span<DataVersion>(gComposedTempSensor2DataVersions), gComposedDevice.GetEndpointId());
 
     // Add 4 lights for the Action Clusters tests
     AddDeviceEndpoint(&ActionLight1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
