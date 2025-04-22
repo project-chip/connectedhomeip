@@ -93,19 +93,19 @@ def operation_allowed(spec_requires: Clusters.AccessControl.Enums.AccessControlE
 def checkable_attributes(cluster_id, cluster, xml_cluster) -> list[uint]:
     all_attrs = cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID]
 
-    def known_cluster_attribute(attribute_id) -> bool:
+    def is_known_cluster_attribute(attribute_id) -> bool:
         ''' Returns true if this is a non-manufacturer specific attribute that has information in the XML and has python codegen data'''
         return is_standard_attribute_id(attribute_id) and attribute_id in xml_cluster.attributes and attribute_id in Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]
-    return [x for x in all_attrs if known_cluster_attribute(x)]
+    return [attr_id for attr_id in all_attrs if is_known_cluster_attribute(attr_id)]
 
 
 def checkable_commands(cluster_id, cluster, xml_cluster) -> list[uint]:
     all_cmds = cluster[GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID]
 
-    def known_cluster_cmds(command_id) -> bool:
+    def is_known_cluster_cmd(command_id) -> bool:
         ''' Returns true if this is a non-manufacturer specific command that has information in the XML and has python codegen data'''
         return is_standard_command_id(command_id) and command_id in xml_cluster.accepted_commands and command_id in Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id]
-    return [x for x in all_cmds if known_cluster_cmds(x)]
+    return [cmd_id for cmd_id in all_cmds if is_known_cluster_cmd(cmd_id)]
 
 
 class AccessChecker(MatterBaseTest, BasicCompositionTests):
@@ -118,7 +118,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
         self.build_spec_xmls()
 
         acl_attr = Clusters.AccessControl.Attributes.Acl
-        self.default_acl = await self.read_single_attribute_check_success(cluster=Clusters.AccessControl, attribute=acl_attr)
+        self.default_acl = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.AccessControl, attribute=acl_attr)
         self._record_errors()
         # We need to run this test from two controllers so we can test access to the ACL cluster while retaining access to the ACL cluster
         fabric_admin = self.certificate_authority_manager.activeCaList[0].adminList[0]
@@ -232,6 +232,8 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             try:
                 timed = None
                 if command.must_use_timed_invoke:
+                    # This command requires a timedRequest. Setting the timed value to largest value (unsigned int).
+                    # We're sending the command right away, so this value doesn't matter, but we do need to set a value here to trigger the timed request message.
                     timed = 65535
                 await self.send_single_cmd(cmd=command(), dev_ctrl=self.TH2, endpoint=endpoint_id, timedRequestTimeoutMs=timed)
                 # If this was successful, that's an error
