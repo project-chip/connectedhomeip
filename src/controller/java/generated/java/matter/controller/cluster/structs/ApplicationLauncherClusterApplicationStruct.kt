@@ -16,7 +16,9 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -24,7 +26,7 @@ import matter.tlv.TlvWriter
 
 class ApplicationLauncherClusterApplicationStruct(
   val catalogVendorID: UShort,
-  val applicationID: String,
+  val applicationID: String
 ) {
   override fun toString(): String = buildString {
     append("ApplicationLauncherClusterApplicationStruct {\n")
@@ -50,7 +52,7 @@ class ApplicationLauncherClusterApplicationStruct(
       tlvReader.enterStructure(tlvTag)
       val catalogVendorID = tlvReader.getUShort(ContextSpecificTag(TAG_CATALOG_VENDOR_ID))
       val applicationID = tlvReader.getString(ContextSpecificTag(TAG_APPLICATION_ID))
-
+      
       tlvReader.exitContainer()
 
       return ApplicationLauncherClusterApplicationStruct(catalogVendorID, applicationID)

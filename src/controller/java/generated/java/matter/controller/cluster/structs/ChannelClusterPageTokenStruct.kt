@@ -18,6 +18,7 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -26,7 +27,7 @@ import matter.tlv.TlvWriter
 class ChannelClusterPageTokenStruct(
   val limit: Optional<UShort>,
   val after: Optional<String>,
-  val before: Optional<String>,
+  val before: Optional<String>
 ) {
   override fun toString(): String = buildString {
     append("ChannelClusterPageTokenStruct {\n")
@@ -62,25 +63,22 @@ class ChannelClusterPageTokenStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ChannelClusterPageTokenStruct {
       tlvReader.enterStructure(tlvTag)
-      val limit =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_LIMIT))) {
-          Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_LIMIT)))
-        } else {
-          Optional.empty()
-        }
-      val after =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_AFTER))) {
-          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_AFTER)))
-        } else {
-          Optional.empty()
-        }
-      val before =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_BEFORE))) {
-          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_BEFORE)))
-        } else {
-          Optional.empty()
-        }
-
+      val limit = if (tlvReader.isNextTag(ContextSpecificTag(TAG_LIMIT))) {
+      Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_LIMIT)))
+    } else {
+      Optional.empty()
+    }
+      val after = if (tlvReader.isNextTag(ContextSpecificTag(TAG_AFTER))) {
+      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_AFTER)))
+    } else {
+      Optional.empty()
+    }
+      val before = if (tlvReader.isNextTag(ContextSpecificTag(TAG_BEFORE))) {
+      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_BEFORE)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
       return ChannelClusterPageTokenStruct(limit, after, before)

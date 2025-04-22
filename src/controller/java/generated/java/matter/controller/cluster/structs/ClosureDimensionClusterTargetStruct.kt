@@ -18,6 +18,7 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -26,7 +27,7 @@ import matter.tlv.TlvWriter
 class ClosureDimensionClusterTargetStruct(
   val position: Optional<UShort>,
   val latch: Optional<Boolean>,
-  val speed: Optional<UByte>,
+  val speed: Optional<UByte>
 ) {
   override fun toString(): String = buildString {
     append("ClosureDimensionClusterTargetStruct {\n")
@@ -62,25 +63,22 @@ class ClosureDimensionClusterTargetStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ClosureDimensionClusterTargetStruct {
       tlvReader.enterStructure(tlvTag)
-      val position =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_POSITION))) {
-          Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_POSITION)))
-        } else {
-          Optional.empty()
-        }
-      val latch =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_LATCH))) {
-          Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_LATCH)))
-        } else {
-          Optional.empty()
-        }
-      val speed =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_SPEED))) {
-          Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_SPEED)))
-        } else {
-          Optional.empty()
-        }
-
+      val position = if (tlvReader.isNextTag(ContextSpecificTag(TAG_POSITION))) {
+      Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_POSITION)))
+    } else {
+      Optional.empty()
+    }
+      val latch = if (tlvReader.isNextTag(ContextSpecificTag(TAG_LATCH))) {
+      Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_LATCH)))
+    } else {
+      Optional.empty()
+    }
+      val speed = if (tlvReader.isNextTag(ContextSpecificTag(TAG_SPEED))) {
+      Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_SPEED)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
       return ClosureDimensionClusterTargetStruct(position, latch, speed)

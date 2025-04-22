@@ -16,6 +16,7 @@
  */
 package matter.controller.cluster.eventstructs
 
+import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -23,7 +24,10 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ZoneManagementClusterZoneTriggeredEvent(val zones: List<UShort>, val reason: UByte) {
+class ZoneManagementClusterZoneTriggeredEvent(
+  val zones: List<UShort>,
+  val reason: UByte
+) {
   override fun toString(): String = buildString {
     append("ZoneManagementClusterZoneTriggeredEvent {\n")
     append("\tzones : $zones\n")
@@ -48,18 +52,17 @@ class ZoneManagementClusterZoneTriggeredEvent(val zones: List<UShort>, val reaso
     private const val TAG_ZONES = 0
     private const val TAG_REASON = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ZoneManagementClusterZoneTriggeredEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ZoneManagementClusterZoneTriggeredEvent {
       tlvReader.enterStructure(tlvTag)
-      val zones =
-        buildList<UShort> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_ZONES))
-          while (!tlvReader.isEndOfContainer()) {
-            this.add(tlvReader.getUShort(AnonymousTag))
-          }
-          tlvReader.exitContainer()
+      val zones = buildList <UShort> {
+        tlvReader.enterArray(ContextSpecificTag(TAG_ZONES))
+        while(!tlvReader.isEndOfContainer()) {
+          this.add(tlvReader.getUShort(AnonymousTag))
         }
+        tlvReader.exitContainer()
+      }
       val reason = tlvReader.getUByte(ContextSpecificTag(TAG_REASON))
-
+      
       tlvReader.exitContainer()
 
       return ZoneManagementClusterZoneTriggeredEvent(zones, reason)

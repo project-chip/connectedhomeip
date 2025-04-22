@@ -16,13 +16,18 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class MediaPlaybackClusterPlaybackPositionStruct(val updatedAt: ULong, val position: ULong?) {
+class MediaPlaybackClusterPlaybackPositionStruct(
+  val updatedAt: ULong,
+  val position: ULong?
+) {
   override fun toString(): String = buildString {
     append("MediaPlaybackClusterPlaybackPositionStruct {\n")
     append("\tupdatedAt : $updatedAt\n")
@@ -50,14 +55,13 @@ class MediaPlaybackClusterPlaybackPositionStruct(val updatedAt: ULong, val posit
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): MediaPlaybackClusterPlaybackPositionStruct {
       tlvReader.enterStructure(tlvTag)
       val updatedAt = tlvReader.getULong(ContextSpecificTag(TAG_UPDATED_AT))
-      val position =
-        if (!tlvReader.isNull()) {
-          tlvReader.getULong(ContextSpecificTag(TAG_POSITION))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_POSITION))
-          null
-        }
-
+      val position = if (!tlvReader.isNull()) {
+      tlvReader.getULong(ContextSpecificTag(TAG_POSITION))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_POSITION))
+      null
+    }
+      
       tlvReader.exitContainer()
 
       return MediaPlaybackClusterPlaybackPositionStruct(updatedAt, position)

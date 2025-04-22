@@ -17,18 +17,20 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ClosureDimensionClusterCurrentStateStruct(
-  val position: Optional<UInt>,
-  val latch: Optional<Boolean>,
-  val speed: Optional<UInt>,
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ClosureDimensionClusterCurrentStateStruct (
+    val position: Optional<UInt>,
+    val latch: Optional<Boolean>,
+    val speed: Optional<UInt>) {
+  override fun toString(): String  = buildString {
     append("ClosureDimensionClusterCurrentStateStruct {\n")
     append("\tposition : $position\n")
     append("\tlatch : $latch\n")
@@ -40,17 +42,17 @@ class ClosureDimensionClusterCurrentStateStruct(
     tlvWriter.apply {
       startStructure(tlvTag)
       if (position.isPresent) {
-        val optposition = position.get()
-        put(ContextSpecificTag(TAG_POSITION), optposition)
-      }
+      val optposition = position.get()
+      put(ContextSpecificTag(TAG_POSITION), optposition)
+    }
       if (latch.isPresent) {
-        val optlatch = latch.get()
-        put(ContextSpecificTag(TAG_LATCH), optlatch)
-      }
+      val optlatch = latch.get()
+      put(ContextSpecificTag(TAG_LATCH), optlatch)
+    }
       if (speed.isPresent) {
-        val optspeed = speed.get()
-        put(ContextSpecificTag(TAG_SPEED), optspeed)
-      }
+      val optspeed = speed.get()
+      put(ContextSpecificTag(TAG_SPEED), optspeed)
+    }
       endStructure()
     }
   }
@@ -60,27 +62,24 @@ class ClosureDimensionClusterCurrentStateStruct(
     private const val TAG_LATCH = 1
     private const val TAG_SPEED = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ClosureDimensionClusterCurrentStateStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ClosureDimensionClusterCurrentStateStruct {
       tlvReader.enterStructure(tlvTag)
-      val position =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_POSITION))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_POSITION)))
-        } else {
-          Optional.empty()
-        }
-      val latch =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_LATCH))) {
-          Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_LATCH)))
-        } else {
-          Optional.empty()
-        }
-      val speed =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_SPEED))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_SPEED)))
-        } else {
-          Optional.empty()
-        }
-
+      val position = if (tlvReader.isNextTag(ContextSpecificTag(TAG_POSITION))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_POSITION)))
+    } else {
+      Optional.empty()
+    }
+      val latch = if (tlvReader.isNextTag(ContextSpecificTag(TAG_LATCH))) {
+      Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_LATCH)))
+    } else {
+      Optional.empty()
+    }
+      val speed = if (tlvReader.isNextTag(ContextSpecificTag(TAG_SPEED))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_SPEED)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
       return ClosureDimensionClusterCurrentStateStruct(position, latch, speed)

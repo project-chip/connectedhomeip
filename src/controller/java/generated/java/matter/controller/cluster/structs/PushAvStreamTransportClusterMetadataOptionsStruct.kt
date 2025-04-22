@@ -16,7 +16,9 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -25,7 +27,7 @@ import matter.tlv.TlvWriter
 class PushAvStreamTransportClusterMetadataOptionsStruct(
   val multiplexing: UByte,
   val includeMotionZones: Boolean,
-  val enableMetadataPrivacySensitive: Boolean,
+  val enableMetadataPrivacySensitive: Boolean
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterMetadataOptionsStruct {\n")
@@ -50,23 +52,15 @@ class PushAvStreamTransportClusterMetadataOptionsStruct(
     private const val TAG_INCLUDE_MOTION_ZONES = 1
     private const val TAG_ENABLE_METADATA_PRIVACY_SENSITIVE = 2
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): PushAvStreamTransportClusterMetadataOptionsStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): PushAvStreamTransportClusterMetadataOptionsStruct {
       tlvReader.enterStructure(tlvTag)
       val multiplexing = tlvReader.getUByte(ContextSpecificTag(TAG_MULTIPLEXING))
       val includeMotionZones = tlvReader.getBoolean(ContextSpecificTag(TAG_INCLUDE_MOTION_ZONES))
-      val enableMetadataPrivacySensitive =
-        tlvReader.getBoolean(ContextSpecificTag(TAG_ENABLE_METADATA_PRIVACY_SENSITIVE))
-
+      val enableMetadataPrivacySensitive = tlvReader.getBoolean(ContextSpecificTag(TAG_ENABLE_METADATA_PRIVACY_SENSITIVE))
+      
       tlvReader.exitContainer()
 
-      return PushAvStreamTransportClusterMetadataOptionsStruct(
-        multiplexing,
-        includeMotionZones,
-        enableMetadataPrivacySensitive,
-      )
+      return PushAvStreamTransportClusterMetadataOptionsStruct(multiplexing, includeMotionZones, enableMetadataPrivacySensitive)
     }
   }
 }

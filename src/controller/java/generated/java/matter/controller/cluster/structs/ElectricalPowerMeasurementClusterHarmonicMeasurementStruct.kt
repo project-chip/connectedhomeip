@@ -16,7 +16,9 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -24,7 +26,7 @@ import matter.tlv.TlvWriter
 
 class ElectricalPowerMeasurementClusterHarmonicMeasurementStruct(
   val order: UByte,
-  val measurement: Long?,
+  val measurement: Long?
 ) {
   override fun toString(): String = buildString {
     append("ElectricalPowerMeasurementClusterHarmonicMeasurementStruct {\n")
@@ -50,20 +52,16 @@ class ElectricalPowerMeasurementClusterHarmonicMeasurementStruct(
     private const val TAG_ORDER = 0
     private const val TAG_MEASUREMENT = 1
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): ElectricalPowerMeasurementClusterHarmonicMeasurementStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ElectricalPowerMeasurementClusterHarmonicMeasurementStruct {
       tlvReader.enterStructure(tlvTag)
       val order = tlvReader.getUByte(ContextSpecificTag(TAG_ORDER))
-      val measurement =
-        if (!tlvReader.isNull()) {
-          tlvReader.getLong(ContextSpecificTag(TAG_MEASUREMENT))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_MEASUREMENT))
-          null
-        }
-
+      val measurement = if (!tlvReader.isNull()) {
+      tlvReader.getLong(ContextSpecificTag(TAG_MEASUREMENT))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_MEASUREMENT))
+      null
+    }
+      
       tlvReader.exitContainer()
 
       return ElectricalPowerMeasurementClusterHarmonicMeasurementStruct(order, measurement)

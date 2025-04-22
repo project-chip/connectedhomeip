@@ -16,13 +16,17 @@
  */
 package matter.controller.cluster.eventstructs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class OccupancySensingClusterOccupancyChangedEvent(val occupancy: UByte) {
+class OccupancySensingClusterOccupancyChangedEvent(
+  val occupancy: UByte
+) {
   override fun toString(): String = buildString {
     append("OccupancySensingClusterOccupancyChangedEvent {\n")
     append("\toccupancy : $occupancy\n")
@@ -40,10 +44,10 @@ class OccupancySensingClusterOccupancyChangedEvent(val occupancy: UByte) {
   companion object {
     private const val TAG_OCCUPANCY = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): OccupancySensingClusterOccupancyChangedEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : OccupancySensingClusterOccupancyChangedEvent {
       tlvReader.enterStructure(tlvTag)
       val occupancy = tlvReader.getUByte(ContextSpecificTag(TAG_OCCUPANCY))
-
+      
       tlvReader.exitContainer()
 
       return OccupancySensingClusterOccupancyChangedEvent(occupancy)

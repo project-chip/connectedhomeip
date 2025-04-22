@@ -16,13 +16,18 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class CameraAvStreamManagementClusterVideoResolutionStruct(val width: UShort, val height: UShort) {
+class CameraAvStreamManagementClusterVideoResolutionStruct(
+  val width: UShort,
+  val height: UShort
+) {
   override fun toString(): String = buildString {
     append("CameraAvStreamManagementClusterVideoResolutionStruct {\n")
     append("\twidth : $width\n")
@@ -43,14 +48,11 @@ class CameraAvStreamManagementClusterVideoResolutionStruct(val width: UShort, va
     private const val TAG_WIDTH = 0
     private const val TAG_HEIGHT = 1
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): CameraAvStreamManagementClusterVideoResolutionStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): CameraAvStreamManagementClusterVideoResolutionStruct {
       tlvReader.enterStructure(tlvTag)
       val width = tlvReader.getUShort(ContextSpecificTag(TAG_WIDTH))
       val height = tlvReader.getUShort(ContextSpecificTag(TAG_HEIGHT))
-
+      
       tlvReader.exitContainer()
 
       return CameraAvStreamManagementClusterVideoResolutionStruct(width, height)

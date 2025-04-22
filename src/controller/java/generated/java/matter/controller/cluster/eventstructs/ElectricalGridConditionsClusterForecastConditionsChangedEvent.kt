@@ -16,6 +16,7 @@
  */
 package matter.controller.cluster.eventstructs
 
+import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -24,10 +25,7 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class ElectricalGridConditionsClusterForecastConditionsChangedEvent(
-  val forecastConditions:
-    List<
-      matter.controller.cluster.structs.ElectricalGridConditionsClusterElectricalGridConditionsStruct
-    >?
+  val forecastConditions: List<matter.controller.cluster.structs.ElectricalGridConditionsClusterElectricalGridConditionsStruct>?
 ) {
   override fun toString(): String = buildString {
     append("ElectricalGridConditionsClusterForecastConditionsChangedEvent {\n")
@@ -40,10 +38,10 @@ class ElectricalGridConditionsClusterForecastConditionsChangedEvent(
       startStructure(tlvTag)
       if (forecastConditions != null) {
         startArray(ContextSpecificTag(TAG_FORECAST_CONDITIONS))
-        for (item in forecastConditions.iterator()) {
-          item.toTlv(AnonymousTag, this)
-        }
-        endArray()
+      for (item in forecastConditions.iterator()) {
+        item.toTlv(AnonymousTag, this)
+      }
+      endArray()
       } else {
         putNull(ContextSpecificTag(TAG_FORECAST_CONDITIONS))
       }
@@ -54,31 +52,21 @@ class ElectricalGridConditionsClusterForecastConditionsChangedEvent(
   companion object {
     private const val TAG_FORECAST_CONDITIONS = 0
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): ElectricalGridConditionsClusterForecastConditionsChangedEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ElectricalGridConditionsClusterForecastConditionsChangedEvent {
       tlvReader.enterStructure(tlvTag)
-      val forecastConditions =
-        if (!tlvReader.isNull()) {
-          buildList<
-            matter.controller.cluster.structs.ElectricalGridConditionsClusterElectricalGridConditionsStruct
-          > {
-            tlvReader.enterArray(ContextSpecificTag(TAG_FORECAST_CONDITIONS))
-            while (!tlvReader.isEndOfContainer()) {
-              this.add(
-                matter.controller.cluster.structs
-                  .ElectricalGridConditionsClusterElectricalGridConditionsStruct
-                  .fromTlv(AnonymousTag, tlvReader)
-              )
-            }
-            tlvReader.exitContainer()
-          }
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_FORECAST_CONDITIONS))
-          null
+      val forecastConditions = if (!tlvReader.isNull()) {
+        buildList <matter.controller.cluster.structs.ElectricalGridConditionsClusterElectricalGridConditionsStruct> {
+        tlvReader.enterArray(ContextSpecificTag(TAG_FORECAST_CONDITIONS))
+        while(!tlvReader.isEndOfContainer()) {
+          this.add(matter.controller.cluster.structs.ElectricalGridConditionsClusterElectricalGridConditionsStruct.fromTlv(AnonymousTag, tlvReader))
         }
-
+        tlvReader.exitContainer()
+      }
+      } else {
+        tlvReader.getNull(ContextSpecificTag(TAG_FORECAST_CONDITIONS))
+        null
+      }
+      
       tlvReader.exitContainer()
 
       return ElectricalGridConditionsClusterForecastConditionsChangedEvent(forecastConditions)
