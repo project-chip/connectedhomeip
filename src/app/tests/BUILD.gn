@@ -178,6 +178,27 @@ source_set("ecosystem-information-test-srcs") {
   ]
 }
 
+source_set("closure-dimension-test-srcs") {
+  sources = [
+    "${chip_root}/src/app/cluster-building-blocks/QuieterReporting.h",
+    "${chip_root}/src/app/clusters/closure-dimension-server/closure-dimension-cluster-logic.cpp",
+    "${chip_root}/src/app/clusters/closure-dimension-server/closure-dimension-cluster-logic.h",
+    "${chip_root}/src/app/clusters/closure-dimension-server/closure-dimension-cluster-objects.h",
+    "${chip_root}/src/app/clusters/closure-dimension-server/closure-dimension-delegate.h",
+    "${chip_root}/src/app/clusters/closure-dimension-server/closure-dimension-matter-context.cpp",
+    "${chip_root}/src/app/clusters/closure-dimension-server/closure-dimension-matter-context.h",
+    "${chip_root}/src/app/clusters/closure-dimension-server/closure-dimension-server.cpp",
+    "${chip_root}/src/app/clusters/closure-dimension-server/closure-dimension-server.h",
+  ]
+  public_deps = [
+    "${chip_root}/src/app:interaction-model",
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
+  ]
+}
+
 source_set("app-test-stubs") {
   sources = [
     "test-ember-api.cpp",
@@ -236,6 +257,7 @@ chip_test_suite("tests") {
     "TestClosureControlClusterLogic.cpp",
     "TestClosureControlClusterObjects.cpp",
     "TestClosureControlConformance.cpp",
+    "TestClosureDimensionCluster.cpp",
     "TestCommandHandlerInterfaceRegistry.cpp",
     "TestCommandInteraction.cpp",
     "TestCommandPathParams.cpp",
@@ -275,6 +297,7 @@ chip_test_suite("tests") {
     ":app-test-stubs",
     ":binding-test-srcs",
     ":closure-control-test-srcs",
+    ":closure-dimension-test-srcs",
     ":ecosystem-information-test-srcs",
     ":operational-state-test-srcs",
     ":ota-requestor-test-srcs",

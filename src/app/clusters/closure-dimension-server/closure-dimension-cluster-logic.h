@@ -96,6 +96,22 @@ struct ClusterConformance
                 ChipLogError(AppServer, 
                             "Validation failed: If Positioning is available then atleast one of Translation, Rotation or Modulation should be enabled"));
         }
+        
+         // If Overflow Attribute is supported, atleast one of  Rotation or MotionLatching should be supported.
+         if (mOptionalAttributes.Has(OptionalAttributeEnum::kOverflow))
+         {
+             VerifyOrReturnValue(HasFeature(Feature::kRotation) || HasFeature(Feature::kMotionLatching), false,
+                 ChipLogError(AppServer, 
+                             "Validation failed: If Overflow Attribute is Supported, atleast one of  Rotation or MotionLatching  should be supported."));
+         }
+         
+         // If Rotation  feature is supported, then Overflow Attribute should be supported.
+        if (HasFeature(Feature::kRotation))
+        {
+            VerifyOrReturnValue(mOptionalAttributes.Has(OptionalAttributeEnum::kOverflow), false,
+                ChipLogError(AppServer, 
+                            "Validation failed: If Rotation  feature is supported, then Overflow Attribute should be supported."));
+        }
 
         return true;
     }
@@ -107,11 +123,12 @@ private:
 
 /**
  * @brief Struct to store the cluster Initilization parameters
- */struct ClusterInitParameters
+ */
+struct ClusterInitParameters
 {
-    TranslationDirectionEnum translationDirection;
-    RotationAxisEnum rotationAxis;
-    ModulationTypeEnum modulationType;
+    TranslationDirectionEnum translationDirection = TranslationDirectionEnum::kUnknownEnumValue;
+    RotationAxisEnum rotationAxis = RotationAxisEnum::kUnknownEnumValue;
+    ModulationTypeEnum modulationType = ModulationTypeEnum::kUnknownEnumValue;
 };
 
 /**
@@ -121,15 +138,15 @@ struct ClusterState
 {
     DataModel::Nullable<GenericCurrentStateStruct> currentState{ DataModel::NullNullable };
     DataModel::Nullable<GenericTargetStruct> target{ DataModel::NullNullable };
-    Percent100ths resolution;
-    Percent100ths stepValue;
-    ClosureUnitEnum unit;
+    Percent100ths resolution = 1;
+    Percent100ths stepValue = 1;
+    ClosureUnitEnum unit = ClosureUnitEnum::kUnknownEnumValue;
     DataModel::Nullable<Structs::UnitRangeStruct::Type> unitRange = DataModel::Nullable<Structs::UnitRangeStruct::Type>();
     Structs::RangePercent100thsStruct::Type limitRange{};
-    TranslationDirectionEnum translationDirection;
-    RotationAxisEnum rotationAxis;
-    OverflowEnum overflow;
-    ModulationTypeEnum modulationType;
+    TranslationDirectionEnum translationDirection = TranslationDirectionEnum::kUnknownEnumValue;
+    RotationAxisEnum rotationAxis = RotationAxisEnum::kUnknownEnumValue;
+    OverflowEnum overflow = OverflowEnum::kUnknownEnumValue;
+    ModulationTypeEnum modulationType = ModulationTypeEnum::kUnknownEnumValue;
 };
 
 class ClusterLogic
@@ -145,6 +162,12 @@ public:
 
     const ClusterState & GetState() { return mState; }
     const ClusterConformance & GetConformance() { return mConformance; }
+    
+    // TODO: Remove this only for Test 
+    void ResetStateToDefault() {
+        mState = ClusterState(); // This will reset mState to its default values
+    }
+    
 
     /**
      *  @brief Validates the conformance and performs initialization
@@ -226,26 +249,6 @@ public:
     CHIP_ERROR SetLimitRange(const Structs::RangePercent100thsStruct::Type & limitRange);
 
     /**
-     * @brief Set TranslationDirection.
-     * @param[in] translationDirection Direction of the translation.
-     * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
-     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported
-     */
-    CHIP_ERROR SetTranslationDirection(const TranslationDirectionEnum translationDirection);
-
-    /**
-     * @brief Set RotationAxis.
-     * @param[in] rotationAxis Axis of the rotation.
-     * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
-     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported
-     */
-    CHIP_ERROR SetRotationAxis(const RotationAxisEnum rotationAxis);
-
-    /**
      * @brief Set Overflow.
      * @param[in] overflow Overflow related to Rotation.
      * @return CHIP_NO_ERROR if set was successful.
@@ -254,16 +257,6 @@ public:
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetOverflow(const OverflowEnum overflow);
-
-    /**
-     * @brief Set ModulationType.
-     * @param[in] modulationType Modulation type.
-     * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
-     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
-     */
-    CHIP_ERROR SetModulationType(const ModulationTypeEnum modulationType);
 
     // All Get functions:
     // Return CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
@@ -316,8 +309,47 @@ private:
     // This cluster implements version 1 of the Closure Dimension cluster. Do not change this revision without updating
     // the cluster to implement the newest features.
     static constexpr Attributes::ClusterRevision::TypeInfo::Type kClusterRevision = 1u;
+    
+    /**
+     * @brief Set TranslationDirection.
+     * @param[in] translationDirection Direction of the translation.
+     * @return CHIP_NO_ERROR if set was successful.
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported
+     * 
+     *  Note: This attribute is not supposed to change once the installation is finalized. 
+     *         so SetTranslationDirection should only be called from Init()
+     */
+    CHIP_ERROR SetTranslationDirection(const TranslationDirectionEnum translationDirection);
 
-    bool mInitialized;
+    /**
+     * @brief Set RotationAxis.
+     * @param[in] rotationAxis Axis of the rotation.
+     * @return CHIP_NO_ERROR if set was successful.
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported
+     * 
+     *  Note: This attribute is not supposed to change once the installation is finalized. 
+     *         so SetRotationAxis should only be called from Init().
+     */
+    CHIP_ERROR SetRotationAxis(const RotationAxisEnum rotationAxis);
+    
+    /**
+     * @brief Set ModulationType.
+     * @param[in] modulationType Modulation type.
+     * @return CHIP_NO_ERROR if set was successful.
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
+     * 
+     *  Note: This attribute is not supposed to change once the installation is finalized. 
+     *         so SetModulationType should only be called from Init().
+     */
+    CHIP_ERROR SetModulationType(const ModulationTypeEnum modulationType);
+
+    bool mInitialized = false;
     ClusterState mState;
     ClusterConformance mConformance;
     DelegateBase & mDelegate;
