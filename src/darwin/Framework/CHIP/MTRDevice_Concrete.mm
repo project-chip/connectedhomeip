@@ -969,7 +969,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                 VerifyOrReturn(self, MTR_LOG_DEBUG("_ensureSubscriptionForExistingDelegates asyncDispatchToMatterQueue called back with nil MTRDevice"));
 
                 std::lock_guard lock(self->_lock);
-                [self _setupSubscriptionWithReason:[NSString stringWithFormat:@"%@ and subscription is needed", reason]];
+                [self _setupSubscriptionWithReason:[NSString stringWithFormat:@"%@ and subscription is allowed", reason]];
             } errorHandler:nil];
         }
     }
@@ -2786,7 +2786,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     // for now just subscribe once
     if (!NeedToStartSubscriptionSetup(_internalDeviceState)) {
-        MTR_LOG("%@ setupSubscription: no need to subscribe due to internal state %lu (reason: %@)", self, static_cast<unsigned long>(_internalDeviceState), reason);
+        MTR_LOG("%@ setupSubscription: No need to subscribe due to internal state %@ (reason: %@)", self,  InternalDeviceStateString(_internalDeviceState), reason);
         [self _clearSubscriptionPoolWork];
         return;
     }
