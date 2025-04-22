@@ -8,7 +8,7 @@
 *
 ```
 
-## Matter NXP MCU (FreeRTOS)
+## Matter NXP `MCU` (FreeRTOS)
 
 -   [NXP - Application Build System Architecture](./nxp_application_architecture.md)
 -   [NXP - Examples Guide for FreeRTOS platforms](./nxp_examples_freertos_platforms.md)
@@ -21,11 +21,11 @@
 -   [NXP - RTs OTA Software Update Guide](./nxp_RTs_ota_software_update.md)
 -   [NXP - Manufacturing Data](./nxp_manufacturing_flow.md)
 
-## Matter NXP MCU (Zephyr)
+## Matter NXP `MCU` (Zephyr)
 
 -   [NXP - Examples Guide for Zephyr platform](./nxp_zephyr_guide.md)
 -   [NXP - Zephyr OTA Software Update Guide](./nxp_zephyr_ota_software_update.md)
 
-## Matter NXP MPU
+## Matter NXP `MPU`
 
 -   [NXP - Linux Examples](./nxp_imx8m_linux_examples.md)

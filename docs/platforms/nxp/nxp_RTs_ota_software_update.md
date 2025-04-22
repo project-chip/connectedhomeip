@@ -69,7 +69,7 @@ using the `MCUBoot DIRECT-XIP` upgrade mode.
 > To build with OTA enabled, you can refer to the 'Building' section of the
 > platform [dedicated readme](./nxp_examples_freertos_platforms.md#building). By
 > default, the software version is 1. For building with software version 2 you
-> can use a `prj_<custom>.conf` wich has `v2` suffix.
+> can use a `prj_<custom>.conf` which has `v2` suffix.
 
 ### Generating and Flashing the bootloader
 
@@ -108,8 +108,8 @@ Replace `RT_board` with :
 
 -   For RW61x platform, either `rdrw612bga` or `frdmrw612` based on the board
     you are targeting.
--   For RT1170-EVKB, use `evkbmimxrt1170`.
--   For RT1060-EVKC, use `evkcmimxrt1060`.
+-   For `RT1170-EVKB`, use `evkbmimxrt1170`.
+-   For `RT1060-EVKC`, use `evkcmimxrt1060`.
 
 MCUBoot binary can be found under `mcuboot_build` folder under the SDK root.
 
@@ -351,7 +351,7 @@ user@ubuntu:~/connectedhomeip$ : ./scripts/tools/nxp/ota/ota_image_tool.py creat
 #### OTA with encryption
 
 A user can choose to enable the encryption of the OTA update image. This can be
-done by addig `--enc_enable` and `--input_ota_key <aes_128_key>` to the
+done by adding `--enc_enable` and `--input_ota_key <aes_128_key>` to the
 ota_image_tool script, by replacing `<aes_128_key>` with the encryption key.
 This will generate an encrypted `.ota` file.
 
