@@ -17,7 +17,7 @@
  */
 
 #include "chef-oven-cavity-operational-state.h"
-#include <app/util/config.h>
+#include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/support/logging/CHIPLogging.h>
 
