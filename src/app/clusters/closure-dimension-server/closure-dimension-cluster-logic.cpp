@@ -215,7 +215,7 @@ CHIP_ERROR ClusterLogic::SetTarget(const DataModel::Nullable<GenericTargetStruct
         Percent100ths resolution;
         ReturnErrorOnFailure(GetResolution(resolution));
         VerifyOrReturnError(
-            target.Value().position.Value() % resolution != 0, CHIP_ERROR_INVALID_ARGUMENT,
+            target.Value().position.Value() % resolution == 0, CHIP_ERROR_INVALID_ARGUMENT,
             ChipLogError(NotSpecified, "target.Value().Position value SHALL follow the scaling from Resolution Attribute"));
     }
 
@@ -591,7 +591,7 @@ CHIP_ERROR ClusterLogic::GetClusterRevision(Attributes::ClusterRevision::TypeInf
 }
 
 Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Optional<bool> latch,
-                                            Optional<Globals::ThreeLevelAutoEnum> speed)
+    Optional<Globals::ThreeLevelAutoEnum> speed)
 {
     VerifyOrDieWithMsg(mInitialized, NotSpecified, "Unexpected command received when device is yet to be initialized");
 
@@ -600,11 +600,10 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
     // If all command parameters don't have a value, return InvalidCommand
     VerifyOrReturnValue(position.HasValue() || latch.HasValue() || speed.HasValue(), Status::InvalidCommand);
 
-    // TODO: SpecIssue If this command is sent while the device is in a non-compatible internal-state, a status code of
-    // INVALID_IN_STATE SHALL be returned.
+    // TODO: SpecIssue If this command is sent while the device is in a non-compatible internal-state, a status code of INVALID_IN_STATE SHALL
+    // be returned.
 
-    DataModel::Nullable<GenericTargetStruct> target;
-    VerifyOrReturnError(GetTarget(target) == CHIP_NO_ERROR, Status::Failure);
+    GenericTargetStruct target{};
 
     if (position.HasValue())
     {
@@ -615,13 +614,24 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
         // Calculate the nearest integer multiple of the resolution
         Percent100ths resolution;
         VerifyOrReturnValue(GetResolution(resolution) == CHIP_NO_ERROR, Status::Failure);
-        Percent100ths adjustedPosition = (position.Value() / resolution) * resolution;
-        if (position.Value() % resolution >= resolution / 2)
+
+        if ((position.Value() % resolution) != 0) 
         {
-            adjustedPosition += resolution;
+
+            Percent100ths adjustedPosition = (position.Value() / resolution) * resolution;
+            if (position.Value() % resolution >= resolution / 2) 
+            {
+                adjustedPosition += resolution;
+            }
+
+            target.position.SetValue(adjustedPosition);
+
+        } 
+        else 
+        {
+           target.position.SetValue(position.Value());
         }
 
-        target.Value().position.SetValue(adjustedPosition);
     }
 
     if (latch.HasValue())
@@ -635,12 +645,7 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
             return Status::InvalidAction;
         }
 
-        target.Value().latch = latch;
-    }
-    else
-    {
-        // Fallback value for latch is False
-        target.Value().latch.Value() = false;
+        target.latch = latch;
     }
 
     if (speed.HasValue())
@@ -649,39 +654,36 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
         // If Speed (SP) feature is not supported, the server SHALL return a status code SUCCESS,
         VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), Status::Success);
 
-        target.Value().speed = speed;
-    }
-    else
-    {
-        // Fallback Value for speed is Auto
-        target.Value().speed.Value() = Globals::ThreeLevelAutoEnum::kAuto;
+        target.speed = speed;
     }
 
     // Check if the current position is valid or else return InvalidInState
     DataModel::Nullable<GenericCurrentStateStruct> currentState;
     VerifyOrReturnError(GetCurrentState(currentState) == CHIP_NO_ERROR, Status::Failure);
-    VerifyOrReturnValue(currentState.IsNull(), Status::InvalidInState);
+    VerifyOrReturnValue(!currentState.IsNull(), Status::InvalidInState);
     VerifyOrReturnValue(currentState.Value().position.HasValue(), Status::InvalidInState);
 
     status = mDelegate.HandleSetTarget(position, latch, speed);
 
     // once SetTarget action is successful on closure will set Target.
-    if (status == Status::Success)
+    if (status == Status::Success) 
     {
-        VerifyOrReturnError(SetTarget(target) == CHIP_NO_ERROR, Status::Failure);
-    }
+        DataModel::Nullable<GenericTargetStruct> nullableTarget;
+        nullableTarget.SetNonNull(target);
+        VerifyOrReturnValue(SetTarget(nullableTarget) == CHIP_NO_ERROR, Status::Failure);
+    } 
 
     return status;
 }
 
 Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t numberOfSteps,
-                                       Optional<Globals::ThreeLevelAutoEnum> speed)
+Optional<Globals::ThreeLevelAutoEnum> speed)
 {
     VerifyOrDieWithMsg(mInitialized, NotSpecified, "Unexpected command recieved when device is yet to be initialized");
 
     Status status = Status::Success;
 
-    DataModel::Nullable<GenericTargetStruct> stepTarget;
+    GenericTargetStruct stepTarget{};
 
     // Return UnsupportedCommand if Positioning feature is not supported.
     VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), Status::UnsupportedCommand);
@@ -689,26 +691,22 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
     // Return ConstraintError if command parameters are out of bounds
     VerifyOrReturnError(direction != StepDirectionEnum::kUnknownEnumValue, Status::ConstraintError);
     VerifyOrReturnError(numberOfSteps > 0, Status::ConstraintError);
+    
     if (speed.HasValue())
     {
         // TODO: Spec Issue: When the device does not support the speed(SP) feature, behaviour is undefined
         VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), Status::Success);
         VerifyOrReturnError(speed.Value() != Globals::ThreeLevelAutoEnum::kUnknownEnumValue, Status::ConstraintError);
-
-        stepTarget.Value().speed = speed;
-    }
-    else
-    {
-        // Fallback Value for speed is Auto
-        stepTarget.Value().speed.Value() = Globals::ThreeLevelAutoEnum::kAuto;
+        stepTarget.speed = speed;
     }
 
-    // TODO: SpecIssue: If the server is in a state where it cannot support the command, the server SHALL respond with an
-    // INVALID_IN_STATE response and the Target attribute value SHALL remain unchanged.
+    // TODO: SpecIssue: If the server is in a state where it cannot support the command, the server SHALL respond with an INVALID_IN_STATE
+    // response and the Target attribute value SHALL remain unchanged.
 
     // Check if the current position is valid or else return InvalidInState
     DataModel::Nullable<GenericCurrentStateStruct> currentState;
     VerifyOrReturnError(GetCurrentState(currentState) == CHIP_NO_ERROR, Status::Failure);
+    VerifyOrReturnValue(!currentState.IsNull(), Status::InvalidInState);
     VerifyOrReturnValue(currentState.Value().position.HasValue(), Status::InvalidInState);
 
     // Derive Target Position from StepValue and NumberOfSteps.
@@ -723,6 +721,7 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
     bool limitSupported = mConformance.HasFeature(Feature::kLimitation) ? true : false;
 
     Structs::RangePercent100thsStruct::Type limitRange;
+    
     if (limitSupported)
     {
         VerifyOrReturnError(GetLimitRange(limitRange) == CHIP_NO_ERROR, Status::Failure);
@@ -733,7 +732,7 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
 
     switch (direction)
     {
-
+    
     case StepDirectionEnum::kDecrease:
         // To avoid underflow, newPosition will be set to 0 if currentPosition is less than or equal to delta
         newPosition = (currentPosition > delta) ? currentPosition - delta : 0;
@@ -741,16 +740,16 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
         // supported.
         newPosition = limitSupported ? std::max(newPosition, static_cast<uint32_t>(limitRange.min)) : newPosition;
         break;
-
+    
     case StepDirectionEnum::kIncrease:
         // To avoid overflow, newPosition will be set to UINT32_MAX if sum of currentPosition and delta is greater than UINT32_MAX
         newPosition = (currentPosition > UINT32_MAX - delta) ? UINT32_MAX : currentPosition + delta;
         // Position value SHALL be clamped to 0.00% if the LM feature is not supported or LimitRange.Max if the LM feature is
         // supported.
         newPosition = limitSupported ? std::min(newPosition, static_cast<uint32_t>(limitRange.max))
-                                     : std::min(newPosition, static_cast<uint32_t>(PERCENT100THS_MAX_VALUE));
+                      : std::min(newPosition, static_cast<uint32_t>(PERCENT100THS_MAX_VALUE));
         break;
-
+    
     default:
         // Should never reach here due to earlier VerifyOrReturnError check
         ChipLogError(AppServer, "Unhandled StepDirectionEnum value");
@@ -760,18 +759,17 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
     status = mDelegate.HandleStep(direction, numberOfSteps, speed);
 
     // once Step action is successful on closure will set Target.
-    if (status == Status::Success)
+    if (status == Status::Success) 
     {
-        stepTarget.Value().position.SetValue(static_cast<Percent100ths>(newPosition));
-        if (speed.HasValue())
-        {
-            stepTarget.Value().speed = speed;
-        }
-        VerifyOrReturnError(SetTarget(stepTarget) == CHIP_NO_ERROR, Status::Failure);
-    }
+        stepTarget.position.SetValue(static_cast<Percent100ths>(newPosition));
+        DataModel::Nullable<GenericTargetStruct> nullableTarget;
+        nullableTarget.SetNonNull(stepTarget);
+        VerifyOrReturnError(SetTarget(nullableTarget) == CHIP_NO_ERROR, Status::Failure);
+    } 
 
     return status;
 }
+
 } // namespace ClosureDimension
 } // namespace Clusters
 } // namespace app

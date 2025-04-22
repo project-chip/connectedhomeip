@@ -139,6 +139,7 @@ struct ClusterState
 {
     DataModel::Nullable<GenericCurrentStateStruct> currentState{ DataModel::NullNullable };
     DataModel::Nullable<GenericTargetStruct> target{ DataModel::NullNullable };
+    // TODO: Spec issue: Fallback values for resolution and StepValue should be set to 1
     Percent100ths resolution                                      = 1;
     Percent100ths stepValue                                       = 1;
     ClosureUnitEnum unit                                          = ClosureUnitEnum::kUnknownEnumValue;
