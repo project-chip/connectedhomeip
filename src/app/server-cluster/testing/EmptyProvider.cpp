@@ -97,4 +97,3 @@ std::optional<ActionReturnStatus> EmptyProvider::InvokeCommand(const app::DataMo
 
 } // namespace Test
 } // namespace chip
-

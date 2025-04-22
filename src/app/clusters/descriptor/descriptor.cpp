@@ -220,7 +220,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadEndpointUniqueId(EndpointId endpoint, Attri
 
     auto readOnlyBuffer = epUniqueId.TakeBuffer();
     return aEncoder.Encode(readOnlyBuffer[0]);
-    
+
     return CHIP_NO_ERROR;
 }
 #endif

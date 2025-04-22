@@ -278,7 +278,7 @@ CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, chip::EndpointId id, const 
 // An optional device type list can be passed in as well. If provided, the memory
 // backing the list needs to remain allocated until this dynamic endpoint is cleared.
 //
-// An optional endpointUniqueId can be passed, the data will be copied out of 
+// An optional endpointUniqueId can be passed, the data will be copied out of
 // endpointUniqueId and it does not need to survive once this call returns.
 //
 // An optional parent endpoint id should be passed for child endpoints of composed device.

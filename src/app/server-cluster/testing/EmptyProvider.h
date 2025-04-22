@@ -64,4 +64,3 @@ public:
 
 } // namespace Test
 } // namespace chip
-
