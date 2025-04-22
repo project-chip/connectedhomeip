@@ -615,19 +615,19 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
         Percent100ths resolution;
         VerifyOrReturnValue(GetResolution(resolution) == CHIP_NO_ERROR, Status::Failure);
 
-        if ((position.Value() % resolution) != 0) 
+        if ((position.Value() % resolution) != 0)
         {
 
             Percent100ths adjustedPosition = (position.Value() / resolution) * resolution;
-            if (position.Value() % resolution >= resolution / 2) 
+            if (position.Value() % resolution >= resolution / 2)
             {
                 adjustedPosition += resolution;
             }
 
             target.position.SetValue(adjustedPosition);
 
-        } 
-        else 
+        }
+        else
         {
            target.position.SetValue(position.Value());
         }
@@ -666,12 +666,12 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
     status = mDelegate.HandleSetTarget(position, latch, speed);
 
     // once SetTarget action is successful on closure will set Target.
-    if (status == Status::Success) 
+    if (status == Status::Success)
     {
         DataModel::Nullable<GenericTargetStruct> nullableTarget;
         nullableTarget.SetNonNull(target);
         VerifyOrReturnValue(SetTarget(nullableTarget) == CHIP_NO_ERROR, Status::Failure);
-    } 
+    }
 
     return status;
 }
@@ -691,7 +691,7 @@ Optional<Globals::ThreeLevelAutoEnum> speed)
     // Return ConstraintError if command parameters are out of bounds
     VerifyOrReturnError(direction != StepDirectionEnum::kUnknownEnumValue, Status::ConstraintError);
     VerifyOrReturnError(numberOfSteps > 0, Status::ConstraintError);
-    
+
     if (speed.HasValue())
     {
         // TODO: Spec Issue: When the device does not support the speed(SP) feature, behaviour is undefined
@@ -721,7 +721,7 @@ Optional<Globals::ThreeLevelAutoEnum> speed)
     bool limitSupported = mConformance.HasFeature(Feature::kLimitation) ? true : false;
 
     Structs::RangePercent100thsStruct::Type limitRange;
-    
+
     if (limitSupported)
     {
         VerifyOrReturnError(GetLimitRange(limitRange) == CHIP_NO_ERROR, Status::Failure);
@@ -732,7 +732,7 @@ Optional<Globals::ThreeLevelAutoEnum> speed)
 
     switch (direction)
     {
-    
+
     case StepDirectionEnum::kDecrease:
         // To avoid underflow, newPosition will be set to 0 if currentPosition is less than or equal to delta
         newPosition = (currentPosition > delta) ? currentPosition - delta : 0;
@@ -740,7 +740,7 @@ Optional<Globals::ThreeLevelAutoEnum> speed)
         // supported.
         newPosition = limitSupported ? std::max(newPosition, static_cast<uint32_t>(limitRange.min)) : newPosition;
         break;
-    
+
     case StepDirectionEnum::kIncrease:
         // To avoid overflow, newPosition will be set to UINT32_MAX if sum of currentPosition and delta is greater than UINT32_MAX
         newPosition = (currentPosition > UINT32_MAX - delta) ? UINT32_MAX : currentPosition + delta;
@@ -749,7 +749,7 @@ Optional<Globals::ThreeLevelAutoEnum> speed)
         newPosition = limitSupported ? std::min(newPosition, static_cast<uint32_t>(limitRange.max))
                       : std::min(newPosition, static_cast<uint32_t>(PERCENT100THS_MAX_VALUE));
         break;
-    
+
     default:
         // Should never reach here due to earlier VerifyOrReturnError check
         ChipLogError(AppServer, "Unhandled StepDirectionEnum value");
@@ -759,13 +759,13 @@ Optional<Globals::ThreeLevelAutoEnum> speed)
     status = mDelegate.HandleStep(direction, numberOfSteps, speed);
 
     // once Step action is successful on closure will set Target.
-    if (status == Status::Success) 
+    if (status == Status::Success)
     {
         stepTarget.position.SetValue(static_cast<Percent100ths>(newPosition));
         DataModel::Nullable<GenericTargetStruct> nullableTarget;
         nullableTarget.SetNonNull(stepTarget);
         VerifyOrReturnError(SetTarget(nullableTarget) == CHIP_NO_ERROR, Status::Failure);
-    } 
+    }
 
     return status;
 }

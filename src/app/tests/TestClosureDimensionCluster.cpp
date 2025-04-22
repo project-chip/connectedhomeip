@@ -55,13 +55,13 @@ public:
     {
         return Protocols::InteractionModel::Status::Success;
     }
-    
+
     bool IsManualLatchingNeeded() { return isLatchManual; }
-    
+
     void ToggleManualLatching(const bool manualLatch) {
         isLatchManual = manualLatch;
     }
-    
+
 private:
     bool isLatchManual = false;
 };
@@ -768,7 +768,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetTargetValues)
     EXPECT_EQ(logic->GetTarget(target), CHIP_NO_ERROR);
     EXPECT_EQ(target, DataModel::NullNullable);
     EXPECT_TRUE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::Target::Id));
-    
+
     mockContext.ClearDirtyList();
     // set NULL value again
     testTarget.SetNull();
@@ -1575,13 +1575,13 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommand)
     EXPECT_EQ(logic->HandleSetTargetCommand(NullOptional, NullOptional, NullOptional), Status::InvalidCommand);
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::Target::Id));
-    
+
     std::cout << "Validating SetTarget with invalid position" << std::endl;
     mockContext.ClearDirtyList();
     EXPECT_EQ(logic->HandleSetTargetCommand(Optional<Percent100ths>(10001),NullOptional, NullOptional), Status::ConstraintError);
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::Target::Id));
-    
+
     std::cout << "Validating SetTarget with manual latch" << std::endl;
     mockContext.ClearDirtyList();
     mockDelegate.ToggleManualLatching(true);
@@ -1589,14 +1589,14 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommand)
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::Target::Id));
     mockDelegate.ToggleManualLatching(false);
-    
+
     std::cout << "Validating SetTarget with invalid speed" << std::endl;
     mockContext.ClearDirtyList();
-    EXPECT_EQ(logic->HandleSetTargetCommand(NullOptional, NullOptional, 
+    EXPECT_EQ(logic->HandleSetTargetCommand(NullOptional, NullOptional,
               Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kUnknownEnumValue)), Status::ConstraintError);
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::Target::Id));
-    
+
     std::cout << "Validating SetTarget with unknown current state" << std::endl;
     mockContext.ClearDirtyList();
     EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
@@ -1646,7 +1646,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommand)
     logic->ResetStateToDefault();
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
     mockContext.ClearDirtyList();
-    
+
     DataModel::Nullable<GenericCurrentStateStruct> currentState;
     DataModel::Nullable<GenericTargetStruct> target;
 
@@ -1655,20 +1655,20 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommand)
     EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kUnknownEnumValue, 1, NullOptional), Status::ConstraintError);
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::Target::Id));
-    
+
     std::cout << "Validating Step with invalid steps" << std::endl;
     mockContext.ClearDirtyList();
     EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kDecrease,0, NullOptional), Status::ConstraintError);
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::Target::Id));
-    
+
     std::cout << "Validating Step with invalid speed" << std::endl;
     mockContext.ClearDirtyList();
-    EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kDecrease, 1, 
+    EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kDecrease, 1,
               Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kUnknownEnumValue)), Status::ConstraintError);
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::Target::Id));
-    
+
     std::cout << "Validating Step with unknown current state" << std::endl;
     mockContext.ClearDirtyList();
     EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
@@ -1677,10 +1677,10 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommand)
                                             Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh)), Status::InvalidInState);
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::Target::Id));
-    
+
     Percent100ths stepValue = 10;
     EXPECT_EQ(logic->SetStepValue(stepValue), CHIP_NO_ERROR);\
-    
+
     std::cout << "Validating Step with proper arguments" << std::endl;
     GenericCurrentStateStruct setCurrentStateStruct(Optional<Percent100ths>(0), Optional<bool>(false),Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto));
     currentState.SetNonNull(setCurrentStateStruct);
@@ -1757,13 +1757,13 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommandWithLimitation)
     logic->ResetStateToDefault();
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
     mockContext.ClearDirtyList();
-    
+
     DataModel::Nullable<GenericCurrentStateStruct> currentState;
     DataModel::Nullable<GenericTargetStruct> target;
-    
+
     Percent100ths stepValue = 10;
     EXPECT_EQ(logic->SetStepValue(stepValue), CHIP_NO_ERROR);\
-    
+
     std::cout << "Validating Step with proper arguments" << std::endl;
     GenericCurrentStateStruct setCurrentStateStruct(Optional<Percent100ths>(1000), Optional<bool>(false),Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto));
     currentState.SetNonNull(setCurrentStateStruct);
