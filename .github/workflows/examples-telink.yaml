@@ -58,7 +58,7 @@ jobs:
                 gh-context: ${{ toJson(github) }}
 
             - name: Update Zephyr version 3.7.0 (develop) to specific revision (for developers purpose)
-              run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py df490eb14407c170087c2b7ec5b22c122ac72ebf"
+              run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 911bf69c5cf07073ae9d70a98ae24c8698023d85"
 
             - name: Build example Telink (B92 retention) Air Quality Sensor App
               # Run test for master and s07641069 PRs
@@ -378,7 +378,7 @@ jobs:
                 gh-context: ${{ toJson(github) }}
 
             - name: Update Zephyr version 3.3.0 (develop_3.3) to specific revision (for developers purpose)
-              run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py a59978f4bc9ca342485825a875ce70bae7e0fc17"
+              run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 91dfd9d0e4c5495d4d823a666f68c77b1c90e6ac"
 
             - name: Build example Telink (B92 retention) Air Quality Sensor App
               # Run test for master and s07641069 PRs
