@@ -68,8 +68,8 @@ spec).
 
 ## Linting `.matter` files for devices
 
-For device validation, `matter-idl-lint` provides the ability to validate
-a matter file for some basic conformance logic. These rules are expressed in
+For device validation, `matter-idl-lint` provides the ability to validate a
+matter file for some basic conformance logic. These rules are expressed in
 `.rules.matterlint`.
 
 The rules generally are:
