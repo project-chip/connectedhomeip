@@ -27,8 +27,6 @@ using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ClosureDimension;
 
-
-
 TEST(GenericCurrentStateStructTest, DefaultConstructor)
 {
     GenericCurrentStateStruct currentState;
@@ -101,8 +99,7 @@ TEST(GenericCurrentStateStructTest, CopyConstructor)
     // Modify the original object
     originalState.position = Optional<Percent100ths>(2000);
     originalState.latch    = Optional<bool>(false);
-    originalState.speed =
-        Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow);
+    originalState.speed    = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow);
 
     // Validate that the copied object remains unchanged
     EXPECT_TRUE(copiedState.position.HasValue());
