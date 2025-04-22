@@ -512,10 +512,7 @@ CHIP_ERROR ClusterLogic::SetModulationType(const ModulationTypeEnum modulationTy
 
 CHIP_ERROR ClusterLogic::GetCurrentState(DataModel::Nullable<GenericCurrentStateStruct> & currentState)
 {
-    static uint32_t count = 0;
-    count++;
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    ChipLogError(AppServer, "In GetCurrentState count = %d", count);
     currentState = mState.currentState;
     return CHIP_NO_ERROR;
 }
