@@ -34,7 +34,7 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches, run_if_endpoint_matches, has_feature
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, run_if_endpoint_matches, has_feature
 from mobly import asserts
 
 from controller.python.chip import ChipDeviceCtrl
@@ -113,8 +113,9 @@ class TC_CNET_4_11(MatterBaseTest):
         self.step(1)
 
         await self.send_single_cmd(
-            cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=0)
+            cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=900)
         )
+        # Successful command execution is implied if no exception is raised.
 
         # TH reads Networks attribute from the DUT and saves the number of entries as 'NumNetworks'
         self.step(2)
@@ -124,6 +125,7 @@ class TC_CNET_4_11(MatterBaseTest):
             attribute=cnet.Attributes.Networks
         )
         num_networks = len(networks)
+        logger.info(f" --- Got NumNetworks: {num_networks}")
 
         # TH finds the index of the Networks list entry with NetworkID for PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and saves it as 'userwifi_netidx'
         self.step(3)
@@ -136,9 +138,10 @@ class TC_CNET_4_11(MatterBaseTest):
         for idx, network in enumerate(networks):
             if network.networkID == wifi_1st_ap_ssid:
                 userwifi_netidx = idx
+                logger.info(f" --- NetworkID 1st SSID: {network.networkID.hex()}")
                 asserts.assert_true(network.connected, f"Wifi network {wifi_1st_ap_ssid.hex()} is not connected.")
                 break
-        asserts.assert_true(userwifi_netidx is not None, "Wifi network not found")
+        asserts.assert_true(userwifi_netidx is not None, f"Wifi network not found for 1st SSID: {wifi_1st_ap_ssid.hex()}")
 
         # TH sends RemoveNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field set to 1
         self.step(4)
@@ -149,8 +152,13 @@ class TC_CNET_4_11(MatterBaseTest):
                 breadcrumb=1
             )
         )
+        # Verify that DUT sends NetworkConfigResponse to command with the following fields:
+        asserts.assert_true(isinstance(response, cnet.Commands.NetworkConfigResponse),
+                            f"Expected response to be of type NetworkConfigResponse but got: {type(response)}")
+        # 1. NetworkingStatus is Success
         asserts.assert_equal(response.networkingStatus,
                              cnet.Enums.NetworkCommissioningStatusEnum.kSuccess, "Network was not removed")
+        # 2. NetworkIndex matches previously saved 'Userwifi_netidx'
         asserts.assert_equal(response.networkIndex, userwifi_netidx,
                              "Incorrect network index in response")
 
@@ -162,17 +170,18 @@ class TC_CNET_4_11(MatterBaseTest):
         logger.info("--- Adding second wifi test network")
         cmd = cnet.Commands.AddOrUpdateWiFiNetwork(
             ssid=wifi_2nd_ap_ssid, credentials=wifi_2nd_ap_credentials, breadcrumb=1)
-        res = await self.send_single_cmd(cmd=cmd)
+        response = await self.send_single_cmd(cmd=cmd)
         # Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:
-        # 1. NetworkingStatus is success which is "0"
-        asserts.assert_true(isinstance(res, cnet.Commands.NetworkConfigResponse),
+        asserts.assert_true(isinstance(response, cnet.Commands.NetworkConfigResponse),
                             "Unexpected value returned from AddOrUpdateWiFiNetwork")
-        asserts.assert_equal(res.networkingStatus, cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
-                             f"Expected 0 (Success), but got: {res.networkingStatus}")
+        # 1. NetworkingStatus is success which is "0"
+        asserts.assert_equal(response.networkingStatus, cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
+                             f"Expected 0 (Success), but got: {response.networkingStatus}")
         # 2. DebugText is of type string with max length 512 or empty
-        asserts.assert_equal(type(res.debugText), str, f"Expected debugText to be of type string, but got: {type(res.debugText)}")
-        asserts.assert_less_equal(len(res.debugText), 512,
-                                  f"Expected length of debugText to be less than or equal to 512, but got: {len(res.debugText)}")
+        asserts.assert_equal(type(response.debugText), str,
+                             f"Expected debugText to be of type string, but got: {type(response.debugText)}")
+        asserts.assert_less_equal(len(response.debugText), 512,
+                                  f"Expected length of debugText to be less than or equal to 512, but got: {len(response.debugText)}")
 
         # TH reads Networks attribute from the DUT
         self.step(6)
@@ -184,13 +193,14 @@ class TC_CNET_4_11(MatterBaseTest):
         )
         # 1. NetworkID is the hex representation of the ASCII values for PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
         # 2. Connected is of type bool and is FALSE
-        userwifi_netidx = None
+        userwifi_2nd_netidx = None
         for idx, network in enumerate(networks):
             if network.networkID == wifi_2nd_ap_ssid:
-                userwifi_netidx = idx
+                logger.info(f" --- NetworkID 2nd SSID: {network.networkID.hex()}")
+                userwifi_2nd_netidx = idx
                 asserts.assert_false(network.connected, f"Wifi network {wifi_2nd_ap_ssid.hex()} is not connected.")
                 break
-        asserts.assert_true(userwifi_netidx is not None, "Wifi network not found")
+        asserts.assert_true(userwifi_2nd_netidx is not None, f"Wifi network not found for 2nd SSID: {wifi_2nd_ap_ssid.hex()}")
 
         # TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID and Breadcrumb field set to 2
         self.step(7)
@@ -201,8 +211,8 @@ class TC_CNET_4_11(MatterBaseTest):
                 breadcrumb=2
             )
         )
-        asserts.assert_equal(response.networkingStatus,
-                             cnet.Enums.NetworkCommissioningStatusEnum.kSuccess)
+        asserts.assert_equal(response.networkingStatus, cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
+                             f"Expected 0 (Success), but got: {response.networkingStatus}")
 
         # TODO: step 8 is manual step, need to remove from here and from test spec
         # TH changes its WiFi connection to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
@@ -219,6 +229,7 @@ class TC_CNET_4_11(MatterBaseTest):
         for idx, network in enumerate(networks):
             if network.networkID == wifi_2nd_ap_ssid:
                 asserts.assert_true(network.connected, f"Wifi network {wifi_2nd_ap_ssid.hex()} is not connected.")
+                logger.info(f" --- Connected to 2nd SSID: {wifi_2nd_ap_ssid.hex()}")
                 break
 
         # TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT
@@ -239,6 +250,7 @@ class TC_CNET_4_11(MatterBaseTest):
         await self.send_single_cmd(
             cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=0)
         )
+        # Successful command execution is implied if no exception is raised.
 
         # TODO: step 12 is manual step, need to remove from here and from test spec
         # TH changes its WiFi connection to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
@@ -256,6 +268,7 @@ class TC_CNET_4_11(MatterBaseTest):
         for idx, network in enumerate(networks):
             if network.networkID == wifi_1st_ap_ssid:
                 asserts.assert_true(network.connected, f"Wifi network {wifi_1st_ap_ssid.hex()} is not connected.")
+                logger.info(f" --- Connected to 1st SSID: {wifi_1st_ap_ssid.hex()}")
                 break
 
         # TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900
@@ -264,6 +277,7 @@ class TC_CNET_4_11(MatterBaseTest):
         await self.send_single_cmd(
             cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=900)
         )
+        # Successful command execution is implied if no exception is raised.
 
         # TH sends RemoveNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field set to 1
         self.step(15)
@@ -274,8 +288,11 @@ class TC_CNET_4_11(MatterBaseTest):
                 breadcrumb=1
             )
         )
+        # Verify that DUT sends NetworkConfigResponse to command with the following response fields:
+        # 1. NetworkingStatus is success
         asserts.assert_equal(response.networkingStatus,
                              cnet.Enums.NetworkCommissioningStatusEnum.kSuccess, "Network was not removed")
+        # 2. NetworkIndex is 'Userwifi_netidx'
         asserts.assert_equal(response.networkIndex, userwifi_netidx,
                              "Incorrect network index in response")
 
@@ -286,17 +303,18 @@ class TC_CNET_4_11(MatterBaseTest):
         logger.info("--- Adding second wifi test network")
         cmd = cnet.Commands.AddOrUpdateWiFiNetwork(
             ssid=wifi_2nd_ap_ssid, credentials=wifi_2nd_ap_credentials, breadcrumb=1)
-        res = await self.send_single_cmd(cmd=cmd)
+        response = await self.send_single_cmd(cmd=cmd)
         # Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:
         # 1. NetworkingStatus is success which is "0"
-        asserts.assert_true(isinstance(res, cnet.Commands.NetworkConfigResponse),
+        asserts.assert_true(isinstance(response, cnet.Commands.NetworkConfigResponse),
                             "Unexpected value returned from AddOrUpdateWiFiNetwork")
-        asserts.assert_equal(res.networkingStatus, cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
-                             f"Expected 0 (Success), but got: {res.networkingStatus}")
+        asserts.assert_equal(response.networkingStatus, cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
+                             f"Expected 0 (Success), but got: {response.networkingStatus}")
         # 2. DebugText is of type string with max length 512 or empty
-        asserts.assert_equal(type(res.debugText), str, f"Expected debugText to be of type string, but got: {type(res.debugText)}")
-        asserts.assert_less_equal(len(res.debugText), 512,
-                                  f"Expected length of debugText to be less than or equal to 512, but got: {len(res.debugText)}")
+        asserts.assert_equal(type(response.debugText), str,
+                             f"Expected debugText to be of type string, but got: {type(response.debugText)}")
+        asserts.assert_less_equal(len(response.debugText), 512,
+                                  f"Expected length of debugText to be less than or equal to 512, but got: {len(response.debugText)}")
 
         # TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID and Breadcrumb field set to 3
         self.step(17)
@@ -308,7 +326,8 @@ class TC_CNET_4_11(MatterBaseTest):
             )
         )
         asserts.assert_equal(response.networkingStatus,
-                             cnet.Enums.NetworkCommissioningStatusEnum.kSuccess)
+                             cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
+                             f"Expected 0 (Success), but got: {response.networkingStatus}")
 
         # TODO: same as step 8, remove from here and from spec
         # TH changes its Wi-Fi connection to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
@@ -325,16 +344,17 @@ class TC_CNET_4_11(MatterBaseTest):
         for idx, network in enumerate(networks):
             if network.networkID == wifi_2nd_ap_ssid:
                 asserts.assert_true(network.connected, f"Wifi network {wifi_2nd_ap_ssid.hex()} is not connected.")
+                logger.info(f" --- Connected to 2nd SSID: {wifi_2nd_ap_ssid.hex()}")
                 break
 
         # TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT
         self.step(20)
 
-        # Verify that the breadcrumb value is set to 3
         breadcrumb = await self.read_single_attribute_check_success(
             cluster=cgen,
             attribute=cgen.Attributes.Breadcrumb
         )
+        # Verify that the breadcrumb value is set to 3
         asserts.assert_equal(breadcrumb, 3, f"Expected breadcrumb to be 3, but got: {breadcrumb}")
 
         # TH sends the CommissioningComplete command to the DUT
@@ -343,11 +363,11 @@ class TC_CNET_4_11(MatterBaseTest):
         # Disarm the failsafe
         logger.info(" --- Disarming the failsafe")
         cmd = cgen.Commands.CommissioningComplete()
-        res = await self.send_single_cmd(cmd=cmd)
+        response = await self.send_single_cmd(cmd=cmd)
         # Verify that DUT sends CommissioningCompleteResponse with the ErrorCode field set to OK (0)
-        asserts.assert_true(isinstance(res, cgen.Commands.CommissioningCompleteResponse), "Got wrong response type")
-        asserts.assert_equal(res.errorCode, cgen.Enums.CommissioningErrorEnum.kOk,
-                             f"Expected CommissioningCompleteResponse to be 0, but got {res.errorCode}")
+        asserts.assert_true(isinstance(response, cgen.Commands.CommissioningCompleteResponse), "Got wrong response type")
+        asserts.assert_equal(response.errorCode, cgen.Enums.CommissioningErrorEnum.kOk,
+                             f"Expected CommissioningCompleteResponse to be 0, but got {response.errorCode}")
 
         # TH reads Networks attribute from the DUT
         self.step(22)
@@ -359,13 +379,13 @@ class TC_CNET_4_11(MatterBaseTest):
         )
         # 1. NetworkID is the hex representation of the ASCII values for PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
         # 2. Connected is of type bool and is TRUE
-        userwifi_netidx = None
         for idx, network in enumerate(networks):
             if network.networkID == wifi_2nd_ap_ssid:
-                userwifi_netidx = idx
+                userwifi_2nd_netidx = idx
                 asserts.assert_true(network.connected, f"Wifi network {wifi_2nd_ap_ssid.hex()} is not connected.")
+                logger.info(f" --- Connected to 2nd SSID: {wifi_2nd_ap_ssid.hex()}")
                 break
-        asserts.assert_true(userwifi_netidx is not None, "Wifi network not found")
+        asserts.assert_true(userwifi_2nd_netidx is not None, "Wifi network not found")
 
 
 if __name__ == "__main__":
