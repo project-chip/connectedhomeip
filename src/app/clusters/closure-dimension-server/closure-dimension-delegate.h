@@ -48,7 +48,7 @@ public:
      *         Error when handle SetTarget fails.
      */
     virtual Protocols::InteractionModel::Status HandleSetTarget(const Optional<Percent100ths> & position,
-                                                                const Optional<TargetLatchEnum> & latch,
+                                                                const Optional<bool> & latch,
                                                                 const Optional<Globals::ThreeLevelAutoEnum> & speed) = 0;
 
     /**

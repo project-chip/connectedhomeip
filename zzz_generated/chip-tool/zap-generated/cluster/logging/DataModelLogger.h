@@ -27,6 +27,9 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Globals::Structs::PowerThresholdStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Globals::Structs::PriceStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Globals::Structs::TestGlobalStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -46,9 +49,6 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::detail::Structs::DeviceTypeStruct::DecodableType & value);
-
-static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::Globals::Structs::PriceStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::detail::Structs::ApplicationStruct::DecodableType & value);
@@ -326,7 +326,7 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ClosureControl::Structs::OverallTargetStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::ClosureDimension::Structs::CurrentStruct::DecodableType & value);
+                           const chip::app::Clusters::ClosureDimension::Structs::CurrentStateStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ClosureDimension::Structs::RangePercent100thsStruct::DecodableType & value);

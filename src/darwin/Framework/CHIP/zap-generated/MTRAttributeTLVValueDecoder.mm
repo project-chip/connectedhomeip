@@ -8402,11 +8402,7 @@ static id _Nullable DecodeAttributeValueForCommodityPriceCluster(AttributeId aAt
                 value.periodEnd = [NSNumber numberWithUnsignedInt:cppValue.Value().periodEnd.Value()];
             }
             if (cppValue.Value().price.HasValue()) {
-                value.price = [MTRDataTypePriceStruct new];
-                value.price.amount = [NSNumber numberWithLongLong:cppValue.Value().price.Value().amount];
-                value.price.currency = [MTRDataTypeCurrencyStruct new];
-                value.price.currency.currency = [NSNumber numberWithUnsignedShort:cppValue.Value().price.Value().currency.currency];
-                value.price.currency.decimalPoints = [NSNumber numberWithUnsignedChar:cppValue.Value().price.Value().currency.decimalPoints];
+                value.price = [NSNumber numberWithLongLong:cppValue.Value().price.Value()];
             } else {
                 value.price = nil;
             }
@@ -8433,16 +8429,7 @@ static id _Nullable DecodeAttributeValueForCommodityPriceCluster(AttributeId aAt
                         auto & entry_3 = iter_3.GetValue();
                         MTRCommodityPriceClusterCommodityPriceComponentStruct * newElement_3;
                         newElement_3 = [MTRCommodityPriceClusterCommodityPriceComponentStruct new];
-                        if (entry_3.price.HasValue()) {
-                            newElement_3.price = [NSNumber numberWithLongLong:entry_3.price.Value()];
-                        } else {
-                            newElement_3.price = nil;
-                        }
-                        if (entry_3.priceLevel.HasValue()) {
-                            newElement_3.priceLevel = [NSNumber numberWithShort:entry_3.priceLevel.Value()];
-                        } else {
-                            newElement_3.priceLevel = nil;
-                        }
+                        newElement_3.price = [NSNumber numberWithLongLong:entry_3.price];
                         newElement_3.source = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_3.source)];
                         if (entry_3.description.HasValue()) {
                             newElement_3.descriptionString = AsString(entry_3.description.Value());
@@ -8496,11 +8483,7 @@ static id _Nullable DecodeAttributeValueForCommodityPriceCluster(AttributeId aAt
                     newElement_0.periodEnd = [NSNumber numberWithUnsignedInt:entry_0.periodEnd.Value()];
                 }
                 if (entry_0.price.HasValue()) {
-                    newElement_0.price = [MTRDataTypePriceStruct new];
-                    newElement_0.price.amount = [NSNumber numberWithLongLong:entry_0.price.Value().amount];
-                    newElement_0.price.currency = [MTRDataTypeCurrencyStruct new];
-                    newElement_0.price.currency.currency = [NSNumber numberWithUnsignedShort:entry_0.price.Value().currency.currency];
-                    newElement_0.price.currency.decimalPoints = [NSNumber numberWithUnsignedChar:entry_0.price.Value().currency.decimalPoints];
+                    newElement_0.price = [NSNumber numberWithLongLong:entry_0.price.Value()];
                 } else {
                     newElement_0.price = nil;
                 }
@@ -8527,16 +8510,7 @@ static id _Nullable DecodeAttributeValueForCommodityPriceCluster(AttributeId aAt
                             auto & entry_3 = iter_3.GetValue();
                             MTRCommodityPriceClusterCommodityPriceComponentStruct * newElement_3;
                             newElement_3 = [MTRCommodityPriceClusterCommodityPriceComponentStruct new];
-                            if (entry_3.price.HasValue()) {
-                                newElement_3.price = [NSNumber numberWithLongLong:entry_3.price.Value()];
-                            } else {
-                                newElement_3.price = nil;
-                            }
-                            if (entry_3.priceLevel.HasValue()) {
-                                newElement_3.priceLevel = [NSNumber numberWithShort:entry_3.priceLevel.Value()];
-                            } else {
-                                newElement_3.priceLevel = nil;
-                            }
+                            newElement_3.price = [NSNumber numberWithLongLong:entry_3.price];
                             newElement_3.source = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_3.source)];
                             if (entry_3.description.HasValue()) {
                                 newElement_3.descriptionString = AsString(entry_3.description.Value());
@@ -11186,27 +11160,27 @@ static id _Nullable DecodeAttributeValueForClosureDimensionCluster(AttributeId a
 {
     using namespace Clusters::ClosureDimension;
     switch (aAttributeId) {
-    case Attributes::Current::Id: {
-        using TypeInfo = Attributes::Current::TypeInfo;
+    case Attributes::CurrentState::Id: {
+        using TypeInfo = Attributes::CurrentState::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        MTRClosureDimensionClusterCurrentStruct * _Nullable value;
+        MTRClosureDimensionClusterCurrentStateStruct * _Nullable value;
         if (cppValue.IsNull()) {
             value = nil;
         } else {
-            value = [MTRClosureDimensionClusterCurrentStruct new];
+            value = [MTRClosureDimensionClusterCurrentStateStruct new];
             if (cppValue.Value().position.HasValue()) {
                 value.position = [NSNumber numberWithUnsignedShort:cppValue.Value().position.Value()];
             } else {
                 value.position = nil;
             }
-            if (cppValue.Value().latching.HasValue()) {
-                value.latching = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().latching.Value())];
+            if (cppValue.Value().latch.HasValue()) {
+                value.latch = [NSNumber numberWithBool:cppValue.Value().latch.Value()];
             } else {
-                value.latching = nil;
+                value.latch = nil;
             }
             if (cppValue.Value().speed.HasValue()) {
                 value.speed = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().speed.Value())];
@@ -11234,7 +11208,7 @@ static id _Nullable DecodeAttributeValueForClosureDimensionCluster(AttributeId a
                 value.position = nil;
             }
             if (cppValue.Value().latch.HasValue()) {
-                value.latch = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().latch.Value())];
+                value.latch = [NSNumber numberWithBool:cppValue.Value().latch.Value()];
             } else {
                 value.latch = nil;
             }

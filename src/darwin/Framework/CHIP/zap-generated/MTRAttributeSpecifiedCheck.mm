@@ -3573,7 +3573,7 @@ static BOOL AttributeIsSpecifiedInClosureDimensionCluster(AttributeId aAttribute
 {
     using namespace Clusters::ClosureDimension;
     switch (aAttributeId) {
-    case Attributes::Current::Id: {
+    case Attributes::CurrentState::Id: {
         return YES;
     }
     case Attributes::Target::Id: {
