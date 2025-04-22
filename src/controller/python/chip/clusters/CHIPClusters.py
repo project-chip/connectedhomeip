@@ -1059,6 +1059,12 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x00000018: {
+                "attributeName": "ConfigurationVersion",
+                "attributeId": 0x00000018,
+                "type": "int",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -2577,6 +2583,18 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x0000003F: {
+                "attributeName": "ExtAddress",
+                "attributeId": 0x0000003F,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000040: {
+                "attributeName": "Rloc16",
+                "attributeId": 0x00000040,
+                "type": "int",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -3097,6 +3115,12 @@ class ChipClusters:
                 "attributeName": "ProductAppearance",
                 "attributeId": 0x00000014,
                 "type": "",
+                "reportable": True,
+            },
+            0x00000018: {
+                "attributeName": "ConfigurationVersion",
+                "attributeId": 0x00000018,
+                "type": "int",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -7069,6 +7093,63 @@ class ChipClusters:
             },
         },
     }
+    _ELECTRICAL_GRID_CONDITIONS_CLUSTER_INFO = {
+        "clusterName": "ElectricalGridConditions",
+        "clusterId": 0x000000A0,
+        "commands": {
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "LocalGenerationAvailable",
+                "attributeId": 0x00000000,
+                "type": "bool",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000001: {
+                "attributeName": "CurrentConditions",
+                "attributeId": 0x00000001,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "ForecastConditions",
+                "attributeId": 0x00000002,
+                "type": "",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _DOOR_LOCK_CLUSTER_INFO = {
         "clusterName": "DoorLock",
         "clusterId": 0x00000101,
@@ -7803,30 +7884,14 @@ class ChipClusters:
                 "commandId": 0x00000001,
                 "commandName": "MoveTo",
                 "args": {
-                    "tag": "int",
-                    "latch": "int",
+                    "position": "int",
+                    "latch": "bool",
                     "speed": "int",
                 },
             },
             0x00000002: {
                 "commandId": 0x00000002,
                 "commandName": "Calibrate",
-                "args": {
-                },
-            },
-            0x00000003: {
-                "commandId": 0x00000003,
-                "commandName": "ConfigureFallback",
-                "args": {
-                    "restingProcedure": "int",
-                    "triggerCondition": "int",
-                    "triggerPosition": "int",
-                    "waitingDelay": "int",
-                },
-            },
-            0x00000004: {
-                "commandId": 0x00000004,
-                "commandName": "CancelFallback",
                 "args": {
                 },
             },
@@ -7860,36 +7925,6 @@ class ChipClusters:
                 "attributeName": "OverallTarget",
                 "attributeId": 0x00000004,
                 "type": "",
-                "reportable": True,
-            },
-            0x00000005: {
-                "attributeName": "RestingProcedure",
-                "attributeId": 0x00000005,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000006: {
-                "attributeName": "TriggerCondition",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000007: {
-                "attributeName": "TriggerPosition",
-                "attributeId": 0x00000007,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000008: {
-                "attributeName": "WaitingDelay",
-                "attributeId": 0x00000008,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000009: {
-                "attributeName": "KickoffTimer",
-                "attributeId": 0x00000009,
-                "type": "int",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -7933,7 +7968,7 @@ class ChipClusters:
                 "commandName": "SetTarget",
                 "args": {
                     "position": "int",
-                    "latch": "int",
+                    "latch": "bool",
                     "speed": "int",
                 },
             },
@@ -7949,7 +7984,7 @@ class ChipClusters:
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "Current",
+                "attributeName": "CurrentState",
                 "attributeId": 0x00000000,
                 "type": "",
                 "reportable": True,
@@ -12723,7 +12758,6 @@ class ChipClusters:
                 "args": {
                     "imageCodec": "int",
                     "maxFrameRate": "int",
-                    "bitRate": "int",
                     "minResolution": "VideoResolutionStruct",
                     "maxResolution": "VideoResolutionStruct",
                     "quality": "int",
@@ -12765,7 +12799,7 @@ class ChipClusters:
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "MaxConcurrentVideoEncoders",
+                "attributeName": "MaxConcurrentEncoders",
                 "attributeId": 0x00000000,
                 "type": "int",
                 "reportable": True,
@@ -12825,7 +12859,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x0000000A: {
-                "attributeName": "SupportedSnapshotParams",
+                "attributeName": "SnapshotCapabilities",
                 "attributeId": 0x0000000A,
                 "type": "",
                 "reportable": True,
@@ -15219,6 +15253,7 @@ class ChipClusters:
         0x0000009D: _ENERGY_EVSE_MODE_CLUSTER_INFO,
         0x0000009E: _WATER_HEATER_MODE_CLUSTER_INFO,
         0x0000009F: _DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER_INFO,
+        0x000000A0: _ELECTRICAL_GRID_CONDITIONS_CLUSTER_INFO,
         0x00000101: _DOOR_LOCK_CLUSTER_INFO,
         0x00000102: _WINDOW_COVERING_CLUSTER_INFO,
         0x00000104: _CLOSURE_CONTROL_CLUSTER_INFO,
@@ -15359,6 +15394,7 @@ class ChipClusters:
         "EnergyEvseMode": _ENERGY_EVSE_MODE_CLUSTER_INFO,
         "WaterHeaterMode": _WATER_HEATER_MODE_CLUSTER_INFO,
         "DeviceEnergyManagementMode": _DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER_INFO,
+        "ElectricalGridConditions": _ELECTRICAL_GRID_CONDITIONS_CLUSTER_INFO,
         "DoorLock": _DOOR_LOCK_CLUSTER_INFO,
         "WindowCovering": _WINDOW_COVERING_CLUSTER_INFO,
         "ClosureControl": _CLOSURE_CONTROL_CLUSTER_INFO,

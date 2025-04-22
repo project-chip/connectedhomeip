@@ -560,7 +560,7 @@ cluster AccessControl = 31 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 cluster BasicInformation = 40 {
-  revision 3;
+  revision 5;
 
   enum ColorEnum : enum8 {
     kBlack = 0;
@@ -643,6 +643,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute int32u specificationVersion = 21;
   readonly attribute int16u maxPathsPerInvoke = 22;
+  readonly attribute int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1733,6 +1734,7 @@ endpoint 0 {
     callback attribute capabilityMinima;
     callback attribute specificationVersion;
     callback attribute maxPathsPerInvoke;
+    callback attribute configurationVersion default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;

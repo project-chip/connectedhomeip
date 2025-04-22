@@ -796,6 +796,16 @@ void emberAfDeviceEnergyManagementModeClusterShutdownCallback(chip::EndpointId e
 /**
  * @param endpoint    Endpoint that is being initialized
  */
+void emberAfElectricalGridConditionsClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfElectricalGridConditionsClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfDoorLockClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -4339,6 +4349,44 @@ chip::Protocols::InteractionModel::Status MatterDeviceEnergyManagementModeCluste
 void emberAfDeviceEnergyManagementModeClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
+// Electrical Grid Conditions Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfElectricalGridConditionsClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterElectricalGridConditionsClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfElectricalGridConditionsClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterElectricalGridConditionsClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterElectricalGridConditionsClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfElectricalGridConditionsClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
 // Door Lock Cluster
 //
 
@@ -7104,18 +7152,6 @@ bool emberAfValveConfigurationAndControlClusterCloseCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ValveConfigurationAndControl::Commands::Close::DecodableType & commandData);
 /**
- * @brief Commodity Price Cluster GetDetailedPriceRequest Command callback (from client)
- */
-bool emberAfCommodityPriceClusterGetDetailedPriceRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CommodityPrice::Commands::GetDetailedPriceRequest::DecodableType & commandData);
-/**
- * @brief Commodity Price Cluster GetDetailedForecastRequest Command callback (from client)
- */
-bool emberAfCommodityPriceClusterGetDetailedForecastRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CommodityPrice::Commands::GetDetailedForecastRequest::DecodableType & commandData);
-/**
  * @brief Demand Response Load Control Cluster RegisterLoadControlProgramRequest Command callback (from client)
  */
 bool emberAfDemandResponseLoadControlClusterRegisterLoadControlProgramRequestCallback(
@@ -7326,18 +7362,6 @@ bool emberAfWindowCoveringClusterGoToTiltValueCallback(
 bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::DecodableType & commandData);
-/**
- * @brief Closure Dimension Cluster SetTarget Command callback (from client)
- */
-bool emberAfClosureDimensionClusterSetTargetCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ClosureDimension::Commands::SetTarget::DecodableType & commandData);
-/**
- * @brief Closure Dimension Cluster Step Command callback (from client)
- */
-bool emberAfClosureDimensionClusterStepCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ClosureDimension::Commands::Step::DecodableType & commandData);
 /**
  * @brief Thermostat Cluster SetpointRaiseLower Command callback (from client)
  */
@@ -7811,48 +7835,6 @@ bool emberAfZoneManagementClusterGetTwoDCartesianZoneCallback(
 bool emberAfZoneManagementClusterRemoveZoneCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ZoneManagement::Commands::RemoveZone::DecodableType & commandData);
-/**
- * @brief Camera AV Settings User Level Management Cluster MPTZSetPosition Command callback (from client)
- */
-bool emberAfCameraAvSettingsUserLevelManagementClusterMPTZSetPositionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZSetPosition::DecodableType & commandData);
-/**
- * @brief Camera AV Settings User Level Management Cluster MPTZRelativeMove Command callback (from client)
- */
-bool emberAfCameraAvSettingsUserLevelManagementClusterMPTZRelativeMoveCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZRelativeMove::DecodableType & commandData);
-/**
- * @brief Camera AV Settings User Level Management Cluster MPTZMoveToPreset Command callback (from client)
- */
-bool emberAfCameraAvSettingsUserLevelManagementClusterMPTZMoveToPresetCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZMoveToPreset::DecodableType & commandData);
-/**
- * @brief Camera AV Settings User Level Management Cluster MPTZSavePreset Command callback (from client)
- */
-bool emberAfCameraAvSettingsUserLevelManagementClusterMPTZSavePresetCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZSavePreset::DecodableType & commandData);
-/**
- * @brief Camera AV Settings User Level Management Cluster MPTZRemovePreset Command callback (from client)
- */
-bool emberAfCameraAvSettingsUserLevelManagementClusterMPTZRemovePresetCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZRemovePreset::DecodableType & commandData);
-/**
- * @brief Camera AV Settings User Level Management Cluster DPTZSetViewport Command callback (from client)
- */
-bool emberAfCameraAvSettingsUserLevelManagementClusterDPTZSetViewportCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DPTZSetViewport::DecodableType & commandData);
-/**
- * @brief Camera AV Settings User Level Management Cluster DPTZRelativeMove Command callback (from client)
- */
-bool emberAfCameraAvSettingsUserLevelManagementClusterDPTZRelativeMoveCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DPTZRelativeMove::DecodableType & commandData);
 /**
  * @brief Push AV Stream Transport Cluster AllocatePushTransport Command callback (from client)
  */
