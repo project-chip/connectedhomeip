@@ -107,6 +107,9 @@ class TC_CNET_4_1(MatterBaseTest):
         networks_dict = await self.read_single_attribute_all_endpoints(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.Networks)
+        logger.info("List of network obj")
+        # logger.info(type(networks_dict.values()))
+        logger.info(list(networks_dict.values()))
 
         asserts.assert_true(network, "NetworkInfoStruct list should not be empty")
         matter_asserts.assert_list_element_type(network, Clusters.NetworkCommissioning.Structs.NetworkInfoStruct,
@@ -116,10 +119,15 @@ class TC_CNET_4_1(MatterBaseTest):
         matter_asserts.assert_all(network, lambda x: isinstance(x.connected, bool),
                                   "NetworkID field is an octet string within a length range 1 to 32")
         network_count = {}
-        network_ids = []
+        network_ids = {}
+        network_ids_list = []
+        # Search for connected networks and ids in all endpoints. Gather by endpoints. List all the networks in a single list.
         for ep in networks_dict:
             network_count[ep] = sum(map(lambda x: x.connected, networks_dict[ep]))
-            network_ids.append(networks_dict[ep].networkID)
+            network_ids[ep] = list(map(lambda x: x.networkID, networks_dict[ep]))
+            network_ids_list.extend(network_ids[ep])
+
+        logger.info(f"All networkd ids: {network_ids_list}")
 
         connected_networks = sum(network_count.values())
         asserts.assert_equal(connected_networks, 1, "Verify that only one entry has connected status as TRUE")
@@ -156,10 +164,11 @@ class TC_CNET_4_1(MatterBaseTest):
         last_network_id = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.LastNetworkID)
-        matching_networks_count = sum(map(lambda x: x.networkID == last_network_id, networks_dict))
+        logger.info(f"Last connected network: {last_network_id}")
+        matching_networks_count = sum(map(lambda x: x == last_network_id, network_ids_list))
         asserts.assert_equal(matching_networks_count, 1,
-                             "Verify that LastNetworkID attribute matches the NetworkID value of one of the entries")
-        asserts.assert_in(last_network_id, network_ids,
+                             "Verify that LastNetworkID attribute matches the NetworkID count of the entries")
+        asserts.assert_in(last_network_id, network_ids_list,
                           "Verify that LastNetworkID attribute matches the NetworkID value of one of the entries")
         asserts.assert_true(isinstance(last_network_id, bytes) and 1 <= len(last_network_id) <= 32,
                             "Verify LastNetworkID attribute value will be of type octstr with a length range of 1 to 32")
@@ -174,6 +183,7 @@ class TC_CNET_4_1(MatterBaseTest):
         supported_wifi_bands = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.SupportedWiFiBands)
+        logger.info(supported_wifi_bands)
         matter_asserts.assert_list_element_type(supported_wifi_bands, Clusters.NetworkCommissioning.Enums.WiFiBandEnum,
                                                 "Verify that SupportedWiFiBands attribute value has 1 or more entries, all of which are in the range of WiFiBandEnum.")
 
