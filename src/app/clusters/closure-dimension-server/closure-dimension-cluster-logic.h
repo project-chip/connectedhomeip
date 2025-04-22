@@ -238,7 +238,7 @@ public:
      *          Returns Success if arguments don't match the feature conformance.
      *          Returns Success on succesful handling.
      */
-    Protocols::InteractionModel::Status HandleSetTargetCommand(Optional<Percent100ths> position, Optional<TargetLatchEnum> latch,
+    Protocols::InteractionModel::Status HandleSetTargetCommand(Optional<Percent100ths> position, Optional<bool> latch,
                                                                Optional<Globals::ThreeLevelAutoEnum> speed);
 
     /**
