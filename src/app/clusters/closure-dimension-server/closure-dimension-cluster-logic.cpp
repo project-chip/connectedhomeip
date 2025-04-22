@@ -117,45 +117,16 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericCurren
     }
 
     /*
-        Validate FeatureMap Conformance
+        Validate incoming values and FeatureMap Conformance
     */
 
-    // Validate if the Positioning feature is required based on the set values and FeatureMap conformance.
-    if (validateClusterCurrentStatePosition || validateIncomingCurrentStatePosition)
+    // Validate the incomging Positioning value has valid input parameters and FeatureMap conformance.
+    if (validateIncomingCurrentStatePosition)
     {
-        // TODO: why are we checking the current position value, why it should impact the set.
-        // TODO: ideally if we dont have ppositioningfeature the current.state should not be present.
-        // TODO: if currentstate has positioning then we are missing check somewhere else.
         //  If the positioning member is present in either the current or incoming CurrentState, we need to check if the Positioning
         //  feature is supported by the device. If the Positioning feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    }
 
-    // Validate if the MotionLatching feature is required based on the set values and FeatureMap conformance.
-    if (validateClusterCurrentStateLatch || validateIncomingCurrentStateLatch)
-    {
-        // TODO: Same comment as above
-        //  If the latching member is present in either the current or incoming CurrentState, we need to check if the MotionLatching
-        //  feature is supported by the device. If the MotionLatching feature is not supported, return an error.
-        VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    }
-
-    // Validate if the Speed feature is required based on the set values and FeatureMap conformance.
-    if (validateClusterCurrentStateSpeed || validateIncomingCurrentStateSpeed)
-    {
-        // TODO: Same comment as above
-        //  If the speed member is present in either the current or incoming CurrentState, we need to check if the Speed feature is
-        //  supported by the device. If the Speed feature is not supported, return an error.
-        VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    }
-
-    /*
-        Validate incoming values and if update is necessary
-    */
-
-    // Validate the incomging Positioning value - We don't need to check feature since the check was done above.
-    if (validateIncomingCurrentStatePosition)
-    {
         // We don't need to check is values are present since the check was done above.
         const Percent100ths & position = incomingCurrentState.Value().position.Value();
         VerifyOrReturnError(position <= PERCENT100THS_MAX_VALUE, CHIP_ERROR_INVALID_ARGUMENT);
@@ -168,6 +139,10 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericCurren
 
     if (validateIncomingCurrentStateLatch)
     {
+        //  If the latching member is present in either the current or incoming CurrentState, we need to check if the MotionLatching
+        //  feature is supported by the device. If the MotionLatching feature is not supported, return an error.
+        VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
         // We don't need to check is values are present since the check was done above.
         const bool & latch = incomingCurrentState.Value().latch.Value();
 
@@ -180,6 +155,10 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericCurren
     // Validate the incomging Speed value - We don't need to check feature since the check was done above.
     if (validateIncomingCurrentStateSpeed)
     {
+        //  If the speed member is present in either the current or incoming CurrentState, we need to check if the Speed feature is
+        //  supported by the device. If the Speed feature is not supported, return an error.
+        VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
         const Globals::ThreeLevelAutoEnum & speed = incomingCurrentState.Value().speed.Value();
 
         VerifyOrReturnError(EnsureKnownEnumValue(speed) != Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
@@ -214,13 +193,13 @@ CHIP_ERROR ClusterLogic::SetTarget(const DataModel::Nullable<GenericTargetStruct
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
 
-    // If both present Target and incoming Target Value are NULL, no Update needed.
+    // If both present target and incoming target value are NULL, no update is needed.
     if (target.IsNull() && mState.target.IsNull())
     {
         return CHIP_NO_ERROR;
     }
 
-    // If present Target in not NULL and incoming Target Value is NULL, update value to NULL and trigger attribute reporting.
+    // If present target in not NULL and incoming target Value is NULL, update value to NULL and trigger attribute reporting.
     if (target.IsNull() && !mState.target.IsNull())
     {
         mState.target.SetNull();
@@ -323,8 +302,8 @@ CHIP_ERROR ClusterLogic::SetUnitRange(const DataModel::Nullable<Structs::UnitRan
 
     if (unitRange.IsNull())
     {
-        // If both the mState unitRange and argument unitRange are null, then just return CHIP_NO_ERROR
-        // If the mState unitRange is not null and argument unitRange is null, then set mstate unitRange to null.
+        // If both the mState unitRange and incoming unitRange are null, then just return CHIP_NO_ERROR
+        // If the mState unitRange is not null and incoming unitRange is null, then set mstate unitRange to null.
         if (!mState.unitRange.IsNull())
         {
             mState.unitRange.SetNull();
