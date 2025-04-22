@@ -41,8 +41,8 @@ std::unique_ptr<Instance> gInstanceTable[kOvenCavityOperationalStateTableSize];
  *   2. onOvenCavityOperationalStateTimerTick is the timer tick function. It decides whether to run another one second iteration
  *      (if there are seconds left to run) or just return and end the timer (when state is invalid or cycle is complete).
  * Timer usage -
- *   * Timer is started on receiving start commmand.
- *   * Timer continues to run until running time has surpassed cycle time (cycle is compleye) OR operational state is non-running.
+ *   * Timer is started on receiving start command.
+ *   * Timer continues to run until running time has surpassed cycle time (cycle is complete) OR operational state is non-running.
  *   * Stop command handler ends an ongoing timer.
  */
 static void onOvenCavityOperationalStateTimerTick(System::Layer * systemLayer, void * data)
@@ -53,15 +53,10 @@ static void onOvenCavityOperationalStateTimerTick(System::Layer * systemLayer, v
     if (opState != to_underlying(OperationalStateEnum::kRunning))
     {
         ChipLogError(DeviceLayer, "onOperationalStateTimerTick: Operational cycle can not be active in state %d", opState);
-        (void) DeviceLayer::SystemLayer().CancelTimer(onOvenCavityOperationalStateTimerTick, delegate);
         return;
     }
 
-    if (!delegate->CheckCycleActive())
-    {
-        (void) DeviceLayer::SystemLayer().CancelTimer(onOvenCavityOperationalStateTimerTick, delegate);
-        return;
-    }
+    if (!delegate->CheckCycleActive()) return;
 
     delegate->CycleSecondTick();
 
