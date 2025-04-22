@@ -81,7 +81,6 @@ bool ChefDelegate::StartCycle()
         return false;
     }
     mRunningTime.SetNonNull(static_cast<uint32_t>(0));
-    mPausedTime.SetNonNull(static_cast<uint32_t>(0));
     app::DataModel::Nullable<uint8_t> phase = GetRunningPhase();
     if (phase.IsNull())
     {
@@ -128,7 +127,7 @@ void ChefDelegate::CycleSecondTick()
     }
     GetInstance()->UpdateCountdownTimeFromDelegate();
 
-    ChipLogDetail(DeviceLayer, "CycleSecondTick: Running time: %d. Paused time: %d", mRunningTime.Value(), mPausedTime.Value());
+    ChipLogDetail(DeviceLayer, "CycleSecondTick: Running time: %d.", mRunningTime.Value());
     if (newPhase.IsNull())
     {
         ChipLogDetail(DeviceLayer, "CycleSecondTick: Phase: NULL");
@@ -160,7 +159,6 @@ bool ChefDelegate::CheckCycleComplete()
 void ChefDelegate::EndCycle()
 {
     mRunningTime.SetNull();
-    mPausedTime.SetNull();
     CHIP_ERROR err = GetInstance()->SetCurrentPhase(DataModel::NullNullable);
     if (err != CHIP_NO_ERROR)
     {
@@ -221,7 +219,6 @@ void ChefDelegate::HandleStartStateCallback(OperationalState::GenericOperational
 void ChefDelegate::HandleStopStateCallback(OperationalState::GenericOperationalError & err)
 {
     uint32_t RunningTime = mRunningTime.IsNull() ? 0 : mRunningTime.Value();
-    uint32_t PausedTime  = mPausedTime.IsNull() ? 0 : mPausedTime.Value();
     uint8_t opState      = GetCurrentOperationalState();
     if (CheckCycleActive())
     {
@@ -246,10 +243,9 @@ void ChefDelegate::HandleStopStateCallback(OperationalState::GenericOperationalE
     OperationalState::GenericOperationalError current_err(to_underlying(OperationalState::ErrorStateEnum::kNoError));
     GetInstance()->GetCurrentOperationalError(current_err);
 
-    Optional<DataModel::Nullable<uint32_t>> totalTime((DataModel::Nullable<uint32_t>(RunningTime + PausedTime)));
-    Optional<DataModel::Nullable<uint32_t>> pausedTime((DataModel::Nullable<uint32_t>(PausedTime)));
+    Optional<DataModel::Nullable<uint32_t>> totalTime((DataModel::Nullable<uint32_t>(RunningTime)));
 
-    GetInstance()->OnOperationCompletionDetected(static_cast<uint8_t>(current_err.errorStateID), totalTime, pausedTime);
+    GetInstance()->OnOperationCompletionDetected(static_cast<uint8_t>(current_err.errorStateID), totalTime, std::nullopt);
     err.Set(to_underlying(ErrorStateEnum::kNoError));
 }
 
