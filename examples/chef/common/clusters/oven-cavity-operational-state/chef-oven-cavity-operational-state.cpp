@@ -211,7 +211,7 @@ void ChefDelegate::HandleStartStateCallback(OperationalState::GenericOperational
     if (CheckCycleActive())
         EndCycle();
 
-    auto error = GetInstance()->SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
+    CHIP_ERROR error = GetInstance()->SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
     if (error != CHIP_NO_ERROR)
     {
         err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
@@ -222,11 +222,10 @@ void ChefDelegate::HandleStartStateCallback(OperationalState::GenericOperational
         err.Set(to_underlying(ErrorStateEnum::kUnableToStartOrResume));
         return;
     }
-    CHIP_ERROR err =
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOvenCavityOperationalStateTimerTick, this);
-    if (err != CHIP_NO_ERROR)
+    error = DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOvenCavityOperationalStateTimerTick, this);
+    if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "HandleStartStateCallback: Failed to start timer. %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(DeviceLayer, "HandleStartStateCallback: Failed to start timer. %" CHIP_ERROR_FORMAT, error.Format());
         err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
         return;
     }
