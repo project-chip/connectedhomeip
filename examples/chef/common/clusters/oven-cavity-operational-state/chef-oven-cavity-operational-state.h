@@ -24,9 +24,8 @@
 #include <app/util/attribute-metadata.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-#ifdef MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
-
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters;
 
 namespace chef {
@@ -44,19 +43,19 @@ private:
     const uint32_t kPreHeatedSeconds   = 50;
     const uint32_t kCoolingDownSeconds = 10;
     const uint32_t kCycleSeconds       = kPreHeatingSeconds + kPreHeatedSeconds + kCoolingDownSeconds;
-    const OvenCavityOperationalState::OperationalStateEnum kOpStateList[4] = {
-        OperationalStateEnum::kStopped,
-        OperationalStateEnum::kRunning,
-        OperationalStateEnum::kPaused,
-        OperationalStateEnum::kError,
+    const Clusters::OvenCavityOperationalState::OperationalStateEnum kOpStateList[4] = {
+        Clusters::OvenCavityOperationalState::OperationalStateEnum::kStopped,
+        Clusters::OvenCavityOperationalState::OperationalStateEnum::kRunning,
+        Clusters::OvenCavityOperationalState::OperationalStateEnum::kPaused,
+        Clusters::OvenCavityOperationalState::OperationalStateEnum::kError,
     };
 
-    Span<const OvenCavityOperationalState::OperationalStateEnum> mOperationalStateList;
+    Span<const Clusters::OvenCavityOperationalState::OperationalStateEnum> mOperationalStateList;
     Span<const CharSpan> mOperationalPhaseList;
 
     // Non-null when cycle is in progress.
-    app::DataModel::Nullable<uint32_t> mRunningTime;
-    app::DataModel::Nullable<uint32_t> mPausedTime;
+    DataModel::Nullable<uint32_t> mRunningTime;
+    DataModel::Nullable<uint32_t> mPausedTime;
 
 public:
     Delegate()
@@ -67,13 +66,13 @@ public:
         mOperationalPhaseList = Span<const CharSpan>(kPhaseList);
     }
 
-    app::DataModel::Nullable<uint32_t> GetCountdownTime() override;
-    CHIP_ERROR GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState) override;
+    DataModel::Nullable<uint32_t> GetCountdownTime() override;
+    CHIP_ERROR GetOperationalStateAtIndex(size_t index, OperationalState::GenericOperationalState & operationalState) override;
     CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase) override;
-    void HandlePauseStateCallback(GenericOperationalError & err) override;
-    void HandleResumeStateCallback(GenericOperationalError & err) override;
-    void HandleStartStateCallback(GenericOperationalError & err) override;
-    void HandleStopStateCallback(GenericOperationalError & err) override;
+    void HandlePauseStateCallback(OperationalState::GenericOperationalState & err) override;
+    void HandleResumeStateCallback(OperationalState::GenericOperationalState & err) override;
+    void HandleStartStateCallback(OperationalState::GenericOperationalState & err) override;
+    void HandleStopStateCallback(OperationalState::GenericOperationalState & err) override;
 
     /**
      * @brief Starts a new cycle with Run/Pause times set to 0. Returns True if new cycle started successfully.
@@ -115,5 +114,3 @@ void InitChefOvenCavityOperationalStateCluster();
 
 } // namespace OvenCavityOperationalState
 } // namespace chef
-
-#endif // MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER

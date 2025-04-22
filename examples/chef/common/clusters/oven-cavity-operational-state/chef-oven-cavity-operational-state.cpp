@@ -20,9 +20,8 @@
 #include <app/util/endpoint-config-api.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#ifdef MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
-
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters;
 
 namespace chef {
@@ -32,15 +31,15 @@ constexpr size_t kOvenCavityOperationalStateTableSize = MATTER_DM_OPERATIONAL_ST
 static_assert(kOvenCavityOperationalStateTableSize <= kEmberInvalidEndpointIndex, "OvenCavityOperationalState table size error");
 
 std::unique_ptr<Delegate> gDelegateTable[kOvenCavityOperationalStateTableSize];
-std::unique_ptr<OvenCavityOperationalState::Instance> gInstanceTable[kOvenCavityOperationalStateTableSize];
+std::unique_ptr<Clusters::OvenCavityOperationalState::Instance> gInstanceTable[kOvenCavityOperationalStateTableSize];
 
 static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data)
 {
     Delegate * delegate = reinterpret_cast<Delegate *>(data);
 
     uint8_t opState = delegate->GetCurrentOperationalState();
-    if (opState != to_underlying(OvenCavityOperationalState::OperationalStateEnum::kRunning) &&
-        opState != to_underlying(OvenCavityOperationalState::OperationalStateEnum::kPaused))
+    if (opState != to_underlying(Clusters::OvenCavityOperationalState::OperationalStateEnum::kRunning) &&
+        opState != to_underlying(Clusters::OvenCavityOperationalState::OperationalStateEnum::kPaused))
     {
         ChipLogError(DeviceLayer, "onOperationalStateTimerTick: Operational cycle can not be active in state %d", opState);
         (void) DeviceLayer::SystemLayer().CancelTimer(onOperationalStateTimerTick, delegate);
@@ -66,7 +65,7 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
     }
 }
 
-app::DataModel::Nullable<uint32_t> Delegate::GetCountdownTime()
+DataModel::Nullable<uint32_t> Delegate::GetCountdownTime()
 {
     if (mRunningTime.IsNull() || CheckCycleComplete())
         return DataModel::NullNullable;
@@ -107,13 +106,13 @@ void Delegate::CycleSecondTick()
 {
     if (mRunningTime.IsNull() || CheckCycleComplete())
         return;
-    uint8_t opState                            = GetCurrentOperationalState();
-    app::DataModel::Nullable<uint8_t> oldPhase = GetRunningPhase();
-    if (opState == to_underlying(OvenCavityOperationalState::OperationalStateEnum::kRunning))
+    uint8_t opState                       = GetCurrentOperationalState();
+    DataModel::Nullable<uint8_t> oldPhase = GetRunningPhase();
+    if (opState == to_underlying(Clusters::OvenCavityOperationalState::OperationalStateEnum::kRunning))
     {
         mRunningTime.SetNonNull(mRunningTime.Value() + 1);
     }
-    else if (opState == to_underlying(OvenCavityOperationalState::OperationalStateEnum::kPaused))
+    else if (opState == to_underlying(Clusters::OvenCavityOperationalState::OperationalStateEnum::kPaused))
     {
         if (mPausedTime.IsNull())
             mPausedTime.SetNonNull(static_cast<uint32_t>(0));
@@ -124,7 +123,7 @@ void Delegate::CycleSecondTick()
         ChipLogError(DeviceLayer, "CycleSecondTick: Invalid state %d", opState);
         return;
     }
-    app::DataModel::Nullable<uint8_t> newPhase = GetRunningPhase();
+    DataModel::Nullable<uint8_t> newPhase = GetRunningPhase();
     if (newPhase != oldPhase)
     {
         CHIP_ERROR err = GetInstance()->SetCurrentPhase(newPhase);
@@ -146,7 +145,7 @@ void Delegate::CycleSecondTick()
     }
 }
 
-app::DataModel::Nullable<uint8_t> Delegate::GetRunningPhase()
+DataModel::Nullable<uint8_t> Delegate::GetRunningPhase()
 {
     if (mRunningTime.IsNull() || CheckCycleComplete())
         return DataModel::NullNullable;
@@ -185,23 +184,23 @@ uint8_t Delegate::GetCurrentOperationalState()
     return GetInstance()->GetCurrentOperationalState();
 }
 
-void Delegate::HandleStartStateCallback(GenericOperationalError & err)
+void Delegate::HandleStartStateCallback(OperationalState::GenericOperationalState & err)
 {
     OperationalState::GenericOperationalError current_err(to_underlying(OperationalState::ErrorStateEnum::kNoError));
     GetInstance()->GetCurrentOperationalError(current_err);
     uint8_t opState = GetCurrentOperationalState();
 
     if (current_err.errorStateID != to_underlying(OperationalState::ErrorStateEnum::kNoError) ||
-        opState == OvenCavityOperationalState::OperationalStateEnum::kError)
+        opState == Clusters::OvenCavityOperationalState::OperationalStateEnum::kError)
     {
-        err.Set(to_underlying(OvenCavityOperationalState::ErrorStateEnum::kUnableToStartOrResume));
+        err.Set(to_underlying(Clusters::OvenCavityOperationalState::ErrorStateEnum::kUnableToStartOrResume));
         return;
     }
 
-    if (opState == to_underlying(OvenCavityOperationalState::OperationalStateEnum::kRunning) ||
-        opState == to_underlying(OvenCavityOperationalState::OperationalStateEnum::kPaused))
+    if (opState == to_underlying(Clusters::OvenCavityOperationalState::OperationalStateEnum::kRunning) ||
+        opState == to_underlying(Clusters::OvenCavityOperationalState::OperationalStateEnum::kPaused))
     {
-        err.Set(to_underlying(OvenCavityOperationalState::ErrorStateEnum::kNoError));
+        err.Set(to_underlying(Clusters::OvenCavityOperationalState::ErrorStateEnum::kNoError));
         return;
     }
 
@@ -211,22 +210,23 @@ void Delegate::HandleStartStateCallback(GenericOperationalError & err)
         EndCycle();
     }
 
-    auto error = GetInstance()->SetOperationalState(to_underlying(OvenCavityOperationalState::OperationalStateEnum::kRunning));
+    auto error =
+        GetInstance()->SetOperationalState(to_underlying(Clusters::OvenCavityOperationalState::OperationalStateEnum::kRunning));
     if (error != CHIP_NO_ERROR)
     {
-        err.Set(to_underlying(OvenCavityOperationalState::ErrorStateEnum::kUnableToCompleteOperation));
+        err.Set(to_underlying(Clusters::OvenCavityOperationalState::ErrorStateEnum::kUnableToCompleteOperation));
         return;
     }
     if (!StartCycle())
     {
-        err.Set(to_underlying(OvenCavityOperationalState::ErrorStateEnum::kUnableToStartOrResume));
+        err.Set(to_underlying(Clusters::OvenCavityOperationalState::ErrorStateEnum::kUnableToStartOrResume));
         return;
     }
     (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOperationalStateTimerTick, this);
-    err.Set(to_underlying(OvenCavityOperationalState::ErrorStateEnum::kNoError));
+    err.Set(to_underlying(Clusters::OvenCavityOperationalState::ErrorStateEnum::kNoError));
 }
 
-void Delegate::HandleStopStateCallback(GenericOperationalError & err)
+void Delegate::HandleStopStateCallback(OperationalState::GenericOperationalError & err)
 {
     uint32_t RunningTime = mRunningTime.IsNull() ? 0 : mRunningTime.Value();
     uint32_t PausedTime  = mPausedTime.IsNull() ? 0 : mPausedTime.Value();
@@ -237,8 +237,8 @@ void Delegate::HandleStopStateCallback(GenericOperationalError & err)
         EndCycle();
     }
 
-    if (opState != OvenCavityOperationalState::OperationalStateEnum::kRunning &&
-        opState != OvenCavityOperationalState::OperationalStateEnum::kPaused)
+    if (opState != Clusters::OvenCavityOperationalState::OperationalStateEnum::kRunning &&
+        opState != Clusters::OvenCavityOperationalState::OperationalStateEnum::kPaused)
     {
         ChipLogDetail(DeviceLayer, "HandleStopStateCallback: Cycle not started. Current state = %d. Returning.",
                       to_underlying(current_state));
@@ -246,10 +246,11 @@ void Delegate::HandleStopStateCallback(GenericOperationalError & err)
         return;
     }
 
-    auto error = GetInstance()->SetOperationalState(to_underlying(OvenCavityOperationalState::OperationalStateEnum::kStopped));
+    auto error =
+        GetInstance()->SetOperationalState(to_underlying(Clusters::OvenCavityOperationalState::OperationalStateEnum::kStopped));
     if (error != CHIP_NO_ERROR)
     {
-        err.Set(to_underlying(OvenCavityOperationalState::ErrorStateEnum::kUnableToCompleteOperation));
+        err.Set(to_underlying(Clusters::OvenCavityOperationalState::ErrorStateEnum::kUnableToCompleteOperation));
         return;
     }
 
@@ -260,27 +261,27 @@ void Delegate::HandleStopStateCallback(GenericOperationalError & err)
     Optional<DataModel::Nullable<uint32_t>> pausedTime((DataModel::Nullable<uint32_t>(PausedTime)));
 
     GetInstance()->OnOperationCompletionDetected(static_cast<uint8_t>(current_err.errorStateID), totalTime, pausedTime);
-    err.Set(to_underlying(OvenCavityOperationalState::ErrorStateEnum::kNoError));
+    err.Set(to_underlying(Clusters::OvenCavityOperationalState::ErrorStateEnum::kNoError));
 }
 
-void Delegate::HandlePauseStateCallback(GenericOperationalError & err)
+void Delegate::HandlePauseStateCallback(OperationalState::GenericOperationalError & err)
 {
-    err.Set(to_underlying(OvenCavityOperationalState::ErrorStateEnum::kUnableToCompleteOperation)); // Not supported.
+    err.Set(to_underlying(Clusters::OvenCavityOperationalState::ErrorStateEnum::kUnableToCompleteOperation)); // Not supported.
 }
 
-void Delegate::HandleResumeStateCallback(GenericOperationalError & err)
+void Delegate::HandleResumeStateCallback(OperationalState::GenericOperationalError & err)
 {
-    err.Set(to_underlying(OvenCavityOperationalState::ErrorStateEnum::kUnableToCompleteOperation)); // Not supported.
+    err.Set(to_underlying(Clusters::OvenCavityOperationalState::ErrorStateEnum::kUnableToCompleteOperation)); // Not supported.
 }
 
-CHIP_ERROR Delegate::GenericOperationalStateDelegateImpl::GetOperationalStateAtIndex(size_t index,
-                                                                                     GenericOperationalState & operationalState)
+CHIP_ERROR Delegate::GenericOperationalStateDelegateImpl::GetOperationalStateAtIndex(
+    size_t index, OperationalState::GenericOperationalState & operationalState)
 {
     if (index >= mOperationalStateList.size())
     {
         return CHIP_ERROR_NOT_FOUND;
     }
-    operationalState = GenericOperationalState(to_underlying(mOperationalStateList[index]));
+    operationalState = OperationalState::GenericOperationalState(to_underlying(mOperationalStateList[index]));
     return CHIP_NO_ERROR;
 }
 
@@ -310,14 +311,15 @@ void InitChefOvenCavityOperationalStateCluster()
         }
 
         // Check if endpoint has OvenCavityOperationalState cluster enabled
-        uint16_t epIndex = emberAfGetClusterServerEndpointIndex(endpointId, OvenCavityOperationalState::Id,
+        uint16_t epIndex = emberAfGetClusterServerEndpointIndex(endpointId, Clusters::OvenCavityOperationalState::Id,
                                                                 MATTER_DM_OPERATIONAL_STATE_OVEN_CLUSTER_SERVER_ENDPOINT_COUNT);
         if (epIndex >= kOvenCavityOperationalStateTableSize)
             continue;
 
         gDelegateTable[epIndex] = std::make_unique<Delegate>();
 
-        gInstanceTable[epIndex] = std::make_unique<OvenCavityOperationalState::Instance>(gDelegateTable[epIndex].get(), endpointId);
+        gInstanceTable[epIndex] =
+            std::make_unique<Clusters::OvenCavityOperationalState::Instance>(gDelegateTable[epIndex].get(), endpointId);
         gInstanceTable[epIndex]->Init();
 
         ChipLogProgress(DeviceLayer, "Endpoint %d OvenCavityOperationalState Initialized.", endpointId);
@@ -326,5 +328,3 @@ void InitChefOvenCavityOperationalStateCluster()
 
 } // namespace OvenCavityOperationalState
 } // namespace chef
-
-#endif // MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
