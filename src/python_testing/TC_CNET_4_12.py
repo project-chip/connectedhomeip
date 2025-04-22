@@ -274,11 +274,18 @@ class TC_CNET_4_12(MatterBaseTest):
         asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
                              "Failure status returned from ConnectNetwork")
 
+        # Read the ConnectMaxTimeSeconds attribute after attempting to connect
+        connect_max_time_seconds = await self.read_single_attribute_check_success(
+            cluster=Clusters.NetworkCommissioning,
+            attribute=Clusters.NetworkCommissioning.Attributes.ConnectMaxTimeSeconds
+        )
+        logger.info(f'Step #7: ConnectMaxTimeSeconds value: {connect_max_time_seconds}')
+
         # Wait for the device to establish connection with the new Thread network
-        await asyncio.sleep(wait_time_reboot)
+        await asyncio.sleep(connect_max_time_seconds + 5)
 
         self.step(8)
-        await asyncio.sleep(10)
+        # await asyncio.sleep(10)
         networks = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.Networks
@@ -290,8 +297,8 @@ class TC_CNET_4_12(MatterBaseTest):
         # Expire the session and re-establish the new session reading attribute (Breadcrum)
         resp = self.default_controller.ExpireSessions(self.dut_node_id)
         logger.info(f'Step #9: Expire the session and re-establish the new session: {resp}')
-        await asyncio.sleep(wait_time_reboot)
-        await asyncio.sleep(10)
+        # await asyncio.sleep(wait_time_reboot)
+        # await asyncio.sleep(10)
 
         breadcrumb_info = await self.read_single_attribute_check_success(
             cluster=Clusters.GeneralCommissioning,
@@ -302,7 +309,7 @@ class TC_CNET_4_12(MatterBaseTest):
         #                      "The Breadcrumb attribute is not 2")
 
         self.step(10)
-        await asyncio.sleep(10)
+        # await asyncio.sleep(10)
         # Workaround 600s
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=600)
         resp = await self.send_single_cmd(
