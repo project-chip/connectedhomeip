@@ -24,33 +24,30 @@
 #include <app/util/attribute-metadata.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-
-namespace chef {
+namespace chip {
+namespace app {
+namespace Clusters {
 namespace OvenCavityOperationalState {
-
 /**
  * @brief Delegate handles heating cycle in 3 phases: pre-heating (0), pre-heated (1) and cooling down (2).
  * Cycle times are compile constants. TBD if cycle times need to be made run time modifiable.
  */
-class Delegate : public OperationalState::Delegate
+class ChefDelegate : public OperationalState::Delegate
 {
 private:
-    const CharSpan kPhaseList[3]       = { "pre-heating"_span, "pre-heated"_span, "cooling down"_span };
-    const uint32_t kPreHeatingSeconds  = 10;
-    const uint32_t kPreHeatedSeconds   = 50;
-    const uint32_t kCoolingDownSeconds = 10;
-    const uint32_t kCycleSeconds       = kPreHeatingSeconds + kPreHeatedSeconds + kCoolingDownSeconds;
-    const Clusters::OvenCavityOperationalState::OperationalStateEnum kOpStateList[4] = {
-        Clusters::OvenCavityOperationalState::OperationalStateEnum::kStopped,
-        Clusters::OvenCavityOperationalState::OperationalStateEnum::kRunning,
-        Clusters::OvenCavityOperationalState::OperationalStateEnum::kPaused,
-        Clusters::OvenCavityOperationalState::OperationalStateEnum::kError,
+    const CharSpan kPhaseList[3]               = { "pre-heating"_span, "pre-heated"_span, "cooling down"_span };
+    const uint32_t kPreHeatingSeconds          = 10;
+    const uint32_t kPreHeatedSeconds           = 50;
+    const uint32_t kCoolingDownSeconds         = 10;
+    const uint32_t kCycleSeconds               = kPreHeatingSeconds + kPreHeatedSeconds + kCoolingDownSeconds;
+    const OperationalStateEnum kOpStateList[4] = {
+        OperationalStateEnum::kStopped,
+        OperationalStateEnum::kRunning,
+        OperationalStateEnum::kPaused,
+        OperationalStateEnum::kError,
     };
 
-    Span<const Clusters::OvenCavityOperationalState::OperationalStateEnum> mOperationalStateList;
+    Span<const OperationalStateEnum> mOperationalStateList;
     Span<const CharSpan> mOperationalPhaseList;
 
     // Non-null when cycle is in progress.
@@ -58,11 +55,11 @@ private:
     DataModel::Nullable<uint32_t> mPausedTime;
 
 public:
-    Delegate()
+    ChefDelegate()
     {
         mRunningTime.SetNull();
         mPausedTime.SetNull();
-        mOperationalStateList = Span<const OvenCavityOperationalState::OperationalStateEnum>(kOpStateList);
+        mOperationalStateList = Span<const OperationalStateEnum>(kOpStateList);
         mOperationalPhaseList = Span<const CharSpan>(kPhaseList);
     }
 
@@ -113,4 +110,7 @@ public:
 void InitChefOvenCavityOperationalStateCluster();
 
 } // namespace OvenCavityOperationalState
-} // namespace chef
+
+} // namespace Clusters
+} // namespace app
+} // namespace chip

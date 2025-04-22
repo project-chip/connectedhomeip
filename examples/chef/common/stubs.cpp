@@ -464,7 +464,7 @@ void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
         SetTagList(kTemperatureControlledCabinetEpId,
                    Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(PostionSemanticTag::kTopTagList));
 #ifdef MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
-        chef::OvenCavityOperationalState::InitChefOvenCavityOperationalStateCluster();
+        Clusters::OvenCavityOperationalState::InitChefOvenCavityOperationalStateCluster();
 #endif // MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
     }
     CooktopCookSurfaceInit(kCooktopEpId);
