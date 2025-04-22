@@ -214,7 +214,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, Attrib
 #ifdef CONFIG_USE_ENDPOINT_UNIQUE_ID
 CHIP_ERROR DescriptorAttrAccess::ReadEndpointUniqueId(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    DataModel::ListBuilder<MutableCharSpan> epUniqueId;
+    ReadOnlyBufferBuilder<MutableCharSpan> epUniqueId;
 
     ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointUniqueID(endpoint, epUniqueId));
 
