@@ -250,6 +250,11 @@ void NetworkRecover::OnBLEDiscoveryError(CHIP_ERROR err)
         // finish recover connection
         NetworkRecoverComplete(mRemoteId, err);
     }
+    else
+    {
+        // BLE scan timeout, no recoverable found, scan again
+        StartDiscoverOverBle(0);
+    }
 }
 
 void NetworkRecover::OnDiscoveredDeviceOverBle(void * appState, uint64_t recoveryId)

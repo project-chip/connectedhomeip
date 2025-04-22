@@ -29,6 +29,7 @@ void NetworkRecoveryCommandBase::OnNetworkRecoverDiscover(std::list<uint64_t> re
     for (const auto & recoveryId : recoveryIds)
     {
         ChipLogProgress(chipTool, "0x" ChipLogFormatX64, ChipLogValueX64(recoveryId));
+        (void) recoveryId; // Avoid unused variable warning in case logging is disabled
     }
     SetCommandExitStatus(CHIP_NO_ERROR);
 }

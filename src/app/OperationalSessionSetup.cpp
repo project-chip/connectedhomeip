@@ -360,15 +360,13 @@ void OperationalSessionSetup::DequeueConnectionCallbacks(CHIP_ERROR error, Sessi
 {
     // We expect that we only have callbacks if we are not performing just address update.
     VerifyOrDie(!mPerformingAddressUpdate || mCallbacks.IsEmpty());
+
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     // Clear out mConnectionRetry, so that those cancelables are not holding
     // pointers to us, since we're about to go away.
-    if (!mConnectionRetry.IsEmpty())
+    while (auto * cb = mConnectionRetry.First())
     {
-        while (auto * cb = mConnectionRetry.First())
-        {
-            cb->Cancel();
-        }
+        cb->Cancel();
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
