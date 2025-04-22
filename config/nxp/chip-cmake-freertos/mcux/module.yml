@@ -15,5 +15,5 @@
 #
 name: chip
 build:
-  cmake: .
-  kconfig: Kconfig
+    cmake: .
+    kconfig: Kconfig
