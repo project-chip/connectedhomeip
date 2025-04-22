@@ -32,7 +32,7 @@ namespace Clusters {
 namespace OvenCavityOperationalState {
 /**
  * @brief Delegate handles heating cycle in 3 phases: pre-heating (0), pre-heated (1) and cooling down (2).
- * Cycle times are compile constants. TBD if cycle times need to be made run time modifiable.
+ * Cycle times are constants. TBD if cycle times need to be made run time modifiable.
  */
 class ChefDelegate : public OperationalState::Delegate
 {
@@ -45,7 +45,6 @@ private:
     const OperationalStateEnum kOpStateList[4] = {
         OperationalStateEnum::kStopped,
         OperationalStateEnum::kRunning,
-        OperationalStateEnum::kPaused,
         OperationalStateEnum::kError,
     };
 
@@ -54,13 +53,11 @@ private:
 
     // Non-null when cycle is in progress.
     DataModel::Nullable<uint32_t> mRunningTime;
-    DataModel::Nullable<uint32_t> mPausedTime;
 
 public:
     ChefDelegate()
     {
         mRunningTime.SetNull();
-        mPausedTime.SetNull();
         mOperationalStateList = Span<const OperationalStateEnum>(kOpStateList);
         mOperationalPhaseList = Span<const CharSpan>(kPhaseList);
     }
@@ -74,35 +71,36 @@ public:
     void HandleStopStateCallback(OperationalState::GenericOperationalError & err) override;
 
     /**
-     * @brief Starts a new cycle with Run/Pause times set to 0. Returns True if new cycle started successfully.
-     * Returns False on failure / current cycle in progress.
+     * @brief Starts a new cycle with Run time set to 0 and current phase set to 0.
+     * Returns True if new cycle started successfully.
+     * Returns False on failure or if a cycle is already active.
      */
     bool StartCycle();
 
     /**
-     * @brief Increments run/paused (based on operational state) by one and updates current Phase if changed.
-     * NOP if no cycle is in progress / cycle has finished.
+     * @brief Increments run time by one and updates current Phase if changed.
+     * NOP if no cycle is active or current cycle has finished.
      */
     void CycleSecondTick();
 
     /**
-     * @brief Gets the current phase based on current running time. NULL if cycle is not in progress or has
+     * @brief Gets the current phase based on current running time. NULL if no cycle is active or cycle has
      * completed.
      */
     app::DataModel::Nullable<uint8_t> GetRunningPhase();
 
     /**
-     * @brief Returns True if an in-progress cycle run time has reached its cycle time. False otherwise.
+     * @brief Returns True if an active cycles run time has reached its cycle time. False otherwise.
      */
     bool CheckCycleComplete();
 
     /**
-     * @brief Returns True if cycle was started but not ended.
+     * @brief Returns True if a cycle is active.
      */
     bool CheckCycleActive();
 
     /**
-     * @brief Sets run/pause times and current phase to NULL.
+     * @brief Deactivates cycle by setting run-time and current phase to NULL.
      */
     void EndCycle();
 

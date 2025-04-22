@@ -39,7 +39,7 @@ static void onOvenCavityOperationalStateTimerTick(System::Layer * systemLayer, v
     ChefDelegate * delegate = reinterpret_cast<ChefDelegate *>(data);
 
     uint8_t opState = delegate->GetCurrentOperationalState();
-    if (opState != to_underlying(OperationalStateEnum::kRunning) && opState != to_underlying(OperationalStateEnum::kPaused))
+    if (opState != to_underlying(OperationalStateEnum::kRunning))
     {
         ChipLogError(DeviceLayer, "onOperationalStateTimerTick: Operational cycle can not be active in state %d", opState);
         (void) DeviceLayer::SystemLayer().CancelTimer(onOvenCavityOperationalStateTimerTick, delegate);
@@ -111,12 +111,6 @@ void ChefDelegate::CycleSecondTick()
     if (opState == to_underlying(OperationalStateEnum::kRunning))
     {
         mRunningTime.SetNonNull(mRunningTime.Value() + 1);
-    }
-    else if (opState == to_underlying(OperationalStateEnum::kPaused))
-    {
-        if (mPausedTime.IsNull())
-            mPausedTime.SetNonNull(static_cast<uint32_t>(0));
-        mPausedTime.SetNonNull(mPausedTime.Value() + 1);
     }
     else
     {
@@ -197,7 +191,7 @@ void ChefDelegate::HandleStartStateCallback(OperationalState::GenericOperational
         return;
     }
 
-    if (opState == to_underlying(OperationalStateEnum::kRunning) || opState == to_underlying(OperationalStateEnum::kPaused))
+    if (opState == to_underlying(OperationalStateEnum::kRunning))
     {
         err.Set(to_underlying(ErrorStateEnum::kNoError));
         return;
@@ -235,7 +229,7 @@ void ChefDelegate::HandleStopStateCallback(OperationalState::GenericOperationalE
         EndCycle();
     }
 
-    if (opState != to_underlying(OperationalStateEnum::kRunning) && opState != to_underlying(OperationalStateEnum::kPaused))
+    if (opState != to_underlying(OperationalStateEnum::kRunning))
     {
         ChipLogDetail(DeviceLayer, "HandleStopStateCallback: Cycle not started. Current state = %d. Returning.", opState);
         err.Set(to_underlying(ErrorStateEnum::kNoError));
