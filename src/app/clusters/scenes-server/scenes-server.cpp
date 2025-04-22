@@ -342,7 +342,9 @@ CHIP_ERROR ScenesServer::Init()
 
 void ScenesServer::Shutdown()
 {
+    chip::Server::GetInstance().GetFabricTable().RemoveFabricDelegate(&gFabricDelegate);
     chip::app::CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    chip::app::AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 
     mGroupProvider = nullptr;
     mIsInitialized = false;

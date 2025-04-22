@@ -473,6 +473,7 @@ void TimeSynchronizationServer::Init()
 void TimeSynchronizationServer::Shutdown()
 {
     PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, 0);
+    chip::Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
 }
 
 void TimeSynchronizationServer::OnPlatformEventFn(const DeviceLayer::ChipDeviceEvent & event)
