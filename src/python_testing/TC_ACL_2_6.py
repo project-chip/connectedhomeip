@@ -58,7 +58,7 @@ class TC_ACL_2_6(MatterBaseTest):
                      "Result is SUCCESS, value is list of AccessControlEntryChanged events containing 2 new elements"),
             TestStep(6, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 2 elements. The first item is valid, the second item is invalid due to group ID 0 being used, which is illegal.", "Result is CONSTRAINT_ERROR"),
             TestStep(7, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
-                     "value is empty list (received ReportData Message should have no/empty EventReportIB list) since the entire list of Test Step 6 was rejected."),
+                     "value MUST NOT contain an AccessControlEntryChanged entry corresponding to the second invalid entry in step 6."),
         ]
         return steps
 
