@@ -69,7 +69,7 @@ class TC_CNET_4_15(MatterBaseTest):
         # Verify that DUT sends ArmFailSafeResponse command with success status
         asserts.assert_equal(
             send_arm.errorCode,
-            Clusters.GeneralCommissioning.Enums.CommissioningError.kOk,
+            Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
             "ArmFailSafe command failed"
         )
 
@@ -88,7 +88,7 @@ class TC_CNET_4_15(MatterBaseTest):
         # Verify NetworkConfigResponse has NetworkIDNotFound status
         asserts.assert_equal(
             send_remove.status,
-            cnet.Enums.NetworkCommissioningStatus.kNetworkIDNotFound,
+            Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kNetworkIDNotFound,
             "Expected NetworkIDNotFound status for non-existent network"
         )
 
@@ -101,12 +101,10 @@ class TC_CNET_4_15(MatterBaseTest):
                 breadcrumb=1
             )
         )
-        # Log response structure
-        logging.info(f"ConnectNetwork response: {send_connect}")
         # Verify ConnectNetworkResponse has NetworkIDNotFound status
         asserts.assert_equal(
             send_connect.status,
-            cnet.Enums.NetworkCommissioningStatus.kNetworkIDNotFound,
+            Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kNetworkIDNotFound,
             "Expected NetworkIDNotFound status for non-existent network"
         )
 
