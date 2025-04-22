@@ -24,7 +24,7 @@ config:
     TEST_EVENT_TRIGGER_KEY:
         type: octet_string
         defaultValue: "hex:00112233445566778899aabbccddeeff"
-    TEST_EVENT_TRIGGER_ATTRIBUTES_VALUE_UPDATE:
+    TEST_EVENT_TRIGGER_ATTRIBUTES_VALUE_SET:
         type: int64u
         defaultValue: "0x0b06000000000000"
     TEST_EVENT_TRIGGER_TEST_EVENT_CLEAR:
@@ -73,7 +73,7 @@ tests:
           "Step 5: TH sends TestEventTrigger command to General Diagnostics
           Cluster on Endpoint 0 with EnableKey field set to
           PIXIT.MTRID.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.MTRID.TEST_EVENT_TRIGGER for Attributes Value Update Test Event"
+          PIXIT.MTRID.TEST_EVENT_TRIGGER for Attributes Value Set Test Event"
       PICS: DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -83,7 +83,7 @@ tests:
               - name: "EnableKey"
                 value: TEST_EVENT_TRIGGER_KEY
               - name: "EventTrigger"
-                value: TEST_EVENT_TRIGGER_ATTRIBUTES_VALUE_UPDATE
+                value: TEST_EVENT_TRIGGER_ATTRIBUTES_VALUE_SET
 
     - label: "Step 6: Check for PowerThreshold attribute report"
       PICS: MTRID.S.A0004
@@ -105,7 +105,7 @@ tests:
           "Step 8: TH sends TestEventTrigger command to General Diagnostics
           Cluster on Endpoint 0 with EnableKey field set to
           PIXIT.MTRID.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.MTRID.TEST_EVENT_TRIGGER for Attributes Value Update Test Event"
+          PIXIT.MTRID.TEST_EVENT_TRIGGER for Attributes Value Set Test Event"
       PICS: DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -115,7 +115,7 @@ tests:
               - name: "EnableKey"
                 value: TEST_EVENT_TRIGGER_KEY
               - name: "EventTrigger"
-                value: TEST_EVENT_TRIGGER_ATTRIBUTES_VALUE_UPDATE
+                value: TEST_EVENT_TRIGGER_ATTRIBUTES_VALUE_SET
 
     - label: "Step 9: Check for PowerThreshold attribute report"
       PICS: MTRID.S.A0004
@@ -147,7 +147,7 @@ tests:
               - name: "EnableKey"
                 value: TEST_EVENT_TRIGGER_KEY
               - name: "EventTrigger"
-                value: TEST_EVENT_TRIGGER_ATTRIBUTES_VALUE_UPDATE
+                value: TEST_EVENT_TRIGGER_TEST_EVENT_CLEAR
 
     - label: "Step 12: Check for PowerThreshold attribute report"
       PICS: MTRID.S.A0004

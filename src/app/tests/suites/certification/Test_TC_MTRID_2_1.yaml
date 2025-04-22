@@ -24,7 +24,7 @@ config:
     TEST_EVENT_TRIGGER_KEY:
         type: octet_string
         defaultValue: "hex:00112233445566778899aabbccddeeff"
-    TEST_EVENT_TRIGGER_ATTRIBUTES_VALUE_UPDATE:
+    TEST_EVENT_TRIGGER_ATTRIBUTES_VALUE_SET:
         type: int64u
         defaultValue: "0x0b06000000000000"
     TEST_EVENT_TRIGGER_TEST_EVENT_CLEAR:
@@ -87,7 +87,7 @@ tests:
           "Step 8: TH sends TestEventTrigger command to General Diagnostics
           Cluster on Endpoint 0 with EnableKey field set to
           PIXIT.MTRID.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.MTRID.TEST_EVENT_TRIGGER for Attributes Value Update Test Event"
+          PIXIT.MTRID.TEST_EVENT_TRIGGER for Attributes Value Set Test Event"
       PICS: DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -97,20 +97,21 @@ tests:
               - name: "EnableKey"
                 value: TEST_EVENT_TRIGGER_KEY
               - name: "EventTrigger"
-                value: TEST_EVENT_TRIGGER_ATTRIBUTES_VALUE_UPDATE
+                value: TEST_EVENT_TRIGGER_ATTRIBUTES_VALUE_SET
 
     - label: "Step 9: TH reads the MeterType attribute from the DUT"
       command: "readAttribute"
       attribute: "MeterType"
       response:
+          value: 0
           constraints:
               type: "MeterTypeEnum"
-              anyOf: [0, 1, 2]
 
     - label: "Step 10: TH reads the PointOfDelivery attribute from the DUT"
       command: "readAttribute"
       attribute: "PointOfDelivery"
       response:
+          value: "Test delivery point"
           constraints:
               type: char_string
               minLength: 0
@@ -120,6 +121,7 @@ tests:
       command: "readAttribute"
       attribute: "MeterSerialNumber"
       response:
+          value: "TST-123456789"
           constraints:
               type: char_string
               minLength: 0
@@ -130,6 +132,7 @@ tests:
       command: "readAttribute"
       attribute: "ProtocolVersion"
       response:
+          value: "1.2.3"
           constraints:
               type: char_string
               minLength: 0
@@ -140,6 +143,12 @@ tests:
       command: "readAttribute"
       attribute: "PowerThreshold"
       response:
+          value:
+              {
+                  "PowerThreshold": 2400000,
+                  "ApparentPowerThreshold": 120,
+                  "PowerThresholdSource": 0,
+              }
           constraints:
               type: "PowerThresholdStruct"
 
