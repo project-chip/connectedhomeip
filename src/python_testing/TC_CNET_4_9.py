@@ -38,7 +38,7 @@
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.testing.matter_asserts import is_valid_bool_value
-from chip.testing.matter_testing import (MatterBaseTest, TestStep, run_if_endpoint_matches, default_matter_test_main, has_feature,
+from chip.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches,
                                          type_matches)
 from mobly import asserts
 
@@ -250,6 +250,7 @@ class TC_CNET_4_9(MatterBaseTest):
 
         asserts.assert_true(userwifi_netidx is None,
                             f"Networks should not contain an entry with the NetworkID for PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID: {ssid}")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
