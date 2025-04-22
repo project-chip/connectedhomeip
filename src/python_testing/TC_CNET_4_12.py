@@ -300,7 +300,8 @@ class TC_CNET_4_12(MatterBaseTest):
         #                      "The Breadcrumb attribute is not 2")
 
         self.step(10)
-        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0)
+        # Workaround 600s
+        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=600)
         resp = await self.send_single_cmd(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
