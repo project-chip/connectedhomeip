@@ -129,7 +129,7 @@ class TC_CNET_4_12(MatterBaseTest):
     @async_test_body
     async def test_TC_CNET_4_12(self):
 
-        wait_time_reboot = 5
+        wait_time_reboot = 10
 
         # Pre-Conditions
         self.step('precondition-1')
@@ -274,6 +274,9 @@ class TC_CNET_4_12(MatterBaseTest):
         asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
                              "Failure status returned from ConnectNetwork")
 
+        # Wait for the device to establish connection with the new Thread network
+        await asyncio.sleep(wait_time_reboot)
+
         self.step(8)
         networks = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
@@ -363,6 +366,9 @@ class TC_CNET_4_12(MatterBaseTest):
         asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
                              "Failure status returned from ConnectNetwork")
 
+        # Wait for the device to establish connection with the new Thread network
+        await asyncio.sleep(wait_time_reboot)
+
         self.step(12)
         networks = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
@@ -419,8 +425,8 @@ class TC_CNET_4_12(MatterBaseTest):
             node_id=self.dut_node_id,
             cmd=cmd
         )
-        logger.info(f'Step #5: AddOrUpdateThreadNetwork response ({vars(resp)})')
-        logger.info(f'Step #5: AddOrUpdateThreadNetwork Status is success ({resp.networkingStatus})')
+        logger.info(f'Step #15: AddOrUpdateThreadNetwork response ({vars(resp)})')
+        logger.info(f'Step #15: AddOrUpdateThreadNetwork Status is success ({resp.networkingStatus})')
         # Verify that the DUT responds with AddThreadNetwork with NetworkingStatus as 'Success'(0)
         asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
                              "Failure status returned from AddThreadNetwork")
@@ -443,6 +449,9 @@ class TC_CNET_4_12(MatterBaseTest):
         # Verify that the DUT responds with AddThreadNConnectNetworketwork with NetworkingStatus as 'Success'(0)
         asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
                              "Failure status returned from ConnectNetwork")
+
+        # Wait for the device to establish connection with the new Thread network
+        await asyncio.sleep(wait_time_reboot)
 
         self.step(17)
         # THREAD_2 - successfully connects to the DUT from previous step
