@@ -54,21 +54,21 @@ void SetTestEventTrigger_PriceUpdate()
 
     // Main price description
     const char * desc = (amount < 10000) ? "Low" : (amount < 24000) ? "Medium" : "High";
-    newPriceStruct.description.SetValue(chip::Span<const char>(desc, strlen(desc)));
+    newPriceStruct.description.SetValue(CharSpan::fromCharString(desc));
 
     // Components
     static Structs::CommodityPriceComponentStruct::Type sComponents[2];
 
     sComponents[0].source = Globals::TariffPriceTypeEnum::kStandard;
     sComponents[0].price  = static_cast<Money>(amount * 95 / 100);
-    sComponents[0].description.SetValue(chip::Span<const char>(kExVATStr, strlen(kExVATStr)));
+    sComponents[0].description.SetValue(CharSpan::fromCharString(kExVATStr));
 
     sComponents[1].source = Globals::TariffPriceTypeEnum::kStandard;
     sComponents[1].price  = static_cast<Money>(amount * 5 / 100);
-    sComponents[1].description.SetValue(chip::Span<const char>(kVATStr, strlen(kVATStr)));
+    sComponents[1].description.SetValue(CharSpan::fromCharString(kVATStr));
 
-    // Assign the component span to the
-    newPriceStruct.components.SetValue(chip::Span<const Structs::CommodityPriceComponentStruct::Type>(sComponents));
+    // Assign the component span to the Commodity Price Struct
+    newPriceStruct.components.SetValue(Span<const Structs::CommodityPriceComponentStruct::Type>(sComponents));
 
     newPrice.SetNonNull(newPriceStruct);
 
@@ -118,26 +118,26 @@ void SetTestEventTrigger_ForecastUpdate()
 
         // Main price description
         const char * desc = (amount < 10000) ? "Low" : (amount < 24000) ? "Medium" : "High";
-        newPriceStruct.description.SetValue(chip::Span<const char>(desc, strlen(desc)));
+        newPriceStruct.description.SetValue(CharSpan::fromCharString(desc));
 
         // Fill in components for this entry
         auto & components = sComponentBuffers[i];
 
         components[0].source = Globals::TariffPriceTypeEnum::kStandard;
         components[0].price  = static_cast<Money>(amount * 95 / 100);
-        components[0].description.SetValue(chip::Span<const char>(kExVATStr, strlen(kExVATStr)));
+        components[0].description.SetValue(CharSpan::fromCharString(kExVATStr));
 
         components[1].source = Globals::TariffPriceTypeEnum::kStandard;
         components[1].price  = static_cast<Money>(amount * 5 / 100);
-        components[1].description.SetValue(chip::Span<const char>(kVATStr, strlen(kVATStr)));
+        components[1].description.SetValue(CharSpan::fromCharString(kVATStr));
 
         // Assign the component span to the forecast entry
-        newPriceStruct.components.SetValue(chip::Span<const Structs::CommodityPriceComponentStruct::Type>(components, 2));
+        newPriceStruct.components.SetValue(Span<const Structs::CommodityPriceComponentStruct::Type>(components, 2));
     }
 
     // Create list from the static array
     DataModel::List<Structs::CommodityPriceStruct::Type> forecastList(
-        chip::Span<Structs::CommodityPriceStruct::Type>(sForecastEntries, kForecastSize));
+        Span<Structs::CommodityPriceStruct::Type>(sForecastEntries, kForecastSize));
 
     inst->SetForecast(forecastList); // Should now be safe: all memory lives long enough
 }
