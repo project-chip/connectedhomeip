@@ -94,11 +94,6 @@ config("siwx917-common-config") {
   ldflags = [ "-Wl,--no-warn-rwx-segment" ]
 }
 
-if (sl_enable_rgb_led) {
-  sources += [ "${silabs_common_plat_dir}/led/ColorFormat.cpp" ]
-  include_dirs = [ "${silabs_common_plat_dir}/led" ]
-}
-
 source_set("siwx917-common") {
   deps = [ "${silabs_common_plat_dir}/provision:storage" ]
   defines = []
@@ -126,6 +121,11 @@ source_set("siwx917-common") {
     "${silabs_common_plat_dir}/silabs_utils.cpp",
     "${silabs_common_plat_dir}/syscalls_stubs.cpp",
   ]
+
+  if (sl_enable_rgb_led) {
+    sources += [ "${silabs_common_plat_dir}/led/ColorFormat.cpp" ]
+    include_dirs += [ "${silabs_common_plat_dir}/led" ]
+  }
 
   if (chip_enable_pw_rpc || chip_build_libshell || sl_uart_log_output) {
     sources += [ "${silabs_common_plat_dir}/uart.cpp" ]
