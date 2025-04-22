@@ -121,7 +121,7 @@ class EGC_2_2(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
         #  Verify that the DUT response contains a ElectricalGridConditionsStruct value.
         #  Verify that the value matches the NewCurrentConditions from step 4.
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
-                                                             attribute=cluster.Attributes.CurrentConditions)
+                                                             attribute=attributes.CurrentConditions)
         if val is not NullValue:
             asserts.assert_true(isinstance(
                 val, cluster.Structs.ElectricalGridConditionsStruct), "val must be of type ElectricalGridConditionsStruct")
