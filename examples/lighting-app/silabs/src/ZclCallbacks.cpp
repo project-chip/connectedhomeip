@@ -42,7 +42,6 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 {
     ClusterId clusterId     = attributePath.mClusterId;
     AttributeId attributeId = attributePath.mAttributeId;
-    EndpointId endpoint     = attributePath.mEndpointId;
     ChipLogProgress(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
 
     if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::OnOff::Id)
@@ -65,7 +64,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
                         ChipLogValueMEI(attributeId), type, *value, size);
 // WIP Apply attribute change to Light
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
-
+        EndpointId endpoint = attributePath.mEndpointId;
         ColorData_t colorData;
         /* XY color space */
         if (attributeId == ColorControl::Attributes::CurrentX::Id || attributeId == ColorControl::Attributes::CurrentY::Id)
@@ -77,11 +76,11 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
                 return;
             }
             Protocols::InteractionModel::Status status_x = ColorControl::Attributes::CurrentY::Get(endpoint, &colorData.xy.y);
-            VerifyOrReturn(Protocols::InteractionModel::status::Success == statusx,
+            VerifyOrReturn(Protocols::InteractionModel::Status::Success == status_x,
                            ChipLogError(NotSpecified, "Failed to get CurrentX attribute"));
 
             Protocols::InteractionModel::Status status_y = ColorControl::Attributes::CurrentX::Get(endpoint, &colorData.xy.x);
-            VerifyOrReturn(Protocols::InteractionModel::status::Success == statusy,
+            VerifyOrReturn(Protocols::InteractionModel::Status::Success == status_y,
                            ChipLogError(NotSpecified, "Failed to get CurrentY attribute"));
 
             ChipLogProgress(Zcl, "New XY color: %u|%u", colorData.xy.x, colorData.xy.y);
@@ -94,12 +93,12 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         {
             colorData.hsv                                 = {};
             Protocols::InteractionModel::Status statusHue = ColorControl::Attributes::CurrentHue::Get(endpoint, &colorData.hsv.h);
-            VerifyOrReturn(Protocols::InteractionModel::status::Success == statusHue,
+            VerifyOrReturn(Protocols::InteractionModel::Status::Success == statusHue,
                            ChipLogError(NotSpecified, "Failed to get CurrentHue attribute"));
 
             Protocols::InteractionModel::Status statusSat =
                 ColorControl::Attributes::CurrentSaturation::Get(endpoint, &colorData.hsv.s);
-            VerifyOrReturn(Protocols::InteractionModel::status::Success == statusSat,
+            VerifyOrReturn(Protocols::InteractionModel::Status::Success == statusSat,
                            ChipLogError(NotSpecified, "Failed to get CurrentSaturation attribute"));
 
             ChipLogProgress(Zcl, "New HSV color: %u|%u", colorData.hsv.h, colorData.hsv.s);

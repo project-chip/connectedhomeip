@@ -182,7 +182,7 @@ void AppTask::LightControlEventHandler(AppEvent * aEvent)
     // Read currentlevel value
     status = Clusters::LevelControl::Attributes::CurrentLevel::Get(1, currentlevel);
     PlatformMgr().UnlockChipStack();
-    VerifyOrReturn(Protocols::InteractionModel::status::Success == status,
+    VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
                    ChipLogError(NotSpecified, "Failed to get CurrentLevel attribute"));
     if (status == Protocols::InteractionModel::Status::Success && !currentlevel.IsNull())
     {
