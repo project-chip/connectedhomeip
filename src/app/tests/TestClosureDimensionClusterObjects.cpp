@@ -123,9 +123,9 @@ TEST(GenericCurrentStateStructTest, Set)
     EXPECT_FALSE(originalState.position.HasValue());
     EXPECT_FALSE(originalState.latch.HasValue());
     EXPECT_FALSE(originalState.speed.HasValue());
-    
+
     originalState.Set(position, latch, speed);
-    
+
     // Validate that the set
     EXPECT_TRUE(originalState.position.HasValue());
     EXPECT_EQ(originalState.position.Value(), 1000);
@@ -228,9 +228,9 @@ TEST(GenericTargetStructTest, Set)
     EXPECT_FALSE(originalState.position.HasValue());
     EXPECT_FALSE(originalState.latch.HasValue());
     EXPECT_FALSE(originalState.speed.HasValue());
-    
+
     originalState.Set(position, latch, speed);
-    
+
     // Validate that the set
     EXPECT_TRUE(originalState.position.HasValue());
     EXPECT_EQ(originalState.position.Value(), 1000);
