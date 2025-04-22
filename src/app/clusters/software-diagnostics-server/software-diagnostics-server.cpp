@@ -175,7 +175,6 @@ SoftwareDiagnosticsCommandHandler::EnumerateAcceptedCommands(const ConcreteClust
                                                              ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Commands;
-    using Priv = Access::Privilege;
     if (!DeviceLayer::GetDiagnosticDataProvider().SupportsWatermarks())
     {
         // No commmands.
