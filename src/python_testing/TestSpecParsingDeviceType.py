@@ -272,6 +272,41 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         asserts.assert_equal(set(one_three.keys())-set(one_five.keys()),
                              set(), "There are some 1.3 device types that are unexpectedly not included in the TOT spec")
 
+    def test_application_device_type_on_root(self):
+        self.test = DeviceConformanceTests()
+        self.test.xml_device_types = self.xml_device_types
+        self.test.xml_clusters = self.xml_clusters
+
+        desc = Clusters.Descriptor
+
+        root_dt = [id for id, dt in self.xml_device_types.items() if dt.name.replace(' ', '').lower() == 'rootnode'][0]
+        lock_dt = [id for id, dt in self.xml_device_types.items() if dt.name.replace(' ', '').lower() == 'doorlock'][0]
+        power_dt = [id for id, dt in self.xml_device_types.items() if dt.name.replace(' ', '').lower() == 'powersource'][0]
+
+        # Root only, should be fine
+        dt_list = [desc.Structs.DeviceTypeStruct(root_dt, 1)]
+        attrs = {desc: {desc.Attributes.DeviceTypeList: dt_list}}
+        self.test.endpoints = {0: attrs}
+
+        problems = self.test.check_root_endpoint_for_application_device_types()
+        asserts.assert_equal(len(problems), 0, "Unexpected problems found on root note endpoint")
+
+        # Utility device type - should be fine
+        self.test.endpoints[0][desc][desc.Attributes.DeviceTypeList].append(desc.Structs.DeviceTypeStruct(power_dt, 1))
+        problems = self.test.check_root_endpoint_for_application_device_types()
+        asserts.assert_equal(len(problems), 0, "Unexpected problems found on root note endpoint")
+
+        # Application device type - not fine
+        self.test.endpoints[0][desc][desc.Attributes.DeviceTypeList].append(desc.Structs.DeviceTypeStruct(lock_dt, 1))
+        problems = self.test.check_root_endpoint_for_application_device_types()
+        asserts.assert_equal(len(problems), 1, "Did not get expected problem on root node with application device type")
+
+    def test_superset_parsing(self):
+        # Testing superset parsing from the spec since it requires multiple device types to be parsed together
+        for d in self.xml_device_types.values():
+            if d.superset_of_str:
+                print(f'{d.name}: {d.superset_of_str} {d.superset_of}')
+
 
 if __name__ == "__main__":
     default_matter_test_main()

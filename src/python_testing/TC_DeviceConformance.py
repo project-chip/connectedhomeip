@@ -46,7 +46,7 @@ from chip.testing.conformance import ConformanceDecision, conformance_allowed
 from chip.testing.global_attribute_ids import (ClusterIdType, DeviceTypeIdType, GlobalAttributeIds, cluster_id_type,
                                                device_type_id_type, is_valid_device_type_id)
 from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
-                                         MatterBaseTest, ProblemNotice, ProblemSeverity, async_test_body, default_matter_test_main)
+                                         MatterBaseTest, ProblemNotice, ProblemSeverity, TestStep, async_test_body, default_matter_test_main)
 from chip.testing.spec_parsing import CommandType
 from chip.tlv import uint
 
@@ -373,6 +373,18 @@ class DeviceConformanceTests(BasicCompositionTests):
 
         return success, problems
 
+    def check_root_endpoint_for_application_device_types(self) -> list[ProblemNotice]:
+        problems = []
+        device_types = [d.deviceType for d in self.endpoints[0][Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]]
+
+        for d in device_types:
+            if self.xml_device_types[d].classification_class.lower() == 'simple':
+                location = DeviceTypePathLocation(device_type_id=d)
+                problems.append(ProblemNotice("TC-DESC-2.3", location, ProblemSeverity.ERROR,
+                                f"Application device type {self.xml_device_types[d].name} found on EP0"))
+
+        return problems
+
 
 class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
     @async_test_body
@@ -410,6 +422,18 @@ class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
         self.problems.extend(problems)
         if not success:
             self.fail_current_test("Problems with Device type revisions on one or more endpoints")
+
+    def steps_TC_DESC_2_3(self):
+        return [TestStep(0, "TH performs a wildcard read of all attributes and endpoints on the device"),
+                TestStep(1, "TH checks the Root node endpoint and ensures no application device types are listed",
+                         "No Application device types on EP0"),
+                TestStep(2, "For each non-root endpoint on the device, TH checks the DeviceTypeList of the Descriptor cluster and verifies that all the listed application device types are part of the same superset")]
+
+    def desc_TC_DESC_2_3(self):
+        return "[TC-DESC-2.3] Test for superset application device types"
+
+    def test_TC_DESC_2_3(self):
+        pass
 
 
 if __name__ == "__main__":
