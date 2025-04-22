@@ -3354,6 +3354,22 @@
               "reportableChange": 0
             },
             {
+              "name": "CountdownTime",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "type": "elapsed_s",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "OperationalStateList",
               "code": 3,
               "mfgCode": null,

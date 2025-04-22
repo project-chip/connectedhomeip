@@ -1918,6 +1918,7 @@ endpoint 2 {
     emits event OperationCompletion;
     callback attribute phaseList;
     callback attribute currentPhase;
+    callback attribute countdownTime;
     callback attribute operationalStateList;
     callback attribute operationalState;
     callback attribute operationalError;
