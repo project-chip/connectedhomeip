@@ -42,6 +42,7 @@ from chip.testing.matter_testing import (MatterBaseTest, TestStep, run_if_endpoi
                                          type_matches)
 from mobly import asserts
 
+
 class TC_CNET_4_9(MatterBaseTest):
     def steps_TC_CNET_4_9(self):
         return [
@@ -94,7 +95,8 @@ class TC_CNET_4_9(MatterBaseTest):
         userwifi_netidx = next((i for i, network in enumerate(networks) if network.networkID == ssid.encode("utf-8")), None)
 
         # Verify that the Networks attribute list has an entry with: NetworkID field value as PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
-        asserts.assert_true(userwifi_netidx is not None, "There is not a NetworkID field equal to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID in Networks attribute list")
+        asserts.assert_true(userwifi_netidx is not None,
+                            "There is not a NetworkID field equal to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID in Networks attribute list")
 
         # Verify that the Networks attribute list has an entry with: Connected field value is of type bool and has the value true
         asserts.assert_true(is_valid_bool_value(networks[userwifi_netidx].connected),
@@ -131,9 +133,11 @@ class TC_CNET_4_9(MatterBaseTest):
 
         # Verify that DUT sends LastNetworkingStatus as Success which is 0 or null if 'NumNetworks' - 1 == 0 entries.
         if len(networks_after_removal) == 0:
-            asserts.assert_equal(last_networking_status, NullValue, "LastNetworkingStatus should be Null when Networks list is empty")
+            asserts.assert_equal(last_networking_status, NullValue,
+                                 "LastNetworkingStatus should be Null when Networks list is empty")
         else:
-            asserts.assert_equal(last_networking_status, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess, "LastNetworkingStatus should be Success when Networks list is not empty")
+            asserts.assert_equal(last_networking_status,
+                                 Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess, "LastNetworkingStatus should be Success when Networks list is not empty")
 
         # TH reads LastNetworkID attribute from the DUT
         self.step(7)
@@ -191,7 +195,8 @@ class TC_CNET_4_9(MatterBaseTest):
         asserts.assert_equal(len(networks), num_networks, f"Network length is not equal to NumNetworks: {num_networks}")
 
         for network in networks:
-            asserts.assert_equal(network.networkID, ssid.encode('utf-8'), f"Network ID: {network.networkID.decode('utf-8')} is not the hex representation of PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID: {ssid}")
+            asserts.assert_equal(network.networkID, ssid.encode(
+                'utf-8'), f"Network ID: {network.networkID.decode('utf-8')} is not the hex representation of PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID: {ssid}")
             asserts.assert_true(is_valid_bool_value(network.connected), "Network Connected attribute field is not a boolean")
             asserts.assert_true(network.connected, "Network Connected attribute field is not a true")
 
@@ -222,7 +227,8 @@ class TC_CNET_4_9(MatterBaseTest):
         result = await self.send_single_cmd(cmd=cmd)
 
         # Verify that DUT sends CommissioningCompleteResponse with the ErrorCode field set to OK (0)
-        asserts.assert_equal(result.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk, "CommissioningCompleteResponse was not OK")
+        asserts.assert_equal(result.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
+                             "CommissioningCompleteResponse was not OK")
 
         # TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 0 to ensure the CommissioningComplete call properly persisted the failsafe context. This call should have no effect if Commissioning Complete call is handled correctly
         self.step(16)
@@ -242,7 +248,8 @@ class TC_CNET_4_9(MatterBaseTest):
 
         userwifi_netidx = next((i for i, network in enumerate(networks) if network.networkID == ssid.encode("utf-8")), None)
 
-        asserts.assert_true(userwifi_netidx is None, f"Networks should not contain an entry with the NetworkID for PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID: {ssid}")
+        asserts.assert_true(userwifi_netidx is None,
+                            f"Networks should not contain an entry with the NetworkID for PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID: {ssid}")
 
 if __name__ == "__main__":
     default_matter_test_main()
