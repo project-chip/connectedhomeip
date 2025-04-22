@@ -4073,8 +4073,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::ClosureDimension::Structs::CurrentStruct::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::ClosureDimension::Structs::CurrentStateStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -4086,10 +4087,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("Latching", indent + 1, value.latching);
+        CHIP_ERROR err = LogValue("Latch", indent + 1, value.latch);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Latching'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Latch'");
             return err;
         }
     }
@@ -16990,10 +16991,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case ClosureDimension::Id: {
         switch (path.mAttributeId)
         {
-        case ClosureDimension::Attributes::Current::Id: {
-            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::CurrentStruct::DecodableType> value;
+        case ClosureDimension::Attributes::CurrentState::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::CurrentStateStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Current", 1, value);
+            return DataModelLogger::LogValue("CurrentState", 1, value);
         }
         case ClosureDimension::Attributes::Target::Id: {
             chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::TargetStruct::DecodableType> value;
