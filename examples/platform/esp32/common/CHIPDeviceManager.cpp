@@ -85,6 +85,18 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     // Start a task to run the CHIP Device event loop.
     return PlatformMgr().StartEventLoopTask();
 }
+
+CHIP_ERROR CHIPDeviceManager::Shutdown(CHIPDeviceManagerCallbacks * cb)
+{
+    ReturnErrorOnFailure(PlatformMgr().StopEventLoopTask());
+
+    ReturnErrorOnFailure(PlatformMgr().StopBackgroundEventLoopTask());
+    PlatformMgr().RemoveEventHandler(CHIPDeviceManager::CommonDeviceEventHandler, reinterpret_cast<intptr_t>(cb));
+
+    PlatformMgr().Shutdown();
+
+    return CHIP_NO_ERROR;
+}
 } // namespace DeviceManager
 } // namespace chip
 

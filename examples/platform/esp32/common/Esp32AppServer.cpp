@@ -59,6 +59,7 @@ namespace {
 static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
                                                                                           0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
                                                                                           0xcc, 0xdd, 0xee, 0xff };
+static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
 #endif
 } // namespace
 
@@ -117,13 +118,18 @@ void Esp32AppServer::DeInitBLEIfCommissioned(void)
 
 void Esp32AppServer::Shutdown()
 {
-#if CONFIG_BT_NIMBLE_ENABLED
-    chip::DeviceLayer::Internal::BLEMgr().Shutdown();
-#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     chip::app::DnssdServer::Instance().StopServer();
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    ChipLogProgress(DeviceLayer, "BLE Layer shutdown");
+    chip::DeviceLayer::Internal::BLEMgr().Shutdown();
+#endif
+
     chip::Server::GetInstance().Shutdown();
+#if CONFIG_TEST_EVENT_TRIGGER_ENABLED
+    sTestEventTriggerDelegate.ClearAllHandlers();
+#endif // CONFIG_TEST_EVENT_TRIGGER_ENABLED
 }
 
 void Esp32AppServer::Init(AppDelegate * sAppDelegate)
@@ -137,7 +143,6 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
         ChipLogError(DeviceLayer, "Failed to convert the EnableKey string to octstr type value");
         memset(sTestEventTriggerEnableKey, 0, sizeof(sTestEventTriggerEnableKey));
     }
-    static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
     VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
 
 #if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER
