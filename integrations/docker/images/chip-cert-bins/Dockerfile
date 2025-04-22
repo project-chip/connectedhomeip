@@ -217,7 +217,7 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-arm64-lock-ipv6only \
     --target linux-arm64-simulated-app1-ipv6only \
     --target linux-arm64-lit-icd-ipv6only \
-    --target linux-arm64-energy-gateway-ipv6only \    
+    --target linux-arm64-energy-gateway-ipv6only \
     --target linux-arm64-energy-management-ipv6only \
     --target linux-arm64-microwave-oven-ipv6only \
     --target linux-arm64-rvc-ipv6only \
