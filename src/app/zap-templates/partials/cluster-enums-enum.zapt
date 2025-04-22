@@ -8,7 +8,7 @@ k{{asUpperCamelCase label}} = {{asHex value 2}},
 // to kUnknownEnumValue. This is a helper enum value that should only
 // be used by code to process how it handles receiving and unknown
 // enum value. This specific should never be transmitted.
-kUnknownEnumValue = {{first_unused_enum_value mode="first_unused"}},
+kUnknownEnumValue = {{first_unused_enum_value mode="next_larger"}},
 {{else}}
 // kUnknownEnumValue intentionally not defined. This enum never goes
 // through DataModel::Decode, likely because it is a part of a derived
