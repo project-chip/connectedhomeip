@@ -161,7 +161,7 @@ Additional arguments that can be passed in the `west build` command line :
 | `prj_wifi_fdata.conf`                      | Wi-Fi, factory data                                    | RW61x, RT1060, RT1170 |
 | `prj_wifi_ota_fdata.conf`                  | Wi-Fi, factory data, OTA                               | RW61x, RT1060, RT1170 |
 | `prj_wifi_ota_fdata_v2.conf`               | Wi-Fi, factory data, OTA, with SW v2                   | RW61x, RT1060, RT1170 |
-| `prj_wifi_ota.conf `                       | Wi-Fi, OTA                                             | RW61x, RT1060, RT1170 |
+| `prj_wifi_ota.conf`                        | Wi-Fi, OTA                                             | RW61x, RT1060, RT1170 |
 | `prj_wifi_ota_v2.conf`                     | Wi-Fi, OTA, SW v2                                      | RW61x, RT1060, RT1170 |
 | `prj_wifi_onnetwork.conf`                  | Wi-Fi onnetwork without BLE                            | RW61x, RT1060, RT1170 |
 | `prj_thread_ftd.conf`                      | Thread FTD                                             | RW61x, RT1060, RT1170 |
