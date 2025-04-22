@@ -195,7 +195,7 @@ void Instance::HandleGetDetailedForecastRequest(HandlerContext & ctx,
         return;
     }
 
-    chip::Platform::ScopedMemoryBuffer<Structs::CommodityPriceStruct::Type> forecastBuffer;
+    Platform::ScopedMemoryBuffer<Structs::CommodityPriceStruct::Type> forecastBuffer;
     Commands::GetDetailedForecastResponse::Type response;
     CHIP_ERROR err = GetDetailedForecastRequest(details, forecastBuffer, response.priceForecast, true);
     if (err != CHIP_NO_ERROR)
@@ -210,7 +210,7 @@ void Instance::HandleGetDetailedForecastRequest(HandlerContext & ctx,
 }
 
 CHIP_ERROR
-Instance::GetDetailedPriceRequest(chip::BitMask<CommodityPriceDetailBitmap> details,
+Instance::GetDetailedPriceRequest(BitMask<CommodityPriceDetailBitmap> details,
                                   DataModel::Nullable<Structs::CommodityPriceStruct::Type> & priceStruct)
 {
 
@@ -238,8 +238,8 @@ Instance::GetDetailedPriceRequest(chip::BitMask<CommodityPriceDetailBitmap> deta
 }
 
 CHIP_ERROR
-Instance::GetDetailedForecastRequest(chip::BitMask<CommodityPriceDetailBitmap> details,
-                                     chip::Platform::ScopedMemoryBuffer<Structs::CommodityPriceStruct::Type> & forecastBuffer,
+Instance::GetDetailedForecastRequest(BitMask<CommodityPriceDetailBitmap> details,
+                                     Platform::ScopedMemoryBuffer<Structs::CommodityPriceStruct::Type> & forecastBuffer,
                                      DataModel::List<const Structs::CommodityPriceStruct::Type> & forecastList, bool isCommand)
 {
 
@@ -320,7 +320,7 @@ Instance::GetDetailedForecastRequest(chip::BitMask<CommodityPriceDetailBitmap> d
 
     // Now wrap in Span + List
     forecastList = DataModel::List<const Structs::CommodityPriceStruct::Type>(
-        chip::Span<Structs::CommodityPriceStruct::Type>(forecastBuffer.Get(), count));
+        Span<Structs::CommodityPriceStruct::Type>(forecastBuffer.Get(), count));
 
     return CHIP_NO_ERROR;
 }
@@ -338,8 +338,7 @@ CHIP_ERROR Instance::SetTariffUnit(TariffUnitEnum newValue)
     mTariffUnit = newValue;
     if (oldValue != newValue)
     {
-        ChipLogDetail(AppServer, "Endpoint: %d - mTariffUnit updated to %d", static_cast<int>(mEndpointId),
-                      to_underlying(mTariffUnit));
+        ChipLogDetail(AppServer, "Endpoint: %d - mTariffUnit updated to %d", mEndpointId, to_underlying(mTariffUnit));
         MatterReportingAttributeChangeCallback(mEndpointId, CommodityPrice::Id, TariffUnit::Id);
     }
 
@@ -359,9 +358,8 @@ CHIP_ERROR Instance::SetCurrency(CurrencyStruct::Type newValue)
     mCurrency = newValue;
     if (oldValue != newValue)
     {
-        ChipLogDetail(AppServer, "Endpoint: %d - mCurrency updated to Currency: %d DecimalPoints: %d",
-                      static_cast<int>(mEndpointId), static_cast<int>(mCurrency.currency),
-                      static_cast<int>(mCurrency.decimalPoints));
+        ChipLogDetail(AppServer, "Endpoint: %d - mCurrency updated to Currency: %d DecimalPoints: %d", mEndpointId,
+                      mCurrency.currency, mCurrency.decimalPoints);
         MatterReportingAttributeChangeCallback(mEndpointId, CommodityPrice::Id, Currency::Id);
     }
 
@@ -387,7 +385,7 @@ CHIP_ERROR Instance::SetCurrentPrice(const DataModel::Nullable<Structs::Commodit
 
     mCurrentPrice = newValue;
 
-    ChipLogDetail(AppServer, "Endpoint: %d - mCurrentPrice updated", static_cast<int>(mEndpointId));
+    ChipLogDetail(AppServer, "Endpoint: %d - mCurrentPrice updated", mEndpointId);
     MatterReportingAttributeChangeCallback(mEndpointId, CommodityPrice::Id, CurrentPrice::Id);
 
     // generate a PriceChange Event
@@ -411,8 +409,8 @@ Status Instance::GeneratePriceChangeEvent()
     err = LogEvent(event, mEndpointId, eventNumber);
     if (CHIP_NO_ERROR != err)
     {
-        ChipLogError(AppServer, "Unable to generate PriceChange event (endpoint %d): %" CHIP_ERROR_FORMAT,
-                     static_cast<int>(mEndpointId), err.Format());
+        ChipLogError(AppServer, "Endpoint %d - Unable to generate PriceChange event: %" CHIP_ERROR_FORMAT, mEndpointId,
+                     err.Format());
         return Status::Failure;
     }
     return Status::Success;
@@ -424,7 +422,7 @@ CHIP_ERROR Instance::SetForecast(const DataModel::List<const Structs::CommodityP
 
     mPriceForecast = priceForecast;
 
-    ChipLogDetail(AppServer, "mPriceForecast updated");
+    ChipLogDetail(AppServer, "Endpoint %d - mPriceForecast updated", mEndpointId);
 
     MatterReportingAttributeChangeCallback(mEndpointId, CommodityPrice::Id, PriceForecast::Id);
 

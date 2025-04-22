@@ -60,17 +60,16 @@ public:
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
 
     // For now this is a place holder and the Delegate could be removed
-    // There is no delegated methods since these are largely implemented in the
+    // There are no delegated methods since these are largely implemented in the
     // commodity-price-server.cpp Instance class
 
 protected:
     EndpointId mEndpointId = 0;
 };
 
-using chip::Protocols::InteractionModel::Status;
-
 class Instance : public AttributeAccessInterface, public CommandHandlerInterface
 {
+
 public:
     Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature) :
         AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterface(MakeOptional(aEndpointId), Id),
@@ -95,7 +94,7 @@ public:
     CHIP_ERROR SetForecast(const DataModel::List<const Structs::CommodityPriceStruct::Type> &);
 
     // Send Price Change events
-    Status GeneratePriceChangeEvent();
+    chip::Protocols::InteractionModel::Status GeneratePriceChangeEvent();
 
 private:
     Delegate & mDelegate;
@@ -116,11 +115,11 @@ private:
                                           const Commands::GetDetailedForecastRequest::DecodableType & commandData);
 
     // Helper function to create a copy of the data for sending to client with the .description or .components knocked out
-    CHIP_ERROR GetDetailedPriceRequest(chip::BitMask<CommodityPriceDetailBitmap> details,
+    CHIP_ERROR GetDetailedPriceRequest(BitMask<CommodityPriceDetailBitmap> details,
                                        DataModel::Nullable<Structs::CommodityPriceStruct::Type> &);
 
-    CHIP_ERROR GetDetailedForecastRequest(chip::BitMask<CommodityPriceDetailBitmap> details,
-                                          chip::Platform::ScopedMemoryBuffer<Structs::CommodityPriceStruct::Type> & forecastBuffer,
+    CHIP_ERROR GetDetailedForecastRequest(BitMask<CommodityPriceDetailBitmap> details,
+                                          Platform::ScopedMemoryBuffer<Structs::CommodityPriceStruct::Type> & forecastBuffer,
                                           DataModel::List<const Structs::CommodityPriceStruct::Type> & forecastList,
                                           bool isCommand);
 
