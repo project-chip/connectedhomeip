@@ -95,7 +95,6 @@ void RvcOperationalStateDelegate::HandlePauseStateCallback(GenericOperationalErr
         return;
     }
 
-
     err.Set(to_underlying(RvcOperationalState::ErrorStateEnum::kCommandInvalidInState));
 }
 
