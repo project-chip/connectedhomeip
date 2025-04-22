@@ -78,10 +78,8 @@ class TC_CNET_4_15(MatterBaseTest):
         # which does not match the provisioned network, and Breadcrumb field set to 1
         network_id = self.matter_test_config.global_test_params['PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID'].encode('utf-8')
         
-        # Log the network ID we're trying to remove for debugging
         logging.info(f"Attempting to remove network with ID: {network_id}")
         
-        # First, let's check the current networks
         read_networks = await self.read_single_attribute(cnet.Attributes.Networks)
         logging.info(f"Current networks on device: {read_networks}")
         
@@ -91,13 +89,12 @@ class TC_CNET_4_15(MatterBaseTest):
                 breadcrumb=1
             )
         )
-        # Log response structure with more detail
-        logging.info(f"RemoveNetwork response: {send_remove}")
-        logging.info(f"RemoveNetwork status: {send_remove.networkCommissioningStatus}")
+        # Log complete response object structure for debugging
+        logging.info(f"RemoveNetwork complete response object: {vars(send_remove)}")
         
         # Verify NetworkConfigResponse has NetworkIDNotFound status
         asserts.assert_equal(
-            send_remove.networkCommissioningStatus,
+            send_remove.errorCode,
             cnet.Enums.NetworkCommissioningStatus.kNetworkIDNotFound,
             f"Expected NetworkIDNotFound status for network ID {network_id}"
         )
@@ -111,13 +108,14 @@ class TC_CNET_4_15(MatterBaseTest):
                 breadcrumb=1
             )
         )
-        # Log response structure
-        logging.info(f"ConnectNetwork response: {send_connect}")
+        # Log complete response object structure for debugging
+        logging.info(f"ConnectNetwork complete response object: {vars(send_connect)}")
+        
         # Verify ConnectNetworkResponse has NetworkIDNotFound status
         asserts.assert_equal(
-            send_connect.networkCommissioningStatus,
+            send_connect.errorCode,
             cnet.Enums.NetworkCommissioningStatus.kNetworkIDNotFound,
-            "Expected NetworkIDNotFound status for non-existent network"
+            f"Expected NetworkIDNotFound status for network ID {network_id}"
         )
 
 
