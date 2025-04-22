@@ -87,21 +87,6 @@ struct SpanCopier {
     }
 };
 
-bool ParseIDArray(const Json::Value& json, DataModel::List<const uint32_t>& output, size_t maxSize) {
-    if (json.empty() || !json.isArray() || json.size() > maxSize) return false;
-    
-    std::vector<uint32_t> ids;
-    for (const auto& id : json) {
-        if (id.isUInt()) ids.push_back(id.asUInt());
-    }
-    
-    return SpanCopier<uint32_t>::Copy(
-        chip::Span<const uint32_t>(ids.data(), ids.size()),
-        output,
-        maxSize
-    );
-}
-
 template <>
 struct SpanCopier<char> {
     static bool Copy(const chip::CharSpan& source,
@@ -128,6 +113,46 @@ struct SpanCopier<char> {
         buffer[bytesToCopy] = '\0';
         destination.SetNonNull(chip::CharSpan(buffer, bytesToCopy));
         return true;
+    }
+};
+
+struct StrToSpan {
+    static CHIP_ERROR Copy(const std::string& source,
+                         chip::CharSpan& destination,
+                         size_t maxLength = std::numeric_limits<size_t>::max())
+    {
+        // Handle empty string case
+        if (source.empty()) {
+            destination = chip::CharSpan();
+            return CHIP_NO_ERROR;
+        }
+
+        // Check length limit
+        if (source.size() > maxLength) {
+            return CHIP_ERROR_INVALID_STRING_LENGTH;
+        }
+
+        // Allocate memory (including null terminator)
+        char* buffer = static_cast<char*>(chip::Platform::MemoryAlloc(source.size() + 1));
+        if (buffer == nullptr) {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+
+        // Copy data and null-terminate
+        memcpy(buffer, source.data(), source.size());
+        buffer[source.size()] = '\0';
+
+        // Set output span
+        destination = chip::CharSpan(buffer, source.size());
+        return CHIP_NO_ERROR;
+    }
+
+    // Optional: Memory cleanup helper
+    static void Release(chip::CharSpan& span) {
+        if (!span.empty()) {
+            chip::Platform::MemoryFree(const_cast<char*>(span.data()));
+            span = chip::CharSpan();
+        }
     }
 };
 
@@ -162,7 +187,7 @@ protected:
 private:
     static constexpr size_t kMaxIDsEntries = 20;
 
-    CHIP_ERROR ParseLabelFromJson(const Json::Value& json, TariffPeriodStructType& output);
+    //CHIP_ERROR ParseLabelFromJson(const Json::Value& json, TariffPeriodStructType& output);
     CHIP_ERROR ParseIDsFromJson(const Json::Value& json, const char* fieldName,
                               DataModel::List<const uint32_t>& output);
     bool IsValid(const TariffPeriodStructType& period) const override;
@@ -246,9 +271,9 @@ protected:
     void CleanupValue() override { CleanupTariffComponent(mValue); }
 
 private:
-    CHIP_ERROR ParseLabelFromJson(
-        const Json::Value& json, 
-        chip::Optional<DataModel::Nullable<chip::CharSpan>>& output);
+    //CHIP_ERROR ParseLabelFromJson(
+    //    const Json::Value& json, 
+    //    chip::Optional<DataModel::Nullable<chip::CharSpan>>& output);
     bool IsValid(const TariffComponentStructType& component) const override;
 };
 

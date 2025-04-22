@@ -45,66 +45,66 @@ public: \
     attrName##DataClass(attrType& aValueStorage) \
         : CTC_BaseDataClass<attrType>(aValueStorage) { mValue = aValueStorage; }\
     ~attrName##DataClass() override = default; \
-    CHIP_ERROR LoadFromJson(const Json::Value& json) override; \
+    CHIP_ERROR LoadFromJson(const Json::Value& json) override ;/*{ return CHIP_NO_ERROR; }*/ \
 protected:    \
-    CHIP_ERROR UpdateValue(const attrType& aValue) override; \
-    void CleanupValue() override; \
+    CHIP_ERROR UpdateValue(const attrType& aValue) override { \
+        mValue = aValue;        \
+        return CHIP_NO_ERROR; }; \
+    void CleanupValue() override {}; \
 };
 // Generate all classes
 COMMODITY_TARIFF_PRIMARY_ATTRIBUTES_STUBS
+#undef X
+
+#define X(attrName, attrType) \
+class attrName##DataClass : public CTC_BaseDataClass<attrType> { \
+public: \
+    attrName##DataClass(attrType& aValueStorage) \
+        : CTC_BaseDataClass<attrType>(aValueStorage) { mValue = aValueStorage; }\
+    ~attrName##DataClass() override = default; \
+protected:    \
+    CHIP_ERROR UpdateValue(const attrType& aValue) override { \
+        mValue = aValue;        \
+        return CHIP_NO_ERROR; }; \
+    void CleanupValue() override {}; \
+};
+// Generate all classes
 COMMODITY_TARIFF_CURRENT_ATTRIBUTES_STUBS
 #undef X
 
-/*
-#define X(attrName, attrType) \
-class attrName##DataClass : public BaseDataClass { \
-protected: \
-    attrType mValue; \
-    bool HasChangedImpl(const void* newValue) const override { return true; } \
-    bool ValidateImpl() const override { return true; } \
-    bool UpdateImpl(const void* newValue) override { return true; } \
-    bool LoadFromJsonImpl(const Json::Value& json) override { return true; } \
-    const void* GetData() const override { return &mValue; } \
-public: \
-    attrType& GetValue() { return mValue; } \
-};
-// Generate all classes
-COMMODITY_TARIFF_PRIMARY_ATTRIBUTES_STUBS
-COMMODITY_TARIFF_CURRENT_ATTRIBUTES_STUBS
-#undef X
-*/
 class CommodityTariffPrimaryData {
 private:
 // 1. First declare storage
 #define X(attrName, attrType) \
-    attrType attrName##Storage;
+    attrType m##attrName;
 COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
 
 public:
 // 2. Then declare DataClass objects initialized with storage
 #define X(attrName, attrType) \
-    attrName##DataClass attrName{attrName##Storage};
+    attrName##DataClass attrName{m##attrName};
 COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
 
     CommodityTariffPrimaryData() = default;
     ~CommodityTariffPrimaryData() = default;
 
-    CHIP_ERROR LoadJson(Json::Value& root);
+    CHIP_ERROR LoadJson(const Json::Value& root);
+    bool IsValid() { return true; }
 };
 
 class CommodityTariffCurrentData {
 private:
 // 1. First declare storage
 #define X(attrName, attrType) \
-    attrType attrName##Storage;
+    attrType m##attrName;
     COMMODITY_TARIFF_CURRENT_ATTRIBUTES
 #undef X
 
 public:
 #define X(attrName, attrType) \
-    attrName##DataClass attrName{attrName##Storage};
+    attrName##DataClass attrName{m##attrName};
     COMMODITY_TARIFF_CURRENT_ATTRIBUTES
 #undef X
 
@@ -117,14 +117,33 @@ class TariffDataUpdater
 {
 public:
     using Callback = std::function<void(const CommodityTariffPrimaryData&)>;
-    TariffDataUpdater(Callback cb) : callback(cb) {}; 
-    ~TariffDataUpdater(); 
-
-
-    CHIP_ERROR LoadJson(Json::Value & root) { return mTariffData.LoadJson(root); };
+    TariffDataUpdater(Callback cb, const Json::Value & json ) : callback(cb) { 
+        if ( CHIP_NO_ERROR != LoadJson(json) )
+        {
+            ChipLogError(NotSpecified, "EGW-CTC: Invalid JSON data");
+        }
+        else if (!Validate())
+        {
+            ChipLogError(NotSpecified, "EGW-CTC: Tariff data rejected due to inconsistencies");
+        }
+        else
+        {
+            TariffDataApply();
+        }
+    };
+    ~TariffDataUpdater() = default; 
 private:
     CommodityTariffPrimaryData mTariffData;
     Callback callback;
+
+    CHIP_ERROR LoadJson(const Json::Value & root) { 
+        return mTariffData.LoadJson(root); 
+    };
+    bool Validate() { return mTariffData.IsValid(); }
+    void TariffDataApply() { 
+        ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data applied");        
+        callback(mTariffData); 
+    }
 };
 
 class CommodityTariffDelegate : public CommodityTariff::Delegate
@@ -200,13 +219,14 @@ private:
     COMMODITY_TARIFF_CURRENT_ATTRIBUTES
     #undef X
 
-    void ReportAttributeChange(uint16_t attributeId) override {};
+    void ReportAttributeChange(uint16_t attributeId) override {
+        MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, attributeId);
+    };
 
-    void HandleNewTariffData(Json::Value & value)
+    void LoadTariffData(const Json::Value & value)
     {
         auto cb = [this](const CommodityTariffPrimaryData& data) { this->TariffDataUpdaterCb(data); };
-        updater = std::make_unique<TariffDataUpdater>(cb);
-        updater->LoadJson(value);
+        updater = std::make_unique<TariffDataUpdater>(cb, value);
     }
 
     void TariffDataUpdaterCb(const CommodityTariffPrimaryData& newData) {
@@ -214,7 +234,13 @@ private:
         updater.reset();
     }
 
-    void UpdateTariffAttributes(const CommodityTariffPrimaryData& newData);
+    void UpdateTariffAttributes(const CommodityTariffPrimaryData& newData) 
+    {
+#define X(attrName, attrType) \
+        Set##attrName(newData.attrName.GetValue());
+    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+#undef X
+    };
     void UpdateCurrentAttrs();
 };
 
@@ -234,6 +260,7 @@ public:
 
     CHIP_ERROR Init();
     void Shutdown();
+    CHIP_ERROR AppInit();
 
     CommodityTariffDelegate * GetDelegate() { return mDelegate; };
 
