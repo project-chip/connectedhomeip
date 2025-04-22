@@ -412,7 +412,7 @@ CHIP_ERROR emberAfSetDynamicEndpointWithEpUniqueId(uint16_t index, EndpointId id
 
     MutableCharSpan targetSpan(emAfEndpoints[index].endpointUniqueId);
     CopyCharSpanToMutableCharSpanWithTruncation(endpointUniqueId, targetSpan);
-    emAfEndpoints[index].endpointUniqueIdSize = targetSpan.size();
+    emAfEndpoints[index].endpointUniqueIdSize = static_cast<uint8_t>(std::min<size_t>(targetSpan.size(), UINT8_MAX)); 
 
     // Start the endpoint off as disabled.
     emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isEnabled);
