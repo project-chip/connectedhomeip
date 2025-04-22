@@ -44,8 +44,7 @@ class TestDelegate : public DelegateBase
 public:
     TestDelegate() {}
 
-    Protocols::InteractionModel::Status HandleSetTarget(const Optional<Percent100ths> & position,
-                                                        const Optional<bool> & latch,
+    Protocols::InteractionModel::Status HandleSetTarget(const Optional<Percent100ths> & position, const Optional<bool> & latch,
                                                         const Optional<Globals::ThreeLevelAutoEnum> & speed)
     {
         return Protocols::InteractionModel::Status::Success;
@@ -57,22 +56,17 @@ public:
         return Protocols::InteractionModel::Status::Success;
     }
 
-    bool IsManualLatchingNeeded()
-    {
-        return false;
-    }
+    bool IsManualLatchingNeeded() { return false; }
 };
-
 
 class MockMatterContext : public MatterContext
 {
 public:
-    MockMatterContext() : MatterContext(kInvalidEndpointId)
-    {}
+    MockMatterContext() : MatterContext(kInvalidEndpointId) {}
     void MarkDirty(AttributeId id) override { mDirtyMarkedList.push_back(id); }
     std::vector<AttributeId> GetDirtyList() { return mDirtyMarkedList; }
     void ClearDirtyList() { mDirtyMarkedList.clear(); }
-    ~MockMatterContext() { }
+    ~MockMatterContext() {}
 
 private:
     // Won't handle double-marking an attribute, so don't do that in tests
@@ -82,15 +76,9 @@ private:
 class TestClosureDimensionClusterLogic : public ::testing::Test
 {
 public:
-    static void SetUpTestSuite()
-    {
-        ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
-    }
+    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
 
-    static void TearDownTestSuite()
-    {
-        Platform::MemoryShutdown();
-    }
+    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 
     void SetUp() override
     {
@@ -214,8 +202,8 @@ TEST_F(TestClosureDimensionClusterLogic, TestInit)
     conformance.FeatureMap() = 255;
     conformance.OptionalAttributes().Set(OptionalAttributeEnum::kOverflow);
 
-    initParams.modulationType = ModulationTypeEnum::kOpacity;
-    initParams.rotationAxis = RotationAxisEnum::kBottom;
+    initParams.modulationType       = ModulationTypeEnum::kOpacity;
+    initParams.rotationAxis         = RotationAxisEnum::kBottom;
     initParams.translationDirection = TranslationDirectionEnum::kBackward;
 
     mockContext.ClearDirtyList();
@@ -240,8 +228,8 @@ TEST_F(TestClosureDimensionClusterLogic, TestInvalidConformance)
     conformance.FeatureMap() = 0;
     conformance.OptionalAttributes().Set(OptionalAttributeEnum::kOverflow);
 
-    initParams.modulationType = ModulationTypeEnum::kOpacity;
-    initParams.rotationAxis = RotationAxisEnum::kBottom;
+    initParams.modulationType       = ModulationTypeEnum::kOpacity;
+    initParams.rotationAxis         = RotationAxisEnum::kBottom;
     initParams.translationDirection = TranslationDirectionEnum::kBackward;
 
     mockContext.ClearDirtyList();
@@ -274,7 +262,6 @@ TEST_F(TestClosureDimensionClusterLogic, TestInvalidInitParameters)
     EXPECT_EQ(state.modulationType, ModulationTypeEnum::kUnknownEnumValue);
     EXPECT_EQ(state.rotationAxis, RotationAxisEnum::kUnknownEnumValue);
     EXPECT_EQ(state.translationDirection, TranslationDirectionEnum::kUnknownEnumValue);
-
 }
 
 //=========================================================================================
@@ -288,8 +275,8 @@ TEST_F(TestClosureDimensionClusterLogic, TestGetAttributesAllFeatures)
     conformance.FeatureMap() = 255;
     conformance.OptionalAttributes().Set(OptionalAttributeEnum::kOverflow);
 
-    initParams.modulationType = ModulationTypeEnum::kOpacity;
-    initParams.rotationAxis = RotationAxisEnum::kBottom;
+    initParams.modulationType       = ModulationTypeEnum::kOpacity;
+    initParams.rotationAxis         = RotationAxisEnum::kBottom;
     initParams.translationDirection = TranslationDirectionEnum::kBackward;
 
     DataModel::Nullable<GenericCurrentStateStruct> currentState;
@@ -322,7 +309,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestGetAttributesAllFeatures)
     EXPECT_EQ(stepValue, 1);
 
     EXPECT_EQ(logic->GetUnit(unit), CHIP_NO_ERROR);
-    EXPECT_EQ(unit,ClosureUnitEnum::kUnknownEnumValue);
+    EXPECT_EQ(unit, ClosureUnitEnum::kUnknownEnumValue);
 
     EXPECT_EQ(logic->GetUnitRange(unitRange), CHIP_NO_ERROR);
     EXPECT_EQ(unitRange.IsNull(), true);
@@ -357,8 +344,8 @@ TEST_F(TestClosureDimensionClusterLogic, TestGetAttributesNoFeatures)
     conformance.FeatureMap() = 2;
     conformance.OptionalAttributes().Clear(OptionalAttributeEnum::kOverflow);
 
-    initParams.modulationType = ModulationTypeEnum::kOpacity;
-    initParams.rotationAxis = RotationAxisEnum::kBottom;
+    initParams.modulationType       = ModulationTypeEnum::kOpacity;
+    initParams.rotationAxis         = RotationAxisEnum::kBottom;
     initParams.translationDirection = TranslationDirectionEnum::kBackward;
 
     DataModel::Nullable<GenericCurrentStateStruct> currentState;
@@ -409,15 +396,14 @@ TEST_F(TestClosureDimensionClusterLogic, TestGetAttributesNoFeatures)
     EXPECT_EQ(clusterRevision, kExpectedClusterRevision);
 }
 
-
 // This test ensures that all attribute getter functions return CHIP_ERROR_INCORRECT_STATE on an uninitialized cluster.
 TEST_F(TestClosureDimensionClusterLogic, TestGetAttributesUninitialized)
 {
     conformance.FeatureMap() = 255;
     conformance.OptionalAttributes().Set(OptionalAttributeEnum::kOverflow);
 
-    initParams.modulationType = ModulationTypeEnum::kOpacity;
-    initParams.rotationAxis = RotationAxisEnum::kBottom;
+    initParams.modulationType       = ModulationTypeEnum::kOpacity;
+    initParams.rotationAxis         = RotationAxisEnum::kBottom;
     initParams.translationDirection = TranslationDirectionEnum::kBackward;
 
     DataModel::Nullable<GenericCurrentStateStruct> currentState;
@@ -469,7 +455,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetAttributesUninitialized)
     ClosureUnitEnum unit     = ClosureUnitEnum::kDegree;
     DataModel::Nullable<Structs::UnitRangeStruct::Type> unitRange{};
     Structs::RangePercent100thsStruct::Type limitRange{};
-    OverflowEnum overflow                         = OverflowEnum::kBottomInside;
+    OverflowEnum overflow = OverflowEnum::kBottomInside;
 
     mockContext.ClearDirtyList();
     logic->ResetStateToDefault();
@@ -491,25 +477,25 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetAttributesNoFeatures)
     conformance.FeatureMap() = 2;
     conformance.OptionalAttributes().Clear(OptionalAttributeEnum::kOverflow);
 
-    initParams.modulationType = ModulationTypeEnum::kOpacity;
-    initParams.rotationAxis = RotationAxisEnum::kBottom;
+    initParams.modulationType       = ModulationTypeEnum::kOpacity;
+    initParams.rotationAxis         = RotationAxisEnum::kBottom;
     initParams.translationDirection = TranslationDirectionEnum::kBackward;
 
     logic->ResetStateToDefault();
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
 
-    GenericCurrentStateStruct initCurrentState = {Optional<Percent100ths>(0), Optional<bool>(false),
-                                                    Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto)};
+    GenericCurrentStateStruct initCurrentState = { Optional<Percent100ths>(0), Optional<bool>(false),
+                                                   Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
     DataModel::Nullable<GenericCurrentStateStruct> currentState(initCurrentState);
-    GenericTargetStruct initTargetState = {Optional<Percent100ths>(0), Optional<bool>(false),
-                                          Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto)};
+    GenericTargetStruct initTargetState = { Optional<Percent100ths>(0), Optional<bool>(false),
+                                            Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
     DataModel::Nullable<GenericTargetStruct> target(initTargetState);
     Percent100ths resolution = 1;
     Percent100ths stepValue  = 1;
     ClosureUnitEnum unit     = ClosureUnitEnum::kDegree;
     DataModel::Nullable<Structs::UnitRangeStruct::Type> unitRange{};
     Structs::RangePercent100thsStruct::Type limitRange{};
-    OverflowEnum overflow    = OverflowEnum::kBottomInside;
+    OverflowEnum overflow = OverflowEnum::kBottomInside;
 
     EXPECT_EQ(logic->SetCurrentState(currentState), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
@@ -536,17 +522,16 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetCurrentStateValues)
     conformance.FeatureMap() = 255;
     conformance.OptionalAttributes().Set(OptionalAttributeEnum::kOverflow);
 
-    initParams.modulationType = ModulationTypeEnum::kOpacity;
-    initParams.rotationAxis = RotationAxisEnum::kBottom;
+    initParams.modulationType       = ModulationTypeEnum::kOpacity;
+    initParams.rotationAxis         = RotationAxisEnum::kBottom;
     initParams.translationDirection = TranslationDirectionEnum::kBackward;
-
 
     logic->ResetStateToDefault();
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
     mockContext.ClearDirtyList();
 
     GenericCurrentStateStruct testCurrentStateStruct{ Optional<Percent100ths>(0), Optional<bool>(false),
-                                                Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
+                                                      Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
 
     DataModel::Nullable<GenericCurrentStateStruct> testCurrentState(testCurrentStateStruct);
     DataModel::Nullable<GenericCurrentStateStruct> currentState;
@@ -564,7 +549,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetCurrentStateValues)
     mockContext.ClearDirtyList();
     // Change values
     testCurrentStateStruct.Set(Optional<Percent100ths>(10000), Optional<bool>(true),
-                         Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh));
+                               Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh));
     testCurrentState.SetNonNull(testCurrentStateStruct);
     EXPECT_EQ(logic->SetCurrentState(testCurrentState), CHIP_NO_ERROR);
     EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
@@ -582,7 +567,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetCurrentStateValues)
     mockContext.ClearDirtyList();
     // Change from NULL
     testCurrentStateStruct.Set(Optional<Percent100ths>(5000), Optional<bool>(false),
-                         Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kMedium));
+                               Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kMedium));
     testCurrentState.SetNonNull(testCurrentStateStruct);
     EXPECT_EQ(logic->SetCurrentState(testCurrentState), CHIP_NO_ERROR);
     EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
@@ -591,8 +576,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetCurrentStateValues)
 
     mockContext.ClearDirtyList();
     // Invalid position
-    GenericCurrentStateStruct InvalidCurrentState{ Optional<Percent100ths>(10001),
-                                                   Optional<bool>(false),
+    GenericCurrentStateStruct InvalidCurrentState{ Optional<Percent100ths>(10001), Optional<bool>(false),
                                                    Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow) };
     DataModel::Nullable<GenericCurrentStateStruct> testInvalid(InvalidCurrentState);
     EXPECT_EQ(logic->SetCurrentState(testInvalid), CHIP_ERROR_INVALID_ARGUMENT);
@@ -621,17 +605,16 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetCurrentStateOnlyPosition)
     conformance.FeatureMap() = 129;
     conformance.OptionalAttributes().Clear(OptionalAttributeEnum::kOverflow);
 
-    initParams.modulationType = ModulationTypeEnum::kOpacity;
-    initParams.rotationAxis = RotationAxisEnum::kBottom;
+    initParams.modulationType       = ModulationTypeEnum::kOpacity;
+    initParams.rotationAxis         = RotationAxisEnum::kBottom;
     initParams.translationDirection = TranslationDirectionEnum::kBackward;
-
 
     logic->ResetStateToDefault();
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
     mockContext.ClearDirtyList();
 
     GenericCurrentStateStruct testCurrentStateStruct{ Optional<Percent100ths>(0), Optional<bool>(false),
-                                                Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
+                                                      Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
 
     DataModel::Nullable<GenericCurrentStateStruct> testCurrentState(testCurrentStateStruct);
     DataModel::Nullable<GenericCurrentStateStruct> currentState;
@@ -660,17 +643,16 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetCurrentStateOnlyLatch)
     conformance.FeatureMap() = 2;
     conformance.OptionalAttributes().Clear(OptionalAttributeEnum::kOverflow);
 
-    initParams.modulationType = ModulationTypeEnum::kOpacity;
-    initParams.rotationAxis = RotationAxisEnum::kBottom;
+    initParams.modulationType       = ModulationTypeEnum::kOpacity;
+    initParams.rotationAxis         = RotationAxisEnum::kBottom;
     initParams.translationDirection = TranslationDirectionEnum::kBackward;
-
 
     logic->ResetStateToDefault();
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
     mockContext.ClearDirtyList();
 
     GenericCurrentStateStruct testCurrentStateStruct{ Optional<Percent100ths>(0), Optional<bool>(false),
-                                                Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
+                                                      Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
 
     DataModel::Nullable<GenericCurrentStateStruct> testCurrentState(testCurrentStateStruct);
     DataModel::Nullable<GenericCurrentStateStruct> currentState;
@@ -699,17 +681,16 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetCurrentStateOnlySpeed)
     conformance.FeatureMap() = 145;
     conformance.OptionalAttributes().Clear(OptionalAttributeEnum::kOverflow);
 
-    initParams.modulationType = ModulationTypeEnum::kOpacity;
-    initParams.rotationAxis = RotationAxisEnum::kBottom;
+    initParams.modulationType       = ModulationTypeEnum::kOpacity;
+    initParams.rotationAxis         = RotationAxisEnum::kBottom;
     initParams.translationDirection = TranslationDirectionEnum::kBackward;
-
 
     logic->ResetStateToDefault();
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
     mockContext.ClearDirtyList();
 
     GenericCurrentStateStruct testCurrentStateStruct{ Optional<Percent100ths>(0), Optional<bool>(false),
-                                                Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
+                                                      Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
 
     DataModel::Nullable<GenericCurrentStateStruct> testCurrentState(testCurrentStateStruct);
     DataModel::Nullable<GenericCurrentStateStruct> currentState;
@@ -722,7 +703,8 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetCurrentStateOnlySpeed)
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
 
     mockContext.ClearDirtyList();
-    testCurrentStateStruct.Set(NullOptional, NullOptional, Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto));
+    testCurrentStateStruct.Set(NullOptional, NullOptional,
+                               Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto));
     testCurrentState.SetNonNull(testCurrentStateStruct);
     EXPECT_EQ(logic->SetCurrentState(testCurrentState), CHIP_NO_ERROR);
     EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
@@ -742,10 +724,9 @@ TEST_F(TestClosureDimensionClusterLogic, TestSetResolution)
     conformance.FeatureMap() = 65;
     conformance.OptionalAttributes().Set(OptionalAttributeEnum::kOverflow);
 
-    initParams.modulationType = ModulationTypeEnum::kOpacity;
-    initParams.rotationAxis = RotationAxisEnum::kBottom;
+    initParams.modulationType       = ModulationTypeEnum::kOpacity;
+    initParams.rotationAxis         = RotationAxisEnum::kBottom;
     initParams.translationDirection = TranslationDirectionEnum::kBackward;
-
 
     logic->ResetStateToDefault();
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
@@ -793,10 +774,9 @@ TEST_F(TestClosureDimensionClusterLogic, TestStepValue)
     conformance.FeatureMap() = 65;
     conformance.OptionalAttributes().Set(OptionalAttributeEnum::kOverflow);
 
-    initParams.modulationType = ModulationTypeEnum::kOpacity;
-    initParams.rotationAxis = RotationAxisEnum::kBottom;
+    initParams.modulationType       = ModulationTypeEnum::kOpacity;
+    initParams.rotationAxis         = RotationAxisEnum::kBottom;
     initParams.translationDirection = TranslationDirectionEnum::kBackward;
-
 
     logic->ResetStateToDefault();
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
@@ -805,7 +785,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestStepValue)
     Percent100ths testStepValue = 10;
     Percent100ths StepValue;
 
-    //Check Default value
+    // Check Default value
     EXPECT_EQ(logic->GetStepValue(StepValue), CHIP_NO_ERROR);
     EXPECT_EQ(StepValue, 1);
 
@@ -834,10 +814,9 @@ TEST_F(TestClosureDimensionClusterLogic, TestStepValue)
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::StepValue::Id));
     EXPECT_EQ(StepValue, testStepValue);
 
-
     mockContext.ClearDirtyList();
     // StepValue not Multiple of Resolution
-    invalidStepValue = 45;
+    invalidStepValue         = 45;
     Percent100ths resolution = 10;
     EXPECT_EQ(logic->SetResolution(resolution), CHIP_NO_ERROR);
     EXPECT_EQ(logic->SetStepValue(invalidStepValue), CHIP_ERROR_INVALID_ARGUMENT);
@@ -855,10 +834,9 @@ TEST_F(TestClosureDimensionClusterLogic, TestUnit)
     conformance.FeatureMap() = 69;
     conformance.OptionalAttributes().Set(OptionalAttributeEnum::kOverflow);
 
-    initParams.modulationType = ModulationTypeEnum::kOpacity;
-    initParams.rotationAxis = RotationAxisEnum::kBottom;
+    initParams.modulationType       = ModulationTypeEnum::kOpacity;
+    initParams.rotationAxis         = RotationAxisEnum::kBottom;
     initParams.translationDirection = TranslationDirectionEnum::kBackward;
-
 
     logic->ResetStateToDefault();
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
@@ -904,10 +882,9 @@ TEST_F(TestClosureDimensionClusterLogic, TestUnitRange)
     conformance.FeatureMap() = 69;
     conformance.OptionalAttributes().Set(OptionalAttributeEnum::kOverflow);
 
-    initParams.modulationType = ModulationTypeEnum::kOpacity;
-    initParams.rotationAxis = RotationAxisEnum::kBottom;
+    initParams.modulationType       = ModulationTypeEnum::kOpacity;
+    initParams.rotationAxis         = RotationAxisEnum::kBottom;
     initParams.translationDirection = TranslationDirectionEnum::kBackward;
-
 
     logic->ResetStateToDefault();
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
@@ -962,7 +939,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestUnitRange)
     EXPECT_EQ(logic->SetUnit(ClosureUnitEnum::kDegree), CHIP_NO_ERROR);
     newUnitRange.max = 90;
     newUnitRange.min = -90;
-    testUnitRange = DataModel::Nullable<Structs::UnitRangeStruct::Type>(newUnitRange);
+    testUnitRange    = DataModel::Nullable<Structs::UnitRangeStruct::Type>(newUnitRange);
     EXPECT_EQ(logic->SetUnitRange(testUnitRange), CHIP_NO_ERROR);
     EXPECT_TRUE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::UnitRange::Id));
 
@@ -977,7 +954,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestUnitRange)
     EXPECT_EQ(logic->SetUnit(ClosureUnitEnum::kMillimeter), CHIP_NO_ERROR);
     invalidUnitRange.max = 0;
     invalidUnitRange.min = 10000;
-    testUnitRange = DataModel::Nullable<Structs::UnitRangeStruct::Type>(invalidUnitRange);
+    testUnitRange        = DataModel::Nullable<Structs::UnitRangeStruct::Type>(invalidUnitRange);
     EXPECT_EQ(logic->SetUnitRange(testUnitRange), CHIP_ERROR_INVALID_ARGUMENT);
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::UnitRange::Id));
 
@@ -986,7 +963,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestUnitRange)
     EXPECT_EQ(logic->SetUnit(ClosureUnitEnum::kMillimeter), CHIP_NO_ERROR);
     invalidUnitRange.max = 10000;
     invalidUnitRange.min = -1;
-    testUnitRange = DataModel::Nullable<Structs::UnitRangeStruct::Type>(invalidUnitRange);
+    testUnitRange        = DataModel::Nullable<Structs::UnitRangeStruct::Type>(invalidUnitRange);
     EXPECT_EQ(logic->SetUnitRange(testUnitRange), CHIP_ERROR_INVALID_ARGUMENT);
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::UnitRange::Id));
 
@@ -994,8 +971,8 @@ TEST_F(TestClosureDimensionClusterLogic, TestUnitRange)
     // Invalid millimeter Values
     EXPECT_EQ(logic->SetUnit(ClosureUnitEnum::kMillimeter), CHIP_NO_ERROR);
     invalidUnitRange.max = -1;
-    invalidUnitRange.min =  1000;
-    testUnitRange = DataModel::Nullable<Structs::UnitRangeStruct::Type>(invalidUnitRange);
+    invalidUnitRange.min = 1000;
+    testUnitRange        = DataModel::Nullable<Structs::UnitRangeStruct::Type>(invalidUnitRange);
     EXPECT_EQ(logic->SetUnitRange(testUnitRange), CHIP_ERROR_INVALID_ARGUMENT);
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::UnitRange::Id));
 
@@ -1004,7 +981,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestUnitRange)
     EXPECT_EQ(logic->SetUnit(ClosureUnitEnum::kDegree), CHIP_NO_ERROR);
     invalidUnitRange.max = 180;
     invalidUnitRange.min = 0;
-    testUnitRange = DataModel::Nullable<Structs::UnitRangeStruct::Type>(invalidUnitRange);
+    testUnitRange        = DataModel::Nullable<Structs::UnitRangeStruct::Type>(invalidUnitRange);
     EXPECT_EQ(logic->SetUnitRange(testUnitRange), CHIP_ERROR_INVALID_ARGUMENT);
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::UnitRange::Id));
 
@@ -1012,8 +989,8 @@ TEST_F(TestClosureDimensionClusterLogic, TestUnitRange)
     // Invalid degree Values
     EXPECT_EQ(logic->SetUnit(ClosureUnitEnum::kDegree), CHIP_NO_ERROR);
     invalidUnitRange.max = -180;
-    invalidUnitRange.min =  0;
-    testUnitRange = DataModel::Nullable<Structs::UnitRangeStruct::Type>(invalidUnitRange);
+    invalidUnitRange.min = 0;
+    testUnitRange        = DataModel::Nullable<Structs::UnitRangeStruct::Type>(invalidUnitRange);
     EXPECT_EQ(logic->SetUnitRange(testUnitRange), CHIP_ERROR_INVALID_ARGUMENT);
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::UnitRange::Id));
 
@@ -1022,7 +999,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestUnitRange)
     EXPECT_EQ(logic->SetUnit(ClosureUnitEnum::kDegree), CHIP_NO_ERROR);
     invalidUnitRange.max = 90;
     invalidUnitRange.min = 180;
-    testUnitRange = DataModel::Nullable<Structs::UnitRangeStruct::Type>(invalidUnitRange);
+    testUnitRange        = DataModel::Nullable<Structs::UnitRangeStruct::Type>(invalidUnitRange);
     EXPECT_EQ(logic->SetUnitRange(testUnitRange), CHIP_ERROR_INVALID_ARGUMENT);
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::UnitRange::Id));
 
@@ -1031,7 +1008,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestUnitRange)
     EXPECT_EQ(logic->SetUnit(ClosureUnitEnum::kDegree), CHIP_NO_ERROR);
     invalidUnitRange.max = 90;
     invalidUnitRange.min = -180;
-    testUnitRange = DataModel::Nullable<Structs::UnitRangeStruct::Type>(invalidUnitRange);
+    testUnitRange        = DataModel::Nullable<Structs::UnitRangeStruct::Type>(invalidUnitRange);
     EXPECT_EQ(logic->SetUnitRange(testUnitRange), CHIP_ERROR_INVALID_ARGUMENT);
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::UnitRange::Id));
 }
@@ -1044,8 +1021,8 @@ TEST_F(TestClosureDimensionClusterLogic, TestLimitRange)
     conformance.FeatureMap() = 73;
     conformance.OptionalAttributes().Set(OptionalAttributeEnum::kOverflow);
 
-    initParams.modulationType = ModulationTypeEnum::kOpacity;
-    initParams.rotationAxis = RotationAxisEnum::kBottom;
+    initParams.modulationType       = ModulationTypeEnum::kOpacity;
+    initParams.rotationAxis         = RotationAxisEnum::kBottom;
     initParams.translationDirection = TranslationDirectionEnum::kBackward;
 
     logic->ResetStateToDefault();
@@ -1099,7 +1076,6 @@ TEST_F(TestClosureDimensionClusterLogic, TestLimitRange)
     testLimitRange = { .min = 40, .max = 105 };
     EXPECT_EQ(logic->SetLimitRange(testLimitRange), CHIP_ERROR_INVALID_ARGUMENT);
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::LimitRange::Id));
-
 }
 
 // This test ensures that the Set function
@@ -1142,9 +1118,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestRotationAxis)
     EXPECT_EQ(logic->GetRotationAxis(RotationAxis), CHIP_NO_ERROR);
     EXPECT_EQ(RotationAxis, RotationAxisEnum::kBottom);
     EXPECT_TRUE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::RotationAxis::Id));
-
 }
-
 
 // This test ensures that the Set function
 // - sets the value properly during intilization
@@ -1352,7 +1326,6 @@ TEST_F(TestClosureDimensionClusterLogic, TestUnsupportedOverflow)
     state = logic->GetState();
     EXPECT_EQ(state.overflow, OverflowEnum::kUnknownEnumValue);
 
-
     mockContext.ClearDirtyList();
     // set Values
     EXPECT_EQ(logic->SetOverflow(testOverflow), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
@@ -1364,13 +1337,11 @@ TEST_F(TestClosureDimensionClusterLogic, TestUnsupportedOverflow)
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::Overflow::Id));
 }
 
-
-
 //=========================================================================================
 // Tests for command parameters
 //=========================================================================================
 
-//TODO: Tests for command parameters
+// TODO: Tests for command parameters
 
 } // namespace ClosureDimension
 } // namespace Clusters

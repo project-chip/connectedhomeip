@@ -42,16 +42,20 @@ CHIP_ERROR ClusterLogic::Init(const ClusterConformance & conformance, const Clus
     VerifyOrReturnError(conformance.Valid(), CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
     mConformance = conformance;
 
-    // Need to set TranslationDirection, RotationAxis, ModulationType before Initilization of closure,As they should not be changed after Initalization.
-    if (conformance.HasFeature(Feature::kTranslation)) {
+    // Need to set TranslationDirection, RotationAxis, ModulationType before Initilization of closure,As they should not be changed
+    // after Initalization.
+    if (conformance.HasFeature(Feature::kTranslation))
+    {
         ReturnErrorOnFailure(SetTranslationDirection(clusterInitParameters.translationDirection));
     }
 
-    if (conformance.HasFeature(Feature::kRotation)) {
+    if (conformance.HasFeature(Feature::kRotation))
+    {
         ReturnErrorOnFailure(SetRotationAxis(clusterInitParameters.rotationAxis));
     }
 
-    if (conformance.HasFeature(Feature::kModulation)) {
+    if (conformance.HasFeature(Feature::kModulation))
+    {
         ReturnErrorOnFailure(SetModulationType(clusterInitParameters.modulationType));
     }
 
@@ -59,7 +63,7 @@ CHIP_ERROR ClusterLogic::Init(const ClusterConformance & conformance, const Clus
     return CHIP_NO_ERROR;
 }
 
-//TODO: CurrentState should be QuietReporting.
+// TODO: CurrentState should be QuietReporting.
 CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericCurrentStateStruct> & incomingCurrentState)
 {
     assertChipStackLockedByCurrentThread();
@@ -69,20 +73,19 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericCurren
 
     DataModel::Nullable<GenericCurrentStateStruct> & clusterCurrentState = mState.currentState;
 
-    bool validateClusterCurrentStateMembers     = false;
+    bool validateClusterCurrentStateMembers  = false;
     bool validateClusterCurrentStatePosition = false;
-    bool validateClusterCurrentStateLatch       = false;
-    bool validateClusterCurrentStateSpeed       = false;
+    bool validateClusterCurrentStateLatch    = false;
+    bool validateClusterCurrentStateSpeed    = false;
 
-    bool validateIncomingCurrentStateMembers     = false;
+    bool validateIncomingCurrentStateMembers  = false;
     bool validateIncomingCurrentStatePosition = false;
-    bool validateIncomingCurrentStateLatch       = false;
-    bool validateIncomingCurrentStateSpeed       = false;
+    bool validateIncomingCurrentStateLatch    = false;
+    bool validateIncomingCurrentStateSpeed    = false;
 
-    bool requirePositioningUpdate  = false;
-    bool requireLatchUpdate        = false;
-    bool requireSpeedUpdate        = false;
-
+    bool requirePositioningUpdate = false;
+    bool requireLatchUpdate       = false;
+    bool requireSpeedUpdate       = false;
 
     /*
         Determine checks that need to be executed based on current and provided values
@@ -97,8 +100,8 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericCurren
         validateClusterCurrentStateMembers = true;
 
         validateClusterCurrentStatePosition = clusterCurrentState.Value().position.HasValue();
-        validateClusterCurrentStateLatch       = clusterCurrentState.Value().latch.HasValue();
-        validateClusterCurrentStateSpeed       = clusterCurrentState.Value().speed.HasValue();
+        validateClusterCurrentStateLatch    = clusterCurrentState.Value().latch.HasValue();
+        validateClusterCurrentStateSpeed    = clusterCurrentState.Value().speed.HasValue();
     }
 
     // Determine CurrentState member values, if a value is present, if it is null or if it has a valid value, to determine what
@@ -109,8 +112,8 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericCurren
         validateIncomingCurrentStateMembers = true;
 
         validateIncomingCurrentStatePosition = incomingCurrentState.Value().position.HasValue();
-        validateIncomingCurrentStateLatch       = incomingCurrentState.Value().latch.HasValue();
-        validateIncomingCurrentStateSpeed       = incomingCurrentState.Value().speed.HasValue();
+        validateIncomingCurrentStateLatch    = incomingCurrentState.Value().latch.HasValue();
+        validateIncomingCurrentStateSpeed    = incomingCurrentState.Value().speed.HasValue();
     }
 
     /*
@@ -120,29 +123,29 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericCurren
     // Validate if the Positioning feature is required based on the set values and FeatureMap conformance.
     if (validateClusterCurrentStatePosition || validateIncomingCurrentStatePosition)
     {
-        //TODO: why are we checking the current position value, why it should impact the set.
-        //TODO: ideally if we dont have ppositioningfeature the current.state should not be present.
-        //TODO: if currentstate has positioning then we are missing check somewhere else.
-        // If the positioning member is present in either the current or incoming CurrentState, we need to check if the Positioning
-        // feature is supported by the device. If the Positioning feature is not supported, return an error.
+        // TODO: why are we checking the current position value, why it should impact the set.
+        // TODO: ideally if we dont have ppositioningfeature the current.state should not be present.
+        // TODO: if currentstate has positioning then we are missing check somewhere else.
+        //  If the positioning member is present in either the current or incoming CurrentState, we need to check if the Positioning
+        //  feature is supported by the device. If the Positioning feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     }
 
     // Validate if the MotionLatching feature is required based on the set values and FeatureMap conformance.
     if (validateClusterCurrentStateLatch || validateIncomingCurrentStateLatch)
     {
-        //TODO: Same comment as above
-        // If the latching member is present in either the current or incoming CurrentState, we need to check if the MotionLatching
-        // feature is supported by the device. If the MotionLatching feature is not supported, return an error.
+        // TODO: Same comment as above
+        //  If the latching member is present in either the current or incoming CurrentState, we need to check if the MotionLatching
+        //  feature is supported by the device. If the MotionLatching feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     }
 
     // Validate if the Speed feature is required based on the set values and FeatureMap conformance.
     if (validateClusterCurrentStateSpeed || validateIncomingCurrentStateSpeed)
     {
-        //TODO: Same comment as above
-        // If the speed member is present in either the current or incoming CurrentState, we need to check if the Speed feature is
-        // supported by the device. If the Speed feature is not supported, return an error.
+        // TODO: Same comment as above
+        //  If the speed member is present in either the current or incoming CurrentState, we need to check if the Speed feature is
+        //  supported by the device. If the Speed feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     }
 
@@ -160,8 +163,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericCurren
         // We need to update the cluster positioning value if
         // - cluster does not have value; the value will necessarily be updated
         // - cluster and incoming values are different
-        requirePositioningUpdate =
-            !validateClusterCurrentStatePosition || clusterCurrentState.Value().position.Value() != position;
+        requirePositioningUpdate = !validateClusterCurrentStatePosition || clusterCurrentState.Value().position.Value() != position;
     }
 
     if (validateIncomingCurrentStateLatch)
@@ -213,13 +215,13 @@ CHIP_ERROR ClusterLogic::SetTarget(const DataModel::Nullable<GenericTargetStruct
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
 
     // If both present Target and incoming Target Value are NULL, no Update needed.
-    if(target.IsNull() && mState.target.IsNull())
+    if (target.IsNull() && mState.target.IsNull())
     {
         return CHIP_NO_ERROR;
     }
 
     // If present Target in not NULL and incoming Target Value is NULL, update value to NULL and trigger attribute reporting.
-    if(target.IsNull() && !mState.target.IsNull())
+    if (target.IsNull() && !mState.target.IsNull())
     {
         mState.target.SetNull();
         mMatterContext.MarkDirty(Attributes::Target::Id);
@@ -233,8 +235,9 @@ CHIP_ERROR ClusterLogic::SetTarget(const DataModel::Nullable<GenericTargetStruct
 
         Percent100ths resolution;
         ReturnErrorOnFailure(GetResolution(resolution));
-        VerifyOrReturnError(target.Value().position.Value() % resolution != 0, CHIP_ERROR_INVALID_ARGUMENT,
-                ChipLogError(NotSpecified, "target.Value().Position value SHALL follow the scaling from Resolution Attribute"));
+        VerifyOrReturnError(
+            target.Value().position.Value() % resolution != 0, CHIP_ERROR_INVALID_ARGUMENT,
+            ChipLogError(NotSpecified, "target.Value().Position value SHALL follow the scaling from Resolution Attribute"));
     }
 
     if (target.Value().latch.HasValue())
@@ -284,8 +287,8 @@ CHIP_ERROR ClusterLogic::SetStepValue(const Percent100ths stepValue)
     // StepValue SHALL be equal to an integer multiple of the Resolution attribute , if not return Invalid Argument.
     Percent100ths resolution;
     ReturnErrorOnFailure(GetResolution(resolution));
-    VerifyOrReturnError(stepValue % resolution == 0, CHIP_ERROR_INVALID_ARGUMENT, ChipLogError(NotSpecified,
-                        "StepValue SHALL be equal to an integer multiple of the Resolution attribute"));
+    VerifyOrReturnError(stepValue % resolution == 0, CHIP_ERROR_INVALID_ARGUMENT,
+                        ChipLogError(NotSpecified, "StepValue SHALL be equal to an integer multiple of the Resolution attribute"));
 
     if (stepValue != mState.stepValue)
     {
@@ -384,10 +387,14 @@ CHIP_ERROR ClusterLogic::SetLimitRange(const Structs::RangePercent100thsStruct::
     // LimitRange.Min and LimitRange.Max SHALL be equal to an integer multiple of the Resolution attribute.
     Percent100ths resolution;
     ReturnErrorOnFailure(GetResolution(resolution));
-    VerifyOrReturnError(limitRange.min % resolution == 0, CHIP_ERROR_INVALID_ARGUMENT, ChipLogError(NotSpecified,
-                        "LimitRange.Min and LimitRange.Max SHALL be equal to an integer multiple of the Resolution attribute."));
-    VerifyOrReturnError(limitRange.max % resolution == 0, CHIP_ERROR_INVALID_ARGUMENT, ChipLogError(NotSpecified,
-                        "LimitRange.Min and LimitRange.Max SHALL be equal to an integer multiple of the Resolution attribute."));
+    VerifyOrReturnError(
+        limitRange.min % resolution == 0, CHIP_ERROR_INVALID_ARGUMENT,
+        ChipLogError(NotSpecified,
+                     "LimitRange.Min and LimitRange.Max SHALL be equal to an integer multiple of the Resolution attribute."));
+    VerifyOrReturnError(
+        limitRange.max % resolution == 0, CHIP_ERROR_INVALID_ARGUMENT,
+        ChipLogError(NotSpecified,
+                     "LimitRange.Min and LimitRange.Max SHALL be equal to an integer multiple of the Resolution attribute."));
 
     if ((limitRange.min != mState.limitRange.min) || (limitRange.max != mState.limitRange.max))
     {
@@ -441,7 +448,8 @@ CHIP_ERROR ClusterLogic::SetOverflow(const OverflowEnum overflow)
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
 
     // No need to check for feature conformance, as feature conformance is validated during Initilization.
-    VerifyOrReturnError(mConformance.OptionalAttributes().Has(OptionalAttributeEnum::kOverflow), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrReturnError(mConformance.OptionalAttributes().Has(OptionalAttributeEnum::kOverflow),
+                        CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     VerifyOrReturnError(EnsureKnownEnumValue(overflow) != OverflowEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
 
     // If the axis is centered, one part goes Outside and the other part goes Inside.
@@ -452,24 +460,27 @@ CHIP_ERROR ClusterLogic::SetOverflow(const OverflowEnum overflow)
     ReturnErrorOnFailure(GetOverflow(currentOverflow));
 
     if (currentOverflow != OverflowEnum::kUnknownEnumValue &&
-            (rotationAxis == RotationAxisEnum::kCenteredHorizontal || rotationAxis == RotationAxisEnum::kCenteredVertical)) {
+        (rotationAxis == RotationAxisEnum::kCenteredHorizontal || rotationAxis == RotationAxisEnum::kCenteredVertical))
+    {
 
-        if ( currentOverflow == OverflowEnum::kTopInside || currentOverflow == OverflowEnum::kBottomInside ||
-             currentOverflow == OverflowEnum::kLeftInside || currentOverflow == OverflowEnum::kRightInside )
+        if (currentOverflow == OverflowEnum::kTopInside || currentOverflow == OverflowEnum::kBottomInside ||
+            currentOverflow == OverflowEnum::kLeftInside || currentOverflow == OverflowEnum::kRightInside)
         {
             VerifyOrReturnError(overflow == OverflowEnum::kTopInside || overflow == OverflowEnum::kBottomInside ||
-                overflow == OverflowEnum::kLeftInside || overflow == OverflowEnum::kRightInside, CHIP_ERROR_INVALID_ARGUMENT);
+                                    overflow == OverflowEnum::kLeftInside || overflow == OverflowEnum::kRightInside,
+                                CHIP_ERROR_INVALID_ARGUMENT);
         }
-        else if ( currentOverflow == OverflowEnum::kTopOutside || currentOverflow == OverflowEnum::kBottomOutside ||
-            currentOverflow == OverflowEnum::kLeftOutside || currentOverflow == OverflowEnum::kRightOutside )
+        else if (currentOverflow == OverflowEnum::kTopOutside || currentOverflow == OverflowEnum::kBottomOutside ||
+                 currentOverflow == OverflowEnum::kLeftOutside || currentOverflow == OverflowEnum::kRightOutside)
         {
-           VerifyOrReturnError(overflow == OverflowEnum::kTopOutside || overflow == OverflowEnum::kBottomOutside ||
-               overflow == OverflowEnum::kLeftOutside || overflow == OverflowEnum::kRightOutside, CHIP_ERROR_INVALID_ARGUMENT);
-        } else
+            VerifyOrReturnError(overflow == OverflowEnum::kTopOutside || overflow == OverflowEnum::kBottomOutside ||
+                                    overflow == OverflowEnum::kLeftOutside || overflow == OverflowEnum::kRightOutside,
+                                CHIP_ERROR_INVALID_ARGUMENT);
+        }
+        else
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-
     }
 
     if (overflow != mState.overflow)
@@ -504,7 +515,7 @@ CHIP_ERROR ClusterLogic::GetCurrentState(DataModel::Nullable<GenericCurrentState
     static uint32_t count = 0;
     count++;
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    ChipLogError(AppServer,"In GetCurrentState count = %d",count);
+    ChipLogError(AppServer, "In GetCurrentState count = %d", count);
     currentState = mState.currentState;
     return CHIP_NO_ERROR;
 }
@@ -613,8 +624,8 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
     // If all command parameters don't have a value, return InvalidCommand
     VerifyOrReturnValue(position.HasValue() || latch.HasValue() || speed.HasValue(), Status::InvalidCommand);
 
-    // TODO: SpecIssue If this command is sent while the device is in a non-compatible internal-state, a status code of INVALID_IN_STATE SHALL
-    // be returned.
+    // TODO: SpecIssue If this command is sent while the device is in a non-compatible internal-state, a status code of
+    // INVALID_IN_STATE SHALL be returned.
 
     DataModel::Nullable<GenericTargetStruct> target;
     VerifyOrReturnError(GetTarget(target) == CHIP_NO_ERROR, Status::Failure);
@@ -649,7 +660,9 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
         }
 
         target.Value().latch = latch;
-    } else {
+    }
+    else
+    {
         // Fallback value for latch is False
         target.Value().latch.Value() = false;
     }
@@ -661,8 +674,10 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
         VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), Status::Success);
 
         target.Value().speed = speed;
-    } else {
-        //Fallback Value for speed is Auto
+    }
+    else
+    {
+        // Fallback Value for speed is Auto
         target.Value().speed.Value() = Globals::ThreeLevelAutoEnum::kAuto;
     }
 
@@ -675,7 +690,8 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
     status = mDelegate.HandleSetTarget(position, latch, speed);
 
     // once SetTarget action is successful on closure will set Target.
-    if (status == Status::Success) {
+    if (status == Status::Success)
+    {
         VerifyOrReturnError(SetTarget(target) == CHIP_NO_ERROR, Status::Failure);
     }
 
@@ -704,13 +720,15 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
         VerifyOrReturnError(speed.Value() != Globals::ThreeLevelAutoEnum::kUnknownEnumValue, Status::ConstraintError);
 
         stepTarget.Value().speed = speed;
-    } else {
-        //Fallback Value for speed is Auto
+    }
+    else
+    {
+        // Fallback Value for speed is Auto
         stepTarget.Value().speed.Value() = Globals::ThreeLevelAutoEnum::kAuto;
     }
 
-    // TODO: SpecIssue: If the server is in a state where it cannot support the command, the server SHALL respond with an INVALID_IN_STATE
-    // response and the Target attribute value SHALL remain unchanged.
+    // TODO: SpecIssue: If the server is in a state where it cannot support the command, the server SHALL respond with an
+    // INVALID_IN_STATE response and the Target attribute value SHALL remain unchanged.
 
     // Check if the current position is valid or else return InvalidInState
     DataModel::Nullable<GenericCurrentStateStruct> currentState;
@@ -766,7 +784,8 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
     status = mDelegate.HandleStep(direction, numberOfSteps, speed);
 
     // once Step action is successful on closure will set Target.
-    if (status == Status::Success) {
+    if (status == Status::Success)
+    {
         stepTarget.Value().position.SetValue(static_cast<Percent100ths>(newPosition));
         if (speed.HasValue())
         {

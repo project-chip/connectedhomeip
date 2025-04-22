@@ -59,7 +59,8 @@ struct ClusterConformance
      *        1. Check if either Positioning or MotionLatching is supported. If neither are enabled, returns false.
      *        2. If Unit, Limitation or speed is enabled, Positioning must be enabled. Return false otherwise.
      *        3. If Translation, Rotation or Modulation is enabled, Positioning must be enabled. Return false otherwise.
-     *        4. If Positioning is enabled, atleast one of Translation, Rotation or Modulation should be enabled. Return false otherwise.
+     *        4. If Positioning is enabled, atleast one of Translation, Rotation or Modulation should be enabled. Return false
+     * otherwise.
      *
      * @return true, the cluster confirmance is valid
      *         false, otherwise
@@ -75,8 +76,7 @@ struct ClusterConformance
         {
             VerifyOrReturnValue(
                 HasFeature(Feature::kPositioning), false,
-                ChipLogError(AppServer,
-                             "Validation failed: Unit , Limitation, or speed requires Positioning enabled."));
+                ChipLogError(AppServer, "Validation failed: Unit , Limitation, or speed requires Positioning enabled."));
         }
 
         // If Translation, Rotation or Modulation is enabled, Positioning must be enabled.
@@ -84,8 +84,7 @@ struct ClusterConformance
         {
             VerifyOrReturnValue(
                 HasFeature(Feature::kPositioning), false,
-                ChipLogError(AppServer,
-                             "Validation failed: Translation, Rotation or Modulation requires Positioning enabled."));
+                ChipLogError(AppServer, "Validation failed: Translation, Rotation or Modulation requires Positioning enabled."));
         }
 
         // If Positioning is enabled, atleast one of Translation, Rotation or Modulation should be enabled.
@@ -94,23 +93,26 @@ struct ClusterConformance
             VerifyOrReturnValue(
                 HasFeature(Feature::kTranslation) || HasFeature(Feature::kRotation) || HasFeature(Feature::kModulation), false,
                 ChipLogError(AppServer,
-                            "Validation failed: If Positioning is available then atleast one of Translation, Rotation or Modulation should be enabled"));
+                             "Validation failed: If Positioning is available then atleast one of Translation, Rotation or "
+                             "Modulation should be enabled"));
         }
 
-         // If Overflow Attribute is supported, atleast one of  Rotation or MotionLatching should be supported.
-         if (mOptionalAttributes.Has(OptionalAttributeEnum::kOverflow))
-         {
-             VerifyOrReturnValue(HasFeature(Feature::kRotation) || HasFeature(Feature::kMotionLatching), false,
-                 ChipLogError(AppServer,
-                             "Validation failed: If Overflow Attribute is Supported, atleast one of  Rotation or MotionLatching  should be supported."));
-         }
+        // If Overflow Attribute is supported, atleast one of  Rotation or MotionLatching should be supported.
+        if (mOptionalAttributes.Has(OptionalAttributeEnum::kOverflow))
+        {
+            VerifyOrReturnValue(HasFeature(Feature::kRotation) || HasFeature(Feature::kMotionLatching), false,
+                                ChipLogError(AppServer,
+                                             "Validation failed: If Overflow Attribute is Supported, atleast one of  Rotation or "
+                                             "MotionLatching  should be supported."));
+        }
 
-         // If Rotation  feature is supported, then Overflow Attribute should be supported.
+        // If Rotation  feature is supported, then Overflow Attribute should be supported.
         if (HasFeature(Feature::kRotation))
         {
-            VerifyOrReturnValue(mOptionalAttributes.Has(OptionalAttributeEnum::kOverflow), false,
+            VerifyOrReturnValue(
+                mOptionalAttributes.Has(OptionalAttributeEnum::kOverflow), false,
                 ChipLogError(AppServer,
-                            "Validation failed: If Rotation  feature is supported, then Overflow Attribute should be supported."));
+                             "Validation failed: If Rotation  feature is supported, then Overflow Attribute should be supported."));
         }
 
         return true;
@@ -127,8 +129,8 @@ private:
 struct ClusterInitParameters
 {
     TranslationDirectionEnum translationDirection = TranslationDirectionEnum::kUnknownEnumValue;
-    RotationAxisEnum rotationAxis = RotationAxisEnum::kUnknownEnumValue;
-    ModulationTypeEnum modulationType = ModulationTypeEnum::kUnknownEnumValue;
+    RotationAxisEnum rotationAxis                 = RotationAxisEnum::kUnknownEnumValue;
+    ModulationTypeEnum modulationType             = ModulationTypeEnum::kUnknownEnumValue;
 };
 
 /**
@@ -138,15 +140,15 @@ struct ClusterState
 {
     DataModel::Nullable<GenericCurrentStateStruct> currentState{ DataModel::NullNullable };
     DataModel::Nullable<GenericTargetStruct> target{ DataModel::NullNullable };
-    Percent100ths resolution = 1;
-    Percent100ths stepValue = 1;
-    ClosureUnitEnum unit = ClosureUnitEnum::kUnknownEnumValue;
+    Percent100ths resolution                                      = 1;
+    Percent100ths stepValue                                       = 1;
+    ClosureUnitEnum unit                                          = ClosureUnitEnum::kUnknownEnumValue;
     DataModel::Nullable<Structs::UnitRangeStruct::Type> unitRange = DataModel::Nullable<Structs::UnitRangeStruct::Type>();
     Structs::RangePercent100thsStruct::Type limitRange{};
     TranslationDirectionEnum translationDirection = TranslationDirectionEnum::kUnknownEnumValue;
-    RotationAxisEnum rotationAxis = RotationAxisEnum::kUnknownEnumValue;
-    OverflowEnum overflow = OverflowEnum::kUnknownEnumValue;
-    ModulationTypeEnum modulationType = ModulationTypeEnum::kUnknownEnumValue;
+    RotationAxisEnum rotationAxis                 = RotationAxisEnum::kUnknownEnumValue;
+    OverflowEnum overflow                         = OverflowEnum::kUnknownEnumValue;
+    ModulationTypeEnum modulationType             = ModulationTypeEnum::kUnknownEnumValue;
 };
 
 class ClusterLogic
@@ -156,18 +158,16 @@ public:
      *  @brief Instantiates a ClusterLogic class. The caller maintains ownership of the driver and the context,
      *           but provides them for use by the ClusterLogic class.
      */
-    ClusterLogic(DelegateBase & delegate, MatterContext & matterContext) :
-        mDelegate(delegate), mMatterContext(matterContext)
-    {}
+    ClusterLogic(DelegateBase & delegate, MatterContext & matterContext) : mDelegate(delegate), mMatterContext(matterContext) {}
 
     const ClusterState & GetState() { return mState; }
     const ClusterConformance & GetConformance() { return mConformance; }
 
     // TODO: Remove this only for Test
-    void ResetStateToDefault() {
+    void ResetStateToDefault()
+    {
         mState = ClusterState(); // This will reset mState to its default values
     }
-
 
     /**
      *  @brief Validates the conformance and performs initialization
