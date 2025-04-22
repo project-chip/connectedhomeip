@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include "lib/support/Span.h"
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 
 #include <app/server-cluster/DefaultServerCluster.h>
@@ -52,6 +53,10 @@ private:
     /// Convenience method that returns if the internal delegate is null and will log
     /// an error if the check returns true
     bool IsNullDelegateWithLogging(EndpointId endpointIdForLogging);
+
+    /// convenience method that checks an update token for validity and logs
+    /// on error (when returning false).
+    static bool IsValidUpdateTokenWithLogging(ByteSpan updateToken);
 };
 
 /// Integration of OTA provider logic within the matter data model

@@ -61,6 +61,7 @@ CHIP_ERROR OtaProviderServer::AcceptedCommands(const ConcreteClusterPath & path,
     };
     return builder.ReferenceExisting({ kEntries, MATTER_ARRAY_SIZE(kEntries) });
 }
+
 CHIP_ERROR OtaProviderServer::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
 {
     static constexpr CommandId kEntries[] = {
@@ -107,6 +108,17 @@ bool OtaProviderLogic::IsNullDelegateWithLogging(EndpointId endpointIdForLogging
     return false;
 }
 
+bool OtaProviderLogic::IsValidUpdateTokenWithLogging(ByteSpan updateToken)
+{
+    if (updateToken.size() > kUpdateTokenMaxLength || updateToken.size() < kUpdateTokenMinLength)
+    {
+        ChipLogError(Zcl, "expected size [%u; %u] for UpdateToken, got %u", static_cast<unsigned int>(kUpdateTokenMinLength),
+                     static_cast<unsigned int>(kUpdateTokenMaxLength), static_cast<unsigned int>(updateToken.size()));
+        return false;
+    }
+    return true;
+}
+
 std::optional<DataModel::ActionReturnStatus>
 OtaProviderLogic::ApplyUpdateRequest(const ConcreteCommandPath & commandPath,
                                      const OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::DecodableType & commandData,
@@ -119,15 +131,10 @@ OtaProviderLogic::ApplyUpdateRequest(const ConcreteCommandPath & commandPath,
     auto & updateToken = commandData.updateToken;
 
     ChipLogProgress(Zcl, "OTA Provider received ApplyUpdateRequest");
-    ChipLogDetail(Zcl, "  Update Token: %u", static_cast<unsigned int>(commandData.updateToken.size()));
+    ChipLogDetail(Zcl, "  Update Token: %u", static_cast<unsigned int>(updateToken.size()));
     ChipLogDetail(Zcl, "  New Version: %" PRIu32, commandData.newVersion);
 
-    if (updateToken.size() > kUpdateTokenMaxLength || updateToken.size() < kUpdateTokenMinLength)
-    {
-        ChipLogError(Zcl, "expected size %u for UpdateToken, got %u", static_cast<unsigned int>(kUpdateTokenMaxLength),
-                     static_cast<unsigned int>(updateToken.size()));
-        return Status::InvalidCommand;
-    }
+    VerifyOrReturnError(IsValidUpdateTokenWithLogging(updateToken), Status::InvalidCommand);
 
     mDelegate->HandleApplyUpdateRequest(handler, commandPath, commandData);
     return std::nullopt;
@@ -146,15 +153,10 @@ OtaProviderLogic::NotifyUpdateApplied(const ConcreteCommandPath & commandPath,
     auto & updateToken = commandData.updateToken;
 
     ChipLogProgress(Zcl, "OTA Provider received NotifyUpdateApplied");
-    ChipLogDetail(Zcl, "  Update Token: %u", static_cast<unsigned int>(commandData.updateToken.size()));
+    ChipLogDetail(Zcl, "  Update Token: %u", static_cast<unsigned int>(updateToken.size()));
     ChipLogDetail(Zcl, "  Software Version: %" PRIu32, commandData.softwareVersion);
 
-    if (updateToken.size() > kUpdateTokenMaxLength || updateToken.size() < kUpdateTokenMinLength)
-    {
-        ChipLogError(Zcl, "expected size %u for UpdateToken, got %u", static_cast<unsigned int>(kUpdateTokenMaxLength),
-                     static_cast<unsigned int>(updateToken.size()));
-        return Status::InvalidCommand;
-    }
+    VerifyOrReturnError(IsValidUpdateTokenWithLogging(updateToken), Status::InvalidCommand);
 
     mDelegate->HandleNotifyUpdateApplied(handler, commandPath, commandData);
     return std::nullopt;

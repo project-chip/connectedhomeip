@@ -14,10 +14,12 @@
  *    limitations under the License.
  */
 
+#include "lib/core/Optional.h"
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/ota-provider/ota-provider-cluster.h>
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
 
 namespace {
@@ -48,7 +50,13 @@ public:
     {}
 };
 
-TEST(TestOtaProviderLogic, QueryImageValidation)
+struct TestOtaProviderLogic : public ::testing::Test
+{
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+};
+
+TEST_F(TestOtaProviderLogic, QueryImageValidation)
 {
     OtaProviderLogic logic;
     const ConcreteCommandPath kCommandPath{ kRootEndpointId, OtaSoftwareUpdateProvider::Id, QueryImage::Id };
@@ -69,6 +77,72 @@ TEST(TestOtaProviderLogic, QueryImageValidation)
     input.location = NullOptional;
     EXPECT_EQ(logic.QueryImage(kCommandPath, input, nullptr /* handler */), std::nullopt);
     // nullopt means delegate was called
+
+    // metadata too large
+    {
+        constexpr size_t kTooLargeMetadataBytes = 513;
+
+        Platform::ScopedMemoryBufferWithSize<uint8_t> kHugeBuffer;
+
+        ASSERT_TRUE(kHugeBuffer.Alloc(kTooLargeMetadataBytes));
+
+        input.metadataForProvider = MakeOptional(kHugeBuffer.Span());
+        EXPECT_EQ(logic.QueryImage(kCommandPath, input, nullptr /* handler */), Status::InvalidCommand);
+        input.metadataForProvider = NullOptional;
+    }
+
+    // valid values, will set some logic
+    input.hardwareVersion = MakeOptional(static_cast<uint16_t>(1234u));
+    input.requestorCanConsent = MakeOptional(true);
+
+    uint8_t someMeta[] = {1,2,3,4,5};
+    input.metadataForProvider = MakeOptional<Span<uint8_t>>(someMeta);
+    EXPECT_EQ(logic.QueryImage(kCommandPath, input, nullptr /* handler */), std::nullopt);
+}
+
+TEST_F(TestOtaProviderLogic, NotifyUpdateApplied)
+{
+    OtaProviderLogic logic;
+    const ConcreteCommandPath kCommandPath{ kRootEndpointId, OtaSoftwareUpdateProvider::Id, NotifyUpdateApplied::Id };
+
+    NotifyUpdateApplied::DecodableType input;
+
+    // Without a delegate, error out
+    EXPECT_EQ(logic.NotifyUpdateApplied(kCommandPath, input, nullptr /* handler not used */), Status::UnsupportedCommand);
+
+    MockDelegate mockDelegate;
+    logic.SetDelegate(&mockDelegate);
+
+    // update token is not valid
+    EXPECT_EQ(logic.NotifyUpdateApplied(kCommandPath, input, nullptr /* handler not used */), Status::InvalidCommand);
+
+    constexpr uint8_t kUpdateToken[] = {1,2,3,4,5,6,7, 8};
+
+    input.softwareVersion = 123;
+    input.updateToken = Span<const uint8_t>(kUpdateToken);
+    EXPECT_EQ(logic.NotifyUpdateApplied(kCommandPath, input, nullptr /* handler not used */), std::nullopt);
+}
+
+TEST_F(TestOtaProviderLogic, ApplyUpdateRequest)
+{
+    OtaProviderLogic logic;
+    const ConcreteCommandPath kCommandPath{ kRootEndpointId, OtaSoftwareUpdateProvider::Id, ApplyUpdateRequest::Id };
+
+    ApplyUpdateRequest::DecodableType input;
+
+    // Without a delegate, error out
+    EXPECT_EQ(logic.ApplyUpdateRequest(kCommandPath, input, nullptr /* handler not used */), Status::UnsupportedCommand);
+
+    MockDelegate mockDelegate;
+    logic.SetDelegate(&mockDelegate);
+
+    // update token is not valid
+    EXPECT_EQ(logic.ApplyUpdateRequest(kCommandPath, input, nullptr /* handler not used */), Status::InvalidCommand);
+
+    constexpr uint8_t kUpdateToken[] = {1,2,3,4,5,6,7, 8};
+    input.newVersion = 124;
+    input.updateToken = Span<const uint8_t>(kUpdateToken);
+    EXPECT_EQ(logic.ApplyUpdateRequest(kCommandPath, input, nullptr /* handler not used */), std::nullopt);
 }
 
 } // namespace
