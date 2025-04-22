@@ -22,7 +22,6 @@
 #include "FabricTable.h"
 
 #include <lib/core/CHIPEncoding.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
@@ -30,6 +29,7 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TypeTraits.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/LockTracker.h>
 #include <tracing/macros.h>
 

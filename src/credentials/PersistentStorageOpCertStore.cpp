@@ -22,12 +22,12 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/TLV.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <credentials/CHIPCert.h>
 
@@ -342,7 +342,8 @@ CHIP_ERROR PersistentStorageOpCertStore::UpdateOpCertsForFabric(FabricIndex fabr
     // Can't set an ICAC if we have installed a VVSC, until the VVSC is gone.
     if (HasVvscForFabric(fabricIndex))
     {
-        ChipLogError(FabricProvisioning, "Received an UpdateNOC storage request with ICAC when VVSC already present. VVSC must be removed first.");
+        ChipLogError(FabricProvisioning,
+                     "Received an UpdateNOC storage request with ICAC when VVSC already present. VVSC must be removed first.");
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
