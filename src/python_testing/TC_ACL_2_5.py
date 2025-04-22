@@ -38,20 +38,9 @@ from chip.interaction_model import Status
 from chip.testing.matter_testing import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
-
 class TC_ACL_2_5(MatterBaseTest):
     def desc_TC_ACL_2_5(self) -> str:
         return "[TC-ACL-2.5] Cluster endpoint"
-
-    async def read_access_control_extension(self):
-        """Read the AccessControl cluster's Extension attribute"""
-        extension_attribute = Clusters.AccessControl.Attributes.Extension
-        result = await self.read_single_attribute_check_success(
-            endpoint=0,
-            cluster=Clusters.AccessControl,
-            attribute=extension_attribute
-        )
-        return result
 
     def steps_TC_ACL_2_5(self) -> list[TestStep]:
         steps = [
@@ -94,7 +83,6 @@ class TC_ACL_2_5(MatterBaseTest):
         self.step(3)
         # Read initial AccessControlClusterExtension
         acec_event = Clusters.AccessControl.Events.AccessControlExtensionChanged
-
         events_response = await self.th1.ReadEvent(
             self.dut_node_id,
             events=[(0, acec_event)],
@@ -165,7 +153,6 @@ class TC_ACL_2_5(MatterBaseTest):
 
         # Write the new extension
         logging.info(f"Writing new extension with data {D_OK_SINGLE.hex()}")
-        extension_attr = Clusters.AccessControl.Attributes.Extension
         extensions_list = [new_extension]
         result = await self.default_controller.WriteAttribute(
             self.dut_node_id,
@@ -209,7 +196,6 @@ class TC_ACL_2_5(MatterBaseTest):
 
         # This should fail with CONSTRAINT_ERROR
         logging.info("Attempting to write extension that exceeds max length (should fail)")
-        extension_attr = Clusters.AccessControl.Attributes.Extension
         extensions_list = [too_long_extension]
         a = await self.default_controller.WriteAttribute(
             self.dut_node_id,
@@ -233,14 +219,13 @@ class TC_ACL_2_5(MatterBaseTest):
         logging.info(f"Events response {str(events_response)}")
 
         # Extract events from the response
-        events = events_response  # Response is already a list of events
+        events = events_response 
         logging.info(f"Found {len(events)} events")
         asserts.assert_equal(len(events), 0, "There should be no events found")
 
         self.step(10)
         # This should fail with CONSTRAINT_ERROR
         logging.info("Attempting to write multiple extensions (should fail)")
-        extension_attr = Clusters.AccessControl.Attributes.Extension
         extensions_list = [extension, new_extension]
         b = await self.default_controller.WriteAttribute(
             self.dut_node_id,
@@ -254,7 +239,6 @@ class TC_ACL_2_5(MatterBaseTest):
         # Verify no event was generated at all, since the whole extensions list was rejected.
         logging.info("Reading events after failed write (multiple extensions)...")
 
-        # Try to read events directly
         events_response = await self.default_controller.ReadEvent(
             self.dut_node_id,
             events=[(0, acec_event)],
@@ -271,7 +255,6 @@ class TC_ACL_2_5(MatterBaseTest):
         self.step(12)
         # Write an empty list to clear all extensions
         logging.info("Writing empty extension list to clear all extensions...")
-        extension_attr = Clusters.AccessControl.Attributes.Extension
         extensions_list2 = []
         result = await self.default_controller.WriteAttribute(
             self.dut_node_id,
