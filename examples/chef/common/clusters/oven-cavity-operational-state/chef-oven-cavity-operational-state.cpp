@@ -68,7 +68,13 @@ static void onOvenCavityOperationalStateTimerTick(System::Layer * systemLayer, v
     }
     else
     {
-        (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOvenCavityOperationalStateTimerTick, delegate);
+        CHIP_ERROR err =
+            DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOvenCavityOperationalStateTimerTick, delegate);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "onOvenCavityOperationalStateTimerTick: Failed to start timer. %" CHIP_ERROR_FORMAT,
+                         err.Format());
+        }
     }
 }
 
@@ -203,10 +209,7 @@ void ChefDelegate::HandleStartStateCallback(OperationalState::GenericOperational
     }
 
     if (CheckCycleActive())
-    {
-        (void) DeviceLayer::SystemLayer().CancelTimer(onOvenCavityOperationalStateTimerTick, this);
         EndCycle();
-    }
 
     auto error = GetInstance()->SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
     if (error != CHIP_NO_ERROR)
@@ -219,7 +222,14 @@ void ChefDelegate::HandleStartStateCallback(OperationalState::GenericOperational
         err.Set(to_underlying(ErrorStateEnum::kUnableToStartOrResume));
         return;
     }
-    (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOvenCavityOperationalStateTimerTick, this);
+    CHIP_ERROR err =
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOvenCavityOperationalStateTimerTick, this);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "HandleStartStateCallback: Failed to start timer. %" CHIP_ERROR_FORMAT, err.Format());
+        err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
+        return;
+    }
     err.Set(to_underlying(ErrorStateEnum::kNoError));
 }
 
@@ -229,7 +239,7 @@ void ChefDelegate::HandleStopStateCallback(OperationalState::GenericOperationalE
     uint8_t opState      = GetCurrentOperationalState();
     if (CheckCycleActive())
     {
-        (void) DeviceLayer::SystemLayer().CancelTimer(onOvenCavityOperationalStateTimerTick, this);
+        DeviceLayer::SystemLayer().CancelTimer(onOvenCavityOperationalStateTimerTick, this);
         EndCycle();
     }
 
