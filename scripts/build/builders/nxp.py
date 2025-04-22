@@ -381,16 +381,16 @@ class NxpBuilder(GnBuilder):
 
         if self.disable_pairing_autostart:
             flags.append('-DCONFIG_CHIP_ENABLE_PAIRING_AUTOSTART=n')
-        
+
         if self.iw416_transceiver:
             flags.append('-DCONFIG_MCUX_COMPONENT_component.wifi_bt_module.IW416=y')
-        
+
         if self.w8801_transceiver:
             flags.append('-DCONFIG_MCUX_COMPONENT_component.wifi_bt_module.88W8801=y')
-        
+
         if self.iwx12_transceiver:
             flags.append('-DCONFIG_MCUX_COMPONENT_component.wifi_bt_module.IW61X=y')
-        
+
         if self.board == NxpBoard.RT1170:
             flags.append('-Dcore_id=cm7')
 
@@ -453,7 +453,7 @@ class NxpBuilder(GnBuilder):
                         cmd += 'export NXP_SDK_ROOT="' + str(p.sdk_storage_location_abspath) + '" \n '
                         cmd += 'export McuxSDK_DIR=$NXP_SDK_ROOT' + ' \n '
                         cmd += 'source $NXP_SDK_ROOT/mcux-env.sh' + ' \n '
-            
+
             if self.build_system == NxpBuildSystem.CMAKE:
                 if 'PW_ENVIRONMENT_ROOT' in os.environ:
                     cmd += 'export ARMGCC_DIR=$PW_ENVIRONMENT_ROOT/cipd/packages/arm' + ' \n '
@@ -461,34 +461,34 @@ class NxpBuilder(GnBuilder):
                     cmd += 'export ARMGCC_DIR=%s/.environment/cipd/packages/arm' % os.path.abspath(self.code_root) + ' \n '
 
         if ((self.os_env == NxpOsUsed.FREERTOS) and (self.build_system == NxpBuildSystem.GN)):
-                # add empty space at the end to avoid concatenation issue when there is no --args
-                cmd += 'gn gen --check --fail-on-unused-args --add-export-compile-commands=* --root=%s ' % self.root
+            # add empty space at the end to avoid concatenation issue when there is no --args
+            cmd += 'gn gen --check --fail-on-unused-args --add-export-compile-commands=* --root=%s ' % self.root
 
-                extra_args = []
+            extra_args = []
 
-                if self.options.pw_command_launcher:
-                    extra_args.append('pw_command_launcher="%s"' % self.options.pw_command_launcher)
+            if self.options.pw_command_launcher:
+                extra_args.append('pw_command_launcher="%s"' % self.options.pw_command_launcher)
 
-                if self.options.enable_link_map_file:
-                    extra_args.append('chip_generate_link_map_file=true')
+            if self.options.enable_link_map_file:
+                extra_args.append('chip_generate_link_map_file=true')
 
-                if self.options.pregen_dir:
-                    extra_args.append('chip_code_pre_generated_directory="%s"' % self.options.pregen_dir)
+            if self.options.pregen_dir:
+                extra_args.append('chip_code_pre_generated_directory="%s"' % self.options.pregen_dir)
 
-                extra_args.extend(self.GnBuildArgs() or [])
-                if extra_args:
-                    cmd += ' --args="%s' % ' '.join(extra_args) + '" '
+            extra_args.extend(self.GnBuildArgs() or [])
+            if extra_args:
+                cmd += ' --args="%s' % ' '.join(extra_args) + '" '
 
-                cmd += self.output_dir
+            cmd += self.output_dir
 
-                title = 'Generating ' + self.identifier
+            title = 'Generating ' + self.identifier
 
-                self._Execute(['bash', '-c', cmd], title=title)
+            self._Execute(['bash', '-c', cmd], title=title)
         else:
             cmd += '\nwest build -p --cmake-only -b {board_name} -d {out_folder} {example_folder} {build_flags}'.format(
                 board_name=self.board_variant.BoardVariantName(self.board, self.os_env),
                 out_folder=self.output_dir,
-                example_folder = self.app.BuildRoot(self.code_root, self.board, self.os_env, self.build_system),
+                example_folder=self.app.BuildRoot(self.code_root, self.board, self.os_env, self.build_system),
                 build_flags=build_flags)
             self._Execute(['bash', '-c', cmd], title='Generating ' + self.identifier)
 
