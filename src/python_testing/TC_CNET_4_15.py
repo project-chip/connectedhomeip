@@ -26,6 +26,7 @@ from matter_testing_infrastructure.chip.testing.matter_testing import (
     run_if_endpoint_matches
 )
 from mobly import asserts
+import logging
 
 
 class TC_CNET_4_15(MatterBaseTest):
@@ -63,6 +64,8 @@ class TC_CNET_4_15(MatterBaseTest):
                 breadcrumb=0
             )
         )
+        # Log response structure
+        logging.info(f"ArmFailSafe response: {send_arm}")
         # Verify that DUT sends ArmFailSafeResponse command with success status
         asserts.assert_equal(
             send_arm.errorCode,
@@ -80,6 +83,8 @@ class TC_CNET_4_15(MatterBaseTest):
                 breadcrumb=1
             )
         )
+        # Log response structure
+        logging.info(f"RemoveNetwork response: {send_remove}")
         # Verify NetworkConfigResponse has NetworkIDNotFound status
         asserts.assert_equal(
             send_remove.status,
@@ -96,6 +101,8 @@ class TC_CNET_4_15(MatterBaseTest):
                 breadcrumb=1
             )
         )
+        # Log response structure
+        logging.info(f"ConnectNetwork response: {send_connect}")
         # Verify ConnectNetworkResponse has NetworkIDNotFound status
         asserts.assert_equal(
             send_connect.status,
