@@ -235,8 +235,7 @@ void ChefDelegate::HandleStopStateCallback(OperationalState::GenericOperationalE
 
     if (opState != to_underlying(OperationalStateEnum::kRunning) && opState != to_underlying(OperationalStateEnum::kPaused))
     {
-        ChipLogDetail(DeviceLayer, "HandleStopStateCallback: Cycle not started. Current state = %d. Returning.",
-                      to_underlying(opState));
+        ChipLogDetail(DeviceLayer, "HandleStopStateCallback: Cycle not started. Current state = %d. Returning.", opState);
         err.Set(to_underlying(ErrorStateEnum::kNoError));
         return;
     }
