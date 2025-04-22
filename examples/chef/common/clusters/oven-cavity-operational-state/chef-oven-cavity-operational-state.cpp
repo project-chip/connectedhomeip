@@ -54,7 +54,7 @@ static void onOvenCavityOperationalStateTimerTick(System::Layer * systemLayer, v
 
     if (delegate->CheckCycleComplete())
     {
-        OperationalState::GenericOperationalError err;
+        OperationalState::GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
         delegate->HandleStopStateCallback(err);
     }
     else
