@@ -274,7 +274,7 @@ void AppTask::PostLightActionRequest(int32_t aActor, LightingManager::Action_t a
     event.Handler           = LightActionEventHandler;
     PostEvent(&event);
 }
-#if 1
+
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
 void AppTask::PostLightControlActionRequest(int32_t aActor, LightingManager::Action_t aAction, ColorData_t * aValue)
 {
@@ -287,7 +287,7 @@ void AppTask::PostLightControlActionRequest(int32_t aActor, LightingManager::Act
     PostEvent(&light_event);
 }
 #endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)
-#endif
+
 void AppTask::UpdateClusterState(intptr_t context)
 {
     uint8_t newValue = LightMgr().IsLightOn();
