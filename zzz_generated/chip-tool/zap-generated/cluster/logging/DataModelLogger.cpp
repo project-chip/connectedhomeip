@@ -12350,6 +12350,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TemperatureUnit", 1, value);
         }
+        case UnitLocalization::Attributes::SupportedTemperatureUnits::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::UnitLocalization::TempUnitEnum> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SupportedTemperatureUnits", 1, value);
+        }
         case UnitLocalization::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));

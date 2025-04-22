@@ -1173,6 +1173,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"TemperatureUnit";
             break;
 
+        case MTRAttributeIDTypeClusterUnitLocalizationAttributeSupportedTemperatureUnitsID:
+            result = @"SupportedTemperatureUnits";
+            break;
+
         case MTRAttributeIDTypeClusterUnitLocalizationAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;

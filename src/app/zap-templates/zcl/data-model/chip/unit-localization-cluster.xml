@@ -48,6 +48,11 @@ limitations under the License.
         <feature name="TEMP"/>
       </mandatoryConform>
     </attribute>
+    <attribute side="server" code="0x01" name="SupportedTemperatureUnits" define="SUPPORTED_TEMPERATURE_UNITS" type="array" entryType="TempUnitEnum" optional="true" apiMaturity="provisional">
+      <mandatoryConform>
+        <feature name="TEMP"/>
+      </mandatoryConform>
+    </attribute>
   </cluster>
 
 </configurator>

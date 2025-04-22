@@ -579,6 +579,9 @@ static BOOL AttributeIsSpecifiedInUnitLocalizationCluster(AttributeId aAttribute
     case Attributes::TemperatureUnit::Id: {
         return YES;
     }
+    case Attributes::SupportedTemperatureUnits::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
