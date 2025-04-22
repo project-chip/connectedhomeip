@@ -80,7 +80,11 @@ class TC_CNET_4_15(MatterBaseTest):
         
         logging.info(f"Attempting to remove network with ID: {network_id}")
         
-        read_networks = await self.read_single_attribute(cnet.Attributes.Networks)
+        read_networks = await self.read_single_attribute(
+            node_id=self.matter_test_config.dut_node_id,
+            endpoint=0,
+            attribute=cnet.Attributes.Networks
+        )
         logging.info(f"Current networks on device: {read_networks}")
         
         send_remove = await self.send_single_cmd(
@@ -95,7 +99,7 @@ class TC_CNET_4_15(MatterBaseTest):
         # Verify NetworkConfigResponse has NetworkIDNotFound status
         asserts.assert_equal(
             send_remove.networkingStatus,
-            cnet.Enums.NetworkCommissioningStatus.kNetworkIDNotFound,
+            cnet.Enums.NetworkCommissioningStatusEnum.kNetworkIDNotFound,
             f"Expected NetworkIDNotFound status for network ID {network_id}"
         )
 
@@ -114,7 +118,7 @@ class TC_CNET_4_15(MatterBaseTest):
         # Verify ConnectNetworkResponse has NetworkIDNotFound status
         asserts.assert_equal(
             send_connect.networkingStatus,
-            cnet.Enums.NetworkCommissioningStatus.kNetworkIDNotFound,
+            cnet.Enums.NetworkCommissioningStatusEnum.kNetworkIDNotFound,
             f"Expected NetworkIDNotFound status for network ID {network_id}"
         )
 
