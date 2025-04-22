@@ -104,7 +104,7 @@ class TC_ACL_2_3(MatterBaseTest):
             TestStep(16, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element struct data field: D_BAD_NONE",
                      "Result is CONSTRAINT_ERROR (0x87)"),
             TestStep(17, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 2 elements struct data field: D_OK_EMPTY, D_OK_SINGLE",
-                     "Result is SUCCESS for first struct, value is D_OK_EMPTY, fabric index is F1, CONTSTRAINT_ERROR for second struct"),
+                     "Result is CONSTRAINT_ERROR (0x87) for the entire list, even the first valid struct should be rejected"),
             TestStep(18, "TH1 reads DUT Endpoint 0 AccessControl cluster Extension attribute",
                      "Result is Success, AccessControlExtensionStruct containing 1 element; which is the last successfully written extension from Test Step 8; value is struct with data field: D_OK_FULL, fabric index is F1"),
             TestStep(19, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is an empty list",
@@ -298,7 +298,7 @@ class TC_ACL_2_3(MatterBaseTest):
         asserts.assert_equal(
             result11[0].Status,
             Status.ConstraintError,
-            "Write should have returned a SUCCESS for struct 1, CONSTRAINT_ERROR for struct 2")
+            "Write should have returned a CONSTRAINT_ERROR for the entire list, even the first valid D_OK_EMPTY should be rejected ")
 
         self.step(18)
         # Read AccessControlExtension attribute for TH1 value is D_OK_FULL
