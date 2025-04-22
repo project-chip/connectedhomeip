@@ -1141,7 +1141,6 @@ class TC_ACL_2_4(MatterBaseTest):
         asserts.assert_equal(len(read_admin_only), 1,
                              "ACL should contain only admin entry after reset")
 
-
         # Now test PASE auth mode (should fail)
         self.step(30)
         pase_acl = [
