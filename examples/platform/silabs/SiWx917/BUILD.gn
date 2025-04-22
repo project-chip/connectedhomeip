@@ -94,6 +94,11 @@ config("siwx917-common-config") {
   ldflags = [ "-Wl,--no-warn-rwx-segment" ]
 }
 
+if (sl_enable_rgb_led) {
+  sources += [ "${silabs_common_plat_dir}/led/ColorFormat.cpp" ]
+  include_dirs = [ "${silabs_common_plat_dir}/led" ]
+}
+
 source_set("siwx917-common") {
   deps = [ "${silabs_common_plat_dir}/provision:storage" ]
   defines = []

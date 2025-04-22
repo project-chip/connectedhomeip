@@ -19,7 +19,9 @@
 
 #pragma once
 
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
 #include "ColorFormat.h"
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
 #include <stdint.h>
 
 class LEDWidget
@@ -45,6 +47,8 @@ private:
 protected:
     uint8_t mLevel;
 };
+
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
 class RGBLEDWidget : public LEDWidget
 {
 public:
@@ -61,3 +65,4 @@ private:
     uint8_t green;
     uint8_t blue;
 };
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)

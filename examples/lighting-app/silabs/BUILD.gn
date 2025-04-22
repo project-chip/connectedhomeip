@@ -78,6 +78,7 @@ if (wifi_soc) {
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
       "${examples_common_plat_dir}",
+      "${examples_common_plat_dir}/led",
     ]
 
     defines = []
@@ -101,6 +102,7 @@ if (wifi_soc) {
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
       "${examples_common_plat_dir}",
+      "${examples_common_plat_dir}/led",
     ]
 
     if (use_wf200) {
@@ -137,7 +139,6 @@ silabs_executable("lighting_app") {
   sources = [
     "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
-    "src/ColorFormat.cpp",
     "src/LightingManager.cpp",
     "src/ZclCallbacks.cpp",
   ]

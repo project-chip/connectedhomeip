@@ -185,6 +185,11 @@ source_set("efr32-common") {
     ]
   }
 
+  if (sl_enable_rgb_led) {
+    sources += [ "${silabs_common_plat_dir}/led/ColorFormat.cpp" ]
+    include_dirs = [ "${silabs_common_plat_dir}/led" ]
+  }
+
   if (chip_build_libshell) {
     deps += [ ":matter-shell" ]
 
