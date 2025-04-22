@@ -64,9 +64,10 @@ bool Instance::HasFeature(Feature aFeature) const
 // AttributeAccessInterface
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    CHIP_ERROR err                                                                    = CHIP_NO_ERROR;
-    const DataModel::Nullable<Structs::CommodityPriceStruct::Type> * pPriceStruct     = nullptr;
-    const DataModel::List<const Structs::CommodityPriceStruct::Type> * pPriceForecast = nullptr;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    DataModel::Nullable<Structs::CommodityPriceStruct::Type> priceStruct;
+    chip::Platform::ScopedMemoryBuffer<Structs::CommodityPriceStruct::Type> forecastBuffer;
+    DataModel::List<const Structs::CommodityPriceStruct::Type> forecastList;
 
     switch (aPath.mAttributeId)
     {
@@ -76,11 +77,8 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         return aEncoder.Encode(mCurrency);
     case CurrentPrice::Id:
         // Call GetDetailedPriceRequest with details = 0 to strip out .components and .description if present
-        pPriceStruct = GetDetailedPriceRequest(0);
-        VerifyOrReturnError(pPriceStruct != nullptr, CHIP_ERROR_NO_MEMORY);
-
-        err = aEncoder.Encode(*pPriceStruct);
-        FreeCurrentPrice(pPriceStruct);
+        ReturnErrorOnFailure(GetDetailedPriceRequest(0, priceStruct));
+        err = aEncoder.Encode(priceStruct);
 
         return err;
     case PriceForecast::Id:
@@ -90,13 +88,22 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
 
+        if (!forecastBuffer.Calloc(kMaxForecastEntries))
+        {
+            ChipLogError(AppServer, "Memory allocation failed for forecast buffer");
+            return CHIP_ERROR_NO_MEMORY;
+        }
         // Call GetDetailedForecastRequest with details = 0 to
         // strip out .components and .description if present
-        pPriceForecast = GetDetailedForecastRequest(0, false);
-        VerifyOrReturnError(pPriceForecast != nullptr, CHIP_ERROR_NO_MEMORY);
+        ReturnErrorOnFailure(GetDetailedForecastRequest(0, forecastBuffer, kMaxForecastEntries, forecastList, false, false));
 
-        err = aEncoder.Encode(*pPriceForecast);
-        FreePriceForecast(pPriceForecast);
+        err = aEncoder.EncodeList([=](const auto & encoder) -> CHIP_ERROR {
+            for (auto const & entry : forecastList)
+            {
+                ReturnErrorOnFailure(encoder.Encode(entry));
+            }
+            return CHIP_NO_ERROR;
+        });
 
         return err;
 
@@ -154,6 +161,8 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
 void Instance::HandleGetDetailedPriceRequest(HandlerContext & ctx,
                                              const Commands::GetDetailedPriceRequest::DecodableType & commandData)
 {
+    DataModel::Nullable<Structs::CommodityPriceStruct::Type> priceStruct;
+
     chip::BitMask<CommodityPriceDetailBitmap> details = commandData.details;
     if (!details.HasOnly(
             BitMask<CommodityPriceDetailBitmap>(CommodityPriceDetailBitmap::kDescription, CommodityPriceDetailBitmap::kComponents)))
@@ -165,23 +174,25 @@ void Instance::HandleGetDetailedPriceRequest(HandlerContext & ctx,
 
     Commands::GetDetailedPriceResponse::Type response;
 
-    const DataModel::Nullable<Structs::CommodityPriceStruct::Type> * pPriceStruct = GetDetailedPriceRequest(details);
-    if (pPriceStruct == nullptr)
+    CHIP_ERROR err = GetDetailedPriceRequest(details, priceStruct);
+    if (err != CHIP_NO_ERROR)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
     else
     {
-        response.currentPrice = *pPriceStruct;
+        response.currentPrice = priceStruct;
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
     }
-    FreeCurrentPrice(pPriceStruct);
 }
 
 void Instance::HandleGetDetailedForecastRequest(HandlerContext & ctx,
                                                 const Commands::GetDetailedForecastRequest::DecodableType & commandData)
 {
+    chip::Platform::ScopedMemoryBuffer<Structs::CommodityPriceStruct::Type> forecastBuffer;
+    DataModel::List<const Structs::CommodityPriceStruct::Type> forecastList;
+
     if (!HasFeature(Feature::kForecasting))
     {
         ChipLogError(Zcl, "GetDetailedForecastRequest not supported");
@@ -198,65 +209,64 @@ void Instance::HandleGetDetailedForecastRequest(HandlerContext & ctx,
         return;
     }
 
+    if (!forecastBuffer.Calloc(kMaxForecastEntries))
+    {
+        ChipLogError(AppServer, "Memory allocation failed for forecast buffer");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ResourceExhausted);
+        return;
+    }
+
     Commands::GetDetailedForecastResponse::Type response;
-    const DataModel::List<const Structs::CommodityPriceStruct::Type> * pPriceForecast = GetDetailedForecastRequest(details, false);
-    if (pPriceForecast == nullptr)
+    CHIP_ERROR err = GetDetailedForecastRequest(details, forecastBuffer, kMaxForecastEntries, forecastList, false, true);
+    if (err != CHIP_NO_ERROR)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
     else
     {
-        response.priceForecast = *pPriceForecast;
+        response.priceForecast = forecastList;
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
     }
-    FreePriceForecast(pPriceForecast);
 }
 
-const DataModel::Nullable<Structs::CommodityPriceStruct::Type> *
-Instance::GetDetailedPriceRequest(chip::BitMask<CommodityPriceDetailBitmap> details)
+CHIP_ERROR
+Instance::GetDetailedPriceRequest(chip::BitMask<CommodityPriceDetailBitmap> details,
+                                  DataModel::Nullable<Structs::CommodityPriceStruct::Type> & priceStruct)
 {
-    // Based on the bitmap we make a copy of mCurrentPrice with/without the .description and/or .components
-    DataModel::Nullable<Structs::CommodityPriceStruct::Type> * pPriceStruct = nullptr;
 
-    // Make a copy of the mCurrentPrice
-    pPriceStruct = new DataModel::Nullable<Structs::CommodityPriceStruct::Type>(mCurrentPrice);
-
-    if (!pPriceStruct->IsNull())
+    if (mCurrentPrice.IsNull())
     {
+        priceStruct.SetNull();
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        priceStruct = mCurrentPrice;
         if (!details.Has(CommodityPriceDetailBitmap::kComponents))
         {
             // Remove the components
-            pPriceStruct->Value().components.ClearValue();
+            priceStruct.Value().components.ClearValue();
         }
 
         if (!details.Has(CommodityPriceDetailBitmap::kDescription))
         {
             // Remove the description
-            pPriceStruct->Value().description.ClearValue();
+            priceStruct.Value().description.ClearValue();
         }
     }
 
-    return pPriceStruct;
+    return CHIP_NO_ERROR;
 }
 
-void Instance::FreeCurrentPrice(const DataModel::Nullable<Structs::CommodityPriceStruct::Type> * pPriceStruct)
+CHIP_ERROR
+Instance::GetDetailedForecastRequest(chip::BitMask<CommodityPriceDetailBitmap> details,
+                                     chip::Platform::ScopedMemoryBuffer<Structs::CommodityPriceStruct::Type> & forecastBuffer,
+                                     size_t bufferSize, DataModel::List<const Structs::CommodityPriceStruct::Type> & forecastList,
+                                     bool isEvent, bool isCommand)
 {
-    VerifyOrReturn(pPriceStruct != nullptr);
-    delete pPriceStruct;
-}
-
-const DataModel::List<const Structs::CommodityPriceStruct::Type> *
-Instance::GetDetailedForecastRequest(chip::BitMask<CommodityPriceDetailBitmap> details, bool isEvent)
-{
-
-    // Allocate backing storage for the copy
-    auto * buffer = new Structs::CommodityPriceStruct::Type[kMaxForecastEntries];
 
     size_t count = 0;
-
-    // Try to dynamically size the response so it will fit based on what is requested
-    size_t maxEntries = kMaxForecastEntries;
 
     // TODO work out what the max udp packet size is
     // For events this needs to be about 500
@@ -265,7 +275,7 @@ Instance::GetDetailedForecastRequest(chip::BitMask<CommodityPriceDetailBitmap> d
     size_t estimatedByteCount = 0;
     for (const auto & srcPrice : mPriceForecast)
     {
-        if (count >= maxEntries)
+        if (count >= bufferSize)
             break; // Avoid overflow
 
         Structs::CommodityPriceStruct::Type copy = srcPrice;
@@ -311,9 +321,12 @@ Instance::GetDetailedForecastRequest(chip::BitMask<CommodityPriceDetailBitmap> d
             }
         }
 
-        if (estimatedByteCount < kMaxByteCount)
+        if ((!isCommand && !isEvent) || (estimatedByteCount < kMaxByteCount))
         {
-            buffer[count++] = copy;
+            // For Events and Commands we need to check the size,
+            // for Attributes we can rely on chunking which needs
+            // to be handled by the parent calling EncodeList
+            forecastBuffer[count++] = copy;
         }
         else
         {
@@ -323,16 +336,10 @@ Instance::GetDetailedForecastRequest(chip::BitMask<CommodityPriceDetailBitmap> d
     }
 
     // Now wrap in Span + List
-    auto * pPriceForecast = new DataModel::List<const Structs::CommodityPriceStruct::Type>(
-        chip::Span<Structs::CommodityPriceStruct::Type>(buffer, count));
+    forecastList = DataModel::List<const Structs::CommodityPriceStruct::Type>(
+        chip::Span<Structs::CommodityPriceStruct::Type>(forecastBuffer.Get(), count));
 
-    return pPriceForecast;
-}
-
-void Instance::FreePriceForecast(const DataModel::List<const Structs::CommodityPriceStruct::Type> * pPriceForecast)
-{
-    VerifyOrReturn(pPriceForecast != nullptr);
-    delete pPriceForecast;
+    return CHIP_NO_ERROR;
 }
 
 // --------------- Internal Attribute Set APIs
@@ -403,7 +410,7 @@ Status Instance::SendPriceChangeEvent()
 {
 
     CHIP_ERROR err;
-    const DataModel::Nullable<Structs::CommodityPriceStruct::Type> * pPriceStruct = nullptr;
+    DataModel::Nullable<Structs::CommodityPriceStruct::Type> priceStruct;
     Events::PriceChange::Type event;
     EventNumber eventNumber;
 
@@ -411,14 +418,12 @@ Status Instance::SendPriceChangeEvent()
      * The Event's CurrentPrice must not include .description or .components
      * call our function to copy the CurrentPrice without these
      */
-    pPriceStruct = GetDetailedPriceRequest(0);
-    VerifyOrReturnError(pPriceStruct != nullptr, Status::Failure);
+    err = GetDetailedPriceRequest(0, priceStruct);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, Status::Failure);
 
-    event.currentPrice = *pPriceStruct;
+    event.currentPrice = priceStruct;
 
     err = LogEvent(event, mEndpointId, eventNumber);
-    /* Free the copy after the LogEvent call has made its internal copy */
-    FreeCurrentPrice(pPriceStruct);
 
     if (CHIP_NO_ERROR != err)
     {
@@ -448,7 +453,9 @@ Status Instance::SendForecastChangeEvent()
 {
 
     CHIP_ERROR err;
-    const DataModel::List<const Structs::CommodityPriceStruct::Type> * pPriceForecast = nullptr;
+    chip::Platform::ScopedMemoryBuffer<Structs::CommodityPriceStruct::Type> forecastBuffer;
+    DataModel::List<const Structs::CommodityPriceStruct::Type> forecastList;
+
     Events::ForecastChange::Type event;
     EventNumber eventNumber;
 
@@ -456,14 +463,17 @@ Status Instance::SendForecastChangeEvent()
      * The Event's PriceForecast must not include .description or .components
      * call our function to copy the PriceForecast attribute without these
      */
-    pPriceForecast = GetDetailedForecastRequest(0, true);
-    VerifyOrReturnError(pPriceForecast != nullptr, Status::Failure);
+    if (!forecastBuffer.Calloc(kMaxForecastEntries))
+    {
+        ChipLogError(AppServer, "Memory allocation failed for forecast buffer") return Status::ResourceExhausted;
+    }
 
-    event.priceForecast = *pPriceForecast;
+    err = GetDetailedForecastRequest(0, forecastBuffer, kMaxForecastEntries, forecastList, true, false);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, Status::Failure);
+
+    event.priceForecast = forecastList;
 
     err = LogEvent(event, mEndpointId, eventNumber);
-    /* Free the copy after the LogEvent call has made its internal copy */
-    FreePriceForecast(pPriceForecast);
 
     if (CHIP_NO_ERROR != err)
     {
