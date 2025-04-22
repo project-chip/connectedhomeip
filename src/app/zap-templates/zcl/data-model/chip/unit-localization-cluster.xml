@@ -33,7 +33,7 @@ limitations under the License.
       may have differing preferences for the units in which values are conveyed in communication to a
       user. As such, Nodes that visually or audibly convey measurable values to the user need a
       mechanism by which they can be configured to use a user’s preferred unit.</description>
-    <globalAttribute side="either" code="0xFFFD" value="1"/>
+    <globalAttribute side="either" code="0xFFFD" value="2"/>
 
     <features>
       <feature bit="0" code="TEMP" name="TemperatureUnit" summary="The Node can be configured to use different units of temperature when conveying values to a user.">
