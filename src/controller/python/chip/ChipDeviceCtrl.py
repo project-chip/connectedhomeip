@@ -1059,12 +1059,12 @@ class ChipDeviceControllerBase():
 
         return fabricid.value
 
-    def GetFabricIdInternal(self):
+    def GetFabricIdInternal(self) -> int:
         '''
         Get the fabric ID from the object. Only used to validate cached value from property.
 
         Returns:
-            int: The compressed fabric ID as a 64-bit integer.
+            int: The raw fabric ID as a 64-bit integer.
 
         Raises:
             ChipStackError: On failure.
@@ -1080,12 +1080,12 @@ class ChipDeviceControllerBase():
 
         return fabricid.value
 
-    def GetFabricIndexInternal(self):
+    def GetFabricIndexInternal(self) -> int:
         '''
         Get the fabric index from the object. Only used to validate cached value from property.
 
         Returns:
-            int: The compressed fabric ID as a 64-bit integer.
+            int: fabric index of applying to the controller (fabricIndex in local fabric table does not match remote)
 
         Raises:
             ChipStackError: On failure.

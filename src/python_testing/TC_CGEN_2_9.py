@@ -52,10 +52,11 @@ class TC_CGEN_2_9(MatterBaseTest):
             dev_ctrl=commissioner,
             node_id=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
-            attribute=Clusters.OperationalCredentials.Attributes.Fabrics)
+            attribute=Clusters.OperationalCredentials.Attributes.Fabrics,
+            fabricFiltered=False)
 
         # Re-order the list of fabrics so that the test harness admin fabric is removed last
-        commissioner_fabric = next((fabric for fabric in fabrics if fabric.fabricIndex == commissioner.fabricId), None)
+        commissioner_fabric = next((fabric for fabric in fabrics if fabric.fabricID == commissioner.fabricId), None)
         fabrics.remove(commissioner_fabric)
         fabrics.append(commissioner_fabric)
 
