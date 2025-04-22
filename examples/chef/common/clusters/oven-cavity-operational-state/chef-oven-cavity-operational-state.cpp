@@ -20,6 +20,7 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceLayer.h>
 
 namespace chip {
 namespace app {
@@ -31,8 +32,6 @@ static_assert(kOvenCavityOperationalStateTableSize <= kEmberInvalidEndpointIndex
 
 std::unique_ptr<ChefDelegate> gDelegateTable[kOvenCavityOperationalStateTableSize];
 std::unique_ptr<Instance> gInstanceTable[kOvenCavityOperationalStateTableSize];
-
-static void onOvenCavityOperationalStateTimerTick(System::Layer * systemLayer, void * data);
 
 static void onOvenCavityOperationalStateTimerTick(System::Layer * systemLayer, void * data)
 {
