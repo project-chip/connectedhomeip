@@ -64,7 +64,8 @@ def main(log_level, rules, idl_path):
     lint_rules.extend(CreateParser(rules).parse())
 
     logging.info("Parsing idl from %s" % idl_path)
-    idl_tree = matter_idl_parser.CreateParser().parse(open(idl_path, "rt").read(), file_name=idl_path)
+    idl_tree = matter_idl_parser.CreateParser().parse(
+        open(idl_path, "rt").read(), file_name=idl_path)
 
     logging.info("Running %d lint rules" % len(lint_rules))
 
