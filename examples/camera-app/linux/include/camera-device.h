@@ -115,13 +115,13 @@ public:
 
     /**
      * Sets the Viewport for a specific stream. The implementation of this HAL API is responsible
-     * for updating the stream identified with the provided viewport. The invoker of this 
+     * for updating the stream identified with the provided viewport. The invoker of this
      * API shall have already ensured that the provided viewport conforms to the specification
      * requirements on size and aspect ratio.
      *
      * @param stream   the currently allocated video stream on which the viewport is being set
      * @param viewport the viewport to be set on the stream
-     */ 
+     */
     CameraError SetViewport(VideoStream & stream, const ViewportStruct & viewport);
 
     // Currently, defaulting to not supporting speaker.
