@@ -32,7 +32,7 @@ static_assert(kOvenCavityOperationalStateTableSize <= kEmberInvalidEndpointIndex
 std::unique_ptr<ChefDelegate> gDelegateTable[kOvenCavityOperationalStateTableSize];
 std::unique_ptr<Instance> gInstanceTable[kOvenCavityOperationalStateTableSize];
 
-static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data)
+static void onOvenCavityOperationalStateTimerTick(System::Layer * systemLayer, void * data)
 {
     ChefDelegate * delegate = reinterpret_cast<ChefDelegate *>(data);
 
@@ -40,13 +40,13 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
     if (opState != to_underlying(OperationalStateEnum::kRunning) && opState != to_underlying(OperationalStateEnum::kPaused))
     {
         ChipLogError(DeviceLayer, "onOperationalStateTimerTick: Operational cycle can not be active in state %d", opState);
-        (void) DeviceLayer::SystemLayer().CancelTimer(onOperationalStateTimerTick, delegate);
+        (void) DeviceLayer::SystemLayer().CancelTimer(onOvenCavityOperationalStateTimerTick, delegate);
         return;
     }
 
     if (!delegate->CheckCycleActive())
     {
-        (void) DeviceLayer::SystemLayer().CancelTimer(onOperationalStateTimerTick, delegate);
+        (void) DeviceLayer::SystemLayer().CancelTimer(onOvenCavityOperationalStateTimerTick, delegate);
         return;
     }
 
@@ -54,12 +54,12 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
 
     if (delegate->CheckCycleComplete())
     {
-        GenericOperationalError err;
+        OperationalState::GenericOperationalError err;
         delegate->HandleStopStateCallback(err);
     }
     else
     {
-        (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOperationalStateTimerTick, delegate);
+        (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOvenCavityOperationalStateTimerTick, delegate);
     }
 }
 
@@ -203,7 +203,7 @@ void ChefDelegate::HandleStartStateCallback(OperationalState::GenericOperational
 
     if (CheckCycleActive())
     {
-        (void) DeviceLayer::SystemLayer().CancelTimer(onOperationalStateTimerTick, this);
+        (void) DeviceLayer::SystemLayer().CancelTimer(onOvenCavityOperationalStateTimerTick, this);
         EndCycle();
     }
 
@@ -218,7 +218,7 @@ void ChefDelegate::HandleStartStateCallback(OperationalState::GenericOperational
         err.Set(to_underlying(ErrorStateEnum::kUnableToStartOrResume));
         return;
     }
-    (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOperationalStateTimerTick, this);
+    (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOvenCavityOperationalStateTimerTick, this);
     err.Set(to_underlying(ErrorStateEnum::kNoError));
 }
 
@@ -229,7 +229,7 @@ void ChefDelegate::HandleStopStateCallback(OperationalState::GenericOperationalE
     uint8_t opState      = GetCurrentOperationalState();
     if (CheckCycleActive())
     {
-        (void) DeviceLayer::SystemLayer().CancelTimer(onOperationalStateTimerTick, this);
+        (void) DeviceLayer::SystemLayer().CancelTimer(onOvenCavityOperationalStateTimerTick, this);
         EndCycle();
     }
 
