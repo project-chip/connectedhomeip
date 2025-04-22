@@ -176,7 +176,8 @@ Status CameraAVSettingsUserLevelManager::DPTZSetViewport(uint16_t aVideoStreamID
             float requestedAR = floorf((static_cast<float>(requestedWidth) / requestedHeight) * 100) / 100;
             float streamAR    = floorf((static_cast<float>(stream.videoStreamParams.maxResolution.width) /
                                      stream.videoStreamParams.maxResolution.height) *
-                                       100) / 100;
+                                       100) /
+                100;
 
             ChipLogDetail(Camera, "DPTZSetViewpoort. AR of viewport %f, AR of stream %f.", requestedAR, streamAR);
             // Ensure that the aspect ration of the viewport matches the aspect ratio of the stream
@@ -287,8 +288,8 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
             {
                 viewport.x1 = 0;
                 viewport.y1 = 0;
-                viewport.x2 = sensorParms.sensorWidth-1;
-                viewport.y2 = sensorParms.sensorHeight-1;
+                viewport.x2 = sensorParms.sensorWidth - 1;
+                viewport.y2 = sensorParms.sensorHeight - 1;
             }
             mCameraDeviceHAL->SetViewport(stream, viewport);
             return Status::Success;
