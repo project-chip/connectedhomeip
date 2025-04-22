@@ -94,7 +94,7 @@ class TC_CNET_4_15(MatterBaseTest):
         
         # Verify NetworkConfigResponse has NetworkIDNotFound status
         asserts.assert_equal(
-            send_remove.errorCode,
+            send_remove.networkingStatus,
             cnet.Enums.NetworkCommissioningStatus.kNetworkIDNotFound,
             f"Expected NetworkIDNotFound status for network ID {network_id}"
         )
@@ -113,7 +113,7 @@ class TC_CNET_4_15(MatterBaseTest):
         
         # Verify ConnectNetworkResponse has NetworkIDNotFound status
         asserts.assert_equal(
-            send_connect.errorCode,
+            send_connect.networkingStatus,
             cnet.Enums.NetworkCommissioningStatus.kNetworkIDNotFound,
             f"Expected NetworkIDNotFound status for network ID {network_id}"
         )
