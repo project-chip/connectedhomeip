@@ -95,7 +95,7 @@ class TC_ACL_2_4(MatterBaseTest):
             TestStep(27, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with a list of MAXENTRIES elements", "Result is SUCCESS"),
             TestStep(28, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
                      "Result is SUCCESS, value is list of AccessControlEntryStruct containing MAXENTRIES elements"),
-            TestStep(29, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing PASE auth mode",
+            TestStep(29, "TH1 resets DUT Endpoint 0 AccessControl cluster ACL attribute, writing it with acl_original",
                      "Result is SUCCESS"),
             TestStep(30, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing PASE auth mode",
                      "Result is CONSTRAINT_ERROR.  Second invalid element is rejected "),
