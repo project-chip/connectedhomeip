@@ -22,6 +22,7 @@
 #include "FabricTable.h"
 
 #include <lib/core/CHIPEncoding.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
@@ -2250,6 +2251,9 @@ CHIP_ERROR FabricTable::SetVIDVerificationStatementElements(FabricIndex fabricIn
     FabricInfo * fabricInfo = GetMutableFabricByIndex(fabricIndex);
     VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
+    // PendingNew fabric means AddNOC had been called. ShadowPending fabric is the overlay version
+    // that is used when UpdateNOC had been called. This is to detect either condition of not
+    // fully committed fabric.
     bool isTargetFabricPending = (GetPendingNewFabricIndex() == fabricIndex) ||
         ((GetShadowPendingFabricEntry() != nullptr) && (GetShadowPendingFabricEntry()->GetFabricIndex() == fabricIndex));
 
@@ -2287,9 +2291,9 @@ CHIP_ERROR FabricTable::SetVIDVerificationStatementElements(FabricIndex fabricIn
         if (static_cast<uint16_t>(fabricInfo->GetVendorId()) != vendorId.Value())
         {
             fabricInfo->SetVendorId(static_cast<VendorId>(vendorId.Value()));
+            // Immediately commit Vendor ID if not a pending fabric. Otherwise the commit occurs on CommissioningComplete.
             if (!isTargetFabricPending)
             {
-                // Immediately commit Vendor ID if not a pending fabric.
                 ReturnErrorOnFailure(StoreFabricMetadata(fabricInfo));
                 outFabricTableWasChanged = true;
             }

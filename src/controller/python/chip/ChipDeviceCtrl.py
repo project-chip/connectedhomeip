@@ -1085,7 +1085,7 @@ class ChipDeviceControllerBase():
         Get the fabric index from the object. Only used to validate cached value from property.
 
         Returns:
-            int: fabric index of applying to the controller (fabricIndex in local fabric table does not match remote)
+            int: fabric index in local fabric table associated with this controller.
 
         Raises:
             ChipStackError: On failure.
