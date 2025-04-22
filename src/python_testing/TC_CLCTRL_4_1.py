@@ -123,6 +123,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
     @async_test_body
     async def test_TC_CLCTRL_4_1(self):
         endpoint = self.get_endpoint(default=1)
+        is_skipped = False
 
         # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)
         self.step(1)
@@ -250,19 +251,15 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         # STEP 4a: If VT feature is not supported on the cluster, skip steps 4b to 4f
         self.step("4a")
         if not is_vt_feature_supported:
-            logging.info("Ventilation feature not supported, skipping test case")
-
-            # Skipping test steps 4b to 4f
-            for step in self.get_test_steps(self.current_test_info.name)[self.current_step_index:]:
-                self.step(step.test_plan_number)
-                logging.info("Test step skipped")
-                if step.test_plan_number == "4f":
-                    break
-            return
+            logging.info("Ventilation feature not supported, skipping steps 4b to 4f")
+            is_skipped = True
 
         # STEP 4b: TH sends command MoveTo with Position = Ventilation
         self.step("4b")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            return
         try:
             await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo, arguments=Clusters.ClosureControl.MoveToRequest(
                 position=Clusters.ClosureControl.Bitmaps.Position.kVentilation,
@@ -283,6 +280,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         # STEP 4c: If the attribute is supported on the cluster, TH reads from the DUT the OverallTaget attribute
         self.step("4c")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            return
         if attributes.OverallTarget.attribute_id in attribute_list:
             overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTarget)
             logging.info(f"OverallTarget: {overall_target}")
@@ -299,6 +299,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         # STEP 4d: TH waits for PIXIT.CLCTRL.FullMotionDuration seconds
         self.step("4d")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            return
         if full_motion_duration is None:
             logging.error("PIXIT.CLCTRL.FullMotionDuration is not defined")
             return
@@ -314,6 +317,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         # STEP 4e: If the attribute is supported on the cluster, TH reads from the DUT the OverallState attribute
         self.step("4e")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            return
         if attributes.OverallState.attribute_id in attribute_list:
             overall_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallState)
             logging.info(f"OverallState: {overall_state}")
@@ -334,6 +340,10 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         # STEP 4f: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
         self.step("4f")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            is_skipped = False
+            return
         if attributes.MainState.attribute_id in attribute_list:
             main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
             logging.info(f"MainState: {main_state}")
@@ -344,24 +354,21 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         else:
             logging.info("MainState attribute is not supported on the cluster, skipping this step.")
             return
+        is_skipped = False
 
         # STEP 5a: If PD feature is not supported on the cluster, skip steps 5b to 5f
         self.step("5a")
 
         if not is_pd_feature_supported:
-            logging.info("Pedestrian feature not supported, skipping test case")
-
-            # Skipping test steps 5b to 5f
-            for step in self.get_test_steps(self.current_test_info.name)[self.current_step_index:]:
-                self.step(step.test_plan_number)
-                logging.info("Test step skipped")
-                if step.test_plan_number == "5f":
-                    break
-            return
+            logging.info("Pedestrian feature not supported, skipping steps 5b to 5f")
+            is_skipped = True
 
         # STEP 5b: TH sends command MoveTo with Position = Pedestrian
         self.step("5b")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            return
         try:
             await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo, arguments=Clusters.ClosureControl.MoveToRequest(
                 position=Clusters.ClosureControl.Bitmaps.Position.kPedestrian,
@@ -382,6 +389,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         # STEP 5c: If the attribute is supported on the cluster, TH reads from the DUT the OverallTaget attribute
         self.step("5c")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            return
         if attributes.OverallTarget.attribute_id in attribute_list:
             overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTarget)
             logging.info(f"OverallTarget: {overall_target}")
@@ -398,6 +408,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         # STEP 5d: TH waits for PIXIT.CLCTRL.FullMotionDuration seconds
         self.step("5d")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            return
         if full_motion_duration is None:
             logging.error("PIXIT.CLCTRL.FullMotionDuration is not defined")
             return
@@ -413,6 +426,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         # STEP 5e: If the attribute is supported on the cluster, TH reads from the DUT the OverallState attribute
         self.step("5e")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            return
         if attributes.OverallState.attribute_id in attribute_list:
             overall_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallState)
             logging.info(f"OverallState: {overall_state}")
@@ -433,6 +449,10 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         # STEP 5f: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
         self.step("5f")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            is_skipped = False
+            return
         if attributes.MainState.attribute_id in attribute_list:
             main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
             logging.info(f"MainState: {main_state}")
@@ -443,6 +463,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         else:
             logging.info("MainState attribute is not supported on the cluster, skipping this step.")
             return
+        is_skipped = False
 
         # STEP 6a: TH sends command MoveTo with Position = OpenInFull
         self.step("6a")
@@ -618,19 +639,15 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         self.step("8a")
 
         if not is_sp_feature_supported:
-            logging.info("Speed feature not supported, skipping test case")
-
-            # Skipping test steps 8b to 8g
-            for step in self.get_test_steps(self.current_test_info.name)[self.current_step_index:]:
-                self.step(step.test_plan_number)
-                logging.info("Test step skipped")
-                if step.test_plan_number == "8g":
-                    break
-            return
+            logging.info("Speed feature not supported, skipping steps 8b to 8g")
+            is_skipped = True
 
         # STEP 8b: TH sends command MoveTo with Speed = High
         self.step("8b")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            return
         try:
             await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo, arguments=Clusters.ClosureControl.MoveToRequest(
                 speed=Clusters.ClosureControl.Bitmaps.Speed.kHigh,
@@ -651,6 +668,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         # STEP 8c: If the attribute is supported on the cluster, TH reads from the DUT the OverallTaget attribute
         self.step("8c")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            return
         if attributes.OverallTarget.attribute_id in attribute_list:
             overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTarget)
             logging.info(f"OverallTarget: {overall_target}")
@@ -667,6 +687,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         # STEP 8d: If the attribute is supported on the cluster, TH reads from the DUT the OverallState attribute
         self.step("8d")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            return
         if attributes.OverallState.attribute_id in attribute_list:
             overall_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallState)
             logging.info(f"OverallState: {overall_state}")
@@ -686,6 +709,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         # STEP 8e: TH sends command MoveTo with Speed = Low
         self.step("8e")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            return
         try:
             await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo, arguments=Clusters.ClosureControl.MoveToRequest(
                 speed=Clusters.ClosureControl.Bitmaps.Speed.kLow,
@@ -706,6 +732,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         # STEP 8f: If the attribute is supported on the cluster, TH reads from the DUT the OverallTaget attribute
         self.step("8f")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            return
         if attributes.OverallTarget.attribute_id in attribute_list:
             overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTarget)
             logging.info(f"OverallTarget: {overall_target}")
@@ -721,6 +750,10 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         # STEP 8g: If the attribute is supported on the cluster, TH reads from the DUT the OverallState attribute
         self.step("8g")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            is_skipped = False
+            return
         if attributes.OverallState.attribute_id in attribute_list:
             overall_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallState)
             logging.info(f"OverallState: {overall_state}")
@@ -736,24 +769,21 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         else:
             logging.info("OverallState attribute is not supported on the cluster, skipping this step.")
             return
+        is_skipped = False
 
         # STEP 9a: If PT feature is not supported on the cluster, skip steps 9b to 9f
         self.step("9a")
 
         if not is_pt_feature_supported:
-            logging.info("Position feature not supported, skipping test case")
-
-            # Skipping test steps 9b to 9f
-            for step in self.get_test_steps(self.current_test_info.name)[self.current_step_index:]:
-                self.step(step.test_plan_number)
-                logging.info("Test step skipped")
-                if step.test_plan_number == "9f":
-                    break
-            return
+            logging.info("Position feature not supported, skipping steps 9b to 9f")
+            is_skipped = True
 
         # STEP 9b: TH sends TestEventTrigger command to General Diagnostic Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState is Protected(5) Test Event
         self.step("9b")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            return
         try:
             await self.send_command(endpoint=0, cluster=Clusters.Objects.GeneralDiagnostics, command=Clusters.GeneralDiagnostics.Commands.TestEventTrigger, arguments=Clusters.GeneralDiagnostics.TestEventTriggerRequest(
                 enabled_key=self.matter_test_config.get("PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY"),
@@ -775,6 +805,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         # STEP 9c: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
         self.step("9c")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            return
         if attributes.MainState.attribute_id in attribute_list:
             main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
             logging.info(f"MainState: {main_state}")
@@ -786,6 +819,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         # STEP 9d: TH sends command MoveTo with Position = CloseInFull
         self.step("9d")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            return
         try:
             await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo, arguments=Clusters.ClosureControl.MoveToRequest(
                 position=Clusters.ClosureControl.Bitmaps.Position.kCloseInFull,
@@ -806,6 +842,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         # STEP 9e: TH sends TestEventTrigger command to General Diagnostic Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState Test Event Clear
         self.step("9e")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            return
         try:
             await self.send_command(endpoint=0, cluster=Clusters.Objects.GeneralDiagnostics, command=Clusters.GeneralDiagnostics.Commands.TestEventTrigger, arguments=Clusters.GeneralDiagnostics.TestEventTriggerRequest(
                 enabled_key=self.matter_test_config.get("PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY"),
@@ -827,6 +866,10 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         # STEP 9f: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
         self.step("9f")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            is_skipped = False
+            return
         if attributes.MainState.attribute_id in attribute_list:
             main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
             logging.info(f"MainState: {main_state}")
@@ -837,24 +880,21 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         else:
             logging.info("MainState attribute is not supported on the cluster, skipping this step.")
             return
+        is_skipped = False
 
         # STEP 10a: If MO feature is not supported on the cluster, skip steps 10b to 10f
         self.step("10a")
 
         if not is_mo_feature_supported:
-            logging.info("Motor Open feature not supported, skipping test case")
-
-            # Skipping test steps 10b to 10f
-            for step in self.get_test_steps(self.current_test_info.name)[self.current_step_index:]:
-                self.step(step.test_plan_number)
-                logging.info("Test step skipped")
-                if step.test_plan_number == "10f":
-                    break
-            return
+            logging.info("Motor Open feature not supported, skipping steps 10b to 10f")
+            is_skipped = True
 
         # STEP 10b: TH sends TestEventTrigger command to General Diagnostic Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState is Disengaged(6) Test Event
         self.step("10b")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            return
         try:
             await self.send_command(endpoint=0, cluster=Clusters.Objects.GeneralDiagnostics, command=Clusters.GeneralDiagnostics.Commands.TestEventTrigger, arguments=Clusters.GeneralDiagnostics.TestEventTriggerRequest(
                 enabled_key=self.matter_test_config.get("PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY"),
@@ -876,6 +916,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         # STEP 10c: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
         self.step("10c")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            return
         if attributes.MainState.attribute_id in attribute_list:
             main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
             logging.info(f"MainState: {main_state}")
@@ -887,6 +930,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         # STEP 10d: TH sends command MoveTo with Position = CloseInFull
         self.step("10d")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            return
         try:
             await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo, arguments=Clusters.ClosureControl.MoveToRequest(
                 position=Clusters.ClosureControl.Bitmaps.Position.kCloseInFull,
@@ -907,6 +953,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         # STEP 10e: TH sends TestEventTrigger command to General Diagnostic Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState Test Event Clear
         self.step("10e")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            return
         try:
             await self.send_command(endpoint=0, cluster=Clusters.Objects.GeneralDiagnostics, command=Clusters.GeneralDiagnostics.Commands.TestEventTrigger, arguments=Clusters.GeneralDiagnostics.TestEventTriggerRequest(
                 enabled_key=self.matter_test_config.get("PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY"),
@@ -928,6 +977,10 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         # STEP 10f: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
         self.step("10f")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            is_skipped = False
+            return
         if attributes.MainState.attribute_id in attribute_list:
             main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
             logging.info(f"MainState: {main_state}")
@@ -938,24 +991,21 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         else:
             logging.info("MainState attribute is not supported on the cluster, skipping this step.")
             return
+        is_skipped = False
 
         # STEP 11a: If IS feature is not supported on the cluster, skip steps 11b to 11k
         self.step("11a")
 
         if not is_is_feature_supported:
-            logging.info("Instantaneous feature not supported, skipping test case")
-
-            # Skipping test steps 11b to 11k
-            for step in self.get_test_steps(self.current_test_info.name)[self.current_step_index:]:
-                self.step(step.test_plan_number)
-                logging.info("Test step skipped")
-                if step.test_plan_number == "11k":
-                    break
-            return
+            logging.info("Instantaneous feature not supported, skipping steps 11b to 11k")
+            is_skipped = True
 
         # STEP 11b: TH sends command MoveTo with Position = OpenInFull
         self.step("11b")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            return
         try:
             await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo, arguments=Clusters.ClosureControl.MoveToRequest(
                 position=Clusters.ClosureControl.Bitmaps.Position.kOpenInFull,
@@ -976,6 +1026,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         # STEP 11c: If the attribute is supported on the cluster, TH reads from the DUT the OverallTaget attribute
         self.step("11c")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            return
         if attributes.OverallTarget.attribute_id in attribute_list:
             overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTarget)
             logging.info(f"OverallTarget: {overall_target}")
@@ -992,12 +1045,18 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         # STEP 11d: TH waits for 2 seconds
         self.step("11d")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            return
         sleep(2)
         logging.info("Waiting for 2 seconds")
 
         # STEP 11e: If the attribute is supported on the cluster, TH reads from the DUT the OverallState attribute
         self.step("11e")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            return
         if attributes.OverallState.attribute_id in attribute_list:
             overall_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallState)
             logging.info(f"OverallState: {overall_state}")
@@ -1018,6 +1077,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         # STEP 11f: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
         self.step("11f")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            return
         if attributes.MainState.attribute_id in attribute_list:
             main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
             logging.info(f"MainState: {main_state}")
@@ -1032,6 +1094,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         # STEP 11g: TH sends command MoveTo with Position = CloseInFull
         self.step("11g")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            return
         try:
             await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo, arguments=Clusters.ClosureControl.MoveToRequest(
                 position=Clusters.ClosureControl.Bitmaps.Position.kCloseInFull,
@@ -1052,6 +1117,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         # STEP 11h: If the attribute is supported on the cluster, TH reads from the DUT the OverallTaget attribute
         self.step("11h")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            return
         if attributes.OverallTarget.attribute_id in attribute_list:
             overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTarget)
             logging.info(f"OverallTarget: {overall_target}")
@@ -1068,12 +1136,18 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         # STEP 11i: TH waits for 2 seconds
         self.step("11i")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            return
         sleep(2)
         logging.info("Waiting for 2 seconds")
 
         # STEP 11j: If the attribute is supported on the cluster, TH reads from the DUT the OverallState attribute
         self.step("11j")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            return
         if attributes.OverallState.attribute_id in attribute_list:
             overall_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallState)
             logging.info(f"OverallState: {overall_state}")
@@ -1094,6 +1168,10 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         # STEP 11k: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
         self.step("11k")
 
+        if is_skipped == True:
+            logging.info("Test step skipped")
+            is_skipped = False
+            return
         if attributes.MainState.attribute_id in attribute_list:
             main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
             logging.info(f"MainState: {main_state}")
@@ -1104,6 +1182,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         else:
             logging.info("MainState attribute is not supported on the cluster, skipping this step.")
             return
+        is_skipped = False
 
 
 if __name__ == "__main__":
