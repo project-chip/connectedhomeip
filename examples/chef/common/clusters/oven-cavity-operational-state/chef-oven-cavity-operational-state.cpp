@@ -22,6 +22,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#ifdef MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -322,3 +323,5 @@ void InitChefOvenCavityOperationalStateCluster()
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+#endif // MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
