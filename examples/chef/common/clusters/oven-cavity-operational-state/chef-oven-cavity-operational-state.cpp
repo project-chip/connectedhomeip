@@ -32,6 +32,8 @@ static_assert(kOvenCavityOperationalStateTableSize <= kEmberInvalidEndpointIndex
 std::unique_ptr<ChefDelegate> gDelegateTable[kOvenCavityOperationalStateTableSize];
 std::unique_ptr<Instance> gInstanceTable[kOvenCavityOperationalStateTableSize];
 
+static void onOvenCavityOperationalStateTimerTick(System::Layer * systemLayer, void * data);
+
 static void onOvenCavityOperationalStateTimerTick(System::Layer * systemLayer, void * data)
 {
     ChefDelegate * delegate = reinterpret_cast<ChefDelegate *>(data);
