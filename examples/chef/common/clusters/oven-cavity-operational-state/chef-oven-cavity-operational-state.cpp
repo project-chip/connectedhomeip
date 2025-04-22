@@ -181,7 +181,7 @@ uint8_t ChefDelegate::GetCurrentOperationalState()
     return GetInstance()->GetCurrentOperationalState();
 }
 
-void ChefDelegate::HandleStartStateCallback(OperationalState::GenericOperationalState & err)
+void ChefDelegate::HandleStartStateCallback(OperationalState::GenericOperationalError & err)
 {
     OperationalState::GenericOperationalError current_err(to_underlying(OperationalState::ErrorStateEnum::kNoError));
     GetInstance()->GetCurrentOperationalError(current_err);

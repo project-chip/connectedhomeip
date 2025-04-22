@@ -66,10 +66,10 @@ public:
     DataModel::Nullable<uint32_t> GetCountdownTime() override;
     CHIP_ERROR GetOperationalStateAtIndex(size_t index, OperationalState::GenericOperationalState & operationalState) override;
     CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase) override;
-    void HandlePauseStateCallback(OperationalState::GenericOperationalState & err) override;
-    void HandleResumeStateCallback(OperationalState::GenericOperationalState & err) override;
-    void HandleStartStateCallback(OperationalState::GenericOperationalState & err) override;
-    void HandleStopStateCallback(OperationalState::GenericOperationalState & err) override;
+    void HandlePauseStateCallback(OperationalState::GenericOperationalError & err) override;
+    void HandleResumeStateCallback(OperationalState::GenericOperationalError & err) override;
+    void HandleStartStateCallback(OperationalState::GenericOperationalError & err) override;
+    void HandleStopStateCallback(OperationalState::GenericOperationalError & err) override;
 
     /**
      * @brief Starts a new cycle with Run/Pause times set to 0. Returns True if new cycle started successfully.
