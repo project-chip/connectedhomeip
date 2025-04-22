@@ -134,8 +134,6 @@ CHIP_ERROR Instance::SetLocalGenerationAvailable(DataModel::Nullable<bool> newVa
 
 CHIP_ERROR Instance::SetCurrentConditions(DataModel::Nullable<Structs::ElectricalGridConditionsStruct::Type> newValue)
 {
-    // DataModel::Nullable<Structs::ElectricalGridConditionsStruct::Type> oldValue = mCurrentConditions;
-
     if (!newValue.IsNull())
     {
         if (EnsureKnownEnumValue(newValue.Value().gridCarbonLevel) == ThreeLevelEnum::kUnknownEnumValue)
@@ -156,15 +154,11 @@ CHIP_ERROR Instance::SetCurrentConditions(DataModel::Nullable<Structs::Electrica
     }
 
     mCurrentConditions = newValue;
-    // if (oldValue != newValue)
-    // {
-    //
     ChipLogDetail(AppServer, "mCurrentConditions updated");
     MatterReportingAttributeChangeCallback(mEndpointId, ElectricalGridConditions::Id, CurrentConditions::Id);
 
     // generate a CurrentConditionsChanged Event
     SendCurrentConditionsChangedEvent();
-    //}
 
     return CHIP_NO_ERROR;
 }
@@ -177,6 +171,7 @@ Status Instance::SendCurrentConditionsChangedEvent()
     Events::CurrentConditionsChanged::Type event;
     EventNumber eventNumber;
 
+    // TODO - see spec issue #11578 if this should be included?
     event.currentConditions = mCurrentConditions;
 
     err = LogEvent(event, mEndpointId, eventNumber);
@@ -209,7 +204,10 @@ Status Instance::SendForecastConditionsChangedEvent()
     Events::ForecastConditionsChanged::Type event;
     EventNumber eventNumber;
 
-    event.forecastConditions = mForecastConditions;
+    // TODO don't include forecastConditions into event since this is duplicating
+    // the Attribute and doesn't fit anyway without some packet size estimation logic
+    // See spec issue #11578
+    // event.forecastConditions = mForecastConditions;
 
     err = LogEvent(event, mEndpointId, eventNumber);
     if (CHIP_NO_ERROR != err)
