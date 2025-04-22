@@ -49,7 +49,7 @@ struct ClusterConformance
 
     BitFlags<OptionalAttributeEnum> & OptionalAttributes() { return mOptionalAttributes; }
     const BitFlags<OptionalAttributeEnum> & OptionalAttributes() const { return mOptionalAttributes; }
-    
+
     inline bool HasFeature(Feature feature) const { return mFeatureMap & to_underlying(feature); }
 
     /**
@@ -78,7 +78,7 @@ struct ClusterConformance
                 ChipLogError(AppServer,
                              "Validation failed: Unit , Limitation, or speed requires Positioning enabled."));
         }
-        
+
         // If Translation, Rotation or Modulation is enabled, Positioning must be enabled.
         if (HasFeature(Feature::kTranslation) || HasFeature(Feature::kRotation) || HasFeature(Feature::kModulation))
         {
@@ -87,29 +87,29 @@ struct ClusterConformance
                 ChipLogError(AppServer,
                              "Validation failed: Translation, Rotation or Modulation requires Positioning enabled."));
         }
-        
+
         // If Positioning is enabled, atleast one of Translation, Rotation or Modulation should be enabled.
         if (HasFeature(Feature::kPositioning))
         {
             VerifyOrReturnValue(
                 HasFeature(Feature::kTranslation) || HasFeature(Feature::kRotation) || HasFeature(Feature::kModulation), false,
-                ChipLogError(AppServer, 
+                ChipLogError(AppServer,
                             "Validation failed: If Positioning is available then atleast one of Translation, Rotation or Modulation should be enabled"));
         }
-        
+
          // If Overflow Attribute is supported, atleast one of  Rotation or MotionLatching should be supported.
          if (mOptionalAttributes.Has(OptionalAttributeEnum::kOverflow))
          {
              VerifyOrReturnValue(HasFeature(Feature::kRotation) || HasFeature(Feature::kMotionLatching), false,
-                 ChipLogError(AppServer, 
+                 ChipLogError(AppServer,
                              "Validation failed: If Overflow Attribute is Supported, atleast one of  Rotation or MotionLatching  should be supported."));
          }
-         
+
          // If Rotation  feature is supported, then Overflow Attribute should be supported.
         if (HasFeature(Feature::kRotation))
         {
             VerifyOrReturnValue(mOptionalAttributes.Has(OptionalAttributeEnum::kOverflow), false,
-                ChipLogError(AppServer, 
+                ChipLogError(AppServer,
                             "Validation failed: If Rotation  feature is supported, then Overflow Attribute should be supported."));
         }
 
@@ -162,12 +162,12 @@ public:
 
     const ClusterState & GetState() { return mState; }
     const ClusterConformance & GetConformance() { return mConformance; }
-    
-    // TODO: Remove this only for Test 
+
+    // TODO: Remove this only for Test
     void ResetStateToDefault() {
         mState = ClusterState(); // This will reset mState to its default values
     }
-    
+
 
     /**
      *  @brief Validates the conformance and performs initialization
@@ -309,7 +309,7 @@ private:
     // This cluster implements version 1 of the Closure Dimension cluster. Do not change this revision without updating
     // the cluster to implement the newest features.
     static constexpr Attributes::ClusterRevision::TypeInfo::Type kClusterRevision = 1u;
-    
+
     /**
      * @brief Set TranslationDirection.
      * @param[in] translationDirection Direction of the translation.
@@ -317,8 +317,8 @@ private:
      *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported
-     * 
-     *  Note: This attribute is not supposed to change once the installation is finalized. 
+     *
+     *  Note: This attribute is not supposed to change once the installation is finalized.
      *         so SetTranslationDirection should only be called from Init()
      */
     CHIP_ERROR SetTranslationDirection(const TranslationDirectionEnum translationDirection);
@@ -330,12 +330,12 @@ private:
      *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported
-     * 
-     *  Note: This attribute is not supposed to change once the installation is finalized. 
+     *
+     *  Note: This attribute is not supposed to change once the installation is finalized.
      *         so SetRotationAxis should only be called from Init().
      */
     CHIP_ERROR SetRotationAxis(const RotationAxisEnum rotationAxis);
-    
+
     /**
      * @brief Set ModulationType.
      * @param[in] modulationType Modulation type.
@@ -343,8 +343,8 @@ private:
      *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
-     * 
-     *  Note: This attribute is not supposed to change once the installation is finalized. 
+     *
+     *  Note: This attribute is not supposed to change once the installation is finalized.
      *         so SetModulationType should only be called from Init().
      */
     CHIP_ERROR SetModulationType(const ModulationTypeEnum modulationType);
