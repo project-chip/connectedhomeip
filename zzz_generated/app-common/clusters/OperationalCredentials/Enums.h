@@ -35,7 +35,7 @@ enum class CertificateChainTypeEnum : uint8_t
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 0,
+    kUnknownEnumValue = 3,
 };
 
 // Enum for NodeOperationalCertStatusEnum
@@ -55,7 +55,7 @@ enum class NodeOperationalCertStatusEnum : uint8_t
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 7,
+    kUnknownEnumValue = 12,
 };
 } // namespace OperationalCredentials
 } // namespace Clusters

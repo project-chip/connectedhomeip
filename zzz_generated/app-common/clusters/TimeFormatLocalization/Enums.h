@@ -46,7 +46,7 @@ enum class CalendarTypeEnum : uint8_t
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 12,
+    kUnknownEnumValue = 256,
 };
 
 // Enum for HourFormatEnum
@@ -59,7 +59,7 @@ enum class HourFormatEnum : uint8_t
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 2,
+    kUnknownEnumValue = 256,
 };
 
 // Bitmap for Feature

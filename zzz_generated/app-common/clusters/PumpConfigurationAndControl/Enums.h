@@ -39,7 +39,7 @@ enum class ControlModeEnum : uint8_t
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 4,
+    kUnknownEnumValue = 8,
 };
 
 // Enum for OperationModeEnum

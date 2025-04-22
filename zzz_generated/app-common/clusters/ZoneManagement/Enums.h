@@ -35,7 +35,7 @@ enum class StatusCodeEnum : uint8_t
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 0,
+    kUnknownEnumValue = 4,
 };
 
 // Enum for ZoneEventStoppedReasonEnum

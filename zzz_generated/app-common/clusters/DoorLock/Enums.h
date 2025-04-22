@@ -41,7 +41,7 @@ enum class AlarmCodeEnum : uint8_t
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 2,
+    kUnknownEnumValue = 9,
 };
 
 // Enum for CredentialRuleEnum
@@ -139,7 +139,7 @@ enum class DlStatus : uint8_t
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 4,
+    kUnknownEnumValue = 140,
 };
 
 // Enum for DoorLockOperationEventCode
@@ -209,7 +209,7 @@ enum class DoorLockUserStatus : uint8_t
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 2,
+    kUnknownEnumValue = 256,
 };
 
 // Enum for DoorLockUserType
@@ -225,7 +225,7 @@ enum class DoorLockUserType : uint8_t
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 5,
+    kUnknownEnumValue = 256,
 };
 
 // Enum for DoorStateEnum
@@ -344,7 +344,7 @@ enum class UserStatusEnum : uint8_t
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 2,
+    kUnknownEnumValue = 4,
 };
 
 // Enum for UserTypeEnum

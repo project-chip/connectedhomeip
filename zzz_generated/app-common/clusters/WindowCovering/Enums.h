@@ -58,7 +58,7 @@ enum class EndProductType : uint8_t
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 24,
+    kUnknownEnumValue = 256,
 };
 
 // Enum for Type
@@ -79,7 +79,7 @@ enum class Type : uint8_t
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 10,
+    kUnknownEnumValue = 256,
 };
 
 // Bitmap for ConfigStatus
