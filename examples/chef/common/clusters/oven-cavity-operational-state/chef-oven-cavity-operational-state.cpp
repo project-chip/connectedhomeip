@@ -308,7 +308,7 @@ void InitChefOvenCavityOperationalStateCluster()
         if (epIndex >= kOvenCavityOperationalStateTableSize)
             continue;
 
-        gDelegateTable[epIndex] = std::make_unique<Delegate>();
+        gDelegateTable[epIndex] = std::make_unique<ChefDelegate>();
 
         gInstanceTable[epIndex] = std::make_unique<Instance>(gDelegateTable[epIndex].get(), endpointId);
         gInstanceTable[epIndex]->Init();
