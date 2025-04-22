@@ -38,6 +38,7 @@ from chip.interaction_model import Status
 from chip.testing.matter_testing import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
+
 class TC_ACL_2_5(MatterBaseTest):
     def desc_TC_ACL_2_5(self) -> str:
         return "[TC-ACL-2.5] Cluster endpoint"
@@ -219,7 +220,7 @@ class TC_ACL_2_5(MatterBaseTest):
         logging.info(f"Events response {str(events_response)}")
 
         # Extract events from the response
-        events = events_response 
+        events = events_response
         logging.info(f"Found {len(events)} events")
         asserts.assert_equal(len(events), 0, "There should be no events found")
 
