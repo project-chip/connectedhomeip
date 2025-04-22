@@ -1151,13 +1151,13 @@ TEST_F(TestCodegenModelViaMocks, IterateOverAttributes)
 
     // Ends with global list attributes
     ASSERT_EQ(attributes[4].attributeId, GeneratedCommandList::Id);
-    ASSERT_FALSE(attributes[4].HasFlags(AttributeQualityFlags::kListAttribute));
+    ASSERT_TRUE(attributes[4].HasFlags(AttributeQualityFlags::kListAttribute));
 
     ASSERT_EQ(attributes[5].attributeId, AcceptedCommandList::Id);
-    ASSERT_FALSE(attributes[5].HasFlags(AttributeQualityFlags::kListAttribute));
+    ASSERT_TRUE(attributes[5].HasFlags(AttributeQualityFlags::kListAttribute));
 
     ASSERT_EQ(attributes[6].attributeId, AttributeList::Id);
-    ASSERT_FALSE(attributes[6].HasFlags(AttributeQualityFlags::kListAttribute));
+    ASSERT_TRUE(attributes[6].HasFlags(AttributeQualityFlags::kListAttribute));
 }
 
 TEST_F(TestCodegenModelViaMocks, FindAttribute)
