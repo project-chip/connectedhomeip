@@ -56,7 +56,6 @@ config("nxp_platform_config") {
       "CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA=1",
       "CONFIG_CHIP_ENCRYPTED_FACTORY_DATA=1",
     ]
-    defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/common/factory_data/FactoryDataProviderFwkImpl.h\"" ]
   }
 
   # When OTBR is enabled Thread network commissioning cluster is enabled using chip_enable_secondary_nwk_if
@@ -96,7 +95,10 @@ static_library("nxp_platform") {
     "CHIPDevicePlatformConfig.h",
     "PlatformManagerImpl.cpp",
   ]
-  deps = [ "${chip_root}/src/app:app_config" ]
+  deps = [
+    "${chip_root}/src/app:app_config",
+    "${chip_root}/src/app/common:ids",
+  ]
 
   if (chip_enable_ble) {
     sources += [
@@ -189,10 +191,10 @@ static_library("nxp_platform") {
 
   if (nxp_use_factory_data) {
     sources += [
-      "../../common/factory_data/FactoryDataProvider.cpp",
-      "../../common/factory_data/FactoryDataProvider.h",
       "../../common/factory_data/FactoryDataProviderFwkImpl.cpp",
       "../../common/factory_data/FactoryDataProviderFwkImpl.h",
+      "../../common/factory_data/legacy/FactoryDataProvider.cpp",
+      "../../common/factory_data/legacy/FactoryDataProvider.h",
     ]
 
     deps += [ "${chip_root}/src/credentials:credentials_header" ]

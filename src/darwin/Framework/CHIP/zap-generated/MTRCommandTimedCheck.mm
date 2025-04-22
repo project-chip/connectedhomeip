@@ -710,6 +710,15 @@ static BOOL CommandNeedsTimedInvokeInDeviceEnergyManagementModeCluster(Attribute
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInElectricalGridConditionsCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ElectricalGridConditions;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInDoorLockCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::DoorLock;
@@ -1523,6 +1532,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::DeviceEnergyManagementMode::Id: {
         return CommandNeedsTimedInvokeInDeviceEnergyManagementModeCluster(commandID);
+    }
+    case Clusters::ElectricalGridConditions::Id: {
+        return CommandNeedsTimedInvokeInElectricalGridConditionsCluster(commandID);
     }
     case Clusters::DoorLock::Id: {
         return CommandNeedsTimedInvokeInDoorLockCluster(commandID);
