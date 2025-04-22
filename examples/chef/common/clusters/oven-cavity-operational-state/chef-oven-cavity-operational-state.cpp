@@ -189,7 +189,7 @@ void ChefDelegate::HandleStartStateCallback(OperationalState::GenericOperational
     uint8_t opState = GetCurrentOperationalState();
 
     if (current_err.errorStateID != to_underlying(OperationalState::ErrorStateEnum::kNoError) ||
-        opState == OperationalStateEnum::kError)
+        opState == to_underlying(OperationalStateEnum::kError))
     {
         err.Set(to_underlying(ErrorStateEnum::kUnableToStartOrResume));
         return;
@@ -233,7 +233,7 @@ void ChefDelegate::HandleStopStateCallback(OperationalState::GenericOperationalE
         EndCycle();
     }
 
-    if (opState != OperationalStateEnum::kRunning && opState != OperationalStateEnum::kPaused)
+    if (opState != to_underlying(OperationalStateEnum::kRunning) && opState != to_underlying(OperationalStateEnum::kPaused))
     {
         ChipLogDetail(DeviceLayer, "HandleStopStateCallback: Cycle not started. Current state = %d. Returning.",
                       to_underlying(current_state));
