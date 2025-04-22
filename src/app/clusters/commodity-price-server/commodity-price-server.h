@@ -117,9 +117,8 @@ private:
                                           const Commands::GetDetailedForecastRequest::DecodableType & commandData);
 
     // Helper function to create a copy of the data for sending to client with the .description or .components knocked out
-    const DataModel::Nullable<Structs::CommodityPriceStruct::Type> *
-    GetDetailedPriceRequest(chip::BitMask<CommodityPriceDetailBitmap> details);
-    void FreeCurrentPrice(const DataModel::Nullable<Structs::CommodityPriceStruct::Type> *);
+    CHIP_ERROR GetDetailedPriceRequest(chip::BitMask<CommodityPriceDetailBitmap> details,
+                                       DataModel::Nullable<Structs::CommodityPriceStruct::Type> &);
 
     CHIP_ERROR GetDetailedForecastRequest(chip::BitMask<CommodityPriceDetailBitmap> details,
                                           chip::Platform::ScopedMemoryBuffer<Structs::CommodityPriceStruct::Type> & forecastBuffer,

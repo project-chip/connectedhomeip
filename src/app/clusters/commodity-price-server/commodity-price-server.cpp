@@ -64,8 +64,8 @@ bool Instance::HasFeature(Feature aFeature) const
 // AttributeAccessInterface
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    CHIP_ERROR err                                                                = CHIP_NO_ERROR;
-    const DataModel::Nullable<Structs::CommodityPriceStruct::Type> * pPriceStruct = nullptr;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    DataModel::Nullable<Structs::CommodityPriceStruct::Type> priceStruct;
     chip::Platform::ScopedMemoryBuffer<Structs::CommodityPriceStruct::Type> forecastBuffer;
     DataModel::List<const Structs::CommodityPriceStruct::Type> forecastList;
 
@@ -77,11 +77,8 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         return aEncoder.Encode(mCurrency);
     case CurrentPrice::Id:
         // Call GetDetailedPriceRequest with details = 0 to strip out .components and .description if present
-        pPriceStruct = GetDetailedPriceRequest(0);
-        VerifyOrReturnError(pPriceStruct != nullptr, CHIP_ERROR_NO_MEMORY);
-
-        err = aEncoder.Encode(*pPriceStruct);
-        FreeCurrentPrice(pPriceStruct);
+        ReturnErrorOnFailure(GetDetailedPriceRequest(0, priceStruct));
+        err = aEncoder.Encode(priceStruct);
 
         return err;
     case PriceForecast::Id:
@@ -101,9 +98,9 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         ReturnErrorOnFailure(GetDetailedForecastRequest(0, forecastBuffer, kMaxForecastEntries, forecastList, false, false));
 
         err = aEncoder.EncodeList([=](const auto & encoder) -> CHIP_ERROR {
-            for (auto const & priceStruct : forecastList)
+            for (auto const & entry : forecastList)
             {
-                ReturnErrorOnFailure(encoder.Encode(priceStruct));
+                ReturnErrorOnFailure(encoder.Encode(entry));
             }
             return CHIP_NO_ERROR;
         });
@@ -164,6 +161,8 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
 void Instance::HandleGetDetailedPriceRequest(HandlerContext & ctx,
                                              const Commands::GetDetailedPriceRequest::DecodableType & commandData)
 {
+    DataModel::Nullable<Structs::CommodityPriceStruct::Type> priceStruct;
+
     chip::BitMask<CommodityPriceDetailBitmap> details = commandData.details;
     if (!details.HasOnly(
             BitMask<CommodityPriceDetailBitmap>(CommodityPriceDetailBitmap::kDescription, CommodityPriceDetailBitmap::kComponents)))
@@ -175,18 +174,17 @@ void Instance::HandleGetDetailedPriceRequest(HandlerContext & ctx,
 
     Commands::GetDetailedPriceResponse::Type response;
 
-    const DataModel::Nullable<Structs::CommodityPriceStruct::Type> * pPriceStruct = GetDetailedPriceRequest(details);
-    if (pPriceStruct == nullptr)
+    CHIP_ERROR err = GetDetailedPriceRequest(details, priceStruct);
+    if (err != CHIP_NO_ERROR)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
     else
     {
-        response.currentPrice = *pPriceStruct;
+        response.currentPrice = priceStruct;
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
     }
-    FreeCurrentPrice(pPriceStruct);
 }
 
 void Instance::HandleGetDetailedForecastRequest(HandlerContext & ctx,
@@ -232,37 +230,33 @@ void Instance::HandleGetDetailedForecastRequest(HandlerContext & ctx,
     }
 }
 
-const DataModel::Nullable<Structs::CommodityPriceStruct::Type> *
-Instance::GetDetailedPriceRequest(chip::BitMask<CommodityPriceDetailBitmap> details)
+CHIP_ERROR
+Instance::GetDetailedPriceRequest(chip::BitMask<CommodityPriceDetailBitmap> details,
+                                  DataModel::Nullable<Structs::CommodityPriceStruct::Type> & priceStruct)
 {
-    // Based on the bitmap we make a copy of mCurrentPrice with/without the .description and/or .components
-    DataModel::Nullable<Structs::CommodityPriceStruct::Type> * pPriceStruct = nullptr;
 
-    // Make a copy of the mCurrentPrice
-    pPriceStruct = new DataModel::Nullable<Structs::CommodityPriceStruct::Type>(mCurrentPrice);
-
-    if (!pPriceStruct->IsNull())
+    if (mCurrentPrice.IsNull())
     {
+        priceStruct.SetNull();
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        priceStruct = mCurrentPrice;
         if (!details.Has(CommodityPriceDetailBitmap::kComponents))
         {
             // Remove the components
-            pPriceStruct->Value().components.ClearValue();
+            priceStruct.Value().components.ClearValue();
         }
 
         if (!details.Has(CommodityPriceDetailBitmap::kDescription))
         {
             // Remove the description
-            pPriceStruct->Value().description.ClearValue();
+            priceStruct.Value().description.ClearValue();
         }
     }
 
-    return pPriceStruct;
-}
-
-void Instance::FreeCurrentPrice(const DataModel::Nullable<Structs::CommodityPriceStruct::Type> * pPriceStruct)
-{
-    VerifyOrReturn(pPriceStruct != nullptr);
-    delete pPriceStruct;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR
@@ -416,7 +410,7 @@ Status Instance::SendPriceChangeEvent()
 {
 
     CHIP_ERROR err;
-    const DataModel::Nullable<Structs::CommodityPriceStruct::Type> * pPriceStruct = nullptr;
+    DataModel::Nullable<Structs::CommodityPriceStruct::Type> priceStruct;
     Events::PriceChange::Type event;
     EventNumber eventNumber;
 
@@ -424,14 +418,12 @@ Status Instance::SendPriceChangeEvent()
      * The Event's CurrentPrice must not include .description or .components
      * call our function to copy the CurrentPrice without these
      */
-    pPriceStruct = GetDetailedPriceRequest(0);
-    VerifyOrReturnError(pPriceStruct != nullptr, Status::Failure);
+    err = GetDetailedPriceRequest(0, priceStruct);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, Status::Failure);
 
-    event.currentPrice = *pPriceStruct;
+    event.currentPrice = priceStruct;
 
     err = LogEvent(event, mEndpointId, eventNumber);
-    /* Free the copy after the LogEvent call has made its internal copy */
-    FreeCurrentPrice(pPriceStruct);
 
     if (CHIP_NO_ERROR != err)
     {
