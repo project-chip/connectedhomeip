@@ -105,3 +105,12 @@ void emberAfWaterHeaterModeClusterInitCallback(chip::EndpointId endpointId)
     gWaterHeaterModeInstance = new ModeBase::Instance(gWaterHeaterModeDelegate, endpointId, WaterHeaterMode::Id, 0);
     gWaterHeaterModeInstance->Init();
 }
+
+void emberAfWaterHeaterModeClusterShutdownCallback(chip::EndpointId endpointId)
+{
+    if (gWaterHeaterModeInstance)
+    {
+        gWaterHeaterModeInstance->Shutdown();
+    }
+    WaterHeaterMode::Shutdown();
+}

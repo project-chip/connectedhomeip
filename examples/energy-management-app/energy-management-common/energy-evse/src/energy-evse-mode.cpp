@@ -94,3 +94,12 @@ void emberAfEnergyEvseModeClusterInitCallback(chip::EndpointId endpointId)
     gEnergyEvseModeInstance = std::make_unique<ModeBase::Instance>(gEnergyEvseModeDelegate.get(), 0x1, EnergyEvseMode::Id, 0);
     gEnergyEvseModeInstance->Init();
 }
+
+void emberAfEnergyEvseModeClusterShutdownCallback(chip::EndpointId endpointId)
+{
+    if (gEnergyEvseModeInstance)
+    {
+        gEnergyEvseModeInstance->Shutdown();
+    }
+    EnergyEvseMode::Shutdown();
+}
