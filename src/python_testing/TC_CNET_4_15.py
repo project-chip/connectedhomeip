@@ -77,16 +77,17 @@ class TC_CNET_4_15(MatterBaseTest):
         # TH sends RemoveNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID,
         # which does not match the provisioned network, and Breadcrumb field set to 1
         network_id = self.matter_test_config.global_test_params['PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID'].encode('utf-8')
-        
+
         logging.info(f"Attempting to remove network with ID: {network_id}")
-        
+
         read_networks = await self.read_single_attribute(
-            node_id=self.matter_test_config.dut_node_id,
-            endpoint=0,
-            attribute=cnet.Attributes.Networks
-        )
+                    dev_ctrl=self.default_controller,
+                    node_id=self.dut_node_id,
+                    endpoint=0,
+                    attribute=cnet.Attributes.Networks
+                )
         logging.info(f"Current networks on device: {read_networks}")
-        
+
         send_remove = await self.send_single_cmd(
             cmd=cnet.Commands.RemoveNetwork(
                 networkID=network_id,
@@ -95,7 +96,7 @@ class TC_CNET_4_15(MatterBaseTest):
         )
         # Log complete response object structure for debugging
         logging.info(f"RemoveNetwork complete response object: {vars(send_remove)}")
-        
+
         # Verify NetworkConfigResponse has NetworkIDNotFound status
         asserts.assert_equal(
             send_remove.networkingStatus,
@@ -114,7 +115,7 @@ class TC_CNET_4_15(MatterBaseTest):
         )
         # Log complete response object structure for debugging
         logging.info(f"ConnectNetwork complete response object: {vars(send_connect)}")
-        
+
         # Verify ConnectNetworkResponse has NetworkIDNotFound status
         asserts.assert_equal(
             send_connect.networkingStatus,
