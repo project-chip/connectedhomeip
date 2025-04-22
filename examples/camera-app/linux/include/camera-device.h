@@ -18,11 +18,12 @@
 
 #pragma once
 #include "camera-av-stream-manager.h"
+#include "camera-avsettingsuserlevel-manager.h"
 #include "camera-device-interface.h"
 #include "chime-manager.h"
 #include "webrtc-provider-manager.h"
 
-#include "media-controller.h"
+#include "default-media-controller.h"
 #include "network-stream-source.h"
 
 #include <protocols/interaction_model/StatusCode.h>
@@ -32,6 +33,14 @@
 #define VIDEO_STREAM_GST_DEST_PORT 5000
 #define AUDIO_STREAM_GST_DEST_PORT 5001
 
+#define MAX_CONTENT_BUFFER_SIZE_BYTES (1024)
+#define MAX_ENCODED_PIXEL_RATE (10000)
+#define MAX_CONCURRENT_VIDEO_ENCODERS (1)
+#define MAX_NETWORK_BANDWIDTH_MBPS (64)
+#define MICROPHONE_MIN_LEVEL (1)
+#define MICROPHONE_MAX_LEVEL (254)
+#define INVALID_SPKR_LEVEL (0)
+
 namespace Camera {
 
 class CameraDevice : public CameraDeviceInterface, public CameraDeviceInterface::CameraHALInterface
@@ -40,6 +49,9 @@ public:
     chip::app::Clusters::ChimeDelegate & GetChimeDelegate();
     chip::app::Clusters::WebRTCTransportProvider::Delegate & GetWebRTCProviderDelegate();
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate();
+    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate & GetCameraAVSettingsUserLevelMgmtDelegate();
+
+    MediaController & GetMediaController();
 
     CameraDevice();
     ~CameraDevice();
@@ -51,7 +63,7 @@ public:
 
     CameraError InitializeStreams();
 
-    CameraError CaptureSnapshot(const uint16_t streamID, const VideoResolutionStruct & resolution,
+    CameraError CaptureSnapshot(const chip::app::DataModel::Nullable<uint16_t> streamID, const VideoResolutionStruct & resolution,
                                 ImageSnapshot & outImageSnapshot);
 
     CameraError StartVideoStream(uint16_t streamID);
@@ -71,19 +83,65 @@ public:
     // Stop snapshot stream
     CameraError StopSnapshotStream(uint16_t streamID);
 
+    uint8_t GetMaxConcurrentVideoEncoders();
+
+    uint32_t GetMaxEncodedPixelRate();
+
     VideoSensorParamsStruct & GetVideoSensorParams();
 
     bool GetNightVisionCapable();
 
     VideoResolutionStruct & GetMinViewport();
 
-    uint8_t GetMaxConcurrentVideoEncoders();
+    uint32_t GetMaxContentBufferSize();
 
-    uint32_t GetMaxEncodedPixelRate();
+    uint32_t GetMaxNetworkBandwidth();
 
-    uint16_t GetFrameRate();
+    uint16_t GetCurrentFrameRate();
 
-    void SetHDRMode(bool hdrMode);
+    CameraError SetHDRMode(bool hdrMode);
+    bool GetHDRMode() { return mHDREnabled; }
+
+    CameraError SetViewport(const ViewportStruct & viewPort);
+    const ViewportStruct & GetViewport() { return mViewport; }
+
+    // Currently, defaulting to not supporting speaker.
+    bool HasSpeaker() { return false; }
+
+    // Mute/Unmute speaker.
+    CameraError SetSpeakerMuted(bool muteSpeaker) { return CameraError::ERROR_NOT_IMPLEMENTED; }
+
+    // Set speaker volume level.
+    CameraError SetSpeakerVolume(uint8_t speakerVol) { return CameraError::ERROR_NOT_IMPLEMENTED; }
+
+    // Get the speaker max and min levels.
+    uint8_t GetSpeakerMaxLevel() { return INVALID_SPKR_LEVEL; }
+    uint8_t GetSpeakerMinLevel() { return INVALID_SPKR_LEVEL; }
+
+    // Does camera have a microphone
+    bool HasMicrophone() { return true; }
+
+    // Mute/Unmute microphone.
+    CameraError SetMicrophoneMuted(bool muteMicrophone);
+    bool GetMicrophoneMuted() { return mMicrophoneMuted; }
+
+    // Set microphone volume level.
+    CameraError SetMicrophoneVolume(uint8_t microphoneVol);
+    uint8_t GetMicrophoneVolume() { return mMicrophoneVol; }
+
+    // Get the microphone max and min levels.
+    uint8_t GetMicrophoneMaxLevel() { return MICROPHONE_MAX_LEVEL; }
+    uint8_t GetMicrophoneMinLevel() { return MICROPHONE_MIN_LEVEL; }
+
+    int16_t GetPanMin();
+
+    int16_t GetPanMax();
+
+    int16_t GetTiltMin();
+
+    int16_t GetTiltMax();
+
+    uint8_t GetZoomMax();
 
     std::vector<VideoStream> & GetAvailableVideoStreams() { return videoStreams; }
 
@@ -112,10 +170,20 @@ private:
     WebRTCProviderManager mWebRTCProviderManager;
 
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManager mCameraAVStreamManager;
+    chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAVSettingsUserLevelManager mCameraAVSettingsUserLevelManager;
 
     NetworkStreamSource mNetworkVideoSource;
     NetworkStreamSource mNetworkAudioSource;
-    MediaController mMediaController;
+
+    DefaultMediaController mMediaController;
+
+    uint16_t mCurrentVideoFrameRate                                         = 0;
+    bool mHDREnabled                                                        = false;
+    bool mMicrophoneMuted                                                   = false;
+    uint8_t mMicrophoneMinLevel                                             = MICROPHONE_MIN_LEVEL;
+    uint8_t mMicrophoneMaxLevel                                             = MICROPHONE_MAX_LEVEL;
+    uint8_t mMicrophoneVol                                                  = MICROPHONE_MIN_LEVEL;
+    chip::app::Clusters::CameraAvStreamManagement::ViewportStruct mViewport = { 325, 585, 2244, 1664 };
 };
 
 } // namespace Camera

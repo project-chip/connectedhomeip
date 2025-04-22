@@ -33,6 +33,8 @@
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Chime;
 using namespace chip::app::Clusters::CameraAvStreamManagement;
+using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
+
 using namespace Camera;
 
 CameraDevice::CameraDevice()
@@ -47,8 +49,12 @@ CameraDevice::CameraDevice()
     // Initialize Audio Sources
     mNetworkAudioSource.Init(&mMediaController, AUDIO_STREAM_GST_DEST_PORT, StreamType::kAudio);
 
-    // Set the CameraHALInterface in CameraAVStreamManager.
+    // Initialize WebRTC connnection
+    mWebRTCProviderManager.Init();
+
+    // Set the CameraHALInterface in CameraAVStreamManager and CameraAVsettingsUserLevelManager.
     mCameraAVStreamManager.SetCameraDeviceHAL(this);
+    mCameraAVSettingsUserLevelManager.SetCameraDeviceHAL(this);
 }
 
 CameraDevice::~CameraDevice()
@@ -270,14 +276,15 @@ CameraError CameraDevice::SetV4l2Control(uint32_t controlId, int value)
     return CameraError::SUCCESS;
 }
 
-CameraError CameraDevice::CaptureSnapshot(const uint16_t streamID, const VideoResolutionStruct & resolution,
-                                          ImageSnapshot & outImageSnapshot)
+CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<uint16_t> streamID,
+                                          const VideoResolutionStruct & resolution, ImageSnapshot & outImageSnapshot)
 {
-    auto it = std::find_if(snapshotStreams.begin(), snapshotStreams.end(),
-                           [streamID](const SnapshotStream & s) { return s.snapshotStreamParams.snapshotStreamID == streamID; });
+    uint16_t streamId = streamID.IsNull() ? 1 : streamID.Value();
+    auto it           = std::find_if(snapshotStreams.begin(), snapshotStreams.end(),
+                                     [streamId](const SnapshotStream & s) { return s.snapshotStreamParams.snapshotStreamID == streamId; });
     if (it == snapshotStreams.end())
     {
-        ChipLogError(Camera, "Snapshot streamID : %u not found", streamID);
+        ChipLogError(Camera, "Snapshot streamID : %u not found", streamId);
         return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
     }
 
@@ -571,6 +578,16 @@ CameraError CameraDevice::StopSnapshotStream(uint16_t streamID)
     return CameraError::SUCCESS;
 }
 
+uint8_t CameraDevice::GetMaxConcurrentVideoEncoders()
+{
+    return MAX_CONCURRENT_VIDEO_ENCODERS;
+}
+
+uint32_t CameraDevice::GetMaxEncodedPixelRate()
+{
+    return MAX_ENCODED_PIXEL_RATE;
+}
+
 VideoSensorParamsStruct & CameraDevice::GetVideoSensorParams()
 {
     static VideoSensorParamsStruct videoSensorParams = { 4608, 2592, 120,
@@ -589,22 +606,75 @@ VideoResolutionStruct & CameraDevice::GetMinViewport()
     return minViewport;
 }
 
-uint8_t CameraDevice::GetMaxConcurrentVideoEncoders()
+uint32_t CameraDevice::GetMaxContentBufferSize()
 {
-    return 1;
+    return MAX_CONTENT_BUFFER_SIZE_BYTES;
 }
 
-uint32_t CameraDevice::GetMaxEncodedPixelRate()
+uint32_t CameraDevice::GetMaxNetworkBandwidth()
 {
-    return 10000;
+    return MAX_NETWORK_BANDWIDTH_MBPS;
 }
 
-uint16_t CameraDevice::GetFrameRate()
+uint16_t CameraDevice::GetCurrentFrameRate()
 {
-    return 60;
+    return mCurrentVideoFrameRate;
 }
 
-void CameraDevice::SetHDRMode(bool hdrMode) {}
+CameraError CameraDevice::SetHDRMode(bool hdrMode)
+{
+    mHDREnabled = hdrMode;
+
+    return CameraError::SUCCESS;
+}
+
+CameraError CameraDevice::SetViewport(const ViewportStruct & viewPort)
+{
+    mViewport = viewPort;
+
+    return CameraError::SUCCESS;
+}
+
+// Mute/Unmute microphone.
+CameraError CameraDevice::SetMicrophoneMuted(bool muteMicrophone)
+{
+    mMicrophoneMuted = muteMicrophone;
+
+    return CameraError::SUCCESS;
+}
+
+// Set microphone volume level.
+CameraError CameraDevice::SetMicrophoneVolume(uint8_t microphoneVol)
+{
+    mMicrophoneVol = microphoneVol;
+
+    return CameraError::SUCCESS;
+}
+
+int16_t CameraDevice::GetPanMin()
+{
+    return -90;
+}
+
+int16_t CameraDevice::GetPanMax()
+{
+    return 90;
+}
+
+int16_t CameraDevice::GetTiltMin()
+{
+    return -90;
+}
+
+int16_t CameraDevice::GetTiltMax()
+{
+    return 90;
+}
+
+uint8_t CameraDevice::GetZoomMax()
+{
+    return 75;
+}
 
 void CameraDevice::InitializeVideoStreams()
 {
@@ -612,11 +682,11 @@ void CameraDevice::InitializeVideoStreams()
     VideoStream videoStream = { { 1 /* Id */,
                                   StreamUsageEnum::kLiveView /* StreamUsage */,
                                   VideoCodecEnum::kH264,
-                                  30 /* MinFrameRate */,
+                                  15 /* MinFrameRate */,
                                   120 /* MaxFrameRate */,
-                                  { 640, 480 } /* MinResolution */,
+                                  { 320, 240 } /* MinResolution */,
                                   { 640, 480 } /* MaxResolution */,
-                                  500000 /* MinBitRate */,
+                                  10000 /* MinBitRate */,
                                   2000000 /* MaxBitRate */,
                                   1000 /* MinFragmentLen */,
                                   10000 /* MaxFragmentLen */,
@@ -647,7 +717,6 @@ void CameraDevice::InitializeSnapshotStreams()
     SnapshotStream snapshotStream = { { 1 /* Id */,
                                         ImageCodecEnum::kJpeg,
                                         30 /* FrameRate */,
-                                        512000 /* BitRate*/,
                                         { 320, 240 } /* MinResolution*/,
                                         { 320, 240 } /* MaxResolution */,
                                         90 /* Quality */,
@@ -671,4 +740,14 @@ WebRTCTransportProvider::Delegate & CameraDevice::GetWebRTCProviderDelegate()
 CameraAVStreamMgmtDelegate & CameraDevice::GetCameraAVStreamMgmtDelegate()
 {
     return mCameraAVStreamManager;
+}
+
+CameraAvSettingsUserLevelManagement::Delegate & CameraDevice::GetCameraAVSettingsUserLevelMgmtDelegate()
+{
+    return mCameraAVSettingsUserLevelManager;
+}
+
+MediaController & CameraDevice::GetMediaController()
+{
+    return mMediaController;
 }

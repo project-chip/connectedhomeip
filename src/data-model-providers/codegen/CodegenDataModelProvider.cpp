@@ -27,10 +27,10 @@
 #include <app/EventPathParams.h>
 #include <app/GlobalAttributes.h>
 #include <app/RequiredPrivilege.h>
-#include <app/data-model-provider/MetadataList.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/Provider.h>
 #include <app/server-cluster/ServerClusterContext.h>
+#include <app/server-cluster/ServerClusterInterface.h>
 #include <app/util/DataModelHandler.h>
 #include <app/util/IMClusterCommandHandler.h>
 #include <app/util/af-types.h>
@@ -43,6 +43,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/SpanSearchValue.h>
 
@@ -198,7 +199,7 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::InvokeCom
     return std::nullopt;
 }
 
-CHIP_ERROR CodegenDataModelProvider::Endpoints(DataModel::ListBuilder<DataModel::EndpointEntry> & builder)
+CHIP_ERROR CodegenDataModelProvider::Endpoints(ReadOnlyBufferBuilder<DataModel::EndpointEntry> & builder)
 {
     const uint16_t endpointCount = emberAfEndpointCount();
 
@@ -252,7 +253,7 @@ std::optional<unsigned> CodegenDataModelProvider::TryFindEndpointIndex(EndpointI
 }
 
 CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
-                                                    DataModel::ListBuilder<DataModel::ServerClusterEntry> & builder)
+                                                    ReadOnlyBufferBuilder<DataModel::ServerClusterEntry> & builder)
 {
     const EmberAfEndpointType * endpoint = emberAfFindEndpointType(endpointId);
 
@@ -282,20 +283,25 @@ CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
 
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(registryClusterCount));
 
-    DataModel::ListBuilder<ClusterId> knownClustersBuilder;
+    ReadOnlyBufferBuilder<ClusterId> knownClustersBuilder;
     ReturnErrorOnFailure(knownClustersBuilder.EnsureAppendCapacity(registryClusterCount));
-    for (auto * cluster : mRegistry.ClustersOnEndpoint(endpointId))
+    for (const auto clusterId : mRegistry.ClustersOnEndpoint(endpointId))
     {
-        const ConcreteClusterPath path = cluster->GetPath();
+        ConcreteClusterPath path(endpointId, clusterId);
+        ServerClusterInterface * cluster = mRegistry.Get(path);
+
+        // path MUST be valid: we just got it from iterating our registrations...
+        VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_INTERNAL);
+
         ReturnErrorOnFailure(builder.Append({
             .clusterId   = path.mClusterId,
-            .dataVersion = cluster->GetDataVersion(),
-            .flags       = cluster->GetClusterFlags(),
+            .dataVersion = cluster->GetDataVersion(path),
+            .flags       = cluster->GetClusterFlags(path),
         }));
         ReturnErrorOnFailure(knownClustersBuilder.Append(path.mClusterId));
     }
 
-    DataModel::ReadOnlyBuffer<ClusterId> knownClusters = knownClustersBuilder.TakeBuffer();
+    ReadOnlyBuffer<ClusterId> knownClusters = knownClustersBuilder.TakeBuffer();
 
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(emberAfClusterCountForEndpointType(endpoint, /* server = */ true)));
 
@@ -333,7 +339,7 @@ CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
 }
 
 CHIP_ERROR CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path,
-                                                DataModel::ListBuilder<DataModel::AttributeEntry> & builder)
+                                                ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     if (auto * cluster = mRegistry.Get(path); cluster != nullptr)
     {
@@ -382,7 +388,7 @@ CHIP_ERROR CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CodegenDataModelProvider::ClientClusters(EndpointId endpointId, DataModel::ListBuilder<ClusterId> & builder)
+CHIP_ERROR CodegenDataModelProvider::ClientClusters(EndpointId endpointId, ReadOnlyBufferBuilder<ClusterId> & builder)
 {
     const EmberAfEndpointType * endpoint = emberAfFindEndpointType(endpointId);
 
@@ -425,7 +431,7 @@ const EmberAfCluster * CodegenDataModelProvider::FindServerCluster(const Concret
 }
 
 CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath & path,
-                                                      DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
+                                                      ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     if (auto * cluster = mRegistry.Get(path); cluster != nullptr)
     {
@@ -457,7 +463,7 @@ CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath 
             using EnumerationData = struct
             {
                 ConcreteCommandPath commandPath;
-                DataModel::ListBuilder<DataModel::AcceptedCommandEntry> * acceptedCommandList;
+                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> * acceptedCommandList;
                 CHIP_ERROR processingError;
             };
 
@@ -513,8 +519,7 @@ CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CodegenDataModelProvider::GeneratedCommands(const ConcreteClusterPath & path,
-                                                       DataModel::ListBuilder<CommandId> & builder)
+CHIP_ERROR CodegenDataModelProvider::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
 {
     if (auto * cluster = mRegistry.Get(path); cluster != nullptr)
     {
@@ -547,7 +552,7 @@ CHIP_ERROR CodegenDataModelProvider::GeneratedCommands(const ConcreteClusterPath
 
             using EnumerationData = struct
             {
-                DataModel::ListBuilder<CommandId> * generatedCommandList;
+                ReadOnlyBufferBuilder<CommandId> * generatedCommandList;
                 CHIP_ERROR processingError;
             };
             EnumerationData enumerationData;
@@ -594,8 +599,7 @@ void CodegenDataModelProvider::InitDataModelForTesting()
     InitDataModelHandler();
 }
 
-CHIP_ERROR CodegenDataModelProvider::DeviceTypes(EndpointId endpointId,
-                                                 DataModel::ListBuilder<DataModel::DeviceTypeEntry> & builder)
+CHIP_ERROR CodegenDataModelProvider::DeviceTypes(EndpointId endpointId, ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & builder)
 {
     std::optional<unsigned> endpoint_index = TryFindEndpointIndex(endpointId);
     if (!endpoint_index.has_value())
@@ -605,11 +609,10 @@ CHIP_ERROR CodegenDataModelProvider::DeviceTypes(EndpointId endpointId,
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    builder.ReferenceExisting(emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err));
-    return CHIP_NO_ERROR;
+    return builder.ReferenceExisting(emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err));
 }
 
-CHIP_ERROR CodegenDataModelProvider::SemanticTags(EndpointId endpointId, DataModel::ListBuilder<SemanticTag> & builder)
+CHIP_ERROR CodegenDataModelProvider::SemanticTags(EndpointId endpointId, ReadOnlyBufferBuilder<SemanticTag> & builder)
 {
     DataModel::Provider::SemanticTag semanticTag;
     size_t count = 0;
