@@ -651,6 +651,8 @@ void Server::Shutdown()
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     app::DnssdServer::Instance().SetICDManager(nullptr);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
+    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(nullptr);
     app::DnssdServer::Instance().SetCommissioningModeProvider(nullptr);
     Dnssd::ServiceAdvertiser::Instance().Shutdown();
 
@@ -681,11 +683,13 @@ void Server::Shutdown()
     mCommissioningWindowManager.Shutdown();
     mMessageCounterManager.Shutdown();
     mExchangeMgr.Shutdown();
+    mFabrics.RemoveFabricDelegate(&mFabricDelegate);
     mSessions.Shutdown();
     mTransports.Close();
     mAccessControl.Finish();
     Access::ResetAccessControlToDefault();
     Credentials::SetGroupDataProvider(nullptr);
+    app::EventManagement::GetInstance().DestroyEventManagement();
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     // Remove Test Event Trigger Handler
     if (mTestEventTriggerDelegate != nullptr)
@@ -695,6 +699,7 @@ void Server::Shutdown()
     mICDManager.Shutdown();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
+    mFabrics.Shutdown();
     // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryShutdown();
 }

@@ -1169,6 +1169,7 @@ void FabricTable::Shutdown()
         delegate->next               = nullptr;
         delegate                     = temp;
     }
+    mDelegateListRoot = nullptr;
 
     RevertPendingFabricData();
     for (FabricInfo & fabricInfo : mStates)

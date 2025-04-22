@@ -84,6 +84,15 @@ void emberAfInit()
     emAfCallInits();
 }
 
+// ****************************************
+// Shutdown Clusters
+// ****************************************
+void emberAfShutdown()
+{
+    emAfCallShutdowns();
+    MATTER_PLUGINS_SHUTDOWN
+}
+
 // Cluster init functions that don't have a cluster implementation to define
 // them in.
 void MatterBallastConfigurationPluginServerInitCallback() {}
@@ -142,6 +151,63 @@ void MatterWaterHeaterModePluginServerInitCallback() {}
 void MatterCommodityPricePluginServerInitCallback() {}
 void MatterElectricalGridConditionsPluginServerInitCallback() {}
 void MatterSoilMeasurementPluginServerInitCallback() {}
+
+// Cluster shutdown functions that don't have a cluster implementation to define
+// them in.
+void MatterBallastConfigurationPluginServerShutdownCallback() {}
+void MatterBooleanStatePluginServerShutdownCallback() {}
+void MatterRelativeHumidityMeasurementPluginServerShutdownCallback() {}
+void MatterIlluminanceMeasurementPluginServerShutdownCallback() {}
+void MatterBinaryInputBasicPluginServerShutdownCallback() {}
+void MatterPressureMeasurementPluginServerShutdownCallback() {}
+void MatterTemperatureMeasurementPluginServerShutdownCallback() {}
+void MatterFlowMeasurementPluginServerShutdownCallback() {}
+void MatterThermostatUserInterfaceConfigurationPluginServerShutdownCallback() {}
+void MatterBridgedDeviceBasicInformationPluginServerShutdownCallback() {}
+void MatterPowerConfigurationPluginServerShutdownCallback() {}
+void MatterPowerProfilePluginServerShutdownCallback() {}
+void MatterPulseWidthModulationPluginServerShutdownCallback() {}
+void MatterAlarmsPluginServerShutdownCallback() {}
+void MatterTimePluginServerShutdownCallback() {}
+void MatterAclPluginServerShutdownCallback() {}
+void MatterPollControlPluginServerShutdownCallback() {}
+void MatterUnitLocalizationPluginServerShutdownCallback() {}
+void MatterProxyValidPluginServerShutdownCallback() {}
+void MatterProxyDiscoveryPluginServerShutdownCallback() {}
+void MatterProxyConfigurationPluginServerShutdownCallback() {}
+void MatterFanControlPluginServerShutdownCallback() {}
+void MatterActivatedCarbonFilterMonitoringPluginServerShutdownCallback() {}
+void MatterHepaFilterMonitoringPluginServerShutdownCallback() {}
+void MatterAirQualityPluginServerShutdownCallback() {}
+void MatterCarbonMonoxideConcentrationMeasurementPluginServerShutdownCallback() {}
+void MatterCarbonDioxideConcentrationMeasurementPluginServerShutdownCallback() {}
+void MatterFormaldehydeConcentrationMeasurementPluginServerShutdownCallback() {}
+void MatterNitrogenDioxideConcentrationMeasurementPluginServerShutdownCallback() {}
+void MatterOzoneConcentrationMeasurementPluginServerShutdownCallback() {}
+void MatterPm10ConcentrationMeasurementPluginServerShutdownCallback() {}
+void MatterPm1ConcentrationMeasurementPluginServerShutdownCallback() {}
+void MatterPm25ConcentrationMeasurementPluginServerShutdownCallback() {}
+void MatterRadonConcentrationMeasurementPluginServerShutdownCallback() {}
+void MatterTotalVolatileOrganicCompoundsConcentrationMeasurementPluginServerShutdownCallback() {}
+void MatterRvcRunModePluginServerShutdownCallback() {}
+void MatterRvcCleanModePluginServerShutdownCallback() {}
+void MatterDishwasherModePluginServerShutdownCallback() {}
+void MatterLaundryWasherModePluginServerShutdownCallback() {}
+void MatterRefrigeratorAndTemperatureControlledCabinetModePluginServerShutdownCallback() {}
+void MatterOperationalStatePluginServerShutdownCallback() {}
+void MatterRvcOperationalStatePluginServerShutdownCallback() {}
+void MatterOvenModePluginServerShutdownCallback() {}
+void MatterOvenCavityOperationalStatePluginServerShutdownCallback() {}
+void MatterDishwasherAlarmPluginServerShutdownCallback() {}
+void MatterMicrowaveOvenModePluginServerShutdownCallback() {}
+void MatterDeviceEnergyManagementModePluginServerShutdownCallback() {}
+void MatterEnergyEvseModePluginServerShutdownCallback() {}
+void MatterPowerTopologyPluginServerShutdownCallback() {}
+void MatterElectricalEnergyMeasurementPluginServerShutdownCallback() {}
+void MatterElectricalPowerMeasurementPluginServerShutdownCallback() {}
+void MatterServiceAreaPluginServerShutdownCallback() {}
+void MatterWaterHeaterManagementPluginServerShutdownCallback() {}
+void MatterWaterHeaterModePluginServerShutdownCallback() {}
 
 bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
 {

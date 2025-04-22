@@ -28,3 +28,8 @@ void InitDataModelHandler()
     emberAfEndpointConfigure();
     emberAfInit();
 }
+
+void ShutdownDataModelHandler()
+{
+    emberAfShutdown();
+}
