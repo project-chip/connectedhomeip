@@ -18,7 +18,12 @@
 
 #pragma once
 
+#include <vector>
+#include <memory>
+#include <mutex>
+#include <thread>
 #include "transport.h"
+#include "pushav-clip-recorder.h"
 #include <app-common/zap-generated/cluster-enums.h>
 
 // Derived class for PushAV transport
@@ -50,12 +55,26 @@ public:
 
     // Enum indicating the type of trigger used to start the transport
     chip::app::Clusters::PushAvStreamTransport::TransportTriggerTypeEnum mTransportTriggerType;
+    void initializeRecorder();
+    AVPacket* createPacket(const uint8_t* data, int size,  uint16_t videoStreamID, uint16_t audioStreamID);
+    void readFromFile(char* filename, uint8_t** videoBuffer, size_t *videoBufferBytes);
+    bool isH264Iframe(const uint8_t *data_ptr, unsigned int data_len);
+    std::mutex mtx;
+    bool isRecorderInitialized = false;
+    int64_t v_pts=3000;
+    int64_t v_dts=3000;
+
+    int64_t a_pts=960;
+    int64_t a_dts=960;
+
+    int vid = 1;
+    std::shared_ptr<PushAVClipRecorder> recorder = nullptr;
 
 private:
     // Dummy implementation to indicate if video can be sent
-    bool mCanSendVideo = true;
+    bool mCanSendVideo = false;
 
     // Dummy implementation to indicate if audio can be sent
-    bool mCanSendAudio = true;
+    bool mCanSendAudio = false;
 
 };

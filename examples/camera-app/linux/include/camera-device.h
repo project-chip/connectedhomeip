@@ -226,7 +226,7 @@ private:
     // Various cluster server delegates
     ChimeManager mChimeManager;
     WebRTCProviderManager mWebRTCProviderManager;
-    PushAVTransportManager mPushAVTransportManager;
+    PushAvStreamTransportManager mPushAVTransportManager;
 
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManager mCameraAVStreamManager;
     chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAVSettingsUserLevelManager mCameraAVSettingsUserLevelManager;

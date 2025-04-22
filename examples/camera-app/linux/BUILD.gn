@@ -26,6 +26,9 @@ config("config") {
     "-Wconversion",
     "-Wno-shadow",
     "-Wno-error",
+    "-Wno-sign-compare",
+    "-Wno-conversion",
+    "-Wno-format-overflow",
   ]
 
   include_dirs = [
@@ -53,10 +56,20 @@ pkg_config("gstreamer") {
   ]
 }
 
+pkg_config("ffmpeg") {
+  packages = [
+    "libavformat",
+    "libavcodec",
+    "libavutil",
+  ]
+}
+
 executable("chip-camera-app") {
   configs += [ ":config" ]
 
   configs += [ ":gstreamer" ]
+  configs += [ ":ffmpeg" ]
+  libs = ["curl"]
 
   sources = [
     "${chip_root}/examples/camera-app/linux/include/media-controller/default-media-controller.h",
@@ -65,6 +78,7 @@ executable("chip-camera-app") {
     "${chip_root}/examples/camera-app/linux/src/clusters/camera-avstream-mgmt/camera-av-stream-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/clusters/push_av_transport/push-av-transport-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/clusters/chime/chime-manager.cpp",
+    "${chip_root}/examples/camera-app/linux/src/pushav-clip-recorder.cpp",
     "${chip_root}/examples/camera-app/linux/src/clusters/webrtc_provider/webrtc-provider-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/media-controller/default-media-controller.cpp",
     "${chip_root}/examples/camera-app/linux/src/network-stream-source/network-stream-source.cpp",

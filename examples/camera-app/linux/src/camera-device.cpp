@@ -65,6 +65,9 @@ CameraDevice::CameraDevice()
     mWebRTCProviderManager.SetMediaController(&mMediaController);
 
     mCameraAVSettingsUserLevelManager.SetCameraDeviceHAL(this);
+
+    // Set the CameraHALInterface in PushAVTransportManager.
+    mPushAVTransportManager.Init(&mMediaController);
 }
 
 CameraDevice::~CameraDevice()

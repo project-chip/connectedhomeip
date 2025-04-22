@@ -19,7 +19,7 @@
 #pragma once
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-server.h>
 #include <transport/pushav-transport.h>
-
+#include "media-controller.h"
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
@@ -35,54 +35,58 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::PushAvStreamTransport;
 
-using MetadataOptionsStruct                   = Structs::MetadataOptionsStruct::Type;
-using CMAFContainerOptionsStruct              = Structs::CMAFContainerOptionsStruct::Type;
-using ContainerOptionsStruct                  = Structs::ContainerOptionsStruct::Type;
-using TransportZoneOptionsStruct              = Structs::TransportZoneOptionsStruct::Type;
-using TransportTriggerOptionsStruct           = Structs::TransportTriggerOptionsStruct::Type;
-using TransportMotionTriggerTimeControlStruct = Structs::TransportMotionTriggerTimeControlStruct::Type;
-using TransportOptionsStruct                  = Structs::TransportOptionsStruct::DecodableType;
-using TransportConfigurationStruct            = Structs::TransportConfigurationStruct::Type;
-
 namespace Camera {
 
-class PushAVTransportManager : public app::Clusters::PushAvStreamTransport::PushAvStreamTransportDelegate
+struct PushAvStream
+{
+    uint16_t id;
+    TransportConfigurationStruct transportConfig;
+};
+
+class PushAvStreamTransportManager : public app::Clusters::PushAvStreamTransport::PushAvStreamTransportDelegate
 {
 public:
-    PushAVTransportManager() { std::fill_n(Transports, MAX_PUSH_TRANSPORT_CONNECTION_ID, nullptr); }
+    PushAvStreamTransportManager() { std::fill_n(Transports, MAX_PUSH_TRANSPORT_CONNECTION_ID, nullptr); }
 
-    ~PushAVTransportManager() {}
+    ~PushAvStreamTransportManager() {}
 
-    Protocols::InteractionModel::Status AllocatePushTransport(uint16_t connectionID,
-                                                              const TransportOptionsStruct & transportOptions,
-                                                              TransportStatusEnum & outTransportStatus) override;
+    Protocols::InteractionModel::Status AllocatePushTransport(const TransportOptionsDecodeableStruct & transportOptions,
+                                                              TransportConfigurationStruct & outTransporConfiguration) override;
 
     Protocols::InteractionModel::Status DeallocatePushTransport(const uint16_t connectionID) override;
 
     Protocols::InteractionModel::Status ModifyPushTransport(const uint16_t connectionID,
-                                                            const TransportOptionsStruct & outTransportOptions) override;
+                                                            const TransportOptionsDecodeableStruct & transportOptions) override;
 
-    Protocols::InteractionModel::Status SetTransportStatus(const uint16_t connectionID,
-                                                           TransportStatusEnum transportStatus) override;
+    Protocols::InteractionModel::Status SetTransportStatus(const std::vector<uint16_t> connectionIDList, TransportStatusEnum transportStatus) override;
 
     Protocols::InteractionModel::Status
     ManuallyTriggerTransport(const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
-                             const TransportMotionTriggerTimeControlStruct & timeControl) override;
+                             const Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> & timeControl) override;
 
     Protocols::InteractionModel::Status
     FindTransport(const Optional<DataModel::Nullable<uint16_t>> & connectionID,
-                  DataModel::List<TransportConfigurationStruct> & outtransportConfigurations) override;
+                  DataModel::List<const TransportConfigurationStruct> & outtransportConfigurations) override;
+
+    CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage,
+                                   const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                                   const Optional<DataModel::Nullable<uint16_t>> & audioStreamId);
 
     void OnAttributeChanged(AttributeId attributeId) override;
 
-    CHIP_ERROR LoadCurrentConnections(std::vector<uint16_t> & currentConnections) override;
+    CHIP_ERROR LoadCurrentConnections(std::vector<TransportConfigurationStruct> & currentConnections) override;
 
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
+    void Init(MediaController * aMediaController);
+
 private:
+    std::vector<PushAvStream> pushavStreams;
+    std::vector<TransportConfigurationStruct> configList;
     PushAVTransport * Transports[MAX_PUSH_TRANSPORT_CONNECTION_ID];                         // map for the transport objects
     std::optional<TransportOptionsStruct> ConnectionsMap[MAX_PUSH_TRANSPORT_CONNECTION_ID]; // map for the transport options
     std::vector<uint16_t> mCurrentConnections;
+    MediaController * mMediaController = nullptr;
 };
 
 } // namespace Camera

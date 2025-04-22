@@ -16,153 +16,145 @@
  *    limitations under the License.
  */
 
-#include "push-av-transport-manager.h"
-
-#include <app-common/zap-generated/cluster-enums.h>
-#include <app/server/Server.h>
-#include <controller/InvokeInteraction.h>
-#include <lib/support/logging/CHIPLogging.h>
-
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-server.h>
+#include <fstream>
 #include <iostream>
-
-#define MAX_PUSH_TRANSPORT_CONNECTION_ID 65535
+#include <lib/support/logging/CHIPLogging.h>
+#include <push-av-transport-manager.h>
+#include <pushav-transport.h>
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::PushAvStreamTransport;
-
-using Status = Protocols::InteractionModel::Status;
-
+using chip::Protocols::InteractionModel::Status;
 using namespace Camera;
 
-Protocols::InteractionModel::Status PushAVTransportManager::AllocatePushTransport(uint16_t connectionID,
-                                                                                  const TransportOptionsStruct & transportOptions,
-                                                                                  TransportStatusEnum & outTransportStatus)
+Protocols::InteractionModel::Status
+PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsDecodeableStruct & transportOptions,
+                                                    TransportConfigurationStruct & outTransporConfiguration)
 {
-    ChipLogProgress(NotSpecified, "AllocatePushTransport manager called");
+    PushAvStream stream{ outTransporConfiguration.connectionID, outTransporConfiguration };
 
-    // check if avpush-transport already exists. if not, create a new avpush-transport
-    if (Transports[connectionID] != nullptr || ConnectionsMap[connectionID].has_value())
-    {
-        return Status::ConstraintError;
-    }
-    else
-    {
-        Transports[connectionID]                        = new PushAVTransport(connectionID, 1);
-        Transports[connectionID]->TransportStatus       = true;
-        Transports[connectionID]->mTransportTriggerType = transportOptions.triggerOptions.triggerType;
-        ConnectionsMap[connectionID]                    = transportOptions;
-        outTransportStatus                              = TransportStatusEnum::kActive;
-    }
+    /*Store the allocated stream persistently*/
+    pushavStreams.push_back(stream);
+    Transports[outTransporConfiguration.connectionID] = new PushAVTransport(outTransporConfiguration.connectionID,
+		                                           1);
+    mMediaController->RegisterTransport(Transports[outTransporConfiguration.connectionID], 1, 0/*videoStreamID, audioStreamID*/);
 
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status PushAVTransportManager::DeallocatePushTransport(const uint16_t connectionID)
+Protocols::InteractionModel::Status PushAvStreamTransportManager::DeallocatePushTransport(const uint16_t connectionID)
 {
-    ChipLogProgress(NotSpecified, "DeallocatePushTransport manager called");
-
-    // check if transport exists and not streaming. If so, delete transport. Otherwise, return error.
-    if (Transports[connectionID] == nullptr || !ConnectionsMap[connectionID].has_value())
-    {
-        return Status::NotFound;
-    }
-    else
-    {
-        Transports[connectionID]->~PushAVTransport();
-        Transports[connectionID] = nullptr;
-        ConnectionsMap[connectionID].reset();
-    }
-
+    pushavStreams.erase(std::remove_if(pushavStreams.begin(), pushavStreams.end(),
+                                       [connectionID](const PushAvStream & stream) { return stream.id == connectionID; }),
+                        pushavStreams.end());
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status PushAVTransportManager::ModifyPushTransport(const uint16_t connectionID,
-                                                                                const TransportOptionsStruct & outTransportOptions)
+Protocols::InteractionModel::Status
+PushAvStreamTransportManager::ModifyPushTransport(const uint16_t connectionID,
+                                                  const TransportOptionsDecodeableStruct & transportOptions)
 {
-    ChipLogProgress(NotSpecified, "ModifyPushTransport manager called");
-
-    // check if transport exists and not streaming. If so, modify transport. Otherwise, return error.
-    if (Transports[connectionID] == nullptr || !ConnectionsMap[connectionID].has_value())
+    for (PushAvStream & stream : pushavStreams)
     {
-        return Status::NotFound;
-    }
-    else
-    {
-        Transports[connectionID]->mTransportTriggerType = outTransportOptions.triggerOptions.triggerType;
-    }
-
-    return Status::Success;
-}
-
-Protocols::InteractionModel::Status PushAVTransportManager::SetTransportStatus(const uint16_t connectionID,
-                                                                               TransportStatusEnum transportStatus)
-{
-    // TODO: Implement allocation logic
-    ChipLogProgress(NotSpecified, "SetTransportStatus manager called");
-
-    // check if transport exists. If so, set the transport status as specified to the transport object attribute. Otherwise, return
-    // error.
-    if (Transports[connectionID] == nullptr || !ConnectionsMap[connectionID].has_value())
-    {
-        return Status::NotFound;
-    }
-    else
-    {
-        if (transportStatus == TransportStatusEnum::kActive)
+        if (stream.id == connectionID)
         {
-            Transports[connectionID]->TransportStatus = true;
+            ChipLogError(Zcl, "Modified Push AV Stream with ID: %d", connectionID);
+            return Status::Success;
         }
-        else if (transportStatus == TransportStatusEnum::kInactive)
+    }
+    ChipLogError(Zcl, "Allocated Push AV Stream with ID: %d not found", connectionID);
+    return Status::NotFound;
+}
+
+Protocols::InteractionModel::Status PushAvStreamTransportManager::SetTransportStatus(const std::vector<uint16_t> connectionIDList,
+                                                                                     TransportStatusEnum transportStatus)
+{
+    for (PushAvStream & stream : pushavStreams)
+    {
+        for(uint16_t connectionID : connectionIDList)
         {
-            Transports[connectionID]->TransportStatus = false;
-        }
-        else
-        {
-            return Status::ConstraintError; // invalid status value passed in. Return error.
+            if (stream.id == connectionID)
+            {
+                stream.transportConfig.transportStatus = transportStatus;
+                ChipLogError(Zcl, "Set Transport Status for Push AV Stream with ID: %d", connectionID);
+
+            }
+            else
+            {
+                return Status::NotFound;
+            }
         }
     }
     return Status::Success;
 }
 
 Protocols::InteractionModel::Status
-PushAVTransportManager::ManuallyTriggerTransport(const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
-                                                 const TransportMotionTriggerTimeControlStruct & timeControl)
+    PushAvStreamTransportManager::ManuallyTriggerTransport(const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
+                             const Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> & timeControl)
 {
-    // TODO: Implement triggering logic
-    ChipLogProgress(NotSpecified, "ManuallyTriggerTransport manager called");
-    return Status::UnsupportedCluster;
+    // TODO: Validates the requested stream usage against the camera's resource management and stream priority policies.
+    return Status::Success;
 }
 
 Protocols::InteractionModel::Status
-PushAVTransportManager::FindTransport(const Optional<DataModel::Nullable<uint16_t>> & connectionID,
-                                      DataModel::List<TransportConfigurationStruct> & outtransportConfigurations)
+    PushAvStreamTransportManager::FindTransport(const Optional<DataModel::Nullable<uint16_t>> & connectionID,
+                  DataModel::List<const TransportConfigurationStruct> & outtransportConfigurations)
 {
-    // TODO: Implement allocation logic
-    ChipLogProgress(NotSpecified, "FindTransport manager called");
-    return Status::UnsupportedCluster;
-}
-
-void PushAVTransportManager::OnAttributeChanged(AttributeId attributeId)
-{
-    // TODO: Implement attribute change logic
-}
-
-CHIP_ERROR PushAVTransportManager::LoadCurrentConnections(std::vector<uint16_t> & currentConnections)
-{
-    ChipLogError(Zcl, "LoadCurrentConnections called");
-    mCurrentConnections = currentConnections;
-    for (auto it : mCurrentConnections)
+    configList.clear();
+    for (PushAvStream & stream : pushavStreams)
     {
-        Transports[it] = new PushAVTransport(it, 1);
-        // TODO: complete implementation required
+        if (connectionID.Value().IsNull())
+        {
+            configList.push_back(stream.transportConfig);
+        }
+        else if (connectionID.Value().Value() == stream.id)
+        {
+            configList.push_back(stream.transportConfig);
+
+        }
     }
+    outtransportConfigurations = DataModel::List<const TransportConfigurationStruct>(configList.data(),configList.size());
+    return Status::Success;
+}
+
+CHIP_ERROR
+PushAvStreamTransportManager::ValidateStreamUsage(StreamUsageEnum streamUsage,
+                                                  const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                                                  const Optional<DataModel::Nullable<uint16_t>> & audioStreamId)
+{
+    // TODO: Validates the requested stream usage against the camera's resource management and stream priority policies.
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PushAVTransportManager::PersistentAttributesLoadedCallback()
+void PushAvStreamTransportManager::OnAttributeChanged(AttributeId attributeId)
 {
-    ChipLogError(Zcl, "PersistentAttributesLoadedCallback called");
+    ChipLogProgress(Zcl, "Attribute changed for AttributeId = " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
+}
+
+void PushAvStreamTransportManager::Init(MediaController * mediaController)
+{
+    mMediaController = mediaController;
+    return;
+}
+
+CHIP_ERROR PushAvStreamTransportManager::LoadCurrentConnections(std::vector<TransportConfigurationStruct> & currentConnections)
+{
+    ChipLogError(Zcl, "Push AV Current Connections loaded");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+PushAvStreamTransportManager::PersistentAttributesLoadedCallback()
+{
+    ChipLogError(Zcl, "Persistent attributes loaded");
+
     return CHIP_NO_ERROR;
 }

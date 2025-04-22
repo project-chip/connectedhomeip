@@ -76,7 +76,6 @@ void PushAVUploader::upload_data(std::pair<std::string, std::string> data) {
         ChipLogError(Camera, "Failed to initialize CURL");
         return;
     }
-
     curl_mime *form;
     curl_mimepart *field;
     struct curl_slist *header;
