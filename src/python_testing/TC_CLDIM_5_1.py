@@ -195,7 +195,7 @@ class TC_CLDIM_5_1(MatterBaseTest):
             asserts.fail("Expected InvalidAction error, but command succeeded")
 
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.InvalidInState, "Unexpected status returned")
+            asserts.assert_equal(e.status, Status.InvalidAction, "Unexpected status returned")
 
         # STEP 6b: Send C_SET_TARGET command while latched
         self.step("6b")
@@ -208,7 +208,7 @@ class TC_CLDIM_5_1(MatterBaseTest):
             asserts.fail("Expected InvalidAction error, but command succeeded")
 
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.InvalidInState, "Unexpected status returned")
+            asserts.assert_equal(e.status, Status.InvalidAction, "Unexpected status returned")
 
         # STEP 7a: Send SetTarget command with Latch=False
         self.step("7a")
