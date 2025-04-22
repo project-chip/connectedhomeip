@@ -26,13 +26,19 @@ pw_python_package("matter_idl") {
     "setup.cfg",
     "pyproject.toml",
   ]
-  inputs = matter_idl_generator_templates
+
+  inputs = []
+  inputs += matter_idl_generator_templates
   inputs += [
     # Dependency grammar
     "matter/idl/matter_grammar.lark",
 
     # Marker file to indicate to mypy that matter_idl is type-annotated
     "matter/idl/py.typed",
+
+    # IDL plugin example used by test
+    "examples/matter_idl_plugin/__init__.py",
+    "examples/matter_idl_plugin/matter_cluster_proto.jinja",
 
     # Unit test data
     "matter/idl/tests/available_tests.yaml",

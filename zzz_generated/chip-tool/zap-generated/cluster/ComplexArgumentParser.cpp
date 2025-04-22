@@ -4598,7 +4598,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ClosureControl::Struct
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::ClosureDimension::Structs::CurrentStruct::Type & request,
+                                        chip::app::Clusters::ClosureDimension::Structs::CurrentStateStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -4614,12 +4614,12 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     }
     valueCopy.removeMember("position");
 
-    if (value.isMember("latching"))
+    if (value.isMember("latch"))
     {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "latching");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.latching, value["latching"]));
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "latch");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.latch, value["latch"]));
     }
-    valueCopy.removeMember("latching");
+    valueCopy.removeMember("latch");
 
     if (value.isMember("speed"))
     {
@@ -4631,10 +4631,10 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::ClosureDimension::Structs::CurrentStruct::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::ClosureDimension::Structs::CurrentStateStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.position);
-    ComplexArgumentParser::Finalize(request.latching);
+    ComplexArgumentParser::Finalize(request.latch);
     ComplexArgumentParser::Finalize(request.speed);
 }
 

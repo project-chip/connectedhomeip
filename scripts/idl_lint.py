@@ -20,15 +20,8 @@ import sys
 import click
 import coloredlogs
 
-try:
-    from matter.idl import matter_idl_parser
-except ImportError:
-    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'py_matter_idl')))
-    from matter.idl import matter_idl_parser
-
-# isort: off
 import matter.idl.lint
-
+from matter.idl import matter_idl_parser
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants

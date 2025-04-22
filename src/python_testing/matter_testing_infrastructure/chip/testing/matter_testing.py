@@ -867,6 +867,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.is_commissioning = False
         # The named pipe name must be set in the derived classes
         self.app_pipe = None
+        self.cached_steps: dict[str, list[TestStep]] = {}
 
     def get_test_steps(self, test: str) -> list[TestStep]:
         ''' Retrieves the test step list for the given test
@@ -884,8 +885,13 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def get_defined_test_steps(self, test: str) -> Optional[list[TestStep]]:
         steps_name = f'steps_{test.removeprefix("test_")}'
+        if test in self.cached_steps:
+            return self.cached_steps[test]
+
         try:
             fn = getattr(self, steps_name)
+            steps = fn()
+            self.cached_steps[test] = steps
             return fn()
         except AttributeError:
             return None
