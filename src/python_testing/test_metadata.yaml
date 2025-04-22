@@ -8,6 +8,8 @@ not_automated:
           network commissioning cluster does not return expected values on linux
           example apps -
           https://github.com/project-chip/connectedhomeip/issues/37824
+    - name: TC_CNET_4_1.py
+      reason: Required commissioning not implemented on CI
     - name: TC_CNET_4_4.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_DGGEN_3_2.py
