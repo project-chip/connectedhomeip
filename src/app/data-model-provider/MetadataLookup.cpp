@@ -56,7 +56,7 @@ std::optional<AttributeEntry> AttributeFinder::Find(const ConcreteAttributePath 
 
     for (auto & attributeEntry : mAttributes)
     {
-        if (attributeEntry.attributeId == path.mAttributeId)
+        if (attributeEntry.GetAttributeId() == path.mAttributeId)
         {
             return attributeEntry;
         }

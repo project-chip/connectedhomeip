@@ -22,6 +22,12 @@
 #include <access/Privilege.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
+#include <lib/support/TypeTraits.h>
+
+#define StartBitFieldInit                                                                                                          \
+    _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\"")                                              \
+        _Pragma("GCC diagnostic ignored \"-Wnarrowing\"")
+#define EndBitFieldInit _Pragma("GCC diagnostic pop")
 
 namespace chip {
 namespace app {
@@ -61,42 +67,73 @@ enum class ClusterQualityFlags : uint32_t
 struct ServerClusterEntry
 {
     ClusterId clusterId;
-    DataVersion dataVersion; // current cluster data version,
+    DataVersion dataVersion; // current cluster data version
     BitFlags<ClusterQualityFlags> flags;
 };
 
 struct ClusterInfo
 {
-    DataVersion dataVersion; // current cluster data version,
-    BitFlags<ClusterQualityFlags> flags;
-
     /// Constructor that marks data version as mandatory
     /// for this structure.
     ClusterInfo(DataVersion version) : dataVersion(version) {}
+    DataVersion dataVersion; // current cluster data version,
+    // This cannot be compressed
+    BitFlags<ClusterQualityFlags> flags;
 };
 
 enum class AttributeQualityFlags : uint32_t
 {
+
     kListAttribute   = 0x0004, // This attribute is a list attribute
     kFabricScoped    = 0x0008, // 'F' quality on attributes
     kFabricSensitive = 0x0010, // 'S' quality on attributes
     kChangesOmitted  = 0x0020, // `C` quality on attributes
     kTimed           = 0x0040, // `T` quality on attributes (writes require timed interactions)
 };
+// We need 5 bits to handle it or 7 keeping the 2 zeroes
+// kListAttribute   = 0b0000100
+// kFabricScoped    = 0b0001000
+// kFabricSensitive = 0b0010000
+// kChangesOmitted  = 0b0100000
+// kTimed           = 0b1000000
 
 struct AttributeEntry
 {
-    AttributeId attributeId;
-    BitFlags<AttributeQualityFlags> flags;
 
-    // read/write access will be missing if read/write is NOT allowed
-    //
-    // NOTE: this should be compacted for size
-    std::optional<Access::Privilege> readPrivilege;  // generally defaults to View if readable
-    std::optional<Access::Privilege> writePrivilege; // generally defaults to Operate if writable
+    StartBitFieldInit // Keep constructor the same
+        constexpr AttributeEntry(AttributeId attributeId, BitFlags<AttributeQualityFlags> flags,
+                                 std::optional<Access::Privilege> readPrivilege  = Access::Privilege::kView,
+                                 std::optional<Access::Privilege> writePrivilege = Access::Privilege::kOperate) :
+        attributeId_{ attributeId }, flags_{ flags.Raw() },
+        readPrivilege_{ !readPrivilege ? 0 : chip::to_underlying(readPrivilege.value()) },
+        writePrivilege_{ !writePrivilege ? 0 : chip::to_underlying(writePrivilege.value()) }
+    {}
+    EndBitFieldInit;
+
+    constexpr AttributeId GetAttributeId() const { return attributeId_; }
+    constexpr BitFlags<AttributeQualityFlags> GetAttributeQualityFlags() const { return BitFlags<AttributeQualityFlags>{ flags_ }; }
+    constexpr std::optional<Access::Privilege> GetReadPrivilege() const
+    {
+        if (!readPrivilege_)
+            return std::nullopt;
+        return static_cast<Access::Privilege>(readPrivilege_);
+    }
+    constexpr std::optional<Access::Privilege> GetWritePrivilege() const
+    {
+        if (!writePrivilege_)
+            return std::nullopt;
+        return static_cast<Access::Privilege>(writePrivilege_);
+    }
+
+private:
+    AttributeId attributeId_;
+    std::underlying_type_t<AttributeQualityFlags> flags_;
+    std::underlying_type_t<Access::Privilege> readPrivilege_;
+    std::underlying_type_t<Access::Privilege> writePrivilege_;
 };
 
 // Bitmask values for different Command qualities.
+// We need 3 bits for this one
 enum class CommandQualityFlags : uint32_t
 {
     kFabricScoped = 0x0001,
@@ -106,12 +143,23 @@ enum class CommandQualityFlags : uint32_t
 
 struct AcceptedCommandEntry
 {
-    CommandId commandId;
+    StartBitFieldInit;
+    // Lets keep the interface the same
+    constexpr AcceptedCommandEntry(CommandId commandId = 0, BitFlags<CommandQualityFlags> flags = {},
+                                   Access::Privilege invokePrivilege = Access::Privilege::kOperate) :
+        commandId_{ commandId }, flags_{ flags.Raw() }, privilege_{ chip::to_underlying(invokePrivilege) }
+    {}
+    EndBitFieldInit;
+    constexpr CommandId GetCommandId() const { return commandId_; };
+    constexpr BitFlags<CommandQualityFlags> GetCommandQualityFlags() const { return BitFlags<CommandQualityFlags>(flags_); }
+    constexpr Access::Privilege GetInvokePrivilege() const { return static_cast<Access::Privilege>(flags_); }
 
-    // TODO: this can be more compact (use some flags for privilege)
-    //       to make this compact, add a compact enum and make flags/invokePrivilege getters (to still be type safe)
-    BitFlags<CommandQualityFlags> flags;
-    Access::Privilege invokePrivilege = Access::Privilege::kOperate;
+private:
+    // AcceptedCommandEntry will be 32bit aligned
+    CommandId commandId_;
+    std::underlying_type_t<CommandQualityFlags> flags_ : 3;
+    std::underlying_type_t<Access::Privilege> privilege_ : 5;
+    // There are still 24bits here
 };
 
 /// Represents a device type that resides on an endpoint

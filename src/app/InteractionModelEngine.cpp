@@ -130,7 +130,8 @@ bool MayHaveAccessibleEventPath(DataModel::Provider * aProvider, const EventPath
 class AutoReleaseSubscriptionInfoIterator
 {
 public:
-    AutoReleaseSubscriptionInfoIterator(SubscriptionResumptionStorage::SubscriptionInfoIterator * iterator) : mIterator(iterator){};
+    AutoReleaseSubscriptionInfoIterator(SubscriptionResumptionStorage::SubscriptionInfoIterator * iterator) :
+        mIterator(iterator) {};
     ~AutoReleaseSubscriptionInfoIterator() { mIterator->Release(); }
 
     SubscriptionResumptionStorage::SubscriptionInfoIterator * operator->() const { return mIterator; }
@@ -1765,7 +1766,7 @@ void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, 
 Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBeDispatched(const DataModel::InvokeRequest & request)
 {
 
-    DataModel::AcceptedCommandEntry acceptedCommandEntry;
+    DataModel::AcceptedCommandEntry acceptedCommandEntry{};
 
     Status status = CheckCommandExistence(request.path, acceptedCommandEntry);
 
@@ -1795,7 +1796,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(c
                                      .requestType = Access::RequestType::kCommandInvokeRequest,
                                      .entityId    = aRequest.path.mCommandId };
 
-    CHIP_ERROR err = Access::GetAccessControl().Check(*aRequest.subjectDescriptor, requestPath, entry.invokePrivilege);
+    CHIP_ERROR err = Access::GetAccessControl().Check(*aRequest.subjectDescriptor, requestPath, entry.GetInvokePrivilege());
     if (err != CHIP_NO_ERROR)
     {
         if ((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL))
@@ -1811,8 +1812,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(c
 Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(const DataModel::InvokeRequest & aRequest,
                                                                               const DataModel::AcceptedCommandEntry & entry)
 {
-    const bool commandNeedsTimedInvoke = entry.flags.Has(DataModel::CommandQualityFlags::kTimed);
-    const bool commandIsFabricScoped   = entry.flags.Has(DataModel::CommandQualityFlags::kFabricScoped);
+    const bool commandNeedsTimedInvoke = entry.GetCommandQualityFlags().Has(DataModel::CommandQualityFlags::kTimed);
+    const bool commandIsFabricScoped   = entry.GetCommandQualityFlags().Has(DataModel::CommandQualityFlags::kFabricScoped);
 
     if (commandIsFabricScoped)
     {
@@ -1834,7 +1835,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(co
 
     // Command that is marked as having a large payload must be sent over a
     // session that supports it.
-    if (entry.flags.Has(DataModel::CommandQualityFlags::kLargeMessage) &&
+    if (entry.GetCommandQualityFlags().Has(DataModel::CommandQualityFlags::kLargeMessage) &&
         !CurrentExchange()->GetSessionHandle()->AllowsLargePayload())
     {
         return Status::InvalidTransportType;
@@ -1852,7 +1853,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandExistenc
     (void) provider->AcceptedCommands(aCommandPath, acceptedCommands);
     for (auto & existing : acceptedCommands.TakeBuffer())
     {
-        if (existing.commandId == aCommandPath.mCommandId)
+        if (existing.GetCommandId() == aCommandPath.mCommandId)
         {
             entry = existing;
             return Protocols::InteractionModel::Status::Success;

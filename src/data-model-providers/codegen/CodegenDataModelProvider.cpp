@@ -57,17 +57,16 @@ namespace {
 DataModel::AcceptedCommandEntry AcceptedCommandEntryFor(const ConcreteCommandPath & path)
 {
     const CommandId commandId = path.mCommandId;
-
-    DataModel::AcceptedCommandEntry entry;
-
-    entry.commandId       = path.mCommandId;
-    entry.invokePrivilege = RequiredPrivilege::ForInvokeCommand(path);
-    entry.flags.Set(DataModel::CommandQualityFlags::kTimed, CommandNeedsTimedInvoke(path.mClusterId, commandId));
-    entry.flags.Set(DataModel::CommandQualityFlags::kFabricScoped, CommandIsFabricScoped(path.mClusterId, commandId));
-    entry.flags.Set(DataModel::CommandQualityFlags::kLargeMessage, CommandHasLargePayload(path.mClusterId, commandId));
-
-    return entry;
-}
+    return DataModel::AcceptedCommandEntry{
+        /*commandId*/ commandId,
+        /*flags*/
+        BitFlags<DataModel::CommandQualityFlags>{}
+            .Set(DataModel::CommandQualityFlags::kTimed, CommandNeedsTimedInvoke(path.mClusterId, commandId))
+            .Set(DataModel::CommandQualityFlags::kFabricScoped, CommandIsFabricScoped(path.mClusterId, commandId))
+            .Set(DataModel::CommandQualityFlags::kLargeMessage, CommandHasLargePayload(path.mClusterId, commandId)),
+        /*invokePrivilege*/ RequiredPrivilege::ForInvokeCommand(path)
+    };
+} // namespace
 
 DataModel::ServerClusterEntry ServerClusterEntryFrom(EndpointId endpointId, const EmberAfCluster & cluster)
 {
@@ -97,19 +96,8 @@ DataModel::ServerClusterEntry ServerClusterEntryFrom(EndpointId endpointId, cons
 
 DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & clusterPath, const EmberAfAttributeMetadata & attribute)
 {
-    DataModel::AttributeEntry entry;
 
     const ConcreteAttributePath attributePath(clusterPath.mEndpointId, clusterPath.mClusterId, attribute.attributeId);
-
-    entry.attributeId   = attribute.attributeId;
-    entry.readPrivilege = RequiredPrivilege::ForReadAttribute(attributePath);
-    if (!attribute.IsReadOnly())
-    {
-        entry.writePrivilege = RequiredPrivilege::ForWriteAttribute(attributePath);
-    }
-
-    entry.flags.Set(DataModel::AttributeQualityFlags::kListAttribute, (attribute.attributeType == ZCL_ARRAY_ATTRIBUTE_TYPE));
-    entry.flags.Set(DataModel::AttributeQualityFlags::kTimed, attribute.MustUseTimedWrite());
 
     // NOTE: we do NOT provide additional info for:
     //    - IsExternal/IsSingleton/IsAutomaticallyPersisted is not used by IM handling
@@ -121,8 +109,16 @@ DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & cluster
     // entry.flags.Set(DataModel::AttributeQualityFlags::kFabricScoped)
     // entry.flags.Set(DataModel::AttributeQualityFlags::kFabricSensitive)
     // entry.flags.Set(DataModel::AttributeQualityFlags::kChangesOmitted)
-    return entry;
-}
+    return DataModel::AttributeEntry{
+        //
+        attribute.attributeId,
+        BitFlags<DataModel::AttributeQualityFlags>() //
+            .Set(DataModel::AttributeQualityFlags::kListAttribute, (attribute.attributeType == ZCL_ARRAY_ATTRIBUTE_TYPE))
+            .Set(DataModel::AttributeQualityFlags::kTimed, attribute.MustUseTimedWrite()),
+        RequiredPrivilege::ForReadAttribute(attributePath),
+        attribute.IsReadOnly() ? std::make_optional(RequiredPrivilege::ForWriteAttribute(attributePath)) : std::nullopt
+    };
+} // namespace
 
 const ConcreteCommandPath kInvalidCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
 
@@ -377,15 +373,14 @@ CHIP_ERROR CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path
     //   - lists of elements
     //   - read-only, with read privilege view
     //   - fixed value (no such flag exists, so this is not a quality flag we set/track)
-    DataModel::AttributeEntry globalListEntry;
-
-    globalListEntry.readPrivilege = Access::Privilege::kView;
-    globalListEntry.flags.Set(DataModel::AttributeQualityFlags::kListAttribute);
 
     for (auto & attribute : GlobalAttributesNotInMetadata)
     {
-        globalListEntry.attributeId = attribute;
-        ReturnErrorOnFailure(builder.Append(globalListEntry));
+        ReturnErrorOnFailure(
+            builder.Append(DataModel::AttributeEntry{ /*attributeId*/ attribute,
+                                                      /*flags*/ DataModel::AttributeQualityFlags::kListAttribute, //
+                                                      /*ReadPrivilege*/ Access::Privilege::kView,                 //
+                                                      /*WritePrivilege*/ std::nullopt }));
     }
 
     return CHIP_NO_ERROR;
