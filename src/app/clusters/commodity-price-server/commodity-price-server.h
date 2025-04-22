@@ -94,9 +94,8 @@ public:
     CHIP_ERROR SetCurrentPrice(const DataModel::Nullable<Structs::CommodityPriceStruct::Type>);
     CHIP_ERROR SetForecast(const DataModel::List<const Structs::CommodityPriceStruct::Type> &);
 
-    // Send Price Change & ForecastChange events
+    // Send Price Change events
     Status SendPriceChangeEvent();
-    Status SendForecastChangeEvent();
 
 private:
     Delegate & mDelegate;

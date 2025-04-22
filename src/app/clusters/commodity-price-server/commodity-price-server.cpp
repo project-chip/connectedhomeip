@@ -441,44 +441,7 @@ CHIP_ERROR Instance::SetForecast(const DataModel::List<const Structs::CommodityP
 
     MatterReportingAttributeChangeCallback(mEndpointId, CommodityPrice::Id, PriceForecast::Id);
 
-    // generate a ForecastChange Event
-    SendForecastChangeEvent();
-
     return CHIP_NO_ERROR;
-}
-
-Status Instance::SendForecastChangeEvent()
-{
-
-    CHIP_ERROR err;
-    chip::Platform::ScopedMemoryBuffer<Structs::CommodityPriceStruct::Type> forecastBuffer;
-    DataModel::List<const Structs::CommodityPriceStruct::Type> forecastList;
-
-    Events::ForecastChange::Type event;
-    EventNumber eventNumber;
-
-    /*
-     * The Event's PriceForecast must not include .description or .components
-     * call our function to copy the PriceForecast attribute without these
-     */
-    if (!forecastBuffer.Calloc(kMaxForecastEntries))
-    {
-        ChipLogError(AppServer, "Memory allocation failed for forecast buffer") return Status::ResourceExhausted;
-    }
-
-    err = GetDetailedForecastRequest(0, forecastBuffer, kMaxForecastEntries, forecastList, true, false);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, Status::Failure);
-
-    event.priceForecast = forecastList;
-
-    err = LogEvent(event, mEndpointId, eventNumber);
-
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogError(AppServer, "Unable to send notify event: %" CHIP_ERROR_FORMAT, err.Format());
-        return Status::Failure;
-    }
-    return Status::Success;
 }
 
 } // namespace CommodityPrice
