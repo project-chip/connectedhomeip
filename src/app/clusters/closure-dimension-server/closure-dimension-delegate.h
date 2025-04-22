@@ -63,6 +63,8 @@ public:
      */
     virtual Protocols::InteractionModel::Status HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
                                                            const Optional<Globals::ThreeLevelAutoEnum> & speed) = 0;
+    
+    virtual bool IsManualLatchingNeeded() = 0;
 };
 
 } // namespace ClosureDimension
