@@ -33,14 +33,6 @@ limitations under the License.
     <item name="Outdoor" value="0x1"/>
     <item name="IndoorOutdoor" value="0x2"/>
   </enum>
-  <enum name="NetworkRecoveryReasonEnum" type="enum8">
-    <cluster code="0x0030"/>
-    <item name="Unspecified" value="0x0"/>
-    <item name="Route" value="0x1"/>
-    <item name="ICD" value="0x2"/>
-    <item name="Auth" value="0x3"/>
-    <item name="Visibility" value="0x4"/>
-  </enum>
   <struct name="BasicCommissioningInfo">
     <cluster code="0x0030"/>
     <item fieldId="0" name="FailSafeExpiryLengthSeconds" type="int16u"/>
@@ -54,12 +46,6 @@ limitations under the License.
     <description>This cluster is used to manage global aspects of the Commissioning flow.</description>
     <features>
       <feature bit="0" code="TC" name="TermsAndConditions" summary="Supports Terms and Conditions acknowledgement" apiMaturity="provisional">
-        <otherwiseConform>
-          <provisionalConform/>
-          <optionalConform/>
-        </otherwiseConform>
-      </feature>
-      <feature bit="1" code="NR" name="NetworkRecovery" summary="Supports Network Recovery" apiMaturity="provisional">
         <otherwiseConform>
           <provisionalConform/>
           <optionalConform/>
@@ -125,24 +111,6 @@ limitations under the License.
         <provisionalConform/>
         <mandatoryConform>
           <feature name="TC"/>
-        </mandatoryConform>
-      </otherwiseConform>
-    </attribute>
-    <attribute side="server" code="0x0B" name="RecoveryIdentifier" define="RECOVERY_IDENTIFIER" type="octet_string" length="8" writable="false" optional="true" apiMaturity="provisional">
-      <access op="read" privilege="manage"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="NR"/>
-        </mandatoryConform>
-      </otherwiseConform>
-    </attribute>
-    <attribute side="server" code="0x0C" name="NetworkRecoveryReason" define="NETWORK_RECOVERY_REASON" type="NetworkRecoveryReasonEnum" writable="false" optional="true" isNullable="true" apiMaturity="provisional">
-      <access op="read" privilege="manage"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="NR"/>
         </mandatoryConform>
       </otherwiseConform>
     </attribute>

@@ -143,7 +143,6 @@ struct ChipBLEDeviceIdentificationInfo
  */
 struct ChipBLENetworkRecoveryInfo
 {
-    constexpr static uint64_t kRecoveryIdentifierMask       = 0x0;
     constexpr static uint8_t kPrimaryReasonMask             = 0x0f;
     constexpr static uint8_t kAdditionalDataFlagMask        = 0x1;
     constexpr static uint8_t kAdvertisementVersionMask      = 0xf0;
@@ -155,13 +154,17 @@ struct ChipBLENetworkRecoveryInfo
     uint8_t RecoveryIdentifier[8];
     uint8_t AdditionalDataFlag;
 
-    void Init() { memset(this, 0, sizeof(*this)); }
+    void Init()
+    {
+        memset(this, 0, sizeof(*this));
+        OpCode = 1;
+    }
 
-    uint64_t GetRecoveryIdentifier() const { return chip::Encoding::LittleEndian::Get64(RecoveryIdentifier); }
+    uint64_t GetRecoveryIdentifier() const { return chip::Encoding::BigEndian::Get64(RecoveryIdentifier); }
 
     void SetRecoveryIdentifier(uint64_t recoveryIdentifier)
     {
-        chip::Encoding::LittleEndian::Put64(RecoveryIdentifier, recoveryIdentifier);
+        chip::Encoding::BigEndian::Put64(RecoveryIdentifier, recoveryIdentifier);
     }
 
     uint8_t GetAdvertisementVersion() const
@@ -179,7 +182,7 @@ struct ChipBLENetworkRecoveryInfo
             static_cast<uint8_t>((advertisementVersion << kAdvertisementVersionShiftBits) & kAdvertisementVersionMask);
     }
 
-    uint16_t GetPrimaryReason() const { return PrimaryReasonAndAdvVersion & kPrimaryReasonMask; }
+    uint8_t GetPrimaryReason() const { return PrimaryReasonAndAdvVersion & kPrimaryReasonMask; }
 
     void SetPrimaryReason(uint8_t reason)
     {
