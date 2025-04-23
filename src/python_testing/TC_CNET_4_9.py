@@ -273,6 +273,7 @@ class TC_CNET_4_9(MatterBaseTest):
         asserts.assert_equal(result.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
                              "Should have received network ok status")
 
+
         # TH reads Networks attribute from the DUT 
         self.step(20)
         networks = await self.read_single_attribute_check_success(cluster=Clusters.NetworkCommissioning, attribute=Clusters.NetworkCommissioning.Attributes.Networks)
