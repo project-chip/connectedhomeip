@@ -76,7 +76,7 @@ public:
     CHIP_ERROR SetForecastConditions(const DataModel::List<const Structs::ElectricalGridConditionsStruct::Type> &);
 
     // Send CurrentConditionsChanged events
-    chip::Protocols::InteractionModel::Status GenerateCurrentConditionsChangedEvent();
+    Protocols::InteractionModel::Status GenerateCurrentConditionsChangedEvent();
 
 private:
     Delegate & mDelegate;
