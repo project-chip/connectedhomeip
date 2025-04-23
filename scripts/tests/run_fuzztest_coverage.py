@@ -1,4 +1,21 @@
+#!/usr/bin/env -S python3 -B
+
+# Copyright (c) 2025 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import enum
+import glob
 import logging
 import os
 import re
@@ -30,17 +47,24 @@ class FuzzTestContext:
     run_mode: Optional[FuzzTestMode] = None
 
 
-def extract_build_target_name(binary_path):
-    """Extract build directory name (target name) from the path by finding directory right above 'chip_pw_fuzztest' """
+FUZZTEST_TOOLCHAIN_MARKER_DIR = "chip_pw_fuzztest"
+FUZZTEST_BIN_PATTERN = f"{FUZZTEST_TOOLCHAIN_MARKER_DIR}/tests/*"
+
+
+def get_build_target_from_fuzztest_path(binary_path):
+    """Extract build directory name (target name) from the given binary path, by using FUZZTEST_TOOLCHAIN_MARKER_DIR as a reference point.
+
+    This assumes the binary was built using the Pigweed FuzzTest toolchain, which GN places in a dedicated subdirectory with the toolchain name 'chip_pw_fuzztest' (as it is a secondary toolchain).
+    The build target is always the parent directory of 'chip_pw_fuzztest'.
+ """
     path_directories = binary_path.split(os.sep)
-    build_target_name = ""
 
-    for i, directory in enumerate(path_directories):
-        if directory == "chip_pw_fuzztest" and i > 0:
-            build_target_name = path_directories[i-1]
-            break
+    for parent, child in zip(path_directories, path_directories[1:]):
+        if child == FUZZTEST_TOOLCHAIN_MARKER_DIR:
+            return parent
 
-    return build_target_name
+    raise ValueError(
+        f"Could not deduce build target name: '{FUZZTEST_TOOLCHAIN_MARKER_DIR}' is not found in binary path: '{binary_path}'")
 
 
 def list_fuzz_test_binaries():
@@ -51,10 +75,9 @@ def list_fuzz_test_binaries():
         return []
 
     fuzz_tests = []
-    for root, _, files in os.walk(build_dir):
-        for file in files:
-            if file.startswith("fuzz-") and os.access(os.path.join(root, file), os.X_OK) and "chip_pw_fuzztest" in root.split(os.sep):
-                fuzz_tests.append(os.path.join(root, file))
+    for file in glob.glob(f"{build_dir}/**/{FUZZTEST_BIN_PATTERN}", recursive=True):
+        if os.access(file, os.X_OK):
+            fuzz_tests.append(file)
     return fuzz_tests
 
 
@@ -221,8 +244,8 @@ def run_script_in_interactive_mode():
     context = FuzzTestContext(
         fuzz_test_binary_path=selected_fuzz,
         fuzz_test_binary_name=selected_fuzz.split(os.sep)[-1],
-        build_target_name=extract_build_target_name(selected_fuzz),
-        is_coverage_instrumented="-coverage" in extract_build_target_name(selected_fuzz)
+        build_target_name=get_build_target_from_fuzztest_path(selected_fuzz),
+        is_coverage_instrumented="-coverage" in get_build_target_from_fuzztest_path(selected_fuzz)
     )
 
     if not context.is_coverage_instrumented:
@@ -265,8 +288,8 @@ def run_script_in_normal_mode(fuzz_test, test_case, list_test_cases, help):
         logging.info("\nAVAILABLE FUZZTEST BINARIES in 'out' directory (each Binary can have multiple FUZZ_TESTs/TestCases): \n")
         previous_build_target_dir = ""
         for test in fuzz_tests:
-            build_target_dir = extract_build_target_name(test)
-            if (build_target_dir != previous_build_target_dir):
+            build_target_dir = get_build_target_from_fuzztest_path(test)
+            if build_target_dir != previous_build_target_dir:
                 is_coverage_build = "-coverage" in build_target_dir
                 if is_coverage_build:
                     logging.info("\n----------- Coverage-instrumented FuzzTests -----------\n")
@@ -281,8 +304,8 @@ def run_script_in_normal_mode(fuzz_test, test_case, list_test_cases, help):
     context = FuzzTestContext(
         fuzz_test_binary_path=fuzz_test,
         fuzz_test_binary_name=fuzz_test.split(os.sep)[-1],
-        build_target_name=extract_build_target_name(fuzz_test),
-        is_coverage_instrumented="-coverage" in extract_build_target_name(fuzz_test)
+        build_target_name=get_build_target_from_fuzztest_path(fuzz_test),
+        is_coverage_instrumented="-coverage" in get_build_target_from_fuzztest_path(fuzz_test)
     )
 
     if not context.is_coverage_instrumented:
