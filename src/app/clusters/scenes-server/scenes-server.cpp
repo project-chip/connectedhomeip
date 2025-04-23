@@ -328,13 +328,13 @@ CHIP_ERROR ScenesServer::Init()
     // Prevents re-initializing
     VerifyOrReturnError(!mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
 
-    ReturnErrorOnFailure(chip::app::CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
+    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
     mGroupProvider = Credentials::GetGroupDataProvider();
 
     SceneTable * sceneTable = scenes::GetSceneTableImpl();
-    ReturnErrorOnFailure(sceneTable->Init(&chip::Server::GetInstance().GetPersistentStorage()));
-    ReturnErrorOnFailure(chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&gFabricDelegate));
+    ReturnErrorOnFailure(sceneTable->Init(&Server::GetInstance().GetPersistentStorage()));
+    ReturnErrorOnFailure(Server::GetInstance().GetFabricTable().AddFabricDelegate(&gFabricDelegate));
 
     mIsInitialized = true;
     return CHIP_NO_ERROR;
@@ -342,9 +342,9 @@ CHIP_ERROR ScenesServer::Init()
 
 void ScenesServer::Shutdown()
 {
-    chip::Server::GetInstance().GetFabricTable().RemoveFabricDelegate(&gFabricDelegate);
-    chip::app::CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
-    chip::app::AttributeAccessInterfaceRegistry::Instance().Unregister(this);
+    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(&gFabricDelegate);
+    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 
     mGroupProvider = nullptr;
     mIsInitialized = false;
