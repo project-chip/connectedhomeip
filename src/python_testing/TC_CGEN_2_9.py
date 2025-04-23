@@ -43,6 +43,7 @@ from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_bod
 from mobly import asserts
 import logging
 
+
 class TC_CGEN_2_9(MatterBaseTest):
 
     async def remove_commissioner_fabric(self):
