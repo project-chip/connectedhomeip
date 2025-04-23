@@ -323,15 +323,15 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
 
         return updated_fabrics, updated_nocs
 
-    def desc_TC_OPCREDS_3_9(self):
-        return "[DUTServer] Pre-release TC-OPCREDS-3.9 test case."
+    def desc_TC_OPCREDS_3_8(self):
+        return "[DUTServer] Pre-release TC-OPCREDS-3.8 test case."
 
-    def steps_TC_OPCREDS_3_9(self) -> list[TestStep]:
+    def steps_TC_OPCREDS_3_8(self) -> list[TestStep]:
         try:
             self.current_step_id = 0
             self.is_aggregating_steps = True
             self.aggregated_steps = []
-            self.test_TC_OPCREDS_3_9()
+            self.test_TC_OPCREDS_3_8()
         finally:
             self.is_aggregating_steps = False
 
@@ -339,7 +339,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
         return self.aggregated_steps
 
     @async_test_body
-    async def test_TC_OPCREDS_3_9(self):
+    async def test_TC_OPCREDS_3_8(self):
         # TODO(test_plans#5046): actually make the test follow final test plan. For now
         # it functionally validates the VID Verification parts of Operational Credentials Cluster
 
