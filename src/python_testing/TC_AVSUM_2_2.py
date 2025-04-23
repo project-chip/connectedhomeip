@@ -61,17 +61,17 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
             TestStep(4, "Create a valid value for a Pan, set via MPTZSetPosition command. Verify success response."),
             TestStep(5, "Read MPTZPosition. Verify the Pan value is that set in Step 4."),
             TestStep(6, "Create an invalid value for a Pan, set via MPTZSetPosition command. Verify failure response."),
-            TestStep(7, "Read MPTZPosition. Verify the Pan value is that set in Step 4."),           
+            TestStep(7, "Read MPTZPosition. Verify the Pan value is that set in Step 4."),
             TestStep(8, "If Tilt is supported, read and verify TiltMin and TiltMax attributes. If not skip to step 13"),
             TestStep(9, "Create a valid value for a Tilt, set via MPTZSetPosition command. Verify success response."),
-            TestStep(10,"Read MPTZPosition. Verify the Tilt value is that set in Step 9."),
-            TestStep(11,"Create an invalid value for a Tilt, set via MPTZSetPosition command. Verify failure response."),
-            TestStep(12,"Read MPTZPosition. Verify the Tilt value is that set in Step 9."),    
-            TestStep(13,"If Zoom is supported, read and verify the ZoomMax attribute."),
-            TestStep(14,"Create a valid value for Zoom, set via MPTZSetPosition command. Verify success response."),
-            TestStep(15,"Read MPTZPosition. Verify the Zoom value is that set in Step 14."),
-            TestStep(16,"Create an invalid value for a Zoom, set via MPTZSetPosition command. Verify failure response."),
-            TestStep(17,"Read MPTZPosition. Verify the Tilt value is that set in Step 14."),    
+            TestStep(10, "Read MPTZPosition. Verify the Tilt value is that set in Step 9."),
+            TestStep(11, "Create an invalid value for a Tilt, set via MPTZSetPosition command. Verify failure response."),
+            TestStep(12, "Read MPTZPosition. Verify the Tilt value is that set in Step 9."),
+            TestStep(13, "If Zoom is supported, read and verify the ZoomMax attribute."),
+            TestStep(14, "Create a valid value for Zoom, set via MPTZSetPosition command. Verify success response."),
+            TestStep(15, "Read MPTZPosition. Verify the Zoom value is that set in Step 14."),
+            TestStep(16, "Create an invalid value for a Zoom, set via MPTZSetPosition command. Verify failure response."),
+            TestStep(17, "Read MPTZPosition. Verify the Tilt value is that set in Step 14."),
         ]
         return steps
 
@@ -147,8 +147,8 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
             self.skip_step(3)
             self.skip_step(4)
             self.skip_step(5)
-            self.skip_step(6)     
-            self.skip_step(7)      
+            self.skip_step(6)
+            self.skip_step(7)
 
         if self.has_feature_mtilt:
             self.step(8)
@@ -192,8 +192,8 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
             self.skip_step(8)
             self.skip_step(9)
             self.skip_step(10)
-            self.skip_step(11)     
-            self.skip_step(12)    
+            self.skip_step(11)
+            self.skip_step(12)
 
         if self.has_feature_mzoom:
             self.step(13)
@@ -231,8 +231,8 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
             self.skip_step(13)
             self.skip_step(14)
             self.skip_step(15)
-            self.skip_step(16)     
-            self.skip_step(17)  
+            self.skip_step(16)
+            self.skip_step(17)
 
 
 if __name__ == "__main__":
