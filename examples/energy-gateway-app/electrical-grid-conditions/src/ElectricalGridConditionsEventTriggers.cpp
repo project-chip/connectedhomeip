@@ -110,7 +110,7 @@ void SetTestEventTrigger_ForecastConditionsUpdate()
 
     // Create list from the static array
     DataModel::List<Structs::ElectricalGridConditionsStruct::Type> forecastList(
-        chip::Span<Structs::ElectricalGridConditionsStruct::Type>(sForecastEntries, kForecastSize));
+        Span<Structs::ElectricalGridConditionsStruct::Type>(sForecastEntries, kForecastSize));
 
     inst->SetForecastConditions(forecastList); // Should now be safe: all memory lives long enough
 }

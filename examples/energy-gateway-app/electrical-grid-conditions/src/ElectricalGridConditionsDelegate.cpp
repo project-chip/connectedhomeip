@@ -28,8 +28,6 @@ using namespace chip::app::Clusters::ElectricalGridConditions;
 using namespace chip::app::Clusters::ElectricalGridConditions::Attributes;
 using namespace chip::app::Clusters::ElectricalGridConditions::Structs;
 
-using chip::Protocols::InteractionModel::Status;
-
 CHIP_ERROR ElectricalGridConditionsInstance::Init()
 {
     return Instance::Init();

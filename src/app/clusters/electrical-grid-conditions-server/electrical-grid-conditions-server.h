@@ -52,8 +52,6 @@ protected:
     EndpointId mEndpointId = 0;
 };
 
-using chip::Protocols::InteractionModel::Status;
-
 class Instance : public AttributeAccessInterface
 {
 public:
@@ -77,9 +75,8 @@ public:
     CHIP_ERROR SetCurrentConditions(DataModel::Nullable<Structs::ElectricalGridConditionsStruct::Type>);
     CHIP_ERROR SetForecastConditions(const DataModel::List<const Structs::ElectricalGridConditionsStruct::Type> &);
 
-    // Send CurrentConditionsChanged & ForecastConditionsChanged events
-    Status SendCurrentConditionsChangedEvent();
-    Status SendForecastConditionsChangedEvent();
+    // Send CurrentConditionsChanged events
+    chip::Protocols::InteractionModel::Status GenerateCurrentConditionsChangedEvent();
 
 private:
     Delegate & mDelegate;

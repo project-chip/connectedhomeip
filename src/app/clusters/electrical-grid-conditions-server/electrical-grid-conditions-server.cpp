@@ -118,11 +118,11 @@ CHIP_ERROR Instance::SetLocalGenerationAvailable(DataModel::Nullable<bool> newVa
     {
         if (newValue.IsNull())
         {
-            ChipLogDetail(AppServer, "mLocalGenerationAvailable updated to Null");
+            ChipLogDetail(AppServer, "Endpoint %d - mLocalGenerationAvailable updated to Null", mEndpointId);
         }
         else
         {
-            ChipLogDetail(AppServer, "mLocalGenerationAvailable updated to %d",
+            ChipLogDetail(AppServer, "Endpoint %d - mLocalGenerationAvailable updated to %d", mEndpointId,
                           static_cast<int>(mLocalGenerationAvailable.Value()));
         }
 
@@ -154,30 +154,27 @@ CHIP_ERROR Instance::SetCurrentConditions(DataModel::Nullable<Structs::Electrica
     }
 
     mCurrentConditions = newValue;
-    ChipLogDetail(AppServer, "mCurrentConditions updated");
+    ChipLogDetail(AppServer, "Endpoint %d - mCurrentConditions updated", mEndpointId);
     MatterReportingAttributeChangeCallback(mEndpointId, ElectricalGridConditions::Id, CurrentConditions::Id);
 
     // generate a CurrentConditionsChanged Event
-    SendCurrentConditionsChangedEvent();
+    GenerateCurrentConditionsChangedEvent();
 
     return CHIP_NO_ERROR;
 }
 
-Status Instance::SendCurrentConditionsChangedEvent()
+Status Instance::GenerateCurrentConditionsChangedEvent()
 {
-
-    CHIP_ERROR err;
 
     Events::CurrentConditionsChanged::Type event;
     EventNumber eventNumber;
 
-    // TODO - see spec issue #11578 if this should be included?
     event.currentConditions = mCurrentConditions;
 
-    err = LogEvent(event, mEndpointId, eventNumber);
+    CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
     if (CHIP_NO_ERROR != err)
     {
-        ChipLogError(AppServer, "Unable to send notify event: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(AppServer, "Endpoint %d - Unable to send notify event: %" CHIP_ERROR_FORMAT, mEndpointId, err.Format());
         return Status::Failure;
     }
     return Status::Success;
@@ -187,35 +184,11 @@ CHIP_ERROR Instance::SetForecastConditions(const DataModel::List<const Structs::
 {
     mForecastConditions = newValue;
 
-    ChipLogDetail(AppServer, "mForecastConditions updated");
+    ChipLogDetail(AppServer, "Endpoint %d - mForecastConditions updated", mEndpointId);
 
     MatterReportingAttributeChangeCallback(mEndpointId, ElectricalGridConditions::Id, ForecastConditions::Id);
 
-    // generate a ForecastConditionsChanged Event
-    SendForecastConditionsChangedEvent();
-
     return CHIP_NO_ERROR;
-}
-
-Status Instance::SendForecastConditionsChangedEvent()
-{
-
-    CHIP_ERROR err;
-    Events::ForecastConditionsChanged::Type event;
-    EventNumber eventNumber;
-
-    // TODO don't include forecastConditions into event since this is duplicating
-    // the Attribute and doesn't fit anyway without some packet size estimation logic
-    // See spec issue #11578
-    // event.forecastConditions = mForecastConditions;
-
-    err = LogEvent(event, mEndpointId, eventNumber);
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogError(AppServer, "Unable to send notify event: %" CHIP_ERROR_FORMAT, err.Format());
-        return Status::Failure;
-    }
-    return Status::Success;
 }
 
 } // namespace ElectricalGridConditions

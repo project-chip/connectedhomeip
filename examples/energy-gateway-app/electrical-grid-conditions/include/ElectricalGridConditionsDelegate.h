@@ -26,8 +26,6 @@ namespace app {
 namespace Clusters {
 namespace ElectricalGridConditions {
 
-using chip::Protocols::InteractionModel::Status;
-
 class ElectricalGridConditionsDelegate : public ElectricalGridConditions::Delegate
 {
 public:
