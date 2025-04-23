@@ -257,7 +257,7 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
         break;
     case Status::PathsExhausted:
         description = NSLocalizedString(@"The receiver has insufficient resources to support the "
-                                         "specified number of paths in the request.",
+                                         "number of paths specified in the request.",
             nil);
         break;
     case Status::TimedRequestMismatch:
