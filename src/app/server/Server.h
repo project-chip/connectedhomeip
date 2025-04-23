@@ -71,6 +71,9 @@
 #include <app/TimerDelegates.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <transport/raw/UDP.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+#include <transport/raw/NFC.h>
+#endif
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDManager.h> // nogncheck
@@ -111,6 +114,10 @@ using ServerTransportMgr = chip::TransportMgr<chip::Transport::UDP
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
                                               ,
                                               chip::Transport::WiFiPAFBase
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+                                              ,
+                                              chip::Transport::NFC
 #endif
                                               >;
 

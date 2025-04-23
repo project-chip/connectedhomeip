@@ -124,6 +124,13 @@ public:
         kWiFiAPState_Deactivating,
     };
 
+    enum CHIPoNFCServiceMode
+    {
+        kCHIPoNFCServiceMode_NotSupported = 0,
+        kCHIPoNFCServiceMode_Enabled      = 1,
+        kCHIPoNFCServiceMode_Disabled     = 2,
+    };
+
     enum CHIPoBLEServiceMode
     {
         kCHIPoBLEServiceMode_NotSupported = 0,

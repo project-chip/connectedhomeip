@@ -8,7 +8,7 @@ python3 third_party/android_deps/set_up_android_deps.py
 third_party/java_deps/set_up_java_deps.sh
 
 # Generating android-arm64-chip-tool
-gn gen --check --fail-on-unused-args {out}/android-arm64-chip-tool '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_build_controller_dynamic_server=true '
+gn gen --check --fail-on-unused-args {out}/android-arm64-chip-tool '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_enable_nfc_based_commissioning=true chip_build_controller_dynamic_server=true '
 
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'

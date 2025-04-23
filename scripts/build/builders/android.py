@@ -98,6 +98,7 @@ class AndroidApp(Enum):
         elif self == AndroidApp.VIRTUAL_DEVICE_APP:
             gn_args["chip_config_network_layer_ble"] = True
         elif self == AndroidApp.CHIP_TOOL:
+            gn_args["chip_enable_nfc_based_commissioning"] = True
             gn_args["chip_build_controller_dynamic_server"] = True
         return gn_args
 
