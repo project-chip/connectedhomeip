@@ -75,6 +75,7 @@ class TC_ACL_2_6(MatterBaseTest):
         cfi_attribute = oc_cluster.Attributes.CurrentFabricIndex
         f1 = await self.read_single_attribute_check_success(endpoint=0, cluster=oc_cluster, attribute=cfi_attribute)
 
+        # Created new follow-up task here: https://github.com/project-chip/matter-test-scripts/issues/548
         self.step(3)
         acec_event = Clusters.AccessControl.Events.AccessControlEntryChanged
         events_response = await self.th1.ReadEvent(
@@ -82,35 +83,28 @@ class TC_ACL_2_6(MatterBaseTest):
             events=[(0, acec_event)],
             fabricFiltered=True
         )
+        logging.info(f"Events response: {events_response}")
+        expected_event = Clusters.AccessControl.Events.AccessControlEntryChanged(
+            adminNodeID=NullValue,
+            adminPasscodeID=0,
+            changeType=Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
+            latestValue=Clusters.AccessControl.Structs.AccessControlEntryStruct(
+                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+                subjects=[self.th1.nodeId],
+                targets=NullValue,
+                fabricIndex=f1
+            ),
+            fabricIndex=f1
+        )
+
         asserts.assert_equal(len(events_response), 1, "Expected 1 event")
-
-        found_initial_event = False
-        for event_data in events_response:
-            logging.info(f"Examining initial event {str(event_data)}")
-
-            if hasattr(event_data, 'Data') and hasattr(event_data.Data, 'changeType'):
-                if (event_data.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and
-                    event_data.Data.adminNodeID is NullValue and
-                    event_data.Data.adminPasscodeID == 0 and
-                    event_data.Data.fabricIndex == f1 and
-                        hasattr(event_data.Data, 'latestValue')):
-
-                    latest_value = event_data.Data.latestValue
-                    # Check for initial admin entry created during commissioning
-                    if (latest_value.privilege == Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister and
-                        latest_value.authMode == Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase and
-                        self.th1.nodeId in latest_value.subjects and
-                        latest_value.targets is NullValue and
-                            latest_value.fabricIndex == f1):
-                        found_initial_event = True
-                        logging.info("Found initial admin ACL entry event")
-                        break
-
-        logging.info(f"Initial event search result Found: {found_initial_event}")
-        asserts.assert_true(found_initial_event, "Did not find expected initial ACL event")
-
-        # Add a small delay before reading events again
-        await asyncio.sleep(5)
+        found = False
+        for event in events_response:
+            if event.Data == expected_event:
+                found = True
+                break
+        asserts.assert_true(found, "Expected event not found in response")
 
         event_path = [(self.matter_test_config.endpoint, acec_event, 1)]
         initial_events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
@@ -124,12 +118,14 @@ class TC_ACL_2_6(MatterBaseTest):
                 authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
                 subjects=[self.th1.nodeId],
                 targets=NullValue,
+                fabricIndex=f1
             ),
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
                 privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
                 authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
                 subjects=[self.th1.nodeId],
                 targets=NullValue,
+                fabricIndex=f1
             )
         ]
 
@@ -139,8 +135,6 @@ class TC_ACL_2_6(MatterBaseTest):
             [(0, acl_attr(value=acl_entries))]
         )
         asserts.assert_equal(result[0].Status, Status.Success, "Write should have succeeded")
-
-        await asyncio.sleep(1)
 
         self.step(5)
         # Create correct event path with endpoint 0
@@ -155,42 +149,14 @@ class TC_ACL_2_6(MatterBaseTest):
         logging.info(f"Event response length: {len(events_response2)}")
         asserts.assert_true(len(events_response2) == 2, "Expected 2 events")
 
-        found_view_entry = False
-        found_changed_entry = False
-
-        for event_data in events_response2:
-            logging.info(f"Examining event {str(event_data)}")
-            # Check for changed admin entry (first event)
-            if (event_data.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged and
-                event_data.Data.adminNodeID == self.th1.nodeId and
-                event_data.Data.adminPasscodeID is NullValue and
-                    hasattr(event_data.Data, 'latestValue')):
-
-                latest_value = event_data.Data.latestValue
-                if (latest_value.privilege == Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister and
-                    latest_value.authMode == Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase and
-                    self.th1.nodeId in latest_value.subjects and
-                        latest_value.targets is NullValue):
-                    found_changed_entry = True
-                    logging.info("Found changed admin ACL entry event")
-
-            # Check for added view entry (second event)
-            elif (event_data.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and
-                    event_data.Data.adminNodeID == self.th1.nodeId and
-                    event_data.Data.adminPasscodeID is NullValue and
-                    hasattr(event_data.Data, 'latestValue')):
-
-                latest_value = event_data.Data.latestValue
-                if (latest_value.privilege == Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView and
-                    latest_value.authMode == Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase and
-                    self.th1.nodeId in latest_value.subjects and
-                        latest_value.targets is NullValue):
-                    found_view_entry = True
-                    logging.info("Found view ACL entry event")
-
-        asserts.assert_true(found_changed_entry, "Did not find changed admin ACL entry event")
-        asserts.assert_true(found_view_entry, "Did not find view ACL entry event")
-        asserts.assert_true(len(events_response2) == 2, f"Expected 2 events, found {len(events_response2)}")
+        # Check if both ACL entries are present in the events' latestValue field
+        for acl_entry in acl_entries:
+            found = False
+            for event in events_response2:
+                if event.Data.latestValue == acl_entry:
+                    found = True
+                    break
+            asserts.assert_true(found, f"Expected ACL entry not found in events: {acl_entry}")
 
         self.step(6)
         # Write invalid ACL attribute
@@ -204,7 +170,7 @@ class TC_ACL_2_6(MatterBaseTest):
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
                 privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
                 authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kGroup,
-                subjects=[0],  # Invalid group ID
+                subjects=[0],
                 targets=NullValue,
             )
         ]
@@ -217,7 +183,7 @@ class TC_ACL_2_6(MatterBaseTest):
 
         self.step(7)
         # Read AccessControlEntryChanged event again
-        events_response = await self.th1.ReadEvent(
+        events_response3 = await self.th1.ReadEvent(
             self.dut_node_id,
             events=[(0, acec_event)],
             fabricFiltered=True
