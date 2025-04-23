@@ -21,7 +21,7 @@ from chip.clusters import Attribute
 from chip.testing.conformance import conformance_allowed
 from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
 from chip.testing.spec_parsing import (PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types,
-                                       parse_single_device_type)
+                                       get_superset_lines, parse_single_device_type)
 from chip.tlv import uint
 from fake_device_builder import create_minimal_dt
 from jinja2 import Template
@@ -306,6 +306,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         for d in self.xml_device_types.values():
             if d.superset_of_str:
                 print(f'{d.name}: {d.superset_of_str} {d.superset_of}')
+        get_superset_lines(self.xml_device_types)
 
 
 if __name__ == "__main__":
