@@ -47,7 +47,7 @@ void SetDelegate(EndpointId endpointId, OTAProviderDelegate * delegate)
         ChipLogError(AppServer, "Cannot set OTA provider for endpoint %d: not a valid OTA provider endpoint.", endpointId);
         return;
     }
-    gOtaProviderLogic.SetDelegate(delegate);
+    gOtaProviderLogic->SetDelegate(delegate);
 }
 
 } // namespace chip::app::Clusters::OTAProvider
@@ -110,7 +110,7 @@ namespace app {
             QueryImage::DecodableType commandData;
             err = DataModel::Decode(aReader, commandData);
             if (err == CHIP_NO_ERROR) {
-                result = gOtaProviderLogic.QueryImage(aPath, commandData, aCommandObj);
+                result = gOtaProviderLogic->QueryImage(aPath, commandData, aCommandObj);
             }
             break;
         }
@@ -118,7 +118,7 @@ namespace app {
             ApplyUpdateRequest::DecodableType commandData;
             err = DataModel::Decode(aReader, commandData);
             if (err == CHIP_NO_ERROR) {
-                result = gOtaProviderLogic.ApplyUpdateRequest(aPath, commandData, aCommandObj);
+                result = gOtaProviderLogic->ApplyUpdateRequest(aPath, commandData, aCommandObj);
             }
             break;
         }
@@ -126,7 +126,7 @@ namespace app {
             NotifyUpdateApplied::DecodableType commandData;
             err = DataModel::Decode(aReader, commandData);
             if (err == CHIP_NO_ERROR) {
-                result = gOtaProviderLogic.NotifyUpdateApplied(aPath, commandData, aCommandObj);
+                result = gOtaProviderLogic->NotifyUpdateApplied(aPath, commandData, aCommandObj);
             }
             break;
         }
