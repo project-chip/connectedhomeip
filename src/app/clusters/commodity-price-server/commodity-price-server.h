@@ -36,6 +36,7 @@ namespace CommodityPrice {
 
 // Spec-defined constraints
 constexpr uint8_t kMaxForecastEntries         = 56;
+constexpr uint8_t kMaxDescriptionLength       = 32;
 constexpr uint8_t kMaxComponentsPerPriceEntry = 10;
 
 constexpr uint16_t kMaxCurrencyValue = 999; // From spec
@@ -133,6 +134,23 @@ private:
     // munging to remove one or other elements
     DataModel::Nullable<Structs::CommodityPriceStruct::Type> mCurrentPrice;
     DataModel::List<const Structs::CommodityPriceStruct::Type> mPriceForecast;
+
+    // This is the cluster server's backing store for mCurrentPrice .components and .descriptions
+    Platform::ScopedMemoryBuffer<Structs::CommodityPriceStruct::Type> mOwnedCurrentPriceBuffer;
+    Platform::ScopedMemoryBuffer<Structs::CommodityPriceComponentStruct::Type> mOwnedCurrentPriceComponentBuffer;
+    // each component has an optional Description
+    Platform::ScopedMemoryBuffer<char> mOwnedCurrentPriceComponentDescriptionBuffer[kMaxComponentsPerPriceEntry];
+    Platform::ScopedMemoryBuffer<char> mOwnedCurrentPriceDescriptionBuffer;
+
+    // Helper function that makes a copy of a string into a span
+    CHIP_ERROR CopyStringToSpan(const char * src, Platform::ScopedMemoryBuffer<char> & bufferOut, CharSpan & spanOut);
+
+    // This performs a deep copy into mCurrentPrice so that the caller of the SetCurrentPrice can free its memory
+    CHIP_ERROR CopyPrice(const DataModel::Nullable<Structs::CommodityPriceStruct::Type> & src);
+
+    // This is the cluster server's backing store for mForecast (list of CommodityPriceStructs) each with .components and
+    // .descriptions
+    Platform::ScopedMemoryBuffer<Structs::CommodityPriceStruct::Type> mOwnedForecastBuffer;
 };
 
 } // namespace CommodityPrice

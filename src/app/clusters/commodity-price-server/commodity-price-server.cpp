@@ -383,7 +383,8 @@ CHIP_ERROR Instance::SetCurrentPrice(const DataModel::Nullable<Structs::Commodit
         }
     }
 
-    mCurrentPrice = newValue;
+    // Do a deep copy of the newValue into mCurrentPrice
+    CopyPrice(newValue);
 
     ChipLogDetail(AppServer, "Endpoint: %d - mCurrentPrice updated", mEndpointId);
     MatterReportingAttributeChangeCallback(mEndpointId, CommodityPrice::Id, CurrentPrice::Id);
@@ -391,6 +392,87 @@ CHIP_ERROR Instance::SetCurrentPrice(const DataModel::Nullable<Structs::Commodit
     // generate a PriceChange Event
     GeneratePriceChangeEvent();
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Instance::CopyStringToSpan(const char * src, Platform::ScopedMemoryBuffer<char> & bufferOut, CharSpan & spanOut)
+{
+    size_t len = strlen(src);
+    if (bufferOut.Get() != nullptr)
+    {
+        bufferOut.Free();
+    }
+
+    if (!bufferOut.Calloc(len))
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    memcpy(bufferOut.Get(), src, len);
+    spanOut = CharSpan(bufferOut.Get(), len);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Instance::CopyPrice(const DataModel::Nullable<Structs::CommodityPriceStruct::Type> & src)
+{
+    if (mCurrentPrice.IsNull())
+    {
+        // Check that the buffer for components should be nullptr
+        VerifyOrDie(mOwnedCurrentPriceBuffer.Get() == nullptr);
+    }
+    else
+    {
+        // Free the .components
+        VerifyOrDie(mOwnedCurrentPriceBuffer.Get() != nullptr);
+        mOwnedCurrentPriceComponentBuffer.Free();
+
+        // The .description is held within a ScopedBuffer so the
+        // CopyStringToSpan() will take care of that for us
+    }
+
+    // At this point we should have free'd all previous memory
+    if (src.IsNull())
+    {
+        mCurrentPrice.SetNull();
+    }
+    else
+    {
+        // Do a basic copy of the CommodityPriceStruct trivial fields
+        mCurrentPrice = src;
+
+        // Deep copy description (if present)
+        if (src.Value().description.HasValue())
+        {
+            CharSpan span;
+            CopyStringToSpan(src.Value().description.Value().data(), mOwnedCurrentPriceDescriptionBuffer, span);
+            mCurrentPrice.Value().description.SetValue(span);
+        }
+
+        // Deep copy the .components list (if present)
+        if (src.Value().components.HasValue())
+        {
+            auto & components = src.Value().components.Value();
+            if (!mOwnedCurrentPriceComponentBuffer.Calloc(components.size()))
+            {
+                return CHIP_ERROR_NO_MEMORY;
+            }
+
+            for (size_t i = 0; i < components.size(); i++)
+            {
+                mOwnedCurrentPriceComponentBuffer[i] = components[i];
+
+                // Components have an optional .description
+                if (components[i].description.HasValue())
+                {
+                    CharSpan span;
+                    auto desc = components[i].description.Value();
+                    CopyStringToSpan(desc.data(), mOwnedCurrentPriceComponentDescriptionBuffer[i], span);
+                    mOwnedCurrentPriceComponentBuffer[i].description.SetValue(span);
+                }
+            }
+            mCurrentPrice.Value().components.SetValue(
+                Span<Structs::CommodityPriceComponentStruct::Type>(mOwnedCurrentPriceComponentBuffer.Get(), components.size()));
+        }
+    }
     return CHIP_NO_ERROR;
 }
 
