@@ -174,7 +174,7 @@ class TC_ACL_2_5(MatterBaseTest):
         # Wait for and verify the event
         logging.info("Waiting for AccessControlExtensionChanged event...")
         event_data = events_callback.wait_for_event_report(acec_event, timeout_sec=15)
-        
+
         # Verify event data
         asserts.assert_equal(event_data.changeType,
                              Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged,
@@ -219,8 +219,8 @@ class TC_ACL_2_5(MatterBaseTest):
         logging.info("Reading events after failed write (too long extension)...")
 
         latest_event_num = await self.get_latest_event_number(acec_event)
-        
-        # Try to read events directly   
+
+        # Try to read events directly
         events_response2 = await self.default_controller.ReadEvent(
             self.dut_node_id,
             events=[(0, acec_event)],
