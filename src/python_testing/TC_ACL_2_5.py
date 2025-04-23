@@ -27,6 +27,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --endpoint 0
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
@@ -40,6 +41,11 @@ from mobly import asserts
 
 
 class TC_ACL_2_5(MatterBaseTest):
+    async def get_latest_event_number(self, acec_event: Clusters.AccessControl.Events.AccessControlExtensionChanged) -> int:
+        event_path = [(self.matter_test_config.endpoint, acec_event, 1)]
+        events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
+        return max([e.Header.EventNumber for e in events])
+
     def desc_TC_ACL_2_5(self) -> str:
         return "[TC-ACL-2.5] Cluster endpoint"
 
@@ -49,8 +55,8 @@ class TC_ACL_2_5(MatterBaseTest):
                      is_commissioning=True),
             TestStep(2, "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
                      "Result is SUCCESS, value is a valid index"),
-            TestStep(3, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlExtensionChanged events",
-                     "Result is SUCCESS, value is empty list"),
+            TestStep(3, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlExtensionChanged events and create subscription for new events",
+                     "Result is SUCCESS, value is empty list, new event subscription is created"),
             TestStep(4, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element", "Result is SUCCESS"),
             TestStep(5, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlExtensionChanged events",
                      "Result is SUCCESS, value is list of AccessControlExtensionChanged containing 1 element"),
@@ -92,9 +98,8 @@ class TC_ACL_2_5(MatterBaseTest):
         logging.info(f"Initial events response {str(events_response)}")
 
         # Extract events from the response
-        events = events_response
-        logging.info(f"Found {len(events)} initial events")
-        asserts.assert_equal(len(events), 0, "Expected 0 events")
+        logging.info(f"Found {len(events_response)} initial events")
+        asserts.assert_equal(len(events_response), 0, "Expected 0 events")
 
         # Set up event subscription before making changes
         logging.info("Setting up event subscription...")
@@ -126,7 +131,7 @@ class TC_ACL_2_5(MatterBaseTest):
         event_data = events_callback.wait_for_event_report(acec_event, timeout_sec=15)
 
         # Verify event data
-        logging.info(f"Event data: {event_data}")
+        # Created new follow-up task here: https://github.com/project-chip/matter-test-scripts/issues/547
         asserts.assert_equal(event_data.changeType,
                              Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
                              "Expected Added change type")
@@ -169,7 +174,7 @@ class TC_ACL_2_5(MatterBaseTest):
         # Wait for and verify the event
         logging.info("Waiting for AccessControlExtensionChanged event...")
         event_data = events_callback.wait_for_event_report(acec_event, timeout_sec=15)
-
+        
         # Verify event data
         asserts.assert_equal(event_data.changeType,
                              Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged,
@@ -213,19 +218,20 @@ class TC_ACL_2_5(MatterBaseTest):
         # Verify no event was generated for the failed write
         logging.info("Reading events after failed write (too long extension)...")
 
-        # Try to read events directly
-        events_response = await self.default_controller.ReadEvent(
+        latest_event_num = await self.get_latest_event_number(acec_event)
+        
+        # Try to read events directly   
+        events_response2 = await self.default_controller.ReadEvent(
             self.dut_node_id,
             events=[(0, acec_event)],
             fabricFiltered=True,
-            eventNumberFilter=7
+            eventNumberFilter=latest_event_num + 1
         )
-        logging.info(f"Events response {str(events_response)}")
+        logging.info(f"Events response {str(events_response2)}")
 
         # Extract events from the response
-        events = events_response
-        logging.info(f"Found {len(events)} events")
-        asserts.assert_equal(len(events), 0, "There should be no events found")
+        logging.info(f"Found {len(events_response2)} events")
+        asserts.assert_equal(len(events_response2), 0, "There should be no events found")
 
         self.step(10)
         # This should fail with CONSTRAINT_ERROR
@@ -243,18 +249,19 @@ class TC_ACL_2_5(MatterBaseTest):
         # Verify no event was generated at all, since the whole extensions list was rejected.
         logging.info("Reading events after failed write (multiple extensions)...")
 
-        events_response = await self.default_controller.ReadEvent(
+        latest_event_num2 = await self.get_latest_event_number(acec_event)
+
+        events_response3 = await self.default_controller.ReadEvent(
             self.dut_node_id,
             events=[(0, acec_event)],
             fabricFiltered=True,
-            eventNumberFilter=7
+            eventNumberFilter=latest_event_num2 + 1
         )
-        logging.info(f"Events response {str(events_response)}")
+        logging.info(f"Events response {str(events_response3)}")
 
         # Extract events from the response
-        events = events_response
-        logging.info(f"Found {len(events)} events")
-        asserts.assert_equal(len(events), 0, "There should be no events found")
+        logging.info(f"Found {len(events_response3)} events")
+        asserts.assert_equal(len(events_response3), 0, "There should be no events found")
 
         self.step(12)
         # Write an empty list to clear all extensions
