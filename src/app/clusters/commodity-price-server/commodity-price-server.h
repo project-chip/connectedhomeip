@@ -95,7 +95,7 @@ public:
     CHIP_ERROR SetForecast(const DataModel::List<const Structs::CommodityPriceStruct::Type> &);
 
     // Send Price Change events
-    chip::Protocols::InteractionModel::Status GeneratePriceChangeEvent();
+    Protocols::InteractionModel::Status GeneratePriceChangeEvent();
 
 private:
     Delegate & mDelegate;
