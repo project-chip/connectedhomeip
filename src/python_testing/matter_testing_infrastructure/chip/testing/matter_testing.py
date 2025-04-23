@@ -298,6 +298,7 @@ class AttributeMatcher:
 
     A match is considered as having occurred when the `matches` method returns True for an `AttributeValue` report.
     """
+
     def __init__(self, description: str):
         self._description: str = description
 
