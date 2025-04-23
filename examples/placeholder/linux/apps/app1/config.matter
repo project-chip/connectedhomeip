@@ -254,6 +254,11 @@ struct PowerThresholdStruct {
   nullable PowerThresholdSourceEnum powerThresholdSource = 2;
 }
 
+struct PriceStruct {
+  money amount = 0;
+  CurrencyStruct currency = 1;
+}
+
 struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
@@ -264,11 +269,6 @@ struct LocationDescriptorStruct {
   char_string<128> locationName = 0;
   nullable int16s floorNumber = 1;
   nullable AreaTypeTag areaType = 2;
-}
-
-struct PriceStruct {
-  money amount = 0;
-  CurrencyStruct currency = 1;
 }
 
 struct AtomicAttributeStatusStruct {
@@ -8295,7 +8295,7 @@ cluster ContentLauncher = 1290 {
 
 /** This cluster provides an interface for controlling the Output on a media device such as a TV. */
 cluster AudioOutput = 1291 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum OutputTypeEnum : enum8 {
     kHDMI = 0;
@@ -8334,15 +8334,15 @@ cluster AudioOutput = 1291 {
     char_string name = 1;
   }
 
-  /** Upon receipt, this SHALL change the output on the media device to the output at a specific index in the Output List. */
+  /** Upon receipt, this SHALL change the output on the device to the output at a specific index in the Output List. */
   command SelectOutput(SelectOutputRequest): DefaultSuccess = 0;
-  /** Upon receipt, this SHALL rename the output at a specific index in the Output List. Updates to the output name SHALL appear in the TV settings menus. */
+  /** Upon receipt, this SHALL rename the output at a specific index in the Output List. */
   command access(invoke: manage) RenameOutput(RenameOutputRequest): DefaultSuccess = 1;
 }
 
 /** This cluster provides an interface for controlling the Output on a media device such as a TV. */
 cluster AudioOutput = 1291 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum OutputTypeEnum : enum8 {
     kHDMI = 0;
@@ -8381,9 +8381,9 @@ cluster AudioOutput = 1291 {
     char_string name = 1;
   }
 
-  /** Upon receipt, this SHALL change the output on the media device to the output at a specific index in the Output List. */
+  /** Upon receipt, this SHALL change the output on the device to the output at a specific index in the Output List. */
   command SelectOutput(SelectOutputRequest): DefaultSuccess = 0;
-  /** Upon receipt, this SHALL rename the output at a specific index in the Output List. Updates to the output name SHALL appear in the TV settings menus. */
+  /** Upon receipt, this SHALL rename the output at a specific index in the Output List. */
   command access(invoke: manage) RenameOutput(RenameOutputRequest): DefaultSuccess = 1;
 }
 

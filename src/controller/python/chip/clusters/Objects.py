@@ -497,6 +497,19 @@ class Globals:
             powerThresholdSource: 'typing.Union[Nullable, Globals.Enums.PowerThresholdSourceEnum]' = NullValue
 
         @dataclass
+        class PriceStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="amount", Tag=0, Type=int),
+                        ClusterObjectFieldDescriptor(Label="currency", Tag=1, Type=Globals.Structs.CurrencyStruct),
+                    ])
+
+            amount: 'int' = 0
+            currency: 'Globals.Structs.CurrencyStruct' = field(default_factory=lambda: Globals.Structs.CurrencyStruct())
+
+        @dataclass
         class TestGlobalStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -525,19 +538,6 @@ class Globals:
             locationName: 'str' = ""
             floorNumber: 'typing.Union[Nullable, int]' = NullValue
             areaType: 'typing.Union[Nullable, Globals.Enums.AreaTypeTag]' = NullValue
-
-        @dataclass
-        class PriceStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="amount", Tag=0, Type=int),
-                        ClusterObjectFieldDescriptor(Label="currency", Tag=1, Type=Globals.Structs.CurrencyStruct),
-                    ])
-
-            amount: 'int' = 0
-            currency: 'Globals.Structs.CurrencyStruct' = field(default_factory=lambda: Globals.Structs.CurrencyStruct())
 
         @dataclass
         class AtomicAttributeStatusStruct(ClusterObject):
@@ -23057,15 +23057,13 @@ class CommodityPrice(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="price", Tag=0, Type=typing.Optional[int]),
-                        ClusterObjectFieldDescriptor(Label="priceLevel", Tag=1, Type=typing.Optional[int]),
-                        ClusterObjectFieldDescriptor(Label="source", Tag=2, Type=Globals.Enums.TariffPriceTypeEnum),
-                        ClusterObjectFieldDescriptor(Label="description", Tag=3, Type=typing.Optional[str]),
-                        ClusterObjectFieldDescriptor(Label="tariffComponentID", Tag=4, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="price", Tag=0, Type=int),
+                        ClusterObjectFieldDescriptor(Label="source", Tag=1, Type=Globals.Enums.TariffPriceTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="description", Tag=2, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="tariffComponentID", Tag=3, Type=typing.Optional[uint]),
                     ])
 
-            price: 'typing.Optional[int]' = None
-            priceLevel: 'typing.Optional[int]' = None
+            price: 'int' = 0
             source: 'Globals.Enums.TariffPriceTypeEnum' = 0
             description: 'typing.Optional[str]' = None
             tariffComponentID: 'typing.Optional[uint]' = None
@@ -23078,7 +23076,7 @@ class CommodityPrice(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="periodStart", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="periodEnd", Tag=1, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="price", Tag=2, Type=typing.Optional[Globals.Structs.PriceStruct]),
+                        ClusterObjectFieldDescriptor(Label="price", Tag=2, Type=typing.Optional[int]),
                         ClusterObjectFieldDescriptor(Label="priceLevel", Tag=3, Type=typing.Optional[int]),
                         ClusterObjectFieldDescriptor(Label="description", Tag=4, Type=typing.Optional[str]),
                         ClusterObjectFieldDescriptor(Label="components", Tag=5, Type=typing.Optional[typing.List[CommodityPrice.Structs.CommodityPriceComponentStruct]]),
@@ -23086,7 +23084,7 @@ class CommodityPrice(Cluster):
 
             periodStart: 'uint' = 0
             periodEnd: 'typing.Union[Nullable, uint]' = NullValue
-            price: 'typing.Optional[Globals.Structs.PriceStruct]' = None
+            price: 'typing.Optional[int]' = None
             priceLevel: 'typing.Optional[int]' = None
             description: 'typing.Optional[str]' = None
             components: 'typing.Optional[typing.List[CommodityPrice.Structs.CommodityPriceComponentStruct]]' = None
@@ -37745,7 +37743,7 @@ class CarbonMonoxideConcentrationMeasurement(Cluster):
                 ClusterObjectFieldDescriptor(Label="averageMeasuredValueWindow", Tag=0x00000006, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="uncertainty", Tag=0x00000007, Type=typing.Optional[float32]),
                 ClusterObjectFieldDescriptor(Label="measurementUnit", Tag=0x00000008, Type=typing.Optional[CarbonMonoxideConcentrationMeasurement.Enums.MeasurementUnitEnum]),
-                ClusterObjectFieldDescriptor(Label="measurementMedium", Tag=0x00000009, Type=typing.Optional[CarbonMonoxideConcentrationMeasurement.Enums.MeasurementMediumEnum]),
+                ClusterObjectFieldDescriptor(Label="measurementMedium", Tag=0x00000009, Type=CarbonMonoxideConcentrationMeasurement.Enums.MeasurementMediumEnum),
                 ClusterObjectFieldDescriptor(Label="levelValue", Tag=0x0000000A, Type=typing.Optional[CarbonMonoxideConcentrationMeasurement.Enums.LevelValueEnum]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
@@ -37763,7 +37761,7 @@ class CarbonMonoxideConcentrationMeasurement(Cluster):
     averageMeasuredValueWindow: typing.Optional[uint] = None
     uncertainty: typing.Optional[float32] = None
     measurementUnit: typing.Optional[CarbonMonoxideConcentrationMeasurement.Enums.MeasurementUnitEnum] = None
-    measurementMedium: typing.Optional[CarbonMonoxideConcentrationMeasurement.Enums.MeasurementMediumEnum] = None
+    measurementMedium: CarbonMonoxideConcentrationMeasurement.Enums.MeasurementMediumEnum = 0
     levelValue: typing.Optional[CarbonMonoxideConcentrationMeasurement.Enums.LevelValueEnum] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
@@ -37975,9 +37973,9 @@ class CarbonMonoxideConcentrationMeasurement(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[CarbonMonoxideConcentrationMeasurement.Enums.MeasurementMediumEnum])
+                return ClusterObjectFieldDescriptor(Type=CarbonMonoxideConcentrationMeasurement.Enums.MeasurementMediumEnum)
 
-            value: typing.Optional[CarbonMonoxideConcentrationMeasurement.Enums.MeasurementMediumEnum] = None
+            value: CarbonMonoxideConcentrationMeasurement.Enums.MeasurementMediumEnum = 0
 
         @dataclass
         class LevelValue(ClusterAttributeDescriptor):
@@ -38093,7 +38091,7 @@ class CarbonDioxideConcentrationMeasurement(Cluster):
                 ClusterObjectFieldDescriptor(Label="averageMeasuredValueWindow", Tag=0x00000006, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="uncertainty", Tag=0x00000007, Type=typing.Optional[float32]),
                 ClusterObjectFieldDescriptor(Label="measurementUnit", Tag=0x00000008, Type=typing.Optional[CarbonDioxideConcentrationMeasurement.Enums.MeasurementUnitEnum]),
-                ClusterObjectFieldDescriptor(Label="measurementMedium", Tag=0x00000009, Type=typing.Optional[CarbonDioxideConcentrationMeasurement.Enums.MeasurementMediumEnum]),
+                ClusterObjectFieldDescriptor(Label="measurementMedium", Tag=0x00000009, Type=CarbonDioxideConcentrationMeasurement.Enums.MeasurementMediumEnum),
                 ClusterObjectFieldDescriptor(Label="levelValue", Tag=0x0000000A, Type=typing.Optional[CarbonDioxideConcentrationMeasurement.Enums.LevelValueEnum]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
@@ -38111,7 +38109,7 @@ class CarbonDioxideConcentrationMeasurement(Cluster):
     averageMeasuredValueWindow: typing.Optional[uint] = None
     uncertainty: typing.Optional[float32] = None
     measurementUnit: typing.Optional[CarbonDioxideConcentrationMeasurement.Enums.MeasurementUnitEnum] = None
-    measurementMedium: typing.Optional[CarbonDioxideConcentrationMeasurement.Enums.MeasurementMediumEnum] = None
+    measurementMedium: CarbonDioxideConcentrationMeasurement.Enums.MeasurementMediumEnum = 0
     levelValue: typing.Optional[CarbonDioxideConcentrationMeasurement.Enums.LevelValueEnum] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
@@ -38323,9 +38321,9 @@ class CarbonDioxideConcentrationMeasurement(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[CarbonDioxideConcentrationMeasurement.Enums.MeasurementMediumEnum])
+                return ClusterObjectFieldDescriptor(Type=CarbonDioxideConcentrationMeasurement.Enums.MeasurementMediumEnum)
 
-            value: typing.Optional[CarbonDioxideConcentrationMeasurement.Enums.MeasurementMediumEnum] = None
+            value: CarbonDioxideConcentrationMeasurement.Enums.MeasurementMediumEnum = 0
 
         @dataclass
         class LevelValue(ClusterAttributeDescriptor):
@@ -38441,7 +38439,7 @@ class NitrogenDioxideConcentrationMeasurement(Cluster):
                 ClusterObjectFieldDescriptor(Label="averageMeasuredValueWindow", Tag=0x00000006, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="uncertainty", Tag=0x00000007, Type=typing.Optional[float32]),
                 ClusterObjectFieldDescriptor(Label="measurementUnit", Tag=0x00000008, Type=typing.Optional[NitrogenDioxideConcentrationMeasurement.Enums.MeasurementUnitEnum]),
-                ClusterObjectFieldDescriptor(Label="measurementMedium", Tag=0x00000009, Type=typing.Optional[NitrogenDioxideConcentrationMeasurement.Enums.MeasurementMediumEnum]),
+                ClusterObjectFieldDescriptor(Label="measurementMedium", Tag=0x00000009, Type=NitrogenDioxideConcentrationMeasurement.Enums.MeasurementMediumEnum),
                 ClusterObjectFieldDescriptor(Label="levelValue", Tag=0x0000000A, Type=typing.Optional[NitrogenDioxideConcentrationMeasurement.Enums.LevelValueEnum]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
@@ -38459,7 +38457,7 @@ class NitrogenDioxideConcentrationMeasurement(Cluster):
     averageMeasuredValueWindow: typing.Optional[uint] = None
     uncertainty: typing.Optional[float32] = None
     measurementUnit: typing.Optional[NitrogenDioxideConcentrationMeasurement.Enums.MeasurementUnitEnum] = None
-    measurementMedium: typing.Optional[NitrogenDioxideConcentrationMeasurement.Enums.MeasurementMediumEnum] = None
+    measurementMedium: NitrogenDioxideConcentrationMeasurement.Enums.MeasurementMediumEnum = 0
     levelValue: typing.Optional[NitrogenDioxideConcentrationMeasurement.Enums.LevelValueEnum] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
@@ -38671,9 +38669,9 @@ class NitrogenDioxideConcentrationMeasurement(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[NitrogenDioxideConcentrationMeasurement.Enums.MeasurementMediumEnum])
+                return ClusterObjectFieldDescriptor(Type=NitrogenDioxideConcentrationMeasurement.Enums.MeasurementMediumEnum)
 
-            value: typing.Optional[NitrogenDioxideConcentrationMeasurement.Enums.MeasurementMediumEnum] = None
+            value: NitrogenDioxideConcentrationMeasurement.Enums.MeasurementMediumEnum = 0
 
         @dataclass
         class LevelValue(ClusterAttributeDescriptor):
@@ -38789,7 +38787,7 @@ class OzoneConcentrationMeasurement(Cluster):
                 ClusterObjectFieldDescriptor(Label="averageMeasuredValueWindow", Tag=0x00000006, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="uncertainty", Tag=0x00000007, Type=typing.Optional[float32]),
                 ClusterObjectFieldDescriptor(Label="measurementUnit", Tag=0x00000008, Type=typing.Optional[OzoneConcentrationMeasurement.Enums.MeasurementUnitEnum]),
-                ClusterObjectFieldDescriptor(Label="measurementMedium", Tag=0x00000009, Type=typing.Optional[OzoneConcentrationMeasurement.Enums.MeasurementMediumEnum]),
+                ClusterObjectFieldDescriptor(Label="measurementMedium", Tag=0x00000009, Type=OzoneConcentrationMeasurement.Enums.MeasurementMediumEnum),
                 ClusterObjectFieldDescriptor(Label="levelValue", Tag=0x0000000A, Type=typing.Optional[OzoneConcentrationMeasurement.Enums.LevelValueEnum]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
@@ -38807,7 +38805,7 @@ class OzoneConcentrationMeasurement(Cluster):
     averageMeasuredValueWindow: typing.Optional[uint] = None
     uncertainty: typing.Optional[float32] = None
     measurementUnit: typing.Optional[OzoneConcentrationMeasurement.Enums.MeasurementUnitEnum] = None
-    measurementMedium: typing.Optional[OzoneConcentrationMeasurement.Enums.MeasurementMediumEnum] = None
+    measurementMedium: OzoneConcentrationMeasurement.Enums.MeasurementMediumEnum = 0
     levelValue: typing.Optional[OzoneConcentrationMeasurement.Enums.LevelValueEnum] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
@@ -39019,9 +39017,9 @@ class OzoneConcentrationMeasurement(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[OzoneConcentrationMeasurement.Enums.MeasurementMediumEnum])
+                return ClusterObjectFieldDescriptor(Type=OzoneConcentrationMeasurement.Enums.MeasurementMediumEnum)
 
-            value: typing.Optional[OzoneConcentrationMeasurement.Enums.MeasurementMediumEnum] = None
+            value: OzoneConcentrationMeasurement.Enums.MeasurementMediumEnum = 0
 
         @dataclass
         class LevelValue(ClusterAttributeDescriptor):
@@ -39137,7 +39135,7 @@ class Pm25ConcentrationMeasurement(Cluster):
                 ClusterObjectFieldDescriptor(Label="averageMeasuredValueWindow", Tag=0x00000006, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="uncertainty", Tag=0x00000007, Type=typing.Optional[float32]),
                 ClusterObjectFieldDescriptor(Label="measurementUnit", Tag=0x00000008, Type=typing.Optional[Pm25ConcentrationMeasurement.Enums.MeasurementUnitEnum]),
-                ClusterObjectFieldDescriptor(Label="measurementMedium", Tag=0x00000009, Type=typing.Optional[Pm25ConcentrationMeasurement.Enums.MeasurementMediumEnum]),
+                ClusterObjectFieldDescriptor(Label="measurementMedium", Tag=0x00000009, Type=Pm25ConcentrationMeasurement.Enums.MeasurementMediumEnum),
                 ClusterObjectFieldDescriptor(Label="levelValue", Tag=0x0000000A, Type=typing.Optional[Pm25ConcentrationMeasurement.Enums.LevelValueEnum]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
@@ -39155,7 +39153,7 @@ class Pm25ConcentrationMeasurement(Cluster):
     averageMeasuredValueWindow: typing.Optional[uint] = None
     uncertainty: typing.Optional[float32] = None
     measurementUnit: typing.Optional[Pm25ConcentrationMeasurement.Enums.MeasurementUnitEnum] = None
-    measurementMedium: typing.Optional[Pm25ConcentrationMeasurement.Enums.MeasurementMediumEnum] = None
+    measurementMedium: Pm25ConcentrationMeasurement.Enums.MeasurementMediumEnum = 0
     levelValue: typing.Optional[Pm25ConcentrationMeasurement.Enums.LevelValueEnum] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
@@ -39367,9 +39365,9 @@ class Pm25ConcentrationMeasurement(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[Pm25ConcentrationMeasurement.Enums.MeasurementMediumEnum])
+                return ClusterObjectFieldDescriptor(Type=Pm25ConcentrationMeasurement.Enums.MeasurementMediumEnum)
 
-            value: typing.Optional[Pm25ConcentrationMeasurement.Enums.MeasurementMediumEnum] = None
+            value: Pm25ConcentrationMeasurement.Enums.MeasurementMediumEnum = 0
 
         @dataclass
         class LevelValue(ClusterAttributeDescriptor):
@@ -39485,7 +39483,7 @@ class FormaldehydeConcentrationMeasurement(Cluster):
                 ClusterObjectFieldDescriptor(Label="averageMeasuredValueWindow", Tag=0x00000006, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="uncertainty", Tag=0x00000007, Type=typing.Optional[float32]),
                 ClusterObjectFieldDescriptor(Label="measurementUnit", Tag=0x00000008, Type=typing.Optional[FormaldehydeConcentrationMeasurement.Enums.MeasurementUnitEnum]),
-                ClusterObjectFieldDescriptor(Label="measurementMedium", Tag=0x00000009, Type=typing.Optional[FormaldehydeConcentrationMeasurement.Enums.MeasurementMediumEnum]),
+                ClusterObjectFieldDescriptor(Label="measurementMedium", Tag=0x00000009, Type=FormaldehydeConcentrationMeasurement.Enums.MeasurementMediumEnum),
                 ClusterObjectFieldDescriptor(Label="levelValue", Tag=0x0000000A, Type=typing.Optional[FormaldehydeConcentrationMeasurement.Enums.LevelValueEnum]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
@@ -39503,7 +39501,7 @@ class FormaldehydeConcentrationMeasurement(Cluster):
     averageMeasuredValueWindow: typing.Optional[uint] = None
     uncertainty: typing.Optional[float32] = None
     measurementUnit: typing.Optional[FormaldehydeConcentrationMeasurement.Enums.MeasurementUnitEnum] = None
-    measurementMedium: typing.Optional[FormaldehydeConcentrationMeasurement.Enums.MeasurementMediumEnum] = None
+    measurementMedium: FormaldehydeConcentrationMeasurement.Enums.MeasurementMediumEnum = 0
     levelValue: typing.Optional[FormaldehydeConcentrationMeasurement.Enums.LevelValueEnum] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
@@ -39715,9 +39713,9 @@ class FormaldehydeConcentrationMeasurement(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[FormaldehydeConcentrationMeasurement.Enums.MeasurementMediumEnum])
+                return ClusterObjectFieldDescriptor(Type=FormaldehydeConcentrationMeasurement.Enums.MeasurementMediumEnum)
 
-            value: typing.Optional[FormaldehydeConcentrationMeasurement.Enums.MeasurementMediumEnum] = None
+            value: FormaldehydeConcentrationMeasurement.Enums.MeasurementMediumEnum = 0
 
         @dataclass
         class LevelValue(ClusterAttributeDescriptor):
@@ -39833,7 +39831,7 @@ class Pm1ConcentrationMeasurement(Cluster):
                 ClusterObjectFieldDescriptor(Label="averageMeasuredValueWindow", Tag=0x00000006, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="uncertainty", Tag=0x00000007, Type=typing.Optional[float32]),
                 ClusterObjectFieldDescriptor(Label="measurementUnit", Tag=0x00000008, Type=typing.Optional[Pm1ConcentrationMeasurement.Enums.MeasurementUnitEnum]),
-                ClusterObjectFieldDescriptor(Label="measurementMedium", Tag=0x00000009, Type=typing.Optional[Pm1ConcentrationMeasurement.Enums.MeasurementMediumEnum]),
+                ClusterObjectFieldDescriptor(Label="measurementMedium", Tag=0x00000009, Type=Pm1ConcentrationMeasurement.Enums.MeasurementMediumEnum),
                 ClusterObjectFieldDescriptor(Label="levelValue", Tag=0x0000000A, Type=typing.Optional[Pm1ConcentrationMeasurement.Enums.LevelValueEnum]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
@@ -39851,7 +39849,7 @@ class Pm1ConcentrationMeasurement(Cluster):
     averageMeasuredValueWindow: typing.Optional[uint] = None
     uncertainty: typing.Optional[float32] = None
     measurementUnit: typing.Optional[Pm1ConcentrationMeasurement.Enums.MeasurementUnitEnum] = None
-    measurementMedium: typing.Optional[Pm1ConcentrationMeasurement.Enums.MeasurementMediumEnum] = None
+    measurementMedium: Pm1ConcentrationMeasurement.Enums.MeasurementMediumEnum = 0
     levelValue: typing.Optional[Pm1ConcentrationMeasurement.Enums.LevelValueEnum] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
@@ -40063,9 +40061,9 @@ class Pm1ConcentrationMeasurement(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[Pm1ConcentrationMeasurement.Enums.MeasurementMediumEnum])
+                return ClusterObjectFieldDescriptor(Type=Pm1ConcentrationMeasurement.Enums.MeasurementMediumEnum)
 
-            value: typing.Optional[Pm1ConcentrationMeasurement.Enums.MeasurementMediumEnum] = None
+            value: Pm1ConcentrationMeasurement.Enums.MeasurementMediumEnum = 0
 
         @dataclass
         class LevelValue(ClusterAttributeDescriptor):
@@ -40181,7 +40179,7 @@ class Pm10ConcentrationMeasurement(Cluster):
                 ClusterObjectFieldDescriptor(Label="averageMeasuredValueWindow", Tag=0x00000006, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="uncertainty", Tag=0x00000007, Type=typing.Optional[float32]),
                 ClusterObjectFieldDescriptor(Label="measurementUnit", Tag=0x00000008, Type=typing.Optional[Pm10ConcentrationMeasurement.Enums.MeasurementUnitEnum]),
-                ClusterObjectFieldDescriptor(Label="measurementMedium", Tag=0x00000009, Type=typing.Optional[Pm10ConcentrationMeasurement.Enums.MeasurementMediumEnum]),
+                ClusterObjectFieldDescriptor(Label="measurementMedium", Tag=0x00000009, Type=Pm10ConcentrationMeasurement.Enums.MeasurementMediumEnum),
                 ClusterObjectFieldDescriptor(Label="levelValue", Tag=0x0000000A, Type=typing.Optional[Pm10ConcentrationMeasurement.Enums.LevelValueEnum]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
@@ -40199,7 +40197,7 @@ class Pm10ConcentrationMeasurement(Cluster):
     averageMeasuredValueWindow: typing.Optional[uint] = None
     uncertainty: typing.Optional[float32] = None
     measurementUnit: typing.Optional[Pm10ConcentrationMeasurement.Enums.MeasurementUnitEnum] = None
-    measurementMedium: typing.Optional[Pm10ConcentrationMeasurement.Enums.MeasurementMediumEnum] = None
+    measurementMedium: Pm10ConcentrationMeasurement.Enums.MeasurementMediumEnum = 0
     levelValue: typing.Optional[Pm10ConcentrationMeasurement.Enums.LevelValueEnum] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
@@ -40411,9 +40409,9 @@ class Pm10ConcentrationMeasurement(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[Pm10ConcentrationMeasurement.Enums.MeasurementMediumEnum])
+                return ClusterObjectFieldDescriptor(Type=Pm10ConcentrationMeasurement.Enums.MeasurementMediumEnum)
 
-            value: typing.Optional[Pm10ConcentrationMeasurement.Enums.MeasurementMediumEnum] = None
+            value: Pm10ConcentrationMeasurement.Enums.MeasurementMediumEnum = 0
 
         @dataclass
         class LevelValue(ClusterAttributeDescriptor):
@@ -40529,7 +40527,7 @@ class TotalVolatileOrganicCompoundsConcentrationMeasurement(Cluster):
                 ClusterObjectFieldDescriptor(Label="averageMeasuredValueWindow", Tag=0x00000006, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="uncertainty", Tag=0x00000007, Type=typing.Optional[float32]),
                 ClusterObjectFieldDescriptor(Label="measurementUnit", Tag=0x00000008, Type=typing.Optional[TotalVolatileOrganicCompoundsConcentrationMeasurement.Enums.MeasurementUnitEnum]),
-                ClusterObjectFieldDescriptor(Label="measurementMedium", Tag=0x00000009, Type=typing.Optional[TotalVolatileOrganicCompoundsConcentrationMeasurement.Enums.MeasurementMediumEnum]),
+                ClusterObjectFieldDescriptor(Label="measurementMedium", Tag=0x00000009, Type=TotalVolatileOrganicCompoundsConcentrationMeasurement.Enums.MeasurementMediumEnum),
                 ClusterObjectFieldDescriptor(Label="levelValue", Tag=0x0000000A, Type=typing.Optional[TotalVolatileOrganicCompoundsConcentrationMeasurement.Enums.LevelValueEnum]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
@@ -40547,7 +40545,7 @@ class TotalVolatileOrganicCompoundsConcentrationMeasurement(Cluster):
     averageMeasuredValueWindow: typing.Optional[uint] = None
     uncertainty: typing.Optional[float32] = None
     measurementUnit: typing.Optional[TotalVolatileOrganicCompoundsConcentrationMeasurement.Enums.MeasurementUnitEnum] = None
-    measurementMedium: typing.Optional[TotalVolatileOrganicCompoundsConcentrationMeasurement.Enums.MeasurementMediumEnum] = None
+    measurementMedium: TotalVolatileOrganicCompoundsConcentrationMeasurement.Enums.MeasurementMediumEnum = 0
     levelValue: typing.Optional[TotalVolatileOrganicCompoundsConcentrationMeasurement.Enums.LevelValueEnum] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
@@ -40759,9 +40757,9 @@ class TotalVolatileOrganicCompoundsConcentrationMeasurement(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[TotalVolatileOrganicCompoundsConcentrationMeasurement.Enums.MeasurementMediumEnum])
+                return ClusterObjectFieldDescriptor(Type=TotalVolatileOrganicCompoundsConcentrationMeasurement.Enums.MeasurementMediumEnum)
 
-            value: typing.Optional[TotalVolatileOrganicCompoundsConcentrationMeasurement.Enums.MeasurementMediumEnum] = None
+            value: TotalVolatileOrganicCompoundsConcentrationMeasurement.Enums.MeasurementMediumEnum = 0
 
         @dataclass
         class LevelValue(ClusterAttributeDescriptor):
@@ -40877,7 +40875,7 @@ class RadonConcentrationMeasurement(Cluster):
                 ClusterObjectFieldDescriptor(Label="averageMeasuredValueWindow", Tag=0x00000006, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="uncertainty", Tag=0x00000007, Type=typing.Optional[float32]),
                 ClusterObjectFieldDescriptor(Label="measurementUnit", Tag=0x00000008, Type=typing.Optional[RadonConcentrationMeasurement.Enums.MeasurementUnitEnum]),
-                ClusterObjectFieldDescriptor(Label="measurementMedium", Tag=0x00000009, Type=typing.Optional[RadonConcentrationMeasurement.Enums.MeasurementMediumEnum]),
+                ClusterObjectFieldDescriptor(Label="measurementMedium", Tag=0x00000009, Type=RadonConcentrationMeasurement.Enums.MeasurementMediumEnum),
                 ClusterObjectFieldDescriptor(Label="levelValue", Tag=0x0000000A, Type=typing.Optional[RadonConcentrationMeasurement.Enums.LevelValueEnum]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
@@ -40895,7 +40893,7 @@ class RadonConcentrationMeasurement(Cluster):
     averageMeasuredValueWindow: typing.Optional[uint] = None
     uncertainty: typing.Optional[float32] = None
     measurementUnit: typing.Optional[RadonConcentrationMeasurement.Enums.MeasurementUnitEnum] = None
-    measurementMedium: typing.Optional[RadonConcentrationMeasurement.Enums.MeasurementMediumEnum] = None
+    measurementMedium: RadonConcentrationMeasurement.Enums.MeasurementMediumEnum = 0
     levelValue: typing.Optional[RadonConcentrationMeasurement.Enums.LevelValueEnum] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
@@ -41107,9 +41105,9 @@ class RadonConcentrationMeasurement(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[RadonConcentrationMeasurement.Enums.MeasurementMediumEnum])
+                return ClusterObjectFieldDescriptor(Type=RadonConcentrationMeasurement.Enums.MeasurementMediumEnum)
 
-            value: typing.Optional[RadonConcentrationMeasurement.Enums.MeasurementMediumEnum] = None
+            value: RadonConcentrationMeasurement.Enums.MeasurementMediumEnum = 0
 
         @dataclass
         class LevelValue(ClusterAttributeDescriptor):
