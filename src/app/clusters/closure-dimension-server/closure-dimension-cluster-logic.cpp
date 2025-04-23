@@ -127,7 +127,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericCurren
         //  feature is supported by the device. If the Positioning feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-        // We don't need to check is values are present since the check was done above.
+        // We don't need to check if values are present since the check was done above.
         const Percent100ths & position = incomingCurrentState.Value().position.Value();
         VerifyOrReturnError(position <= PERCENT100THS_MAX_VALUE, CHIP_ERROR_INVALID_ARGUMENT);
 
