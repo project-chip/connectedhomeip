@@ -43,7 +43,7 @@ from mobly import asserts
 from TC_AVSUMTestBase import AVSUMTestBase
 
 
-class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
+class TC_AVSUM_2_4(MatterBaseTest, AVSUMTestBase):
     has_feature_dptz = False
     has_feature_mpan = False
     has_feature_mtilt = False
@@ -75,33 +75,45 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
                 asserts.assert_greater_equal(azoom, 1, "Zoom out of range of DUT defined values")
                 asserts.assert_less_equal(azoom, zoommax, "Zoom out of range of DUT defined values")
 
-    def desc_TC_AVSUM_2_1(self) -> str:
-        return "[TC-AVSUM-2.1] Attributes with DUT as Server"
+    def verify_preset_matches(self, preset, position):
+        if self.has_feature_mpan:
+            asserts.assert_equal(preset.settings.pan, position.pan)
 
-    def steps_TC_AVSUM_2_1(self) -> list[TestStep]:
+        if self.has_feature_mtilt:
+            asserts.assert_equal(preset.settings.tilt, position.tilt)
+
+        if self.has_feature_mzoom:
+            asserts.assert_equal(preset.settings.zoom, position.zoom)
+
+    def desc_TC_AVSUM_2_4(self) -> str:
+        return "[TC-AVSUM-2.4] Attributes with DUT as Server"
+
+    def steps_TC_AVSUM_2_4(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "Read and verify that one of MTILT, MPAN, or MZOOM is supported"),
-            TestStep(3, "Read and verify ZoomMax attribute, if supported"),
-            TestStep(4, "Read and verify TiltMin attribute, if supported"),
-            TestStep(5, "Read and verify TiltMax attribute, if supported"),
-            TestStep(6, "Read and verify PanMin attribute, if supported"),
-            TestStep(7, "Read and verify PanMax attribute, if supported"),
-            TestStep(8, "Read and verify MPTZPosition attribute."),
-            TestStep(9, "Read and verify MaxPresets attribute, if supported."),
-            TestStep(10, "Read and verify MPTZPresets attribute, if supported."),
-            TestStep(11, "Read and verify DPTZRelativeMove attribute, if supported"),
+            TestStep(2, "Verify that the MPRESETS feature is supported, exit otherwise"),
+            TestStep(3, "Read the value of MaxPresets, fail if unsupported."),
+            TestStep(4, "Read the value of MPTZPresets, fail if unsupported"),
+            TestStep(5, "If MPTZPresets is empty, jump to step 9"),
+            TestStep(6, "Verify that the size of the Presets List is not greater than MaxPresets"),
+            TestStep(7, "Loop over the supported presets, for each verify the PresetID and Name are in range"),
+            TestStep(8, "For each found preset, invoke MoveToPreset with the PresetID. Verify that the MPTZPosition is that from the Preset"),
+            TestStep(9, "Exit the testcase"),
+            TestStep(10, "Create a new saved preset with PresetID and MaxPresets"),
+            TestStep(11, "Move to a new MPTZPosition that is the mid-point of all support PTZ attributes"),
+            TestStep(12, "Move to the newly saved preset"),
+            TestStep(13, "Verify that the MPTZPosition is that of the preset"),
         ]
         return steps
 
-    def pics_TC_AVSUM_2_1(self) -> list[str]:
+    def pics_TC_AVSUM_2_4(self) -> list[str]:
         pics = [
             "AVSUM.S",
         ]
         return pics
 
     @run_if_endpoint_matches(has_cluster(Clusters.CameraAvSettingsUserLevelManagement))
-    async def test_TC_AVSUM_2_1(self):
+    async def test_TC_AVSUM_2_4(self):
         cluster = Clusters.Objects.CameraAvSettingsUserLevelManagement
         attributes = cluster.Attributes
         tilt_min_dut = tilt_max_dut = pan_min_dut = pan_max_dut = zoom_max_dut = None
@@ -115,116 +127,84 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
         self.has_feature_mzoom = (feature_map & cluster.Bitmaps.Feature.kMechanicalZoom) != 0
         self.has_feature_mpresets = (feature_map & cluster.Bitmaps.Feature.kMechanicalPresets) != 0
 
-        logging.info(
-            f"Feature map: 0x{feature_map:x}. MPAN: {self.has_feature_mpan}, MTILT:{self.has_feature_mtilt}, MZOOM:{self.has_feature_mzoom}")
+        # Get the Max and Min values
+        if self.has_feature_mzoom:
+            zoom_max_dut = await self.read_avsum_attribute_expect_success(attribute="ZoomMax")
+
+        if self.has_feature_mtilt:
+            tilt_min_dut = await self.read_avsum_attribute_expect_success(attribute="TiltMin")
+            tilt_max_dut = await self.read_avsum_attribute_expect_success(attribute="TiltMax")
+
+        if self.has_feature_mpan:
+            pan_min_dut = await self.read_avsum_attribute_expect_success(attribute="PanMin")
+            pan_max_dut = await self.read_avsum_attribute_expect_success(attribute="PanMax")
 
         attribute_list = await self.read_avsum_attribute_expect_success(attribute="AttributeList")
 
+        # If Presets is empty, change MPTZPosition to some new value, save that as a Preset.  Change to a different value.
+        # Check that.
+        # Move to a discovered preset, or the created Preset.  Verify content.
         self.step(2)
-        if not (self.has_feature_mpan | self.has_feature_mtilt | self.has_feature_mzoom):
-            asserts.fail("One of MPAN, MTILT, or MZOOM is mandatory")
-
-        if self.has_feature_mzoom:
-            self.step(3)
-            asserts.assert_in(attributes.ZoomMax.attribute_id, attribute_list,
-                              "ZoomMax attribute is a mandatory attribute if MZOOM.")
-            zoom_max_dut = await self.read_avsum_attribute_expect_success(attribute="ZoomMax")
-            asserts.assert_less_equal(zoom_max_dut, 100, "ZoomMax is not in valid range.")
-            asserts.assert_greater_equal(zoom_max_dut, 1, "ZoomMax is not in valid range.")
-        else:
-            logging.info("MZOOM Feature not supported. Test step skipped")
-            self.skip_step(3)
-
-        if self.has_feature_mtilt:
-            self.step(4)
-            asserts.assert_in(attributes.TiltMin.attribute_id, attribute_list,
-                              "TiltMin attribute is a mandatory attribute if MTILT.")
-            tilt_min_dut = await self.read_avsum_attribute_expect_success(attribute="TiltMin")
-            asserts.assert_less_equal(tilt_min_dut, 179, "TiltMin is not in valid range.")
-            asserts.assert_greater_equal(tilt_min_dut, -180, "TiltMin is not in valid range.")
-
-            self.step(5)
-            asserts.assert_in(attributes.TiltMax.attribute_id, attribute_list,
-                              "TiltMax attribute is a mandatory attribute if MTILT.")
-            tilt_max_dut = await self.read_avsum_attribute_expect_success(attribute="TiltMax")
-            asserts.assert_less_equal(tilt_max_dut, 180, "TiltMin is not in valid range.")
-            asserts.assert_greater_equal(tilt_max_dut, -179, "TiltMin is not in valid range.")
-        else:
-            logging.info("MTILT Feature not supported. Test steps skipped")
-            self.skip_step(4)
-            self.skip_step(5)
-
-        if self.has_feature_mpan:
-            self.step(6)
-            asserts.assert_in(attributes.PanMin.attribute_id, attribute_list,
-                              "PanMin attribute is a mandatory attribute if MPAN.")
-            pan_min_dut = await self.read_avsum_attribute_expect_success(attribute="PanMin")
-            asserts.assert_less_equal(pan_min_dut, 179, "PanMin is not in valid range.")
-            asserts.assert_greater_equal(pan_min_dut, -180, "PanMin is not in valid range.")
-
-            self.step(7)
-            asserts.assert_in(attributes.PanMax.attribute_id, attribute_list,
-                              "PanMax attribute is a mandatory attribute if MPAN.")
-            pan_max_dut = await self.read_avsum_attribute_expect_success(attribute="PanMax")
-            asserts.assert_less_equal(pan_max_dut, 180, "PanMax is not in valid range.")
-            asserts.assert_greater_equal(pan_max_dut, -179, "PanMax is not in valid range.")
-        else:
-            logging.info("MPAN Feature not supported. Test steps skipped")
-            self.skip_step(6)
-            self.skip_step(7)
-
-        # We have already exited the testcase if one of MPAN, MTILT, or MZOOM is not present.  MPTZPosition is effectively
-        # mandatory
-        self.step(8)
-        asserts.assert_in(attributes.MPTZPosition.attribute_id, attribute_list, "MPTZPosition attribute is mandatory.")
-        mptzposition_dut = await self.read_avsum_attribute_expect_success(attribute="MPTZPosition")
-        self.ptz_range_validation(mptzposition_dut, tilt_min_dut, tilt_max_dut, pan_min_dut, pan_max_dut, zoom_max_dut)
-
         if self.has_feature_mpresets:
-            self.step(9)
+            self.step(3)
             asserts.assert_in(attributes.MaxPresets.attribute_id, attribute_list,
                               "MaxPresets attribute is a mandatory attribute if MPRESETS.")
-
-            # For now force a preset to be present so there is something to read
-            await self.send_save_presets_command(name="newpreset")
-
             max_presets_dut = await self.read_avsum_attribute_expect_success(attribute="MaxPresets")
 
-            self.step(10)
+            self.step(4)
             asserts.assert_in(attributes.MPTZPresets.attribute_id, attribute_list,
                               "MPTZPresets attribute is a mandatory attribut if MPRESETS.")
 
             mptz_presets_dut = await self.read_avsum_attribute_expect_success(attribute="MPTZPresets")
-            if mptz_presets_dut is not None:
+
+            self.step(5)
+            if mptz_presets_dut:
+                self.step(6)
                 asserts.assert_less_equal(len(mptz_presets_dut), max_presets_dut,
                                           "MPTZPresets size is greater than the allowed max.")
+
+                self.step(7)
+                self.step(8)
                 for mptzpreset in mptz_presets_dut:
                     asserts.assert_less_equal(mptzpreset.presetID, max_presets_dut, "PresetID is out of range")
                     asserts.assert_less_equal(len(mptzpreset.name), 32, "Preset name is too long")
                     self.ptz_range_validation(mptzpreset.settings, tilt_min_dut, tilt_max_dut,
                                               pan_min_dut, pan_max_dut, zoom_max_dut)
+                    # Move to the Preset
+                    await self.send_move_to_preset_command(mptzpreset.presetID)
+                    mptzposition_dut = await self.read_avsum_attribute_expect_success(attribute="MPTZPosition")
+                    self.verify_preset_matches(mptzpreset, mptzposition_dut)
+                self.step(8)
+                self.skip_all_remaining_tests(9)
             else:
-                asserts.fail("MPTZPresets is empty, even after saving at least one entry.")
+                self.skip_step(6)
+                self.skip_step(7)
+                self.skip_step(8)
+                self.skip_step(9)
+                self.step(10)
+                # For now force a preset to be present so there is something to read
+                await self.send_save_presets_command(name="newpreset", presetID=max_presets_dut)
+                stored_preset = await self.read_avsum_attribute_expect_success(attribute="MPTZPresets")
+                newPan = newTilt = newZoom = None
+                if self.has_feature_mpan:
+                    newPan = (pan_max_dut - pan_min_dut)//2
+                if self.has_feature_mtilt:
+                    newTilt = (tilt_max_dut - tilt_min_dut)//2
+                if self.has_feature_mzoom:
+                    newZoom = (zoom_max_dut)//2
+
+                self.step(11)
+                await self.send_mptz_set_position_command(newPan, newTilt, newZoom)
+
+                self.step(12)
+                await self.send_move_to_preset_command(max_presets_dut)
+                mptzposition_dut = await self.read_avsum_attribute_expect_success(attribute="MPTZPosition")
+
+                self.step(13)
+                self.verify_preset_matches(stored_preset[0], mptzposition_dut)
+
         else:
             logging.info("MPRESETS Feature not supported. Test steps skipped")
-            self.skip_step(9)
-            self.skip_step(10)
-
-        if self.has_feature_dptz:
-            self.step(11)
-            asserts.assert_in(attributes.DPTZRelativeMove.attribute_id, attribute_list,
-                              "DPTZRelativeMove attribute is a mandatory attribute if DPTZ.")
-
-            dptz_relative_move_dut = await self.read_avsum_attribute_expect_success(attribute="DPTZRelativeMove")
-            if dptz_relative_move_dut is not None:
-                # Verify that all elements in the list are unique
-                asserts.assert_equal(len(dptz_relative_move_dut), len(
-                    set(dptz_relative_move_dut)), "DPTZRelativeMove has non-unique values")
-                for videostreamid in dptz_relative_move_dut:
-                    asserts.assert_greater_equal(videostreamid, 0, "Provided video stream id is out of range")
-        else:
-            logging.info("DPTZ Feature not supported. Test step skipped")
-            self.skip_step(11)
 
 
 if __name__ == "__main__":
