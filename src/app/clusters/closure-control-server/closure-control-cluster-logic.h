@@ -27,6 +27,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <app/AttributeAccessInterface.h>
 
 namespace chip {
 namespace app {
@@ -102,7 +103,19 @@ private:
  */
 struct ClusterState
 {
-    QuieterReportingAttribute<ElapsedS> mCountDownTime{ DataModel::NullNullable };
+    ClusterState()
+    {
+        // Configure CountdownTime Quiet Reporting strategies
+        // - When it changes from 0 to any other value and vice versa
+        // - When it increases
+        // - When it changes from null to any other value and vice versa (default support)
+        // - Otherwise strategies manages within the set function
+        mCountdownTime.policy()
+            .Set(QuieterReportingPolicyEnum::kMarkDirtyOnIncrement)
+            .Set(QuieterReportingPolicyEnum::kMarkDirtyOnChangeToFromZero);
+    };
+
+    QuieterReportingAttribute<ElapsedS> mCountdownTime{ DataModel::NullNullable };
     MainStateEnum mMainState                                 = MainStateEnum::kUnknownEnumValue;
     DataModel::Nullable<GenericOverallState> mOverallState   = DataModel::NullNullable;
     DataModel::Nullable<GenericOverallTarget> mOverallTarget = DataModel::NullNullable;
@@ -121,31 +134,6 @@ struct ClusterInitParameters
 };
 
 /**
- * @brief Attribute Class Set interface
- *        Class is responsible for setting the attributes of the cluster and marking them as dirty if necessary.
- */
-class ClusterStateAttributes
-{
-public:
-    explicit ClusterStateAttributes(MatterContext & matterContext) : mMatterContext(matterContext) { (void) mMatterContext; }
-    ~ClusterStateAttributes() = default;
-
-    CHIP_ERROR SetCountdownTime(const DataModel::Nullable<ElapsedS> & countdownTime);
-    CHIP_ERROR SetMainState(MainStateEnum mainState);
-    CHIP_ERROR SetOverallState(const DataModel::Nullable<GenericOverallState> & overallState);
-    CHIP_ERROR SetTargetState(const DataModel::Nullable<GenericOverallTarget> & targetState);
-
-    CHIP_ERROR GetCountdownTime(DataModel::Nullable<ElapsedS> & countdownTime);
-    CHIP_ERROR GetMainState(MainStateEnum & mainState);
-    CHIP_ERROR GetOverallState(DataModel::Nullable<GenericOverallState> & overallState);
-    CHIP_ERROR GetOverallTarget(DataModel::Nullable<GenericOverallTarget> & overallTarget);
-
-private:
-    MatterContext & mMatterContext;
-    ClusterState mState;
-};
-
-/**
  * @brief Class containing the cluster business logic
  *
  */
@@ -154,7 +142,7 @@ class ClusterLogic
 public:
     // Instantiates a ClusterLogic class. The caller maintains ownership of the driver and the context, but provides them for use by
     // the ClusterLogic class.
-    ClusterLogic(DelegateBase & delegate, MatterContext & matterContext) : mDelegate(delegate), mState(matterContext)
+    ClusterLogic(DelegateBase & delegate, MatterContext & matterContext) : mDelegate(delegate), mMatterContext(matterContext)
     {
         // TODO remove this
         (void) mDelegate;
@@ -163,7 +151,7 @@ public:
     ~ClusterLogic() = default;
 
     const ClusterConformance & GetConformance() const { return mConformance; }
-    const ClusterStateAttributes & GetState() const { return mState; }
+    const ClusterState & GetState() const { return mState; }
 
     /**
      * @brief Initializes the cluster logic
@@ -183,30 +171,219 @@ public:
     CHIP_ERROR GetMainState(MainStateEnum & mainState);
     CHIP_ERROR GetOverallState(DataModel::Nullable<GenericOverallState> & overallState);
     CHIP_ERROR GetOverallTarget(DataModel::Nullable<GenericOverallTarget> & overallTarget);
-
-    // TODO: Add ErrorList guetter with its implementation
+    CHIP_ERROR GetCurrentErrorList(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
 
     // All Set functions
     // Return CHIP_ERROR_INCORRECT_STATE if the class has not been initialized.
     // Return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if the attribute is not supported by the conformance.
     // Return CHIP_ERROR_INVALID_ARGUMENT if the input value is out of range.
-    // Returns CHIP_ERROR_PERSISTED_STORAGE_FAILED if the value could not not be stored in persistent storage.
     // Otherwise return CHIP_NO_ERROR and set the parameter value in the cluster state
     // Set functions are supplied for any values that can be set either internally by the device or externally
     // through a direct attribute write. Changes to attributes that happen as a side effect of cluster commands
     // are handled by the cluster command handlers.
-
-    CHIP_ERROR SetCountdownTime(const DataModel::Nullable<ElapsedS> & countdownTime);
-    CHIP_ERROR SetMainState(MainStateEnum mainState);
+    
     CHIP_ERROR SetOverallState(const DataModel::Nullable<GenericOverallState> & overallState);
+    CHIP_ERROR SetOverallTarget(const DataModel::Nullable<GenericOverallTarget> & overallTarget);
+    CHIP_ERROR SetCurrentErrorList(const ClosureErrorEnum error);
+    
+    /**
+     * @brief Function to change the MainState.
+     *        Function posts EngageStateChanged Event, base on trasition to/from Disengaged state.
+     *        Function calls the SetCountdownTimeFromCluster function with the State Specific CountdownTime and
+     *          also starts and cancel the timer based on MovingStates(Calibration/Moving/WaitingForMotion) or not.
+     *
+     *        See SetCountdownTime function comment below
+     */
+    CHIP_ERROR SetMainState(MainStateEnum mainState);
+    
+    /**
+     * @brief Public API to trigger countdown time update from the delegate (application layer).
+     *        Function calls the SetCountdownTime function with the fromDelegate parameter set to true.
+     *
+     *        See SetCountdownTime function comment below
+     */
+    inline CHIP_ERROR SetCountdownTimeFromDelegate(const DataModel::Nullable<ElapsedS> & countdownTime)
+    {
+        return SetCountdownTime(countdownTime, true);
+    }
+    
+    /**
+     * @brief API to trigger countdown time update from the cluster logic.
+     *        Function calls the SetCountdownTime function with the fromDelegate parameter set to false.
+     *
+     *        See SetCountdownTime function comment above
+     */
+    inline CHIP_ERROR SetCountdownTimeFromCluster(const DataModel::Nullable<ElapsedS> & countdownTime)
+    {
+        return SetCountdownTime(countdownTime, false);
+    }
+    
+    
+    /**
+     *  @brief Calls delegate HandleStopCommand function after validating MainState
+     *  @return Exits if the cluster is not initialized.
+     *          Returns Success if the Stop command not supported from present Mainstate.
+     *          Returns Success on succesful handling or Error Otherwise
+     */
+    chip::Protocols::InteractionModel::Status HandleStopInternal();
+    
+    /**
+     *  @brief Calls HandleStopInternal function after validating the conformance and Initialization
+     *  @return Exits if the cluster is not initialized.
+     *          Returns UnsupportedCommand if Instantaneous feature is supported.
+     *          Returns Success on succesful handling or Error Otherwise
+     */
+    chip::Protocols::InteractionModel::Status HandleStop();
+    
+    /**
+     *  @brief Calls delegate HandleMoveToCommand function after validating the parameters and conformance.
+     *  @param [in] position target position
+     *  @param [in] latch Target latch
+     *  @param [in] speed Target speed
+     *  @return Exits if the cluster is not initialized.
+     *          Returns ConstraintError if the input values are out is out of range.
+     *          Returns InvalidInState iif the MoveTo command not supported from present Mainstate.
+     *          Returns Success if arguments don't match the feature conformance.
+     *          Returns Success on succesful handling.
+     */
+    chip::Protocols::InteractionModel::Status HandleMoveTo(Optional<TargetPositionEnum> position, Optional<bool> latch,
+                                                           Optional<Globals::ThreeLevelAutoEnum> speed);
+    
+    /**
+     *  @brief Calls delegate HandleCalibrateCommand function after validating the parameters and conformance.
+     *  @return Exits if the cluster is not initialized.
+     *          Returns ConstraintError if the input values are out is out of range.
+     *          Returns InvalidInState if the Calibrate command not supported from present Mainstate.
+     *          Returns Success on succesful handling.
+     */
+    chip::Protocols::InteractionModel::Status HandleCalibrate();
+    
+    /**
+     * @brief Post event when a reportable error condition is detected
+     * @param [in] errorState current error list
+     * @return CHIP_NO_ERROR if event posted succesfully
+     *         Return error recieved from LogEvent.
+     */
+    CHIP_ERROR PostOperationalErrorEvent(const DataModel::List<const ClosureErrorEnum> errorState);
+
+    /**
+     * @brief Post event, if supported, when the overall operation ends, either successfully or otherwise
+     * @return CHIP_NO_ERROR if event posted succesfully
+     *         CHIP_NO_ERROR if positioning feature is not supported.
+     *         Return error recieved from LogEvent.
+     */
+    CHIP_ERROR PostMovementCompletedEvent();
+
+    /**
+     * @brief Post event, if supported,when the MainStateEnum attribute changes state to and from disengaged
+     * @param[in] EngageValue will indicate if the actuator is Engaged or Disengaged
+     * @return CHIP_NO_ERROR if event posted succesfully
+     *         CHIP_NO_ERROR if manuallyOperable feature is not supported.
+     *         Return error recieved from LogEvent.
+     */
+    CHIP_ERROR PostEngageStateChangedEvent(const bool engageValue);
+
+    /**
+     * @brief Post event, if supported, when the SecureState field in the OverallState attribute changes.
+     * @param[in] secureValue will indicate whether a closure is securing a space against possible unauthorized entry.
+     * @return CHIP_NO_ERROR if event posted succesfully
+     *         CHIP_NO_ERROR if feature conformance is not supported
+     *         Return error recieved from LogEvent.
+     */
+    CHIP_ERROR PostSecureStateChangedEvent(const bool secureValue);
+    
+    /**
+     * @brief Causes reporting of CurrentErrorList.
+     *        Whenever application wants to report a change in Errorlist, call this method.
+     */
+    void ReportCurrentErrorListChange();
+    
+    
+    /**
+     * @brief Fuction handles the expiry of countdowntime. 
+     *        If device is in WaitingforMotion,will check if Motion should be triggered or not.
+     *        If no motion nedded, will post MotionComplete event and call HandlestopInternal.
+     */
+    void HandleCountdownTimeExpired();
 
 private:
+    /**
+     * @brief Function validates if the requested mainState is supported by the device.
+     *        Function validates agaisnt the FeatureMap conformance to validate support.
+     *
+     *        - Stopped, Moving, WaitingForMotion, Error and SetupRequired always return true since they are mandatory.
+     *        - Calibrating returns true if the Calibration feature is supported, false otherwise.
+     *        - Protected returns true if the Proitection feature is supported, false otherwise.
+     *        - Disengaged returns true if the ManuallyOperable feature is supported, false otherwise.
+     *        - Returns true if the requested MainState is not a known state.
+     *
+     * @param mainState requested MainState to validate
+     *
+     * @return true, if the requested MainState is supported
+     *         false, otherwise
+     */
+    bool IsSupportedMainState(MainStateEnum mainState);
+
+    /**
+     * @brief Function validates if the requested mainState is a valid transition from the current state.
+     *        TODO: Add functionnal description of the state machine
+     *
+     * @param mainState requested main state to be applied
+     *
+     * @return true, transition from current to requested is valid
+     *         false, otherwise
+     */
+    bool IsValidMainStateTransition(MainStateEnum mainState);
+
+    /**
+     * @brief Function validates if the requested overallState positioning is supported by the device.
+     *        Function validates agaisnt the FeatureMap conformance to validate support.
+     *
+     *        - FullyClosed, FullyOpened, PartiallyOpened and OpenedAtSignature always return true since they are mandatory.
+     *        - OpenedForPedestrian returns true if the Pedestrian feature is supported, false otherwise.
+     *        - OpenedForVentilation returns true if the Ventilation feature is supported, false otherwise.
+     *
+     * @param positioning requested Positioning to validate
+     *
+     * @return true if the requested Positioning is supported
+     *        false, otherwise
+     */
+    bool IsSupportedOverallStatePositioning(PositioningEnum positioning);
+    
+    /**
+     * @brief Function validates if the requested OverallTarget positioning is supported by the device.
+     *        Function validates agaisnt the FeatureMap conformance to validate support.
+     *
+     *        - CloseInFull, OpenInFull and Signaturealways return true since they are mandatory.
+     *        - Pedestrian returns true if the Pedestrian feature is supported, false otherwise.
+     *        - Ventilation returns true if the Ventilation feature is supported, false otherwise.
+     *
+     * @param positioning requested Positioning to validate
+     *
+     * @return true if the requested Positioning is supported
+     *        false, otherwise
+     */
+    bool IsSupportedOverallTargetPositioning(TargetPositionEnum positioning);
+
+    /**
+     * @brief Update the stored countdown time
+     *        When the attribute should be marked dirty changes based on wether the change is from the delegate or the internal
+     *        cluster processing.
+     *
+     *        If countdown time is changed due to the internal cluster logic, the attribute will be marked dirty,
+     *        otherwise, configured quiet reporting rules apply
+     *
+     *        See Set function comment above for common behavior
+     *
+     * @param fromDelegate true if the coutdown time is being configured by the delegate, false otherwise
+     */
+    CHIP_ERROR SetCountdownTime(const DataModel::Nullable<ElapsedS> & countdownTime, bool fromDelegate);
+
     bool mIsInitialized = false;
-
     DelegateBase & mDelegate;
-
     ClusterConformance mConformance;
-    ClusterStateAttributes mState;
+    ClusterState mState;
+    MatterContext & mMatterContext;
 };
 
 } // namespace ClosureControl

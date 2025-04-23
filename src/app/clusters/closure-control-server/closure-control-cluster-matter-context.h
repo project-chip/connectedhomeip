@@ -38,6 +38,8 @@ public:
     virtual ~MatterContext() = default;
 
     virtual void MarkDirty(AttributeId attributeId) { MatterReportingAttributeChangeCallback(mEndpointId, Id, attributeId); }
+    
+    const EndpointId & GetEndpointId() const { return mEndpointId; }
 
 private:
     EndpointId mEndpointId = kInvalidEndpointId;
