@@ -1125,7 +1125,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def get_wifi_ssid(self, default: Optional[str] = 0) -> str:
         return self.matter_test_config.wifi_ssid if self.matter_test_config.wifi_ssid is not None else default
-    
+
     def get_credentials(self, default: Optional[str] = 0) -> str:
         return self.matter_test_config.wifi_passphrase if self.matter_test_config.wifi_passphrase is not None else default
 
