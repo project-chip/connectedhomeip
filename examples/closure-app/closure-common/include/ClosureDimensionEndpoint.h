@@ -55,13 +55,31 @@ public:
    {}
    virtual ~PrintOnlyDelegate() = default;
 
-    // Override for the DelegateBase Virtual functions
-    Status HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<bool> & latch,
-    const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
-    Status HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
-        const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
-        
+   enum Action_t
+   {
+      MOVE_ACTION = 0,
+      MOVE_AND_LATCH_ACTION,
+      STEP_ACTION,
+      TARGET_CHANGE_ACTION,
+      INVALID_ACTION
+   } Action;
+
+   typedef void (*Callback_fn_initiated)(Action_t);
+   typedef void (*Callback_fn_completed)(Action_t);
+   void SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB);
+
+   Callback_fn_initiated mActionInitiated_CB;
+   Callback_fn_completed mActionCompleted_CB;
+
+   // Override for the DelegateBase Virtual functions
+   Status HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<bool> & latch,
+   const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
+   Status HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
+      const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
+      
    bool IsManualLatchingNeeded() override;
+
+   Status HandleMotion(bool latchNeeded, bool motionNeeded, bool newTarget);
 
    /**
     * @brief Initializes the PrintOnlyDelegate instance.
@@ -70,8 +88,29 @@ public:
     */
    CHIP_ERROR Init();
 
+   void SetLogic(ClusterLogic * logic) { gLogic = logic; }
+
+   ClusterLogic * GetLogic() const { return mLogic; }
+
+   bool IsDeviceMoving() const { return isMoving; }
+
+   void SetDeviceMoving(bool moving) { isMoving = moving; }
+
+   Action_t GetAction() const { return mAction; }
+
+   void SetAction(Action_t action) { mAction = action; }
+
+   StepDirectionEnum GetTargetDirection() const { return mTargetDirection; }
+
+   void SetTargetDirection(StepDirectionEnum direction) { mTargetDirection = direction; }
+
 private:
    EndpointId mEndpoint = kInvalidEndpointId;
+   bool isMoving                      = false;
+   bool isManualLatch                 = false;
+   StepDirectionEnum mTargetDirection = StepDirectionEnum::kUnknownEnumValue;
+   Action_t mAction                   = INVALID_ACTION;
+   ClusterLogic * mLogic;
 };
 
 /**
@@ -93,7 +132,9 @@ public:
 
    ClosureDimensionEndpoint(EndpointId endpoint) :
        mEndpoint(endpoint), mContext(mEndpoint), mDelegate(mEndpoint), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
-   {}
+   {
+      mDelegate.SetLogic(&mLogic);
+   }
    
    virtual ~ClosureDimensionEndpoint() = default;
 
@@ -109,7 +150,8 @@ public:
     * 
     * @return Reference to the PrintOnlyDelegate instance.
     */
-   PrintOnlyDelegate & getDelegate() { return mDelegate; }
+   PrintOnlyDelegate & GetDelegate() { return mDelegate; }
+   ClusterLogic & GetLogic() { return mLogic; }
 
 private:
    EndpointId mEndpoint = kInvalidEndpointId;
