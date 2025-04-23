@@ -101,7 +101,7 @@ struct AttributeEntry
 
     // Constructor
 
-    StartBitFieldInit  // Disabling '-Wconversion' & '-Wconversion' 
+    StartBitFieldInit  // Disabling '-Wconversion' & '-Wconversion'
 
         constexpr AttributeEntry(
             AttributeId id = 0,                                                                 // attributeId initial value,
@@ -124,24 +124,24 @@ struct AttributeEntry
     {
         if(ReadAllowed()) {
             return static_cast<Access::Privilege>(mask.readPrivilege);
-          } 
+          }
           else
           {
             return std::nullopt;
-          }     
+          }
     }
 
     // Getter for mask.writePrivilege
-    constexpr std::optional<Access::Privilege> 
+    constexpr std::optional<Access::Privilege>
     GetWritePrivilege() const
-    { 
+    {
         if(WriteAllowed()) {
             return static_cast<Access::Privilege>(mask.writePrivilege);
-          } 
+          }
           else
           {
             return std::nullopt;
-          }     
+          }
     }
 
     constexpr bool HasFlags(AttributeQualityFlags f) const { return (mask.flags & chip::to_underlying(f)) != 0; }
@@ -222,11 +222,11 @@ struct AcceptedCommandEntry
     {
         if(mask.invokePrivilege==0) {
             return std::nullopt;
-          } 
+          }
           else
           {
             return static_cast<Access::Privilege>(mask.invokePrivilege);
-          }     
+          }
     }
 
     constexpr bool HasFlags(CommandQualityFlags f) const { return (mask.flags & chip::to_underlying(f)) != 0; }
