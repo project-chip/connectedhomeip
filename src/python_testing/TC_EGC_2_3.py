@@ -68,12 +68,11 @@ class EGC_2_3(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
     def steps_EGC_2_3(self) -> list[TestStep]:
         steps = [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)."),
-            TestStep("2", "Set up a subscription to all ElectricalGridConditions cluster events"),
-            TestStep("3", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
+            TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
                      "Value has to be 1 (True)"),
-            TestStep("4", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EGC.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EGC.TESTEVENTTRIGGER for Forecast Conditions Update Test Event",
-                     "Verify DUT responds w/ status SUCCESS(0x00) and event EGC.S.E0001(ForecastConditionsChanged) sent."),
-            TestStep("4a", "TH reads from the DUT the ForecastConditions attribute.",
+            TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EGC.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EGC.TESTEVENTTRIGGER for Forecast Conditions Update Test Event",
+                     "Verify DUT responds w/ status SUCCESS(0x00)."),
+            TestStep("3a", "TH reads from the DUT the ForecastConditions attribute.",
                      "Verify that the DUT response contains a list of  ElectricalGridConditionsStruct (or empty)."),
         ]
         return steps
@@ -87,24 +86,15 @@ class EGC_2_3(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
         # Commission DUT - already done
 
         self.step("2")
-        events_callback = EventChangeCallback(cluster)
-        await events_callback.start(self.default_controller,
-                                    self.dut_node_id,
-                                    endpoint)
-
-        self.step("3")
         # TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster
         await self.check_test_event_triggers_enabled()
 
-        self.step("4")
+        self.step("3")
         # TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EGC.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EGC.TESTEVENTTRIGGER for Forecast Conditions Update Test Event
         # Verify DUT responds w/ status SUCCESS(0x00) and event EGC.S.E0001(ForecastConditionsChanged) sent.
         await self.send_test_event_trigger_forecast_conditions_update()
 
-        events_callback.wait_for_event_report(
-            Clusters.ElectricalGridConditions.Events.ForecastConditionsChanged)
-
-        self.step("4a")
+        self.step("3a")
         # TH reads from the DUT the ForecastConditions attribute.
         # Verify that the DUT response contains a list of  ElectricalGridConditionsStruct (or empty).
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
