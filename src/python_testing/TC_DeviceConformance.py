@@ -30,7 +30,7 @@
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --tests test_TC_IDM_10_2 test_TC_IDM_10_6
+#       --tests test_TC_IDM_10_2 test_TC_IDM_10_6 test_TC_DESC_2_3
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
