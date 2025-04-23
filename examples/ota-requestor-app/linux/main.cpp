@@ -317,7 +317,7 @@ int main(int argc, char * argv[])
 
         // Set the boot reason to SoftwareUpdateCompleted since the OTA requestor is going to boot into the new image after applying
         // the firmware update.
-        CHIP_ERROR err = ConfigurationMgr().StoreBootReason(static_cast<uint32_t>(BootReasonEnum::kSoftwareUpdateCompleted));
+        CHIP_ERROR err = ConfigurationMgr().StoreBootReason(to_underlying(BootReasonEnum::kSoftwareUpdateCompleted));
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(SoftwareUpdate, "Failed to store boot reason - SoftwareUpdateCompleted");
