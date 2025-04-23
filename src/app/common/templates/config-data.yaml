@@ -82,7 +82,7 @@ ClustersWithInitFunctions:
     - Scenes Management
 
 ClustersWithAttributeChangedFunctions:
-    - Bridged Device Basic
+    - Bridged Device Basic Information
     - Door Lock
     - Identify
     - Pump Configuration and Control

@@ -22,7 +22,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${CAMERA_APP}
-#     app-args: --camera-deferred-offer --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --storage-path admin_storage.json
@@ -39,32 +39,29 @@
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
-class TC_WebRTCProvider_2_1(MatterBaseTest):
+class TC_WebRTCProvider_2_2(MatterBaseTest):
 
-    def desc_TC_WebRTCProvider_2_1(self) -> str:
+    def desc_TC_WebRTCProvider_2_2(self) -> str:
         """Returns a description of this test"""
-        return "[TC-{picsCode}-2.1] Validate delayed processing of SolicitOffer with {DUT_Server}"
+        return "[TC-{picsCode}-2.2] Validate immediate processing of SolicitOffer with {DUT_Server}"
 
-    def steps_TC_WebRTCProvider_2_1(self) -> list[TestStep]:
+    def steps_TC_WebRTCProvider_2_2(self) -> list[TestStep]:
         """
         Define the step-by-step sequence for the test.
         """
         steps = [
             TestStep(1, "Read CurrentSessions attribute => expect 0", is_commissioning=True),
-            TestStep(2, "Send SolicitOffer with both videoStreamID and audioStreamID not present, usage=3 => expect ConstraintError"),
-            TestStep(3, "Send SolicitOffer with a valid videoStreamID and usage=4 => expect ConstraintError"),
-            TestStep(4, "Send SolicitOffer with valid parameters => expect DeferredOffer=TRUE"),
-            TestStep(5, "Read CurrentSessions attribute => expect 1"),
+            TestStep(2, "Send SolicitOffer with valid parameters => expect DeferredOffer=FALSE"),
+            TestStep(3, "Read CurrentSessions attribute => expect 1"),
         ]
         return steps
 
     @async_test_body
-    async def test_TC_WebRTCProvider_2_1(self):
+    async def test_TC_WebRTCProvider_2_2(self):
         """
         Executes the test steps for the WebRTC Provider cluster scenario.
         """
@@ -82,32 +79,26 @@ class TC_WebRTCProvider_2_1(MatterBaseTest):
 
         self.step(2)
         cmd = cluster.Commands.SolicitOffer(
-            streamUsage=3, originatingEndpointID=endpoint)
-        try:
-            await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
-            asserts.fail("Unexpected success on SolicitOffer")
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.ConstraintError, "Incorrect error returned")
-
-        self.step(3)
-        cmd = cluster.Commands.SolicitOffer(
-            streamUsage=4, originatingEndpointID=endpoint, videoStreamID=NullValue, audioStreamID=NullValue)
-        try:
-            await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
-            asserts.fail("Unexpected success on SolicitOffer")
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.ConstraintError, "Incorrect error returned")
-
-        self.step(4)
-        cmd = cluster.Commands.SolicitOffer(
             streamUsage=3, originatingEndpointID=endpoint, videoStreamID=NullValue, audioStreamID=NullValue)
         resp = await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
         asserts.assert_equal(type(resp), Clusters.WebRTCTransportProvider.Commands.SolicitOfferResponse,
                              "Incorrect response type")
         asserts.assert_not_equal(resp.webRTCSessionID, 0, "webrtcSessionID in SolicitOfferResponse should not be 0.")
-        asserts.assert_true(resp.deferredOffer, "Expected 'deferredOffer' to be True.")
+        asserts.assert_false(resp.deferredOffer, "Expected 'deferredOffer' to be False.")
 
-        self.step(5)
+        # TODO: Enable this check after integrating with Camera AvStreamManager
+        # asserts.assert_not_equal(
+        #     resp.videoStreamID,
+        #     NullValue,
+        #     "videoStreamID in SolicitOfferResponse should be valid."
+        # )
+        # asserts.assert_not_equal(
+        #     resp.audioStreamID,
+        #     NullValue,
+        #     "audioStreamID in SolicitOfferResponse should be valid."
+        # )
+
+        self.step(3)
         current_sessions = await self.read_single_attribute_check_success(
             endpoint=endpoint,
             cluster=cluster,
