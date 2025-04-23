@@ -2773,7 +2773,7 @@ TEST_F(TestCodegenModelViaMocks, EndpointUniqueID)
     // Mock endpoint 1 has a unique ID
     ReadOnlyBufferBuilder<MutableCharSpan> builder;
     // Mock endpoint 4 has a unique ID
-    //ASSERT_TRUE(builder.IsEmpty()); // ownership taken above, we start fresh
+    // ASSERT_TRUE(builder.IsEmpty()); // ownership taken above, we start fresh
     ASSERT_EQ(model.EndpointUniqueID(kMockEndpoint4, builder), CHIP_NO_ERROR);
     auto uniqueIDs = builder.TakeBuffer();
     ASSERT_EQ(uniqueIDs.size(), 1u);

@@ -115,7 +115,7 @@ const MockNodeConfig & DefaultMockNodeConfig()
         ),
     });
     // clang-format on
-   return config;
+    return config;
 }
 
 const MockNodeConfig & GetMockNodeConfig()
