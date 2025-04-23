@@ -384,8 +384,21 @@ def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attri
 
 
 class ClusterAttributeChangeAccumulator:
-    def __init__(self, expected_cluster: ClusterObjects.Cluster):
+    """
+    Subscribes to a cluster or single attribute and accumulates attribute reports in a queue.
+
+    If `expected_attribute` is provided, it subscribes only to that specific attribute.
+    Otherwise, it subscribes to all attributes from the cluster.
+
+    Args:
+        expected_cluster (ClusterObjects.Cluster): The cluster to subscribe to.
+        expected_attribute (ClusterObjects.ClusterAttributeDescriptor, optional):
+            If provided, subscribes to a single attribute. Defaults to None.
+    """
+
+    def __init__(self, expected_cluster: ClusterObjects.Cluster, expected_attribute: ClusterObjects.ClusterAttributeDescriptor = None):
         self._expected_cluster = expected_cluster
+        self._expected_attribute = expected_attribute
         self._subscription = None
         self._lock = threading.Lock()
         self._q = queue.Queue()
@@ -398,6 +411,8 @@ class ClusterAttributeChangeAccumulator:
             attrs = [cls for name, cls in inspect.getmembers(self._expected_cluster.Attributes) if inspect.isclass(
                 cls) and issubclass(cls, ClusterObjects.ClusterAttributeDescriptor)]
             self._attribute_reports: dict[Any, AttributeValue] = {}
+            if self._expected_attribute is not None:
+                attrs = [self._expected_attribute]
             for a in attrs:
                 self._attribute_report_counts[a] = 0
                 self._attribute_reports[a] = []
@@ -406,9 +421,12 @@ class ClusterAttributeChangeAccumulator:
 
     async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 5, keepSubscriptions: bool = True) -> Any:
         """This starts a subscription for attributes on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
+        attributes = [(endpoint, self._expected_cluster)]
+        if self._expected_attribute is not None:
+            attributes = [(endpoint, self._expected_attribute)]
         self._subscription = await dev_ctrl.ReadAttribute(
             nodeid=node_id,
-            attributes=[(endpoint, self._expected_cluster)],
+            attributes=attributes,
             reportInterval=(int(min_interval_sec), int(max_interval_sec)),
             fabricFiltered=fabric_filtered,
             keepSubscriptions=keepSubscriptions
@@ -429,7 +447,14 @@ class ClusterAttributeChangeAccumulator:
     def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
         """This is the subscription callback when an attribute report is received.
            It checks the report is from the expected_cluster and then posts it into the queue for later processing."""
+        valid_report = False
         if path.ClusterType == self._expected_cluster:
+            if self._expected_attribute is not None:
+                valid_report = path.ClusterId == self._expected_attribute.cluster_id
+            else:
+                valid_report = True
+
+        if valid_report:
             data = transaction.GetAttribute(path)
             value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType,
                                    value=data, timestamp_utc=datetime.now(timezone.utc))
