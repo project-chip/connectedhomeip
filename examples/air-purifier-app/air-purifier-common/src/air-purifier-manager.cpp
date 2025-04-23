@@ -209,7 +209,7 @@ void AirPurifierManager::HandleOnOff(AttributeId attributeId, uint8_t type, uint
         // If either of these come back as NULL, that should mean the fan is operating in auto mode.
         // I have no idea what that means for this case, so I'll just set them to high because this
         // is just an example.
-        // In theory these should always be NULL together or not all all, so hopefully the last
+        // In theory these should always be NULL together or not at all, so hopefully the last
         // error is more theoretical than practical.
         DataModel::Nullable<Percent> percent = GetPercentSetting();
         DataModel::Nullable<uint8_t> speed   = GetSpeedSetting();
