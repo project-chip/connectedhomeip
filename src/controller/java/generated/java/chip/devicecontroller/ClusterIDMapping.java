@@ -11741,7 +11741,7 @@ public class ClusterIDMapping {
         }
 
         public enum Attribute {
-            Current(0L),
+            CurrentState(0L),
             Target(1L),
             Resolution(2L),
             StepValue(3L),

@@ -35,11 +35,11 @@ namespace app {
 namespace Clusters {
 namespace ClosureDimension {
 namespace Structs {
-namespace CurrentStruct {
+namespace CurrentStateStruct {
 enum class Fields : uint8_t
 {
     kPosition = 0,
-    kLatching = 1,
+    kLatch    = 1,
     kSpeed    = 2,
 };
 
@@ -47,7 +47,7 @@ struct Type
 {
 public:
     Optional<chip::Percent100ths> position;
-    Optional<LatchingEnum> latching;
+    Optional<bool> latch;
     Optional<Globals::ThreeLevelAutoEnum> speed;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -59,7 +59,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace CurrentStruct
+} // namespace CurrentStateStruct
 namespace RangePercent100thsStruct {
 enum class Fields : uint8_t
 {
@@ -95,7 +95,7 @@ struct Type
 {
 public:
     Optional<chip::Percent100ths> position;
-    Optional<TargetLatchEnum> latch;
+    Optional<bool> latch;
     Optional<Globals::ThreeLevelAutoEnum> speed;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
