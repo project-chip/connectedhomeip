@@ -145,7 +145,6 @@ jobs:
                       --target nxp-rt1060-freertos-all-clusters-wifi-w8801-no_ble-cmake \
                       --target nxp-rt1060-freertos-all-clusters-wifi-ota-evkc-iwx12-cmake \
                       build \
-                      --copy-artifacts-to out/artifacts \
                   "
             - name: Build RT1060 thermostat example app
               if:
@@ -156,7 +155,6 @@ jobs:
                       ./scripts/build/build_examples.py \
                       --target nxp-rt1060-freertos-thermostat-thread-wifi-matter-shell-evkc-iwx12-cmake \
                       build \
-                      --copy-artifacts-to out/artifacts \
                   "
 
             - name: clean build
@@ -172,7 +170,6 @@ jobs:
                       --target nxp-rt1170-freertos-all-clusters-wifi-iwx12-cmake \
                       --target nxp-rt1170-freertos-all-clusters-wifi-ota-iwx12-cmake \
                       build \
-                      --copy-artifacts-to out/artifacts \
                   "
             - name: Build RT1170 thermostat example app
               run: |
@@ -180,7 +177,6 @@ jobs:
                       ./scripts/build/build_examples.py \
                       --target nxp-rt1170-freertos-thermostat-thread-wifi-matter-shell-iwx12-cmake \
                       build \
-                      --copy-artifacts-to out/artifacts \
                   "
 
             - name: clean build
@@ -192,7 +188,6 @@ jobs:
                       ./scripts/build/build_examples.py \
                       --target nxp-rw61x-freertos-all-clusters-wifi-ota-cmake \
                       build \
-                      --copy-artifacts-to out/artifacts \
                   "
             - name: Build RW61X thermostat example app
               run: |
@@ -200,7 +195,6 @@ jobs:
                       ./scripts/build/build_examples.py \
                       --target nxp-rw61x-freertos-thermostat-thread-wifi-matter-shell-cmake \
                       build \
-                      --copy-artifacts-to out/artifacts \
                   "
 
             - name: clean build
