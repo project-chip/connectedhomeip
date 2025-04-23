@@ -371,8 +371,8 @@ void OperationalSessionSetup::DequeueConnectionCallbacks(CHIP_ERROR error, Sessi
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
     // Gather up state we will need for our notifications.
-    SuccessFailureCallbackList readyCallbacks;
-    readyCallbacks.EnqueueTakeAll(mCallbacks);
+    auto readyCallbacks = std::make_shared<SuccessFailureCallbackList>();
+    readyCallbacks->EnqueueTakeAll(mCallbacks);
     auto * exchangeMgr                            = mInitParams.exchangeMgr;
     Optional<SessionHandle> optionalSessionHandle = mSecureSession.Get();
     ScopedNodeId peerId                           = mPeerId;
@@ -390,7 +390,7 @@ void OperationalSessionSetup::DequeueConnectionCallbacks(CHIP_ERROR error, Sessi
     }
 
     // DO NOT touch any members of this object after this point.  It's dead.
-    NotifyConnectionCallbacks(readyCallbacks, error, stage, peerId, exchangeMgr, optionalSessionHandle, requestedBusyDelay);
+    NotifyConnectionCallbacks(*readyCallbacks, error, stage, peerId, exchangeMgr, optionalSessionHandle, requestedBusyDelay);
 }
 
 void OperationalSessionSetup::NotifyConnectionCallbacks(SuccessFailureCallbackList & ready, CHIP_ERROR error,
