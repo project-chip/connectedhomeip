@@ -81,7 +81,7 @@ config ISR_STACK_SIZE
     default 528 if SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
 
 config SYSTEM_WORKQUEUE_STACK_SIZE
-    default 616 if PM || SOC_RISCV_TELINK_W91
+    default 616 if PM
 
 config HEAP_MEM_POOL_SIZE
     default 256 if ZEPHYR_VERSION_3_3
