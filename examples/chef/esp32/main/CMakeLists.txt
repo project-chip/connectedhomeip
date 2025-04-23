@@ -27,7 +27,6 @@ get_filename_component(CHEF ${CHIP_ROOT}/examples/chef REALPATH)
 set(CHIP_SHELL_DIR "${CHIP_ROOT}/examples/shell")
 
 set(PRIV_INCLUDE_DIRS_LIST
-                      "${CHIP_ROOT}/zzz_generated/"
                       "${CHIP_ROOT}/zzz_generated/app-common"
                       "${CHIP_ROOT}/examples/platform/esp32/"
                       "${CHIP_ROOT}/third_party/nlio/repo/include"

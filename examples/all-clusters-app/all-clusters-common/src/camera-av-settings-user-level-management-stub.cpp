@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h>
 #include <camera-av-settings-user-level-management-instance.h>
 
 using namespace chip;
@@ -25,20 +26,15 @@ using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
 
 using chip::Protocols::InteractionModel::Status;
 
-static AVSettingsUserLevelManagementDelegate * gDelegate                           = nullptr;
-static CameraAvSettingsUserLevelMgmtServer * gAVSettingsUserLevelManagementCluster = nullptr;
-static constexpr EndpointId kEndpointId                                            = 1;
-
-CameraAvSettingsUserLevelMgmtServer * GetInstance()
-{
-    return gAVSettingsUserLevelManagementCluster;
-}
+std::unique_ptr<AVSettingsUserLevelManagementDelegate> gDelegate;
+std::unique_ptr<CameraAvSettingsUserLevelMgmtServer> gAVSettingsUserLevelManagementCluster;
+static constexpr EndpointId kEndpointId = 1;
 
 void Shutdown()
 {
     if (gAVSettingsUserLevelManagementCluster != nullptr)
     {
-        delete gAVSettingsUserLevelManagementCluster;
+        gDelegate                             = nullptr;
         gAVSettingsUserLevelManagementCluster = nullptr;
     }
 }
@@ -122,10 +118,27 @@ Status AVSettingsUserLevelManagementDelegate::DPTZRelativeMove(uint16_t aVideoSt
     return Status::Success;
 }
 
+CHIP_ERROR AVSettingsUserLevelManagementDelegate::LoadMPTZPresets(std::vector<MPTZPresetHelper> & mptzPresetHelpers)
+{
+    mptzPresetHelpers.clear();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AVSettingsUserLevelManagementDelegate::LoadDPTZRelativeMove(std::vector<uint16_t> dptzRelativeMove)
+{
+    dptzRelativeMove.clear();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AVSettingsUserLevelManagementDelegate::PersistentAttributesLoadedCallback()
+{
+    return CHIP_NO_ERROR;
+}
+
 void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::EndpointId aEndpointId)
 {
     VerifyOrDie(aEndpointId == 1); // this cluster is only enabled for endpoint 1.
-    VerifyOrDie(gDelegate == nullptr && gAVSettingsUserLevelManagementCluster == nullptr);
+    VerifyOrDie(!gDelegate && !gAVSettingsUserLevelManagementCluster);
     const int16_t appPanMin     = -90;
     const int16_t appPanMax     = 90;
     const int16_t appTiltMin    = -45;
@@ -133,7 +146,7 @@ void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::Endpoin
     const uint8_t appZoomMax    = 75;
     const uint8_t appMaxPresets = 5;
 
-    gDelegate = new AVSettingsUserLevelManagementDelegate;
+    gDelegate = std::make_unique<AVSettingsUserLevelManagementDelegate>();
     BitFlags<CameraAvSettingsUserLevelManagement::Feature, uint32_t> avsumFeatures(
         CameraAvSettingsUserLevelManagement::Feature::kDigitalPTZ, CameraAvSettingsUserLevelManagement::Feature::kMechanicalPan,
         CameraAvSettingsUserLevelManagement::Feature::kMechanicalTilt,
@@ -150,8 +163,8 @@ void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::Endpoin
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMin,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMax);
 
-    gAVSettingsUserLevelManagementCluster =
-        new CameraAvSettingsUserLevelMgmtServer(kEndpointId, gDelegate, avsumFeatures, avsumAttrs, appMaxPresets);
+    gAVSettingsUserLevelManagementCluster = std::make_unique<CameraAvSettingsUserLevelMgmtServer>(
+        kEndpointId, *gDelegate.get(), avsumFeatures, avsumAttrs, appMaxPresets);
     gAVSettingsUserLevelManagementCluster->Init();
 
     // Set app specific limits to pan, tilt, zoom

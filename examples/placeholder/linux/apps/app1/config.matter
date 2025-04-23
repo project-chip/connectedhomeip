@@ -254,6 +254,11 @@ struct PowerThresholdStruct {
   nullable PowerThresholdSourceEnum powerThresholdSource = 2;
 }
 
+struct PriceStruct {
+  money amount = 0;
+  CurrencyStruct currency = 1;
+}
+
 struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
@@ -264,11 +269,6 @@ struct LocationDescriptorStruct {
   char_string<128> locationName = 0;
   nullable int16s floorNumber = 1;
   nullable AreaTypeTag areaType = 2;
-}
-
-struct PriceStruct {
-  money amount = 0;
-  CurrencyStruct currency = 1;
 }
 
 struct AtomicAttributeStatusStruct {
@@ -1186,7 +1186,7 @@ cluster Actions = 37 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 cluster BasicInformation = 40 {
-  revision 3;
+  revision 5;
 
   enum ColorEnum : enum8 {
     kBlack = 0;
@@ -1269,6 +1269,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute int32u specificationVersion = 21;
   readonly attribute int16u maxPathsPerInvoke = 22;
+  readonly attribute int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2660,7 +2661,7 @@ cluster EthernetNetworkDiagnostics = 55 {
           collection of attributes that the Node MAY collect to aid in conveying information regarding the Bridged Device to a user,
           such as the vendor name, the model name, or user-assigned name. */
 cluster BridgedDeviceBasicInformation = 57 {
-  revision 3;
+  revision 5;
 
   enum ColorEnum : enum8 {
     kBlack = 0;
@@ -2726,7 +2727,7 @@ cluster BridgedDeviceBasicInformation = 57 {
   readonly attribute optional vendor_id vendorID = 2;
   readonly attribute optional char_string<32> productName = 3;
   readonly attribute optional int16u productID = 4;
-  attribute optional char_string<32> nodeLabel = 5;
+  attribute access(write: manage) optional char_string<32> nodeLabel = 5;
   readonly attribute optional int16u hardwareVersion = 7;
   readonly attribute optional char_string<64> hardwareVersionString = 8;
   readonly attribute optional int32u softwareVersion = 9;
@@ -2739,6 +2740,7 @@ cluster BridgedDeviceBasicInformation = 57 {
   readonly attribute boolean reachable = 17;
   readonly attribute char_string<32> uniqueID = 18;
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
+  readonly attribute optional int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2751,7 +2753,7 @@ cluster BridgedDeviceBasicInformation = 57 {
     int32u timeoutMs = 1;
   }
 
-  /** The server SHALL attempt to keep the devices specified active for StayActiveDuration milliseconds when they are next active. */
+  /** Upon receipt, the server SHALL attempt to keep the bridged device active for the duration specified by the command, when the device is next active. */
   command KeepActive(KeepActiveRequest): DefaultSuccess = 128;
 }
 
@@ -8292,7 +8294,7 @@ cluster ContentLauncher = 1290 {
 
 /** This cluster provides an interface for controlling the Output on a media device such as a TV. */
 cluster AudioOutput = 1291 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum OutputTypeEnum : enum8 {
     kHDMI = 0;
@@ -8331,15 +8333,15 @@ cluster AudioOutput = 1291 {
     char_string name = 1;
   }
 
-  /** Upon receipt, this SHALL change the output on the media device to the output at a specific index in the Output List. */
+  /** Upon receipt, this SHALL change the output on the device to the output at a specific index in the Output List. */
   command SelectOutput(SelectOutputRequest): DefaultSuccess = 0;
-  /** Upon receipt, this SHALL rename the output at a specific index in the Output List. Updates to the output name SHALL appear in the TV settings menus. */
+  /** Upon receipt, this SHALL rename the output at a specific index in the Output List. */
   command access(invoke: manage) RenameOutput(RenameOutputRequest): DefaultSuccess = 1;
 }
 
 /** This cluster provides an interface for controlling the Output on a media device such as a TV. */
 cluster AudioOutput = 1291 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum OutputTypeEnum : enum8 {
     kHDMI = 0;
@@ -8378,9 +8380,9 @@ cluster AudioOutput = 1291 {
     char_string name = 1;
   }
 
-  /** Upon receipt, this SHALL change the output on the media device to the output at a specific index in the Output List. */
+  /** Upon receipt, this SHALL change the output on the device to the output at a specific index in the Output List. */
   command SelectOutput(SelectOutputRequest): DefaultSuccess = 0;
-  /** Upon receipt, this SHALL rename the output at a specific index in the Output List. Updates to the output name SHALL appear in the TV settings menus. */
+  /** Upon receipt, this SHALL rename the output at a specific index in the Output List. */
   command access(invoke: manage) RenameOutput(RenameOutputRequest): DefaultSuccess = 1;
 }
 
@@ -8739,6 +8741,7 @@ endpoint 0 {
     persist  attribute localConfigDisabled default = 0;
     callback attribute uniqueID;
     callback attribute capabilityMinima;
+    callback attribute configurationVersion default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -9598,6 +9601,7 @@ endpoint 1 {
     ram      attribute reachable default = 1;
     callback attribute uniqueID;
     callback attribute capabilityMinima;
+    callback attribute configurationVersion default = 1;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 2;
   }
