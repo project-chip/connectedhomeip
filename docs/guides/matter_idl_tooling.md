@@ -70,7 +70,7 @@ spec).
 
 For device validation, `matter-idl-lint` provides the ability to validate a
 matter file for some basic conformance logic. These rules are expressed in
-`.rules.matterlint`.
+`.matterlint`.
 
 The rules generally are:
 

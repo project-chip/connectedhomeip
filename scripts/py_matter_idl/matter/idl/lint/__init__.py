@@ -44,7 +44,7 @@ __LOG_LEVELS__ = {
 )
 @click.option(
     "--rules",
-    default=".rules.matterlint",
+    default=".matterlint",
     type=click.Path(exists=True, dir_okay=False),
     help="Matter lint rules file to use.",
     show_default=True,
