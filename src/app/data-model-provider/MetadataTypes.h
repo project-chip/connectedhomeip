@@ -115,7 +115,7 @@ struct AttributeEntry
         mask{ to_underlying(attrQualityFlags) & ((1 << kAttrQualityBits) - 1),                     // Narrowing expression to 7 bits
               (readPriv.has_value() ? to_underlying(*readPriv) : 0) & ((1 << kPrivilegeBits) - 1), // Narrowing expression to 5 bits
               (writePriv.has_value() ? to_underlying(*writePriv) : 0) & ((1 << kPrivilegeBits) - 1) }
-        // Narrowing expression to 5 bits
+    // Narrowing expression to 5 bits
     {}
 
     _EndBitFieldInit // Enabling '-Wconversion' & '-Wconversion'
