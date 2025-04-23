@@ -80,6 +80,7 @@ class TC_CNET_4_9(MatterBaseTest):
     @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
     async def test_TC_CNET_4_9(self):
         ssid = self.get_wifi_ssid()
+        credentials = self.get_credentials()
 
         # Commissioning is already done
         self.step("Precondition")
@@ -267,7 +268,8 @@ class TC_CNET_4_9(MatterBaseTest):
 
         # TH adds a WiFi network
         self.step(19)
-        cmd = Clusters.NetworkCommissioning.Commands.AddOrUpdateWiFiNetwork(ssid=ssid.encode("utf-8"), credentials=self.matter_test_config.wifi_passphrase.encode("utf-8"), breadcrumb=4)
+        cmd = Clusters.NetworkCommissioning.Commands.AddOrUpdateWiFiNetwork(ssid=ssid.encode("utf-8"),
+                                                                            credentials=credentials.encode("utf-8"), breadcrumb=4)
         result = await self.send_single_cmd(cmd=cmd)
 
         asserts.assert_equal(result.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
@@ -281,6 +283,7 @@ class TC_CNET_4_9(MatterBaseTest):
 
         asserts.assert_true(userwifi_netidx is not None,
                             "There is not a NetworkID field equal to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID in Networks attribute list")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
