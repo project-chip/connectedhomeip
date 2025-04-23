@@ -29,10 +29,10 @@
 // Without the use of these macros, the compiler would not allow
 // the narrowing and conversion of input values during the settings
 // of the variables inside of both 'AttributeEntry.mask' and 'AcceptedCommandEntry.mask'.
-#define StartBitFieldInit                                                                                                          \
+#define _StartBitFieldInit                                                                                                          \
     _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\"")                                              \
         _Pragma("GCC diagnostic ignored \"-Wnarrowing\"")
-#define EndBitFieldInit _Pragma("GCC diagnostic pop")
+#define _EndBitFieldInit _Pragma("GCC diagnostic pop")
 
 namespace chip {
 namespace app {
@@ -86,6 +86,11 @@ struct ClusterInfo
     ClusterInfo(DataVersion version) : dataVersion(version) {}
 };
 
+// constants used to narrow binary expressions
+constexpr uint8_t kPrivilegeBits   = 5;
+constexpr uint8_t kAttrQualityBits = 7;
+constexpr uint8_t kCmmdQualityBits = 3;
+
 enum class AttributeQualityFlags : uint32_t
 {
     kListAttribute   = 0x0004, // This attribute is a list attribute
@@ -101,24 +106,21 @@ struct AttributeEntry
 
     // Constructor
 
-    StartBitFieldInit // Disabling '-Wconversion' & '-Wconversion'
+    _StartBitFieldInit // Disabling '-Wconversion' & '-Wconversion'
 
         constexpr AttributeEntry(
-            AttributeId id = 0,                                                                 // attributeId initial value,
-                                                                                                // this could be altered later
-            AttributeQualityFlags attrQualityFlags     = static_cast<AttributeQualityFlags>(0), // mask.flags initial value
-            std::optional<Access::Privilege> readPriv  = static_cast<Access::Privilege>(0),     // mask.readPrivilege initial value
-            std::optional<Access::Privilege> writePriv = static_cast<Access::Privilege>(0)      // mask.writePrivilege initial value
+            AttributeId id = 0,
+            AttributeQualityFlags attrQualityFlags     = static_cast<AttributeQualityFlags>(0),
+            std::optional<Access::Privilege> readPriv  = std::nullopt,
+            std::optional<Access::Privilege> writePriv = std::nullopt
             ) :
         attributeId{ id },
-        mask{ to_underlying(attrQualityFlags) & ((1 << 7) - 1), // Narrowing expression to 7 bits
-              to_underlying(readPriv.value_or(static_cast<Access::Privilege>(0))) &
-                  ((1 << 5) - 1), // Narrowing expression to 5 bits
-              to_underlying(writePriv.value_or(static_cast<Access::Privilege>(0))) & ((1 << 5) - 1) }
-    // Narrowing expression to 5 bits
+        mask{ to_underlying(attrQualityFlags) & ((1 << kAttrQualityBits) - 1),                        // Narrowing expression to 7 bits
+              (readPriv.has_value() ? to_underlying(*readPriv) : 0) & ((1 << kPrivilegeBits) - 1),    // Narrowing expression to 5 bits
+              (writePriv.has_value() ? to_underlying(*writePriv) : 0) & ((1 << kPrivilegeBits) - 1) } // Narrowing expression to 5 bits
     {}
 
-    EndBitFieldInit // Enabling '-Wconversion' & '-Wconversion'
+    _EndBitFieldInit // Enabling '-Wconversion' & '-Wconversion'
 
         // Getter for mask.readPrivilege
         constexpr std::optional<Access::Privilege>
@@ -128,10 +130,7 @@ struct AttributeEntry
         {
             return static_cast<Access::Privilege>(mask.readPrivilege);
         }
-        else
-        {
             return std::nullopt;
-        }
     }
 
     // Getter for mask.writePrivilege
@@ -141,10 +140,7 @@ struct AttributeEntry
         {
             return static_cast<Access::Privilege>(mask.writePrivilege);
         }
-        else
-        {
             return std::nullopt;
-        }
     }
 
     constexpr bool HasFlags(AttributeQualityFlags f) const { return (mask.flags & chip::to_underlying(f)) != 0; }
@@ -204,34 +200,29 @@ struct AcceptedCommandEntry
 
     // Constructor
 
-    StartBitFieldInit // Disabling '-Wconversion' & '-Wconversion'
+    _StartBitFieldInit // Disabling '-Wconversion' & '-Wconversion'
 
         constexpr AcceptedCommandEntry(
-            CommandId id = 0,                                                                  // commandId initial value,
-                                                                                               // this could be altered later
-            CommandQualityFlags cmdQualityFlags         = static_cast<CommandQualityFlags>(0), // mask.flags initial value
-            std::optional<Access::Privilege> invokePriv = Access::Privilege::kView             // mask.invokePrivilege initial value
+            CommandId id = 0,
+            CommandQualityFlags cmdQualityFlags = static_cast<CommandQualityFlags>(0),
+            Access::Privilege invokePriv        = Access::Privilege::kOperate
             ) :
         commandId(id),
-        mask{ to_underlying(cmdQualityFlags) & ((1 << 3) - 1), // Narrowing expression to 3 bits
-              to_underlying(invokePriv.value_or(static_cast<Access::Privilege>(0))) & ((1 << 5) - 1) }
-    // Narrowing expression to 5 bits
+        mask{ to_underlying(cmdQualityFlags) & ((1 << kCmmdQualityBits) - 1), // Narrowing expression to 3 bits
+              to_underlying(invokePriv) & ((1 << kPrivilegeBits) - 1) }       // Narrowing expression to 5 bits
     {}
 
-    EndBitFieldInit // Enabling '-Wconversion' & '-Wconversion'
+    _EndBitFieldInit // Enabling '-Wconversion' & '-Wconversion'
 
-        // Getter for mask.invokePrivilege
-        constexpr std::optional<Access::Privilege>
-        GetInvokePrivilege() const
+    // Getter for mask.invokePrivilege
+    constexpr std::optional<Access::Privilege>
+    GetInvokePrivilege() const
     {
         if (mask.invokePrivilege == 0)
         {
             return std::nullopt;
         }
-        else
-        {
             return static_cast<Access::Privilege>(mask.invokePrivilege);
-        }
     }
 
     constexpr bool HasFlags(CommandQualityFlags f) const { return (mask.flags & chip::to_underlying(f)) != 0; }
@@ -239,13 +230,10 @@ struct AcceptedCommandEntry
 private:
     struct accepted_command_entry_mask_t
     {
-
         // command quality flags
         //
-        std::underlying_type_t<CommandQualityFlags> flags : 3; // generally defaults to View if readable
+        std::underlying_type_t<CommandQualityFlags> flags : 3;
 
-        // invoke privilege variable
-        //
         std::underlying_type_t<Access::Privilege> invokePrivilege : 5;
     };
 
@@ -271,5 +259,5 @@ struct DeviceTypeEntry
 } // namespace app
 } // namespace chip
 
-#undef StartBitFieldInit
-#undef EndBitFieldInit
+#undef _StartBitFieldInit
+#undef _EndBitFieldInit
