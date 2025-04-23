@@ -61,7 +61,7 @@ struct ClusterConformance
      *        4. Only one of Translation, Rotation or Modulation must be enabled. Return false otherwise.
      *        5. If the Overflow attribute is supported, at least one of Rotation or MotionLatching feature must be supported. Return false otherwise.
      *        6. If Rotation feature is enabled, then the Overflow attribute must be supported. Return false otherwise.
-     * 
+     *
      * @return true, the cluster confirmance is valid
      *         false, otherwise
      */
@@ -94,7 +94,7 @@ struct ClusterConformance
         {
                 ChipLogError(NotSpecified, "Validation failed: Only one of Translation, Rotation or Modulation feature can be enabled.");
                 return false;
-        }   
+        }
 
         // If the Overflow Attribute is supported, at least one of Rotation or MotionLatching must be supported.
         if (mOptionalAttributes.Has(OptionalAttributeEnum::kOverflow))
@@ -165,10 +165,10 @@ public:
 
     /**
      *  @brief Validates the conformance and performs initialisation and sets up the ClusterInitParameters into Attributes.
-     * 
+     *
      *  @param [in] conformance cluster conformance
      *  @param [in] clusterInitParameters cluster Init Parameters
-     * 
+     *
      *  @return CHIP_ERROR_INCORRECT_STATE if the cluster has already been initialized,
      *              CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR if the conformance is incorrect.
      *              Set Function Errors if the Setting of any feature supported ClusterInitParameters failed.
@@ -178,9 +178,9 @@ public:
 
     /**
      * @brief Set Current State.
-     * 
+     *
      * @param[in] currentState Current State Position, Latch and Speed.
-     * 
+     *
      * @return CHIP_NO_ERROR if set was successful.
      *              CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
      *              CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
@@ -190,9 +190,9 @@ public:
 
     /**
      * @brief Set Target.
-     * 
+     *
      * @param[in] target Target Position, Latch and Speed.
-     * 
+     *
      * @return CHIP_NO_ERROR if set was successful.
      *              CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
      *              CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
@@ -202,9 +202,9 @@ public:
 
     /**
      * @brief Set Resolution.
-     * 
+     *
      * @param[in] resolution Minimal acceptable change of Position fields of attributes.
-     * 
+     *
      * @return CHIP_NO_ERROR if set was successful.
      *              CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
      *              CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
@@ -214,9 +214,9 @@ public:
 
     /**
      * @brief Set StepValue.
-     * 
+     *
      * @param[in] stepValue One step value for Step command
-     * 
+     *
      * @return CHIP_NO_ERROR if set was successful.
      *              CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
      *              CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
@@ -226,9 +226,9 @@ public:
 
     /**
      * @brief Set Unit.
-     * 
+     *
      * @param[in] unit Unit related to the Positioning.
-     * 
+     *
      * @return CHIP_NO_ERROR if set was successful.
      *              CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
      *              CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
@@ -238,9 +238,9 @@ public:
 
     /**
      * @brief Set UnitRange.
-     * 
+     *
      * @param[in] unitRange Minimum and Maximum values expressed by positioning following the unit.
-     * 
+     *
      * @return CHIP_NO_ERROR if set was successful.
      *              CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
      *              CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
@@ -250,9 +250,9 @@ public:
 
     /**
      * @brief Set LimitRange.
-     * 
+     *
      * @param[in] limitRange Range of possible values for the position field in Current attribute.
-     * 
+     *
      * @return CHIP_NO_ERROR if set was successful.
      *              CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
      *              CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
@@ -262,9 +262,9 @@ public:
 
     /**
      * @brief Set Overflow.
-     * 
+     *
      * @param[in] overflow Overflow related to Rotation.
-     * 
+     *
      * @return CHIP_NO_ERROR if set was successful.
      *              CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      *              CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
@@ -292,11 +292,11 @@ public:
 
     /**
      *  @brief Calls delegate HandleSetTarget function after validating the parameters and conformance.
-     * 
+     *
      *  @param [in] position target position
      *  @param [in] latch Target latch
      *  @param [in] speed Target speed
-     * 
+     *
      *  @return Exits if the cluster is not initialized.
      *              Returns ConstraintError if the input values are out is out of range.
      *              Returns InvalidInState if the current position of device is not known.
@@ -308,11 +308,11 @@ public:
 
     /**
      *  @brief Calls delegate HandleStep function after validating the parameters and conformance.
-     * 
+     *
      *  @param [in] direction step direction
      *  @param [in] numberOfSteps Number of steps
      *  @param [in] speed step speed
-     * 
+     *
      *  @return Exits if the cluster is not initialized.
      *              Returns UnsupportedCommand if Positioning feature is not supported.
      *              Returns ConstraintError if the input values are out is out of range.
@@ -332,7 +332,7 @@ private:
      * @brief Set TranslationDirection.
      *             This attribute is not supposed to change once the installation is finalized.
      *             SetTranslationDirection should only be called from Init()
-     *       
+     *
      * @param[in] translationDirection Direction of the translation.
      *
      * @return CHIP_NO_ERROR if set was successful.
@@ -347,9 +347,9 @@ private:
      * @brief Set RotationAxis.
      *              This attribute is not supposed to change once the installation is finalized.
      *              so SetRotationAxis should only be called from Init().
-     * 
+     *
      * @param[in] rotationAxis Axis of the rotation.
-     * 
+     *
      * @return CHIP_NO_ERROR if set was successful.
      *              CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      *              CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
@@ -359,17 +359,17 @@ private:
     CHIP_ERROR SetRotationAxis(const RotationAxisEnum rotationAxis);
 
     /**
-     * @brief Set ModulationType. 
+     * @brief Set ModulationType.
      *              This attribute is not supposed to change once the installation is finalized.
      *              so SetModulationType should only be called from Init().
-     * 
+     *
      * @param[in] modulationType Modulation type.
-     * 
+     *
      * @return CHIP_NO_ERROR if set was successful.
      *              CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      *              CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
      *              CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
-     * 
+     *
      */
     CHIP_ERROR SetModulationType(const ModulationTypeEnum modulationType);
 
