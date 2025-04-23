@@ -24,6 +24,8 @@ from mobly import asserts
 
 
 class TestDefaultChecker(MatterBaseTest):
+    ''' This is a unit-style test of the defaults test. It runs the individual test functions against mocks.'''
+
     def setup_test(self):
         self.test = TC_DefaultWarnings.DefaultChecker()
         self.test.mark_current_step_skipped = self.mark_current_step_skipped
@@ -31,9 +33,10 @@ class TestDefaultChecker(MatterBaseTest):
         super().setup_test()
 
     def mark_current_step_skipped(self):
+        ''' Override of the base mark_current_step_skipped so the tests here can assert that these get called correctly.'''
         self.skipped += 1
 
-    def test_product_name_test(self):
+    def test_product_name_is_not_default_check(self):
         def run_check(product_name: str, set_override: bool, expect_problem: bool):
             self.test.user_params = {TC_DefaultWarnings.FLAG_PRODUCT_NAME: set_override}
             self.test.problems = []
@@ -41,7 +44,7 @@ class TestDefaultChecker(MatterBaseTest):
             self.test.check_default_product_name()
             if expect_problem:
                 asserts.assert_equal(len(self.test.problems), 1,
-                                     f"Did not generated expected problem when testing with product name {product_name} (override = {set_override})")
+                                     f"did not generate expected problem when testing with product name {product_name} (override = {set_override})")
             else:
                 asserts.assert_equal(len(self.test.problems), 0,
                                      f"Unexpected problem when testing with product name {product_name} (override = {set_override})")
@@ -57,7 +60,7 @@ class TestDefaultChecker(MatterBaseTest):
         run_check('OK name', set_override=True, expect_problem=False)
         asserts.assert_equal(self.skipped, 4, "Some override tests did not mark steps skipped")
 
-    def test_vendor_name_test(self):
+    def test_vendor_name_is_not_default_check(self):
         def run_check(vendor_name: str, set_override: bool, expect_problem: bool):
             self.test.user_params = {TC_DefaultWarnings.FLAG_VENDOR_NAME: set_override}
             self.test.problems = []
@@ -65,7 +68,7 @@ class TestDefaultChecker(MatterBaseTest):
             self.test.check_default_vendor_name()
             if expect_problem:
                 asserts.assert_equal(len(self.test.problems), 1,
-                                     f"Did not generated expected problem when testing with vendor name {vendor_name} (override = {set_override})")
+                                     f"did not generate expected problem when testing with vendor name {vendor_name} (override = {set_override})")
             else:
                 asserts.assert_equal(len(self.test.problems), 0,
                                      f"Unexpected problem when testing with vendor name {vendor_name} (override = {set_override})")
@@ -81,7 +84,7 @@ class TestDefaultChecker(MatterBaseTest):
         run_check('OK name', set_override=True, expect_problem=False)
         asserts.assert_equal(self.skipped, 4, "Some override tests did not mark steps skipped")
 
-    def test_vendor_id_test(self):
+    def test_vendor_id_is_not_default_check(self):
         def run_check(vendor_id: int, set_override: bool, expect_problem: bool):
             self.test.user_params = {TC_DefaultWarnings.FLAG_VENDOR_ID: set_override}
             self.test.problems = []
@@ -89,7 +92,7 @@ class TestDefaultChecker(MatterBaseTest):
             self.test.check_default_vendor_id()
             if expect_problem:
                 asserts.assert_equal(len(self.test.problems), 1,
-                                     f"Did not generated expected problem when testing with vendor id {vendor_id} (override = {set_override})")
+                                     f"did not generate expected problem when testing with vendor id {vendor_id} (override = {set_override})")
             else:
                 asserts.assert_equal(len(self.test.problems), 0,
                                      f"Unexpected problem when testing with vendor id {vendor_id} (override = {set_override})")
@@ -105,7 +108,7 @@ class TestDefaultChecker(MatterBaseTest):
         run_check(0x6006, set_override=True, expect_problem=False)
         asserts.assert_equal(self.skipped, 4, "Some override tests did not mark steps skipped")
 
-    def test_calendar_test(self):
+    def test_calendar_is_not_default_check(self):
         enum = Clusters.TimeFormatLocalization.Enums.CalendarTypeEnum
 
         def run_check(calendar_type: Clusters.TimeFormatLocalization.Enums.CalendarTypeEnum, set_override: bool, expect_problem: bool):
@@ -116,7 +119,7 @@ class TestDefaultChecker(MatterBaseTest):
             self.test.check_default_calendar_format()
             if expect_problem:
                 asserts.assert_equal(len(self.test.problems), 1,
-                                     f"Did not generated expected problem when testing with calendar type {calendar_type} (override = {set_override})")
+                                     f"did not generate expected problem when testing with calendar type {calendar_type} (override = {set_override})")
             else:
                 asserts.assert_equal(len(self.test.problems), 0,
                                      f"Unexpected problem when testing with calendar {calendar_type} (override = {set_override})")
@@ -208,19 +211,19 @@ class TestDefaultChecker(MatterBaseTest):
         test_endpoint(0)
         test_endpoint(1)
 
-    def test_unit_testing_test(self):
+    def test_unit_testing_is_not_present_check(self):
         self._cluster_presence_test(Clusters.UnitTesting, self.test.check_unit_testing_cluster_presence,
                                     TC_DefaultWarnings.FLAG_UNIT_TESTING)
 
-    def test_fault_injection_test(self):
+    def test_fault_injection_is_not_present_check(self):
         self._cluster_presence_test(Clusters.FaultInjection, self.test.check_fault_injection_cluster_presence,
                                     TC_DefaultWarnings.FLAG_FAULT_INJECTION)
 
-    def test_sample_mei_test(self):
+    def test_sample_mei_is_not_present_check(self):
         self._cluster_presence_test(Clusters.SampleMei, self.test.check_sample_mei_cluster_presence,
                                     TC_DefaultWarnings.FLAG_SAMPLE_MEI)
 
-    def test_fixed_label_test(self):
+    def test_fixed_label_is_not_default_check(self):
         def run_check(label_list: list[Clusters.FixedLabel.Structs.LabelStruct], set_override: bool, expect_problem: bool):
             self.test.user_params = {TC_DefaultWarnings.FLAG_FIXED_LABEL: set_override}
             self.test.problems = []
@@ -228,7 +231,7 @@ class TestDefaultChecker(MatterBaseTest):
             self.test.check_fixed_label_cluster()
             if expect_problem:
                 asserts.assert_equal(len(self.test.problems), 1,
-                                     f"Did not generated expected problem when testing with empty fixed label list (override = {set_override})")
+                                     f"did not generate expected problem when testing with empty fixed label list (override = {set_override})")
             else:
                 asserts.assert_equal(len(self.test.problems), 0,
                                      f"Unexpected problem when testing with non-empty fixed label list (override = {set_override})")
