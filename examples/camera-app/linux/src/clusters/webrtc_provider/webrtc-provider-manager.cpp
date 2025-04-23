@@ -162,7 +162,7 @@ void WebRTCProviderManager::RegisterWebrtcTransport(uint16_t sessionId)
         return;
     }
 
-    mCameraDeviceHAL->RegisterTransport(webrtcTransportMap[sessionId], videoStreamID, audioStreamID);
+    mCameraDeviceHAL->RegisterTransport(webrtcTransportMap[sessionId], 1, 0/*videoStreamID, audioStreamID*/);
 }
 
 CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession)
@@ -214,17 +214,17 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
         outSession.audioStreamID.SetNull();
     }
 
-    if (webrtcTransportMap.find(args.sessionId) == webrtcTransportMap.end())
-    {
-        webrtcTransportMap[args.sessionId] = new WebrtcTransport(args.sessionId, peerId.GetNodeId());
-    }
-
     // Process the SDP Offer, begin the ICE Candidate gathering phase, create the SDP Answer, and invoke Answer.
     mPeerId                = ScopedNodeId(args.peerNodeId, args.fabricIndex);
     mOriginatingEndpointId = args.originatingEndpointId;
     mCurrentSessionId      = args.sessionId;
 
     mPeerConnection->setRemoteDescription(args.sdp);
+
+    if (webrtcTransportMap.find(args.sessionId) == webrtcTransportMap.end())
+    {
+        webrtcTransportMap[args.sessionId] = new WebrtcTransport(args.sessionId, peerId.GetNodeId(), mPeerConnection);
+    }
 
     return CHIP_NO_ERROR;
 }

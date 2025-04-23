@@ -19,10 +19,22 @@
 #include <iostream>
 #include <transport/webrtc-transport.h>
 
-WebrtcTransport::WebrtcTransport(uint16_t sessionID, uint64_t nodeID)
+WebrtcTransport::WebrtcTransport(uint16_t sessionID, uint64_t nodeID, std::shared_ptr<rtc::PeerConnection> mPeerConnection)
 {
     sessionID = sessionID;
     nodeID    = nodeID;
+    peerConnection = mPeerConnection;
+    timestamp = 0;
+    std::cout << "constructor of WebrtcTransport";
+    const rtc::SSRC ssrc = 42;
+    media = rtc::Description::Video("video", rtc::Description::Direction::SendOnly);
+    media.addH264Codec(96);
+    media.setBitrate(3000);
+    media.addSSRC(ssrc, "video-send");
+    track = peerConnection->addTrack(media);
+    auto rtpConfig = std::make_shared<rtc::RtpPacketizationConfig>(ssrc, "video-send", 96, rtc::H264RtpPacketizer::ClockRate);
+    auto packetizer = std::make_shared<rtc::H264RtpPacketizer>(rtpConfig);
+    track->setMediaHandler(packetizer);
 }
 
 WebrtcTransport::~WebrtcTransport() {}
@@ -36,6 +48,14 @@ void WebrtcTransport::RegisterToMediaController()
 void WebrtcTransport::SendVideo(const char * data, size_t size, uint16_t videoStreamID)
 {
     std::cout << "Sending video data of size: " << size << " bytes." << std::endl;
+    auto *b = reinterpret_cast<const std::byte*>(data);
+    rtc::binary sample = {};
+    sample.assign(b, b + size);
+    int sampleDuration_us = 1000 * 1000 / 30;
+    timestamp += sampleDuration_us;
+    rtc::FrameInfo frameInfo(timestamp);
+    frameInfo.payloadType = 96;
+    track->sendFrame(sample, frameInfo);
 }
 
 // Dummy implementation of SendAudio method

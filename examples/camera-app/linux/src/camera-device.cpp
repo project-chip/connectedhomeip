@@ -164,7 +164,7 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
     pipeline = gst_pipeline_new("video-pipeline");
 
     // Create elements
-    source       = gst_element_factory_make("v4l2src", "source");
+    source       = gst_element_factory_make("videotestsrc", "source");
     capsfilter   = gst_element_factory_make("capsfilter", "filter");
     videoconvert = gst_element_factory_make("videoconvert", "videoconvert");
     videoscale   = gst_element_factory_make("videoscale", "videoscale");
