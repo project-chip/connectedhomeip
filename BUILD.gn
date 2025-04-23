@@ -76,23 +76,23 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
   }
 
-  # Matter's in-tree pw_python_package or pw_python_distribution targets.
-  _matter_python_packages = [
-    "//examples/chef",
-    "//examples/common/pigweed/rpc_console/py:chip_rpc",
-    "//integrations/mobly:chip_mobly",
-    "//scripts/py_matter_yamltests:matter_yamltests",
-    "//src/python_testing/matter_testing_infrastructure:chip-testing",
-  ]
-
   pw_python_venv("matter_build_venv") {
     path = "$root_build_dir/python-venv"
     constraints = pw_build_PIP_CONSTRAINTS
     requirements = pw_build_PIP_REQUIREMENTS
 
+    # Extra packages required for running tests.
+    requirements += [ "//scripts/tests/requirements.txt" ]
+
     # Packages available to import within GN's build venv.
-    source_packages = _matter_python_packages +
-                      [ "$dir_pw_env_setup:core_pigweed_python_packages" ]
+    # Matter's in-tree pw_python_package or pw_python_distribution targets.
+    source_packages = [
+      "//examples/chef",
+      "//examples/common/pigweed/rpc_console/py:chip_rpc",
+      "//integrations/mobly:chip_mobly",
+      "//src/python_testing/matter_testing_infrastructure:chip-testing",
+      "$dir_pw_env_setup:core_pigweed_python_packages",
+    ]
   }
 
   pw_python_pip_install("pip_install_matter_packages") {
