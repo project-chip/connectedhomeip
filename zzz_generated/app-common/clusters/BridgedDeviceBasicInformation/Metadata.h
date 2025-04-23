@@ -16,7 +16,7 @@ namespace app {
 namespace Clusters {
 namespace BridgedDeviceBasicInformation {
 
-inline constexpr uint32_t kRevision = 3;
+inline constexpr uint32_t kRevision = 5;
 
 namespace Attributes {
 namespace VendorName {
@@ -56,7 +56,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = NodeLabel::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
+    .writePrivilege = Access::Privilege::kManage,
 };
 } // namespace NodeLabel
 namespace HardwareVersion {
@@ -155,6 +155,14 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .writePrivilege = std::nullopt,
 };
 } // namespace ProductAppearance
+namespace ConfigurationVersion {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
+    .attributeId    = ConfigurationVersion::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+} // namespace ConfigurationVersion
 
 } // namespace Attributes
 

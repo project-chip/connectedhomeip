@@ -12,9 +12,9 @@ namespace app {
 namespace Clusters {
 namespace ClosureDimension {
 namespace Attributes {
-namespace Current {
+namespace CurrentState {
 inline constexpr AttributeId Id = 0x00000000;
-} // namespace Current
+} // namespace CurrentState
 
 namespace Target {
 inline constexpr AttributeId Id = 0x00000001;

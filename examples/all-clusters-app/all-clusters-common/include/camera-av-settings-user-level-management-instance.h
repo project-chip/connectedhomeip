@@ -29,10 +29,15 @@ namespace CameraAvSettingsUserLevelManagement {
 class AVSettingsUserLevelManagementDelegate : public Delegate
 {
 public:
-    AVSettingsUserLevelManagementDelegate(){};
+    AVSettingsUserLevelManagementDelegate()  = default;
+    ~AVSettingsUserLevelManagementDelegate() = default;
 
     bool CanChangeMPTZ() override;
     bool IsValidVideoStreamID(uint16_t videoStreamID) override;
+
+    CHIP_ERROR LoadMPTZPresets(std::vector<MPTZPresetHelper> & mptzPresetHelpers) override;
+    CHIP_ERROR LoadDPTZRelativeMove(std::vector<uint16_t> dptzRelativeMove) override;
+    CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
     /**
      * delegate command handlers
@@ -49,8 +54,6 @@ public:
     Protocols::InteractionModel::Status DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX,
                                                          Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta) override;
 };
-
-CameraAvSettingsUserLevelMgmtServer * GetInstance();
 
 void Shutdown();
 

@@ -16,7 +16,9 @@
 #
 
 import argparse
+import glob
 import json
+import logging
 import os
 import shutil
 import subprocess
@@ -24,7 +26,7 @@ import sys
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
+from typing import Generator, Optional
 
 from clang_format import getClangFormatBinary
 from zap_execution import ZapTool
@@ -248,18 +250,46 @@ def runGeneration(cmdLineArgs):
         extractGeneratedIdl(output_dir, matter_name)
 
 
+def expandPlaceholderWildcards(path: str) -> Generator[str, None, None]:
+    """
+    Generates expanded path lists from ZAP output paths.
+    ZAP allows to use iterators (see https://github.com/project-chip/zap/blob/master/docs/sdk-integration.md#individual-template)
+    and then paths may include placeholders such as '{name}'.
+
+    If such placehoders exist in `path` this method will do a filesystem glob
+    to select the actual outputs.
+    """
+    if '{' not in path:
+        yield path
+        return
+
+    while '{' in path:
+        s = path.find('{')
+        e = path.find('}')
+        path = path[:s] + '*' + path[e+1:]
+
+    # path is a glob target, expand it
+    for result in glob.glob(path, include_hidden=True):
+        yield result
+
+
 def runClangPrettifier(templates_file, output_dir):
     listOfSupportedFileExtensions = [
-        '.js', '.h', '.c', '.hpp', '.cpp', '.m', '.mm']
+        '.js', '.h', '.c', '.hpp', '.cpp', '.m', '.mm', '.ipp']
 
     try:
         jsonData = json.loads(Path(templates_file).read_text())
         outputs = [(os.path.join(output_dir, template['output']))
                    for template in jsonData['templates']]
-        clangOutputs = list(filter(lambda filepath: os.path.splitext(
+        rawPaths = list(filter(lambda filepath: os.path.splitext(
             filepath)[1] in listOfSupportedFileExtensions, outputs))
 
-        if len(clangOutputs) > 0:
+        clangOutputs = []
+        for path in rawPaths:
+            clangOutputs.extend(expandPlaceholderWildcards(path))
+        clangOutputs = list(set(clangOutputs))  # unique paths in case of glob overlap
+
+        if clangOutputs:
             # NOTE: clang-format differs output in time. We generally would be
             #       compatible only with pigweed provided clang-format (which is
             #       tracking non-released clang).
@@ -267,9 +297,10 @@ def runClangPrettifier(templates_file, output_dir):
             args = [clang_format, '-i']
             args.extend(clangOutputs)
             subprocess.check_call(args)
-            print('Formatted using %s (%s)' % (clang_format, subprocess.check_output([clang_format, '--version'])))
+            print('Formatted %d files using %s (%s)' %
+                  (len(clangOutputs), clang_format, subprocess.check_output([clang_format, '--version'])))
             for outputName in clangOutputs:
-                print('  - %s' % outputName)
+                logging.debug("Formatted: %s", outputName)
     except subprocess.CalledProcessError as err:
         print('clang-format error: %s', err)
 
@@ -333,6 +364,23 @@ def main():
                 os.environ['TEMP'] = old_temp
             else:
                 del os.environ['TEMP']
+
+        # Post-process fixes: zap needs some fixes from
+        # https://github.com/project-chip/zap/pull/1569
+        #
+        # While that is going on, we need to post-process outputs
+        renames = {
+            '../../clusters/Pm2.5ConcentrationMeasurement': '../../clusters/Pm25ConcentrationMeasurement',
+        }
+        for src, dest in renames.items():
+            srcDir = f'{cmdLineArgs.outputDir}/{src}'
+            if not os.path.exists(srcDir):
+                continue
+            print(f"Moving files from {srcDir} INTO {cmdLineArgs.outputDir}/{dest}")
+            # move all files
+            for name in glob.glob(f'{srcDir}/*'):
+                os.rename(name, f'{cmdLineArgs.outputDir}/{dest}/{os.path.basename(name)}')
+            os.rmdir(srcDir)
 
     if cmdLineArgs.prettify_output:
         prettifiers = [
