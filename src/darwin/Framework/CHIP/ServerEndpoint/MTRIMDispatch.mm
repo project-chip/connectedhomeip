@@ -88,20 +88,17 @@ namespace app {
         // But OTA would need some special-casing in any case, to call into the
         // existing cluster implementation.
 
-        using Protocols::InteractionModel::Status;
-
-        if (aPath.mClusterId != OtaSoftwareUpdateProvider::Id) {
-            aCommandObj->AddStatus(aPath, Status::UnsupportedCluster);
-            return;
-        }
-
-        if (aPath.mEndpointId != kOtaProviderEndpointId) {
-            aCommandObj->AddStatus(aPath, Status::UnsupportedCluster);
-            return;
-        }
-
         // This command passed ServerClusterCommandExists so we know it's one of our
         // supported commands.
+        //
+        // The code below is a double-check in case configuration is not valid.
+        //
+        if ((aPath.mClusterId != OtaSoftwareUpdateProvider::Id) || (aPath.mEndpointId != kOtaProviderEndpointId)) {
+            aCommandObj->AddStatus(aPath, Status::UnsupportedCluster);
+            return;
+        }
+
+        using Protocols::InteractionModel::Status;
         using namespace OtaSoftwareUpdateProvider::Commands;
 
         std::optional<DataModel::ActionReturnStatus> result;

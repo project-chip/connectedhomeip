@@ -88,6 +88,13 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aPath, TLV::TLVRea
 {
     // This command passed ServerClusterCommandExists so we know it's one of our
     // supported commands.
+    //
+    // The code below is a double-check in case configuration is not valid.
+    if ((aPath.mClusterId != OtaSoftwareUpdateProvider::Id) || (aPath.mEndpointId != kOtaProviderDynamicEndpointId))
+    {
+        aCommandObj->AddStatus(aPath, Status::UnsupportedCluster);
+        return;
+    }
     using namespace OtaSoftwareUpdateProvider::Commands;
 
     std::optional<DataModel::ActionReturnStatus> result;
