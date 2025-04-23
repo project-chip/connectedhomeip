@@ -2786,7 +2786,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     // for now just subscribe once
     if (!NeedToStartSubscriptionSetup(_internalDeviceState)) {
-        MTR_LOG("%@ setupSubscription: No need to subscribe due to internal state %@ (reason: %@)", self,  InternalDeviceStateString(_internalDeviceState), reason);
+        MTR_LOG("%@ setupSubscription: No need to subscribe due to internal state %@ (reason: %@)", self, InternalDeviceStateString(_internalDeviceState), reason);
         [self _clearSubscriptionPoolWork];
         return;
     }
