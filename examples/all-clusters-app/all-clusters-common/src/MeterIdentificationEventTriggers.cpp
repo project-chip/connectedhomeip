@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <meter-identification-instance.h>
 #include <app/clusters/meter-identification-server/MeterIdentificationTestEventTriggerHandler.h>
+#include <meter-identification-instance.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -29,23 +29,23 @@ namespace {
 class OldMeterIdentificationAttributes
 {
 private:
-
-    Instance * mInstance = nullptr;
-    static constexpr size_t kMaximumStringSize = 64;
-    char mPointOfDeliveryBuf[kMaximumStringSize] = {};
+    Instance * mInstance                           = nullptr;
+    static constexpr size_t kMaximumStringSize     = 64;
+    char mPointOfDeliveryBuf[kMaximumStringSize]   = {};
     char mMeterSerialNumberBuf[kMaximumStringSize] = {};
-    char mProtocolVersionBuf[kMaximumStringSize] = {};
+    char mProtocolVersionBuf[kMaximumStringSize]   = {};
     DataModel::Nullable<MeterTypeEnum> mMeterType;
     DataModel::Nullable<CharSpan> mPointOfDelivery;
     DataModel::Nullable<CharSpan> mMeterSerialNumber;
     DataModel::Nullable<CharSpan> mProtocolVersion;
     DataModel::Nullable<Globals::Structs::PowerThresholdStruct::Type> mPowerThreshold;
 
-    struct DataPresets_s {
-        DataModel::Nullable<MeterTypeEnum>                                meterType;
-        DataModel::Nullable<CharSpan>                                     pointOfDelivery;
-        DataModel::Nullable<CharSpan>                                     meterSerialNumber;
-        DataModel::Nullable<CharSpan>                                     protocolVersion;
+    struct DataPresets_s
+    {
+        DataModel::Nullable<MeterTypeEnum> meterType;
+        DataModel::Nullable<CharSpan> pointOfDelivery;
+        DataModel::Nullable<CharSpan> meterSerialNumber;
+        DataModel::Nullable<CharSpan> protocolVersion;
         DataModel::Nullable<Globals::Structs::PowerThresholdStruct::Type> powerThreshold;
     };
 
@@ -53,21 +53,18 @@ private:
     uint8_t mPresetsIdx;
 
     const DataPresets_s TestsDataPresets[kMaxPresetItems] = {
-        {
-            .meterType = DataModel::MakeNullable(MeterTypeEnum::kUtility),
-            .pointOfDelivery = DataModel::MakeNullable(CharSpan::fromCharString("Test delivery point")),
-            .meterSerialNumber = DataModel::MakeNullable(CharSpan::fromCharString("TST-123456789")),
-            .protocolVersion = DataModel::MakeNullable(CharSpan::fromCharString("1.2.3")),
-            .powerThreshold = DataModel::MakeNullable(Globals::Structs::PowerThresholdStruct::Type({Optional<int64_t>(2400000), Optional<int64_t>(120), Globals::PowerThresholdSourceEnum::kContract }))
-        },
-        {
-            .meterType = DataModel::MakeNullable(MeterTypeEnum::kPrivate),
-            .pointOfDelivery = DataModel::MakeNullable(CharSpan::fromCharString("New delivery point")),
-            .meterSerialNumber = DataModel::MakeNullable(CharSpan::fromCharString("NEW-987654321")),
-            .protocolVersion = DataModel::MakeNullable(CharSpan::fromCharString("3.4.5")),
-            .powerThreshold = DataModel::MakeNullable(Globals::Structs::PowerThresholdStruct::Type({Optional<int64_t>(4800000),
-                Optional<int64_t>(240), Globals::PowerThresholdSourceEnum::kRegulator}))
-        }
+        { .meterType         = DataModel::MakeNullable(MeterTypeEnum::kUtility),
+          .pointOfDelivery   = DataModel::MakeNullable(CharSpan::fromCharString("Test delivery point")),
+          .meterSerialNumber = DataModel::MakeNullable(CharSpan::fromCharString("TST-123456789")),
+          .protocolVersion   = DataModel::MakeNullable(CharSpan::fromCharString("1.2.3")),
+          .powerThreshold    = DataModel::MakeNullable(Globals::Structs::PowerThresholdStruct::Type(
+              { Optional<int64_t>(2400000), Optional<int64_t>(120), Globals::PowerThresholdSourceEnum::kContract })) },
+        { .meterType         = DataModel::MakeNullable(MeterTypeEnum::kPrivate),
+          .pointOfDelivery   = DataModel::MakeNullable(CharSpan::fromCharString("New delivery point")),
+          .meterSerialNumber = DataModel::MakeNullable(CharSpan::fromCharString("NEW-987654321")),
+          .protocolVersion   = DataModel::MakeNullable(CharSpan::fromCharString("3.4.5")),
+          .powerThreshold    = DataModel::MakeNullable(Globals::Structs::PowerThresholdStruct::Type(
+              { Optional<int64_t>(4800000), Optional<int64_t>(240), Globals::PowerThresholdSourceEnum::kRegulator })) }
     };
 
     static bool NullableCharSpansEqual(const DataModel::Nullable<CharSpan> & a, const DataModel::Nullable<CharSpan> & b)
@@ -99,8 +96,9 @@ private:
 
         if (!newValue.IsNull())
         {
-            const size_t len = newValue.IsNull() ? 0 : newValue.Value().size() < kMaximumStringSize ?
-                newValue.Value().size() : kMaximumStringSize;
+            const size_t len = newValue.IsNull()               ? 0
+                : newValue.Value().size() < kMaximumStringSize ? newValue.Value().size()
+                                                               : kMaximumStringSize;
             memmove(mPointOfDeliveryBuf, newValue.Value().data(), len);
             mPointOfDelivery = DataModel::MakeNullable(CharSpan(mPointOfDeliveryBuf, len));
         }
@@ -120,8 +118,9 @@ private:
 
         if (!newValue.IsNull())
         {
-            const size_t len = newValue.IsNull() ? 0 : newValue.Value().size() < kMaximumStringSize ?
-                newValue.Value().size() : kMaximumStringSize;
+            const size_t len = newValue.IsNull()               ? 0
+                : newValue.Value().size() < kMaximumStringSize ? newValue.Value().size()
+                                                               : kMaximumStringSize;
             memmove(mMeterSerialNumberBuf, newValue.Value().data(), len);
             mMeterSerialNumber = DataModel::MakeNullable(CharSpan(mMeterSerialNumberBuf, len));
         }
@@ -141,8 +140,9 @@ private:
 
         if (!newValue.IsNull())
         {
-            const size_t len = newValue.IsNull() ? 0 : newValue.Value().size() < kMaximumStringSize ?
-                newValue.Value().size() : kMaximumStringSize;
+            const size_t len = newValue.IsNull()               ? 0
+                : newValue.Value().size() < kMaximumStringSize ? newValue.Value().size()
+                                                               : kMaximumStringSize;
             memmove(mProtocolVersionBuf, newValue.Value().data(), len);
             mProtocolVersion = DataModel::MakeNullable(CharSpan(mProtocolVersionBuf, len));
         }
@@ -153,12 +153,12 @@ private:
      *
      * @param string A string to lexicographically increment
      */
-    static std::string IncrementString(const std::string &&string)
+    static std::string IncrementString(const std::string && string)
     {
         // The lexicographically smallest and largest characters
         constexpr char minC = ' ', maxC = '~';
 
-        std::string ret{minC};
+        std::string ret{ minC };
 
         auto rit = string.rbegin();
         while (rit != string.rend())
@@ -225,8 +225,8 @@ private:
         }
         else
         {
-            mInstance->SetMeterType(DataModel::MakeNullable(static_cast<MeterTypeEnum>(1 +
-                to_underlying(mInstance->GetMeterType().Value()))));
+            mInstance->SetMeterType(
+                DataModel::MakeNullable(static_cast<MeterTypeEnum>(1 + to_underlying(mInstance->GetMeterType().Value()))));
         }
 
         if (mInstance->GetPointOfDelivery().IsNull())
@@ -236,8 +236,8 @@ private:
         else
         {
             const auto value = mInstance->GetPointOfDelivery().Value();
-            mInstance->SetPointOfDelivery(DataModel::MakeNullable(CharSpan::fromCharString(IncrementString(
-                std::string(value.data(), value.size())).c_str())));
+            mInstance->SetPointOfDelivery(DataModel::MakeNullable(
+                CharSpan::fromCharString(IncrementString(std::string(value.data(), value.size())).c_str())));
         }
 
         if (mInstance->GetMeterSerialNumber().IsNull())
@@ -247,8 +247,8 @@ private:
         else
         {
             const auto value = mInstance->GetMeterSerialNumber().Value();
-            mInstance->SetMeterSerialNumber(DataModel::MakeNullable(CharSpan::fromCharString(IncrementString(
-                std::string(value.data(), value.size())).c_str())));
+            mInstance->SetMeterSerialNumber(DataModel::MakeNullable(
+                CharSpan::fromCharString(IncrementString(std::string(value.data(), value.size())).c_str())));
         }
 
         if (mInstance->GetProtocolVersion().IsNull())
@@ -258,22 +258,22 @@ private:
         else
         {
             const auto value = mInstance->GetProtocolVersion().Value();
-            mInstance->SetProtocolVersion(DataModel::MakeNullable(CharSpan::fromCharString(IncrementString(
-                std::string(value.data(), value.size())).c_str())));
+            mInstance->SetProtocolVersion(DataModel::MakeNullable(
+                CharSpan::fromCharString(IncrementString(std::string(value.data(), value.size())).c_str())));
         }
 
         if (mInstance->GetPowerThreshold().IsNull())
         {
-            mInstance->SetPowerThreshold(DataModel::MakeNullable(Globals::Structs::PowerThresholdStruct::Type({Optional<int64_t>(0),
-                Optional<int64_t>(0), Globals::PowerThresholdSourceEnum::kContract})));
+            mInstance->SetPowerThreshold(DataModel::MakeNullable(Globals::Structs::PowerThresholdStruct::Type(
+                { Optional<int64_t>(0), Optional<int64_t>(0), Globals::PowerThresholdSourceEnum::kContract })));
         }
         else
         {
             auto powerThreshold = mInstance->GetPowerThreshold();
             ++powerThreshold.Value().powerThreshold.Value();
             ++powerThreshold.Value().apparentPowerThreshold.Value();
-            powerThreshold.Value().powerThresholdSource.Value() = static_cast<Globals::PowerThresholdSourceEnum>(1 +
-                to_underlying(powerThreshold.Value().powerThresholdSource.Value()));
+            powerThreshold.Value().powerThresholdSource.Value() = static_cast<Globals::PowerThresholdSourceEnum>(
+                1 + to_underlying(powerThreshold.Value().powerThresholdSource.Value()));
             mInstance->SetPowerThreshold(std::move(powerThreshold));
         }
     }

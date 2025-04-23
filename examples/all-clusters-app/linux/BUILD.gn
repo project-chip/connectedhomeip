@@ -30,6 +30,7 @@ if (chip_enable_pw_rpc) {
 
 source_set("chip-all-clusters-common") {
   sources = [
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/MeterIdentificationEventTriggers.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/air-quality-instance.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/boolcfg-stub.cpp",
@@ -65,7 +66,6 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/tcc-mode.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/wifi-diagnostics-stub.cpp",
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/MeterIdentificationEventTriggers.cpp",
     "${chip_root}/examples/all-clusters-app/linux/diagnostic-logs-provider-delegate-impl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/common/src/EnergyTimeUtils.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementDelegateImpl.cpp",
