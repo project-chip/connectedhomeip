@@ -177,16 +177,24 @@ public:
     // Return CHIP_ERROR_INCORRECT_STATE if the class has not been initialized.
     // Return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if the attribute is not supported by the conformance.
     // Return CHIP_ERROR_INVALID_ARGUMENT if the input value is out of range.
-    // Returns CHIP_ERROR_PERSISTED_STORAGE_FAILED if the value could not not be stored in persistent storage.
     // Otherwise return CHIP_NO_ERROR and set the parameter value in the cluster state
     // Set functions are supplied for any values that can be set either internally by the device or externally
     // through a direct attribute write. Changes to attributes that happen as a side effect of cluster commands
     // are handled by the cluster command handlers.
-
-    CHIP_ERROR SetMainState(MainStateEnum mainState);
+    
     CHIP_ERROR SetOverallState(const DataModel::Nullable<GenericOverallState> & overallState);
     CHIP_ERROR SetOverallTarget(const DataModel::Nullable<GenericOverallTarget> & overallTarget);
     CHIP_ERROR SetCurrentErrorList(const ClosureErrorEnum error);
+    
+    /**
+     * @brief Function to change the MainState.
+     *        Function posts EngageStateChanged Event, base on trasition to/from Disengaged state.
+     *        Function calls the SetCountdownTimeFromCluster function with the State Specific CountdownTime and
+     *          also starts and cancel the timer based on MovingStates(Calibration/Moving/WaitingForMotion) or not.
+     *
+     *        See SetCountdownTime function comment below
+     */
+    CHIP_ERROR SetMainState(MainStateEnum mainState);
     
     /**
      * @brief Public API to trigger countdown time update from the delegate (application layer).
@@ -210,11 +218,20 @@ public:
         return SetCountdownTime(countdownTime, false);
     }
     
+    
     /**
-     *  @brief Calls delegate HandleStopCommand function after validating the parameters and conformance.
+     *  @brief Calls delegate HandleStopCommand function after validating MainState
      *  @return Exits if the cluster is not initialized.
-     *          Returns InvalidInState if the Stop command not supported from present Mainstate.
-     *          Returns Success on succesful handling.
+     *          Returns Success if the Stop command not supported from present Mainstate.
+     *          Returns Success on succesful handling or Error Otherwise
+     */
+    chip::Protocols::InteractionModel::Status HandleStopInternal();
+    
+    /**
+     *  @brief Calls HandleStopInternal function after validating the conformance and Initialization
+     *  @return Exits if the cluster is not initialized.
+     *          Returns UnsupportedCommand if Instantaneous feature is supported.
+     *          Returns Success on succesful handling or Error Otherwise
      */
     chip::Protocols::InteractionModel::Status HandleStop();
     
@@ -281,6 +298,12 @@ public:
      */
     void ReportCurrentErrorListChange();
     
+    
+    /**
+     * @brief Fuction handles the expiry of countdowntime. 
+     *        If device is in WaitingforMotion,will check if Motion should be triggered or not.
+     *        If no motion nedded, will post MotionComplete event and call HandlestopInternal.
+     */
     void HandleCountdownTimeExpired();
 
 private:

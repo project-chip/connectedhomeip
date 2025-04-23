@@ -31,9 +31,7 @@ class DelegateBase
 public:
     DelegateBase()          = default;
     virtual ~DelegateBase() = default;
-
-    // TODO: Delagte only has the default three APIs for now. This will be refined when the updated cluster structure is integrated
-    // in the Closure Sample app
+    //TODO: Add fucntion comments
     virtual Protocols::InteractionModel::Status HandleStopCommand()      = 0;
     virtual Protocols::InteractionModel::Status HandleMoveToCommand(const Optional<TargetPositionEnum> & tag, const Optional<bool> & latch,
                                                        const Optional<Globals::ThreeLevelAutoEnum> & speed) = 0;

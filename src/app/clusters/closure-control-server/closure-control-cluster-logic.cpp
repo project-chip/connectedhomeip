@@ -208,6 +208,7 @@ static void onCountdownTimerTick(System::Layer * systemLayer, void * context)
     {
         (void) DeviceLayer::SystemLayer().CancelTimer(onCountdownTimerTick, logic);
         logic->HandleCountdownTimeExpired();
+        return;
     }
 
     (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onCountdownTimerTick, logic);
@@ -226,12 +227,13 @@ void ClusterLogic::HandleCountdownTimeExpired()
             if (status == Status::Success)
             {
                 SetMainState(MainStateEnum::kMoving);
-            } 
+            }
+            return;
         } 
     }
     
     PostMovementCompletedEvent();
-    HandleStop();
+    HandleStopInternal();
 }
 
 CHIP_ERROR ClusterLogic::SetMainState(MainStateEnum mainState)
@@ -270,7 +272,7 @@ CHIP_ERROR ClusterLogic::SetMainState(MainStateEnum mainState)
         } else if (mainState == MainStateEnum::kWaitingForMotion) {
             SetCountdownTimeFromCluster(mDelegate.GetWaitingForMotionCountdownTime());
         } else {
-            SetCountdownTimeFromCluster(DataModel::NullNullable);
+            (void) DeviceLayer::SystemLayer().CancelTimer(onCountdownTimerTick, this);
         }
     
         if (mainState == MainStateEnum::kCalibrating || mainState == MainStateEnum::kMoving || mainState == MainStateEnum::kWaitingForMotion)
@@ -634,8 +636,6 @@ CHIP_ERROR ClusterLogic::SetCurrentErrorList(const ClosureErrorEnum error)
     ReturnErrorOnFailure(mDelegate.SetCurrentErrorInList(error));
     ReportCurrentErrorListChange();
     
-    //TODO: GetErrorList and PostErrorEvent
-    
     ReturnErrorOnFailure(SetMainState(MainStateEnum::kError));
     
     return CHIP_NO_ERROR;
@@ -687,7 +687,7 @@ CHIP_ERROR ClusterLogic::GetOverallTarget(DataModel::Nullable<GenericOverallTarg
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
 
-    if (mState.mOverallState.IsNull())
+    if (mState.mOverallTarget.IsNull())
     {
         overallTarget.SetNull();
     }
@@ -730,17 +730,12 @@ exit:
     return err;
 }
 
-chip::Protocols::InteractionModel::Status ClusterLogic::HandleStop() 
+chip::Protocols::InteractionModel::Status ClusterLogic::HandleStopInternal() 
 {
     Status status = Status::Success;
-    
-    // Stop command can only be supported if closure doesnt support instantaneous features
-    VerifyOrReturnError(!mConformance.HasFeature(Feature::kInstantaneous), Status::UnsupportedCommand);
-    
+        
     MainStateEnum state;
     VerifyOrReturnValue(GetMainState(state) == CHIP_NO_ERROR,Status::Failure);
-
-    //VerifyOrReturnValue(CheckCommandStateCompatibility(Commands::Stop::Id, state), Status::InvalidInState);
     
     // Stop action is supported only if the closure is in one of the following states Moving, WaitingForMotion or Calibrating.
     // A status code of SUCCESS SHALL always be returned, regardless if it is in above states or not.
@@ -758,9 +753,21 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleStop()
     
 }
 
+chip::Protocols::InteractionModel::Status ClusterLogic::HandleStop() 
+{
+    VerifyOrDieWithMsg(mIsInitialized, NotSpecified, "Stop Command called before Initialization of closure");
+    
+    // Stop command can only be supported if closure doesnt support instantaneous features
+    VerifyOrReturnError(!mConformance.HasFeature(Feature::kInstantaneous), Status::UnsupportedCommand);
+    
+    return HandleStopInternal();
+}
+
 chip::Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPositionEnum> position, Optional<bool> latch,
                                                        Optional<Globals::ThreeLevelAutoEnum> speed) 
 {
+    VerifyOrDieWithMsg(mIsInitialized, NotSpecified, "MoveTo Command called before Initialization of closure");
+    
     Status status = Status::Success;
     
     MainStateEnum state;
@@ -809,14 +816,6 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<Ta
     VerifyOrReturnValue(state != MainStateEnum::kMoving && state != MainStateEnum::kWaitingForMotion
                         && state != MainStateEnum::kStopped, Status::InvalidInState);
 
-    // TODO: Check if Closure need to perform motion or not.
-    // if the closure is already in the target position, Motion is not required
-    // If Motion is required, then ignore next checks and start checking if closure is ready to move or not.
-    // If Motion is not required, then check for Errors on closure.
-    // If there are no errors on closure, set MainState to Stopped and return SUCCESS.
-    // If there are errors on closure, set MainState to Error and return SUCCESS.
-
-    
 
     status = mDelegate.HandleMoveToCommand(position, latch, speed);
     
@@ -846,6 +845,8 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<Ta
 
 chip::Protocols::InteractionModel::Status ClusterLogic::HandleCalibrate()
 {
+    VerifyOrDieWithMsg(mIsInitialized, NotSpecified, "Calibrate Command called before Initialization of closure");
+    
     Status status = Status::Success;
     
     // Calibrate command can only be supported if closure supports Calibration feature.
@@ -862,7 +863,7 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleCalibrate()
     
     // If Calibrate command is invoked in any state other than Stopped, the server SHALL respond with INVALID_IN_STATE.
     // this check excludes Claibrating Mainstate as its already validated above.
-    VerifyOrReturnValue(state != MainStateEnum::kStopped,Status::InvalidInState);
+    VerifyOrReturnValue(state == MainStateEnum::kStopped,Status::InvalidInState);
     
     status = mDelegate.HandleCalibrateCommand();
     
