@@ -910,18 +910,6 @@ class TC_ACL_2_4(MatterBaseTest):
         asserts.assert_equal(admin_entry.subjects, [self.th1.nodeId],
                              "Entry should have admin node ID")
 
-        verify_acl = await self.read_single_attribute_check_success(
-            endpoint=0,
-            cluster=acl_cluster,
-            attribute=acl_attribute
-        )
-        asserts.assert_equal(len(verify_acl), 1, "ACL should contain only admin entry after failed operation")
-        asserts.assert_equal(verify_acl[0].privilege,
-                             Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
-                             "Remaining entry must be admin")
-        asserts.assert_equal(verify_acl[0].subjects, [self.th1.nodeId],
-                             "Admin entry must have correct node ID")
-
         # Step 32: Test Group auth mode for admin (should fail)
         self.step(32)
         group_admin_acl = [
@@ -949,6 +937,19 @@ class TC_ACL_2_4(MatterBaseTest):
         )
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
                              "Write ACL with Group auth mode for admin should fail with CONSTRAINT_ERROR")
+
+        # Verify ACL still contains only admin entry after constraint error
+        verify_acl = await self.read_single_attribute_check_success(
+            endpoint=0,
+            cluster=acl_cluster,
+            attribute=acl_attribute
+        )
+        asserts.assert_equal(len(verify_acl), 1, "ACL should contain only admin entry after failed operation")
+        asserts.assert_equal(verify_acl[0].privilege,
+                             Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+                             "Remaining entry must be admin")
+        asserts.assert_equal(verify_acl[0].subjects, [self.th1.nodeId],
+                             "Admin entry must have correct node ID")
 
         # Step 33: Test invalid privilege value (should fail)
         self.step(33)
@@ -978,6 +979,19 @@ class TC_ACL_2_4(MatterBaseTest):
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
                              "Write ACL with invalid privilege should fail with CONSTRAINT_ERROR")
 
+        # Verify ACL still contains only admin entry after constraint error
+        verify_acl = await self.read_single_attribute_check_success(
+            endpoint=0,
+            cluster=acl_cluster,
+            attribute=acl_attribute
+        )
+        asserts.assert_equal(len(verify_acl), 1, "ACL should contain only admin entry after failed operation")
+        asserts.assert_equal(verify_acl[0].privilege,
+                             Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+                             "Remaining entry must be admin")
+        asserts.assert_equal(verify_acl[0].subjects, [self.th1.nodeId],
+                             "Admin entry must have correct node ID")
+
         # Step 34: Test invalid auth mode value (should fail)
         self.step(34)
         invalid_auth_mode_acl = [
@@ -1005,6 +1019,19 @@ class TC_ACL_2_4(MatterBaseTest):
         )
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
                              "Write ACL with invalid auth mode should fail with CONSTRAINT_ERROR")
+
+        # Verify ACL still contains only admin entry after constraint error
+        verify_acl = await self.read_single_attribute_check_success(
+            endpoint=0,
+            cluster=acl_cluster,
+            attribute=acl_attribute
+        )
+        asserts.assert_equal(len(verify_acl), 1, "ACL should contain only admin entry after failed operation")
+        asserts.assert_equal(verify_acl[0].privilege,
+                             Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+                             "Remaining entry must be admin")
+        asserts.assert_equal(verify_acl[0].subjects, [self.th1.nodeId],
+                             "Admin entry must have correct node ID")
 
         # Step 35: Test invalid subject ID 0 (should fail)
         self.step(35)
@@ -1034,6 +1061,19 @@ class TC_ACL_2_4(MatterBaseTest):
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
                              "Write ACL with invalid subject ID should fail with CONSTRAINT_ERROR")
 
+        # Verify ACL still contains only admin entry after constraint error
+        verify_acl = await self.read_single_attribute_check_success(
+            endpoint=0,
+            cluster=acl_cluster,
+            attribute=acl_attribute
+        )
+        asserts.assert_equal(len(verify_acl), 1, "ACL should contain only admin entry after failed operation")
+        asserts.assert_equal(verify_acl[0].privilege,
+                             Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+                             "Remaining entry must be admin")
+        asserts.assert_equal(verify_acl[0].subjects, [self.th1.nodeId],
+                             "Admin entry must have correct node ID")
+
         # Step 36: Test max node ID (should fail)
         self.step(36)
         max_node_id_acl = [
@@ -1061,6 +1101,19 @@ class TC_ACL_2_4(MatterBaseTest):
         )
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
                              "Write ACL with max node ID should fail with CONSTRAINT_ERROR")
+
+        # Verify ACL still contains only admin entry after constraint error
+        verify_acl = await self.read_single_attribute_check_success(
+            endpoint=0,
+            cluster=acl_cluster,
+            attribute=acl_attribute
+        )
+        asserts.assert_equal(len(verify_acl), 1, "ACL should contain only admin entry after failed operation")
+        asserts.assert_equal(verify_acl[0].privilege,
+                             Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+                             "Remaining entry must be admin")
+        asserts.assert_equal(verify_acl[0].subjects, [self.th1.nodeId],
+                             "Admin entry must have correct node ID")
 
         # Step 37: Test invalid CAT (Case-Authenticated Tag) as subject (should fail)
         self.step(37)
@@ -1090,6 +1143,19 @@ class TC_ACL_2_4(MatterBaseTest):
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
                              "Write ACL with an invalid CAT as subject should fail with CONSTRAINT_ERROR")
 
+        # Verify ACL still contains only admin entry after constraint error
+        verify_acl = await self.read_single_attribute_check_success(
+            endpoint=0,
+            cluster=acl_cluster,
+            attribute=acl_attribute
+        )
+        asserts.assert_equal(len(verify_acl), 1, "ACL should contain only admin entry after failed operation")
+        asserts.assert_equal(verify_acl[0].privilege,
+                             Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+                             "Remaining entry must be admin")
+        asserts.assert_equal(verify_acl[0].subjects, [self.th1.nodeId],
+                             "Admin entry must have correct node ID")
+
         # Step 38: Test invalid Group Node ID (should fail)
         self.step(38)
         fabric_scoped_id_acl = [
@@ -1117,6 +1183,19 @@ class TC_ACL_2_4(MatterBaseTest):
         )
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
                              "Write ACL with invalid Group Node ID should fail with CONSTRAINT_ERROR")
+
+        # Verify ACL still contains only admin entry after constraint error
+        verify_acl = await self.read_single_attribute_check_success(
+            endpoint=0,
+            cluster=acl_cluster,
+            attribute=acl_attribute
+        )
+        asserts.assert_equal(len(verify_acl), 1, "ACL should contain only admin entry after failed operation")
+        asserts.assert_equal(verify_acl[0].privilege,
+                             Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+                             "Remaining entry must be admin")
+        asserts.assert_equal(verify_acl[0].subjects, [self.th1.nodeId],
+                             "Admin entry must have correct node ID")
 
         # Step 39: Test empty target (should fail)
         self.step(39)
@@ -1152,6 +1231,19 @@ class TC_ACL_2_4(MatterBaseTest):
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
                              "Write ACL with empty target should fail with CONSTRAINT_ERROR")
 
+        # Verify ACL still contains only admin entry after constraint error
+        verify_acl = await self.read_single_attribute_check_success(
+            endpoint=0,
+            cluster=acl_cluster,
+            attribute=acl_attribute
+        )
+        asserts.assert_equal(len(verify_acl), 1, "ACL should contain only admin entry after failed operation")
+        asserts.assert_equal(verify_acl[0].privilege,
+                             Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+                             "Remaining entry must be admin")
+        asserts.assert_equal(verify_acl[0].subjects, [self.th1.nodeId],
+                             "Admin entry must have correct node ID")
+
         # Step 40: Test invalid cluster ID (should fail)
         self.step(40)
         invalid_cluster_acl = [
@@ -1185,6 +1277,19 @@ class TC_ACL_2_4(MatterBaseTest):
         )
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
                              "Write ACL with invalid cluster ID should fail with CONSTRAINT_ERROR")
+
+        # Verify ACL still contains only admin entry after constraint error
+        verify_acl = await self.read_single_attribute_check_success(
+            endpoint=0,
+            cluster=acl_cluster,
+            attribute=acl_attribute
+        )
+        asserts.assert_equal(len(verify_acl), 1, "ACL should contain only admin entry after failed operation")
+        asserts.assert_equal(verify_acl[0].privilege,
+                             Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+                             "Remaining entry must be admin")
+        asserts.assert_equal(verify_acl[0].subjects, [self.th1.nodeId],
+                             "Admin entry must have correct node ID")
 
         # Step 41: Test invalid endpoint ID (should fail)
         self.step(41)
@@ -1220,6 +1325,19 @@ class TC_ACL_2_4(MatterBaseTest):
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
                              "Write ACL with invalid endpoint ID should fail with CONSTRAINT_ERROR")
 
+        # Verify ACL still contains only admin entry after constraint error
+        verify_acl = await self.read_single_attribute_check_success(
+            endpoint=0,
+            cluster=acl_cluster,
+            attribute=acl_attribute
+        )
+        asserts.assert_equal(len(verify_acl), 1, "ACL should contain only admin entry after failed operation")
+        asserts.assert_equal(verify_acl[0].privilege,
+                             Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+                             "Remaining entry must be admin")
+        asserts.assert_equal(verify_acl[0].subjects, [self.th1.nodeId],
+                             "Admin entry must have correct node ID")
+
         # Step 42: Test invalid device type (should fail)
         self.step(42)
         invalid_device_type_acl = [
@@ -1253,6 +1371,19 @@ class TC_ACL_2_4(MatterBaseTest):
         )
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
                              "Write ACL with invalid device type should fail with CONSTRAINT_ERROR")
+
+        # Verify ACL still contains only admin entry after constraint error
+        verify_acl = await self.read_single_attribute_check_success(
+            endpoint=0,
+            cluster=acl_cluster,
+            attribute=acl_attribute
+        )
+        asserts.assert_equal(len(verify_acl), 1, "ACL should contain only admin entry after failed operation")
+        asserts.assert_equal(verify_acl[0].privilege,
+                             Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+                             "Remaining entry must be admin")
+        asserts.assert_equal(verify_acl[0].subjects, [self.th1.nodeId],
+                             "Admin entry must have correct node ID")
 
         # Step 43: Test endpoint with device type (should fail)
         self.step(43)
@@ -1288,6 +1419,19 @@ class TC_ACL_2_4(MatterBaseTest):
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
                              "Write ACL with both endpoint and device type should fail with CONSTRAINT_ERROR")
 
+        # Verify ACL still contains only admin entry after constraint error
+        verify_acl = await self.read_single_attribute_check_success(
+            endpoint=0,
+            cluster=acl_cluster,
+            attribute=acl_attribute
+        )
+        asserts.assert_equal(len(verify_acl), 1, "ACL should contain only admin entry after failed operation")
+        asserts.assert_equal(verify_acl[0].privilege,
+                             Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+                             "Remaining entry must be admin")
+        asserts.assert_equal(verify_acl[0].subjects, [self.th1.nodeId],
+                             "Admin entry must have correct node ID")
+
         # Step 44: Test all target fields (should fail)
         self.step(44)
         all_target_fields_acl = [
@@ -1321,6 +1465,19 @@ class TC_ACL_2_4(MatterBaseTest):
         )
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
                              "Write ACL with all target fields should fail with CONSTRAINT_ERROR")
+
+        # Verify ACL still contains only admin entry after constraint error
+        verify_acl = await self.read_single_attribute_check_success(
+            endpoint=0,
+            cluster=acl_cluster,
+            attribute=acl_attribute
+        )
+        asserts.assert_equal(len(verify_acl), 1, "ACL should contain only admin entry after failed operation")
+        asserts.assert_equal(verify_acl[0].privilege,
+                             Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+                             "Remaining entry must be admin")
+        asserts.assert_equal(verify_acl[0].subjects, [self.th1.nodeId],
+                             "Admin entry must have correct node ID")
 
         # Step 45: Write minimum required ACL (admin only)
         self.step(45)
