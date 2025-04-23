@@ -22,7 +22,7 @@ import typing
 import xml.etree.ElementTree as ElementTree
 import zipfile
 from copy import deepcopy
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum, auto
 from importlib.abc import Traversable
 from typing import Callable, Optional, Union
