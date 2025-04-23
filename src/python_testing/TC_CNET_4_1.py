@@ -47,6 +47,16 @@ logger = logging.getLogger(__name__)
 
 
 class TC_CNET_4_1(MatterBaseTest):
+    """[TC-CNET-4.2] [Thread] Verification for attributes check [DUT-Server].
+
+    Example usage:
+        ```bash
+        python src/python_testing/TC_CNET_4_1.py --commissioning-method ble-wifi --qr-code MT:-24J0AFN00KA0648G00 \
+            --wifi-ssid <wifissid>  --wifi-passphrase <wifipasspgrase> --endpoint <endpointvalue>
+        ```
+        Where `<endpoint_value>` should be replaced with the actual endpoint
+        number for the Network Commissioning cluster on the DUT.
+    """
 
     def desc_TC_CNET_4_1(self) -> str:
         return "[TC-CNET-4.1] [Wi-Fi] Verification for attributes check [DUT-Server]"
