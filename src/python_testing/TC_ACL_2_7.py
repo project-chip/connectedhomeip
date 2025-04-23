@@ -212,11 +212,11 @@ class TC_ACL_2_7(MatterBaseTest):
                         event_data.Data.fabricIndex == f1):
                     found_valid_event = True
                     logging.info("Found valid event for TH1")
-                
+
                 # Check for TH2 events that shouldn't be visible to TH1
                 if (event_data.Data.adminNodeID == self.th2.nodeId or
                     event_data.Data.latestValue.fabricIndex == f2 or
-                    event_data.Data.fabricIndex == f2):
+                        event_data.Data.fabricIndex == f2):
                     found_th2_event = True
                     logging.info("Found TH2 event visible to TH1, which violates fabric isolation")
 
@@ -253,11 +253,11 @@ class TC_ACL_2_7(MatterBaseTest):
                         event_data.Data.fabricIndex == f2):
                     found_valid_event = True
                     logging.info("Found valid event for TH2")
-                
+
                 # Check for TH1 events that shouldn't be visible to TH2
                 if (event_data.Data.adminNodeID == self.th1.nodeId or
                     event_data.Data.latestValue.fabricIndex == f1 or
-                    event_data.Data.fabricIndex == f1):
+                        event_data.Data.fabricIndex == f1):
                     found_th1_event = True
                     logging.info("Found TH1 event visible to TH2, which violates fabric isolation")
 
