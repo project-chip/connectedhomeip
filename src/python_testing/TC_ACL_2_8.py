@@ -236,11 +236,11 @@ class TC_ACL_2_8(MatterBaseTest):
             self.th1.nodeId,
             f1)
         self._verify_acl_event(
-            events[1], 
-            self.th1.nodeId, 
+            events[1],
+            self.th1.nodeId,
             NullValue,
-            Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged, 
-            [self.th1.nodeId, 1111], 
+            Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged,
+            [self.th1.nodeId, 1111],
             f1)
 
         for event in events:
@@ -270,11 +270,11 @@ class TC_ACL_2_8(MatterBaseTest):
             f2)
 
         self._verify_acl_event(
-            events[1], 
-            self.th2.nodeId, 
+            events[1],
+            self.th2.nodeId,
             NullValue,
-            Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged, 
-            [self.th2.nodeId, 2222], 
+            Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged,
+            [self.th2.nodeId, 2222],
             f2)
 
         for event in events:
