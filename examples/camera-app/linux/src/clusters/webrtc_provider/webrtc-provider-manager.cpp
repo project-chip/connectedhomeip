@@ -18,6 +18,7 @@
 
 #include "webrtc-provider-manager.h"
 
+#include <Options.h>
 #include <app/server/Server.h>
 #include <controller/InvokeInteraction.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -143,8 +144,7 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
     mOriginatingEndpointId = args.originatingEndpointId;
     mCurrentSessionId      = args.sessionId;
 
-    // TODO: use proper mechnism to decide if defer the Offer
-    outDeferredOffer = true;
+    outDeferredOffer = LinuxDeviceOptions::GetInstance().cameraDeferredOffer;
 
     return CHIP_NO_ERROR;
 }
