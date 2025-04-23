@@ -172,8 +172,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
 
             if is_positioning_supported:
                 asserts.assert_greater_equal(target.Position, min_position, "Target Position is outside expected range")
-                asserts.assert_less_equal(target.Position, max_position, "Target Speed is outside expected range")
-            
+                asserts.assert_less_equal(target.Position, max_position, "Target Position is outside expected range")
             asserts.assert_equal(target.Latch, True, "Target Latch is not True")
 
             if is_speed_supported:
@@ -220,8 +219,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
             
             if is_positioning_supported:
                 asserts.assert_greater_equal(target.Position, min_position, "Target Position is outside expected range")
-                asserts.assert_less_equal(target.Position, max_position, "Target Speed is outside expected range")
-            
+                asserts.assert_less_equal(target.Position, max_position, "Target Position is outside expected range")
             asserts.assert_equal(target.Latch, False, "Target Latch is not False")
 
             if is_speed_supported:
@@ -241,8 +239,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
             
             if is_positioning_supported:
                 asserts.assert_greater_equal(current_state.Position, min_position, "CurrentState Position is outside expected range")
-                asserts.assert_less_equal(current_state.Position, max_position, "CurrentState Speed is outside expected range")
-                
+                asserts.assert_less_equal(current_state.Position, max_position, "CurrentState Position is outside expected range")
             asserts.assert_equal(current_state.Latch, False, "CurrentState Latch is not False")
 
             if is_speed_supported:
