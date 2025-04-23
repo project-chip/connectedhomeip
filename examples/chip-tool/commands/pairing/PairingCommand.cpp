@@ -85,7 +85,9 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
         if (mDiscriminator.has_value())
         {
             err = Pair(remoteId, PeerAddress::NFC(mDiscriminator.value()));
-        } else {
+        }
+        else
+        {
             // Discriminator is mandatory
             err = CHIP_ERROR_MESSAGE_INCOMPLETE;
         }
