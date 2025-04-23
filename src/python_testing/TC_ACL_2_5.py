@@ -102,7 +102,8 @@ class TC_ACL_2_5(MatterBaseTest):
         await events_callback.start(self.default_controller, self.dut_node_id, 0)
 
         self.step(4)
-        # Create an extension with a test string
+        # Create an extension with a test string (test string specified by test plan)
+        # 1718 = octstr of length 2 containing valid TLC for a top level anonymous list (empty)
         D_OK_EMPTY = bytes.fromhex('1718')
         extension = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
             data=D_OK_EMPTY)
@@ -146,6 +147,7 @@ class TC_ACL_2_5(MatterBaseTest):
 
         self.step(6)
         # Create a new extension with different data to replace the existing one
+        # Value is from test plan and is a valid top level anonymous list containing one element.
         D_OK_SINGLE = bytes.fromhex(
             '17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018'
         )
@@ -189,6 +191,7 @@ class TC_ACL_2_5(MatterBaseTest):
 
         self.step(8)
         # Try to write an extension that exceeds max length (128 bytes)
+        # Value is from test plan and is a valid top-level anonymous list with a length of 129 (too long)
         too_long_data = bytes.fromhex(
             "17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E6700D00000F1FF02003248656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E7420616761696E2E2E2E2E2E2E0018"
         )
