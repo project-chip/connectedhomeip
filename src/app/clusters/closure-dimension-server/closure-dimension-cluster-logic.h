@@ -96,7 +96,7 @@ struct ClusterConformance
                              "Modulation should be enabled"));
         }
 
-        // If Overflow Attribute is supported, atleast one of  Rotation or MotionLatching should be supported.
+        // If the Overflow Attribute is supported, at least one of Rotation or MotionLatching must be supported.
         if (mOptionalAttributes.Has(OptionalAttributeEnum::kOverflow))
         {
             VerifyOrReturnValue(HasFeature(Feature::kRotation) || HasFeature(Feature::kMotionLatching), false,
