@@ -151,7 +151,6 @@ class XmlDeviceType:
     classification_scope: str
     superset_of_str: Optional[str] = None
     superset_of: int = 0
-    superset_group: list[int] = field(default_factory=list)
 
     def __str__(self):
         msg = f'{self.name} - Revision {self.revision}, Class {self.classification_class}, Scope {self.classification_scope}\n'
@@ -914,41 +913,6 @@ def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelD
         d.superset_of = matches[0]
 
     return device_types, problems
-
-
-def get_superset_lines(xml_device_types: dict[int, XmlDeviceType]) -> list[list[int]]:
-    # Endpoints can have multiple application device types from a single line, even with skips, but cannot have multiple
-    # higher-level device types that map to a lower level endpoint
-    # Ex. Color temperature light is a superset of dimmable light, which is a superset of on/off light
-    # If there were another device type SomethingElse light that were a superset of on/off light, the following
-    # would be acceptable
-    # - SomethingElse light + on/off
-    # - Dimmable light + on/off
-    # - Color temperature light + dimmable light + on/off
-    # - Color temperature light + on/off (skipping middle device type)
-    # But the following would not be acceptable
-    # - SomethingElse light + dimmable light
-    # - SomethingElse light + dimmable light + on/off
-    # Because it's not clear to clients whether the endpoint should be treated as a SomethingElse light or dimmable light,
-    # even if both can be an on/off light
-    #
-    # This means that we need to know that all the devices come from a single line of device types, rather than that they
-    # all belong to one tree
-    # To do this, we need to identify the top-level device type and generate the list of acceptable children
-
-    device_types_that_have_supersets = set([dt.superset_of for dt in xml_device_types.values() if dt.superset_of != 0])
-    top_level_device_types = [id for id, dt in xml_device_types.items(
-    ) if dt.superset_of != 0 and id not in device_types_that_have_supersets]
-    superset_lines: list[list[int]] = []
-    for top in top_level_device_types:
-        line: list[int] = []
-        dt = top
-        while dt != 0:
-            line.append(dt)
-            dt = xml_device_types[dt].superset_of
-        superset_lines.append(line)
-    for l in superset_lines:
-        print(l)
 
 
 def dm_from_spec_version(specification_version: uint) -> PrebuiltDataModelDirectory:

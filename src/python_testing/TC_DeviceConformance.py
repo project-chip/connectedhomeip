@@ -47,8 +47,44 @@ from chip.testing.global_attribute_ids import (ClusterIdType, DeviceTypeIdType, 
                                                device_type_id_type, is_valid_device_type_id)
 from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
                                          MatterBaseTest, ProblemNotice, ProblemSeverity, TestStep, async_test_body, default_matter_test_main)
-from chip.testing.spec_parsing import CommandType
+from chip.testing.spec_parsing import CommandType, XmlDeviceType
 from chip.tlv import uint
+
+
+def get_supersets(xml_device_types: dict[int, XmlDeviceType]) -> list[set[int]]:
+    # Endpoints can have multiple application device types from a single line, even with skips, but cannot have multiple
+    # higher-level device types that map to a lower level endpoint
+    # Ex. Color temperature light is a superset of dimmable light, which is a superset of on/off light
+    # If there were another device type (ex Blinkable light) that were a superset of on/off light, the following
+    # would be acceptable
+    # - Blinkable light + on/off
+    # - Dimmable light + on/off
+    # - Color temperature light + dimmable light + on/off
+    # - Color temperature light + on/off (skipping middle device type)
+    # But the following would not be acceptable
+    # - Blinkable light + dimmable light
+    # - Blinkable light + dimmable light + on/off
+    # Because it's not clear to clients whether the endpoint should be treated as a Blinkable light or dimmable light,
+    # even if both can be an on/off light
+    #
+    # This means that we need to know that all the devices come from a single line of device types, rather than that they
+    # all belong to one tree
+    # To do this, we need to identify the top-level device type and generate the list of acceptable children
+
+    device_types_that_have_supersets = set([dt.superset_of for dt in xml_device_types.values() if dt.superset_of != 0])
+    top_level_device_types = [id for id, dt in xml_device_types.items(
+    ) if dt.superset_of != 0 and id not in device_types_that_have_supersets]
+    supersets: list[set[int]] = []
+    for top in top_level_device_types:
+        line: set[int] = set()
+        dt = top
+        visited = []
+        while dt != 0 and dt not in visited:
+            visited.append(dt)
+            line.add(dt)
+            dt = xml_device_types[dt].superset_of
+        supersets.append(line)
+    return supersets
 
 
 class DeviceConformanceTests(BasicCompositionTests):
@@ -385,6 +421,24 @@ class DeviceConformanceTests(BasicCompositionTests):
 
         return problems
 
+    def check_all_application_device_types_superset(self) -> list[ProblemNotice]:
+        problems = []
+        supersets = get_supersets(self.xml_device_types)
+        for endpoint_num, endpoint in self.endpoints.items():
+            all_device_type_ids = [dt.deviceType for dt in endpoint[Clusters.Descriptor]
+                                   [Clusters.Descriptor.Attributes.DeviceTypeList]]
+            application_device_type_ids = set([
+                dt for dt in all_device_type_ids if self.xml_device_types[dt].classification_class == 'simple'])
+            if len(application_device_type_ids) <= 1:
+                continue
+            if any([application_device_type_ids.issubset(superset) for superset in supersets]):
+                continue
+
+            location = AttributePathLocation(3, Clusters.Descriptor.id, Clusters.Descriptor.Attributes.DeviceTypeList.attribute_id)
+            problems.append(ProblemNotice('TC-DESC-2.3', location=location, severity=ProblemSeverity.ERROR,
+                            problem=f"Multiple non-superset application device types found on EP {endpoint_num} ({application_device_type_ids})"))
+        return problems
+
 
 class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
     @async_test_body
@@ -427,13 +481,25 @@ class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
         return [TestStep(0, "TH performs a wildcard read of all attributes and endpoints on the device"),
                 TestStep(1, "TH checks the Root node endpoint and ensures no application device types are listed",
                          "No Application device types on EP0"),
-                TestStep(2, "For each non-root endpoint on the device, TH checks the DeviceTypeList of the Descriptor cluster and verifies that all the listed application device types are part of the same superset")]
+                TestStep(2, "For each non-root endpoint on the device, TH checks the DeviceTypeList of the Descriptor cluster and verifies that all the listed application device types are part of the same superset"),
+                TestStep(3, "Fail test if either of the above steps failed.")]
+        # TODO: add check that at least one endpoint has an application endpoint or an aggregator
 
     def desc_TC_DESC_2_3(self):
         return "[TC-DESC-2.3] Test for superset application device types"
 
     def test_TC_DESC_2_3(self):
-        pass
+        self.step(0)  # done in setup class
+
+        self.step(1)
+        self.problems.extend(self.check_root_endpoint_for_application_device_types())
+
+        self.step(2)
+        self.problems.extend(self.check_all_application_device_types_superset())
+
+        self.step(3)
+        if self.problems:
+            self.fail_current_test("One or more application device type endpoint violations")
 
 
 if __name__ == "__main__":

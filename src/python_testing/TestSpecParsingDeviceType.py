@@ -20,13 +20,13 @@ import chip.clusters as Clusters
 from chip.clusters import Attribute
 from chip.testing.conformance import conformance_allowed
 from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
-from chip.testing.spec_parsing import (PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types,
-                                       get_superset_lines, parse_single_device_type)
+from chip.testing.spec_parsing import (PrebuiltDataModelDirectory, XmlDeviceType, build_xml_clusters, build_xml_device_types,
+                                       parse_single_device_type)
 from chip.tlv import uint
 from fake_device_builder import create_minimal_dt
 from jinja2 import Template
 from mobly import asserts
-from TC_DeviceConformance import DeviceConformanceTests
+from TC_DeviceConformance import DeviceConformanceTests, get_supersets
 
 
 class TestSpecParsingDeviceType(MatterBaseTest):
@@ -45,6 +45,9 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         self.classification_class = "simple"
         self.classification_scope = "endpoint"
         self.clusters = {0x0003: "Identify", 0x0004: "Groups"}
+
+        # Let's just build a dictionary of device types to IDs becasue I need them and we don't have codegen
+        self.dt_ids = {dt.name.replace(' ', '').replace('/', '').replace('-', '').lower(): id for id, dt in self.xml_device_types.items()}
 
         # Conformance support tests the different types of conformance for clusters, so here we just want to ensure that we're correctly parsing the XML into python
         # adds the same attributes and features to every cluster. This is fine for testing.
@@ -279,9 +282,9 @@ class TestSpecParsingDeviceType(MatterBaseTest):
 
         desc = Clusters.Descriptor
 
-        root_dt = [id for id, dt in self.xml_device_types.items() if dt.name.replace(' ', '').lower() == 'rootnode'][0]
-        lock_dt = [id for id, dt in self.xml_device_types.items() if dt.name.replace(' ', '').lower() == 'doorlock'][0]
-        power_dt = [id for id, dt in self.xml_device_types.items() if dt.name.replace(' ', '').lower() == 'powersource'][0]
+        root_dt = self.dt_ids['rootnode']
+        lock_dt = self.dt_ids['doorlock']
+        power_dt = self.dt_ids['powersource']
 
         # Root only, should be fine
         dt_list = [desc.Structs.DeviceTypeStruct(root_dt, 1)]
@@ -301,12 +304,172 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         problems = self.test.check_root_endpoint_for_application_device_types()
         asserts.assert_equal(len(problems), 1, "Did not get expected problem on root node with application device type")
 
-    def test_superset_parsing(self):
+    def test_superset_parsing_released_spec(self):
         # Testing superset parsing from the spec since it requires multiple device types to be parsed together
         for d in self.xml_device_types.values():
             if d.superset_of_str:
                 print(f'{d.name}: {d.superset_of_str} {d.superset_of}')
-        get_superset_lines(self.xml_device_types)
+        supersets = get_supersets(self.xml_device_types)
+
+        expected_light_superset = set([self.dt_ids['extendedcolorlight'],
+                                       self.dt_ids['colortemperaturelight'], self.dt_ids['dimmablelight'], self.dt_ids['onofflight']])
+        expected_dimmer_switch = set([self.dt_ids['colordimmerswitch'],
+                                     self.dt_ids['dimmerswitch'], self.dt_ids['onofflightswitch']])
+
+        asserts.assert_in(expected_light_superset, supersets, "Did not find expected light superset")
+        asserts.assert_in(expected_dimmer_switch, supersets, "Did not find expected switch superset")
+
+        # 1.5 has some interesting stuff where we have equivalent device types, so check that explicitly
+        xml_device_types_1_5, _ = build_xml_device_types(PrebuiltDataModelDirectory.k1_5)
+        supersets = get_supersets(xml_device_types_1_5)
+
+        expected_onoff_plugin = set([self.dt_ids['mountedonoffcontrol'], self.dt_ids['onoffpluginunit']])
+        expected_dimmable_plugin = set([self.dt_ids['mounteddimmableloadcontrol'], self.dt_ids['dimmablepluginunit']])
+
+        asserts.assert_in(expected_light_superset, supersets, "Did not find expected light superset")
+        asserts.assert_in(expected_dimmer_switch, supersets, "Did not find expected switch superset")
+        asserts.assert_in(expected_onoff_plugin, supersets, "Did not find expected mounted on off superset")
+        asserts.assert_in(expected_dimmable_plugin, supersets, "Did not find expected mounted dimmable superset")
+
+    def _build_superset_tree(self) -> dict[int, XmlDeviceType]:
+        # Builds the tree as follows
+        # 1 -> 2 -> 3
+        # 4 -> 3
+        # 5 - all alone
+        # 6 - utility endpoint
+        one = XmlDeviceType('one', 1, [], [], 'simple', 'endpoint', superset_of_str='two', superset_of=2)
+        two = XmlDeviceType('two', 1, [], [], 'simple', 'endpoint', superset_of_str='three', superset_of=3)
+        three = XmlDeviceType('three', 1, [], [], 'simple', 'endpoint', superset_of_str=None, superset_of=0)
+        four = XmlDeviceType('four', 1, [], [], 'simple', 'endpoint', superset_of_str='three', superset_of=3)
+        five = XmlDeviceType('five', 1, [], [], 'simple', 'endpoint', superset_of_str=None, superset_of=0)
+        six = XmlDeviceType('six', 1, [], [], 'utility', 'endpoint', superset_of_str=None, superset_of=0)
+        return {1: one, 2: two, 3: three, 4: four, 5: five, 6: six}
+
+    def test_superset_parsing_mocks(self):
+        # We could in theory have superset trees. We don't currently, but let's be future proof.
+        superset_tree = self._build_superset_tree()
+        supersets = get_supersets(superset_tree)
+        # We should see separate lines
+        asserts.assert_in(set([1, 2, 3]), supersets, "Did not find expected superset in tree")
+        asserts.assert_in(set([4, 3]), supersets, "Did not find expected superset in tree")
+
+    def test_supersets_on_endpoints_mocks(self):
+        superset_tree = self._build_superset_tree()
+
+        self.test = DeviceConformanceTests()
+        self.test.xml_device_types = superset_tree
+
+        desc = Clusters.Descriptor
+        attrs = {desc: {desc.Attributes.DeviceTypeList: []}}
+        self.test.endpoints = {1: attrs}
+
+        # Non-superset application endpoint
+        self.test.endpoints[1][desc][desc.Attributes.DeviceTypeList] = [desc.Structs.DeviceTypeStruct(5, 1)]
+        problems = self.test.check_all_application_device_types_superset()
+        asserts.assert_equal(len(problems), 0, "unexpected problem found on endpoint with one non-superset application endpoint")
+
+        # utility endpoint only
+        self.test.endpoints[1][desc][desc.Attributes.DeviceTypeList] = [desc.Structs.DeviceTypeStruct(6, 1)]
+        problems = self.test.check_all_application_device_types_superset()
+        asserts.assert_equal(len(problems), 0, "Unexpected problem found on endpoint with only utility endpoint")
+
+        # 1, 2, and 3 (all one subset) - should be fine
+        self.test.endpoints[1][desc][desc.Attributes.DeviceTypeList] = [desc.Structs.DeviceTypeStruct(
+            1, 1), desc.Structs.DeviceTypeStruct(2, 1), desc.Structs.DeviceTypeStruct(3, 1)]
+        problems = self.test.check_all_application_device_types_superset()
+        asserts.assert_equal(len(problems), 0, "Unexpected problem found on endpoint with device types all subset")
+
+        # 1 and 3 (skips middle)
+        self.test.endpoints[1][desc][desc.Attributes.DeviceTypeList] = [
+            desc.Structs.DeviceTypeStruct(1, 1), desc.Structs.DeviceTypeStruct(3, 1)]
+        problems = self.test.check_all_application_device_types_superset()
+        asserts.assert_equal(len(problems), 0, "Unexpected problem found on endpoint with device types all subset (skips middle)")
+
+        # 2 and 3 (skips top)
+        self.test.endpoints[1][desc][desc.Attributes.DeviceTypeList] = [
+            desc.Structs.DeviceTypeStruct(2, 1), desc.Structs.DeviceTypeStruct(3, 1)]
+        problems = self.test.check_all_application_device_types_superset()
+        asserts.assert_equal(len(problems), 0, "Unexpected problem found on endpoint with device types all subset (skips highest)")
+
+        # 1 and 2 (skips bottom)
+        self.test.endpoints[1][desc][desc.Attributes.DeviceTypeList] = [
+            desc.Structs.DeviceTypeStruct(1, 1), desc.Structs.DeviceTypeStruct(2, 1)]
+        problems = self.test.check_all_application_device_types_superset()
+        asserts.assert_equal(len(problems), 0, "Unexpected problem found on endpoint with device types all subset (skips lowest)")
+
+        # 1, 2 and 3 (all one subsets) with utility
+        self.test.endpoints[1][desc][desc.Attributes.DeviceTypeList] = [desc.Structs.DeviceTypeStruct(
+            1, 1), desc.Structs.DeviceTypeStruct(2, 1), desc.Structs.DeviceTypeStruct(3, 1), desc.Structs.DeviceTypeStruct(6, 1)]
+        problems = self.test.check_all_application_device_types_superset()
+        asserts.assert_equal(len(problems), 0, "Unexpected problem found on endpoint with device types all subset with utility")
+
+        # non-subset with utility - 5 and 6
+        self.test.endpoints[1][desc][desc.Attributes.DeviceTypeList] = [
+            desc.Structs.DeviceTypeStruct(5, 1), desc.Structs.DeviceTypeStruct(6, 1)]
+        problems = self.test.check_all_application_device_types_superset()
+        asserts.assert_equal(len(problems), 0, "Unexpected problem found on endpoint with device types non-subset with utility")
+
+        # subset with non-subset - 2, 3, 5 - should fail
+        self.test.endpoints[1][desc][desc.Attributes.DeviceTypeList] = [desc.Structs.DeviceTypeStruct(
+            2, 1), desc.Structs.DeviceTypeStruct(3, 1), desc.Structs.DeviceTypeStruct(5, 1)]
+        problems = self.test.check_all_application_device_types_superset()
+        asserts.assert_equal(len(problems), 1, "Did not find expected problem when testing with subset and non-subset devices")
+
+        # mixed subsets without connector - 1, 2 and 4 - these are all supersets of 3, but shouldn't be allowed on the same endpoint
+        self.test.endpoints[1][desc][desc.Attributes.DeviceTypeList] = [desc.Structs.DeviceTypeStruct(
+            1, 1), desc.Structs.DeviceTypeStruct(2, 1), desc.Structs.DeviceTypeStruct(4, 1)]
+        problems = self.test.check_all_application_device_types_superset()
+        asserts.assert_equal(len(problems), 1, "Did not find expected problem when testing with mixed subsets")
+
+        # mixed subsets with connector - 1, 2, 3 and 4 - these are all supersets of 3, but shouldn't be allowed on the same endpoint
+        self.test.endpoints[1][desc][desc.Attributes.DeviceTypeList] = [desc.Structs.DeviceTypeStruct(
+            1, 1), desc.Structs.DeviceTypeStruct(2, 1), desc.Structs.DeviceTypeStruct(4, 1), desc.Structs.DeviceTypeStruct(3, 1)]
+        problems = self.test.check_all_application_device_types_superset()
+        asserts.assert_equal(len(problems), 1, "Did not find expected problem when testing with mixed subsets")
+
+    def test_supersets_on_endpoints_spec_ids(self):
+        self.test = DeviceConformanceTests()
+        self.test.xml_device_types = self.xml_device_types
+
+        # create mock devices using the real spec IDs
+        desc = Clusters.Descriptor
+        attrs0 = {desc: {desc.Attributes.DeviceTypeList: [desc.Structs.DeviceTypeStruct(self.dt_ids['rootnode'], 1)]}}
+        attrs1 = {desc: {desc.Attributes.DeviceTypeList: []}}
+        attrs2 = {desc: {desc.Attributes.DeviceTypeList: []}}
+        self.test.endpoints = {0: attrs0, 1: attrs1, 2: attrs2}
+
+        door_lock = desc.Structs.DeviceTypeStruct(self.dt_ids['doorlock'], 1)
+        light_sensor = desc.Structs.DeviceTypeStruct(self.dt_ids['lightsensor'], 1)
+        power_source = desc.Structs.DeviceTypeStruct(self.dt_ids['powersource'], 1)
+        onoff_light = desc.Structs.DeviceTypeStruct(self.dt_ids['onofflight'], 1)
+        dimmable_light = desc.Structs.DeviceTypeStruct(self.dt_ids['dimmablelight'], 1)
+
+        # two of the same simple application device types on different endpoints
+        self.test.endpoints[1][desc][desc.Attributes.DeviceTypeList] = [door_lock]
+        self.test.endpoints[2][desc][desc.Attributes.DeviceTypeList] = [door_lock]
+        problems = self.test.check_all_application_device_types_superset()
+        asserts.assert_equal(len(problems), 0, "Unexpected problems found with two endpoints with the same device type")
+
+        # two different simple application device types on different endpoints
+        self.test.endpoints[2][desc][desc.Attributes.DeviceTypeList] = [light_sensor]
+        problems = self.test.check_all_application_device_types_superset()
+        asserts.assert_equal(
+            len(problems), 0, "Unexpected problems found with two endpoints with the different non-subset device types")
+
+        # two subset application device types on one endpoint
+        self.test.endpoints[2][desc][desc.Attributes.DeviceTypeList] = [onoff_light, dimmable_light]
+        problems = self.test.check_all_application_device_types_superset()
+        asserts.assert_equal(len(problems), 0, "Unexpected problems found with endpoint with permitted subsets")
+
+        # two subset application device types on one endpoint with an application device type
+        self.test.endpoints[2][desc][desc.Attributes.DeviceTypeList] = [onoff_light, dimmable_light, power_source]
+        problems = self.test.check_all_application_device_types_superset()
+        asserts.assert_equal(len(problems), 0, "Unexpected problems found with endpoint with permitted subsets and utility")
+
+        # bad - two non-subset device types on one endpoint
+        self.test.endpoints[2][desc][desc.Attributes.DeviceTypeList].append(door_lock)
+        problems = self.test.check_all_application_device_types_superset()
+        asserts.assert_equal(len(problems), 1, "Did not find problem with non-permitted application device types")
 
 
 if __name__ == "__main__":
