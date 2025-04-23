@@ -99,10 +99,10 @@ class TC_AVSUM_2_4(MatterBaseTest, AVSUMTestBase):
             TestStep(7, "Loop over the supported presets, for each verify the PresetID and Name are in range"),
             TestStep(8, "For each found preset, invoke MoveToPreset with the PresetID. Verify that the MPTZPosition is that from the Preset"),
             TestStep(9, "Exit the testcase"),
-            TestStep(10,"Create a new saved preset with PresetID and MaxPresets"),
-            TestStep(11,"Move to a new MPTZPosition that is the mid-point of all support PTZ attributes"),
-            TestStep(12,"Move to the newly saved preset"),
-            TestStep(13,"Verify that the MPTZPosition is that of the preset"),
+            TestStep(10, "Create a new saved preset with PresetID and MaxPresets"),
+            TestStep(11, "Move to a new MPTZPosition that is the mid-point of all support PTZ attributes"),
+            TestStep(12, "Move to the newly saved preset"),
+            TestStep(13, "Verify that the MPTZPosition is that of the preset"),
         ]
         return steps
 
@@ -141,25 +141,25 @@ class TC_AVSUM_2_4(MatterBaseTest, AVSUMTestBase):
 
         attribute_list = await self.read_avsum_attribute_expect_success(attribute="AttributeList")
 
-        # If Presets is empty, change MPTZPosition to some new value, save that as a Preset.  Change to a different value. 
+        # If Presets is empty, change MPTZPosition to some new value, save that as a Preset.  Change to a different value.
         # Check that.
         # Move to a discovered preset, or the created Preset.  Verify content.
-        self.step(2) 
+        self.step(2)
         if self.has_feature_mpresets:
-            self.step(3) 
+            self.step(3)
             asserts.assert_in(attributes.MaxPresets.attribute_id, attribute_list,
                               "MaxPresets attribute is a mandatory attribute if MPRESETS.")
             max_presets_dut = await self.read_avsum_attribute_expect_success(attribute="MaxPresets")
 
-            self.step(4) 
+            self.step(4)
             asserts.assert_in(attributes.MPTZPresets.attribute_id, attribute_list,
                               "MPTZPresets attribute is a mandatory attribut if MPRESETS.")
 
             mptz_presets_dut = await self.read_avsum_attribute_expect_success(attribute="MPTZPresets")
 
-            self.step(5) 
+            self.step(5)
             if mptz_presets_dut:
-                self.step(6) 
+                self.step(6)
                 asserts.assert_less_equal(len(mptz_presets_dut), max_presets_dut,
                                           "MPTZPresets size is greater than the allowed max.")
 
