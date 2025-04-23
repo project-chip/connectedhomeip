@@ -59,7 +59,8 @@ CHIP_ERROR ClusterLogic::Init(const ClusterConformance & conformance, const Clus
         ReturnErrorOnFailure(SetModulationType(clusterInitParameters.modulationType));
     }
 
-    //TODO: SpecIssue: All the attributes like resolution, unit etc which are constant for closure should be made to be set only during Initialization.
+    // TODO: SpecIssue: All the attributes like resolution, unit etc which are constant for closure should be made to be set only
+    // during Initialization.
 
     mInitialized = true;
     return CHIP_NO_ERROR;
@@ -262,9 +263,8 @@ CHIP_ERROR ClusterLogic::SetTarget(const DataModel::Nullable<GenericTargetStruct
         // Incoming Target Position value SHALL follow the scaling from Resolution Attribute.
         Percent100ths resolution;
         ReturnErrorOnFailure(GetResolution(resolution));
-        VerifyOrReturnError(
-            incomingTarget.Value().position.Value() % resolution == 0, CHIP_ERROR_INVALID_ARGUMENT,
-            ChipLogError(NotSpecified, "Target Position value SHALL follow the scaling from Resolution Attribute"));
+        VerifyOrReturnError(incomingTarget.Value().position.Value() % resolution == 0, CHIP_ERROR_INVALID_ARGUMENT,
+                            ChipLogError(NotSpecified, "Target Position value SHALL follow the scaling from Resolution Attribute"));
 
         // We need to update the cluster position value if
         // - cluster does not have value; the value will necessarily be updated
@@ -411,7 +411,7 @@ CHIP_ERROR ClusterLogic::SetUnitRange(const DataModel::Nullable<Structs::UnitRan
 
     // If Unit is Degrees , 0° value orientation is the value corresponding to the perpendicular axis to the Closure panel.
     // Range of values SHALL contain -90 to 90 only
-    //TODO: Spec issue - No explicit mention of constrains for degrees.
+    // TODO: Spec issue - No explicit mention of constrains for degrees.
     if (unit == ClosureUnitEnum::kDegree)
     {
         VerifyOrReturnError(unitRange.Value().min >= -90 && unitRange.Value().min <= 90, CHIP_ERROR_INVALID_ARGUMENT);
@@ -524,7 +524,8 @@ CHIP_ERROR ClusterLogic::SetOverflow(const OverflowEnum overflow)
     if (rotationAxis == RotationAxisEnum::kCenteredHorizontal || rotationAxis == RotationAxisEnum::kCenteredVertical)
     {
         VerifyOrReturnError(overflow != OverflowEnum::kNoOverflow && overflow != OverflowEnum::kInside &&
-                            overflow != OverflowEnum::kOutside, CHIP_ERROR_INVALID_ARGUMENT);
+                                overflow != OverflowEnum::kOutside,
+                            CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     if (overflow != mState.overflow)
@@ -662,8 +663,8 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
 
     Status status = Status::Success;
 
-    //TODO: SpecIssue No Explicit error code mentioned in case all 3 fields are absent.
-    // If all command parameters don't have a value, return InvalidCommand
+    // TODO: SpecIssue No Explicit error code mentioned in case all 3 fields are absent.
+    //  If all command parameters don't have a value, return InvalidCommand
     VerifyOrReturnValue(position.HasValue() || latch.HasValue() || speed.HasValue(), Status::InvalidCommand);
 
     // TODO: SpecIssue If this command is sent while the device is in a non-compatible internal-state, a status code of
@@ -671,28 +672,29 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
 
     GenericTargetStruct target{};
 
-
-
     // If position field is present and Positioning(PS) feature is not supported, we should not set target.position value.
     if (position.HasValue() && mConformance.HasFeature(Feature::kPositioning))
     {
         VerifyOrReturnError((position.Value() <= kPercents100thsMaxValue), Status::ConstraintError);
 
-        //TODO: Specissue: Previously spec says if target position in not multiple of resolution, we should set to nearest integer multiple.
-        //But in latest spec the behaviour is not defined
+        // TODO: Specissue: Previously spec says if target position in not multiple of resolution, we should set to nearest integer
+        // multiple. But in latest spec the behaviour is not defined
 
-        // If the Limitation Feature is active, the device will automatically offset the Target.Position value to fit within LimitRange.Min and LimitRange.Max.
+        // If the Limitation Feature is active, the device will automatically offset the Target.Position value to fit within
+        // LimitRange.Min and LimitRange.Max.
         Structs::RangePercent100thsStruct::Type limitRange;
 
         if (mConformance.HasFeature(Feature::kLimitation))
         {
             VerifyOrReturnError(GetLimitRange(limitRange) == CHIP_NO_ERROR, Status::Failure);
 
-            if(position.Value() > limitRange.max) {
+            if (position.Value() > limitRange.max)
+            {
                 position.Value() = limitRange.max;
             }
 
-            if(position.Value() < limitRange.min) {
+            if (position.Value() < limitRange.min)
+            {
                 position.Value() = limitRange.min;
             }
         }
@@ -771,7 +773,8 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
     VerifyOrReturnError(GetStepValue(stepValue) == CHIP_NO_ERROR, Status::Failure);
 
     // Convert step to position delta.
-    // As StepValue can only take maxvalue of kPercents100thsMaxValue(which is 10000). Below product will be within limits of int32_t
+    // As StepValue can only take maxvalue of kPercents100thsMaxValue(which is 10000). Below product will be within limits of
+    // int32_t
     uint32_t delta       = numberOfSteps * stepValue;
     uint32_t newPosition = 0;
 

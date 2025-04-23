@@ -59,7 +59,8 @@ struct ClusterConformance
      *        2. If Unit, Limitation or speed is enabled, Positioning must be enabled. Return false otherwise.
      *        3. If Translation, Rotation or Modulation is enabled, Positioning must be enabled. Return false otherwise.
      *        4. Only one of Translation, Rotation or Modulation must be enabled. Return false otherwise.
-     *        5. If the Overflow attribute is supported, at least one of Rotation or MotionLatching feature must be supported. Return false otherwise.
+     *        5. If the Overflow attribute is supported, at least one of Rotation or MotionLatching feature must be supported.
+     * Return false otherwise.
      *        6. If Rotation feature is enabled, then the Overflow attribute must be supported. Return false otherwise.
      *
      * @return true, the cluster confirmance is valid
@@ -92,17 +93,19 @@ struct ClusterConformance
             (HasFeature(Feature::kRotation) && HasFeature(Feature::kModulation)) ||
             (HasFeature(Feature::kModulation) && HasFeature(Feature::kTranslation)))
         {
-                ChipLogError(NotSpecified, "Validation failed: Only one of Translation, Rotation or Modulation feature can be enabled.");
-                return false;
+            ChipLogError(NotSpecified,
+                         "Validation failed: Only one of Translation, Rotation or Modulation feature can be enabled.");
+            return false;
         }
 
         // If the Overflow Attribute is supported, at least one of Rotation or MotionLatching must be supported.
         if (mOptionalAttributes.Has(OptionalAttributeEnum::kOverflow))
         {
-            VerifyOrReturnValue(HasFeature(Feature::kRotation) || HasFeature(Feature::kMotionLatching), false,
-                                ChipLogError(NotSpecified,
-                                             "Validation failed: If the Overflow attribute is supported, at least one of Rotation or "
-                                             "MotionLatching must be supported."));
+            VerifyOrReturnValue(
+                HasFeature(Feature::kRotation) || HasFeature(Feature::kMotionLatching), false,
+                ChipLogError(NotSpecified,
+                             "Validation failed: If the Overflow attribute is supported, at least one of Rotation or "
+                             "MotionLatching must be supported."));
         }
 
         // If Rotation feature is supported, the Overflow attribute must be supported.
@@ -110,8 +113,9 @@ struct ClusterConformance
         {
             VerifyOrReturnValue(
                 mOptionalAttributes.Has(OptionalAttributeEnum::kOverflow), false,
-                ChipLogError(NotSpecified,
-                             "Validation failed: If the Rotation feature is supported, then Overflow Attribute must be supported."));
+                ChipLogError(
+                    NotSpecified,
+                    "Validation failed: If the Rotation feature is supported, then Overflow Attribute must be supported."));
         }
 
         return true;
@@ -127,9 +131,9 @@ private:
  */
 struct ClusterInitParameters
 {
-    TranslationDirectionEnum translationDirection                 = TranslationDirectionEnum::kUnknownEnumValue;
-    RotationAxisEnum rotationAxis                                 = RotationAxisEnum::kUnknownEnumValue;
-    ModulationTypeEnum modulationType                             = ModulationTypeEnum::kUnknownEnumValue;
+    TranslationDirectionEnum translationDirection = TranslationDirectionEnum::kUnknownEnumValue;
+    RotationAxisEnum rotationAxis                 = RotationAxisEnum::kUnknownEnumValue;
+    ModulationTypeEnum modulationType             = ModulationTypeEnum::kUnknownEnumValue;
 };
 
 /**
@@ -145,10 +149,10 @@ struct ClusterState
     ClosureUnitEnum unit                                          = ClosureUnitEnum::kUnknownEnumValue;
     DataModel::Nullable<Structs::UnitRangeStruct::Type> unitRange = DataModel::Nullable<Structs::UnitRangeStruct::Type>();
     Structs::RangePercent100thsStruct::Type limitRange{};
-    TranslationDirectionEnum translationDirection                 = TranslationDirectionEnum::kUnknownEnumValue;
-    RotationAxisEnum rotationAxis                                 = RotationAxisEnum::kUnknownEnumValue;
-    OverflowEnum overflow                                         = OverflowEnum::kUnknownEnumValue;
-    ModulationTypeEnum modulationType                             = ModulationTypeEnum::kUnknownEnumValue;
+    TranslationDirectionEnum translationDirection = TranslationDirectionEnum::kUnknownEnumValue;
+    RotationAxisEnum rotationAxis                 = RotationAxisEnum::kUnknownEnumValue;
+    OverflowEnum overflow                         = OverflowEnum::kUnknownEnumValue;
+    ModulationTypeEnum modulationType             = ModulationTypeEnum::kUnknownEnumValue;
 };
 
 class ClusterLogic
