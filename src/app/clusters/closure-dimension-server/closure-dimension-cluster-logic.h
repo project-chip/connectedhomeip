@@ -58,9 +58,10 @@ struct ClusterConformance
      *        1. Check if either Positioning or MotionLatching is supported. If neither are enabled, returns false.
      *        2. If Unit, Limitation or speed is enabled, Positioning must be enabled. Return false otherwise.
      *        3. If Translation, Rotation or Modulation is enabled, Positioning must be enabled. Return false otherwise.
-     *        4. If Positioning is enabled, atleast one of Translation, Rotation or Modulation should be enabled. Return false
-     * otherwise.
-     *
+     *        4. Only one of Translation, Rotation or Modulation must be enabled. Return false otherwise.
+     *        5. If the Overflow attribute is supported, at least one of Rotation or MotionLatching feature must be supported. Return false otherwise.
+     *        6. If Rotation feature is enabled, then the Overflow attribute must be supported. Return false otherwise.
+     * 
      * @return true, the cluster confirmance is valid
      *         false, otherwise
      */
@@ -68,14 +69,14 @@ struct ClusterConformance
     {
         // Positioning or Matching must be enabled
         VerifyOrReturnValue(HasFeature(Feature::kPositioning) || HasFeature(Feature::kMotionLatching), false,
-                            ChipLogError(AppServer, "Validation failed: Neither Positioning nor MotionLatching is enabled."));
+                            ChipLogError(NotSpecified, "Validation failed: Neither Positioning nor MotionLatching is enabled."));
 
         // If Unit, Limitation or speed is enabled, Positioning must be enabled
         if (HasFeature(Feature::kUnit) || HasFeature(Feature::kLimitation) || HasFeature(Feature::kSpeed))
         {
             VerifyOrReturnValue(
                 HasFeature(Feature::kPositioning), false,
-                ChipLogError(AppServer, "Validation failed: Unit , Limitation, or speed requires Positioning enabled."));
+                ChipLogError(NotSpecified, "Validation failed: Unit , Limitation, or speed requires Positioning enabled."));
         }
 
         // If Translation, Rotation or Modulation is enabled, Positioning must be enabled.
@@ -83,24 +84,23 @@ struct ClusterConformance
         {
             VerifyOrReturnValue(
                 HasFeature(Feature::kPositioning), false,
-                ChipLogError(AppServer, "Validation failed: Translation, Rotation or Modulation requires Positioning enabled."));
+                ChipLogError(NotSpecified, "Validation failed: Translation, Rotation or Modulation requires Positioning enabled."));
         }
 
-        // If Positioning is enabled, atleast one of Translation, Rotation or Modulation should be enabled.
-        if (HasFeature(Feature::kPositioning))
+        // Only one of Translation, Rotation or Modulation features must be enabled. Return false otherwise.
+        if ((HasFeature(Feature::kTranslation) && HasFeature(Feature::kRotation)) ||
+            (HasFeature(Feature::kRotation) && HasFeature(Feature::kModulation)) ||
+            (HasFeature(Feature::kModulation) && HasFeature(Feature::kTranslation)))
         {
-            VerifyOrReturnValue(
-                HasFeature(Feature::kTranslation) || HasFeature(Feature::kRotation) || HasFeature(Feature::kModulation), false,
-                ChipLogError(AppServer,
-                             "Validation failed: If Positioning is available then atleast one of Translation, Rotation or "
-                             "Modulation should be enabled"));
-        }
+                ChipLogError(NotSpecified, "Validation failed: Only one of Translation, Rotation or Modulation feature can be enabled.");
+                return false;
+        }   
 
         // If the Overflow Attribute is supported, at least one of Rotation or MotionLatching must be supported.
         if (mOptionalAttributes.Has(OptionalAttributeEnum::kOverflow))
         {
             VerifyOrReturnValue(HasFeature(Feature::kRotation) || HasFeature(Feature::kMotionLatching), false,
-                                ChipLogError(AppServer,
+                                ChipLogError(NotSpecified,
                                              "Validation failed: If the Overflow attribute is supported, at least one of Rotation or "
                                              "MotionLatching must be supported."));
         }
@@ -110,7 +110,7 @@ struct ClusterConformance
         {
             VerifyOrReturnValue(
                 mOptionalAttributes.Has(OptionalAttributeEnum::kOverflow), false,
-                ChipLogError(AppServer,
+                ChipLogError(NotSpecified,
                              "Validation failed: If the Rotation feature is supported, then Overflow Attribute must be supported."));
         }
 
@@ -127,9 +127,9 @@ private:
  */
 struct ClusterInitParameters
 {
-    TranslationDirectionEnum translationDirection = TranslationDirectionEnum::kUnknownEnumValue;
-    RotationAxisEnum rotationAxis                 = RotationAxisEnum::kUnknownEnumValue;
-    ModulationTypeEnum modulationType             = ModulationTypeEnum::kUnknownEnumValue;
+    TranslationDirectionEnum translationDirection                 = TranslationDirectionEnum::kUnknownEnumValue;
+    RotationAxisEnum rotationAxis                                 = RotationAxisEnum::kUnknownEnumValue;
+    ModulationTypeEnum modulationType                             = ModulationTypeEnum::kUnknownEnumValue;
 };
 
 /**
@@ -145,10 +145,10 @@ struct ClusterState
     ClosureUnitEnum unit                                          = ClosureUnitEnum::kUnknownEnumValue;
     DataModel::Nullable<Structs::UnitRangeStruct::Type> unitRange = DataModel::Nullable<Structs::UnitRangeStruct::Type>();
     Structs::RangePercent100thsStruct::Type limitRange{};
-    TranslationDirectionEnum translationDirection = TranslationDirectionEnum::kUnknownEnumValue;
-    RotationAxisEnum rotationAxis                 = RotationAxisEnum::kUnknownEnumValue;
-    OverflowEnum overflow                         = OverflowEnum::kUnknownEnumValue;
-    ModulationTypeEnum modulationType             = ModulationTypeEnum::kUnknownEnumValue;
+    TranslationDirectionEnum translationDirection                 = TranslationDirectionEnum::kUnknownEnumValue;
+    RotationAxisEnum rotationAxis                                 = RotationAxisEnum::kUnknownEnumValue;
+    OverflowEnum overflow                                         = OverflowEnum::kUnknownEnumValue;
+    ModulationTypeEnum modulationType                             = ModulationTypeEnum::kUnknownEnumValue;
 };
 
 class ClusterLogic
@@ -163,98 +163,112 @@ public:
     const ClusterState & GetState() { return mState; }
     const ClusterConformance & GetConformance() { return mConformance; }
 
-    // TODO: Remove this only for Test
-    void ResetStateToDefault()
-    {
-        mState = ClusterState(); // This will reset mState to its default values
-    }
-
     /**
-     *  @brief Validates the conformance and performs initialization
+     *  @brief Validates the conformance and performs initialisation and sets up the ClusterInitParameters into Attributes.
+     * 
      *  @param [in] conformance cluster conformance
-     *  @return Returns CHIP_ERROR_INCORRECT_STATE if the cluster has already been initialized,
-     *          Returns CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR if the conformance is incorrect.
-     *          Returns CHIP_NO_ERROR on succesful initialization.
+     *  @param [in] clusterInitParameters cluster Init Parameters
+     * 
+     *  @return CHIP_ERROR_INCORRECT_STATE if the cluster has already been initialized,
+     *              CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR if the conformance is incorrect.
+     *              Set Function Errors if the Setting of any feature supported ClusterInitParameters failed.
+     *              CHIP_NO_ERROR on succesful initialisation.
      */
     CHIP_ERROR Init(const ClusterConformance & conformance, const ClusterInitParameters & clusterInitParameters);
 
     /**
      * @brief Set Current State.
-     * @param[in] currentState Current State Position, Latching and/or Speed.
+     * 
+     * @param[in] currentState Current State Position, Latch and Speed.
+     * 
      * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
-     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
-     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     *              CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
+     *              CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
+     *              CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      */
     CHIP_ERROR SetCurrentState(const DataModel::Nullable<GenericCurrentStateStruct> & currentState);
 
     /**
      * @brief Set Target.
-     * @param[in] target Target Position, Latching and/or Speed.
+     * 
+     * @param[in] target Target Position, Latch and Speed.
+     * 
      * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
-     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
-     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     *              CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
+     *              CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
+     *              CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      */
     CHIP_ERROR SetTarget(const DataModel::Nullable<GenericTargetStruct> & target);
 
     /**
      * @brief Set Resolution.
+     * 
      * @param[in] resolution Minimal acceptable change of Position fields of attributes.
+     * 
      * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
-     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
-     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
+     *              CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
+     *              CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     *              CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetResolution(const Percent100ths resolution);
 
     /**
      * @brief Set StepValue.
+     * 
      * @param[in] stepValue One step value for Step command
+     * 
      * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
-     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
-     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
+     *              CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
+     *              CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     *              CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetStepValue(const Percent100ths stepValue);
 
     /**
      * @brief Set Unit.
+     * 
      * @param[in] unit Unit related to the Positioning.
+     * 
      * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
-     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
-     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
+     *              CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
+     *              CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     *              CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetUnit(const ClosureUnitEnum unit);
 
     /**
      * @brief Set UnitRange.
+     * 
      * @param[in] unitRange Minimum and Maximum values expressed by positioning following the unit.
+     * 
      * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
-     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
-     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
+     *              CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
+     *              CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     *              CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetUnitRange(const DataModel::Nullable<Structs::UnitRangeStruct::Type> & unitRange);
 
     /**
      * @brief Set LimitRange.
+     * 
      * @param[in] limitRange Range of possible values for the position field in Current attribute.
+     * 
      * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
-     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
-     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
+     *              CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
+     *              CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     *              CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetLimitRange(const Structs::RangePercent100thsStruct::Type & limitRange);
 
     /**
      * @brief Set Overflow.
+     * 
      * @param[in] overflow Overflow related to Rotation.
+     * 
      * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
-     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
+     *              CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     *              CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
+     *              CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetOverflow(const OverflowEnum overflow);
 
@@ -278,29 +292,33 @@ public:
 
     /**
      *  @brief Calls delegate HandleSetTarget function after validating the parameters and conformance.
+     * 
      *  @param [in] position target position
      *  @param [in] latch Target latch
      *  @param [in] speed Target speed
+     * 
      *  @return Exits if the cluster is not initialized.
-     *          Returns ConstraintError if the input values are out is out of range.
-     *          Returns InvalidInState if the current position of device is not known.
-     *          Returns Success if arguments don't match the feature conformance.
-     *          Returns Success on succesful handling.
+     *              Returns ConstraintError if the input values are out is out of range.
+     *              Returns InvalidInState if the current position of device is not known.
+     *              Returns Success if arguments don't match the feature conformance.
+     *              Returns Success on succesful handling.
      */
     Protocols::InteractionModel::Status HandleSetTargetCommand(Optional<Percent100ths> position, Optional<bool> latch,
                                                                Optional<Globals::ThreeLevelAutoEnum> speed);
 
     /**
      *  @brief Calls delegate HandleStep function after validating the parameters and conformance.
+     * 
      *  @param [in] direction step direction
      *  @param [in] numberOfSteps Number of steps
      *  @param [in] speed step speed
+     * 
      *  @return Exits if the cluster is not initialized.
-     *          Returns UnsupportedCommand if Positioning feature is not supported.
-     *          Returns ConstraintError if the input values are out is out of range.
-     *          Returns InvalidInState if the current position of device is not known.
-     *          Returns Success if speed field don't match the feature conformance.
-     *          Returns Success on successful handling.
+     *              Returns UnsupportedCommand if Positioning feature is not supported.
+     *              Returns ConstraintError if the input values are out is out of range.
+     *              Returns InvalidInState if the current position of device is not known.
+     *              Returns Success if speed field don't match the feature conformance.
+     *              Returns Success on successful handling.
      */
     Protocols::InteractionModel::Status HandleStepCommand(StepDirectionEnum direction, uint16_t numberOfSteps,
                                                           Optional<Globals::ThreeLevelAutoEnum> speed);
@@ -327,27 +345,31 @@ private:
 
     /**
      * @brief Set RotationAxis.
+     *              This attribute is not supposed to change once the installation is finalized.
+     *              so SetRotationAxis should only be called from Init().
+     * 
      * @param[in] rotationAxis Axis of the rotation.
+     * 
      * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
-     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported
+     *              CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     *              CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
+     *              CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported
      *
-     *  Note: This attribute is not supposed to change once the installation is finalized.
-     *         so SetRotationAxis should only be called from Init().
      */
     CHIP_ERROR SetRotationAxis(const RotationAxisEnum rotationAxis);
 
     /**
-     * @brief Set ModulationType.
+     * @brief Set ModulationType. 
+     *              This attribute is not supposed to change once the installation is finalized.
+     *              so SetModulationType should only be called from Init().
+     * 
      * @param[in] modulationType Modulation type.
+     * 
      * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
-     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
-     *
-     *  Note: This attribute is not supposed to change once the installation is finalized.
-     *         so SetModulationType should only be called from Init().
+     *              CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     *              CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
+     *              CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
+     * 
      */
     CHIP_ERROR SetModulationType(const ModulationTypeEnum modulationType);
 

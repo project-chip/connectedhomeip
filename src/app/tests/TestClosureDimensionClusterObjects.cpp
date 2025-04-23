@@ -69,7 +69,7 @@ TEST(GenericCurrentStateStructTest, EqualityOperator)
     EXPECT_FALSE(state1 == state2);
 }
 
-TEST(GenericCurrentStateStructTest, InEqualityOperator)
+TEST(GenericCurrentStateStructTest, InequalityOperator)
 {
     auto position1 = Optional<Percent100ths>(6000);
     auto latch1    = Optional<bool>(true);
@@ -174,7 +174,7 @@ TEST(GenericTargetStructTest, EqualityOperator)
     EXPECT_FALSE(target1 == target2);
 }
 
-TEST(GenericTargetStructTest, InEqualityOperator)
+TEST(GenericTargetStructTest, InequalityOperator)
 {
     auto position1 = Optional<Percent100ths>(1000);
     auto latch1    = Optional<bool>(true);
