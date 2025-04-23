@@ -385,7 +385,7 @@ class TC_ACL_2_4(MatterBaseTest):
 
         # Verify updated targets ACL contents
         asserts.assert_equal(len(read_updated_targets_acl), 3, "ACL should contain exactly 3 entries")
-        asserts.assert_in(updated_targets_acl[0], read_updated_targets_acl, "Missing Admin entry")  
+        asserts.assert_in(updated_targets_acl[0], read_updated_targets_acl, "Missing Admin entry")
         asserts.assert_in(updated_targets_acl[1], read_updated_targets_acl, "Missing View entry")
         asserts.assert_in(updated_targets_acl[2], read_updated_targets_acl, "Missing Operate entry")
 
@@ -716,7 +716,7 @@ class TC_ACL_2_4(MatterBaseTest):
             if i % 3 == 0:
                 # Target with cluster only
                 target = Clusters.AccessControl.Structs.AccessControlTargetStruct(
-                    cluster=i + 1,  
+                    cluster=i + 1,
                     endpoint=NullValue,
                     deviceType=NullValue
                 )
@@ -724,7 +724,7 @@ class TC_ACL_2_4(MatterBaseTest):
                 # Target with endpoint only
                 target = Clusters.AccessControl.Structs.AccessControlTargetStruct(
                     cluster=NullValue,
-                    endpoint=i + 1, 
+                    endpoint=i + 1,
                     deviceType=NullValue
                 )
             else:
@@ -732,7 +732,7 @@ class TC_ACL_2_4(MatterBaseTest):
                 target = Clusters.AccessControl.Structs.AccessControlTargetStruct(
                     cluster=NullValue,
                     endpoint=NullValue,
-                    deviceType=i + 1 
+                    deviceType=i + 1
                 )
             random_targets.append(target)
 
@@ -992,7 +992,7 @@ class TC_ACL_2_4(MatterBaseTest):
             # Entry with invalid auth mode (should fail)
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
                 privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
-                authMode=255, 
+                authMode=255,
                 subjects=NullValue,
                 targets=NullValue,
                 fabricIndex=f1
@@ -1077,7 +1077,7 @@ class TC_ACL_2_4(MatterBaseTest):
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
                 privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
                 authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                subjects=[0xFFFFFFFD00000000], 
+                subjects=[0xFFFFFFFD00000000],
                 targets=NullValue,
                 fabricIndex=f1
             )
@@ -1105,7 +1105,7 @@ class TC_ACL_2_4(MatterBaseTest):
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
                 privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
                 authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                subjects=[0xFFFFFFFFFFFF0000], 
+                subjects=[0xFFFFFFFFFFFF0000],
                 targets=NullValue,
                 fabricIndex=f1
             )
@@ -1170,7 +1170,7 @@ class TC_ACL_2_4(MatterBaseTest):
                 subjects=NullValue,
                 targets=[
                     Clusters.AccessControl.Structs.AccessControlTargetStruct(
-                        cluster=0xFFFFFFFF, 
+                        cluster=0xFFFFFFFF,
                         endpoint=NullValue,
                         deviceType=NullValue
                     )
@@ -1308,7 +1308,7 @@ class TC_ACL_2_4(MatterBaseTest):
                     Clusters.AccessControl.Structs.AccessControlTargetStruct(
                         cluster=11,
                         endpoint=22,
-                        deviceType=33 
+                        deviceType=33
                     )
                 ],
                 fabricIndex=f1
