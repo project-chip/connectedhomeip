@@ -45,8 +45,7 @@ struct ServerClusterRegistration
 };
 
 /// It is very typical to join together a registration and a Server
-/// This templates makes this registration somewhat easier.
-
+/// This templates makes this registration somewhat easier/standardized.
 template <typename SERVER_CLUSTER>
 struct RegisteredServerCluster
 {
