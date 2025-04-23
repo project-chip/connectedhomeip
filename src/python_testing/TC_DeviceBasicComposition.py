@@ -187,9 +187,8 @@ from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocat
                                          async_test_body, default_matter_test_main)
 from chip.testing.taglist_and_topology_test import (create_device_type_list_for_root, create_device_type_lists,
                                                     find_tag_list_problems, find_tree_roots, flat_list_ok,
-                                                    get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
+                                                    get_direct_children_of_root, parts_list_cycles, separate_endpoint_types)
 from chip.tlv import uint
-from mobly import asserts
 
 
 def get_vendor_id(mei: int) -> int:
@@ -750,12 +749,12 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         flat, tree = separate_endpoint_types(self.endpoints)
 
         self.print_step(5, "Check for cycles in the tree endpoints")
-        part_list_errors = parts_list_problems(tree, self.endpoints)
-        if len(part_list_errors) != 0:
-            for id in part_list_errors:
+        cycles = parts_list_cycles(tree, self.endpoints)
+        if len(cycles) != 0:
+            for id in cycles:
                 location = AttributePathLocation(endpoint_id=id, cluster_id=cluster_id, attribute_id=attribute_id)
                 self.record_error(self.get_test_name(), location=location,
-                                  problem=f"Endpoint {id} parts list includes a cycle or endpoint with multiple paths to the root or non-existent endpoint", spec_location="PartsList Attribute")
+                                  problem=f"Endpoint {id} parts list includes a cycle", spec_location="PartsList Attribute")
             self.fail_current_test()
 
         self.print_step(6, "Check flat lists include all sub ids")
@@ -944,43 +943,50 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
     @async_test_body
     async def test_TC_DESC_2_1(self):
-        asserts.assert_true('PIXIT.DESC.AGGREVISION' in self.matter_test_config.global_test_params,
-                            "PIXIT.DESC.AGGREVISION must be included on the command line in "
-                            "the --int-arg flag as PIXIT.DESC.AGGREVISION:<device_type_revision>")
+
+        EP_RANGE_MIN = 1
+        EP_RANGE_MAX = 65534
+        TAG_LIST_EP_RANGE_MIN = 1
+        TAG_LIST_EP_RANGE_MAX = 7
+        ROOT_NODE_DEVICE_TYPE = 0x0016
+        SERVER_CONFORMANCE = 0x001D
+        ONOFF_DEVICETYPE = 0x0100
+        BRIDGED_NODE_DEVICE_TYPE = 0x0013
+        TEMPERATURE_SENSOR_DEVICE_TYPE = 0x0302
+        POWER_SOURCE_DEVICE_TYPE = 0x0011
+        OTA_REQUESTOR_DEVICE_TYPE = 0x0012
+        OTA_PROVIDER_DEVICE_TYPE = 0x0014
+        AGGREGATOR_DEVICE_TYPE = 0x000E
+        COMMON_CLOSURE_NAMESPACE_NAMESPACE_ID = 0x01
+        COMMON_COMPASS_DIRECTION_NAMESPACE_ID = 0x02
+        COMMON_COMPASS_LOCATION_NAMESPACE_ID = 0x03
+        COMMON_DIRECTION_NAMESPACE_ID = 0x04
+        COMMON_LEVEL_NAMESPACE_ID = 0x05
+        COMMON_LOCATION_NAMESPACE_ID = 0x06
+        COMMON_NUMBERNAME_SPACE_ID = 0x07
+        COMMON_POSITION_NAMESPACE_ID = 0x08
+        ELECTRICAL_MEASUREMENT_NAMESPACE_ID = 0x0A
+        LAUNDRY_NAMESPACE_ID = 0x0E
+        POWER_SOURCE_NAMESPACE_ID = 0x0F
+        COMMON_AREA_NAMESPACE_ID = 0x10
+        COMMON_LANDMARK_NAMESPACE_ID = 0x11
+        COMMON_RELATIVE_POSITION_ID = 0x12
+        REFRIGERATOR_NAMESPACE_ID = 0x41
+        ROOM_AIRCONDITIONER_NAMESPACE_ID = 0x42
+        SWITCHES_NAMESPACE_ID = 0x43
+        END_POINT_UNIQUE_ID_LENGTH_BYTES = 32
+        CLUSTER_REVISION_NON_ZERO_EP = 1
 
         unique_ids = []
-        ROOT_NODE_DEVICE_TYPE = 0x0016
-        server_conformance = 0x001D
-        OnOff_deviceType = 0x0100
-        BridgedNode_deviceType = 0x0013
-        Temperature_sensor_deviceType = 0x0302
-        PowerSource_deviceType = 0x0011
-        OTARequestor_deviceType = 0x0012
-        OTAProvider_deviceType = 0x0014
-        Aggregator_deviceType = 0x000E
-        CommonClosureNamespace_Namespace_id = 0x01
-        CommonCompassDirection_Namespace_id = 0x02
-        CommonCompassLocation_Namespace_id = 0x03
-        CommonDirectionNamespace_id = 0x04
-        CommonLevelNamespace_id = 0x05
-        CommonLocationNamespace_id = 0x06
-        CommonNumberNamespace_id = 0x07
-        CommonPositionNamespace_id = 0x08
-        ElectricalMeasurementNamespace_id = 0x0A
-        LaundryNamespace_id = 0x0E
-        PowerSourceNamespace_id = 0x0F
-        CommonAreaNamespace_id = 0x10
-        CommonLandmarkNamespace_id = 0x11
-        CommonRelativePosition_id = 0x12
-        RefrigeratorNamespace_id = 0x41
-        RoomAirConditionerNamespace_id = 0x42
-        SwitchesNamespace_id = 0x43
-
-        Aggregator_deviceType_revision = self.matter_test_config.global_test_params['PIXIT.DESC.AGGREVISION']
+        self.print_step("1", "TH reads aggregator DeviceType revision from spec for Endpoint 0")
+        if self.matter_test_config.pixit['PIXIT.DESC.DeviceTypeConformanceList']:
+            aggregator_deviceType_revision = self.matter_test_config.pixit['PIXIT.DESC.DeviceTypeConformanceList']
+        else:
+            self.fail_current_test()
         self.print_step("1a.1", "TH reads DeviceTypeList and PartsList attributes from DUT for Endpoint 0")
         parts_list_ep_0 = self.endpoints[0][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
-        listed_device_types = [i.deviceType for i in self.endpoints[0]
-                               [Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]]
+        listed_device_types = {i.deviceType for i in self.endpoints[0]
+                               [Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]}
         device_revision_ep_0 = [i.revision for i in self.endpoints[0]
                                 [Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]]
         cluster_revision = self.endpoints[0][Clusters.Descriptor][Clusters.Descriptor.Attributes.ClusterRevision]
@@ -988,7 +994,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         if not parts_list_ep_0:
             self.fail_current_test()
         self.print_step("1a.6", "Verify that Revision should match the revision of that Device Type.")
-        if device_revision_ep_0[0] != Aggregator_deviceType_revision:
+        if device_revision_ep_0[0] != int(aggregator_deviceType_revision):
             self.fail_current_test()
         self.print_step("1a.7", "Verify that cluster Revision should not be less than 1")
         if not cluster_revision:
@@ -1008,7 +1014,8 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
             "1a.4", "Verify that the DeviceTypeList may only contain other Node Device Types (device types with scope=node, it can be any of the following Power Source, OTA Requestor, OTA Provider) next to the Root Node Device Type.")
 
         if listed_device_types:
-            if not all(x in {ROOT_NODE_DEVICE_TYPE, OTARequestor_deviceType, Aggregator_deviceType} for x in listed_device_types):
+            allowed_device_types = {ROOT_NODE_DEVICE_TYPE, OTA_REQUESTOR_DEVICE_TYPE, OTA_PROVIDER_DEVICE_TYPE}
+            if not listed_device_types.issubset(allowed_device_types):
                 self.fail_current_test()
         self.print_step(3, "TH reads PartsList attribute- covered in step 2")
 
@@ -1017,8 +1024,6 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
             self.print_step(8, "TH reads ServerList attribute for endpoint :{endpoint_id}".format(endpoint_id=endpoint_id))
 
             if endpoint_id != 0:
-                if Clusters.Descriptor not in endpoint:
-                    continue
 
                 self.print_step(
                     "1b", "TH reads DeviceTypeList and PartsList attributes from DUT for Endpoint {endpoint_id} supported by DUT (except Endpoint 0).".format(endpoint_id=endpoint_id))
@@ -1037,10 +1042,10 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                 self.print_step(
                     "1b.2", "the DeviceTypeList contains more than one Application Device Type, verify that all the Application Device Types are part of the same superset for end point {endpoint_id}".format(endpoint_id=endpoint_id))
                 for item in listed_device_types_ep_non_zero:
-                    if item not in [Aggregator_deviceType, OnOff_deviceType, BridgedNode_deviceType, Temperature_sensor_deviceType, PowerSource_deviceType, OTARequestor_deviceType, OTAProvider_deviceType]:
+                    if item not in [AGGREGATOR_DEVICE_TYPE, ONOFF_DEVICETYPE, BRIDGED_NODE_DEVICE_TYPE, TEMPERATURE_SENSOR_DEVICE_TYPE, POWER_SOURCE_DEVICE_TYPE, OTA_REQUESTOR_DEVICE_TYPE, OTA_PROVIDER_DEVICE_TYPE]:
                         self.fail_current_test()
 
-                if cluster_revision_ep_non_zero <= 1:
+                if cluster_revision_ep_non_zero < CLUSTER_REVISION_NON_ZERO_EP:
                     self.fail_current_test()
 
                 self.print_step(
@@ -1066,7 +1071,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                         self.print_step(
                             "4.1", "Endpoint is in the range of 1 to 65534 for endpoint {endpoint_id}".format(endpoint_id=endpoint_id))
 
-                        if ep not in range(1, 65535):
+                        if ep not in range(EP_RANGE_MIN, EP_RANGE_MAX):
                             self.fail_current_test()
                         self.print_step(
                             "4.2", "Endpoint is not equal to the Endpoint of the Endpoint where this PartsList was read (i.e. no self-reference) for {endpoint_id}".format(endpoint_id=endpoint_id))
@@ -1080,7 +1085,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
             self.print_step(
                 2.1, "verify Each cluster marked as server and mandatory for endpoint :{endpoint_id} should present on the endpoint".format(endpoint_id=endpoint_id))
             if serverlist:
-                if server_conformance not in serverlist:
+                if SERVER_CONFORMANCE not in serverlist:
                     self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=endpoint_id),
                                       problem="server type conformance for endpoints", spec_location="server type conformance")
                     self.fail_current_test()
@@ -1095,7 +1100,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
             self.print_step(
                 5.1, "verifying tagList is in the range of 1 to 6 for endpoint: {endpoint_id}".format(endpoint_id=endpoint_id))
             if taglist_ep:
-                if len(taglist_ep) not in range(1, 7):
+                if len(taglist_ep) not in range(TAG_LIST_EP_RANGE_MIN, TAG_LIST_EP_RANGE_MAX):
                     self.fail_current_test()
             no_duplicate_tag = []
             for tag_struct in taglist_ep:
@@ -1109,20 +1114,23 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                     self.fail_current_test()
                 self.print_step(
                     5.4, "verifying namespaceID value falls under defined namespaces for endpoint: {endpoint_id}".format(endpoint_id=endpoint_id))
-                if tag_struct.namespaceID not in [CommonClosureNamespace_Namespace_id, CommonCompassDirection_Namespace_id, CommonCompassLocation_Namespace_id, CommonDirectionNamespace_id,
-                                                  CommonLevelNamespace_id,
-                                                  CommonLocationNamespace_id,
-                                                  CommonNumberNamespace_id,
-                                                  CommonPositionNamespace_id,
-                                                  ElectricalMeasurementNamespace_id,
-                                                  LaundryNamespace_id,
-                                                  PowerSourceNamespace_id,
-                                                  CommonAreaNamespace_id,
-                                                  CommonLandmarkNamespace_id,
-                                                  CommonRelativePosition_id,
-                                                  RefrigeratorNamespace_id,
-                                                  RoomAirConditionerNamespace_id,
-                                                  SwitchesNamespace_id]:
+                if tag_struct.namespaceID not in [COMMON_CLOSURE_NAMESPACE_NAMESPACE_ID,
+                                                  COMMON_COMPASS_DIRECTION_NAMESPACE_ID,
+                                                  COMMON_COMPASS_LOCATION_NAMESPACE_ID,
+                                                  COMMON_DIRECTION_NAMESPACE_ID,
+                                                  COMMON_LEVEL_NAMESPACE_ID,
+                                                  COMMON_LOCATION_NAMESPACE_ID,
+                                                  COMMON_NUMBERNAME_SPACE_ID,
+                                                  COMMON_POSITION_NAMESPACE_ID,
+                                                  ELECTRICAL_MEASUREMENT_NAMESPACE_ID,
+                                                  LAUNDRY_NAMESPACE_ID,
+                                                  POWER_SOURCE_NAMESPACE_ID,
+                                                  COMMON_AREA_NAMESPACE_ID,
+                                                  COMMON_LANDMARK_NAMESPACE_ID,
+                                                  COMMON_RELATIVE_POSITION_ID,
+                                                  REFRIGERATOR_NAMESPACE_ID,
+                                                  ROOM_AIRCONDITIONER_NAMESPACE_ID,
+                                                  SWITCHES_NAMESPACE_ID]:
                     self.fail_current_test()
                 if tag_struct.tag in no_duplicate_tag:
                     self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=endpoint_id),
@@ -1138,8 +1146,6 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
         for endpoint_id, endpoint in self.endpoints.items():
             if endpoint_id == 0:
-                if Clusters.Descriptor not in endpoint:
-                    continue
                 parts_list = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
 
             descriptor_cluster = endpoint[Clusters.Descriptor]
@@ -1154,7 +1160,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                             continue
                         self.print_step(
                             7.2, "Validate EndpointUniqueId attribute in Descriptor cluster is not more than 32 bytes for endpoint : {endpoint_id}".format(endpoint_id=endpoint_id))
-                        if len(value) > 32:
+                        if len(value) > END_POINT_UNIQUE_ID_LENGTH_BYTES:
                             location = AttributePathLocation(
                                 endpoint_id,
                                 Clusters.Descriptor.id,
@@ -1198,3 +1204,4 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
 if __name__ == "__main__":
     default_matter_test_main()
+

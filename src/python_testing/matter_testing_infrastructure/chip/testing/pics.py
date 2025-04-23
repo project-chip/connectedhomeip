@@ -64,26 +64,11 @@ def parse_pics(lines: typing.List[str]) -> dict[str, bool]:
 
 
 def parse_pics_xml(contents: str) -> dict[str, bool]:
-    pics: dict[str, bool] = {}
+    pics = {}
     mytree = ET.fromstring(contents)
     for pi in mytree.iter('picsItem'):
-        name_elem = pi.find('itemNumber')
-        support_elem = pi.find('support')
-
-        # Raise an error if either element is None
-        if name_elem is None:
-            raise ValueError(f"PICS XML item missing 'itemNumber' element: {ET.tostring(pi, encoding='unicode')}")
-        if support_elem is None:
-            raise ValueError(f"PICS XML item missing 'support' element: {ET.tostring(pi, encoding='unicode')}")
-
-        # Raise an error if either text is None
-        name = name_elem.text
-        support = support_elem.text
-        if name is None:
-            raise ValueError(f"PICS XML item 'itemNumber' element missing text: {ET.tostring(pi, encoding='unicode')}")
-        if support is None:
-            raise ValueError(f"PICS XML item 'support' element missing text: {ET.tostring(pi, encoding='unicode')}")
-
+        name = pi.find('itemNumber').text
+        support = pi.find('support').text
         pics[name] = int(json.loads(support.lower())) == 1
     return pics
 
@@ -96,9 +81,33 @@ def read_pics_from_file(path: str) -> dict[str, bool]:
             with open(filename, 'r') as f:
                 contents = f.read()
                 pics_dict.update(parse_pics_xml(contents))
+                print("reading pics ****")
         return pics_dict
 
     else:
         with open(path, 'r') as f:
             lines = f.readlines()
             return parse_pics(lines)
+
+
+def parse_pixit_xml(contents: str) -> dict[str, bool]:
+    pixit = {}
+    mytree = ET.fromstring(contents)
+    for pi in mytree.iter('pixitItem'):
+        name = pi.find('itemNumber').text
+        support = pi.find('support').text
+        pixit[name] = support
+    return pixit
+
+
+def read_pixit_from_file(path: str) -> dict[str, bool]:
+    """ Reads a dictionary of PIXITS from a file (ci format) or directory (xml format). """
+    if os.path.isdir(os.path.abspath(path)):
+        pixit_dict = {}
+        for filename in glob.glob(f'{path}/*.xml'):
+            with open(filename, 'r') as f:
+                contents = f.read()
+                pixit_dict.update(parse_pixit_xml(contents))
+                print("reading ****")
+        return pixit_dict
+
