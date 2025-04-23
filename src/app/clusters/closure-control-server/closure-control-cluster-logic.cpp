@@ -25,7 +25,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ClosureControl {
-    
+
 using namespace Protocols::InteractionModel;
 
 /*
@@ -186,11 +186,11 @@ CHIP_ERROR ClusterLogic::SetCountdownTime(const DataModel::Nullable<ElapsedS> & 
 static void onCountdownTimerTick(System::Layer * systemLayer, void * context)
 {
     assertChipStackLockedByCurrentThread();
-    
+
     auto * logic = static_cast<ClusterLogic *>(context);
-    
+
     ClusterState state = logic->GetState();
-    
+
     if (state.mCountdownTime.value().IsNull())
     {
         // I think this might be an error state - if mCountdownTime is NULL, this timer shouldn't be on.
@@ -204,7 +204,7 @@ static void onCountdownTimerTick(System::Layer * systemLayer, void * context)
         countdownTime--;
         logic->SetCountdownTimeFromCluster(countdownTime);
     }
-    else 
+    else
     {
         (void) DeviceLayer::SystemLayer().CancelTimer(onCountdownTimerTick, logic);
         logic->HandleCountdownTimeExpired();
@@ -229,9 +229,9 @@ void ClusterLogic::HandleCountdownTimeExpired()
                 SetMainState(MainStateEnum::kMoving);
             }
             return;
-        } 
+        }
     }
-    
+
     PostMovementCompletedEvent();
     HandleStopInternal();
 }
@@ -246,7 +246,7 @@ CHIP_ERROR ClusterLogic::SetMainState(MainStateEnum mainState)
     VerifyOrReturnValue(mainState != mState.mMainState, CHIP_NO_ERROR);
 
     // EngageStateChanged event SHALL be generated when the MainStateEnum attribute changes state to and from disengaged
-    // Present state is Disengaged and will be changed to new state, so trigger EngageStateChangedEvent 
+    // Present state is Disengaged and will be changed to new state, so trigger EngageStateChangedEvent
     if (mState.mMainState == MainStateEnum::kDisengaged)
     {
         // As Closure is transition from Disengaged state to new State, EngageValue should be true.
@@ -255,16 +255,16 @@ CHIP_ERROR ClusterLogic::SetMainState(MainStateEnum mainState)
     // New state will be Disengaged , so trigger EngageStateChangedEvent
     if (mainState == MainStateEnum::kDisengaged)
     {
-        // As Closure is transition to Disengaged state, EngageValue should be false.  
+        // As Closure is transition to Disengaged state, EngageValue should be false.
         PostEngageStateChangedEvent(false);
     }
 
     mState.mMainState = mainState;
     mMatterContext.MarkDirty(Attributes::MainState::Id);
-    
-    
+
+
     if (mConformance.HasFeature(Feature::kInstantaneous)) {
-        
+
         if (mainState == MainStateEnum::kCalibrating){
             SetCountdownTimeFromCluster(mDelegate.GetCalibrationCountdownTime());
         } else if (mainState == MainStateEnum::kMoving) {
@@ -274,13 +274,13 @@ CHIP_ERROR ClusterLogic::SetMainState(MainStateEnum mainState)
         } else {
             (void) DeviceLayer::SystemLayer().CancelTimer(onCountdownTimerTick, this);
         }
-    
+
         if (mainState == MainStateEnum::kCalibrating || mainState == MainStateEnum::kMoving || mainState == MainStateEnum::kWaitingForMotion)
         {
             (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onCountdownTimerTick, this);
-        }   
+        }
     }
-    
+
     return CHIP_NO_ERROR;
 }
 
@@ -348,7 +348,7 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
     // Validate if the Positioning feature is required based on the set values and FeatureMap conformance.
     if (validateClusterOverallStatePositioning || validateIncomingOverallStatePositioning)
     {
-        //TODO: why are we checking the current position value, why it should impact the set. 
+        //TODO: why are we checking the current position value, why it should impact the set.
         //TODO: ideally if we dont have ppositioningfeature the current.state should not be present.
         //TODO: if currentstate has positioning then we are missing check somewhere else.
         // If the positioning member is present in either the current or incoming OverallState, we need to check if the Positioning
@@ -380,7 +380,7 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
         //TODO: Same comment as above
         // If the secureState member is present in either the current or incoming OverallState, we need to check if the Speed feature is
         // supported by the device. If the Speed feature is not supported, return an error.
-        VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) || mConformance.HasFeature(Feature::kMotionLatching), 
+        VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) || mConformance.HasFeature(Feature::kMotionLatching),
                             CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     }
 
@@ -463,7 +463,7 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
     {
         currentOverallState.SetNonNull(overallState.Value());
         mMatterContext.MarkDirty(Attributes::OverallState::Id);
-        
+
         //SecureStateChangedEvent SHALL be generated when the SecureState field in the OverallState attribute changes
         if (requiredSecureStateUpdate) {
             PostSecureStateChangedEvent(overallState.Value().secureState.Value().Value());
@@ -532,7 +532,7 @@ CHIP_ERROR ClusterLogic::SetOverallTarget(const DataModel::Nullable<GenericOvera
     // Validate if the Position feature is required based on the set values and FeatureMap conformance.
     if (validateClusterOverallTargetPosition || validateIncomingOverallTargetPosition)
     {
-        //TODO: why are we checking the current position value, why it should impact the set. 
+        //TODO: why are we checking the current position value, why it should impact the set.
         //TODO: ideally if we dont have ppositioningfeature the current.state should not be present.
         //TODO: if currentstate has positioning then we are missing check somewhere else.
         // If the position member is present in either the current or incoming OverallTarget, we need to check if the Position
@@ -567,11 +567,11 @@ CHIP_ERROR ClusterLogic::SetOverallTarget(const DataModel::Nullable<GenericOvera
     {
         // We don't need to check is values are present since the check was done above.
         const TargetPositionEnum & position = overallTarget.Value().position.Value();
-        
+
         VerifyOrReturnError(EnsureKnownEnumValue(position) != TargetPositionEnum::kUnknownEnumValue,
                                 CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(IsSupportedOverallTargetPositioning(position), CHIP_ERROR_INVALID_ARGUMENT);
-        
+
         // We need to update the cluster positioning value if
         // - cluster does not have value; the value will necessarily be updated
         // - cluster and incoming values are different
@@ -595,7 +595,7 @@ CHIP_ERROR ClusterLogic::SetOverallTarget(const DataModel::Nullable<GenericOvera
     if (validateIncomingOverallTargetSpeed)
     {
         const Globals::ThreeLevelAutoEnum & speed = overallTarget.Value().speed.Value();
-        
+
         VerifyOrReturnError(EnsureKnownEnumValue(speed) != Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
                                 CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -628,16 +628,16 @@ CHIP_ERROR ClusterLogic::SetOverallTarget(const DataModel::Nullable<GenericOvera
 CHIP_ERROR ClusterLogic::SetCurrentErrorList(const ClosureErrorEnum error)
 {
     assertChipStackLockedByCurrentThread();
-    
+
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
-    
+
     VerifyOrReturnError(EnsureKnownEnumValue(error) != ClosureErrorEnum::kUnknownEnumValue,
                                 CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(mDelegate.SetCurrentErrorInList(error));
     ReportCurrentErrorListChange();
-    
+
     ReturnErrorOnFailure(SetMainState(MainStateEnum::kError));
-    
+
     return CHIP_NO_ERROR;
 }
 
@@ -695,14 +695,14 @@ CHIP_ERROR ClusterLogic::GetOverallTarget(DataModel::Nullable<GenericOverallTarg
     {
         overallTarget = mState.mOverallTarget;
     }
-    
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ClusterLogic::GetCurrentErrorList(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    
+
     for (size_t i = 0; true; i++)
     {
         ClosureErrorEnum error;
@@ -730,13 +730,13 @@ exit:
     return err;
 }
 
-chip::Protocols::InteractionModel::Status ClusterLogic::HandleStopInternal() 
+chip::Protocols::InteractionModel::Status ClusterLogic::HandleStopInternal()
 {
     Status status = Status::Success;
-        
+
     MainStateEnum state;
     VerifyOrReturnValue(GetMainState(state) == CHIP_NO_ERROR,Status::Failure);
-    
+
     // Stop action is supported only if the closure is in one of the following states Moving, WaitingForMotion or Calibrating.
     // A status code of SUCCESS SHALL always be returned, regardless if it is in above states or not.
     if ((state == MainStateEnum::kCalibrating) || (state == MainStateEnum::kMoving) || (state == MainStateEnum::kWaitingForMotion))
@@ -746,33 +746,33 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleStopInternal()
         if (status == Status::Success) {
             VerifyOrReturnValue(SetMainState(MainStateEnum::kStopped) == CHIP_NO_ERROR,Status::Failure,
                                 ChipLogError(AppServer, "Stop Command: Failed to set MainState to Stopped"));
-        } 
+        }
     }
 
     return status;
-    
+
 }
 
-chip::Protocols::InteractionModel::Status ClusterLogic::HandleStop() 
+chip::Protocols::InteractionModel::Status ClusterLogic::HandleStop()
 {
     VerifyOrDieWithMsg(mIsInitialized, NotSpecified, "Stop Command called before Initialization of closure");
-    
+
     // Stop command can only be supported if closure doesnt support instantaneous features
     VerifyOrReturnError(!mConformance.HasFeature(Feature::kInstantaneous), Status::UnsupportedCommand);
-    
+
     return HandleStopInternal();
 }
 
 chip::Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPositionEnum> position, Optional<bool> latch,
-                                                       Optional<Globals::ThreeLevelAutoEnum> speed) 
+                                                       Optional<Globals::ThreeLevelAutoEnum> speed)
 {
     VerifyOrDieWithMsg(mIsInitialized, NotSpecified, "MoveTo Command called before Initialization of closure");
-    
+
     Status status = Status::Success;
-    
+
     MainStateEnum state;
     VerifyOrReturnValue(GetMainState(state) == CHIP_NO_ERROR,Status::Failure);
-    
+
     DataModel::Nullable<GenericOverallTarget> target;
 
     // If all command parameters don't have a value, return InvalidCommand
@@ -798,7 +798,7 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<Ta
         {
             return Status::InvalidAction;
         }
-        
+
         target.Value().latch = latch;
     }
 
@@ -808,7 +808,7 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<Ta
 
         // If Speed (SP) feature is not supported, the server SHALL return a status code SUCCESS,
         VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), Status::Success);
-        
+
         target.Value().speed = speed;
     }
 
@@ -818,12 +818,12 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<Ta
 
 
     status = mDelegate.HandleMoveToCommand(position, latch, speed);
-    
+
     // once MoveTo action is successful.Server will set OverallTarget and the MainState.
-    if (status == Status::Success) 
+    if (status == Status::Success)
     {
         VerifyOrReturnValue(SetOverallTarget(target) == CHIP_NO_ERROR, Status::Failure);
-        
+
         // MainState is set to Moving or WaitingforMotion based on closure.
         if (mDelegate.IsReadyToMove())
         {
@@ -839,42 +839,42 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<Ta
             VerifyOrReturnValue(SetMainState(MainStateEnum::kCalibrating) == CHIP_NO_ERROR,Status::Failure,
                                 ChipLogError(AppServer, "Calibrate Command: Failed to set MainState to Calibrating"));
     }
-    
+
     return status;
 }
 
 chip::Protocols::InteractionModel::Status ClusterLogic::HandleCalibrate()
 {
     VerifyOrDieWithMsg(mIsInitialized, NotSpecified, "Calibrate Command called before Initialization of closure");
-    
+
     Status status = Status::Success;
-    
+
     // Calibrate command can only be supported if closure supports Calibration feature.
     VerifyOrReturnError(!mConformance.HasFeature(Feature::kCalibration), Status::UnsupportedCommand);
-    
+
     MainStateEnum state;
     VerifyOrReturnValue(GetMainState(state) == CHIP_NO_ERROR,Status::Failure);
-    
+
     //If Calibrate command is received when already in the Calibrating state, the server SHALL respond with a status code of SUCCESS.
-    if (state == MainStateEnum::kCalibrating) 
+    if (state == MainStateEnum::kCalibrating)
     {
         return Status::Success;
     }
-    
+
     // If Calibrate command is invoked in any state other than Stopped, the server SHALL respond with INVALID_IN_STATE.
     // this check excludes Claibrating Mainstate as its already validated above.
     VerifyOrReturnValue(state == MainStateEnum::kStopped,Status::InvalidInState);
-    
+
     status = mDelegate.HandleCalibrateCommand();
-    
+
     // once Calibrate action is successful on closure will set MainState to stopped.
     if (status == Status::Success) {
         VerifyOrReturnValue(SetMainState(MainStateEnum::kCalibrating) == CHIP_NO_ERROR,Status::Failure,
                                 ChipLogError(AppServer, "Calibrate Command: Failed to set MainState to Calibrating"));
-    } 
-    
+    }
+
     return status;
-    
+
 }
 
 
@@ -894,7 +894,7 @@ CHIP_ERROR ClusterLogic::PostOperationalErrorEvent(const DataModel::List<const C
     Events::OperationalError::Type event{ .errorState = errorState };
     EventNumber eventNumber;
     err = LogEvent(event, mMatterContext.GetEndpointId(), eventNumber);
-    
+
     if (CHIP_NO_ERROR != err)
     {
         ChipLogError(DataManagement, "ClosureControlCLuster: Operation error log event failed %" CHIP_ERROR_FORMAT, err.Format());
@@ -908,12 +908,12 @@ CHIP_ERROR ClusterLogic::PostMovementCompletedEvent()
     // Movement complete event can only be triggered,if the Positioning feature is supported and Instantenous feature is not supported.
     // Return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE otherwise.
     VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) && !mConformance.HasFeature(Feature::kInstantaneous), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    
+
     Events::MovementCompleted::Type event{};
     EventNumber eventNumber;
-    
+
     CHIP_ERROR err = LogEvent(event, mMatterContext.GetEndpointId(), eventNumber);
-    
+
     if (CHIP_NO_ERROR != err)
     {
         ChipLogError(DataManagement, "ClosureControlCLuster: Movement complete log event failed %" CHIP_ERROR_FORMAT, err.Format());
@@ -924,16 +924,16 @@ CHIP_ERROR ClusterLogic::PostMovementCompletedEvent()
 
 CHIP_ERROR ClusterLogic::PostEngageStateChangedEvent(const bool engageValue)
 {
-    
+
     // EngageState changed Event can only be triggered,if the ManuallyOperable feature is supported.
     // Return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE otherwise.
     VerifyOrReturnError(mConformance.HasFeature(Feature::kManuallyOperable), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    
+
     Events::EngageStateChanged::Type event{ .engageValue = engageValue };
     EventNumber eventNumber;
-    
+
     CHIP_ERROR err = LogEvent(event, mMatterContext.GetEndpointId(), eventNumber);
-    
+
     if (CHIP_NO_ERROR != err)
     {
         ChipLogError(DataManagement, "ClosureControlCLuster: Engage State log event failed %" CHIP_ERROR_FORMAT, err.Format());
@@ -947,12 +947,12 @@ CHIP_ERROR ClusterLogic::PostSecureStateChangedEvent(const bool secureValue)
     // SecureState changed event can only be triggered,if the Positioning or MotionLatching feature is supported.
     // Return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE otherwise.
     VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) && !mConformance.HasFeature(Feature::kInstantaneous), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    
+
     Events::SecureStateChanged::Type event{ .secureValue = secureValue };
     EventNumber eventNumber;
-    
+
     CHIP_ERROR err = LogEvent(event, mMatterContext.GetEndpointId(), eventNumber);
-    
+
     if (CHIP_NO_ERROR != err)
     {
         ChipLogError(DataManagement, "ClosureControlCLuster: Secured state log event failed %" CHIP_ERROR_FORMAT, err.Format());

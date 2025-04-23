@@ -181,11 +181,11 @@ public:
     // Set functions are supplied for any values that can be set either internally by the device or externally
     // through a direct attribute write. Changes to attributes that happen as a side effect of cluster commands
     // are handled by the cluster command handlers.
-    
+
     CHIP_ERROR SetOverallState(const DataModel::Nullable<GenericOverallState> & overallState);
     CHIP_ERROR SetOverallTarget(const DataModel::Nullable<GenericOverallTarget> & overallTarget);
     CHIP_ERROR SetCurrentErrorList(const ClosureErrorEnum error);
-    
+
     /**
      * @brief Function to change the MainState.
      *        Function posts EngageStateChanged Event, base on trasition to/from Disengaged state.
@@ -195,7 +195,7 @@ public:
      *        See SetCountdownTime function comment below
      */
     CHIP_ERROR SetMainState(MainStateEnum mainState);
-    
+
     /**
      * @brief Public API to trigger countdown time update from the delegate (application layer).
      *        Function calls the SetCountdownTime function with the fromDelegate parameter set to true.
@@ -206,7 +206,7 @@ public:
     {
         return SetCountdownTime(countdownTime, true);
     }
-    
+
     /**
      * @brief API to trigger countdown time update from the cluster logic.
      *        Function calls the SetCountdownTime function with the fromDelegate parameter set to false.
@@ -217,8 +217,8 @@ public:
     {
         return SetCountdownTime(countdownTime, false);
     }
-    
-    
+
+
     /**
      *  @brief Calls delegate HandleStopCommand function after validating MainState
      *  @return Exits if the cluster is not initialized.
@@ -226,7 +226,7 @@ public:
      *          Returns Success on succesful handling or Error Otherwise
      */
     chip::Protocols::InteractionModel::Status HandleStopInternal();
-    
+
     /**
      *  @brief Calls HandleStopInternal function after validating the conformance and Initialization
      *  @return Exits if the cluster is not initialized.
@@ -234,7 +234,7 @@ public:
      *          Returns Success on succesful handling or Error Otherwise
      */
     chip::Protocols::InteractionModel::Status HandleStop();
-    
+
     /**
      *  @brief Calls delegate HandleMoveToCommand function after validating the parameters and conformance.
      *  @param [in] position target position
@@ -248,7 +248,7 @@ public:
      */
     chip::Protocols::InteractionModel::Status HandleMoveTo(Optional<TargetPositionEnum> position, Optional<bool> latch,
                                                            Optional<Globals::ThreeLevelAutoEnum> speed);
-    
+
     /**
      *  @brief Calls delegate HandleCalibrateCommand function after validating the parameters and conformance.
      *  @return Exits if the cluster is not initialized.
@@ -257,7 +257,7 @@ public:
      *          Returns Success on succesful handling.
      */
     chip::Protocols::InteractionModel::Status HandleCalibrate();
-    
+
     /**
      * @brief Post event when a reportable error condition is detected
      * @param [in] errorState current error list
@@ -291,16 +291,16 @@ public:
      *         Return error recieved from LogEvent.
      */
     CHIP_ERROR PostSecureStateChangedEvent(const bool secureValue);
-    
+
     /**
      * @brief Causes reporting of CurrentErrorList.
      *        Whenever application wants to report a change in Errorlist, call this method.
      */
     void ReportCurrentErrorListChange();
-    
-    
+
+
     /**
-     * @brief Fuction handles the expiry of countdowntime. 
+     * @brief Fuction handles the expiry of countdowntime.
      *        If device is in WaitingforMotion,will check if Motion should be triggered or not.
      *        If no motion nedded, will post MotionComplete event and call HandlestopInternal.
      */
@@ -349,7 +349,7 @@ private:
      *        false, otherwise
      */
     bool IsSupportedOverallStatePositioning(PositioningEnum positioning);
-    
+
     /**
      * @brief Function validates if the requested OverallTarget positioning is supported by the device.
      *        Function validates agaisnt the FeatureMap conformance to validate support.
