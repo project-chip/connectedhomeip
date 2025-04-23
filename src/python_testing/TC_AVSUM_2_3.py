@@ -126,7 +126,7 @@ class TC_AVSUM_2_3(MatterBaseTest, AVSUMTestBase):
             self.step(4)
             # Create new Value for Pan
             while True:
-                newPan = random.randint(pan_min_dut, pan_max_dut)
+                newPan = random.randint(pan_min_dut+1, pan_max_dut)
                 if newPan != initialPan:
                     break
 
@@ -144,7 +144,7 @@ class TC_AVSUM_2_3(MatterBaseTest, AVSUMTestBase):
 
             self.step(7)
             # Create an out of range value for Pan, verify it's clipped to PanMax
-            newPanFail = abs(pan_max_dut - newPan) + 10
+            newPanFail = abs(pan_max_dut - pan_min_dut)
 
             self.step(8)
             await self.send_mptz_relative_move_pan_command(newPanFail)
@@ -178,7 +178,7 @@ class TC_AVSUM_2_3(MatterBaseTest, AVSUMTestBase):
             self.step(11)
             # Create new Value for Tilt
             while True:
-                newTilt = random.randint(tilt_min_dut, tilt_max_dut)
+                newTilt = random.randint(tilt_min_dut+1, tilt_max_dut)
                 if newTilt != initialTilt:
                     break
 
@@ -195,7 +195,7 @@ class TC_AVSUM_2_3(MatterBaseTest, AVSUMTestBase):
 
             self.step(14)
             # Create an out of range value for Tilt, verify it's clipped to TiltMax
-            newTiltFail = abs(tilt_max_dut - newTilt) + 10
+            newTiltFail = abs(tilt_max_dut - tilt_min_dut)
 
             self.step(15)
             await self.send_mptz_relative_move_tilt_command(newTiltFail)
@@ -240,7 +240,7 @@ class TC_AVSUM_2_3(MatterBaseTest, AVSUMTestBase):
 
             self.step(21)
             # Create an out of range value for Zoom, verify it's clipped to ZoomMax
-            newZoomFail = abs(zoom_max_dut - newZoom) + 10
+            newZoomFail = zoom_max_dut - 1
 
             self.step(22)
             await self.send_mptz_relative_move_zoom_command(newZoomFail)
