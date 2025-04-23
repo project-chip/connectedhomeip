@@ -142,7 +142,7 @@ private:
     Platform::ScopedMemoryBuffer<char> mOwnedCurrentPriceDescriptionBuffer;
 
     // Helper function that makes a copy of a string into a span
-    CHIP_ERROR CopyStringToSpan(const char * src, Platform::ScopedMemoryBuffer<char> & bufferOut, CharSpan & spanOut);
+    CHIP_ERROR CopyCharSpan(const CharSpan src, Platform::ScopedMemoryBuffer<char> & bufferOut, CharSpan & spanOut);
 
     // This performs a deep copy into mCurrentPrice so that the caller of the SetCurrentPrice can free its memory
     CHIP_ERROR CopyPrice(const DataModel::Nullable<Structs::CommodityPriceStruct::Type> & src);

@@ -373,13 +373,13 @@ CHIP_ERROR Instance::SetCurrentPrice(const DataModel::Nullable<Structs::Commodit
     {
         if (!newValue.Value().periodEnd.IsNull() && (newValue.Value().periodStart > newValue.Value().periodEnd.Value()))
         {
-            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+            return CHIP_ERROR_BAD_REQUEST;
         }
 
         if (!newValue.Value().price.HasValue() && !newValue.Value().priceLevel.HasValue())
         {
             // Must have Price or PriceLevel
-            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+            return CHIP_ERROR_BAD_REQUEST;
         }
     }
 
@@ -395,9 +395,9 @@ CHIP_ERROR Instance::SetCurrentPrice(const DataModel::Nullable<Structs::Commodit
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::CopyStringToSpan(const char * src, Platform::ScopedMemoryBuffer<char> & bufferOut, CharSpan & spanOut)
+CHIP_ERROR Instance::CopyCharSpan(const CharSpan src, Platform::ScopedMemoryBuffer<char> & bufferOut, CharSpan & spanOut)
 {
-    size_t len = strlen(src);
+    size_t len = src.size();
     if (bufferOut.Get() != nullptr)
     {
         bufferOut.Free();
@@ -407,7 +407,7 @@ CHIP_ERROR Instance::CopyStringToSpan(const char * src, Platform::ScopedMemoryBu
     {
         return CHIP_ERROR_NO_MEMORY;
     }
-    memcpy(bufferOut.Get(), src, len);
+    memcpy(bufferOut.Get(), src.data(), len);
     spanOut = CharSpan(bufferOut.Get(), len);
     return CHIP_NO_ERROR;
 }
@@ -426,7 +426,7 @@ CHIP_ERROR Instance::CopyPrice(const DataModel::Nullable<Structs::CommodityPrice
         mOwnedCurrentPriceComponentBuffer.Free();
 
         // The .description is held within a ScopedBuffer so the
-        // CopyStringToSpan() will take care of that for us
+        // CopyCharSpan() will take care of that for us
     }
 
     // At this point we should have free'd all previous memory
@@ -443,7 +443,7 @@ CHIP_ERROR Instance::CopyPrice(const DataModel::Nullable<Structs::CommodityPrice
         if (src.Value().description.HasValue())
         {
             CharSpan span;
-            CopyStringToSpan(src.Value().description.Value().data(), mOwnedCurrentPriceDescriptionBuffer, span);
+            ReturnErrorOnFailure(CopyCharSpan(src.Value().description.Value(), mOwnedCurrentPriceDescriptionBuffer, span));
             mCurrentPrice.Value().description.SetValue(span);
         }
 
@@ -465,7 +465,7 @@ CHIP_ERROR Instance::CopyPrice(const DataModel::Nullable<Structs::CommodityPrice
                 {
                     CharSpan span;
                     auto desc = components[i].description.Value();
-                    CopyStringToSpan(desc.data(), mOwnedCurrentPriceComponentDescriptionBuffer[i], span);
+                    ReturnErrorOnFailure(CopyCharSpan(desc, mOwnedCurrentPriceComponentDescriptionBuffer[i], span));
                     mOwnedCurrentPriceComponentBuffer[i].description.SetValue(span);
                 }
             }
