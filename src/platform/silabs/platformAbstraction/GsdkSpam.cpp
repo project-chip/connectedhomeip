@@ -124,6 +124,11 @@ CHIP_ERROR SilabsPlatform::Init(void)
     return CHIP_NO_ERROR;
 }
 
+void SilabsPlatform::SoftwareReset()
+{
+    NVIC_SystemReset();
+}
+
 CHIP_ERROR SilabsPlatform::FlashInit()
 {
 #if defined(SL_TRUSTZONE_NONSECURE)

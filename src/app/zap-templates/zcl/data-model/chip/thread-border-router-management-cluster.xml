@@ -22,7 +22,7 @@ limitations under the License.
     <field name="PANChange" mask="0x1"/>
   </bitmap>
 
-  <cluster apiMaturity="provisional">
+  <cluster>
     <domain>Network Infrastructure</domain>
     <name>Thread Border Router Management</name>
     <code>0x0452</code>
@@ -33,49 +33,49 @@ limitations under the License.
 
     <globalAttribute code="0xFFFD" side="either" value="1"/>
 
-    <attribute side="server" code="0x0000" name="BorderRouterName" apiMaturity="provisional" define="BORDER_ROUTER_NAME" type="char_string" length="63">
+    <attribute side="server" code="0x0000" name="BorderRouterName" define="BORDER_ROUTER_NAME" type="char_string" length="63">
       <mandatoryConform/>
     </attribute>
 
-    <attribute side="server" code="0x0001" name="BorderAgentID" apiMaturity="provisional" define="BORDER_AGENT_ID" type="octet_string">
+    <attribute side="server" code="0x0001" name="BorderAgentID" define="BORDER_AGENT_ID" type="octet_string">
       <mandatoryConform/>
     </attribute>
     
-    <attribute side="server" code="0x0002" name="ThreadVersion" apiMaturity="provisional" define="THREAD_VERSION" type="int16u">
+    <attribute side="server" code="0x0002" name="ThreadVersion" define="THREAD_VERSION" type="int16u">
       <mandatoryConform/>
     </attribute>
 
-    <attribute side="server" code="0x0003" name="InterfaceEnabled" apiMaturity="provisional" define="INTERFACE_ENABLED" type="boolean" default="0">
+    <attribute side="server" code="0x0003" name="InterfaceEnabled" define="INTERFACE_ENABLED" type="boolean" default="0">
       <mandatoryConform/>
     </attribute>
 
-    <attribute side="server" code="0x0004" name="ActiveDatasetTimestamp" apiMaturity="provisional" define="ACTIVE_DATASET_TIMESTAMP" type="int64u" isNullable="true">
+    <attribute side="server" code="0x0004" name="ActiveDatasetTimestamp" define="ACTIVE_DATASET_TIMESTAMP" type="int64u" isNullable="true">
       <mandatoryConform/>
     </attribute>
 
-    <attribute side="server" code="0x0005" name="PendingDatasetTimestamp" apiMaturity="provisional" define="PENDING_DATASET_TIMESTAMP" type="int64u" isNullable="true">
+    <attribute side="server" code="0x0005" name="PendingDatasetTimestamp" define="PENDING_DATASET_TIMESTAMP" type="int64u" isNullable="true">
       <mandatoryConform/>
     </attribute>
     
-    <command source="client" code="0x00" apiMaturity="provisional" name="GetActiveDatasetRequest" response="DatasetResponse" optional="false">
+    <command source="client" code="0x00" name="GetActiveDatasetRequest" response="DatasetResponse" optional="false">
       <description>Command to request the active operational dataset of the Thread network to which the border router is connected. This command must be sent over a valid CASE session</description>
       <access op="invoke" privilege="manage"/>
       <mandatoryConform/>
     </command>
 
-    <command source="client" code="0x01" apiMaturity="provisional" name="GetPendingDatasetRequest" response="DatasetResponse" optional="false">
+    <command source="client" code="0x01" name="GetPendingDatasetRequest" response="DatasetResponse" optional="false">
       <description>Command to request the pending dataset of the Thread network to which the border router is connected. This command must be sent over a valid CASE session</description>
       <access op="invoke" privilege="manage"/>
       <mandatoryConform/>
     </command>
 
-   <command source="server" code="0x02" apiMaturity="provisional" name="DatasetResponse" optional="false">
+   <command source="server" code="0x02" name="DatasetResponse" optional="false">
       <description>Generated response to GetActiveDatasetRequest or GetPendingDatasetRequest commands.</description>
       <arg name="Dataset" type="octet_string" length="254"/>
       <mandatoryConform/>
     </command>
 
-    <command source="client" code="0x03" apiMaturity="provisional" name="SetActiveDatasetRequest" optional="false">
+    <command source="client" code="0x03" name="SetActiveDatasetRequest" optional="false">
       <description>Command to set or update the active Dataset of the Thread network to which the Border Router is connected.</description>
       <arg name="ActiveDataset" type="octet_string" length="254"/>
       <arg name="Breadcrumb" type="int64u" optional="true"/>
@@ -83,7 +83,7 @@ limitations under the License.
       <mandatoryConform/>
     </command>
 
-    <command source="client" code="0x04" apiMaturity="provisional" name="SetPendingDatasetRequest" optional="true">
+    <command source="client" code="0x04" name="SetPendingDatasetRequest" optional="true">
       <description>Command set or update the pending Dataset of the Thread network to which the Border Router is connected.</description>
       <arg name="PendingDataset" type="octet_string" length="254"/>
       <access op="invoke" privilege="manage"/>

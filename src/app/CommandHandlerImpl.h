@@ -18,6 +18,8 @@
 
 #include <app/CommandHandler.h>
 
+#include <app/CommandHandlerExchangeInterface.h>
+#include <app/CommandHandlerInterface.h>
 #include <app/CommandPathRegistry.h>
 #include <app/MessageDef/InvokeRequestMessage.h>
 #include <app/MessageDef/InvokeResponseMessage.h>

@@ -141,7 +141,7 @@ packaging==23.0
     #   ghapi
     #   idf-component-manager
     #   west
-pandas==2.1.4 ; platform_machine != "aarch64" and platform_machine != "arm64"
+pandas==2.2.3 ; platform_machine != "aarch64" and platform_machine != "arm64"
     # via -r requirements.memory.txt
 parso==0.8.3
     # via jedi
@@ -163,7 +163,7 @@ portpicker==1.5.2
     #   mobly
 prompt-toolkit==3.0.43
     # via ipython
-protobuf==4.24.4
+protobuf==5.28.3
     # via
     #   -r requirements.all.txt
     #   mypy-protobuf
@@ -253,7 +253,7 @@ traitlets==5.9.0
     # via
     #   ipython
     #   matplotlib-inline
-types-protobuf==4.24.0.2
+types-protobuf==5.29.1.20250208
     # via
     #   -r requirements.all.txt
     #   mypy-protobuf
