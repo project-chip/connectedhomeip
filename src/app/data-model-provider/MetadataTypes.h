@@ -101,7 +101,7 @@ struct AttributeEntry
 
     // Constructor
 
-    StartBitFieldInit  // Disabling '-Wconversion' & '-Wconversion'
+    StartBitFieldInit // Disabling '-Wconversion' & '-Wconversion'
 
         constexpr AttributeEntry(
             AttributeId id = 0,                                                                 // attributeId initial value,
@@ -111,37 +111,40 @@ struct AttributeEntry
             std::optional<Access::Privilege> writePriv = static_cast<Access::Privilege>(0)      // mask.writePrivilege initial value
             ) :
         attributeId{ id },
-        mask{ to_underlying(attrQualityFlags) & ((1 << 7) - 1),                                       // Narrowing expression to 7 bits
-              to_underlying(readPriv.value_or(static_cast<Access::Privilege>(0))) & ((1 << 5) - 1),   // Narrowing expression to 5 bits
-              to_underlying(writePriv.value_or(static_cast<Access::Privilege>(0))) & ((1 << 5) - 1) } // Narrowing expression to 5 bits
+        mask{ to_underlying(attrQualityFlags) & ((1 << 7) - 1), // Narrowing expression to 7 bits
+              to_underlying(readPriv.value_or(static_cast<Access::Privilege>(0))) &
+                  ((1 << 5) - 1), // Narrowing expression to 5 bits
+              to_underlying(writePriv.value_or(static_cast<Access::Privilege>(0))) & ((1 << 5) - 1) }
+        // Narrowing expression to 5 bits
     {}
 
     EndBitFieldInit // Enabling '-Wconversion' & '-Wconversion'
 
-    // Getter for mask.readPrivilege
-    constexpr std::optional<Access::Privilege>
-    GetReadPrivilege() const
+        // Getter for mask.readPrivilege
+        constexpr std::optional<Access::Privilege>
+        GetReadPrivilege() const
     {
-        if(ReadAllowed()) {
+        if (ReadAllowed())
+        {
             return static_cast<Access::Privilege>(mask.readPrivilege);
-          }
-          else
-          {
+        }
+        else
+        {
             return std::nullopt;
-          }
+        }
     }
 
     // Getter for mask.writePrivilege
-    constexpr std::optional<Access::Privilege>
-    GetWritePrivilege() const
+    constexpr std::optional<Access::Privilege> GetWritePrivilege() const
     {
-        if(WriteAllowed()) {
+        if (WriteAllowed())
+        {
             return static_cast<Access::Privilege>(mask.writePrivilege);
-          }
-          else
-          {
+        }
+        else
+        {
             return std::nullopt;
-          }
+        }
     }
 
     constexpr bool HasFlags(AttributeQualityFlags f) const { return (mask.flags & chip::to_underlying(f)) != 0; }
@@ -204,29 +207,31 @@ struct AcceptedCommandEntry
     StartBitFieldInit // Disabling '-Wconversion' & '-Wconversion'
 
         constexpr AcceptedCommandEntry(
-            CommandId id = 0,                                                          // commandId initial value,
-                                                                                       // this could be altered later
+            CommandId id = 0,                                                                  // commandId initial value,
+                                                                                               // this could be altered later
             CommandQualityFlags cmdQualityFlags         = static_cast<CommandQualityFlags>(0), // mask.flags initial value
             std::optional<Access::Privilege> invokePriv = Access::Privilege::kView             // mask.invokePrivilege initial value
             ) :
         commandId(id),
-        mask{ to_underlying(cmdQualityFlags) & ((1 << 3) - 1),                                         // Narrowing expression to 3 bits
-              to_underlying(invokePriv.value_or(static_cast<Access::Privilege>(0))) & ((1 << 5) - 1) } // Narrowing expression to 5 bits
+        mask{ to_underlying(cmdQualityFlags) & ((1 << 3) - 1), // Narrowing expression to 3 bits
+              to_underlying(invokePriv.value_or(static_cast<Access::Privilege>(0))) & ((1 << 5) - 1) }
+        // Narrowing expression to 5 bits
     {}
 
     EndBitFieldInit // Enabling '-Wconversion' & '-Wconversion'
 
-    // Getter for mask.invokePrivilege
-    constexpr std::optional<Access::Privilege>
-    GetInvokePrivilege() const
+        // Getter for mask.invokePrivilege
+        constexpr std::optional<Access::Privilege>
+        GetInvokePrivilege() const
     {
-        if(mask.invokePrivilege==0) {
+        if (mask.invokePrivilege == 0)
+        {
             return std::nullopt;
-          }
-          else
-          {
+        }
+        else
+        {
             return static_cast<Access::Privilege>(mask.invokePrivilege);
-          }
+        }
     }
 
     constexpr bool HasFlags(CommandQualityFlags f) const { return (mask.flags & chip::to_underlying(f)) != 0; }
