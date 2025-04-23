@@ -91,7 +91,7 @@ COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
     ~CommodityTariffPrimaryData() = default;
 
     CHIP_ERROR LoadJson(const Json::Value& root);
-    bool IsValid() { return true; }
+    bool IsValid() const { return true; }
 };
 
 class CommodityTariffCurrentData {
@@ -122,13 +122,9 @@ public:
         {
             ChipLogError(NotSpecified, "EGW-CTC: Invalid JSON data");
         }
-        else if (!Validate())
-        {
-            ChipLogError(NotSpecified, "EGW-CTC: Tariff data rejected due to inconsistencies");
-        }
         else
         {
-            TariffDataApply();
+            callback(mTariffData);
         }
     };
     ~TariffDataUpdater() = default; 
@@ -137,13 +133,8 @@ private:
     Callback callback;
 
     CHIP_ERROR LoadJson(const Json::Value & root) { 
-        return mTariffData.LoadJson(root); 
+        return mTariffData.LoadJson(root);
     };
-    bool Validate() { return mTariffData.IsValid(); }
-    void TariffDataApply() { 
-        ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data applied");        
-        callback(mTariffData); 
-    }
 };
 
 class CommodityTariffDelegate : public CommodityTariff::Delegate
@@ -230,8 +221,16 @@ private:
     }
 
     void TariffDataUpdaterCb(const CommodityTariffPrimaryData& newData) {
-        UpdateTariffAttributes(newData);
-        updater.reset();
+        if (!newData.IsValid())
+        {
+            ChipLogError(NotSpecified, "EGW-CTC: Tariff data rejected due to inconsistencies");
+        }
+        else
+        {
+            UpdateTariffAttributes(newData);
+            ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data applied");
+            //updater.reset();
+        }
     }
 
     void UpdateTariffAttributes(const CommodityTariffPrimaryData& newData) 

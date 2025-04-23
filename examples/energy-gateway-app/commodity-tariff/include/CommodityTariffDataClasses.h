@@ -178,34 +178,30 @@ public:
     TariffPeriodItemDataClass(TariffPeriodStructType& aValueStorage)
         : CTC_BaseDataClass<TariffPeriodStructType>(aValueStorage) {}
 
-    ~TariffPeriodItemDataClass() override { CleanupValue(); }
+    ~TariffPeriodItemDataClass() override = default;
 
-    CHIP_ERROR LoadFromJson(const Json::Value& json) override;
-    static void CleanupTariffPeriod(TariffPeriodStructType& period);    
+    static void CleanupTariffPeriod(TariffPeriodStructType& period);
+    static CHIP_ERROR ParseFromJson(const Json::Value& json, TariffPeriodStructType& output);
 protected:
     CHIP_ERROR UpdateValue(const TariffPeriodStructType& aValue) override;
+    void CleanupValue() override { CleanupTariffPeriod(mValue); }
 private:
     static constexpr size_t kMaxIDsEntries = 20;
-
-    //CHIP_ERROR ParseLabelFromJson(const Json::Value& json, TariffPeriodStructType& output);
-    CHIP_ERROR ParseIDsFromJson(const Json::Value& json, const char* fieldName,
-                              DataModel::List<const uint32_t>& output);
     bool IsValid(const TariffPeriodStructType& period) const override;
-    void CleanupValue() override { CleanupTariffPeriod(mValue); }
 };
 
-using TariffPeriodsList = DataModel::List<Structs::TariffPeriodStruct::Type>;
+using TariffPeriodsListType = DataModel::List<Structs::TariffPeriodStruct::Type>;
 
-class TariffPeriodsDataClass : public CTC_BaseDataClass<TariffPeriodsList> {
+class TariffPeriodsDataClass : public CTC_BaseDataClass<TariffPeriodsListType> {
 public:
-    TariffPeriodsDataClass(TariffPeriodsList& aValueStorage)
-        : CTC_BaseDataClass<TariffPeriodsList>(aValueStorage) {}
+    TariffPeriodsDataClass(TariffPeriodsListType& aValueStorage)
+        : CTC_BaseDataClass<TariffPeriodsListType>(aValueStorage) {}
 
     ~TariffPeriodsDataClass() override { CleanupValue(); }
 
     CHIP_ERROR LoadFromJson(const Json::Value& json) override;
 protected:
-    CHIP_ERROR UpdateValue(const TariffPeriodsList& aValue) override;
+    CHIP_ERROR UpdateValue(const TariffPeriodsListType& aValue) override;
     void CleanupValue() override;
 
 private:
@@ -222,16 +218,13 @@ public:
 
     ~DayEntryItemDataClass() override = default;
 
-    CHIP_ERROR LoadFromJson(const Json::Value& json) override;
-
     static void CleanupDayEntry(DayEntryStructType& entry);
-
+    static CHIP_ERROR ParseFromJson(const Json::Value& json, DayEntryStructType& output);
 protected:
     CHIP_ERROR UpdateValue(const DayEntryStructType& aValue) override;
     void CleanupValue() override { CleanupDayEntry(mValue); }
 
 private:
-    CHIP_ERROR ParseFromJson(const Json::Value& json, DayEntryStructType& output);
     bool IsValid(const DayEntryStructType& entry) const override;
 };
 
@@ -261,19 +254,14 @@ public:
     TariffComponentItemDataClass(TariffComponentStructType& aValueStorage)
         : CTC_BaseDataClass<TariffComponentStructType>(aValueStorage) {}
 
-    ~TariffComponentItemDataClass() override { CleanupValue(); }
+    ~TariffComponentItemDataClass() override = default;
 
-    CHIP_ERROR LoadFromJson(const Json::Value& json) override;
     static void CleanupTariffComponent(TariffComponentStructType& component);
-
+    static CHIP_ERROR ParseFromJson(const Json::Value& json, TariffComponentStructType& output);
 protected:
     CHIP_ERROR UpdateValue(const TariffComponentStructType& aValue) override;
     void CleanupValue() override { CleanupTariffComponent(mValue); }
-
 private:
-    //CHIP_ERROR ParseLabelFromJson(
-    //    const Json::Value& json, 
-    //    chip::Optional<DataModel::Nullable<chip::CharSpan>>& output);
     bool IsValid(const TariffComponentStructType& component) const override;
 };
 
@@ -294,6 +282,101 @@ protected:
 
 private:
     static constexpr size_t kMaxComponents = 20; // Example max components
+};
+
+using DayStructType = Structs::DayStruct::Type;
+class DayStructItemDataClass : public CTC_BaseDataClass<DayStructType> {
+public:
+    DayStructItemDataClass(DayStructType& aValueStorage)
+        : CTC_BaseDataClass<DayStructType>(aValueStorage) {}
+
+    ~DayStructItemDataClass() override = default;
+
+    static void CleanupTariffComponent(DayStructType& component);
+    static CHIP_ERROR ParseFromJson(const Json::Value& json, DayStructType& output);
+protected:
+    CHIP_ERROR UpdateValue(const DayStructType& aValue) override;
+    void CleanupValue() override { CleanupTariffComponent(mValue); }
+private:
+    bool IsValid(const DayStructType& component) const override;
+};
+
+using DayStructsListType = DataModel::List<Structs::DayStruct::Type>;
+class IndividualDaysDataClass : public CTC_BaseDataClass<DayStructsListType> {
+public:
+    IndividualDaysDataClass(DayStructsListType& aValueStorage)
+        : CTC_BaseDataClass<DayStructsListType>(aValueStorage) {}
+
+    ~IndividualDaysDataClass() override { CleanupValue(); }
+
+    CHIP_ERROR LoadFromJson(const Json::Value& json) override;
+protected:
+    CHIP_ERROR UpdateValue(const DayStructsListType& aValue) override;
+    void CleanupValue() override;
+};
+
+using DayPatternStructType = Structs::DayPatternStruct::Type;
+class DayPatternStructItemDataClass : public CTC_BaseDataClass<DayPatternStructType> {
+public:
+    DayPatternStructItemDataClass(DayPatternStructType& aValueStorage)
+        : CTC_BaseDataClass<DayPatternStructType>(aValueStorage) {}
+
+    ~DayPatternStructItemDataClass() override = default;
+
+    static void CleanupTariffComponent(DayPatternStructType& component);
+    static CHIP_ERROR ParseFromJson(const Json::Value& json, DayPatternStructType& output);
+protected:
+    CHIP_ERROR UpdateValue(const DayPatternStructType& aValue) override;
+    void CleanupValue() override { CleanupTariffComponent(mValue); }
+private:
+    bool IsValid(const DayPatternStructType& component) const override;
+};
+
+using DayPatternsListType = DataModel::List<DayPatternStructType>;
+
+class DayPatternsDataClass : public CTC_BaseDataClass<DayPatternsListType> {
+public:
+    DayPatternsDataClass(DayPatternsListType& aValueStorage)
+        : CTC_BaseDataClass<DayPatternsListType>(aValueStorage) {}
+
+    ~DayPatternsDataClass() override { CleanupValue(); }
+
+    CHIP_ERROR LoadFromJson(const Json::Value& json) override;
+protected:
+    CHIP_ERROR UpdateValue(const DayPatternsListType& aValue) override;
+    void CleanupValue() override;
+};
+
+using CalendarPeriodStructType = Structs::CalendarPeriodStruct::Type;
+
+class CalendarPeriodItemDataClass : public CTC_BaseDataClass<CalendarPeriodStructType> {
+public:
+    CalendarPeriodItemDataClass(CalendarPeriodStructType& aValueStorage)
+        : CTC_BaseDataClass<CalendarPeriodStructType>(aValueStorage) {}
+
+    ~CalendarPeriodItemDataClass() override = default;
+
+    static void CleanupTariffComponent(CalendarPeriodStructType& component);
+    static CHIP_ERROR ParseFromJson(const Json::Value& json, CalendarPeriodStructType& output);
+protected:
+    CHIP_ERROR UpdateValue(const CalendarPeriodStructType& aValue) override;
+    void CleanupValue() override { CleanupTariffComponent(mValue); }
+private:
+    bool IsValid(const CalendarPeriodStructType& component) const override;
+};
+
+using CalendarPeriodsListType = DataModel::List<CalendarPeriodStructType>;
+class CalendarPeriodsDataClass : public CTC_BaseDataClass<CalendarPeriodsListType> {
+public:
+    CalendarPeriodsDataClass(CalendarPeriodsListType& aValueStorage)
+        : CTC_BaseDataClass<CalendarPeriodsListType>(aValueStorage) {}
+
+    ~CalendarPeriodsDataClass() override { CleanupValue(); }
+
+    CHIP_ERROR LoadFromJson(const Json::Value& json) override;
+protected:
+    CHIP_ERROR UpdateValue(const CalendarPeriodsListType& aValue) override;
+    void CleanupValue() override;
 };
 
 } // namespace CommodityTariff

@@ -100,7 +100,7 @@ CommodityTariffDelegate::~CommodityTariffDelegate()
    // TODO - free allocated space
 }*/
 
-Status CommodityTariffDelegate::GetDayEntryById(DataModel::Nullable<uint32_t> aDayEntryId, Structs::DayEntryStruct::Type & aDayEntry)
+Status CommodityTariffDelegate::GetDayEntryById(DataModel::Nullable<uint32_t> aDayEntryId, DayEntryStructType & aDayEntry)
 {
     return Status::Success;
 }
@@ -108,7 +108,7 @@ Status CommodityTariffDelegate::GetDayEntryById(DataModel::Nullable<uint32_t> aD
 Status CommodityTariffDelegate::GetTariffComponentInfoById(DataModel::Nullable<uint32_t>  aTariffComponentId,
                                                            DataModel::Nullable<chip::CharSpan> & label,
                                                            DataModel::List<const uint32_t> & dayEntryIDs,
-                                                           Structs::TariffComponentStruct::Type & aTariffComponent)
+                                                           TariffComponentStructType & aTariffComponent)
 {
     return Status::Success;
 }
@@ -148,7 +148,14 @@ CHIP_ERROR CommodityTariffPrimaryData::LoadJson(const Json::Value& root)
             }
             else
             {
-                item.second(root);
+                err = item.second(root);
+            }
+
+            if ( err != CHIP_NO_ERROR )
+            {
+                ChipLogError(NotSpecified,
+                    "Invalid tariff data: Invalid value in field \"%s\"", key.c_str());
+                break;
             }
         }
         else
@@ -156,7 +163,10 @@ CHIP_ERROR CommodityTariffPrimaryData::LoadJson(const Json::Value& root)
             ChipLogError(NotSpecified,
                 "Invalid tariff data: the mandatory field \"%s\"is not present", key.c_str());
             err = CHIP_ERROR_INVALID_ARGUMENT;
+            break;
         }
+
+
     }
 
     if ( err != CHIP_NO_ERROR)
@@ -183,25 +193,6 @@ CHIP_ERROR CommodityTariffPrimaryData::LoadJson(const Json::Value& root)
     }
 
     return err;
-}
-
-static bool ParseIDArray(const Json::Value& json, DataModel::List<const uint32_t>& output, size_t maxSize) {
-    if (json.empty() || !json.isArray() || json.size() > maxSize) return false;
-    
-    std::vector<uint32_t> ids;
-    ids.reserve(json.size());
-
-    for (const auto& id : json) {
-        if (id.isUInt()) ids.push_back(id.asUInt());
-    }
-
-    bool is_success = SpanCopier<uint32_t>::Copy(
-        chip::Span<const uint32_t>(ids.data(), ids.size()),
-        output,
-        maxSize
-    );
-    ids.clear();
-    return is_success;
 }
 
 // Specialized implementations for complex types
@@ -270,7 +261,7 @@ CHIP_ERROR TariffInfoDataClass::UpdateValue(const TariffInformationStructType& a
             }
         }
         else{
-            tempValue.currency.Value().SetNull();
+            tempValue.currency.ClearValue();
         }
 
         if (!val.blockMode.IsNull())
@@ -344,16 +335,16 @@ CHIP_ERROR TariffInfoDataClass::LoadFromJson(const Json::Value & json)
     return CHIP_NO_ERROR;
 }
 
-bool TariffInfoDataClass::IsValid(const TariffInformationStructType& period) const {
+bool TariffInfoDataClass::IsValid(const TariffInformationStructType& tariffInfo) const {
 
-    if (period.IsNull())
+    if (tariffInfo.IsNull())
     {
         return false;
     }
 
-    const auto& period_val = period.Value();
+    const auto& tariffInfo_val = tariffInfo.Value();
     // Validate label length if present
-    if (!period_val.tariffLabel.IsNull()) {
+    if (tariffInfo_val.tariffLabel.IsNull()) {
         return false;
     }
     // TODO - add other conditions
@@ -440,58 +431,64 @@ static CHIP_ERROR ParseLabelFromJson(
     return err;
 }
 
-CHIP_ERROR TariffPeriodItemDataClass::LoadFromJson(const Json::Value& json) {
-    TariffPeriodStructType tempValue;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    err = ParseLabelFromJson(json.get("Label", Json::Value()), tempValue.label);
-    SuccessOrExit(err);
-
-    // Parse DayEntryIDs
-    err = ParseIDsFromJson(json, "DayEntryIDs", tempValue.dayEntryIDs);
-    SuccessOrExit(err);
-
-    // Parse TariffComponentIDs
-    err = ParseIDsFromJson(json, "TariffComponentIDs", tempValue.tariffComponentIDs);
-    SuccessOrExit(err);
-
-    // Validate final structure
-    VerifyOrExit(IsValid(tempValue), err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Commit changes
-    CleanupValue();
-    mValue = tempValue;
-
-exit:
-    if (err != CHIP_NO_ERROR) {
-        CleanupTariffPeriod(tempValue);
+static CHIP_ERROR ParseIDArray(const Json::Value& value, DataModel::List<const uint32_t>& output, size_t maxSize) {
+    if (value.empty() || !value.isArray() || value.size() > maxSize)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    return err;
-}
+    
+    std::vector<uint32_t> ids;
+    ids.reserve(value.size());
 
-CHIP_ERROR TariffPeriodItemDataClass::ParseIDsFromJson(
-    const Json::Value& json, const char* fieldName,
-    DataModel::List<const uint32_t>& output)
-{
-    Json::Value value = json.get(fieldName, Json::Value());
+    for (const auto& id : value) {
+        if (id.isUInt()) ids.push_back(id.asUInt());
+    }
 
-    if (!ParseIDArray(value, output, kMaxIDsEntries))
+    bool is_success = SpanCopier<uint32_t>::Copy(
+        chip::Span<const uint32_t>(ids.data(), ids.size()),
+        output,
+        maxSize
+    );
+    ids.clear();
+
+    if (!is_success)
     {
         return CHIP_ERROR_NO_MEMORY;
     }
-
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR TariffPeriodItemDataClass::ParseFromJson(const Json::Value& json, TariffPeriodStructType& output) {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    err = ParseLabelFromJson(json.get("Label", Json::Value()), output.label);
+    SuccessOrExit(err);
+
+    // Parse DayEntryIDs
+    err = ParseIDArray(json.get("DayEntryIDs", Json::Value()), output.dayEntryIDs, kMaxIDsEntries);
+    SuccessOrExit(err);
+
+    // Parse TariffComponentIDs
+    err = ParseIDArray(json.get("TariffComponentIDs", Json::Value()), output.tariffComponentIDs, kMaxIDsEntries);
+    SuccessOrExit(err);
+
+exit:
+    return err;
 }
 
 void TariffPeriodItemDataClass::CleanupTariffPeriod(TariffPeriodStructType& period) {
     if (!period.label.IsNull() && period.label.Value().data()) {
-        chip::Platform::MemoryFree(const_cast<char*>(period.label.Value().data()));
+        auto& tmp_label = period.label;
+        chip::Platform::MemoryFree(const_cast<char*>(tmp_label.Value().data()));
+        tmp_label.SetNull();
     }
     if (!period.dayEntryIDs.empty() && period.dayEntryIDs.data()) {
         chip::Platform::MemoryFree(const_cast<uint32_t*>(period.dayEntryIDs.data()));
+        period.dayEntryIDs = DataModel::List<uint32_t>();
     }
     if (!period.tariffComponentIDs.empty() && period.tariffComponentIDs.data() ) {
         chip::Platform::MemoryFree(const_cast<uint32_t*>(period.tariffComponentIDs.data()));
+        period.tariffComponentIDs = DataModel::List<uint32_t>();
     }
 }
 
@@ -515,28 +512,28 @@ bool TariffPeriodItemDataClass::IsValid(const TariffPeriodStructType& period) co
 }
 
 // TariffPeriodsDataClass
-CHIP_ERROR TariffPeriodsDataClass::UpdateValue(const TariffPeriodsList& aValue) {
+CHIP_ERROR TariffPeriodsDataClass::UpdateValue(const TariffPeriodsListType& aValue) {
     if (aValue.size() > kMaxPeriods) {
-        mValue = TariffPeriodsList();
+        mValue = TariffPeriodsListType();
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    auto* buffer = static_cast<Structs::TariffPeriodStruct::Type*>(
-        chip::Platform::MemoryCalloc(aValue.size(), sizeof(Structs::TariffPeriodStruct::Type))
+    auto* buffer = static_cast<TariffPeriodStructType*>(
+        chip::Platform::MemoryCalloc(aValue.size(), sizeof(TariffPeriodStructType))
     );
 
     if (!buffer) {
-        mValue = TariffPeriodsList();
+        mValue = TariffPeriodsListType();
         return CHIP_ERROR_NO_MEMORY;
     }
 
     // Initialize with placement new
     for (size_t i = 0; i < aValue.size(); i++) {
-        new (&buffer[i]) Structs::TariffPeriodStruct::Type();
+        new (&buffer[i]) TariffPeriodStructType();
     }
 
-    TariffPeriodsList tempList(
-        chip::Span<Structs::TariffPeriodStruct::Type>(buffer, aValue.size())
+    TariffPeriodsListType tempList(
+        chip::Span<TariffPeriodStructType>(buffer, aValue.size())
     );
 
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -572,42 +569,43 @@ CHIP_ERROR TariffPeriodsDataClass::LoadFromJson(const Json::Value& json) {
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
 
-    auto* buffer = static_cast<Structs::TariffPeriodStruct::Type*>(
-        chip::Platform::MemoryCalloc(json.size(), sizeof(Structs::TariffPeriodStruct::Type))
-    );
+    std::vector<TariffPeriodStructType> tempList;
+    tempList.reserve(json.size());
 
-    if (!buffer) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    TariffPeriodsList tempList(
-        chip::Span<Structs::TariffPeriodStruct::Type>(buffer, json.size())
-    );
-
-    CHIP_ERROR overallErr = CHIP_NO_ERROR;
-
-    for (Json::ArrayIndex i = 0; i < json.size(); ++i) {
-        TariffPeriodItemDataClass period(tempList[i]);
-        CHIP_ERROR err = period.LoadFromJson(json[i]);
-
-        if (err != CHIP_NO_ERROR) {
-            overallErr = err;
-            // Cleanup what we've allocated so far
-            for (Json::ArrayIndex j = 0; j < i; ++j) {
-                TariffPeriodItemDataClass::CleanupTariffPeriod(tempList[j]);
-            }
+    for (const auto& entryJson : json) {
+        TariffPeriodStructType entry;
+        err = TariffPeriodItemDataClass::ParseFromJson(entryJson, entry);
+        if ( err != CHIP_NO_ERROR)
+        {
             break;
         }
+        tempList.push_back(entry);
     }
 
-    if (overallErr == CHIP_NO_ERROR) {
-        CleanupValue(); // Cleanup old data
-        mValue = tempList;
-    } else {
-        chip::Platform::MemoryFree(buffer);
+    if (err == CHIP_NO_ERROR) {
+        CleanupValue();
+
+        auto* buffer = static_cast<TariffPeriodStructType*>(
+            chip::Platform::MemoryCalloc(tempList.size(), sizeof(TariffPeriodStructType))
+        );
+        if (!buffer) {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+        // Copy data
+        std::copy(tempList.begin(), tempList.end(), buffer);
+        mValue = TariffPeriodsListType(buffer, tempList.size());
+    }
+    else
+    {
+        for (auto& entry : tempList) {
+            TariffPeriodItemDataClass::CleanupTariffPeriod(entry);
+        }
+        tempList.clear();    
     }
 
-    return overallErr;
+    return err;
 }
 
 void TariffPeriodsDataClass::CleanupValue() {
@@ -615,8 +613,8 @@ void TariffPeriodsDataClass::CleanupValue() {
         for (auto& period : mValue) {
             TariffPeriodItemDataClass::CleanupTariffPeriod(period);
         }
-        chip::Platform::MemoryFree(const_cast<Structs::TariffPeriodStruct::Type*>(mValue.data()));
-        mValue = TariffPeriodsList();
+        chip::Platform::MemoryFree(const_cast<TariffPeriodStructType*>(mValue.data()));
+        mValue = TariffPeriodsListType();
     }
 }
 
@@ -642,7 +640,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR DayEntryItemDataClass::LoadFromJson(const Json::Value& json) {
+CHIP_ERROR DayEntryItemDataClass::ParseFromJson(const Json::Value& json, DayEntryStructType& output) {
     // Required fields check
     auto checkRequired = [&](const std::string& key, auto& dest, auto converter) -> CHIP_ERROR {
         if (!json.isMember(key) || !json[key].isUInt())
@@ -658,19 +656,14 @@ CHIP_ERROR DayEntryItemDataClass::LoadFromJson(const Json::Value& json) {
         }
     };
 
-    DayEntryStructType tempValue;
-    CHIP_ERROR err;
-    if ((err = checkRequired("DayEntryID", tempValue.dayEntryID, [](auto v){ return v; })) == CHIP_NO_ERROR &&
-        (err = checkRequired("StartTime", tempValue.startTime, [](auto v){ return static_cast<uint16_t>(v); })) == CHIP_NO_ERROR)
-    {
-        checkOptional("Duration", tempValue.duration, [](auto v){ return static_cast<uint16_t>(v); });
-        checkOptional("RandomizationOffset", tempValue.randomizationOffset, [](auto v){ return static_cast<int16_t>(v); });
-        checkOptional("RandomizationType", tempValue.randomizationType, [](auto v){ return static_cast<DayEntryRandomizationTypeEnum>(v); });
-    }
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (err == CHIP_NO_ERROR && IsValid(tempValue)) {
-        CleanupValue();
-        mValue = tempValue;
+    if ((err = checkRequired("DayEntryID", output.dayEntryID, [](auto v){ return v; })) == CHIP_NO_ERROR &&
+        (err = checkRequired("StartTime", output.startTime, [](auto v){ return static_cast<uint16_t>(v); })) == CHIP_NO_ERROR)
+    {
+        checkOptional("Duration", output.duration, [](auto v){ return static_cast<uint16_t>(v); });
+        checkOptional("RandomizationOffset", output.randomizationOffset, [](auto v){ return static_cast<int16_t>(v); });
+        checkOptional("RandomizationType", output.randomizationType, [](auto v){ return static_cast<DayEntryRandomizationTypeEnum>(v); });
     }
 
     return err;
@@ -691,7 +684,7 @@ bool DayEntryItemDataClass::IsValid(const DayEntryStructType& entry) const {
 }
 
 void DayEntryItemDataClass::CleanupDayEntry(DayEntryStructType& entry) {
-    // No dynamic memory in basic DayEntryStruct
+    entry = DayEntryStructType();
 }
 
 // DayEntriesDataClass
@@ -701,8 +694,8 @@ CHIP_ERROR DayEntriesDataClass::UpdateValue(const DayEntryListType& aValue) {
         return CHIP_ERROR_INVALID_LIST_LENGTH;
     }
 
-    auto* buffer = static_cast<Structs::DayEntryStruct::Type*>(
-        chip::Platform::MemoryCalloc(aValue.size(), sizeof(Structs::DayEntryStruct::Type))
+    auto* buffer = static_cast<DayEntryStructType*>(
+        chip::Platform::MemoryCalloc(aValue.size(), sizeof(DayEntryStructType))
     );
 
     if (!buffer) {
@@ -711,11 +704,11 @@ CHIP_ERROR DayEntriesDataClass::UpdateValue(const DayEntryListType& aValue) {
 
     // Copy data
     for (size_t i = 0; i < aValue.size(); i++) {
-        new (&buffer[i]) Structs::DayEntryStruct::Type(aValue[i]);
+        new (&buffer[i]) DayEntryStructType(aValue[i]);
     }
 
     CleanupValue();
-    mValue = DayEntryListType(chip::Span<Structs::DayEntryStruct::Type>(buffer, aValue.size()));
+    mValue = DayEntryListType(chip::Span<DayEntryStructType>(buffer, aValue.size()));
 
     return CHIP_NO_ERROR;
 }
@@ -729,25 +722,45 @@ CHIP_ERROR DayEntriesDataClass::LoadFromJson(const Json::Value& json) {
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
 
-    std::vector<Structs::DayEntryStruct::Type> tempEntries;
-    tempEntries.reserve(json.size());
+    std::vector<DayEntryStructType> tempList;
+    tempList.reserve(json.size());
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     for (const auto& entryJson : json) {
-        Structs::DayEntryStruct::Type entry;
-        DayEntryItemDataClass item(entry);
-        CHIP_ERROR err = item.LoadFromJson(entryJson);
-        if (err != CHIP_NO_ERROR) {
-            return err;
+        DayEntryStructType entry;
+        err = DayEntryItemDataClass::ParseFromJson(entryJson, entry);
+        if (err != CHIP_NO_ERROR)
+        {
+           break;
         }
-        tempEntries.push_back(entry);
+        tempList.push_back(entry);
     }
 
-    return UpdateValue(DayEntryListType(tempEntries.data(), tempEntries.size()));
+    if (err == CHIP_NO_ERROR) {
+        CleanupValue();
+
+        auto* buffer = static_cast<DayEntryStructType*>(
+            chip::Platform::MemoryCalloc(tempList.size(), sizeof(DayEntryStructType))
+        );
+        if (!buffer) {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+        // Copy data
+        std::copy(tempList.begin(), tempList.end(), buffer);
+        mValue = DayEntryListType(buffer, tempList.size());
+    }
+    else
+    {
+        tempList.clear();        
+    }
+
+    return err;
 }
 
 void DayEntriesDataClass::CleanupValue() {
     if (!mValue.empty()) {
-        chip::Platform::MemoryFree(const_cast<Structs::DayEntryStruct::Type*>(mValue.data()));
+        chip::Platform::MemoryFree(const_cast<DayEntryStructType*>(mValue.data()));
         mValue = DayEntryListType();
     }
 }
@@ -802,28 +815,31 @@ exit:
 
 //static CHIP_ERROR ParsePriceFromJson
 
-CHIP_ERROR TariffComponentItemDataClass::LoadFromJson(const Json::Value& json) {
-    CHIP_ERROR err = CHIP_NO_ERROR;    
-    TariffComponentStructType tempValue;
+CHIP_ERROR TariffComponentItemDataClass::ParseFromJson(const Json::Value& json, TariffComponentStructType& output) {
     DataModel::Nullable<chip::CharSpan> tempLabel;
 
-    tempValue.tariffComponentID = 0;
+    output.tariffComponentID = 0;
+    output.threshold.SetNull();
     tempLabel.SetNull();
-    tempValue.threshold.SetNull();
 
     const std::map<std::string, std::function<void(const Json::Value&)>> handlers = {
-        {"TariffComponentID",   [&tempValue](const Json::Value& v){ tempValue.tariffComponentID = (v.isUInt() ? (v.asUInt()): 0); }},
-        {"Threshold",           [&tempValue](const Json::Value& v){ tempValue.threshold = (v.isUInt() ? (v.asUInt()): 0); }},
+        {"TariffComponentID",   [&output](const Json::Value& v){ output.tariffComponentID = (v.isUInt() ? (v.asUInt()): 0); }},
+        {"Threshold",           [&output](const Json::Value& v){ output.threshold = (v.isUInt() ? (v.asUInt()): 0); }},
         {"Label",               [&tempLabel](const Json::Value& v){ ParseLabelFromJson(v, tempLabel); }},
 
-        {"FriendlyCredit",      [&tempValue](const Json::Value& v){ tempValue.friendlyCredit = MakeOptional((v.isBool() ? (v.asBool()): 0)); }},
-        {"Predicted",           [&tempValue](const Json::Value& v){ tempValue.predicted = MakeOptional((v.isBool() ? (v.asBool()): 0)); }},
+        {"FriendlyCredit",      [&output](const Json::Value& v){ output.friendlyCredit = MakeOptional((v.isBool() ? (v.asBool()): 0)); }},
+        {"Predicted",           [&output](const Json::Value& v){ output.predicted = MakeOptional((v.isBool() ? (v.asBool()): 0)); }},
     
         {"Price",               [](const Json::Value& v){ }},
         {"AuxiliaryLoad",       [](const Json::Value& v){ }},
         {"PeakPeriod",          [](const Json::Value& v){ }},
         {"PowerThreshold",      [](const Json::Value& v){ }},
     };
+
+    if (!json.isMember("TariffComponentID"))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 
     for (const auto& item : handlers) {
         auto key = item.first;
@@ -835,23 +851,20 @@ CHIP_ERROR TariffComponentItemDataClass::LoadFromJson(const Json::Value& json) {
         }
     }
 
-    tempValue.label = MakeOptional(tempLabel);
-
-    VerifyOrExit(IsValid(tempValue), err = CHIP_ERROR_INVALID_ARGUMENT);
-    CleanupValue();
-
-    mValue = tempValue;
-
-exit:
-    if (err != CHIP_NO_ERROR) {
-        CleanupTariffComponent(tempValue);
+    if ( !tempLabel.IsNull() )
+    {
+        output.label = MakeOptional(tempLabel);        
     }
-    return err;
+
+    return CHIP_NO_ERROR;
 }
 
 void TariffComponentItemDataClass::CleanupTariffComponent(TariffComponentStructType& component) {
     if (component.label.HasValue() && !component.label.Value().IsNull()) {
-        chip::Platform::MemoryFree(const_cast<char*>(component.label.Value().Value().data()));
+        auto& tmp_label = component.label.Value();
+        chip::Platform::MemoryFree(const_cast<char*>(tmp_label.Value().data()));
+        tmp_label.SetNull();
+        component.label.ClearValue();
     }
 }
 
@@ -882,8 +895,8 @@ CHIP_ERROR TariffComponentsDataClass::UpdateValue(const TariffComponentsListType
         return CHIP_ERROR_INVALID_LIST_LENGTH;
     }
 
-    auto* buffer = static_cast<Structs::TariffComponentStruct::Type*>(
-        chip::Platform::MemoryCalloc(aValue.size(), sizeof(Structs::TariffComponentStruct::Type))
+    auto* buffer = static_cast<TariffComponentStructType*>(
+        chip::Platform::MemoryCalloc(aValue.size(), sizeof(TariffComponentStructType))
     );
 
     if (!buffer) {
@@ -893,7 +906,7 @@ CHIP_ERROR TariffComponentsDataClass::UpdateValue(const TariffComponentsListType
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     for (size_t i = 0; i < aValue.size(); i++) {
-        new (&buffer[i]) Structs::TariffComponentStruct::Type();
+        new (&buffer[i]) TariffComponentStructType();
         TariffComponentItemDataClass component(buffer[i]);
         if (!component.Update(aValue[i])) {
             err = CHIP_ERROR_NO_MEMORY;
@@ -907,7 +920,7 @@ CHIP_ERROR TariffComponentsDataClass::UpdateValue(const TariffComponentsListType
 
     if (err == CHIP_NO_ERROR) {
         CleanupValue();
-        mValue = TariffComponentsListType(chip::Span<Structs::TariffComponentStruct::Type>(buffer, aValue.size()));
+        mValue = TariffComponentsListType(chip::Span<TariffComponentStructType>(buffer, aValue.size()));
     } else {
         chip::Platform::MemoryFree(buffer);
     }
@@ -924,20 +937,42 @@ CHIP_ERROR TariffComponentsDataClass::LoadFromJson(const Json::Value& json) {
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
 
-    std::vector<Structs::TariffComponentStruct::Type> tempComponents;
-    tempComponents.reserve(json.size());
+    std::vector<TariffComponentStructType> tempList;
+    tempList.reserve(json.size());
 
-    for (const auto& compJson : json) {
-        Structs::TariffComponentStruct::Type component;
-        TariffComponentItemDataClass item(component);
-        CHIP_ERROR err = item.LoadFromJson(compJson);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    for (const auto& entryJson : json) {
+        TariffComponentStructType entry;
+        err = TariffComponentItemDataClass::ParseFromJson(entryJson, entry);
         if (err != CHIP_NO_ERROR) {
-            return err;
+            break;
         }
-        tempComponents.push_back(component);
+        tempList.push_back(entry);
     }
 
-    return UpdateValue(TariffComponentsListType(tempComponents.data(), tempComponents.size()));
+    if (err == CHIP_NO_ERROR) {
+        CleanupValue();
+
+        auto* buffer = static_cast<TariffComponentStructType*>(
+            chip::Platform::MemoryCalloc(tempList.size(), sizeof(TariffComponentStructType))
+        );
+        if (!buffer) {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+        // Copy data
+        std::copy(tempList.begin(), tempList.end(), buffer);
+        mValue = TariffComponentsListType(buffer, tempList.size());
+    }
+    else
+    {
+        for (auto& entry : tempList) {
+            TariffComponentItemDataClass::CleanupTariffComponent(entry);
+        }
+        tempList.clear();        
+    }
+
+    return err;
 }
 
 void TariffComponentsDataClass::CleanupValue() {
@@ -945,26 +980,49 @@ void TariffComponentsDataClass::CleanupValue() {
         for (auto& component : mValue) {
             TariffComponentItemDataClass::CleanupTariffComponent(component);
         }
-        chip::Platform::MemoryFree(const_cast<Structs::TariffComponentStruct::Type*>(mValue.data()));
+        chip::Platform::MemoryFree(const_cast<TariffComponentStructType*>(mValue.data()));
         mValue = TariffComponentsListType();
     }
 }
 
-//DayPatternsDataClass
-CHIP_ERROR DayPatternsDataClass::LoadFromJson(const Json::Value& json) {
+//IndividualDaysDataClass
+CHIP_ERROR IndividualDaysDataClass::UpdateValue(const DayStructsListType& aValue) {
     return CHIP_NO_ERROR;
 }
 
-//IndividualDaysDataClass
 CHIP_ERROR IndividualDaysDataClass::LoadFromJson(const Json::Value& json) {
     return CHIP_NO_ERROR;
 }
 
+void IndividualDaysDataClass::CleanupValue() {
+
+}
+
+//DayPatternsDataClass
+CHIP_ERROR DayPatternsDataClass::UpdateValue(const DayPatternsListType& aValue) {
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DayPatternsDataClass::LoadFromJson(const Json::Value& json) {
+    return CHIP_NO_ERROR;
+}
+
+void DayPatternsDataClass::CleanupValue() {
+
+}
+
 //CalendarPeriodsDataClass
+CHIP_ERROR CalendarPeriodsDataClass::UpdateValue(const CalendarPeriodsListType& aValue) {
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR CalendarPeriodsDataClass::LoadFromJson(const Json::Value& json) {
     return CHIP_NO_ERROR;
 }
 
+void CalendarPeriodsDataClass::CleanupValue() {
+
+}
 /** -------------------Current attrs data--------------------- **/
 
 //CurrentDayEntryDataClass
