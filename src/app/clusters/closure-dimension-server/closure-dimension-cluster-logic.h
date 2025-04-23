@@ -105,7 +105,7 @@ struct ClusterConformance
                                              "MotionLatching  should be supported."));
         }
 
-        // If Rotation  feature is supported, then Overflow Attribute should be supported.
+        // If Rotation feature is supported, the Overflow attribute must be supported.
         if (HasFeature(Feature::kRotation))
         {
             VerifyOrReturnValue(
