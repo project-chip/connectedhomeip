@@ -146,6 +146,10 @@ menu "Demo"
         help
             To reduce wear and heat the M5Stack's Display is automatically switched off after a few seconds
 
+    config CHIP_NETWORK_RECOVERY_REQUIRED
+        bool "chip device network recovery by ble. When enable it, should disable USE_BLE_ONLY_FOR_COMMISSIONING."
+        default "y"
+        depends on RENDEZVOUS_MODE_BLE
 endmenu
 
 menu "PW RPC Debug channel"

@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
+#include <platform/CHIPDeviceConfig.h>
 #include <app-common/zap-generated/cluster-objects.h>
 
 namespace chip {
@@ -23,7 +23,12 @@ namespace Clusters {
 namespace GeneralCommissioning {
 
 void SetBreadcrumb(Attributes::Breadcrumb::TypeInfo::Type breadcrumb);
-
+#if CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
+void SetNetworkRecoveryReasonValue(Attributes::NetworkRecoveryReason::TypeInfo::Type& value);
+void GetNetworkRecoveryReasonValue(Attributes::NetworkRecoveryReason::TypeInfo::Type& value);
+void GenerateAndSetRecoveryIdentifier(void);
+uint64_t GetRecoveryIdentifier(void);
+#endif // CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
 } // namespace GeneralCommissioning
 } // namespace Clusters
 } // namespace app

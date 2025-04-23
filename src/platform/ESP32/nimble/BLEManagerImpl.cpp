@@ -23,7 +23,7 @@
  */
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-
+#include <platform/CHIPDeviceConfig.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #include "sdkconfig.h"
@@ -69,7 +69,9 @@
 #include "nimble/nimble_port_freertos.h"
 #include "services/gap/ble_svc_gap.h"
 #include "services/gatt/ble_svc_gatt.h"
-
+#if CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
+#include <app/clusters/general-commissioning-server/general-commissioning-server.h>
+#endif //CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
 // Not declared in any header file, hence requires a forward declaration.
 extern "C" void ble_store_config_init(void);
 
@@ -97,7 +99,13 @@ struct ESP32ChipServiceData
     uint8_t ServiceUUID[2];
     ChipBLEDeviceIdentificationInfo DeviceIdInfo;
 };
-
+#if CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
+struct ESP32ChipServiceNetworkRecoveryData
+{
+    uint8_t ServiceUUID[2];
+    ChipBLEDeviceNetworkRecoveryIdentificationInfo DeviceNwRecoIdInfo;
+};
+#endif
 const ble_uuid16_t ShortUUID_CHIPoBLEService = { BLE_UUID_TYPE_16, 0xFFF6 };
 
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
@@ -753,8 +761,10 @@ void BLEManagerImpl::DriveBLEState(void)
 
     if (mFlags.Has(Flags::kBleDeinitAndMemReleased))
     {
+        ChipLogError(DeviceLayer, "BLE Deinit and Memory released, returning from DriveBLEState");
         return;
     }
+
 
     // Initializes the ESP BLE layer if needed.
     if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && !mFlags.Has(Flags::kESPBLELayerInitialized))
@@ -1061,7 +1071,71 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     uint8_t index = 0;
 
     constexpr uint8_t kServiceDataTypeSize = 1;
+#if CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
+    ///Just for the wifi network recoveryS
+    bool wifiProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
+    bool wifiEnabled     = ConnectivityMgr().IsWiFiStationEnabled();
+    bool wifiConnected   = ConnectivityMgr().IsWiFiStationConnected();
+    ChipLogProgress(DeviceLayer, "BLE Checking WiFi connetion status: P=%d,E=%d,C=%d", wifiProvisioned, wifiEnabled, wifiConnected);
+    chip::app::Clusters::GeneralCommissioning::Attributes::NetworkRecoveryReason::TypeInfo::Type reason;
+    chip::app::Clusters::GeneralCommissioning::GetNetworkRecoveryReasonValue(reason);
+if (wifiProvisioned && (!reason.IsNull())) //The device had been provisionded, consider to start the network recovery advertising.
+{
+    chip::Ble::ChipBLEDeviceNetworkRecoveryIdentificationInfo deviceNwRecoveryIdInfo;
 
+    if (!mFlags.Has(Flags::kUseCustomDeviceName))
+    {
+        snprintf(mDeviceName, sizeof(mDeviceName), "%s", CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX);
+        mDeviceName[kMaxDeviceNameLength] = 0;
+    }
+
+    // Configure the BLE device name.
+    err = MapBLEError(ble_svc_gap_device_name_set(mDeviceName));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "ble_svc_gap_device_name_set() failed: %s", ErrorStr(err));
+        ExitNow();
+    }
+
+    memset(advData, 0, sizeof(advData));
+    advData[index++] = 0x02;                                                                // length
+    advData[index++] = CHIP_ADV_DATA_TYPE_FLAGS;                                            // AD type : flags
+    advData[index++] = CHIP_ADV_DATA_FLAGS;                                                 // AD value
+    advData[index++] = kServiceDataTypeSize + sizeof(ESP32ChipServiceNetworkRecoveryData);  // length
+    advData[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA;                                     // AD type: (Service Data - 16-bit UUID)
+    advData[index++] = static_cast<uint8_t>(ShortUUID_CHIPoBLEService.value & 0xFF);        // AD value
+    advData[index++] = static_cast<uint8_t>((ShortUUID_CHIPoBLEService.value >> 8) & 0xFF); // AD value
+    uint64_t identifier;
+    identifier = chip::app::Clusters::GeneralCommissioning::GetRecoveryIdentifier();
+    deviceNwRecoveryIdInfo.Init();
+    deviceNwRecoveryIdInfo.SetRecoveryReason((uint8_t)reason.Value());
+    deviceNwRecoveryIdInfo.SetRecoveryId(identifier);
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    if (!mFlags.Has(Flags::kExtAdvertisingEnabled))
+    {
+        deviceNwRecoveryIdInfo.SetAdditionalDataFlag(true);
+    }
+    else
+    {
+        deviceNwRecoveryIdInfo.SetAdditionalDataFlag(false);
+    }
+#endif
+    VerifyOrExit(index + sizeof(deviceNwRecoveryIdInfo) <= sizeof(advData), err = CHIP_ERROR_OUTBOUND_MESSAGE_TOO_BIG);
+    memcpy(&advData[index], &deviceNwRecoveryIdInfo, sizeof(deviceNwRecoveryIdInfo));
+    index = static_cast<uint8_t>(index + sizeof(deviceNwRecoveryIdInfo));
+
+    // Construct the Chip BLE Service Data to be sent in the scan response packet.
+    err = MapBLEError(ble_gap_adv_set_data(advData, sizeof(advData)));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "ble_gap_adv_set_NW_Recovery_data failed: %s", ErrorStr(err));
+        ExitNow();
+    }
+    ChipLogProgress(DeviceLayer, "Start network recovery BLE advertisment");
+}
+else
+#endif //CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
+{
     chip::Ble::ChipBLEDeviceIdentificationInfo deviceIdInfo;
 
     // If a custom device name has not been specified, generate a CHIP-standard name based on the
@@ -1131,7 +1205,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
         ChipLogError(DeviceLayer, "ble_gap_adv_set_data failed: %s %d", ErrorStr(err), discriminator);
         ExitNow();
     }
-
+}
 exit:
     return err;
 }

@@ -76,10 +76,16 @@ public:
     GeneralCommissioningGlobalInstance() :
         AttributeAccessInterface(Optional<EndpointId>::Missing(), GeneralCommissioning::Id),
         CommandHandlerInterface(Optional<EndpointId>::Missing(), GeneralCommissioning::Id)
-    {}
+    {
+#if CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
+        mNetworkRecoveryReasonValue.SetNull();
+#endif //CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
+    }
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-
+#if CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
+    Attributes::NetworkRecoveryReason::TypeInfo::Type mNetworkRecoveryReasonValue;
+#endif //CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
 private:
     CHIP_ERROR ReadIfSupported(CHIP_ERROR (ConfigurationManager::*getter)(uint8_t &), AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadBasicCommissioningInfo(AttributeValueEncoder & aEncoder);
@@ -112,6 +118,9 @@ CHIP_ERROR GeneralCommissioningGlobalInstance::Read(const ConcreteReadAttributeP
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         features.Set(GeneralCommissioning::Feature::kTermsAndConditions);
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+#if CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
+        features.Set(GeneralCommissioning::Feature::kNetworkRecovery);
+#endif // CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
         return aEncoder.Encode(features);
     }
 
@@ -179,6 +188,17 @@ CHIP_ERROR GeneralCommissioningGlobalInstance::Read(const ConcreteReadAttributeP
         return aEncoder.Encode(outUpdateAcceptanceDeadline.Value());
     }
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+#if CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
+    case RecoveryIdentifier::Id: {
+        uint8_t buffer[8];
+        chip::MutableByteSpan identifierTemp(buffer, sizeof(buffer));
+        RecoveryIdentifier::Get(aPath.mEndpointId, identifierTemp);
+        return aEncoder.Encode(identifierTemp);
+    }
+    case NetworkRecoveryReason::Id: {
+        return aEncoder.Encode(mNetworkRecoveryReasonValue);
+    }
+#endif // CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
     default: {
         break;
     }
@@ -660,6 +680,16 @@ public:
             NotifyTermsAndConditionsAttributeChangeIfRequired(initialState, updatedState);
         }
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+#if CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
+        // If the FabricIndex matches the last remaining entry in the Fabrics list, then the device SHALL delete all Matter
+        // related data on the node which was created since it was commissioned.
+        if (Server::GetInstance().GetFabricTable().FabricCount() == 0)
+        {
+            //here should set the NetworkRecoveryReason to Null, and regenerate the RecoveryIdentifier.
+            gGeneralCommissioningInstance.mNetworkRecoveryReasonValue.SetNull();
+            chip::app::Clusters::GeneralCommissioning::GenerateAndSetRecoveryIdentifier();
+        }
+#endif // CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
     }
 };
 
@@ -672,6 +702,18 @@ void MatterGeneralCommissioningPluginServerInitCallback()
 
     static GeneralCommissioningFabricTableDelegate fabricDelegate;
     Server::GetInstance().GetFabricTable().AddFabricDelegate(&fabricDelegate);
+    #if CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
+    //chip::DeviceLayer::PlatformMgr().LockChipStack();
+    gGeneralCommissioningInstance.mNetworkRecoveryReasonValue.SetNull();
+        // If this is the first-time initialization without any fabric, regenerate the network recovery information
+    if (Server::GetInstance().GetFabricTable().FabricCount() == 0)
+    {
+        if (GetRecoveryIdentifier() == 0) {
+            chip::app::Clusters::GeneralCommissioning::GenerateAndSetRecoveryIdentifier();
+        }
+    }
+    //chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+    #endif // CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
 }
 
 namespace chip {
@@ -682,6 +724,42 @@ void SetBreadcrumb(Attributes::Breadcrumb::TypeInfo::Type breadcrumb)
 {
     Breadcrumb::Set(0, breadcrumb);
 }
+#if CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
+void SetNetworkRecoveryReasonValue(Attributes::NetworkRecoveryReason::TypeInfo::Type& value)
+{
+    gGeneralCommissioningInstance.mNetworkRecoveryReasonValue = value;
+}
+void GetNetworkRecoveryReasonValue(Attributes::NetworkRecoveryReason::TypeInfo::Type& value)
+{
+    value = gGeneralCommissioningInstance.mNetworkRecoveryReasonValue;
+}
+void GenerateAndSetRecoveryIdentifier(void)
+{
+    uint8_t recoveryIdentiferSpan[8];
+    // Generate a random byte array for the recovery identifier
+    for (uint8_t i=0; i<3; i++)
+    { //avoid the identifer is zero, when is zero, try more times.
+        Crypto::DRBG_get_bytes(reinterpret_cast<uint8_t *>(recoveryIdentiferSpan), sizeof(recoveryIdentiferSpan));
+        if (!chip::Encoding::BigEndian::Get64(recoveryIdentiferSpan))
+        {
+            break;
+        }
+    }
+    chip::MutableByteSpan identifierTemp(recoveryIdentiferSpan,sizeof(recoveryIdentiferSpan));
+    RecoveryIdentifier::Set(kRootEndpointId, identifierTemp);
+}
+uint64_t GetRecoveryIdentifier(void)
+{
+    uint8_t buffer[8];
+    chip::MutableByteSpan identifierTemp(buffer, sizeof(buffer));
+    RecoveryIdentifier::Get(kRootEndpointId, identifierTemp);
+    if (identifierTemp.size() == 0)
+    {
+        return 0;
+    }
+    return chip::Encoding::BigEndian::Get64(identifierTemp.data());
+}
+#endif // CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
 } // namespace GeneralCommissioning
 } // namespace Clusters
 } // namespace app
