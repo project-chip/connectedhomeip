@@ -47,7 +47,7 @@ struct ServerClusterRegistration
 /// It is very typical to join together a registration and a Server
 /// This templates makes this registration somewhat easier.
 
-template<typename SERVER_CLUSTER>
+template <typename SERVER_CLUSTER>
 struct RegisteredServerCluster
 {
     SERVER_CLUSTER cluster;
@@ -55,7 +55,6 @@ struct RegisteredServerCluster
 
     RegisteredServerCluster() : registration(cluster) {}
 };
-
 
 /// Allows registering and retrieving ServerClusterInterface instances for specific cluster paths.
 class ServerClusterInterfaceRegistry
