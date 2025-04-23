@@ -282,87 +282,7 @@ CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberA
                                      const Span<DataVersion> & dataVersionStorage, Span<const EmberAfDeviceType> deviceTypeList,
                                      EndpointId parentEndpointId)
 {
-#ifndef CONFIG_USE_ENDPOINT_UNIQUE_ID
-    auto realIndex = index + FIXED_ENDPOINT_COUNT;
-
-    if (realIndex >= MAX_ENDPOINT_COUNT)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-    if (id == kInvalidEndpointId)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    auto serverClusterCount = emberAfClusterCountForEndpointType(ep, /* server = */ true);
-    if (dataVersionStorage.size() < serverClusterCount)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    index = static_cast<uint16_t>(realIndex);
-    for (uint16_t i = FIXED_ENDPOINT_COUNT; i < MAX_ENDPOINT_COUNT; i++)
-    {
-        if (emAfEndpoints[i].endpoint == id)
-        {
-            return CHIP_ERROR_ENDPOINT_EXISTS;
-        }
-    }
-
-    const size_t bufferSize = Compatibility::Internal::gEmberAttributeIOBufferSpan.size();
-    for (uint8_t i = 0; i < ep->clusterCount; i++)
-    {
-        const EmberAfCluster * cluster = &(ep->cluster[i]);
-        if (!cluster->attributes)
-        {
-            continue;
-        }
-
-        for (uint16_t j = 0; j < cluster->attributeCount; j++)
-        {
-            const EmberAfAttributeMetadata * attr = &(cluster->attributes[j]);
-            uint16_t attrSize                     = emberAfAttributeSize(attr);
-            if (attrSize > bufferSize)
-            {
-                ChipLogError(DataManagement,
-                             "Attribute size %u exceeds max size %lu, (attrId=" ChipLogFormatMEI ", clusterId=" ChipLogFormatMEI
-                             ")",
-                             attrSize, static_cast<unsigned long>(bufferSize), ChipLogValueMEI(attr->attributeId),
-                             ChipLogValueMEI(cluster->clusterId));
-                return CHIP_ERROR_NO_MEMORY;
-            }
-        }
-    }
-    emAfEndpoints[index].endpoint       = id;
-    emAfEndpoints[index].deviceTypeList = deviceTypeList;
-    emAfEndpoints[index].endpointType   = ep;
-    emAfEndpoints[index].dataVersions   = dataVersionStorage.data();
-
-    // Start the endpoint off as disabled.
-    emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isEnabled);
-    emAfEndpoints[index].parentEndpointId = parentEndpointId;
-
-    emberAfSetDynamicEndpointCount(MAX_ENDPOINT_COUNT - FIXED_ENDPOINT_COUNT);
-
-    // Initialize the data versions.
-    size_t dataSize = sizeof(DataVersion) * serverClusterCount;
-    if (dataSize != 0)
-    {
-        if (Crypto::DRBG_get_bytes(reinterpret_cast<uint8_t *>(dataVersionStorage.data()), dataSize) != CHIP_NO_ERROR)
-        {
-            // Now what?  At least 0-init it.
-            memset(dataVersionStorage.data(), 0, dataSize);
-        }
-    }
-
-    // Now enable the endpoint.
-    emberAfEndpointEnableDisable(id, true);
-
-    emberMetadataStructureGeneration++;
-    return CHIP_NO_ERROR;
-}
-#else
-    return emberAfSetDynamicEndpointWithEpUniqueId(index, id, ep, dataVersionStorage, deviceTypeList, CharSpan{}, parentEndpointId);
+	return emberAfSetDynamicEndpointWithEpUniqueId (index, id, ep, dataVersionStorage, deviceTypeList, {}, parentEndpointId);
 }
 
 CHIP_ERROR emberAfSetDynamicEndpointWithEpUniqueId(uint16_t index, EndpointId id, const EmberAfEndpointType * ep,
@@ -424,11 +344,16 @@ CHIP_ERROR emberAfSetDynamicEndpointWithEpUniqueId(uint16_t index, EndpointId id
     emAfEndpoints[index].deviceTypeList = deviceTypeList;
     emAfEndpoints[index].endpointType   = ep;
     emAfEndpoints[index].dataVersions   = dataVersionStorage.data();
-
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
     MutableCharSpan targetSpan(emAfEndpoints[index].endpointUniqueId);
     CopyCharSpanToMutableCharSpanWithTruncation(endpointUniqueId, targetSpan);
-    emAfEndpoints[index].endpointUniqueIdSize = static_cast<uint8_t>(std::min<size_t>(targetSpan.size(), UINT8_MAX));
 
+    // Ensure that the size of emAfEndpoints[index].endpointUniqueId fits within uint8_t
+    static_assert(sizeof(emAfEndpoints[0].endpointUniqueId) <= UINT8_MAX,
+              "The size of emAfEndpoints[index].endpointUniqueId must fit within uint8_t");
+
+    emAfEndpoints[index].endpointUniqueIdSize = static_cast<uint8_t>(targetSpan.size());
+#endif
     // Start the endpoint off as disabled.
     emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isEnabled);
     emAfEndpoints[index].parentEndpointId = parentEndpointId;
@@ -452,7 +377,6 @@ CHIP_ERROR emberAfSetDynamicEndpointWithEpUniqueId(uint16_t index, EndpointId id
     emberMetadataStructureGeneration++;
     return CHIP_NO_ERROR;
 }
-#endif
 
 EndpointId emberAfClearDynamicEndpoint(uint16_t index)
 {
@@ -1188,8 +1112,7 @@ CHIP_ERROR GetSemanticTagForEndpointAtIndex(EndpointId endpoint, size_t index,
     tag = emAfEndpoints[endpointIndex].tagList[index];
     return CHIP_NO_ERROR;
 }
-
-#ifdef CONFIG_USE_ENDPOINT_UNIQUE_ID
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
 CHIP_ERROR emberAfGetEndpointUniqueIdForEndPoint(EndpointId endpoint, MutableCharSpan & epUniqueIdMutSpan)
 {
     uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
@@ -1203,7 +1126,6 @@ CHIP_ERROR emberAfGetEndpointUniqueIdForEndPoint(EndpointId endpoint, MutableCha
     return CopyCharSpanToMutableCharSpan(epUniqueIdSpan, epUniqueIdMutSpan);
 }
 #endif
-
 CHIP_ERROR emberAfSetDeviceTypeList(EndpointId endpoint, Span<const EmberAfDeviceType> deviceTypeList)
 {
     uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);

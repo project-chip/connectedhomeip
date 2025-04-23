@@ -103,9 +103,19 @@ const MockNodeConfig & DefaultMockNodeConfig()
                 ClusterRevision::Id, FeatureMap::Id,
             }),
         }),
+        MockEndpointConfig(kMockEndpoint4, {
+            MockClusterConfig(MockClusterId(1), {
+                ClusterRevision::Id, FeatureMap::Id,
+            }),
+        },
+        {}, // No device types
+        {}, // No semantic tags
+        app::EndpointComposition::kFullFamily,
+        chip::CharSpan("AABBCCDDEEFFGGHHIIJJKKLLMMNNOO02", strlen("AABBCCDDEEFFGGHHIIJJKKLLMMNNOO01")) // Add endpointUniqueID
+        ),
     });
     // clang-format on
-    return config;
+   return config;
 }
 
 const MockNodeConfig & GetMockNodeConfig()
@@ -243,6 +253,26 @@ chip::EndpointId emberAfEndpointFromIndex(uint16_t index)
     VerifyOrDie(index < config.endpoints.size());
     return config.endpoints[index].id;
 }
+
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+CHIP_ERROR emberAfGetEndpointUniqueIdForEndPoint(EndpointId endpoint, MutableCharSpan & epUniqueIdSpan)
+{
+    
+    // Retrieve the endpoint configuration from the mock node configuration
+    auto epConfig = GetMockNodeConfig().endpointById(endpoint);
+    VerifyOrReturnError(epConfig != nullptr, CHIP_ERROR_NOT_FOUND);
+
+    // Ensure the provided span is large enough to hold the unique ID
+    if (epUniqueIdSpan.size() < epConfig->endpointUniqueIdSize)
+    {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
+    // Copy the unique ID into the provided span
+    CharSpan targetSpan(epConfig->endpointUniqueIdBuffer, epConfig->endpointUniqueIdSize);
+    CopyCharSpanToMutableCharSpanWithTruncation(targetSpan, epUniqueIdSpan);
+    return CHIP_NO_ERROR;
+}
+#endif
 
 namespace chip {
 namespace app {

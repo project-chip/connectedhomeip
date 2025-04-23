@@ -121,7 +121,7 @@ DECLARE_DYNAMIC_ATTRIBUTE(Descriptor::Attributes::DeviceTypeList::Id, ARRAY, kDe
     DECLARE_DYNAMIC_ATTRIBUTE(Descriptor::Attributes::ServerList::Id, ARRAY, kDescriptorAttributeArraySize, 0), /* server list */
     DECLARE_DYNAMIC_ATTRIBUTE(Descriptor::Attributes::ClientList::Id, ARRAY, kDescriptorAttributeArraySize, 0), /* client list */
     DECLARE_DYNAMIC_ATTRIBUTE(Descriptor::Attributes::PartsList::Id, ARRAY, kDescriptorAttributeArraySize, 0),  /* parts list */
-#ifdef CONFIG_USE_ENDPOINT_UNIQUE_ID
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
     DECLARE_DYNAMIC_ATTRIBUTE(Descriptor::Attributes::EndpointUniqueID::Id, ARRAY, 32, 0), /* endpoint unique id*/
 #endif
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
@@ -260,7 +260,7 @@ DataVersion gComposedTempSensor2DataVersions[MATTER_ARRAY_SIZE(bridgedTempSensor
 
 // ---------------------------------------------------------------------------
 
-#ifndef CONFIG_USE_ENDPOINT_UNIQUE_ID
+#if !CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
 int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const EmberAfDeviceType> & deviceTypeList,
                       const Span<DataVersion> & dataVersionStorage, chip::EndpointId parentEndpointId = chip::kInvalidEndpointId)
 #else
@@ -283,7 +283,7 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const E
                 DeviceLayer::StackLock lock;
                 dev->SetEndpointId(gCurrentEndpointId);
                 dev->SetParentEndpointId(parentEndpointId);
-#ifndef CONFIG_USE_ENDPOINT_UNIQUE_ID
+#if !CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
                 err =
                     emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, dataVersionStorage, deviceTypeList, parentEndpointId);
 #else
@@ -812,7 +812,7 @@ void * bridge_polling_thread(void * context)
             if (ch == '2' && light2_added == false)
             {
                 // TC-BR-2 step 2, Add Light2
-#ifndef CONFIG_USE_ENDPOINT_UNIQUE_ID
+#if !CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
                 AddDeviceEndpoint(&Light2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
                                   Span<DataVersion>(gLight2DataVersions), 1);
 #else
@@ -830,7 +830,7 @@ void * bridge_polling_thread(void * context)
             if (ch == '5' && light1_added == false)
             {
                 // TC-BR-2 step 5, Add Light 1 back
-#ifndef CONFIG_USE_ENDPOINT_UNIQUE_ID
+#if !CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
                 AddDeviceEndpoint(&Light2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
                                   Span<DataVersion>(gLight2DataVersions), 1);
 #else
@@ -979,7 +979,7 @@ void ApplicationInit()
     emberAfEndpointEnableDisable(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1)), false);
 
     // Add light 1 -> will be mapped to ZCL endpoints 3
-#ifndef CONFIG_USE_ENDPOINT_UNIQUE_ID
+#if !CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
     AddDeviceEndpoint(&Light1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
                       Span<DataVersion>(gLight1DataVersions), 1);
 

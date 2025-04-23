@@ -635,15 +635,14 @@ CHIP_ERROR CodegenDataModelProvider::SemanticTags(EndpointId endpointId, ReadOnl
 
     return CHIP_NO_ERROR;
 }
-#ifdef CONFIG_USE_ENDPOINT_UNIQUE_ID
-
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
 CHIP_ERROR CodegenDataModelProvider::EndpointUniqueID(EndpointId endpointId, ReadOnlyBufferBuilder<MutableCharSpan> & builder)
 {
     char epUniqueId[Clusters::Descriptor::Attributes::EndpointUniqueID::TypeInfo::MaxLength()] = { 0 };
     MutableCharSpan epUniqueIdSpan(epUniqueId);
     emberAfGetEndpointUniqueIdForEndPoint(endpointId, epUniqueIdSpan);
 
-    char * buffer = static_cast<char *>(Platform::MemoryCalloc(epUniqueIdSpan.size() + 1, sizeof(char)));
+    char * buffer = static_cast<char *>(Platform::MemoryCalloc(epUniqueIdSpan.size(), sizeof(char)));
     VerifyOrReturnError(buffer != nullptr, CHIP_ERROR_NO_MEMORY);
     memcpy(buffer, epUniqueIdSpan.data(), epUniqueIdSpan.size());
     MutableCharSpan copiedSpan(buffer, epUniqueIdSpan.size());

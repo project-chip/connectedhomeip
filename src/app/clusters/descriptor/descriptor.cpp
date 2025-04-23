@@ -211,17 +211,14 @@ CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, Attrib
 
     return err;
 }
-#ifdef CONFIG_USE_ENDPOINT_UNIQUE_ID
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
 CHIP_ERROR DescriptorAttrAccess::ReadEndpointUniqueId(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     ReadOnlyBufferBuilder<MutableCharSpan> epUniqueId;
 
     ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointUniqueID(endpoint, epUniqueId));
-
     auto readOnlyBuffer = epUniqueId.TakeBuffer();
     return aEncoder.Encode(readOnlyBuffer[0]);
-
-    return CHIP_NO_ERROR;
 }
 #endif
 
@@ -285,7 +282,7 @@ CHIP_ERROR DescriptorAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
     case FeatureMap::Id: {
         return ReadFeatureMap(aPath.mEndpointId, aEncoder);
     }
-#ifdef CONFIG_USE_ENDPOINT_UNIQUE_ID
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
     case EndpointUniqueID::Id: {
         return ReadEndpointUniqueId(aPath.mEndpointId, aEncoder);
     }

@@ -59,7 +59,7 @@ public:
     virtual CHIP_ERROR DeviceTypes(EndpointId endpointId, ReadOnlyBufferBuilder<DeviceTypeEntry> & builder)       = 0;
     virtual CHIP_ERROR ClientClusters(EndpointId endpointId, ReadOnlyBufferBuilder<ClusterId> & builder)          = 0;
     virtual CHIP_ERROR ServerClusters(EndpointId endpointId, ReadOnlyBufferBuilder<ServerClusterEntry> & builder) = 0;
-#ifdef CONFIG_USE_ENDPOINT_UNIQUE_ID
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
     virtual CHIP_ERROR EndpointUniqueID(EndpointId endpointId, ReadOnlyBufferBuilder<MutableCharSpan> & builder) = 0;
 #endif
 

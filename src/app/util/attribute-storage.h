@@ -208,9 +208,7 @@ CHIP_ERROR GetSemanticTagForEndpointAtIndex(chip::EndpointId endpoint, size_t in
 CHIP_ERROR SetTagList(chip::EndpointId endpoint,
                       chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> tagList);
 
-#ifdef CONFIG_USE_ENDPOINT_UNIQUE_ID
 CHIP_ERROR emberAfGetEndpointUniqueIdForEndPoint(chip::EndpointId endpoint, chip::MutableCharSpan & epUniqueIdMutSpan);
-#endif
 
 // Returns number of clusters put into the passed cluster list
 // for the given endpoint and client/server polarity
@@ -263,7 +261,7 @@ CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, chip::EndpointId id, const 
                                      const chip::Span<chip::DataVersion> & dataVersionStorage,
                                      chip::Span<const EmberAfDeviceType> deviceTypeList = {},
                                      chip::EndpointId parentEndpointId                  = chip::kInvalidEndpointId);
-#ifdef CONFIG_USE_ENDPOINT_UNIQUE_ID
+
 // Register a dynamic endpoint. This involves registering descriptors that describe
 // the composition of the endpoint (encapsulated in the 'ep' argument) as well as providing
 // storage for data versions.
@@ -293,7 +291,7 @@ CHIP_ERROR emberAfSetDynamicEndpointWithEpUniqueId(uint16_t index, chip::Endpoin
                                                    chip::Span<const EmberAfDeviceType> deviceTypeList = {},
                                                    chip::CharSpan endpointUniqueId                    = {},
                                                    chip::EndpointId parentEndpointId                  = chip::kInvalidEndpointId);
-#endif
+
 chip::EndpointId emberAfClearDynamicEndpoint(uint16_t index);
 uint16_t emberAfGetDynamicIndexFromEndpoint(chip::EndpointId id);
 /**
