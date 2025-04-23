@@ -71,7 +71,7 @@ public:
     void MarkDirty(AttributeId id) override { mDirtyMarkedList.push_back(id); }
     std::vector<AttributeId> GetDirtyList() { return mDirtyMarkedList; }
     void ClearDirtyList() { mDirtyMarkedList.clear(); }
-    ~MockMatterContext() {}
+    ~MockMatterContext() = default;
 
 private:
     // Won't handle double-marking an attribute, so don't do that in tests
