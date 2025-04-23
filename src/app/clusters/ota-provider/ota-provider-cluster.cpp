@@ -72,7 +72,7 @@ CHIP_ERROR OtaProviderServer::GeneratedCommands(const ConcreteClusterPath & path
 }
 
 std::optional<DataModel::ActionReturnStatus> OtaProviderServer::InvokeCommand(const DataModel::InvokeRequest & request,
-                                                                              chip::TLV::TLVReader & input_arguments,
+                                                                              TLV::TLVReader & input_arguments,
                                                                               CommandHandler * handler)
 {
     switch (request.path.mCommandId)
@@ -112,7 +112,7 @@ bool OtaProviderLogic::IsValidUpdateTokenWithLogging(ByteSpan updateToken)
 {
     if (updateToken.size() > kUpdateTokenMaxLength || updateToken.size() < kUpdateTokenMinLength)
     {
-        ChipLogError(Zcl, "expected size [%u; %u] for UpdateToken, got %u", static_cast<unsigned int>(kUpdateTokenMinLength),
+        ChipLogError(Zcl, "expected size int [%u, %u] for UpdateToken, got %u", static_cast<unsigned int>(kUpdateTokenMinLength),
                      static_cast<unsigned int>(kUpdateTokenMaxLength), static_cast<unsigned int>(updateToken.size()));
         return false;
     }
@@ -122,7 +122,7 @@ bool OtaProviderLogic::IsValidUpdateTokenWithLogging(ByteSpan updateToken)
 std::optional<DataModel::ActionReturnStatus>
 OtaProviderLogic::ApplyUpdateRequest(const ConcreteCommandPath & commandPath,
                                      const OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::DecodableType & commandData,
-                                     app::CommandHandler * handler)
+                                     CommandHandler * handler)
 {
     if (IsNullDelegateWithLogging(commandPath.mEndpointId))
     {
@@ -143,7 +143,7 @@ OtaProviderLogic::ApplyUpdateRequest(const ConcreteCommandPath & commandPath,
 std::optional<DataModel::ActionReturnStatus>
 OtaProviderLogic::NotifyUpdateApplied(const ConcreteCommandPath & commandPath,
                                       const OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData,
-                                      app::CommandHandler * handler)
+                                      CommandHandler * handler)
 {
     if (IsNullDelegateWithLogging(commandPath.mEndpointId))
     {
@@ -165,7 +165,7 @@ OtaProviderLogic::NotifyUpdateApplied(const ConcreteCommandPath & commandPath,
 std::optional<DataModel::ActionReturnStatus>
 OtaProviderLogic::QueryImage(const ConcreteCommandPath & commandPath,
                              const OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData,
-                             app::CommandHandler * handler)
+                             CommandHandler * handler)
 {
     if (IsNullDelegateWithLogging(commandPath.mEndpointId))
     {

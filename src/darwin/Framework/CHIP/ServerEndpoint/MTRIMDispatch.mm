@@ -34,7 +34,7 @@ namespace {
 
 // Code assumes there is only a single OTA provider and it lives on EP0
 constexpr EndpointId kOtaProviderEndpointId = 0;
-OtaProviderLogic gOtaProviderLogic;
+Global<OtaProviderLogic> gOtaProviderLogic;
 
 } // anonymous namespace
 
@@ -83,6 +83,11 @@ namespace app {
 
     void DispatchSingleClusterCommand(const ConcreteCommandPath & aPath, TLV::TLVReader & aReader, CommandHandler * aCommandObj)
     {
+        // TODO: Consider having MTRServerCluster register a
+        // CommandHandlerInterface/ServerClusterInterface for command dispatch.
+        // But OTA would need some special-casing in any case, to call into the
+        // existing cluster implementation.
+
         using Protocols::InteractionModel::Status;
 
         if (aPath.mClusterId != OtaSoftwareUpdateProvider::Id) {
