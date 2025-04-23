@@ -115,7 +115,7 @@ struct AttributeEntry
               to_underlying(readPriv.value_or(static_cast<Access::Privilege>(0))) &
                   ((1 << 5) - 1), // Narrowing expression to 5 bits
               to_underlying(writePriv.value_or(static_cast<Access::Privilege>(0))) & ((1 << 5) - 1) }
-        // Narrowing expression to 5 bits
+    // Narrowing expression to 5 bits
     {}
 
     EndBitFieldInit // Enabling '-Wconversion' & '-Wconversion'
@@ -215,7 +215,7 @@ struct AcceptedCommandEntry
         commandId(id),
         mask{ to_underlying(cmdQualityFlags) & ((1 << 3) - 1), // Narrowing expression to 3 bits
               to_underlying(invokePriv.value_or(static_cast<Access::Privilege>(0))) & ((1 << 5) - 1) }
-        // Narrowing expression to 5 bits
+    // Narrowing expression to 5 bits
     {}
 
     EndBitFieldInit // Enabling '-Wconversion' & '-Wconversion'
