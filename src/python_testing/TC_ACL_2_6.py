@@ -31,7 +31,6 @@
 #       --endpoint 0
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
 import logging
 import random
 
@@ -190,7 +189,7 @@ class TC_ACL_2_6(MatterBaseTest):
         )
 
         found_invalid_event = False
-        for event in events_response:
+        for event in events_response3:
             if (hasattr(event, 'Data') and
                 hasattr(event.Data, 'subjects') and
                     0 in event.Data.subjects):
