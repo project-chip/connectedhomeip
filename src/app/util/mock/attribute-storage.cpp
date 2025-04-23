@@ -111,7 +111,7 @@ const MockNodeConfig & DefaultMockNodeConfig()
         {}, // No device types
         {}, // No semantic tags
         app::EndpointComposition::kFullFamily,
-        chip::CharSpan("AABBCCDDEEFFGGHHIIJJKKLLMMNNOO02", strlen("AABBCCDDEEFFGGHHIIJJKKLLMMNNOO01")) // Add endpointUniqueID
+        "AABBCCDDEEFFGGHHIIJJKKLLMMNNOO02"_span // Add endpointUniqueID
         ),
     });
     // clang-format on
@@ -262,14 +262,10 @@ CHIP_ERROR emberAfGetEndpointUniqueIdForEndPoint(EndpointId endpoint, MutableCha
     auto epConfig = GetMockNodeConfig().endpointById(endpoint);
     VerifyOrReturnError(epConfig != nullptr, CHIP_ERROR_NOT_FOUND);
 
-    // Ensure the provided span is large enough to hold the unique ID
-    if (epUniqueIdSpan.size() < epConfig->endpointUniqueIdSize)
-    {
-        return CHIP_ERROR_BUFFER_TOO_SMALL;
-    }
     // Copy the unique ID into the provided span
     CharSpan targetSpan(epConfig->endpointUniqueIdBuffer, epConfig->endpointUniqueIdSize);
     CopyCharSpanToMutableCharSpanWithTruncation(targetSpan, epUniqueIdSpan);
+
     return CHIP_NO_ERROR;
 }
 #endif

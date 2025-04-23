@@ -2771,14 +2771,12 @@ TEST_F(TestCodegenModelViaMocks, EndpointUniqueID)
     CodegenDataModelProviderWithContext model;
 
     // Mock endpoint 1 has a unique ID
-    ReadOnlyBufferBuilder<MutableCharSpan> builder;
+    char buffer[chip::app::Clusters::Descriptor::Attributes::EndpointUniqueID::TypeInfo::MaxLength()] = {0};
+    MutableCharSpan span(buffer);
     // Mock endpoint 4 has a unique ID
     // ASSERT_TRUE(builder.IsEmpty()); // ownership taken above, we start fresh
-    ASSERT_EQ(model.EndpointUniqueID(kMockEndpoint4, builder), CHIP_NO_ERROR);
-    auto uniqueIDs = builder.TakeBuffer();
-    ASSERT_EQ(uniqueIDs.size(), 1u);
-
-    EXPECT_TRUE(uniqueIDs[0].data_equal(CharSpan::fromCharString("AABBCCDDEEFFGGHHIIJJKKLLMMNNOO01")));
-    ASSERT_EQ(uniqueIDs[0].size(), strlen("AABBCCDDEEFFGGHHIIJJKKLLMMNNOO01"));
+    ASSERT_EQ(model.EndpointUniqueID(kMockEndpoint4, span), CHIP_NO_ERROR);
+    EXPECT_TRUE(span.data_equal(CharSpan::fromCharString("AABBCCDDEEFFGGHHIIJJKKLLMMNNOO01")));
+    ASSERT_EQ(span.size(), strlen("AABBCCDDEEFFGGHHIIJJKKLLMMNNOO01"));
 }
 #endif
