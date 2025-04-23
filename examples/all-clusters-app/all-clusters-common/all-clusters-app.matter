@@ -3748,50 +3748,6 @@ cluster MicrowaveOvenMode = 94 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** Attributes and commands for configuring the microwave oven control, and reporting cooking stats. */
-cluster MicrowaveOvenControl = 95 {
-  revision 1; // NOTE: Default/not specifically set
-
-  bitmap Feature : bitmap32 {
-    kPowerAsNumber = 0x1;
-    kPowerInWatts = 0x2;
-    kPowerNumberLimits = 0x4;
-  }
-
-  readonly attribute elapsed_s cookTime = 0;
-  readonly attribute elapsed_s maxCookTime = 1;
-  readonly attribute optional int8u powerSetting = 2;
-  readonly attribute optional int8u minPower = 3;
-  readonly attribute optional int8u maxPower = 4;
-  readonly attribute optional int8u powerStep = 5;
-  provisional readonly attribute optional int16u supportedWatts[] = 6;
-  provisional readonly attribute optional int8u selectedWattIndex = 7;
-  readonly attribute optional int16u wattRating = 8;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct SetCookingParametersRequest {
-    optional int8u cookMode = 0;
-    optional elapsed_s cookTime = 1;
-    optional int8u powerSetting = 2;
-    optional int8u wattSettingIndex = 3;
-    optional boolean startAfterSetting = 4;
-  }
-
-  request struct AddMoreTimeRequest {
-    elapsed_s timeToAdd = 0;
-  }
-
-  /** Set Cooking Parameters */
-  command SetCookingParameters(SetCookingParametersRequest): DefaultSuccess = 0;
-  /** Add More Cooking Time */
-  command AddMoreTime(AddMoreTimeRequest): DefaultSuccess = 1;
-}
-
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation. */
 cluster OperationalState = 96 {
   revision 1;
@@ -8119,7 +8075,6 @@ endpoint 0 {
     callback attribute productAppearance;
     callback attribute specificationVersion;
     callback attribute maxPathsPerInvoke;
-    callback attribute configurationVersion default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -8921,18 +8876,6 @@ endpoint 1 {
     callback attribute attributeList;
     callback attribute featureMap;
     ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster MicrowaveOvenControl {
-    callback attribute cookTime;
-    callback attribute maxCookTime;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    callback attribute featureMap;
-    ram      attribute clusterRevision default = 1;
-
-    handle command SetCookingParameters;
   }
 
   server cluster OperationalState {
