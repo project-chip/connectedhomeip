@@ -197,11 +197,13 @@ class TC_ACL_2_7(MatterBaseTest):
         logging.info("Found %d events", len(events))
 
         found_valid_event = False
+        found_th2_event = False
 
         for event_data in events:
             logging.info("Examining event: %s", str(event_data))
 
             if hasattr(event_data, 'Data') and hasattr(event_data.Data, 'changeType'):
+                # Check for valid TH1 event
                 if (event_data.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and
                     event_data.Data.adminNodeID == self.th1.nodeId and
                     isinstance(event_data.Data.adminPasscodeID, Nullable) and
@@ -210,10 +212,18 @@ class TC_ACL_2_7(MatterBaseTest):
                         event_data.Data.fabricIndex == f1):
                     found_valid_event = True
                     logging.info("Found valid event for TH1")
-                    break
+                
+                # Check for TH2 events that shouldn't be visible to TH1
+                if (event_data.Data.adminNodeID == self.th2.nodeId or
+                    event_data.Data.latestValue.fabricIndex == f2 or
+                    event_data.Data.fabricIndex == f2):
+                    found_th2_event = True
+                    logging.info("Found TH2 event visible to TH1, which violates fabric isolation")
 
         asserts.assert_true(
             found_valid_event, "Did not find the expected event with specified fields for TH1")
+        asserts.assert_false(
+            found_th2_event, "TH1 should not see any events from TH2's fabric due to fabric isolation")
 
         self.step(10)
         # TH2 reads AccessControlExtensionChanged event
@@ -228,11 +238,13 @@ class TC_ACL_2_7(MatterBaseTest):
         logging.info("Found %d events", len(events))
 
         found_valid_event = False
+        found_th1_event = False
 
         for event_data in events:
             logging.info("Examining event: %s", str(event_data))
 
             if hasattr(event_data, 'Data') and hasattr(event_data.Data, 'changeType'):
+                # Check for valid TH2 event
                 if (event_data.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and
                     event_data.Data.adminNodeID == self.th2.nodeId and
                     isinstance(event_data.Data.adminPasscodeID, Nullable) and
@@ -241,10 +253,18 @@ class TC_ACL_2_7(MatterBaseTest):
                         event_data.Data.fabricIndex == f2):
                     found_valid_event = True
                     logging.info("Found valid event for TH2")
-                    break
+                
+                # Check for TH1 events that shouldn't be visible to TH2
+                if (event_data.Data.adminNodeID == self.th1.nodeId or
+                    event_data.Data.latestValue.fabricIndex == f1 or
+                    event_data.Data.fabricIndex == f1):
+                    found_th1_event = True
+                    logging.info("Found TH1 event visible to TH2, which violates fabric isolation")
 
         asserts.assert_true(
             found_valid_event, "Did not find the expected event with specified fields for TH2")
+        asserts.assert_false(
+            found_th1_event, "TH2 should not see any events from TH1's fabric due to fabric isolation")
 
         self.step(11)
         # TH_CR1 sends RemoveFabric for TH2 fabric command to DUT_CE
