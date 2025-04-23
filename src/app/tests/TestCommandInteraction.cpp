@@ -178,6 +178,8 @@ private:
 struct Fields
 {
     static constexpr chip::CommandId GetCommandId() { return 4; }
+    static constexpr bool kIsFabricScoped = false;
+
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     {
         TLV::TLVType outerContainerType;
@@ -190,6 +192,8 @@ struct Fields
 struct BadFields
 {
     static constexpr chip::CommandId GetCommandId() { return 4; }
+    static constexpr bool kIsFabricScoped = false;
+
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     {
         TLV::TLVType outerContainerType;
