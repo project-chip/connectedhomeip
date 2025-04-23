@@ -26,10 +26,24 @@ namespace app {
 namespace Clusters {
 
 namespace {
+
 constexpr size_t kLocationLen          = 2;   // The expected length of the location parameter in QueryImage
 constexpr size_t kMaxMetadataLen       = 512; // The maximum length of Metadata in any OTA Provider command
 constexpr size_t kUpdateTokenMaxLength = 32;  // The expected length of the Update Token parameter used in multiple commands
 constexpr size_t kUpdateTokenMinLength = 8;   // The expected length of the Update Token parameter used in multiple commands
+
+using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
+
+constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
+    QueryImage::kMetadataEntry,
+    ApplyUpdateRequest::kMetadataEntry,
+    NotifyUpdateApplied::kMetadataEntry,
+};
+
+constexpr CommandId kGeneratedCommands[] = {
+    QueryImageResponse::Id,
+    ApplyUpdateResponse::Id,
+};
 
 } // namespace
 
@@ -54,21 +68,12 @@ DataModel::ActionReturnStatus OtaProviderServer::ReadAttribute(const DataModel::
 CHIP_ERROR OtaProviderServer::AcceptedCommands(const ConcreteClusterPath & path,
                                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    static constexpr DataModel::AcceptedCommandEntry kEntries[] = {
-        QueryImage::kMetadataEntry,
-        ApplyUpdateRequest::kMetadataEntry,
-        NotifyUpdateApplied::kMetadataEntry,
-    };
-    return builder.ReferenceExisting({ kEntries, MATTER_ARRAY_SIZE(kEntries) });
+    return builder.ReferenceExisting(kAcceptedCommands);
 }
 
 CHIP_ERROR OtaProviderServer::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
 {
-    static constexpr CommandId kEntries[] = {
-        OtaSoftwareUpdateProvider::Commands::QueryImageResponse::Id,
-        OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::Id,
-    };
-    return builder.ReferenceExisting({ kEntries, MATTER_ARRAY_SIZE(kEntries) });
+    return builder.ReferenceExisting(kGeneratedCommands);
 }
 
 std::optional<DataModel::ActionReturnStatus> OtaProviderServer::InvokeCommand(const DataModel::InvokeRequest & request,
