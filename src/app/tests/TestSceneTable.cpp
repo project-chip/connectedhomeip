@@ -1503,6 +1503,10 @@ TEST_F(TestSceneTable, TestRemoveScenes)
     EXPECT_EQ(entryCount, 6u);
 
     EXPECT_EQ(CHIP_NO_ERROR, sceneTable->DeleteAllScenesInGroup(kFabric1, kGroup1));
+    SceneId sceneList[defaultTestFabricCapacity];
+    Span<SceneId> sceneListSpan = Span<SceneId>(sceneList);
+    EXPECT_EQ(CHIP_NO_ERROR, sceneTable->GetAllSceneIdsInGroup(kFabric1, kGroup1, sceneListSpan));
+    EXPECT_EQ(0u, sceneListSpan.size());
     EXPECT_EQ(CHIP_NO_ERROR, sceneTable->GetFabricSceneCount(kFabric1, entryCount));
     EXPECT_EQ(entryCount, 2u);
 

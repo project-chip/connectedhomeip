@@ -164,25 +164,27 @@ CHIP_ERROR DefaultSceneTableImpl::GetAllSceneIdsInGroup(FabricIndex fabric_index
     FabricSceneData fabric(mEndpointId, fabric_index, mMaxPerFabric, mMaxPerEndpoint);
     SceneTableData scene(mEndpointId, fabric_index);
 
-    CHIP_ERROR err = fabric.Load(this->mStorage);
-    VerifyOrReturnValue(CHIP_ERROR_NOT_FOUND != err, CHIP_NO_ERROR);
-    ReturnErrorOnFailure(err);
-    SceneId * list      = scene_list.data();
     uint8_t scene_count = 0;
-
-    for (uint16_t i = 0; i < mMaxPerFabric; i++)
+    CHIP_ERROR err      = fabric.Load(this->mStorage);
+    if (CHIP_ERROR_NOT_FOUND != err)
     {
-        if (fabric.entry_map[i].mGroupId != group_id)
-        {
-            continue;
-        }
+        ReturnErrorOnFailure(err);
+        SceneId * list = scene_list.data();
 
-        if (scene_count >= scene_list.size())
+        for (uint16_t i = 0; i < mMaxPerFabric; i++)
         {
-            return CHIP_ERROR_BUFFER_TOO_SMALL;
+            if (fabric.entry_map[i].mGroupId != group_id)
+            {
+                continue;
+            }
+
+            if (scene_count >= scene_list.size())
+            {
+                return CHIP_ERROR_BUFFER_TOO_SMALL;
+            }
+            list[scene_count] = fabric.entry_map[i].mSceneId;
+            scene_count++;
         }
-        list[scene_count] = fabric.entry_map[i].mSceneId;
-        scene_count++;
     }
 
     scene_list.reduce_size(scene_count);
