@@ -96,8 +96,8 @@ def get_fuzz_test_cases(context):
             return re.findall(r'test:\s*(\S+)', output)
 
         else:
-            logging.info("No test cases found.")
-            raise ValueError(f"No FUZZ_TESTs (TestCases) found in {context.fuzz_test_binary_path}")
+            logging.info("No FUZZ_TESTs (TestCases) found in {context.fuzz_test_binary_path}")
+            raise ValueError(f"FuzzTest Binary outputted the following error: \n{result.stderr}\n")
 
     except Exception as e:
         raise Exception(f"Error executing {context.fuzz_test_binary_path}: {e}")
