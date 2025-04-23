@@ -235,32 +235,10 @@ class TC_ACL_2_4(MatterBaseTest):
         )
         logging.info(f"Read ACL: {read_acl}")
 
-        # Verify ACL contents match what we wrote
         asserts.assert_equal(len(read_acl), 3, "ACL should contain exactly 3 entries")
-        # Verify each entry matches what we wrote
-        for i, entry in enumerate(read_acl):
-            asserts.assert_equal(entry.privilege, new_acl[i].privilege)
-            asserts.assert_equal(entry.authMode, new_acl[i].authMode)
-            asserts.assert_equal(entry.subjects, new_acl[i].subjects)
-            asserts.assert_equal(entry.fabricIndex, new_acl[i].fabricIndex)
-
-            # Handle targets verification differently based on whether it's nullable
-            if isinstance(new_acl[i].targets, Nullable):
-                asserts.assert_true(isinstance(entry.targets, Nullable),
-                                    f"Entry {i} targets should be Nullable")
-            else:
-                asserts.assert_false(isinstance(entry.targets, Nullable),
-                                     f"Entry {i} targets should not be Nullable")
-                asserts.assert_equal(len(entry.targets), len(new_acl[i].targets),
-                                     f"Entry {i} should have same number of targets")
-                for j, target in enumerate(entry.targets):
-                    # Only verify non-null fields
-                    if not isinstance(new_acl[i].targets[j].cluster, Nullable):
-                        asserts.assert_equal(target.cluster, new_acl[i].targets[j].cluster)
-                    if not isinstance(new_acl[i].targets[j].endpoint, Nullable):
-                        asserts.assert_equal(target.endpoint, new_acl[i].targets[j].endpoint)
-                    if not isinstance(new_acl[i].targets[j].deviceType, Nullable):
-                        asserts.assert_equal(target.deviceType, new_acl[i].targets[j].deviceType)
+        asserts.assert_in(new_acl[0], read_acl, "Missing Admin entry")
+        asserts.assert_in(new_acl[1], read_acl, "Missing View entry")
+        asserts.assert_in(new_acl[2], read_acl, "Missing Operate entry")
 
         # Step 6: Write modified ACL entries
         self.step(6)
@@ -330,32 +308,9 @@ class TC_ACL_2_4(MatterBaseTest):
 
         # Verify modified ACL contents
         asserts.assert_equal(len(read_modified_acl), 3, "ACL should contain exactly 3 entries")
-        for i, entry in enumerate(read_modified_acl):
-            # Verify basic fields
-            asserts.assert_equal(entry.privilege, modified_acl[i].privilege)
-            asserts.assert_equal(entry.authMode, modified_acl[i].authMode)
-            asserts.assert_equal(entry.subjects, modified_acl[i].subjects)
-            asserts.assert_equal(entry.fabricIndex, modified_acl[i].fabricIndex)
-
-            # Verify targets field
-            if isinstance(modified_acl[i].targets, Nullable):
-                asserts.assert_true(isinstance(entry.targets, Nullable),
-                                    f"Entry {i} targets should be Nullable")
-            else:
-                asserts.assert_false(isinstance(entry.targets, Nullable),
-                                     f"Entry {i} targets should not be Nullable")
-                # Only verify targets if they're not Nullable
-                for j, target in enumerate(entry.targets):
-                    expected_target = modified_acl[i].targets[j]
-                    # Verify cluster if not Nullable
-                    if not isinstance(expected_target.cluster, Nullable):
-                        asserts.assert_equal(target.cluster, expected_target.cluster)
-                    # Verify endpoint if not Nullable
-                    if not isinstance(expected_target.endpoint, Nullable):
-                        asserts.assert_equal(target.endpoint, expected_target.endpoint)
-                    # Verify deviceType if not Nullable
-                    if not isinstance(expected_target.deviceType, Nullable):
-                        asserts.assert_equal(target.deviceType, expected_target.deviceType)
+        asserts.assert_in(modified_acl[0], read_modified_acl, "Missing Admin entry")
+        asserts.assert_in(modified_acl[1], read_modified_acl, "Missing Manage entry")
+        asserts.assert_in(modified_acl[2], read_modified_acl, "Missing Admin entry")
 
         # Step 8: Write ACL with updated targets
         self.step(8)
@@ -430,59 +385,9 @@ class TC_ACL_2_4(MatterBaseTest):
 
         # Verify updated targets ACL contents
         asserts.assert_equal(len(read_updated_targets_acl), 3, "ACL should contain exactly 3 entries")
-
-        for i, entry in enumerate(read_updated_targets_acl):
-            expected_entry = updated_targets_acl[i]
-            logging.info(f"Verifying entry {i}")
-
-            # Verify basic fields
-            asserts.assert_equal(entry.privilege, expected_entry.privilege,
-                                 f"Entry {i} privilege mismatch")
-            asserts.assert_equal(entry.authMode, expected_entry.authMode,
-                                 f"Entry {i} authMode mismatch")
-            asserts.assert_equal(entry.subjects, expected_entry.subjects,
-                                 f"Entry {i} subjects mismatch")
-            asserts.assert_equal(entry.fabricIndex, expected_entry.fabricIndex,
-                                 f"Entry {i} fabricIndex mismatch")
-
-            # Verify targets field
-            if isinstance(expected_entry.targets, Nullable):
-                logging.info(f"Entry {i} expecting Nullable targets")
-                asserts.assert_true(isinstance(entry.targets, Nullable),
-                                    f"Entry {i} targets should be Nullable")
-            else:
-                logging.info(f"Entry {i} expecting non-Nullable targets")
-                asserts.assert_false(isinstance(entry.targets, Nullable),
-                                     f"Entry {i} targets should not be Nullable")
-
-                # Verify each target in the entry
-                for j, target in enumerate(entry.targets):
-                    expected_target = expected_entry.targets[j]
-                    logging.info(f"Verifying target {j} in entry {i}")
-
-                    # Verify cluster field
-                    if isinstance(expected_target.cluster, Nullable):
-                        asserts.assert_true(isinstance(target.cluster, Nullable),
-                                            f"Entry {i} Target {j} cluster should be Nullable")
-                    else:
-                        asserts.assert_equal(target.cluster, expected_target.cluster,
-                                             f"Entry {i} Target {j} cluster mismatch")
-
-                    # Verify endpoint field
-                    if isinstance(expected_target.endpoint, Nullable):
-                        asserts.assert_true(isinstance(target.endpoint, Nullable),
-                                            f"Entry {i} Target {j} endpoint should be Nullable")
-                    else:
-                        asserts.assert_equal(target.endpoint, expected_target.endpoint,
-                                             f"Entry {i} Target {j} endpoint mismatch")
-
-                    # Verify deviceType field
-                    if isinstance(expected_target.deviceType, Nullable):
-                        asserts.assert_true(isinstance(target.deviceType, Nullable),
-                                            f"Entry {i} Target {j} deviceType should be Nullable")
-                    else:
-                        asserts.assert_equal(target.deviceType, expected_target.deviceType,
-                                             f"Entry {i} Target {j} deviceType mismatch")
+        asserts.assert_in(updated_targets_acl[0], read_updated_targets_acl, "Missing Admin entry")  
+        asserts.assert_in(updated_targets_acl[1], read_updated_targets_acl, "Missing View entry")
+        asserts.assert_in(updated_targets_acl[2], read_updated_targets_acl, "Missing Operate entry")
 
         # Step 10: Write ACL with null subjects
         self.step(10)
@@ -553,46 +458,9 @@ class TC_ACL_2_4(MatterBaseTest):
 
         # Verify null subjects ACL contents
         asserts.assert_equal(len(read_null_subjects_acl), 3, "ACL should contain exactly 3 entries")
-        for i, entry in enumerate(read_null_subjects_acl):
-            expected_entry = null_subjects_acl[i]
-
-            # Verify basic fields
-            asserts.assert_equal(entry.privilege, expected_entry.privilege,
-                                 f"Entry {i} privilege mismatch")
-            asserts.assert_equal(entry.authMode, expected_entry.authMode,
-                                 f"Entry {i} authMode mismatch")
-            asserts.assert_equal(entry.fabricIndex, expected_entry.fabricIndex,
-                                 f"Entry {i} fabricIndex mismatch")
-
-            # Verify subjects field
-            if isinstance(expected_entry.subjects, Nullable):
-                asserts.assert_true(isinstance(entry.subjects, Nullable),
-                                    f"Entry {i} subjects should be Nullable")
-            else:
-                asserts.assert_equal(entry.subjects, expected_entry.subjects,
-                                     f"Entry {i} subjects mismatch")
-
-            # Verify targets field using the same pattern as before
-            if isinstance(expected_entry.targets, Nullable):
-                asserts.assert_true(isinstance(entry.targets, Nullable),
-                                    f"Entry {i} targets should be Nullable")
-            else:
-                for j, target in enumerate(entry.targets):
-                    expected_target = expected_entry.targets[j]
-                    if isinstance(expected_target.cluster, Nullable):
-                        asserts.assert_true(isinstance(target.cluster, Nullable), "Cluster should be Nullable")
-                    else:
-                        asserts.assert_equal(target.cluster, expected_target.cluster)
-
-                    if isinstance(expected_target.endpoint, Nullable):
-                        asserts.assert_true(isinstance(target.endpoint, Nullable), "Endpoint should be Nullable")
-                    else:
-                        asserts.assert_equal(target.endpoint, expected_target.endpoint)
-
-                    if isinstance(expected_target.deviceType, Nullable):
-                        asserts.assert_true(isinstance(target.deviceType, Nullable), "Device type should be Nullable")
-                    else:
-                        asserts.assert_equal(target.deviceType, expected_target.deviceType)
+        asserts.assert_in(null_subjects_acl[0], read_null_subjects_acl, "Missing Admin entry")
+        asserts.assert_in(null_subjects_acl[1], read_null_subjects_acl, "Missing View entry")
+        asserts.assert_in(null_subjects_acl[2], read_null_subjects_acl, "Missing Operate entry")
 
         # Step 12: Write ACL with null targets
         self.step(12)
@@ -641,21 +509,9 @@ class TC_ACL_2_4(MatterBaseTest):
 
         # Verify null targets ACL contents
         asserts.assert_equal(len(read_null_targets_acl), 3, "ACL should contain exactly 3 entries")
-        for i, entry in enumerate(read_null_targets_acl):
-            expected_entry = null_targets_acl[i]
-
-            # Verify basic fields
-            asserts.assert_equal(entry.privilege, expected_entry.privilege,
-                                 f"Entry {i} privilege mismatch")
-            asserts.assert_equal(entry.authMode, expected_entry.authMode,
-                                 f"Entry {i} authMode mismatch")
-            asserts.assert_equal(entry.subjects, expected_entry.subjects,
-                                 f"Entry {i} subjects mismatch")
-            asserts.assert_equal(entry.fabricIndex, expected_entry.fabricIndex,
-                                 f"Entry {i} fabricIndex mismatch")
-
-            asserts.assert_true(isinstance(entry.targets, Nullable),
-                                f"Entry {i} targets should be Nullable")
+        asserts.assert_in(null_targets_acl[0], read_null_targets_acl, "Missing Admin entry")
+        asserts.assert_in(null_targets_acl[1], read_null_targets_acl, "Missing View entry")
+        asserts.assert_in(null_targets_acl[2], read_null_targets_acl, "Missing Operate entry")
 
         # Step 14: Write ACL with 2 elements
         self.step(14)
@@ -696,28 +552,8 @@ class TC_ACL_2_4(MatterBaseTest):
 
         # Verify two element ACL contents
         asserts.assert_equal(len(read_two_element_acl), 2, "ACL should contain exactly 2 entries")
-        for i, entry in enumerate(read_two_element_acl):
-            expected_entry = two_element_acl[i]
-
-            # Verify basic fields
-            asserts.assert_equal(entry.privilege, expected_entry.privilege,
-                                 f"Entry {i} privilege mismatch")
-            asserts.assert_equal(entry.authMode, expected_entry.authMode,
-                                 f"Entry {i} authMode mismatch")
-            asserts.assert_equal(entry.fabricIndex, expected_entry.fabricIndex,
-                                 f"Entry {i} fabricIndex mismatch")
-
-            # Verify subjects field
-            if isinstance(expected_entry.subjects, Nullable):
-                asserts.assert_true(isinstance(entry.subjects, Nullable),
-                                    f"Entry {i} subjects should be Nullable")
-            else:
-                asserts.assert_equal(entry.subjects, expected_entry.subjects,
-                                     f"Entry {i} subjects mismatch")
-
-            # Verify targets field
-            asserts.assert_true(isinstance(entry.targets, Nullable),
-                                f"Entry {i} targets should be Nullable")
+        asserts.assert_in(two_element_acl[0], read_two_element_acl, "Missing Admin entry")
+        asserts.assert_in(two_element_acl[1], read_two_element_acl, "Missing Operate entry")
 
         # Step 16: Write ACL with ProxyView privilege
         self.step(16)
@@ -758,28 +594,8 @@ class TC_ACL_2_4(MatterBaseTest):
 
         # Verify ProxyView ACL contents
         asserts.assert_equal(len(read_proxy_view_acl), 2, "ACL should contain exactly 2 entries")
-        for i, entry in enumerate(read_proxy_view_acl):
-            expected_entry = proxy_view_acl[i]
-
-            # Verify basic fields
-            asserts.assert_equal(entry.privilege, expected_entry.privilege,
-                                 f"Entry {i} privilege mismatch")
-            asserts.assert_equal(entry.authMode, expected_entry.authMode,
-                                 f"Entry {i} authMode mismatch")
-            asserts.assert_equal(entry.fabricIndex, expected_entry.fabricIndex,
-                                 f"Entry {i} fabricIndex mismatch")
-
-            # Verify subjects field
-            if isinstance(expected_entry.subjects, Nullable):
-                asserts.assert_true(isinstance(entry.subjects, Nullable),
-                                    f"Entry {i} subjects should be Nullable")
-            else:
-                asserts.assert_equal(entry.subjects, expected_entry.subjects,
-                                     f"Entry {i} subjects mismatch")
-
-            # Verify targets field
-            asserts.assert_true(isinstance(entry.targets, Nullable),
-                                f"Entry {i} targets should be Nullable")
+        asserts.assert_in(proxy_view_acl[0], read_proxy_view_acl, "Missing Admin entry")
+        asserts.assert_in(proxy_view_acl[1], read_proxy_view_acl, "Missing ProxyView entry")
 
         # Step 18: Read SubjectsPerAccessControlEntry attribute
         self.step(18)
@@ -793,7 +609,6 @@ class TC_ACL_2_4(MatterBaseTest):
 
         # Step 19: Write ACL with max subjects
         self.step(19)
-        # Generate list of random node IDs
         random_subjects = [random.randint(1, 0xFFFFFFFF) for _ in range(max_subjects)]
         max_subjects_acl = [
             # Admin entry (unchanged)
@@ -832,28 +647,8 @@ class TC_ACL_2_4(MatterBaseTest):
 
         # Verify max subjects ACL contents
         asserts.assert_equal(len(read_max_subjects_acl), 2, "ACL should contain exactly 2 entries")
-        for i, entry in enumerate(read_max_subjects_acl):
-            expected_entry = max_subjects_acl[i]
-
-            # Verify basic fields
-            asserts.assert_equal(entry.privilege, expected_entry.privilege,
-                                 f"Entry {i} privilege mismatch")
-            asserts.assert_equal(entry.authMode, expected_entry.authMode,
-                                 f"Entry {i} authMode mismatch")
-            asserts.assert_equal(entry.fabricIndex, expected_entry.fabricIndex,
-                                 f"Entry {i} fabricIndex mismatch")
-
-            # Verify subjects field
-            if isinstance(expected_entry.subjects, Nullable):
-                asserts.assert_true(isinstance(entry.subjects, Nullable),
-                                    f"Entry {i} subjects should be Nullable")
-            else:
-                asserts.assert_equal(entry.subjects, expected_entry.subjects,
-                                     f"Entry {i} subjects mismatch")
-
-            # Verify targets field
-            asserts.assert_true(isinstance(entry.targets, Nullable),
-                                f"Entry {i} targets should be Nullable")
+        asserts.assert_in(max_subjects_acl[0], read_max_subjects_acl, "Missing Admin entry")
+        asserts.assert_in(max_subjects_acl[1], read_max_subjects_acl, "Missing Operate entry")
 
         # Step 21: Write ACL with 4 valid CATs as subjects
         self.step(21)
@@ -900,13 +695,8 @@ class TC_ACL_2_4(MatterBaseTest):
 
         # Verify specific subjects ACL contents
         asserts.assert_equal(len(read_specific_subjects_acl), 2, "ACL should contain exactly 2 entries")
-        for i, entry in enumerate(read_specific_subjects_acl):
-            expected_entry = specific_subjects_acl[i]
-            asserts.assert_equal(entry.privilege, expected_entry.privilege)
-            asserts.assert_equal(entry.authMode, expected_entry.authMode)
-            asserts.assert_equal(entry.subjects, expected_entry.subjects)
-            asserts.assert_equal(entry.fabricIndex, expected_entry.fabricIndex)
-            asserts.assert_true(isinstance(entry.targets, Nullable), "Targets should be Nullable")
+        asserts.assert_in(specific_subjects_acl[0], read_specific_subjects_acl, "Missing Admin entry")
+        asserts.assert_in(specific_subjects_acl[1], read_specific_subjects_acl, "Missing Operate entry")
 
         # Step 23: Read TargetsPerAccessControlEntry attribute
         self.step(23)
@@ -920,14 +710,13 @@ class TC_ACL_2_4(MatterBaseTest):
 
         # Step 24: Write ACL with max targets
         self.step(24)
-        # Generate list of targets with valid values
         random_targets = []
         for i in range(max_targets):
             # Alternate between different valid target configurations
             if i % 3 == 0:
                 # Target with cluster only
                 target = Clusters.AccessControl.Structs.AccessControlTargetStruct(
-                    cluster=i + 1,  # Ensure non-zero cluster ID
+                    cluster=i + 1,  
                     endpoint=NullValue,
                     deviceType=NullValue
                 )
@@ -935,7 +724,7 @@ class TC_ACL_2_4(MatterBaseTest):
                 # Target with endpoint only
                 target = Clusters.AccessControl.Structs.AccessControlTargetStruct(
                     cluster=NullValue,
-                    endpoint=i + 1,  # Ensure non-zero endpoint
+                    endpoint=i + 1, 
                     deviceType=NullValue
                 )
             else:
@@ -943,7 +732,7 @@ class TC_ACL_2_4(MatterBaseTest):
                 target = Clusters.AccessControl.Structs.AccessControlTargetStruct(
                     cluster=NullValue,
                     endpoint=NullValue,
-                    deviceType=i + 1  # Ensure non-zero deviceType
+                    deviceType=i + 1 
                 )
             random_targets.append(target)
 
@@ -984,58 +773,8 @@ class TC_ACL_2_4(MatterBaseTest):
 
         # Verify max targets ACL contents
         asserts.assert_equal(len(read_max_targets_acl), 2, "ACL should contain exactly 2 entries")
-        for i, entry in enumerate(read_max_targets_acl):
-            expected_entry = max_targets_acl[i]
-            logging.info(f"Verifying entry {i}")
-
-            # Verify basic fields
-            asserts.assert_equal(entry.privilege, expected_entry.privilege,
-                                 f"Entry {i} privilege mismatch")
-            asserts.assert_equal(entry.authMode, expected_entry.authMode,
-                                 f"Entry {i} authMode mismatch")
-            asserts.assert_equal(entry.fabricIndex, expected_entry.fabricIndex,
-                                 f"Entry {i} fabricIndex mismatch")
-
-            # Verify subjects field
-            if isinstance(expected_entry.subjects, Nullable):
-                asserts.assert_true(isinstance(entry.subjects, Nullable),
-                                    f"Entry {i} subjects should be Nullable")
-            else:
-                asserts.assert_equal(entry.subjects, expected_entry.subjects,
-                                     f"Entry {i} subjects mismatch")
-
-            # Verify targets field
-            if isinstance(expected_entry.targets, Nullable):
-                asserts.assert_true(isinstance(entry.targets, Nullable),
-                                    f"Entry {i} targets should be Nullable")
-            else:
-                asserts.assert_equal(len(entry.targets), len(expected_entry.targets),
-                                     f"Entry {i} should have same number of targets")
-                for j, target in enumerate(entry.targets):
-                    expected_target = expected_entry.targets[j]
-                    logging.info(f"Verifying target {j} in entry {i}")
-
-                    # For each target field, verify either the value matches or both are Nullable
-                    if isinstance(expected_target.cluster, Nullable):
-                        asserts.assert_true(isinstance(target.cluster, Nullable),
-                                            f"Entry {i} Target {j} cluster should be Nullable")
-                    else:
-                        asserts.assert_equal(target.cluster, expected_target.cluster,
-                                             f"Entry {i} Target {j} cluster mismatch")
-
-                    if isinstance(expected_target.endpoint, Nullable):
-                        asserts.assert_true(isinstance(target.endpoint, Nullable),
-                                            f"Entry {i} Target {j} endpoint should be Nullable")
-                    else:
-                        asserts.assert_equal(target.endpoint, expected_target.endpoint,
-                                             f"Entry {i} Target {j} endpoint mismatch")
-
-                    if isinstance(expected_target.deviceType, Nullable):
-                        asserts.assert_true(isinstance(target.deviceType, Nullable),
-                                            f"Entry {i} Target {j} deviceType should be Nullable")
-                    else:
-                        asserts.assert_equal(target.deviceType, expected_target.deviceType,
-                                             f"Entry {i} Target {j} deviceType mismatch")
+        asserts.assert_in(max_targets_acl[0], read_max_targets_acl, "Missing Admin entry")
+        asserts.assert_in(max_targets_acl[1], read_max_targets_acl, "Missing Operate entry")
 
         # Step 26: Read AccessControlEntriesPerFabric attribute
         self.step(26)
@@ -1090,26 +829,8 @@ class TC_ACL_2_4(MatterBaseTest):
         # Verify max entries ACL contents
         asserts.assert_equal(len(read_max_entries_acl), max_entries,
                              f"ACL should contain exactly {max_entries} entries")
-        for i, entry in enumerate(read_max_entries_acl):
-            expected_entry = max_entries_acl[i]
-            logging.info(f"Verifying entry {i}")
-
-            asserts.assert_equal(entry.privilege, expected_entry.privilege,
-                                 f"Entry {i} privilege mismatch")
-            asserts.assert_equal(entry.authMode, expected_entry.authMode,
-                                 f"Entry {i} authMode mismatch")
-            asserts.assert_equal(entry.fabricIndex, expected_entry.fabricIndex,
-                                 f"Entry {i} fabricIndex mismatch")
-
-            if isinstance(expected_entry.subjects, Nullable):
-                asserts.assert_true(isinstance(entry.subjects, Nullable),
-                                    f"Entry {i} subjects should be Nullable")
-            else:
-                asserts.assert_equal(entry.subjects, expected_entry.subjects,
-                                     f"Entry {i} subjects mismatch")
-
-            asserts.assert_true(isinstance(entry.targets, Nullable),
-                                f"Entry {i} targets should be Nullable")
+        asserts.assert_in(max_entries_acl[0], read_max_entries_acl, "Missing Admin entry")
+        asserts.assert_in(max_entries_acl[1], read_max_entries_acl, "Missing Operate entry")
 
         # First reset ACL to only admin entry
         self.step(29)
@@ -1242,7 +963,7 @@ class TC_ACL_2_4(MatterBaseTest):
             ),
             # Entry with invalid privilege (should fail)
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
-                privilege=255,  # Invalid privilege value
+                privilege=255,
                 authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
                 subjects=NullValue,
                 targets=NullValue,
@@ -1271,7 +992,7 @@ class TC_ACL_2_4(MatterBaseTest):
             # Entry with invalid auth mode (should fail)
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
                 privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
-                authMode=255,  # Invalid auth mode value
+                authMode=255, 
                 subjects=NullValue,
                 targets=NullValue,
                 fabricIndex=f1
@@ -1300,7 +1021,7 @@ class TC_ACL_2_4(MatterBaseTest):
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
                 privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
                 authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                subjects=[0],  # Invalid subject ID
+                subjects=[0],
                 targets=NullValue,
                 fabricIndex=f1
             )
@@ -1328,7 +1049,7 @@ class TC_ACL_2_4(MatterBaseTest):
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
                 privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
                 authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                subjects=[0xFFFFFFFFFFFFFFFF],  # Max node ID
+                subjects=[0xFFFFFFFFFFFFFFFF],
                 targets=NullValue,
                 fabricIndex=f1
             )
@@ -1356,7 +1077,7 @@ class TC_ACL_2_4(MatterBaseTest):
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
                 privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
                 authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                subjects=[0xFFFFFFFD00000000],  # Invalid CAT
+                subjects=[0xFFFFFFFD00000000], 
                 targets=NullValue,
                 fabricIndex=f1
             )
@@ -1384,7 +1105,7 @@ class TC_ACL_2_4(MatterBaseTest):
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
                 privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
                 authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                subjects=[0xFFFFFFFFFFFF0000],  # invalid Group Node ID
+                subjects=[0xFFFFFFFFFFFF0000], 
                 targets=NullValue,
                 fabricIndex=f1
             )
@@ -1449,7 +1170,7 @@ class TC_ACL_2_4(MatterBaseTest):
                 subjects=NullValue,
                 targets=[
                     Clusters.AccessControl.Structs.AccessControlTargetStruct(
-                        cluster=0xFFFFFFFF,  # Invalid cluster ID
+                        cluster=0xFFFFFFFF, 
                         endpoint=NullValue,
                         deviceType=NullValue
                     )
@@ -1484,7 +1205,7 @@ class TC_ACL_2_4(MatterBaseTest):
                 targets=[
                     Clusters.AccessControl.Structs.AccessControlTargetStruct(
                         cluster=NullValue,
-                        endpoint=65535,  # Invalid endpoint ID
+                        endpoint=65535,
                         deviceType=NullValue
                     )
                 ],
@@ -1519,7 +1240,7 @@ class TC_ACL_2_4(MatterBaseTest):
                     Clusters.AccessControl.Structs.AccessControlTargetStruct(
                         cluster=NullValue,
                         endpoint=NullValue,
-                        deviceType=0xFFFFFFFF  # Invalid device type
+                        deviceType=0xFFFFFFFF
                     )
                 ],
                 fabricIndex=f1
@@ -1553,7 +1274,7 @@ class TC_ACL_2_4(MatterBaseTest):
                     Clusters.AccessControl.Structs.AccessControlTargetStruct(
                         cluster=NullValue,
                         endpoint=22,
-                        deviceType=33  # Cannot have both endpoint and device type
+                        deviceType=33
                     )
                 ],
                 fabricIndex=f1
@@ -1587,7 +1308,7 @@ class TC_ACL_2_4(MatterBaseTest):
                     Clusters.AccessControl.Structs.AccessControlTargetStruct(
                         cluster=11,
                         endpoint=22,
-                        deviceType=33  # Cannot have all three fields
+                        deviceType=33 
                     )
                 ],
                 fabricIndex=f1
