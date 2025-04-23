@@ -179,6 +179,7 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
         await self.test_priceForecast(endpoint=endpoint, cluster=cluster,
                                       priceForecast=val, details=details)
 
+        self.step("6")
         # TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to True,
         # and Components set to False.
         details = cluster.Bitmaps.CommodityPriceDetailBitmap.kDescription
