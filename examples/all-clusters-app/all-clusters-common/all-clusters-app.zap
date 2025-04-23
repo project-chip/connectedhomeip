@@ -987,6 +987,22 @@
               "reportableChange": 0
             },
             {
+              "name": "ConfigurationVersion",
+              "code": 24,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int32u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 1,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
@@ -20930,7 +20946,7 @@
               "reportableChange": 0
             },
             {
-              "name": "SupportedSnapshotParams",
+              "name": "SnapshotCapabilities",
               "code": 10,
               "mfgCode": null,
               "side": "server",
@@ -21083,7 +21099,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -21243,7 +21259,7 @@
               "code": 4,
               "mfgCode": null,
               "side": "server",
-              "type": "uint8s",
+              "type": "int8u",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
