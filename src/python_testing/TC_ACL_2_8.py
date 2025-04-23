@@ -55,15 +55,8 @@ class TC_ACL_2_8(MatterBaseTest):
         data = event.Data
 
         # Verify admin IDs
-        if admin_node_id is None:
-            asserts.assert_equal(data.adminNodeID, NullValue)
-        else:
-            asserts.assert_equal(data.adminNodeID, admin_node_id)
-
-        if admin_passcode_id is None:
-            asserts.assert_equal(data.adminPasscodeID, NullValue)
-        else:
-            asserts.assert_equal(data.adminPasscodeID, admin_passcode_id)
+        asserts.assert_equal(data.adminNodeID, admin_node_id)
+        asserts.assert_equal(data.adminPasscodeID, admin_passcode_id)
 
         # Verify event data
         asserts.assert_equal(data.changeType, change_type)
@@ -237,14 +230,18 @@ class TC_ACL_2_8(MatterBaseTest):
         # Verify event contents match expected sequence
         self._verify_acl_event(
             events[0],
-            None,
+            NullValue,
             0,
             Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
             self.th1.nodeId,
             f1)
         self._verify_acl_event(
-            events[1], self.th1.nodeId, None, Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged, [
-                self.th1.nodeId, 1111], f1)
+            events[1], 
+            self.th1.nodeId, 
+            NullValue,
+            Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged, 
+            [self.th1.nodeId, 1111], 
+            f1)
 
         for event in events:
             asserts.assert_not_equal(
@@ -266,15 +263,19 @@ class TC_ACL_2_8(MatterBaseTest):
         # Verify event contents match expected sequence
         self._verify_acl_event(
             events[0],
-            None,
+            NullValue,
             0,
             Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
             self.th2.nodeId,
             f2)
 
         self._verify_acl_event(
-            events[1], self.th2.nodeId, None, Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged, [
-                self.th2.nodeId, 2222], f2)
+            events[1], 
+            self.th2.nodeId, 
+            NullValue,
+            Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged, 
+            [self.th2.nodeId, 2222], 
+            f2)
 
         for event in events:
             asserts.assert_not_equal(
