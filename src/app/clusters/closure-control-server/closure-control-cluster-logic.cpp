@@ -15,10 +15,10 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/closure-control-server/closure-control-cluster-logic.h>
 #include <app/EventLogging.h>
-#include <platform/LockTracker.h>
+#include <app/clusters/closure-control-server/closure-control-cluster-logic.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/LockTracker.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -80,10 +80,9 @@ bool ClusterLogic::IsSupportedMainState(MainStateEnum mainState)
     return isSupported;
 }
 
-
 bool ClusterLogic::IsValidMainStateTransition(MainStateEnum mainState)
 {
-    //TODO: Implement the MainState state machin to validate transitions
+    // TODO: Implement the MainState state machin to validate transitions
     return true;
 }
 
@@ -223,7 +222,8 @@ void ClusterLogic::HandleCountdownTimeExpired()
         if (mDelegate.IsReadyToMove())
         {
             DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onCountdownTimerTick, this);
-            Status status = mDelegate.HandleMoveToCommand(state.mOverallTarget.Value().position, state.mOverallTarget.Value().latch, state.mOverallTarget.Value().speed);
+            Status status = mDelegate.HandleMoveToCommand(state.mOverallTarget.Value().position, state.mOverallTarget.Value().latch,
+                                                          state.mOverallTarget.Value().speed);
             if (status == Status::Success)
             {
                 SetMainState(MainStateEnum::kMoving);
@@ -262,20 +262,28 @@ CHIP_ERROR ClusterLogic::SetMainState(MainStateEnum mainState)
     mState.mMainState = mainState;
     mMatterContext.MarkDirty(Attributes::MainState::Id);
 
+    if (mConformance.HasFeature(Feature::kInstantaneous))
+    {
 
-    if (mConformance.HasFeature(Feature::kInstantaneous)) {
-
-        if (mainState == MainStateEnum::kCalibrating){
+        if (mainState == MainStateEnum::kCalibrating)
+        {
             SetCountdownTimeFromCluster(mDelegate.GetCalibrationCountdownTime());
-        } else if (mainState == MainStateEnum::kMoving) {
+        }
+        else if (mainState == MainStateEnum::kMoving)
+        {
             SetCountdownTimeFromCluster(mDelegate.GetMovingCountdownTime());
-        } else if (mainState == MainStateEnum::kWaitingForMotion) {
+        }
+        else if (mainState == MainStateEnum::kWaitingForMotion)
+        {
             SetCountdownTimeFromCluster(mDelegate.GetWaitingForMotionCountdownTime());
-        } else {
+        }
+        else
+        {
             (void) DeviceLayer::SystemLayer().CancelTimer(onCountdownTimerTick, this);
         }
 
-        if (mainState == MainStateEnum::kCalibrating || mainState == MainStateEnum::kMoving || mainState == MainStateEnum::kWaitingForMotion)
+        if (mainState == MainStateEnum::kCalibrating || mainState == MainStateEnum::kMoving ||
+            mainState == MainStateEnum::kWaitingForMotion)
         {
             (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onCountdownTimerTick, this);
         }
@@ -348,38 +356,38 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
     // Validate if the Positioning feature is required based on the set values and FeatureMap conformance.
     if (validateClusterOverallStatePositioning || validateIncomingOverallStatePositioning)
     {
-        //TODO: why are we checking the current position value, why it should impact the set.
-        //TODO: ideally if we dont have ppositioningfeature the current.state should not be present.
-        //TODO: if currentstate has positioning then we are missing check somewhere else.
-        // If the positioning member is present in either the current or incoming OverallState, we need to check if the Positioning
-        // feature is supported by the device. If the Positioning feature is not supported, return an error.
+        // TODO: why are we checking the current position value, why it should impact the set.
+        // TODO: ideally if we dont have ppositioningfeature the current.state should not be present.
+        // TODO: if currentstate has positioning then we are missing check somewhere else.
+        //  If the positioning member is present in either the current or incoming OverallState, we need to check if the Positioning
+        //  feature is supported by the device. If the Positioning feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     }
 
     // Validate if the MotionLatching feature is required based on the set values and FeatureMap conformance.
     if (validateClusterOverallStateLatch || validateIncomingOverallStateLatch)
     {
-        //TODO: Same comment as above
-        // If the latching member is present in either the current or incoming OverallState, we need to check if the MotionLatching
-        // feature is supported by the device. If the MotionLatching feature is not supported, return an error.
+        // TODO: Same comment as above
+        //  If the latching member is present in either the current or incoming OverallState, we need to check if the MotionLatching
+        //  feature is supported by the device. If the MotionLatching feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     }
 
     // Validate if the Speed feature is required based on the set values and FeatureMap conformance.
     if (validateClusterOverallStateSpeed || validateIncomingOverallStateSpeed)
     {
-        //TODO: Same comment as above
-        // If the speed member is present in either the current or incoming OverallState, we need to check if the Speed feature is
-        // supported by the device. If the Speed feature is not supported, return an error.
+        // TODO: Same comment as above
+        //  If the speed member is present in either the current or incoming OverallState, we need to check if the Speed feature is
+        //  supported by the device. If the Speed feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     }
 
     // Validate if the Positioning or MotionLatching feature is required based on the set values and FeatureMap conformance.
     if (validateClusterOverallStateSecureState || validateIncomingOverallStateSecureState)
     {
-        //TODO: Same comment as above
-        // If the secureState member is present in either the current or incoming OverallState, we need to check if the Speed feature is
-        // supported by the device. If the Speed feature is not supported, return an error.
+        // TODO: Same comment as above
+        //  If the secureState member is present in either the current or incoming OverallState, we need to check if the Speed
+        //  feature is supported by the device. If the Speed feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) || mConformance.HasFeature(Feature::kMotionLatching),
                             CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     }
@@ -446,7 +454,8 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
         // We need to update the cluster positioning value if
         // - cluster does not have value; the value will necessarily be updated
         // - cluster and incoming values are different
-        requiredSecureStateUpdate = !validateClusterOverallStateSecureState || currentOverallState.Value().secureState.Value() != secureState;
+        requiredSecureStateUpdate =
+            !validateClusterOverallStateSecureState || currentOverallState.Value().secureState.Value() != secureState;
     }
 
     /*
@@ -464,8 +473,9 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
         currentOverallState.SetNonNull(overallState.Value());
         mMatterContext.MarkDirty(Attributes::OverallState::Id);
 
-        //SecureStateChangedEvent SHALL be generated when the SecureState field in the OverallState attribute changes
-        if (requiredSecureStateUpdate) {
+        // SecureStateChangedEvent SHALL be generated when the SecureState field in the OverallState attribute changes
+        if (requiredSecureStateUpdate)
+        {
             PostSecureStateChangedEvent(overallState.Value().secureState.Value().Value());
         }
     }
@@ -492,9 +502,9 @@ CHIP_ERROR ClusterLogic::SetOverallTarget(const DataModel::Nullable<GenericOvera
     bool validateIncomingOverallTargetLatch    = false;
     bool validateIncomingOverallTargetSpeed    = false;
 
-    bool requirePositioningUpdate  = false;
-    bool requireLatchUpdate        = false;
-    bool requireSpeedUpdate        = false;
+    bool requirePositioningUpdate = false;
+    bool requireLatchUpdate       = false;
+    bool requireSpeedUpdate       = false;
 
     /*
         Determine checks that need to be executed based on current and provided values
@@ -505,7 +515,8 @@ CHIP_ERROR ClusterLogic::SetOverallTarget(const DataModel::Nullable<GenericOvera
     if (!currentOverallTarget.IsNull())
     {
 
-        // If the OverallTarget has a value, we need to check internal members to validate if we need to mark the attribute as dirty.
+        // If the OverallTarget has a value, we need to check internal members to validate if we need to mark the attribute as
+        // dirty.
         validateClusterOverallTargetMembers = true;
 
         validateClusterOverallTargetPosition = currentOverallTarget.Value().position.HasValue();
@@ -532,29 +543,29 @@ CHIP_ERROR ClusterLogic::SetOverallTarget(const DataModel::Nullable<GenericOvera
     // Validate if the Position feature is required based on the set values and FeatureMap conformance.
     if (validateClusterOverallTargetPosition || validateIncomingOverallTargetPosition)
     {
-        //TODO: why are we checking the current position value, why it should impact the set.
-        //TODO: ideally if we dont have ppositioningfeature the current.state should not be present.
-        //TODO: if currentstate has positioning then we are missing check somewhere else.
-        // If the position member is present in either the current or incoming OverallTarget, we need to check if the Position
-        // feature is supported by the device. If the Position feature is not supported, return an error.
+        // TODO: why are we checking the current position value, why it should impact the set.
+        // TODO: ideally if we dont have ppositioningfeature the current.state should not be present.
+        // TODO: if currentstate has positioning then we are missing check somewhere else.
+        //  If the position member is present in either the current or incoming OverallTarget, we need to check if the Position
+        //  feature is supported by the device. If the Position feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     }
 
     // Validate if the MotionLatching feature is required based on the set values and FeatureMap conformance.
     if (validateClusterOverallTargetLatch || validateIncomingOverallTargetLatch)
     {
-        //TODO: Same comment as above
-        // If the latching member is present in either the current or incoming OverallTarget, we need to check if the MotionLatching
-        // feature is supported by the device. If the MotionLatching feature is not supported, return an error.
+        // TODO: Same comment as above
+        //  If the latching member is present in either the current or incoming OverallTarget, we need to check if the
+        //  MotionLatching feature is supported by the device. If the MotionLatching feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     }
 
     // Validate if the Speed feature is required based on the set values and FeatureMap conformance.
     if (validateClusterOverallTargetSpeed || validateIncomingOverallTargetSpeed)
     {
-        //TODO: Same comment as above
-        // If the speed member is present in either the current or incoming OverallTarget, we need to check if the Speed feature is
-        // supported by the device. If the Speed feature is not supported, return an error.
+        // TODO: Same comment as above
+        //  If the speed member is present in either the current or incoming OverallTarget, we need to check if the Speed feature is
+        //  supported by the device. If the Speed feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     }
 
@@ -568,8 +579,7 @@ CHIP_ERROR ClusterLogic::SetOverallTarget(const DataModel::Nullable<GenericOvera
         // We don't need to check is values are present since the check was done above.
         const TargetPositionEnum & position = overallTarget.Value().position.Value();
 
-        VerifyOrReturnError(EnsureKnownEnumValue(position) != TargetPositionEnum::kUnknownEnumValue,
-                                CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(EnsureKnownEnumValue(position) != TargetPositionEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(IsSupportedOverallTargetPositioning(position), CHIP_ERROR_INVALID_ARGUMENT);
 
         // We need to update the cluster positioning value if
@@ -597,8 +607,7 @@ CHIP_ERROR ClusterLogic::SetOverallTarget(const DataModel::Nullable<GenericOvera
         const Globals::ThreeLevelAutoEnum & speed = overallTarget.Value().speed.Value();
 
         VerifyOrReturnError(EnsureKnownEnumValue(speed) != Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
-                                CHIP_ERROR_INVALID_ARGUMENT);
-
+                            CHIP_ERROR_INVALID_ARGUMENT);
 
         // We need to update the cluster positioning value if
         // - cluster does not have value; the value will necessarily be updated
@@ -631,8 +640,7 @@ CHIP_ERROR ClusterLogic::SetCurrentErrorList(const ClosureErrorEnum error)
 
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
 
-    VerifyOrReturnError(EnsureKnownEnumValue(error) != ClosureErrorEnum::kUnknownEnumValue,
-                                CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(EnsureKnownEnumValue(error) != ClosureErrorEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(mDelegate.SetCurrentErrorInList(error));
     ReportCurrentErrorListChange();
 
@@ -735,7 +743,7 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleStopInternal()
     Status status = Status::Success;
 
     MainStateEnum state;
-    VerifyOrReturnValue(GetMainState(state) == CHIP_NO_ERROR,Status::Failure);
+    VerifyOrReturnValue(GetMainState(state) == CHIP_NO_ERROR, Status::Failure);
 
     // Stop action is supported only if the closure is in one of the following states Moving, WaitingForMotion or Calibrating.
     // A status code of SUCCESS SHALL always be returned, regardless if it is in above states or not.
@@ -743,14 +751,14 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleStopInternal()
     {
         status = mDelegate.HandleStopCommand();
         // once stop action is successful on closure will set MainState to stopped.
-        if (status == Status::Success) {
-            VerifyOrReturnValue(SetMainState(MainStateEnum::kStopped) == CHIP_NO_ERROR,Status::Failure,
+        if (status == Status::Success)
+        {
+            VerifyOrReturnValue(SetMainState(MainStateEnum::kStopped) == CHIP_NO_ERROR, Status::Failure,
                                 ChipLogError(AppServer, "Stop Command: Failed to set MainState to Stopped"));
         }
     }
 
     return status;
-
 }
 
 chip::Protocols::InteractionModel::Status ClusterLogic::HandleStop()
@@ -764,14 +772,14 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleStop()
 }
 
 chip::Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPositionEnum> position, Optional<bool> latch,
-                                                       Optional<Globals::ThreeLevelAutoEnum> speed)
+                                                                     Optional<Globals::ThreeLevelAutoEnum> speed)
 {
     VerifyOrDieWithMsg(mIsInitialized, NotSpecified, "MoveTo Command called before Initialization of closure");
 
     Status status = Status::Success;
 
     MainStateEnum state;
-    VerifyOrReturnValue(GetMainState(state) == CHIP_NO_ERROR,Status::Failure);
+    VerifyOrReturnValue(GetMainState(state) == CHIP_NO_ERROR, Status::Failure);
 
     DataModel::Nullable<GenericOverallTarget> target;
 
@@ -812,10 +820,11 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<Ta
         target.Value().speed = speed;
     }
 
-    // If MoveTo command is received in any state other than Moving, WaitingForMotion or Stopped, an error code INVALID_IN_STATE SHALL be returned
-    VerifyOrReturnValue(state != MainStateEnum::kMoving && state != MainStateEnum::kWaitingForMotion
-                        && state != MainStateEnum::kStopped, Status::InvalidInState);
-
+    // If MoveTo command is received in any state other than Moving, WaitingForMotion or Stopped, an error code INVALID_IN_STATE
+    // SHALL be returned
+    VerifyOrReturnValue(state != MainStateEnum::kMoving && state != MainStateEnum::kWaitingForMotion &&
+                            state != MainStateEnum::kStopped,
+                        Status::InvalidInState);
 
     status = mDelegate.HandleMoveToCommand(position, latch, speed);
 
@@ -828,7 +837,7 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<Ta
         if (mDelegate.IsReadyToMove())
         {
             // If the closure is ready to move, set MainState to Moving
-            VerifyOrReturnValue(SetMainState(MainStateEnum::kCalibrating) == CHIP_NO_ERROR,Status::Failure,
+            VerifyOrReturnValue(SetMainState(MainStateEnum::kCalibrating) == CHIP_NO_ERROR, Status::Failure,
                                 ChipLogError(AppServer, "MoveTo Command: Failed to set MainState to Moving"));
         }
         else
@@ -836,8 +845,8 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<Ta
             // If closure needs to pre-stage before moving, then set MainState to WaitingForMoving
             SetMainState(MainStateEnum::kWaitingForMotion);
         }
-            VerifyOrReturnValue(SetMainState(MainStateEnum::kCalibrating) == CHIP_NO_ERROR,Status::Failure,
-                                ChipLogError(AppServer, "Calibrate Command: Failed to set MainState to Calibrating"));
+        VerifyOrReturnValue(SetMainState(MainStateEnum::kCalibrating) == CHIP_NO_ERROR, Status::Failure,
+                            ChipLogError(AppServer, "Calibrate Command: Failed to set MainState to Calibrating"));
     }
 
     return status;
@@ -853,9 +862,10 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleCalibrate()
     VerifyOrReturnError(!mConformance.HasFeature(Feature::kCalibration), Status::UnsupportedCommand);
 
     MainStateEnum state;
-    VerifyOrReturnValue(GetMainState(state) == CHIP_NO_ERROR,Status::Failure);
+    VerifyOrReturnValue(GetMainState(state) == CHIP_NO_ERROR, Status::Failure);
 
-    //If Calibrate command is received when already in the Calibrating state, the server SHALL respond with a status code of SUCCESS.
+    // If Calibrate command is received when already in the Calibrating state, the server SHALL respond with a status code of
+    // SUCCESS.
     if (state == MainStateEnum::kCalibrating)
     {
         return Status::Success;
@@ -863,20 +873,19 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleCalibrate()
 
     // If Calibrate command is invoked in any state other than Stopped, the server SHALL respond with INVALID_IN_STATE.
     // this check excludes Claibrating Mainstate as its already validated above.
-    VerifyOrReturnValue(state == MainStateEnum::kStopped,Status::InvalidInState);
+    VerifyOrReturnValue(state == MainStateEnum::kStopped, Status::InvalidInState);
 
     status = mDelegate.HandleCalibrateCommand();
 
     // once Calibrate action is successful on closure will set MainState to stopped.
-    if (status == Status::Success) {
-        VerifyOrReturnValue(SetMainState(MainStateEnum::kCalibrating) == CHIP_NO_ERROR,Status::Failure,
-                                ChipLogError(AppServer, "Calibrate Command: Failed to set MainState to Calibrating"));
+    if (status == Status::Success)
+    {
+        VerifyOrReturnValue(SetMainState(MainStateEnum::kCalibrating) == CHIP_NO_ERROR, Status::Failure,
+                            ChipLogError(AppServer, "Calibrate Command: Failed to set MainState to Calibrating"));
     }
 
     return status;
-
 }
-
 
 CHIP_ERROR ClusterLogic::PostOperationalErrorEvent(const DataModel::List<const ClosureErrorEnum> errorState)
 {
@@ -905,9 +914,10 @@ CHIP_ERROR ClusterLogic::PostOperationalErrorEvent(const DataModel::List<const C
 
 CHIP_ERROR ClusterLogic::PostMovementCompletedEvent()
 {
-    // Movement complete event can only be triggered,if the Positioning feature is supported and Instantenous feature is not supported.
-    // Return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE otherwise.
-    VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) && !mConformance.HasFeature(Feature::kInstantaneous), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    // Movement complete event can only be triggered,if the Positioning feature is supported and Instantenous feature is not
+    // supported. Return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE otherwise.
+    VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) && !mConformance.HasFeature(Feature::kInstantaneous),
+                        CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     Events::MovementCompleted::Type event{};
     EventNumber eventNumber;
@@ -946,7 +956,8 @@ CHIP_ERROR ClusterLogic::PostSecureStateChangedEvent(const bool secureValue)
 {
     // SecureState changed event can only be triggered,if the Positioning or MotionLatching feature is supported.
     // Return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE otherwise.
-    VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) && !mConformance.HasFeature(Feature::kInstantaneous), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) && !mConformance.HasFeature(Feature::kInstantaneous),
+                        CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     Events::SecureStateChanged::Type event{ .secureValue = secureValue };
     EventNumber eventNumber;
@@ -960,7 +971,6 @@ CHIP_ERROR ClusterLogic::PostSecureStateChangedEvent(const bool secureValue)
 
     return err;
 }
-
 
 } // namespace ClosureControl
 } // namespace Clusters

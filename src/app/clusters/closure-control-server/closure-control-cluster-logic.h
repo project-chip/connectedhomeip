@@ -20,6 +20,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-enums.h>
+#include <app/AttributeAccessInterface.h>
 #include <app/cluster-building-blocks/QuieterReporting.h>
 #include <app/clusters/closure-control-server/closure-control-cluster-delegate.h>
 #include <app/clusters/closure-control-server/closure-control-cluster-matter-context.h>
@@ -27,7 +28,6 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <app/AttributeAccessInterface.h>
 
 namespace chip {
 namespace app {
@@ -218,7 +218,6 @@ public:
         return SetCountdownTime(countdownTime, false);
     }
 
-
     /**
      *  @brief Calls delegate HandleStopCommand function after validating MainState
      *  @return Exits if the cluster is not initialized.
@@ -297,7 +296,6 @@ public:
      *        Whenever application wants to report a change in Errorlist, call this method.
      */
     void ReportCurrentErrorListChange();
-
 
     /**
      * @brief Fuction handles the expiry of countdowntime.

@@ -31,19 +31,20 @@ class DelegateBase
 public:
     DelegateBase()          = default;
     virtual ~DelegateBase() = default;
-    //TODO: Add fucntion comments
-    virtual Protocols::InteractionModel::Status HandleStopCommand()      = 0;
-    virtual Protocols::InteractionModel::Status HandleMoveToCommand(const Optional<TargetPositionEnum> & tag, const Optional<bool> & latch,
-                                                       const Optional<Globals::ThreeLevelAutoEnum> & speed) = 0;
-    virtual Protocols::InteractionModel::Status HandleCalibrateCommand() = 0;
+    // TODO: Add fucntion comments
+    virtual Protocols::InteractionModel::Status HandleStopCommand()                                                      = 0;
+    virtual Protocols::InteractionModel::Status HandleMoveToCommand(const Optional<TargetPositionEnum> & tag,
+                                                                    const Optional<bool> & latch,
+                                                                    const Optional<Globals::ThreeLevelAutoEnum> & speed) = 0;
+    virtual Protocols::InteractionModel::Status HandleCalibrateCommand()                                                 = 0;
 
     virtual CHIP_ERROR GetCurrentErrorAtIndex(size_t index, ClosureErrorEnum & closureError) = 0;
-    virtual CHIP_ERROR SetCurrentErrorInList(const ClosureErrorEnum & closureError) = 0;
+    virtual CHIP_ERROR SetCurrentErrorInList(const ClosureErrorEnum & closureError)          = 0;
 
-    virtual bool IsManualLatchingNeeded() = 0;
-    virtual bool IsReadyToMove() = 0;
-    virtual ElapsedS GetCalibrationCountdownTime() = 0;
-    virtual ElapsedS GetMovingCountdownTime() = 0;
+    virtual bool IsManualLatchingNeeded()               = 0;
+    virtual bool IsReadyToMove()                        = 0;
+    virtual ElapsedS GetCalibrationCountdownTime()      = 0;
+    virtual ElapsedS GetMovingCountdownTime()           = 0;
     virtual ElapsedS GetWaitingForMotionCountdownTime() = 0;
 };
 
