@@ -126,20 +126,20 @@ public:
         if (index >= currentErrors.size()) {
             return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED; // Invalid index
         }
-        
+
         auto it = currentErrors.begin();
         std::advance(it, index);
         closureError = *it;
-        
-        return CHIP_NO_ERROR;     
+
+        return CHIP_NO_ERROR;
     }
-    
+
     CHIP_ERROR SetCurrentErrorInList(const ClosureErrorEnum & closureError) override
     {
         if (currentErrors.size() >= 10) {
             return CHIP_ERROR_INVALID_LIST_LENGTH; // List is full
         }
-    
+
         if (currentErrors.find(closureError) != currentErrors.end()) {
             return CHIP_ERROR_DUPLICATE_KEY_ID; // Duplicate error
         }
@@ -147,7 +147,7 @@ public:
         if (closureError == ClosureErrorEnum::kUnknownEnumValue) {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        
+
         currentErrors.insert(closureError);
         return CHIP_NO_ERROR;
     }
