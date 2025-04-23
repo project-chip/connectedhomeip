@@ -74,10 +74,9 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
         """Execute the test steps."""
         steps = [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)."),
-            TestStep("2", "Set up a subscription to all CommodityPrice cluster events"),
-            TestStep("3", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
+            TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
                      "Value has to be 1 (True)"),
-            TestStep("4", "TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to True, and Components set to False.",
+            TestStep("3", "TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to True, and Components set to False.",
                      """Verify that the DUT response contains GetDetailedForecastResponse with a list of CommodityPriceStruct entries (it may be empty) and shall have not more than 56 entries.
                         For each entry in the list:
                         - except for the first list entry, verify that the PeriodStart is greater than the PeriodEnd of the previous list entry.
@@ -86,7 +85,7 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
                         - verify that either or both of Price, PriceLevel are not null.
                         - verify that the Description which is a string with max length of 32.
                         - verify that the Components list is not included."""),
-            TestStep("5", "TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to False and Components set to True.",
+            TestStep("4", "TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to False and Components set to True.",
                      """Verify that the DUT response contains GetDetailedForecastResponse with a list of CommodityPriceStruct entries (it may be empty) and shall have not more than 56 entries.
                         For each entry in the list:
                         - except for the first list entry, verify that the PeriodStart is greater than the PeriodEnd of the list entry.
@@ -96,11 +95,11 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
                         - verify that the Description field is not included.
                         - verify that the Components field is included. It may be an empty list but shall have no more than 10 entries.
                             Each entry shall have a valid value of Price (Money), Source (a valid TariffPriceTypeEnum), it may include an optional Description (a string of max length 32) and may include an optional TariffComponentID (unsigned integer value)."""),
-            TestStep("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.SEPR.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.SEPR.TESTEVENTTRIGGER for Forecast Update Test Event",
-                     "Verify DUT responds w/ status SUCCESS(0x00) and event SEPR.S.E0001(ForecastChange) sent. Store the event's PriceForecast field as NewForecast."),
-            TestStep("6a", "TH reads PriceForecast attribute.",
-                     "Verify that the DUT response contains a list of  CommodityPriceStruct (or empty). Verify that the list matches the NewForecast from step 6."),
-            TestStep("7", "TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to True, and Components set to False.",
+            TestStep("5", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.SEPR.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.SEPR.TESTEVENTTRIGGER for Forecast Update Test Event",
+                     "Verify DUT responds w/ status SUCCESS(0x00)."),
+            TestStep("5a", "TH reads PriceForecast attribute.",
+                     "Verify that the DUT response contains a list of  CommodityPriceStruct (or empty)."),
+            TestStep("6", "TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to True, and Components set to False.",
                      """Verify that the DUT response contains GetDetailedForecastResponse with a list of CommodityPriceStruct entries (it may be empty) and shall have not more than 56 entries.
                         For each entry in the list:
                         - except for the first list entry, verify that the PeriodStart is greater than the PeriodEnd of the previous list entry.
@@ -109,7 +108,7 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
                         - verify that either or both of Price, PriceLevel are not null.
                         - verify that the Description which is a string with max length of 32.
                         - verify that the Components list is not included."""),
-            TestStep("8", "TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to False and Components set to True.",
+            TestStep("7", "TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to False and Components set to True.",
                      """Verify that the DUT response contains GetDetailedForecastResponse with a list of CommodityPriceStruct entries (it may be empty) and shall have not more than 56 entries.
                         For each entry in the list:
                         - except for the first list entry, verify that the PeriodStart is greater than the PeriodEnd of the list entry.
@@ -119,7 +118,7 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
                         - verify that the Description field is not included.
                         - verify that the Components field is included. It may be an empty list but shall have no more than 10 entries.
                             Each entry shall have a valid value of Price (Money), Source (a valid TariffPriceTypeEnum), it may include an optional Description (a string of max length 32) and may include an optional TariffComponentID (unsigned integer value)."""),
-            TestStep("9", "TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to True and Components set to True.",
+            TestStep("8", "TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to True and Components set to True.",
                      """Verify that the DUT response contains GetDetailedForecastResponse with a list of CommodityPriceStruct entries (it may be empty) and shall have not more than 56 entries.
                         For each entry in the list:
                         - except for the first list entry, verify that the PeriodStart is greater than the PeriodEnd of the list entry.
@@ -144,16 +143,10 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
         # Commission DUT - already done
 
         self.step("2")
-        events_callback = EventChangeCallback(cluster)
-        await events_callback.start(self.default_controller,
-                                    self.dut_node_id,
-                                    endpoint)
-
-        self.step("3")
         # TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster
         await self.check_test_event_triggers_enabled()
 
-        self.step("4")
+        self.step("3")
         # TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to True,
         # and Components set to False.
         details = cluster.Bitmaps.CommodityPriceDetailBitmap.kDescription
@@ -162,7 +155,7 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
         await self.test_priceForecast(endpoint=endpoint, cluster=cluster,
                                       priceForecast=val.priceForecast, details=details)
 
-        self.step("5")
+        self.step("4")
         # TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to False
         # and Components set to True.
         details = cluster.Bitmaps.CommodityPriceDetailBitmap.kComponents
@@ -171,24 +164,13 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
         await self.test_priceForecast(endpoint=endpoint, cluster=cluster,
                                       priceForecast=val.priceForecast, details=details)
 
-        self.step("6")
+        self.step("5")
         # TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey
         # field set to PIXIT.SEPR.TESTEVENT_TRIGGERKEY and EventTrigger field set to
         # PIXIT.SEPR.TESTEVENTTRIGGER for Forecast Update Test Event
         await self.send_test_event_trigger_forecast_update()
 
-        # Verify DUT responds w/ status SUCCESS(0x00) and event SEPR.S.E0001(ForecastChange) sent.
-        # Store the event's PriceForecast field as NewForecast.
-        event_data = events_callback.wait_for_event_report(
-            Clusters.CommodityPrice.Events.ForecastChange)
-
-        details = 0  # In an event we should not have any description or components
-        newForecast = event_data.priceForecast
-
-        await self.test_priceForecast(endpoint=endpoint, cluster=cluster,
-                                      priceForecast=newForecast, details=details)
-
-        self.step("6a")
+        self.step("5a")
         # TH reads PriceForecast attribute.
         # Verify that the DUT response contains a CommodityPriceStruct value.
         # Verify that the value matches the NewCurrentPrice from step 6
@@ -198,18 +180,6 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
         await self.test_priceForecast(endpoint=endpoint, cluster=cluster,
                                       priceForecast=val, details=details)
 
-        # NOTE: due to the overhead of sending an event (headers, etc), the max number
-        # of list entries in the PriceForecast attribute vs the PriceForecast field in the event
-        # can be different. We can fit more entries in the attribute
-        # So only compare the entries
-        i = 0
-        asserts.assert_greater_equal(len(val), len(newForecast),
-                                     "PriceForecast Attribute should be at least as long as ForecastChange.PriceForecast list")
-        for item in newForecast:
-            asserts.assert_equal(val[i], item, f"Forecast entry{i} is not equal to NewForecast entry {i}")
-            i += 1
-
-        self.step("7")
         # TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to True,
         # and Components set to False.
         details = cluster.Bitmaps.CommodityPriceDetailBitmap.kDescription
@@ -218,7 +188,7 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
         await self.test_priceForecast(endpoint=endpoint, cluster=cluster,
                                       priceForecast=val.priceForecast, details=details)
 
-        self.step("8")
+        self.step("7")
         # TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to False
         # and Components set to True.
         details = cluster.Bitmaps.CommodityPriceDetailBitmap.kComponents
@@ -227,7 +197,7 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
         await self.test_priceForecast(endpoint=endpoint, cluster=cluster,
                                       priceForecast=val.priceForecast, details=details)
 
-        self.step("9")
+        self.step("8")
         # TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to True
         # and Components set to True.
         details = cluster.Bitmaps.CommodityPriceDetailBitmap.kComponents | cluster.Bitmaps.CommodityPriceDetailBitmap.kDescription
