@@ -254,6 +254,11 @@ struct PowerThresholdStruct {
   nullable PowerThresholdSourceEnum powerThresholdSource = 2;
 }
 
+struct PriceStruct {
+  money amount = 0;
+  CurrencyStruct currency = 1;
+}
+
 struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
@@ -264,11 +269,6 @@ struct LocationDescriptorStruct {
   char_string<128> locationName = 0;
   nullable int16s floorNumber = 1;
   nullable AreaTypeTag areaType = 2;
-}
-
-struct PriceStruct {
-  money amount = 0;
-  CurrencyStruct currency = 1;
 }
 
 struct AtomicAttributeStatusStruct {
@@ -1517,17 +1517,16 @@ provisional cluster CommodityPrice = 149 {
   }
 
   struct CommodityPriceComponentStruct {
-    optional money price = 0;
-    optional int16s priceLevel = 1;
-    TariffPriceTypeEnum source = 2;
-    optional char_string<32> description = 3;
-    optional int32u tariffComponentID = 4;
+    money price = 0;
+    TariffPriceTypeEnum source = 1;
+    optional char_string<32> description = 2;
+    optional int32u tariffComponentID = 3;
   }
 
   struct CommodityPriceStruct {
     epoch_s periodStart = 0;
     nullable epoch_s periodEnd = 1;
-    optional PriceStruct price = 2;
+    optional money price = 2;
     optional int16s priceLevel = 3;
     optional char_string<32> description = 4;
     optional CommodityPriceComponentStruct components[] = 5;

@@ -18,6 +18,7 @@
 
 #include "webrtc-provider-manager.h"
 
+#include <Options.h>
 #include <app/server/Server.h>
 #include <controller/InvokeInteraction.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -94,7 +95,58 @@ void WebRTCProviderManager::CloseConnection()
 CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & args, WebRTCSessionStruct & outSession,
                                                      bool & outDeferredOffer)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    // Initialize a new WebRTC session from the SolicitOfferRequestArgs
+    outSession.id          = args.sessionId;
+    outSession.peerNodeID  = args.peerNodeId;
+    outSession.streamUsage = args.streamUsage;
+    outSession.fabricIndex = args.fabricIndex;
+
+    // By spec, MetadataOptions SHALL be set to 0 and reserved for future use
+    outSession.metadataOptions.ClearAll();
+
+    // Resolve or allocate a VIDEO stream
+    if (args.videoStreamId.HasValue())
+    {
+        if (args.videoStreamId.Value().IsNull())
+        {
+            // TODO: Automatically select the closest matching video stream for the StreamUsage requested by looking at the and the
+            // server MAY allocate a new video stream if there are available resources.
+        }
+        else
+        {
+            outSession.videoStreamID = args.videoStreamId.Value();
+        }
+    }
+    else
+    {
+        outSession.videoStreamID.SetNull();
+    }
+
+    // Resolve or allocate an AUDIO stream
+    if (args.audioStreamId.HasValue())
+    {
+        if (args.audioStreamId.Value().IsNull())
+        {
+            // TODO: Automatically select the closest matching audio stream for the StreamUsage requested and the server MAY
+            // allocate a new audio stream if there are available resources.
+        }
+        else
+        {
+            outSession.audioStreamID = args.audioStreamId.Value();
+        }
+    }
+    else
+    {
+        outSession.audioStreamID.SetNull();
+    }
+
+    mPeerId                = ScopedNodeId(args.peerNodeId, args.fabricIndex);
+    mOriginatingEndpointId = args.originatingEndpointId;
+    mCurrentSessionId      = args.sessionId;
+
+    outDeferredOffer = LinuxDeviceOptions::GetInstance().cameraDeferredOffer;
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession)
