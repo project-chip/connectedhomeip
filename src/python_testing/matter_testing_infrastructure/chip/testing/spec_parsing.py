@@ -155,7 +155,7 @@ class XmlDeviceType:
     def __str__(self):
         msg = f'{self.name} - Revision {self.revision}, Class {self.classification_class}, Scope {self.classification_scope}\n'
         if self.superset_of_str:
-            msg += f'superset of {self.superset_of_str} ({self.superset_of} - group ({self.superset_group}))'
+            msg += f'superset of {self.superset_of_str} ({self.superset_of})'
         msg += '    Server clusters\n'
         for id, c in self.server_clusters.items():
             msg = msg + f'      {id}: {str(c)}\n'
