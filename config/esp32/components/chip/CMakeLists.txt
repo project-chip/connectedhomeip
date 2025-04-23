@@ -35,9 +35,9 @@ set(CHIP_REQUIRE_COMPONENTS esp_eth freertos lwip bt mbedtls fatfs app_update co
 
 if (NOT CMAKE_BUILD_EARLY_EXPANSION)
     if (CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_DISABLE)
-        set(is_debug TRUE)
-    else()
         set(is_debug FALSE)
+    else()
+        set(is_debug TRUE)
     endif()
 endif()
 
