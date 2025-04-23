@@ -245,7 +245,7 @@ CHIP_ERROR ClusterLogic::SetResolution(const Percent100ths resolution)
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
 
     VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    VerifyOrReturnError(resolution > 0 && resolution <= PERCENT100THS_MAX_VALUE, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(0 < resolution && resolution <= PERCENT100THS_MAX_VALUE, CHIP_ERROR_INVALID_ARGUMENT);
 
     if (resolution != mState.resolution)
     {
@@ -593,7 +593,7 @@ CHIP_ERROR ClusterLogic::GetClusterRevision(Attributes::ClusterRevision::TypeInf
 Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Optional<bool> latch,
                                             Optional<Globals::ThreeLevelAutoEnum> speed)
 {
-    VerifyOrDieWithMsg(mInitialized, NotSpecified, "Unexpected command received when device is yet to be initialized");
+    VerifyOrDieWithMsg(mInitialized, AppServer, "Unexpected command received when device is yet to be initialized");
 
     Status status = Status::Success;
 

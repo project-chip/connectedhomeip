@@ -101,8 +101,8 @@ struct ClusterConformance
         {
             VerifyOrReturnValue(HasFeature(Feature::kRotation) || HasFeature(Feature::kMotionLatching), false,
                                 ChipLogError(AppServer,
-                                             "Validation failed: If Overflow Attribute is Supported, atleast one of  Rotation or "
-                                             "MotionLatching  should be supported."));
+                                             "Validation failed: If the Overflow attribute is supported, at least one of Rotation or "
+                                             "MotionLatching must be supported."));
         }
 
         // If Rotation feature is supported, the Overflow attribute must be supported.
@@ -111,7 +111,7 @@ struct ClusterConformance
             VerifyOrReturnValue(
                 mOptionalAttributes.Has(OptionalAttributeEnum::kOverflow), false,
                 ChipLogError(AppServer,
-                             "Validation failed: If Rotation  feature is supported, then Overflow Attribute should be supported."));
+                             "Validation failed: If the Rotation feature is supported, then Overflow Attribute must be supported."));
         }
 
         return true;
@@ -312,14 +312,16 @@ private:
 
     /**
      * @brief Set TranslationDirection.
+     *             This attribute is not supposed to change once the installation is finalized.
+     *             SetTranslationDirection should only be called from Init()
+     *       
      * @param[in] translationDirection Direction of the translation.
-     * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
-     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported
      *
-     *  Note: This attribute is not supposed to change once the installation is finalized.
-     *         so SetTranslationDirection should only be called from Init()
+     * @return CHIP_NO_ERROR if set was successful.
+     *                CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     *                CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
+     *                CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported
+     *
      */
     CHIP_ERROR SetTranslationDirection(const TranslationDirectionEnum translationDirection);
 
