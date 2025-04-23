@@ -136,6 +136,7 @@ private:
     DataModel::List<const Structs::CommodityPriceStruct::Type> mPriceForecast;
 
     // This is the cluster server's backing store for mCurrentPrice .components and .descriptions
+    Platform::ScopedMemoryBuffer<Structs::CommodityPriceStruct::Type> mOwnedCurrentPriceStructBuffer;
     Platform::ScopedMemoryBuffer<Structs::CommodityPriceComponentStruct::Type> mOwnedCurrentPriceComponentBuffer;
     // each component has an optional Description
     Platform::ScopedMemoryBuffer<char> mOwnedCurrentPriceComponentDescriptionBuffer[kMaxComponentsPerPriceEntry];

@@ -417,10 +417,15 @@ CHIP_ERROR Instance::CopyPrice(const DataModel::Nullable<Structs::CommodityPrice
     if (mCurrentPrice.IsNull())
     {
         // Check that the buffer for components should be nullptr
+        VerifyOrDie(mOwnedCurrentPriceStructBuffer.Get() == nullptr);
         VerifyOrDie(mOwnedCurrentPriceComponentBuffer.Get() == nullptr);
     }
     else
     {
+        // Free the struct
+        VerifyOrDie(mOwnedCurrentPriceStructBuffer.Get() != nullptr);
+        mOwnedCurrentPriceStructBuffer.Free();
+
         // Free the .components
         VerifyOrDie(mOwnedCurrentPriceComponentBuffer.Get() != nullptr);
         mOwnedCurrentPriceComponentBuffer.Free();
@@ -437,14 +442,23 @@ CHIP_ERROR Instance::CopyPrice(const DataModel::Nullable<Structs::CommodityPrice
     else
     {
         // Do a basic copy of the CommodityPriceStruct trivial fields
-        mCurrentPrice = src;
+        if (!mOwnedCurrentPriceStructBuffer.Calloc(1))
+        {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+
+        auto mOwnedPriceStructPtr         = mOwnedCurrentPriceStructBuffer.Get();
+        mOwnedPriceStructPtr->periodStart = src.Value().periodStart;
+        mOwnedPriceStructPtr->periodEnd   = src.Value().periodEnd;
+        mOwnedPriceStructPtr->price       = src.Value().price;
+        mOwnedPriceStructPtr->priceLevel  = src.Value().priceLevel;
 
         // Deep copy description (if present)
         if (src.Value().description.HasValue())
         {
             CharSpan span;
             ReturnErrorOnFailure(CopyCharSpan(src.Value().description.Value(), mOwnedCurrentPriceDescriptionBuffer, span));
-            mCurrentPrice.Value().description.SetValue(span);
+            mOwnedPriceStructPtr->description.SetValue(span);
         }
 
         // Deep copy the .components list (if present)
@@ -458,6 +472,7 @@ CHIP_ERROR Instance::CopyPrice(const DataModel::Nullable<Structs::CommodityPrice
 
             for (size_t i = 0; i < components.size(); i++)
             {
+                // Do a copy for trivial types
                 mOwnedCurrentPriceComponentBuffer[i] = components[i];
 
                 // Components have an optional .description
@@ -469,9 +484,11 @@ CHIP_ERROR Instance::CopyPrice(const DataModel::Nullable<Structs::CommodityPrice
                     mOwnedCurrentPriceComponentBuffer[i].description.SetValue(span);
                 }
             }
-            mCurrentPrice.Value().components.SetValue(
+            mOwnedPriceStructPtr->components.SetValue(
                 Span<Structs::CommodityPriceComponentStruct::Type>(mOwnedCurrentPriceComponentBuffer.Get(), components.size()));
         }
+
+        mCurrentPrice.SetNonNull(*mOwnedPriceStructPtr);
     }
     return CHIP_NO_ERROR;
 }
