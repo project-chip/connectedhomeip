@@ -292,10 +292,20 @@ class AttributeValue:
 
 
 class AttributeMatcher:
+    """Matcher for a self-descripbed AttributeValue matcher, to be used in `await_all_expected_report_matches` methods.
+
+    This class embodies a predicate for a condition that must be matched by an attribute report.
+
+    A match is considered as having occurred when the `matches` method returns True for an `AttributeValue` report.
+    """
     def __init__(self, description: str):
         self._description: str = description
 
     def matches(self, report: AttributeValue) -> bool:
+        """Implementers must override this method to return True when an attribute value matches.
+
+        The condition matched should be clearly expressed by the `description` property.
+        """
         pass
 
     @property
@@ -304,6 +314,7 @@ class AttributeMatcher:
 
     @staticmethod
     def from_callable(description: str, matcher: Callable[[AttributeValue], bool]) -> "AttributeMatcher":
+        """Take a single callable and wrap it into an AttributeMatcher object. Useful to wrap closures."""
         class AttributeMatcherFromCallable(AttributeMatcher):
             def __init__(self, description, matcher: Callable[[AttributeValue], bool]):
                 super().__init__(description)
