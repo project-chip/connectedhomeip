@@ -35,6 +35,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import logging
+
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.testing.matter_asserts import is_valid_bool_value
@@ -63,7 +65,10 @@ class TC_CNET_4_9(MatterBaseTest):
             TestStep(14, 'TH sends RemoveNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field set to 1'),
             TestStep(15, 'TH sends the CommissioningComplete command to the DUT'),
             TestStep(16, 'TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 0 to ensure the CommissioningComplete call properly persisted the failsafe context. This call should have no effect if Commissioning Complete call is handled correctly'),
-            TestStep(17, 'TH reads Networks attribute from the DUT')
+            TestStep(17, 'TH reads Networks attribute from the DUT'),
+            TestStep(18, 'TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900'),
+            TestStep(19, 'TH adds a WiFi network'),
+            TestStep(20, 'TH reads Networks attribute from the DUT ')
         ]
 
     def def_TC_CNET_4_9(self):
@@ -251,6 +256,31 @@ class TC_CNET_4_9(MatterBaseTest):
         asserts.assert_true(userwifi_netidx is None,
                             f"Networks should not contain an entry with the NetworkID for PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID: {ssid}")
 
+        # Next steps are required to not leave the device in a bad state
+        # TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 990
+        self.step(18)
+        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900)
+        result = await self.send_single_cmd(cmd=cmd)
+
+        asserts.assert_true(type_matches(result, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
+                            "Unexpected value returned from ArmFailSafe")
+
+        # TH adds a WiFi network
+        self.step(19)
+        cmd = Clusters.NetworkCommissioning.Commands.AddOrUpdateWiFiNetwork(ssid=ssid.encode("utf-8"), credentials=self.matter_test_config.wifi_passphrase.encode("utf-8"), breadcrumb=4)
+        result = await self.send_single_cmd(cmd=cmd)
+
+        asserts.assert_equal(result.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
+                             "Should have received network ok status")
+
+        # TH reads Networks attribute from the DUT 
+        self.step(20)
+        networks = await self.read_single_attribute_check_success(cluster=Clusters.NetworkCommissioning, attribute=Clusters.NetworkCommissioning.Attributes.Networks)
+
+        userwifi_netidx = next((i for i, network in enumerate(networks) if network.networkID == ssid.encode("utf-8")), None)
+
+        asserts.assert_true(userwifi_netidx is not None,
+                            "There is not a NetworkID field equal to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID in Networks attribute list")
 
 if __name__ == "__main__":
     default_matter_test_main()
