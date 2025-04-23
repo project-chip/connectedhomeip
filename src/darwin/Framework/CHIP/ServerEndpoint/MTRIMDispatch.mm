@@ -88,6 +88,9 @@ namespace app {
         // But OTA would need some special-casing in any case, to call into the
         // existing cluster implementation.
 
+        using Protocols::InteractionModel::Status;
+        using namespace OtaSoftwareUpdateProvider::Commands;
+
         // This command passed ServerClusterCommandExists so we know it's one of our
         // supported commands.
         //
@@ -97,9 +100,6 @@ namespace app {
             aCommandObj->AddStatus(aPath, Status::UnsupportedCluster);
             return;
         }
-
-        using Protocols::InteractionModel::Status;
-        using namespace OtaSoftwareUpdateProvider::Commands;
 
         std::optional<DataModel::ActionReturnStatus> result;
         CHIP_ERROR err = CHIP_NO_ERROR;
