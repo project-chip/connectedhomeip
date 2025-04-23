@@ -46,7 +46,7 @@ class TestDefaultChecker(MatterBaseTest):
                 asserts.assert_equal(len(self.test.problems), 0,
                                      f"Unexpected problem when testing with product name {product_name} (override = {set_override})")
 
-        asserts.assert_equal(self.skipped, 0, "Skip not reset properly")
+        asserts.assert_equal(self.skipped, 0, "Internal error: skip not reset properly")
         run_check('TEST_PRODUCT', set_override=False, expect_problem=True)
         run_check('TestBad', set_override=False, expect_problem=True)
         run_check('BadTest', set_override=False, expect_problem=True)
