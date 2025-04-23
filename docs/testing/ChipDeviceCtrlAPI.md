@@ -1,7 +1,7 @@
 # Table of Contents
 
 -   [Table of Contents](#table-of-contents)
--   [chip.ChipDeviceCtrl](#chipchipdevicectrl)
+-   [matter.ChipDeviceCtrl](#matterchipdevicectrl)
     -   [CommissionableNode](#commissionablenode)
         -   [Commission](#commission)
     -   [DeviceProxyWrapper](#deviceproxywrapper)
@@ -51,13 +51,13 @@
     -   [BareChipDeviceController](#barechipdevicecontroller)
         -   [\_\_init\_\_](#__init__)
 
-<a id="chip.ChipDeviceCtrl"></a>
+<a id="matter.ChipDeviceCtrl"></a>
 
-# chip.ChipDeviceCtrl
+# matter.ChipDeviceCtrl
 
 Chip Device Controller interface
 
-<a id="chip.ChipDeviceCtrl.CommissionableNode"></a>
+<a id="matter.ChipDeviceCtrl.CommissionableNode"></a>
 
 ## CommissionableNode
 
@@ -65,7 +65,7 @@ Chip Device Controller interface
 class CommissionableNode(discovery.CommissionableNode)
 ```
 
-<a id="chip.ChipDeviceCtrl.CommissionableNode.Commission"></a>
+<a id="matter.ChipDeviceCtrl.CommissionableNode.Commission"></a>
 
 #### Commission
 
@@ -78,7 +78,7 @@ Commission the device using the device controller discovered this device.
 nodeId: The nodeId commissioned to the device setupPinCode: The setup pin code
 of the device
 
-<a id="chip.ChipDeviceCtrl.DeviceProxyWrapper"></a>
+<a id="matter.ChipDeviceCtrl.DeviceProxyWrapper"></a>
 
 ## DeviceProxyWrapper
 
@@ -92,7 +92,7 @@ where if this is copied around that a double free will occur, but how this is
 used today that is not an issue that needs to be accounted for and it will
 become very apparent if that happens.
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceControllerBase"></a>
 
 ## ChipDeviceControllerBase
 
@@ -100,7 +100,7 @@ become very apparent if that happens.
 class ChipDeviceControllerBase()
 ```
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.Shutdown"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceControllerBase.Shutdown"></a>
 
 #### Shutdown
 
@@ -111,7 +111,7 @@ def Shutdown()
 Shuts down this controller and reclaims any used resources, including the bound
 C++ constructor instance in the SDK.
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.ShutdownAll"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceControllerBase.ShutdownAll"></a>
 
 #### ShutdownAll
 
@@ -121,7 +121,7 @@ def ShutdownAll()
 
 Shut down all active controllers and reclaim any used resources.
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.ExpireSessions"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceControllerBase.ExpireSessions"></a>
 
 #### ExpireSessions
 
@@ -137,7 +137,7 @@ such as UpdateNOC.
 
 WARNING: ONLY CALL THIS IF YOU UNDERSTAND THE SIDE-EFFECTS
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.DiscoverCommissionableNodes"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceControllerBase.DiscoverCommissionableNodes"></a>
 
 #### DiscoverCommissionableNodes
 
@@ -167,7 +167,7 @@ This function will always return a list of CommissionableDevice. When
 stopOnFirst is set, this function will return when at least one device is
 discovered or on timeout.
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.OpenCommissioningWindow"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceControllerBase.OpenCommissioningWindow"></a>
 
 #### OpenCommissioningWindow
 
@@ -187,7 +187,7 @@ kTokenWithRandomPIN
 
 Returns CommissioningParameters
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.GetFabricIdInternal"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceControllerBase.GetFabricIdInternal"></a>
 
 #### GetFabricIdInternal
 
@@ -198,7 +198,7 @@ def GetFabricIdInternal()
 Get the fabric ID from the object. Only used to validate cached value from
 property.
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.GetNodeIdInternal"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceControllerBase.GetNodeIdInternal"></a>
 
 #### GetNodeIdInternal
 
@@ -209,7 +209,7 @@ def GetNodeIdInternal() -> int
 Get the node ID from the object. Only used to validate cached value from
 property.
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.GetConnectedDeviceSync"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceControllerBase.GetConnectedDeviceSync"></a>
 
 #### GetConnectedDeviceSync
 
@@ -219,7 +219,7 @@ def GetConnectedDeviceSync(nodeid, allowPASE=True, timeoutMs: int = None)
 
 Returns DeviceProxyWrapper upon success.
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.ComputeRoundTripTimeout"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceControllerBase.ComputeRoundTripTimeout"></a>
 
 #### ComputeRoundTripTimeout
 
@@ -235,7 +235,7 @@ takes to process a message at the upper layer on the target For group sessions.
 
 This will result in a session being established if one wasn't already.
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.GetRemoteSessionParameters"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceControllerBase.GetRemoteSessionParameters"></a>
 
 #### GetRemoteSessionParameters
 
@@ -249,7 +249,7 @@ Returns the SessionParameters of reported by the remote node associated with
 This will result in a session being established if one wasn't already
 established.
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.TestOnlySendBatchCommands"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceControllerBase.TestOnlySendBatchCommands"></a>
 
 #### TestOnlySendBatchCommands
 
@@ -276,7 +276,7 @@ for each command with the same index in `commands`.
 
 -   TestOnlyBatchCommandResponse
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceControllerBase.TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke"></a>
 
 #### TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke
 
@@ -290,7 +290,7 @@ async def TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(
 
 Please see SendCommand for description.
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.SendCommand"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceControllerBase.SendCommand"></a>
 
 #### SendCommand
 
@@ -324,7 +324,7 @@ responsiveness of the target.
 
 -   InteractionModelError on error
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.SendBatchCommands"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceControllerBase.SendBatchCommands"></a>
 
 #### SendBatchCommands
 
@@ -368,7 +368,7 @@ suppressResponse: Do not send a response to this action
 -   InteractionModelError if error with sending of InvokeRequestMessage fails as
     a whole.
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.SendGroupCommand"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceControllerBase.SendGroupCommand"></a>
 
 #### SendGroupCommand
 
@@ -389,7 +389,7 @@ a future that can be awaited upon to get confirmation command was sent.
 
 -   InteractionModelError on error
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.WriteAttribute"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceControllerBase.WriteAttribute"></a>
 
 #### WriteAttribute
 
@@ -418,7 +418,7 @@ to the XYZ attribute on the test cluster to endpoint 1
 
 -   [AttributeStatus] (list - one for each path)
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.WriteGroupAttribute"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceControllerBase.WriteGroupAttribute"></a>
 
 #### WriteGroupAttribute
 
@@ -437,7 +437,7 @@ type (cluster-object, data-version). The data-version can be omitted.
 E.g (Clusters.UnitTesting.Attributes.XYZAttribute('hello'), 1) -- Group Write
 'hello' with data version 1
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.Read"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceControllerBase.Read"></a>
 
 #### Read
 
@@ -527,9 +527,9 @@ sent.
 
 **Raises**:
 
--   InteractionModelError (chip.interaction_model) on error
+-   InteractionModelError (matter.interaction_model) on error
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.ReadAttribute"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceControllerBase.ReadAttribute"></a>
 
 #### ReadAttribute
 
@@ -604,9 +604,9 @@ sent.
 
 **Raises**:
 
--   InteractionModelError (chip.interaction_model) on error
+-   InteractionModelError (matter.interaction_model) on error
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.ReadEvent"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceControllerBase.ReadEvent"></a>
 
 #### ReadEvent
 
@@ -669,9 +669,9 @@ subscriptions. When not provided, a read request will be sent.
 
 **Raises**:
 
--   InteractionModelError (chip.interaction_model) on error
+-   InteractionModelError (matter.interaction_model) on error
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.ZCLSend"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceControllerBase.ZCLSend"></a>
 
 #### ZCLSend
 
@@ -682,7 +682,7 @@ def ZCLSend(cluster, command, nodeid, endpoint, groupid, args, blocking=False)
 Wrapper over SendCommand that catches the exceptions Returns a tuple of
 (errorCode, CommandResponse)
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.ZCLReadAttribute"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceControllerBase.ZCLReadAttribute"></a>
 
 #### ZCLReadAttribute
 
@@ -697,7 +697,7 @@ def ZCLReadAttribute(cluster,
 
 Wrapper over ReadAttribute for a single attribute Returns an AttributeReadResult
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.ZCLWriteAttribute"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceControllerBase.ZCLWriteAttribute"></a>
 
 #### ZCLWriteAttribute
 
@@ -714,7 +714,7 @@ def ZCLWriteAttribute(cluster: str,
 
 Wrapper over WriteAttribute for a single attribute return PyChipError
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.ZCLSubscribeAttribute"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceControllerBase.ZCLSubscribeAttribute"></a>
 
 #### ZCLSubscribeAttribute
 
@@ -733,7 +733,7 @@ def ZCLSubscribeAttribute(cluster,
 Wrapper over ReadAttribute for a single attribute Returns a
 SubscriptionTransaction. See ReadAttribute for more information.
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.InitGroupTestingData"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceControllerBase.InitGroupTestingData"></a>
 
 #### InitGroupTestingData
 
@@ -744,7 +744,7 @@ def InitGroupTestingData()
 Populates the Device Controller's GroupDataProvider with known test group info
 and keys.
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceController"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceController"></a>
 
 ## ChipDeviceController
 
@@ -757,7 +757,7 @@ The ChipDeviceCommissioner binding, named as ChipDeviceController
 TODO: This class contains DEPRECATED functions, we should update the test
 scripts to avoid the usage of those functions.
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceController.Commission"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceController.Commission"></a>
 
 #### Commission
 
@@ -777,7 +777,7 @@ and commission automatically.
 
 -   `bool` - True if successful, False otherwise.
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceController.CommissionThread"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceController.CommissionThread"></a>
 
 #### CommissionThread
 
@@ -788,7 +788,7 @@ def CommissionThread(discriminator, setupPinCode, nodeId,
 
 Commissions a Thread device over BLE
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceController.CommissionWiFi"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceController.CommissionWiFi"></a>
 
 #### CommissionWiFi
 
@@ -799,7 +799,7 @@ def CommissionWiFi(discriminator, setupPinCode, nodeId, ssid: str,
 
 Commissions a Wi-Fi device over BLE.
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceController.SetWiFiCredentials"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceController.SetWiFiCredentials"></a>
 
 #### SetWiFiCredentials
 
@@ -809,7 +809,7 @@ def SetWiFiCredentials(ssid: str, credentials: str)
 
 Set the Wi-Fi credentials to set during commissioning.
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceController.SetThreadOperationalDataset"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceController.SetThreadOperationalDataset"></a>
 
 #### SetThreadOperationalDataset
 
@@ -819,7 +819,7 @@ def SetThreadOperationalDataset(threadOperationalDataset)
 
 Set the Thread operational dataset to set during commissioning.
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceController.ResetCommissioningParameters"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceController.ResetCommissioningParameters"></a>
 
 #### ResetCommissioningParameters
 
@@ -829,7 +829,7 @@ def ResetCommissioningParameters()
 
 Sets the commissioning parameters back to the default values.
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceController.SetTimeZone"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceController.SetTimeZone"></a>
 
 #### SetTimeZone
 
@@ -840,7 +840,7 @@ def SetTimeZone(offset: int, validAt: int, name: str = "")
 Set the time zone to set during commissioning. Currently only one time zone
 entry is supported
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceController.SetDSTOffset"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceController.SetDSTOffset"></a>
 
 #### SetDSTOffset
 
@@ -851,7 +851,7 @@ def SetDSTOffset(offset: int, validStarting: int, validUntil: int)
 Set the DST offset to set during commissioning. Currently only one DST entry is
 supported
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceController.SetDefaultNTP"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceController.SetDefaultNTP"></a>
 
 #### SetDefaultNTP
 
@@ -861,7 +861,7 @@ def SetDefaultNTP(defaultNTP: str)
 
 Set the DefaultNTP to set during commissioning
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceController.SetTrustedTimeSource"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceController.SetTrustedTimeSource"></a>
 
 #### SetTrustedTimeSource
 
@@ -872,7 +872,7 @@ def SetTrustedTimeSource(nodeId: int, endpoint: int)
 Set the trusted time source nodeId to set during commissioning. This must be a
 node on the commissioner fabric.
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceController.SetCheckMatchingFabric"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceController.SetCheckMatchingFabric"></a>
 
 #### SetCheckMatchingFabric
 
@@ -883,7 +883,7 @@ def SetCheckMatchingFabric(check: bool)
 Instructs the auto-commissioner to perform a matching fabric check before
 commissioning.
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceController.GetFabricCheckResult"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceController.GetFabricCheckResult"></a>
 
 #### GetFabricCheckResult
 
@@ -893,7 +893,7 @@ def GetFabricCheckResult() -> int
 
 Returns the fabric check result if SetCheckMatchingFabric was used.
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceController.CommissionOnNetwork"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceController.CommissionOnNetwork"></a>
 
 #### CommissionOnNetwork
 
@@ -922,7 +922,7 @@ Supported filters are:
 The filter can be an integer, a string or None depending on the actual type of
 selected filter.
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceController.CommissionWithCode"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceController.CommissionWithCode"></a>
 
 #### CommissionWithCode
 
@@ -937,7 +937,7 @@ def CommissionWithCode(
 Commission with the given nodeid from the setupPayload. setupPayload may be a QR
 or manual code.
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceController.CommissionIP"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceController.CommissionIP"></a>
 
 #### CommissionIP
 
@@ -947,7 +947,7 @@ def CommissionIP(ipaddr: str, setupPinCode: int, nodeid: int) -> PyChipError
 
 DEPRECATED, DO NOT USE! Use `CommissionOnNetwork` or `CommissionWithCode`
 
-<a id="chip.ChipDeviceCtrl.ChipDeviceController.IssueNOCChain"></a>
+<a id="matter.ChipDeviceCtrl.ChipDeviceController.IssueNOCChain"></a>
 
 #### IssueNOCChain
 
@@ -959,7 +959,7 @@ def IssueNOCChain(csr: Clusters.OperationalCredentials.Commands.CSRResponse,
 Issue an NOC chain using the associated OperationalCredentialsDelegate. The NOC
 chain will be provided in TLV cert format.
 
-<a id="chip.ChipDeviceCtrl.BareChipDeviceController"></a>
+<a id="matter.ChipDeviceCtrl.BareChipDeviceController"></a>
 
 ## BareChipDeviceController
 
@@ -969,7 +969,7 @@ class BareChipDeviceController(ChipDeviceControllerBase)
 
 A bare device controller without AutoCommissioner support.
 
-<a id="chip.ChipDeviceCtrl.BareChipDeviceController.__init__"></a>
+<a id="matter.ChipDeviceCtrl.BareChipDeviceController.__init__"></a>
 
 #### \_\_init\_\_
 

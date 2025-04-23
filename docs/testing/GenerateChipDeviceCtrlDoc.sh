@@ -16,7 +16,7 @@
 
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 
-pydoc-markdown -m chip.ChipDeviceCtrl '{
+pydoc-markdown -m matter.ChipDeviceCtrl '{
     renderer: {
       type: markdown,
       descriptive_class_title: false,
