@@ -384,7 +384,7 @@ CHIP_ERROR Instance::SetCurrentPrice(const DataModel::Nullable<Structs::Commodit
     }
 
     // Do a deep copy of the newValue into mCurrentPrice
-    CopyPrice(newValue);
+    ReturnErrorOnFailure(CopyPrice(newValue));
 
     ChipLogDetail(AppServer, "Endpoint: %d - mCurrentPrice updated", mEndpointId);
     MatterReportingAttributeChangeCallback(mEndpointId, CommodityPrice::Id, CurrentPrice::Id);
@@ -417,12 +417,12 @@ CHIP_ERROR Instance::CopyPrice(const DataModel::Nullable<Structs::CommodityPrice
     if (mCurrentPrice.IsNull())
     {
         // Check that the buffer for components should be nullptr
-        VerifyOrDie(mOwnedCurrentPriceBuffer.Get() == nullptr);
+        VerifyOrDie(mOwnedCurrentPriceComponentBuffer.Get() == nullptr);
     }
     else
     {
         // Free the .components
-        VerifyOrDie(mOwnedCurrentPriceBuffer.Get() != nullptr);
+        VerifyOrDie(mOwnedCurrentPriceComponentBuffer.Get() != nullptr);
         mOwnedCurrentPriceComponentBuffer.Free();
 
         // The .description is held within a ScopedBuffer so the
