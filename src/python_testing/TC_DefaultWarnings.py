@@ -29,7 +29,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --bool-arg PIXIT.AllowTestInProductName:True PIXIT.AllowTestInVendorName:True PIXIT.AllowDefaultVendorId:True
+#       --bool-arg pixit_allow_test_in_product_name:True pixit_allow_test_in_vendor_name:True pixit_allow_default_vendor_id:True
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
