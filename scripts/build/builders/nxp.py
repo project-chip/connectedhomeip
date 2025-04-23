@@ -102,20 +102,21 @@ class NxpBoard(Enum):
 class NxpBoardVariant(Enum):
     DEFAULT = auto()
     RD = auto()
+    RDBGA = auto()
     FRDM = auto()
     EVKC = auto()
     EVKB = auto()
 
     def BoardVariantName(self, board, os_env):
         if board == NxpBoard.RW61X and os_env == NxpOsUsed.FREERTOS:
-            if self == NxpBoardVariant.DEFAULT:
+            if self == NxpBoardVariant.RDBGA:
                 return "rdrw612bga"
-            elif self == NxpBoardVariant.FRDM:
+            elif self == NxpBoardVariant.DEFAULT or self == NxpBoardVariant.FRDM:
                 return "frdmrw612"
         elif board == NxpBoard.RW61X and os_env == NxpOsUsed.ZEPHYR:
-            if self == NxpBoardVariant.DEFAULT:
+            if self == NxpBoardVariant.RDBGA:
                 return "rd_rw612_bga"
-            elif self == NxpBoardVariant.FRDM:
+            elif self == NxpBoardVariant.DEFAULT or self == NxpBoardVariant.FRDM:
                 return "frdm_rw612"
         elif board == NxpBoard.RW61X_ETH and os_env == NxpOsUsed.ZEPHYR:
             if self == NxpBoardVariant.DEFAULT:
@@ -340,14 +341,15 @@ class NxpBuilder(GnBuilder):
                 args.append('chip_enable_openthread=true chip_inet_config_enable_ipv4=false')
 
         if self.board_variant:
+            board_variant_value = self.board_variant.BoardVariantName(self.board, self.os_env)
             if self.board == NxpBoard.RT1060:
-                flag_board_variant = "evkname=\\\"%s\\\"" % self.board_variant.BoardVariantName(self.board, self.os_env)
+                flag_board_variant = "evkname=\\\"%s\\\"" % board_variant_value
                 args.append(flag_board_variant)
             if self.board == NxpBoard.RW61X:
-                if self.board_variant.BoardVariantName(self.board, self.os_env) == NxpBoardVariant.FRDM:
+                if board_variant_value == NxpBoardVariant.DEFAULT or board_variant_value == NxpBoardVariant.FRDM:
                     flag_board_variant = "board_version=\"frdm\""
                 else:
-                    flag_board_variant = "board_version=\\\"%s\\\"" % self.board_variant.BoardVariantName(self.board, self.os_env)
+                    flag_board_variant = "board_version=\\\"%s\\\"" % board_variant_value
                 args.append(flag_board_variant)
 
         if self.iw416_transceiver:
