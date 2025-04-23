@@ -519,6 +519,8 @@ template("chip_data_model") {
       "${chip_root}/src/lib/core",
       "${chip_root}/src/lib/support",
       "${chip_root}/src/protocols/secure_channel",
+      "${chip_root}/zzz_generated/app-common/clusters:all-elements",
+      "${chip_root}/zzz_generated/app-common/clusters:all-metadata",
 
       # TODO: Embedded example apps currently build with chip_build_controller = false, and so get a libCHIP without controller support,
       # but nevertheless expect to have access to some of the "controller" code to implement bindings and related functionality.
