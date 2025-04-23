@@ -80,7 +80,7 @@ class TC_CLDIM_5_1(MatterBaseTest):
 
         # Default values
         min_position = 0
-        max_position = 10000  
+        max_position = 10000
 
         # STEP 2a: Read feature map and determine supported features
         self.step("2a")
@@ -174,7 +174,8 @@ class TC_CLDIM_5_1(MatterBaseTest):
             current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
 
             if is_positioning_supported:
-                asserts.assert_greater_equal(current_state.Position, min_position, "CurrentState Position is outside expected range")
+                asserts.assert_greater_equal(current_state.Position, min_position,
+                                             "CurrentState Position is outside expected range")
                 asserts.assert_less_equal(current_state.Position, max_position, "CurrentState Position is outside expected range")
 
             asserts.assert_equal(current_state.Latch, True, "CurrentState Latch is not True")
@@ -187,7 +188,8 @@ class TC_CLDIM_5_1(MatterBaseTest):
         self.step("6a")
         try:
             await self.send_single_cmd(
-                cmd=Clusters.Objects.ClosureDimension.Commands.Step(Direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease, NumberOfSteps=1),
+                cmd=Clusters.Objects.ClosureDimension.Commands.Step(
+                    Direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease, NumberOfSteps=1),
                 endpoint=endpoint
             )
 
@@ -229,7 +231,8 @@ class TC_CLDIM_5_1(MatterBaseTest):
             current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
 
             if is_positioning_supported:
-                asserts.assert_greater_equal(current_state.Position, min_position, "CurrentState Position is outside expected range")
+                asserts.assert_greater_equal(current_state.Position, min_position,
+                                             "CurrentState Position is outside expected range")
                 asserts.assert_less_equal(current_state.Position, max_position, "CurrentState Position is outside expected range")
 
             asserts.assert_equal(current_state.Latch, False, "CurrentState Latch is not False")
@@ -237,6 +240,7 @@ class TC_CLDIM_5_1(MatterBaseTest):
             if is_speed_supported:
                 asserts.assert_greater_equal(current_state.Speed, 0, "CurrentState Speed is outside allowed range")
                 asserts.assert_less_equal(current_state.Speed, 3, "CurrentState Speed is outside allowed range")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
