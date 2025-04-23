@@ -110,4 +110,3 @@ def read_pixit_from_file(path: str) -> dict[str, bool]:
                 pixit_dict.update(parse_pixit_xml(contents))
                 print("reading ****")
         return pixit_dict
-
