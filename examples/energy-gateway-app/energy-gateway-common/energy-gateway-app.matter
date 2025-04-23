@@ -1536,10 +1536,6 @@ provisional cluster CommodityPrice = 149 {
     nullable CommodityPriceStruct currentPrice = 0;
   }
 
-  info event ForecastChange = 1 {
-    nullable CommodityPriceStruct priceForecast[] = 0;
-  }
-
   readonly attribute TariffUnitEnum tariffUnit = 0;
   readonly attribute nullable CurrencyStruct currency = 1;
   readonly attribute nullable CommodityPriceStruct currentPrice = 2;
@@ -1816,7 +1812,6 @@ endpoint 1 {
 
   server cluster CommodityPrice {
     emits event PriceChange;
-    emits event ForecastChange;
     ram      attribute tariffUnit;
     callback attribute currency;
     callback attribute currentPrice;

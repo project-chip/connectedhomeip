@@ -23301,25 +23301,6 @@ class CommodityPrice(Cluster):
 
             currentPrice: typing.Union[Nullable, CommodityPrice.Structs.CommodityPriceStruct] = NullValue
 
-        @dataclass
-        class ForecastChange(ClusterEvent):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000095
-
-            @ChipUtility.classproperty
-            def event_id(cls) -> int:
-                return 0x00000001
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="priceForecast", Tag=0, Type=typing.Union[Nullable, typing.List[CommodityPrice.Structs.CommodityPriceStruct]]),
-                    ])
-
-            priceForecast: typing.Union[Nullable, typing.List[CommodityPrice.Structs.CommodityPriceStruct]] = NullValue
-
 
 @dataclass
 class DemandResponseLoadControl(Cluster):
@@ -27139,25 +27120,6 @@ class ElectricalGridConditions(Cluster):
                     ])
 
             currentConditions: typing.Union[Nullable, ElectricalGridConditions.Structs.ElectricalGridConditionsStruct] = NullValue
-
-        @dataclass
-        class ForecastConditionsChanged(ClusterEvent):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x000000A0
-
-            @ChipUtility.classproperty
-            def event_id(cls) -> int:
-                return 0x00000001
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="forecastConditions", Tag=0, Type=typing.Union[Nullable, typing.List[ElectricalGridConditions.Structs.ElectricalGridConditionsStruct]]),
-                    ])
-
-            forecastConditions: typing.Union[Nullable, typing.List[ElectricalGridConditions.Structs.ElectricalGridConditionsStruct]] = NullValue
 
 
 @dataclass
