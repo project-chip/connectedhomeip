@@ -214,7 +214,6 @@ source_set("app-test-stubs") {
   ]
 
   public_deps = [
-    "${chip_root}/src/app",
     "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",

@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <app/EventLogging.h>
+#include <app/EventLogging.h> // nogncheck
 #include <app/clusters/closure-control-server/closure-control-cluster-logic.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/LockTracker.h>
