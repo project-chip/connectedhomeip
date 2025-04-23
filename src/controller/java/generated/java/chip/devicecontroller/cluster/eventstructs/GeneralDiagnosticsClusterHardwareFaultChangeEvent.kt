@@ -20,16 +20,14 @@ import chip.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class GeneralDiagnosticsClusterHardwareFaultChangeEvent (
-    val current: List<UInt>,
-    val previous: List<UInt>) {
-  override fun toString(): String  = buildString {
+class GeneralDiagnosticsClusterHardwareFaultChangeEvent(
+  val current: List<UInt>,
+  val previous: List<UInt>,
+) {
+  override fun toString(): String = buildString {
     append("GeneralDiagnosticsClusterHardwareFaultChangeEvent {\n")
     append("\tcurrent : $current\n")
     append("\tprevious : $previous\n")
@@ -57,23 +55,28 @@ class GeneralDiagnosticsClusterHardwareFaultChangeEvent (
     private const val TAG_CURRENT = 0
     private const val TAG_PREVIOUS = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : GeneralDiagnosticsClusterHardwareFaultChangeEvent {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): GeneralDiagnosticsClusterHardwareFaultChangeEvent {
       tlvReader.enterStructure(tlvTag)
-      val current = buildList <UInt> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_CURRENT))
-      while(!tlvReader.isEndOfContainer()) {
-        this.add(tlvReader.getUInt(AnonymousTag))
-      }
-      tlvReader.exitContainer()
-    }
-      val previous = buildList <UInt> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_PREVIOUS))
-      while(!tlvReader.isEndOfContainer()) {
-        this.add(tlvReader.getUInt(AnonymousTag))
-      }
-      tlvReader.exitContainer()
-    }
-      
+      val current =
+        buildList<UInt> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_CURRENT))
+          while (!tlvReader.isEndOfContainer()) {
+            this.add(tlvReader.getUInt(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+      val previous =
+        buildList<UInt> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_PREVIOUS))
+          while (!tlvReader.isEndOfContainer()) {
+            this.add(tlvReader.getUInt(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+
       tlvReader.exitContainer()
 
       return GeneralDiagnosticsClusterHardwareFaultChangeEvent(current, previous)

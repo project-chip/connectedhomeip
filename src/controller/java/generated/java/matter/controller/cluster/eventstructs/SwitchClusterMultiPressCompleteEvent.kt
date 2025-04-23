@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.eventstructs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -26,7 +24,7 @@ import matter.tlv.TlvWriter
 
 class SwitchClusterMultiPressCompleteEvent(
   val previousPosition: UByte,
-  val totalNumberOfPressesCounted: UByte
+  val totalNumberOfPressesCounted: UByte,
 ) {
   override fun toString(): String = buildString {
     append("SwitchClusterMultiPressCompleteEvent {\n")
@@ -48,11 +46,12 @@ class SwitchClusterMultiPressCompleteEvent(
     private const val TAG_PREVIOUS_POSITION = 0
     private const val TAG_TOTAL_NUMBER_OF_PRESSES_COUNTED = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : SwitchClusterMultiPressCompleteEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): SwitchClusterMultiPressCompleteEvent {
       tlvReader.enterStructure(tlvTag)
       val previousPosition = tlvReader.getUByte(ContextSpecificTag(TAG_PREVIOUS_POSITION))
-      val totalNumberOfPressesCounted = tlvReader.getUByte(ContextSpecificTag(TAG_TOTAL_NUMBER_OF_PRESSES_COUNTED))
-      
+      val totalNumberOfPressesCounted =
+        tlvReader.getUByte(ContextSpecificTag(TAG_TOTAL_NUMBER_OF_PRESSES_COUNTED))
+
       tlvReader.exitContainer()
 
       return SwitchClusterMultiPressCompleteEvent(previousPosition, totalNumberOfPressesCounted)

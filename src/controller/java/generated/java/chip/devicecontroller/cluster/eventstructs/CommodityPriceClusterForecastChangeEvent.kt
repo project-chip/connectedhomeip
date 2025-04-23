@@ -20,15 +20,14 @@ import chip.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class CommodityPriceClusterForecastChangeEvent (
-    val priceForecast: List<chip.devicecontroller.cluster.structs.CommodityPriceClusterCommodityPriceStruct>?) {
-  override fun toString(): String  = buildString {
+class CommodityPriceClusterForecastChangeEvent(
+  val priceForecast:
+    List<chip.devicecontroller.cluster.structs.CommodityPriceClusterCommodityPriceStruct>?
+) {
+  override fun toString(): String = buildString {
     append("CommodityPriceClusterForecastChangeEvent {\n")
     append("\tpriceForecast : $priceForecast\n")
     append("}\n")
@@ -38,14 +37,14 @@ class CommodityPriceClusterForecastChangeEvent (
     tlvWriter.apply {
       startStructure(tlvTag)
       if (priceForecast != null) {
-      startArray(ContextSpecificTag(TAG_PRICE_FORECAST))
-      for (item in priceForecast.iterator()) {
-        item.toTlv(AnonymousTag, this)
+        startArray(ContextSpecificTag(TAG_PRICE_FORECAST))
+        for (item in priceForecast.iterator()) {
+          item.toTlv(AnonymousTag, this)
+        }
+        endArray()
+      } else {
+        putNull(ContextSpecificTag(TAG_PRICE_FORECAST))
       }
-      endArray()
-    } else {
-      putNull(ContextSpecificTag(TAG_PRICE_FORECAST))
-    }
       endStructure()
     }
   }
@@ -53,21 +52,27 @@ class CommodityPriceClusterForecastChangeEvent (
   companion object {
     private const val TAG_PRICE_FORECAST = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : CommodityPriceClusterForecastChangeEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): CommodityPriceClusterForecastChangeEvent {
       tlvReader.enterStructure(tlvTag)
-      val priceForecast = if (!tlvReader.isNull()) {
-      buildList <chip.devicecontroller.cluster.structs.CommodityPriceClusterCommodityPriceStruct> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_PRICE_FORECAST))
-      while(!tlvReader.isEndOfContainer()) {
-        this.add(chip.devicecontroller.cluster.structs.CommodityPriceClusterCommodityPriceStruct.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    }
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_PRICE_FORECAST))
-      null
-    }
-      
+      val priceForecast =
+        if (!tlvReader.isNull()) {
+          buildList<
+            chip.devicecontroller.cluster.structs.CommodityPriceClusterCommodityPriceStruct
+          > {
+            tlvReader.enterArray(ContextSpecificTag(TAG_PRICE_FORECAST))
+            while (!tlvReader.isEndOfContainer()) {
+              this.add(
+                chip.devicecontroller.cluster.structs.CommodityPriceClusterCommodityPriceStruct
+                  .fromTlv(AnonymousTag, tlvReader)
+              )
+            }
+            tlvReader.exitContainer()
+          }
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_PRICE_FORECAST))
+          null
+        }
+
       tlvReader.exitContainer()
 
       return CommodityPriceClusterForecastChangeEvent(priceForecast)

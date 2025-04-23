@@ -18,7 +18,6 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -35,7 +34,7 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
   val containerFormat: UByte,
   val containerOptions: PushAvStreamTransportClusterContainerOptionsStruct,
   val metadataOptions: Optional<PushAvStreamTransportClusterMetadataOptionsStruct>,
-  val expiryTime: Optional<UInt>
+  val expiryTime: Optional<UInt>,
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterTransportOptionsStruct {\n")
@@ -96,39 +95,71 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
     private const val TAG_METADATA_OPTIONS = 9
     private const val TAG_EXPIRY_TIME = 10
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): PushAvStreamTransportClusterTransportOptionsStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): PushAvStreamTransportClusterTransportOptionsStruct {
       tlvReader.enterStructure(tlvTag)
       val streamUsage = tlvReader.getUByte(ContextSpecificTag(TAG_STREAM_USAGE))
-      val videoStreamID = if (tlvReader.isNextTag(ContextSpecificTag(TAG_VIDEO_STREAM_ID))) {
-      Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_VIDEO_STREAM_ID)))
-    } else {
-      Optional.empty()
-    }
-      val audioStreamID = if (tlvReader.isNextTag(ContextSpecificTag(TAG_AUDIO_STREAM_ID))) {
-      Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_AUDIO_STREAM_ID)))
-    } else {
-      Optional.empty()
-    }
+      val videoStreamID =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_VIDEO_STREAM_ID))) {
+          Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_VIDEO_STREAM_ID)))
+        } else {
+          Optional.empty()
+        }
+      val audioStreamID =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_AUDIO_STREAM_ID))) {
+          Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_AUDIO_STREAM_ID)))
+        } else {
+          Optional.empty()
+        }
       val endpointID = tlvReader.getUShort(ContextSpecificTag(TAG_ENDPOINT_ID))
       val url = tlvReader.getString(ContextSpecificTag(TAG_URL))
-      val triggerOptions = PushAvStreamTransportClusterTransportTriggerOptionsStruct.fromTlv(ContextSpecificTag(TAG_TRIGGER_OPTIONS), tlvReader)
+      val triggerOptions =
+        PushAvStreamTransportClusterTransportTriggerOptionsStruct.fromTlv(
+          ContextSpecificTag(TAG_TRIGGER_OPTIONS),
+          tlvReader,
+        )
       val ingestMethod = tlvReader.getUByte(ContextSpecificTag(TAG_INGEST_METHOD))
       val containerFormat = tlvReader.getUByte(ContextSpecificTag(TAG_CONTAINER_FORMAT))
-      val containerOptions = PushAvStreamTransportClusterContainerOptionsStruct.fromTlv(ContextSpecificTag(TAG_CONTAINER_OPTIONS), tlvReader)
-      val metadataOptions = if (tlvReader.isNextTag(ContextSpecificTag(TAG_METADATA_OPTIONS))) {
-      Optional.of(PushAvStreamTransportClusterMetadataOptionsStruct.fromTlv(ContextSpecificTag(TAG_METADATA_OPTIONS), tlvReader))
-    } else {
-      Optional.empty()
-    }
-      val expiryTime = if (tlvReader.isNextTag(ContextSpecificTag(TAG_EXPIRY_TIME))) {
-      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_EXPIRY_TIME)))
-    } else {
-      Optional.empty()
-    }
-      
+      val containerOptions =
+        PushAvStreamTransportClusterContainerOptionsStruct.fromTlv(
+          ContextSpecificTag(TAG_CONTAINER_OPTIONS),
+          tlvReader,
+        )
+      val metadataOptions =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_METADATA_OPTIONS))) {
+          Optional.of(
+            PushAvStreamTransportClusterMetadataOptionsStruct.fromTlv(
+              ContextSpecificTag(TAG_METADATA_OPTIONS),
+              tlvReader,
+            )
+          )
+        } else {
+          Optional.empty()
+        }
+      val expiryTime =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_EXPIRY_TIME))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_EXPIRY_TIME)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return PushAvStreamTransportClusterTransportOptionsStruct(streamUsage, videoStreamID, audioStreamID, endpointID, url, triggerOptions, ingestMethod, containerFormat, containerOptions, metadataOptions, expiryTime)
+      return PushAvStreamTransportClusterTransportOptionsStruct(
+        streamUsage,
+        videoStreamID,
+        audioStreamID,
+        endpointID,
+        url,
+        triggerOptions,
+        ingestMethod,
+        containerFormat,
+        containerOptions,
+        metadataOptions,
+        expiryTime,
+      )
     }
   }
 }

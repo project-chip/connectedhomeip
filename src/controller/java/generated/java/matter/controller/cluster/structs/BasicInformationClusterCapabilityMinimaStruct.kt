@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -26,7 +24,7 @@ import matter.tlv.TlvWriter
 
 class BasicInformationClusterCapabilityMinimaStruct(
   val caseSessionsPerFabric: UShort,
-  val subscriptionsPerFabric: UShort
+  val subscriptionsPerFabric: UShort,
 ) {
   override fun toString(): String = buildString {
     append("BasicInformationClusterCapabilityMinimaStruct {\n")
@@ -50,12 +48,17 @@ class BasicInformationClusterCapabilityMinimaStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): BasicInformationClusterCapabilityMinimaStruct {
       tlvReader.enterStructure(tlvTag)
-      val caseSessionsPerFabric = tlvReader.getUShort(ContextSpecificTag(TAG_CASE_SESSIONS_PER_FABRIC))
-      val subscriptionsPerFabric = tlvReader.getUShort(ContextSpecificTag(TAG_SUBSCRIPTIONS_PER_FABRIC))
-      
+      val caseSessionsPerFabric =
+        tlvReader.getUShort(ContextSpecificTag(TAG_CASE_SESSIONS_PER_FABRIC))
+      val subscriptionsPerFabric =
+        tlvReader.getUShort(ContextSpecificTag(TAG_SUBSCRIPTIONS_PER_FABRIC))
+
       tlvReader.exitContainer()
 
-      return BasicInformationClusterCapabilityMinimaStruct(caseSessionsPerFabric, subscriptionsPerFabric)
+      return BasicInformationClusterCapabilityMinimaStruct(
+        caseSessionsPerFabric,
+        subscriptionsPerFabric,
+      )
     }
   }
 }

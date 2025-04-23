@@ -17,22 +17,20 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class CommodityTariffClusterDayEntryStruct (
-    val dayEntryID: ULong,
-    val startTime: UInt,
-    val duration: Optional<UInt>,
-    val randomizationOffset: Optional<Int>,
-    val randomizationType: Optional<UInt>) {
-  override fun toString(): String  = buildString {
+class CommodityTariffClusterDayEntryStruct(
+  val dayEntryID: ULong,
+  val startTime: UInt,
+  val duration: Optional<UInt>,
+  val randomizationOffset: Optional<Int>,
+  val randomizationType: Optional<UInt>,
+) {
+  override fun toString(): String = buildString {
     append("CommodityTariffClusterDayEntryStruct {\n")
     append("\tdayEntryID : $dayEntryID\n")
     append("\tstartTime : $startTime\n")
@@ -48,17 +46,17 @@ class CommodityTariffClusterDayEntryStruct (
       put(ContextSpecificTag(TAG_DAY_ENTRY_ID), dayEntryID)
       put(ContextSpecificTag(TAG_START_TIME), startTime)
       if (duration.isPresent) {
-      val optduration = duration.get()
-      put(ContextSpecificTag(TAG_DURATION), optduration)
-    }
+        val optduration = duration.get()
+        put(ContextSpecificTag(TAG_DURATION), optduration)
+      }
       if (randomizationOffset.isPresent) {
-      val optrandomizationOffset = randomizationOffset.get()
-      put(ContextSpecificTag(TAG_RANDOMIZATION_OFFSET), optrandomizationOffset)
-    }
+        val optrandomizationOffset = randomizationOffset.get()
+        put(ContextSpecificTag(TAG_RANDOMIZATION_OFFSET), optrandomizationOffset)
+      }
       if (randomizationType.isPresent) {
-      val optrandomizationType = randomizationType.get()
-      put(ContextSpecificTag(TAG_RANDOMIZATION_TYPE), optrandomizationType)
-    }
+        val optrandomizationType = randomizationType.get()
+        put(ContextSpecificTag(TAG_RANDOMIZATION_TYPE), optrandomizationType)
+      }
       endStructure()
     }
   }
@@ -70,29 +68,38 @@ class CommodityTariffClusterDayEntryStruct (
     private const val TAG_RANDOMIZATION_OFFSET = 3
     private const val TAG_RANDOMIZATION_TYPE = 4
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : CommodityTariffClusterDayEntryStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): CommodityTariffClusterDayEntryStruct {
       tlvReader.enterStructure(tlvTag)
       val dayEntryID = tlvReader.getULong(ContextSpecificTag(TAG_DAY_ENTRY_ID))
       val startTime = tlvReader.getUInt(ContextSpecificTag(TAG_START_TIME))
-      val duration = if (tlvReader.isNextTag(ContextSpecificTag(TAG_DURATION))) {
-      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_DURATION)))
-    } else {
-      Optional.empty()
-    }
-      val randomizationOffset = if (tlvReader.isNextTag(ContextSpecificTag(TAG_RANDOMIZATION_OFFSET))) {
-      Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_RANDOMIZATION_OFFSET)))
-    } else {
-      Optional.empty()
-    }
-      val randomizationType = if (tlvReader.isNextTag(ContextSpecificTag(TAG_RANDOMIZATION_TYPE))) {
-      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_RANDOMIZATION_TYPE)))
-    } else {
-      Optional.empty()
-    }
-      
+      val duration =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_DURATION))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_DURATION)))
+        } else {
+          Optional.empty()
+        }
+      val randomizationOffset =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_RANDOMIZATION_OFFSET))) {
+          Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_RANDOMIZATION_OFFSET)))
+        } else {
+          Optional.empty()
+        }
+      val randomizationType =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_RANDOMIZATION_TYPE))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_RANDOMIZATION_TYPE)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return CommodityTariffClusterDayEntryStruct(dayEntryID, startTime, duration, randomizationOffset, randomizationType)
+      return CommodityTariffClusterDayEntryStruct(
+        dayEntryID,
+        startTime,
+        duration,
+        randomizationOffset,
+        randomizationType,
+      )
     }
   }
 }

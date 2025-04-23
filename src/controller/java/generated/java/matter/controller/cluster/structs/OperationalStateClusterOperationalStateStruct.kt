@@ -18,7 +18,6 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -26,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class OperationalStateClusterOperationalStateStruct(
   val operationalStateID: UByte,
-  val operationalStateLabel: Optional<String>
+  val operationalStateLabel: Optional<String>,
 ) {
   override fun toString(): String = buildString {
     append("OperationalStateClusterOperationalStateStruct {\n")
@@ -54,15 +53,19 @@ class OperationalStateClusterOperationalStateStruct(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): OperationalStateClusterOperationalStateStruct {
       tlvReader.enterStructure(tlvTag)
       val operationalStateID = tlvReader.getUByte(ContextSpecificTag(TAG_OPERATIONAL_STATE_ID))
-      val operationalStateLabel = if (tlvReader.isNextTag(ContextSpecificTag(TAG_OPERATIONAL_STATE_LABEL))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_OPERATIONAL_STATE_LABEL)))
-    } else {
-      Optional.empty()
-    }
-      
+      val operationalStateLabel =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_OPERATIONAL_STATE_LABEL))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_OPERATIONAL_STATE_LABEL)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return OperationalStateClusterOperationalStateStruct(operationalStateID, operationalStateLabel)
+      return OperationalStateClusterOperationalStateStruct(
+        operationalStateID,
+        operationalStateLabel,
+      )
     }
   }
 }

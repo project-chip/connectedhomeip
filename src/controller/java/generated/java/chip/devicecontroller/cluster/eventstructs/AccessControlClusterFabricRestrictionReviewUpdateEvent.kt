@@ -17,21 +17,19 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class AccessControlClusterFabricRestrictionReviewUpdateEvent (
-    val token: ULong,
-    val instruction: Optional<String>,
-    val ARLRequestFlowUrl: Optional<String>,
-    val fabricIndex: UInt) {
-  override fun toString(): String  = buildString {
+class AccessControlClusterFabricRestrictionReviewUpdateEvent(
+  val token: ULong,
+  val instruction: Optional<String>,
+  val ARLRequestFlowUrl: Optional<String>,
+  val fabricIndex: UInt,
+) {
+  override fun toString(): String = buildString {
     append("AccessControlClusterFabricRestrictionReviewUpdateEvent {\n")
     append("\ttoken : $token\n")
     append("\tinstruction : $instruction\n")
@@ -45,13 +43,13 @@ class AccessControlClusterFabricRestrictionReviewUpdateEvent (
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_TOKEN), token)
       if (instruction.isPresent) {
-      val optinstruction = instruction.get()
-      put(ContextSpecificTag(TAG_INSTRUCTION), optinstruction)
-    }
+        val optinstruction = instruction.get()
+        put(ContextSpecificTag(TAG_INSTRUCTION), optinstruction)
+      }
       if (ARLRequestFlowUrl.isPresent) {
-      val optARLRequestFlowUrl = ARLRequestFlowUrl.get()
-      put(ContextSpecificTag(TAG_ARL_REQUEST_FLOW_URL), optARLRequestFlowUrl)
-    }
+        val optARLRequestFlowUrl = ARLRequestFlowUrl.get()
+        put(ContextSpecificTag(TAG_ARL_REQUEST_FLOW_URL), optARLRequestFlowUrl)
+      }
       put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
@@ -63,24 +61,34 @@ class AccessControlClusterFabricRestrictionReviewUpdateEvent (
     private const val TAG_ARL_REQUEST_FLOW_URL = 2
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : AccessControlClusterFabricRestrictionReviewUpdateEvent {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): AccessControlClusterFabricRestrictionReviewUpdateEvent {
       tlvReader.enterStructure(tlvTag)
       val token = tlvReader.getULong(ContextSpecificTag(TAG_TOKEN))
-      val instruction = if (tlvReader.isNextTag(ContextSpecificTag(TAG_INSTRUCTION))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_INSTRUCTION)))
-    } else {
-      Optional.empty()
-    }
-      val ARLRequestFlowUrl = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ARL_REQUEST_FLOW_URL))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_ARL_REQUEST_FLOW_URL)))
-    } else {
-      Optional.empty()
-    }
+      val instruction =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_INSTRUCTION))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_INSTRUCTION)))
+        } else {
+          Optional.empty()
+        }
+      val ARLRequestFlowUrl =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ARL_REQUEST_FLOW_URL))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_ARL_REQUEST_FLOW_URL)))
+        } else {
+          Optional.empty()
+        }
       val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
-      return AccessControlClusterFabricRestrictionReviewUpdateEvent(token, instruction, ARLRequestFlowUrl, fabricIndex)
+      return AccessControlClusterFabricRestrictionReviewUpdateEvent(
+        token,
+        instruction,
+        ARLRequestFlowUrl,
+        fabricIndex,
+      )
     }
   }
 }

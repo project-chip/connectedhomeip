@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -27,7 +25,7 @@ import matter.tlv.TlvWriter
 class PushAvStreamTransportClusterTransportConfigurationStruct(
   val connectionID: UShort,
   val transportStatus: UByte,
-  val transportOptions: PushAvStreamTransportClusterTransportOptionsStruct
+  val transportOptions: PushAvStreamTransportClusterTransportOptionsStruct,
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterTransportConfigurationStruct {\n")
@@ -52,15 +50,26 @@ class PushAvStreamTransportClusterTransportConfigurationStruct(
     private const val TAG_TRANSPORT_STATUS = 1
     private const val TAG_TRANSPORT_OPTIONS = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): PushAvStreamTransportClusterTransportConfigurationStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): PushAvStreamTransportClusterTransportConfigurationStruct {
       tlvReader.enterStructure(tlvTag)
       val connectionID = tlvReader.getUShort(ContextSpecificTag(TAG_CONNECTION_ID))
       val transportStatus = tlvReader.getUByte(ContextSpecificTag(TAG_TRANSPORT_STATUS))
-      val transportOptions = PushAvStreamTransportClusterTransportOptionsStruct.fromTlv(ContextSpecificTag(TAG_TRANSPORT_OPTIONS), tlvReader)
-      
+      val transportOptions =
+        PushAvStreamTransportClusterTransportOptionsStruct.fromTlv(
+          ContextSpecificTag(TAG_TRANSPORT_OPTIONS),
+          tlvReader,
+        )
+
       tlvReader.exitContainer()
 
-      return PushAvStreamTransportClusterTransportConfigurationStruct(connectionID, transportStatus, transportOptions)
+      return PushAvStreamTransportClusterTransportConfigurationStruct(
+        connectionID,
+        transportStatus,
+        transportOptions,
+      )
     }
   }
 }

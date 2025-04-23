@@ -17,19 +17,17 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ApplicationLauncherClusterApplicationEPStruct (
-    val application: ApplicationLauncherClusterApplicationStruct,
-    val endpoint: Optional<UInt>) {
-  override fun toString(): String  = buildString {
+class ApplicationLauncherClusterApplicationEPStruct(
+  val application: ApplicationLauncherClusterApplicationStruct,
+  val endpoint: Optional<UInt>,
+) {
+  override fun toString(): String = buildString {
     append("ApplicationLauncherClusterApplicationEPStruct {\n")
     append("\tapplication : $application\n")
     append("\tendpoint : $endpoint\n")
@@ -41,9 +39,9 @@ class ApplicationLauncherClusterApplicationEPStruct (
       startStructure(tlvTag)
       application.toTlv(ContextSpecificTag(TAG_APPLICATION), this)
       if (endpoint.isPresent) {
-      val optendpoint = endpoint.get()
-      put(ContextSpecificTag(TAG_ENDPOINT), optendpoint)
-    }
+        val optendpoint = endpoint.get()
+        put(ContextSpecificTag(TAG_ENDPOINT), optendpoint)
+      }
       endStructure()
     }
   }
@@ -52,15 +50,20 @@ class ApplicationLauncherClusterApplicationEPStruct (
     private const val TAG_APPLICATION = 0
     private const val TAG_ENDPOINT = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ApplicationLauncherClusterApplicationEPStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ApplicationLauncherClusterApplicationEPStruct {
       tlvReader.enterStructure(tlvTag)
-      val application = ApplicationLauncherClusterApplicationStruct.fromTlv(ContextSpecificTag(TAG_APPLICATION), tlvReader)
-      val endpoint = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENDPOINT))) {
-      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_ENDPOINT)))
-    } else {
-      Optional.empty()
-    }
-      
+      val application =
+        ApplicationLauncherClusterApplicationStruct.fromTlv(
+          ContextSpecificTag(TAG_APPLICATION),
+          tlvReader,
+        )
+      val endpoint =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENDPOINT))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_ENDPOINT)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
       return ApplicationLauncherClusterApplicationEPStruct(application, endpoint)

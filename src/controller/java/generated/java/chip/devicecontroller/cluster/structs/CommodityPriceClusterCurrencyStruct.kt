@@ -17,19 +17,13 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class CommodityPriceClusterCurrencyStruct (
-    val currency: UInt,
-    val decimalPoints: UInt) {
-  override fun toString(): String  = buildString {
+class CommodityPriceClusterCurrencyStruct(val currency: UInt, val decimalPoints: UInt) {
+  override fun toString(): String = buildString {
     append("CommodityPriceClusterCurrencyStruct {\n")
     append("\tcurrency : $currency\n")
     append("\tdecimalPoints : $decimalPoints\n")
@@ -49,11 +43,11 @@ class CommodityPriceClusterCurrencyStruct (
     private const val TAG_CURRENCY = 0
     private const val TAG_DECIMAL_POINTS = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : CommodityPriceClusterCurrencyStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): CommodityPriceClusterCurrencyStruct {
       tlvReader.enterStructure(tlvTag)
       val currency = tlvReader.getUInt(ContextSpecificTag(TAG_CURRENCY))
       val decimalPoints = tlvReader.getUInt(ContextSpecificTag(TAG_DECIMAL_POINTS))
-      
+
       tlvReader.exitContainer()
 
       return CommodityPriceClusterCurrencyStruct(currency, decimalPoints)

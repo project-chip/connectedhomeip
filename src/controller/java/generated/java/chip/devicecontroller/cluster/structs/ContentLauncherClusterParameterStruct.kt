@@ -17,20 +17,19 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import java.util.Optional
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ContentLauncherClusterParameterStruct (
-    val type: UInt,
-    val value: String,
-    val externalIDList: Optional<List<ContentLauncherClusterAdditionalInfoStruct>>) {
-  override fun toString(): String  = buildString {
+class ContentLauncherClusterParameterStruct(
+  val type: UInt,
+  val value: String,
+  val externalIDList: Optional<List<ContentLauncherClusterAdditionalInfoStruct>>,
+) {
+  override fun toString(): String = buildString {
     append("ContentLauncherClusterParameterStruct {\n")
     append("\ttype : $type\n")
     append("\tvalue : $value\n")
@@ -44,13 +43,13 @@ class ContentLauncherClusterParameterStruct (
       put(ContextSpecificTag(TAG_TYPE), type)
       put(ContextSpecificTag(TAG_VALUE), value)
       if (externalIDList.isPresent) {
-      val optexternalIDList = externalIDList.get()
-      startArray(ContextSpecificTag(TAG_EXTERNAL_ID_LIST))
-      for (item in optexternalIDList.iterator()) {
-        item.toTlv(AnonymousTag, this)
+        val optexternalIDList = externalIDList.get()
+        startArray(ContextSpecificTag(TAG_EXTERNAL_ID_LIST))
+        for (item in optexternalIDList.iterator()) {
+          item.toTlv(AnonymousTag, this)
+        }
+        endArray()
       }
-      endArray()
-    }
       endStructure()
     }
   }
@@ -60,22 +59,25 @@ class ContentLauncherClusterParameterStruct (
     private const val TAG_VALUE = 1
     private const val TAG_EXTERNAL_ID_LIST = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ContentLauncherClusterParameterStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ContentLauncherClusterParameterStruct {
       tlvReader.enterStructure(tlvTag)
       val type = tlvReader.getUInt(ContextSpecificTag(TAG_TYPE))
       val value = tlvReader.getString(ContextSpecificTag(TAG_VALUE))
-      val externalIDList = if (tlvReader.isNextTag(ContextSpecificTag(TAG_EXTERNAL_ID_LIST))) {
-      Optional.of(buildList<ContentLauncherClusterAdditionalInfoStruct> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_EXTERNAL_ID_LIST))
-      while(!tlvReader.isEndOfContainer()) {
-        add(ContentLauncherClusterAdditionalInfoStruct.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    })
-    } else {
-      Optional.empty()
-    }
-      
+      val externalIDList =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_EXTERNAL_ID_LIST))) {
+          Optional.of(
+            buildList<ContentLauncherClusterAdditionalInfoStruct> {
+              tlvReader.enterArray(ContextSpecificTag(TAG_EXTERNAL_ID_LIST))
+              while (!tlvReader.isEndOfContainer()) {
+                add(ContentLauncherClusterAdditionalInfoStruct.fromTlv(AnonymousTag, tlvReader))
+              }
+              tlvReader.exitContainer()
+            }
+          )
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
       return ContentLauncherClusterParameterStruct(type, value, externalIDList)

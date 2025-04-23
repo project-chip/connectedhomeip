@@ -17,19 +17,13 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class BasicInformationClusterProductAppearanceStruct (
-    val finish: UInt,
-    val primaryColor: UInt?) {
-  override fun toString(): String  = buildString {
+class BasicInformationClusterProductAppearanceStruct(val finish: UInt, val primaryColor: UInt?) {
+  override fun toString(): String = buildString {
     append("BasicInformationClusterProductAppearanceStruct {\n")
     append("\tfinish : $finish\n")
     append("\tprimaryColor : $primaryColor\n")
@@ -41,10 +35,10 @@ class BasicInformationClusterProductAppearanceStruct (
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_FINISH), finish)
       if (primaryColor != null) {
-      put(ContextSpecificTag(TAG_PRIMARY_COLOR), primaryColor)
-    } else {
-      putNull(ContextSpecificTag(TAG_PRIMARY_COLOR))
-    }
+        put(ContextSpecificTag(TAG_PRIMARY_COLOR), primaryColor)
+      } else {
+        putNull(ContextSpecificTag(TAG_PRIMARY_COLOR))
+      }
       endStructure()
     }
   }
@@ -53,16 +47,17 @@ class BasicInformationClusterProductAppearanceStruct (
     private const val TAG_FINISH = 0
     private const val TAG_PRIMARY_COLOR = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : BasicInformationClusterProductAppearanceStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): BasicInformationClusterProductAppearanceStruct {
       tlvReader.enterStructure(tlvTag)
       val finish = tlvReader.getUInt(ContextSpecificTag(TAG_FINISH))
-      val primaryColor = if (!tlvReader.isNull()) {
-      tlvReader.getUInt(ContextSpecificTag(TAG_PRIMARY_COLOR))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_PRIMARY_COLOR))
-      null
-    }
-      
+      val primaryColor =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUInt(ContextSpecificTag(TAG_PRIMARY_COLOR))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_PRIMARY_COLOR))
+          null
+        }
+
       tlvReader.exitContainer()
 
       return BasicInformationClusterProductAppearanceStruct(finish, primaryColor)

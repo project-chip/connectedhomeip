@@ -16,16 +16,15 @@
  */
 package matter.controller.cluster.eventstructs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class ElectricalGridConditionsClusterCurrentConditionsChangedEvent(
-  val currentConditions: matter.controller.cluster.structs.ElectricalGridConditionsClusterElectricalGridConditionsStruct?
+  val currentConditions:
+    matter.controller.cluster.structs.ElectricalGridConditionsClusterElectricalGridConditionsStruct?
 ) {
   override fun toString(): String = buildString {
     append("ElectricalGridConditionsClusterCurrentConditionsChangedEvent {\n")
@@ -48,15 +47,21 @@ class ElectricalGridConditionsClusterCurrentConditionsChangedEvent(
   companion object {
     private const val TAG_CURRENT_CONDITIONS = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ElectricalGridConditionsClusterCurrentConditionsChangedEvent {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): ElectricalGridConditionsClusterCurrentConditionsChangedEvent {
       tlvReader.enterStructure(tlvTag)
-      val currentConditions = if (!tlvReader.isNull()) {
-        matter.controller.cluster.structs.ElectricalGridConditionsClusterElectricalGridConditionsStruct.fromTlv(ContextSpecificTag(TAG_CURRENT_CONDITIONS), tlvReader)
-      } else {
-        tlvReader.getNull(ContextSpecificTag(TAG_CURRENT_CONDITIONS))
-        null
-      }
-      
+      val currentConditions =
+        if (!tlvReader.isNull()) {
+          matter.controller.cluster.structs
+            .ElectricalGridConditionsClusterElectricalGridConditionsStruct
+            .fromTlv(ContextSpecificTag(TAG_CURRENT_CONDITIONS), tlvReader)
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_CURRENT_CONDITIONS))
+          null
+        }
+
       tlvReader.exitContainer()
 
       return ElectricalGridConditionsClusterCurrentConditionsChangedEvent(currentConditions)

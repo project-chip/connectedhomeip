@@ -17,18 +17,15 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class CommodityPriceClusterPriceChangeEvent (
-    val currentPrice: chip.devicecontroller.cluster.structs.CommodityPriceClusterCommodityPriceStruct?) {
-  override fun toString(): String  = buildString {
+class CommodityPriceClusterPriceChangeEvent(
+  val currentPrice: chip.devicecontroller.cluster.structs.CommodityPriceClusterCommodityPriceStruct?
+) {
+  override fun toString(): String = buildString {
     append("CommodityPriceClusterPriceChangeEvent {\n")
     append("\tcurrentPrice : $currentPrice\n")
     append("}\n")
@@ -38,10 +35,10 @@ class CommodityPriceClusterPriceChangeEvent (
     tlvWriter.apply {
       startStructure(tlvTag)
       if (currentPrice != null) {
-      currentPrice.toTlv(ContextSpecificTag(TAG_CURRENT_PRICE), this)
-    } else {
-      putNull(ContextSpecificTag(TAG_CURRENT_PRICE))
-    }
+        currentPrice.toTlv(ContextSpecificTag(TAG_CURRENT_PRICE), this)
+      } else {
+        putNull(ContextSpecificTag(TAG_CURRENT_PRICE))
+      }
       endStructure()
     }
   }
@@ -49,15 +46,19 @@ class CommodityPriceClusterPriceChangeEvent (
   companion object {
     private const val TAG_CURRENT_PRICE = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : CommodityPriceClusterPriceChangeEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): CommodityPriceClusterPriceChangeEvent {
       tlvReader.enterStructure(tlvTag)
-      val currentPrice = if (!tlvReader.isNull()) {
-      chip.devicecontroller.cluster.structs.CommodityPriceClusterCommodityPriceStruct.fromTlv(ContextSpecificTag(TAG_CURRENT_PRICE), tlvReader)
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_CURRENT_PRICE))
-      null
-    }
-      
+      val currentPrice =
+        if (!tlvReader.isNull()) {
+          chip.devicecontroller.cluster.structs.CommodityPriceClusterCommodityPriceStruct.fromTlv(
+            ContextSpecificTag(TAG_CURRENT_PRICE),
+            tlvReader,
+          )
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_CURRENT_PRICE))
+          null
+        }
+
       tlvReader.exitContainer()
 
       return CommodityPriceClusterPriceChangeEvent(currentPrice)

@@ -18,16 +18,12 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class MicrowaveOvenModeClusterModeTagStruct(
-  val mfgCode: Optional<UShort>,
-  val value: UShort
-) {
+class MicrowaveOvenModeClusterModeTagStruct(val mfgCode: Optional<UShort>, val value: UShort) {
   override fun toString(): String = buildString {
     append("MicrowaveOvenModeClusterModeTagStruct {\n")
     append("\tmfgCode : $mfgCode\n")
@@ -53,13 +49,14 @@ class MicrowaveOvenModeClusterModeTagStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): MicrowaveOvenModeClusterModeTagStruct {
       tlvReader.enterStructure(tlvTag)
-      val mfgCode = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MFG_CODE))) {
-      Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_MFG_CODE)))
-    } else {
-      Optional.empty()
-    }
+      val mfgCode =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MFG_CODE))) {
+          Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_MFG_CODE)))
+        } else {
+          Optional.empty()
+        }
       val value = tlvReader.getUShort(ContextSpecificTag(TAG_VALUE))
-      
+
       tlvReader.exitContainer()
 
       return MicrowaveOvenModeClusterModeTagStruct(mfgCode, value)

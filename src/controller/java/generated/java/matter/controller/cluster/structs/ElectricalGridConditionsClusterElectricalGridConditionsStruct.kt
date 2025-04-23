@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -30,7 +28,7 @@ class ElectricalGridConditionsClusterElectricalGridConditionsStruct(
   val gridCarbonIntensity: Short,
   val gridCarbonLevel: UByte,
   val localCarbonIntensity: Short,
-  val localCarbonLevel: UByte
+  val localCarbonLevel: UByte,
 ) {
   override fun toString(): String = buildString {
     append("ElectricalGridConditionsClusterElectricalGridConditionsStruct {\n")
@@ -68,23 +66,34 @@ class ElectricalGridConditionsClusterElectricalGridConditionsStruct(
     private const val TAG_LOCAL_CARBON_INTENSITY = 4
     private const val TAG_LOCAL_CARBON_LEVEL = 5
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ElectricalGridConditionsClusterElectricalGridConditionsStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): ElectricalGridConditionsClusterElectricalGridConditionsStruct {
       tlvReader.enterStructure(tlvTag)
       val periodStart = tlvReader.getUInt(ContextSpecificTag(TAG_PERIOD_START))
-      val periodEnd = if (!tlvReader.isNull()) {
-      tlvReader.getUInt(ContextSpecificTag(TAG_PERIOD_END))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_PERIOD_END))
-      null
-    }
+      val periodEnd =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUInt(ContextSpecificTag(TAG_PERIOD_END))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_PERIOD_END))
+          null
+        }
       val gridCarbonIntensity = tlvReader.getShort(ContextSpecificTag(TAG_GRID_CARBON_INTENSITY))
       val gridCarbonLevel = tlvReader.getUByte(ContextSpecificTag(TAG_GRID_CARBON_LEVEL))
       val localCarbonIntensity = tlvReader.getShort(ContextSpecificTag(TAG_LOCAL_CARBON_INTENSITY))
       val localCarbonLevel = tlvReader.getUByte(ContextSpecificTag(TAG_LOCAL_CARBON_LEVEL))
-      
+
       tlvReader.exitContainer()
 
-      return ElectricalGridConditionsClusterElectricalGridConditionsStruct(periodStart, periodEnd, gridCarbonIntensity, gridCarbonLevel, localCarbonIntensity, localCarbonLevel)
+      return ElectricalGridConditionsClusterElectricalGridConditionsStruct(
+        periodStart,
+        periodEnd,
+        gridCarbonIntensity,
+        gridCarbonLevel,
+        localCarbonIntensity,
+        localCarbonLevel,
+      )
     }
   }
 }

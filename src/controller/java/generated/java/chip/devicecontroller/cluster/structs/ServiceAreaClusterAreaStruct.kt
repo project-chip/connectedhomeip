@@ -17,20 +17,17 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ServiceAreaClusterAreaStruct (
-    val areaID: ULong,
-    val mapID: ULong?,
-    val areaInfo: ServiceAreaClusterAreaInfoStruct) {
-  override fun toString(): String  = buildString {
+class ServiceAreaClusterAreaStruct(
+  val areaID: ULong,
+  val mapID: ULong?,
+  val areaInfo: ServiceAreaClusterAreaInfoStruct,
+) {
+  override fun toString(): String = buildString {
     append("ServiceAreaClusterAreaStruct {\n")
     append("\tareaID : $areaID\n")
     append("\tmapID : $mapID\n")
@@ -43,10 +40,10 @@ class ServiceAreaClusterAreaStruct (
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_AREA_ID), areaID)
       if (mapID != null) {
-      put(ContextSpecificTag(TAG_MAP_ID), mapID)
-    } else {
-      putNull(ContextSpecificTag(TAG_MAP_ID))
-    }
+        put(ContextSpecificTag(TAG_MAP_ID), mapID)
+      } else {
+        putNull(ContextSpecificTag(TAG_MAP_ID))
+      }
       areaInfo.toTlv(ContextSpecificTag(TAG_AREA_INFO), this)
       endStructure()
     }
@@ -57,17 +54,19 @@ class ServiceAreaClusterAreaStruct (
     private const val TAG_MAP_ID = 1
     private const val TAG_AREA_INFO = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ServiceAreaClusterAreaStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ServiceAreaClusterAreaStruct {
       tlvReader.enterStructure(tlvTag)
       val areaID = tlvReader.getULong(ContextSpecificTag(TAG_AREA_ID))
-      val mapID = if (!tlvReader.isNull()) {
-      tlvReader.getULong(ContextSpecificTag(TAG_MAP_ID))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_MAP_ID))
-      null
-    }
-      val areaInfo = ServiceAreaClusterAreaInfoStruct.fromTlv(ContextSpecificTag(TAG_AREA_INFO), tlvReader)
-      
+      val mapID =
+        if (!tlvReader.isNull()) {
+          tlvReader.getULong(ContextSpecificTag(TAG_MAP_ID))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_MAP_ID))
+          null
+        }
+      val areaInfo =
+        ServiceAreaClusterAreaInfoStruct.fromTlv(ContextSpecificTag(TAG_AREA_INFO), tlvReader)
+
       tlvReader.exitContainer()
 
       return ServiceAreaClusterAreaStruct(areaID, mapID, areaInfo)

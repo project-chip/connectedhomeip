@@ -20,17 +20,15 @@ import chip.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class CommodityTariffClusterDayStruct (
-    val date: ULong,
-    val dayType: UInt,
-    val dayEntryIDs: List<ULong>) {
-  override fun toString(): String  = buildString {
+class CommodityTariffClusterDayStruct(
+  val date: ULong,
+  val dayType: UInt,
+  val dayEntryIDs: List<ULong>,
+) {
+  override fun toString(): String = buildString {
     append("CommodityTariffClusterDayStruct {\n")
     append("\tdate : $date\n")
     append("\tdayType : $dayType\n")
@@ -57,18 +55,19 @@ class CommodityTariffClusterDayStruct (
     private const val TAG_DAY_TYPE = 1
     private const val TAG_DAY_ENTRY_I_DS = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : CommodityTariffClusterDayStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): CommodityTariffClusterDayStruct {
       tlvReader.enterStructure(tlvTag)
       val date = tlvReader.getULong(ContextSpecificTag(TAG_DATE))
       val dayType = tlvReader.getUInt(ContextSpecificTag(TAG_DAY_TYPE))
-      val dayEntryIDs = buildList<ULong> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_DAY_ENTRY_I_DS))
-      while(!tlvReader.isEndOfContainer()) {
-        add(tlvReader.getULong(AnonymousTag))
-      }
-      tlvReader.exitContainer()
-    }
-      
+      val dayEntryIDs =
+        buildList<ULong> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_DAY_ENTRY_I_DS))
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getULong(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+
       tlvReader.exitContainer()
 
       return CommodityTariffClusterDayStruct(date, dayType, dayEntryIDs)

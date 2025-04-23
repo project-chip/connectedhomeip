@@ -16,7 +16,6 @@
  */
 package matter.controller.cluster.eventstructs
 
-import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -25,7 +24,8 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class CommodityPriceClusterForecastChangeEvent(
-  val priceForecast: List<matter.controller.cluster.structs.CommodityPriceClusterCommodityPriceStruct>?
+  val priceForecast:
+    List<matter.controller.cluster.structs.CommodityPriceClusterCommodityPriceStruct>?
 ) {
   override fun toString(): String = buildString {
     append("CommodityPriceClusterForecastChangeEvent {\n")
@@ -38,10 +38,10 @@ class CommodityPriceClusterForecastChangeEvent(
       startStructure(tlvTag)
       if (priceForecast != null) {
         startArray(ContextSpecificTag(TAG_PRICE_FORECAST))
-      for (item in priceForecast.iterator()) {
-        item.toTlv(AnonymousTag, this)
-      }
-      endArray()
+        for (item in priceForecast.iterator()) {
+          item.toTlv(AnonymousTag, this)
+        }
+        endArray()
       } else {
         putNull(ContextSpecificTag(TAG_PRICE_FORECAST))
       }
@@ -52,21 +52,27 @@ class CommodityPriceClusterForecastChangeEvent(
   companion object {
     private const val TAG_PRICE_FORECAST = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : CommodityPriceClusterForecastChangeEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): CommodityPriceClusterForecastChangeEvent {
       tlvReader.enterStructure(tlvTag)
-      val priceForecast = if (!tlvReader.isNull()) {
-        buildList <matter.controller.cluster.structs.CommodityPriceClusterCommodityPriceStruct> {
-        tlvReader.enterArray(ContextSpecificTag(TAG_PRICE_FORECAST))
-        while(!tlvReader.isEndOfContainer()) {
-          this.add(matter.controller.cluster.structs.CommodityPriceClusterCommodityPriceStruct.fromTlv(AnonymousTag, tlvReader))
+      val priceForecast =
+        if (!tlvReader.isNull()) {
+          buildList<matter.controller.cluster.structs.CommodityPriceClusterCommodityPriceStruct> {
+            tlvReader.enterArray(ContextSpecificTag(TAG_PRICE_FORECAST))
+            while (!tlvReader.isEndOfContainer()) {
+              this.add(
+                matter.controller.cluster.structs.CommodityPriceClusterCommodityPriceStruct.fromTlv(
+                  AnonymousTag,
+                  tlvReader,
+                )
+              )
+            }
+            tlvReader.exitContainer()
+          }
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_PRICE_FORECAST))
+          null
         }
-        tlvReader.exitContainer()
-      }
-      } else {
-        tlvReader.getNull(ContextSpecificTag(TAG_PRICE_FORECAST))
-        null
-      }
-      
+
       tlvReader.exitContainer()
 
       return CommodityPriceClusterForecastChangeEvent(priceForecast)

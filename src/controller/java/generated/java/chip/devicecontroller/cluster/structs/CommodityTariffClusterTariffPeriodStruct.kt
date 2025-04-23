@@ -20,17 +20,15 @@ import chip.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class CommodityTariffClusterTariffPeriodStruct (
-    val label: String?,
-    val dayEntryIDs: List<ULong>,
-    val tariffComponentIDs: List<ULong>) {
-  override fun toString(): String  = buildString {
+class CommodityTariffClusterTariffPeriodStruct(
+  val label: String?,
+  val dayEntryIDs: List<ULong>,
+  val tariffComponentIDs: List<ULong>,
+) {
+  override fun toString(): String = buildString {
     append("CommodityTariffClusterTariffPeriodStruct {\n")
     append("\tlabel : $label\n")
     append("\tdayEntryIDs : $dayEntryIDs\n")
@@ -42,10 +40,10 @@ class CommodityTariffClusterTariffPeriodStruct (
     tlvWriter.apply {
       startStructure(tlvTag)
       if (label != null) {
-      put(ContextSpecificTag(TAG_LABEL), label)
-    } else {
-      putNull(ContextSpecificTag(TAG_LABEL))
-    }
+        put(ContextSpecificTag(TAG_LABEL), label)
+      } else {
+        putNull(ContextSpecificTag(TAG_LABEL))
+      }
       startArray(ContextSpecificTag(TAG_DAY_ENTRY_I_DS))
       for (item in dayEntryIDs.iterator()) {
         put(AnonymousTag, item)
@@ -65,29 +63,32 @@ class CommodityTariffClusterTariffPeriodStruct (
     private const val TAG_DAY_ENTRY_I_DS = 1
     private const val TAG_TARIFF_COMPONENT_I_DS = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : CommodityTariffClusterTariffPeriodStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): CommodityTariffClusterTariffPeriodStruct {
       tlvReader.enterStructure(tlvTag)
-      val label = if (!tlvReader.isNull()) {
-      tlvReader.getString(ContextSpecificTag(TAG_LABEL))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_LABEL))
-      null
-    }
-      val dayEntryIDs = buildList<ULong> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_DAY_ENTRY_I_DS))
-      while(!tlvReader.isEndOfContainer()) {
-        add(tlvReader.getULong(AnonymousTag))
-      }
-      tlvReader.exitContainer()
-    }
-      val tariffComponentIDs = buildList<ULong> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_TARIFF_COMPONENT_I_DS))
-      while(!tlvReader.isEndOfContainer()) {
-        add(tlvReader.getULong(AnonymousTag))
-      }
-      tlvReader.exitContainer()
-    }
-      
+      val label =
+        if (!tlvReader.isNull()) {
+          tlvReader.getString(ContextSpecificTag(TAG_LABEL))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_LABEL))
+          null
+        }
+      val dayEntryIDs =
+        buildList<ULong> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_DAY_ENTRY_I_DS))
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getULong(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+      val tariffComponentIDs =
+        buildList<ULong> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_TARIFF_COMPONENT_I_DS))
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getULong(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+
       tlvReader.exitContainer()
 
       return CommodityTariffClusterTariffPeriodStruct(label, dayEntryIDs, tariffComponentIDs)

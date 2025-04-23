@@ -20,17 +20,15 @@ import chip.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class AccessControlClusterCommissioningAccessRestrictionEntryStruct (
-    val endpoint: UInt,
-    val cluster: ULong,
-    val restrictions: List<AccessControlClusterAccessRestrictionStruct>) {
-  override fun toString(): String  = buildString {
+class AccessControlClusterCommissioningAccessRestrictionEntryStruct(
+  val endpoint: UInt,
+  val cluster: ULong,
+  val restrictions: List<AccessControlClusterAccessRestrictionStruct>,
+) {
+  override fun toString(): String = buildString {
     append("AccessControlClusterCommissioningAccessRestrictionEntryStruct {\n")
     append("\tendpoint : $endpoint\n")
     append("\tcluster : $cluster\n")
@@ -57,21 +55,29 @@ class AccessControlClusterCommissioningAccessRestrictionEntryStruct (
     private const val TAG_CLUSTER = 1
     private const val TAG_RESTRICTIONS = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : AccessControlClusterCommissioningAccessRestrictionEntryStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): AccessControlClusterCommissioningAccessRestrictionEntryStruct {
       tlvReader.enterStructure(tlvTag)
       val endpoint = tlvReader.getUInt(ContextSpecificTag(TAG_ENDPOINT))
       val cluster = tlvReader.getULong(ContextSpecificTag(TAG_CLUSTER))
-      val restrictions = buildList<AccessControlClusterAccessRestrictionStruct> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_RESTRICTIONS))
-      while(!tlvReader.isEndOfContainer()) {
-        add(AccessControlClusterAccessRestrictionStruct.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    }
-      
+      val restrictions =
+        buildList<AccessControlClusterAccessRestrictionStruct> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_RESTRICTIONS))
+          while (!tlvReader.isEndOfContainer()) {
+            add(AccessControlClusterAccessRestrictionStruct.fromTlv(AnonymousTag, tlvReader))
+          }
+          tlvReader.exitContainer()
+        }
+
       tlvReader.exitContainer()
 
-      return AccessControlClusterCommissioningAccessRestrictionEntryStruct(endpoint, cluster, restrictions)
+      return AccessControlClusterCommissioningAccessRestrictionEntryStruct(
+        endpoint,
+        cluster,
+        restrictions,
+      )
     }
   }
 }

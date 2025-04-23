@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -28,7 +26,7 @@ class EcosystemInformationClusterEcosystemLocationStruct(
   val uniqueLocationID: String,
   val locationDescriptor: EcosystemInformationClusterLocationDescriptorStruct,
   val locationDescriptorLastEdit: ULong,
-  val fabricIndex: UByte
+  val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
     append("EcosystemInformationClusterEcosystemLocationStruct {\n")
@@ -56,16 +54,29 @@ class EcosystemInformationClusterEcosystemLocationStruct(
     private const val TAG_LOCATION_DESCRIPTOR_LAST_EDIT = 2
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): EcosystemInformationClusterEcosystemLocationStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): EcosystemInformationClusterEcosystemLocationStruct {
       tlvReader.enterStructure(tlvTag)
       val uniqueLocationID = tlvReader.getString(ContextSpecificTag(TAG_UNIQUE_LOCATION_ID))
-      val locationDescriptor = EcosystemInformationClusterLocationDescriptorStruct.fromTlv(ContextSpecificTag(TAG_LOCATION_DESCRIPTOR), tlvReader)
-      val locationDescriptorLastEdit = tlvReader.getULong(ContextSpecificTag(TAG_LOCATION_DESCRIPTOR_LAST_EDIT))
+      val locationDescriptor =
+        EcosystemInformationClusterLocationDescriptorStruct.fromTlv(
+          ContextSpecificTag(TAG_LOCATION_DESCRIPTOR),
+          tlvReader,
+        )
+      val locationDescriptorLastEdit =
+        tlvReader.getULong(ContextSpecificTag(TAG_LOCATION_DESCRIPTOR_LAST_EDIT))
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
-      return EcosystemInformationClusterEcosystemLocationStruct(uniqueLocationID, locationDescriptor, locationDescriptorLastEdit, fabricIndex)
+      return EcosystemInformationClusterEcosystemLocationStruct(
+        uniqueLocationID,
+        locationDescriptor,
+        locationDescriptorLastEdit,
+        fabricIndex,
+      )
     }
   }
 }

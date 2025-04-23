@@ -17,19 +17,13 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ServiceAreaClusterLandmarkInfoStruct (
-    val landmarkTag: UInt,
-    val relativePositionTag: UInt?) {
-  override fun toString(): String  = buildString {
+class ServiceAreaClusterLandmarkInfoStruct(val landmarkTag: UInt, val relativePositionTag: UInt?) {
+  override fun toString(): String = buildString {
     append("ServiceAreaClusterLandmarkInfoStruct {\n")
     append("\tlandmarkTag : $landmarkTag\n")
     append("\trelativePositionTag : $relativePositionTag\n")
@@ -41,10 +35,10 @@ class ServiceAreaClusterLandmarkInfoStruct (
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_LANDMARK_TAG), landmarkTag)
       if (relativePositionTag != null) {
-      put(ContextSpecificTag(TAG_RELATIVE_POSITION_TAG), relativePositionTag)
-    } else {
-      putNull(ContextSpecificTag(TAG_RELATIVE_POSITION_TAG))
-    }
+        put(ContextSpecificTag(TAG_RELATIVE_POSITION_TAG), relativePositionTag)
+      } else {
+        putNull(ContextSpecificTag(TAG_RELATIVE_POSITION_TAG))
+      }
       endStructure()
     }
   }
@@ -53,16 +47,17 @@ class ServiceAreaClusterLandmarkInfoStruct (
     private const val TAG_LANDMARK_TAG = 0
     private const val TAG_RELATIVE_POSITION_TAG = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ServiceAreaClusterLandmarkInfoStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ServiceAreaClusterLandmarkInfoStruct {
       tlvReader.enterStructure(tlvTag)
       val landmarkTag = tlvReader.getUInt(ContextSpecificTag(TAG_LANDMARK_TAG))
-      val relativePositionTag = if (!tlvReader.isNull()) {
-      tlvReader.getUInt(ContextSpecificTag(TAG_RELATIVE_POSITION_TAG))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_RELATIVE_POSITION_TAG))
-      null
-    }
-      
+      val relativePositionTag =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUInt(ContextSpecificTag(TAG_RELATIVE_POSITION_TAG))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_RELATIVE_POSITION_TAG))
+          null
+        }
+
       tlvReader.exitContainer()
 
       return ServiceAreaClusterLandmarkInfoStruct(landmarkTag, relativePositionTag)

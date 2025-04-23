@@ -17,31 +17,29 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class CameraAvStreamManagementClusterVideoStreamStruct (
-    val videoStreamID: UInt,
-    val streamUsage: UInt,
-    val videoCodec: UInt,
-    val minFrameRate: UInt,
-    val maxFrameRate: UInt,
-    val minResolution: CameraAvStreamManagementClusterVideoResolutionStruct,
-    val maxResolution: CameraAvStreamManagementClusterVideoResolutionStruct,
-    val minBitRate: ULong,
-    val maxBitRate: ULong,
-    val minFragmentLen: UInt,
-    val maxFragmentLen: UInt,
-    val watermarkEnabled: Optional<Boolean>,
-    val OSDEnabled: Optional<Boolean>,
-    val referenceCount: UInt) {
-  override fun toString(): String  = buildString {
+class CameraAvStreamManagementClusterVideoStreamStruct(
+  val videoStreamID: UInt,
+  val streamUsage: UInt,
+  val videoCodec: UInt,
+  val minFrameRate: UInt,
+  val maxFrameRate: UInt,
+  val minResolution: CameraAvStreamManagementClusterVideoResolutionStruct,
+  val maxResolution: CameraAvStreamManagementClusterVideoResolutionStruct,
+  val minBitRate: ULong,
+  val maxBitRate: ULong,
+  val minFragmentLen: UInt,
+  val maxFragmentLen: UInt,
+  val watermarkEnabled: Optional<Boolean>,
+  val OSDEnabled: Optional<Boolean>,
+  val referenceCount: UInt,
+) {
+  override fun toString(): String = buildString {
     append("CameraAvStreamManagementClusterVideoStreamStruct {\n")
     append("\tvideoStreamID : $videoStreamID\n")
     append("\tstreamUsage : $streamUsage\n")
@@ -75,13 +73,13 @@ class CameraAvStreamManagementClusterVideoStreamStruct (
       put(ContextSpecificTag(TAG_MIN_FRAGMENT_LEN), minFragmentLen)
       put(ContextSpecificTag(TAG_MAX_FRAGMENT_LEN), maxFragmentLen)
       if (watermarkEnabled.isPresent) {
-      val optwatermarkEnabled = watermarkEnabled.get()
-      put(ContextSpecificTag(TAG_WATERMARK_ENABLED), optwatermarkEnabled)
-    }
+        val optwatermarkEnabled = watermarkEnabled.get()
+        put(ContextSpecificTag(TAG_WATERMARK_ENABLED), optwatermarkEnabled)
+      }
       if (OSDEnabled.isPresent) {
-      val optOSDEnabled = OSDEnabled.get()
-      put(ContextSpecificTag(TAG_OSD_ENABLED), optOSDEnabled)
-    }
+        val optOSDEnabled = OSDEnabled.get()
+        put(ContextSpecificTag(TAG_OSD_ENABLED), optOSDEnabled)
+      }
       put(ContextSpecificTag(TAG_REFERENCE_COUNT), referenceCount)
       endStructure()
     }
@@ -103,34 +101,62 @@ class CameraAvStreamManagementClusterVideoStreamStruct (
     private const val TAG_OSD_ENABLED = 12
     private const val TAG_REFERENCE_COUNT = 13
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : CameraAvStreamManagementClusterVideoStreamStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): CameraAvStreamManagementClusterVideoStreamStruct {
       tlvReader.enterStructure(tlvTag)
       val videoStreamID = tlvReader.getUInt(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
       val streamUsage = tlvReader.getUInt(ContextSpecificTag(TAG_STREAM_USAGE))
       val videoCodec = tlvReader.getUInt(ContextSpecificTag(TAG_VIDEO_CODEC))
       val minFrameRate = tlvReader.getUInt(ContextSpecificTag(TAG_MIN_FRAME_RATE))
       val maxFrameRate = tlvReader.getUInt(ContextSpecificTag(TAG_MAX_FRAME_RATE))
-      val minResolution = CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(ContextSpecificTag(TAG_MIN_RESOLUTION), tlvReader)
-      val maxResolution = CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(ContextSpecificTag(TAG_MAX_RESOLUTION), tlvReader)
+      val minResolution =
+        CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(
+          ContextSpecificTag(TAG_MIN_RESOLUTION),
+          tlvReader,
+        )
+      val maxResolution =
+        CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(
+          ContextSpecificTag(TAG_MAX_RESOLUTION),
+          tlvReader,
+        )
       val minBitRate = tlvReader.getULong(ContextSpecificTag(TAG_MIN_BIT_RATE))
       val maxBitRate = tlvReader.getULong(ContextSpecificTag(TAG_MAX_BIT_RATE))
       val minFragmentLen = tlvReader.getUInt(ContextSpecificTag(TAG_MIN_FRAGMENT_LEN))
       val maxFragmentLen = tlvReader.getUInt(ContextSpecificTag(TAG_MAX_FRAGMENT_LEN))
-      val watermarkEnabled = if (tlvReader.isNextTag(ContextSpecificTag(TAG_WATERMARK_ENABLED))) {
-      Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_WATERMARK_ENABLED)))
-    } else {
-      Optional.empty()
-    }
-      val OSDEnabled = if (tlvReader.isNextTag(ContextSpecificTag(TAG_OSD_ENABLED))) {
-      Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_OSD_ENABLED)))
-    } else {
-      Optional.empty()
-    }
+      val watermarkEnabled =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_WATERMARK_ENABLED))) {
+          Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_WATERMARK_ENABLED)))
+        } else {
+          Optional.empty()
+        }
+      val OSDEnabled =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_OSD_ENABLED))) {
+          Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_OSD_ENABLED)))
+        } else {
+          Optional.empty()
+        }
       val referenceCount = tlvReader.getUInt(ContextSpecificTag(TAG_REFERENCE_COUNT))
-      
+
       tlvReader.exitContainer()
 
-      return CameraAvStreamManagementClusterVideoStreamStruct(videoStreamID, streamUsage, videoCodec, minFrameRate, maxFrameRate, minResolution, maxResolution, minBitRate, maxBitRate, minFragmentLen, maxFragmentLen, watermarkEnabled, OSDEnabled, referenceCount)
+      return CameraAvStreamManagementClusterVideoStreamStruct(
+        videoStreamID,
+        streamUsage,
+        videoCodec,
+        minFrameRate,
+        maxFrameRate,
+        minResolution,
+        maxResolution,
+        minBitRate,
+        maxBitRate,
+        minFragmentLen,
+        maxFragmentLen,
+        watermarkEnabled,
+        OSDEnabled,
+        referenceCount,
+      )
     }
   }
 }

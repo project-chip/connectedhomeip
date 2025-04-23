@@ -16,18 +16,13 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class CommodityTariffClusterCurrencyStruct(
-  val currency: UShort,
-  val decimalPoints: UByte
-) {
+class CommodityTariffClusterCurrencyStruct(val currency: UShort, val decimalPoints: UByte) {
   override fun toString(): String = buildString {
     append("CommodityTariffClusterCurrencyStruct {\n")
     append("\tcurrency : $currency\n")
@@ -52,7 +47,7 @@ class CommodityTariffClusterCurrencyStruct(
       tlvReader.enterStructure(tlvTag)
       val currency = tlvReader.getUShort(ContextSpecificTag(TAG_CURRENCY))
       val decimalPoints = tlvReader.getUByte(ContextSpecificTag(TAG_DECIMAL_POINTS))
-      
+
       tlvReader.exitContainer()
 
       return CommodityTariffClusterCurrencyStruct(currency, decimalPoints)
