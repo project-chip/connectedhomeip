@@ -37,10 +37,22 @@ class AVSUMTestBase:
         asserts.assert_equal(value, expected_value,
                              f"Unexpected '{attribute}' value - expected {expected_value}, was {value}")
 
-    async def send_save_presets_command(self, name: str, endpoint: int = None, expected_status: Status = Status.Success):
+    async def send_save_presets_command(self, name: str, presetID: int = None, endpoint: int = None, expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=Clusters.CameraAvSettingsUserLevelManagement.Commands.MPTZSavePreset(
-                name=name),
+                name=name,
+                presetID=presetID),
+                endpoint=endpoint)
+
+            asserts.assert_equal(expected_status, Status.Success)
+
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
+
+    async def send_move_to_preset_command(self, presetID, endpoint: int = None, expected_status: Status = Status.Success):
+        try:
+            await self.send_single_cmd(cmd=Clusters.CameraAvSettingsUserLevelManagement.Commands.MPTZMoveToPreset(
+                presetID=presetID),
                 endpoint=endpoint)
 
             asserts.assert_equal(expected_status, Status.Success)
@@ -50,17 +62,17 @@ class AVSUMTestBase:
 
     async def send_mptz_set_pan_position_command(self, pan, endpoint: int = None, expected_status: Status = Status.Success):
         tilt = zoom = None
-        await self.send_mptz_set_position_command(endpoint, pan, tilt, zoom, expected_status)
+        await self.send_mptz_set_position_command(pan, tilt, zoom, endpoint, expected_status)
 
     async def send_mptz_set_tilt_position_command(self, tilt, endpoint: int = None, expected_status: Status = Status.Success):
         pan = zoom = None
-        await self.send_mptz_set_position_command(endpoint, pan, tilt, zoom, expected_status)
+        await self.send_mptz_set_position_command(pan, tilt, zoom, endpoint, expected_status)
 
     async def send_mptz_set_zoom_position_command(self, zoom, endpoint: int = None, expected_status: Status = Status.Success):
         pan = tilt = None
-        await self.send_mptz_set_position_command(endpoint, pan, tilt, zoom, expected_status)
+        await self.send_mptz_set_position_command(pan, tilt, zoom, endpoint, expected_status)
 
-    async def send_mptz_set_position_command(self, endpoint, pan, tilt, zoom, expected_status: Status = Status.Success):
+    async def send_mptz_set_position_command(self, pan, tilt, zoom, endpoint: int = None, expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=Clusters.CameraAvSettingsUserLevelManagement.Commands.MPTZSetPosition(
                 pan=pan, tilt=tilt, zoom=zoom),
