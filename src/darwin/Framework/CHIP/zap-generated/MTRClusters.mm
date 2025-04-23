@@ -2114,6 +2114,11 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeBasicInformationID) attributeID:@(MTRAttributeIDTypeClusterBasicInformationAttributeMaxPathsPerInvokeID) params:params];
 }
 
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeConfigurationVersionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeBasicInformationID) attributeID:@(MTRAttributeIDTypeClusterBasicInformationAttributeConfigurationVersionID) params:params];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeBasicInformationID) attributeID:@(MTRAttributeIDTypeClusterBasicInformationAttributeGeneratedCommandListID) params:params];
@@ -4127,6 +4132,16 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeActiveNetworkFaultsListID) params:params];
 }
 
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeExtAddressWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeExtAddressID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRloc16WithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRloc16ID) params:params];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeGeneratedCommandListID) params:params];
@@ -4806,6 +4821,11 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeProductAppearanceWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeBridgedDeviceBasicInformationID) attributeID:@(MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeProductAppearanceID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeConfigurationVersionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeBridgedDeviceBasicInformationID) attributeID:@(MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeConfigurationVersionID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -10302,6 +10322,61 @@ using chip::System::Clock::Timeout;
 
 @end
 
+@implementation MTRClusterElectricalGridConditions
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeLocalGenerationAvailableWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeElectricalGridConditionsID) attributeID:@(MTRAttributeIDTypeClusterElectricalGridConditionsAttributeLocalGenerationAvailableID) params:params];
+}
+
+- (void)writeAttributeLocalGenerationAvailableWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeLocalGenerationAvailableWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeLocalGenerationAvailableWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeElectricalGridConditionsID) attributeID:@(MTRAttributeIDTypeClusterElectricalGridConditionsAttributeLocalGenerationAvailableID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentConditionsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeElectricalGridConditionsID) attributeID:@(MTRAttributeIDTypeClusterElectricalGridConditionsAttributeCurrentConditionsID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeForecastConditionsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeElectricalGridConditionsID) attributeID:@(MTRAttributeIDTypeClusterElectricalGridConditionsAttributeForecastConditionsID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeElectricalGridConditionsID) attributeID:@(MTRAttributeIDTypeClusterElectricalGridConditionsAttributeGeneratedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeElectricalGridConditionsID) attributeID:@(MTRAttributeIDTypeClusterElectricalGridConditionsAttributeAcceptedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeElectricalGridConditionsID) attributeID:@(MTRAttributeIDTypeClusterElectricalGridConditionsAttributeAttributeListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeElectricalGridConditionsID) attributeID:@(MTRAttributeIDTypeClusterElectricalGridConditionsAttributeFeatureMapID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeElectricalGridConditionsID) attributeID:@(MTRAttributeIDTypeClusterElectricalGridConditionsAttributeClusterRevisionID) params:params];
+}
+
+@end
+
 @implementation MTRClusterDoorLock
 
 - (void)lockDoorWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
@@ -12098,9 +12173,9 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentStateWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeClosureDimensionID) attributeID:@(MTRAttributeIDTypeClusterClosureDimensionAttributeCurrentID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeClosureDimensionID) attributeID:@(MTRAttributeIDTypeClusterClosureDimensionAttributeCurrentStateID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeTargetWithParams:(MTRReadParams * _Nullable)params
@@ -19598,9 +19673,9 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeMaxConcurrentVideoEncodersWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMaxConcurrentEncodersWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVStreamManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMaxConcurrentVideoEncodersID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVStreamManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMaxConcurrentEncodersID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMaxEncodedPixelRateWithParams:(MTRReadParams * _Nullable)params
@@ -19648,9 +19723,9 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVStreamManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeTwoWayTalkSupportID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeSupportedSnapshotParamsWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeSnapshotCapabilitiesWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVStreamManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeSupportedSnapshotParamsID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVStreamManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeSnapshotCapabilitiesID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMaxNetworkBandwidthWithParams:(MTRReadParams * _Nullable)params

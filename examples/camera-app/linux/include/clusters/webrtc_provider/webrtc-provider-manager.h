@@ -34,6 +34,8 @@ public:
 
     ~WebRTCProviderManager() { CloseConnection(); };
 
+    void Init();
+
     void CloseConnection();
 
     CHIP_ERROR HandleSolicitOffer(const OfferRequestArgs & args,
@@ -42,8 +44,7 @@ public:
 
     CHIP_ERROR
     HandleProvideOffer(const ProvideOfferRequestArgs & args,
-                       chip::app::Clusters::WebRTCTransportProvider::WebRTCSessionStruct & outSession,
-                       const chip::ScopedNodeId & peerId, chip::EndpointId originatingEndpointId) override;
+                       chip::app::Clusters::WebRTCTransportProvider::WebRTCSessionStruct & outSession) override;
 
     CHIP_ERROR HandleProvideAnswer(uint16_t sessionId, const std::string & sdpAnswer) override;
 
