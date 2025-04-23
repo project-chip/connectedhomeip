@@ -149,7 +149,7 @@ jobs:
                       # Example is intentionally not spe compliant for use in cert testing
                       if [ "$idl_file" = './examples/lighting-app-data-mode-no-unique-id/lighting-common/lighting-app.matter' ]; then continue; fi
 
-                      # Test files are intentionally small and not spec-compilant, just parse-compliant
+                      # Test files are intentionally small and not spec-compliant, just parse-compliant
                       if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/cluster_struct_attribute.matter" ]; then continue; fi
                       if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/global_struct_attribute.matter" ]; then continue; fi
                       if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/optional_argument.matter" ]; then continue; fi
