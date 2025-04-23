@@ -209,8 +209,9 @@ void AirPurifierManager::HandleOnOff(AttributeId attributeId, uint8_t type, uint
         // If either of these come back as NULL, that should mean the fan is operating in auto mode.
         // I have no idea what that means for this case, so I'll just set them to high because this
         // is just an example.
-        // In theory these should always be NULL together or not at all, so hopefully the last
-        // error is more theoretical than practical.
+        // In theory these should always be NULL together or not at all, so hopefully
+        // the checks for only percent.IsNull() or only speed.IsNull() are more theoretical
+        // than practical.
         DataModel::Nullable<Percent> percent = GetPercentSetting();
         DataModel::Nullable<uint8_t> speed   = GetSpeedSetting();
         uint8_t speedMax                     = 100;
@@ -251,8 +252,8 @@ void AirPurifierManager::HandleOnOff(AttributeId attributeId, uint8_t type, uint
         new_percent = 0;
         new_speed   = 0;
     }
-    FanControl::Attributes::SpeedCurrent::Set(mEndpointId, new_speed, MarkAttributeDirty::kYes);
-    FanControl::Attributes::PercentCurrent::Set(mEndpointId, new_percent, MarkAttributeDirty::kYes);
+    FanControl::Attributes::SpeedCurrent::Set(mEndpointId, new_speed);
+    FanControl::Attributes::PercentCurrent::Set(mEndpointId, new_percent);
     mOnOffClusterOn = on;
 }
 
@@ -287,19 +288,19 @@ void AirPurifierManager::SpeedSettingWriteCallback(uint8_t aNewSpeedSetting)
     // Determine if the speed change should also change the fan mode
     if (aNewSpeedSetting == 0)
     {
-        FanControl::Attributes::FanMode::Set(mEndpointId, FanControl::FanModeEnum::kOff, MarkAttributeDirty::kIfChanged);
+        FanControl::Attributes::FanMode::Set(mEndpointId, FanControl::FanModeEnum::kOff);
     }
     else if (aNewSpeedSetting <= FAN_MODE_LOW_UPPER_BOUND)
     {
-        FanControl::Attributes::FanMode::Set(mEndpointId, FanControl::FanModeEnum::kLow, MarkAttributeDirty::kIfChanged);
+        FanControl::Attributes::FanMode::Set(mEndpointId, FanControl::FanModeEnum::kLow);
     }
     else if (aNewSpeedSetting <= FAN_MODE_MEDIUM_UPPER_BOUND)
     {
-        FanControl::Attributes::FanMode::Set(mEndpointId, FanControl::FanModeEnum::kMedium, MarkAttributeDirty::kIfChanged);
+        FanControl::Attributes::FanMode::Set(mEndpointId, FanControl::FanModeEnum::kMedium);
     }
     else if (aNewSpeedSetting <= FAN_MODE_HIGH_UPPER_BOUND)
     {
-        FanControl::Attributes::FanMode::Set(mEndpointId, FanControl::FanModeEnum::kHigh, MarkAttributeDirty::kIfChanged);
+        FanControl::Attributes::FanMode::Set(mEndpointId, FanControl::FanModeEnum::kHigh);
     }
 }
 
@@ -363,7 +364,7 @@ void AirPurifierManager::SetSpeedSetting(DataModel::Nullable<uint8_t> aNewSpeedS
         return;
     }
 
-    Status status = FanControl::Attributes::SpeedSetting::Set(mEndpointId, aNewSpeedSetting, MarkAttributeDirty::kIfChanged);
+    Status status = FanControl::Attributes::SpeedSetting::Set(mEndpointId, aNewSpeedSetting);
     if (status != Status::Success)
     {
         ChipLogError(NotSpecified, "AirPurifierManager::SetSpeedSetting: failed to set SpeedSetting attribute: %d",

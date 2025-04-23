@@ -47,7 +47,7 @@ from matter_testing_infrastructure.chip.testing.matter_testing import (Attribute
 from mobly import asserts
 
 
-class TC_FAN_2_4(MatterBaseTest):
+class TC_FAN_4_1(MatterBaseTest):
     def desc_TC_FAN_4_1(self) -> str:
         return "[TC-FAN-4.1] Fan interaction with On/Off cluster"
 
@@ -137,13 +137,13 @@ class TC_FAN_2_4(MatterBaseTest):
         fan = Clusters.FanControl
         features = await self.read_single_attribute_check_success(cluster=fan, attribute=fan.Attributes.FeatureMap)
         has_spd = (features & fan.Bitmaps.Feature.kMultiSpeed) != 0
-        # Wait for the entire duration of the test because this valve may be slow. The test will time out before this does. That's fine.
+        # Wait for the entire duration of the test because this fan may be slow. The test will time out before this does. That's fine.
         timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
 
         wait_s = self.user_params.get('pixit_fan_start_time', 1)
 
         self.step(2)
-        sub = ClusterAttributeChangeAccumulator(Clusters.FanControl)
+        sub = ClusterAttributeChangeAccumulator(fan)
         await sub.start(self.default_controller, node_id=self.dut_node_id, endpoint=self.get_endpoint())
 
         self.step(3)
@@ -153,13 +153,14 @@ class TC_FAN_2_4(MatterBaseTest):
         if has_spd:
             speed_max = await self.read_single_attribute_check_success(cluster=fan, attribute=fan.Attributes.SpeedMax)
         else:
+            speed_max = None
             self.mark_current_step_skipped()
 
         self.step(5)
         await self.send_single_cmd(cmd=Clusters.OnOff.Commands.On())
 
         self.step(6)
-        attr = Clusters.FanControl.Attributes.FanMode(Clusters.FanControl.Enums.FanModeEnum.kHigh)
+        attr = fan.Attributes.FanMode(fan.Enums.FanModeEnum.kHigh)
         resp = await self.default_controller.WriteAttribute(nodeid=self.dut_node_id, attributes=[(self.get_endpoint(), attr)])
         asserts.assert_equal(resp[0].Status, Status.Success, "Unexpected error writing FanMode attribute")
 
@@ -285,13 +286,13 @@ class TC_FAN_2_4(MatterBaseTest):
         if has_spd:
             awaiting.append(AttributeValue(endpoint_id=self.get_endpoint(),
                             attribute=fan.Attributes.SpeedCurrent, value=speed_max))
-        sub.await_all_final_values_reported(expected_final_values=awaiting, timeout_sec=5)
+        sub.await_all_final_values_reported(expected_final_values=awaiting, timeout_sec=timeout)
         sub.reset()
         step_num += 1
 
         # Make sure that we can still adjust the Percent values now that it's back on
         self.step(step_num)
-        attr = Clusters.FanControl.Attributes.PercentSetting(50)
+        attr = fan.Attributes.PercentSetting(50)
         resp = await self.default_controller.WriteAttribute(nodeid=self.dut_node_id, attributes=[(self.get_endpoint(), attr)])
         asserts.assert_in(resp[0].Status, [Status.Success, Status.InvalidInState], "Invalid response from writing PercentSetting")
         step_num += 1
