@@ -39,8 +39,7 @@ import random
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_cluster,
-                                         run_if_endpoint_matches)
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 from TC_AVSUMTestBase import AVSUMTestBase
 
