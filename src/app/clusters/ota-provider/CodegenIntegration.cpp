@@ -28,7 +28,8 @@ using namespace chip::app::Clusters;
 
 namespace {
 
-static constexpr size_t kOtaProviderFixedClusterCount = OtaSoftwareUpdateProvider::StaticApplicationConfig::kFixedClusterConfig.size();
+static constexpr size_t kOtaProviderFixedClusterCount =
+    OtaSoftwareUpdateProvider::StaticApplicationConfig::kFixedClusterConfig.size();
 static constexpr size_t kOtaProviderMaxClusterCount = kOtaProviderFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 OtaProviderServer gClusters[kOtaProviderMaxClusterCount];
@@ -38,8 +39,8 @@ ServerClusterRegistration gRegistrations[kOtaProviderMaxClusterCount];
 // Log an error if not found.
 bool findEndpointWithLog(EndpointId endpointId, uint16_t & outArrayIndex)
 {
-    uint16_t arrayIndex = emberAfGetClusterServerEndpointIndex(
-        endpointId, OtaSoftwareUpdateProvider::Id, kOtaProviderFixedClusterCount);
+    uint16_t arrayIndex =
+        emberAfGetClusterServerEndpointIndex(endpointId, OtaSoftwareUpdateProvider::Id, kOtaProviderFixedClusterCount);
 
     if (arrayIndex >= kOtaProviderMaxClusterCount)
     {
