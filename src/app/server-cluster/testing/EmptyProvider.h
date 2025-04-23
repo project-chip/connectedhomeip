@@ -41,7 +41,7 @@ public:
     CHIP_ERROR ClientClusters(EndpointId endpointId, ReadOnlyBufferBuilder<ClusterId> & builder) override;
     CHIP_ERROR ServerClusters(EndpointId endpointId, ReadOnlyBufferBuilder<app::DataModel::ServerClusterEntry> & builder) override;
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
-    CHIP_ERROR EndpointUniqueID(EndpointId endpointId, MutableCharSpan &epUniqueId) override;
+    CHIP_ERROR EndpointUniqueID(EndpointId endpointId, MutableCharSpan & epUniqueId) override;
 #endif
     CHIP_ERROR Attributes(const app::ConcreteClusterPath & path,
                           ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> & builder) override;

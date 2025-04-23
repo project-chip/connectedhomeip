@@ -636,7 +636,7 @@ CHIP_ERROR CodegenDataModelProvider::SemanticTags(EndpointId endpointId, ReadOnl
     return CHIP_NO_ERROR;
 }
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
-CHIP_ERROR CodegenDataModelProvider::EndpointUniqueID(EndpointId endpointId, MutableCharSpan &epUniqueId)
+CHIP_ERROR CodegenDataModelProvider::EndpointUniqueID(EndpointId endpointId, MutableCharSpan & epUniqueId)
 {
     char buffer[Clusters::Descriptor::Attributes::EndpointUniqueID::TypeInfo::MaxLength()] = { 0 };
     MutableCharSpan epUniqueIdSpan(buffer);

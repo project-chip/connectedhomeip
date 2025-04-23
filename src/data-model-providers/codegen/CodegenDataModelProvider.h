@@ -73,7 +73,7 @@ public:
     CHIP_ERROR ClientClusters(EndpointId endpointId, ReadOnlyBufferBuilder<ClusterId> & builder) override;
     CHIP_ERROR ServerClusters(EndpointId endpointId, ReadOnlyBufferBuilder<DataModel::ServerClusterEntry> & builder) override;
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
-    CHIP_ERROR EndpointUniqueID(EndpointId endpointId,  MutableCharSpan &epUniqueId) override;
+    CHIP_ERROR EndpointUniqueID(EndpointId endpointId, MutableCharSpan & epUniqueId) override;
 #endif
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,

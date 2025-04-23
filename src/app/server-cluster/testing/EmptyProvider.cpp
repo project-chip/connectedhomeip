@@ -58,7 +58,7 @@ CHIP_ERROR EmptyProvider::Attributes(const app::ConcreteClusterPath & path,
 }
 
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
-CHIP_ERROR EmptyProvider::EndpointUniqueID(EndpointId endpointId, MutableCharSpan &epUniqueId)
+CHIP_ERROR EmptyProvider::EndpointUniqueID(EndpointId endpointId, MutableCharSpan & epUniqueId)
 {
     return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
 }

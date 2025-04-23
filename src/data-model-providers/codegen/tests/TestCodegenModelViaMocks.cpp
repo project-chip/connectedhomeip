@@ -2771,7 +2771,7 @@ TEST_F(TestCodegenModelViaMocks, EndpointUniqueID)
     CodegenDataModelProviderWithContext model;
 
     // Mock endpoint 1 has a unique ID
-    char buffer[chip::app::Clusters::Descriptor::Attributes::EndpointUniqueID::TypeInfo::MaxLength()] = {0};
+    char buffer[chip::app::Clusters::Descriptor::Attributes::EndpointUniqueID::TypeInfo::MaxLength()] = { 0 };
     MutableCharSpan span(buffer);
     // Mock endpoint 4 has a unique ID
     // ASSERT_TRUE(builder.IsEmpty()); // ownership taken above, we start fresh
