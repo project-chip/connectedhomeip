@@ -41,7 +41,7 @@ from chip import ChipDeviceCtrl
 from chip.commissioning import ROOT_ENDPOINT_ID
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
-
+import logging
 
 class TC_CGEN_2_9(MatterBaseTest):
 
@@ -56,17 +56,24 @@ class TC_CGEN_2_9(MatterBaseTest):
             fabricFiltered=False)
 
         # Re-order the list of fabrics so that the test harness admin fabric is removed last
+        logging.info(f"Fabrics list read from DUT: {fabrics}")
         commissioner_fabric = next((fabric for fabric in fabrics if fabric.fabricID == commissioner.fabricId), None)
         fabrics.remove(commissioner_fabric)
         fabrics.append(commissioner_fabric)
 
+        logging.info(f"Fabrics list prior to removals: {fabrics}")
+
         for fabric in fabrics:
+            logging.info(f"Removing fabric index {fabric.fabricIndex} (fabricID = {fabric.fabricID})")
             response: Clusters.OperationalCredentials.Commands.NOCResponse = await commissioner.SendCommand(
                 nodeid=self.dut_node_id,
                 endpoint=ROOT_ENDPOINT_ID,
                 payload=Clusters.OperationalCredentials.Commands.RemoveFabric(fabric.fabricIndex),
             )
             asserts.assert_equal(response.statusCode, Clusters.OperationalCredentials.Enums.NodeOperationalCertStatusEnum.kOk)
+
+            # Expire session so that RemoveFabric is done on new sessions.
+            commissioner.ExpireSessions(self.dut_node_id)
 
     def desc_TC_CGEN_2_9(self) -> str:
         return "[TC-CGEN-2.9] Verification that TCAcknowledgements is reset after all fabrics removed [DUT as Server]"
