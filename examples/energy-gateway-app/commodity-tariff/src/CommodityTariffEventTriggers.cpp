@@ -42,6 +42,11 @@
      // TODO
  }
  
+ void SetTestEventTrigger_TariffDataClear()
+ {
+     // TODO
+ }
+
  void SetTestEventTrigger_ForcedOneDayForward()
  {
      // TODO
@@ -56,6 +61,10 @@
      case CommodityTariffTrigger::kTariffDataUpdated:
          ChipLogProgress(Support, "[CommodityTariff-Test-Event] => Tariff Data Updated");
          SetTestEventTrigger_TariffDataUpdated();
+         break;
+    case CommodityTariffTrigger::kTariffDataClear:
+         ChipLogProgress(Support, "[CommodityTariff-Test-Event] => Tariff Data Clear");
+         SetTestEventTrigger_TariffDataClear();
          break;
      case CommodityTariffTrigger::kForcedOneDayForward:
          ChipLogProgress(Support, "[CommodityTariff-Test-Event] => Forced OneDay Forward");

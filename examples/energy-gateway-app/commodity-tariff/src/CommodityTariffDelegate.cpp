@@ -65,7 +65,7 @@ static bool LoadJsonFile(const char * aFname, Json::Value &jsonValue)
 
     if (jsonValue.empty() || !jsonValue.isObject())
     {
-        ChipLogError(NotSpecified, "JSON dtat %s", aFname);
+        ChipLogError(NotSpecified, "Invalid file format %s", aFname);
         goto exit;
     }
 
@@ -89,9 +89,16 @@ CommodityTariffDelegate::CommodityTariffDelegate()
 {
     Json::Value json_root;
 
-    VerifyOrDieWithMsg(LoadJsonFile(default_tariff_data, json_root), AppServer, "Unable to load default tariff file");
-    LoadTariffData(json_root);
-    mTariffData.LoadJson(json_root);
+    if ( LoadJsonFile(default_tariff_data, json_root) )
+    {
+        ChipLogProgress(NotSpecified, "The default tariff file opened successfully");
+        LoadTariffData(json_root);
+        mTariffData.LoadJson(json_root);        
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "Unable to load default tariff file");
+    }
 }
 
 /*

@@ -193,6 +193,7 @@ private:
     #define X(attrName, attrType) \
         CHIP_ERROR Set##attrName(const attrType& newValue) override { \
             if (mTariffData.attrName.Update(newValue)) { \
+                ChipLogProgress(NotSpecified, "EGW-CTC: The attr %s updated", #attrName);\
                 ReportAttributeChange(Attributes::attrName::Id); \
             } \
             return CHIP_NO_ERROR; \

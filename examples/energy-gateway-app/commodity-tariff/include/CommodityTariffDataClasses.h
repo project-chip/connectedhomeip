@@ -9,10 +9,12 @@ namespace CommodityTariff {
 
 static constexpr size_t kDefaultStringValuesMaxBufLength = 128u;
 
+#define LOG_VAR_CH(changed) ChipLogProgress(NotSpecified, "EGW-CTC: Attr value %s", changed ? "changed": "not changed" )
+
 template <typename T>
 class CTC_BaseDataClass {
 public:
-    explicit CTC_BaseDataClass(T& aValueStorage) : mValue(aValueStorage) {}
+    explicit CTC_BaseDataClass(T& aValueStorage) : mValue(aValueStorage) { /*CleanupValue();*/ }
     virtual ~CTC_BaseDataClass() = default;
 
     enum class Error : uint8_t {
@@ -41,7 +43,6 @@ public:
     {
         return CHIP_NO_ERROR;
     }
-private:
 protected:
     T & mValue;
 
@@ -49,7 +50,25 @@ protected:
         return true;
     }
 
+    static bool NullableNotEqual(const T& a, const T& b) {
+        bool is_neq = false;
+
+        if (a.IsNull() || b.IsNull()) {
+            is_neq = a.IsNull() != b.IsNull();
+        }
+
+        LOG_VAR_CH(is_neq);
+
+       return is_neq;
+       //return a.Value() != b.Value();
+    }
+
     virtual bool HasChanged(const T& newValue) const {
+        if constexpr (is_nullable<T>::value) {
+            return NullableNotEqual(mValue, newValue);
+        } else if constexpr (is_list<T>::value) {
+            return mValue.size() != newValue.size();
+        }
         return true;
     }
     
@@ -59,8 +78,25 @@ protected:
     }
 
     virtual void CleanupValue() {
-        return;
+        if constexpr (is_nullable<T>::value) {
+            mValue.SetNull();
+        } else if constexpr (is_list<T>::value) {
+            mValue = T();
+        }
     }
+private:
+    // Type traits for conditional behavior
+    template <typename U>
+    struct is_nullable : std::false_type {};
+
+    template <typename U>
+    struct is_nullable<DataModel::Nullable<U>> : std::true_type {};
+
+    template <typename U>
+    struct is_list : std::false_type {};
+
+    template <typename U>
+    struct is_list<DataModel::List<U>> : std::true_type {};
 };
 
 template <typename T>
