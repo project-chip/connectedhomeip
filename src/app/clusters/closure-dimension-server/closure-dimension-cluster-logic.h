@@ -143,7 +143,6 @@ struct ClusterState
 {
     DataModel::Nullable<GenericCurrentStateStruct> currentState{ DataModel::NullNullable };
     DataModel::Nullable<GenericTargetStruct> target{ DataModel::NullNullable };
-    // TODO: Spec issue: Fallback values for resolution and StepValue should be set to 1
     Percent100ths resolution                                      = 1;
     Percent100ths stepValue                                       = 1;
     ClosureUnitEnum unit                                          = ClosureUnitEnum::kUnknownEnumValue;
@@ -174,9 +173,9 @@ public:
      *  @param [in] clusterInitParameters cluster Init Parameters
      *
      *  @return CHIP_ERROR_INCORRECT_STATE if the cluster has already been initialized,
-     *              CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR if the conformance is incorrect.
-     *              Set function errors if setting the attributes with the provided ClusterInitParameters fails.
-     *              CHIP_NO_ERROR on succesful initialisation.
+     *          CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR if the conformance is incorrect.
+     *          Set function errors if setting the attributes with the provided ClusterInitParameters fails.
+     *          CHIP_NO_ERROR on succesful initialisation.
      */
     CHIP_ERROR Init(const ClusterConformance & conformance, const ClusterInitParameters & clusterInitParameters);
 
@@ -186,9 +185,9 @@ public:
      * @param[in] currentState Current State Position, Latch and Speed.
      *
      * @return CHIP_NO_ERROR if set was successful.
-     *              CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
-     *              CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
-     *              CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      */
     CHIP_ERROR SetCurrentState(const DataModel::Nullable<GenericCurrentStateStruct> & currentState);
 
@@ -198,9 +197,9 @@ public:
      * @param[in] target Target Position, Latch and Speed.
      *
      * @return CHIP_NO_ERROR if set was successful.
-     *              CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
-     *              CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
-     *              CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      */
     CHIP_ERROR SetTarget(const DataModel::Nullable<GenericTargetStruct> & target);
 
@@ -210,9 +209,9 @@ public:
      * @param[in] resolution Minimal acceptable change of Position fields of attributes.
      *
      * @return CHIP_NO_ERROR if set was successful.
-     *              CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
-     *              CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
-     *              CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetResolution(const Percent100ths resolution);
 
@@ -222,9 +221,9 @@ public:
      * @param[in] stepValue One step value for Step command
      *
      * @return CHIP_NO_ERROR if set was successful.
-     *              CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
-     *              CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
-     *              CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetStepValue(const Percent100ths stepValue);
 
@@ -234,9 +233,9 @@ public:
      * @param[in] unit Unit related to the Positioning.
      *
      * @return CHIP_NO_ERROR if set was successful.
-     *              CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
-     *              CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
-     *              CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetUnit(const ClosureUnitEnum unit);
 
@@ -246,9 +245,9 @@ public:
      * @param[in] unitRange Minimum and Maximum values expressed by positioning following the unit.
      *
      * @return CHIP_NO_ERROR if set was successful.
-     *              CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
-     *              CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
-     *              CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetUnitRange(const DataModel::Nullable<Structs::UnitRangeStruct::Type> & unitRange);
 
@@ -258,9 +257,9 @@ public:
      * @param[in] limitRange Range of possible values for the position field in Current attribute.
      *
      * @return CHIP_NO_ERROR if set was successful.
-     *              CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
-     *              CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
-     *              CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetLimitRange(const Structs::RangePercent100thsStruct::Type & limitRange);
 
@@ -270,9 +269,9 @@ public:
      * @param[in] overflow Overflow related to Rotation.
      *
      * @return CHIP_NO_ERROR if set was successful.
-     *              CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
-     *              CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
-     *              CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetOverflow(const OverflowEnum overflow);
 
@@ -302,10 +301,10 @@ public:
      *  @param [in] speed Target speed
      *
      *  @return Exits if the cluster is not initialized.
-     *              Returns ConstraintError if the input values are out is out of range.
-     *              Returns InvalidInState if the current position of device is not known.
-     *              Returns Success if arguments don't match the feature conformance.
-     *              Returns Success on succesful handling.
+     *          InvalidCommand if none of the input parameters are present.
+     *          ConstraintError if the input values are out is out of range.
+     *          InvalidInState if the current position of closure is not known.
+     *          Success on succesful handling.
      */
     Protocols::InteractionModel::Status HandleSetTargetCommand(Optional<Percent100ths> position, Optional<bool> latch,
                                                                Optional<Globals::ThreeLevelAutoEnum> speed);
@@ -318,11 +317,10 @@ public:
      *  @param [in] speed step speed
      *
      *  @return Exits if the cluster is not initialized.
-     *              Returns UnsupportedCommand if Positioning feature is not supported.
-     *              Returns ConstraintError if the input values are out is out of range.
-     *              Returns InvalidInState if the current position of device is not known.
-     *              Returns Success if speed field don't match the feature conformance.
-     *              Returns Success on successful handling.
+     *          UnsupportedCommand if Positioning feature is not supported.
+     *          ConstraintError if the input values are out is out of range.
+     *          InvalidInState if the current position of closure is not known.
+     *          Success on successful handling.
      */
     Protocols::InteractionModel::Status HandleStepCommand(StepDirectionEnum direction, uint16_t numberOfSteps,
                                                           Optional<Globals::ThreeLevelAutoEnum> speed);
@@ -340,9 +338,9 @@ private:
      * @param[in] translationDirection Direction of the translation.
      *
      * @return CHIP_NO_ERROR if set was successful.
-     *                CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
-     *                CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
-     *                CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported
      *
      */
     CHIP_ERROR SetTranslationDirection(const TranslationDirectionEnum translationDirection);
@@ -355,9 +353,9 @@ private:
      * @param[in] rotationAxis Axis of the rotation.
      *
      * @return CHIP_NO_ERROR if set was successful.
-     *              CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
-     *              CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
-     *              CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported
      *
      */
     CHIP_ERROR SetRotationAxis(const RotationAxisEnum rotationAxis);
@@ -370,9 +368,9 @@ private:
      * @param[in] modulationType Modulation type.
      *
      * @return CHIP_NO_ERROR if set was successful.
-     *              CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
-     *              CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
-     *              CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      *
      */
     CHIP_ERROR SetModulationType(const ModulationTypeEnum modulationType);

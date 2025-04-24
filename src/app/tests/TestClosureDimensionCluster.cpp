@@ -127,8 +127,8 @@ TEST_F(TestClosureDimensionClusterLogic, TestConformanceValid)
 {
     conformance.OptionalAttributes().Clear(OptionalAttributeEnum::kOverflow);
 
-    std::cout << "Validating if either Positioning or MotionLatching is supported. If neither are enabled, returns false."
-              << std::endl;
+    // Validating if either Positioning or MotionLatching is supported. If neither are enabled, returns false.
+
     // Neither Positioning or MotionLatching is enabled , return false.
     conformance.FeatureMap() = 0;
     EXPECT_FALSE(conformance.Valid());
@@ -139,8 +139,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestConformanceValid)
     conformance.FeatureMap() = 2;
     EXPECT_TRUE(conformance.Valid());
 
-    std::cout << "Validating If Unit, Limitation or speed is enabled, Positioning must be enabled. Return false otherwise."
-              << std::endl;
+    // Validating If Unit, Limitation or speed is enabled, Positioning must be enabled. Return false otherwise.
 
     // Speed is enabled, Positioning is not enabled. Return false.
     conformance.FeatureMap() = 18;
@@ -166,9 +165,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestConformanceValid)
     conformance.FeatureMap() = 5;
     EXPECT_TRUE(conformance.Valid());
 
-    std::cout
-        << "Validating If Translation, Rotation or Modulation is enabled, Positioning must be enabled. Return false otherwise."
-        << std::endl;
+    // Validating If Translation, Rotation or Modulation is enabled, Positioning must be enabled. Return false otherwise.
 
     // Translation is enabled, Positioning is not enabled. Return false
     conformance.FeatureMap() = 34;
@@ -196,7 +193,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestConformanceValid)
     conformance.FeatureMap() = 129;
     EXPECT_TRUE(conformance.Valid());
 
-    std::cout << "Validating Only one of Translation, Rotation or Modulation must be enabled. Return false otherwise." << std::endl;
+    // Validating Only one of Translation, Rotation or Modulation must be enabled. Return false otherwise.
 
     // If Positioning is enabled, all 3 Translation, Rotation and  Modulation are enabled. Return false
     conformance.FeatureMap() = 225;
@@ -218,9 +215,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestConformanceValid)
     conformance.FeatureMap() = 161;
     EXPECT_FALSE(conformance.Valid());
 
-    std::cout << "Validating If Overflow Attribute is supported, atleast one of Rotation or MotionLatching should be supported. "
-                 "Return false otherwise. "
-              << std::endl;
+    // Validating If Overflow Attribute is supported, atleast one of Rotation or MotionLatching should be supported. Return false otherwise.
 
     // Overflow Attribute is supported, MotionLatching is supported. Return True.
     conformance.FeatureMap() = 2;
@@ -240,8 +235,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestConformanceValid)
     EXPECT_FALSE(conformance.Valid());
     conformance.OptionalAttributes().Clear(OptionalAttributeEnum::kOverflow);
 
-    std::cout << "Validating If Rotation feature is enabled, then the Overflow attribute must be supported. Return false otherwise."
-              << std::endl;
+    // Validating If Rotation feature is enabled, then the Overflow attribute must be supported. Return false otherwise.
 
     // If Rotation  feature is supported, then Overflow Attribute should be supported.
     conformance.FeatureMap() = 65;
@@ -1549,27 +1543,27 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommand)
     DataModel::Nullable<GenericCurrentStateStruct> currentState;
     DataModel::Nullable<GenericTargetStruct> target;
 
-    std::cout << "Validating SetTarget with no arguments" << std::endl;
+    // Validating SetTarget with no arguments
     mockContext.ClearDirtyList();
     EXPECT_EQ(logic->HandleSetTargetCommand(NullOptional, NullOptional, NullOptional), Status::InvalidCommand);
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::Target::Id));
 
-    std::cout << "Validating SetTarget with invalid position" << std::endl;
+   // Validating SetTarget with invalid position
     mockContext.ClearDirtyList();
     EXPECT_EQ(logic->HandleSetTargetCommand(Optional<Percent100ths>(10001), NullOptional, NullOptional), Status::ConstraintError);
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::Target::Id));
 
-    std::cout << "Validating SetTarget with manual latch" << std::endl;
+    // Validating SetTarget with manual latch
     mockContext.ClearDirtyList();
-    mockDelegate.ToggleManualLatching(true);
+    mockDelegate.SetManualLatching(true);
     EXPECT_EQ(logic->HandleSetTargetCommand(NullOptional, Optional<bool>(true), NullOptional), Status::InvalidAction);
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::Target::Id));
-    mockDelegate.ToggleManualLatching(false);
+    mockDelegate.SetManualLatching(false);
 
-    std::cout << "Validating SetTarget with invalid speed" << std::endl;
+    // Validating SetTarget with invalid speed
     mockContext.ClearDirtyList();
     EXPECT_EQ(logic->HandleSetTargetCommand(NullOptional, NullOptional,
                                             Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kUnknownEnumValue)),
@@ -1577,7 +1571,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommand)
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::Target::Id));
 
-    std::cout << "Validating SetTarget with unknown current state" << std::endl;
+    // Validating SetTarget with unknown current state
     mockContext.ClearDirtyList();
     EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
     EXPECT_EQ(currentState, DataModel::NullNullable);
@@ -1587,7 +1581,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommand)
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::Target::Id));
 
-    std::cout << "Validating SetTarget with proper arguments" << std::endl;
+    // Validating SetTarget with proper arguments
     GenericCurrentStateStruct setCurrentStateStruct(Optional<Percent100ths>(0), Optional<bool>(false),
                                                     Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto));
     currentState.SetNonNull(setCurrentStateStruct);
@@ -1603,7 +1597,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommand)
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
     EXPECT_TRUE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::Target::Id));
 
-    std::cout << "Validating SetTarget with only position arguments" << std::endl;
+    // Validating SetTarget with only position arguments
     mockContext.ClearDirtyList();
     EXPECT_EQ(logic->HandleSetTargetCommand(Optional<Percent100ths>(10000), NullOptional, NullOptional), Status::Success);
     EXPECT_EQ(logic->GetTarget(target), CHIP_NO_ERROR);
@@ -1630,7 +1624,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommandWithLimitatio
     Structs::RangePercent100thsStruct::Type limitRange = { .min = 1000, .max = 9000 };
     EXPECT_EQ(logic->SetLimitRange(limitRange), CHIP_NO_ERROR);
 
-    std::cout << "Validating SetTarget with position greater than Limit.Max" << std::endl;
+    // Validating SetTarget with position greater than Limit.Max
     GenericCurrentStateStruct setCurrentStateStruct(Optional<Percent100ths>(1000), Optional<bool>(false),
                                                     Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto));
     currentState.SetNonNull(setCurrentStateStruct);
@@ -1646,7 +1640,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommandWithLimitatio
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
     EXPECT_TRUE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::Target::Id));
 
-    std::cout << "Validating SetTarget with position less the limit.Min" << std::endl;
+    // Validating SetTarget with position less the limit.Min
     setCurrentStateStruct.Set(Optional<Percent100ths>(9000), Optional<bool>(false),
                               Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto));
     currentState.SetNonNull(setCurrentStateStruct);
@@ -1677,19 +1671,19 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommand)
     DataModel::Nullable<GenericCurrentStateStruct> currentState;
     DataModel::Nullable<GenericTargetStruct> target;
 
-    std::cout << "Validating Step with Invalid direction" << std::endl;
+    // Validating Step with Invalid direction
     mockContext.ClearDirtyList();
     EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kUnknownEnumValue, 1, NullOptional), Status::ConstraintError);
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::Target::Id));
 
-    std::cout << "Validating Step with invalid steps" << std::endl;
+    // Validating Step with invalid steps
     mockContext.ClearDirtyList();
     EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kDecrease, 0, NullOptional), Status::ConstraintError);
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::Target::Id));
 
-    std::cout << "Validating Step with invalid speed" << std::endl;
+    // Validating Step with invalid speed
     mockContext.ClearDirtyList();
     EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kDecrease, 1,
                                        Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kUnknownEnumValue)),
@@ -1697,7 +1691,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommand)
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::Target::Id));
 
-    std::cout << "Validating Step with unknown current state" << std::endl;
+    // Validating Step with unknown current state
     mockContext.ClearDirtyList();
     EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
     EXPECT_EQ(currentState, DataModel::NullNullable);
@@ -1710,7 +1704,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommand)
     Percent100ths stepValue = 10;
     EXPECT_EQ(logic->SetStepValue(stepValue), CHIP_NO_ERROR);
 
-    std::cout << "Validating Step increase with proper arguments" << std::endl;
+    // Validating Step increase with proper arguments
     GenericCurrentStateStruct setCurrentStateStruct(Optional<Percent100ths>(0), Optional<bool>(false),
                                                     Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto));
     currentState.SetNonNull(setCurrentStateStruct);
@@ -1730,7 +1724,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommand)
     currentState.SetNonNull(setCurrentStateStruct);
     EXPECT_EQ(logic->SetCurrentState(currentState), CHIP_NO_ERROR);
 
-    std::cout << "Validating Step increase which target will be >10000" << std::endl;
+    // Validating Step increase which target will be >10000
     mockContext.ClearDirtyList();
     EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kIncrease, 65535,
                                        Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kMedium)),
@@ -1746,7 +1740,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommand)
     currentState.SetNonNull(setCurrentStateStruct);
     EXPECT_EQ(logic->SetCurrentState(currentState), CHIP_NO_ERROR);
 
-    std::cout << "Validating Step decrease " << std::endl;
+    // Validating Step decrease 
     mockContext.ClearDirtyList();
     EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kDecrease, 10,
                                        Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow)),
@@ -1762,7 +1756,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommand)
     currentState.SetNonNull(setCurrentStateStruct);
     EXPECT_EQ(logic->SetCurrentState(currentState), CHIP_NO_ERROR);
 
-    std::cout << "Validating Step decrease which target will be <0" << std::endl;
+    // Validating Step decrease which target will be <0
     mockContext.ClearDirtyList();
     EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kDecrease, 65535,
                                        Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto)),
@@ -1796,7 +1790,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommandWithLimitation)
     Percent100ths stepValue = 10;
     EXPECT_EQ(logic->SetStepValue(stepValue), CHIP_NO_ERROR);
 
-    std::cout << "Validating Step with proper arguments" << std::endl;
+    // Validating Step with proper arguments
     GenericCurrentStateStruct setCurrentStateStruct(Optional<Percent100ths>(1000), Optional<bool>(false),
                                                     Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto));
     currentState.SetNonNull(setCurrentStateStruct);

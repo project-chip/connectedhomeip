@@ -58,9 +58,6 @@ CHIP_ERROR ClusterLogic::Init(const ClusterConformance & conformance, const Clus
         ReturnErrorOnFailure(SetModulationType(clusterInitParameters.modulationType));
     }
 
-    // TODO: SpecIssue: All the attributes like resolution, unit etc which are constant for closure should be made to be set only
-    // during Initialization.
-
     mInitialized = true;
     return CHIP_NO_ERROR;
 }
@@ -71,7 +68,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericCurren
     assertChipStackLockedByCurrentThread();
 
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnValue(mState.currentState != incomingCurrentState, CHIP_NO_ERROR);
+    VerifyOrReturnError(mState.currentState != incomingCurrentState, CHIP_NO_ERROR);
 
     DataModel::Nullable<GenericCurrentStateStruct> & clusterCurrentState = mState.currentState;
 
@@ -197,7 +194,7 @@ CHIP_ERROR ClusterLogic::SetTarget(const DataModel::Nullable<GenericTargetStruct
     assertChipStackLockedByCurrentThread();
 
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnValue(mState.target != incomingTarget, CHIP_NO_ERROR);
+    VerifyOrReturnError(mState.target != incomingTarget, CHIP_NO_ERROR);
 
     DataModel::Nullable<GenericTargetStruct> & clusterTarget = mState.target;
 
@@ -410,7 +407,6 @@ CHIP_ERROR ClusterLogic::SetUnitRange(const DataModel::Nullable<Structs::UnitRan
 
     // If Unit is Degrees , 0° value orientation is the value corresponding to the perpendicular axis to the Closure panel.
     // Range of values SHALL contain -90 to 90 only
-    // TODO: Spec issue - No explicit mention of constrains for degrees.
     if (unit == ClosureUnitEnum::kDegree)
     {
         VerifyOrReturnError(unitRange.Value().min >= -90 && unitRange.Value().min <= 90, CHIP_ERROR_INVALID_ARGUMENT);
@@ -469,8 +465,6 @@ CHIP_ERROR ClusterLogic::SetLimitRange(const Structs::RangePercent100thsStruct::
     return CHIP_NO_ERROR;
 }
 
-// This attribute is not supposed to change once the installation is finalized.
-// so SetTranslationDirection should only be called from Init()
 CHIP_ERROR ClusterLogic::SetTranslationDirection(const TranslationDirectionEnum translationDirection)
 {
     VerifyOrReturnError(!mInitialized, CHIP_ERROR_INCORRECT_STATE);
@@ -488,8 +482,6 @@ CHIP_ERROR ClusterLogic::SetTranslationDirection(const TranslationDirectionEnum 
     return CHIP_NO_ERROR;
 }
 
-// This attribute is not supposed to change once the installation is finalized.
-// so SetRotationAxis should only be called from Init().
 CHIP_ERROR ClusterLogic::SetRotationAxis(const RotationAxisEnum rotationAxis)
 {
     VerifyOrReturnError(!mInitialized, CHIP_ERROR_INCORRECT_STATE);
@@ -536,8 +528,6 @@ CHIP_ERROR ClusterLogic::SetOverflow(const OverflowEnum overflow)
     return CHIP_NO_ERROR;
 }
 
-// This attribute is not supposed to change once the installation is finalized.
-// so SetModulationType should only be called from Init().
 CHIP_ERROR ClusterLogic::SetModulationType(const ModulationTypeEnum modulationType)
 {
     VerifyOrReturnError(!mInitialized, CHIP_ERROR_INCORRECT_STATE);
@@ -662,11 +652,10 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
 
     Status status = Status::Success;
 
-    // TODO: SpecIssue No Explicit error code mentioned in case all 3 fields are absent.
     //  If all command parameters don't have a value, return InvalidCommand
-    VerifyOrReturnValue(position.HasValue() || latch.HasValue() || speed.HasValue(), Status::InvalidCommand);
+    VerifyOrReturnError(position.HasValue() || latch.HasValue() || speed.HasValue(), Status::InvalidCommand);
 
-    // TODO: SpecIssue If this command is sent while the device is in a non-compatible internal-state, a status code of
+    // TODO: If this command is sent while the device is in a non-compatible internal-state, a status code of
     // INVALID_IN_STATE SHALL be returned.
 
     GenericTargetStruct target{};
@@ -675,9 +664,6 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
     if (position.HasValue() && mConformance.HasFeature(Feature::kPositioning))
     {
         VerifyOrReturnError((position.Value() <= kPercents100thsMaxValue), Status::ConstraintError);
-
-        // TODO: Specissue: Previously spec says if target position in not multiple of resolution, we should set to nearest integer
-        // multiple. But in latest spec the behaviour is not defined
 
         // If the Limitation Feature is active, the device will automatically offset the Target.Position value to fit within
         // LimitRange.Min and LimitRange.Max.
@@ -722,15 +708,15 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
     // Check if the current position is valid or else return InvalidInState
     DataModel::Nullable<GenericCurrentStateStruct> currentState;
     VerifyOrReturnError(GetCurrentState(currentState) == CHIP_NO_ERROR, Status::Failure);
-    VerifyOrReturnValue(!currentState.IsNull(), Status::InvalidInState);
-    VerifyOrReturnValue(currentState.Value().position.HasValue(), Status::InvalidInState);
+    VerifyOrReturnError(!currentState.IsNull(), Status::InvalidInState);
+    VerifyOrReturnError(currentState.Value().position.HasValue(), Status::InvalidInState);
 
     // Target should only be set when delegate function returns status as Success. Return failure otherwise
-    VerifyOrReturnValue(mDelegate.HandleSetTarget(position, latch, speed) == Status::Success, Status::Failure);
+    VerifyOrReturnError(mDelegate.HandleSetTarget(position, latch, speed) == Status::Success, Status::Failure);
 
     DataModel::Nullable<GenericTargetStruct> nullableTarget;
     nullableTarget.SetNonNull(target);
-    VerifyOrReturnValue(SetTarget(nullableTarget) == CHIP_NO_ERROR, Status::Failure);
+    VerifyOrReturnError(SetTarget(nullableTarget) == CHIP_NO_ERROR, Status::Failure);
 
     return status;
 }
@@ -758,14 +744,14 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
         stepTarget.speed = speed;
     }
 
-    // TODO: SpecIssue: If the server is in a state where it cannot support the command, the server SHALL respond with an
+    // TODO: If the server is in a state where it cannot support the command, the server SHALL respond with an
     // INVALID_IN_STATE response and the Target attribute value SHALL remain unchanged.
 
     // Check if the current position is valid or else return InvalidInState
     DataModel::Nullable<GenericCurrentStateStruct> currentState;
     VerifyOrReturnError(GetCurrentState(currentState) == CHIP_NO_ERROR, Status::Failure);
-    VerifyOrReturnValue(!currentState.IsNull(), Status::InvalidInState);
-    VerifyOrReturnValue(currentState.Value().position.HasValue(), Status::InvalidInState);
+    VerifyOrReturnError(!currentState.IsNull(), Status::InvalidInState);
+    VerifyOrReturnError(currentState.Value().position.HasValue(), Status::InvalidInState);
 
     // Derive Target Position from StepValue and NumberOfSteps.
     Percent100ths stepValue;
@@ -817,7 +803,7 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
     }
 
     // Target should only be set when delegate function returns status as Success. Return failure otherwise
-    VerifyOrReturnValue(mDelegate.HandleStep(direction, numberOfSteps, speed) == Status::Success, Status::Failure);
+    VerifyOrReturnError(mDelegate.HandleStep(direction, numberOfSteps, speed) == Status::Success, Status::Failure);
 
     stepTarget.position.SetValue(static_cast<Percent100ths>(newPosition));
     DataModel::Nullable<GenericTargetStruct> nullableTarget;
