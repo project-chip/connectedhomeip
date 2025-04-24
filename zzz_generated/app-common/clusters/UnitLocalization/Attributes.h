@@ -53,6 +53,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TemperatureUnit
+namespace SupportedTemperatureUnits {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::app::Clusters::UnitLocalization::TempUnitEnum>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::UnitLocalization::TempUnitEnum>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::UnitLocalization::TempUnitEnum> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitLocalization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedTemperatureUnits::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SupportedTemperatureUnits
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -94,6 +106,7 @@ struct TypeInfo
 
         Attributes::TemperatureUnit::TypeInfo::DecodableType temperatureUnit =
             static_cast<chip::app::Clusters::UnitLocalization::TempUnitEnum>(0);
+        Attributes::SupportedTemperatureUnits::TypeInfo::DecodableType supportedTemperatureUnits;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
