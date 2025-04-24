@@ -33,12 +33,6 @@ namespace app {
 namespace Clusters {
 namespace ClosureDimension {
 
-namespace {
-
-constexpr uint16_t kExpectedClusterRevision = 1u;
-
-} // namespace
-
 class TestDelegate : public DelegateBase
 {
 public:
@@ -310,6 +304,49 @@ TEST_F(TestClosureDimensionClusterLogic, TestInvalidInitParameters)
     EXPECT_EQ(state.modulationType, ModulationTypeEnum::kUnknownEnumValue);
     EXPECT_EQ(state.rotationAxis, RotationAxisEnum::kUnknownEnumValue);
     EXPECT_EQ(state.translationDirection, TranslationDirectionEnum::kUnknownEnumValue);
+}
+
+//=========================================================================================
+// Tests for Featuremap and Cluster Revision Attribute
+//=========================================================================================
+
+// This test ensures the get FeatureMap get the Featuremap set from conformance
+TEST_F(TestClosureDimensionClusterLogic, TestFeatureMap)
+{
+    conformance.FeatureMap() = 1;
+    conformance.OptionalAttributes().Clear(OptionalAttributeEnum::kOverflow);
+
+    mockContext.ClearDirtyList();
+
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+    EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::ModulationType::Id));
+    EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::RotationAxis::Id));
+    EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::TranslationDirection::Id));
+
+    Attributes::FeatureMap::TypeInfo::Type featureMap;
+
+    EXPECT_EQ(logic->GetFeatureMap(featureMap), CHIP_NO_ERROR);
+    EXPECT_EQ(featureMap, conformance.FeatureMap());
+}
+
+// This test ensures the get ClusterRevision get the intended value
+TEST_F(TestClosureDimensionClusterLogic, TestClusterRevision)
+{
+    conformance.FeatureMap() = 1;
+    conformance.OptionalAttributes().Clear(OptionalAttributeEnum::kOverflow);
+
+    mockContext.ClearDirtyList();
+
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+    EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::ModulationType::Id));
+    EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::RotationAxis::Id));
+    EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::TranslationDirection::Id));
+
+    uint16_t kExpectedClusterRevision = 1u;
+    Attributes::ClusterRevision::TypeInfo::Type clusterRevision;
+
+    EXPECT_EQ(logic->GetClusterRevision(clusterRevision), CHIP_NO_ERROR);
+    EXPECT_EQ(clusterRevision, kExpectedClusterRevision);
 }
 
 //=========================================================================================

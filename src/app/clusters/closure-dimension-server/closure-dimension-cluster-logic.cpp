@@ -306,7 +306,7 @@ CHIP_ERROR ClusterLogic::SetTarget(const DataModel::Nullable<GenericTargetStruct
         Update the cluster state and mark it as dirty if necessary
     */
 
-    // Cluster Target going from non-null to null
+    // Cluster target going from non-null to null
     if (validateClusterTargetMembers && !validateIncomingTargetMembers)
     {
         clusterTarget.SetNull();
