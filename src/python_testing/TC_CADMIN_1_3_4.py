@@ -44,6 +44,7 @@
 
 import asyncio
 import base64
+import logging
 import random
 from time import sleep
 
@@ -104,10 +105,19 @@ class TC_CADMIN(MatterBaseTest):
             asserts.fail(f"Unknown commissioning type: {commission_type}")
 
         self.step("3b")
-        services = await self.support.get_txt_record()
-        expected_cm_value = "2" if commission_type == "ECM" else "1"
-        if services.txt_record['CM'] != expected_cm_value:
-            asserts.fail(f"Expected cm record value {expected_cm_value}, but found {services.txt_record['CM']}")
+        if commission_type == "ECM":
+            service = await self.support.wait_for_correct_cm_value(
+                expected_cm_value=2,
+                expected_discriminator=1234
+            )
+            logging.info(f"Successfully found service with CM={service.txt_record.get('CM')}, D={service.txt_record.get('D')}")
+        elif commission_type == "BCM":
+            service = await self.support.wait_for_correct_cm_value(
+                expected_cm_value=1,
+                expected_discriminator=setupPayloadInfo[0].filter_value
+            )
+            logging.info(f"Successfully found service with CM={service.txt_record.get('CM')}, D={service.txt_record.get('D')}")
+
 
         self.step("3c")
         BI_cluster = Clusters.BasicInformation
