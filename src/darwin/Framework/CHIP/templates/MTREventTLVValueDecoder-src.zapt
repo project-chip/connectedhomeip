@@ -52,6 +52,7 @@ static id _Nullable DecodeEventPayloadFor{{asUpperCamelCase name preserveAcronym
         {{/if}}
         {{/zcl_events}}
         default: {
+            // Not a known {{asUpperCamelCase name preserveAcronyms=true}} event.
             break;
         }
     }

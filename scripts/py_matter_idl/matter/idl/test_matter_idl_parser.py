@@ -27,8 +27,8 @@ except ModuleNotFoundError:
 import unittest
 from typing import Optional
 
-from matter.idl.generators import GeneratorStorage
 from matter.idl.generators.idl import IdlGenerator
+from matter.idl.generators.storage import GeneratorStorage
 from matter.idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute, AttributeInstantiation, AttributeQuality,
                                          AttributeStorage, Bitmap, Cluster, Command, CommandInstantiation, CommandQuality,
                                          ConstantEntry, DataType, DeviceType, Endpoint, Enum, Event, EventPriority, EventQuality,
