@@ -591,10 +591,10 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
             asserts.assert_equal(th2_fabrics_entry.vendorID, vendorID,
                                  "Did not get the expected value set for VendorID field of Fabrics list for TH2's fabric.")
 
-        with test_step(13, description="Arm a fail safe for 300s from TH2 on dut_node_id2 with breadcrumb set to 10.") as step:
+        with test_step(13, description="Arm a fail safe for 300s from TH2 on dut_node_id2 with breadcrumb set to 10."):
             await self.send_single_cmd(dev_ctrl=th2_dev_ctrl, node_id=th2_dut_node_id, cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=60, breadcrumb=10))
 
-        with test_step(14, description="Invoke SetVIDVerificationStatement with VVSC and VIDVerificationStatement to empty, and VID set to 0xFFF3 on TH2's fabric, inside fail-safe. Verify VVSC, VIDVerificationStatement are now empty and VID is 0xFFF3 for that fabric.") as step:
+        with test_step(14, description="Invoke SetVIDVerificationStatement with VVSC and VIDVerificationStatement to empty, and VID set to 0xFFF3 on TH2's fabric, inside fail-safe. Verify VVSC, VIDVerificationStatement are now empty and VID is 0xFFF3 for that fabric."):
             vvsc = b""
             VIDVerificationStatement = b""
             vendorID = 0xFFF3
@@ -620,7 +620,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
             asserts.assert_equal(th2_fabrics_entry.vendorID, 0xFFF3,
                                  "Did not get the expected value set for VendorID field of Fabrics list for TH2's fabric.")
 
-        with test_step(15, description="Disarm fail safe with ArmFailSafe(0s). Verify VVS, VendorID are not reverted, since there had been no AddNOC/UpdateNOC") as step:
+        with test_step(15, description="Disarm fail safe with ArmFailSafe(0s). Verify VVS, VendorID are not reverted, since there had been no AddNOC/UpdateNOC"):
             await self.send_single_cmd(dev_ctrl=th2_dev_ctrl, node_id=th2_dut_node_id, cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=11))
             updated_fabrics, updated_nocs = await self.read_updated_fabrics(dev_ctrl=th2_dev_ctrl, node_id=th2_dut_node_id)
 
@@ -638,7 +638,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
             asserts.assert_equal(th2_fabrics_entry.vendorID, 0xFFF3,
                                  "Did not get the expected value set for VendorID field of Fabrics list for TH2's fabric.")
 
-        with test_step(16, description="Create a new fabric under TH2's root with fabric ID 0x3333, node ID 0x33333333, VendorID 0xFFF2, by invoking ArmFailSafe(600s), CSRRequest, AddTrustedRootCertificate and AddNOC. Do not disarm failsafe, do not execute commissioning complete.") as step:
+        with test_step(16, description="Create a new fabric under TH2's root with fabric ID 0x3333, node ID 0x33333333, VendorID 0xFFF2, by invoking ArmFailSafe(600s), CSRRequest, AddTrustedRootCertificate and AddNOC. Do not disarm failsafe, do not execute commissioning complete."):
             th3_dut_node_id = 0x33333333
 
             th3_vid = 0xFFF2
@@ -660,7 +660,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
             th3_fabric_index = nocResp.fabricIndex
             asserts.assert_true(success, "Commissioning DUT into TH3's fabrics must succeed.")
 
-        with test_step(17, description="Invoke SetVIDVerificationStatement with VVSC and VIDVerificationStatement present and setting VID to 0xFFF1 on fabric ID 0x3333 under TH2's root, inside fail-safe. Verify VIDVerificationStatement, VVSC and VID values match values set.") as step:
+        with test_step(17, description="Invoke SetVIDVerificationStatement with VVSC and VIDVerificationStatement present and setting VID to 0xFFF1 on fabric ID 0x3333 under TH2's root, inside fail-safe. Verify VIDVerificationStatement, VVSC and VID values match values set."):
             vvsc = b"\xcc" * 400
             VIDVerificationStatement = b"\x01" * VID_VERIFICATION_STATEMENT_SIZE_BYTES_V1
             vendorID = 0xFFF1
