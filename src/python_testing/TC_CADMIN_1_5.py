@@ -181,7 +181,7 @@ class TC_CADMIN_1_5(MatterBaseTest):
         # Wait for DNS-SD advertisement with correct CM value and discriminator
         # This will either return a valid service or assert failure
         service = await self.wait_for_correct_cm_value(
-            expected_cm_value=4,
+            expected_cm_value=2,
             expected_discriminator=params.randomDiscriminator
         )
         logging.info(f"Successfully found service with CM={service.txt_record.get('CM')}, D={service.txt_record.get('D')}")
