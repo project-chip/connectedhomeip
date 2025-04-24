@@ -60,7 +60,7 @@ struct ClusterConformance
      *        3. If Translation, Rotation or Modulation is enabled, Positioning must be enabled. Return false otherwise.
      *        4. Only one of Translation, Rotation or Modulation must be enabled. Return false otherwise.
      *        5. If the Overflow attribute is supported, at least one of Rotation or MotionLatching feature must be supported.
-     * Return false otherwise.
+     *            Return false otherwise.
      *        6. If Rotation feature is enabled, then the Overflow attribute must be supported. Return false otherwise.
      *
      * @return true, the cluster confirmance is valid
@@ -70,14 +70,14 @@ struct ClusterConformance
     {
         // Positioning or Matching must be enabled
         VerifyOrReturnValue(HasFeature(Feature::kPositioning) || HasFeature(Feature::kMotionLatching), false,
-                            ChipLogError(NotSpecified, "Validation failed: Neither Positioning nor MotionLatching is enabled."));
+                            ChipLogError(AppServer, "Validation failed: Neither Positioning nor MotionLatching is enabled."));
 
         // If Unit, Limitation or speed is enabled, Positioning must be enabled
         if (HasFeature(Feature::kUnit) || HasFeature(Feature::kLimitation) || HasFeature(Feature::kSpeed))
         {
             VerifyOrReturnValue(
                 HasFeature(Feature::kPositioning), false,
-                ChipLogError(NotSpecified, "Validation failed: Unit , Limitation, or speed requires Positioning enabled."));
+                ChipLogError(AppServer, "Validation failed: Unit , Limitation, and speed requires the Positioning feature."));
         }
 
         // If Translation, Rotation or Modulation is enabled, Positioning must be enabled.
@@ -175,7 +175,7 @@ public:
      *
      *  @return CHIP_ERROR_INCORRECT_STATE if the cluster has already been initialized,
      *              CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR if the conformance is incorrect.
-     *              Set Function Errors if the Setting of any feature supported ClusterInitParameters failed.
+     *              Set function errors if setting the attributes with the provided ClusterInitParameters fails.
      *              CHIP_NO_ERROR on succesful initialisation.
      */
     CHIP_ERROR Init(const ClusterConformance & conformance, const ClusterInitParameters & clusterInitParameters);

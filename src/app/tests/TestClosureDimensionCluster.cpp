@@ -58,7 +58,7 @@ public:
 
     bool IsManualLatchingNeeded() { return isLatchManual; }
 
-    void ToggleManualLatching(const bool manualLatch) { isLatchManual = manualLatch; }
+    void SetManualLatching(const bool manualLatch) { isLatchManual = manualLatch; }
 
 private:
     bool isLatchManual = false;

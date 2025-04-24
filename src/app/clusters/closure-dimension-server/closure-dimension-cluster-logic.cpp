@@ -31,14 +31,13 @@ using namespace chip::app::Clusters::ClosureDimension::Attributes;
 
 namespace {
 
-static constexpr Percent100ths kPercents100thsMaxValue = 10000;
+constexpr Percent100ths kPercents100thsMaxValue = 10000;
 
 } // namespace
 
 CHIP_ERROR ClusterLogic::Init(const ClusterConformance & conformance, const ClusterInitParameters & clusterInitParameters)
 {
     VerifyOrReturnError(!mInitialized, CHIP_ERROR_INCORRECT_STATE);
-
     VerifyOrReturnError(conformance.Valid(), CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
     mConformance = conformance;
 
