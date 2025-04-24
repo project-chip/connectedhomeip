@@ -1960,7 +1960,7 @@ endpoint 1 {
     ram      attribute temperatureSetpoint default = 0;
     ram      attribute minTemperature default = 4900;
     ram      attribute maxTemperature default = 8200;
-    ram      attribute step default = 0;
+    ram      attribute step default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2021,5 +2021,3 @@ endpoint 1 {
     handle command OperationalCommandResponse;
   }
 }
-
-
