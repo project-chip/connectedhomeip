@@ -527,11 +527,10 @@ void Instance::CheckAndFreeForecastBuffers()
     }
 }
 
-CHIP_ERROR Instance::CopyPrice2(Structs::CommodityPriceStruct::Type & destPriceStruct,
-                                Platform::ScopedMemoryBuffer<char> & dest_descriptionBuffer,
-                                Platform::ScopedMemoryBuffer<Structs::CommodityPriceComponentStruct::Type> & dest_componentsBuffer,
-                                Platform::ScopedMemoryBuffer<char> * dest_componentsDescriptionBuffer,
-                                const Structs::CommodityPriceStruct::Type & src)
+CHIP_ERROR Instance::CopyPriceStructWithinForecast(
+    Structs::CommodityPriceStruct::Type & destPriceStruct, Platform::ScopedMemoryBuffer<char> & dest_descriptionBuffer,
+    Platform::ScopedMemoryBuffer<Structs::CommodityPriceComponentStruct::Type> & dest_componentsBuffer,
+    Platform::ScopedMemoryBuffer<char> * dest_componentsDescriptionBuffer, const Structs::CommodityPriceStruct::Type & src)
 {
     // Do a basic copy of the CommodityPriceStruct trivial fields
     destPriceStruct.periodStart = src.periodStart;
@@ -604,9 +603,9 @@ CHIP_ERROR Instance::CopyPriceForecast(const DataModel::List<const Structs::Comm
     for (size_t count = 0; count < entries; count++)
     {
         // Deep copy each PriceStruct in the src list
-        ReturnLogErrorOnFailure(CopyPrice2(mOwnedForecastPriceStructBuffer[count], mOwnedForecastPriceDescriptionBuffer[count],
-                                           mOwnedForecastPriceComponentBuffer[count],
-                                           &mOwnedForecastPriceComponentDescriptionBuffer[count][0], src[count]));
+        ReturnLogErrorOnFailure(CopyPriceStructWithinForecast(
+            mOwnedForecastPriceStructBuffer[count], mOwnedForecastPriceDescriptionBuffer[count],
+            mOwnedForecastPriceComponentBuffer[count], &mOwnedForecastPriceComponentDescriptionBuffer[count][0], src[count]));
     }
     mPriceForecast = DataModel::List<const Structs::CommodityPriceStruct::Type>(
         Span<Structs::CommodityPriceStruct::Type>(mOwnedForecastPriceStructBuffer.Get(), entries));

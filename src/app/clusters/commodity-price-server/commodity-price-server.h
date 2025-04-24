@@ -153,11 +153,10 @@ private:
 
     // Helper function to clear buffer storage
     void CheckAndFreeForecastBuffers(void);
-    CHIP_ERROR CopyPrice2(Structs::CommodityPriceStruct::Type & destPriceStruct,
-                          Platform::ScopedMemoryBuffer<char> & dest_descriptionBuffer,
-                          Platform::ScopedMemoryBuffer<Structs::CommodityPriceComponentStruct::Type> & dest_componentsBuffer,
-                          Platform::ScopedMemoryBuffer<char> * dest_componentsDescriptionBuffer,
-                          const Structs::CommodityPriceStruct::Type & src);
+    CHIP_ERROR CopyPriceStructWithinForecast(
+        Structs::CommodityPriceStruct::Type & destPriceStruct, Platform::ScopedMemoryBuffer<char> & dest_descriptionBuffer,
+        Platform::ScopedMemoryBuffer<Structs::CommodityPriceComponentStruct::Type> & dest_componentsBuffer,
+        Platform::ScopedMemoryBuffer<char> * dest_componentsDescriptionBuffer, const Structs::CommodityPriceStruct::Type & src);
 
     // This is the cluster server's backing store for mForecast (list of CommodityPriceStructs) each with .components and
     // .descriptions
