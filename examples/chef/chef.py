@@ -42,9 +42,8 @@ _CICD_CONFIG_FILE_NAME = os.path.join(_CHEF_SCRIPT_PATH, "cicd_config.json")
 _CD_STAGING_DIR = os.path.join(_CHEF_SCRIPT_PATH, "staging")
 _EXCLUDE_DEVICE_FROM_LINUX_CI = [  # These do not compile / deprecated.
     "noip_rootnode_dimmablelight_bCwGYSDpoe",
-    "icd_rootnode_contactsensor_ed3b19ec55",
-    "rootnode_refrigerator_temperaturecontrolledcabinet_temperaturecontrolledcabinet_ffdb696680",
 ]
+_ICD_DEVICE_PATTERN = "^icd_"  # Pattern to filter (based on device-name) devices that need ICD support.
 
 gen_dir = ""  # Filled in after sample app type is read from args.
 
@@ -904,7 +903,7 @@ def main() -> int:
             else:
                 linux_args.append("chip_inet_config_enable_ipv4=false")
 
-            if options.enable_lit_icd:
+            if options.enable_lit_icd or re.search(_ICD_DEVICE_PATTERN, options.sample_device_type_name):
                 linux_args.append("chip_enable_icd_server = true")
                 linux_args.append("chip_icd_report_on_active_mode = true")
                 linux_args.append("chip_enable_icd_lit = true")
