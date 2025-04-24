@@ -57,7 +57,8 @@ jobs:
             src/python_testing/matter_testing_infrastructure/chip/testing/apps.py \
             src/python_testing/matter_testing_infrastructure/chip/testing/tasks.py \
             src/python_testing/matter_testing_infrastructure/chip/testing/taglist_and_topology_test.py \
-            src/python_testing/matter_testing_infrastructure/chip/testing/pics.py"
+            src/python_testing/matter_testing_infrastructure/chip/testing/pics.py \
+            src/python_testing/matter_testing_infrastructure/chip/testing/basic_composition.py"
           
           # Print a reminder about expanding coverage
           echo "⚠️ NOTE: Currently only checking a subset of files. Remember to expand coverage!" 
