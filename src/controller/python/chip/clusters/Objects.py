@@ -222,7 +222,6 @@ class Globals:
             kGardenDoor = 0x25
             kGuestBathroom = 0x26
             kGuestBedroom = 0x27
-            kGuestRestroom = 0x28
             kGuestRoom = 0x29
             kGym = 0x2A
             kHallway = 0x2B
@@ -230,7 +229,6 @@ class Globals:
             kKidsRoom = 0x2D
             kKidsBedroom = 0x2E
             kKitchen = 0x2F
-            kLarder = 0x30
             kLaundryRoom = 0x31
             kLawn = 0x32
             kLibrary = 0x33
@@ -255,7 +253,6 @@ class Globals:
             kRamp = 0x46
             kReceptionRoom = 0x47
             kRecreationRoom = 0x48
-            kRestroom = 0x49
             kRoof = 0x4A
             kSauna = 0x4B
             kScullery = 0x4C
@@ -277,11 +274,12 @@ class Globals:
             kUtilityRoom = 0x5C
             kWard = 0x5D
             kWorkshop = 0x5E
+            kToilet = 0x5F
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 95
+            kUnknownEnumValue = 40
 
         class AtomicRequestTypeEnum(MatterIntEnum):
             kBeginWrite = 0x00
@@ -292,37 +290,6 @@ class Globals:
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3
-
-        class FloorSurfaceTag(MatterIntEnum):
-            kCarpet = 0x00
-            kCeramic = 0x01
-            kConcrete = 0x02
-            kCork = 0x03
-            kDeepCarpet = 0x04
-            kDirt = 0x05
-            kEngineeredWood = 0x06
-            kGlass = 0x07
-            kGrass = 0x08
-            kHardwood = 0x09
-            kLaminate = 0x0A
-            kLinoleum = 0x0B
-            kMat = 0x0C
-            kMetal = 0x0D
-            kPlastic = 0x0E
-            kPolishedConcrete = 0x0F
-            kRubber = 0x10
-            kRug = 0x11
-            kSand = 0x12
-            kStone = 0x13
-            kTatami = 0x14
-            kTerrazzo = 0x15
-            kTile = 0x16
-            kVinyl = 0x17
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 24
 
         class LandmarkTag(MatterIntEnum):
             kAirConditioner = 0x00
@@ -381,6 +348,17 @@ class Globals:
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 51
+
+        class LocationTag(MatterIntEnum):
+            kIndoor = 0x00
+            kOutdoor = 0x01
+            kInside = 0x02
+            kOutside = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 4
 
         class PositionTag(MatterIntEnum):
             kLeft = 0x00
@@ -5065,6 +5043,7 @@ class UnitLocalization(Cluster):
         return ClusterObjectDescriptor(
             Fields=[
                 ClusterObjectFieldDescriptor(Label="temperatureUnit", Tag=0x00000000, Type=typing.Optional[UnitLocalization.Enums.TempUnitEnum]),
+                ClusterObjectFieldDescriptor(Label="supportedTemperatureUnits", Tag=0x00000001, Type=typing.Optional[typing.List[UnitLocalization.Enums.TempUnitEnum]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -5073,6 +5052,7 @@ class UnitLocalization(Cluster):
             ])
 
     temperatureUnit: typing.Optional[UnitLocalization.Enums.TempUnitEnum] = None
+    supportedTemperatureUnits: typing.Optional[typing.List[UnitLocalization.Enums.TempUnitEnum]] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -5110,6 +5090,22 @@ class UnitLocalization(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[UnitLocalization.Enums.TempUnitEnum])
 
             value: typing.Optional[UnitLocalization.Enums.TempUnitEnum] = None
+
+        @dataclass
+        class SupportedTemperatureUnits(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000002D
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[UnitLocalization.Enums.TempUnitEnum]])
+
+            value: typing.Optional[typing.List[UnitLocalization.Enums.TempUnitEnum]] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -19580,6 +19576,13 @@ class RvcOperationalState(Cluster):
             kWaterTankMissing = 0x45
             kWaterTankLidOpen = 0x46
             kMopCleaningPadMissing = 0x47
+            kLowBattery = 0x48
+            kCannotReachTargetArea = 0x49
+            kDirtyWaterTankFull = 0x4A
+            kDirtyWaterTankMissing = 0x4B
+            kWheelsJammed = 0x4C
+            kBrushJammed = 0x4D
+            kNavigationSensorObscured = 0x4E
             # kUnknownEnumValue intentionally not defined. This enum never goes
             # through DataModel::Decode, likely because it is a part of a derived
             # cluster. As a result having kUnknownEnumValue in this enum is error
@@ -19594,6 +19597,10 @@ class RvcOperationalState(Cluster):
             kSeekingCharger = 0x40
             kCharging = 0x41
             kDocked = 0x42
+            kEmptyingDustBin = 0x43
+            kCleaningMop = 0x44
+            kFillingWaterTank = 0x45
+            kUpdatingMaps = 0x46
             # kUnknownEnumValue intentionally not defined. This enum never goes
             # through DataModel::Decode, likely because it is a part of a derived
             # cluster. As a result having kUnknownEnumValue in this enum is error
