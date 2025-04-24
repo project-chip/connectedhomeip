@@ -34,7 +34,7 @@ CHIP_ERROR PrintOnlyDelegate::Init()
     return CHIP_NO_ERROR;
 }
 
-Status PrintOnlyDelegate::HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<TargetLatchEnum> & latch,
+Status PrintOnlyDelegate::HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<bool> & latch,
     const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
     ChipLogProgress(AppServer, "HandleSetTarget");
@@ -55,7 +55,7 @@ CHIP_ERROR ClosureDimensionEndpoint::Init()
 {
     ChipLogProgress(AppServer, "ClosureDimensionEndpoint::Init start");
     
-    ClusterConformance Conformance = { .featureMap = 255, .supportsOverflow = true };
+    ClusterConformance conformance = { .featureMap = 255, .supportsOverflow = true };
      
     ReturnErrorOnFailure(mLogic.Init(conformance));
     ReturnErrorOnFailure(mInterface.Init());

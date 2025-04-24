@@ -20,9 +20,9 @@
 
 #include <app/clusters/closure-dimension-server/closure-dimension-server.h>
 #include <app/clusters/closure-dimension-server/closure-dimension-cluster-logic.h>
-#include <app/clusters/closure-dimension-server/closure-dimension-cluster-delegate.h>
 #include <app/clusters/closure-dimension-server/closure-dimension-cluster-objects.h>
-#include <app/clusters/closure-dimension-server/closure-dimension-cluster-matter-context.h>
+#include <app/clusters/closure-dimension-server/closure-dimension-delegate.h>
+#include <app/clusters/closure-dimension-server/closure-dimension-matter-context.h>
 
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
@@ -54,7 +54,7 @@ public:
    PrintOnlyDelegate(EndpointId endpoint) : mEndpoint(endpoint) {}
 
     // Override for the DelegateBase Virtual functions
-    Status HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<TargetLatchEnum> & latch,
+    Status HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<bool> & latch,
     const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
     Status HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
         const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
