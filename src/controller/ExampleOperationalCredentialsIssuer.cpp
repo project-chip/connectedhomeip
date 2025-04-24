@@ -30,11 +30,6 @@
 namespace chip {
 namespace Controller {
 
-constexpr char kOperationalCredentialsIssuerKeypairStorage[]             = "ExampleOpCredsCAKey";
-constexpr char kOperationalCredentialsIntermediateIssuerKeypairStorage[] = "ExampleOpCredsICAKey";
-constexpr char kOperationalCredentialsRootCertificateStorage[]           = "ExampleCARootCert";
-constexpr char kOperationalCredentialsIntermediateCertificateStorage[]   = "ExampleCAIntermediateCert";
-
 using namespace Credentials;
 using namespace Crypto;
 using namespace TLV;
