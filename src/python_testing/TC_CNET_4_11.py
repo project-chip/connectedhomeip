@@ -34,8 +34,10 @@
 #     quiet: true
 
 
+import asyncio
 import logging
 import subprocess
+import time
 
 import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
@@ -54,13 +56,10 @@ async def connect_host_wifi(ssid, passphrase):
         logger.info(f" --- connect_host_wifi: Connected to {ssid}")
     except subprocess.CalledProcessError as e:
         logger.error(f" --- connect_host_wifi: Error connecting to networksetup: {e.stderr.decode()}")
+    asyncio.sleep(5)
 
 
 async def change_networks(object, cluster, ssid, passphrase, breadcrumb):
-    # max_retries = 3
-    # attempt = 0
-    # while attempt < max_retries:
-    #     logger.info(f" --- change_networks: Attempting to change networks: {attempt+1}/{max_retries}")
     try:
         await object.send_single_cmd(
             cmd=cluster.Commands.ConnectNetwork(
@@ -79,7 +78,7 @@ async def change_networks(object, cluster, ssid, passphrase, breadcrumb):
             ),
             timedRequestTimeoutMs=5000
         )
-        # attempt += 1
+    asyncio.sleep(5)
 
 
 class TC_CNET_4_11(MatterBaseTest):
