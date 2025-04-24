@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <protocols/interaction_model/StatusCode.h>
 #include <app-common/zap-generated/cluster-enums.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
@@ -39,7 +39,7 @@ public:
      * @return Success when closure succesfully handles stop.
      *         Error when stop fails.
      */
-    virtual Protocols::InteractionModel::Status HandleStopCommand()      = 0;
+    virtual Protocols::InteractionModel::Status HandleStopCommand() = 0;
 
     /**
      * @brief This function handles MoveTo command implementaion.
@@ -51,8 +51,9 @@ public:
      * @return Success when closure succesfully handles motion.
      *         Error when motion fails.
      */
-    virtual Protocols::InteractionModel::Status HandleMoveToCommand(const Optional<TargetPositionEnum> & position, const Optional<bool> & latch,
-                                                       const Optional<Globals::ThreeLevelAutoEnum> & speed) = 0;
+    virtual Protocols::InteractionModel::Status HandleMoveToCommand(const Optional<TargetPositionEnum> & position,
+                                                                    const Optional<bool> & latch,
+                                                                    const Optional<Globals::ThreeLevelAutoEnum> & speed) = 0;
 
     /**
      * @brief This function handles Calibrate command implementaion.

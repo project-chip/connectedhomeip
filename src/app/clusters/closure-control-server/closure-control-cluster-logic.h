@@ -20,6 +20,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-enums.h>
+#include <app/AttributeAccessInterface.h>
 #include <app/cluster-building-blocks/QuieterReporting.h>
 #include <app/clusters/closure-control-server/closure-control-cluster-delegate.h>
 #include <app/clusters/closure-control-server/closure-control-cluster-matter-context.h>
@@ -27,7 +28,6 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <app/AttributeAccessInterface.h>
 
 namespace chip {
 namespace app {
@@ -142,8 +142,7 @@ class ClusterLogic
 public:
     // Instantiates a ClusterLogic class. The caller maintains ownership of the driver and the context, but provides them for use by
     // the ClusterLogic class.
-    ClusterLogic(DelegateBase & delegate, MatterContext & matterContext) : mDelegate(delegate), mMatterContext(matterContext)
-    {}
+    ClusterLogic(DelegateBase & delegate, MatterContext & matterContext) : mDelegate(delegate), mMatterContext(matterContext) {}
 
     ~ClusterLogic() = default;
 
@@ -352,7 +351,6 @@ private:
      * @param fromDelegate true if the coutdown time is being configured by the delegate, false otherwise
      */
     CHIP_ERROR SetCountdownTime(const DataModel::Nullable<ElapsedS> & countdownTime, bool fromDelegate);
-
 
     /**
      * @brief API to trigger countdown time update from the cluster logic.

@@ -40,10 +40,11 @@ public:
 
     virtual void MarkDirty(AttributeId attributeId) { MatterReportingAttributeChangeCallback(mEndpointId, Id, attributeId); }
 
-    template<typename EventType> CHIP_ERROR LogClosureEvent(EventType event)
+    template <typename EventType>
+    CHIP_ERROR LogClosureEvent(EventType event)
     {
-            EventNumber eventNumber;
-            return LogEvent(event, mEndpointId, eventNumber);
+        EventNumber eventNumber;
+        return LogEvent(event, mEndpointId, eventNumber);
     }
 
 private:
