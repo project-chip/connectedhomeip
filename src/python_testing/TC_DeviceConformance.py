@@ -53,37 +53,41 @@ from chip.tlv import uint
 
 
 def get_supersets(xml_device_types: dict[int, XmlDeviceType]) -> list[set[int]]:
-    # Endpoints can have multiple application device types from a single line, even with skips, but cannot have multiple
-    # higher-level device types that map to a lower level endpoint
-    # Ex. Color temperature light is a superset of dimmable light, which is a superset of on/off light
-    # If there were another device type (ex Blinkable light) that were a superset of on/off light, the following
-    # would be acceptable
-    # - Blinkable light + on/off
-    # - Dimmable light + on/off
-    # - Color temperature light + dimmable light + on/off
-    # - Color temperature light + on/off (skipping middle device type)
-    # But the following would not be acceptable
-    # - Blinkable light + dimmable light
-    # - Blinkable light + dimmable light + on/off
-    # Because it's not clear to clients whether the endpoint should be treated as a Blinkable light or dimmable light,
-    # even if both can be an on/off light
-    #
-    # This means that we need to know that all the devices come from a single line of device types, rather than that they
-    # all belong to one tree
-    # To do this, we need to identify the top-level device type and generate the list of acceptable children
+    ''' Returns a list of the sets of device type id that each constitute a single superset.
 
-    device_types_that_have_supersets = set([dt.superset_of for dt in xml_device_types.values() if dt.superset_of != 0])
+        Endpoints can have multiple application device types from a single line, even with skips, but cannot have multiple
+        higher-level device types that map to a lower level endpoint
+        Ex. Color temperature light is a superset of dimmable light, which is a superset of on/off light
+        If there were another device type (ex Blinkable light) that were a superset of on/off light, the following
+        would be acceptable
+        - Blinkable light + on/off
+        - Dimmable light + on/off
+        - Color temperature light + dimmable light + on/off
+        - Color temperature light + on/off (skipping middle device type)
+        But the following would not be acceptable
+        - Blinkable light + dimmable light
+        - Blinkable light + dimmable light + on/off
+        Because it's not clear to clients whether the endpoint should be treated as a Blinkable light or dimmable light,
+        even if both can be an on/off light
+
+        This means that we need to know that all the devices come from a single line of device types, rather than that they
+        all belong to one tree
+        To do this, we need to identify the top-level device type and generate the list of acceptable children
+    '''
+
+    device_types_that_have_supersets = set([dt.superset_of_device_type_id for dt in xml_device_types.values()]) - {0}
+
+    # Ex. in the above example, the top level device types would be blinkable light and color temperature light
+    # because they are supersets of other things, but have no device types that are supersets of them.
     top_level_device_types = [id for id, dt in xml_device_types.items(
-    ) if dt.superset_of != 0 and id not in device_types_that_have_supersets]
+    ) if dt.superset_of_device_type_id != 0 and id not in device_types_that_have_supersets]
     supersets: list[set[int]] = []
     for top in top_level_device_types:
         line: set[int] = set()
         dt = top
-        visited = []
-        while dt != 0 and dt not in visited:
-            visited.append(dt)
+        while dt != 0 and dt not in line:
             line.add(dt)
-            dt = xml_device_types[dt].superset_of
+            dt = xml_device_types[dt].superset_of_device_type_id
         supersets.append(line)
     return supersets
 

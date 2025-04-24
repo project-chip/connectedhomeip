@@ -47,7 +47,8 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         self.clusters = {0x0003: "Identify", 0x0004: "Groups"}
 
         # Let's just build a dictionary of device types to IDs becasue I need them and we don't have codegen
-        self.dt_ids = {dt.name.replace(' ', '').replace('/', '').replace('-', '').lower(): id for id, dt in self.xml_device_types.items()}
+        self.dt_ids = {dt.name.replace(' ', '').replace('/', '').replace('-', '').lower()
+                                       : id for id, dt in self.xml_device_types.items()}
 
         # Conformance support tests the different types of conformance for clusters, so here we just want to ensure that we're correctly parsing the XML into python
         # adds the same attributes and features to every cluster. This is fine for testing.
@@ -307,8 +308,8 @@ class TestSpecParsingDeviceType(MatterBaseTest):
     def test_superset_parsing_released_spec(self):
         # Testing superset parsing from the spec since it requires multiple device types to be parsed together
         for d in self.xml_device_types.values():
-            if d.superset_of_str:
-                print(f'{d.name}: {d.superset_of_str} {d.superset_of}')
+            if d.superset_of_device_type_name:
+                print(f'{d.name}: {d.superset_of_device_type_name} {d.superset_of_device_type_id}')
         supersets = get_supersets(self.xml_device_types)
 
         expected_light_superset = set([self.dt_ids['extendedcolorlight'],
@@ -337,12 +338,18 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         # 4 -> 3
         # 5 - all alone
         # 6 - utility endpoint
-        one = XmlDeviceType('one', 1, [], [], 'simple', 'endpoint', superset_of_str='two', superset_of=2)
-        two = XmlDeviceType('two', 1, [], [], 'simple', 'endpoint', superset_of_str='three', superset_of=3)
-        three = XmlDeviceType('three', 1, [], [], 'simple', 'endpoint', superset_of_str=None, superset_of=0)
-        four = XmlDeviceType('four', 1, [], [], 'simple', 'endpoint', superset_of_str='three', superset_of=3)
-        five = XmlDeviceType('five', 1, [], [], 'simple', 'endpoint', superset_of_str=None, superset_of=0)
-        six = XmlDeviceType('six', 1, [], [], 'utility', 'endpoint', superset_of_str=None, superset_of=0)
+        one = XmlDeviceType('one', 1, [], [], 'simple', 'endpoint',
+                            superset_of_device_type_name='two', superset_of_device_type_id=2)
+        two = XmlDeviceType('two', 1, [], [], 'simple', 'endpoint',
+                            superset_of_device_type_name='three', superset_of_device_type_id=3)
+        three = XmlDeviceType('three', 1, [], [], 'simple', 'endpoint',
+                              superset_of_device_type_name=None, superset_of_device_type_id=0)
+        four = XmlDeviceType('four', 1, [], [], 'simple', 'endpoint',
+                             superset_of_device_type_name='three', superset_of_device_type_id=3)
+        five = XmlDeviceType('five', 1, [], [], 'simple', 'endpoint',
+                             superset_of_device_type_name=None, superset_of_device_type_id=0)
+        six = XmlDeviceType('six', 1, [], [], 'utility', 'endpoint',
+                            superset_of_device_type_name=None, superset_of_device_type_id=0)
         return {1: one, 2: two, 3: three, 4: four, 5: five, 6: six}
 
     def test_superset_parsing_mocks(self):

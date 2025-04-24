@@ -150,13 +150,13 @@ class XmlDeviceType:
     # Keeping these as strings for now because the exact definitions are being discussed in DMTT
     classification_class: str
     classification_scope: str
-    superset_of_str: Optional[str] = None
-    superset_of: int = 0
+    superset_of_device_type_name: Optional[str] = None
+    superset_of_device_type_id: int = 0
 
     def __str__(self):
         msg = f'{self.name} - Revision {self.revision}, Class {self.classification_class}, Scope {self.classification_scope}\n'
-        if self.superset_of_str:
-            msg += f'superset of {self.superset_of_str} ({self.superset_of})'
+        if self.superset_of_device_type_name:
+            msg += f'superset of {self.superset_of_device_type_name} ({self.superset_of_device_type_id})'
         msg += '    Server clusters\n'
         for id, c in self.server_clusters.items():
             msg = msg + f'      {id}: {str(c)}\n'
@@ -827,20 +827,20 @@ def parse_single_device_type(root: ElementTree.Element) -> tuple[dict[int, XmlDe
             classification = next(d.iter('classification'))
             scope = classification.attrib['scope']
             device_class = classification.attrib['class']
-            superset_of_str = classification.attrib.get('superset', None)
+            superset_of_device_type_name = classification.attrib.get('superset', None)
         except (KeyError, StopIteration):
             # this is fine for base device type
             if id == -1:
                 scope = 'BASE'
                 device_class = 'BASE'
-                superset_of_str = None
+                superset_of_device_type_name = None
             else:
                 location = DeviceTypePathLocation(device_type_id=id)
                 problems.append(ProblemNotice("Parse Device Type XML", location=location,
                                 severity=ProblemSeverity.WARNING, problem="Unable to find classification data for device type"))
                 break
         device_types[id] = XmlDeviceType(name=name, revision=revision, server_clusters={}, client_clusters={},
-                                         classification_class=device_class, classification_scope=scope, superset_of_str=superset_of_str)
+                                         classification_class=device_class, classification_scope=scope, superset_of_device_type_name=superset_of_device_type_name)
         clusters = d.iter('cluster')
         for c in clusters:
             try:
@@ -908,15 +908,15 @@ def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelD
     for id, d in device_types.items():
         def standardize_name(name: str):
             return name.replace(' ', '').replace('/', '').lower()
-        if d.superset_of_str is None:
+        if d.superset_of_device_type_name is None:
             continue
-        name = standardize_name(d.superset_of_str)
+        name = standardize_name(d.superset_of_device_type_name)
         matches = [id for id, d in device_types.items() if standardize_name(d.name) == name]
         if len(matches) != 1:
             problems.append(ProblemNotice('Device types parsing', location=DeviceTypePathLocation(
-                id), severity=ProblemSeverity.ERROR, problem=f"No unique match found for superset {d.superset_of_str}"))
+                id), severity=ProblemSeverity.ERROR, problem=f"No unique match found for superset {d.superset_of_device_type_name}"))
             break
-        d.superset_of = matches[0]
+        d.superset_of_device_type_id = matches[0]
 
     return device_types, problems
 
