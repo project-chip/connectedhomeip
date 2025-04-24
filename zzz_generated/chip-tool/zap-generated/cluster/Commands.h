@@ -6822,7 +6822,6 @@ private:
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
 | * PriceChange                                                       | 0x0000 |
-| * ForecastChange                                                    | 0x0001 |
 \*----------------------------------------------------------------------------*/
 
 /*
@@ -8128,7 +8127,6 @@ private:
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
 | * CurrentConditionsChanged                                          | 0x0000 |
-| * ForecastConditionsChanged                                         | 0x0001 |
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
@@ -9493,7 +9491,7 @@ private:
 | * Step                                                              |   0x01 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * Current                                                           | 0x0000 |
+| * CurrentState                                                      | 0x0000 |
 | * Target                                                            | 0x0001 |
 | * Resolution                                                        | 0x0002 |
 | * StepValue                                                         | 0x0003 |
@@ -9522,7 +9520,7 @@ public:
     ClosureDimensionSetTarget(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("set-target", credsIssuerConfig)
     {
         AddArgument("Position", 0, UINT16_MAX, &mRequest.position);
-        AddArgument("Latch", 0, UINT8_MAX, &mRequest.latch);
+        AddArgument("Latch", 0, 1, &mRequest.latch);
         AddArgument("Speed", 0, UINT8_MAX, &mRequest.speed);
         ClusterCommand::AddArguments();
     }
@@ -23360,12 +23358,10 @@ void registerClusterCommodityPrice(Commands & commands, CredentialIssuerCommands
         //
         // Events
         //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                     //
-        make_unique<ReadEvent>(Id, "price-change", Events::PriceChange::Id, credsIssuerConfig),            //
-        make_unique<ReadEvent>(Id, "forecast-change", Events::ForecastChange::Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                //
-        make_unique<SubscribeEvent>(Id, "price-change", Events::PriceChange::Id, credsIssuerConfig),       //
-        make_unique<SubscribeEvent>(Id, "forecast-change", Events::ForecastChange::Id, credsIssuerConfig), //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                               //
+        make_unique<ReadEvent>(Id, "price-change", Events::PriceChange::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                          //
+        make_unique<SubscribeEvent>(Id, "price-change", Events::PriceChange::Id, credsIssuerConfig), //
     };
 
     commands.RegisterCluster(clusterName, clusterCommands);
@@ -24176,12 +24172,10 @@ void registerClusterElectricalGridConditions(Commands & commands, CredentialIssu
         //
         // Events
         //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                                            //
-        make_unique<ReadEvent>(Id, "current-conditions-changed", Events::CurrentConditionsChanged::Id, credsIssuerConfig),        //
-        make_unique<ReadEvent>(Id, "forecast-conditions-changed", Events::ForecastConditionsChanged::Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                                       //
-        make_unique<SubscribeEvent>(Id, "current-conditions-changed", Events::CurrentConditionsChanged::Id, credsIssuerConfig),   //
-        make_unique<SubscribeEvent>(Id, "forecast-conditions-changed", Events::ForecastConditionsChanged::Id, credsIssuerConfig), //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                                          //
+        make_unique<ReadEvent>(Id, "current-conditions-changed", Events::CurrentConditionsChanged::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                                     //
+        make_unique<SubscribeEvent>(Id, "current-conditions-changed", Events::CurrentConditionsChanged::Id, credsIssuerConfig), //
     };
 
     commands.RegisterCluster(clusterName, clusterCommands);
@@ -24792,7 +24786,7 @@ void registerClusterClosureDimension(Commands & commands, CredentialIssuerComman
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<ReadAttribute>(Id, "current", Attributes::Current::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "current-state", Attributes::CurrentState::Id, credsIssuerConfig),                  //
         make_unique<ReadAttribute>(Id, "target", Attributes::Target::Id, credsIssuerConfig),                               //
         make_unique<ReadAttribute>(Id, "resolution", Attributes::Resolution::Id, credsIssuerConfig),                       //
         make_unique<ReadAttribute>(Id, "step-value", Attributes::StepValue::Id, credsIssuerConfig),                        //
@@ -24810,8 +24804,8 @@ void registerClusterClosureDimension(Commands & commands, CredentialIssuerComman
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::CurrentStruct::Type>>>(
-            Id, "current", Attributes::Current::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::CurrentStateStruct::Type>>>(
+            Id, "current-state", Attributes::CurrentState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
             chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::TargetStruct::Type>>>(
             Id, "target", Attributes::Target::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -24848,7 +24842,7 @@ void registerClusterClosureDimension(Commands & commands, CredentialIssuerComman
         make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "current", Attributes::Current::Id, credsIssuerConfig),                             //
+        make_unique<SubscribeAttribute>(Id, "current-state", Attributes::CurrentState::Id, credsIssuerConfig),                  //
         make_unique<SubscribeAttribute>(Id, "target", Attributes::Target::Id, credsIssuerConfig),                               //
         make_unique<SubscribeAttribute>(Id, "resolution", Attributes::Resolution::Id, credsIssuerConfig),                       //
         make_unique<SubscribeAttribute>(Id, "step-value", Attributes::StepValue::Id, credsIssuerConfig),                        //
