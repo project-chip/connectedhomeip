@@ -345,11 +345,58 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 test_step = "Manually put the device in the low battery error state"
                 self.print_step("7y", test_step)
                 if self.is_ci:
-                    self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "MopCleaningPadMissing"})
+                    self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "BatteryLow"})
                 else:
                     self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
                 await self.read_and_validate_operror(step="7z", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kLowBattery)
-
+            if self.check_pics("RVCOPSTATE.S.M.ERR_CANTREACHTGT"):
+                test_step = "Manually put the device in the cannot reach target area error state"
+                self.print_step("7aa", test_step)
+                if self.is_ci:
+                    self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "CannotReachTargetArea"})
+                else:
+                    self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
+                await self.read_and_validate_operror(step="7ab", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kCannotReachTargetArea)
+            if self.check_pics("RVCOPSTATE.S.M.ERR_DIRTYWATERFULL"):
+                test_step = "Manually put the device in the dirty water full error state"
+                self.print_step("7ac", test_step)
+                if self.is_ci:
+                    self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "DirtyWaterTankFull"})
+                else:
+                    self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
+                await self.read_and_validate_operror(step="7ad", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kDirtyWaterTankFull)
+            if self.check_pics("RVCOPSTATE.S.M.ERR_DIRTYWATERMISS"):
+                test_step = "Manually put the device in the dirty water tank missing error state"
+                self.print_step("7ae", test_step)
+                if self.is_ci:
+                    self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "DirtyWaterTankMissing"})
+                else:
+                    self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
+                await self.read_and_validate_operror(step="7af", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kDirtyWaterTankMissing)
+            if self.check_pics("RVCOPSTATE.S.M.ERR_WHEELSJAMMED"):
+                test_step = "Manually put the device in the wheels jammed error state"
+                self.print_step("7ag", test_step)
+                if self.is_ci:
+                    self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "WheelsJammed"})
+                else:
+                    self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
+                await self.read_and_validate_operror(step="7ah", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kWheelsJammed)
+            if self.check_pics("RVCOPSTATE.S.M.ERR_BRUSHJAMMED"):
+                test_step = "Manually put the device in the brush jammed error state"
+                self.print_step("7ai", test_step)
+                if self.is_ci:
+                    self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "BrushJammed"})
+                else:
+                    self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
+                await self.read_and_validate_operror(step="7aj", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kBrushJammed)
+            if self.check_pics("RVCOPSTATE.S.M.NAVSENSOBSCUR"):
+                test_step = "Manually put the device in the navigation sensor obscured error state"
+                self.print_step("7ak", test_step)
+                if self.is_ci:
+                    self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "NavigationSensorObscured"})
+                else:
+                    self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
+                await self.read_and_validate_operror(step="7al", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kNavigationSensorObscured)
 
 if __name__ == "__main__":
     default_matter_test_main()
