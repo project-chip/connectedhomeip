@@ -218,7 +218,8 @@ CHIP_ERROR Instance::SetPowerThreshold(const DataModel::Nullable<Globals::Struct
 // AttributeAccessInterface
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    ChipLogProgress(Zcl, "Meter Indication read attr %d on endpoint %d", aPath.mAttributeId, mEndpointId);
+    ChipLogProgress(Zcl, "Meter Indication read attr %" PRIu32 " on endpoint %" PRIu32, static_cast<uint32_t>(aPath.mAttributeId),
+                    static_cast<uint32_t>(mEndpointId));
 
     switch (aPath.mAttributeId)
     {
