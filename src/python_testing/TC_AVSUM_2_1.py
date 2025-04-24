@@ -44,36 +44,6 @@ from TC_AVSUMTestBase import AVSUMTestBase
 
 
 class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
-    has_feature_dptz = False
-    has_feature_mpan = False
-    has_feature_mtilt = False
-    has_feature_mzoom = False
-    has_feature_mpresets = False
-
-    def ptz_range_validation(self, mptz, tiltmin, tiltmax, panmin, panmax, zoommax):
-        if self.has_feature_mpan:
-            if mptz.pan is None:
-                asserts.fail("Pan value missing when MPAN feature set")
-            else:
-                apan = mptz.pan
-                asserts.assert_greater_equal(apan, panmin, "Pan out of range of DUT defined values")
-                asserts.assert_less_equal(apan, panmax, "Pan out of range of DUT defined values")
-
-        if self.has_feature_mtilt:
-            if mptz.tilt is None:
-                asserts.fail("Tilt value missing when MTILT feature set")
-            else:
-                atilt = mptz.tilt
-                asserts.assert_greater_equal(atilt, tiltmin, "Tilt out of range of DUT defined values")
-                asserts.assert_less_equal(atilt, tiltmax, "Tilt out of range of DUT defined values")
-
-        if self.has_feature_mzoom:
-            if mptz.zoom is None:
-                asserts.fail("Zoom value missing when MZOOM feature set")
-            else:
-                azoom = mptz.zoom
-                asserts.assert_greater_equal(azoom, 1, "Zoom out of range of DUT defined values")
-                asserts.assert_less_equal(azoom, zoommax, "Zoom out of range of DUT defined values")
 
     def desc_TC_AVSUM_2_1(self) -> str:
         return "[TC-AVSUM-2.1] Attributes with DUT as Server"
@@ -104,11 +74,13 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
     async def test_TC_AVSUM_2_1(self):
         cluster = Clusters.Objects.CameraAvSettingsUserLevelManagement
         attributes = cluster.Attributes
+        endpoint = self.get_endpoint(default=1)
+
         tilt_min_dut = tilt_max_dut = pan_min_dut = pan_max_dut = zoom_max_dut = None
 
         self.step(1)  # Already done, immediately go to step 2
 
-        feature_map = await self.read_avsum_attribute_expect_success(attribute="FeatureMap")
+        feature_map = await self.read_avsum_attribute_expect_success(endpoint, attributes.FeatureMap)
         self.has_feature_dptz = (feature_map & cluster.Bitmaps.Feature.kDigitalPTZ) != 0
         self.has_feature_mpan = (feature_map & cluster.Bitmaps.Feature.kMechanicalPan) != 0
         self.has_feature_mtilt = (feature_map & cluster.Bitmaps.Feature.kMechanicalTilt) != 0
@@ -118,7 +90,7 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
         logging.info(
             f"Feature map: 0x{feature_map:x}. MPAN: {self.has_feature_mpan}, MTILT:{self.has_feature_mtilt}, MZOOM:{self.has_feature_mzoom}")
 
-        attribute_list = await self.read_avsum_attribute_expect_success(attribute="AttributeList")
+        attribute_list = await self.read_avsum_attribute_expect_success(endpoint, attributes.AttributeList)
 
         self.step(2)
         if not (self.has_feature_mpan | self.has_feature_mtilt | self.has_feature_mzoom):
@@ -128,7 +100,7 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
             self.step(3)
             asserts.assert_in(attributes.ZoomMax.attribute_id, attribute_list,
                               "ZoomMax attribute is a mandatory attribute if MZOOM.")
-            zoom_max_dut = await self.read_avsum_attribute_expect_success(attribute="ZoomMax")
+            zoom_max_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.ZoomMax)
             asserts.assert_less_equal(zoom_max_dut, 100, "ZoomMax is not in valid range.")
             asserts.assert_greater_equal(zoom_max_dut, 1, "ZoomMax is not in valid range.")
         else:
@@ -139,14 +111,14 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
             self.step(4)
             asserts.assert_in(attributes.TiltMin.attribute_id, attribute_list,
                               "TiltMin attribute is a mandatory attribute if MTILT.")
-            tilt_min_dut = await self.read_avsum_attribute_expect_success(attribute="TiltMin")
+            tilt_min_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.TiltMin)
             asserts.assert_less_equal(tilt_min_dut, 179, "TiltMin is not in valid range.")
             asserts.assert_greater_equal(tilt_min_dut, -180, "TiltMin is not in valid range.")
 
             self.step(5)
             asserts.assert_in(attributes.TiltMax.attribute_id, attribute_list,
                               "TiltMax attribute is a mandatory attribute if MTILT.")
-            tilt_max_dut = await self.read_avsum_attribute_expect_success(attribute="TiltMax")
+            tilt_max_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.TiltMax)
             asserts.assert_less_equal(tilt_max_dut, 180, "TiltMin is not in valid range.")
             asserts.assert_greater_equal(tilt_max_dut, -179, "TiltMin is not in valid range.")
         else:
@@ -158,14 +130,14 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
             self.step(6)
             asserts.assert_in(attributes.PanMin.attribute_id, attribute_list,
                               "PanMin attribute is a mandatory attribute if MPAN.")
-            pan_min_dut = await self.read_avsum_attribute_expect_success(attribute="PanMin")
+            pan_min_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.PanMin)
             asserts.assert_less_equal(pan_min_dut, 179, "PanMin is not in valid range.")
             asserts.assert_greater_equal(pan_min_dut, -180, "PanMin is not in valid range.")
 
             self.step(7)
             asserts.assert_in(attributes.PanMax.attribute_id, attribute_list,
                               "PanMax attribute is a mandatory attribute if MPAN.")
-            pan_max_dut = await self.read_avsum_attribute_expect_success(attribute="PanMax")
+            pan_max_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.PanMax)
             asserts.assert_less_equal(pan_max_dut, 180, "PanMax is not in valid range.")
             asserts.assert_greater_equal(pan_max_dut, -179, "PanMax is not in valid range.")
         else:
@@ -177,7 +149,7 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
         # mandatory
         self.step(8)
         asserts.assert_in(attributes.MPTZPosition.attribute_id, attribute_list, "MPTZPosition attribute is mandatory.")
-        mptzposition_dut = await self.read_avsum_attribute_expect_success(attribute="MPTZPosition")
+        mptzposition_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPosition)
         self.ptz_range_validation(mptzposition_dut, tilt_min_dut, tilt_max_dut, pan_min_dut, pan_max_dut, zoom_max_dut)
 
         if self.has_feature_mpresets:
@@ -186,15 +158,15 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
                               "MaxPresets attribute is a mandatory attribute if MPRESETS.")
 
             # For now force a preset to be present so there is something to read
-            await self.send_save_presets_command(name="newpreset")
+            await self.send_save_presets_command(endpoint, name="newpreset")
 
-            max_presets_dut = await self.read_avsum_attribute_expect_success(attribute="MaxPresets")
+            max_presets_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MaxPresets)
 
             self.step(10)
             asserts.assert_in(attributes.MPTZPresets.attribute_id, attribute_list,
                               "MPTZPresets attribute is a mandatory attribut if MPRESETS.")
 
-            mptz_presets_dut = await self.read_avsum_attribute_expect_success(attribute="MPTZPresets")
+            mptz_presets_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPresets)
             if mptz_presets_dut is not None:
                 asserts.assert_less_equal(len(mptz_presets_dut), max_presets_dut,
                                           "MPTZPresets size is greater than the allowed max.")
@@ -215,7 +187,7 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
             asserts.assert_in(attributes.DPTZRelativeMove.attribute_id, attribute_list,
                               "DPTZRelativeMove attribute is a mandatory attribute if DPTZ.")
 
-            dptz_relative_move_dut = await self.read_avsum_attribute_expect_success(attribute="DPTZRelativeMove")
+            dptz_relative_move_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.DPTZRelativeMove)
             if dptz_relative_move_dut is not None:
                 # Verify that all elements in the list are unique
                 asserts.assert_equal(len(dptz_relative_move_dut), len(

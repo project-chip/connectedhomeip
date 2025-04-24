@@ -84,22 +84,23 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
     async def test_TC_AVSUM_2_2(self):
         cluster = Clusters.Objects.CameraAvSettingsUserLevelManagement
         attributes = cluster.Attributes
+        endpoint = self.get_endpoint(default=1)
 
         self.step(1)  # Already done, immediately go to step 2
 
-        feature_map = await self.read_avsum_attribute_expect_success(attribute="FeatureMap")
+        feature_map = await self.read_avsum_attribute_expect_success(endpoint, attributes.FeatureMap)
         self.has_feature_mpan = (feature_map & cluster.Bitmaps.Feature.kMechanicalPan) != 0
         self.has_feature_mtilt = (feature_map & cluster.Bitmaps.Feature.kMechanicalTilt) != 0
         self.has_feature_mzoom = (feature_map & cluster.Bitmaps.Feature.kMechanicalZoom) != 0
 
-        attribute_list = await self.read_avsum_attribute_expect_success(attribute="AttributeList")
+        attribute_list = await self.read_avsum_attribute_expect_success(endpoint, attributes.AttributeList)
 
         if not (self.has_feature_mpan | self.has_feature_mtilt | self.has_feature_mzoom):
             asserts.fail("One of MPAN, MTILT, or MZOOM is mandatory")
 
         self.step(2)
         asserts.assert_in(attributes.MPTZPosition.attribute_id, attribute_list, "MPTZPosition attribute is mandatory.")
-        mptzposition_dut = await self.read_avsum_attribute_expect_success(attribute="MPTZPosition")
+        mptzposition_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPosition)
         initialPan = mptzposition_dut.pan
         initialTilt = mptzposition_dut.tilt
         initialZoom = mptzposition_dut.zoom
@@ -108,13 +109,13 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
             self.step(3)
             asserts.assert_in(attributes.PanMin.attribute_id, attribute_list,
                               "PanMin attribute is a mandatory attribute if MPAN.")
-            pan_min_dut = await self.read_avsum_attribute_expect_success(attribute="PanMin")
+            pan_min_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.PanMin)
             asserts.assert_less_equal(pan_min_dut, 179, "PanMin is not in valid range.")
             asserts.assert_greater_equal(pan_min_dut, -180, "PanMin is not in valid range.")
 
             asserts.assert_in(attributes.PanMax.attribute_id, attribute_list,
                               "PanMax attribute is a mandatory attribute if MPAN.")
-            pan_max_dut = await self.read_avsum_attribute_expect_success(attribute="PanMax")
+            pan_max_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.PanMax)
             asserts.assert_less_equal(pan_max_dut, 180, "PanMax is not in valid range.")
             asserts.assert_greater_equal(pan_max_dut, -179, "PanMax is not in valid range.")
 
@@ -126,21 +127,21 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
                     break
 
             # Invoke the command with the new Pan value
-            await self.send_mptz_set_pan_position_command(newPan)
+            await self.send_mptz_set_pan_position_command(endpoint, newPan)
 
             self.step(5)
             # Read the attribute back and make sure it was set
-            newpan_mptzposition_dut = await self.read_avsum_attribute_expect_success(attribute="MPTZPosition")
+            newpan_mptzposition_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPosition)
             asserts.assert_equal(newpan_mptzposition_dut.pan, newPan, "Received Pan does not match set Pan")
 
             self.step(6)
             # Create an out of range value for Pan, verify failure
             newPanFail = pan_max_dut + 10
-            await self.send_mptz_set_pan_position_command(newPanFail, expected_status=Status.ConstraintError)
+            await self.send_mptz_set_pan_position_command(endpoint, newPanFail, expected_status=Status.ConstraintError)
 
             self.step(7)
             # Verify no change in the Pan value
-            newpan_mptzposition_dut = await self.read_avsum_attribute_expect_success(attribute="MPTZPosition")
+            newpan_mptzposition_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPosition)
             asserts.assert_equal(newpan_mptzposition_dut.pan, newPan, "Received Pan does not match set Pan")
         else:
             self.skip_step(3)
@@ -153,13 +154,13 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
             self.step(8)
             asserts.assert_in(attributes.TiltMin.attribute_id, attribute_list,
                               "TiltMin attribute is a mandatory attribute if MTILT.")
-            tilt_min_dut = await self.read_avsum_attribute_expect_success(attribute="TiltMin")
+            tilt_min_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.TiltMin)
             asserts.assert_less_equal(tilt_min_dut, 179, "TiltMin is not in valid range.")
             asserts.assert_greater_equal(tilt_min_dut, -180, "TiltMin is not in valid range.")
 
             asserts.assert_in(attributes.TiltMax.attribute_id, attribute_list,
                               "TiltMax attribute is a mandatory attribute if MTILT.")
-            tilt_max_dut = await self.read_avsum_attribute_expect_success(attribute="TiltMax")
+            tilt_max_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.TiltMax)
             asserts.assert_less_equal(tilt_max_dut, 180, "TiltMax is not in valid range.")
             asserts.assert_greater_equal(tilt_max_dut, -179, "TiltMax is not in valid range.")
 
@@ -171,21 +172,21 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
                     break
 
             # Invoke the command with the new Tilt value
-            await self.send_mptz_set_tilt_position_command(newTilt)
+            await self.send_mptz_set_tilt_position_command(endpoint, newTilt)
 
             self.step(10)
             # Read the attribute back and make sure it was set
-            newtilt_mptzposition_dut = await self.read_avsum_attribute_expect_success(attribute="MPTZPosition")
+            newtilt_mptzposition_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPosition)
             asserts.assert_equal(newtilt_mptzposition_dut.tilt, newTilt, "Received Tilt does not match set Tilt")
 
             self.step(11)
             # Create an out of range value for Tilt, verify failure
             newTiltFail = tilt_max_dut + 10
-            await self.send_mptz_set_tilt_position_command(newTiltFail, expected_status=Status.ConstraintError)
+            await self.send_mptz_set_tilt_position_command(endpoint, newTiltFail, expected_status=Status.ConstraintError)
 
             self.step(12)
             # Verify no change in the Tilt value
-            newtilt_mptzposition_dut = await self.read_avsum_attribute_expect_success(attribute="MPTZPosition")
+            newtilt_mptzposition_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPosition)
             asserts.assert_equal(newtilt_mptzposition_dut.tilt, newTilt, "Received Tilt does not match set Tilt")
         else:
             self.skip_step(8)
@@ -198,7 +199,7 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
             self.step(13)
             asserts.assert_in(attributes.ZoomMax.attribute_id, attribute_list,
                               "ZoomMax attribute is a mandatory attribute if MZOOM.")
-            zoom_max_dut = await self.read_avsum_attribute_expect_success(attribute="ZoomMax")
+            zoom_max_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.ZoomMax)
             asserts.assert_less_equal(zoom_max_dut, 100, "ZoomMax is not in valid range.")
             asserts.assert_greater_equal(zoom_max_dut, 2, "ZoomMax is not in valid range.")
 
@@ -210,21 +211,21 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
                     break
 
             # Invoke the command with the new Zoom value
-            await self.send_mptz_set_zoom_position_command(newZoom)
+            await self.send_mptz_set_zoom_position_command(endpoint, newZoom)
 
             self.step(15)
             # Read the attribute back and make sure it was set
-            newzoom_mptzposition_dut = await self.read_avsum_attribute_expect_success(attribute="MPTZPosition")
+            newzoom_mptzposition_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPosition)
             asserts.assert_equal(newzoom_mptzposition_dut.zoom, newZoom, "Received Zoom does not match set Zoom")
 
             self.step(16)
             # Create an out of range value for Zoom, verify failure
             newZoomFail = zoom_max_dut + 10
-            await self.send_mptz_set_zoom_position_command(newZoomFail, expected_status=Status.ConstraintError)
+            await self.send_mptz_set_zoom_position_command(endpoint, newZoomFail, expected_status=Status.ConstraintError)
 
             self.step(17)
             # Verify no change in the Zoom value
-            newzoom_mptzposition_dut = await self.read_avsum_attribute_expect_success(attribute="MPTZPosition")
+            newzoom_mptzposition_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPosition)
             asserts.assert_equal(newzoom_mptzposition_dut.zoom, newZoom, "Received Zoom does not match set Zoom")
         else:
             self.skip_step(13)
