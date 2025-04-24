@@ -47,8 +47,7 @@ class LogCommands(PseudoCluster):
         for value in request.arguments.get("values", []):
             if value.get('name') and 'expectedValue' in value['name']:
                 expected_value = value['value']
-                request.responses = [
-                    {"values": [{"name": "expectedValue", "value": expected_value}]}]
+                request.responses = [{"values": [{"name": "expectedValue", "value": expected_value}]}]
 
         if expected_value is not None:
             input_result = input("")
@@ -61,3 +60,4 @@ class LogCommands(PseudoCluster):
 
     async def UserPromptSdp(self, request):
         pass
+
