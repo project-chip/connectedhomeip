@@ -163,8 +163,8 @@ public:
     {
         CHIP_ERROR res;
 
-        uint32_t totalLength         = (uint32_t) messageSize;
-        uint32_t nbrOfBytesRemaining = (uint32_t) messageSize;
+        uint32_t totalLength         = static_cast<uint32_t>(messageSize);
+        uint32_t nbrOfBytesRemaining = static_cast<uint32_t>(messageSize);
         uint8_t * pNextDataToSend    = pMessage;
 
         while (nbrOfBytesRemaining > 0)
@@ -197,7 +197,7 @@ public:
                 //   SW1=0x61 SW2=0xXX if the transmission was successful and the recipient has
                 //     transmitted the first part of a chained response (SW2 indicates the size of
                 //     the data in the next block).
-                if (((sw1 == ((uint8_t) 0x90)) && (sw2 == 0x00)) || (sw1 == ((uint8_t) 0x61)))
+                if (((sw1 == static_cast<uint8_t>(0x90)) && (sw2 == 0x00)) || (sw1 == static_cast<uint8_t>(0x61)))
                 {
                     // Response will be processed outside of the while loop
                 }
@@ -212,7 +212,7 @@ public:
             else
             {
                 // This is an intermediate block so the only valid response is 0x90 0x00
-                if ((sw1 == ((uint8_t) 0x90)) && (sw2 == 0x00))
+                if ((sw1 == static_cast<uint8_t>(0x90)) && (sw2 == 0x00))
                 {
                     // The command was successfully sent
                     // Continue with the next block
@@ -258,14 +258,14 @@ public:
         uint8_t sw1 = mAPDURxBuffer[mAPDUResponseLength - 2];
         uint8_t sw2 = mAPDURxBuffer[mAPDUResponseLength - 1];
 
-        if ((sw1 == ((uint8_t) 0x90)) && (sw2 == 0x00))
+        if ((sw1 == static_cast<uint8_t>(0x90)) && (sw2 == 0x00))
         {
             // Response fits in a single block.
             // Drop the 2 status bytes and return it
             NotifyResponse(mAPDURxBuffer, mAPDUResponseLength - 2);
             return;
         }
-        else if (sw1 == ((uint8_t) 0x61))
+        else if (sw1 == static_cast<uint8_t>(0x61))
         {
             // SW1=0x61 indicates a chained response. it means that the response is too big to be transmitted in a single packet.
 
@@ -284,7 +284,7 @@ public:
                 // If SW2 is 0x00 or if it is higher than TYPE4_SIMPLE_APDU_MAX_RX_SIZE, we clamp it to
                 // TYPE4_SIMPLE_APDU_MAX_RX_SIZE.
                 uint8_t nextBlockLength =
-                    ((sw2 == 0x00) || ((int) sw2 > TYPE4_SIMPLE_APDU_MAX_RX_SIZE)) ? (uint8_t) TYPE4_SIMPLE_APDU_MAX_RX_SIZE : sw2;
+                    ((sw2 == 0x00) || (static_cast<int>(sw2) > TYPE4_SIMPLE_APDU_MAX_RX_SIZE)) ? static_cast<uint8_t>(TYPE4_SIMPLE_APDU_MAX_RX_SIZE) : sw2;
 
                 mAPDUResponseLength = sizeof(mAPDURxBuffer); // Initialized with with mAPDURxBuffer size to indicate to the low
                                                              // level driver the capacity of the RX buffer
@@ -299,7 +299,7 @@ public:
                 sw1 = mAPDURxBuffer[mAPDUResponseLength - 2];
                 sw2 = mAPDURxBuffer[mAPDUResponseLength - 1];
 
-                if ((sw1 == ((uint8_t) 0x90)) && (sw2 == 0x00))
+                if ((sw1 == static_cast<uint8_t>(0x90)) && (sw2 == 0x00))
                 {
                     // Put the received bytes (without the 2 status bytes) into the ChainedResponseBuffer
                     res = AddDataToChainedResponseBuffer(mAPDURxBuffer, mAPDUResponseLength - 2);
@@ -309,7 +309,7 @@ public:
                         return;
                     }
                 }
-                else if (sw1 == (uint8_t) 0x61)
+                else if (sw1 == static_cast<uint8_t>(0x61))
                 {
                     // We have successfully received a block and it is not the last one
 
@@ -363,13 +363,13 @@ public:
         {
             if (receivedLength >= 10)
             {
-                discriminator = dataReceived[2] * 256 + dataReceived[3];
+                discriminator = static_cast<uint16_t>(dataReceived[2] * 256 + dataReceived[3]);
                 res           = CHIP_NO_ERROR;
             }
             else
             {
                 ChipLogError(DeviceLayer, "Response to Select Matter AID cmd is too small (%d bytes)",
-                             (unsigned int) receivedLength);
+                             static_cast<unsigned int>(receivedLength));
                 res = CHIP_ERROR_INTERNAL;
             }
         }
@@ -420,13 +420,13 @@ public:
 
         VerifyOrReturnLogError(dataToSendLength <= sizeof(mAPDUTxBuffer), CHIP_ERROR_INTERNAL);
 
-        mAPDUTxBuffer[0] = isLastBlock ? (uint8_t) 0x80 : (uint8_t) 0x90; // CLA
+        mAPDUTxBuffer[0] = isLastBlock ? static_cast<uint8_t>(0x80) : static_cast<uint8_t>(0x90); // CLA
         mAPDUTxBuffer[1] = 0x20;                                          // INS
-        mAPDUTxBuffer[2] = (uint8_t) ((totalLength >> 8) & 0xFF);         // P1 (contains the totalLength's MSB)
-        mAPDUTxBuffer[3] = (uint8_t) (totalLength & 0xFF);                // P2 (contains the totalLength's LSB)
-        mAPDUTxBuffer[4] = (uint8_t) dataToSendLength;                    // Lc
+        mAPDUTxBuffer[2] = static_cast<uint8_t>((totalLength >> 8) & 0xFF);         // P1 (contains the totalLength's MSB)
+        mAPDUTxBuffer[3] = static_cast<uint8_t>(totalLength & 0xFF);                // P2 (contains the totalLength's LSB)
+        mAPDUTxBuffer[4] = static_cast<uint8_t>(dataToSendLength);                    // Lc
         memcpy(&(mAPDUTxBuffer[5]), dataToSend, dataToSendLength);
-        mAPDUTxBuffer[5 + dataToSendLength] = (uint8_t) TYPE4_SIMPLE_APDU_MAX_RX_SIZE; // Le
+        mAPDUTxBuffer[5 + dataToSendLength] = static_cast<uint8_t>(TYPE4_SIMPLE_APDU_MAX_RX_SIZE); // Le
 
         uint32_t apduLength = 6 + dataToSendLength;
 
@@ -440,7 +440,7 @@ public:
         uint8_t frame[5];
 
         frame[0] = 0x00;           // CLA
-        frame[1] = (uint8_t) 0xC0; // INS
+        frame[1] = static_cast<uint8_t>(0xC0); // INS
         frame[2] = 0x00;           // P1
         frame[3] = 0x00;           // P2
         frame[4] = length;         // Le
@@ -456,16 +456,16 @@ public:
         CHIP_ERROR ret;
 
         // Use a local 'dwRecvLength' variable to avoid cast of pRcvLength from 'uint32_t *' to 'DWORD *'.
-        // Before the transceive action, those variables contain contain the size of pRcvBuffer buffer.
+        // Before the transceive action, those variables contain the size of pRcvBuffer buffer.
         // After the transceive, they will contain the length of the received data.
-        DWORD dwRecvLength = *pRcvLength;
+        DWORD dwRecvLength = static_cast<DWORD>(*pRcvLength);
 
         LONG result = SCardTransmit(cardHandle, &pioSendPci, pSendBuffer, sendBufferLength, NULL, pRcvBuffer, &dwRecvLength);
 
         if ((result == SCARD_S_SUCCESS) && (dwRecvLength >= 2))
         {
             // Copy the length of received data to pRcvLength
-            *pRcvLength = (uint32_t) dwRecvLength;
+            *pRcvLength = static_cast<uint32_t>(dwRecvLength);
 
             ret = CHIP_NO_ERROR;
         }
@@ -632,7 +632,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::ScanAllReaders(uint16_t nfcShortId)
 
     // dwReaders now contains "mszReaders" data size
     // Allocate a buffer where we will store "mszReaders" multi-string.
-    mszReaders = (LPTSTR) calloc(dwReaders, sizeof(char));
+    mszReaders = static_cast<LPTSTR>(calloc(dwReaders, sizeof(char)));
     if (mszReaders == nullptr)
     {
         ChipLogError(DeviceLayer, "Memory allocation failed");

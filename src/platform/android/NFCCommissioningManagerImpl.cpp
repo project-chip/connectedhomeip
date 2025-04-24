@@ -109,14 +109,14 @@ CHIP_ERROR NFCCommissioningManagerImpl::SendToNfcTag(const Transport::PeerAddres
     // Create a JniLocalReferenceScope to manage local references
     chip::JniLocalReferenceScope localRefScope(env);
 
-    jbyteArray jbArray = env->NewByteArray((int) len);
+    jbyteArray jbArray = env->NewByteArray(static_cast<int>(len));
     if (jbArray == nullptr)
     {
         ChipLogError(DeviceLayer, "Failed to create new Java byte array");
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    env->SetByteArrayRegion(jbArray, 0, (int) len, (jbyte *) buffer);
+    env->SetByteArrayRegion(jbArray, 0, static_cast<int>(len), reinterpret_cast<const jbyte *>(buffer));
     if (env->ExceptionCheck())
     {
         env->ExceptionClear();
