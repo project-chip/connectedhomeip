@@ -36,6 +36,7 @@ typedef uint16_t CommandRef;
 typedef uint64_t CompressedFabricId;
 typedef uint32_t DataVersion;
 typedef uint32_t DeviceTypeId;
+typedef uint32_t ElapsedS;
 typedef uint16_t EndpointId;
 typedef uint32_t EventId;
 typedef uint64_t EventNumber;

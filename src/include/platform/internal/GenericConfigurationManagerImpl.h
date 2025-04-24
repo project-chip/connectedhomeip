@@ -66,6 +66,8 @@ public:
     CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override;
     CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVer) override;
     CHIP_ERROR StoreSoftwareVersion(uint32_t softwareVer) override;
+    CHIP_ERROR GetConfigurationVersion(uint32_t & configurationVer) override;
+    CHIP_ERROR StoreConfigurationVersion(uint32_t softwareVer) override;
     CHIP_ERROR GetFirmwareBuildChipEpochTime(System::Clock::Seconds32 & buildTime) override;
     CHIP_ERROR SetFirmwareBuildChipEpochTime(System::Clock::Seconds32 buildTime) override;
     CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen) override;
