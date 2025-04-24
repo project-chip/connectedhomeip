@@ -1020,16 +1020,16 @@ void ApplicationInit()
 
     // Add composed Device with two temperature sensors and a power source
     AddDeviceEndpoint(&gComposedDevice, &bridgedComposedDeviceEndpoint, Span<const EmberAfDeviceType>(gBridgedComposedDeviceTypes),
-                      Span<DataVersion>(gComposedDeviceDataVersions), chip::CharSpan(), 1);
+                      Span<DataVersion>(gComposedDeviceDataVersions), ""_span, 1);
     AddDeviceEndpoint(&ComposedTempSensor1, &bridgedTempSensorEndpoint,
                       Span<const EmberAfDeviceType>(gComposedTempSensorDeviceTypes),
                       Span<DataVersion>(gComposedTempSensor1DataVersions),
-                      chip::CharSpan("AABBCCDDEEFFGGHHIIJJKKLLMMNNOO01", strlen("AABBCCDDEEFFGGHHIIJJKKLLMMNNOO01")),
+                      "AABBCCDDEEFFGGHHIIJJKKLLMMNNOO01"_span,
                       gComposedDevice.GetEndpointId());
     AddDeviceEndpoint(&ComposedTempSensor2, &bridgedTempSensorEndpoint,
                       Span<const EmberAfDeviceType>(gComposedTempSensorDeviceTypes),
                       Span<DataVersion>(gComposedTempSensor2DataVersions),
-                      chip::CharSpan("AABBCCDDEEFFGGHHIIJJKKLLMMNNOO02", strlen("AABBCCDDEEFFGGHHIIJJKKLLMMNNOO02")),
+                      "AABBCCDDEEFFGGHHIIJJKKLLMMNNOO02"_span,
                       gComposedDevice.GetEndpointId());
 
     // Add 4 lights for the Action Clusters tests
