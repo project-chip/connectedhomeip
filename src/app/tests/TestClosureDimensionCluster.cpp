@@ -1740,7 +1740,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommand)
     currentState.SetNonNull(setCurrentStateStruct);
     EXPECT_EQ(logic->SetCurrentState(currentState), CHIP_NO_ERROR);
 
-    // Validating Step decrease 
+    // Validating Step decrease
     mockContext.ClearDirtyList();
     EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kDecrease, 10,
                                        Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow)),
