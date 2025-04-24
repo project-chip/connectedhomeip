@@ -348,8 +348,21 @@ def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attri
 
 
 class ClusterAttributeChangeAccumulator:
-    def __init__(self, expected_cluster: ClusterObjects.Cluster):
+    """
+    Subscribes to a cluster or single attribute and accumulates attribute reports in a queue.
+
+    If `expected_attribute` is provided, it subscribes only to that specific attribute.
+    Otherwise, it subscribes to all attributes from the cluster.
+
+    Args:
+        expected_cluster (ClusterObjects.Cluster): The cluster to subscribe to.
+        expected_attribute (ClusterObjects.ClusterAttributeDescriptor, optional): 
+            If provided, subscribes to a single attribute. Defaults to None.
+    """
+
+    def __init__(self, expected_cluster: ClusterObjects.Cluster, expected_attribute: ClusterObjects.ClusterAttributeDescriptor = None):
         self._expected_cluster = expected_cluster
+        self._expected_attribute = expected_attribute
         self._subscription = None
         self._lock = threading.Lock()
         self._q = queue.Queue()
@@ -361,6 +374,8 @@ class ClusterAttributeChangeAccumulator:
             self._attribute_report_counts = {}
             attrs = [cls for name, cls in inspect.getmembers(self._expected_cluster.Attributes) if inspect.isclass(
                 cls) and issubclass(cls, ClusterObjects.ClusterAttributeDescriptor)]
+            if self._expected_attribute is not None:
+                attrs = [self._expected_attribute]
             self._attribute_reports = {}
             for a in attrs:
                 self._attribute_report_counts[a] = 0
@@ -370,9 +385,12 @@ class ClusterAttributeChangeAccumulator:
 
     async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 5, keepSubscriptions: bool = True) -> Any:
         """This starts a subscription for attributes on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
+        attributes = [(endpoint, self._expected_cluster)]
+        if self._expected_attribute is not None:
+            attributes = [(endpoint, self._expected_attribute)]
         self._subscription = await dev_ctrl.ReadAttribute(
             nodeid=node_id,
-            attributes=[(endpoint, self._expected_cluster)],
+            attributes=attributes,
             reportInterval=(int(min_interval_sec), int(max_interval_sec)),
             fabricFiltered=fabric_filtered,
             keepSubscriptions=keepSubscriptions
@@ -393,7 +411,14 @@ class ClusterAttributeChangeAccumulator:
     def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
         """This is the subscription callback when an attribute report is received.
            It checks the report is from the expected_cluster and then posts it into the queue for later processing."""
+        valid_report = False
         if path.ClusterType == self._expected_cluster:
+            if self._expected_attribute is not None:
+                valid_report = path.ClusterId == self._expected_attribute.cluster_id
+            else:
+                valid_report = True
+
+        if valid_report:
             data = transaction.GetAttribute(path)
             value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType,
                                    value=data, timestamp_utc=datetime.now(timezone.utc))
@@ -547,7 +572,7 @@ class MatterTestConfig:
     storage_path: pathlib.Path = pathlib.Path(".")
     logs_path: pathlib.Path = pathlib.Path(".")
     paa_trust_store_path: Optional[pathlib.Path] = None
-    ble_interface_id: Optional[int] = None
+    ble_controller: Optional[int] = None
     commission_only: bool = False
 
     admin_vendor_id: int = _DEFAULT_ADMIN_VENDOR_ID
@@ -773,7 +798,7 @@ class MatterStackState:
         self._config = config
 
         if not hasattr(builtins, "chipStack"):
-            chip.native.Init(bluetoothAdapter=config.ble_interface_id)
+            chip.native.Init(bluetoothAdapter=config.ble_controller)
             if config.storage_path is None:
                 raise ValueError("Must have configured a MatterTestConfig.storage_path")
             self._init_stack(already_initialized=False, persistentStoragePath=config.storage_path)
@@ -867,6 +892,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.is_commissioning = False
         # The named pipe name must be set in the derived classes
         self.app_pipe = None
+        self.cached_steps: dict[str, list[TestStep]] = {}
 
     def get_test_steps(self, test: str) -> list[TestStep]:
         ''' Retrieves the test step list for the given test
@@ -884,8 +910,13 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def get_defined_test_steps(self, test: str) -> Optional[list[TestStep]]:
         steps_name = f'steps_{test.removeprefix("test_")}'
+        if test in self.cached_steps:
+            return self.cached_steps[test]
+
         try:
             fn = getattr(self, steps_name)
+            steps = fn()
+            self.cached_steps[test] = steps
             return fn()
         except AttributeError:
             return None
@@ -1110,6 +1141,27 @@ class MatterBaseTest(base_test.BaseTestClass):
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabricFiltered)
         data = result[endpoint]
         return list(data.values())[0][attribute]
+
+    async def read_single_attribute_all_endpoints(
+            self, cluster: Clusters.ClusterObjects.ClusterCommand, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
+            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None):
+        """Reads a single attribute of a specified cluster across all endpoints.
+
+        Returns:
+            dict: endpoint to attribute value
+
+        """
+        if dev_ctrl is None:
+            dev_ctrl = self.default_controller
+        if node_id is None:
+            node_id = self.dut_node_id
+
+        read_response = await dev_ctrl.ReadAttribute(node_id, [(attribute)])
+        attrs = {}
+        for endpoint in read_response:
+            attr_ret = read_response[endpoint][cluster][attribute]
+            attrs[endpoint] = attr_ret
+        return attrs
 
     async def read_single_attribute_check_success(
             self, cluster: Clusters.ClusterObjects.ClusterCommand, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
@@ -1853,7 +1905,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.storage_path = pathlib.Path(_DEFAULT_STORAGE_PATH) if args.storage_path is None else args.storage_path
     config.logs_path = pathlib.Path(_DEFAULT_LOG_PATH) if args.logs_path is None else args.logs_path
     config.paa_trust_store_path = args.paa_trust_store_path
-    config.ble_interface_id = args.ble_interface_id
+    config.ble_controller = args.ble_controller
     config.pics = {} if args.PICS is None else read_pics_from_file(args.PICS)
     config.tests = list(chain.from_iterable(args.tests or []))
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
@@ -1904,8 +1956,8 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                              help="PAA trust store path (default: %s)" % str(paa_path_default))
     basic_group.add_argument('--dac-revocation-set-path', action="store", type=pathlib.Path, metavar="PATH",
                              help="Path to JSON file containing the device attestation revocation set.")
-    basic_group.add_argument('--ble-interface-id', action="store", type=int,
-                             metavar="INTERFACE_ID", help="ID of BLE adapter (from hciconfig)")
+    basic_group.add_argument('--ble-controller', action="store", type=int,
+                             metavar="CONTROLLER_ID", help="BLE controller selector, see example or platform docs for details")
     basic_group.add_argument('-N', '--controller-node-id', type=int_decimal_or_hex,
                              metavar='NODE_ID',
                              default=_DEFAULT_CONTROLLER_NODE_ID,
@@ -1923,11 +1975,11 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
 
     commission_group.add_argument('-m', '--commissioning-method', type=str,
                                   metavar='METHOD_NAME',
-                                  choices=["on-network", "ble-wifi", "ble-thread", "on-network-ip"],
+                                  choices=["on-network", "ble-wifi", "ble-thread"],
                                   help='Name of commissioning method to use')
     commission_group.add_argument('--in-test-commissioning-method', type=str,
                                   metavar='METHOD_NAME',
-                                  choices=["on-network", "ble-wifi", "ble-thread", "on-network-ip"],
+                                  choices=["on-network", "ble-wifi", "ble-thread"],
                                   help='Name of commissioning method to use, for commissioning tests')
     commission_group.add_argument('-d', '--discriminator', type=int_decimal_or_hex,
                                   metavar='LONG_DISCRIMINATOR',
@@ -1939,9 +1991,6 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                                   dest='passcodes',
                                   default=[],
                                   help='PAKE passcode to use', nargs="+")
-    commission_group.add_argument('-i', '--ip-addr', type=str,
-                                  metavar='RAW_IP_ADDRESS',
-                                  help='IP address to use (only for method "on-network-ip". ONLY FOR LOCAL TESTING!', nargs="+")
 
     commission_group.add_argument('--wifi-ssid', type=str,
                                   metavar='SSID',

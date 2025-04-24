@@ -196,6 +196,12 @@ enum PositionTag : enum8 {
   kColumn = 6;
 }
 
+enum PowerThresholdSourceEnum : enum8 {
+  kContract = 0;
+  kRegulator = 1;
+  kEquipment = 2;
+}
+
 enum RelativePositionTag : enum8 {
   kUnder = 0;
   kNextTo = 1;
@@ -204,6 +210,19 @@ enum RelativePositionTag : enum8 {
   kAbove = 4;
   kFrontOf = 5;
   kBehind = 6;
+}
+
+enum TariffPriceTypeEnum : enum8 {
+  kStandard = 0;
+  kCritical = 1;
+  kVirtual = 2;
+  kIncentive = 3;
+  kIncentiveSignal = 4;
+}
+
+enum TariffUnitEnum : enum8 {
+  kKWh = 0;
+  kKVAh = 1;
 }
 
 enum TestGlobalEnum : enum8 {
@@ -222,6 +241,22 @@ enum ThreeLevelAutoEnum : enum8 {
 bitmap TestGlobalBitmap : bitmap32 {
   kFirstBit = 0x1;
   kSecondBit = 0x2;
+}
+
+struct CurrencyStruct {
+  int16u currency = 0;
+  int8u decimalPoints = 1;
+}
+
+struct PowerThresholdStruct {
+  optional power_mw powerThreshold = 0;
+  optional power_mva apparentPowerThreshold = 1;
+  nullable PowerThresholdSourceEnum powerThresholdSource = 2;
+}
+
+struct PriceStruct {
+  money amount = 0;
+  CurrencyStruct currency = 1;
 }
 
 struct TestGlobalStruct {
@@ -299,7 +334,7 @@ cluster Descriptor = 29 {
     kTagList = 0x1;
   }
 
-  struct DeviceTypeStruct {
+  shared struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
   }
@@ -453,7 +488,7 @@ cluster AccessControl = 31 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 cluster BasicInformation = 40 {
-  revision 3;
+  revision 5;
 
   enum ColorEnum : enum8 {
     kBlack = 0;
@@ -536,6 +571,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute int32u specificationVersion = 21;
   readonly attribute int16u maxPathsPerInvoke = 22;
+  readonly attribute int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1325,12 +1361,12 @@ cluster RvcRunMode = 84 {
     kDirectModeChange = 0x10000;
   }
 
-  struct ModeTagStruct {
+  shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
   }
 
-  struct ModeOptionStruct {
+  shared struct ModeOptionStruct {
     char_string<64> label = 0;
     int8u mode = 1;
     ModeTagStruct modeTags[] = 2;
@@ -1387,12 +1423,12 @@ cluster RvcCleanMode = 85 {
     kDirectModeChange = 0x10000;
   }
 
-  struct ModeTagStruct {
+  shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
   }
 
-  struct ModeOptionStruct {
+  shared struct ModeOptionStruct {
     char_string<64> label = 0;
     int8u mode = 1;
     ModeTagStruct modeTags[] = 2;
@@ -1450,13 +1486,13 @@ cluster RvcOperationalState = 97 {
     kDocked = 66;
   }
 
-  struct ErrorStateStruct {
+  shared struct ErrorStateStruct {
     enum8 errorStateID = 0;
     optional char_string<64> errorStateLabel = 1;
     optional char_string<64> errorStateDetails = 2;
   }
 
-  struct OperationalStateStruct {
+  shared struct OperationalStateStruct {
     enum8 operationalStateID = 0;
     optional char_string<64> operationalStateLabel = 1;
   }
@@ -1498,7 +1534,7 @@ cluster RvcOperationalState = 97 {
 
 /** The Service Area cluster provides an interface for controlling the areas where a device should operate, and for querying the current area being serviced. */
 provisional cluster ServiceArea = 336 {
-  revision 1;
+  revision 2;
 
   enum OperationalStatusEnum : enum8 {
     kPending = 0;
@@ -1574,7 +1610,7 @@ provisional cluster ServiceArea = 336 {
 
   response struct SelectAreasResponse = 1 {
     SelectAreasStatus status = 0;
-    char_string<256> statusText = 1;
+    long_char_string<256> statusText = 1;
   }
 
   request struct SkipAreaRequest {
@@ -1583,12 +1619,12 @@ provisional cluster ServiceArea = 336 {
 
   response struct SkipAreaResponse = 3 {
     SkipAreaStatus status = 0;
-    char_string<256> statusText = 1;
+    long_char_string<256> statusText = 1;
   }
 
-  /** Command used to select a set of device areas, where the device is to operate. */
+  /** This command is used to select a set of device areas, where the device is to operate. */
   command SelectAreas(SelectAreasRequest): SelectAreasResponse = 0;
-  /** This command is used to skip an area where the device operates. */
+  /** This command is used to skip the given area, and to attempt operating at other areas on the SupportedAreas attribute list. */
   command SkipArea(SkipAreaRequest): SkipAreaResponse = 2;
 }
 
@@ -1642,6 +1678,7 @@ endpoint 0 {
     callback attribute capabilityMinima;
     callback attribute specificationVersion;
     callback attribute maxPathsPerInvoke;
+    callback attribute configurationVersion default = 1;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
   }

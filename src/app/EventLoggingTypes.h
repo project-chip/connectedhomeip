@@ -128,9 +128,7 @@ class EventOptions
 {
 public:
     EventOptions() : mPriority(PriorityLevel::Invalid) {}
-    EventOptions(Timestamp aTimestamp) : mTimestamp(aTimestamp), mPriority(PriorityLevel::Invalid) {}
     ConcreteEventPath mPath;
-    Timestamp mTimestamp;
     PriorityLevel mPriority = PriorityLevel::Invalid;
     // kUndefinedFabricIndex 0 means not fabric associated at all
     FabricIndex mFabricIndex = kUndefinedFabricIndex;

@@ -71,6 +71,7 @@ if (chip_build_tests) {
       "${chip_root}/src/system/tests",
       "${chip_root}/src/transport/retransmit/tests",
       "${chip_root}/src/transport/tests",
+      "${chip_root}/src/tracing/esp32_diagnostic_trace/tests",
     ]
 
     # Skip DNSSD tests for Mbed platform due to flash memory size limitations
@@ -135,6 +136,10 @@ if (chip_build_tests) {
 
     if (chip_config_network_layer_ble) {
       tests += [ "${chip_root}/src/ble/tests" ]
+    }
+
+    if (chip_device_config_enable_wifipaf) {
+      tests += [ "${chip_root}/src/wifipaf/tests" ]
     }
 
     # On nrfconnect, the controller tests run into
