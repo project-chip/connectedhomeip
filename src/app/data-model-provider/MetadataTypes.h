@@ -22,7 +22,6 @@
 #include <access/Privilege.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
-#include <lib/support/BitMask.h>
 
 // Pragma macro to disable the "conversion" and "narrowing" warnings.
 // This is done in some sections of the code in order to allow
@@ -109,12 +108,12 @@ struct AttributeEntry
 
     _StartBitFieldInit // Disabling '-Wconversion' & '-Wconversion'
 
-        constexpr AttributeEntry(AttributeId id                                  = 0,
-                                 BitMask<AttributeQualityFlags> attrQualityFlags = BitMask<AttributeQualityFlags>(),
-                                 std::optional<Access::Privilege> readPriv       = std::nullopt,
-                                 std::optional<Access::Privilege> writePriv      = std::nullopt) :
+        constexpr AttributeEntry(AttributeId id                             = 0,
+                                 AttributeQualityFlags attrQualityFlags     = static_cast<AttributeQualityFlags>(0),
+                                 std::optional<Access::Privilege> readPriv  = std::nullopt,
+                                 std::optional<Access::Privilege> writePriv = std::nullopt) :
         attributeId{ id },
-        mask{ attrQualityFlags.Raw() & ((1 << kAttrQualityBits) - 1),                              // Narrowing expression to 7 bits
+        mask{ to_underlying(attrQualityFlags) & ((1 << kAttrQualityBits) - 1),                              // Narrowing expression to 7 bits
               (readPriv.has_value() ? to_underlying(*readPriv) : 0) & ((1 << kPrivilegeBits) - 1), // Narrowing expression to 5 bits
               (writePriv.has_value() ? to_underlying(*writePriv) : 0) & ((1 << kPrivilegeBits) - 1) }
     // Narrowing expression to 5 bits
@@ -202,11 +201,11 @@ struct AcceptedCommandEntry
 
     _StartBitFieldInit // Disabling '-Wconversion' & '-Wconversion'
 
-        constexpr AcceptedCommandEntry(CommandId id                                 = 0,
-                                       BitMask<CommandQualityFlags> cmdQualityFlags = BitMask<CommandQualityFlags>(),
-                                       Access::Privilege invokePriv                 = Access::Privilege::kOperate) :
+        constexpr AcceptedCommandEntry(CommandId id                        = 0,
+                                       CommandQualityFlags cmdQualityFlags = static_cast<CommandQualityFlags>(0),
+                                       Access::Privilege invokePriv        = Access::Privilege::kOperate) :
         commandId(id),
-        mask{ cmdQualityFlags.Raw() & ((1 << kCmmdQualityBits) - 1),    // Narrowing expression to 3 bits
+        mask{ to_underlying(cmdQualityFlags) & ((1 << kCmmdQualityBits) - 1),    // Narrowing expression to 3 bits
               to_underlying(invokePriv) & ((1 << kPrivilegeBits) - 1) } // Narrowing expression to 5 bits
     {}
 
