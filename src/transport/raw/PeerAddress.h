@@ -68,7 +68,6 @@ public:
     PeerAddress(const Inet::IPAddress & addr, Type type) : mIPAddress(addr), mTransportType(type) {}
     PeerAddress(Type type) : mTransportType(type) {}
     PeerAddress(Type type, NodeId remoteId) : mTransportType(type), mRemoteId(remoteId) {}
-    PeerAddress(Type type, uint16_t shortId) : mTransportType(type), mNFCShortId(shortId) {}
 
     PeerAddress(PeerAddress &&)                  = default;
     PeerAddress(const PeerAddress &)             = default;
@@ -184,7 +183,7 @@ public:
             snprintf(buf, bufSize, "BLE");
             break;
         case Type::kNfc:
-            snprintf(buf, bufSize, "NFC");
+            snprintf(buf, bufSize, "NFC:%d", mNFCShortId);
             break;
         default:
             snprintf(buf, bufSize, "ERROR");
@@ -245,6 +244,8 @@ public:
     }
 
 private:
+    PeerAddress(Type type, uint16_t shortId) : mTransportType(type), mNFCShortId(shortId) {}
+
     static PeerAddress FromString(char * addrStr, uint16_t port, Type type)
     {
         Inet::IPAddress addr;

@@ -34,7 +34,6 @@
 
 #include <lib/support/BytesToHex.h>
 
-// using namespace chip::Nfc;
 using namespace chip::System;
 
 namespace chip {

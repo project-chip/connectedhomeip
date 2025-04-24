@@ -80,16 +80,6 @@ public:
 private:
     void ClearState();
 
-    /**
-     * Sends the specified message once a connection has been established.
-     *
-     * @param msg - what buffer to send once a connection has been established.
-     *
-     * Ownership of msg is taken over and will be freed at some unspecified time
-     * in the future (once connection succeeds/fails).
-     */
-    CHIP_ERROR SendAfterConnect(System::PacketBufferHandle && msg);
-
     State mState = State::kNotReady; ///< State of the NFC transport
 };
 
