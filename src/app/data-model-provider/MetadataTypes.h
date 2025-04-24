@@ -22,6 +22,7 @@
 #include <access/Privilege.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
+#include <lib/support/BitMask.h>
 
 // Pragma macro to disable the "conversion" and "narrowing" warnings.
 // This is done in some sections of the code in order to allow
@@ -200,10 +201,10 @@ struct AcceptedCommandEntry
 
     _StartBitFieldInit // Disabling '-Wconversion' & '-Wconversion'
 
-        constexpr AcceptedCommandEntry(CommandId id = 0, CommandQualityFlags cmdQualityFlags = static_cast<CommandQualityFlags>(0),
+        constexpr AcceptedCommandEntry(CommandId id = 0, BitMask<CommandQualityFlags> cmdQualityFlags = BitMask<CommandQualityFlags>(),
                                        Access::Privilege invokePriv = Access::Privilege::kOperate) :
         commandId(id),
-        mask{ to_underlying(cmdQualityFlags) & ((1 << kCmmdQualityBits) - 1), // Narrowing expression to 3 bits
+        mask{ cmdQualityFlags.Raw() & ((1 << kCmmdQualityBits) - 1), // Narrowing expression to 3 bits
               to_underlying(invokePriv) & ((1 << kPrivilegeBits) - 1) }       // Narrowing expression to 5 bits
     {}
 
