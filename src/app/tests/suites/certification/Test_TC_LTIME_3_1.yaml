@@ -45,14 +45,14 @@ tests:
 
     - label:
           "Step 2: If (LTIME.S.A0000.12HR) TH writes 0 to HourFormat attribute"
-      PICS: LTIME.S.M.12HR
+      PICS: LTIME.S.A0000 && LTIME.S.M.12HR
       command: "writeAttribute"
       attribute: "HourFormat"
       arguments:
           value: 0
 
     - label: "Step 3: TH reads HourFormat attribute"
-      PICS: LTIME.S.A0000
+      PICS: LTIME.S.A0000 && LTIME.S.M.12HR
       command: "readAttribute"
       attribute: "HourFormat"
       response:
@@ -60,20 +60,35 @@ tests:
 
     - label:
           "Step 4: If (LTIME.S.A0000.24HR) TH writes 1 to HourFormat attribute"
-      PICS: LTIME.S.M.24HR
+      PICS: LTIME.S.A0000 && LTIME.S.M.24HR
       command: "writeAttribute"
       attribute: "HourFormat"
       arguments:
           value: 1
 
     - label: "Step 5: TH reads HourFormat attribute"
-      PICS: LTIME.S.A0000
+      PICS: LTIME.S.A0000 && LTIME.S.M.24HR
       command: "readAttribute"
       attribute: "HourFormat"
       response:
           value: 1
 
-    - label: "Step 6: TH reads ActiveCalendarType attribute from DUT"
+    - label:
+          "Step 6: TH writes 255 (UseActiveLocale) to HourFormat attribute"
+      PICS: LTIME.S.A0000
+      command: "writeAttribute"
+      attribute: "HourFormat"
+      arguments:
+          value: 255
+
+    - label: "Step 7: TH reads HourFormat attribute"
+      PICS: LTIME.S.A0000
+      command: "readAttribute"
+      attribute: "HourFormat"
+      response:
+          value: 255
+
+    - label: "Step 8: TH reads ActiveCalendarType attribute from DUT"
       PICS: LTIME.S.A0001
       command: "readAttribute"
       attribute: "ActiveCalendarType"
@@ -82,16 +97,8 @@ tests:
               minValue: 0
               maxValue: 11
 
-    - label: "Step 7: TH reads SupportedCalendarTypes attribute from DUT"
-      PICS: LTIME.S.A0002
-      command: "readAttribute"
-      attribute: "SupportedCalendarTypes"
-      response:
-          constraints:
-              maxLength: 12
-
     - label:
-          "Step 8: TH writes value in PIXIT.LTIME.SCT to ActiveCalendarType
+          "Step 9: TH writes value in PIXIT.LTIME.SCT to ActiveCalendarType
           attribute, followed by reading the ActiveCalendarType attribute value"
       PICS: LTIME.S.A0001 && PICS_SKIP_SAMPLE_APP
       verification: |
@@ -141,7 +148,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 9: Repeat step 8 for all the values in PIXIT.LTIME.SCT"
+    - label: "Step 10: Repeat step 8 for all the values in PIXIT.LTIME.SCT"
       PICS: LTIME.S.A0001 && PICS_SKIP_SAMPLE_APP
       verification: |
           Repeat the test step 8 for below mentioned values 1, 2,3, 4, 5, 6,7, 8, 9,10 and 11 and verify that TH receives the write command and updates the respective value. Verify that TH reads ActiveCalendarType attribute value and it is the same as the value that was set before
@@ -347,7 +354,15 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 10: TH writes 50 to ActiveCalendarType attribute"
+    - label: "Step 11: TH reads SupportedCalendarTypes attribute from DUT"
+      PICS: LTIME.S.A0002
+      command: "readAttribute"
+      attribute: "SupportedCalendarTypes"
+      response:
+          constraints:
+              maxLength: 12
+
+    - label: "Step 12: TH writes 50 to ActiveCalendarType attribute"
       PICS: LTIME.S.A0001
       command: "writeAttribute"
       attribute: "ActiveCalendarType"
@@ -356,7 +371,7 @@ tests:
       response:
           error: CONSTRAINT_ERROR
 
-    - label: "Step 11: TH writes 5 to HourFormat attribute"
+    - label: "Step 13: TH writes 5 to HourFormat attribute"
       PICS: LTIME.S.A0000
       command: "writeAttribute"
       attribute: "HourFormat"
