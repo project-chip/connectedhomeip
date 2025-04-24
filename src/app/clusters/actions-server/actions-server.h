@@ -110,13 +110,13 @@ private:
     EndpointId mEpList[kEndpointListMaxSize];
 };
 
-class ActionsServer : public AttributeAccessInterface, public CommandHandlerInterface
+class ActionsServer : public AttributeAccessInterface, public CommandHandlerInterfaceB
 {
 public:
     // Register for the Actions cluster on all endpoints.
     ActionsServer(EndpointId aEndpointId, Delegate & aDelegate) :
         AttributeAccessInterface(MakeOptional(aEndpointId), Actions::Id),
-        CommandHandlerInterface(MakeOptional(aEndpointId), Actions::Id), mDelegate(aDelegate), mEndpointId(aEndpointId)
+        CommandHandlerInterfaceB(MakeOptional(aEndpointId), Actions::Id), mDelegate(aDelegate), mEndpointId(aEndpointId)
     {}
 
     ~ActionsServer();
@@ -129,7 +129,7 @@ public:
     CHIP_ERROR Init();
 
     /**
-     * Unregisters the CommandHandlerInterface and AttributeAccessInterface.
+     * Unregisters the CommandHandlerInterfaceB and AttributeAccessInterface.
      */
     void Shutdown();
 
@@ -182,7 +182,7 @@ private:
     {
         MatterReportingAttributeChangeCallback(aEndpointId, Id, aAttributeId);
     }
-    // Cannot use CommandHandlerInterface::HandleCommand directly because we need to do the HaveActionWithId() check before
+    // Cannot use CommandHandlerInterfaceB::HandleCommand directly because we need to do the HaveActionWithId() check before
     // handling a command.
     template <typename RequestT, typename FuncT>
     void HandleCommand(HandlerContext & handlerContext, FuncT func);

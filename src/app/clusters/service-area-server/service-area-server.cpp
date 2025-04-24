@@ -47,7 +47,7 @@ namespace ServiceArea {
 // Service Area Server Instance
 
 Instance::Instance(StorageDelegate * storageDelegate, Delegate * aDelegate, EndpointId aEndpointId, BitMask<Feature> aFeature) :
-    AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterface(MakeOptional(aEndpointId), Id),
+    AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterfaceB(MakeOptional(aEndpointId), Id),
     mStorageDelegate(storageDelegate), mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(Id), mFeature(aFeature)
 {
     ChipLogProgress(Zcl, "Service Area: Instance constructor");
@@ -120,11 +120,11 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
     switch (handlerContext.mRequestPath.mCommandId)
     {
     case Commands::SelectAreas::Id:
-        return CommandHandlerInterface::HandleCommand<Commands::SelectAreas::DecodableType>(
+        return CommandHandlerInterfaceB::HandleCommand<Commands::SelectAreas::DecodableType>(
             handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleSelectAreasCmd(ctx, req); });
 
     case Commands::SkipArea::Id:
-        return CommandHandlerInterface::HandleCommand<Commands::SkipArea::DecodableType>(
+        return CommandHandlerInterfaceB::HandleCommand<Commands::SkipArea::DecodableType>(
             handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleSkipAreaCmd(ctx, req); });
     }
 }

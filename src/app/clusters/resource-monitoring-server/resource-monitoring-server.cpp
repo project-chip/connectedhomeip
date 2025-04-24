@@ -47,7 +47,7 @@ namespace ResourceMonitoring {
 Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeatureMap,
                    ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
                    bool aResetConditionCommandSupported) :
-    CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),
+    CommandHandlerInterfaceB(Optional<EndpointId>(aEndpointId), aClusterId),
     AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId), mDelegate(aDelegate), mEndpointId(aEndpointId),
     mClusterId(aClusterId), mDegradationDirection(aDegradationDirection), mFeatureMap(aFeatureMap),
     mResetConditionCommandSupported(aResetConditionCommandSupported)
@@ -188,12 +188,16 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
 
 // List the commands supported by this instance.
 CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                               CommandHandlerInterface::CommandIdCallback callback, void * context)
+                                               ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
+    using namespace ResourceMonitoring::Commands;
+
     ChipLogDetail(Zcl, "resourcemonitoring: EnumerateAcceptedCommands");
     if (mResetConditionCommandSupported)
     {
-        callback(ResourceMonitoring::Commands::ResetCondition::Id, context);
+        ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
+        // Maybe add interface to provide this entry dynamically for the alias?
+        return builder.Append(ResetCondition::kMetadataEntry);
     }
 
     return CHIP_NO_ERROR;

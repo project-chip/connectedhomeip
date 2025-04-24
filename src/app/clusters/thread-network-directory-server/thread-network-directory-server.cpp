@@ -42,7 +42,7 @@ namespace Clusters {
 
 ThreadNetworkDirectoryServer::ThreadNetworkDirectoryServer(EndpointId endpoint, ThreadNetworkDirectoryStorage & storage) :
     AttributeAccessInterface(MakeOptional(endpoint), ThreadNetworkDirectory::Id),
-    CommandHandlerInterface(MakeOptional(endpoint), ThreadNetworkDirectory::Id), mStorage(storage)
+    CommandHandlerInterfaceB(MakeOptional(endpoint), ThreadNetworkDirectory::Id), mStorage(storage)
 {}
 
 ThreadNetworkDirectoryServer::~ThreadNetworkDirectoryServer()

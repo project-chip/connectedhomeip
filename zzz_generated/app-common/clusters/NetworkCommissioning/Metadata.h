@@ -113,49 +113,49 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace ScanNetworks {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = NetworkCommissioning::Commands::ScanNetworks::Id,
+    .commandId       = Commands::ScanNetworks::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace ScanNetworks
 namespace AddOrUpdateWiFiNetwork {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Id,
+    .commandId       = Commands::AddOrUpdateWiFiNetwork::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace AddOrUpdateWiFiNetwork
 namespace AddOrUpdateThreadNetwork {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::Id,
+    .commandId       = Commands::AddOrUpdateThreadNetwork::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace AddOrUpdateThreadNetwork
 namespace RemoveNetwork {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = NetworkCommissioning::Commands::RemoveNetwork::Id,
+    .commandId       = Commands::RemoveNetwork::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace RemoveNetwork
 namespace ConnectNetwork {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = NetworkCommissioning::Commands::ConnectNetwork::Id,
+    .commandId       = Commands::ConnectNetwork::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace ConnectNetwork
 namespace ReorderNetwork {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = NetworkCommissioning::Commands::ReorderNetwork::Id,
+    .commandId       = Commands::ReorderNetwork::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace ReorderNetwork
 namespace QueryIdentity {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = NetworkCommissioning::Commands::QueryIdentity::Id,
+    .commandId       = Commands::QueryIdentity::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };

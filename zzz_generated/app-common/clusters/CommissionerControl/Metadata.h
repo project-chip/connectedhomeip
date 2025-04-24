@@ -33,14 +33,14 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace RequestCommissioningApproval {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CommissionerControl::Commands::RequestCommissioningApproval::Id,
+    .commandId       = Commands::RequestCommissioningApproval::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace RequestCommissioningApproval
 namespace CommissionNode {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CommissionerControl::Commands::CommissionNode::Id,
+    .commandId       = Commands::CommissionNode::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };

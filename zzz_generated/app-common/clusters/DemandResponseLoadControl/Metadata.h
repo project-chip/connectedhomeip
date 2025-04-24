@@ -89,35 +89,35 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace RegisterLoadControlProgramRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DemandResponseLoadControl::Commands::RegisterLoadControlProgramRequest::Id,
+    .commandId       = Commands::RegisterLoadControlProgramRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace RegisterLoadControlProgramRequest
 namespace UnregisterLoadControlProgramRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DemandResponseLoadControl::Commands::UnregisterLoadControlProgramRequest::Id,
+    .commandId       = Commands::UnregisterLoadControlProgramRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace UnregisterLoadControlProgramRequest
 namespace AddLoadControlEventRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DemandResponseLoadControl::Commands::AddLoadControlEventRequest::Id,
+    .commandId       = Commands::AddLoadControlEventRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace AddLoadControlEventRequest
 namespace RemoveLoadControlEventRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DemandResponseLoadControl::Commands::RemoveLoadControlEventRequest::Id,
+    .commandId       = Commands::RemoveLoadControlEventRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace RemoveLoadControlEventRequest
 namespace ClearLoadControlEventsRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DemandResponseLoadControl::Commands::ClearLoadControlEventsRequest::Id,
+    .commandId       = Commands::ClearLoadControlEventsRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

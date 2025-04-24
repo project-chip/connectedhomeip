@@ -40,12 +40,12 @@ namespace ServiceArea {
 
 /**
  * Instance is a class that represents an instance of the generic Service Area cluster.
- * It implements AttributeAccessInterface and CommandHandlerInterface so it can
+ * It implements AttributeAccessInterface and CommandHandlerInterfaceB so it can
  * handle commands for any implementation of the location cluster.
  * Custom implementations of the Service Area cluster override functions in the Delegate class
  * must be provided to operate with specific devices.
  */
-class Instance : public AttributeAccessInterface, public CommandHandlerInterface
+class Instance : public AttributeAccessInterface, public CommandHandlerInterfaceB
 {
 public:
     /**

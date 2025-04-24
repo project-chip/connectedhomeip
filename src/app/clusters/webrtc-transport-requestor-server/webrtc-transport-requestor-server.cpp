@@ -67,7 +67,7 @@ namespace WebRTCTransportRequestor {
 
 WebRTCTransportRequestorServer::WebRTCTransportRequestorServer(EndpointId endpointId, WebRTCTransportRequestorDelegate & delegate) :
     AttributeAccessInterface(MakeOptional(endpointId), WebRTCTransportRequestor::Id),
-    CommandHandlerInterface(MakeOptional(endpointId), WebRTCTransportRequestor::Id), mDelegate(delegate)
+    CommandHandlerInterfaceB(MakeOptional(endpointId), WebRTCTransportRequestor::Id), mDelegate(delegate)
 {
     // Set WebRTCTransportRequestorServer in delegate here
 }
@@ -125,19 +125,19 @@ void WebRTCTransportRequestorServer::InvokeCommand(HandlerContext & ctx)
     switch (ctx.mRequestPath.mCommandId)
     {
     case Commands::Offer::Id:
-        CommandHandlerInterface::HandleCommand<Commands::Offer::DecodableType>(
+        CommandHandlerInterfaceB::HandleCommand<Commands::Offer::DecodableType>(
             ctx, [this](HandlerContext & ctx_, const auto & req) { HandleOffer(ctx_, req); });
         break;
     case Commands::Answer::Id:
-        CommandHandlerInterface::HandleCommand<Commands::Answer::DecodableType>(
+        CommandHandlerInterfaceB::HandleCommand<Commands::Answer::DecodableType>(
             ctx, [this](HandlerContext & ctx_, const auto & req) { HandleAnswer(ctx_, req); });
         break;
     case Commands::ICECandidates::Id:
-        CommandHandlerInterface::HandleCommand<Commands::ICECandidates::DecodableType>(
+        CommandHandlerInterfaceB::HandleCommand<Commands::ICECandidates::DecodableType>(
             ctx, [this](HandlerContext & ctx_, const auto & req) { HandleICECandidates(ctx_, req); });
         break;
     case Commands::End::Id:
-        CommandHandlerInterface::HandleCommand<Commands::End::DecodableType>(
+        CommandHandlerInterfaceB::HandleCommand<Commands::End::DecodableType>(
             ctx, [this](HandlerContext & ctx_, const auto & req) { HandleEnd(ctx_, req); });
         break;
 
