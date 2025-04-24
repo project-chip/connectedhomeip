@@ -65,9 +65,7 @@ private:
 class OtaProviderServer : public DefaultServerCluster, private OtaProviderLogic
 {
 public:
-    OtaProviderServer() : DefaultServerCluster({ kInvalidEndpointId, OtaSoftwareUpdateProvider::Id }) {}
-
-    void SetEndpointId(EndpointId endpoint) { mPath.mEndpointId = endpoint; }
+    OtaProviderServer(EndpointId endpointId) : DefaultServerCluster({ endpointId, OtaSoftwareUpdateProvider::Id }) {}
 
     using OtaProviderLogic::SetDelegate;
 

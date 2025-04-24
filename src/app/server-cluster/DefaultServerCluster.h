@@ -88,7 +88,7 @@ public:
     static Span<const DataModel::AttributeEntry> GlobalAttributes();
 
 protected:
-    ConcreteClusterPath mPath;
+    const ConcreteClusterPath mPath;
     ServerClusterContext * mContext = nullptr;
 
     void IncreaseDataVersion() { mDataVersion++; }

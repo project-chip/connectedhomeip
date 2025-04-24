@@ -32,7 +32,7 @@ static constexpr size_t kOtaProviderFixedClusterCount =
     OtaSoftwareUpdateProvider::StaticApplicationConfig::kFixedClusterConfig.size();
 static constexpr size_t kOtaProviderMaxClusterCount = kOtaProviderFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-RegisteredServerCluster<OtaProviderServer> gServers[kOtaProviderMaxClusterCount];
+LazyRegisteredServerCluster<OtaProviderServer> gServers[kOtaProviderMaxClusterCount];
 
 // Find the 0-based array index corresponding to the given endpoint id.
 // Log an error if not found.
@@ -58,9 +58,8 @@ void emberAfOtaSoftwareUpdateProviderClusterInitCallback(EndpointId endpointId)
     {
         return;
     }
-
-    gServers[arrayIndex].cluster.SetEndpointId(endpointId);
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServers[arrayIndex].registration);
+    gServers[arrayIndex].Create(endpointId);
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServers[arrayIndex].Registration());
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Failed to register OTA on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
@@ -75,11 +74,12 @@ void emberAfOtaSoftwareUpdateProviderClusterShutdownCallback(EndpointId endpoint
         return;
     }
 
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServers[arrayIndex].cluster);
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServers[arrayIndex].Cluster());
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Failed to unregister OTA on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
     }
+    gServers[arrayIndex].Destroy();
 }
 
 void MatterOtaSoftwareUpdateProviderPluginServerInitCallback() {}
@@ -98,7 +98,7 @@ void SetDelegate(EndpointId endpointId, OTAProviderDelegate * delegate)
     {
         return;
     }
-    gServers[arrayIndex].cluster.SetDelegate(delegate);
+    gServers[arrayIndex].Cluster().SetDelegate(delegate);
 }
 
 } // namespace OTAProvider
