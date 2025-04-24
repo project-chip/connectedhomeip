@@ -39,7 +39,6 @@ import enum
 import hashlib
 import inspect
 import logging
-import inspect
 import re
 import sys
 from binascii import unhexlify
