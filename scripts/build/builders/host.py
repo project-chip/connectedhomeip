@@ -477,8 +477,6 @@ class HostBuilder(GnBuilder):
         if enable_test_event_triggers is not None:
             if 'EVSE' in enable_test_event_triggers:
                 self.extra_gn_options.append('chip_enable_energy_evse_trigger=true')
-            if 'MTRID' in enable_test_event_triggers:
-                self.extra_gn_options.append('chip_enable_meter_identification_trigger=true')
 
         if enable_dnssd_tests is not None:
             if enable_dnssd_tests:
