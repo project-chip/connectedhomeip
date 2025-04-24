@@ -223,7 +223,7 @@ class TC_CADMIN(MatterBaseTest):
 
         if commission_type == "ECM":
             self.step(15)
-            
+
         elif commission_type == "BCM":
             self.step(7)
 
@@ -265,7 +265,8 @@ class TC_CADMIN(MatterBaseTest):
                      "DUT_CE opens its Commissioning window to allow a new commissioning"),
             TestStep(13, "TH_CR1 starts a commissioning process with DUT_CE before the timeout from step 12",
                      "Since DUT_CE was already commissioned by TH_CR1 in step 1, AddNOC fails with NOCResponse with StatusCode field set to FabricConflict (9)"),
-            TestStep(14, "TH_CR1 sends an RevokeCommissioning command to the DUT to cleanup step 13", "Successfully revoked commissioning"),
+            TestStep(14, "TH_CR1 sends an RevokeCommissioning command to the DUT to cleanup step 13",
+                     "Successfully revoked commissioning"),
             TestStep(15, "TH_CR2 reads the CurrentFabricIndex attribute from the Operational Credentials cluster and saves as th2_idx, TH_CR1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx",
                      "TH_CR1 removes TH_CR2 fabric using th2_idx")
         ]
