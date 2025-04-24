@@ -149,7 +149,7 @@ jobs:
                       # Example is intentionally not spe compliant for use in cert testing
                       if [ "$idl_file" = './examples/lighting-app-data-mode-no-unique-id/lighting-common/lighting-app.matter' ]; then continue; fi
 
-                      # Test files are intentionally small and not spec-compilant, just parse-compliant
+                      # Test files are intentionally small and not spec-compliant, just parse-compliant
                       if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/cluster_struct_attribute.matter" ]; then continue; fi
                       if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/global_struct_attribute.matter" ]; then continue; fi
                       if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/optional_argument.matter" ]; then continue; fi
@@ -158,7 +158,7 @@ jobs:
                       if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/large_lighting_app.matter" ]; then continue; fi
                       if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/large_all_clusters_app.matter" ]; then continue; fi
 
-                      ./scripts/run_in_build_env.sh "./scripts/idl_lint.py --log-level warn $idl_file" >/dev/null || exit 1
+                      ./scripts/run_in_build_env.sh "matter-idl-lint --log-level warn $idl_file" >/dev/null || exit 1
                   done
 
             - name: Check broken links
