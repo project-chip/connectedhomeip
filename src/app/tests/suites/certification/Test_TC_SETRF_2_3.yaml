@@ -12,27 +12,239 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: X.2.3. [TC-SETRF-2.3] Commands with Client as DUT
+name:
+    X.2.3. [TC-SETRF-2.3] Primary Functionality. Check tariff examples loading
+    and changing with Server as DUT
 
 PICS:
-  - SETRF.C
+    - SETRF.S
+    - SETRF.S.F00
+    - SETRF.S.F01
+    - SETRF.S.F02
+    - SETRF.S.F03
+    - SETRF.S.F04
+    - SETRF.S.F05
 
 config:
-  nodeId: 0x12344321
-  cluster: "Commodity Tariff"
-  endpoint: 1
+    nodeId: 0x12344321
+    cluster: "Commodity Tariff"
+    endpoint: 1
+    TEST_EVENT_TRIGGER_KEY:
+        type: octet_string
+        defaultValue: "hex:00112233445566778899aabbccddeeff"
+    TEST_EVENT_TRIGGER_FULL_TARIFF_SET:
+        type: int64u
+        defaultValue: "0x0700000000000000"
+    TEST_EVENT_TRIGGER_TEST_EVENT_CLEAR:
+        type: int64u
+        defaultValue: "0x0700000000000001"
 
 tests:
-  - label: "Step 1: Commission DUT to TH"
-    cluster: "DelayCommands"
-    command: "WaitForCommissionee"
-    arguments:
-      values:
-        - name: "nodeId"
-          value: nodeId
+    - label: "Step 1: Commission DUT to TH"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-  - label: "Step 2: DUT sends GetTariffComponent command to TH."
-    wait: "GetTariffComponent"
+    - label:
+          "Step 2: TH reads TestEventTriggersEnabled attribute from General
+          Diagnostics Cluster"
+      PICS: DGGEN.S.A0008
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "readAttribute"
+      attribute: "TestEventTriggersEnabled"
+      response:
+          value: 1
 
-  - label: "Step 3: DUT sends GetDayEntry command to TH."
-    wait: "GetDayEntry"
+    - label:
+          "Step 3: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
+          PIXIT.SETRF.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SETRF.TEST_EVENT_TRIGGER for Full Tariff Set Test Event"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_TEST_EVENT_CLEAR
+
+    - label: "Step 4: TH reads the TariffInfo attribute from the DUT"
+      command: "readAttribute"
+      attribute: "TariffInfo"
+      response:
+          value: null
+
+    - label:
+          "Step 5: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
+          PIXIT.SETRF.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SETRF.TEST_EVENT_TRIGGER for Full Tariff Set Test Event"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_FULL_TARIFF_SET
+
+    - label: "Step 6: TH reads the TariffInfo attribute from the DUT"
+      command: "readAttribute"
+      attribute: "TariffInfo"
+      response:
+          value:
+              {
+                  "TariffLabel": "Full Tariff One",
+                  "ProviderName": "Default Provider",
+                  "Currency": { "Currency": 120, "DecimalPoints": 0 },
+                  "BlockMode": 0,
+              }
+          constraints:
+              type: "TariffInformationStruct"
+
+    - label: "Step 7: TH reads the DayEntries attribute from the DUT"
+      command: "readAttribute"
+      attribute: "DayEntries"
+      response:
+          constraints:
+              type: list
+              minLength: 5
+              maxLength: 5
+
+    - label: "Step 8: TH reads the DayPatterns attribute from the DUT"
+      command: "readAttribute"
+      attribute: "DayPatterns"
+      response:
+          constraints:
+              type: list
+              minLength: 3
+              maxLength: 3
+
+    - label: "Step 9: TH reads the CalendarPeriods attribute from the DUT"
+      command: "readAttribute"
+      attribute: "CalendarPeriods"
+      response:
+          constraints:
+              type: list
+              minLength: 1
+              maxLength: 1
+
+    - label: "Step 10: TH reads the IndividualDays attribute from the DUT"
+      command: "readAttribute"
+      attribute: "IndividualDays"
+      response:
+          constraints:
+              type: list
+              minLength: 1
+              maxLength: 1
+
+    - label: "Step 11: TH reads the TariffComponents attribute from the DUT"
+      command: "readAttribute"
+      attribute: "TariffComponents"
+      response:
+          constraints:
+              type: list
+              minLength: 2
+              maxLength: 2
+
+    - label: "Step 12: TH reads the TariffPeriods attribute from the DUT"
+      command: "readAttribute"
+      attribute: "TariffPeriods"
+      response:
+          constraints:
+              type: list
+              minLength: 4
+              maxLength: 4
+
+    - label:
+          "Step 13: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
+          PIXIT.SETRF.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SETRF.TEST_EVENT_TRIGGER for Full Tariff Set Test Event"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_FULL_TARIFF_SET
+
+    - label: "Step 14: TH reads the TariffInfo attribute from the DUT"
+      command: "readAttribute"
+      attribute: "TariffInfo"
+      response:
+          value:
+              {
+                  "TariffLabel": "Full Tariff Two",
+                  "ProviderName": "New Default Provider",
+                  "Currency": { "Currency": 100, "DecimalPoints": 0 },
+                  "BlockMode": 0,
+              }
+          constraints:
+              type: "TariffInformationStruct"
+
+    - label: "Step 15: TH reads the DayEntries attribute from the DUT"
+      command: "readAttribute"
+      attribute: "DayEntries"
+      response:
+          constraints:
+              type: list
+              minLength: 4
+              maxLength: 4
+
+    - label: "Step 16: TH reads the DayPatterns attribute from the DUT"
+      command: "readAttribute"
+      attribute: "DayPatterns"
+      response:
+          constraints:
+              type: list
+              minLength: 2
+              maxLength: 2
+
+    - label: "Step 17: TH reads the CalendarPeriods attribute from the DUT"
+      command: "readAttribute"
+      attribute: "CalendarPeriods"
+      response:
+          constraints:
+              type: list
+              minLength: 1
+              maxLength: 1
+
+    - label: "Step 18: TH reads the IndividualDays attribute from the DUT"
+      command: "readAttribute"
+      attribute: "IndividualDays"
+      response:
+          constraints:
+              type: list
+              minLength: 1
+              maxLength: 1
+
+    - label: "Step 19: TH reads the TariffComponents attribute from the DUT"
+      command: "readAttribute"
+      attribute: "TariffComponents"
+      response:
+          constraints:
+              type: list
+              minLength: 3
+              maxLength: 3
+
+    - label: "Step 20: TH reads the TariffPeriods attribute from the DUT"
+      command: "readAttribute"
+      attribute: "TariffPeriods"
+      response:
+          constraints:
+              type: list
+              minLength: 3
+              maxLength: 3

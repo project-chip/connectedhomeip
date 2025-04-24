@@ -15,310 +15,320 @@
 name: X.2.1. [TC-SETRF-2.1] Attributes with DUT as Server
 
 PICS:
-  - SETRF.S
+    - SETRF.S
 
 config:
-  nodeId: 0x12344321
-  cluster: "Commodity Tariff"
-  endpoint: 1
-  TEST_EVENT_TRIGGER_KEY:
-    type: octet_string
-    defaultValue: "hex:00112233445566778899aabbccddeeff"
-  TEST_EVENT_TRIGGER_ATTRIBUTES_VALUE_UPDATE:
-    type: int64u
-    defaultValue: "0x0700000000000000"
-  TEST_EVENT_TRIGGER_TEST_EVENT_CLEAR:
-    type: int64u
-    defaultValue: "0x0700000000000001"
+    nodeId: 0x12344321
+    cluster: "Commodity Tariff"
+    endpoint: 1
+    TEST_EVENT_TRIGGER_KEY:
+        type: octet_string
+        defaultValue: "hex:00112233445566778899aabbccddeeff"
+    TEST_EVENT_TRIGGER_FULL_TARIFF_SET:
+        type: int64u
+        defaultValue: "0x0700000000000000"
+    TEST_EVENT_TRIGGER_TEST_EVENT_CLEAR:
+        type: int64u
+        defaultValue: "0x0700000000000001"
 
 tests:
-  - label: "Step 1: Commission DUT to TH"
-    cluster: "DelayCommands"
-    command: "WaitForCommissionee"
-    arguments:
-      values:
-        - name: "nodeId"
-          value: nodeId
+    - label: "Step 1: Commission DUT to TH"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-  - label: "Step 2: TH reads the TariffInfo attribute from the DUT"
-    command: "readAttribute"
-    attribute: "TariffInfo"
-    response:
-      value: null
+    - label: "Step 2: TH reads the TariffInfo attribute from the DUT"
+      command: "readAttribute"
+      attribute: "TariffInfo"
+      response:
+          value: null
 
-  - label: "Step 3: TH reads the TariffUnit attribute from the DUT"
-    command: "readAttribute"
-    attribute: "TariffUnit"
-    response:
-      value: null
+    - label: "Step 3: TH reads the TariffUnit attribute from the DUT"
+      command: "readAttribute"
+      attribute: "TariffUnit"
+      response:
+          value: null
 
-  - label: "Step 4: TH reads the StartDate attribute from the DUT"
-    command: "readAttribute"
-    attribute: "StartDate"
-    response:
-      value: null
+    - label: "Step 4: TH reads the StartDate attribute from the DUT"
+      command: "readAttribute"
+      attribute: "StartDate"
+      response:
+          value: null
 
-  - label: "Step 5: TH reads the DayEntries attribute from the DUT"
-    command: "readAttribute"
-    attribute: "DayEntries"
-    response:
-      value: null
+    - label: "Step 5: TH reads the DayEntries attribute from the DUT"
+      command: "readAttribute"
+      attribute: "DayEntries"
+      response:
+          value: null
 
-  - label: "Step 6: TH reads the DayPatterns attribute from the DUT"
-    command: "readAttribute"
-    attribute: "DayPatterns"
-    response:
-      value: null
+    - label: "Step 6: TH reads the DayPatterns attribute from the DUT"
+      command: "readAttribute"
+      attribute: "DayPatterns"
+      response:
+          value: null
 
-  - label: "Step 7: TH reads the CalendarPeriods attribute from the DUT"
-    command: "readAttribute"
-    attribute: "CalendarPeriods"
-    response:
-      value: null
+    - label: "Step 7: TH reads the CalendarPeriods attribute from the DUT"
+      command: "readAttribute"
+      attribute: "CalendarPeriods"
+      response:
+          value: null
 
-  - label: "Step 8: TH reads the IndividualDays attribute from the DUT"
-    command: "readAttribute"
-    attribute: "IndividualDays"
-    response:
-      value: null
+    - label: "Step 8: TH reads the IndividualDays attribute from the DUT"
+      command: "readAttribute"
+      attribute: "IndividualDays"
+      response:
+          value: null
 
-  - label: "Step 9: TH reads the CurrentDay attribute from the DUT"
-    command: "readAttribute"
-    attribute: "CurrentDay"
-    response:
-      value: null
+    - label: "Step 9: TH reads the CurrentDay attribute from the DUT"
+      command: "readAttribute"
+      attribute: "CurrentDay"
+      response:
+          value: null
 
-  - label: "Step 10: TH reads the NextDay attribute from the DUT"
-    command: "readAttribute"
-    attribute: "NextDay"
-    response:
-      value: null
+    - label: "Step 10: TH reads the NextDay attribute from the DUT"
+      command: "readAttribute"
+      attribute: "NextDay"
+      response:
+          value: null
 
-  - label: "Step 11: TH reads the CurrentDayEntry attribute from the DUT"
-    command: "readAttribute"
-    attribute: "CurrentDayEntry"
-    response:
-      value: null
+    - label: "Step 11: TH reads the CurrentDayEntry attribute from the DUT"
+      command: "readAttribute"
+      attribute: "CurrentDayEntry"
+      response:
+          value: null
 
-  - label: "Step 12: TH reads the CurrentDayEntryDate attribute from the DUT"
-    command: "readAttribute"
-    attribute: "CurrentDayEntryDate"
-    response:
-      value: null
+    - label: "Step 12: TH reads the CurrentDayEntryDate attribute from the DUT"
+      command: "readAttribute"
+      attribute: "CurrentDayEntryDate"
+      response:
+          value: null
 
-  - label: "Step 13: TH reads the NextDayEntry attribute from the DUT"
-    command: "readAttribute"
-    attribute: "NextDayEntry"
-    response:
-      value: null
+    - label: "Step 13: TH reads the NextDayEntry attribute from the DUT"
+      command: "readAttribute"
+      attribute: "NextDayEntry"
+      response:
+          value: null
 
-  - label: "Step 14: TH reads the NextDayEntryDate attribute from the DUT"
-    command: "readAttribute"
-    attribute: "NextDayEntryDate"
-    response:
-      value: null
+    - label: "Step 14: TH reads the NextDayEntryDate attribute from the DUT"
+      command: "readAttribute"
+      attribute: "NextDayEntryDate"
+      response:
+          value: null
 
-  - label: "Step 15: TH reads the TariffComponents attribute from the DUT"
-    command: "readAttribute"
-    attribute: "TariffComponents"
-    response:
-      value: null
+    - label: "Step 15: TH reads the TariffComponents attribute from the DUT"
+      command: "readAttribute"
+      attribute: "TariffComponents"
+      response:
+          value: null
 
-  - label: "Step 16: TH reads the TariffPeriods attribute from the DUT"
-    command: "readAttribute"
-    attribute: "TariffPeriods"
-    response:
-      value: null
+    - label: "Step 16: TH reads the TariffPeriods attribute from the DUT"
+      command: "readAttribute"
+      attribute: "TariffPeriods"
+      response:
+          value: null
 
-  - label: "Step 17: TH reads the CurrentTariffComponents attribute from the DUT"
-    command: "readAttribute"
-    attribute: "CurrentTariffComponents"
-    response:
-      value: null
+    - label:
+          "Step 17: TH reads the CurrentTariffComponents attribute from the DUT"
+      command: "readAttribute"
+      attribute: "CurrentTariffComponents"
+      response:
+          value: null
 
-  - label: "Step 18: TH reads the NextTariffComponents attribute from the DUT"
-    command: "readAttribute"
-    attribute: "NextTariffComponents"
-    response:
-      value: null
+    - label: "Step 18: TH reads the NextTariffComponents attribute from the DUT"
+      command: "readAttribute"
+      attribute: "NextTariffComponents"
+      response:
+          value: null
 
-  - label: "Step 19: TH reads the DefaultRandomizationOffset attribute from the DUT"
-    PICS: SETRF.S.A0011
-    command: "readAttribute"
-    attribute: "DefaultRandomizationOffset"
-    response:
-      value: null
+    - label:
+          "Step 19: TH reads the DefaultRandomizationOffset attribute from the
+          DUT"
+      PICS: SETRF.S.A0011
+      command: "readAttribute"
+      attribute: "DefaultRandomizationOffset"
+      response:
+          value: null
 
-  - label: "Step 20: TH reads the DefaultRandomizationType attribute from the DUT"
-    PICS: SETRF.S.A0012
-    command: "readAttribute"
-    attribute: "DefaultRandomizationType"
-    response:
-      value: null
+    - label:
+          "Step 20: TH reads the DefaultRandomizationType attribute from the DUT"
+      PICS: SETRF.S.A0012
+      command: "readAttribute"
+      attribute: "DefaultRandomizationType"
+      response:
+          value: null
 
-  - label: "Step 21: TH reads TestEventTriggersEnabled attribute from General
-      Diagnostics Cluster"
-    PICS: DGGEN.S.A0008
-    cluster: "General Diagnostics"
-    endpoint: 0
-    command: "readAttribute"
-    attribute: "TestEventTriggersEnabled"
-    response:
-      value: 1
+    - label:
+          "Step 21: TH reads TestEventTriggersEnabled attribute from General
+          Diagnostics Cluster"
+      PICS: DGGEN.S.A0008
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "readAttribute"
+      attribute: "TestEventTriggersEnabled"
+      response:
+          value: 1
 
-  - label: "Step 22: TH sends TestEventTrigger command to General Diagnostics
-      Cluster on Endpoint 0 with EnableKey field set to
-      PIXIT.SETRF.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-      PIXIT.SETRF.TEST_EVENT_TRIGGER for Attributes Value Update Test Event"
-    PICS: DGGEN.S.C00.Rsp
-    cluster: "General Diagnostics"
-    endpoint: 0
-    command: "TestEventTrigger"
-    arguments:
-      values:
-        - name: "EnableKey"
-          value: TEST_EVENT_TRIGGER_KEY
-        - name: "EventTrigger"
-          value: TEST_EVENT_TRIGGER_ATTRIBUTES_VALUE_UPDATE
+    - label:
+          "Step 22: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
+          PIXIT.SETRF.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SETRF.TEST_EVENT_TRIGGER for Full Tariff Set Test Event"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_FULL_TARIFF_SET
 
-  - label: "Step 23: TH reads the TariffInfo attribute from the DUT"
-    command: "readAttribute"
-    attribute: "TariffInfo"
-    response:
-      constraints:
-        type: "TariffInformationStruct"
+    - label: "Step 23: TH reads the TariffInfo attribute from the DUT"
+      command: "readAttribute"
+      attribute: "TariffInfo"
+      response:
+          constraints:
+              type: "TariffInformationStruct"
 
-  - label: "Step 24: TH reads the TariffUnit attribute from the DUT"
-    command: "readAttribute"
-    attribute: "TariffUnit"
-    response:
-      constraints:
-        type: "TariffUnitEnum"
-        anyOf: [0, 1, 2, 3, 4, 5, 6, 7, 8]
+    - label: "Step 24: TH reads the TariffUnit attribute from the DUT"
+      command: "readAttribute"
+      attribute: "TariffUnit"
+      response:
+          constraints:
+              type: "TariffUnitEnum"
+              anyOf: [0, 1, 2, 3, 4, 5, 6, 7, 8]
 
-  - label: "Step 25: TH reads the StartDate attribute from the DUT"
-    command: "readAttribute"
-    attribute: "StartDate"
-    response:
-      constraints:
-        type: epoch-s
+    - label: "Step 25: TH reads the StartDate attribute from the DUT"
+      command: "readAttribute"
+      attribute: "StartDate"
+      response:
+          constraints:
+              type: epoch-s
 
-  - label: "Step 26: TH reads the DayEntries attribute from the DUT"
-    command: "readAttribute"
-    attribute: "DayEntries"
-    response:
-      constraints:
-        type: list
+    - label: "Step 26: TH reads the DayEntries attribute from the DUT"
+      command: "readAttribute"
+      attribute: "DayEntries"
+      response:
+          constraints:
+              type: list
 
-  - label: "Step 27: TH reads the DayPatterns attribute from the DUT"
-    command: "readAttribute"
-    attribute: "DayPatterns"
-    response:
-      constraints:
-        type: list
+    - label: "Step 27: TH reads the DayPatterns attribute from the DUT"
+      command: "readAttribute"
+      attribute: "DayPatterns"
+      response:
+          constraints:
+              type: list
 
-  - label: "Step 28: TH reads the CalendarPeriods attribute from the DUT"
-    command: "readAttribute"
-    attribute: "CalendarPeriods"
-    response:
-      constraints:
-        type: list
-        minLength: 1
-        maxLength: 4
+    - label: "Step 28: TH reads the CalendarPeriods attribute from the DUT"
+      command: "readAttribute"
+      attribute: "CalendarPeriods"
+      response:
+          constraints:
+              type: list
+              minLength: 1
+              maxLength: 4
 
-  - label: "Step 29: TH reads the IndividualDays attribute from the DUT"
-    command: "readAttribute"
-    attribute: "IndividualDays"
-    response:
-      constraints:
-        type: list
-        maxLength: 50
+    - label: "Step 29: TH reads the IndividualDays attribute from the DUT"
+      command: "readAttribute"
+      attribute: "IndividualDays"
+      response:
+          constraints:
+              type: list
+              maxLength: 50
 
-  - label: "Step 30: TH reads the CurrentDay attribute from the DUT"
-    command: "readAttribute"
-    attribute: "CurrentDay"
-    response:
-      constraints:
-        type: "DayStruct"
+    - label: "Step 30: TH reads the CurrentDay attribute from the DUT"
+      command: "readAttribute"
+      attribute: "CurrentDay"
+      response:
+          constraints:
+              type: "DayStruct"
 
-  - label: "Step 31: TH reads the NextDay attribute from the DUT"
-    command: "readAttribute"
-    attribute: "NextDay"
-    response:
-      constraints:
-        type: "DayStruct"
+    - label: "Step 31: TH reads the NextDay attribute from the DUT"
+      command: "readAttribute"
+      attribute: "NextDay"
+      response:
+          constraints:
+              type: "DayStruct"
 
-  - label: "Step 32: TH reads the CurrentDayEntry attribute from the DUT"
-    command: "readAttribute"
-    attribute: "CurrentDayEntry"
-    response:
-      constraints:
-        type: "DayEntryStruct"
+    - label: "Step 32: TH reads the CurrentDayEntry attribute from the DUT"
+      command: "readAttribute"
+      attribute: "CurrentDayEntry"
+      response:
+          constraints:
+              type: "DayEntryStruct"
 
-  - label: "Step 33: TH reads the CurrentDayEntryDate attribute from the DUT"
-    command: "readAttribute"
-    attribute: "CurrentDayEntryDate"
-    response:
-      constraints:
-        type: epoch-s
+    - label: "Step 33: TH reads the CurrentDayEntryDate attribute from the DUT"
+      command: "readAttribute"
+      attribute: "CurrentDayEntryDate"
+      response:
+          constraints:
+              type: epoch-s
 
-  - label: "Step 34: TH reads the NextDayEntry attribute from the DUT"
-    command: "readAttribute"
-    attribute: "NextDayEntry"
-    response:
-      constraints:
-        type: "DayEntryStruct"
+    - label: "Step 34: TH reads the NextDayEntry attribute from the DUT"
+      command: "readAttribute"
+      attribute: "NextDayEntry"
+      response:
+          constraints:
+              type: "DayEntryStruct"
 
-  - label: "Step 35: TH reads the NextDayEntryDate attribute from the DUT"
-    command: "readAttribute"
-    attribute: "NextDayEntryDate"
-    response:
-      constraints:
-        type: epoch-s
+    - label: "Step 35: TH reads the NextDayEntryDate attribute from the DUT"
+      command: "readAttribute"
+      attribute: "NextDayEntryDate"
+      response:
+          constraints:
+              type: epoch-s
 
-  - label: "Step 36: TH reads the TariffComponents attribute from the DUT"
-    command: "readAttribute"
-    attribute: "TariffComponents"
-    response:
-      constraints:
-        type: list
-        minLength: 1
+    - label: "Step 36: TH reads the TariffComponents attribute from the DUT"
+      command: "readAttribute"
+      attribute: "TariffComponents"
+      response:
+          constraints:
+              type: list
+              minLength: 1
 
-  - label: "Step 37: TH reads the TariffPeriods attribute from the DUT"
-    command: "readAttribute"
-    attribute: "TariffPeriods"
-    response:
-      constraints:
-        type: list
-        minLength: 1
+    - label: "Step 37: TH reads the TariffPeriods attribute from the DUT"
+      command: "readAttribute"
+      attribute: "TariffPeriods"
+      response:
+          constraints:
+              type: list
+              minLength: 1
 
-  - label: "Step 38: TH reads the CurrentTariffComponents attribute from the DUT"
-    command: "readAttribute"
-    attribute: "CurrentTariffComponents"
-    response:
-      constraints:
-        type: list
+    - label:
+          "Step 38: TH reads the CurrentTariffComponents attribute from the DUT"
+      command: "readAttribute"
+      attribute: "CurrentTariffComponents"
+      response:
+          constraints:
+              type: list
 
-  - label: "Step 39: TH reads the NextTariffComponents attribute from the DUT"
-    command: "readAttribute"
-    attribute: "NextTariffComponents"
-    response:
-      constraints:
-        type: list
+    - label: "Step 39: TH reads the NextTariffComponents attribute from the DUT"
+      command: "readAttribute"
+      attribute: "NextTariffComponents"
+      response:
+          constraints:
+              type: list
 
-  - label: "Step 40: TH reads the DefaultRandomizationOffset attribute from the DUT"
-    PICS: SETRF.S.A0011
-    command: "readAttribute"
-    attribute: "DefaultRandomizationOffset"
-    response:
-      constraints:
-        type: int16s
+    - label:
+          "Step 40: TH reads the DefaultRandomizationOffset attribute from the
+          DUT"
+      PICS: SETRF.S.A0011
+      command: "readAttribute"
+      attribute: "DefaultRandomizationOffset"
+      response:
+          constraints:
+              type: int16s
 
-  - label: "Step 41: TH reads the DefaultRandomizationType attribute from the DUT"
-    PICS: SETRF.S.A0012
-    command: "readAttribute"
-    attribute: "DefaultRandomizationType"
-    response:
-      constraints:
-        type: "TransitionRandomizationType"
-        anyOf: [0, 1, 2, 3, 4]
+    - label:
+          "Step 41: TH reads the DefaultRandomizationType attribute from the DUT"
+      PICS: SETRF.S.A0012
+      command: "readAttribute"
+      attribute: "DefaultRandomizationType"
+      response:
+          constraints:
+              type: "TransitionRandomizationType"
+              anyOf: [0, 1, 2, 3, 4]

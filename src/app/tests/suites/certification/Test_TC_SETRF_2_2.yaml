@@ -15,77 +15,85 @@
 name: X.2.2. [TC-SETRF-2.2] Commands with Server as DUT
 
 PICS:
-  - SETRF.S
+    - SETRF.S
 
 config:
-  nodeId: 0x12344321
-  cluster: "Commodity Tariff"
-  endpoint: 1
-  TEST_EVENT_TRIGGER_KEY:
-    type: octet_string
-    defaultValue: "hex:00112233445566778899aabbccddeeff"
-  TEST_EVENT_TRIGGER_ATTRIBUTES_VALUE_UPDATE:
-    type: int64u
-    defaultValue: "0x0700000000000000"
-  TEST_EVENT_TRIGGER_TEST_EVENT_CLEAR:
-    type: int64u
-    defaultValue: "0x0700000000000001"
+    nodeId: 0x12344321
+    cluster: "Commodity Tariff"
+    endpoint: 1
+    TEST_EVENT_TRIGGER_KEY:
+        type: octet_string
+        defaultValue: "hex:00112233445566778899aabbccddeeff"
+    TEST_EVENT_TRIGGER_ATTRIBUTES_VALUE_UPDATE:
+        type: int64u
+        defaultValue: "0x0700000000000000"
+    TEST_EVENT_TRIGGER_TEST_EVENT_CLEAR:
+        type: int64u
+        defaultValue: "0x0700000000000001"
 
 tests:
-  - label: "Step 1: Commission DUT to TH"
-    cluster: "DelayCommands"
-    command: "WaitForCommissionee"
-    arguments:
-      values:
-        - name: "nodeId"
-          value: nodeId
+    - label: "Step 1: Commission DUT to TH"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-  - label: "Step 2: TH sends command GetTariffComponent command with TariffComponentID field set to 0."
-    command: "GetTariffComponent"
-    arguments:
-      values:
-        - name: "TariffComponentID"
-          value: 0
-    response:
-      values:
-        - name: "Label"
-          constraints:
-            type: char_string
-            maxLength: 128
-        - name: "DayEntryIDs"
-          constraints:
-            type: list
-            minLength: 1
-        - name: "TariffComponent"
-          constraints:
-            type: "TariffComponentStruct"
+    - label:
+          "Step 2: TH sends command GetTariffComponent command with
+          TariffComponentID field set to 0."
+      command: "GetTariffComponent"
+      arguments:
+          values:
+              - name: "TariffComponentID"
+                value: 0
+      response:
+          values:
+              - name: "Label"
+                constraints:
+                    type: char_string
+                    maxLength: 128
+              - name: "DayEntryIDs"
+                constraints:
+                    type: list
+                    minLength: 1
+              - name: "TariffComponent"
+                constraints:
+                    type: "TariffComponentStruct"
 
-  - label: "Step 3: TH sends command GetTariffComponent command with TariffComponentID field set to 0."
-    command: "GetTariffComponent"
-    arguments:
-      values:
-        - name: "TariffComponentID"
-          value: 100
-    response:
-      error: NOT_FOUND
+    - label:
+          "Step 3: TH sends command GetTariffComponent command with
+          TariffComponentID field set to 0."
+      command: "GetTariffComponent"
+      arguments:
+          values:
+              - name: "TariffComponentID"
+                value: 100
+      response:
+          error: NOT_FOUND
 
-  - label: "Step 4: TH sends command GetDayEntry command with DayEntryID field set to 0."
-    command: "GetDayEntry"
-    arguments:
-      values:
-        - name: "DayEntryID"
-          value: 0
-    response:
-      values:
-        - name: "DayEntry"
-          constraints:
-            type: "DayEntryStruct"
+    - label:
+          "Step 4: TH sends command GetDayEntry command with DayEntryID field
+          set to 0."
+      command: "GetDayEntry"
+      arguments:
+          values:
+              - name: "DayEntryID"
+                value: 0
+      response:
+          values:
+              - name: "DayEntry"
+                constraints:
+                    type: "DayEntryStruct"
 
-  - label: "Step 5: TH sends command GetDayEntry command with DayEntryID field set to 0."
-    command: "GetDayEntry"
-    arguments:
-      values:
-        - name: "DayEntryID"
-          value: 100
-    response:
-      error: NOT_FOUND
+    - label:
+          "Step 5: TH sends command GetDayEntry command with DayEntryID field
+          set to 0."
+      command: "GetDayEntry"
+      arguments:
+          values:
+              - name: "DayEntryID"
+                value: 100
+      response:
+          error: NOT_FOUND

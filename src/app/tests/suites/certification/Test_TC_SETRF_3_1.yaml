@@ -15,138 +15,135 @@
 name: X.3.1. [TC-SETRF-3.1] Subscription Report Verification with DUT as Server
 
 PICS:
-  - SETRF.S
+    - SETRF.S
 
 config:
-  nodeId: 0x12344321
-  cluster: "Commodity Tariff"
-  endpoint: 1
-  TEST_EVENT_TRIGGER_KEY:
-    type: octet_string
-    defaultValue: "hex:00112233445566778899aabbccddeeff"
-  TEST_EVENT_TRIGGER_ATTRIBUTES_VALUE_UPDATE:
-    type: int64u
-    defaultValue: "0x0700000000000000"
-  TEST_EVENT_TRIGGER_TEST_EVENT_CLEAR:
-    type: int64u
-    defaultValue: "0x0700000000000001"
+    nodeId: 0x12344321
+    cluster: "Commodity Tariff"
+    endpoint: 1
+    TEST_EVENT_TRIGGER_KEY:
+        type: octet_string
+        defaultValue: "hex:00112233445566778899aabbccddeeff"
+    TEST_EVENT_TRIGGER_ATTRIBUTES_VALUE_UPDATE:
+        type: int64u
+        defaultValue: "0x0700000000000000"
+    TEST_EVENT_TRIGGER_TEST_EVENT_CLEAR:
+        type: int64u
+        defaultValue: "0x0700000000000001"
 
 tests:
-  - label: "Step 1: Commission DUT to TH"
-    cluster: "DelayCommands"
-    command: "WaitForCommissionee"
-    arguments:
-      values:
-        - name: "nodeId"
-          value: nodeId
+    - label: "Step 1: Commission DUT to TH"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-  - label: "Step 2: TH subscribes to TariffInfo attribute from DUT"
-    PICS: SETRF.S.A0004
-    command: "subscribeAttribute"
-    attribute: "TariffInfo"
-    minInterval: 5
-    maxInterval: 30
-    timeout: 30
+    - label: "Step 2: TH subscribes to TariffInfo attribute from DUT"
+      command: "subscribeAttribute"
+      attribute: "TariffInfo"
+      minInterval: 5
+      maxInterval: 30
+      timeout: 30
 
-  - label: "Step 3: TH reads the TariffInfo attribute from the DUT"
-    PICS: SETRF.S.A0004
-    command: "readAttribute"
-    attribute: "TariffInfo"
-    response:
-      saveAs: Saved
+    - label: "Step 3: TH reads the TariffInfo attribute from the DUT"
+      command: "readAttribute"
+      attribute: "TariffInfo"
+      response:
+          saveAs: Saved
 
-  - label: "Step 4: TH reads TestEventTriggersEnabled attribute from General
-      Diagnostics Cluster"
-    PICS: DGGEN.S.A0008
-    cluster: "General Diagnostics"
-    endpoint: 0
-    command: "readAttribute"
-    attribute: "TestEventTriggersEnabled"
-    response:
-      value: 1
+    - label:
+          "Step 4: TH reads TestEventTriggersEnabled attribute from General
+          Diagnostics Cluster"
+      PICS: DGGEN.S.A0008
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "readAttribute"
+      attribute: "TestEventTriggersEnabled"
+      response:
+          value: 1
 
-  - label: "Step 5: TH sends TestEventTrigger command to General Diagnostics
-      Cluster on Endpoint 0 with EnableKey field set to
-      PIXIT.SETRF.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-      PIXIT.SETRF.TEST_EVENT_TRIGGER for Attributes Value Update Test Event"
-    PICS: DGGEN.S.C00.Rsp
-    cluster: "General Diagnostics"
-    endpoint: 0
-    command: "TestEventTrigger"
-    arguments:
-      values:
-        - name: "EnableKey"
-          value: TEST_EVENT_TRIGGER_KEY
-        - name: "EventTrigger"
-          value: TEST_EVENT_TRIGGER_ATTRIBUTES_VALUE_UPDATE
+    - label:
+          "Step 5: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
+          PIXIT.SETRF.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SETRF.TEST_EVENT_TRIGGER for Attributes Value Update Test Event"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_ATTRIBUTES_VALUE_UPDATE
 
-  - label: "Step 6: Check for TariffInfo attribute report"
-    PICS: SETRF.S.A0004
-    command: "waitForReport"
-    attribute: "TariffInfo"
-    response:
-      constraints:
-        type: TariffInformationStruct
-        notValue: Saved
+    - label: "Step 6: Check for TariffInfo attribute report"
+      command: "waitForReport"
+      attribute: "TariffInfo"
+      response:
+          constraints:
+              type: TariffInformationStruct
+              notValue: Saved
 
-  - label: "Step 7: TH reads the TariffInfo attribute from the DUT"
-    PICS: SETRF.S.A0004
-    command: "readAttribute"
-    attribute: "TariffInfo"
-    response:
-      saveAs: Saved
+    - label: "Step 7: TH reads the TariffInfo attribute from the DUT"
+      command: "readAttribute"
+      attribute: "TariffInfo"
+      response:
+          saveAs: Saved
 
-  - label: "Step 8: TH sends TestEventTrigger command to General Diagnostics
-      Cluster on Endpoint 0 with EnableKey field set to
-      PIXIT.SETRF.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-      PIXIT.SETRF.TEST_EVENT_TRIGGER for Attributes Value Update Test Event"
-    PICS: DGGEN.S.C00.Rsp
-    cluster: "General Diagnostics"
-    endpoint: 0
-    command: "TestEventTrigger"
-    arguments:
-      values:
-        - name: "EnableKey"
-          value: TEST_EVENT_TRIGGER_KEY
-        - name: "EventTrigger"
-          value: TEST_EVENT_TRIGGER_ATTRIBUTES_VALUE_UPDATE
+    - label:
+          "Step 8: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
+          PIXIT.SETRF.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SETRF.TEST_EVENT_TRIGGER for Attributes Value Update Test Event"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_ATTRIBUTES_VALUE_UPDATE
 
-  - label: "Step 9: Check for TariffInfo attribute report"
-    PICS: SETRF.S.A0004
-    command: "waitForReport"
-    attribute: "TariffInfo"
-    response:
-      constraints:
-        type: TariffInformationStruct
-        notValue: Saved
+    - label: "Step 9: Check for TariffInfo attribute report"
+      command: "waitForReport"
+      attribute: "TariffInfo"
+      response:
+          constraints:
+              type: TariffInformationStruct
+              notValue: Saved
 
-  - label: "Step 10: TH reads the TariffInfo attribute from the DUT"
-    PICS: SETRF.S.A0004
-    command: "readAttribute"
-    attribute: "TariffInfo"
-    response:
-      saveAs: Saved
+    - label: "Step 10: TH reads the TariffInfo attribute from the DUT"
+      command: "readAttribute"
+      attribute: "TariffInfo"
+      response:
+          saveAs: Saved
 
-  - label: "Step 11: TH sends TestEventTrigger command to General Diagnostics
-      Cluster on Endpoint 0 with EnableKey field set to
-      PIXIT.SETRF.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-      PIXIT.SETRF.TEST_EVENT_TRIGGER for Attributes Value Update Test Event"
-    PICS: DGGEN.S.C00.Rsp
-    cluster: "General Diagnostics"
-    endpoint: 0
-    command: "TestEventTrigger"
-    arguments:
-      values:
-        - name: "EnableKey"
-          value: TEST_EVENT_TRIGGER_KEY
-        - name: "EventTrigger"
-          value: TEST_EVENT_TRIGGER_ATTRIBUTES_VALUE_UPDATE
+    - label:
+          "Step 11: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
+          PIXIT.SETRF.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SETRF.TEST_EVENT_TRIGGER for Attributes Value Update Test Event"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_ATTRIBUTES_VALUE_UPDATE
 
-  - label: "Step 12: Check for TariffInfo attribute report"
-    PICS: SETRF.S.A0004
-    command: "waitForReport"
-    attribute: "TariffInfo"
-    response:
-      constraints:
-        type: TariffInformationStruct
-        notValue: Saved
+    - label: "Step 12: Check for TariffInfo attribute report"
+      command: "waitForReport"
+      attribute: "TariffInfo"
+      response:
+          constraints:
+              type: TariffInformationStruct
+              notValue: Saved
