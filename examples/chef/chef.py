@@ -43,7 +43,8 @@ _CD_STAGING_DIR = os.path.join(_CHEF_SCRIPT_PATH, "staging")
 _EXCLUDE_DEVICE_FROM_LINUX_CI = [  # These do not compile / deprecated.
     "noip_rootnode_dimmablelight_bCwGYSDpoe",
 ]
-_ICD_DEVICE_PATTERN = "^icd_"  # Pattern to filter (based on device-name) devices that need ICD support.
+# Pattern to filter (based on device-name) devices that need ICD support.
+_ICD_DEVICE_PATTERN = "^icd_"
 
 gen_dir = ""  # Filled in after sample app type is read from args.
 
@@ -910,7 +911,8 @@ def main() -> int:
                 linux_args.append("chip_enable_icd_dsls = true")
                 if options.icd_subscription_resumption:
                     options.icd_persist_subscription = True
-                    linux_args.append("chip_subscription_timeout_resumption = true")
+                    linux_args.append(
+                        "chip_subscription_timeout_resumption = true")
                 if options.icd_persist_subscription:
                     linux_args.append("chip_persist_subscriptions = true")
 
