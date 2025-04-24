@@ -215,7 +215,8 @@ TEST_F(TestClosureDimensionClusterLogic, TestConformanceValid)
     conformance.FeatureMap() = 161;
     EXPECT_FALSE(conformance.Valid());
 
-    // Validating If Overflow Attribute is supported, atleast one of Rotation or MotionLatching should be supported. Return false otherwise.
+    // Validating If Overflow Attribute is supported, atleast one of Rotation or MotionLatching should be supported. Return false
+    // otherwise.
 
     // Overflow Attribute is supported, MotionLatching is supported. Return True.
     conformance.FeatureMap() = 2;
@@ -1549,7 +1550,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommand)
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::Target::Id));
 
-   // Validating SetTarget with invalid position
+    // Validating SetTarget with invalid position
     mockContext.ClearDirtyList();
     EXPECT_EQ(logic->HandleSetTargetCommand(Optional<Percent100ths>(10001), NullOptional, NullOptional), Status::ConstraintError);
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
