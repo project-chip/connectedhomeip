@@ -96,7 +96,7 @@ private:
 
     int64_t mCurrentClipStartPts     = AV_NOPTS_VALUE;
     int64_t mFragmentDuration = 4 * AV_TIME_BASE;
-    const int64_t MAX_CLIP_DURATION = 10 * AV_TIME_BASE;
+    const int64_t MAX_CLIP_DURATION = 50 * AV_TIME_BASE;
     const size_t MAX_QUEUE_SIZE = 150;
 
     std::queue<AVPacket *> audioQueue;
@@ -118,7 +118,7 @@ private:
      * @param media_seg_pattern Pattern for media segments.
      */
     void SetupOutput(const std::string & output_prefix, const std::string & init_seg_pattern,
-                      const std::string & media_seg_pattern);
+                      const std::string & media_seg_pattern, int video);
 
     /**
      * @brief Starts the clip recording process.

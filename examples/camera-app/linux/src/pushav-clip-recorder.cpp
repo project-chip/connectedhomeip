@@ -10,9 +10,9 @@ extern "C" {
 #include <libavutil/opt.h>
 #include <libavutil/timestamp.h>
 }
-
+// TODO: KODAM  updated mHasVideo, MHasAudio
 PushAVClipRecorder::PushAVClipRecorder(const std::string& id, const std::string& outputPath, bool hasVideo, bool hasAudio)
-    : mId(id), mOutputPath(outputPath), mHasVideo(hasVideo), mHasAudio(hasAudio), mRunning(false)
+    : mId(id), mOutputPath(outputPath), mHasVideo(hasVideo), mHasAudio(true), mRunning(false)
 {
     ChipLogProgress(Camera, "PushAVClipRecorder initialized with ID: %s, output path: %s", mId.c_str(), mOutputPath.c_str());
 }
@@ -88,7 +88,7 @@ void PushAVClipRecorder::PushPacket(AVPacket * packet, bool isVideo)
     mCondition.notify_one();
 }
 
-void PushAVClipRecorder::SetupOutput(const std::string & outputPrefix, const std::string & initSegPattern, const std::string & mediaSegPattern)
+void PushAVClipRecorder::SetupOutput(const std::string & outputPrefix, const std::string & initSegPattern, const std::string & mediaSegPattern, int usevideo)
 {
     const std::string mpdFilename = outputPrefix + mId + ".mpd";
     if (avformat_alloc_output_context2(&mFmtCtx, nullptr, "dash", mpdFilename.c_str()) < 0)
@@ -102,13 +102,9 @@ void PushAVClipRecorder::SetupOutput(const std::string & outputPrefix, const std
     av_opt_set(mFmtCtx->priv_data, "increment_tc", "1", 0);
     av_opt_set(mFmtCtx->priv_data, "use_timeline", "1", 0);
     av_opt_set(mFmtCtx->priv_data, "movflags", "+cmaf+dash+delay_moov+skip_sidx+skip_trailer+frag_custom", 0);
-    av_opt_set(mFmtCtx->priv_data, "init_seg_pattern", initSegPattern.c_str(), 0);
+    av_opt_set(mFmtCtx->priv_data, "init_seg_name", initSegPattern.c_str(), 0);
     av_opt_set(mFmtCtx->priv_data, "media_seg_name", mediaSegPattern.c_str(), 0);
-    av_opt_set_int(mFmtCtx->priv_data, "hls_playlist", 1, 0);
-    av_opt_set(mFmtCtx->priv_data, "hls_segment_type", "fmp4", 0);
-    av_opt_set(mFmtCtx->priv_data, "hls_base_url", outputPrefix.c_str(), 0);
-
-    if (mHasVideo)
+    if (usevideo)
         AddStreamToOutput(AVMEDIA_TYPE_VIDEO);
     if (mHasAudio)
         AddStreamToOutput(AVMEDIA_TYPE_AUDIO);
@@ -161,17 +157,26 @@ void PushAVClipRecorder::AddStreamToOutput(AVMediaType type)
             return;
         }
         mVideoStream ->codecpar->codec_tag = 0;
-        mVideoStream ->avg_frame_rate      = (AVRational) { 20, 1 };
+        mVideoStream->codecpar->width     = 320;
+        mVideoStream->codecpar->height    = 240;
+
+        mVideoStream->avg_frame_rate = (AVRational) { 15, 1 };
     }
     else if (type == AVMEDIA_TYPE_AUDIO)
     {
-        AVCodecParameters * audio_in_codecpar = mInFmtCtx->streams[1]->codecpar;
-        mAudioStream  = avformat_new_stream(mFmtCtx, nullptr);
-        if (avcodec_parameters_copy(mAudioStream->codecpar, audio_in_codecpar) < 0)
-        {
-            ChipLogError(Camera, "Failed to copy codec parameters for media type: %d", type);
-            return;
-        }
+        mAudioStream                          = avformat_new_stream(mFmtCtx, nullptr);
+		const AVCodec* audio_codec = avcodec_find_encoder(AV_CODEC_ID_OPUS);
+		AVCodecContext * audio_enc_ctx = avcodec_alloc_context3(audio_codec);
+		audio_enc_ctx->sample_rate     = 48000;
+		//audio_enc_ctx->channel_layout  = AV_CH_LAYOUT_STEREO;
+		//audio_enc_ctx->channels        = 2;
+		audio_enc_ctx->bit_rate        = 20000;
+		audio_enc_ctx->sample_fmt      = audio_codec->sample_fmts[0];
+		audio_enc_ctx->time_base       = (AVRational) { 1, 48000 };
+		avcodec_open2(audio_enc_ctx, audio_codec, nullptr);
+		avcodec_parameters_from_context(mAudioStream->codecpar, audio_enc_ctx);
+		if (mFmtCtx->oformat->flags & AVFMT_GLOBALHEADER)
+		   audio_enc_ctx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
     }
     else
     {
@@ -217,7 +222,7 @@ bool PushAVClipRecorder::ProcessBuffersAndWrite()
         mInitSegName      = prefix + "_init-stream$RepresentationID$.fmp4";
         mMediaSegName     = prefix + "_chunk-stream$RepresentationID$-$Number%05d$.cmfv";
         mInFmtCtx                 = avformat_alloc_context();
-        int avio_ctx_buffer_size  = 4096;
+        int avio_ctx_buffer_size  = 1048576;
         uint8_t * avio_ctx_buffer = (uint8_t *) av_malloc(avio_ctx_buffer_size);
         struct buffer_data data   = { 0 };
         data.ptr                  = (uint8_t *) pkt->data;
@@ -225,9 +230,12 @@ bool PushAVClipRecorder::ProcessBuffersAndWrite()
         AVIOContext * avio_ctx    = avio_alloc_context(avio_ctx_buffer, avio_ctx_buffer_size, 0, &data, &read_packet, nullptr, nullptr);
         mInFmtCtx->pb             = avio_ctx;
         mInFmtCtx->flags          = AVFMT_FLAG_CUSTOM_IO;
-        int ret                   = avformat_open_input(&mInFmtCtx, "", nullptr, nullptr);
+        if (useVideo) {
+           const AVInputFormat *ifmt = av_find_input_format("h264");
+        int ret                   = avformat_open_input(&mInFmtCtx, "", ifmt, nullptr);
         ret                       = avformat_find_stream_info(mInFmtCtx, nullptr);
-        SetupOutput(mOutputPrefix, mInitSegName, mMediaSegName);
+		}
+        SetupOutput(mOutputPrefix, mInitSegName, mMediaSegName, useVideo);
         if (!mFmtCtx)
             return AVERROR(ENOENT);
         mMetadataSet = true;
@@ -247,15 +255,6 @@ bool PushAVClipRecorder::ProcessBuffersAndWrite()
         currentPts = av_rescale_q(pkt->dts, inputTb, AV_TIME_BASE_Q);
     }
 
-    if (mCurrentClipStartPts  != AV_NOPTS_VALUE && currentPts != AV_NOPTS_VALUE)
-    {
-        if (currentPts - mCurrentClipStartPts >= MAX_CLIP_DURATION)
-        {
-            finalize_current_clip();
-            mCurrentClipStartPts = currentPts;
-        }
-    }
-
     if (mCurrentClipStartPts == AV_NOPTS_VALUE && currentPts != AV_NOPTS_VALUE)
     {
         mCurrentClipStartPts = currentPts;
@@ -273,16 +272,6 @@ bool PushAVClipRecorder::ProcessBuffersAndWrite()
     pkt->pts = (pkt->pts < 0) ? 0 : pkt->pts;
     out_stream->time_base = outputTb;
     av_write_frame(mFmtCtx, pkt);
-    int fragmentId = (pkt->pts / mFragmentDuration);
-    if(fragmentId > mLastFragmentId){
-        mLastFragmentId = fragmentId;
-        char buffer[256];
-        sprintf(buffer, "%s_chunk-stream%d-%05d.cmfv", mOutputPrefix.c_str(),
-                    mVideoStream->id, fragmentId);
-	std::string filename(buffer);
-	std::string url = "https://localhost:1234/streams/1";
-        uploader.add_uploadData(filename, url);	
-    }
 
     // Free the clone
     av_packet_free(&pkt);
@@ -290,6 +279,33 @@ bool PushAVClipRecorder::ProcessBuffersAndWrite()
         videoQueue.pop();
     } else {
         audioQueue.pop();
+    }
+
+    int64_t clipLengthInPTS = currentPts - mCurrentClipStartPts;
+    int currentFragmentId   = (clipLengthInPTS / mFragmentDuration);
+
+    std::cout << "fragmentId " << currentFragmentId << " mLastFragmentId " << mLastFragmentId << " mFragmentDuration "
+              << mFragmentDuration << std::endl;
+
+    if (clipLengthInPTS >= MAX_CLIP_DURATION)
+    {
+        std::cout << "CLIP DONE currentPts " << currentPts << " mCurrentClipStartPts " << mCurrentClipStartPts
+                  << " MAX_CLIP_DURATION " << MAX_CLIP_DURATION << std::endl;
+        currentFragmentId++;
+        finalize_current_clip();
+        mCurrentClipStartPts = currentPts;
+    }
+
+    if (currentFragmentId > mLastFragmentId /* && check is frag exists*/)
+    {
+        mLastFragmentId = currentFragmentId;
+        char buffer[256];
+
+        std::cout << "KODAM calling uploader module for fragment: " << mLastFragmentId << std::endl;
+        sprintf(buffer, "%s_chunk-stream0-%05d.cmfv", mOutputPrefix.c_str(), currentFragmentId);
+        std::string filename(buffer);
+        std::string url = "https://localhost:1234/streams/1";
+        uploader.add_uploadData(filename, url);
     }
     return true;
 }

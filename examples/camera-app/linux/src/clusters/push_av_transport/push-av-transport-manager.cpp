@@ -44,7 +44,7 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsDecode
     pushavStreams.push_back(stream);
     Transports[outTransporConfiguration.connectionID] = new PushAVTransport(outTransporConfiguration.connectionID,
 		                                           1);
-    mMediaController->RegisterTransport(Transports[outTransporConfiguration.connectionID], 1, 0/*videoStreamID, audioStreamID*/);
+    mMediaController->RegisterTransport(Transports[outTransporConfiguration.connectionID], 1, 1/*videoStreamID, audioStreamID*/);
 
     return Status::Success;
 }

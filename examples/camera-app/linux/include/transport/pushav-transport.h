@@ -72,9 +72,8 @@ public:
 
 private:
     // Dummy implementation to indicate if video can be sent
-    bool mCanSendVideo = false;
+    bool mCanSendVideo = true;
 
     // Dummy implementation to indicate if audio can be sent
-    bool mCanSendAudio = false;
-
+    bool mCanSendAudio = true;
 };

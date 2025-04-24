@@ -23,7 +23,7 @@ extern "C" {
 }
 
 #define AUD_FRAME_DURATION_48000 960
-#define VID_FRAME_DURATION 5000 // Microseconds, for 20fps
+#define VID_FRAME_DURATION 66667 // Microseconds, for 30fps
 
 #define IS_H264_FRAME_NALU_HEAD(frame) (((frame)[0] == 0x00) && \
                                         ((frame)[1] == 0x00) && \
@@ -69,17 +69,7 @@ void PushAVTransport::SendAudioVideo(const char * data, size_t size, uint16_t vi
     if(!isRecorderInitialized) {
        initializeRecorder();
     }
-/*  // Enable below code to send data from .h264 files
-    char filename[2048];
-    uint8_t* filedata = nullptr;
-    size_t dataLen = 0;
-    
-    const char path[2048] = "/workspace/cfmv/";
-    if (vid == 203) vid = 1;
-    sprintf(filename, "%s%d.h264",path, vid++);
-    readFromFile(filename, &filedata, &dataLen);
 
-    AVPacket* packet = createPacket(filedata, dataLen, videoStreamID, audioStreamID);*/
     AVPacket* packet = createPacket((const uint8_t*)data, size, videoStreamID, audioStreamID);
     if (!packet) {
         return;
@@ -89,6 +79,7 @@ void PushAVTransport::SendAudioVideo(const char * data, size_t size, uint16_t vi
 }
 
 AVPacket* PushAVTransport::createPacket(const uint8_t* data, int size,  uint16_t videoStreamID, uint16_t audioStreamID) {
+	static int found_first = 0;
     AVPacket *packet = av_packet_alloc();
     packet->data = (uint8_t*)av_malloc(size);
     if (!packet) {
@@ -97,12 +88,19 @@ AVPacket* PushAVTransport::createPacket(const uint8_t* data, int size,  uint16_t
     memcpy(packet->data, data, size);
     packet->size = size;
     if(videoStreamID != 65535) {
+        if(isH264Iframe(data, size)){
+			found_first   = 1;
+            packet->flags = AV_PKT_FLAG_KEY;
+        } else {
+    		if (found_first == 0)
+		{
+        		return nullptr;
+    	}
+		}
         packet->pts = v_pts;
         packet->dts = v_dts;
         packet->stream_index = 0;
-        if(isH264Iframe(data, size)){
-            packet->flags = AV_PKT_FLAG_KEY;
-        }
+		packet->duration = VID_FRAME_DURATION;
         v_dts += VID_FRAME_DURATION;
         v_pts += VID_FRAME_DURATION; //assuming 20fps for now, adjust as needed
     }
@@ -111,6 +109,7 @@ AVPacket* PushAVTransport::createPacket(const uint8_t* data, int size,  uint16_t
         packet->dts = a_dts;
         packet->stream_index = 1;
 
+		packet->duration     = AUD_FRAME_DURATION_48000;
         a_dts += AUD_FRAME_DURATION_48000;
         a_pts += AUD_FRAME_DURATION_48000; //assuming 48kHz for now, adjust as needed
     }
