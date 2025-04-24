@@ -18,6 +18,7 @@
 #pragma once
 
 #include <protocols/interaction_model/StatusCode.h>
+#include <app-common/zap-generated/cluster-enums.h>
 
 namespace chip {
 namespace app {
@@ -62,7 +63,6 @@ public:
     virtual Protocols::InteractionModel::Status HandleCalibrateCommand() = 0;
     
     virtual CHIP_ERROR GetCurrentErrorAtIndex(size_t index, ClosureErrorEnum & closureError) = 0;
-    virtual CHIP_ERROR SetCurrentErrorInList(const ClosureErrorEnum & closureError) = 0;
     
     /**
      * @brief Checks whether the closure can move (as opposed to still needing pre-motion stages to complete).

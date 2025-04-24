@@ -633,7 +633,7 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<Ta
     MainStateEnum state;
     VerifyOrReturnError(GetMainState(state) == CHIP_NO_ERROR,Status::Failure);
     
-    DataModel::Nullable<GenericOverallTarget> target;
+    GenericOverallTarget target;
 
     VerifyOrReturnError(position.HasValue() || latch.HasValue() || speed.HasValue(), Status::InvalidCommand);
 
@@ -641,7 +641,7 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<Ta
     {
         VerifyOrReturnError(position.Value() != TargetPositionEnum::kUnknownEnumValue, Status::ConstraintError);
 
-        target.Value().position = position;
+        target.position = position;
     }
 
     if (latch.HasValue() && mConformance.HasFeature(Feature::kMotionLatching))
@@ -652,25 +652,27 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<Ta
             return Status::InvalidAction;
         }
         
-        target.Value().latch = latch;
+        target.latch = latch;
     }
 
     if (speed.HasValue() && mConformance.HasFeature(Feature::kSpeed))
     {
         VerifyOrReturnError(speed.Value() != Globals::ThreeLevelAutoEnum::kUnknownEnumValue, Status::ConstraintError);
         
-        target.Value().speed = speed;
+        target.speed = speed;
     }
 
     // If the MoveTo command is received in any state other than 'Moving', 'WaitingForMotion', or 'Stopped', an error code INVALID_IN_STATE shall be returned.
-    VerifyOrReturnError(state != MainStateEnum::kMoving && state != MainStateEnum::kWaitingForMotion
-                        && state != MainStateEnum::kStopped, Status::InvalidInState);
+    VerifyOrReturnError(state == MainStateEnum::kMoving || state == MainStateEnum::kWaitingForMotion
+                        || state == MainStateEnum::kStopped, Status::InvalidInState);
 
     // Once the MoveTo action is successfully completed, the server will set OverallTarget and MainState.
     VerifyOrReturnError(mDelegate.HandleMoveToCommand(position, latch, speed) == Status::Success, Status::Failure);
     
-    VerifyOrReturnError(SetOverallTarget(target) == CHIP_NO_ERROR, Status::Failure);
-        
+    DataModel::Nullable<GenericOverallTarget> setTarget;
+    setTarget.SetNonNull(target);
+    VerifyOrReturnError(SetOverallTarget(setTarget) == CHIP_NO_ERROR, Status::Failure);
+
     if (mDelegate.IsReadyToMove())
     {
         VerifyOrReturnError(SetMainState(MainStateEnum::kMoving) == CHIP_NO_ERROR, Status::Failure,
@@ -692,7 +694,7 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleCalibrate()
     
     Status status = Status::Success;
     
-    VerifyOrReturnError(!mConformance.HasFeature(Feature::kCalibration), Status::UnsupportedCommand);
+    VerifyOrReturnError(mConformance.HasFeature(Feature::kCalibration), Status::UnsupportedCommand);
     
     MainStateEnum state;
     VerifyOrReturnError(GetMainState(state) == CHIP_NO_ERROR,Status::Failure);
