@@ -18817,6 +18817,13 @@ typedef NS_ENUM(uint8_t, MTRRVCOperationalStateErrorState) {
     MTRRVCOperationalStateErrorStateWaterTankMissing MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x45,
     MTRRVCOperationalStateErrorStateWaterTankLidOpen MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x46,
     MTRRVCOperationalStateErrorStateMopCleaningPadMissing MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x47,
+    MTRRVCOperationalStateErrorStateLowBattery MTR_PROVISIONALLY_AVAILABLE = 0x48,
+    MTRRVCOperationalStateErrorStateCannotReachTargetArea MTR_PROVISIONALLY_AVAILABLE = 0x49,
+    MTRRVCOperationalStateErrorStateDirtyWaterTankFull MTR_PROVISIONALLY_AVAILABLE = 0x4A,
+    MTRRVCOperationalStateErrorStateDirtyWaterTankMissing MTR_PROVISIONALLY_AVAILABLE = 0x4B,
+    MTRRVCOperationalStateErrorStateWheelsJammed MTR_PROVISIONALLY_AVAILABLE = 0x4C,
+    MTRRVCOperationalStateErrorStateBrushJammed MTR_PROVISIONALLY_AVAILABLE = 0x4D,
+    MTRRVCOperationalStateErrorStateNavigationSensorObscured MTR_PROVISIONALLY_AVAILABLE = 0x4E,
 } MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 
 typedef NS_ENUM(uint8_t, MTRRVCOperationalStateOperationalState) {
@@ -18827,6 +18834,10 @@ typedef NS_ENUM(uint8_t, MTRRVCOperationalStateOperationalState) {
     MTRRVCOperationalStateOperationalStateSeekingCharger MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x40,
     MTRRVCOperationalStateOperationalStateCharging MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x41,
     MTRRVCOperationalStateOperationalStateDocked MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x42,
+    MTRRVCOperationalStateOperationalStateEmptyingDustBin MTR_PROVISIONALLY_AVAILABLE = 0x43,
+    MTRRVCOperationalStateOperationalStateCleaningMop MTR_PROVISIONALLY_AVAILABLE = 0x44,
+    MTRRVCOperationalStateOperationalStateFillingWaterTank MTR_PROVISIONALLY_AVAILABLE = 0x45,
+    MTRRVCOperationalStateOperationalStateUpdatingMaps MTR_PROVISIONALLY_AVAILABLE = 0x46,
 } MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 
 typedef NS_OPTIONS(uint8_t, MTRScenesManagementCopyModeBitmap) {
