@@ -6822,7 +6822,6 @@ private:
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
 | * PriceChange                                                       | 0x0000 |
-| * ForecastChange                                                    | 0x0001 |
 \*----------------------------------------------------------------------------*/
 
 /*
@@ -8128,7 +8127,6 @@ private:
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
 | * CurrentConditionsChanged                                          | 0x0000 |
-| * ForecastConditionsChanged                                         | 0x0001 |
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
@@ -23360,12 +23358,10 @@ void registerClusterCommodityPrice(Commands & commands, CredentialIssuerCommands
         //
         // Events
         //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                     //
-        make_unique<ReadEvent>(Id, "price-change", Events::PriceChange::Id, credsIssuerConfig),            //
-        make_unique<ReadEvent>(Id, "forecast-change", Events::ForecastChange::Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                //
-        make_unique<SubscribeEvent>(Id, "price-change", Events::PriceChange::Id, credsIssuerConfig),       //
-        make_unique<SubscribeEvent>(Id, "forecast-change", Events::ForecastChange::Id, credsIssuerConfig), //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                               //
+        make_unique<ReadEvent>(Id, "price-change", Events::PriceChange::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                          //
+        make_unique<SubscribeEvent>(Id, "price-change", Events::PriceChange::Id, credsIssuerConfig), //
     };
 
     commands.RegisterCluster(clusterName, clusterCommands);
@@ -24176,12 +24172,10 @@ void registerClusterElectricalGridConditions(Commands & commands, CredentialIssu
         //
         // Events
         //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                                            //
-        make_unique<ReadEvent>(Id, "current-conditions-changed", Events::CurrentConditionsChanged::Id, credsIssuerConfig),        //
-        make_unique<ReadEvent>(Id, "forecast-conditions-changed", Events::ForecastConditionsChanged::Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                                       //
-        make_unique<SubscribeEvent>(Id, "current-conditions-changed", Events::CurrentConditionsChanged::Id, credsIssuerConfig),   //
-        make_unique<SubscribeEvent>(Id, "forecast-conditions-changed", Events::ForecastConditionsChanged::Id, credsIssuerConfig), //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                                          //
+        make_unique<ReadEvent>(Id, "current-conditions-changed", Events::CurrentConditionsChanged::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                                     //
+        make_unique<SubscribeEvent>(Id, "current-conditions-changed", Events::CurrentConditionsChanged::Id, credsIssuerConfig), //
     };
 
     commands.RegisterCluster(clusterName, clusterCommands);

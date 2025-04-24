@@ -14819,10 +14819,6 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
             result = @"PriceChange";
             break;
 
-        case MTREventIDTypeClusterCommodityPriceEventForecastChangeID:
-            result = @"ForecastChange";
-            break;
-
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
             break;
@@ -14986,10 +14982,6 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
             // Cluster ElectricalGridConditions events
         case MTREventIDTypeClusterElectricalGridConditionsEventCurrentConditionsChangedID:
             result = @"CurrentConditionsChanged";
-            break;
-
-        case MTREventIDTypeClusterElectricalGridConditionsEventForecastConditionsChangedID:
-            result = @"ForecastConditionsChanged";
             break;
 
         default:
