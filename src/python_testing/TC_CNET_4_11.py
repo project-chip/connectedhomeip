@@ -34,7 +34,6 @@
 #     quiet: true
 
 
-import asyncio
 import logging
 import subprocess
 
@@ -48,35 +47,39 @@ logger.setLevel(logging.INFO)
 
 async def connect_host_wifi(ssid, passphrase):
     try:
-        result = subprocess.run([
+        subprocess.run([
             "networksetup",
             "-setairportnetwork", "en0", ssid, passphrase
         ], check=True, capture_output=True)
-        print(f" --- Connected to {ssid}")
+        logger.info(f" --- connect_host_wifi: Connected to {ssid}")
     except subprocess.CalledProcessError as e:
-        logger.error(f" --- Error connecting to networksetup: {e.stderr.decode()}")
+        logger.error(f" --- connect_host_wifi: Error connecting to networksetup: {e.stderr.decode()}")
 
 
-async def change_networks(cluster, object, timeout, ssid, breadcrumb, passphrase):
+async def change_networks(object, cluster, ssid, passphrase, breadcrumb):
+    # max_retries = 3
+    # attempt = 0
+    # while attempt < max_retries:
+    #     logger.info(f" --- change_networks: Attempting to change networks: {attempt+1}/{max_retries}")
     try:
         await object.send_single_cmd(
             cmd=cluster.Commands.ConnectNetwork(
                 networkID=ssid,
                 breadcrumb=breadcrumb
             ),
-            timedRequestTimeoutMs=timeout
+            timedRequestTimeoutMs=5000
         )
     except Exception as e:
-        logger.error(f" --- Exception in ConnectNetwork: {e}")
+        logger.error(f" --- change_networks: Exception in ConnectNetwork: {e}")
         await connect_host_wifi(ssid=ssid, passphrase=passphrase)
-        response = await object.send_single_cmd(
+        await object.send_single_cmd(
             cmd=cluster.Commands.ConnectNetwork(
                 networkID=ssid,
                 breadcrumb=breadcrumb
             ),
-            timedRequestTimeoutMs=timeout
+            timedRequestTimeoutMs=5000
         )
-        logger.info(f" --- Response: {response}")
+        # attempt += 1
 
 
 class TC_CNET_4_11(MatterBaseTest):
@@ -95,7 +98,7 @@ class TC_CNET_4_11(MatterBaseTest):
             TestStep(9, "TH discovers and connects to DUT on the PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID operational network"),
             TestStep(10, "TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT"),
             TestStep(11, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 0."),
-            TestStep(12, "TH changes its Wi-Fi connection to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID"),
+            # TestStep(12, "TH changes its Wi-Fi connection to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID"),
             TestStep(13, "TH discovers and connects to DUT on the PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID operational network"),
             TestStep(14, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900"),
             TestStep(15, "TH sends RemoveNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field set to 1"),
@@ -121,21 +124,10 @@ class TC_CNET_4_11(MatterBaseTest):
                             "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS must be included on the command line in "
                             "the --string-arg flag as PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS:<hex:70617373776f7264313233>")
 
-        pixit_wifi_1st_ap_ssid = self.matter_test_config.wifi_ssid
-        pixit_wifi_1st_ap_credentials = self.matter_test_config.wifi_passphrase
-        pixit_wifi_2nd_ap_ssid = self.matter_test_config.global_test_params["PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID"]
-        pixit_wifi_2nd_ap_credentials = self.matter_test_config.global_test_params["PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS"]
-        wifi_1st_ap_ssid = pixit_wifi_1st_ap_ssid.encode()
-        wifi_1st_ap_credentials = pixit_wifi_1st_ap_credentials.encode()
-        wifi_2nd_ap_ssid = pixit_wifi_2nd_ap_ssid.encode()
-        wifi_2nd_ap_credentials = pixit_wifi_2nd_ap_credentials.encode()
-
-        logger.info(f" ----------- pixit_wifi_1st_ap_ssid: {pixit_wifi_1st_ap_ssid}")
-        logger.info(f" ----------- pixit_wifi_2nd_ap_ssid: {pixit_wifi_2nd_ap_ssid}")
-        logger.info(f" ----------- pixit_wifi_2nd_ap_credentials: {pixit_wifi_2nd_ap_credentials}")
-        logger.info(f" ----------- wifi_1st_ap_ssid: {wifi_1st_ap_ssid}")
-        logger.info(f" ----------- wifi_2nd_ap_ssid: {wifi_2nd_ap_ssid}")
-        logger.info(f" ----------- wifi_2nd_ap_credentials: {wifi_2nd_ap_credentials}")
+        wifi_1st_ap_ssid = self.matter_test_config.wifi_ssid
+        wifi_1st_ap_credentials = self.matter_test_config.wifi_passphrase
+        wifi_2nd_ap_ssid = self.matter_test_config.global_test_params["PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID"]
+        wifi_2nd_ap_credentials = self.matter_test_config.global_test_params["PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS"]
 
         cgen = Clusters.GeneralCommissioning
         cnet = Clusters.NetworkCommissioning
@@ -157,7 +149,8 @@ class TC_CNET_4_11(MatterBaseTest):
         self.step(1)
 
         await self.send_single_cmd(
-            cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=900)
+            cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=900),
+            timedRequestTimeoutMs=5000
         )
         # Successful command execution is implied if no exception is raised.
 
@@ -170,7 +163,7 @@ class TC_CNET_4_11(MatterBaseTest):
         )
         num_networks = len(networks)
         logger.info(f" --- Step 2: networks: {networks}")
-        logger.info(f" --- Got NumNetworks: {num_networks}")
+        logger.info(f" --- Step 2: Got NumNetworks: {num_networks}")
 
         # TH finds the index of the Networks list entry with NetworkID for PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and saves it as 'userwifi_netidx'
         self.step(3)
@@ -181,9 +174,9 @@ class TC_CNET_4_11(MatterBaseTest):
         # 2. Connected is of type bool and is TRUE
         userwifi_netidx = None
         for idx, network in enumerate(networks):
-            if network.networkID == wifi_1st_ap_ssid:
+            if network.networkID == wifi_1st_ap_ssid.encode():
                 userwifi_netidx = idx
-                logger.info(f" --- NetworkID 1st SSID: {network.networkID.decode()}")
+                logger.info(f" --- Step 3: NetworkID 1st SSID: {network.networkID.decode()}")
                 asserts.assert_true(network.connected, f"Wifi network {wifi_1st_ap_ssid} is not connected.")
                 break
         asserts.assert_true(userwifi_netidx is not None, f"Wifi network not found for 1st SSID: {wifi_1st_ap_ssid}")
@@ -193,9 +186,10 @@ class TC_CNET_4_11(MatterBaseTest):
 
         response = await self.send_single_cmd(
             cmd=cnet.Commands.RemoveNetwork(
-                networkID=wifi_1st_ap_ssid,
+                networkID=wifi_1st_ap_ssid.encode(),
                 breadcrumb=1
-            )
+            ),
+            timedRequestTimeoutMs=5000
         )
         # Verify that DUT sends NetworkConfigResponse to command with the following fields:
         asserts.assert_true(isinstance(response, cnet.Commands.NetworkConfigResponse),
@@ -212,10 +206,10 @@ class TC_CNET_4_11(MatterBaseTest):
         self.step(5)
 
         # Add second network
-        logger.info("--- Adding second wifi test network")
+        logger.info(" --- Step 5: Adding second wifi test network")
         cmd = cnet.Commands.AddOrUpdateWiFiNetwork(
-            ssid=wifi_2nd_ap_ssid, credentials=wifi_2nd_ap_credentials, breadcrumb=1)
-        response = await self.send_single_cmd(cmd=cmd)
+            ssid=wifi_2nd_ap_ssid.encode(), credentials=wifi_2nd_ap_credentials.encode(), breadcrumb=1)
+        response = await self.send_single_cmd(cmd=cmd, timedRequestTimeoutMs=5000)
         # Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:
         asserts.assert_true(isinstance(response, cnet.Commands.NetworkConfigResponse),
                             "Unexpected value returned from AddOrUpdateWiFiNetwork")
@@ -240,22 +234,22 @@ class TC_CNET_4_11(MatterBaseTest):
         # 2. Connected is of type bool and is FALSE
         userwifi_2nd_netidx = None
         for idx, network in enumerate(networks):
-            if network.networkID == wifi_2nd_ap_ssid:
-                logger.info(f" --- NetworkID 2nd SSID: {network.networkID.decode()}")
+            if network.networkID == wifi_2nd_ap_ssid.encode():
+                logger.info(f" --- Step 6: NetworkID 2nd SSID: {network.networkID.decode()}")
                 userwifi_2nd_netidx = idx
-                asserts.assert_false(network.connected, f"Wifi network {wifi_2nd_ap_ssid.decode()} should not be connected.")
+                asserts.assert_false(network.connected, f"Wifi network {wifi_2nd_ap_ssid} should not be connected.")
                 break
-        asserts.assert_true(userwifi_2nd_netidx is not None, f"Wifi network not found for 2nd SSID: {wifi_2nd_ap_ssid.decode()}")
+        asserts.assert_true(userwifi_2nd_netidx is not None, f"Wifi network not found for 2nd SSID: {wifi_2nd_ap_ssid}")
 
         # TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID and Breadcrumb field set to 2
         self.step(7)
 
-        logger.info(f" --- Step 7: Attempting to connect to: {wifi_2nd_ap_ssid.decode()}")
-        await change_networks(cluster=cnet,
-                              object=self,
-                              timeout=5000,
-                              ssid=wifi_2nd_ap_ssid, breadcrumb=2,
-                              passphrase=wifi_2nd_ap_credentials
+        logger.info(f" --- Step 7: Attempting to connect to: {wifi_2nd_ap_ssid}")
+        await change_networks(object=self,
+                              cluster=cnet,
+                              ssid=wifi_2nd_ap_ssid.encode(),
+                              passphrase=wifi_2nd_ap_credentials.encode(),
+                              breadcrumb=2
                               )
 
         # TH discovers and connects to DUT on the PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID operational network
@@ -268,9 +262,9 @@ class TC_CNET_4_11(MatterBaseTest):
         )
         logger.info(f" --- Step 9: networks: {networks}")
         for idx, network in enumerate(networks):
-            if network.networkID == wifi_2nd_ap_ssid:
-                asserts.assert_true(network.connected, f"Wifi network {wifi_2nd_ap_ssid.decode()} is not connected.")
-                logger.info(f" --- Connected to 2nd SSID: {wifi_2nd_ap_ssid.decode()}")
+            if network.networkID == wifi_2nd_ap_ssid.encode():
+                asserts.assert_true(network.connected, f"Wifi network {wifi_2nd_ap_ssid} is not connected.")
+                logger.info(f" --- Step 9: Connected to 2nd SSID: {wifi_2nd_ap_ssid}")
                 break
 
         # TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT
@@ -281,7 +275,7 @@ class TC_CNET_4_11(MatterBaseTest):
             cluster=cgen,
             attribute=cgen.Attributes.Breadcrumb
         )
-        logger.info(f" --- Breadcrumb is: {breadcrumb}")
+        logger.info(f" --- Step 10: Breadcrumb is: {breadcrumb}")
         asserts.assert_equal(breadcrumb, 2, f"Expected breadcrumb to be 2, but got: {breadcrumb}")
 
         # TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 0.
@@ -289,9 +283,10 @@ class TC_CNET_4_11(MatterBaseTest):
         # configuration to NetworkCommissioning cluster done so far to be reverted.
         self.step(11)
 
-        logger.info(" --- Setting ArmFailSafe to 0.")
+        logger.info(" --- Step 11: Setting ArmFailSafe to 0.")
         response = await self.send_single_cmd(
-            cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=0)
+            cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=0),
+            timedRequestTimeoutMs=5000
         )
         asserts.assert_equal(
             response.errorCode,
@@ -302,10 +297,7 @@ class TC_CNET_4_11(MatterBaseTest):
         # TODO: step 12 is manual step, need to remove from here and from test spec
         # TH changes its WiFi connection to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
         # How does it change? is it automatic or need to use ConnectNetwork? if so, look at step 7
-        self.step(12)
-
-        # logger.info(f" --- Connecting host back to: {wifi_1st_ap_ssid.decode()}")
-        # await connect_host_wifi(wifi_1st_ap_ssid, wifi_1st_ap_credentials)
+        # self.step(12)
 
         # TH discovers and connects to DUT on the PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID operational network
         self.step(13)
@@ -316,8 +308,8 @@ class TC_CNET_4_11(MatterBaseTest):
                 attribute=cnet.Attributes.Networks
             )
         except Exception as e:
-            logger.error(f" --- Exception reading networks: {e}")
-            logger.info(f" --- Connecting host back to: {wifi_1st_ap_ssid.decode()}")
+            logger.error(f" --- Step 13: Exception reading networks: {e}")
+            logger.info(f" --- Step 13: Connecting host back to: {wifi_1st_ap_ssid}")
             await connect_host_wifi(wifi_1st_ap_ssid, wifi_1st_ap_credentials)
             networks = await self.read_single_attribute_check_success(
                 cluster=cnet,
@@ -327,16 +319,17 @@ class TC_CNET_4_11(MatterBaseTest):
         logger.info(f" --- Step 13: networks: {networks}")
         # Verify that the TH successfully connects to the DUT
         for idx, network in enumerate(networks):
-            if network.networkID == wifi_1st_ap_ssid:
+            if network.networkID == wifi_1st_ap_ssid.encode():
                 asserts.assert_true(network.connected, f"Wifi network {wifi_1st_ap_ssid} is not connected.")
-                logger.info(f" --- Connected to 1st SSID: {wifi_1st_ap_ssid}")
+                logger.info(f" --- Step 13: Connected to 1st SSID: {wifi_1st_ap_ssid}")
                 break
 
         # TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900
         self.step(14)
 
         await self.send_single_cmd(
-            cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=900)
+            cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=900),
+            timedRequestTimeoutMs=5000
         )
         # Successful command execution is implied if no exception is raised.
 
@@ -345,9 +338,10 @@ class TC_CNET_4_11(MatterBaseTest):
 
         response = await self.send_single_cmd(
             cmd=cnet.Commands.RemoveNetwork(
-                networkID=wifi_1st_ap_ssid,
+                networkID=wifi_1st_ap_ssid.encode(),
                 breadcrumb=1
-            )
+            ),
+            timedRequestTimeoutMs=5000
         )
         # Verify that DUT sends NetworkConfigResponse to command with the following response fields:
         # 1. NetworkingStatus is success
@@ -361,10 +355,10 @@ class TC_CNET_4_11(MatterBaseTest):
         # Credentials field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS and Breadcrumb field set to 1
         self.step(16)
 
-        logger.info("--- Adding second wifi test network")
+        logger.info("--- Step 16: Adding second wifi test network")
         cmd = cnet.Commands.AddOrUpdateWiFiNetwork(
-            ssid=wifi_2nd_ap_ssid, credentials=wifi_2nd_ap_credentials, breadcrumb=1)
-        response = await self.send_single_cmd(cmd=cmd)
+            ssid=wifi_2nd_ap_ssid.encode(), credentials=wifi_2nd_ap_credentials.encode(), breadcrumb=1)
+        response = await self.send_single_cmd(cmd=cmd, timedRequestTimeoutMs=5000)
         # Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:
         # 1. NetworkingStatus is success which is "0"
         asserts.assert_true(isinstance(response, cnet.Commands.NetworkConfigResponse),
@@ -379,23 +373,12 @@ class TC_CNET_4_11(MatterBaseTest):
         # TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID and Breadcrumb field set to 3
         self.step(17)
 
-        # response = await self.send_single_cmd(
-        #     cmd=cnet.Commands.ConnectNetwork(
-        #         networkID=wifi_2nd_ap_ssid,
-        #         breadcrumb=3
-        #     )
-        # )
-        # asserts.assert_equal(response.networkingStatus,
-        #                      cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
-        #                      f"Expected 0 (Success), but got: {response.networkingStatus}")
-
-        logger.info(f" --- Step 17: Attempting to connect to: {wifi_2nd_ap_ssid.decode()}")
-        await change_networks(cluster=cnet,
-                              object=self,
-                              timeout=5000,
-                              ssid=wifi_2nd_ap_ssid,
-                              breadcrumb=3,
-                              passphrase=wifi_2nd_ap_credentials)
+        logger.info(f" --- Step 17: Attempting to connect to: {wifi_2nd_ap_ssid}")
+        await change_networks(object=self,
+                              cluster=cnet,
+                              ssid=wifi_2nd_ap_ssid.encode(),
+                              passphrase=wifi_2nd_ap_credentials.encode(),
+                              breadcrumb=3)
 
         # TODO: same as step 8, remove from here and from spec
         # TH changes its Wi-Fi connection to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
@@ -411,18 +394,18 @@ class TC_CNET_4_11(MatterBaseTest):
                 attribute=cnet.Attributes.Networks
             )
         except Exception as e:
-            logger.error(f" --- Exception reading networks: {e}")
-            logger.info(f" --- Connecting host back to: {wifi_1st_ap_ssid.decode()}")
-            await connect_host_wifi(wifi_1st_ap_ssid, wifi_1st_ap_credentials)
+            logger.error(f" --- Step 19: Exception reading networks: {e}")
+            logger.info(f" --- Step 19: Connecting host back to: {wifi_2nd_ap_ssid}")
+            await connect_host_wifi(wifi_2nd_ap_ssid, wifi_2nd_ap_credentials)
             networks = await self.read_single_attribute_check_success(
                 cluster=cnet,
                 attribute=cnet.Attributes.Networks
             )
         logger.info(f" --- Step 19: networks: {networks}")
         for idx, network in enumerate(networks):
-            if network.networkID == wifi_2nd_ap_ssid:
+            if network.networkID == wifi_2nd_ap_ssid.encode():
                 asserts.assert_true(network.connected, f"Wifi network {wifi_2nd_ap_ssid} is not connected.")
-                logger.info(f" --- Connected to 2nd SSID: {wifi_2nd_ap_ssid}")
+                logger.info(f" --- Step 19: Connected to 2nd SSID: {wifi_2nd_ap_ssid}")
                 break
 
         # TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT
@@ -439,9 +422,9 @@ class TC_CNET_4_11(MatterBaseTest):
         self.step(21)
 
         # Disarm the failsafe
-        logger.info(" --- Disarming the failsafe")
+        logger.info(" --- Step 21: Disarming the failsafe")
         cmd = cgen.Commands.CommissioningComplete()
-        response = await self.send_single_cmd(cmd=cmd)
+        response = await self.send_single_cmd(cmd=cmd, timedRequestTimeoutMs=5000)
         # Verify that DUT sends CommissioningCompleteResponse with the ErrorCode field set to OK (0)
         asserts.assert_true(isinstance(response, cgen.Commands.CommissioningCompleteResponse), "Got wrong response type")
         asserts.assert_equal(response.errorCode, cgen.Enums.CommissioningErrorEnum.kOk,
@@ -459,7 +442,7 @@ class TC_CNET_4_11(MatterBaseTest):
         # 1. NetworkID is the hex representation of the ASCII values for PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
         # 2. Connected is of type bool and is TRUE
         for idx, network in enumerate(networks):
-            if network.networkID == wifi_2nd_ap_ssid:
+            if network.networkID == wifi_2nd_ap_ssid.encode():
                 userwifi_2nd_netidx = idx
                 asserts.assert_true(network.connected, f"Wifi network {wifi_2nd_ap_ssid} is not connected.")
                 logger.info(f" --- Connected to 2nd SSID: {wifi_2nd_ap_ssid}")
