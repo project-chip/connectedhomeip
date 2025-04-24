@@ -33,8 +33,8 @@
 
 import asyncio.exceptions as ae
 import logging
-from time import sleep
 from dataclasses import dataclass
+from time import sleep
 from typing import Optional
 
 import chip.clusters as Clusters
