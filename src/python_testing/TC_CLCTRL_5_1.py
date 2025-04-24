@@ -101,9 +101,29 @@ class TC_CLCTRL_5_1(MatterBaseTest):
         self.step(1)
         attributes = Clusters.ClosureControl.Attributes
 
+        feature_map = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
+        logging.info(f"FeatureMap: {feature_map}")
+        is_is_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kIs
+        is_ps_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kPosition
+        is_cl_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kCalibration
+
+        if is_is_feature_supported:
+            logging.info("Instantanous feature is supported, skipping test case")
+
+            # Skipping all remainig steps
+            for step in self.get_test_steps(self.current_test_info.name)[self.current_step_index:]:
+                self.step(step.test_plan_number)
+                logging.info("Test step skipped")
+
+            return
+
         # STEP 2a: TH sends command MoveTo to DUT, with Position = OpenInFull
         self.step("2a")
 
+        if not is_ps_feature_supported:
+            logging.info("Position feature is not supported, skipping test case")
+            logging.info("Test step skipped")
+            return
         try:
             await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo, arguments=Clusters.ClosureControl.MoveToRequest(
                 position=Clusters.ClosureControl.Bitmaps.Position.kOpenInFull
@@ -196,6 +216,10 @@ class TC_CLCTRL_5_1(MatterBaseTest):
         # STEP 3a: TH sends command Calibrate to DUT
         self.step("3a")
 
+        if not is_cl_feature_supported:
+            logging.info("Calibration feature is not supported, skipping test case")
+            logging.info("Test step skipped")
+            return
         try:
             await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.Calibrate)
         except InteractionModelError as e:
