@@ -210,13 +210,9 @@ struct AcceptedCommandEntry
     _EndBitFieldInit // Enabling '-Wconversion' & '-Wconversion'
 
         // Getter for mask.invokePrivilege
-        constexpr std::optional<Access::Privilege>
+        constexpr Access::Privilege
         GetInvokePrivilege() const
     {
-        if (mask.invokePrivilege == 0)
-        {
-            return std::nullopt;
-        }
         return static_cast<Access::Privilege>(mask.invokePrivilege);
     }
 
