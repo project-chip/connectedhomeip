@@ -17,8 +17,8 @@
  */
 
 #include <ClosureControlEndpoint.h>
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/cluster-enums.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 using namespace chip;
@@ -60,8 +60,16 @@ CHIP_ERROR ClosureControlEndpoint::Init()
     ChipLogProgress(AppServer, "ClosureControlEndpoint::Init start");
 
     ClusterConformance conformance;
-    conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kInstantaneous).Set(Feature::kSpeed).Set(Feature::kVentilation)
-                            .Set(Feature::kPedestrian).Set(Feature::kCalibration).Set(Feature::kProtection).Set(Feature::kManuallyOperable);
+    conformance.FeatureMap()
+        .Set(Feature::kPositioning)
+        .Set(Feature::kMotionLatching)
+        .Set(Feature::kInstantaneous)
+        .Set(Feature::kSpeed)
+        .Set(Feature::kVentilation)
+        .Set(Feature::kPedestrian)
+        .Set(Feature::kCalibration)
+        .Set(Feature::kProtection)
+        .Set(Feature::kManuallyOperable);
     conformance.OptionalAttributes().Set(OptionalAttributeEnum::kCountdownTime);
 
     ReturnErrorOnFailure(mLogic.Init(conformance));
@@ -71,4 +79,4 @@ CHIP_ERROR ClosureControlEndpoint::Init()
     ChipLogProgress(AppServer, "ClosureControlEndpoint::Init end");
 
     return CHIP_NO_ERROR;
- }
+}

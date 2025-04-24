@@ -17,8 +17,8 @@
  */
 
 #include <ClosureDimensionEndpoint.h>
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/cluster-enums.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 using namespace chip;
@@ -35,7 +35,7 @@ CHIP_ERROR PrintOnlyDelegate::Init()
 }
 
 Status PrintOnlyDelegate::HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<bool> & latch,
-    const Optional<Globals::ThreeLevelAutoEnum> & speed)
+                                          const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
     ChipLogProgress(AppServer, "HandleSetTarget");
     // Add the SetTarget handling logic here
@@ -43,12 +43,11 @@ Status PrintOnlyDelegate::HandleSetTarget(const Optional<Percent100ths> & pos, c
 }
 
 Status PrintOnlyDelegate::HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
-    const Optional<Globals::ThreeLevelAutoEnum> & speed)
+                                     const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
     ChipLogProgress(AppServer, "HandleStep");
     // Add the Step handling logic here
     return Status::Success;
-
 }
 
 CHIP_ERROR ClosureDimensionEndpoint::Init()

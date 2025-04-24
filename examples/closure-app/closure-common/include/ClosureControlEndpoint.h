@@ -18,16 +18,16 @@
 
 #pragma once
 
-#include <app/clusters/closure-control-server/closure-control-cluster-logic.h>
 #include <app/clusters/closure-control-server/closure-control-cluster-delegate.h>
-#include <app/clusters/closure-control-server/closure-control-cluster-objects.h>
+#include <app/clusters/closure-control-server/closure-control-cluster-logic.h>
 #include <app/clusters/closure-control-server/closure-control-cluster-matter-context.h>
+#include <app/clusters/closure-control-server/closure-control-cluster-objects.h>
 #include <app/clusters/closure-control-server/closure-control-server.h>
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <protocols/interaction_model/StatusCode.h>
-#include <app-common/zap-generated/cluster-objects.h>
 
 namespace chip {
 namespace app {
@@ -50,7 +50,6 @@ using Protocols::InteractionModel::Status;
 class PrintOnlyDelegate : public DelegateBase
 {
 public:
-
     PrintOnlyDelegate(EndpointId endpoint) : mEndpoint(endpoint) {}
 
     // Override for the DelegateBase Virtual functions
@@ -85,10 +84,9 @@ private:
 class ClosureControlEndpoint
 {
 public:
-
     ClosureControlEndpoint(EndpointId endpoint) :
         mEndpoint(endpoint), mContext(mEndpoint), mDelegate(mEndpoint), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
-    { }
+    {}
 
     /**
      * @brief Initializes the ClosureControlEndpoint instance.

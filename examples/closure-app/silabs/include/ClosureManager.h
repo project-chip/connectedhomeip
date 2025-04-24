@@ -16,26 +16,24 @@
  *    limitations under the License.
  */
 
- /*
-  * @class ClosureManager
-  * @brief Manages the initialization and operations related to closure and
-  *        closure panel endpoints in the application.
-  *
-  * @note This class is part of the closure application example
-  */
+/*
+ * @class ClosureManager
+ * @brief Manages the initialization and operations related to closure and
+ *        closure panel endpoints in the application.
+ *
+ * @note This class is part of the closure application example
+ */
 
- class ClosureManager
- {
- public:
-
+class ClosureManager
+{
+public:
     static ClosureManager sClosureMgr;
 
     /**
-    * @brief Initializes the ClosureManager.
-    *
-    * This method sets up the necessary resources and configurations required
-    * for the Closure Application to function properly.
-    */
+     * @brief Initializes the ClosureManager.
+     *
+     * This method sets up the necessary resources and configurations required
+     * for the Closure Application to function properly.
+     */
     void Init();
-
- };
+};
