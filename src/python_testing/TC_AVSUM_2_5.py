@@ -35,8 +35,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
-
 import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
@@ -76,34 +74,10 @@ class TC_AVSUM_2_5(MatterBaseTest, AVSUMTestBase):
         attributes = cluster.Attributes
         endpoint = self.get_endpoint(default=1)
 
-        tilt_min_dut = tilt_max_dut = pan_min_dut = pan_max_dut = zoom_max_dut = None
-        presetPan = presetTilt = presetZoom = None
-
         self.step(1)  # Already done, immediately go to step 2
-
-        feature_map = await self.read_avsum_attribute_expect_success(endpoint, attributes.FeatureMap)
-        self.has_feature_mpan = (feature_map & cluster.Bitmaps.Feature.kMechanicalPan) != 0
-        self.has_feature_mtilt = (feature_map & cluster.Bitmaps.Feature.kMechanicalTilt) != 0
-        self.has_feature_mzoom = (feature_map & cluster.Bitmaps.Feature.kMechanicalZoom) != 0
-        self.has_feature_mpresets = (feature_map & cluster.Bitmaps.Feature.kMechanicalPresets) != 0
 
         self.step(2)
         mptzposition_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPosition)
-
-        # Get the Max and Min values, plus the preset candidate values
-        if self.has_feature_mzoom:
-            zoom_max_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.ZoomMax)
-            presetZoom = mptzposition_dut.zoom
-
-        if self.has_feature_mtilt:
-            tilt_min_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.TiltMin)
-            tilt_max_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.TiltMax)
-            presetTilt = mptzposition_dut.tilt
-
-        if self.has_feature_mpan:
-            pan_min_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.PanMin)
-            pan_max_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.PanMax)
-            presetPan = mptzposition_dut.pan
 
         attribute_list = await self.read_avsum_attribute_expect_success(endpoint, attributes.AttributeList)
 
