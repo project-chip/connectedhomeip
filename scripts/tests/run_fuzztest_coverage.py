@@ -19,6 +19,7 @@ import glob
 import logging
 import os
 import re
+import shutil
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -103,6 +104,17 @@ def get_fuzz_test_cases(context):
         raise Exception(f"Error executing {context.fuzz_test_binary_path}: {e}")
 
 
+def check_if_coverage_tools_detected():
+    missing = []
+    for tool in ["llvm-profdata", "llvm-cov", "genhtml"]:
+        if shutil.which(tool) is None:
+            missing.append(tool)
+
+    if missing:
+        raise Exception("Following required coverage packages not found: " + ", ".join(missing) +
+                        "\nPlease either install them or source the correct environment")
+
+
 def run_fuzz_test(context):
     """Runs the fuzz test and generates an LLVM profile file if binary is coverage instrumented"""
 
@@ -119,6 +131,7 @@ def run_fuzz_test(context):
 
     env = os.environ.copy()
     if context.is_coverage_instrumented:
+        check_if_coverage_tools_detected()
         profraw_file = f"{build_profile_folder}/{context.coverage_output_base_name}.profraw"
         env["LLVM_PROFILE_FILE"] = profraw_file
 
@@ -329,7 +342,7 @@ def run_script_in_normal_mode(fuzz_test, test_case, list_test_cases, help):
     if not test_cases:
         raise ValueError(f"No FUZZ_TESTs (TestCases) found in {fuzz_test}")
 
-    if "all" in test_case:
+    if test_case.strip().lower() == "all":
         context.run_mode = FuzzTestMode.UNIT_TEST_MODE
     else:
         context.run_mode = FuzzTestMode.CONTINUOUS_FUZZ_MODE
@@ -348,7 +361,7 @@ def run_script_in_normal_mode(fuzz_test, test_case, list_test_cases, help):
 def main(fuzz_test, test_case, list_test_cases, interactive, output, help):
 
     coloredlogs.install(
-        level="INFO",
+        level="DEBUG",
         fmt="%(message)s",
         level_styles={
             "debug": {"color": "cyan"},
@@ -395,7 +408,7 @@ def main(fuzz_test, test_case, list_test_cases, interactive, output, help):
     if should_generate_coverage and context.is_coverage_instrumented:
         generate_coverage_report(context, output)
     else:
-        logging.info("Skipping coverage report generation for non-instrumented build")
+        logging.info("Skipping coverage report generation")
 
 
 if __name__ == "__main__":
