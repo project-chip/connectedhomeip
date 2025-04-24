@@ -25,6 +25,11 @@
 #include <webrtc_manager/WebRTCProviderClient.h>
 #include <webrtc_manager/WebRTCRequestorDelegate.h>
 
+#define LOCALHOST_IP "127.0.0.1"
+#define VIDEO_STREAM_DEST_PORT 5000
+#define VIDEO_H264_CODEC 96
+#define VIDEO_BITRATE 3000
+
 class WebRTCManager
 {
 public:
@@ -61,11 +66,14 @@ private:
     std::string mLocalDescription;
     std::vector<std::string> mLocalCandidates;
 
+    // a track to receive video stream
     rtc::Description::Video mMedia;
     std::shared_ptr<rtc::Track> mTrack;
+    // media handler to depacketize the incoming RTP stream
     std::shared_ptr<rtc::H264RtpDepacketizer> mDepacketizer;
+    // socket to send over the video stream
     int sock;
     sockaddr_in socket_address;
 
-    void initializeSocket();
+    bool initializeSocket();
 };

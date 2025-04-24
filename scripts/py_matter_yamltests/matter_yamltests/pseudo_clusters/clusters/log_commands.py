@@ -29,10 +29,6 @@ _DEFINITION = '''<?xml version="1.0"?>
       <arg name="message" type="char_string"/>
       <arg name="expectedValue" type="char_string" optional="true"/>
     </command>
-
-    <command source="client" code="0" name="UserPromptSdp">
-      <arg name="promptMessage" type="char_string"/>
-    </command>
 </cluster>
 </configurator>
 '''
@@ -57,7 +53,3 @@ class LogCommands(PseudoCluster):
 
     async def Log(self, request):
         pass
-
-    async def UserPromptSdp(self, request):
-        pass
-
