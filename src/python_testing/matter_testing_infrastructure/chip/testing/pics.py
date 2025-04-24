@@ -67,8 +67,14 @@ def parse_pics_xml(contents: str) -> dict[str, bool]:
     pics = {}
     mytree = ET.fromstring(contents)
     for pi in mytree.iter('picsItem'):
-        name = pi.find('itemNumber').text
-        support = pi.find('support').text
+        name_element = pi.find('itemNumber')
+        if name_element is None:
+            raise ValueError("Missing 'itemNumber' in picsItem")
+        name = name_element.text
+        support_element = pi.find('support')
+        if support_element is None:
+            raise ValueError("Missing 'support' in picsItem")
+        support = support_element.text
         pics[name] = int(json.loads(support.lower())) == 1
     return pics
 
@@ -81,7 +87,6 @@ def read_pics_from_file(path: str) -> dict[str, bool]:
             with open(filename, 'r') as f:
                 contents = f.read()
                 pics_dict.update(parse_pics_xml(contents))
-                print("reading pics ****")
         return pics_dict
 
     else:
