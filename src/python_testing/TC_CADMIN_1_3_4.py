@@ -215,14 +215,15 @@ class TC_CADMIN(MatterBaseTest):
                 [2024-10-08 11:57:43.144365][TEST][STDOUT][MatterTest] 10-08 11:57:42.777 INFO Add NOC failed with error src/controller/CHIPDeviceController.cpp:1712: CHIP Error 0x0000007E: Trying to add a NOC for a fabric that already exists
             """
 
+            self.step(14)
             revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
             await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
             # The failsafe cleanup is scheduled after the command completes, so give it a bit of time to do that
             sleep(1)
 
         if commission_type == "ECM":
-            self.step(14)
-
+            self.step(15)
+            
         elif commission_type == "BCM":
             self.step(7)
 
@@ -264,7 +265,8 @@ class TC_CADMIN(MatterBaseTest):
                      "DUT_CE opens its Commissioning window to allow a new commissioning"),
             TestStep(13, "TH_CR1 starts a commissioning process with DUT_CE before the timeout from step 12",
                      "Since DUT_CE was already commissioned by TH_CR1 in step 1, AddNOC fails with NOCResponse with StatusCode field set to FabricConflict (9)"),
-            TestStep(14, "TH_CR2 reads the CurrentFabricIndex attribute from the Operational Credentials cluster and saves as th2_idx, TH_CR1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx",
+            TestStep(14, "TH_CR1 sends an RevokeCommissioning command to the DUT to cleanup step 13", "Successfully revoked commissioning"),
+            TestStep(15, "TH_CR2 reads the CurrentFabricIndex attribute from the Operational Credentials cluster and saves as th2_idx, TH_CR1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx",
                      "TH_CR1 removes TH_CR2 fabric using th2_idx")
         ]
 
