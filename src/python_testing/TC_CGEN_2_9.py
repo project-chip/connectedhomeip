@@ -69,8 +69,6 @@ class TC_CGEN_2_9(MatterBaseTest):
         fabrics.remove(commissioner_fabric)
         fabrics.append(commissioner_fabric)
 
-        logging.info(f"Fabrics list prior to removals: {fabrics}")
-
         for fabric in fabrics:
             logging.info(f"Removing fabric at fabricIndex {fabric.fabricIndex}")
             response: Clusters.OperationalCredentials.Commands.NOCResponse = await commissioner.SendCommand(
@@ -79,9 +77,6 @@ class TC_CGEN_2_9(MatterBaseTest):
                 payload=Clusters.OperationalCredentials.Commands.RemoveFabric(fabric.fabricIndex),
             )
             asserts.assert_equal(response.statusCode, Clusters.OperationalCredentials.Enums.NodeOperationalCertStatusEnum.kOk)
-
-            # Expire session so that RemoveFabric is done on new sessions.
-            commissioner.ExpireSessions(self.dut_node_id)
 
     def desc_TC_CGEN_2_9(self) -> str:
         return "[TC-CGEN-2.9] Verification that TCAcknowledgements is reset after all fabrics removed [DUT as Server]"
