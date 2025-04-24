@@ -129,7 +129,8 @@ public:
         memset(mChainedResponseBuffer, 0, sizeof(mChainedResponseBuffer));
     }
 
-    ~TagInstance() {
+    ~TagInstance()
+    {
         if (readerName != nullptr)
         {
             free(readerName);
