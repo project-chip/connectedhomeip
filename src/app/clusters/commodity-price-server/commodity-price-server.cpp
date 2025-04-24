@@ -377,12 +377,16 @@ CHIP_ERROR Instance::CopyPrice(const DataModel::Nullable<Structs::CommodityPrice
     else
     {
         // Free the priceStruct
-        VerifyOrDie(mOwnedCurrentPriceStructBuffer.Get() != nullptr);
-        mOwnedCurrentPriceStructBuffer.Free();
+        if (mOwnedCurrentPriceStructBuffer.Get() != nullptr)
+        {
+            mOwnedCurrentPriceStructBuffer.Free();
+        }
 
         // Free the .components
-        VerifyOrDie(mOwnedCurrentPriceComponentBuffer.Get() != nullptr);
-        mOwnedCurrentPriceComponentBuffer.Free();
+        if (mOwnedCurrentPriceComponentBuffer.Get() != nullptr)
+        {
+            mOwnedCurrentPriceComponentBuffer.Free();
+        }
 
         // The .description is held within a ScopedBuffer so the
         // CopyCharSpan() will take care of that for us
