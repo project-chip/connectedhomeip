@@ -32,7 +32,6 @@
 class ClosureManager
 {
 public:
-
     /**
      * @brief Initializes the ClosureManager.
      *
@@ -45,12 +44,12 @@ public:
 
 private:
     static ClosureManager sClosureMgr;
-// Define the endpoint ID for the Closure
+    // Define the endpoint ID for the Closure
     static constexpr chip::EndpointId kClosureEndpoint       = 1;
     static constexpr chip::EndpointId kClosurePanel1Endpoint = 2;
     static constexpr chip::EndpointId kClosurePanel2Endpoint = 3;
 
-    chip::app::Clusters::ClosureControl::ClosureControlEndpoint ep1{kClosureEndpoint};
-    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint ep2{kClosurePanel1Endpoint};
-    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint ep3{kClosurePanel2Endpoint};
+    chip::app::Clusters::ClosureControl::ClosureControlEndpoint ep1{ kClosureEndpoint };
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint ep2{ kClosurePanel1Endpoint };
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint ep3{ kClosurePanel2Endpoint };
 };

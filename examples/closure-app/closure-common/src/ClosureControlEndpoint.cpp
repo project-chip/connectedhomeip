@@ -26,7 +26,6 @@ using namespace chip::app::Clusters::ClosureControl;
 
 using Protocols::InteractionModel::Status;
 
-
 Status PrintOnlyDelegate::HandleCalibrateCommand()
 {
     ChipLogProgress(AppServer, "HandleCalibrateCommand");
