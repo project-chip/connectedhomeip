@@ -33,6 +33,7 @@
 
 import asyncio.exceptions as ae
 from time import sleep
+import logging
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
@@ -44,13 +45,59 @@ from mobly import asserts
 
 
 class TC_CADMIN_1_5(MatterBaseTest):
-    async def get_txt_record(self):
+    async def get_all_txt_records(self):
         discovery = mdns_discovery.MdnsDiscovery(verbose_logging=True)
-        comm_service = await discovery.get_commissionable_service(
-            discovery_timeout_sec=240,
-            log_output=False,
-        )
-        return comm_service
+        discovery._service_types = [mdns_discovery.MdnsServiceType.COMMISSIONABLE.value]
+        await discovery._discover(discovery_timeout_sec=240, log_output=False)
+        
+        if mdns_discovery.MdnsServiceType.COMMISSIONABLE.value in discovery._discovered_services:
+            return discovery._discovered_services[mdns_discovery.MdnsServiceType.COMMISSIONABLE.value]
+        return []
+
+    async def wait_for_correct_cm_value(self, expected_cm_value, expected_discriminator, max_attempts=5, delay_sec=5):
+        """Wait for the correct CM value and discriminator in DNS-SD with retries."""
+        for attempt in range(max_attempts):
+            services = await self.get_all_txt_records()
+            
+            # Look through all services for a match
+            for service in services:
+                cm_value = service.txt_record.get('CM')
+                d_value = service.txt_record.get('D')
+                
+                # Convert to strings for comparison
+                if str(cm_value) == str(expected_cm_value) and str(d_value) == str(expected_discriminator):
+                    logging.info(f"Found matching service: CM={cm_value}, D={d_value}")
+                    return service
+            
+            # Log what we found for debugging purposes
+            if services:
+                logging.info(f"Found {len(services)} services, but none match CM={expected_cm_value}, D={expected_discriminator}")
+                for service in services:
+                    logging.info(f"  Service: CM={service.txt_record.get('CM')} (type: {type(service.txt_record.get('CM'))}), "
+                                f"D={service.txt_record.get('D')} (type: {type(service.txt_record.get('D'))})")
+            else:
+                logging.info("No services found in this attempt")
+            
+            if attempt < max_attempts - 1:
+                logging.info(f"Waiting for service with CM={expected_cm_value} and D={expected_discriminator}, "
+                             f"attempt {attempt+1}/{max_attempts}")
+                sleep(delay_sec)
+
+            else:
+                # Final retry attempt failed, format services for display and fail
+                found_services = []
+                for svc in services:
+                    # Convert values to strings to ensure consistent comparison
+                    cm = str(svc.txt_record.get('CM', 'MISSING'))
+                    d = str(svc.txt_record.get('D', 'MISSING'))
+                    found_services.append(f"Service with CM={cm}, D={d}")
+                
+                # Log the expected types for comparison
+                logging.info(f"Expected: CM={expected_cm_value}, D={expected_discriminator}")
+                
+                asserts.fail(f"Failed to find DNS-SD advertisement with CM={expected_cm_value} and "
+                             f"discriminator={expected_discriminator} after {max_attempts} attempts. "
+                             f"Found services: {found_services}")
 
     async def commission_on_network(self, setup_code: int, discriminator: int, expected_error: int = 0):
         # This is expected to error as steps 4 and 7 expects timeout issue or pase connection error to occur due to commissioning window being closed already
@@ -122,11 +169,16 @@ class TC_CADMIN_1_5(MatterBaseTest):
 
         self.step(2)
         params = await self.open_commissioning_window(dev_ctrl=self.th1, timeout=180, node_id=self.dut_node_id)
+        logging.info(f"Commissioning window params: {params}")
 
         self.step(3)
-        services = await self.get_txt_record()
-        if services.txt_record['CM'] != "2":
-            asserts.fail(f"Expected cm record value not found, instead value found was {str(services.txt_record['CM'])}")
+        # Wait for DNS-SD advertisement with correct CM value and discriminator
+        # This will either return a valid service or assert failure
+        service = await self.wait_for_correct_cm_value(
+            expected_cm_value="2", 
+            expected_discriminator=params.randomDiscriminator
+        )
+        logging.info(f"Successfully found service with CM={service.txt_record.get('CM')}, D={service.txt_record.get('D')}")
         sleep(190)
 
         self.step(4)
