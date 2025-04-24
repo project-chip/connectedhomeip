@@ -34,8 +34,6 @@ namespace app {
 namespace Clusters {
 namespace ClosureControl {
 
-using Protocols::InteractionModel::Status;
-
 /**
  * @class PrintOnlyDelegate
  * @brief A delegate class that handles Closure Control commands at the application level.
@@ -50,22 +48,12 @@ using Protocols::InteractionModel::Status;
 class PrintOnlyDelegate : public DelegateBase
 {
 public:
-    PrintOnlyDelegate(EndpointId endpoint) : mEndpoint(endpoint) {}
+    PrintOnlyDelegate(EndpointId endpoint) {}
 
     // Override for the DelegateBase Virtual functions
     Protocols::InteractionModel::Status HandleStopCommand() override;
     Protocols::InteractionModel::Status HandleMoveToCommand() override;
     Protocols::InteractionModel::Status HandleCalibrateCommand() override;
-
-    /**
-     * @brief Initializes the PrintOnlyDelegate instance.
-     *
-     * @return CHIP_ERROR indicating the result of the initialization.
-     */
-    CHIP_ERROR Init();
-
-private:
-    EndpointId mEndpoint = kInvalidEndpointId;
 };
 
 /**

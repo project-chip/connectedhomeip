@@ -26,14 +26,6 @@ using namespace chip::app::Clusters::ClosureDimension;
 
 using Protocols::InteractionModel::Status;
 
-CHIP_ERROR PrintOnlyDelegate::Init()
-{
-    ChipLogProgress(AppServer, "PrintOnlyDelegate::Init start");
-    // Add the Init logic here
-    ChipLogProgress(AppServer, "PrintOnlyDelegate::Init done");
-    return CHIP_NO_ERROR;
-}
-
 Status PrintOnlyDelegate::HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<bool> & latch,
                                           const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
@@ -58,7 +50,6 @@ CHIP_ERROR ClosureDimensionEndpoint::Init()
 
     ReturnErrorOnFailure(mLogic.Init(conformance));
     ReturnErrorOnFailure(mInterface.Init());
-    ReturnErrorOnFailure(mDelegate.Init());
 
     ChipLogProgress(AppServer, "ClosureDimensionEndpoint::Init end");
 

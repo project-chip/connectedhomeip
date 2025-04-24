@@ -50,7 +50,7 @@ using Protocols::InteractionModel::Status;
 class PrintOnlyDelegate : public DelegateBase
 {
 public:
-    PrintOnlyDelegate(EndpointId endpoint) : mEndpoint(endpoint) {}
+    PrintOnlyDelegate(EndpointId endpoint) {}
 
     // Override for the DelegateBase Virtual functions
     Status HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<bool> & latch,
@@ -58,15 +58,6 @@ public:
     Status HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
                       const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
 
-    /**
-     * @brief Initializes the PrintOnlyDelegate instance.
-     *
-     * @return CHIP_ERROR indicating the result of the initialization.
-     */
-    CHIP_ERROR Init();
-
-private:
-    EndpointId mEndpoint = kInvalidEndpointId;
 };
 
 /**

@@ -26,13 +26,6 @@ using namespace chip::app::Clusters::ClosureControl;
 
 using Protocols::InteractionModel::Status;
 
-CHIP_ERROR PrintOnlyDelegate::Init()
-{
-    ChipLogProgress(AppServer, "PrintOnlyDelegate::Init start");
-    // Add the Init logic here
-    ChipLogProgress(AppServer, "PrintOnlyDelegate::Init done");
-    return CHIP_NO_ERROR;
-}
 
 Status PrintOnlyDelegate::HandleCalibrateCommand()
 {
@@ -57,13 +50,10 @@ Status PrintOnlyDelegate::HandleStopCommand()
 
 CHIP_ERROR ClosureControlEndpoint::Init()
 {
-    ChipLogProgress(AppServer, "ClosureControlEndpoint::Init start");
-
     ClusterConformance conformance;
     conformance.FeatureMap()
         .Set(Feature::kPositioning)
         .Set(Feature::kMotionLatching)
-        .Set(Feature::kInstantaneous)
         .Set(Feature::kSpeed)
         .Set(Feature::kVentilation)
         .Set(Feature::kPedestrian)
@@ -74,9 +64,6 @@ CHIP_ERROR ClosureControlEndpoint::Init()
 
     ReturnErrorOnFailure(mLogic.Init(conformance));
     ReturnErrorOnFailure(mInterface.Init());
-    ReturnErrorOnFailure(mDelegate.Init());
-
-    ChipLogProgress(AppServer, "ClosureControlEndpoint::Init end");
 
     return CHIP_NO_ERROR;
 }
