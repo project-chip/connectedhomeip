@@ -122,7 +122,7 @@ void Interface::InvokeCommand(HandlerContext & handlerContext)
         HandleCommand<Commands::Stop::DecodableType>(
             handlerContext, [&logic = mClusterLogic, &status](HandlerContext & ctx, const auto & commandData) {
                 status = logic.HandleStop();
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::UnsupportedCommand);
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
             });
         return;
 
@@ -130,14 +130,14 @@ void Interface::InvokeCommand(HandlerContext & handlerContext)
         HandleCommand<Commands::MoveTo::DecodableType>(
             handlerContext, [&logic = mClusterLogic, &status](HandlerContext & ctx, const auto & commandData) {
                 status = logic.HandleMoveTo(commandData.position, commandData.latch, commandData.speed);
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::UnsupportedCommand);
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
             });
         return;
     case Commands::Calibrate::Id:
         HandleCommand<Commands::Calibrate::DecodableType>(
             handlerContext, [&logic = mClusterLogic, &status](HandlerContext & ctx, const auto & commandData) {
                 status = logic.HandleCalibrate();
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::UnsupportedCommand);
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
             });
         return;
 

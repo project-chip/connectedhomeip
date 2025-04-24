@@ -155,12 +155,17 @@ public:
 
     /**
      * @brief Initializes the cluster logic
-     *        Validates that the provided conformance is spec compliant
+     *        Validates that the provided conformance is spec compliant.
+     *        Set the initPrasams in their respective attributes.
      *
      * @param[in] conformance
-     * @return CHIP_ERROR
+     * @param[in] initParams
+     * 
+     * @return CHIP_ERROR_INCORRECT_STATE if the class has already been initialized.
+     *         Set fucntion Specific errors, if set of initParams failed.
+     *         CHIP_NO_ERROR on successful Initialization.
      */
-    CHIP_ERROR Init(const ClusterConformance & conformance);
+    CHIP_ERROR Init(const ClusterConformance & conformance, const ClusterInitParameters & initParams);
 
     // All Get functions
     // Return CHIP_ERROR_INCORRECT_STATE if the class has not been initialized.
@@ -173,24 +178,20 @@ public:
     CHIP_ERROR GetOverallTarget(DataModel::Nullable<GenericOverallTarget> & overallTarget);
     CHIP_ERROR GetCurrentErrorList(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
 
-    // All Set functions
-    // Return CHIP_ERROR_INCORRECT_STATE if the class has not been initialized.
-    // Return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if the attribute is not supported by the conformance.
-    // Return CHIP_ERROR_INVALID_ARGUMENT if the input value is out of range.
-    // Otherwise return CHIP_NO_ERROR and set the parameter value in the cluster state
-    // Set functions are supplied for any values that can be set either internally by the device or externally
-    // through a direct attribute write. Changes to attributes that happen as a side effect of cluster commands
-    // are handled by the cluster command handlers.
-    
+    /**
+     * @brief Set OverallTarget.
+     * 
+     * @param[in] overallTarget OverallTarget Position, Latch and Speed.
+     * 
+     * @return CHIP_NO_ERROR if set was successful.
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     */
     CHIP_ERROR SetOverallState(const DataModel::Nullable<GenericOverallState> & overallState);
-    CHIP_ERROR SetOverallTarget(const DataModel::Nullable<GenericOverallTarget> & overallTarget);
-    CHIP_ERROR SetCurrentErrorList(const ClosureErrorEnum error);
     
     /**
      * @brief Function to change the MainState.
-     *        Function posts EngageStateChanged Event, base on trasition to/from Disengaged state.
-     *        Function calls the SetCountdownTimeFromCluster function with the State Specific CountdownTime and
-     *          also starts and cancel the timer based on MovingStates(Calibration/Moving/WaitingForMotion) or not.
      *
      *        See SetCountdownTime function comment below
      */
@@ -208,66 +209,53 @@ public:
     }
     
     /**
-     * @brief API to trigger countdown time update from the cluster logic.
-     *        Function calls the SetCountdownTime function with the fromDelegate parameter set to false.
-     *
-     *        See SetCountdownTime function comment above
-     */
-    inline CHIP_ERROR SetCountdownTimeFromCluster(const DataModel::Nullable<ElapsedS> & countdownTime)
-    {
-        return SetCountdownTime(countdownTime, false);
-    }
-    
-    
-    /**
-     *  @brief Calls delegate HandleStopCommand function after validating MainState
+     *  @brief Calls delegate HandleStopCommand function after validating MainState, parameters and conformance.
+     * 
      *  @return Exits if the cluster is not initialized.
-     *          Returns Success if the Stop command not supported from present Mainstate.
-     *          Returns Success on succesful handling or Error Otherwise
-     */
-    chip::Protocols::InteractionModel::Status HandleStopInternal();
-    
-    /**
-     *  @brief Calls HandleStopInternal function after validating the conformance and Initialization
-     *  @return Exits if the cluster is not initialized.
-     *          Returns UnsupportedCommand if Instantaneous feature is supported.
-     *          Returns Success on succesful handling or Error Otherwise
+     *          Success if the Stop command not supported from present Mainstate.
+     *          UnsupportedCommand if Instantaneous feature is supported.
+     *          Success on succesful handling or Error Otherwise
      */
     chip::Protocols::InteractionModel::Status HandleStop();
     
     /**
      *  @brief Calls delegate HandleMoveToCommand function after validating the parameters and conformance.
+     * 
      *  @param [in] position target position
      *  @param [in] latch Target latch
      *  @param [in] speed Target speed
+     * 
      *  @return Exits if the cluster is not initialized.
-     *          Returns ConstraintError if the input values are out is out of range.
-     *          Returns InvalidInState iif the MoveTo command not supported from present Mainstate.
-     *          Returns Success if arguments don't match the feature conformance.
-     *          Returns Success on succesful handling.
+     *          ConstraintError if the input values are out is out of range.
+     *          InvalidInState if the MoveTo command not supported from present Mainstate.
+     *          Success on succesful handling.
      */
     chip::Protocols::InteractionModel::Status HandleMoveTo(Optional<TargetPositionEnum> position, Optional<bool> latch,
                                                            Optional<Globals::ThreeLevelAutoEnum> speed);
     
     /**
      *  @brief Calls delegate HandleCalibrateCommand function after validating the parameters and conformance.
+     * 
      *  @return Exits if the cluster is not initialized.
-     *          Returns ConstraintError if the input values are out is out of range.
-     *          Returns InvalidInState if the Calibrate command not supported from present Mainstate.
-     *          Returns Success on succesful handling.
+     *          ConstraintError if the input values are out is out of range.
+     *          InvalidInState if the Calibrate command not supported from present Mainstate.
+     *          Success on succesful handling.
      */
     chip::Protocols::InteractionModel::Status HandleCalibrate();
     
     /**
      * @brief Post event when a reportable error condition is detected
+     * 
      * @param [in] errorState current error list
+     * 
      * @return CHIP_NO_ERROR if event posted succesfully
      *         Return error recieved from LogEvent.
      */
-    CHIP_ERROR PostOperationalErrorEvent(const DataModel::List<const ClosureErrorEnum> errorState);
+    CHIP_ERROR PostOperationalErrorEvent(const DataModel::List<const ClosureErrorEnum> & errorState);
 
     /**
      * @brief Post event, if supported, when the overall operation ends, either successfully or otherwise
+     * 
      * @return CHIP_NO_ERROR if event posted succesfully
      *         CHIP_NO_ERROR if positioning feature is not supported.
      *         Return error recieved from LogEvent.
@@ -276,7 +264,9 @@ public:
 
     /**
      * @brief Post event, if supported,when the MainStateEnum attribute changes state to and from disengaged
+     * 
      * @param[in] EngageValue will indicate if the actuator is Engaged or Disengaged
+     * 
      * @return CHIP_NO_ERROR if event posted succesfully
      *         CHIP_NO_ERROR if manuallyOperable feature is not supported.
      *         Return error recieved from LogEvent.
@@ -285,19 +275,13 @@ public:
 
     /**
      * @brief Post event, if supported, when the SecureState field in the OverallState attribute changes.
+     * 
      * @param[in] secureValue will indicate whether a closure is securing a space against possible unauthorized entry.
      * @return CHIP_NO_ERROR if event posted succesfully
      *         CHIP_NO_ERROR if feature conformance is not supported
      *         Return error recieved from LogEvent.
      */
     CHIP_ERROR PostSecureStateChangedEvent(const bool secureValue);
-    
-    /**
-     * @brief Causes reporting of CurrentErrorList.
-     *        Whenever application wants to report a change in Errorlist, call this method.
-     */
-    void ReportCurrentErrorListChange();
-    
     
     /**
      * @brief Fuction handles the expiry of countdowntime. 
@@ -337,7 +321,7 @@ private:
 
     /**
      * @brief Function validates if the requested overallState positioning is supported by the device.
-     *        Function validates agaisnt the FeatureMap conformance to validate support.
+     *        Function validates against the FeatureMap conformance to validate support.
      *
      *        - FullyClosed, FullyOpened, PartiallyOpened and OpenedAtSignature always return true since they are mandatory.
      *        - OpenedForPedestrian returns true if the Pedestrian feature is supported, false otherwise.
@@ -354,7 +338,7 @@ private:
      * @brief Function validates if the requested OverallTarget positioning is supported by the device.
      *        Function validates agaisnt the FeatureMap conformance to validate support.
      *
-     *        - CloseInFull, OpenInFull and Signaturealways return true since they are mandatory.
+     *        - CloseInFull, OpenInFull and Signature always return true since they are mandatory.
      *        - Pedestrian returns true if the Pedestrian feature is supported, false otherwise.
      *        - Ventilation returns true if the Ventilation feature is supported, false otherwise.
      *
@@ -378,6 +362,30 @@ private:
      * @param fromDelegate true if the coutdown time is being configured by the delegate, false otherwise
      */
     CHIP_ERROR SetCountdownTime(const DataModel::Nullable<ElapsedS> & countdownTime, bool fromDelegate);
+    
+        
+    /**
+     * @brief API to trigger countdown time update from the cluster logic.
+     *        Function calls the SetCountdownTime function with the fromDelegate parameter set to false.
+     *
+     *        See SetCountdownTime function comment above
+     */
+    inline CHIP_ERROR SetCountdownTimeFromCluster(const DataModel::Nullable<ElapsedS> & countdownTime)
+    {
+        return SetCountdownTime(countdownTime, false);
+    }
+    
+    /**
+     * @brief Set OverallTarget.
+     * 
+     * @param[in] overallTarget OverallTarget Position, Latch and Speed.
+     * 
+     * @return CHIP_NO_ERROR if set was successful.
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     */
+    CHIP_ERROR SetOverallTarget(const DataModel::Nullable<GenericOverallTarget> & overallTarget);
 
     bool mIsInitialized = false;
     DelegateBase & mDelegate;

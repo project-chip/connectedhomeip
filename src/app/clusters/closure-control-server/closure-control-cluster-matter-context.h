@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/EventLogging.h>
 #include <app/reporting/reporting.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
@@ -39,7 +40,11 @@ public:
 
     virtual void MarkDirty(AttributeId attributeId) { MatterReportingAttributeChangeCallback(mEndpointId, Id, attributeId); }
     
-    const EndpointId & GetEndpointId() const { return mEndpointId; }
+    template<typename EventType> CHIP_ERROR LogClosureEvent(EventType event) 
+    {
+            EventNumber eventNumber;
+            return LogEvent(event, mEndpointId, eventNumber);
+    }
 
 private:
     EndpointId mEndpointId = kInvalidEndpointId;
