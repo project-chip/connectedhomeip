@@ -483,10 +483,10 @@ class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
             self.fail_current_test("Problems with Device type revisions on one or more endpoints")
 
     def steps_TC_DESC_2_3(self):
-        return [TestStep(0, "TH performs a wildcard read of all attributes and endpoints on the device"),
+        return [TestStep(0, "TH performs a wildcard read of all attributes on all endpoints on the device"),
                 TestStep(1, "TH checks the Root node endpoint and ensures no application device types are listed",
                          "No Application device types on EP0"),
-                TestStep(2, "For each non-root endpoint on the device, TH checks the DeviceTypeList of the Descriptor cluster and verifies that all the listed application device types are part of the same superset"),
+                TestStep(2, "For each non-root endpoint on the device, TH checks the DeviceTypeList of the Descriptor cluster and verifies that all the listed application device types are part of the same superset, and that no two device types are unrelated supersets of any device type."),
                 TestStep(3, "Fail test if either of the above steps failed.")]
         # TODO: add check that at least one endpoint has an application endpoint or an aggregator
 
