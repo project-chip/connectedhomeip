@@ -148,9 +148,26 @@ private:
     // This performs a deep copy into mCurrentPrice so that the caller of the SetCurrentPrice can free its memory
     CHIP_ERROR CopyPrice(const DataModel::Nullable<Structs::CommodityPriceStruct::Type> & src);
 
+    // This performs a deep copy into mPriceForecast so that the caller of the SetPriceForecast can free its memory
+    CHIP_ERROR CopyPriceForecast(const DataModel::List<const Structs::CommodityPriceStruct::Type> & src);
+
+    // Helper function to clear buffer storage
+    void CheckAndFreeForecastBuffers(void);
+    CHIP_ERROR CopyPrice2(Structs::CommodityPriceStruct::Type & destPriceStruct,
+                          Platform::ScopedMemoryBuffer<char> & dest_descriptionBuffer,
+                          Platform::ScopedMemoryBuffer<Structs::CommodityPriceComponentStruct::Type> & dest_componentsBuffer,
+                          Platform::ScopedMemoryBuffer<char> * dest_componentsDescriptionBuffer,
+                          const Structs::CommodityPriceStruct::Type & src);
+
     // This is the cluster server's backing store for mForecast (list of CommodityPriceStructs) each with .components and
     // .descriptions
-    Platform::ScopedMemoryBuffer<Structs::CommodityPriceStruct::Type> mOwnedForecastBuffer;
+    Platform::ScopedMemoryBuffer<Structs::CommodityPriceStruct::Type> mOwnedForecastPriceStructBuffer;
+    Platform::ScopedMemoryBuffer<Structs::CommodityPriceComponentStruct::Type>
+        mOwnedForecastPriceComponentBuffer[kMaxForecastEntries];
+    // each component has an optional Description
+    Platform::ScopedMemoryBuffer<char> mOwnedForecastPriceComponentDescriptionBuffer[kMaxForecastEntries]
+                                                                                    [kMaxComponentsPerPriceEntry];
+    Platform::ScopedMemoryBuffer<char> mOwnedForecastPriceDescriptionBuffer[kMaxForecastEntries];
 };
 
 } // namespace CommodityPrice
