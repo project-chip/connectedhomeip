@@ -252,6 +252,10 @@ if (CONFIG_ENABLE_OTA_REQUESTOR)
     chip_gn_arg_append("chip_enable_ota_requestor"                 "true")
 endif()
 
+if (CONFIG_ENABLE_ACCESS_RESTRICTIONS)
+    chip_gn_arg_append("chip_enable_access_restrictions"                 "true")
+endif()
+
 if (CONFIG_ENABLE_ROTATING_DEVICE_ID)
     chip_gn_arg_append("chip_enable_additional_data_advertising"   "true")
     chip_gn_arg_append("chip_enable_rotating_device_id"            "true")
