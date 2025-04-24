@@ -22,6 +22,13 @@
 using namespace ::chip;
 using namespace ::chip::app;
 
+namespace {
+
+// Constants
+constexpr uint32_t kSessionTimeoutSeconds = 30;
+
+} // namespace
+
 void WebRTCProviderClient::Init(const ScopedNodeId & peerId, EndpointId endpointId,
                                 Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorServer * requestorServer)
 {
@@ -42,6 +49,12 @@ CHIP_ERROR WebRTCProviderClient::ProvideOffer(
 {
     ChipLogProgress(Camera, "Sending ProvideOffer to node " ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
 
+    if (mState != State::Idle)
+    {
+        ChipLogError(Camera, "Operation NOT POSSIBLE: another sync is in progress");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
     // Store the command type
     mCommandType = CommandType::kProvideOffer;
 
@@ -61,7 +74,11 @@ CHIP_ERROR WebRTCProviderClient::ProvideOffer(
     CASESessionManager * caseSessionMgr = engine->GetCASESessionManager();
     VerifyOrReturnError(caseSessionMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    caseSessionMgr->FindOrEstablishSession(mPeerId, &mOnConnectedCallback, &mOnConnectionFailureCallback);
+    MoveToState(State::Connecting);
+
+    // WebRTC ProvideOffer requires a large payload session establishment
+    caseSessionMgr->FindOrEstablishSession(mPeerId, &mOnConnectedCallback, &mOnConnectionFailureCallback,
+                                           TransportPayloadCapability::kLargePayload);
 
     return CHIP_NO_ERROR;
 }
@@ -69,6 +86,12 @@ CHIP_ERROR WebRTCProviderClient::ProvideOffer(
 CHIP_ERROR WebRTCProviderClient::ProvideICECandidates(uint16_t webRTCSessionID, DataModel::List<const chip::CharSpan> ICECandidates)
 {
     ChipLogProgress(Camera, "Sending ProvideICECandidates to node " ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
+
+    if (mState != State::Idle)
+    {
+        ChipLogError(Camera, "Operation NOT POSSIBLE: another sync is in progress");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
 
     // Store the command type
     mCommandType = CommandType::kProvideICECandidates;
@@ -82,9 +105,21 @@ CHIP_ERROR WebRTCProviderClient::ProvideICECandidates(uint16_t webRTCSessionID, 
     CASESessionManager * caseSessionMgr = engine->GetCASESessionManager();
     VerifyOrReturnError(caseSessionMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    caseSessionMgr->FindOrEstablishSession(mPeerId, &mOnConnectedCallback, &mOnConnectionFailureCallback);
+    MoveToState(State::Connecting);
+
+    // WebRTC ProvideOffer requires a large payload session establishment
+    caseSessionMgr->FindOrEstablishSession(mPeerId, &mOnConnectedCallback, &mOnConnectionFailureCallback,
+                                           TransportPayloadCapability::kLargePayload);
 
     return CHIP_NO_ERROR;
+}
+
+void WebRTCProviderClient::NotifyRemoteDecryptorReceived(uint16_t webRTCSessionID)
+{
+    ChipLogProgress(Camera, "Remote decryptor received for WebRTC session ID: %u", webRTCSessionID);
+
+    DeviceLayer::SystemLayer().CancelTimer(OnSessionEstablishTimeout, this);
+    MoveToState(State::Idle);
 }
 
 void WebRTCProviderClient::OnResponse(CommandSender * client, const ConcreteCommandPath & path, const StatusIB & status,
@@ -125,6 +160,36 @@ void WebRTCProviderClient::OnDone(CommandSender * client)
     // Reset command type, free up the CommandSender
     mCommandType = CommandType::kUndefined;
     mCommandSender.reset();
+
+    if (mState == State::AwaitingResponse)
+    {
+        MoveToState(State::Idle);
+    }
+}
+
+void WebRTCProviderClient::MoveToState(const State targetState)
+{
+    mState = targetState;
+    ChipLogProgress(Camera, "WebRTCProviderClient moving to [ %s ]", GetStateStr());
+}
+
+const char * WebRTCProviderClient::GetStateStr() const
+{
+    switch (mState)
+    {
+    case State::Idle:
+        return "Idle";
+
+    case State::Connecting:
+        return "Connecting";
+
+    case State::AwaitingResponse:
+        return "AwaitingResponse";
+
+    case State::AwaitingAnswer:
+        return "AwaitingAnswer";
+    }
+    return "N/A";
 }
 
 CHIP_ERROR WebRTCProviderClient::SendCommandForType(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle,
@@ -158,6 +223,11 @@ void WebRTCProviderClient::OnDeviceConnected(void * context, Messaging::Exchange
     if (sendErr != CHIP_NO_ERROR)
     {
         ChipLogError(Camera, "SendCommandForType failed: %" CHIP_ERROR_FORMAT, sendErr.Format());
+        self->MoveToState(State::Idle);
+    }
+    else
+    {
+        self->MoveToState(State::AwaitingResponse);
     }
 }
 
@@ -167,6 +237,21 @@ void WebRTCProviderClient::OnDeviceConnectionFailure(void * context, const Scope
     WebRTCProviderClient * self = reinterpret_cast<WebRTCProviderClient *>(context);
     VerifyOrReturn(self != nullptr, ChipLogError(Camera, "OnDeviceConnectionFailure: context is null"));
     self->OnDone(nullptr);
+}
+
+void WebRTCProviderClient::OnSessionEstablishTimeout(chip::System::Layer * systemLayer, void * appState)
+{
+    WebRTCProviderClient * self = reinterpret_cast<WebRTCProviderClient *>(appState);
+    VerifyOrReturn(self != nullptr, ChipLogError(Camera, "OnSessionEstablishTimeout: context is null"));
+
+    if (self->mCurrentSessionId != 0)
+    {
+        self->mRequestorServer->RemoveSession(self->mCurrentSessionId);
+        self->mCurrentSessionId = 0;
+    }
+
+    ChipLogError(Camera, "WebRTC Session establishment has timed out!");
+    self->MoveToState(State::Idle);
 }
 
 void WebRTCProviderClient::HandleProvideOfferResponse(TLV::TLVReader & data)
@@ -187,6 +272,8 @@ void WebRTCProviderClient::HandleProvideOfferResponse(TLV::TLVReader & data)
     session.peerNodeID     = mPeerId.GetNodeId();
     session.fabricIndex    = mPeerId.GetFabricIndex();
     session.peerEndpointID = mEndpointId;
+
+    mCurrentSessionId = value.webRTCSessionID;
 
     // TODO:: spec needs to clarify how to set streamUsage here
 
@@ -217,4 +304,8 @@ void WebRTCProviderClient::HandleProvideOfferResponse(TLV::TLVReader & data)
 
     // Insert or update the Requestor cluster's CurrentSessions.
     mRequestorServer->UpsertSession(session);
+
+    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kSessionTimeoutSeconds), OnSessionEstablishTimeout, this);
+
+    MoveToState(State::AwaitingAnswer);
 }

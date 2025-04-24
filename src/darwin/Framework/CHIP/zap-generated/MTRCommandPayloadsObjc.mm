@@ -15939,11 +15939,16 @@ NS_ASSUME_NONNULL_BEGIN
             } else {
                 self.currentPrice.periodEnd = [NSNumber numberWithUnsignedInt:decodableStruct.currentPrice.Value().periodEnd.Value()];
             }
-            self.currentPrice.price = [MTRDataTypePriceStruct new];
-            self.currentPrice.price.amount = [NSNumber numberWithLongLong:decodableStruct.currentPrice.Value().price.amount];
-            self.currentPrice.price.currency = [MTRDataTypeCurrencyStruct new];
-            self.currentPrice.price.currency.currency = [NSNumber numberWithUnsignedShort:decodableStruct.currentPrice.Value().price.currency.currency];
-            self.currentPrice.price.currency.decimalPoints = [NSNumber numberWithUnsignedChar:decodableStruct.currentPrice.Value().price.currency.decimalPoints];
+            if (decodableStruct.currentPrice.Value().price.HasValue()) {
+                self.currentPrice.price = [NSNumber numberWithLongLong:decodableStruct.currentPrice.Value().price.Value()];
+            } else {
+                self.currentPrice.price = nil;
+            }
+            if (decodableStruct.currentPrice.Value().priceLevel.HasValue()) {
+                self.currentPrice.priceLevel = [NSNumber numberWithShort:decodableStruct.currentPrice.Value().priceLevel.Value()];
+            } else {
+                self.currentPrice.priceLevel = nil;
+            }
             if (decodableStruct.currentPrice.Value().description.HasValue()) {
                 self.currentPrice.descriptionString = AsString(decodableStruct.currentPrice.Value().description.Value());
                 if (self.currentPrice.descriptionString == nil) {
@@ -16159,11 +16164,16 @@ NS_ASSUME_NONNULL_BEGIN
                 } else {
                     newElement_0.periodEnd = [NSNumber numberWithUnsignedInt:entry_0.periodEnd.Value()];
                 }
-                newElement_0.price = [MTRDataTypePriceStruct new];
-                newElement_0.price.amount = [NSNumber numberWithLongLong:entry_0.price.amount];
-                newElement_0.price.currency = [MTRDataTypeCurrencyStruct new];
-                newElement_0.price.currency.currency = [NSNumber numberWithUnsignedShort:entry_0.price.currency.currency];
-                newElement_0.price.currency.decimalPoints = [NSNumber numberWithUnsignedChar:entry_0.price.currency.decimalPoints];
+                if (entry_0.price.HasValue()) {
+                    newElement_0.price = [NSNumber numberWithLongLong:entry_0.price.Value()];
+                } else {
+                    newElement_0.price = nil;
+                }
+                if (entry_0.priceLevel.HasValue()) {
+                    newElement_0.priceLevel = [NSNumber numberWithShort:entry_0.priceLevel.Value()];
+                } else {
+                    newElement_0.priceLevel = nil;
+                }
                 if (entry_0.description.HasValue()) {
                     newElement_0.descriptionString = AsString(entry_0.description.Value());
                     if (newElement_0.descriptionString == nil) {
@@ -22342,7 +22352,7 @@ NS_ASSUME_NONNULL_BEGIN
     {
         if (self.latch != nil) {
             auto & definedValue_0 = encodableStruct.latch.Emplace();
-            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.latch.unsignedCharValue);
+            definedValue_0 = self.latch.boolValue;
         }
     }
     {
@@ -22515,7 +22525,7 @@ NS_ASSUME_NONNULL_BEGIN
     {
         if (self.latch != nil) {
             auto & definedValue_0 = encodableStruct.latch.Emplace();
-            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.latch.unsignedCharValue);
+            definedValue_0 = self.latch.boolValue;
         }
     }
     {
@@ -33655,8 +33665,6 @@ NS_ASSUME_NONNULL_BEGIN
 
         _maxFrameRate = @(0);
 
-        _bitRate = @(0);
-
         _minResolution = [MTRCameraAVStreamManagementClusterVideoResolutionStruct new];
 
         _maxResolution = [MTRCameraAVStreamManagementClusterVideoResolutionStruct new];
@@ -33678,7 +33686,6 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.imageCodec = self.imageCodec;
     other.maxFrameRate = self.maxFrameRate;
-    other.bitRate = self.bitRate;
     other.minResolution = self.minResolution;
     other.maxResolution = self.maxResolution;
     other.quality = self.quality;
@@ -33692,7 +33699,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: imageCodec:%@; maxFrameRate:%@; bitRate:%@; minResolution:%@; maxResolution:%@; quality:%@; watermarkEnabled:%@; osdEnabled:%@; >", NSStringFromClass([self class]), _imageCodec, _maxFrameRate, _bitRate, _minResolution, _maxResolution, _quality, _watermarkEnabled, _osdEnabled];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: imageCodec:%@; maxFrameRate:%@; minResolution:%@; maxResolution:%@; quality:%@; watermarkEnabled:%@; osdEnabled:%@; >", NSStringFromClass([self class]), _imageCodec, _maxFrameRate, _minResolution, _maxResolution, _quality, _watermarkEnabled, _osdEnabled];
     return descriptionString;
 }
 
@@ -33709,9 +33716,6 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         encodableStruct.maxFrameRate = self.maxFrameRate.unsignedShortValue;
-    }
-    {
-        encodableStruct.bitRate = self.bitRate.unsignedIntValue;
     }
     {
         encodableStruct.minResolution.width = self.minResolution.width.unsignedShortValue;
@@ -34136,7 +34140,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _snapshotStreamID = @(0);
+        _snapshotStreamID = nil;
 
         _requestedResolution = [MTRCameraAVStreamManagementClusterVideoResolutionStruct new];
         _timedInvokeTimeoutMs = nil;
@@ -34172,7 +34176,12 @@ NS_ASSUME_NONNULL_BEGIN
     chip::app::Clusters::CameraAvStreamManagement::Commands::CaptureSnapshot::Type encodableStruct;
     ListFreer listFreer;
     {
-        encodableStruct.snapshotStreamID = self.snapshotStreamID.unsignedShortValue;
+        if (self.snapshotStreamID == nil) {
+            encodableStruct.snapshotStreamID.SetNull();
+        } else {
+            auto & nonNullValue_0 = encodableStruct.snapshotStreamID.SetNonNull();
+            nonNullValue_0 = self.snapshotStreamID.unsignedShortValue;
+        }
     }
     {
         encodableStruct.requestedResolution.width = self.requestedResolution.width.unsignedShortValue;

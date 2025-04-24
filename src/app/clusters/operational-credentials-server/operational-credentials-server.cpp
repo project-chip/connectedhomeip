@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2022 Project CHIP Authors
+ *    Copyright (c) 2021-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@
 
 #include <access/AccessControl.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
@@ -34,6 +33,11 @@
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <clusters/OperationalCredentials/Attributes.h>
+#include <clusters/OperationalCredentials/Commands.h>
+#include <clusters/OperationalCredentials/Events.h>
+#include <clusters/OperationalCredentials/Metadata.h>
+#include <clusters/OperationalCredentials/Structs.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/CertificationDeclaration.h>
 #include <credentials/DeviceAttestationConstructor.h>
@@ -60,12 +64,12 @@ using namespace chip::Protocols::InteractionModel;
 
 namespace {
 
+constexpr auto kDACCertificate = CertificateChainTypeEnum::kDACCertificate;
+constexpr auto kPAICertificate = CertificateChainTypeEnum::kPAICertificate;
+
 void SendNOCResponse(app::CommandHandler * commandObj, const ConcreteCommandPath & path, NodeOperationalCertStatusEnum status,
                      uint8_t index, const CharSpan & debug_text);
 NodeOperationalCertStatusEnum ConvertToNOCResponseStatus(CHIP_ERROR err);
-
-constexpr auto kDACCertificate = CertificateChainTypeEnum::kDACCertificate;
-constexpr auto kPAICertificate = CertificateChainTypeEnum::kPAICertificate;
 
 CHIP_ERROR CreateAccessControlEntryForNewFabricAdministrator(const Access::SubjectDescriptor & subjectDescriptor,
                                                              FabricIndex fabricIndex, uint64_t subject)
@@ -117,35 +121,39 @@ private:
 
 CHIP_ERROR OperationalCredentialsAttrAccess::ReadNOCs(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    auto accessingFabricIndex = aEncoder.AccessingFabricIndex();
-
-    return aEncoder.EncodeList([accessingFabricIndex](const auto & encoder) -> CHIP_ERROR {
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
         const auto & fabricTable = Server::GetInstance().GetFabricTable();
         for (const auto & fabricInfo : fabricTable)
         {
-            Clusters::OperationalCredentials::Structs::NOCStruct::Type noc;
+            Clusters::OperationalCredentials::Structs::NOCStruct::Type nocStruct;
             uint8_t nocBuf[kMaxCHIPCertLength];
-            uint8_t icacBuf[kMaxCHIPCertLength];
+            uint8_t icacOrVvscBuf[kMaxCHIPCertLength];
             MutableByteSpan nocSpan{ nocBuf };
-            MutableByteSpan icacSpan{ icacBuf };
+            MutableByteSpan icacOrVvscSpan{ icacOrVvscBuf };
             FabricIndex fabricIndex = fabricInfo.GetFabricIndex();
 
-            noc.fabricIndex = fabricIndex;
+            nocStruct.fabricIndex = fabricIndex;
 
-            if (accessingFabricIndex == fabricIndex)
+            ReturnErrorOnFailure(fabricTable.FetchNOCCert(fabricIndex, nocSpan));
+            nocStruct.noc = nocSpan;
+
+            // ICAC and VVSC are mutually exclusive. ICAC is nullable, VVSC is optional.
+            ReturnErrorOnFailure(fabricTable.FetchICACert(fabricIndex, icacOrVvscSpan));
+            if (!icacOrVvscSpan.empty())
             {
-
-                ReturnErrorOnFailure(fabricTable.FetchNOCCert(fabricIndex, nocSpan));
-                ReturnErrorOnFailure(fabricTable.FetchICACert(fabricIndex, icacSpan));
-
-                noc.noc = nocSpan;
-                if (!icacSpan.empty())
+                nocStruct.icac.SetNonNull(icacOrVvscSpan);
+            }
+            else
+            {
+                icacOrVvscSpan = MutableByteSpan{ icacOrVvscBuf };
+                ReturnErrorOnFailure(fabricTable.FetchVVSC(fabricIndex, icacOrVvscSpan));
+                if (!icacOrVvscSpan.empty())
                 {
-                    noc.icac.SetNonNull(icacSpan);
+                    nocStruct.vvsc = MakeOptional(icacOrVvscSpan);
                 }
             }
 
-            ReturnErrorOnFailure(encoder.Encode(noc));
+            ReturnErrorOnFailure(encoder.Encode(nocStruct));
         }
 
         return CHIP_NO_ERROR;
@@ -184,6 +192,14 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadFabricsList(EndpointId endpoint
             Crypto::P256PublicKey pubKey;
             ReturnErrorOnFailure(fabricTable.FetchRootPubkey(fabricIndex, pubKey));
             fabricDescriptor.rootPublicKey = ByteSpan{ pubKey.ConstBytes(), pubKey.Length() };
+
+            uint8_t vidVerificationStatement[Crypto::kVendorIdVerificationStatementV1Size];
+            MutableByteSpan vidVerificationStatementSpan{ vidVerificationStatement };
+            ReturnErrorOnFailure(fabricTable.FetchVIDVerificationStatement(fabricIndex, vidVerificationStatementSpan));
+            if (!vidVerificationStatementSpan.empty())
+            {
+                fabricDescriptor.VIDVerificationStatement = MakeOptional(vidVerificationStatementSpan);
+            }
 
             ReturnErrorOnFailure(encoder.Encode(fabricDescriptor));
         }
@@ -232,10 +248,11 @@ OperationalCredentialsAttrAccess gAttrAccess;
 
 CHIP_ERROR OperationalCredentialsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    VerifyOrDie(aPath.mClusterId == Clusters::OperationalCredentials::Id);
-
     switch (aPath.mAttributeId)
     {
+    case Attributes::ClusterRevision::Id: {
+        return aEncoder.Encode(kRevision);
+    }
     case Attributes::NOCs::Id: {
         return ReadNOCs(aPath.mEndpointId, aEncoder);
     }
@@ -318,6 +335,22 @@ void OnPlatformEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, in
         ChipLogError(Zcl, "OpCreds: Got FailSafeTimerExpired");
         FailSafeCleanup(event);
     }
+}
+
+// Get the attestation challenge for the current session in progress. Only valid when called
+// synchronously from inside a CommandHandler. If not called in CASE/PASE session context,
+// return an empty span. This will for sure make the procedures that rely on the challenge
+// fail, which is intended as it never should have reached here.
+// TODO: Create an alternative way to retrieve the Attestation Challenge without this huge amount of calls.
+ByteSpan GetAttestationChallengeFromCurrentSession(app::CommandHandler * commandObj)
+{
+    VerifyOrDie((commandObj != nullptr) && (commandObj->GetExchangeContext() != nullptr));
+    Transport::Session::SessionType sessionType = commandObj->GetExchangeContext()->GetSessionHandle()->GetSessionType();
+    VerifyOrReturnValue(sessionType == Transport::Session::SessionType::kSecure, ByteSpan{});
+
+    ByteSpan attestationChallenge =
+        commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
+    return attestationChallenge;
 }
 
 } // anonymous namespace
@@ -932,10 +965,7 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
                                                               // See DeviceAttestationCredsExample
     MutableByteSpan certDeclSpan(certDeclBuf);
 
-    // TODO: Create an alternative way to retrieve the Attestation Challenge without this huge amount of calls.
-    // Retrieve attestation challenge
-    ByteSpan attestationChallenge =
-        commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
+    ByteSpan attestationChallenge = GetAttestationChallengeFromCurrentSession(commandObj);
 
     // TODO: in future versions, retrieve vendor information to populate the fields below.
     uint32_t timestamp = 0;
@@ -1032,10 +1062,7 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
     auto & CSRNonce     = commandData.CSRNonce;
     bool isForUpdateNoc = commandData.isForUpdateNOC.ValueOr(false);
 
-    // TODO: Create an alternative way to retrieve the Attestation Challenge without this huge amount of calls.
-    // Retrieve attestation challenge
-    ByteSpan attestationChallenge =
-        commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
+    ByteSpan attestationChallenge = GetAttestationChallengeFromCurrentSession(commandObj);
 
     failSafeContext.SetCsrRequestForUpdateNoc(isForUpdateNoc);
     const FabricInfo * fabricInfo = RetrieveCurrentFabric(commandObj);
@@ -1207,8 +1234,59 @@ bool emberAfOperationalCredentialsClusterSetVIDVerificationStatementCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::SetVIDVerificationStatement::DecodableType & commandData)
 {
-    (void) commandData;
-    commandObj->AddStatus(commandPath, Status::UnsupportedCommand);
+
+    FabricIndex fabricIndex = commandObj->GetAccessingFabricIndex();
+    ChipLogProgress(Zcl, "OpCreds: Received a SetVIDVerificationStatement Command for FabricIndex 0x%x",
+                    static_cast<unsigned>(fabricIndex));
+
+    if (!commandData.vendorID.HasValue() && !commandData.VIDVerificationStatement.HasValue() && !commandData.vvsc.HasValue())
+    {
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
+        return true;
+    }
+
+    if (commandData.vendorID.HasValue() && !IsVendorIdValidOperationally(commandData.vendorID.Value()))
+    {
+        commandObj->AddStatus(commandPath, Status::ConstraintError);
+        return true;
+    }
+
+    auto & fabricTable = Server::GetInstance().GetFabricTable();
+
+    bool fabricChangesOccurred = false;
+    CHIP_ERROR err             = fabricTable.SetVIDVerificationStatementElements(
+        fabricIndex, commandData.vendorID, commandData.VIDVerificationStatement, commandData.vvsc, fabricChangesOccurred);
+    if (err == CHIP_ERROR_INVALID_ARGUMENT)
+    {
+        commandObj->AddStatus(commandPath, Status::ConstraintError);
+    }
+    else if (err == CHIP_ERROR_INCORRECT_STATE)
+    {
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
+    }
+    else if (err != CHIP_NO_ERROR)
+    {
+        // We have no idea what happened; just report failure.
+        StatusIB status(err);
+        commandObj->AddStatus(commandPath, status.mStatus);
+    }
+    else
+    {
+        commandObj->AddStatus(commandPath, Status::Success);
+    }
+
+    // Handle dirty-marking if anything changed. Only `Fabrics` attribute is reported since `NOCs`
+    // is not reportable (`C` quality).
+    if (fabricChangesOccurred)
+    {
+        MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
+                                               OperationalCredentials::Attributes::Fabrics::Id);
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "SetVIDVerificationStatement failed: %" CHIP_ERROR_FORMAT, err.Format());
+    }
     return true;
 }
 
@@ -1216,7 +1294,43 @@ bool emberAfOperationalCredentialsClusterSignVIDVerificationRequestCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::SignVIDVerificationRequest::DecodableType & commandData)
 {
-    (void) commandData;
-    commandObj->AddStatus(commandPath, Status::UnsupportedCommand);
+    ChipLogProgress(Zcl, "OpCreds: Received a SignVIDVerificationRequest Command for FabricIndex 0x%x",
+                    static_cast<unsigned>(commandData.fabricIndex));
+
+    if (!IsValidFabricIndex(commandData.fabricIndex) ||
+        (commandData.clientChallenge.size() != kVendorIdVerificationClientChallengeSize))
+    {
+        commandObj->AddStatus(commandPath, Status::ConstraintError);
+        return true;
+    }
+
+    commandObj->FlushAcksRightAwayOnSlowCommand();
+
+    auto & fabricTable = Server::GetInstance().GetFabricTable();
+    FabricTable::SignVIDVerificationResponseData responseData;
+    ByteSpan attestationChallenge = GetAttestationChallengeFromCurrentSession(commandObj);
+
+    CHIP_ERROR err = fabricTable.SignVIDVerificationRequest(commandData.fabricIndex, commandData.clientChallenge,
+                                                            attestationChallenge, responseData);
+    if (err == CHIP_ERROR_INVALID_ARGUMENT)
+    {
+        commandObj->AddStatus(commandPath, Status::ConstraintError);
+        return true;
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        // We have no idea what happened; just report failure.
+        StatusIB status(err);
+        commandObj->AddStatus(commandPath, status.mStatus);
+        return true;
+    }
+
+    Commands::SignVIDVerificationResponse::Type response;
+    response.fabricIndex          = responseData.fabricIndex;
+    response.fabricBindingVersion = responseData.fabricBindingVersion;
+    response.signature            = responseData.signature.Span();
+    commandObj->AddResponse(commandPath, response);
+
     return true;
 }
