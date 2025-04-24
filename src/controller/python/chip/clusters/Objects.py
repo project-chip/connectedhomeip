@@ -5065,6 +5065,7 @@ class UnitLocalization(Cluster):
         return ClusterObjectDescriptor(
             Fields=[
                 ClusterObjectFieldDescriptor(Label="temperatureUnit", Tag=0x00000000, Type=typing.Optional[UnitLocalization.Enums.TempUnitEnum]),
+                ClusterObjectFieldDescriptor(Label="supportedTemperatureUnits", Tag=0x00000001, Type=typing.Optional[typing.List[UnitLocalization.Enums.TempUnitEnum]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -5073,6 +5074,7 @@ class UnitLocalization(Cluster):
             ])
 
     temperatureUnit: typing.Optional[UnitLocalization.Enums.TempUnitEnum] = None
+    supportedTemperatureUnits: typing.Optional[typing.List[UnitLocalization.Enums.TempUnitEnum]] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -5110,6 +5112,22 @@ class UnitLocalization(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[UnitLocalization.Enums.TempUnitEnum])
 
             value: typing.Optional[UnitLocalization.Enums.TempUnitEnum] = None
+
+        @dataclass
+        class SupportedTemperatureUnits(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000002D
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[UnitLocalization.Enums.TempUnitEnum]])
+
+            value: typing.Optional[typing.List[UnitLocalization.Enums.TempUnitEnum]] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
