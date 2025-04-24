@@ -567,8 +567,6 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
             asserts.assert_equal(th2_fabrics_entry.vendorID, vendorID,
                                  "Did not get the expected value set for VendorID field of Fabrics list for TH2's fabric.")
 
-            previous_th2_dut_vvsc = th2_nocs_entry.vvsc
-
         with test_step(11, description="Invoke SetVIDVerificationStatement with maximum-sized VVSC on TH1's fabric, outside fail-safe. Verify INVALID_COMMAND due to presence of ICAC."):
             vvsc = b"\xaa" * 400
 
@@ -592,9 +590,6 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
                 th2_fabrics_entry, f"Could not find Fabrics list entry for TH2's fabric index {th2_fabric_index}")
             asserts.assert_equal(th2_fabrics_entry.vendorID, vendorID,
                                  "Did not get the expected value set for VendorID field of Fabrics list for TH2's fabric.")
-
-            previous_th2_dut_vendorID = th2_fabrics_entry.vendorID
-            previous_th2_dut_VIDVerificationStatement = th2_fabrics_entry.VIDVerificationStatement
 
         with test_step(13, description="Arm a fail safe for 300s from TH2 on dut_node_id2 with breadcrumb set to 10.") as step:
             await self.send_single_cmd(dev_ctrl=th2_dev_ctrl, node_id=th2_dut_node_id, cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=60, breadcrumb=10))
@@ -691,7 +686,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
             asserts.assert_equal(th3_fabrics_entry.vendorID, vendorID,
                                  "Did not get the expected value set for VendorID field of Fabrics list for TH2's fabric.")
 
-        with test_step(18, description="Disarm failsafe with ArmFailSafe(0s) from TH3 client. Verify that fabric table no longer has VVSC and VIDVerificationStatement for the pending fabric that was dropped.") as step:
+        with test_step(18, description="Disarm failsafe with ArmFailSafe(0s) from TH3 client. Verify that fabric table no longer has VVSC and VIDVerificationStatement for the pending fabric that was dropped."):
             attrib_listener.reset()
 
             await self.send_single_cmd(dev_ctrl=th3_dev_ctrl, node_id=th3_dut_node_id, cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=12))
