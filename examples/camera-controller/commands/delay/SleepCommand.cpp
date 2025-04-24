@@ -16,20 +16,13 @@
  *
  */
 
-#pragma once
+#include "SleepCommand.h"
+#include <chrono>
+#include <thread>
 
-#include "commands/common/CHIPCommand.h"
-#include "commands/common/Commands.h"
-#include "commands/interactive/InteractiveCommands.h"
-
-void registerCommandsInteractive(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+CHIP_ERROR SleepCommand::RunCommand()
 {
-    const char * clusterName = "interactive";
-
-    commands_list clusterCommands = {
-        make_unique<InteractiveStartCommand>(&commands, credsIssuerConfig),
-        make_unique<InteractiveServerCommand>(&commands, credsIssuerConfig),
-    };
-
-    commands.RegisterCommandSet(clusterName, clusterCommands, "Commands for starting long-lived interactive modes.");
+    std::this_thread::sleep_for(std::chrono::milliseconds(mDurationInMs));
+    SetCommandExitStatus(CHIP_NO_ERROR);
+    return CHIP_NO_ERROR;
 }
