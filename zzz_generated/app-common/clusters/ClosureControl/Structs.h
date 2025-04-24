@@ -39,18 +39,18 @@ namespace OverallStateStruct {
 enum class Fields : uint8_t
 {
     kPositioning = 0,
-    kLatching    = 1,
+    kLatch       = 1,
     kSpeed       = 2,
-    kExtraInfo   = 3,
+    kSecureState = 3,
 };
 
 struct Type
 {
 public:
     Optional<DataModel::Nullable<PositioningEnum>> positioning;
-    Optional<DataModel::Nullable<LatchingEnum>> latching;
+    Optional<DataModel::Nullable<bool>> latch;
     Optional<DataModel::Nullable<Globals::ThreeLevelAutoEnum>> speed;
-    Optional<DataModel::Nullable<uint32_t>> extraInfo;
+    Optional<DataModel::Nullable<bool>> secureState;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -74,7 +74,7 @@ struct Type
 {
 public:
     Optional<TargetPositionEnum> position;
-    Optional<TargetLatchEnum> latch;
+    Optional<bool> latch;
     Optional<Globals::ThreeLevelAutoEnum> speed;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);

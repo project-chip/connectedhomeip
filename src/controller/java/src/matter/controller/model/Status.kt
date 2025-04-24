@@ -71,6 +71,7 @@ data class Status(val status: Int, val clusterStatus: Int?) {
     FAILSAFE_REQUIRED(0XCA),
     INVALID_IN_STATE(0XCB),
     NO_COMMAND_RESPONSE(0XCC),
+    INVALID_TRANSPORT_TYPE(0XD1),
     WRITE_IGNORED(0XF0)
   }
 

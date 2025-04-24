@@ -51,6 +51,7 @@ template("declare_all_items_target") {
       "${chip_root}/zzz_generated/app-common/clusters/DoorLock" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/EcosystemInformation" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/ElectricalEnergyMeasurement" + invoker.target,
+      "${chip_root}/zzz_generated/app-common/clusters/ElectricalGridConditions" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/ElectricalPowerMeasurement" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/EnergyEvse" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/EnergyEvseMode" + invoker.target,
@@ -151,7 +152,9 @@ template("declare_all_items_target") {
   }
 }
 
-declare_all_items_target("all-ids") { target = ":ids" }
+declare_all_items_target("all-elements") { target = ":elements" }
 declare_all_items_target("all-enums") { target = ":enums" }
 declare_all_items_target("all-headers") { target = ":headers" }
+declare_all_items_target("all-ids") { target = ":ids" }
+declare_all_items_target("all-metadata") { target = ":metadata" }
 

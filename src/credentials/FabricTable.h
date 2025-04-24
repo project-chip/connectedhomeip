@@ -104,6 +104,7 @@ public:
 
     CHIP_ERROR FetchRootPubkey(Crypto::P256PublicKey & outPublicKey) const;
 
+    void SetVendorId(VendorId vendorId) { mVendorId = vendorId; }
     VendorId GetVendorId() const { return mVendorId; }
 
     bool IsInitialized() const { return (mFabricIndex != kUndefinedFabricIndex) && IsOperationalNodeId(mNodeId); }
@@ -1005,16 +1006,14 @@ public:
     void RevertPendingOpCertsExceptRoot();
 
     // Verifies credentials, using the root certificate of the provided fabric index.
-    CHIP_ERROR VerifyCredentials(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac,
-                                 Credentials::ValidationContext & context, CompressedFabricId & outCompressedFabricId,
-                                 FabricId & outFabricId, NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
-                                 Crypto::P256PublicKey * outRootPublicKey = nullptr) const;
+    CHIP_ERROR VerifyCredentials(FabricIndex fabricIndex, ByteSpan noc, ByteSpan icac, Credentials::ValidationContext & context,
+                                 CompressedFabricId & outCompressedFabricId, FabricId & outFabricId, NodeId & outNodeId,
+                                 Crypto::P256PublicKey & outNocPubkey, Crypto::P256PublicKey * outRootPublicKey = nullptr) const;
 
     // Verifies credentials, using the provided root certificate.
-    static CHIP_ERROR VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac,
-                                        Credentials::ValidationContext & context, CompressedFabricId & outCompressedFabricId,
-                                        FabricId & outFabricId, NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
-                                        Crypto::P256PublicKey * outRootPublicKey = nullptr);
+    static CHIP_ERROR VerifyCredentials(ByteSpan noc, ByteSpan icac, ByteSpan rcac, Credentials::ValidationContext & context,
+                                        CompressedFabricId & outCompressedFabricId, FabricId & outFabricId, NodeId & outNodeId,
+                                        Crypto::P256PublicKey & outNocPubkey, Crypto::P256PublicKey * outRootPublicKey = nullptr);
     /**
      * @brief Enables FabricInfo instances to collide and reference the same logical fabric (i.e Root Public Key + FabricId).
      *
@@ -1025,18 +1024,18 @@ public:
 
     // Add a new fabric for testing. The Operational Key is a raw P256Keypair (public key and private key raw bits) that will
     // get copied (directly) into the fabric table.
-    CHIP_ERROR AddNewFabricForTest(const ByteSpan & rootCert, const ByteSpan & icacCert, const ByteSpan & nocCert,
-                                   const ByteSpan & opKeySpan, FabricIndex * outFabricIndex);
+    CHIP_ERROR AddNewFabricForTest(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan opKeySpan,
+                                   FabricIndex * outFabricIndex);
 
     // Add a new fabric for testing. The Operational Key is a raw P256Keypair (public key and private key raw bits) that will
     // get copied (directly) into the fabric table. The fabric will NOT be committed, and will remain pending.
-    CHIP_ERROR AddNewUncommittedFabricForTest(const ByteSpan & rootCert, const ByteSpan & icacCert, const ByteSpan & nocCert,
-                                              const ByteSpan & opKeySpan, FabricIndex * outFabricIndex);
+    CHIP_ERROR AddNewUncommittedFabricForTest(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan opKeySpan,
+                                              FabricIndex * outFabricIndex);
 
     // Same as AddNewFabricForTest, but ignore if we are colliding with same <Root Public Key, Fabric Id>, so
     // that a single fabric table can have N nodes for same fabric. This usually works, but is bad form.
-    CHIP_ERROR AddNewFabricForTestIgnoringCollisions(const ByteSpan & rootCert, const ByteSpan & icacCert, const ByteSpan & nocCert,
-                                                     const ByteSpan & opKeySpan, FabricIndex * outFabricIndex)
+    CHIP_ERROR AddNewFabricForTestIgnoringCollisions(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan opKeySpan,
+                                                     FabricIndex * outFabricIndex)
     {
         PermitCollidingFabrics();
         CHIP_ERROR err = AddNewFabricForTest(rootCert, icacCert, nocCert, opKeySpan, outFabricIndex);
@@ -1093,12 +1092,31 @@ public:
      * @param[in] fabricIndex - Fabric Index for which to produce the response.
      * @param[in] clientChallenge - Client-provided challenge.
      * @param[in] attestationChallenge - Attestation challenge from the secure session.
-     * @param[inout] outResponse - Reference to a pre-allocated response object that will be populated on success.
+     * @param[out] outResponse - Reference to a pre-allocated response object that will be populated on success.
      * @retval CHIP_NO_ERROR on success
      * @retval CHIP_ERROR_INVALID_ARGUMENT if the fabricIndex or clientChallenge is incorrectly formatted.
      */
-    CHIP_ERROR SignVIDVerificationRequest(FabricIndex fabricIndex, const ByteSpan & clientChallenge,
-                                          const ByteSpan & attestationChallenge, SignVIDVerificationResponseData & outResponse);
+    CHIP_ERROR SignVIDVerificationRequest(FabricIndex fabricIndex, ByteSpan clientChallenge, ByteSpan attestationChallenge,
+                                          SignVIDVerificationResponseData & outResponse);
+
+    /**
+     * @brief Handle setting data related to Fabric Table VID Verification.
+     *
+     * This is on purpose structured to mirror the SetVIDVerificationStatement Operational Credentials Cluster command
+     *
+     * @param[in] fabricIndex - Fabric Index for which to produce the response.
+     * @param[in] vendorID - New VendorID to set on the Fabric (ignored if missing)
+     * @param[in] VIDVerificationStatement - VID Verification Statement to add/remove (ignored if missing)
+     * @param[in] VVSC - VID Verification Signing Certificate to add/remove (ignored if missing)
+     * @param[out] outFabricTableWasChanged - This is set to true if FabricTable saw a change from prior value, even if
+     *                                        method returns an error (appies to VIDVerificationStatement and VendorID)
+     * @retval CHIP_NO_ERROR on success
+     * @retval CHIP_ERROR_INVALID_ARGUMENT if vendorID, VVSC or VIDVerificationStatement are not correct (maps to CONSTRAINT_ERROR)
+     * @retval CHIP_ERROR_INCORRECT_STATE if VVSC cannot be set due to ICAC presence (maps to INVALID_COMMAND)
+     */
+    CHIP_ERROR SetVIDVerificationStatementElements(FabricIndex fabricIndex, Optional<uint16_t> vendorId,
+                                                   Optional<ByteSpan> VIDVerificationStatement, Optional<ByteSpan> VVSC,
+                                                   bool & outFabricTableWasChanged);
 
 private:
     enum class StateFlags : uint16_t

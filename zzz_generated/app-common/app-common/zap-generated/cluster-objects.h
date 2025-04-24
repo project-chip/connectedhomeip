@@ -186,6 +186,10 @@
 #include <clusters/ElectricalEnergyMeasurement/Commands.h>
 #include <clusters/ElectricalEnergyMeasurement/Events.h>
 #include <clusters/ElectricalEnergyMeasurement/Structs.h>
+#include <clusters/ElectricalGridConditions/Attributes.h>
+#include <clusters/ElectricalGridConditions/Commands.h>
+#include <clusters/ElectricalGridConditions/Events.h>
+#include <clusters/ElectricalGridConditions/Structs.h>
 #include <clusters/ElectricalPowerMeasurement/Attributes.h>
 #include <clusters/ElectricalPowerMeasurement/Commands.h>
 #include <clusters/ElectricalPowerMeasurement/Events.h>

@@ -276,11 +276,11 @@ class BuildTarget:
         result = self.name
         for fixed in self.fixed_targets:
             if len(fixed) > 1:
-                result += '-{' + ",".join(map(lambda x: x.name, fixed)) + '}'
+                result += '-{' + ",".join(sorted(map(lambda x: x.name, fixed))) + '}'
             else:
                 result += '-' + fixed[0].name
 
-        for modifier in self.modifiers:
+        for modifier in sorted(self.modifiers, key=lambda m: m.name):
             result += f"[-{modifier.name}]"
 
         return result

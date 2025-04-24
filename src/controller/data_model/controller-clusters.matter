@@ -254,6 +254,11 @@ struct PowerThresholdStruct {
   nullable PowerThresholdSourceEnum powerThresholdSource = 2;
 }
 
+struct PriceStruct {
+  money amount = 0;
+  CurrencyStruct currency = 1;
+}
+
 struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
@@ -264,11 +269,6 @@ struct LocationDescriptorStruct {
   char_string<128> locationName = 0;
   nullable int16s floorNumber = 1;
   nullable AreaTypeTag areaType = 2;
-}
-
-struct PriceStruct {
-  money amount = 0;
-  CurrencyStruct currency = 1;
 }
 
 struct AtomicAttributeStatusStruct {
@@ -972,7 +972,7 @@ cluster Actions = 37 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 cluster BasicInformation = 40 {
-  revision 3;
+  revision 5;
 
   enum ColorEnum : enum8 {
     kBlack = 0;
@@ -1055,6 +1055,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute int32u specificationVersion = 21;
   readonly attribute int16u maxPathsPerInvoke = 22;
+  readonly attribute int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1285,7 +1286,7 @@ cluster TimeFormatLocalization = 44 {
       user. As such, Nodes that visually or audibly convey measurable values to the user need a
       mechanism by which they can be configured to use a user’s preferred unit. */
 cluster UnitLocalization = 45 {
-  revision 1;
+  revision 2;
 
   enum TempUnitEnum : enum8 {
     kFahrenheit = 0;
@@ -1298,6 +1299,7 @@ cluster UnitLocalization = 45 {
   }
 
   attribute access(write: manage) optional TempUnitEnum temperatureUnit = 0;
+  provisional readonly attribute optional TempUnitEnum supportedTemperatureUnits[] = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2505,7 +2507,7 @@ cluster TimeSynchronization = 56 {
           collection of attributes that the Node MAY collect to aid in conveying information regarding the Bridged Device to a user,
           such as the vendor name, the model name, or user-assigned name. */
 cluster BridgedDeviceBasicInformation = 57 {
-  revision 3;
+  revision 5;
 
   enum ColorEnum : enum8 {
     kBlack = 0;
@@ -2571,7 +2573,7 @@ cluster BridgedDeviceBasicInformation = 57 {
   readonly attribute optional vendor_id vendorID = 2;
   readonly attribute optional char_string<32> productName = 3;
   readonly attribute optional int16u productID = 4;
-  attribute optional char_string<32> nodeLabel = 5;
+  attribute access(write: manage) optional char_string<32> nodeLabel = 5;
   readonly attribute optional int16u hardwareVersion = 7;
   readonly attribute optional char_string<64> hardwareVersionString = 8;
   readonly attribute optional int32u softwareVersion = 9;
@@ -2584,6 +2586,7 @@ cluster BridgedDeviceBasicInformation = 57 {
   readonly attribute boolean reachable = 17;
   readonly attribute char_string<32> uniqueID = 18;
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
+  readonly attribute optional int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2596,7 +2599,7 @@ cluster BridgedDeviceBasicInformation = 57 {
     int32u timeoutMs = 1;
   }
 
-  /** The server SHALL attempt to keep the devices specified active for StayActiveDuration milliseconds when they are next active. */
+  /** Upon receipt, the server SHALL attempt to keep the bridged device active for the duration specified by the command, when the device is next active. */
   command KeepActive(KeepActiveRequest): DefaultSuccess = 128;
 }
 
@@ -4831,17 +4834,16 @@ provisional cluster CommodityPrice = 149 {
   }
 
   struct CommodityPriceComponentStruct {
-    optional money price = 0;
-    optional int16s priceLevel = 1;
-    TariffPriceTypeEnum source = 2;
-    optional char_string<32> description = 3;
-    optional int32u tariffComponentID = 4;
+    money price = 0;
+    TariffPriceTypeEnum source = 1;
+    optional char_string<32> description = 2;
+    optional int32u tariffComponentID = 3;
   }
 
   struct CommodityPriceStruct {
     epoch_s periodStart = 0;
     nullable epoch_s periodEnd = 1;
-    optional PriceStruct price = 2;
+    optional money price = 2;
     optional int16s priceLevel = 3;
     optional char_string<32> description = 4;
     optional CommodityPriceComponentStruct components[] = 5;
@@ -4849,10 +4851,6 @@ provisional cluster CommodityPrice = 149 {
 
   info event PriceChange = 0 {
     nullable CommodityPriceStruct currentPrice = 0;
-  }
-
-  info event ForecastChange = 1 {
-    nullable CommodityPriceStruct priceForecast[] = 0;
   }
 
   readonly attribute TariffUnitEnum tariffUnit = 0;
@@ -5807,6 +5805,44 @@ provisional cluster DeviceEnergyManagementMode = 159 {
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
+/** The Electrical Grid Conditions Cluster provides the mechanism for communicating electricity grid carbon intensity to devices within the premises in units of Grams of CO2e per kWh. */
+provisional cluster ElectricalGridConditions = 160 {
+  revision 1;
+
+  enum ThreeLevelEnum : enum8 {
+    kLow = 0;
+    kMedium = 1;
+    kHigh = 2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kForecasting = 0x1;
+  }
+
+  struct ElectricalGridConditionsStruct {
+    epoch_s periodStart = 0;
+    nullable epoch_s periodEnd = 1;
+    int16s gridCarbonIntensity = 2;
+    ThreeLevelEnum gridCarbonLevel = 3;
+    int16s localCarbonIntensity = 4;
+    ThreeLevelEnum localCarbonLevel = 5;
+  }
+
+  info event CurrentConditionsChanged = 0 {
+    nullable ElectricalGridConditionsStruct currentConditions = 0;
+  }
+
+  attribute nullable boolean localGenerationAvailable = 0;
+  readonly attribute nullable ElectricalGridConditionsStruct currentConditions = 1;
+  readonly attribute optional ElectricalGridConditionsStruct forecastConditions[] = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** An interface to a generic way to secure a door */
 cluster DoorLock = 257 {
   revision 7;
@@ -6617,16 +6653,11 @@ provisional cluster ClosureControl = 260 {
   revision 1;
 
   enum ClosureErrorEnum : enum8 {
-    kBlocked = 0;
-    kTemperatureLimited = 1;
-    kMaintenanceRequired = 2;
-    kInternalInterference = 3;
-  }
-
-  enum LatchingEnum : enum8 {
-    kLatchedAndSecured = 0;
-    kLatchedButNotSecured = 1;
-    kNotLatched = 2;
+    kPhysicallyBlocked = 0;
+    kBlockedBySensor = 1;
+    kTemperatureLimited = 2;
+    kMaintenanceRequired = 3;
+    kInternalInterference = 4;
   }
 
   enum MainStateEnum : enum8 {
@@ -6647,11 +6678,6 @@ provisional cluster ClosureControl = 260 {
     kOpenedForPedestrian = 3;
     kOpenedForVentilation = 4;
     kOpenedAtSignature = 5;
-  }
-
-  enum TargetLatchEnum : enum8 {
-    kLatch = 0;
-    kUnlatch = 1;
   }
 
   enum TargetPositionEnum : enum8 {
@@ -6676,15 +6702,30 @@ provisional cluster ClosureControl = 260 {
 
   struct OverallStateStruct {
     optional nullable PositioningEnum positioning = 0;
-    optional nullable LatchingEnum latching = 1;
+    optional nullable boolean latch = 1;
     optional nullable ThreeLevelAutoEnum speed = 2;
-    optional nullable bitmap32 extraInfo = 3;
+    optional nullable boolean secureState = 3;
   }
 
   struct OverallTargetStruct {
     optional TargetPositionEnum position = 0;
-    optional TargetLatchEnum latch = 1;
+    optional boolean latch = 1;
     optional ThreeLevelAutoEnum speed = 2;
+  }
+
+  critical event OperationalError = 0 {
+    ClosureErrorEnum errorState[] = 0;
+  }
+
+  info event MovementCompleted = 1 {
+  }
+
+  info event EngageStateChanged = 2 {
+    boolean engageValue = 0;
+  }
+
+  info event SecureStateChanged = 3 {
+    boolean secureValue = 0;
   }
 
   readonly attribute optional nullable elapsed_s countdownTime = 0;
@@ -6701,15 +6742,15 @@ provisional cluster ClosureControl = 260 {
 
   request struct MoveToRequest {
     optional TargetPositionEnum position = 0;
-    optional TargetLatchEnum latch = 1;
+    optional boolean latch = 1;
     optional ThreeLevelAutoEnum speed = 2;
   }
 
-  /** On receipt of this command, the device SHALL stop its operation if it is at a position where it is safe to do so and/or permitted. */
+  /** On receipt of this command, the closure SHALL stop its movement as fast as the closure is able too. */
   command Stop(): DefaultSuccess = 0;
-  /** Upon receipt, this SHALL move the product in the most fitting state following the data as follows: */
+  /** This command is used to move the device to a specific position, latch and/or perform the movement at specific speed. */
   command MoveTo(MoveToRequest): DefaultSuccess = 1;
-  /** Upon receipt, this SHALL initiate a calibration. */
+  /** This command is used to trigger a calibration of the device. */
   command access(invoke: manage) Calibrate(): DefaultSuccess = 2;
 }
 
@@ -6720,12 +6761,6 @@ provisional cluster ClosureDimension = 261 {
   enum ClosureUnitEnum : enum8 {
     kMillimeter = 0;
     kDegree = 1;
-  }
-
-  enum LatchingEnum : enum8 {
-    kLatchedAndSecured = 0;
-    kLatchedButNotSecured = 1;
-    kNotLatched = 2;
   }
 
   enum ModulationTypeEnum : enum8 {
@@ -6769,11 +6804,6 @@ provisional cluster ClosureDimension = 261 {
     kIncrease = 1;
   }
 
-  enum TargetLatchEnum : enum8 {
-    kLatch = 0;
-    kUnlatch = 1;
-  }
-
   enum TranslationDirectionEnum : enum8 {
     kDownward = 0;
     kUpward = 1;
@@ -6804,9 +6834,9 @@ provisional cluster ClosureDimension = 261 {
     kModulation = 0x80;
   }
 
-  struct CurrentStruct {
+  struct CurrentStateStruct {
     optional percent100ths position = 0;
-    optional LatchingEnum latching = 1;
+    optional boolean latch = 1;
     optional ThreeLevelAutoEnum speed = 2;
   }
 
@@ -6817,7 +6847,7 @@ provisional cluster ClosureDimension = 261 {
 
   struct TargetStruct {
     optional percent100ths position = 0;
-    optional TargetLatchEnum latch = 1;
+    optional boolean latch = 1;
     optional ThreeLevelAutoEnum speed = 2;
   }
 
@@ -6826,7 +6856,7 @@ provisional cluster ClosureDimension = 261 {
     int16s max = 1;
   }
 
-  readonly attribute nullable CurrentStruct current = 0;
+  readonly attribute nullable CurrentStateStruct currentState = 0;
   readonly attribute nullable TargetStruct target = 1;
   readonly attribute optional percent100ths resolution = 2;
   readonly attribute optional percent100ths stepValue = 3;
@@ -6846,7 +6876,7 @@ provisional cluster ClosureDimension = 261 {
 
   request struct SetTargetRequest {
     optional percent100ths position = 0;
-    optional TargetLatchEnum latch = 1;
+    optional boolean latch = 1;
     optional ThreeLevelAutoEnum speed = 2;
   }
 
@@ -6856,9 +6886,9 @@ provisional cluster ClosureDimension = 261 {
     optional ThreeLevelAutoEnum speed = 2;
   }
 
-  /** Upon receipt, this SHALL move the product's dimension in the most fitting state following the data as follows: */
+  /** This command is used to move a dimension of the device to a target position. */
   command SetTarget(SetTargetRequest): DefaultSuccess = 0;
-  /** Upon receipt, this SHALL update the Target.Position attribute value e.g. by sending multiple commands with short step by step or a single command with multiple steps. */
+  /** This command is used to move a dimension of the device to a target position by a number of steps. */
   command Step(StepRequest): DefaultSuccess = 1;
 }
 
@@ -8122,7 +8152,7 @@ cluster CarbonMonoxideConcentrationMeasurement = 1036 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -8179,7 +8209,7 @@ cluster CarbonDioxideConcentrationMeasurement = 1037 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -8236,7 +8266,7 @@ cluster NitrogenDioxideConcentrationMeasurement = 1043 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -8293,7 +8323,7 @@ cluster OzoneConcentrationMeasurement = 1045 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -8350,7 +8380,7 @@ cluster Pm25ConcentrationMeasurement = 1066 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -8407,7 +8437,7 @@ cluster FormaldehydeConcentrationMeasurement = 1067 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -8464,7 +8494,7 @@ cluster Pm1ConcentrationMeasurement = 1068 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -8521,7 +8551,7 @@ cluster Pm10ConcentrationMeasurement = 1069 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -8578,7 +8608,7 @@ cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -8635,7 +8665,7 @@ cluster RadonConcentrationMeasurement = 1071 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -9498,7 +9528,7 @@ cluster ContentLauncher = 1290 {
 
 /** This cluster provides an interface for controlling the Output on a media device such as a TV. */
 cluster AudioOutput = 1291 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum OutputTypeEnum : enum8 {
     kHDMI = 0;
@@ -9537,9 +9567,9 @@ cluster AudioOutput = 1291 {
     char_string name = 1;
   }
 
-  /** Upon receipt, this SHALL change the output on the media device to the output at a specific index in the Output List. */
+  /** Upon receipt, this SHALL change the output on the device to the output at a specific index in the Output List. */
   command SelectOutput(SelectOutputRequest): DefaultSuccess = 0;
-  /** Upon receipt, this SHALL rename the output at a specific index in the Output List. Updates to the output name SHALL appear in the TV settings menus. */
+  /** Upon receipt, this SHALL rename the output at a specific index in the Output List. */
   command access(invoke: manage) RenameOutput(RenameOutputRequest): DefaultSuccess = 1;
 }
 
