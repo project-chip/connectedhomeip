@@ -42,9 +42,11 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsDecode
 
     /*Store the allocated stream persistently*/
     pushavStreams.push_back(stream);
-    Transports[outTransporConfiguration.connectionID] = new PushAVTransport(outTransporConfiguration.connectionID,
-		                                           1);
-    mMediaController->RegisterTransport(Transports[outTransporConfiguration.connectionID], 1, 1/*videoStreamID, audioStreamID*/);
+    ChipLogError(Zcl, "PushAvStreamTransportManager, Create PushAV Transport for Connection: [%u]",
+                 outTransporConfiguration.connectionID);
+    Transports[outTransporConfiguration.connectionID] =
+        new PushAVTransport(outTransporConfiguration.connectionID, transportOptions.triggerOptions.triggerType);
+    mMediaController->RegisterTransport(Transports[outTransporConfiguration.connectionID], 1, 1 /*videoStreamID, audioStreamID*/);
 
     return Status::Success;
 }
@@ -78,13 +80,16 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::SetTransportSt
 {
     for (PushAvStream & stream : pushavStreams)
     {
-        for(uint16_t connectionID : connectionIDList)
+        for (uint16_t connectionID : connectionIDList)
         {
             if (stream.id == connectionID)
             {
                 stream.transportConfig.transportStatus = transportStatus;
-                ChipLogError(Zcl, "Set Transport Status for Push AV Stream with ID: %d", connectionID);
-
+                if (Transports[connectionID])
+                {
+                    ChipLogError(Zcl, "Set Transport Status for Push AV Stream with ID: %d", connectionID);
+                    Transports[connectionID]->setTransportStatus(transportStatus);
+                }
             }
             else
             {
@@ -95,17 +100,37 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::SetTransportSt
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status
-    PushAvStreamTransportManager::ManuallyTriggerTransport(const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
-                             const Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> & timeControl)
+Protocols::InteractionModel::Status PushAvStreamTransportManager::ManuallyTriggerTransport(
+    const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
+    const Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> & timeControl)
 {
-    // TODO: Validates the requested stream usage against the camera's resource management and stream priority policies.
-    return Status::Success;
+    if (activationReason == TriggerActivationReasonEnum::kUnknownEnumValue)
+    {
+        ChipLogError(Zcl, "PushAvStreamTransportManager, Manual Trigger failed for connection [%u], reason: [%u]", connectionID,
+                     (uint16_t) activationReason);
+        return Status::Failure;
+    }
+
+    for (PushAvStream & stream : pushavStreams)
+    {
+        if (stream.id == connectionID)
+        {
+            if (Transports[connectionID])
+            {
+                ChipLogProgress(Zcl, "Manual Trigger PushAV Transport, id: %d", connectionID);
+                Transports[connectionID]->TriggerTransport(activationReason);
+                return Status::Success;
+            }
+        }
+    }
+
+    ChipLogError(Zcl, "PushAvStreamTransportManager, Manual Trigger, connectionID [%u] not found ", connectionID);
+    return Status::NotFound;
 }
 
 Protocols::InteractionModel::Status
-    PushAvStreamTransportManager::FindTransport(const Optional<DataModel::Nullable<uint16_t>> & connectionID,
-                  DataModel::List<const TransportConfigurationStruct> & outtransportConfigurations)
+PushAvStreamTransportManager::FindTransport(const Optional<DataModel::Nullable<uint16_t>> & connectionID,
+                                            DataModel::List<const TransportConfigurationStruct> & outtransportConfigurations)
 {
     configList.clear();
     for (PushAvStream & stream : pushavStreams)
@@ -117,10 +142,9 @@ Protocols::InteractionModel::Status
         else if (connectionID.Value().Value() == stream.id)
         {
             configList.push_back(stream.transportConfig);
-
         }
     }
-    outtransportConfigurations = DataModel::List<const TransportConfigurationStruct>(configList.data(),configList.size());
+    outtransportConfigurations = DataModel::List<const TransportConfigurationStruct>(configList.data(), configList.size());
     return Status::Success;
 }
 

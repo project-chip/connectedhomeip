@@ -18,19 +18,30 @@
 
 #pragma once
 
-#include <vector>
+#include "pushav-clip-recorder.h"
+#include "transport.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-enums.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <memory>
 #include <mutex>
 #include <thread>
-#include "transport.h"
-#include "pushav-clip-recorder.h"
-#include <app-common/zap-generated/cluster-enums.h>
+#include <vector>
 
-// Derived class for PushAV transport
+#include <app-common/zap-generated/cluster-enums.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributeAccessInterface.h>
+#include <app/CommandHandlerInterface.h>
+#include <protocols/interaction_model/StatusCode.h>
+
+using namespace chip::app::Clusters::PushAvStreamTransport;
+
+// PushAV transport
 class PushAVTransport : public camera::Transport
 {
 public:
-    PushAVTransport(uint16_t sessionID, uint64_t nodeID);
+    PushAVTransport(uint16_t connectionID, TransportTriggerTypeEnum transportTriggerType);
     ~PushAVTransport() override;
     // Send video data for a given stream ID
     void SendVideo(const char * data, size_t size, uint16_t videoStreamID) override;
@@ -50,30 +61,43 @@ public:
     // Dummy implementation to indicate whether the transport is streaming or not
     bool IsStreaming();
 
-    // Dummy implementation to indicate the status of the transport stream
-    bool TransportStatus;
+    // Set Transport status
+    void setTransportStatus(TransportStatusEnum status);
 
-    // Enum indicating the type of trigger used to start the transport
-    chip::app::Clusters::PushAvStreamTransport::TransportTriggerTypeEnum mTransportTriggerType;
+    void TriggerTransport(TriggerActivationReasonEnum activationReason);
+
+    // Get Transport status
+    TransportStatusEnum getTransportStatus() { return mTransportStatus; }
+
+    void StartTransport();
     void initializeRecorder();
-    AVPacket* createPacket(const uint8_t* data, int size,  uint16_t videoStreamID, uint16_t audioStreamID);
-    void readFromFile(char* filename, uint8_t** videoBuffer, size_t *videoBufferBytes);
-    bool isH264Iframe(const uint8_t *data_ptr, unsigned int data_len);
+
+    AVPacket * createPacket(const uint8_t * data, int size, uint16_t videoStreamID, uint16_t audioStreamID);
+    void readFromFile(char * filename, uint8_t ** videoBuffer, size_t * videoBufferBytes);
+    bool isH264Iframe(const uint8_t * data_ptr, unsigned int data_len);
     std::mutex mtx;
     bool isRecorderInitialized = false;
-    int64_t v_pts=3000;
-    int64_t v_dts=3000;
+    int64_t v_pts              = 3000;
+    int64_t v_dts              = 3000;
 
-    int64_t a_pts=960;
-    int64_t a_dts=960;
+    int64_t a_pts = 960;
+    int64_t a_dts = 960;
 
-    int vid = 1;
+    int vid                                      = 1;
     std::shared_ptr<PushAVClipRecorder> recorder = nullptr;
 
 private:
     // Dummy implementation to indicate if video can be sent
-    bool mCanSendVideo = true;
+    bool mCanSendVideo = false;
 
     // Dummy implementation to indicate if audio can be sent
-    bool mCanSendAudio = true;
+    bool mCanSendAudio = false;
+
+    // Enum indicating the type of trigger used to start the transport
+    TransportTriggerTypeEnum mTransportTriggerType;
+    TransportStatusEnum mTransportStatus;
+
+    uint16_t mConnectionID;
+
+    std::string serverUrl;
 };

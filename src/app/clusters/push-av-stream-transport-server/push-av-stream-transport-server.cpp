@@ -220,6 +220,7 @@ void PushAvStreamTransportServer::InvokeCommand(HandlerContext & handlerContext)
 
 TransportConfigurationStruct * PushAvStreamTransportServer::FindStreamTransportConnection(const uint16_t connectionID)
 {
+    ChipLogDetail(Zcl, "PushAVStreamTransport: FindStreamTransportConnection for connection id: [%u]", connectionID);
     for (auto & transportConnection : mCurrentConnections)
     {
         if (transportConnection.connectionID == connectionID)
@@ -255,50 +256,50 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
     uint16_t ep                 = emberAfGetClusterServerEndpointIndex(transportOptions.endpointID, TlsCertificateManagement::Id,
                                                                        MATTER_DM_TLS_CERTIFICATE_MANAGEMENT_CLUSTER_CLIENT_ENDPOINT_COUNT);
 
-/*    if (ep == kEmberInvalidEndpointIndex)
-    {
-        auto status = static_cast<uint8_t>(StatusCodeEnum::kInvalidTLSEndpoint);
-        ChipLogError(Zcl, "HandleAllocatePushTransport: Invalid TLSEndpointId not found");
-        ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, status);
-        return;
-    }
+    /*    if (ep == kEmberInvalidEndpointIndex)
+        {
+            auto status = static_cast<uint8_t>(StatusCodeEnum::kInvalidTLSEndpoint);
+            ChipLogError(Zcl, "HandleAllocatePushTransport: Invalid TLSEndpointId not found");
+            ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, status);
+            return;
+        }
 
-    if (transportOptions.ingestMethod == IngestMethodsEnum::kUnknownEnumValue)
-    {
-        auto status = static_cast<uint8_t>(StatusCodeEnum::kUnsupportedIngestMethod);
-        ChipLogError(Zcl, "HandleAllocatePushTransport: Ingest method not supported");
-        ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, status);
-        return;
-    }
+        if (transportOptions.ingestMethod == IngestMethodsEnum::kUnknownEnumValue)
+        {
+            auto status = static_cast<uint8_t>(StatusCodeEnum::kUnsupportedIngestMethod);
+            ChipLogError(Zcl, "HandleAllocatePushTransport: Ingest method not supported");
+            ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, status);
+            return;
+        }
 
-    if (transportOptions.containerFormat == ContainerFormatEnum::kUnknownEnumValue)
-    {
-        auto status = static_cast<uint8_t>(StatusCodeEnum::kUnsupportedContainerFormat);
-        ChipLogError(Zcl, "HandleAllocatePushTransport: Container format not supported");
-        ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, status);
-        return;
-    }
+        if (transportOptions.containerFormat == ContainerFormatEnum::kUnknownEnumValue)
+        {
+            auto status = static_cast<uint8_t>(StatusCodeEnum::kUnsupportedContainerFormat);
+            ChipLogError(Zcl, "HandleAllocatePushTransport: Container format not supported");
+            ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, status);
+            return;
+        }
 
-    if (transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kUnknownEnumValue)
-    {
-        auto status = static_cast<uint8_t>(StatusCodeEnum::kInvalidTriggerType);
-        ChipLogError(Zcl, "HandleAllocatePushTransport: Invalid Trigger type");
-        ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, status);
-        return;
-    }
+        if (transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kUnknownEnumValue)
+        {
+            auto status = static_cast<uint8_t>(StatusCodeEnum::kInvalidTriggerType);
+            ChipLogError(Zcl, "HandleAllocatePushTransport: Invalid Trigger type");
+            ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, status);
+            return;
+        }
 
-    // Todo: Validate MotionZones list in the TransportTriggerOptionsStruct field
+        // Todo: Validate MotionZones list in the TransportTriggerOptionsStruct field
 
-    // Validate the StreamUsageEnum as per resource management and stream priorities.
-    CHIP_ERROR err =
-        mDelegate.ValidateStreamUsage(transportOptions.streamUsage, transportOptions.videoStreamID, transportOptions.audioStreamID);
-    if (err != CHIP_NO_ERROR)
-    {
-        auto status = static_cast<uint8_t>(StatusCodeEnum::kInvalidStream);
-        ChipLogError(Zcl, "HandleAllocatePushTransport: Invalid Stream");
-        ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, status);
-        return;
-    }*/
+        // Validate the StreamUsageEnum as per resource management and stream priorities.
+        CHIP_ERROR err =
+            mDelegate.ValidateStreamUsage(transportOptions.streamUsage, transportOptions.videoStreamID,
+       transportOptions.audioStreamID); if (err != CHIP_NO_ERROR)
+        {
+            auto status = static_cast<uint8_t>(StatusCodeEnum::kInvalidStream);
+            ChipLogError(Zcl, "HandleAllocatePushTransport: Invalid Stream");
+            ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, status);
+            return;
+        }*/
 
     uint16_t connectionID = GenerateConnectionID();
 
@@ -316,7 +317,7 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
     {
         // add connection to CurrentConnections
         UpsertStreamTransportConnection(outTransportConfiguration);
-        //response.transportConfiguration = outTransportConfiguration;
+        // response.transportConfiguration = outTransportConfiguration;
 
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
     }
@@ -394,6 +395,9 @@ void PushAvStreamTransportServer::HandleSetTransportStatus(HandlerContext & ctx,
     {
         connectionIDList.push_back(connectionID.Value());
     }
+
+    TransportConfigurationStruct * transportConfiguration = FindStreamTransportConnection(connectionID.Value());
+    transportConfiguration->transportStatus               = transportStatus;
 
     // Call the delegate
     status = mDelegate.SetTransportStatus(connectionIDList, transportStatus);
@@ -484,7 +488,7 @@ void PushAvStreamTransportServer::HandleFindTransport(HandlerContext & ctx,
     status = mDelegate.FindTransport(connectionID, outTransportConfigurations);
     if (status == Status::Success)
     {
-        //response.transportConfigurations = outTransportConfigurations;
+        // response.transportConfigurations = outTransportConfigurations;
 
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
     }
