@@ -350,7 +350,7 @@ CHIP_ERROR emberAfSetDynamicEndpointWithEpUniqueId(uint16_t index, EndpointId id
 
     // Ensure that the size of emAfEndpoints[index].endpointUniqueId fits within uint8_t
     static_assert(sizeof(emAfEndpoints[0].endpointUniqueId) <= UINT8_MAX,
-    "The size of emAfEndpoints[index].endpointUniqueId must fit within uint8_t");
+                  "The size of emAfEndpoints[index].endpointUniqueId must fit within uint8_t");
 
     emAfEndpoints[index].endpointUniqueIdSize = static_cast<uint8_t>(targetSpan.size());
 #endif
