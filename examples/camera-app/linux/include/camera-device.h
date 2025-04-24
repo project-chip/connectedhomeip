@@ -43,6 +43,13 @@
 
 namespace Camera {
 
+// Camera defined constants for Pan, Tilt, Zoom bounding values
+constexpr int16_t kMinPanValue  = -90;
+constexpr int16_t kMaxPanValue  = 90;
+constexpr int16_t kMinTiltValue = -90;
+constexpr int16_t kMaxTiltValue = 90;
+constexpr uint8_t kMaxZoomValue = 75;
+
 class CameraDevice : public CameraDeviceInterface, public CameraDeviceInterface::CameraHALInterface
 {
 public:
@@ -102,8 +109,20 @@ public:
     CameraError SetHDRMode(bool hdrMode);
     bool GetHDRMode() { return mHDREnabled; }
 
+    // Sets the Default Camera Viewport
     CameraError SetViewport(const ViewportStruct & viewPort);
     const ViewportStruct & GetViewport() { return mViewport; }
+
+    /**
+     * Sets the Viewport for a specific stream. The implementation of this HAL API is responsible
+     * for updating the stream identified with the provided viewport. The invoker of this
+     * API shall have already ensured that the provided viewport conforms to the specification
+     * requirements on size and aspect ratio.
+     *
+     * @param stream   the currently allocated video stream on which the viewport is being set
+     * @param viewport the viewport to be set on the stream
+     */
+    CameraError SetViewport(VideoStream & stream, const ViewportStruct & viewport);
 
     // Currently, defaulting to not supporting speaker.
     bool HasSpeaker() { return false; }
@@ -143,6 +162,10 @@ public:
 
     uint8_t GetZoomMax();
 
+    CameraError SetPan(int16_t aPan);
+    CameraError SetTilt(int16_t aTilt);
+    CameraError SetZoom(uint8_t aZoom);
+
     std::vector<VideoStream> & GetAvailableVideoStreams() { return videoStreams; }
 
     std::vector<AudioStream> & GetAvailableAudioStreams() { return audioStreams; }
@@ -177,13 +200,17 @@ private:
 
     DefaultMediaController mMediaController;
 
-    uint16_t mCurrentVideoFrameRate                                         = 0;
-    bool mHDREnabled                                                        = false;
-    bool mMicrophoneMuted                                                   = false;
-    uint8_t mMicrophoneMinLevel                                             = MICROPHONE_MIN_LEVEL;
-    uint8_t mMicrophoneMaxLevel                                             = MICROPHONE_MAX_LEVEL;
-    uint8_t mMicrophoneVol                                                  = MICROPHONE_MIN_LEVEL;
-    chip::app::Clusters::CameraAvStreamManagement::ViewportStruct mViewport = { 325, 585, 2244, 1664 };
+    uint16_t mCurrentVideoFrameRate = 0;
+    bool mHDREnabled                = false;
+    bool mMicrophoneMuted           = false;
+    uint8_t mMicrophoneMinLevel     = MICROPHONE_MIN_LEVEL;
+    uint8_t mMicrophoneMaxLevel     = MICROPHONE_MAX_LEVEL;
+    uint8_t mMicrophoneVol          = MICROPHONE_MIN_LEVEL;
+    uint16_t mPan                   = chip::app::Clusters::CameraAvSettingsUserLevelManagement::kDefaultPan;
+    uint16_t mTilt                  = chip::app::Clusters::CameraAvSettingsUserLevelManagement::kDefaultTilt;
+    int8_t mZoom                    = chip::app::Clusters::CameraAvSettingsUserLevelManagement::kDefaultZoom;
+    // Use a standard 1080p aspect ratio
+    chip::app::Clusters::CameraAvStreamManagement::ViewportStruct mViewport = { 320, 585, 2240, 1665 };
 };
 
 } // namespace Camera
