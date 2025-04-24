@@ -347,7 +347,7 @@ CHIP_ERROR emberAfSetDynamicEndpointWithEpUniqueId(uint16_t index, EndpointId id
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
     MutableCharSpan targetSpan(emAfEndpoints[index].endpointUniqueId);
     CopyCharSpanToMutableCharSpanWithTruncation(endpointUniqueId, targetSpan);
-    
+
     // Ensure that the size of emAfEndpoints[index].endpointUniqueId fits within uint8_t
     static_assert(sizeof(emAfEndpoints[0].endpointUniqueId) <= UINT8_MAX,
     "The size of emAfEndpoints[index].endpointUniqueId must fit within uint8_t");
