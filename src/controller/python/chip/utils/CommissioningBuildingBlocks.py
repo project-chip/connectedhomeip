@@ -144,7 +144,7 @@ async def CreateControllersOnFabric(fabricAdmin: FabricAdmin,
     return controllerList
 
 
-async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, existingNodeId, newNodeId, omitCommissioningComplete: bool=False, failSafeDurationSeconds: int=60) -> tuple[bool, typing.Optional[Clusters.OperationalCredentials.Commands.NOCResponse], typing.Optional[NOCChain]]:
+async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, existingNodeId, newNodeId, omitCommissioningComplete: bool = False, failSafeDurationSeconds: int = 60) -> tuple[bool, typing.Optional[Clusters.OperationalCredentials.Commands.NOCResponse], typing.Optional[NOCChain]]:
     ''' Perform sequence to commission new fabric using existing commissioned fabric.
 
     Args:
@@ -208,7 +208,7 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
     return True, nocResp, chainForAddNOC
 
 
-async def UpdateNOC(devCtrl, existingNodeId, newNodeId, omitCommissioningComplete: bool=False, failSafeDurationSeconds: int=600):
+async def UpdateNOC(devCtrl, existingNodeId, newNodeId, omitCommissioningComplete: bool = False, failSafeDurationSeconds: int = 600):
     """ Perform sequence to generate a new NOC cert and issue updated NOC to server.
 
     Args:

@@ -137,6 +137,8 @@ def generate_vendor_fabric_binding_message(
     return vendor_fabric_binding_message
 
 # From Matter spec src/crypto_primitives/vid_verify_payload_test_vector.py
+
+
 def generate_vendor_id_verification_tbs(fabric_binding_version: int,
                                         attestation_challenge: bytes,
                                         client_challenge: bytes,
