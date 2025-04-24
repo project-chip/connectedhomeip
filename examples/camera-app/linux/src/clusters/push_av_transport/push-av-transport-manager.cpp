@@ -38,24 +38,45 @@ Protocols::InteractionModel::Status
 PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsDecodeableStruct & transportOptions,
                                                     TransportConfigurationStruct & outTransporConfiguration)
 {
-    PushAvStream stream{ outTransporConfiguration.connectionID, outTransporConfiguration };
+    uint16_t connectionID = outTransporConfiguration.connectionID;
 
-    /*Store the allocated stream persistently*/
-    pushavStreams.push_back(stream);
-    ChipLogError(Zcl, "PushAvStreamTransportManager, Create PushAV Transport for Connection: [%u]",
-                 outTransporConfiguration.connectionID);
-    Transports[outTransporConfiguration.connectionID] =
-        new PushAVTransport(outTransporConfiguration.connectionID, transportOptions.triggerOptions.triggerType);
-    mMediaController->RegisterTransport(Transports[outTransporConfiguration.connectionID], 1, 1 /*videoStreamID, audioStreamID*/);
+    mTransportOptionsMap[connectionID] = transportOptions;
+    mTransportConfigMap[connectionID]  = outTransporConfiguration;
+
+    ChipLogProgress(Camera, "PushAvStreamTransportManager, Create PushAV Transport for Connection: [%u]", connectionID);
+    mTransportMap[connectionID] =
+        std::move(std::make_unique<PushAVTransport>(connectionID, transportOptions.triggerOptions.triggerType));
+
+    mMediaController->RegisterTransport(mTransportMap[connectionID].get(), 1, 1 /*videoStreamID, audioStreamID*/);
 
     return Status::Success;
 }
 
+PushAvStreamTransportManager::~PushAvStreamTransportManager()
+{
+    // Unregister all transports from Media Controller before deleting them. This will ensure that any ongoing streams are stopped.
+    for (auto & transport : mTransportMap)
+    {
+        mMediaController->UnregisterTransport(transport.second.get());
+    }
+    mTransportMap.clear();
+    mTransportOptionsMap.clear();
+    mTransportConfigMap.clear();
+}
+
 Protocols::InteractionModel::Status PushAvStreamTransportManager::DeallocatePushTransport(const uint16_t connectionID)
 {
-    pushavStreams.erase(std::remove_if(pushavStreams.begin(), pushavStreams.end(),
-                                       [connectionID](const PushAvStream & stream) { return stream.id == connectionID; }),
-                        pushavStreams.end());
+    if (mTransportMap.find(connectionID) == mTransportMap.end())
+    {
+        ChipLogError(Camera, "PushAvStreamTransportManager, failed to find Connection :[%u]", connectionID);
+        return Status::NotFound;
+    }
+
+    mMediaController->UnregisterTransport(mTransportMap[connectionID].get());
+    mTransportMap.erase(connectionID);
+    mTransportOptionsMap.erase(connectionID);
+    mTransportConfigMap.erase(connectionID);
+
     return Status::Success;
 }
 
@@ -63,40 +84,45 @@ Protocols::InteractionModel::Status
 PushAvStreamTransportManager::ModifyPushTransport(const uint16_t connectionID,
                                                   const TransportOptionsDecodeableStruct & transportOptions)
 {
-    for (PushAvStream & stream : pushavStreams)
+    if (mTransportMap.find(connectionID) == mTransportMap.end())
     {
-        if (stream.id == connectionID)
-        {
-            ChipLogError(Zcl, "Modified Push AV Stream with ID: %d", connectionID);
-            return Status::Success;
-        }
+        ChipLogError(Camera, "PushAvStreamTransportManager, failed to find Connection :[%u]", connectionID);
+        return Status::NotFound;
     }
-    ChipLogError(Zcl, "Allocated Push AV Stream with ID: %d not found", connectionID);
-    return Status::NotFound;
+
+    mTransportOptionsMap[connectionID] = transportOptions;
+
+    ChipLogProgress(Camera, "PushAvStreamTransportManager, failed to find Connection :[%u]", connectionID);
+
+    return Status::Success;
 }
 
 Protocols::InteractionModel::Status PushAvStreamTransportManager::SetTransportStatus(const std::vector<uint16_t> connectionIDList,
                                                                                      TransportStatusEnum transportStatus)
 {
-    for (PushAvStream & stream : pushavStreams)
+    if (connectionIDList.empty())
     {
-        for (uint16_t connectionID : connectionIDList)
-        {
-            if (stream.id == connectionID)
-            {
-                stream.transportConfig.transportStatus = transportStatus;
-                if (Transports[connectionID])
-                {
-                    ChipLogError(Zcl, "Set Transport Status for Push AV Stream with ID: %d", connectionID);
-                    Transports[connectionID]->setTransportStatus(transportStatus);
-                }
-            }
-            else
-            {
-                return Status::NotFound;
-            }
-        }
+        ChipLogError(Camera, "PushAvStreamTransportManager, connectionIDList is empty");
+        return Status::Failure;
     }
+
+    if (transportStatus == TransportStatusEnum::kUnknownEnumValue)
+    {
+        ChipLogError(Camera, "PushAvStreamTransportManager, Invalid TransportStatus, transportStatus: [%u]",
+                     (uint16_t) transportStatus);
+        return Status::Failure;
+    }
+
+    for (uint16_t connectionID : connectionIDList)
+    {
+        if (mTransportMap.find(connectionID) == mTransportMap.end())
+        {
+            ChipLogError(Camera, "PushAvStreamTransportManager, failed to find Connection :[%u]", connectionID);
+            continue;
+        }
+        mTransportMap[connectionID]->setTransportStatus(transportStatus);
+    }
+
     return Status::Success;
 }
 
@@ -106,44 +132,43 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::ManuallyTrigge
 {
     if (activationReason == TriggerActivationReasonEnum::kUnknownEnumValue)
     {
-        ChipLogError(Zcl, "PushAvStreamTransportManager, Manual Trigger failed for connection [%u], reason: [%u]", connectionID,
+        ChipLogError(Camera, "PushAvStreamTransportManager, Manual Trigger failed for connection [%u], reason: [%u]", connectionID,
                      (uint16_t) activationReason);
         return Status::Failure;
     }
 
-    for (PushAvStream & stream : pushavStreams)
+    if (mTransportMap.find(connectionID) == mTransportMap.end())
     {
-        if (stream.id == connectionID)
-        {
-            if (Transports[connectionID])
-            {
-                ChipLogProgress(Zcl, "Manual Trigger PushAV Transport, id: %d", connectionID);
-                Transports[connectionID]->TriggerTransport(activationReason);
-                return Status::Success;
-            }
-        }
+        ChipLogError(Camera, "PushAvStreamTransportManager, failed to find Connection :[%u]", connectionID);
+        return Status::NotFound;
     }
 
-    ChipLogError(Zcl, "PushAvStreamTransportManager, Manual Trigger, connectionID [%u] not found ", connectionID);
-    return Status::NotFound;
+    ChipLogProgress(Camera, "PushAvStreamTransportManager, Trigger PushAV Transport for Connection: [%u]", connectionID);
+    mTransportMap[connectionID]->TriggerTransport(activationReason);
+
+    return Status::Success;
 }
 
 Protocols::InteractionModel::Status
 PushAvStreamTransportManager::FindTransport(const Optional<DataModel::Nullable<uint16_t>> & connectionID,
                                             DataModel::List<const TransportConfigurationStruct> & outtransportConfigurations)
 {
-    configList.clear();
-    for (PushAvStream & stream : pushavStreams)
+    if (connectionID.Value().IsNull())
     {
-        if (connectionID.Value().IsNull())
+        ChipLogError(Camera, "PushAvStreamTransportManager, connectionID is null");
+        return Status::Failure;
+    }
+
+    std::vector<TransportConfigurationStruct> configList;
+
+    for (auto & it : mTransportConfigMap)
+    {
+        if (connectionID.Value().Value() == it.first)
         {
-            configList.push_back(stream.transportConfig);
-        }
-        else if (connectionID.Value().Value() == stream.id)
-        {
-            configList.push_back(stream.transportConfig);
+            configList.push_back(it.second);
         }
     }
+
     outtransportConfigurations = DataModel::List<const TransportConfigurationStruct>(configList.data(), configList.size());
     return Status::Success;
 }

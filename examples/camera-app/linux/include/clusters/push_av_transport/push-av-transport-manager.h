@@ -17,14 +17,16 @@
  */
 
 #pragma once
-#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-server.h>
-#include <transport/pushav-transport.h>
 #include "media-controller.h"
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-server.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <transport/pushav-transport.h>
+
+#include <unordered_map>
 
 #include <optional>
 
@@ -46,9 +48,9 @@ struct PushAvStream
 class PushAvStreamTransportManager : public app::Clusters::PushAvStreamTransport::PushAvStreamTransportDelegate
 {
 public:
-    PushAvStreamTransportManager() { std::fill_n(Transports, MAX_PUSH_TRANSPORT_CONNECTION_ID, nullptr); }
+    PushAvStreamTransportManager() {};
 
-    ~PushAvStreamTransportManager() {}
+    ~PushAvStreamTransportManager();
 
     Protocols::InteractionModel::Status AllocatePushTransport(const TransportOptionsDecodeableStruct & transportOptions,
                                                               TransportConfigurationStruct & outTransporConfiguration) override;
@@ -58,18 +60,18 @@ public:
     Protocols::InteractionModel::Status ModifyPushTransport(const uint16_t connectionID,
                                                             const TransportOptionsDecodeableStruct & transportOptions) override;
 
-    Protocols::InteractionModel::Status SetTransportStatus(const std::vector<uint16_t> connectionIDList, TransportStatusEnum transportStatus) override;
+    Protocols::InteractionModel::Status SetTransportStatus(const std::vector<uint16_t> connectionIDList,
+                                                           TransportStatusEnum transportStatus) override;
 
-    Protocols::InteractionModel::Status
-    ManuallyTriggerTransport(const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
-                             const Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> & timeControl) override;
+    Protocols::InteractionModel::Status ManuallyTriggerTransport(
+        const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
+        const Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> & timeControl) override;
 
     Protocols::InteractionModel::Status
     FindTransport(const Optional<DataModel::Nullable<uint16_t>> & connectionID,
                   DataModel::List<const TransportConfigurationStruct> & outtransportConfigurations) override;
 
-    CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage,
-                                   const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+    CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                                    const Optional<DataModel::Nullable<uint16_t>> & audioStreamId);
 
     void OnAttributeChanged(AttributeId attributeId) override;
@@ -81,12 +83,11 @@ public:
     void Init(MediaController * aMediaController);
 
 private:
-    std::vector<PushAvStream> pushavStreams;
-    std::vector<TransportConfigurationStruct> configList;
-    PushAVTransport * Transports[MAX_PUSH_TRANSPORT_CONNECTION_ID];                         // map for the transport objects
-    std::optional<TransportOptionsStruct> ConnectionsMap[MAX_PUSH_TRANSPORT_CONNECTION_ID]; // map for the transport options
-    std::vector<uint16_t> mCurrentConnections;
     MediaController * mMediaController = nullptr;
+
+    std::unordered_map<uint16_t, std::unique_ptr<PushAVTransport>> mTransportMap;        // map for the transport objects
+    std::unordered_map<uint16_t, TransportOptionsDecodeableStruct> mTransportOptionsMap; // map for the transport options
+    std::unordered_map<uint16_t, TransportConfigurationStruct> mTransportConfigMap;      // map for the transport configurations
 };
 
 } // namespace Camera
