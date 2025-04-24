@@ -24,7 +24,7 @@ namespace app {
 namespace Storage {
 
 /**
- * @brief Implementation of a storage in nonvolatile storage of a templatized table that stores by fabric id.
+ * @brief Implementation of a storage in nonvolatile storage of a templatized table that stores by fabric index.
  *
  * FabricTableImpl is an implementation that allows to store arbitrary entities using PersistentStorageDelegate.
  * It handles the storage of entities by their StorageId and EnpointID over multiple fabrics.
@@ -42,7 +42,7 @@ public:
     CHIP_ERROR Init(PersistentStorageDelegate * storage);
     void Finish();
 
-    // Scene count
+    // Entry count
     CHIP_ERROR GetEndpointEntryCount(uint8_t & entry_count);
     CHIP_ERROR GetFabricEntryCount(FabricIndex fabric_index, uint8_t & entry_count);
 
@@ -81,6 +81,12 @@ protected:
     // wrapper function around emberAfGetClusterCountForEndpoint to allow override when testing
     virtual uint8_t GetClusterCountFromEndpoint();
 
+    /**
+     * @brief Implementation of an iterator over the elements in the FabricTableImpl.
+     *
+     * If you would like to expose iterators in your subclass of FabricTableImpl, use this class
+     * in an ObjectPool<EntryIteratorImpl> field to allow callers to obtain an iterator.
+     */
     class EntryIteratorImpl : public EntryIterator
     {
     public:

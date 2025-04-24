@@ -468,7 +468,7 @@ CHIP_ERROR FabricTableImpl<StorageId, StorageData, kIteratorsMax>::Init(Persiste
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    // Verified the initialized parameter respect the maximum allowed values for entry capacity
+    // Verify the initialized parameter respects the maximum allowed values for entry capacity
     VerifyOrReturnError(mMaxPerFabric <= Serializer::kMaxPerFabric() && mMaxPerEndpoint <= Serializer::kMaxPerEndpoint(),
                         CHIP_ERROR_INVALID_INTEGER_VALUE);
     this->mStorage = storage;

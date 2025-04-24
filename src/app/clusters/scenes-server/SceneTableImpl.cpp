@@ -87,7 +87,7 @@ constexpr EndpointId DefaultSceneTableImpl::Super::kEntryEndpointClusterID()
 namespace {
 /// @brief Tags Used to serialize Scenes so they can be stored in flash memory.
 /// kGroupID: Tag for GroupID if the Scene is a Group Scene
-/// kSceneID: Tag for the scene ID together with the two previous tag, forms the SceneStorageID
+/// kSceneID: Tag for the scene ID together with kGroupID, forms the SceneStorageID
 /// kName: Tag for the name of the scene
 /// kTransitionTime: Tag for the transition time of the scene in miliseconds
 enum class TagScene : uint8_t

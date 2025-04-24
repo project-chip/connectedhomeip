@@ -272,9 +272,6 @@ public:
     virtual CHIP_ERROR RemoveFabric(FabricIndex fabric_index) = 0;
     virtual CHIP_ERROR RemoveEndpoint()                       = 0;
 
-    // Iterators
-    using SceneEntryIterator = CommonIterator<SceneTableEntry>;
-
     // Handlers
     virtual bool HandlerListEmpty() { return mHandlerList.Empty(); }
 
