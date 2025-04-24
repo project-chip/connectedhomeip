@@ -52,16 +52,16 @@ class TC_CLCTRL_3_1(MatterBaseTest):
         steps = [
             TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", is_commissioning=True),
             TestStep("2a", "TH sends command Calibrate to DUT"),
-            TestStep("2b", "after 2 seconds, TH reads from the DUT the MainState attribute"),
+            TestStep("2b", "after 1 seconds, TH reads from the DUT the MainState attribute"),
             TestStep("2c", "TH waits for PIXIT.CLCTRL.CalibrationDuration seconds"),
             TestStep("2d", "TH reads from the DUT the MainState attribute"),
             TestStep("3a", "TH sends command Calibrate to DUT"),
-            TestStep("3b", "after 2 seconds, TH reads from the DUT the MainState attribute"),
+            TestStep("3b", "after 1 seconds, TH reads from the DUT the MainState attribute"),
             TestStep("3c", "TH sends command Calibrate to DUT"),
             TestStep("3d", "TH waits for PIXIT.CLCTRL.CalibrationDuration seconds"),
             TestStep("3e", "TH reads from the DUT the MainState attribute"),
             TestStep("4a", "TH sends command MoveTo to DUT with Position = CloseInFull(0)"),
-            TestStep("4b", "after 2 seconds, TH reads from the DUT the MainState attribute"),
+            TestStep("4b", "after 1 seconds, TH reads from the DUT the MainState attribute"),
             TestStep("4c", "TH sends command Calibrate to DUT"),
         ]
         return steps
@@ -81,6 +81,24 @@ class TC_CLCTRL_3_1(MatterBaseTest):
         self.step(1)
         attributes = Clusters.ClosureControl.Attributes
 
+        # Read the FeatureMap attribute
+        feature_map = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
+        # Check if the FeatureMap attribute was read successfully
+        if not type_matches(feature_map.status, Status.SUCCESS):
+            logging.error(f"Failed to read FeatureMap attribute: {feature_map.status}")
+            return
+        else:
+            logging.info("FeatureMap attribute read successfully")
+            logging.info(f"FeatureMap: {feature_map}")
+            is_CL_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kCalibrate
+            if not is_CL_feature_supported:
+                logging.info("The feature Calibration is not supported by the DUT")
+                for step in self.get_test_steps(self.current_test_info.name)[self.current_step.index:]:
+                    # Skip the test steps that are not relevant
+                    self.step(step.test_plan_number)
+                    logging.info(f"Skipping test step {step.test_plan_number}")
+                return
+
         # STEP 2a: TH sends command Calibrate to DUT
         self.step("2a")
 
@@ -99,10 +117,10 @@ class TC_CLCTRL_3_1(MatterBaseTest):
         else:
             logging.info("Command Calibrate sent successfully")
 
-        # STEP 2b: after 2 seconds, TH reads from the DUT the MainState attribute
+        # STEP 2b: after 1 seconds, TH reads from the DUT the MainState attribute
         self.step("2b")
 
-        sleep(2)
+        sleep(1)
         mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
         if mainstate is NullValue:
             logging.error("Failed to read MainState attribute")
@@ -169,10 +187,10 @@ class TC_CLCTRL_3_1(MatterBaseTest):
         else:
             logging.info("Command Calibrate sent successfully")
 
-        # STEP 3b: after 2 seconds, TH reads from the DUT the MainState attribute
+        # STEP 3b: after 1 seconds, TH reads from the DUT the MainState attribute
         self.step("3b")
 
-        sleep(2)
+        sleep(1)
         mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
         if mainstate is NullValue:
             logging.error("Failed to read MainState attribute")
@@ -259,10 +277,10 @@ class TC_CLCTRL_3_1(MatterBaseTest):
         else:
             logging.info("Command MoveTo sent successfully")
 
-        # STEP 4b: after 2 seconds, TH reads from the DUT the MainState attribute
+        # STEP 4b: after 1 seconds, TH reads from the DUT the MainState attribute
         self.step("4b")
 
-        sleep(2)
+        sleep(1)
         mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
         if mainstate is NullValue:
             logging.error("Failed to read MainState attribute")
@@ -281,6 +299,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
         if not type_matches(mainstate.status, Status.SUCCESS):
             logging.error(f"Failed to read MainState attribute: {mainstate.status}")
             return
+
         # STEP 4c: TH sends command Calibrate to DUT
         self.step("4c")
 
