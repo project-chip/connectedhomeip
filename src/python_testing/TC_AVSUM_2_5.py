@@ -44,7 +44,7 @@ from TC_AVSUMTestBase import AVSUMTestBase
 class TC_AVSUM_2_5(MatterBaseTest, AVSUMTestBase):
 
     def desc_TC_AVSUM_2_5(self) -> str:
-        return "[TC-AVSUM-2.4] Attributes with DUT as Server"
+        return "[TC-AVSUM-2.5] Attributes with DUT as Server"
 
     def steps_TC_AVSUM_2_5(self) -> list[TestStep]:
         steps = [
