@@ -74,7 +74,15 @@ class TC_CLDIM_3_3(MatterBaseTest):
             TestStep("5h", "Wait for PIXIT.CLDIM.FullMotionDuration seconds"),
             TestStep("5i", "Verify CurrentState attribute is updated"),
             TestStep(6, "Send SetTarget command with invalid Position"),
-            TestStep(7, "Send SetTarget command with Position not a multiple of Resolution"),
+            TestStep("7a", "If Resolution is unsupported, skip step 7b to 7i"),
+            TestStep("7b", "Send SetTarget command with Position not a multiple of Resolution"),
+            TestStep("7c", "Verify Target attribute is updated"),
+            TestStep("7d", "Wait for PIXIT.CLDIM.FullMotionDuration seconds"),
+            TestStep("7e", "Verify CurrentState attribute is updated"),
+            TestStep("7f", "Send SetTarget command with Position not a multiple of Resolution"),
+            TestStep("7g", "Verify Target attribute is updated"),
+            TestStep("7h", "Wait for PIXIT.CLDIM.FullMotionDuration seconds"),
+            TestStep("7i", "Verify CurrentState attribute is updated"),
             TestStep(8, "Send SetTarget command with Latch field when MotionLatching is unsupported"),
             TestStep(9, "Send SetTarget command with Speed field when Speed is unsupported"),
             TestStep(10, "Send SetTarget command with invalid Speed when Speed is unsupported"),
@@ -311,21 +319,94 @@ class TC_CLDIM_3_3(MatterBaseTest):
         else: 
             logging.info("Positioning feature is not supported. Skipping step 6.")
 
-        # STEP 7: Send SetTarget command with Position not a multiple of Resolution
-        self.step(7)
-        if (is_positioning_supported) and (attributes.Resolution.attribute_id in attribute_list) and (resolution > 1):
-            try:
-                await self.send_single_cmd(
-                    cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(Position=min_position + resolution - 1),
-                    endpoint=endpoint
-                )
+        # STEP 7a: If Resolution is unsupported, skip step 7b to 7i
+        self.step("7a")
+        if (not is_positioning_supported) or (attributes.Resolution.attribute_id not in attribute_list):
+            logging.info("Resolution attribute is not supported. Skipping steps 7b to 7i.")
+            self.skip_step("7b")
+            self.skip_step("7c")
+            self.skip_step("7d")
+            self.skip_step("7e")
+            self.skip_step("7f")
+            self.skip_step("7g")
+            self.skip_step("7h")
+            self.skip_step("7i")
 
-                asserts.fail("Expected ConstraintError for invalid Position")
+        # STEP 7b: Send SetTarget command with Position not a multiple of Resolution
+        self.step("7b")
+        try:
+            await self.send_single_cmd(
+                cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(Position=min_position + resolution - 1),
+                endpoint=endpoint
+            )
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected status returned")
+        # STEP 7c: Verify Target attribute is updated
+        self.step("7c")
+        if attributes.Target.attribute_id in attribute_list:
+            target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
+
+            if resolution == 1:
+                asserts.assert_equal(target.Position, min_position, "Target Position does not match expected value")
+            else:
+                asserts.assert_equal(target.Position, min_position + resolution, "Target Position does not match expected value")
         else:
-            logging.info("Positioning feature is not supported or Resolution is not greater than 1. Skipping step 7.")
+            logging.info("Target attribute not supported. Skipping step 7c.")
+
+        # STEP 7d: Wait for PIXIT.CLDIM.FullMotionDuration seconds
+        self.step("7d")
+        time.sleep(full_motion_duration)
+
+        # STEP 7e: Verify CurrentState attribute is updated
+        self.step("7e")
+        if attributes.CurrentState.attribute_id in attribute_list:
+            current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
+
+            if resolution == 1:
+                asserts.assert_equal(current_state.Position, min_position, "CurrentState Position does not match expected value")
+            else:
+                asserts.assert_equal(current_state.Position, min_position + resolution, "CurrentState Position does not match expected value")
+        else:
+            logging.info("CurrentState attribute not supported. Skipping step 7e.")
+
+        # STEP 7f: Send SetTarget command with Position not a multiple of Resolution
+        self.step("7f")
+        try:
+            await self.send_single_cmd(
+                cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(Position=(max_position - resolution) + 1),
+                endpoint=endpoint
+            )
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+
+        # STEP 7g: Verify Target attribute is updated
+        self.step("7g")
+        if attributes.Target.attribute_id in attribute_list:
+            target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
+
+            if resolution <= 2:
+                asserts.assert_equal(target.Position, max_position, "Target Position does not match expected value")
+            else:
+                asserts.assert_equal(target.Position, max_position - resolution, "Target Position does not match expected value")
+        else:
+            logging.info("Target attribute not supported. Skipping step 7g.")
+
+        # STEP 7h: Wait for PIXIT.CLDIM.FullMotionDuration seconds
+        self.step("7h")
+        time.sleep(full_motion_duration)
+
+        # STEP 7i: Verify CurrentState attribute is updated
+        self.step("7i")
+        if attributes.CurrentState.attribute_id in attribute_list:
+            current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
+
+            if resolution <= 2:
+                asserts.assert_equal(current_state.Position, max_position, "CurrentState Position does not match expected value")
+            else:
+                asserts.assert_equal(current_state.Position, max_position - resolution, "CurrentState Position does not match expected value")
+        else:
+            logging.info("CurrentState attribute not supported. Skipping step 7i.")
 
         # STEP 8: Send SetTarget command with Latch field when MotionLatching is unsupported
         self.step(8)
