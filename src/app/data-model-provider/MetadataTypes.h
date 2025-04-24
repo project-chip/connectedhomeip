@@ -201,11 +201,12 @@ struct AcceptedCommandEntry
 
     _StartBitFieldInit // Disabling '-Wconversion' & '-Wconversion'
 
-        constexpr AcceptedCommandEntry(CommandId id = 0, BitMask<CommandQualityFlags> cmdQualityFlags = BitMask<CommandQualityFlags>(),
-                                       Access::Privilege invokePriv = Access::Privilege::kOperate) :
+        constexpr AcceptedCommandEntry(CommandId id                                 = 0,
+                                       BitMask<CommandQualityFlags> cmdQualityFlags = BitMask<CommandQualityFlags>(),
+                                       Access::Privilege invokePriv                 = Access::Privilege::kOperate) :
         commandId(id),
-        mask{ cmdQualityFlags.Raw() & ((1 << kCmmdQualityBits) - 1), // Narrowing expression to 3 bits
-              to_underlying(invokePriv) & ((1 << kPrivilegeBits) - 1) }       // Narrowing expression to 5 bits
+        mask{ cmdQualityFlags.Raw() & ((1 << kCmmdQualityBits) - 1),    // Narrowing expression to 3 bits
+              to_underlying(invokePriv) & ((1 << kPrivilegeBits) - 1) } // Narrowing expression to 5 bits
     {}
 
     _EndBitFieldInit // Enabling '-Wconversion' & '-Wconversion'
