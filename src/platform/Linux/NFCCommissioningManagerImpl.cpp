@@ -283,8 +283,9 @@ public:
             {
                 // If SW2 is 0x00 or if it is higher than TYPE4_SIMPLE_APDU_MAX_RX_SIZE, we clamp it to
                 // TYPE4_SIMPLE_APDU_MAX_RX_SIZE.
-                uint8_t nextBlockLength =
-                    ((sw2 == 0x00) || (static_cast<int>(sw2) > TYPE4_SIMPLE_APDU_MAX_RX_SIZE)) ? static_cast<uint8_t>(TYPE4_SIMPLE_APDU_MAX_RX_SIZE) : sw2;
+                uint8_t nextBlockLength = ((sw2 == 0x00) || (static_cast<int>(sw2) > TYPE4_SIMPLE_APDU_MAX_RX_SIZE))
+                    ? static_cast<uint8_t>(TYPE4_SIMPLE_APDU_MAX_RX_SIZE)
+                    : sw2;
 
                 mAPDUResponseLength = sizeof(mAPDURxBuffer); // Initialized with with mAPDURxBuffer size to indicate to the low
                                                              // level driver the capacity of the RX buffer
@@ -421,10 +422,10 @@ public:
         VerifyOrReturnLogError(dataToSendLength <= sizeof(mAPDUTxBuffer), CHIP_ERROR_INTERNAL);
 
         mAPDUTxBuffer[0] = isLastBlock ? static_cast<uint8_t>(0x80) : static_cast<uint8_t>(0x90); // CLA
-        mAPDUTxBuffer[1] = 0x20;                                          // INS
-        mAPDUTxBuffer[2] = static_cast<uint8_t>((totalLength >> 8) & 0xFF);         // P1 (contains the totalLength's MSB)
-        mAPDUTxBuffer[3] = static_cast<uint8_t>(totalLength & 0xFF);                // P2 (contains the totalLength's LSB)
-        mAPDUTxBuffer[4] = static_cast<uint8_t>(dataToSendLength);                    // Lc
+        mAPDUTxBuffer[1] = 0x20;                                                                  // INS
+        mAPDUTxBuffer[2] = static_cast<uint8_t>((totalLength >> 8) & 0xFF); // P1 (contains the totalLength's MSB)
+        mAPDUTxBuffer[3] = static_cast<uint8_t>(totalLength & 0xFF);        // P2 (contains the totalLength's LSB)
+        mAPDUTxBuffer[4] = static_cast<uint8_t>(dataToSendLength);          // Lc
         memcpy(&(mAPDUTxBuffer[5]), dataToSend, dataToSendLength);
         mAPDUTxBuffer[5 + dataToSendLength] = static_cast<uint8_t>(TYPE4_SIMPLE_APDU_MAX_RX_SIZE); // Le
 
@@ -439,11 +440,11 @@ public:
     {
         uint8_t frame[5];
 
-        frame[0] = 0x00;           // CLA
+        frame[0] = 0x00;                       // CLA
         frame[1] = static_cast<uint8_t>(0xC0); // INS
-        frame[2] = 0x00;           // P1
-        frame[3] = 0x00;           // P2
-        frame[4] = length;         // Le
+        frame[2] = 0x00;                       // P1
+        frame[3] = 0x00;                       // P2
+        frame[4] = length;                     // Le
 
         CHIP_ERROR result = Transceive("GetResponse", frame, sizeof(frame), pRcvBuffer, pRcvLength);
 
