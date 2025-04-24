@@ -81,8 +81,8 @@ class TC_AVSUM_2_4(MatterBaseTest, AVSUMTestBase):
         ]
         return pics
 
-    @run_if_endpoint_matches(has_feature(Clusters.CameraAvSettingsUserLevelManagement, 
-                                        Clusters.CameraAvSettingsUserLevelManagement.Bitmaps.Feature.kMechanicalPresets))
+    @run_if_endpoint_matches(has_feature(Clusters.CameraAvSettingsUserLevelManagement,
+                                         Clusters.CameraAvSettingsUserLevelManagement.Bitmaps.Feature.kMechanicalPresets))
     async def test_TC_AVSUM_2_4(self):
         cluster = Clusters.Objects.CameraAvSettingsUserLevelManagement
         attributes = cluster.Attributes
@@ -171,7 +171,6 @@ class TC_AVSUM_2_4(MatterBaseTest, AVSUMTestBase):
 
             self.step(12)
             self.verify_preset_matches(stored_preset[0], mptzposition_dut)
-
 
 
 if __name__ == "__main__":

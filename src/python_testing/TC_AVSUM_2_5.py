@@ -42,6 +42,7 @@ from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter
 from mobly import asserts
 from TC_AVSUMTestBase import AVSUMTestBase
 
+
 class TC_AVSUM_2_5(MatterBaseTest, AVSUMTestBase):
 
     def desc_TC_AVSUM_2_5(self) -> str:
@@ -58,7 +59,7 @@ class TC_AVSUM_2_5(MatterBaseTest, AVSUMTestBase):
             TestStep(7, "Read the value of MPTZPresets. Ensure it has an entry for a PresetID of MaxPresets with a name 'newpreset' that matches the saved MPTZPosition"),
             TestStep(8, "Verify there is space in the preset list, if not, end the test case"),
             TestStep(9, "save a new Preset via the MPTZSavePreset command, name 'newpreset-2', do not provide a PresetID"),
-            TestStep(10,"Read the value of MPTZPresets. Ensure it has an entry with a name 'newpreset-2' that matches the saved MPTZPosition"),
+            TestStep(10, "Read the value of MPTZPresets. Ensure it has an entry with a name 'newpreset-2' that matches the saved MPTZPosition"),
         ]
         return steps
 
@@ -68,8 +69,8 @@ class TC_AVSUM_2_5(MatterBaseTest, AVSUMTestBase):
         ]
         return pics
 
-    @run_if_endpoint_matches(has_feature(Clusters.CameraAvSettingsUserLevelManagement, 
-                                        Clusters.CameraAvSettingsUserLevelManagement.Bitmaps.Feature.kMechanicalPresets))
+    @run_if_endpoint_matches(has_feature(Clusters.CameraAvSettingsUserLevelManagement,
+                                         Clusters.CameraAvSettingsUserLevelManagement.Bitmaps.Feature.kMechanicalPresets))
     async def test_TC_AVSUM_2_5(self):
         cluster = Clusters.Objects.CameraAvSettingsUserLevelManagement
         attributes = cluster.Attributes
@@ -130,7 +131,7 @@ class TC_AVSUM_2_5(MatterBaseTest, AVSUMTestBase):
         for mptzpreset in mptz_presets_dut:
             if mptzpreset.presetID == max_presets_dut:
                 # verify that the values match
-                asserts.assert_equal(name, mptzpreset.name,"Preset name doesn't match that saved")
+                asserts.assert_equal(name, mptzpreset.name, "Preset name doesn't match that saved")
                 self.verify_preset_matches(mptzpreset, mptzposition_dut)
                 match_found = True
                 break
@@ -162,6 +163,7 @@ class TC_AVSUM_2_5(MatterBaseTest, AVSUMTestBase):
         else:
             self.skip_step(9)
             self.skip_step(10)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
