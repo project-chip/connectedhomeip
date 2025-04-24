@@ -73,8 +73,7 @@ tests:
       response:
           value: 1
 
-    - label:
-          "Step 6: TH writes 255 (UseActiveLocale) to HourFormat attribute"
+    - label: "Step 6: TH writes 255 (UseActiveLocale) to HourFormat attribute"
       PICS: LTIME.S.A0000
       command: "writeAttribute"
       attribute: "HourFormat"
