@@ -134,14 +134,6 @@ public:
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
 };
 
-class InternalEventOptions : public EventOptions
-{
-public:
-    InternalEventOptions() {}
-    InternalEventOptions(Timestamp aTimestamp) : mTimestamp(aTimestamp) {}
-    Timestamp mTimestamp;
-};
-
 /**
  * @brief
  *   Structure for copying event lists on output.

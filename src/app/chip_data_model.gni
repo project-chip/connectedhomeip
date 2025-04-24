@@ -97,6 +97,7 @@ template("chip_data_model") {
       "app/PluginApplicationCallbacks.h",
       "app/callback-stub.cpp",
       "app/cluster-callbacks.cpp",
+      "app/static-cluster-config/{{server_cluster_name}}.h",
     ]
 
     if (!defined(deps)) {
@@ -379,6 +380,11 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/${cluster}.h",
         ]
+      } else if (cluster == "commodity-price-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+        ]
       } else if (cluster == "energy-evse-server") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
@@ -460,9 +466,29 @@ template("chip_data_model") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/${cluster}.h",
+          "${_app_root}/clusters/${cluster}/closure-control-cluster-delegate.h",
+          "${_app_root}/clusters/${cluster}/closure-control-cluster-logic.cpp",
+          "${_app_root}/clusters/${cluster}/closure-control-cluster-logic.h",
+          "${_app_root}/clusters/${cluster}/closure-control-cluster-matter-context.h",
           "${_app_root}/clusters/${cluster}/closure-control-cluster-objects.h",
         ]
+      } else if (cluster == "closure-dimension-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/closure-dimension-cluster-logic.cpp",
+          "${_app_root}/clusters/${cluster}/closure-dimension-cluster-logic.h",
+          "${_app_root}/clusters/${cluster}/closure-dimension-cluster-objects.h",
+          "${_app_root}/clusters/${cluster}/closure-dimension-delegate.h",
+          "${_app_root}/clusters/${cluster}/closure-dimension-matter-context.cpp",
+          "${_app_root}/clusters/${cluster}/closure-dimension-matter-context.h",
+          "${_app_root}/clusters/${cluster}/closure-dimension-server.cpp",
+          "${_app_root}/clusters/${cluster}/closure-dimension-server.h",
+        ]
       } else if (cluster == "camera-av-stream-management-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+        ]
+      } else if (cluster == "camera-av-settings-user-level-management-server") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/${cluster}.h",
@@ -490,6 +516,8 @@ template("chip_data_model") {
       "${chip_root}/src/lib/core",
       "${chip_root}/src/lib/support",
       "${chip_root}/src/protocols/secure_channel",
+      "${chip_root}/zzz_generated/app-common/clusters:all-elements",
+      "${chip_root}/zzz_generated/app-common/clusters:all-metadata",
 
       # TODO: Embedded example apps currently build with chip_build_controller = false, and so get a libCHIP without controller support,
       # but nevertheless expect to have access to some of the "controller" code to implement bindings and related functionality.

@@ -23,7 +23,6 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
-#include <app/data-model-provider/MetadataList.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model/List.h>
 #include <app/util/attribute-storage.h>
@@ -31,6 +30,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
@@ -106,7 +106,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadFeatureMap(EndpointId endpoint, AttributeVa
 
 CHIP_ERROR DescriptorAttrAccess::ReadTagListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    DataModel::ListBuilder<DataModel::Provider::SemanticTag> semanticTagsList;
+    ReadOnlyBufferBuilder<DataModel::Provider::SemanticTag> semanticTagsList;
     ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->SemanticTags(endpoint, semanticTagsList));
 
     return aEncoder.EncodeList([&semanticTagsList](const auto & encoder) -> CHIP_ERROR {
@@ -120,7 +120,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadTagListAttribute(EndpointId endpoint, Attri
 
 CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
+    ReadOnlyBufferBuilder<DataModel::EndpointEntry> endpointsList;
     ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->Endpoints(endpointsList));
     auto endpoints = endpointsList.TakeBuffer();
     if (endpoint == 0x00)
@@ -191,7 +191,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
 
 CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    DataModel::ListBuilder<DataModel::DeviceTypeEntry> deviceTypesList;
+    ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> deviceTypesList;
     ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->DeviceTypes(endpoint, deviceTypesList));
 
     auto deviceTypes = deviceTypesList.TakeBuffer();
@@ -213,7 +213,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, Attrib
 
 CHIP_ERROR DescriptorAttrAccess::ReadServerClusters(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    DataModel::ListBuilder<DataModel::ServerClusterEntry> builder;
+    ReadOnlyBufferBuilder<DataModel::ServerClusterEntry> builder;
     ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->ServerClusters(endpoint, builder));
     return aEncoder.EncodeList([&builder](const auto & encoder) -> CHIP_ERROR {
         for (const auto & cluster : builder.TakeBuffer())
@@ -226,7 +226,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadServerClusters(EndpointId endpoint, Attribu
 
 CHIP_ERROR DescriptorAttrAccess::ReadClientClusters(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    DataModel::ListBuilder<ClusterId> clusterIdList;
+    ReadOnlyBufferBuilder<ClusterId> clusterIdList;
     ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->ClientClusters(endpoint, clusterIdList));
     return aEncoder.EncodeList([&clusterIdList](const auto & encoder) -> CHIP_ERROR {
         for (const auto & id : clusterIdList.TakeBuffer())

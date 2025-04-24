@@ -23,17 +23,17 @@ config:
     cluster: "Access Control"
     endpoint: 0
     CAT1:
-        type: int64u
-        defaultValue: 65520
+        type: node_id
+        defaultValue: 0xFFFFFFFDABCD0001
     CAT2:
-        type: int64u
-        defaultValue: 65521
+        type: node_id
+        defaultValue: 0xFFFFFFFDFFFF0001
     CAT3:
-        type: int64u
-        defaultValue: 65522
+        type: node_id
+        defaultValue: 0xFFFFFFFD071C1074
     CAT4:
-        type: int64u
-        defaultValue: 65523
+        type: node_id
+        defaultValue: 0xFFFFFFFDAB120003
 
 tests:
     - label: "Step 1:Wait for the commissioned device to be retrieved"
@@ -1101,12 +1101,19 @@ tests:
       command: "readAttribute"
       attribute: "ACL"
       response:
-          value:
-              [
+          value: [
                   {
                       Privilege: 5,
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  # We are retaining the ACLs from Step 21 and Step 22
+                  {
+                      Privilege: 3,
+                      AuthMode: 2,
+                      Subjects: [CAT1, CAT2, CAT3, CAT4],
                       Targets: null,
                       FabricIndex: CurrentFabricIndexValue,
                   },
