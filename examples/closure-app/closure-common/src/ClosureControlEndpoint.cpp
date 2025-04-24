@@ -58,17 +58,17 @@ Status PrintOnlyDelegate::HandleStopCommand()
 CHIP_ERROR ClosureControlEndpoint::Init()
 {
     ChipLogProgress(AppServer, "ClosureControlEndpoint::Init start");
-    
+
     ClusterConformance conformance;
     conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kInstantaneous).Set(Feature::kSpeed).Set(Feature::kVentilation)
                             .Set(Feature::kPedestrian).Set(Feature::kCalibration).Set(Feature::kProtection).Set(Feature::kManuallyOperable);
     conformance.OptionalAttributes().Set(OptionalAttributeEnum::kCountdownTime);
-    
+
     ReturnErrorOnFailure(mLogic.Init(conformance));
     ReturnErrorOnFailure(mInterface.Init());
     ReturnErrorOnFailure(mDelegate.Init());
-     
+
     ChipLogProgress(AppServer, "ClosureControlEndpoint::Init end");
-     
+
     return CHIP_NO_ERROR;
  }

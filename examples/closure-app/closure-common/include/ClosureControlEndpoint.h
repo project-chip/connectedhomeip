@@ -23,28 +23,28 @@
 #include <app/clusters/closure-control-server/closure-control-cluster-objects.h>
 #include <app/clusters/closure-control-server/closure-control-cluster-matter-context.h>
 #include <app/clusters/closure-control-server/closure-control-server.h>
- 
+
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <app-common/zap-generated/cluster-objects.h>
- 
+
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ClosureControl {
-    
+
 using Protocols::InteractionModel::Status;
 
 /**
  * @class PrintOnlyDelegate
  * @brief A delegate class that handles Closure Control commands at the application level.
- * 
+ *
  * This class is responsible for processing Closure Control commands such as Stop, MoveTo, and Calibrate
  * according to specific business logic. It is designed to be used as a delegate for the Closure Control cluster.
- * 
+ *
  * @note This implementation is a "PrintOnly" delegate, which may primarily log or print command handling actions.
- * 
+ *
  * @param mEndpoint The endpoint ID associated with this delegate.
  */
 class PrintOnlyDelegate : public DelegateBase
@@ -60,7 +60,7 @@ public:
 
     /**
      * @brief Initializes the PrintOnlyDelegate instance.
-     * 
+     *
      * @return CHIP_ERROR indicating the result of the initialization.
      */
     CHIP_ERROR Init();
@@ -72,10 +72,10 @@ private:
 /**
  * @class ClosureControlEndpoint
  * @brief Represents a Closure Control cluster endpoint.
- * 
+ *
  * This class encapsulates the logic and interfaces required to manage a Closure Control cluster endpoint.
  * It integrates the delegate, context, logic, and interface components for the endpoint.
- * 
+ *
  * @param mEndpoint The endpoint ID associated with this Closure Control endpoint.
  * @param mContext The Matter context for the endpoint.
  * @param mDelegate The delegate instance for handling commands.
@@ -92,24 +92,24 @@ public:
 
     /**
      * @brief Initializes the ClosureControlEndpoint instance.
-     * 
+     *
      * @return CHIP_ERROR indicating the result of the initialization.
      */
     CHIP_ERROR Init();
 
     /**
      * @brief Retrieves the delegate associated with this Closure Control endpoint.
-     * 
+     *
      * @return Reference to the PrintOnlyDelegate instance.
      */
     PrintOnlyDelegate & getDelegate() { return mDelegate; }
 
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
-    MatterContext mContext; 
-    PrintOnlyDelegate mDelegate; 
-    ClusterLogic mLogic; 
-    Interface mInterface; 
+    MatterContext mContext;
+    PrintOnlyDelegate mDelegate;
+    ClusterLogic mLogic;
+    Interface mInterface;
 };
 
 } // namespace ClosureControl

@@ -20,12 +20,12 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/cluster-enums.h>
 #include <protocols/interaction_model/StatusCode.h>
- 
+
 using namespace chip;
 using namespace chip::app::Clusters::ClosureDimension;
- 
+
 using Protocols::InteractionModel::Status;
- 
+
 CHIP_ERROR PrintOnlyDelegate::Init()
 {
     ChipLogProgress(AppServer, "PrintOnlyDelegate::Init start");
@@ -48,20 +48,20 @@ Status PrintOnlyDelegate::HandleStep(const StepDirectionEnum & direction, const 
     ChipLogProgress(AppServer, "HandleStep");
     // Add the Step handling logic here
     return Status::Success;
-    
+
 }
- 
+
 CHIP_ERROR ClosureDimensionEndpoint::Init()
 {
     ChipLogProgress(AppServer, "ClosureDimensionEndpoint::Init start");
-    
+
     ClusterConformance conformance = { .featureMap = 255, .supportsOverflow = true };
-     
+
     ReturnErrorOnFailure(mLogic.Init(conformance));
     ReturnErrorOnFailure(mInterface.Init());
     ReturnErrorOnFailure(mDelegate.Init());
-      
+
     ChipLogProgress(AppServer, "ClosureDimensionEndpoint::Init end");
-      
+
     return CHIP_NO_ERROR;
 }

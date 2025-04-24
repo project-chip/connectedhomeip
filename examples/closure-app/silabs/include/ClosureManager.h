@@ -15,21 +15,21 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
- 
+
  /*
   * @class ClosureManager
   * @brief Manages the initialization and operations related to closure and
   *        closure panel endpoints in the application.
   *
-  * @note This class is part of the closure application example 
+  * @note This class is part of the closure application example
   */
- 
+
  class ClosureManager
  {
  public:
- 
+
     static ClosureManager sClosureMgr;
- 
+
     /**
     * @brief Initializes the ClosureManager.
     *
