@@ -49,7 +49,8 @@
 
 #include <mutex>
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-#include <transport/raw/WiFiPAF.h>
+#include <wifipaf/WiFiPAFEndPoint.h>
+#include <wifipaf/WiFiPAFLayer.h>
 #endif
 #endif
 
@@ -141,15 +142,18 @@ public:
                                               NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    CHIP_ERROR _WiFiPAFConnect(const SetupDiscriminator & connDiscriminator, void * appState, OnConnectionCompleteFunct onSuccess,
-                               OnConnectionErrorFunct onError);
-    CHIP_ERROR _WiFiPAFCancelConnect();
-    void OnDiscoveryResult(gboolean success, GVariant * obj);
+    CHIP_ERROR _WiFiPAFSubscribe(const uint16_t & connDiscriminator, void * appState, OnConnectionCompleteFunct onSuccess,
+                                 OnConnectionErrorFunct onError);
+    CHIP_ERROR _WiFiPAFCancelSubscribe(uint32_t SubscribeId);
+    CHIP_ERROR _WiFiPAFCancelIncompleteSubscribe();
+    void OnDiscoveryResult(GVariant * obj);
+    void OnReplied(GVariant * obj);
     void OnNanReceive(GVariant * obj);
-    void OnNanSubscribeTerminated(gint term_subscribe_id, gint reason);
-    CHIP_ERROR _WiFiPAFSend(chip::System::PacketBufferHandle && msgBuf);
-    Transport::WiFiPAFBase * _GetWiFiPAF();
-    void _SetWiFiPAF(Transport::WiFiPAFBase * pWiFiPAF);
+    void OnNanPublishTerminated(guint public_id, gchar * reason);
+    void OnNanSubscribeTerminated(guint subscribe_id, gchar * reason);
+    CHIP_ERROR _WiFiPAFSend(const WiFiPAF::WiFiPAFSession & TxInfo, chip::System::PacketBufferHandle && msgBuf);
+    void _WiFiPafSetApFreq(const uint16_t freq) { mApFreq = freq; }
+    CHIP_ERROR _WiFiPAFShutdown(uint32_t id, WiFiPAF::WiFiPafRole role);
 #endif
 
     void PostNetworkConnect();
@@ -230,31 +234,14 @@ private:
     void _OnWpaInterfaceProxyReady(GObject * sourceObject, GAsyncResult * res);
     void _OnWpaBssProxyReady(GObject * sourceObject, GAsyncResult * res);
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    struct wpa_dbus_discov_info
-    {
-        uint32_t subscribe_id;
-        uint32_t peer_publish_id;
-        uint8_t peer_addr[6];
-        uint32_t ssi_len;
-    };
-    uint32_t mpresubscribe_id;
-    struct wpa_dbus_discov_info mpaf_info;
-    struct wpa_dbus_nanrx_info
-    {
-        uint32_t id;
-        uint32_t peer_id;
-        uint8_t peer_addr[6];
-        uint32_t ssi_len;
-    };
-    struct wpa_dbus_nanrx_info mpaf_nanrx_info;
-
     OnConnectionCompleteFunct mOnPafSubscribeComplete;
     OnConnectionErrorFunct mOnPafSubscribeError;
-    Transport::WiFiPAFBase * pmWiFiPAF;
+    WiFiPAF::WiFiPAFLayer * pmWiFiPAF;
+    WiFiPAF::WiFiPAFEndPoint mWiFiPAFEndPoint;
     void * mAppState;
-    CHIP_ERROR _SetWiFiPAFAdvertisingEnabled(WiFiPAFAdvertiseParam & args);
+    uint16_t mApFreq;
     CHIP_ERROR _WiFiPAFPublish(WiFiPAFAdvertiseParam & args);
-    CHIP_ERROR _WiFiPAFCancelPublish();
+    CHIP_ERROR _WiFiPAFCancelPublish(uint32_t PublishId);
 #endif
 
     bool _GetBssInfo(const gchar * bssPath, NetworkCommissioning::WiFiScanResponse & result);
@@ -289,7 +276,7 @@ private:
 
     // ===== Private members reserved for use by this class only.
 
-    char mEthIfName[chip::Inet::InterfaceId::kMaxIfNameLength];
+    char mEthIfName[Inet::InterfaceId::kMaxIfNameLength];
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     ConnectivityManager::WiFiStationMode mWiFiStationMode;
@@ -301,7 +288,7 @@ private:
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    char sWiFiIfName[chip::Inet::InterfaceId::kMaxIfNameLength];
+    char sWiFiIfName[Inet::InterfaceId::kMaxIfNameLength];
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA

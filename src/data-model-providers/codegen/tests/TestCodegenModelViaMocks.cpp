@@ -30,10 +30,10 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/ConcreteClusterPath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/GlobalAttributes.h>
 #include <app/MessageDef/ReportDataMessage.h>
-#include <app/data-model-provider/MetadataList.h>
 #include <app/data-model-provider/MetadataLookup.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
@@ -45,6 +45,8 @@
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/Nullable.h>
+#include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/attribute-storage-null-handling.h>
 #include <app/util/ember-io-storage.h>
@@ -62,6 +64,7 @@
 #include <lib/core/TLVTags.h>
 #include <lib/core/TLVTypes.h>
 #include <lib/core/TLVWriter.h>
+#include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -465,10 +468,6 @@ const MockNodeConfig gTestNodeConfig({
             MOCK_ATTRIBUTE_CONFIG_NON_NULLABLE(ZCL_SYSTIME_MS_ATTRIBUTE_TYPE),
             MOCK_ATTRIBUTE_CONFIG_NON_NULLABLE(ZCL_ELAPSED_S_ATTRIBUTE_TYPE),
             MOCK_ATTRIBUTE_CONFIG_NON_NULLABLE(ZCL_TEMPERATURE_ATTRIBUTE_TYPE),
-            MOCK_ATTRIBUTE_CONFIG_NON_NULLABLE(ZCL_POWER_MW_ATTRIBUTE_TYPE),
-            MOCK_ATTRIBUTE_CONFIG_NON_NULLABLE(ZCL_AMPERAGE_MA_ATTRIBUTE_TYPE),
-            MOCK_ATTRIBUTE_CONFIG_NON_NULLABLE(ZCL_VOLTAGE_MV_ATTRIBUTE_TYPE),
-            MOCK_ATTRIBUTE_CONFIG_NON_NULLABLE(ZCL_ENERGY_MWH_ATTRIBUTE_TYPE),
             MOCK_ATTRIBUTE_CONFIG_NON_NULLABLE(ZCL_TOD_ATTRIBUTE_TYPE),
             MOCK_ATTRIBUTE_CONFIG_NON_NULLABLE(ZCL_DATE_ATTRIBUTE_TYPE),
             MOCK_ATTRIBUTE_CONFIG_NON_NULLABLE(ZCL_EPOCH_US_ATTRIBUTE_TYPE),
@@ -538,10 +537,6 @@ const MockNodeConfig gTestNodeConfig({
             MOCK_ATTRIBUTE_CONFIG_NULLABLE(ZCL_SYSTIME_MS_ATTRIBUTE_TYPE),
             MOCK_ATTRIBUTE_CONFIG_NULLABLE(ZCL_ELAPSED_S_ATTRIBUTE_TYPE),
             MOCK_ATTRIBUTE_CONFIG_NULLABLE(ZCL_TEMPERATURE_ATTRIBUTE_TYPE),
-            MOCK_ATTRIBUTE_CONFIG_NULLABLE(ZCL_POWER_MW_ATTRIBUTE_TYPE),
-            MOCK_ATTRIBUTE_CONFIG_NULLABLE(ZCL_AMPERAGE_MA_ATTRIBUTE_TYPE),
-            MOCK_ATTRIBUTE_CONFIG_NULLABLE(ZCL_VOLTAGE_MV_ATTRIBUTE_TYPE),
-            MOCK_ATTRIBUTE_CONFIG_NULLABLE(ZCL_ENERGY_MWH_ATTRIBUTE_TYPE),
             MOCK_ATTRIBUTE_CONFIG_NULLABLE(ZCL_TOD_ATTRIBUTE_TYPE),
             MOCK_ATTRIBUTE_CONFIG_NULLABLE(ZCL_DATE_ATTRIBUTE_TYPE),
             MOCK_ATTRIBUTE_CONFIG_NULLABLE(ZCL_EPOCH_US_ATTRIBUTE_TYPE),
@@ -744,6 +739,72 @@ public:
 
 private:
     T mData;
+};
+
+class FakeDefaultServerCluster : public DefaultServerCluster
+{
+public:
+    static constexpr uint32_t kFakeFeatureMap      = 0x35;
+    static constexpr uint32_t kFakeClusterRevision = 1234;
+
+    static constexpr CommandId kGeneratedCommands[]           = { 1, 2, 3, 100, 200 };
+    static constexpr AcceptedCommandEntry kAcceptedCommands[] = {
+        { 101 },
+        { 102 },
+    };
+
+    FakeDefaultServerCluster(const ConcreteClusterPath & path) : DefaultServerCluster(path) {}
+
+    [[nodiscard]] BitFlags<DataModel::ClusterQualityFlags> GetClusterFlags(const ConcreteClusterPath &) const override
+    {
+        return DataModel::ClusterQualityFlags::kDiagnosticsData;
+    }
+
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override
+    {
+        return builder.ReferenceExisting(Span<const AcceptedCommandEntry>(kAcceptedCommands));
+    }
+
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override
+    {
+        return builder.ReferenceExisting(Span<const CommandId>(kGeneratedCommands));
+    }
+
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               chip::TLV::TLVReader & input_arguments,
+                                                               CommandHandler * handler) override
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                 AttributeValueDecoder & decoder) override
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override
+    {
+        using namespace chip::app::Clusters;
+
+        switch (request.path.mAttributeId)
+        {
+        case Globals::Attributes::FeatureMap::Id: {
+            uint32_t value = kFakeFeatureMap;
+            return encoder.Encode<uint32_t>(std::move(value));
+        }
+        case Globals::Attributes::ClusterRevision::Id: {
+            uint32_t value = kFakeClusterRevision;
+            return encoder.Encode<uint32_t>(std::move(value));
+        }
+        }
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    void TestIncreaseDataVersion() { IncreaseDataVersion(); }
+    void TestNotifyAttributeChanged(AttributeId attributeId) { NotifyAttributeChanged(attributeId); }
 };
 
 template <typename T, EmberAfAttributeType ZclType>
@@ -959,7 +1020,7 @@ TEST_F(TestCodegenModelViaMocks, IterateOverEndpoints)
     CodegenDataModelProviderWithContext model;
 
     // This iteration relies on the hard-coding that occurs when mock_ember is used
-    DataModel::ListBuilder<DataModel::EndpointEntry> endpointsBuilder;
+    ReadOnlyBufferBuilder<DataModel::EndpointEntry> endpointsBuilder;
 
     ASSERT_EQ(model.Endpoints(endpointsBuilder), CHIP_NO_ERROR);
 
@@ -987,7 +1048,7 @@ TEST_F(TestCodegenModelViaMocks, IterateOverServerClusters)
 
     chip::Test::ResetVersion();
 
-    DataModel::ListBuilder<DataModel::ServerClusterEntry> builder;
+    ReadOnlyBufferBuilder<DataModel::ServerClusterEntry> builder;
 
     EXPECT_NE(model.ServerClusters(kEndpointIdThatIsMissing, builder), CHIP_NO_ERROR);
     EXPECT_TRUE(builder.IsEmpty());
@@ -1030,7 +1091,7 @@ TEST_F(TestCodegenModelViaMocks, IterateOverClientClusters)
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
 
-    DataModel::ListBuilder<ClusterId> builder;
+    ReadOnlyBufferBuilder<ClusterId> builder;
 
     EXPECT_EQ(model.ClientClusters(kEndpointIdThatIsMissing, builder), CHIP_ERROR_NOT_FOUND);
     EXPECT_TRUE(builder.IsEmpty());
@@ -1064,7 +1125,7 @@ TEST_F(TestCodegenModelViaMocks, IterateOverAttributes)
     ASSERT_TRUE(model.AttributesIgnoreError(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId)).empty());
 
     // should be able to iterate over valid paths
-    DataModel::ListBuilder<DataModel::AttributeEntry> builder;
+    ReadOnlyBufferBuilder<DataModel::AttributeEntry> builder;
 
     // invalid paths return errors
     ASSERT_EQ(model.Attributes(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1)), builder), CHIP_ERROR_NOT_FOUND);
@@ -1164,7 +1225,7 @@ TEST_F(TestCodegenModelViaMocks, IterateOverAcceptedCommands)
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
 
-    DataModel::ListBuilder<DataModel::AcceptedCommandEntry> builder;
+    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> builder;
 
     // invalid paths should return in "no more data"
     ASSERT_EQ(model.AcceptedCommands(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1)), builder),
@@ -1197,7 +1258,7 @@ TEST_F(TestCodegenModelViaMocks, IterateOverGeneratedCommands)
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
 
-    DataModel::ListBuilder<CommandId> builder;
+    ReadOnlyBufferBuilder<CommandId> builder;
 
     // invalid paths should return in "no more data"
     ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1)), builder),
@@ -1232,8 +1293,8 @@ TEST_F(TestCodegenModelViaMocks, AcceptedGeneratedCommandsOnInvalidEndpoints)
     CustomListCommandHandler handler(chip::NullOptional, MockClusterId(1));
     handler.SetHandleCommands(true);
 
-    DataModel::ListBuilder<CommandId> generatedBuilder;
-    DataModel::ListBuilder<DataModel::AcceptedCommandEntry> acceptedBuilder;
+    ReadOnlyBufferBuilder<CommandId> generatedBuilder;
+    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedBuilder;
 
     // valid endpoint will result in valid data (even though list is empty)
     ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)), generatedBuilder), CHIP_NO_ERROR);
@@ -1264,8 +1325,8 @@ TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceCommandHandling)
     // Validate that these work
     CustomListCommandHandler handler(MakeOptional(kMockEndpoint1), MockClusterId(1));
 
-    DataModel::ListBuilder<CommandId> generatedBuilder;
-    DataModel::ListBuilder<DataModel::AcceptedCommandEntry> acceptedBuilder;
+    ReadOnlyBufferBuilder<CommandId> generatedBuilder;
+    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedBuilder;
 
     // At this point, without overrides, there should be no accepted/generated commands
     ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)), generatedBuilder), CHIP_NO_ERROR);
@@ -2432,7 +2493,7 @@ TEST_F(TestCodegenModelViaMocks, DeviceTypeIteration)
     CodegenDataModelProviderWithContext model;
 
     // Mock endpoint 1 has 3 device types
-    DataModel::ListBuilder<DataModel::DeviceTypeEntry> builder;
+    ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> builder;
     ASSERT_EQ(model.DeviceTypes(kMockEndpoint1, builder), CHIP_NO_ERROR);
     auto deviceTypes = builder.TakeBuffer();
     ASSERT_EQ(deviceTypes.size(), 3u);
@@ -2467,7 +2528,7 @@ TEST_F(TestCodegenModelViaMocks, SemanticTagIteration)
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
 
-    DataModel::ListBuilder<Provider::SemanticTag> builder;
+    ReadOnlyBufferBuilder<Provider::SemanticTag> builder;
     ASSERT_EQ(model.SemanticTags(kMockEndpoint2, builder), CHIP_NO_ERROR);
     ASSERT_TRUE(builder.IsEmpty());
     auto tags = builder.TakeBuffer();
@@ -2499,4 +2560,191 @@ TEST_F(TestCodegenModelViaMocks, SemanticTagIteration)
     EXPECT_EQ(tag.namespaceID, kNamespaceID3);
     EXPECT_EQ(tag.tag, kTag3);
     EXPECT_FALSE(tag.label.HasValue());
+}
+
+// reading attributes is a LOT of boilerplate. This just makes tests more readable.
+static CHIP_ERROR ReadU32Attribute(DataModel::Provider & provider, const ConcreteAttributePath & path, uint32_t & value)
+{
+
+    ReadOperation testRequest(path);
+    testRequest.SetSubjectDescriptor(kAdminSubjectDescriptor);
+
+    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
+    ReturnErrorOnFailure(provider.ReadAttribute(testRequest.GetRequest(), *encoder).GetUnderlyingError());
+    ReturnErrorOnFailure(testRequest.FinishEncoding());
+
+    std::vector<DecodedAttributeData> attribute_data;
+
+    ReturnErrorOnFailure(testRequest.GetEncodedIBs().Decode(attribute_data));
+    VerifyOrReturnError(attribute_data.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
+
+    DecodedAttributeData & encodedData = attribute_data[0];
+
+    VerifyOrReturnError(encodedData.attributePath == testRequest.GetRequest().path, CHIP_ERROR_INCORRECT_STATE);
+
+    return chip::app::DataModel::Decode<uint32_t>(encodedData.dataReader, value);
+}
+
+TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRegistration)
+{
+    TestServerClusterContext testContext;
+
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelProviderWithContext model;
+
+    model.SetPersistentStorageDelegate(&testContext.StorageDelegate());
+    ASSERT_EQ(model.Startup(testContext.ImContext()), CHIP_NO_ERROR);
+
+    const ConcreteClusterPath kTestClusterPath(kMockEndpoint1, MockClusterId(2));
+
+    FakeDefaultServerCluster fakeClusterServer(kTestClusterPath);
+    ServerClusterRegistration registration(fakeClusterServer);
+
+    uint32_t revisionEmber;
+    ASSERT_EQ(ReadU32Attribute(
+                  model,
+                  { kTestClusterPath.mEndpointId, kTestClusterPath.mClusterId, Clusters::Globals::Attributes::ClusterRevision::Id },
+                  revisionEmber),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(revisionEmber, 0u);
+    static_assert(FakeDefaultServerCluster::kFakeClusterRevision != 0);
+
+    ASSERT_EQ(model.Registry().Register(registration), CHIP_NO_ERROR);
+
+    uint32_t revision;
+    ASSERT_EQ(ReadU32Attribute(
+                  model,
+                  { kTestClusterPath.mEndpointId, kTestClusterPath.mClusterId, Clusters::Globals::Attributes::ClusterRevision::Id },
+                  revision),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(revision, FakeDefaultServerCluster::kFakeClusterRevision);
+
+    // now that registration looks ok and DIFFERENT from ember, invoke various methods on the registered cluster
+    // to ensure behavior is redirected correctly
+    {
+        ReadOnlyBufferBuilder<AttributeEntry> builder;
+        ASSERT_EQ(model.Attributes(kTestClusterPath, builder), CHIP_NO_ERROR);
+
+        // Attributes will be just global attributes
+        ASSERT_TRUE(DefaultServerCluster::GlobalAttributes().data_equal(builder.TakeBuffer()));
+    }
+
+    {
+        ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
+        ASSERT_EQ(model.AcceptedCommands(kTestClusterPath, builder), CHIP_NO_ERROR);
+        ASSERT_TRUE(Span<const AcceptedCommandEntry>(FakeDefaultServerCluster::kAcceptedCommands).data_equal(builder.TakeBuffer()));
+    }
+
+    {
+        ReadOnlyBufferBuilder<CommandId> builder;
+        ASSERT_EQ(model.GeneratedCommands(kTestClusterPath, builder), CHIP_NO_ERROR);
+        ASSERT_TRUE(Span<const CommandId>(FakeDefaultServerCluster::kGeneratedCommands).data_equal(builder.TakeBuffer()));
+    }
+
+    // Invoke specifically on the fake server returns a unique (and non-spec really) error
+    // so we can see the right method is called.
+    {
+        const ConcreteCommandPath kCommandPath(kTestClusterPath.mEndpointId, kTestClusterPath.mClusterId, kMockCommandId1);
+        const InvokeRequest kInvokeRequest{ .path = kCommandPath };
+        chip::TLV::TLVReader tlvReader;
+
+        // Using a handler set to nullptr as it is not used by the impl
+        std::optional<ActionReturnStatus> result = model.InvokeCommand(kInvokeRequest, tlvReader, /* handler = */ nullptr);
+        ASSERT_TRUE(result.has_value() && result->GetUnderlyingError() == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    // Write attribute also has a specific error to know the right code is called
+    {
+        WriteOperation test(kTestClusterPath.mEndpointId, kTestClusterPath.mClusterId, kAttributeIdReadOnly);
+        test.SetSubjectDescriptor(kAdminSubjectDescriptor);
+
+        AttributeValueDecoder decoder = test.DecoderFor<uint32_t>(1234);
+
+        std::optional<ActionReturnStatus> result = model.WriteAttribute(test.GetRequest(), decoder);
+        ASSERT_TRUE(result.has_value() && result->GetUnderlyingError() == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    model.Registry().Unregister(&fakeClusterServer);
+    model.Shutdown();
+}
+
+TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesListClusters)
+{
+    TestServerClusterContext testContext;
+
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelProviderWithContext model;
+
+    model.SetPersistentStorageDelegate(&testContext.StorageDelegate());
+    ASSERT_EQ(model.Startup(testContext.ImContext()), CHIP_NO_ERROR);
+
+    // will register a fake cluster server which overrides the cluster data version
+    // once registered
+    const ConcreteClusterPath kTestClusterPath(kMockEndpoint1, MockClusterId(2));
+    FakeDefaultServerCluster fakeClusterServer(kTestClusterPath);
+    ServerClusterRegistration registration(fakeClusterServer);
+
+    // ensure ember and fake server do not ramdomly point to the same data
+    // version as we use this data version to differentiate between the two
+    DataVersion * versionPtr = emberAfDataVersionStorage(kTestClusterPath);
+    ASSERT_NE(versionPtr, nullptr);
+    if (*versionPtr == fakeClusterServer.GetDataVersion(kTestClusterPath))
+    {
+        fakeClusterServer.TestIncreaseDataVersion();
+    }
+
+    ReadOnlyBufferBuilder<DataModel::ServerClusterEntry> builder;
+
+    ASSERT_EQ(model.ServerClusters(kTestClusterPath.mEndpointId, builder), CHIP_NO_ERROR);
+    std::vector<ServerClusterEntry> originalClusters;
+    for (auto entry : builder.TakeBuffer())
+    {
+        originalClusters.push_back(entry);
+    }
+
+    ASSERT_EQ(model.Registry().Register(registration), CHIP_NO_ERROR);
+
+    ASSERT_EQ(model.ServerClusters(kTestClusterPath.mEndpointId, builder), CHIP_NO_ERROR);
+    std::vector<ServerClusterEntry> afterRegistrationClusters;
+    for (auto entry : builder.TakeBuffer())
+    {
+        afterRegistrationClusters.push_back(entry);
+    }
+
+    // lists MUST be identical EXCEPT data version will be different
+    // EMBER has one data version, clusters have a random (different) one
+    EXPECT_EQ(originalClusters.size(), afterRegistrationClusters.size());
+    std::sort(originalClusters.begin(), originalClusters.end(),
+              [](const ServerClusterEntry & a, const ServerClusterEntry & b) { return a.clusterId < b.clusterId; });
+    std::sort(afterRegistrationClusters.begin(), afterRegistrationClusters.end(),
+              [](const ServerClusterEntry & a, const ServerClusterEntry & b) { return a.clusterId < b.clusterId; });
+
+    bool updatedClusterFound = false;
+
+    for (size_t i = 0; i < originalClusters.size(); i++)
+    {
+        const ServerClusterEntry & original   = originalClusters[i];
+        const ServerClusterEntry & registered = afterRegistrationClusters[i];
+
+        if (original.clusterId == kTestClusterPath.mClusterId)
+        {
+            updatedClusterFound = true;
+            EXPECT_EQ(registered.clusterId, original.clusterId);
+            EXPECT_EQ(registered.dataVersion, fakeClusterServer.GetDataVersion(kTestClusterPath));
+            EXPECT_EQ(registered.flags, fakeClusterServer.GetClusterFlags(kTestClusterPath));
+
+            // version MUST be different for ember for the test to make sense
+            EXPECT_NE(original.dataVersion, registered.dataVersion);
+        }
+        else
+        {
+            EXPECT_EQ(original.clusterId, registered.clusterId);
+            EXPECT_EQ(original.dataVersion, registered.dataVersion);
+            EXPECT_EQ(original.flags, registered.flags);
+        }
+    }
+    EXPECT_TRUE(updatedClusterFound);
+
+    model.Registry().Unregister(&fakeClusterServer);
+    model.Shutdown();
 }
