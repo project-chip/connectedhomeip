@@ -62,22 +62,21 @@ def parse_pics(lines: typing.List[str]) -> dict[str, bool]:
         pics[key.strip()] = (val == "1")
     return pics
 
-
 def parse_pics_xml(contents: str) -> dict[str, bool]:
     pics = {}
     mytree = ET.fromstring(contents)
     for pi in mytree.iter('picsItem'):
         name_element = pi.find('itemNumber')
-        if name_element is None:
-            raise ValueError("Missing 'itemNumber' in picsItem")
+        if name_element is None or name_element.text is None:
+            raise ValueError("Missing or empty 'itemNumber' in picsItem")
         name = name_element.text
+
         support_element = pi.find('support')
-        if support_element is None:
-            raise ValueError("Missing 'support' in picsItem")
-        support = support_element.text
-        if support is None:
-            raise ValueError("The 'support' element is empty or missing text")
-        pics[name] = int(json.loads(support.lower())) == 1
+        if support_element is None or support_element.text is None:
+            raise ValueError("Missing or empty 'support' in picsItem")
+        support = support_element.text.lower()
+
+        pics[name] = int(json.loads(support)) == 1
     return pics
 
 
@@ -96,25 +95,27 @@ def read_pics_from_file(path: str) -> dict[str, bool]:
             lines = f.readlines()
             return parse_pics(lines)
 
-
 def parse_pixit_xml(contents: str) -> dict[str, bool]:
     pixit = {}
     mytree = ET.fromstring(contents)
     for pi in mytree.iter('pixitItem'):
+        # Ensure 'itemNumber' exists and is not empty
         name_element = pi.find('itemNumber')
-        if name_element is None:
-            raise ValueError("Missing 'itemNumber' in pixitItem")
+        if name_element is None or name_element.text is None:
+            raise ValueError("Missing or empty 'itemNumber' in pixitItem")
         name = name_element.text
 
+        # Ensure 'support' exists and is not empty
         support_element = pi.find('support')
-        if support_element is None:
-            raise ValueError("Missing 'support' in pixitItem")
-        support = support_element.text
-        if support is None:
-            raise ValueError("The 'support' element is empty or missing text")
-        pixit[name] = support
-    return pixit
+        if support_element is None or support_element.text is None:
+            raise ValueError("Missing or empty 'support' in pixitItem")
+        support = support_element.text.lower()
 
+        # Convert 'support' to a boolean value
+        if support not in ["true", "false"]:
+            raise ValueError(f"Invalid value for 'support': {support}")
+        pixit[name] = json.loads(support) == True
+    return pixit
 
 def read_pixit_from_file(path: str) -> dict[str, bool]:
     """ Reads a dictionary of PIXITS from a file (ci format) or directory (xml format). """
