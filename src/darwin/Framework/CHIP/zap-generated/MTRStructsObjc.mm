@@ -82,6 +82,36 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRDataTypePriceStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _amount = @(0);
+
+        _currency = [MTRDataTypeCurrencyStruct new];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDataTypePriceStruct alloc] init];
+
+    other.amount = self.amount;
+    other.currency = self.currency;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: amount:%@; currency:%@; >", NSStringFromClass([self class]), _amount, _currency];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRDataTypeTestGlobalStruct
 - (instancetype)init
 {
@@ -143,36 +173,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: locationName:%@; floorNumber:%@; areaType:%@; >", NSStringFromClass([self class]), _locationName, _floorNumber, _areaType];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRDataTypePriceStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _amount = @(0);
-
-        _currency = [MTRDataTypeCurrencyStruct new];
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRDataTypePriceStruct alloc] init];
-
-    other.amount = self.amount;
-    other.currency = self.currency;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: amount:%@; currency:%@; >", NSStringFromClass([self class]), _amount, _currency];
     return descriptionString;
 }
 
@@ -5198,9 +5198,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _price = nil;
-
-        _priceLevel = nil;
+        _price = @(0);
 
         _source = @(0);
 
@@ -5216,7 +5214,6 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRCommodityPriceClusterCommodityPriceComponentStruct alloc] init];
 
     other.price = self.price;
-    other.priceLevel = self.priceLevel;
     other.source = self.source;
     other.descriptionString = self.descriptionString;
     other.tariffComponentID = self.tariffComponentID;
@@ -5226,7 +5223,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: price:%@; priceLevel:%@; source:%@; descriptionString:%@; tariffComponentID:%@; >", NSStringFromClass([self class]), _price, _priceLevel, _source, _descriptionString, _tariffComponentID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: price:%@; source:%@; descriptionString:%@; tariffComponentID:%@; >", NSStringFromClass([self class]), _price, _source, _descriptionString, _tariffComponentID];
     return descriptionString;
 }
 
@@ -5296,33 +5293,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: currentPrice:%@; >", NSStringFromClass([self class]), _currentPrice];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRCommodityPriceClusterForecastChangeEvent
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _priceForecast = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRCommodityPriceClusterForecastChangeEvent alloc] init];
-
-    other.priceForecast = self.priceForecast;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: priceForecast:%@; >", NSStringFromClass([self class]), _priceForecast];
     return descriptionString;
 }
 
@@ -6782,33 +6752,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: currentConditions:%@; >", NSStringFromClass([self class]), _currentConditions];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRElectricalGridConditionsClusterForecastConditionsChangedEvent
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _forecastConditions = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRElectricalGridConditionsClusterForecastConditionsChangedEvent alloc] init];
-
-    other.forecastConditions = self.forecastConditions;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: forecastConditions:%@; >", NSStringFromClass([self class]), _forecastConditions];
     return descriptionString;
 }
 

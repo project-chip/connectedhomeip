@@ -35,9 +35,9 @@ set(CHIP_REQUIRE_COMPONENTS esp_eth freertos lwip bt mbedtls fatfs app_update co
 
 if (NOT CMAKE_BUILD_EARLY_EXPANSION)
     if (CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_DISABLE)
-        set(is_debug TRUE)
-    else()
         set(is_debug FALSE)
+    else()
+        set(is_debug TRUE)
     endif()
 endif()
 
@@ -173,10 +173,6 @@ if (CONFIG_BUILD_CHIP_TESTS)
     chip_gn_arg_bool("chip_build_tests"     "true")
 endif()
 
-if (CONFIG_IM_PRETTY_PRINT)
-    chip_gn_arg_bool("enable_im_pretty_print"	"true")
-endif()
-
 if (NOT CONFIG_USE_MINIMAL_MDNS)
     chip_gn_arg_append("chip_mdns"                          "\"platform\"")
 else()
@@ -246,6 +242,10 @@ endif()
 
 if (CONFIG_ENABLE_OTA_REQUESTOR)
     chip_gn_arg_append("chip_enable_ota_requestor"                 "true")
+endif()
+
+if (CONFIG_ENABLE_ACCESS_RESTRICTIONS)
+    chip_gn_arg_append("chip_enable_access_restrictions"                 "true")
 endif()
 
 if (CONFIG_ENABLE_ROTATING_DEVICE_ID)

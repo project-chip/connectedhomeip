@@ -695,6 +695,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         {
         case chip::app::Clusters::UnitLocalization::Attributes::TemperatureUnit::Id:
             return "TemperatureUnit";
+        case chip::app::Clusters::UnitLocalization::Attributes::SupportedTemperatureUnits::Id:
+            return "SupportedTemperatureUnits";
         case chip::app::Clusters::UnitLocalization::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::UnitLocalization::Attributes::AcceptedCommandList::Id:
