@@ -29,10 +29,26 @@ steps:
       args:
           - >-
               perl -i -pe 's/^gdbgui==/# gdbgui==/' /opt/espressif/esp-idf/requirements.txt &&
-              ./examples/chef/chef.py --build_all --build_exclude "noip|temperaturecontrolledcabinet|icd"
+              ./examples/chef/chef.py --build_all --build_exclude "noip|icd"
       id: CompileAll
       waitFor:
           - Bootstrap
+      entrypoint: ./scripts/run_in_build_env.sh
+      volumes:
+          - name: pwenv
+            path: /pwenv
+
+    - name: "ghcr.io/project-chip/chip-build-vscode:125"
+      # ICD device is currently not supported for ESP32 and NRF targets. New rule to compile only ICD
+      # linux binary.
+      env:
+          - PW_ENVIRONMENT_ROOT=/pwenv
+      args:
+          - ./examples/chef/chef.py --build_all --build_include linux_x86-icd
+      allowFailure: true # TODO: Remove this once compilation stability is established.
+      id: CompileICDLinux
+      waitFor:
+          - CompileAll
       entrypoint: ./scripts/run_in_build_env.sh
       volumes:
           - name: pwenv
@@ -52,7 +68,7 @@ steps:
       allowFailure: true
       id: CompileNoip
       waitFor:
-          - CompileAll
+          - CompileICDLinux
       entrypoint: ./scripts/run_in_build_env.sh
       volumes:
           - name: pwenv

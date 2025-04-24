@@ -172,6 +172,7 @@ static id _Nullable DecodeAttributeValueForIdentifyCluster(AttributeId aAttribut
         return value;
     }
     default: {
+        // Not a known Identify attribute.
         break;
     }
     }
@@ -195,6 +196,7 @@ static id _Nullable DecodeAttributeValueForGroupsCluster(AttributeId aAttributeI
         return value;
     }
     default: {
+        // Not a known Groups attribute.
         break;
     }
     }
@@ -266,6 +268,7 @@ static id _Nullable DecodeAttributeValueForOnOffCluster(AttributeId aAttributeId
         return value;
     }
     default: {
+        // Not a known OnOff attribute.
         break;
     }
     }
@@ -456,6 +459,7 @@ static id _Nullable DecodeAttributeValueForLevelControlCluster(AttributeId aAttr
         return value;
     }
     default: {
+        // Not a known LevelControl attribute.
         break;
     }
     }
@@ -468,6 +472,7 @@ static id _Nullable DecodeAttributeValueForPulseWidthModulationCluster(Attribute
     using namespace Clusters::PulseWidthModulation;
     switch (aAttributeId) {
     default: {
+        // Not a known PulseWidthModulation attribute.
         break;
     }
     }
@@ -633,6 +638,7 @@ static id _Nullable DecodeAttributeValueForDescriptorCluster(AttributeId aAttrib
         return value;
     }
     default: {
+        // Not a known Descriptor attribute.
         break;
     }
     }
@@ -692,6 +698,7 @@ static id _Nullable DecodeAttributeValueForBindingCluster(AttributeId aAttribute
         return value;
     }
     default: {
+        // Not a known Binding attribute.
         break;
     }
     }
@@ -950,6 +957,7 @@ static id _Nullable DecodeAttributeValueForAccessControlCluster(AttributeId aAtt
         return value;
     }
     default: {
+        // Not a known AccessControl attribute.
         break;
     }
     }
@@ -1065,6 +1073,7 @@ static id _Nullable DecodeAttributeValueForActionsCluster(AttributeId aAttribute
         return value;
     }
     default: {
+        // Not a known Actions attribute.
         break;
     }
     }
@@ -1409,6 +1418,7 @@ static id _Nullable DecodeAttributeValueForBasicInformationCluster(AttributeId a
         return value;
     }
     default: {
+        // Not a known BasicInformation attribute.
         break;
     }
     }
@@ -1421,6 +1431,7 @@ static id _Nullable DecodeAttributeValueForOTASoftwareUpdateProviderCluster(Attr
     using namespace Clusters::OtaSoftwareUpdateProvider;
     switch (aAttributeId) {
     default: {
+        // Not a known OTASoftwareUpdateProvider attribute.
         break;
     }
     }
@@ -1499,6 +1510,7 @@ static id _Nullable DecodeAttributeValueForOTASoftwareUpdateRequestorCluster(Att
         return value;
     }
     default: {
+        // Not a known OTASoftwareUpdateRequestor attribute.
         break;
     }
     }
@@ -1558,6 +1570,7 @@ static id _Nullable DecodeAttributeValueForLocalizationConfigurationCluster(Attr
         return value;
     }
     default: {
+        // Not a known LocalizationConfiguration attribute.
         break;
     }
     }
@@ -1618,6 +1631,7 @@ static id _Nullable DecodeAttributeValueForTimeFormatLocalizationCluster(Attribu
         return value;
     }
     default: {
+        // Not a known TimeFormatLocalization attribute.
         break;
     }
     }
@@ -1640,7 +1654,34 @@ static id _Nullable DecodeAttributeValueForUnitLocalizationCluster(AttributeId a
         value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
+    case Attributes::SupportedTemperatureUnits::Id: {
+        using TypeInfo = Attributes::SupportedTemperatureUnits::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
     default: {
+        // Not a known UnitLocalization attribute.
         break;
     }
     }
@@ -1679,6 +1720,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceConfigurationCluster(Attri
         return value;
     }
     default: {
+        // Not a known PowerSourceConfiguration attribute.
         break;
     }
     }
@@ -2155,6 +2197,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
         return value;
     }
     default: {
+        // Not a known PowerSource attribute.
         break;
     }
     }
@@ -2283,6 +2326,7 @@ static id _Nullable DecodeAttributeValueForGeneralCommissioningCluster(Attribute
         return value;
     }
     default: {
+        // Not a known GeneralCommissioning attribute.
         break;
     }
     }
@@ -2478,6 +2522,7 @@ static id _Nullable DecodeAttributeValueForNetworkCommissioningCluster(Attribute
         return value;
     }
     default: {
+        // Not a known NetworkCommissioning attribute.
         break;
     }
     }
@@ -2490,6 +2535,7 @@ static id _Nullable DecodeAttributeValueForDiagnosticLogsCluster(AttributeId aAt
     using namespace Clusters::DiagnosticLogs;
     switch (aAttributeId) {
     default: {
+        // Not a known DiagnosticLogs attribute.
         break;
     }
     }
@@ -2712,6 +2758,7 @@ static id _Nullable DecodeAttributeValueForGeneralDiagnosticsCluster(AttributeId
         return value;
     }
     default: {
+        // Not a known GeneralDiagnostics attribute.
         break;
     }
     }
@@ -2809,6 +2856,7 @@ static id _Nullable DecodeAttributeValueForSoftwareDiagnosticsCluster(AttributeI
         return value;
     }
     default: {
+        // Not a known SoftwareDiagnostics attribute.
         break;
     }
     }
@@ -3708,6 +3756,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
         return value;
     }
     default: {
+        // Not a known ThreadNetworkDiagnostics attribute.
         break;
     }
     }
@@ -3915,6 +3964,7 @@ static id _Nullable DecodeAttributeValueForWiFiNetworkDiagnosticsCluster(Attribu
         return value;
     }
     default: {
+        // Not a known WiFiNetworkDiagnostics attribute.
         break;
     }
     }
@@ -4038,6 +4088,7 @@ static id _Nullable DecodeAttributeValueForEthernetNetworkDiagnosticsCluster(Att
         return value;
     }
     default: {
+        // Not a known EthernetNetworkDiagnostics attribute.
         break;
     }
     }
@@ -4266,6 +4317,7 @@ static id _Nullable DecodeAttributeValueForTimeSynchronizationCluster(AttributeI
         return value;
     }
     default: {
+        // Not a known TimeSynchronization attribute.
         break;
     }
     }
@@ -4537,6 +4589,7 @@ static id _Nullable DecodeAttributeValueForBridgedDeviceBasicInformationCluster(
         return value;
     }
     default: {
+        // Not a known BridgedDeviceBasicInformation attribute.
         break;
     }
     }
@@ -4582,6 +4635,7 @@ static id _Nullable DecodeAttributeValueForSwitchCluster(AttributeId aAttributeI
         return value;
     }
     default: {
+        // Not a known Switch attribute.
         break;
     }
     }
@@ -4635,6 +4689,7 @@ static id _Nullable DecodeAttributeValueForAdministratorCommissioningCluster(Att
         return value;
     }
     default: {
+        // Not a known AdministratorCommissioning attribute.
         break;
     }
     }
@@ -4786,6 +4841,7 @@ static id _Nullable DecodeAttributeValueForOperationalCredentialsCluster(Attribu
         return value;
     }
     default: {
+        // Not a known OperationalCredentials attribute.
         break;
     }
     }
@@ -4903,6 +4959,7 @@ static id _Nullable DecodeAttributeValueForGroupKeyManagementCluster(AttributeId
         return value;
     }
     default: {
+        // Not a known GroupKeyManagement attribute.
         break;
     }
     }
@@ -4953,6 +5010,7 @@ static id _Nullable DecodeAttributeValueForFixedLabelCluster(AttributeId aAttrib
         return value;
     }
     default: {
+        // Not a known FixedLabel attribute.
         break;
     }
     }
@@ -5003,6 +5061,7 @@ static id _Nullable DecodeAttributeValueForUserLabelCluster(AttributeId aAttribu
         return value;
     }
     default: {
+        // Not a known UserLabel attribute.
         break;
     }
     }
@@ -5026,6 +5085,7 @@ static id _Nullable DecodeAttributeValueForBooleanStateCluster(AttributeId aAttr
         return value;
     }
     default: {
+        // Not a known BooleanState attribute.
         break;
     }
     }
@@ -5172,6 +5232,7 @@ static id _Nullable DecodeAttributeValueForICDManagementCluster(AttributeId aAtt
         return value;
     }
     default: {
+        // Not a known ICDManagement attribute.
         break;
     }
     }
@@ -5217,6 +5278,7 @@ static id _Nullable DecodeAttributeValueForTimerCluster(AttributeId aAttributeId
         return value;
     }
     default: {
+        // Not a known Timer attribute.
         break;
     }
     }
@@ -5374,6 +5436,7 @@ static id _Nullable DecodeAttributeValueForOvenCavityOperationalStateCluster(Att
         return value;
     }
     default: {
+        // Not a known OvenCavityOperationalState attribute.
         break;
     }
     }
@@ -5452,6 +5515,7 @@ static id _Nullable DecodeAttributeValueForOvenModeCluster(AttributeId aAttribut
         return value;
     }
     default: {
+        // Not a known OvenMode attribute.
         break;
     }
     }
@@ -5505,6 +5569,7 @@ static id _Nullable DecodeAttributeValueForLaundryDryerControlsCluster(Attribute
         return value;
     }
     default: {
+        // Not a known LaundryDryerControls attribute.
         break;
     }
     }
@@ -5640,6 +5705,7 @@ static id _Nullable DecodeAttributeValueForModeSelectCluster(AttributeId aAttrib
         return value;
     }
     default: {
+        // Not a known ModeSelect attribute.
         break;
     }
     }
@@ -5718,6 +5784,7 @@ static id _Nullable DecodeAttributeValueForLaundryWasherModeCluster(AttributeId 
         return value;
     }
     default: {
+        // Not a known LaundryWasherMode attribute.
         break;
     }
     }
@@ -5796,6 +5863,7 @@ static id _Nullable DecodeAttributeValueForRefrigeratorAndTemperatureControlledC
         return value;
     }
     default: {
+        // Not a known RefrigeratorAndTemperatureControlledCabinetMode attribute.
         break;
     }
     }
@@ -5891,6 +5959,7 @@ static id _Nullable DecodeAttributeValueForLaundryWasherControlsCluster(Attribut
         return value;
     }
     default: {
+        // Not a known LaundryWasherControls attribute.
         break;
     }
     }
@@ -5969,6 +6038,7 @@ static id _Nullable DecodeAttributeValueForRVCRunModeCluster(AttributeId aAttrib
         return value;
     }
     default: {
+        // Not a known RVCRunMode attribute.
         break;
     }
     }
@@ -6047,6 +6117,7 @@ static id _Nullable DecodeAttributeValueForRVCCleanModeCluster(AttributeId aAttr
         return value;
     }
     default: {
+        // Not a known RVCCleanMode attribute.
         break;
     }
     }
@@ -6145,6 +6216,7 @@ static id _Nullable DecodeAttributeValueForTemperatureControlCluster(AttributeId
         return value;
     }
     default: {
+        // Not a known TemperatureControl attribute.
         break;
     }
     }
@@ -6190,6 +6262,7 @@ static id _Nullable DecodeAttributeValueForRefrigeratorAlarmCluster(AttributeId 
         return value;
     }
     default: {
+        // Not a known RefrigeratorAlarm attribute.
         break;
     }
     }
@@ -6268,6 +6341,7 @@ static id _Nullable DecodeAttributeValueForDishwasherModeCluster(AttributeId aAt
         return value;
     }
     default: {
+        // Not a known DishwasherMode attribute.
         break;
     }
     }
@@ -6291,6 +6365,7 @@ static id _Nullable DecodeAttributeValueForAirQualityCluster(AttributeId aAttrib
         return value;
     }
     default: {
+        // Not a known AirQuality attribute.
         break;
     }
     }
@@ -6446,6 +6521,7 @@ static id _Nullable DecodeAttributeValueForSmokeCOAlarmCluster(AttributeId aAttr
         return value;
     }
     default: {
+        // Not a known SmokeCOAlarm attribute.
         break;
     }
     }
@@ -6502,6 +6578,7 @@ static id _Nullable DecodeAttributeValueForDishwasherAlarmCluster(AttributeId aA
         return value;
     }
     default: {
+        // Not a known DishwasherAlarm attribute.
         break;
     }
     }
@@ -6580,6 +6657,7 @@ static id _Nullable DecodeAttributeValueForMicrowaveOvenModeCluster(AttributeId 
         return value;
     }
     default: {
+        // Not a known MicrowaveOvenMode attribute.
         break;
     }
     }
@@ -6706,6 +6784,7 @@ static id _Nullable DecodeAttributeValueForMicrowaveOvenControlCluster(Attribute
         return value;
     }
     default: {
+        // Not a known MicrowaveOvenControl attribute.
         break;
     }
     }
@@ -6863,6 +6942,7 @@ static id _Nullable DecodeAttributeValueForOperationalStateCluster(AttributeId a
         return value;
     }
     default: {
+        // Not a known OperationalState attribute.
         break;
     }
     }
@@ -7020,6 +7100,7 @@ static id _Nullable DecodeAttributeValueForRVCOperationalStateCluster(AttributeI
         return value;
     }
     default: {
+        // Not a known RVCOperationalState attribute.
         break;
     }
     }
@@ -7075,6 +7156,7 @@ static id _Nullable DecodeAttributeValueForScenesManagementCluster(AttributeId a
         return value;
     }
     default: {
+        // Not a known ScenesManagement attribute.
         break;
     }
     }
@@ -7179,6 +7261,7 @@ static id _Nullable DecodeAttributeValueForHEPAFilterMonitoringCluster(Attribute
         return value;
     }
     default: {
+        // Not a known HEPAFilterMonitoring attribute.
         break;
     }
     }
@@ -7283,6 +7366,7 @@ static id _Nullable DecodeAttributeValueForActivatedCarbonFilterMonitoringCluste
         return value;
     }
     default: {
+        // Not a known ActivatedCarbonFilterMonitoring attribute.
         break;
     }
     }
@@ -7383,6 +7467,7 @@ static id _Nullable DecodeAttributeValueForBooleanStateConfigurationCluster(Attr
         return value;
     }
     default: {
+        // Not a known BooleanStateConfiguration attribute.
         break;
     }
     }
@@ -7548,6 +7633,7 @@ static id _Nullable DecodeAttributeValueForValveConfigurationAndControlCluster(A
         return value;
     }
     default: {
+        // Not a known ValveConfigurationAndControl attribute.
         break;
     }
     }
@@ -7996,6 +8082,7 @@ static id _Nullable DecodeAttributeValueForElectricalPowerMeasurementCluster(Att
         return value;
     }
     default: {
+        // Not a known ElectricalPowerMeasurement attribute.
         break;
     }
     }
@@ -8266,6 +8353,7 @@ static id _Nullable DecodeAttributeValueForElectricalEnergyMeasurementCluster(At
         return value;
     }
     default: {
+        // Not a known ElectricalEnergyMeasurement attribute.
         break;
     }
     }
@@ -8344,6 +8432,7 @@ static id _Nullable DecodeAttributeValueForWaterHeaterManagementCluster(Attribut
         return value;
     }
     default: {
+        // Not a known WaterHeaterManagement attribute.
         break;
     }
     }
@@ -8551,6 +8640,7 @@ static id _Nullable DecodeAttributeValueForCommodityPriceCluster(AttributeId aAt
         return value;
     }
     default: {
+        // Not a known CommodityPrice attribute.
         break;
     }
     }
@@ -8922,6 +9012,7 @@ static id _Nullable DecodeAttributeValueForDemandResponseLoadControlCluster(Attr
         return value;
     }
     default: {
+        // Not a known DemandResponseLoadControl attribute.
         break;
     }
     }
@@ -9040,6 +9131,7 @@ static id _Nullable DecodeAttributeValueForMessagesCluster(AttributeId aAttribut
         return value;
     }
     default: {
+        // Not a known Messages attribute.
         break;
     }
     }
@@ -9306,6 +9398,7 @@ static id _Nullable DecodeAttributeValueForDeviceEnergyManagementCluster(Attribu
         return value;
     }
     default: {
+        // Not a known DeviceEnergyManagement attribute.
         break;
     }
     }
@@ -9636,6 +9729,7 @@ static id _Nullable DecodeAttributeValueForEnergyEVSECluster(AttributeId aAttrib
         return value;
     }
     default: {
+        // Not a known EnergyEVSE attribute.
         break;
     }
     }
@@ -9770,6 +9864,7 @@ static id _Nullable DecodeAttributeValueForEnergyPreferenceCluster(AttributeId a
         return value;
     }
     default: {
+        // Not a known EnergyPreference attribute.
         break;
     }
     }
@@ -9834,6 +9929,7 @@ static id _Nullable DecodeAttributeValueForPowerTopologyCluster(AttributeId aAtt
         return value;
     }
     default: {
+        // Not a known PowerTopology attribute.
         break;
     }
     }
@@ -9912,6 +10008,7 @@ static id _Nullable DecodeAttributeValueForEnergyEVSEModeCluster(AttributeId aAt
         return value;
     }
     default: {
+        // Not a known EnergyEVSEMode attribute.
         break;
     }
     }
@@ -9990,6 +10087,7 @@ static id _Nullable DecodeAttributeValueForWaterHeaterModeCluster(AttributeId aA
         return value;
     }
     default: {
+        // Not a known WaterHeaterMode attribute.
         break;
     }
     }
@@ -10068,6 +10166,7 @@ static id _Nullable DecodeAttributeValueForDeviceEnergyManagementModeCluster(Att
         return value;
     }
     default: {
+        // Not a known DeviceEnergyManagementMode attribute.
         break;
     }
     }
@@ -10156,6 +10255,7 @@ static id _Nullable DecodeAttributeValueForElectricalGridConditionsCluster(Attri
         return value;
     }
     default: {
+        // Not a known ElectricalGridConditions attribute.
         break;
     }
     }
@@ -10718,6 +10818,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
         return value;
     }
     default: {
+        // Not a known DoorLock attribute.
         break;
     }
     }
@@ -11004,6 +11105,7 @@ static id _Nullable DecodeAttributeValueForWindowCoveringCluster(AttributeId aAt
         return value;
     }
     default: {
+        // Not a known WindowCovering attribute.
         break;
     }
     }
@@ -11149,6 +11251,7 @@ static id _Nullable DecodeAttributeValueForClosureControlCluster(AttributeId aAt
         return value;
     }
     default: {
+        // Not a known ClosureControl attribute.
         break;
     }
     }
@@ -11328,6 +11431,7 @@ static id _Nullable DecodeAttributeValueForClosureDimensionCluster(AttributeId a
         return value;
     }
     default: {
+        // Not a known ClosureDimension attribute.
         break;
     }
     }
@@ -11540,6 +11644,7 @@ static id _Nullable DecodeAttributeValueForServiceAreaCluster(AttributeId aAttri
         return value;
     }
     default: {
+        // Not a known ServiceArea attribute.
         break;
     }
     }
@@ -11877,6 +11982,7 @@ static id _Nullable DecodeAttributeValueForPumpConfigurationAndControlCluster(At
         return value;
     }
     default: {
+        // Not a known PumpConfigurationAndControl attribute.
         break;
     }
     }
@@ -12774,6 +12880,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
         return value;
     }
     default: {
+        // Not a known Thermostat attribute.
         break;
     }
     }
@@ -12926,6 +13033,7 @@ static id _Nullable DecodeAttributeValueForFanControlCluster(AttributeId aAttrib
         return value;
     }
     default: {
+        // Not a known FanControl attribute.
         break;
     }
     }
@@ -12971,6 +13079,7 @@ static id _Nullable DecodeAttributeValueForThermostatUserInterfaceConfigurationC
         return value;
     }
     default: {
+        // Not a known ThermostatUserInterfaceConfiguration attribute.
         break;
     }
     }
@@ -13604,6 +13713,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
         return value;
     }
     default: {
+        // Not a known ColorControl attribute.
         break;
     }
     }
@@ -13800,6 +13910,7 @@ static id _Nullable DecodeAttributeValueForBallastConfigurationCluster(Attribute
         return value;
     }
     default: {
+        // Not a known BallastConfiguration attribute.
         break;
     }
     }
@@ -13883,6 +13994,7 @@ static id _Nullable DecodeAttributeValueForIlluminanceMeasurementCluster(Attribu
         return value;
     }
     default: {
+        // Not a known IlluminanceMeasurement attribute.
         break;
     }
     }
@@ -13951,6 +14063,7 @@ static id _Nullable DecodeAttributeValueForTemperatureMeasurementCluster(Attribu
         return value;
     }
     default: {
+        // Not a known TemperatureMeasurement attribute.
         break;
     }
     }
@@ -14086,6 +14199,7 @@ static id _Nullable DecodeAttributeValueForPressureMeasurementCluster(AttributeI
         return value;
     }
     default: {
+        // Not a known PressureMeasurement attribute.
         break;
     }
     }
@@ -14154,6 +14268,7 @@ static id _Nullable DecodeAttributeValueForFlowMeasurementCluster(AttributeId aA
         return value;
     }
     default: {
+        // Not a known FlowMeasurement attribute.
         break;
     }
     }
@@ -14222,6 +14337,7 @@ static id _Nullable DecodeAttributeValueForRelativeHumidityMeasurementCluster(At
         return value;
     }
     default: {
+        // Not a known RelativeHumidityMeasurement attribute.
         break;
     }
     }
@@ -14391,6 +14507,7 @@ static id _Nullable DecodeAttributeValueForOccupancySensingCluster(AttributeId a
         return value;
     }
     default: {
+        // Not a known OccupancySensing attribute.
         break;
     }
     }
@@ -14544,6 +14661,7 @@ static id _Nullable DecodeAttributeValueForCarbonMonoxideConcentrationMeasuremen
         return value;
     }
     default: {
+        // Not a known CarbonMonoxideConcentrationMeasurement attribute.
         break;
     }
     }
@@ -14697,6 +14815,7 @@ static id _Nullable DecodeAttributeValueForCarbonDioxideConcentrationMeasurement
         return value;
     }
     default: {
+        // Not a known CarbonDioxideConcentrationMeasurement attribute.
         break;
     }
     }
@@ -14850,6 +14969,7 @@ static id _Nullable DecodeAttributeValueForNitrogenDioxideConcentrationMeasureme
         return value;
     }
     default: {
+        // Not a known NitrogenDioxideConcentrationMeasurement attribute.
         break;
     }
     }
@@ -15003,6 +15123,7 @@ static id _Nullable DecodeAttributeValueForOzoneConcentrationMeasurementCluster(
         return value;
     }
     default: {
+        // Not a known OzoneConcentrationMeasurement attribute.
         break;
     }
     }
@@ -15156,6 +15277,7 @@ static id _Nullable DecodeAttributeValueForPM25ConcentrationMeasurementCluster(A
         return value;
     }
     default: {
+        // Not a known PM25ConcentrationMeasurement attribute.
         break;
     }
     }
@@ -15309,6 +15431,7 @@ static id _Nullable DecodeAttributeValueForFormaldehydeConcentrationMeasurementC
         return value;
     }
     default: {
+        // Not a known FormaldehydeConcentrationMeasurement attribute.
         break;
     }
     }
@@ -15462,6 +15585,7 @@ static id _Nullable DecodeAttributeValueForPM1ConcentrationMeasurementCluster(At
         return value;
     }
     default: {
+        // Not a known PM1ConcentrationMeasurement attribute.
         break;
     }
     }
@@ -15615,6 +15739,7 @@ static id _Nullable DecodeAttributeValueForPM10ConcentrationMeasurementCluster(A
         return value;
     }
     default: {
+        // Not a known PM10ConcentrationMeasurement attribute.
         break;
     }
     }
@@ -15768,6 +15893,7 @@ static id _Nullable DecodeAttributeValueForTotalVolatileOrganicCompoundsConcentr
         return value;
     }
     default: {
+        // Not a known TotalVolatileOrganicCompoundsConcentrationMeasurement attribute.
         break;
     }
     }
@@ -15921,6 +16047,7 @@ static id _Nullable DecodeAttributeValueForRadonConcentrationMeasurementCluster(
         return value;
     }
     default: {
+        // Not a known RadonConcentrationMeasurement attribute.
         break;
     }
     }
@@ -15963,6 +16090,7 @@ static id _Nullable DecodeAttributeValueForWiFiNetworkManagementCluster(Attribut
         return value;
     }
     default: {
+        // Not a known WiFiNetworkManagement attribute.
         break;
     }
     }
@@ -16054,6 +16182,7 @@ static id _Nullable DecodeAttributeValueForThreadBorderRouterManagementCluster(A
         return value;
     }
     default: {
+        // Not a known ThreadBorderRouterManagement attribute.
         break;
     }
     }
@@ -16127,6 +16256,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDirectoryCluster(Attribu
         return value;
     }
     default: {
+        // Not a known ThreadNetworkDirectory attribute.
         break;
     }
     }
@@ -16166,6 +16296,7 @@ static id _Nullable DecodeAttributeValueForWakeOnLANCluster(AttributeId aAttribu
         return value;
     }
     default: {
+        // Not a known WakeOnLAN attribute.
         break;
     }
     }
@@ -16355,6 +16486,7 @@ static id _Nullable DecodeAttributeValueForChannelCluster(AttributeId aAttribute
         return value;
     }
     default: {
+        // Not a known Channel attribute.
         break;
     }
     }
@@ -16411,6 +16543,7 @@ static id _Nullable DecodeAttributeValueForTargetNavigatorCluster(AttributeId aA
         return value;
     }
     default: {
+        // Not a known TargetNavigator attribute.
         break;
     }
     }
@@ -16740,6 +16873,7 @@ static id _Nullable DecodeAttributeValueForMediaPlaybackCluster(AttributeId aAtt
         return value;
     }
     default: {
+        // Not a known MediaPlayback attribute.
         break;
     }
     }
@@ -16803,6 +16937,7 @@ static id _Nullable DecodeAttributeValueForMediaInputCluster(AttributeId aAttrib
         return value;
     }
     default: {
+        // Not a known MediaInput attribute.
         break;
     }
     }
@@ -16815,6 +16950,7 @@ static id _Nullable DecodeAttributeValueForLowPowerCluster(AttributeId aAttribut
     using namespace Clusters::LowPower;
     switch (aAttributeId) {
     default: {
+        // Not a known LowPower attribute.
         break;
     }
     }
@@ -16827,6 +16963,7 @@ static id _Nullable DecodeAttributeValueForKeypadInputCluster(AttributeId aAttri
     using namespace Clusters::KeypadInput;
     switch (aAttributeId) {
     default: {
+        // Not a known KeypadInput attribute.
         break;
     }
     }
@@ -16881,6 +17018,7 @@ static id _Nullable DecodeAttributeValueForContentLauncherCluster(AttributeId aA
         return value;
     }
     default: {
+        // Not a known ContentLauncher attribute.
         break;
     }
     }
@@ -16938,6 +17076,7 @@ static id _Nullable DecodeAttributeValueForAudioOutputCluster(AttributeId aAttri
         return value;
     }
     default: {
+        // Not a known AudioOutput attribute.
         break;
     }
     }
@@ -17004,6 +17143,7 @@ static id _Nullable DecodeAttributeValueForApplicationLauncherCluster(AttributeI
         return value;
     }
     default: {
+        // Not a known ApplicationLauncher attribute.
         break;
     }
     }
@@ -17141,6 +17281,7 @@ static id _Nullable DecodeAttributeValueForApplicationBasicCluster(AttributeId a
         return value;
     }
     default: {
+        // Not a known ApplicationBasic attribute.
         break;
     }
     }
@@ -17153,6 +17294,7 @@ static id _Nullable DecodeAttributeValueForAccountLoginCluster(AttributeId aAttr
     using namespace Clusters::AccountLogin;
     switch (aAttributeId) {
     default: {
+        // Not a known AccountLogin attribute.
         break;
     }
     }
@@ -17325,6 +17467,7 @@ static id _Nullable DecodeAttributeValueForContentControlCluster(AttributeId aAt
         return value;
     }
     default: {
+        // Not a known ContentControl attribute.
         break;
     }
     }
@@ -17337,6 +17480,7 @@ static id _Nullable DecodeAttributeValueForContentAppObserverCluster(AttributeId
     using namespace Clusters::ContentAppObserver;
     switch (aAttributeId) {
     default: {
+        // Not a known ContentAppObserver attribute.
         break;
     }
     }
@@ -17450,6 +17594,7 @@ static id _Nullable DecodeAttributeValueForZoneManagementCluster(AttributeId aAt
         return value;
     }
     default: {
+        // Not a known ZoneManagement attribute.
         break;
     }
     }
@@ -18193,6 +18338,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
         return value;
     }
     default: {
+        // Not a known CameraAVStreamManagement attribute.
         break;
     }
     }
@@ -18372,6 +18518,7 @@ static id _Nullable DecodeAttributeValueForCameraAVSettingsUserLevelManagementCl
         return value;
     }
     default: {
+        // Not a known CameraAVSettingsUserLevelManagement attribute.
         break;
     }
     }
@@ -18426,6 +18573,7 @@ static id _Nullable DecodeAttributeValueForWebRTCTransportProviderCluster(Attrib
         return value;
     }
     default: {
+        // Not a known WebRTCTransportProvider attribute.
         break;
     }
     }
@@ -18480,6 +18628,7 @@ static id _Nullable DecodeAttributeValueForWebRTCTransportRequestorCluster(Attri
         return value;
     }
     default: {
+        // Not a known WebRTCTransportRequestor attribute.
         break;
     }
     }
@@ -18540,6 +18689,7 @@ static id _Nullable DecodeAttributeValueForPushAVStreamTransportCluster(Attribut
         return value;
     }
     default: {
+        // Not a known PushAVStreamTransport attribute.
         break;
     }
     }
@@ -18607,6 +18757,7 @@ static id _Nullable DecodeAttributeValueForChimeCluster(AttributeId aAttributeId
         return value;
     }
     default: {
+        // Not a known Chime attribute.
         break;
     }
     }
@@ -19498,6 +19649,7 @@ static id _Nullable DecodeAttributeValueForCommodityTariffCluster(AttributeId aA
         return value;
     }
     default: {
+        // Not a known CommodityTariff attribute.
         break;
     }
     }
@@ -19645,6 +19797,7 @@ static id _Nullable DecodeAttributeValueForEcosystemInformationCluster(Attribute
         return value;
     }
     default: {
+        // Not a known EcosystemInformation attribute.
         break;
     }
     }
@@ -19668,6 +19821,7 @@ static id _Nullable DecodeAttributeValueForCommissionerControlCluster(AttributeI
         return value;
     }
     default: {
+        // Not a known CommissionerControl attribute.
         break;
     }
     }
@@ -19786,6 +19940,7 @@ static id _Nullable DecodeAttributeValueForTLSCertificateManagementCluster(Attri
         return value;
     }
     default: {
+        // Not a known TLSCertificateManagement attribute.
         break;
     }
     }
@@ -19845,6 +20000,7 @@ static id _Nullable DecodeAttributeValueForTLSClientManagementCluster(AttributeI
         return value;
     }
     default: {
+        // Not a known TLSClientManagement attribute.
         break;
     }
     }
@@ -19962,6 +20118,7 @@ static id _Nullable DecodeAttributeValueForMeterIdentificationCluster(AttributeI
         return value;
     }
     default: {
+        // Not a known MeterIdentification attribute.
         break;
     }
     }
@@ -20051,6 +20208,7 @@ static id _Nullable DecodeAttributeValueForCommodityMeteringCluster(AttributeId 
         return value;
     }
     default: {
+        // Not a known CommodityMetering attribute.
         break;
     }
     }
@@ -21617,6 +21775,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
         return value;
     }
     default: {
+        // Not a known UnitTesting attribute.
         break;
     }
     }
@@ -21640,6 +21799,7 @@ static id _Nullable DecodeAttributeValueForSampleMEICluster(AttributeId aAttribu
         return value;
     }
     default: {
+        // Not a known SampleMEI attribute.
         break;
     }
     }

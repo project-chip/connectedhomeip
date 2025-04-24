@@ -54,8 +54,9 @@ tests:
 
           Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-
           ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
+
+          Note: The specified value of the timedInteractionTimeoutMs argument is intended for the RPI platform. While validating with a real device, the test step may fail due to the lesser timeout. In such cases, please increase the value of the timedInteractionTimeoutMs argument(Max value 65535 milliseconds).
 
           Verify the Open commisioning window on the TH_CE(all-cluster-app) Log:
 
@@ -89,9 +90,9 @@ tests:
 
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-
           ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
 
+          Note: The specified value of the timedInteractionTimeoutMs argument is intended for the RPI platform. While validating with a real device, the test step may fail due to the lesser timeout. In such cases, please increase the value of the timedInteractionTimeoutMs argument(Max value 65535 milliseconds).
 
           Verify the Open commisioning window on the TH_CE(all-cluster-app) Log:
 
@@ -375,6 +376,7 @@ tests:
           For BCM,
           ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
 
+          Note: The specified value of the timedInteractionTimeoutMs argument is intended for the RPI platform. While validating with a real device, the test step may fail due to the lesser timeout. In such cases, please increase the value of the timedInteractionTimeoutMs argument(Max value 65535 milliseconds).
 
           Verify the Open commisioning window on the TH_CE(all-cluster-app) Log:
 
