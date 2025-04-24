@@ -116,7 +116,7 @@ def parse_pixit_xml(contents: str) -> dict[str, bool]:
         # Convert 'support' to a boolean value
         if support not in ["true", "false"]:
             raise ValueError(f"Invalid value for 'support': {support}")
-        pixit[name] = json.loads(support) == True
+        pixit[name] = json.loads(support)
     return pixit
 
 
