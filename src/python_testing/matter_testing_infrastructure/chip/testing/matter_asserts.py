@@ -359,6 +359,7 @@ def assert_valid_enum(value: Any, description: str, enum_type: type) -> None:
 
 # map8 bitmap
 
+
 def assert_valid_map8(value: Any, description: str = "Value") -> None:
     """
     Asserts that 'value' is a valid 8-bit bitmap (map8).
