@@ -302,6 +302,13 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
 
     FabricIndex fabricIndex = event->FailSafeTimerExpired.fabricIndex;
 
+    // Report Fabrics table change if SetVIDVerificationStatement had been called.
+    if (event->FailSafeTimerExpired.setVidVerificationStatementHasBeenInvoked)
+    {
+        // Opcreds cluster is always on Endpoint 0.
+        MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id, OperationalCredentials::Attributes::Fabrics::Id);
+    }
+
     // If an AddNOC or UpdateNOC command has been successfully invoked, terminate all CASE sessions associated with the Fabric
     // whose Fabric Index is recorded in the Fail-Safe context (see ArmFailSafe Command) by clearing any associated Secure
     // Session Context at the Server.
@@ -1279,6 +1286,9 @@ bool emberAfOperationalCredentialsClusterSetVIDVerificationStatementCallback(
     // is not reportable (`C` quality).
     if (fabricChangesOccurred)
     {
+        auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
+        failSafeContext.RecordSetVidVerificationStatementHasBeenInvoked();
+
         MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
                                                OperationalCredentials::Attributes::Fabrics::Id);
     }
