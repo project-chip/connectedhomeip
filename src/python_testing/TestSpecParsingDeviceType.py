@@ -14,6 +14,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+import re
 import xml.etree.ElementTree as ElementTree
 
 import chip.clusters as Clusters
@@ -47,8 +48,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         self.clusters = {0x0003: "Identify", 0x0004: "Groups"}
 
         # Let's just build a dictionary of device types to IDs becasue I need them and we don't have codegen
-        self.dt_ids = {re.replace('[ -/]*', '', dt.name.lower())
-                                       : id for id, dt in self.xml_device_types.items()}
+        self.dt_ids = {re.sub('[ -/]*', '', dt.name.lower()): id for id, dt in self.xml_device_types.items()}
 
         # Conformance support tests the different types of conformance for clusters, so here we just want to ensure that we're correctly parsing the XML into python
         # adds the same attributes and features to every cluster. This is fine for testing.
