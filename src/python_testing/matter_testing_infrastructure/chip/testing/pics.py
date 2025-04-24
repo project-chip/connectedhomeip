@@ -75,6 +75,8 @@ def parse_pics_xml(contents: str) -> dict[str, bool]:
         if support_element is None:
             raise ValueError("Missing 'support' in picsItem")
         support = support_element.text
+        if support is None:
+            raise ValueError("The 'support' element is empty or missing text")
         pics[name] = int(json.loads(support.lower())) == 1
     return pics
 
@@ -108,6 +110,8 @@ def parse_pixit_xml(contents: str) -> dict[str, bool]:
         if support_element is None:
             raise ValueError("Missing 'support' in pixitItem")
         support = support_element.text
+        if support is None:
+            raise ValueError("The 'support' element is empty or missing text")
         pixit[name] = support
     return pixit
 
