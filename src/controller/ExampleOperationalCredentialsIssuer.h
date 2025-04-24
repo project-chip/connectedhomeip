@@ -40,6 +40,11 @@
 namespace chip {
 namespace Controller {
 
+constexpr char kOperationalCredentialsIssuerKeypairStorage[]             = "ExampleOpCredsCAKey";
+constexpr char kOperationalCredentialsIntermediateIssuerKeypairStorage[] = "ExampleOpCredsICAKey";
+constexpr char kOperationalCredentialsRootCertificateStorage[]           = "ExampleCARootCert";
+constexpr char kOperationalCredentialsIntermediateCertificateStorage[]   = "ExampleCAIntermediateCert";
+
 class DLL_EXPORT ExampleOperationalCredentialsIssuer : public OperationalCredentialsDelegate
 {
 public:
