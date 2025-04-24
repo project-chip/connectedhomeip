@@ -41,14 +41,14 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace SelectOutput {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = AudioOutput::Commands::SelectOutput::Id,
+    .commandId       = Commands::SelectOutput::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace SelectOutput
 namespace RenameOutput {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = AudioOutput::Commands::RenameOutput::Id,
+    .commandId       = Commands::RenameOutput::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };

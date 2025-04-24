@@ -33,28 +33,28 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace Offer {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = WebRTCTransportRequestor::Commands::Offer::Id,
+    .commandId       = Commands::Offer::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Offer
 namespace Answer {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = WebRTCTransportRequestor::Commands::Answer::Id,
+    .commandId       = Commands::Answer::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Answer
 namespace ICECandidates {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = WebRTCTransportRequestor::Commands::ICECandidates::Id,
+    .commandId       = Commands::ICECandidates::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace ICECandidates
 namespace End {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = WebRTCTransportRequestor::Commands::End::Id,
+    .commandId       = Commands::End::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

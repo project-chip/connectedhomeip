@@ -341,23 +341,25 @@ Instance::NetworkInstanceList Instance::sInstances;
 #endif
 
 Instance::Instance(EndpointId aEndpointId, WiFiDriver * apDelegate) :
-    CommandHandlerInterface(Optional<EndpointId>(aEndpointId), Id), AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id),
-    mEndpointId(aEndpointId), mFeatureFlags(WiFiFeatures(apDelegate)), mpWirelessDriver(apDelegate), mpBaseDriver(apDelegate)
+    CommandHandlerInterfaceShim(Optional<EndpointId>(aEndpointId), Id),
+    AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id), mEndpointId(aEndpointId),
+    mFeatureFlags(WiFiFeatures(apDelegate)), mpWirelessDriver(apDelegate), mpBaseDriver(apDelegate)
 {
     mpDriver.Set<WiFiDriver *>(apDelegate);
 }
 
 Instance::Instance(EndpointId aEndpointId, ThreadDriver * apDelegate) :
-    CommandHandlerInterface(Optional<EndpointId>(aEndpointId), Id), AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id),
-    mEndpointId(aEndpointId), mFeatureFlags(Feature::kThreadNetworkInterface), mpWirelessDriver(apDelegate),
-    mpBaseDriver(apDelegate)
+    CommandHandlerInterfaceShim(Optional<EndpointId>(aEndpointId), Id),
+    AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id), mEndpointId(aEndpointId),
+    mFeatureFlags(Feature::kThreadNetworkInterface), mpWirelessDriver(apDelegate), mpBaseDriver(apDelegate)
 {
     mpDriver.Set<ThreadDriver *>(apDelegate);
 }
 
 Instance::Instance(EndpointId aEndpointId, EthernetDriver * apDelegate) :
-    CommandHandlerInterface(Optional<EndpointId>(aEndpointId), Id), AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id),
-    mEndpointId(aEndpointId), mFeatureFlags(Feature::kEthernetNetworkInterface), mpWirelessDriver(nullptr), mpBaseDriver(apDelegate)
+    CommandHandlerInterfaceShim(Optional<EndpointId>(aEndpointId), Id),
+    AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id), mEndpointId(aEndpointId),
+    mFeatureFlags(Feature::kEthernetNetworkInterface), mpWirelessDriver(nullptr), mpBaseDriver(apDelegate)
 {}
 
 CHIP_ERROR Instance::Init()

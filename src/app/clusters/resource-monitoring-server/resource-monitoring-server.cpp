@@ -188,12 +188,16 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
 
 // List the commands supported by this instance.
 CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                               CommandHandlerInterface::CommandIdCallback callback, void * context)
+                                               ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
+    using namespace ResourceMonitoring::Commands;
+
     ChipLogDetail(Zcl, "resourcemonitoring: EnumerateAcceptedCommands");
     if (mResetConditionCommandSupported)
     {
-        callback(ResourceMonitoring::Commands::ResetCondition::Id, context);
+        ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
+        // Maybe add interface to provide this entry dynamically for the alias?
+        return builder.Append(ResetCondition::kMetadataEntry);
     }
 
     return CHIP_NO_ERROR;

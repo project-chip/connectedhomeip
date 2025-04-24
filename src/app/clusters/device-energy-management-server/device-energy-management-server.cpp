@@ -104,49 +104,45 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 }
 
 // CommandHandlerInterface
-CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                                               ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Commands;
 
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(8)); // Ensure we have capacity for all possible commands
+
     if (HasFeature(Feature::kPowerAdjustment))
     {
-        for (auto && cmd : {
-                 PowerAdjustRequest::Id,
-                 CancelPowerAdjustRequest::Id,
-             })
-        {
-            VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
-        }
+        ReturnErrorOnFailure(
+            builder.AppendElements({ PowerAdjustRequest::kMetadataEntry, CancelPowerAdjustRequest::kMetadataEntry }));
     }
 
     if (HasFeature(Feature::kStartTimeAdjustment))
     {
-        VerifyOrExit(callback(StartTimeAdjustRequest::Id, context) == Loop::Continue, /**/);
+        ReturnErrorOnFailure(builder.Append(StartTimeAdjustRequest::kMetadataEntry));
     }
 
     if (HasFeature(Feature::kPausable))
     {
-        VerifyOrExit(callback(PauseRequest::Id, context) == Loop::Continue, /**/);
-        VerifyOrExit(callback(ResumeRequest::Id, context) == Loop::Continue, /**/);
+        ReturnErrorOnFailure(builder.AppendElements({ PauseRequest::kMetadataEntry, ResumeRequest::kMetadataEntry }));
     }
 
     if (HasFeature(Feature::kForecastAdjustment))
     {
-        VerifyOrExit(callback(ModifyForecastRequest::Id, context) == Loop::Continue, /**/);
+        ReturnErrorOnFailure(builder.Append(ModifyForecastRequest::kMetadataEntry));
     }
 
     if (HasFeature(Feature::kConstraintBasedAdjustment))
     {
-        VerifyOrExit(callback(RequestConstraintBasedForecast::Id, context) == Loop::Continue, /**/);
+        ReturnErrorOnFailure(builder.Append(RequestConstraintBasedForecast::kMetadataEntry));
     }
 
     if (HasFeature(Feature::kStartTimeAdjustment) || HasFeature(Feature::kForecastAdjustment) ||
         HasFeature(Feature::kConstraintBasedAdjustment))
     {
-        VerifyOrExit(callback(CancelRequest::Id, context) == Loop::Continue, /**/);
+        ReturnErrorOnFailure(builder.Append(CancelRequest::kMetadataEntry));
     }
 
-exit:
     return CHIP_NO_ERROR;
 }
 
