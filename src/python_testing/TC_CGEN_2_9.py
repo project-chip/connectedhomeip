@@ -56,7 +56,7 @@ class TC_CGEN_2_9(MatterBaseTest):
             endpoint=ROOT_ENDPOINT_ID,
             attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
         logging.info(f"Commissioner's fabricIndex on DUT: {commissioner_fabric_index_on_dut}")
-        
+
         fabrics: list[Clusters.OperationalCredentials.Structs.FabricDescriptorStruct] = await self.read_single_attribute(
             dev_ctrl=commissioner,
             node_id=self.dut_node_id,
