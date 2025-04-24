@@ -817,7 +817,7 @@ void * bridge_polling_thread(void * context)
                                   Span<DataVersion>(gLight2DataVersions), 1);
 #else
                 AddDeviceEndpoint(&Light2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                                  Span<DataVersion>(gLight2DataVersions), chip::CharSpan(), 1);
+                                  Span<DataVersion>(gLight2DataVersions), ""_span, 1);
 #endif
                 light2_added = true;
             }
@@ -835,7 +835,7 @@ void * bridge_polling_thread(void * context)
                                   Span<DataVersion>(gLight2DataVersions), 1);
 #else
                 AddDeviceEndpoint(&Light1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                                  Span<DataVersion>(gLight1DataVersions), chip::CharSpan(), 1);
+                                  Span<DataVersion>(gLight1DataVersions), ""_span, 1);
 #endif
                 light1_added = true;
             }
@@ -1010,13 +1010,13 @@ void ApplicationInit()
                       Span<DataVersion>(gActionLight4DataVersions), 1);
 #else
     AddDeviceEndpoint(&Light1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight1DataVersions), chip::CharSpan(), 1);
+                      Span<DataVersion>(gLight1DataVersions), ""_span, 1);
 
     // Add Temperature Sensor devices --> will be mapped to endpoints 4,5
     AddDeviceEndpoint(&TempSensor1, &bridgedTempSensorEndpoint, Span<const EmberAfDeviceType>(gBridgedTempSensorDeviceTypes),
-                      Span<DataVersion>(gTempSensor1DataVersions), chip::CharSpan(), 1);
+                      Span<DataVersion>(gTempSensor1DataVersions), ""_span, 1);
     AddDeviceEndpoint(&TempSensor2, &bridgedTempSensorEndpoint, Span<const EmberAfDeviceType>(gBridgedTempSensorDeviceTypes),
-                      Span<DataVersion>(gTempSensor2DataVersions), chip::CharSpan(), 1);
+                      Span<DataVersion>(gTempSensor2DataVersions), ""_span, 1);
 
     // Add composed Device with two temperature sensors and a power source
     AddDeviceEndpoint(&gComposedDevice, &bridgedComposedDeviceEndpoint, Span<const EmberAfDeviceType>(gBridgedComposedDeviceTypes),
@@ -1034,13 +1034,13 @@ void ApplicationInit()
 
     // Add 4 lights for the Action Clusters tests
     AddDeviceEndpoint(&ActionLight1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gActionLight1DataVersions), chip::CharSpan(), 1);
+                      Span<DataVersion>(gActionLight1DataVersions), ""_span, 1);
     AddDeviceEndpoint(&ActionLight2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gActionLight2DataVersions), chip::CharSpan(), 1);
+                      Span<DataVersion>(gActionLight2DataVersions), ""_span, 1);
     AddDeviceEndpoint(&ActionLight3, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gActionLight3DataVersions), chip::CharSpan(), 1);
+                      Span<DataVersion>(gActionLight3DataVersions), ""_span, 1);
     AddDeviceEndpoint(&ActionLight4, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gActionLight4DataVersions), chip::CharSpan(), 1);
+                      Span<DataVersion>(gActionLight4DataVersions), ""_span, 1);
 #endif
 
     // Because the power source is on the same endpoint as the composed device, it needs to be explicitly added
