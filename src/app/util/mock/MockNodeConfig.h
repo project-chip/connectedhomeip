@@ -134,7 +134,7 @@ struct MockEndpointConfig
     const EndpointId id;
     const app::EndpointComposition composition;
     const std::vector<MockClusterConfig> clusters;
-    char endpointUniqueIdBuffer[chip::app::Clusters::Descriptor::Attributes::EndpointUniqueID::TypeInfo::MaxLength()] = { 0 };
+    char endpointUniqueIdBuffer[app::Clusters::Descriptor::Attributes::EndpointUniqueID::TypeInfo::MaxLength()] = { 0 };
     uint8_t endpointUniqueIdSize;
 
 private:

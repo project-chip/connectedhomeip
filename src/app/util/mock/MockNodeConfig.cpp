@@ -186,7 +186,7 @@ const MockAttributeConfig * MockClusterConfig::attributeById(AttributeId attribu
 MockEndpointConfig::MockEndpointConfig(EndpointId aId, std::initializer_list<MockClusterConfig> aClusters,
                                        std::initializer_list<EmberAfDeviceType> aDeviceTypes,
                                        std::initializer_list<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> aTags,
-                                       app::EndpointComposition aComposition, chip::CharSpan aEndpointUniqueId) :
+                                       app::EndpointComposition aComposition, CharSpan aEndpointUniqueId) :
     id(aId),
     composition(aComposition), clusters(aClusters), mDeviceTypes(aDeviceTypes), mSemanticTags(aTags), mEmberEndpoint{}
 

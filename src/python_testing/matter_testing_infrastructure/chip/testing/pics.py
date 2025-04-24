@@ -99,8 +99,15 @@ def parse_pixit_xml(contents: str) -> dict[str, bool]:
     pixit = {}
     mytree = ET.fromstring(contents)
     for pi in mytree.iter('pixitItem'):
-        name = pi.find('itemNumber').text
-        support = pi.find('support').text
+        name_element = pi.find('itemNumber')
+        if name_element is None:
+            raise ValueError("Missing 'itemNumber' in pixitItem")
+        name = name_element.text
+
+        support_element = pi.find('support')
+        if support_element is None:
+            raise ValueError("Missing 'support' in pixitItem")
+        support = support_element.text
         pixit[name] = support
     return pixit
 
@@ -113,5 +120,4 @@ def read_pixit_from_file(path: str) -> dict[str, bool]:
             with open(filename, 'r') as f:
                 contents = f.read()
                 pixit_dict.update(parse_pixit_xml(contents))
-                print("reading ****")
         return pixit_dict

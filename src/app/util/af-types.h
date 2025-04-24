@@ -238,7 +238,7 @@ struct EmberAfDefinedEndpoint
 
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
     /**
-     * Unique Id for this end point.
+     * Unique Id for this endpoint.
      */
     char endpointUniqueId[chip::app::Clusters::Descriptor::Attributes::EndpointUniqueID::TypeInfo::MaxLength()] = { 0 };
 
