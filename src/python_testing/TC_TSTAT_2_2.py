@@ -699,7 +699,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
             # Sends SetpointRaise Command Heat Only
             await self.send_single_cmd(cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(mode=Clusters.Objects.Thermostat.Enums.SetpointRaiseLowerModeEnum.kHeat, amount=-30), endpoint=endpoint)
             asserts.assert_equal(status, Status.InvalidCommand)
-        
+
         self.step("14")
 
         if self.pics_guard(hasHeatingFeature):
