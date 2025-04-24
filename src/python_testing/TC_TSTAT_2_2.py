@@ -89,9 +89,11 @@ class TC_TSTAT_2_2(MatterBaseTest):
             TestStep("11b", "Test Harness Writes the value below MinSetpointDeadBand"),
             TestStep("11c", "Test Harness Writes the min limit of MinSetpointDeadBand"),
             TestStep("12", "Test Harness Reads ControlSequenceOfOperation from Server DUT, if TSTAT.S.F01 is true"),
-            TestStep("13", "Sets OccupiedCoolingSetpoint to default value"),
+            TestStep("13a", "Sets OccupiedCoolingSetpoint to default value"),
+            TestStep("13b", "Sets SetpointRaiseLower set to Heat (0x00), and the amount set to 0xE2 (-30 units = -3 degrees)."),
             TestStep("14", "Sets OccupiedHeatingSetpoint to default value"),
-            TestStep("15", "Test Harness Sends SetpointRaise Command Cool Only"),
+            TestStep("15a", "Test Harness Sends SetpointRaise Command Cool Only"),
+            TestStep("15b", "Sets SetpointRaiseLower set to Cool (0x01), and the amount set to 0xE2 (-30 units = -3 degrees)."),
             TestStep("16", "Sets OccupiedCoolingSetpoint to default value"),
             TestStep("17", "Sets OccupiedCoolingSetpoint to default value"),
             TestStep("18", "Sets OccupiedCoolingSetpoint to default value"),
@@ -674,7 +676,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
             if val != ControlSequenceOfOperation:
                 asserts.assert_equal(val, 4)
 
-        self.step("13")
+        self.step("13a")
 
         if self.pics_guard(hasCoolingFeature):
             # Sets OccupiedCoolingSetpoint to default value
@@ -691,6 +693,13 @@ class TC_TSTAT_2_2(MatterBaseTest):
             val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.OccupiedHeatingSetpoint)
             asserts.assert_equal(val, OccupiedHeatingSetpointValue - 30 * 10)
 
+        self.step("13b")
+
+        if self.pics_guard(not hasHeatingFeature):
+            # Sends SetpointRaise Command Heat Only
+            await self.send_single_cmd(cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(mode=Clusters.Objects.Thermostat.Enums.SetpointRaiseLowerModeEnum.kHeat, amount=-30), endpoint=endpoint)
+            asserts.assert_equal(status, Status.InvalidCommand)
+
         self.step("14")
 
         if self.pics_guard(hasHeatingFeature):
@@ -704,7 +713,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
             val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.OccupiedHeatingSetpoint)
             asserts.assert_equal(val, OccupiedHeatingSetpointValue + 30 * 10)
 
-        self.step("15")
+        self.step("15a")
 
         if self.pics_guard(hasCoolingFeature):
             # Test Harness Sends SetpointRaise Command Cool Only
@@ -713,6 +722,13 @@ class TC_TSTAT_2_2(MatterBaseTest):
             # Test Harness Reads back OccupiedCoolingSetpoint to confirm the success of the write
             val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.OccupiedCoolingSetpoint)
             asserts.assert_equal(val, OccupiedCoolingSetpointValue - 30 * 10)
+
+        self.step("15b")
+
+        if self.pics_guard(not hasCoolingFeature):
+            # Test Harness Sends SetpointRaise Command Cool Only
+            await self.send_single_cmd(cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(mode=Clusters.Objects.Thermostat.Enums.SetpointRaiseLowerModeEnum.kCool, amount=-30), endpoint=endpoint)
+            asserts.assert_equal(status, Status.InvalidCommand)
 
         self.step("16")
 

@@ -496,6 +496,9 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/${cluster}.h",
         ]
+      } else if (cluster == "operational-credentials-server") {
+        sources += [ "${_app_root}/clusters/operational-credentials-server/operational-credentials-server.cpp" ]
+        deps += [ "${chip_root}/zzz_generated/app-common/clusters/OperationalCredentials:metadata" ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
       }
