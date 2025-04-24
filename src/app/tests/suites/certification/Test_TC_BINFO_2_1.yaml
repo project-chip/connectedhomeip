@@ -779,7 +779,6 @@ tests:
           constraints:
               type: int32u
               minValue: 1
-              maxValue: 4294967295
 
     - label: "Step 69: TH writes ConfigurationVersion as '0x1124' "
       command: "writeAttribute"
