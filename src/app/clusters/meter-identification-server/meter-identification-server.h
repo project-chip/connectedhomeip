@@ -36,7 +36,8 @@ class Instance : public AttributeAccessInterface
 {
 public:
     Instance(const EndpointId & aEndpointId, const BitMask<Feature> & aFeature) :
-        AttributeAccessInterface(MakeOptional(aEndpointId), Id), mEndpointId(aEndpointId), mFeature(aFeature) {}
+        AttributeAccessInterface(MakeOptional(aEndpointId), Id), mEndpointId(aEndpointId), mFeature(aFeature)
+    {}
     ~Instance() override;
 
     CHIP_ERROR Init();
@@ -45,8 +46,8 @@ public:
     bool HasFeature(const Feature & aFeature) const;
 
     // Attribute Accessors
-    const DataModel::Nullable<MeterTypeEnum> & GetMeterType() const  { return mMeterType; }
-    const DataModel::Nullable<CharSpan> & GetPointOfDelivery()const  { return mPointOfDelivery; }
+    const DataModel::Nullable<MeterTypeEnum> & GetMeterType() const { return mMeterType; }
+    const DataModel::Nullable<CharSpan> & GetPointOfDelivery() const { return mPointOfDelivery; }
     const DataModel::Nullable<CharSpan> & GetMeterSerialNumber() const { return mMeterSerialNumber; }
     const DataModel::Nullable<CharSpan> & GetProtocolVersion() const { return mProtocolVersion; }
     const DataModel::Nullable<Globals::Structs::PowerThresholdStruct::Type> & GetPowerThreshold() const { return mPowerThreshold; }
@@ -60,10 +61,10 @@ public:
 
 private:
     // Attribute storage
-    static constexpr size_t kMaximumStringSize = 64;
-    char mPointOfDeliveryBuf[kMaximumStringSize] = {};
+    static constexpr size_t kMaximumStringSize     = 64;
+    char mPointOfDeliveryBuf[kMaximumStringSize]   = {};
     char mMeterSerialNumberBuf[kMaximumStringSize] = {};
-    char mProtocolVersionBuf[kMaximumStringSize] = {};
+    char mProtocolVersionBuf[kMaximumStringSize]   = {};
     DataModel::Nullable<MeterTypeEnum> mMeterType;
     DataModel::Nullable<CharSpan> mPointOfDelivery;
     DataModel::Nullable<CharSpan> mMeterSerialNumber;
