@@ -449,6 +449,30 @@ using DecodableType = Type;
 
 } // namespace PowerThresholdStruct
 
+namespace PriceStruct {
+enum class Fields : uint8_t
+{
+    kAmount   = 0,
+    kCurrency = 1,
+};
+
+struct Type
+{
+public:
+    int64_t amount = static_cast<int64_t>(0);
+    Globals::Structs::CurrencyStruct::Type currency;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace PriceStruct
+
 namespace TestGlobalStruct {
 enum class Fields : uint8_t
 {
@@ -500,30 +524,6 @@ public:
 using DecodableType = Type;
 
 } // namespace LocationDescriptorStruct
-
-namespace PriceStruct {
-enum class Fields : uint8_t
-{
-    kAmount   = 0,
-    kCurrency = 1,
-};
-
-struct Type
-{
-public:
-    int64_t amount = static_cast<int64_t>(0);
-    Globals::Structs::CurrencyStruct::Type currency;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace PriceStruct
 
 namespace AtomicAttributeStatusStruct {
 enum class Fields : uint8_t
