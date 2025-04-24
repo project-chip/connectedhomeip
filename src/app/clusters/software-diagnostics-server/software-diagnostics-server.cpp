@@ -28,6 +28,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
 #include <app/util/attribute-storage.h>
+#include <clusters/SoftwareDiagnostics/Metadata.h>
 #include <lib/core/Optional.h>
 #include <platform/DiagnosticDataProvider.h>
 
@@ -62,7 +63,8 @@ public:
 
     void InvokeCommand(HandlerContext & handlerContext) override;
 
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
+    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                                         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 };
 
 SoftwareDiagnosticsAttrAccess gAttrAccess;
@@ -168,18 +170,18 @@ void SoftwareDiagnosticsCommandHandler::InvokeCommand(HandlerContext & handlerCo
     handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, status);
 }
 
-CHIP_ERROR SoftwareDiagnosticsCommandHandler::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                                                        CommandIdCallback callback, void * context)
+CHIP_ERROR
+SoftwareDiagnosticsCommandHandler::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                                                             ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
+    using namespace Commands;
     if (!DeviceLayer::GetDiagnosticDataProvider().SupportsWatermarks())
     {
         // No commmands.
         return CHIP_NO_ERROR;
     }
-
-    callback(Commands::ResetWatermarks::Id, context);
-
-    return CHIP_NO_ERROR;
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
+    return builder.Append(ResetWatermarks::kMetadataEntry);
 }
 
 } // anonymous namespace

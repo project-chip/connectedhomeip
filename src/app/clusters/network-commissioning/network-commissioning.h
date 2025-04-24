@@ -22,6 +22,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/data-model/Nullable.h>
+#include <clusters/NetworkCommissioning/Metadata.h>
 #include <lib/support/IntrusiveList.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <lib/support/Variant.h>
@@ -40,7 +41,7 @@ class InstanceListNode : public IntrusiveListNodeBase<>
 };
 
 // TODO: Use macro to disable some wifi or thread
-class Instance : public CommandHandlerInterface,
+class Instance : public CommandHandlerInterfaceShim,
                  public AttributeAccessInterface,
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
                  private InstanceListNode,
@@ -59,7 +60,8 @@ public:
 
     // CommandHandlerInterface
     void InvokeCommand(HandlerContext & ctx) override;
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
+    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandEntryCallback callback,
+                                         void * context) override;
     CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
 
     // AttributeAccessInterface

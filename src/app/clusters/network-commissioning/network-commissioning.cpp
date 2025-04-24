@@ -30,6 +30,7 @@
 #include <app/reporting/reporting.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <clusters/NetworkCommissioning/Metadata.h>
 #include <credentials/CHIPCert.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/SafeInt.h>
@@ -341,23 +342,25 @@ Instance::NetworkInstanceList Instance::sInstances;
 #endif
 
 Instance::Instance(EndpointId aEndpointId, WiFiDriver * apDelegate) :
-    CommandHandlerInterface(Optional<EndpointId>(aEndpointId), Id), AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id),
-    mEndpointId(aEndpointId), mFeatureFlags(WiFiFeatures(apDelegate)), mpWirelessDriver(apDelegate), mpBaseDriver(apDelegate)
+    CommandHandlerInterfaceShim(Optional<EndpointId>(aEndpointId), Id),
+    AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id), mEndpointId(aEndpointId),
+    mFeatureFlags(WiFiFeatures(apDelegate)), mpWirelessDriver(apDelegate), mpBaseDriver(apDelegate)
 {
     mpDriver.Set<WiFiDriver *>(apDelegate);
 }
 
 Instance::Instance(EndpointId aEndpointId, ThreadDriver * apDelegate) :
-    CommandHandlerInterface(Optional<EndpointId>(aEndpointId), Id), AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id),
-    mEndpointId(aEndpointId), mFeatureFlags(Feature::kThreadNetworkInterface), mpWirelessDriver(apDelegate),
-    mpBaseDriver(apDelegate)
+    CommandHandlerInterfaceShim(Optional<EndpointId>(aEndpointId), Id),
+    AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id), mEndpointId(aEndpointId),
+    mFeatureFlags(Feature::kThreadNetworkInterface), mpWirelessDriver(apDelegate), mpBaseDriver(apDelegate)
 {
     mpDriver.Set<ThreadDriver *>(apDelegate);
 }
 
 Instance::Instance(EndpointId aEndpointId, EthernetDriver * apDelegate) :
-    CommandHandlerInterface(Optional<EndpointId>(aEndpointId), Id), AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id),
-    mEndpointId(aEndpointId), mFeatureFlags(Feature::kEthernetNetworkInterface), mpWirelessDriver(nullptr), mpBaseDriver(apDelegate)
+    CommandHandlerInterfaceShim(Optional<EndpointId>(aEndpointId), Id),
+    AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id), mEndpointId(aEndpointId),
+    mFeatureFlags(Feature::kEthernetNetworkInterface), mpWirelessDriver(nullptr), mpBaseDriver(apDelegate)
 {}
 
 CHIP_ERROR Instance::Init()
@@ -1360,18 +1363,18 @@ void Instance::OnFailSafeTimerExpired()
     }
 }
 
-CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandEntryCallback callback, void * context)
 {
     using namespace Clusters::NetworkCommissioning::Commands;
 
     if (mFeatureFlags.Has(Feature::kThreadNetworkInterface))
     {
         for (auto && cmd : {
-                 ScanNetworks::Id,
-                 AddOrUpdateThreadNetwork::Id,
-                 RemoveNetwork::Id,
-                 ConnectNetwork::Id,
-                 ReorderNetwork::Id,
+                 ScanNetworks::kMetadataEntry,
+                 AddOrUpdateThreadNetwork::kMetadataEntry,
+                 RemoveNetwork::kMetadataEntry,
+                 ConnectNetwork::kMetadataEntry,
+                 ReorderNetwork::kMetadataEntry,
              })
         {
             VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
@@ -1380,11 +1383,11 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
     else if (mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
     {
         for (auto && cmd : {
-                 ScanNetworks::Id,
-                 AddOrUpdateWiFiNetwork::Id,
-                 RemoveNetwork::Id,
-                 ConnectNetwork::Id,
-                 ReorderNetwork::Id,
+                 ScanNetworks::kMetadataEntry,
+                 AddOrUpdateWiFiNetwork::kMetadataEntry,
+                 RemoveNetwork::kMetadataEntry,
+                 ConnectNetwork::kMetadataEntry,
+                 ReorderNetwork::kMetadataEntry,
              })
         {
             VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
@@ -1393,7 +1396,7 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
 
     if (mFeatureFlags.Has(Feature::kPerDeviceCredentials))
     {
-        VerifyOrExit(callback(QueryIdentity::Id, context) == Loop::Continue, /**/);
+        VerifyOrExit(callback(QueryIdentity::kMetadataEntry, context) == Loop::Continue, /**/);
     }
 
 exit:
