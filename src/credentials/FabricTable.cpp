@@ -118,7 +118,7 @@ CHIP_ERROR FabricInfo::Init(const FabricInfo::InitParams & initParams)
 
     Reset();
 
-    mNodeId = initParams.nodeId;
+    mNodeId                  = initParams.nodeId;
     VerifyOrDie(mNodeId != kPlaceholderNodeId && "DEATH1");
     mFabricId                = initParams.fabricId;
     mFabricIndex             = initParams.fabricIndex;
@@ -147,7 +147,7 @@ void FabricInfo::operator=(FabricInfo && other)
 {
     Reset();
 
-    mNodeId = other.mNodeId;
+    mNodeId                  = other.mNodeId;
     VerifyOrDie(mNodeId != kPlaceholderNodeId && "DEATH2");
     mFabricId                = other.mFabricId;
     mFabricIndex             = other.mFabricIndex;
