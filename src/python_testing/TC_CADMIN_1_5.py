@@ -49,7 +49,7 @@ class TC_CADMIN_1_5(MatterBaseTest):
         discovery = mdns_discovery.MdnsDiscovery(verbose_logging=True)
         discovery._service_types = [mdns_discovery.MdnsServiceType.COMMISSIONABLE.value]
         await discovery._discover(discovery_timeout_sec=240, log_output=False)
-        
+
         if mdns_discovery.MdnsServiceType.COMMISSIONABLE.value in discovery._discovered_services:
             return discovery._discovered_services[mdns_discovery.MdnsServiceType.COMMISSIONABLE.value]
         return []
@@ -58,26 +58,26 @@ class TC_CADMIN_1_5(MatterBaseTest):
         """Wait for the correct CM value and discriminator in DNS-SD with retries."""
         for attempt in range(max_attempts):
             services = await self.get_all_txt_records()
-            
+
             # Look through all services for a match
             for service in services:
                 cm_value = service.txt_record.get('CM')
                 d_value = service.txt_record.get('D')
-                
+
                 # Convert to strings for comparison
                 if str(cm_value) == str(expected_cm_value) and str(d_value) == str(expected_discriminator):
                     logging.info(f"Found matching service: CM={cm_value}, D={d_value}")
                     return service
-            
+
             # Log what we found for debugging purposes
             if services:
                 logging.info(f"Found {len(services)} services, but none match CM={expected_cm_value}, D={expected_discriminator}")
                 for service in services:
                     logging.info(f"  Service: CM={service.txt_record.get('CM')} (type: {type(service.txt_record.get('CM'))}), "
-                                f"D={service.txt_record.get('D')} (type: {type(service.txt_record.get('D'))})")
+                                 f"D={service.txt_record.get('D')} (type: {type(service.txt_record.get('D'))})")
             else:
                 logging.info("No services found in this attempt")
-            
+
             if attempt < max_attempts - 1:
                 logging.info(f"Waiting for service with CM={expected_cm_value} and D={expected_discriminator}, "
                              f"attempt {attempt+1}/{max_attempts}")
@@ -91,10 +91,10 @@ class TC_CADMIN_1_5(MatterBaseTest):
                     cm = str(svc.txt_record.get('CM', 'MISSING'))
                     d = str(svc.txt_record.get('D', 'MISSING'))
                     found_services.append(f"Service with CM={cm}, D={d}")
-                
+
                 # Log the expected types for comparison
                 logging.info(f"Expected: CM={expected_cm_value}, D={expected_discriminator}")
-                
+
                 asserts.fail(f"Failed to find DNS-SD advertisement with CM={expected_cm_value} and "
                              f"discriminator={expected_discriminator} after {max_attempts} attempts. "
                              f"Found services: {found_services}")
@@ -175,7 +175,7 @@ class TC_CADMIN_1_5(MatterBaseTest):
         # Wait for DNS-SD advertisement with correct CM value and discriminator
         # This will either return a valid service or assert failure
         service = await self.wait_for_correct_cm_value(
-            expected_cm_value="2", 
+            expected_cm_value="2",
             expected_discriminator=params.randomDiscriminator
         )
         logging.info(f"Successfully found service with CM={service.txt_record.get('CM')}, D={service.txt_record.get('D')}")
