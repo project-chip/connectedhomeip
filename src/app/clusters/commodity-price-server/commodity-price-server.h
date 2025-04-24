@@ -36,6 +36,7 @@ namespace CommodityPrice {
 
 // Spec-defined constraints
 constexpr uint8_t kMaxForecastEntries         = 56;
+constexpr uint8_t kMaxDescriptionLength       = 32;
 constexpr uint8_t kMaxComponentsPerPriceEntry = 10;
 
 constexpr uint16_t kMaxCurrencyValue = 999; // From spec
@@ -60,17 +61,16 @@ public:
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
 
     // For now this is a place holder and the Delegate could be removed
-    // There is no delegated methods since these are largely implemented in the
+    // There are no delegated methods since these are largely implemented in the
     // commodity-price-server.cpp Instance class
 
 protected:
     EndpointId mEndpointId = 0;
 };
 
-using chip::Protocols::InteractionModel::Status;
-
 class Instance : public AttributeAccessInterface, public CommandHandlerInterface
 {
+
 public:
     Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature) :
         AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterface(MakeOptional(aEndpointId), Id),
@@ -94,9 +94,8 @@ public:
     CHIP_ERROR SetCurrentPrice(const DataModel::Nullable<Structs::CommodityPriceStruct::Type>);
     CHIP_ERROR SetForecast(const DataModel::List<const Structs::CommodityPriceStruct::Type> &);
 
-    // Send Price Change & ForecastChange events
-    Status SendPriceChangeEvent();
-    Status SendForecastChangeEvent();
+    // Send Price Change events
+    Protocols::InteractionModel::Status GeneratePriceChangeEvent();
 
 private:
     Delegate & mDelegate;
@@ -117,13 +116,12 @@ private:
                                           const Commands::GetDetailedForecastRequest::DecodableType & commandData);
 
     // Helper function to create a copy of the data for sending to client with the .description or .components knocked out
-    CHIP_ERROR GetDetailedPriceRequest(chip::BitMask<CommodityPriceDetailBitmap> details,
+    CHIP_ERROR GetDetailedPriceRequest(BitMask<CommodityPriceDetailBitmap> details,
                                        DataModel::Nullable<Structs::CommodityPriceStruct::Type> &);
 
-    CHIP_ERROR GetDetailedForecastRequest(chip::BitMask<CommodityPriceDetailBitmap> details,
-                                          chip::Platform::ScopedMemoryBuffer<Structs::CommodityPriceStruct::Type> & forecastBuffer,
-                                          size_t bufferSize,
-                                          DataModel::List<const Structs::CommodityPriceStruct::Type> & forecastList, bool isEvent,
+    CHIP_ERROR GetDetailedForecastRequest(BitMask<CommodityPriceDetailBitmap> details,
+                                          Platform::ScopedMemoryBuffer<Structs::CommodityPriceStruct::Type> & forecastBuffer,
+                                          DataModel::List<const Structs::CommodityPriceStruct::Type> & forecastList,
                                           bool isCommand);
 
     // Attribute storage
@@ -136,6 +134,39 @@ private:
     // munging to remove one or other elements
     DataModel::Nullable<Structs::CommodityPriceStruct::Type> mCurrentPrice;
     DataModel::List<const Structs::CommodityPriceStruct::Type> mPriceForecast;
+
+    // This is the cluster server's backing store for mCurrentPrice .components and .descriptions
+    Platform::ScopedMemoryBuffer<Structs::CommodityPriceStruct::Type> mOwnedCurrentPriceStructBuffer;
+    Platform::ScopedMemoryBuffer<Structs::CommodityPriceComponentStruct::Type> mOwnedCurrentPriceComponentBuffer;
+    // each component has an optional Description
+    Platform::ScopedMemoryBuffer<char> mOwnedCurrentPriceComponentDescriptionBuffer[kMaxComponentsPerPriceEntry];
+    Platform::ScopedMemoryBuffer<char> mOwnedCurrentPriceDescriptionBuffer;
+
+    // Helper function that makes a copy of a string into a span
+    CHIP_ERROR CopyCharSpan(const CharSpan src, Platform::ScopedMemoryBuffer<char> & bufferOut, CharSpan & spanOut);
+
+    // This performs a deep copy into mCurrentPrice so that the caller of the SetCurrentPrice can free its memory
+    CHIP_ERROR CopyPrice(const DataModel::Nullable<Structs::CommodityPriceStruct::Type> & src);
+
+    // This performs a deep copy into mPriceForecast so that the caller of the SetPriceForecast can free its memory
+    CHIP_ERROR CopyPriceForecast(const DataModel::List<const Structs::CommodityPriceStruct::Type> & src);
+
+    // Helper function to clear buffer storage
+    void CheckAndFreeForecastBuffers(void);
+    CHIP_ERROR CopyPriceStructWithinForecast(
+        Structs::CommodityPriceStruct::Type & destPriceStruct, Platform::ScopedMemoryBuffer<char> & dest_descriptionBuffer,
+        Platform::ScopedMemoryBuffer<Structs::CommodityPriceComponentStruct::Type> & dest_componentsBuffer,
+        Platform::ScopedMemoryBuffer<char> * dest_componentsDescriptionBuffer, const Structs::CommodityPriceStruct::Type & src);
+
+    // This is the cluster server's backing store for mForecast (list of CommodityPriceStructs) each with .components and
+    // .descriptions
+    Platform::ScopedMemoryBuffer<Structs::CommodityPriceStruct::Type> mOwnedForecastPriceStructBuffer;
+    Platform::ScopedMemoryBuffer<Structs::CommodityPriceComponentStruct::Type>
+        mOwnedForecastPriceComponentBuffer[kMaxForecastEntries];
+    // each component has an optional Description
+    Platform::ScopedMemoryBuffer<char> mOwnedForecastPriceComponentDescriptionBuffer[kMaxForecastEntries]
+                                                                                    [kMaxComponentsPerPriceEntry];
+    Platform::ScopedMemoryBuffer<char> mOwnedForecastPriceDescriptionBuffer[kMaxForecastEntries];
 };
 
 } // namespace CommodityPrice
