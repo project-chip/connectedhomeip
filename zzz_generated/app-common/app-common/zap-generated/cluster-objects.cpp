@@ -1386,6 +1386,16 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
 
 bool CommandHasLargePayload(ClusterId aCluster, CommandId aCommand)
 {
+    if ((aCluster == Clusters::CommodityPrice::Id) &&
+        (aCommand == Clusters::CommodityPrice::Commands::GetDetailedForecastRequest::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::CommodityPrice::Id) &&
+        (aCommand == Clusters::CommodityPrice::Commands::GetDetailedForecastResponse::Id))
+    {
+        return true;
+    }
     if ((aCluster == Clusters::CameraAvStreamManagement::Id) &&
         (aCommand == Clusters::CameraAvStreamManagement::Commands::CaptureSnapshot::Id))
     {

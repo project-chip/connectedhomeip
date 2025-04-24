@@ -15940,11 +15940,7 @@ NS_ASSUME_NONNULL_BEGIN
                 self.currentPrice.periodEnd = [NSNumber numberWithUnsignedInt:decodableStruct.currentPrice.Value().periodEnd.Value()];
             }
             if (decodableStruct.currentPrice.Value().price.HasValue()) {
-                self.currentPrice.price = [MTRDataTypePriceStruct new];
-                self.currentPrice.price.amount = [NSNumber numberWithLongLong:decodableStruct.currentPrice.Value().price.Value().amount];
-                self.currentPrice.price.currency = [MTRDataTypeCurrencyStruct new];
-                self.currentPrice.price.currency.currency = [NSNumber numberWithUnsignedShort:decodableStruct.currentPrice.Value().price.Value().currency.currency];
-                self.currentPrice.price.currency.decimalPoints = [NSNumber numberWithUnsignedChar:decodableStruct.currentPrice.Value().price.Value().currency.decimalPoints];
+                self.currentPrice.price = [NSNumber numberWithLongLong:decodableStruct.currentPrice.Value().price.Value()];
             } else {
                 self.currentPrice.price = nil;
             }
@@ -15970,16 +15966,7 @@ NS_ASSUME_NONNULL_BEGIN
                         auto & entry_3 = iter_3.GetValue();
                         MTRCommodityPriceClusterCommodityPriceComponentStruct * newElement_3;
                         newElement_3 = [MTRCommodityPriceClusterCommodityPriceComponentStruct new];
-                        if (entry_3.price.HasValue()) {
-                            newElement_3.price = [NSNumber numberWithLongLong:entry_3.price.Value()];
-                        } else {
-                            newElement_3.price = nil;
-                        }
-                        if (entry_3.priceLevel.HasValue()) {
-                            newElement_3.priceLevel = [NSNumber numberWithShort:entry_3.priceLevel.Value()];
-                        } else {
-                            newElement_3.priceLevel = nil;
-                        }
+                        newElement_3.price = [NSNumber numberWithLongLong:entry_3.price];
                         newElement_3.source = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_3.source)];
                         if (entry_3.description.HasValue()) {
                             newElement_3.descriptionString = AsString(entry_3.description.Value());
@@ -16178,11 +16165,7 @@ NS_ASSUME_NONNULL_BEGIN
                     newElement_0.periodEnd = [NSNumber numberWithUnsignedInt:entry_0.periodEnd.Value()];
                 }
                 if (entry_0.price.HasValue()) {
-                    newElement_0.price = [MTRDataTypePriceStruct new];
-                    newElement_0.price.amount = [NSNumber numberWithLongLong:entry_0.price.Value().amount];
-                    newElement_0.price.currency = [MTRDataTypeCurrencyStruct new];
-                    newElement_0.price.currency.currency = [NSNumber numberWithUnsignedShort:entry_0.price.Value().currency.currency];
-                    newElement_0.price.currency.decimalPoints = [NSNumber numberWithUnsignedChar:entry_0.price.Value().currency.decimalPoints];
+                    newElement_0.price = [NSNumber numberWithLongLong:entry_0.price.Value()];
                 } else {
                     newElement_0.price = nil;
                 }
@@ -16208,16 +16191,7 @@ NS_ASSUME_NONNULL_BEGIN
                             auto & entry_3 = iter_3.GetValue();
                             MTRCommodityPriceClusterCommodityPriceComponentStruct * newElement_3;
                             newElement_3 = [MTRCommodityPriceClusterCommodityPriceComponentStruct new];
-                            if (entry_3.price.HasValue()) {
-                                newElement_3.price = [NSNumber numberWithLongLong:entry_3.price.Value()];
-                            } else {
-                                newElement_3.price = nil;
-                            }
-                            if (entry_3.priceLevel.HasValue()) {
-                                newElement_3.priceLevel = [NSNumber numberWithShort:entry_3.priceLevel.Value()];
-                            } else {
-                                newElement_3.priceLevel = nil;
-                            }
+                            newElement_3.price = [NSNumber numberWithLongLong:entry_3.price];
                             newElement_3.source = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_3.source)];
                             if (entry_3.description.HasValue()) {
                                 newElement_3.descriptionString = AsString(entry_3.description.Value());
@@ -22039,7 +22013,7 @@ NS_ASSUME_NONNULL_BEGIN
     {
         if (self.latch != nil) {
             auto & definedValue_0 = encodableStruct.latch.Emplace();
-            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.latch.unsignedCharValue);
+            definedValue_0 = self.latch.boolValue;
         }
     }
     {

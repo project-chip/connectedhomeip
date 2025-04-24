@@ -3882,52 +3882,6 @@ public static class CommodityPriceClusterPriceChangeEvent {
     return output.toString();
   }
 }
-public static class CommodityPriceClusterForecastChangeEvent {
-  public @Nullable ArrayList<ChipStructs.CommodityPriceClusterCommodityPriceStruct> priceForecast;
-  private static final long PRICE_FORECAST_ID = 0L;
-
-  public CommodityPriceClusterForecastChangeEvent(
-    @Nullable ArrayList<ChipStructs.CommodityPriceClusterCommodityPriceStruct> priceForecast
-  ) {
-    this.priceForecast = priceForecast;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(PRICE_FORECAST_ID, priceForecast != null ? ArrayType.generateArrayType(priceForecast, (elementpriceForecast) -> elementpriceForecast.encodeTlv()) : new NullType()));
-
-    return new StructType(values);
-  }
-
-  public static CommodityPriceClusterForecastChangeEvent decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    @Nullable ArrayList<ChipStructs.CommodityPriceClusterCommodityPriceStruct> priceForecast = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == PRICE_FORECAST_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
-          ArrayType castingValue = element.value(ArrayType.class);
-          priceForecast = castingValue.map((elementcastingValue) -> ChipStructs.CommodityPriceClusterCommodityPriceStruct.decodeTlv(elementcastingValue));
-        }
-      }
-    }
-    return new CommodityPriceClusterForecastChangeEvent(
-      priceForecast
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("CommodityPriceClusterForecastChangeEvent {\n");
-    output.append("\tpriceForecast: ");
-    output.append(priceForecast);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
 public static class MessagesClusterMessageQueuedEvent {
   public byte[] messageID;
   private static final long MESSAGE_ID_ID = 0L;
@@ -4816,52 +4770,6 @@ public static class ElectricalGridConditionsClusterCurrentConditionsChangedEvent
     output.append("ElectricalGridConditionsClusterCurrentConditionsChangedEvent {\n");
     output.append("\tcurrentConditions: ");
     output.append(currentConditions);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-public static class ElectricalGridConditionsClusterForecastConditionsChangedEvent {
-  public @Nullable ArrayList<ChipStructs.ElectricalGridConditionsClusterElectricalGridConditionsStruct> forecastConditions;
-  private static final long FORECAST_CONDITIONS_ID = 0L;
-
-  public ElectricalGridConditionsClusterForecastConditionsChangedEvent(
-    @Nullable ArrayList<ChipStructs.ElectricalGridConditionsClusterElectricalGridConditionsStruct> forecastConditions
-  ) {
-    this.forecastConditions = forecastConditions;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(FORECAST_CONDITIONS_ID, forecastConditions != null ? ArrayType.generateArrayType(forecastConditions, (elementforecastConditions) -> elementforecastConditions.encodeTlv()) : new NullType()));
-
-    return new StructType(values);
-  }
-
-  public static ElectricalGridConditionsClusterForecastConditionsChangedEvent decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    @Nullable ArrayList<ChipStructs.ElectricalGridConditionsClusterElectricalGridConditionsStruct> forecastConditions = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == FORECAST_CONDITIONS_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
-          ArrayType castingValue = element.value(ArrayType.class);
-          forecastConditions = castingValue.map((elementcastingValue) -> ChipStructs.ElectricalGridConditionsClusterElectricalGridConditionsStruct.decodeTlv(elementcastingValue));
-        }
-      }
-    }
-    return new ElectricalGridConditionsClusterForecastConditionsChangedEvent(
-      forecastConditions
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("ElectricalGridConditionsClusterForecastConditionsChangedEvent {\n");
-    output.append("\tforecastConditions: ");
-    output.append(forecastConditions);
     output.append("\n");
     output.append("}\n");
     return output.toString();
