@@ -1013,7 +1013,7 @@ class Pm25ConcentrationMeasurementCluster(
     }
   }
 
-  suspend fun readMeasurementMediumAttribute(): UByte? {
+  suspend fun readMeasurementMediumAttribute(): UByte {
     val ATTRIBUTE_ID: UInt = 9u
 
     val attributePath =
@@ -1039,12 +1039,7 @@ class Pm25ConcentrationMeasurementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUByte(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
 
     return decodedValue
   }
@@ -1090,14 +1085,9 @@ class Pm25ConcentrationMeasurementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UByte? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getUByte(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
 
-          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
+          emit(UByteSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(UByteSubscriptionState.SubscriptionEstablished)
