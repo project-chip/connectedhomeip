@@ -22,6 +22,7 @@ static BOOL AttributeIsSpecifiedIn{{asUpperCamelCase name preserveAcronyms=true}
         {{/if}}
         {{/zcl_attributes_server}}
         default: {
+            // Not a known {{asUpperCamelCase name preserveAcronyms=true}} attribute.
             return NO;
         }
     }

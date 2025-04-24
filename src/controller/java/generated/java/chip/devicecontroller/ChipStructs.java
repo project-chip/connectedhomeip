@@ -6896,26 +6896,22 @@ public static class WaterHeaterManagementClusterWaterHeaterBoostInfoStruct {
   }
 }
 public static class CommodityPriceClusterCommodityPriceComponentStruct {
-  public Optional<Long> price;
-  public Optional<Integer> priceLevel;
+  public Long price;
   public Integer source;
   public Optional<String> description;
   public Optional<Long> tariffComponentID;
   private static final long PRICE_ID = 0L;
-  private static final long PRICE_LEVEL_ID = 1L;
-  private static final long SOURCE_ID = 2L;
-  private static final long DESCRIPTION_ID = 3L;
-  private static final long TARIFF_COMPONENT_ID_ID = 4L;
+  private static final long SOURCE_ID = 1L;
+  private static final long DESCRIPTION_ID = 2L;
+  private static final long TARIFF_COMPONENT_ID_ID = 3L;
 
   public CommodityPriceClusterCommodityPriceComponentStruct(
-    Optional<Long> price,
-    Optional<Integer> priceLevel,
+    Long price,
     Integer source,
     Optional<String> description,
     Optional<Long> tariffComponentID
   ) {
     this.price = price;
-    this.priceLevel = priceLevel;
     this.source = source;
     this.description = description;
     this.tariffComponentID = tariffComponentID;
@@ -6923,8 +6919,7 @@ public static class CommodityPriceClusterCommodityPriceComponentStruct {
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(PRICE_ID, price.<BaseTLVType>map((nonOptionalprice) -> new IntType(nonOptionalprice)).orElse(new EmptyType())));
-    values.add(new StructElement(PRICE_LEVEL_ID, priceLevel.<BaseTLVType>map((nonOptionalpriceLevel) -> new IntType(nonOptionalpriceLevel)).orElse(new EmptyType())));
+    values.add(new StructElement(PRICE_ID, new IntType(price)));
     values.add(new StructElement(SOURCE_ID, new UIntType(source)));
     values.add(new StructElement(DESCRIPTION_ID, description.<BaseTLVType>map((nonOptionaldescription) -> new StringType(nonOptionaldescription)).orElse(new EmptyType())));
     values.add(new StructElement(TARIFF_COMPONENT_ID_ID, tariffComponentID.<BaseTLVType>map((nonOptionaltariffComponentID) -> new UIntType(nonOptionaltariffComponentID)).orElse(new EmptyType())));
@@ -6936,8 +6931,7 @@ public static class CommodityPriceClusterCommodityPriceComponentStruct {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Optional<Long> price = Optional.empty();
-    Optional<Integer> priceLevel = Optional.empty();
+    Long price = null;
     Integer source = null;
     Optional<String> description = Optional.empty();
     Optional<Long> tariffComponentID = Optional.empty();
@@ -6945,12 +6939,7 @@ public static class CommodityPriceClusterCommodityPriceComponentStruct {
       if (element.contextTagNum() == PRICE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Int) {
           IntType castingValue = element.value(IntType.class);
-          price = Optional.of(castingValue.value(Long.class));
-        }
-      } else if (element.contextTagNum() == PRICE_LEVEL_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
-          IntType castingValue = element.value(IntType.class);
-          priceLevel = Optional.of(castingValue.value(Integer.class));
+          price = castingValue.value(Long.class);
         }
       } else if (element.contextTagNum() == SOURCE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -6971,7 +6960,6 @@ public static class CommodityPriceClusterCommodityPriceComponentStruct {
     }
     return new CommodityPriceClusterCommodityPriceComponentStruct(
       price,
-      priceLevel,
       source,
       description,
       tariffComponentID
@@ -6984,9 +6972,6 @@ public static class CommodityPriceClusterCommodityPriceComponentStruct {
     output.append("CommodityPriceClusterCommodityPriceComponentStruct {\n");
     output.append("\tprice: ");
     output.append(price);
-    output.append("\n");
-    output.append("\tpriceLevel: ");
-    output.append(priceLevel);
     output.append("\n");
     output.append("\tsource: ");
     output.append(source);
@@ -7004,7 +6989,7 @@ public static class CommodityPriceClusterCommodityPriceComponentStruct {
 public static class CommodityPriceClusterCommodityPriceStruct {
   public Long periodStart;
   public @Nullable Long periodEnd;
-  public Optional<ChipStructs.CommodityPriceClusterPriceStruct> price;
+  public Optional<Long> price;
   public Optional<Integer> priceLevel;
   public Optional<String> description;
   public Optional<ArrayList<ChipStructs.CommodityPriceClusterCommodityPriceComponentStruct>> components;
@@ -7018,7 +7003,7 @@ public static class CommodityPriceClusterCommodityPriceStruct {
   public CommodityPriceClusterCommodityPriceStruct(
     Long periodStart,
     @Nullable Long periodEnd,
-    Optional<ChipStructs.CommodityPriceClusterPriceStruct> price,
+    Optional<Long> price,
     Optional<Integer> priceLevel,
     Optional<String> description,
     Optional<ArrayList<ChipStructs.CommodityPriceClusterCommodityPriceComponentStruct>> components
@@ -7035,7 +7020,7 @@ public static class CommodityPriceClusterCommodityPriceStruct {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(PERIOD_START_ID, new UIntType(periodStart)));
     values.add(new StructElement(PERIOD_END_ID, periodEnd != null ? new UIntType(periodEnd) : new NullType()));
-    values.add(new StructElement(PRICE_ID, price.<BaseTLVType>map((nonOptionalprice) -> nonOptionalprice.encodeTlv()).orElse(new EmptyType())));
+    values.add(new StructElement(PRICE_ID, price.<BaseTLVType>map((nonOptionalprice) -> new IntType(nonOptionalprice)).orElse(new EmptyType())));
     values.add(new StructElement(PRICE_LEVEL_ID, priceLevel.<BaseTLVType>map((nonOptionalpriceLevel) -> new IntType(nonOptionalpriceLevel)).orElse(new EmptyType())));
     values.add(new StructElement(DESCRIPTION_ID, description.<BaseTLVType>map((nonOptionaldescription) -> new StringType(nonOptionaldescription)).orElse(new EmptyType())));
     values.add(new StructElement(COMPONENTS_ID, components.<BaseTLVType>map((nonOptionalcomponents) -> ArrayType.generateArrayType(nonOptionalcomponents, (elementnonOptionalcomponents) -> elementnonOptionalcomponents.encodeTlv())).orElse(new EmptyType())));
@@ -7049,7 +7034,7 @@ public static class CommodityPriceClusterCommodityPriceStruct {
     }
     Long periodStart = null;
     @Nullable Long periodEnd = null;
-    Optional<ChipStructs.CommodityPriceClusterPriceStruct> price = Optional.empty();
+    Optional<Long> price = Optional.empty();
     Optional<Integer> priceLevel = Optional.empty();
     Optional<String> description = Optional.empty();
     Optional<ArrayList<ChipStructs.CommodityPriceClusterCommodityPriceComponentStruct>> components = Optional.empty();
@@ -7065,9 +7050,9 @@ public static class CommodityPriceClusterCommodityPriceStruct {
           periodEnd = castingValue.value(Long.class);
         }
       } else if (element.contextTagNum() == PRICE_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
-          StructType castingValue = element.value(StructType.class);
-          price = Optional.of(ChipStructs.CommodityPriceClusterPriceStruct.decodeTlv(castingValue));
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          price = Optional.of(castingValue.value(Long.class));
         }
       } else if (element.contextTagNum() == PRICE_LEVEL_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Int) {
@@ -7178,67 +7163,6 @@ public static class CommodityPriceClusterCurrencyStruct {
     output.append("\n");
     output.append("\tdecimalPoints: ");
     output.append(decimalPoints);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-public static class CommodityPriceClusterPriceStruct {
-  public Long amount;
-  public ChipStructs.CommodityPriceClusterCurrencyStruct currency;
-  private static final long AMOUNT_ID = 0L;
-  private static final long CURRENCY_ID = 1L;
-
-  public CommodityPriceClusterPriceStruct(
-    Long amount,
-    ChipStructs.CommodityPriceClusterCurrencyStruct currency
-  ) {
-    this.amount = amount;
-    this.currency = currency;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(AMOUNT_ID, new IntType(amount)));
-    values.add(new StructElement(CURRENCY_ID, currency.encodeTlv()));
-
-    return new StructType(values);
-  }
-
-  public static CommodityPriceClusterPriceStruct decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    Long amount = null;
-    ChipStructs.CommodityPriceClusterCurrencyStruct currency = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == AMOUNT_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
-          IntType castingValue = element.value(IntType.class);
-          amount = castingValue.value(Long.class);
-        }
-      } else if (element.contextTagNum() == CURRENCY_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
-          StructType castingValue = element.value(StructType.class);
-          currency = ChipStructs.CommodityPriceClusterCurrencyStruct.decodeTlv(castingValue);
-        }
-      }
-    }
-    return new CommodityPriceClusterPriceStruct(
-      amount,
-      currency
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("CommodityPriceClusterPriceStruct {\n");
-    output.append("\tamount: ");
-    output.append(amount);
-    output.append("\n");
-    output.append("\tcurrency: ");
-    output.append(currency);
     output.append("\n");
     output.append("}\n");
     return output.toString();
