@@ -62,6 +62,7 @@ def parse_pics(lines: typing.List[str]) -> dict[str, bool]:
         pics[key.strip()] = (val == "1")
     return pics
 
+
 def parse_pics_xml(contents: str) -> dict[str, bool]:
     pics = {}
     mytree = ET.fromstring(contents)
@@ -95,6 +96,7 @@ def read_pics_from_file(path: str) -> dict[str, bool]:
             lines = f.readlines()
             return parse_pics(lines)
 
+
 def parse_pixit_xml(contents: str) -> dict[str, bool]:
     pixit = {}
     mytree = ET.fromstring(contents)
@@ -116,6 +118,7 @@ def parse_pixit_xml(contents: str) -> dict[str, bool]:
             raise ValueError(f"Invalid value for 'support': {support}")
         pixit[name] = json.loads(support) == True
     return pixit
+
 
 def read_pixit_from_file(path: str) -> dict[str, bool]:
     """ Reads a dictionary of PIXITS from a file (ci format) or directory (xml format). """
