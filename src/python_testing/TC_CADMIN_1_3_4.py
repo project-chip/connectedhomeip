@@ -118,7 +118,6 @@ class TC_CADMIN(MatterBaseTest):
             )
             logging.info(f"Successfully found service with CM={service.txt_record.get('CM')}, D={service.txt_record.get('D')}")
 
-
         self.step("3c")
         BI_cluster = Clusters.BasicInformation
         self.nl_attribute = BI_cluster.Attributes.NodeLabel
