@@ -17,7 +17,6 @@
 
 import logging
 
-
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.testing.matter_asserts import is_valid_bool_value
