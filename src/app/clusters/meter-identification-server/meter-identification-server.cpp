@@ -193,15 +193,17 @@ CHIP_ERROR Instance::SetPowerThreshold(const DataModel::Nullable<Globals::Struct
     else
     {
         // This is needed because PowerThresholdStruct has no operator==
-        if (!mPowerThreshold.IsNull() && (newValue.Value().powerThreshold == mPowerThreshold.Value().powerThreshold &&
-            newValue.Value().apparentPowerThreshold == mPowerThreshold.Value().apparentPowerThreshold &&
-            newValue.Value().powerThresholdSource == mPowerThreshold.Value().powerThresholdSource))
+        if (!mPowerThreshold.IsNull() &&
+            (newValue.Value().powerThreshold == mPowerThreshold.Value().powerThreshold &&
+             newValue.Value().apparentPowerThreshold == mPowerThreshold.Value().apparentPowerThreshold &&
+             newValue.Value().powerThresholdSource == mPowerThreshold.Value().powerThresholdSource))
         {
             return CHIP_NO_ERROR;
         }
 
         if (!newValue.Value().powerThresholdSource.IsNull() &&
-            Globals::PowerThresholdSourceEnum::kUnknownEnumValue == EnsureKnownEnumValue(newValue.Value().powerThresholdSource.Value()))
+            Globals::PowerThresholdSourceEnum::kUnknownEnumValue ==
+                EnsureKnownEnumValue(newValue.Value().powerThresholdSource.Value()))
         {
             return CHIP_ERROR_INVALID_INTEGER_VALUE;
         }
@@ -212,8 +214,6 @@ CHIP_ERROR Instance::SetPowerThreshold(const DataModel::Nullable<Globals::Struct
     MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, PowerThreshold::Id);
     return CHIP_NO_ERROR;
 }
-
-
 
 // AttributeAccessInterface
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
