@@ -41,20 +41,20 @@ namespace Clusters {
 namespace ClosureDimension {
 namespace Attributes {
 
-namespace Current {
+namespace CurrentState {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::CurrentStruct::Type>;
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::CurrentStateStruct::Type>;
     using DecodableType =
-        chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::CurrentStruct::DecodableType>;
+        chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::CurrentStateStruct::DecodableType>;
     using DecodableArgType =
-        const chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::CurrentStruct::DecodableType> &;
+        const chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::CurrentStateStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::Current::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentState::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace Current
+} // namespace CurrentState
 namespace Target {
 struct TypeInfo
 {
@@ -218,7 +218,7 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::Current::TypeInfo::DecodableType current;
+        Attributes::CurrentState::TypeInfo::DecodableType currentState;
         Attributes::Target::TypeInfo::DecodableType target;
         Attributes::Resolution::TypeInfo::DecodableType resolution = static_cast<chip::Percent100ths>(0);
         Attributes::StepValue::TypeInfo::DecodableType stepValue   = static_cast<chip::Percent100ths>(0);

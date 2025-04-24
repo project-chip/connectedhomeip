@@ -695,6 +695,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         {
         case chip::app::Clusters::UnitLocalization::Attributes::TemperatureUnit::Id:
             return "TemperatureUnit";
+        case chip::app::Clusters::UnitLocalization::Attributes::SupportedTemperatureUnits::Id:
+            return "SupportedTemperatureUnits";
         case chip::app::Clusters::UnitLocalization::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::UnitLocalization::Attributes::AcceptedCommandList::Id:
@@ -2821,8 +2823,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
     case chip::app::Clusters::ClosureDimension::Id: {
         switch (id)
         {
-        case chip::app::Clusters::ClosureDimension::Attributes::Current::Id:
-            return "Current";
+        case chip::app::Clusters::ClosureDimension::Attributes::CurrentState::Id:
+            return "CurrentState";
         case chip::app::Clusters::ClosureDimension::Attributes::Target::Id:
             return "Target";
         case chip::app::Clusters::ClosureDimension::Attributes::Resolution::Id:
@@ -7012,33 +7014,11 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
     case 0x00000203:
         return "Window Covering Controller";
     case 0x00000230:
-        return "ClosureBase";
+        return "Closure";
     case 0x00000231:
-        return "Window";
-    case 0x00000232:
-        return "Shutter";
-    case 0x00000233:
-        return "Shade";
-    case 0x00000234:
-        return "Curtain";
-    case 0x00000235:
-        return "Blind";
-    case 0x00000236:
-        return "Screen";
-    case 0x00000237:
-        return "Awning";
-    case 0x00000238:
-        return "Pergola";
-    case 0x00000239:
-        return "Door";
-    case 0x0000023A:
-        return "GarageDoor";
-    case 0x0000023B:
-        return "Gate";
-    case 0x0000023C:
-        return "Barrier";
-    case 0x0000023D:
-        return "Cabinet";
+        return "Closure Panel";
+    case 0x0000023E:
+        return "Closure Controller";
     case 0x00000300:
         return "Heating/Cooling Unit";
     case 0x00000301:

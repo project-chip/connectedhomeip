@@ -1361,6 +1361,12 @@ class ChipClusters:
                 "reportable": True,
                 "writable": True,
             },
+            0x00000001: {
+                "attributeName": "SupportedTemperatureUnits",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -8036,7 +8042,7 @@ class ChipClusters:
                 "commandName": "SetTarget",
                 "args": {
                     "position": "int",
-                    "latch": "int",
+                    "latch": "bool",
                     "speed": "int",
                 },
             },
@@ -8052,7 +8058,7 @@ class ChipClusters:
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "Current",
+                "attributeName": "CurrentState",
                 "attributeId": 0x00000000,
                 "type": "",
                 "reportable": True,

@@ -231,19 +231,22 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
     case Status::Timeout:
         description = NSLocalizedString(@"The transaction was aborted due to time being exceeded.", nil);
         break;
-    case Status::Busy: {
+    case Status::Busy:
         description = NSLocalizedString(@"The receiver is busy processing another action "
                                          "that prevents the execution of the incoming action.",
+            nil);
+        break;
+    case Status::AccessRestricted:
+        description = NSLocalizedString(@"Access to the action or command by the sender is "
+                                         "permitted by the ACL but restricted by the ARL.",
             nil);
         break;
     case Status::UnsupportedCluster:
         description = NSLocalizedString(@"The cluster indicated is not supported", nil);
         break;
-    // Gap in values is intentional.
     case Status::NoUpstreamSubscription:
         description = NSLocalizedString(@"Proxy does not have a subscription to the source.", nil);
         break;
-    }
     case Status::NeedsTimedInteraction:
         description = NSLocalizedString(@"An Untimed Write or Untimed Invoke interaction was used "
                                          "for an attribute or command that requires a Timed Write or Timed Invoke.",
@@ -251,6 +254,38 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
         break;
     case Status::UnsupportedEvent:
         description = NSLocalizedString(@"The event indicated is unsupported on the cluster.", nil);
+        break;
+    case Status::PathsExhausted:
+        description = NSLocalizedString(@"The receiver has insufficient resources to support the "
+                                         "number of paths specified in the request.",
+            nil);
+        break;
+    case Status::TimedRequestMismatch:
+        description = NSLocalizedString(@"A request with TimedRequest set to TRUE was issued "
+                                         "outside a Timed transaction or a request with "
+                                         "TimedRequest set to FALSE was issued inside a Timed "
+                                         "transaction.",
+            nil);
+        break;
+    case Status::FailsafeRequired:
+        description = NSLocalizedString(@"A request requiring a fail-safe context was invoked "
+                                         "without the Fail-Safe context.",
+            nil);
+        break;
+    case Status::InvalidInState:
+        description = NSLocalizedString(@"The received request cannot be handled due to the current "
+                                         "operational state of the device.",
+            nil);
+        break;
+    case Status::NoCommandResponse:
+        description = NSLocalizedString(@"A CommandDataIB is missing a response in the "
+                                         "InvokeResponses of an Invoke Response action.",
+            nil);
+        break;
+    case Status::InvalidTransportType:
+        description = NSLocalizedString(@"Attempt to process on a transport type not valid for this "
+                                         "element. Command or action not carried out.",
+            nil);
         break;
     }
 

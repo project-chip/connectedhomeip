@@ -469,7 +469,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:125
+            image: ghcr.io/project-chip/chip-build:126
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
@@ -510,6 +510,7 @@ jobs:
                       --target linux-x64-fabric-admin-rpc-ipv6only-no-ble-no-wifi-clang \
                       --target linux-x64-fabric-bridge-rpc-ipv6only-no-ble-no-wifi-clang \
                       --target linux-x64-fabric-sync-ipv6only-no-ble-no-wifi-clang \
+                      --target linux-x64-camera \
                       --target linux-x64-light-data-model-no-unique-id-ipv6only-no-ble-no-wifi-clang \
                       --target linux-x64-terms-and-conditions \
                       --target linux-x64-python-bindings \
@@ -521,6 +522,7 @@ jobs:
                   echo -n "" >/tmp/test_env.yaml
                   echo "ALL_CLUSTERS_APP: out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app" >> /tmp/test_env.yaml
                   echo "CHIP_LOCK_APP: out/linux-x64-lock-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-lock-app" >> /tmp/test_env.yaml
+                  echo "CAMERA_APP: out/linux-x64-camera/chip-camera-app" >> /tmp/test_env.yaml
                   echo "ENERGY_MANAGEMENT_APP: out/linux-x64-energy-management-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-energy-management-app" >> /tmp/test_env.yaml
                   echo "LIT_ICD_APP: out/linux-x64-lit-icd-ipv6only-no-ble-no-wifi-tsan-clang-test/lit-icd-app" >> /tmp/test_env.yaml
                   echo "AIR_PURIFIER_APP: out/linux-x64-air-purifier-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-air-purifier-app" >> /tmp/test_env.yaml

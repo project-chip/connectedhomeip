@@ -39,6 +39,22 @@ steps:
             path: /pwenv
 
     - name: "ghcr.io/project-chip/chip-build-vscode:125"
+      # ICD device is currently not supported for ESP32 and NRF targets. New rule to compile only ICD
+      # linux binary.
+      env:
+          - PW_ENVIRONMENT_ROOT=/pwenv
+      args:
+          - ./examples/chef/chef.py -cbrI -d icd_rootnode_contactsensor_ed3b19ec55 -t linux
+      allowFailure: true # TODO: Remove this once compilation stability is established.
+      id: CompileICDLinux
+      waitFor:
+          - CompileAll
+      entrypoint: ./scripts/run_in_build_env.sh
+      volumes:
+          - name: pwenv
+            path: /pwenv
+
+    - name: "ghcr.io/project-chip/chip-build-vscode:125"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
@@ -52,7 +68,7 @@ steps:
       allowFailure: true
       id: CompileNoip
       waitFor:
-          - CompileAll
+          - CompileICDLinux
       entrypoint: ./scripts/run_in_build_env.sh
       volumes:
           - name: pwenv
