@@ -98,6 +98,17 @@ class AVSUMTestBase:
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
+    async def send_remove_preset_command(self, endpoint, presetID, expected_status: Status = Status.Success):
+        try:
+            await self.send_single_cmd(cmd=Clusters.CameraAvSettingsUserLevelManagement.Commands.MPTZRemovePreset(
+                presetID=presetID),
+                endpoint=endpoint)
+
+            asserts.assert_equal(expected_status, Status.Success)
+
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
+
     async def send_mptz_set_pan_position_command(self, endpoint, pan, expected_status: Status = Status.Success):
         tilt = zoom = None
         await self.send_mptz_set_position_command(endpoint, pan, tilt, zoom, expected_status)
