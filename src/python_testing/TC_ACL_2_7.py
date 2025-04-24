@@ -153,7 +153,6 @@ class TC_ACL_2_7(MatterBaseTest):
         extension_attr = Clusters.AccessControl.Attributes.Extension
         result = await self.read_single_attribute_check_success(dev_ctrl=self.th1, endpoint=0, cluster=ac_cluster, attribute=extension_attr)
         logging.info("TH1 read result: %s", str(result))
-        logging.info("TH1 read result: %s", str(result))
         asserts.assert_equal(len(result), 1,
                              "Should have exactly one extension")
 
