@@ -30,11 +30,22 @@ logger = logging.getLogger(__name__)
 
 class CommodityPriceTestBaseHelper:
 
+    # Spec derived constants
+    kMaxForecastEntries = 56    # Maximum number of list entries for Forecasts
+    kMaxDescriptionLength = 32  # Maximum length of description string
+    kMaxComponentsPerPrice = 10  # Maximum number of Component entries in PriceStruct.components list
+
+    # Test event trigger IDs
+    kEventTriggerPriceUpdate = 0x0095000000000000
+    kEventTriggerForecastUpdate = 0x0095000000000001
+
     async def test_priceForecast(self,
                                  endpoint: int = None,
                                  cluster: Clusters.CommodityPrice = None,
                                  priceForecast: list = None,
-                                 details: Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap = 0):
+                                 details: Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap
+                                 = Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap(0)
+                                 ):
 
         # Verify that the DUT response contains GetDetailedForecastResponse with a
         # list of CommodityPriceStruct entries (it may be empty) and shall have not more than 56 entries.
@@ -44,24 +55,33 @@ class CommodityPriceTestBaseHelper:
             "PriceForecast list must contain CommodityPriceStruct elements",
             allow_empty=True)
 
+        # According to spec we must not have more than 56 entries
         asserts.assert_less_equal(len(priceForecast),
-                                  56, "PriceForecast list must be less than 56 entries")
+                                  self.kMaxForecastEntries, "PriceForecast list must be less than 56 entries")
         for item in priceForecast:
             # The other aspects of this verification are handled by the helper
             await self.test_checkCommodityPriceStruct(endpoint=endpoint, cluster=cluster, struct=item,
                                                       details=details,
-                                                      check_time=False)  # Do not check time limits for forecast
+                                                      now_time_must_be_within_period=False)  # Do not check time limits for forecast
 
     async def test_checkCommodityPriceStruct(self,
                                              endpoint: int = None,
                                              cluster: Clusters.CommodityPrice = None,
                                              struct: Clusters.CommodityPrice.Structs.CommodityPriceStruct = None,
                                              details: Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap = 0,
-                                             check_time: bool = True):
+                                             now_time_must_be_within_period: bool = True):
+        """now_time_must_be_within_period - When verifying a 'CurrentPrice' then 
+           the CurrentPrice has a single period, and so 'now' time must be within
+           the current period.
+
+           However PriceForecast also uses this same structure, which contains a
+           list of CommodityPriceStruct (going out into the future), so we
+           must no check now time is within each of the list elements.
+           """
 
         matter_asserts.assert_valid_uint32(struct.periodStart, 'PeriodStart')
 
-        if check_time:  # Only check time limits when dealing with current price (not list of Forecast)
+        if now_time_must_be_within_period:  # Only check time limits when dealing with current price (not list of Forecast)
             # - verify that the PeriodStart is in the past.
             now_time_epoch_s = self.get_current_time_as_epoch_s()
             asserts.assert_less_equal(struct.periodStart, now_time_epoch_s,
@@ -90,7 +110,8 @@ class CommodityPriceTestBaseHelper:
         if details & cluster.Bitmaps.CommodityPriceDetailBitmap.kDescription:
             if struct.description is not None:
                 matter_asserts.assert_is_string(struct.description, "Description must be a string")
-                asserts.assert_less_equal(len(struct.description), 32, "Description must have length at most 32!")
+                asserts.assert_less_equal(len(struct.description), self.kMaxDescriptionLength,
+                                          f"Description must have length at most {self.kMaxDescriptionLength}!")
         else:
             asserts.assert_is_none(struct.description)
 
@@ -106,7 +127,8 @@ class CommodityPriceTestBaseHelper:
                     allow_empty=True)
                 for item in struct.components:
                     await self.test_checkCommodityPriceComponentStruct(endpoint=endpoint, cluster=cluster, struct=item)
-                asserts.assert_less_equal(len(struct.components), 10, "Components must have at most 10 entries!")
+                asserts.assert_less_equal(len(struct.components), self.kMaxComponentsPerPrice,
+                                          f"Components must have at most {self.kMaxComponentsPerPrice} entries!")
         else:
             asserts.assert_is_none(struct.components)
 
@@ -134,7 +156,9 @@ class CommodityPriceTestBaseHelper:
         logger.info(
             f"  Component: price: {struct.price} source: {struct.source}, desc: {struct.description} tariffComponentID: {struct.tariffComponentID}")
 
-    async def send_get_detailed_price_request(self, endpoint: int = None, details: Clusters.CommodityPrice.Bitmaps = 0,
+    async def send_get_detailed_price_request(self, endpoint: int = None,
+                                              details: Clusters.CommodityPrice.Bitmaps =
+                                              Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap(0),
                                               timedRequestTimeoutMs: int = 3000,
                                               expected_status: Status = Status.Success):
         try:
@@ -146,10 +170,14 @@ class CommodityPriceTestBaseHelper:
             return result
 
         except InteractionModelError as e:
+            asserts.assert_not_equal(e.status, Status.Success,
+                                     "We had an IM exception, but still got Success?")
             asserts.assert_equal(e.status, expected_status,
                                  "Unexpected error returned")
 
-    async def send_get_detailed_forecast_request(self, endpoint: int = None, details: Clusters.CommodityPrice.Bitmaps = 0,
+    async def send_get_detailed_forecast_request(self, endpoint: int = None,
+                                                 details: Clusters.CommodityPrice.Bitmaps =
+                                                 Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap(0),
                                                  timedRequestTimeoutMs: int = 3000,
                                                  expected_status: Status = Status.Success):
         try:
@@ -161,14 +189,16 @@ class CommodityPriceTestBaseHelper:
             return result
 
         except InteractionModelError as e:
+            asserts.assert_not_equal(e.status, Status.Success,
+                                     "We had an IM exception, but still got Success?")
             asserts.assert_equal(e.status, expected_status,
                                  "Unexpected error returned")
 
     async def send_test_event_trigger_price_update(self):
-        await self.send_test_event_triggers(eventTrigger=0x0095000000000000)
+        await self.send_test_event_triggers(eventTrigger=self.kEventTriggerPriceUpdate)
 
     async def send_test_event_trigger_forecast_update(self):
-        await self.send_test_event_triggers(eventTrigger=0x0095000000000001)
+        await self.send_test_event_triggers(eventTrigger=self.kEventTriggerForecastUpdate)
 
     def get_current_time_as_epoch_s(self):
         """Returns current time in UTC in Matter Epoch_S"""
@@ -192,4 +222,4 @@ class CommodityPriceTestBaseHelper:
 
             return matter_epoch + delta_from_epoch
         else:
-            return "None"
+            return None

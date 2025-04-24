@@ -131,7 +131,8 @@ class TC_SEPR_2_1(CommodityPriceTestBaseHelper, MatterBaseTest):
                 cluster.Structs.CommodityPriceStruct, allow_empty=True)
             for item in val:
                 # In the PriceForecast attribute we must not have Description or Components in this returned list
-                await self.test_checkCommodityPriceStruct(endpoint=endpoint, cluster=cluster, struct=item, details=0)
+                await self.test_checkCommodityPriceStruct(endpoint=endpoint, cluster=cluster, struct=item,
+                                                          details=Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap(0))
 
 
 if __name__ == "__main__":

@@ -45,6 +45,7 @@
 
 import logging
 
+from chip import ChipDeviceCtrl
 import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from TC_SEPRTestBase import CommodityPriceTestBaseHelper
@@ -140,6 +141,11 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
 
         self.step("1")
         # Commission DUT - already done
+        try:
+            device = await self.default_controller.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000,
+                                                                      payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+        except TimeoutError:
+            asserts.fail("Unable to establish a CASE session over TCP to the device. Does the device support TCP?")
 
         self.step("2")
         # TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster
