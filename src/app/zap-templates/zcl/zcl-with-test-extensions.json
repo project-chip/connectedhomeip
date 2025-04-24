@@ -760,8 +760,7 @@
             "StatusLightBrightness",
             "FeatureMap"
         ],
-        "Camera AV Settings User Level Management": ["MPTZPosition"],
-        "Unit Localization": ["SupportedTemperatureUnits"]
+        "Camera AV Settings User Level Management": ["MPTZPosition"]
     },
     "mandatoryDeviceTypes": "0x0016",
     "defaultReportingPolicy": "mandatory",
