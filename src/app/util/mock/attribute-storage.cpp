@@ -103,16 +103,6 @@ const MockNodeConfig & DefaultMockNodeConfig()
                 ClusterRevision::Id, FeatureMap::Id,
             }),
         }),
-        MockEndpointConfig(kMockEndpoint4, {
-            MockClusterConfig(MockClusterId(1), {
-                ClusterRevision::Id, FeatureMap::Id,
-            }),
-        },
-        {}, // No device types
-        {}, // No semantic tags
-        app::EndpointComposition::kFullFamily,
-        "AABBCCDDEEFFGGHHIIJJKKLLMMNNOO02"_span // Add endpointUniqueID
-        ),
     });
     // clang-format on
     return config;
