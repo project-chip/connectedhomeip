@@ -680,11 +680,11 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
             asserts.assert_is_not_none(th3_nocs_entry, f"Could not find NOCs list entry for TH3's fabric index {th3_fabric_index}")
 
             asserts.assert_equal(th3_nocs_entry.vvsc, vvsc,
-                                 "Expected VVSC to be missing")
+                                 "Did not get the expected value set for VVSC field of NOCs list for TH3.")
             asserts.assert_equal(th3_fabrics_entry.VIDVerificationStatement, VIDVerificationStatement,
-                                 "Did not get the expected value set for VIDVerificationStatement field of Fabrics list for TH2's fabric.")
+                                 "Did not get the expected value set for VIDVerificationStatement field of Fabrics list for TH3's fabric.")
             asserts.assert_equal(th3_fabrics_entry.vendorID, vendorID,
-                                 "Did not get the expected value set for VendorID field of Fabrics list for TH2's fabric.")
+                                 "Did not get the expected value set for VendorID field of Fabrics list for TH3's fabric.")
 
         with test_step(18, description="Disarm failsafe with ArmFailSafe(0s) from TH3 client. Verify that fabric table no longer has VVSC and VIDVerificationStatement for the pending fabric that was dropped."):
             attrib_listener.reset()

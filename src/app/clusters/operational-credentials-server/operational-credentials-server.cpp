@@ -306,6 +306,7 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
     if (event->FailSafeTimerExpired.setVidVerificationStatementHasBeenInvoked)
     {
         // Opcreds cluster is always on Endpoint 0.
+        // Only `Fabrics` attribute is reported since `NOCs` is not reportable (`C` quality).```
         MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id, OperationalCredentials::Attributes::Fabrics::Id);
     }
 
