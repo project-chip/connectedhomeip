@@ -40,7 +40,7 @@ CHIP_ERROR ClusterLogic::Init(const ClusterConformance & conformance, const Clus
     mIsInitialized = true;
     
     ReturnErrorOnFailure(SetMainState(initParams.mMainState));
-    ReturnErrorOnFailure(SetMainState(initParams.mOverallState));
+    ReturnErrorOnFailure(SetOverallState(initParams.mOverallState));
     
     return CHIP_NO_ERROR;
 }
@@ -200,6 +200,22 @@ CHIP_ERROR ClusterLogic::SetMainState(MainStateEnum mainState)
 
     mState.mMainState = mainState;
     mMatterContext.MarkDirty(Attributes::MainState::Id);
+    
+    if (!mConformance.HasFeature(Feature::kInstantaneous))
+    {
+        if (mainState == MainStateEnum::kCalibrating)
+        {
+            SetCountdownTimeFromCluster(mDelegate.GetCalibrationCountdownTime());
+        }
+        else if (mainState == MainStateEnum::kMoving)
+        {
+            SetCountdownTimeFromCluster(mDelegate.GetMovingCountdownTime());
+        }
+        else if (mainState == MainStateEnum::kWaitingForMotion)
+        {
+            SetCountdownTimeFromCluster(mDelegate.GetWaitingForMotionCountdownTime());
+        }
+    }
     
     return CHIP_NO_ERROR;
 }
@@ -704,41 +720,23 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleCalibrate()
 
 CHIP_ERROR ClusterLogic::PostOperationalErrorEvent(const DataModel::List<const ClosureErrorEnum> & errorState)
 {
-
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    err            = SetMainState(MainStateEnum::kError);
-
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogError(AppServer,
-                     "ClosureControlCLuster: Operation error event set MainState as Error failed %" CHIP_ERROR_FORMAT,
-                     err.Format());
-    }
+    ReturnErrorOnFailure(SetMainState(MainStateEnum::kError));
 
     Events::OperationalError::Type event{ .errorState = errorState };
-    err = mMatterContext.LogClosureEvent(event);
-    
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogError(AppServer, "ClosureControlCLuster: Operation error log event failed %" CHIP_ERROR_FORMAT, err.Format());
-    }
+    ReturnErrorOnFailure(mMatterContext.LogClosureEvent(event));
 
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ClusterLogic::PostMovementCompletedEvent()
 {
-    VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) && !mConformance.HasFeature(Feature::kInstantaneous), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) && !mConformance.HasFeature(Feature::kInstantaneous),
+                            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     
     Events::MovementCompleted::Type event{};
-    err = mMatterContext.LogClosureEvent(event);
-    
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogError(AppServer, "ClosureControlCLuster: Movement complete log event failed %" CHIP_ERROR_FORMAT, err.Format());
-    }
+    ReturnErrorOnFailure(mMatterContext.LogClosureEvent(event));
 
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ClusterLogic::PostEngageStateChangedEvent(const bool engageValue)
@@ -746,14 +744,9 @@ CHIP_ERROR ClusterLogic::PostEngageStateChangedEvent(const bool engageValue)
     VerifyOrReturnError(mConformance.HasFeature(Feature::kManuallyOperable), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     
     Events::EngageStateChanged::Type event{ .engageValue = engageValue };
-    err = mMatterContext.LogClosureEvent(event);
-    
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogError(AppServer, "ClosureControlCLuster: Engage State log event failed %" CHIP_ERROR_FORMAT, err.Format());
-    }
+    ReturnErrorOnFailure(mMatterContext.LogClosureEvent(event));
 
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ClusterLogic::PostSecureStateChangedEvent(const bool secureValue)
@@ -761,14 +754,9 @@ CHIP_ERROR ClusterLogic::PostSecureStateChangedEvent(const bool secureValue)
     VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) && !mConformance.HasFeature(Feature::kInstantaneous), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     
     Events::SecureStateChanged::Type event{ .secureValue = secureValue };
-    err = mMatterContext.LogClosureEvent(event);
-    
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogError(AppServer, "ClosureControlCLuster: Secured state log event failed %" CHIP_ERROR_FORMAT, err.Format());
-    }
+    ReturnErrorOnFailure(mMatterContext.LogClosureEvent(event));
 
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 

@@ -80,8 +80,25 @@ public:
      */
     virtual bool IsManualLatchingNeeded() = 0;
     
+    /**
+     * @brief Get the countdown time required by the closure for calibration.
+     * 
+     * @return Time required for calibration action.
+     */
     virtual ElapsedS GetCalibrationCountdownTime() = 0;
+    
+    /**
+     * @brief Get the countdown time required by the closure for Motion.
+     * 
+     * @return Time required for Motion action.
+     */
     virtual ElapsedS GetMovingCountdownTime() = 0;
+    
+    /**
+     * @brief Get the countdown time required by the closure for pre-stage before start of motion.
+     * 
+     * @return Time required for Motion action.
+     */
     virtual ElapsedS GetWaitingForMotionCountdownTime() = 0;
 };
 

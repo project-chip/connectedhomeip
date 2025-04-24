@@ -143,10 +143,7 @@ public:
     // Instantiates a ClusterLogic class. The caller maintains ownership of the driver and the context, but provides them for use by
     // the ClusterLogic class.
     ClusterLogic(DelegateBase & delegate, MatterContext & matterContext) : mDelegate(delegate), mMatterContext(matterContext)
-    {
-        // TODO remove this
-        (void) mDelegate;
-    }
+    {}
 
     ~ClusterLogic() = default;
 
@@ -282,13 +279,6 @@ public:
      *         Return error recieved from LogEvent.
      */
     CHIP_ERROR PostSecureStateChangedEvent(const bool secureValue);
-    
-    /**
-     * @brief Fuction handles the expiry of countdowntime. 
-     *        If device is in WaitingforMotion,will check if Motion should be triggered or not.
-     *        If no motion nedded, will post MotionComplete event and call HandlestopInternal.
-     */
-    void HandleCountdownTimeExpired();
 
 private:
     /**
