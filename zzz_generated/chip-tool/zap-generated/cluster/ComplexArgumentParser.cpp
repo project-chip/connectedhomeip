@@ -7197,47 +7197,6 @@ void ComplexArgumentParser::Finalize(
     ComplexArgumentParser::Finalize(request.sensitivity);
 }
 
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::PushAvStreamTransport::Structs::MetadataOptionsStruct::Type & request,
-                                        Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Copy to track which members we already processed.
-    Json::Value valueCopy(value);
-
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("MetadataOptionsStruct.multiplexing", "multiplexing",
-                                                                  value.isMember("multiplexing")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("MetadataOptionsStruct.includeMotionZones", "includeMotionZones",
-                                                                  value.isMember("includeMotionZones")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("MetadataOptionsStruct.enableMetadataPrivacySensitive",
-                                                                  "enableMetadataPrivacySensitive",
-                                                                  value.isMember("enableMetadataPrivacySensitive")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "multiplexing");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.multiplexing, value["multiplexing"]));
-    valueCopy.removeMember("multiplexing");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "includeMotionZones");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.includeMotionZones, value["includeMotionZones"]));
-    valueCopy.removeMember("includeMotionZones");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "enableMetadataPrivacySensitive");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.enableMetadataPrivacySensitive,
-                                                      value["enableMetadataPrivacySensitive"]));
-    valueCopy.removeMember("enableMetadataPrivacySensitive");
-
-    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
-}
-
-void ComplexArgumentParser::Finalize(chip::app::Clusters::PushAvStreamTransport::Structs::MetadataOptionsStruct::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.multiplexing);
-    ComplexArgumentParser::Finalize(request.includeMotionZones);
-    ComplexArgumentParser::Finalize(request.enableMetadataPrivacySensitive);
-}
-
 CHIP_ERROR
 ComplexArgumentParser::Setup(const char * label,
                              chip::app::Clusters::PushAvStreamTransport::Structs::TransportTriggerOptionsStruct::Type & request,
@@ -7322,6 +7281,13 @@ ComplexArgumentParser::Setup(const char * label,
     }
     valueCopy.removeMember("CENCKey");
 
+    if (value.isMember("metadataEnabled"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "metadataEnabled");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.metadataEnabled, value["metadataEnabled"]));
+    }
+    valueCopy.removeMember("metadataEnabled");
+
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -7330,6 +7296,7 @@ void ComplexArgumentParser::Finalize(
 {
     ComplexArgumentParser::Finalize(request.chunkDuration);
     ComplexArgumentParser::Finalize(request.CENCKey);
+    ComplexArgumentParser::Finalize(request.metadataEnabled);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
@@ -7432,13 +7399,6 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.containerOptions, value["containerOptions"]));
     valueCopy.removeMember("containerOptions");
 
-    if (value.isMember("metadataOptions"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "metadataOptions");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.metadataOptions, value["metadataOptions"]));
-    }
-    valueCopy.removeMember("metadataOptions");
-
     if (value.isMember("expiryTime"))
     {
         snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "expiryTime");
@@ -7460,7 +7420,6 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::PushAvStreamTransport:
     ComplexArgumentParser::Finalize(request.ingestMethod);
     ComplexArgumentParser::Finalize(request.containerFormat);
     ComplexArgumentParser::Finalize(request.containerOptions);
-    ComplexArgumentParser::Finalize(request.metadataOptions);
     ComplexArgumentParser::Finalize(request.expiryTime);
 }
 
@@ -7478,8 +7437,6 @@ ComplexArgumentParser::Setup(const char * label,
                                                                   value.isMember("connectionID")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TransportConfigurationStruct.transportStatus", "transportStatus",
                                                                   value.isMember("transportStatus")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TransportConfigurationStruct.transportOptions",
-                                                                  "transportOptions", value.isMember("transportOptions")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "connectionID");
@@ -7490,8 +7447,11 @@ ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.transportStatus, value["transportStatus"]));
     valueCopy.removeMember("transportStatus");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "transportOptions");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.transportOptions, value["transportOptions"]));
+    if (value.isMember("transportOptions"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "transportOptions");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.transportOptions, value["transportOptions"]));
+    }
     valueCopy.removeMember("transportOptions");
 
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);

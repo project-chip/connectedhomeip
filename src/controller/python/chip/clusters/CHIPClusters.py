@@ -13559,7 +13559,7 @@ class ChipClusters:
             0x00000002: {
                 "attributeName": "CurrentConnections",
                 "attributeId": 0x00000002,
-                "type": "int",
+                "type": "",
                 "reportable": True,
             },
             0x0000FFF8: {

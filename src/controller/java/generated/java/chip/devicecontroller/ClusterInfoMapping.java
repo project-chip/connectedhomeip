@@ -21672,15 +21672,11 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer connectionID, ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct transportOptions, Integer transportStatus) {
+    public void onSuccess(ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct transportConfiguration) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
-      CommandResponseInfo connectionIDResponseValue = new CommandResponseInfo("connectionID", "Integer");
-      responseValues.put(connectionIDResponseValue, connectionID);
-      // transportOptions: Struct TransportOptionsStruct
+      // transportConfiguration: Struct TransportConfigurationStruct
       // Conversion from this type to Java is not properly implemented yet
-      CommandResponseInfo transportStatusResponseValue = new CommandResponseInfo("transportStatus", "Integer");
-      responseValues.put(transportStatusResponseValue, transportStatus);
       callback.onSuccess(responseValues);
     }
 
@@ -21698,10 +21694,10 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(ArrayList<ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct> streamConfigurations) {
+    public void onSuccess(ArrayList<ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct> transportConfigurations) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
-      // streamConfigurations: TransportConfigurationStruct
+      // transportConfigurations: TransportConfigurationStruct
       // Conversion from this type to Java is not properly implemented yet
 
       callback.onSuccess(responseValues);
@@ -21720,9 +21716,9 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<Integer> valueList) {
+    public void onSuccess(List<ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }

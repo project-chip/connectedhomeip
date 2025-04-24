@@ -10526,7 +10526,7 @@ provisional cluster WebRTCTransportRequestor = 1364 {
 }
 
 /** This cluster implements the upload of Audio and Video streams from the Push AV Stream Transport Cluster using suitable push-based transports. */
-cluster PushAvStreamTransport = 1365 {
+provisional cluster PushAvStreamTransport = 1365 {
   revision 1;
 
   enum ContainerFormatEnum : enum8 {
@@ -10538,19 +10538,14 @@ cluster PushAvStreamTransport = 1365 {
   }
 
   enum StatusCodeEnum : enum8 {
-    kAllocationNotPermitted = 2;
-    kInvalidTLSEndpoint = 3;
-    kInvalidStream = 4;
-    kInvalidURL = 5;
-    kInvalidZone = 6;
-    kUnsupportedContainerFormat = 7;
-    kUnsupportedIngestMethod = 8;
-    kInvalidTriggerType = 9;
-    kInvalidTransportStatus = 16;
-  }
-
-  enum StreamMultiplexingEnum : enum8 {
-    kInterleaved = 0;
+    kInvalidTLSEndpoint = 2;
+    kInvalidStream = 3;
+    kInvalidURL = 4;
+    kInvalidZone = 5;
+    kUnsupportedContainerFormat = 6;
+    kUnsupportedIngestMethod = 7;
+    kInvalidTriggerType = 8;
+    kInvalidTransportStatus = 9;
   }
 
   shared enum StreamUsageEnum : enum8 {
@@ -10579,6 +10574,7 @@ cluster PushAvStreamTransport = 1365 {
 
   bitmap Feature : bitmap32 {
     kPerZoneSensitivity = 0x1;
+    kMetadata = 0x2;
   }
 
   bitmap SupportedContainerFormatsBitmap : bitmap8 {
@@ -10601,12 +10597,6 @@ cluster PushAvStreamTransport = 1365 {
     optional int8u sensitivity = 2;
   }
 
-  struct MetadataOptionsStruct {
-    StreamMultiplexingEnum multiplexing = 0;
-    boolean includeMotionZones = 1;
-    boolean enableMetadataPrivacySensitive = 2;
-  }
-
   struct TransportTriggerOptionsStruct {
     TransportTriggerTypeEnum triggerType = 0;
     optional nullable TransportZoneOptionsStruct motionZones[] = 1;
@@ -10617,7 +10607,8 @@ cluster PushAvStreamTransport = 1365 {
 
   struct CMAFContainerOptionsStruct {
     int16u chunkDuration = 0;
-    optional octet_string CENCKey = 1;
+    optional octet_string<16> CENCKey = 1;
+    optional boolean metadataEnabled = 2;
   }
 
   struct ContainerOptionsStruct {
@@ -10627,22 +10618,21 @@ cluster PushAvStreamTransport = 1365 {
 
   struct TransportOptionsStruct {
     StreamUsageEnum streamUsage = 0;
-    optional int16u videoStreamID = 1;
-    optional int16u audioStreamID = 2;
+    optional nullable int16u videoStreamID = 1;
+    optional nullable int16u audioStreamID = 2;
     int16u endpointID = 3;
     long_char_string<2000> url = 4;
     TransportTriggerOptionsStruct triggerOptions = 5;
     IngestMethodsEnum ingestMethod = 6;
     ContainerFormatEnum containerFormat = 7;
     ContainerOptionsStruct containerOptions = 8;
-    optional MetadataOptionsStruct metadataOptions = 9;
-    optional epoch_s expiryTime = 10;
+    optional epoch_s expiryTime = 9;
   }
 
   struct TransportConfigurationStruct {
     int16u connectionID = 0;
     TransportStatusEnum transportStatus = 1;
-    TransportOptionsStruct transportOptions = 2;
+    optional TransportOptionsStruct transportOptions = 2;
   }
 
   info event PushTransportBegin = 0 {
@@ -10659,7 +10649,7 @@ cluster PushAvStreamTransport = 1365 {
 
   readonly attribute SupportedContainerFormatsBitmap supportedContainerFormats = 0;
   readonly attribute SupportedIngestMethodsBitmap supportedIngestMethods = 1;
-  readonly attribute int16u currentConnections[] = 2;
+  readonly attribute TransportConfigurationStruct currentConnections[] = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -10672,9 +10662,7 @@ cluster PushAvStreamTransport = 1365 {
   }
 
   response struct AllocatePushTransportResponse = 1 {
-    int16u connectionID = 0;
-    TransportOptionsStruct transportOptions = 1;
-    TransportStatusEnum transportStatus = 2;
+    TransportConfigurationStruct transportConfiguration = 0;
   }
 
   request struct DeallocatePushTransportRequest {
@@ -10687,7 +10675,7 @@ cluster PushAvStreamTransport = 1365 {
   }
 
   request struct SetTransportStatusRequest {
-    int16u connectionID = 0;
+    nullable int16u connectionID = 0;
     TransportStatusEnum transportStatus = 1;
   }
 
@@ -10702,21 +10690,21 @@ cluster PushAvStreamTransport = 1365 {
   }
 
   response struct FindTransportResponse = 7 {
-    TransportConfigurationStruct streamConfigurations[] = 0;
+    TransportConfigurationStruct transportConfigurations[] = 0;
   }
 
   /** This command SHALL allocate a transport and return a PushTransportConnectionID. */
-  command access(invoke: manage) AllocatePushTransport(AllocatePushTransportRequest): AllocatePushTransportResponse = 0;
+  fabric command access(invoke: manage) AllocatePushTransport(AllocatePushTransportRequest): AllocatePushTransportResponse = 0;
   /** This command SHALL be generated to request the Node deallocates the specified transport. */
-  command access(invoke: manage) DeallocatePushTransport(DeallocatePushTransportRequest): DefaultSuccess = 2;
+  fabric command access(invoke: manage) DeallocatePushTransport(DeallocatePushTransportRequest): DefaultSuccess = 2;
   /** This command is used to request the Node modifies the configuration of the specified push transport. */
-  command access(invoke: manage) ModifyPushTransport(ModifyPushTransportRequest): DefaultSuccess = 3;
-  /** This command SHALL be generated to request the Node modifies the Transport Status of the transport. */
-  command access(invoke: manage) SetTransportStatus(SetTransportStatusRequest): DefaultSuccess = 4;
+  fabric command access(invoke: manage) ModifyPushTransport(ModifyPushTransportRequest): DefaultSuccess = 3;
+  /** This command SHALL be generated to request the Node modifies the Transport Status of a specified transport or all transports. */
+  fabric command access(invoke: manage) SetTransportStatus(SetTransportStatusRequest): DefaultSuccess = 4;
   /** This command SHALL be generated to request the Node to manually start the specified push transport. */
-  command ManuallyTriggerTransport(ManuallyTriggerTransportRequest): DefaultSuccess = 5;
-  /** This command SHALL return the Stream Options Configuration for the specified push transport. */
-  command FindTransport(FindTransportRequest): FindTransportResponse = 6;
+  fabric command ManuallyTriggerTransport(ManuallyTriggerTransportRequest): DefaultSuccess = 5;
+  /** This command SHALL return the Transport Configuration for the specified push transport or all allocated transports for the fabric if null. */
+  fabric command FindTransport(FindTransportRequest): FindTransportResponse = 6;
 }
 
 /** This cluster provides facilities to configure and play Chime sounds, such as those used in a doorbell. */

@@ -68,9 +68,12 @@ struct TypeInfo
 namespace CurrentConnections {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const uint16_t>;
-    using DecodableType    = chip::app::DataModel::DecodableList<uint16_t>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<uint16_t> &;
+    using Type =
+        chip::app::DataModel::List<const chip::app::Clusters::PushAvStreamTransport::Structs::TransportConfigurationStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::PushAvStreamTransport::Structs::TransportConfigurationStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::PushAvStreamTransport::Structs::TransportConfigurationStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentConnections::Id; }
