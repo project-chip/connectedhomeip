@@ -172,6 +172,7 @@ static id _Nullable DecodeAttributeValueForIdentifyCluster(AttributeId aAttribut
         return value;
     }
     default: {
+        // Not a known Identify attribute.
         break;
     }
     }
@@ -195,6 +196,7 @@ static id _Nullable DecodeAttributeValueForGroupsCluster(AttributeId aAttributeI
         return value;
     }
     default: {
+        // Not a known Groups attribute.
         break;
     }
     }
@@ -266,6 +268,7 @@ static id _Nullable DecodeAttributeValueForOnOffCluster(AttributeId aAttributeId
         return value;
     }
     default: {
+        // Not a known OnOff attribute.
         break;
     }
     }
@@ -456,6 +459,7 @@ static id _Nullable DecodeAttributeValueForLevelControlCluster(AttributeId aAttr
         return value;
     }
     default: {
+        // Not a known LevelControl attribute.
         break;
     }
     }
@@ -468,6 +472,7 @@ static id _Nullable DecodeAttributeValueForPulseWidthModulationCluster(Attribute
     using namespace Clusters::PulseWidthModulation;
     switch (aAttributeId) {
     default: {
+        // Not a known PulseWidthModulation attribute.
         break;
     }
     }
@@ -633,6 +638,7 @@ static id _Nullable DecodeAttributeValueForDescriptorCluster(AttributeId aAttrib
         return value;
     }
     default: {
+        // Not a known Descriptor attribute.
         break;
     }
     }
@@ -692,6 +698,7 @@ static id _Nullable DecodeAttributeValueForBindingCluster(AttributeId aAttribute
         return value;
     }
     default: {
+        // Not a known Binding attribute.
         break;
     }
     }
@@ -950,6 +957,7 @@ static id _Nullable DecodeAttributeValueForAccessControlCluster(AttributeId aAtt
         return value;
     }
     default: {
+        // Not a known AccessControl attribute.
         break;
     }
     }
@@ -1065,6 +1073,7 @@ static id _Nullable DecodeAttributeValueForActionsCluster(AttributeId aAttribute
         return value;
     }
     default: {
+        // Not a known Actions attribute.
         break;
     }
     }
@@ -1397,7 +1406,19 @@ static id _Nullable DecodeAttributeValueForBasicInformationCluster(AttributeId a
         value = [NSNumber numberWithUnsignedShort:cppValue];
         return value;
     }
+    case Attributes::ConfigurationVersion::Id: {
+        using TypeInfo = Attributes::ConfigurationVersion::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedInt:cppValue];
+        return value;
+    }
     default: {
+        // Not a known BasicInformation attribute.
         break;
     }
     }
@@ -1410,6 +1431,7 @@ static id _Nullable DecodeAttributeValueForOTASoftwareUpdateProviderCluster(Attr
     using namespace Clusters::OtaSoftwareUpdateProvider;
     switch (aAttributeId) {
     default: {
+        // Not a known OTASoftwareUpdateProvider attribute.
         break;
     }
     }
@@ -1488,6 +1510,7 @@ static id _Nullable DecodeAttributeValueForOTASoftwareUpdateRequestorCluster(Att
         return value;
     }
     default: {
+        // Not a known OTASoftwareUpdateRequestor attribute.
         break;
     }
     }
@@ -1547,6 +1570,7 @@ static id _Nullable DecodeAttributeValueForLocalizationConfigurationCluster(Attr
         return value;
     }
     default: {
+        // Not a known LocalizationConfiguration attribute.
         break;
     }
     }
@@ -1607,6 +1631,7 @@ static id _Nullable DecodeAttributeValueForTimeFormatLocalizationCluster(Attribu
         return value;
     }
     default: {
+        // Not a known TimeFormatLocalization attribute.
         break;
     }
     }
@@ -1629,7 +1654,34 @@ static id _Nullable DecodeAttributeValueForUnitLocalizationCluster(AttributeId a
         value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
+    case Attributes::SupportedTemperatureUnits::Id: {
+        using TypeInfo = Attributes::SupportedTemperatureUnits::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
     default: {
+        // Not a known UnitLocalization attribute.
         break;
     }
     }
@@ -1668,6 +1720,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceConfigurationCluster(Attri
         return value;
     }
     default: {
+        // Not a known PowerSourceConfiguration attribute.
         break;
     }
     }
@@ -2144,6 +2197,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
         return value;
     }
     default: {
+        // Not a known PowerSource attribute.
         break;
     }
     }
@@ -2272,6 +2326,7 @@ static id _Nullable DecodeAttributeValueForGeneralCommissioningCluster(Attribute
         return value;
     }
     default: {
+        // Not a known GeneralCommissioning attribute.
         break;
     }
     }
@@ -2467,6 +2522,7 @@ static id _Nullable DecodeAttributeValueForNetworkCommissioningCluster(Attribute
         return value;
     }
     default: {
+        // Not a known NetworkCommissioning attribute.
         break;
     }
     }
@@ -2479,6 +2535,7 @@ static id _Nullable DecodeAttributeValueForDiagnosticLogsCluster(AttributeId aAt
     using namespace Clusters::DiagnosticLogs;
     switch (aAttributeId) {
     default: {
+        // Not a known DiagnosticLogs attribute.
         break;
     }
     }
@@ -2701,6 +2758,7 @@ static id _Nullable DecodeAttributeValueForGeneralDiagnosticsCluster(AttributeId
         return value;
     }
     default: {
+        // Not a known GeneralDiagnostics attribute.
         break;
     }
     }
@@ -2798,6 +2856,7 @@ static id _Nullable DecodeAttributeValueForSoftwareDiagnosticsCluster(AttributeI
         return value;
     }
     default: {
+        // Not a known SoftwareDiagnostics attribute.
         break;
     }
     }
@@ -3697,6 +3756,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
         return value;
     }
     default: {
+        // Not a known ThreadNetworkDiagnostics attribute.
         break;
     }
     }
@@ -3904,6 +3964,7 @@ static id _Nullable DecodeAttributeValueForWiFiNetworkDiagnosticsCluster(Attribu
         return value;
     }
     default: {
+        // Not a known WiFiNetworkDiagnostics attribute.
         break;
     }
     }
@@ -4027,6 +4088,7 @@ static id _Nullable DecodeAttributeValueForEthernetNetworkDiagnosticsCluster(Att
         return value;
     }
     default: {
+        // Not a known EthernetNetworkDiagnostics attribute.
         break;
     }
     }
@@ -4255,6 +4317,7 @@ static id _Nullable DecodeAttributeValueForTimeSynchronizationCluster(AttributeI
         return value;
     }
     default: {
+        // Not a known TimeSynchronization attribute.
         break;
     }
     }
@@ -4514,7 +4577,19 @@ static id _Nullable DecodeAttributeValueForBridgedDeviceBasicInformationCluster(
         }
         return value;
     }
+    case Attributes::ConfigurationVersion::Id: {
+        using TypeInfo = Attributes::ConfigurationVersion::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedInt:cppValue];
+        return value;
+    }
     default: {
+        // Not a known BridgedDeviceBasicInformation attribute.
         break;
     }
     }
@@ -4560,6 +4635,7 @@ static id _Nullable DecodeAttributeValueForSwitchCluster(AttributeId aAttributeI
         return value;
     }
     default: {
+        // Not a known Switch attribute.
         break;
     }
     }
@@ -4613,6 +4689,7 @@ static id _Nullable DecodeAttributeValueForAdministratorCommissioningCluster(Att
         return value;
     }
     default: {
+        // Not a known AdministratorCommissioning attribute.
         break;
     }
     }
@@ -4764,6 +4841,7 @@ static id _Nullable DecodeAttributeValueForOperationalCredentialsCluster(Attribu
         return value;
     }
     default: {
+        // Not a known OperationalCredentials attribute.
         break;
     }
     }
@@ -4881,6 +4959,7 @@ static id _Nullable DecodeAttributeValueForGroupKeyManagementCluster(AttributeId
         return value;
     }
     default: {
+        // Not a known GroupKeyManagement attribute.
         break;
     }
     }
@@ -4931,6 +5010,7 @@ static id _Nullable DecodeAttributeValueForFixedLabelCluster(AttributeId aAttrib
         return value;
     }
     default: {
+        // Not a known FixedLabel attribute.
         break;
     }
     }
@@ -4981,6 +5061,7 @@ static id _Nullable DecodeAttributeValueForUserLabelCluster(AttributeId aAttribu
         return value;
     }
     default: {
+        // Not a known UserLabel attribute.
         break;
     }
     }
@@ -5004,6 +5085,7 @@ static id _Nullable DecodeAttributeValueForBooleanStateCluster(AttributeId aAttr
         return value;
     }
     default: {
+        // Not a known BooleanState attribute.
         break;
     }
     }
@@ -5150,6 +5232,7 @@ static id _Nullable DecodeAttributeValueForICDManagementCluster(AttributeId aAtt
         return value;
     }
     default: {
+        // Not a known ICDManagement attribute.
         break;
     }
     }
@@ -5195,6 +5278,7 @@ static id _Nullable DecodeAttributeValueForTimerCluster(AttributeId aAttributeId
         return value;
     }
     default: {
+        // Not a known Timer attribute.
         break;
     }
     }
@@ -5352,6 +5436,7 @@ static id _Nullable DecodeAttributeValueForOvenCavityOperationalStateCluster(Att
         return value;
     }
     default: {
+        // Not a known OvenCavityOperationalState attribute.
         break;
     }
     }
@@ -5430,6 +5515,7 @@ static id _Nullable DecodeAttributeValueForOvenModeCluster(AttributeId aAttribut
         return value;
     }
     default: {
+        // Not a known OvenMode attribute.
         break;
     }
     }
@@ -5483,6 +5569,7 @@ static id _Nullable DecodeAttributeValueForLaundryDryerControlsCluster(Attribute
         return value;
     }
     default: {
+        // Not a known LaundryDryerControls attribute.
         break;
     }
     }
@@ -5618,6 +5705,7 @@ static id _Nullable DecodeAttributeValueForModeSelectCluster(AttributeId aAttrib
         return value;
     }
     default: {
+        // Not a known ModeSelect attribute.
         break;
     }
     }
@@ -5696,6 +5784,7 @@ static id _Nullable DecodeAttributeValueForLaundryWasherModeCluster(AttributeId 
         return value;
     }
     default: {
+        // Not a known LaundryWasherMode attribute.
         break;
     }
     }
@@ -5774,6 +5863,7 @@ static id _Nullable DecodeAttributeValueForRefrigeratorAndTemperatureControlledC
         return value;
     }
     default: {
+        // Not a known RefrigeratorAndTemperatureControlledCabinetMode attribute.
         break;
     }
     }
@@ -5869,6 +5959,7 @@ static id _Nullable DecodeAttributeValueForLaundryWasherControlsCluster(Attribut
         return value;
     }
     default: {
+        // Not a known LaundryWasherControls attribute.
         break;
     }
     }
@@ -5947,6 +6038,7 @@ static id _Nullable DecodeAttributeValueForRVCRunModeCluster(AttributeId aAttrib
         return value;
     }
     default: {
+        // Not a known RVCRunMode attribute.
         break;
     }
     }
@@ -6025,6 +6117,7 @@ static id _Nullable DecodeAttributeValueForRVCCleanModeCluster(AttributeId aAttr
         return value;
     }
     default: {
+        // Not a known RVCCleanMode attribute.
         break;
     }
     }
@@ -6123,6 +6216,7 @@ static id _Nullable DecodeAttributeValueForTemperatureControlCluster(AttributeId
         return value;
     }
     default: {
+        // Not a known TemperatureControl attribute.
         break;
     }
     }
@@ -6168,6 +6262,7 @@ static id _Nullable DecodeAttributeValueForRefrigeratorAlarmCluster(AttributeId 
         return value;
     }
     default: {
+        // Not a known RefrigeratorAlarm attribute.
         break;
     }
     }
@@ -6246,6 +6341,7 @@ static id _Nullable DecodeAttributeValueForDishwasherModeCluster(AttributeId aAt
         return value;
     }
     default: {
+        // Not a known DishwasherMode attribute.
         break;
     }
     }
@@ -6269,6 +6365,7 @@ static id _Nullable DecodeAttributeValueForAirQualityCluster(AttributeId aAttrib
         return value;
     }
     default: {
+        // Not a known AirQuality attribute.
         break;
     }
     }
@@ -6424,6 +6521,7 @@ static id _Nullable DecodeAttributeValueForSmokeCOAlarmCluster(AttributeId aAttr
         return value;
     }
     default: {
+        // Not a known SmokeCOAlarm attribute.
         break;
     }
     }
@@ -6480,6 +6578,7 @@ static id _Nullable DecodeAttributeValueForDishwasherAlarmCluster(AttributeId aA
         return value;
     }
     default: {
+        // Not a known DishwasherAlarm attribute.
         break;
     }
     }
@@ -6558,6 +6657,7 @@ static id _Nullable DecodeAttributeValueForMicrowaveOvenModeCluster(AttributeId 
         return value;
     }
     default: {
+        // Not a known MicrowaveOvenMode attribute.
         break;
     }
     }
@@ -6684,6 +6784,7 @@ static id _Nullable DecodeAttributeValueForMicrowaveOvenControlCluster(Attribute
         return value;
     }
     default: {
+        // Not a known MicrowaveOvenControl attribute.
         break;
     }
     }
@@ -6841,6 +6942,7 @@ static id _Nullable DecodeAttributeValueForOperationalStateCluster(AttributeId a
         return value;
     }
     default: {
+        // Not a known OperationalState attribute.
         break;
     }
     }
@@ -6998,6 +7100,7 @@ static id _Nullable DecodeAttributeValueForRVCOperationalStateCluster(AttributeI
         return value;
     }
     default: {
+        // Not a known RVCOperationalState attribute.
         break;
     }
     }
@@ -7053,6 +7156,7 @@ static id _Nullable DecodeAttributeValueForScenesManagementCluster(AttributeId a
         return value;
     }
     default: {
+        // Not a known ScenesManagement attribute.
         break;
     }
     }
@@ -7157,6 +7261,7 @@ static id _Nullable DecodeAttributeValueForHEPAFilterMonitoringCluster(Attribute
         return value;
     }
     default: {
+        // Not a known HEPAFilterMonitoring attribute.
         break;
     }
     }
@@ -7261,6 +7366,7 @@ static id _Nullable DecodeAttributeValueForActivatedCarbonFilterMonitoringCluste
         return value;
     }
     default: {
+        // Not a known ActivatedCarbonFilterMonitoring attribute.
         break;
     }
     }
@@ -7361,6 +7467,7 @@ static id _Nullable DecodeAttributeValueForBooleanStateConfigurationCluster(Attr
         return value;
     }
     default: {
+        // Not a known BooleanStateConfiguration attribute.
         break;
     }
     }
@@ -7526,6 +7633,7 @@ static id _Nullable DecodeAttributeValueForValveConfigurationAndControlCluster(A
         return value;
     }
     default: {
+        // Not a known ValveConfigurationAndControl attribute.
         break;
     }
     }
@@ -7974,6 +8082,7 @@ static id _Nullable DecodeAttributeValueForElectricalPowerMeasurementCluster(Att
         return value;
     }
     default: {
+        // Not a known ElectricalPowerMeasurement attribute.
         break;
     }
     }
@@ -8244,6 +8353,7 @@ static id _Nullable DecodeAttributeValueForElectricalEnergyMeasurementCluster(At
         return value;
     }
     default: {
+        // Not a known ElectricalEnergyMeasurement attribute.
         break;
     }
     }
@@ -8322,6 +8432,7 @@ static id _Nullable DecodeAttributeValueForWaterHeaterManagementCluster(Attribut
         return value;
     }
     default: {
+        // Not a known WaterHeaterManagement attribute.
         break;
     }
     }
@@ -8380,11 +8491,7 @@ static id _Nullable DecodeAttributeValueForCommodityPriceCluster(AttributeId aAt
                 value.periodEnd = [NSNumber numberWithUnsignedInt:cppValue.Value().periodEnd.Value()];
             }
             if (cppValue.Value().price.HasValue()) {
-                value.price = [MTRDataTypePriceStruct new];
-                value.price.amount = [NSNumber numberWithLongLong:cppValue.Value().price.Value().amount];
-                value.price.currency = [MTRDataTypeCurrencyStruct new];
-                value.price.currency.currency = [NSNumber numberWithUnsignedShort:cppValue.Value().price.Value().currency.currency];
-                value.price.currency.decimalPoints = [NSNumber numberWithUnsignedChar:cppValue.Value().price.Value().currency.decimalPoints];
+                value.price = [NSNumber numberWithLongLong:cppValue.Value().price.Value()];
             } else {
                 value.price = nil;
             }
@@ -8411,16 +8518,7 @@ static id _Nullable DecodeAttributeValueForCommodityPriceCluster(AttributeId aAt
                         auto & entry_3 = iter_3.GetValue();
                         MTRCommodityPriceClusterCommodityPriceComponentStruct * newElement_3;
                         newElement_3 = [MTRCommodityPriceClusterCommodityPriceComponentStruct new];
-                        if (entry_3.price.HasValue()) {
-                            newElement_3.price = [NSNumber numberWithLongLong:entry_3.price.Value()];
-                        } else {
-                            newElement_3.price = nil;
-                        }
-                        if (entry_3.priceLevel.HasValue()) {
-                            newElement_3.priceLevel = [NSNumber numberWithShort:entry_3.priceLevel.Value()];
-                        } else {
-                            newElement_3.priceLevel = nil;
-                        }
+                        newElement_3.price = [NSNumber numberWithLongLong:entry_3.price];
                         newElement_3.source = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_3.source)];
                         if (entry_3.description.HasValue()) {
                             newElement_3.descriptionString = AsString(entry_3.description.Value());
@@ -8474,11 +8572,7 @@ static id _Nullable DecodeAttributeValueForCommodityPriceCluster(AttributeId aAt
                     newElement_0.periodEnd = [NSNumber numberWithUnsignedInt:entry_0.periodEnd.Value()];
                 }
                 if (entry_0.price.HasValue()) {
-                    newElement_0.price = [MTRDataTypePriceStruct new];
-                    newElement_0.price.amount = [NSNumber numberWithLongLong:entry_0.price.Value().amount];
-                    newElement_0.price.currency = [MTRDataTypeCurrencyStruct new];
-                    newElement_0.price.currency.currency = [NSNumber numberWithUnsignedShort:entry_0.price.Value().currency.currency];
-                    newElement_0.price.currency.decimalPoints = [NSNumber numberWithUnsignedChar:entry_0.price.Value().currency.decimalPoints];
+                    newElement_0.price = [NSNumber numberWithLongLong:entry_0.price.Value()];
                 } else {
                     newElement_0.price = nil;
                 }
@@ -8505,16 +8599,7 @@ static id _Nullable DecodeAttributeValueForCommodityPriceCluster(AttributeId aAt
                             auto & entry_3 = iter_3.GetValue();
                             MTRCommodityPriceClusterCommodityPriceComponentStruct * newElement_3;
                             newElement_3 = [MTRCommodityPriceClusterCommodityPriceComponentStruct new];
-                            if (entry_3.price.HasValue()) {
-                                newElement_3.price = [NSNumber numberWithLongLong:entry_3.price.Value()];
-                            } else {
-                                newElement_3.price = nil;
-                            }
-                            if (entry_3.priceLevel.HasValue()) {
-                                newElement_3.priceLevel = [NSNumber numberWithShort:entry_3.priceLevel.Value()];
-                            } else {
-                                newElement_3.priceLevel = nil;
-                            }
+                            newElement_3.price = [NSNumber numberWithLongLong:entry_3.price];
                             newElement_3.source = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_3.source)];
                             if (entry_3.description.HasValue()) {
                                 newElement_3.descriptionString = AsString(entry_3.description.Value());
@@ -8555,6 +8640,7 @@ static id _Nullable DecodeAttributeValueForCommodityPriceCluster(AttributeId aAt
         return value;
     }
     default: {
+        // Not a known CommodityPrice attribute.
         break;
     }
     }
@@ -8926,6 +9012,7 @@ static id _Nullable DecodeAttributeValueForDemandResponseLoadControlCluster(Attr
         return value;
     }
     default: {
+        // Not a known DemandResponseLoadControl attribute.
         break;
     }
     }
@@ -9044,6 +9131,7 @@ static id _Nullable DecodeAttributeValueForMessagesCluster(AttributeId aAttribut
         return value;
     }
     default: {
+        // Not a known Messages attribute.
         break;
     }
     }
@@ -9310,6 +9398,7 @@ static id _Nullable DecodeAttributeValueForDeviceEnergyManagementCluster(Attribu
         return value;
     }
     default: {
+        // Not a known DeviceEnergyManagement attribute.
         break;
     }
     }
@@ -9640,6 +9729,7 @@ static id _Nullable DecodeAttributeValueForEnergyEVSECluster(AttributeId aAttrib
         return value;
     }
     default: {
+        // Not a known EnergyEVSE attribute.
         break;
     }
     }
@@ -9774,6 +9864,7 @@ static id _Nullable DecodeAttributeValueForEnergyPreferenceCluster(AttributeId a
         return value;
     }
     default: {
+        // Not a known EnergyPreference attribute.
         break;
     }
     }
@@ -9838,6 +9929,7 @@ static id _Nullable DecodeAttributeValueForPowerTopologyCluster(AttributeId aAtt
         return value;
     }
     default: {
+        // Not a known PowerTopology attribute.
         break;
     }
     }
@@ -9916,6 +10008,7 @@ static id _Nullable DecodeAttributeValueForEnergyEVSEModeCluster(AttributeId aAt
         return value;
     }
     default: {
+        // Not a known EnergyEVSEMode attribute.
         break;
     }
     }
@@ -9994,6 +10087,7 @@ static id _Nullable DecodeAttributeValueForWaterHeaterModeCluster(AttributeId aA
         return value;
     }
     default: {
+        // Not a known WaterHeaterMode attribute.
         break;
     }
     }
@@ -10072,6 +10166,96 @@ static id _Nullable DecodeAttributeValueForDeviceEnergyManagementModeCluster(Att
         return value;
     }
     default: {
+        // Not a known DeviceEnergyManagementMode attribute.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeAttributeValueForElectricalGridConditionsCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::ElectricalGridConditions;
+    switch (aAttributeId) {
+    case Attributes::LocalGenerationAvailable::Id: {
+        using TypeInfo = Attributes::LocalGenerationAvailable::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithBool:cppValue.Value()];
+        }
+        return value;
+    }
+    case Attributes::CurrentConditions::Id: {
+        using TypeInfo = Attributes::CurrentConditions::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTRElectricalGridConditionsClusterElectricalGridConditionsStruct * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [MTRElectricalGridConditionsClusterElectricalGridConditionsStruct new];
+            value.periodStart = [NSNumber numberWithUnsignedInt:cppValue.Value().periodStart];
+            if (cppValue.Value().periodEnd.IsNull()) {
+                value.periodEnd = nil;
+            } else {
+                value.periodEnd = [NSNumber numberWithUnsignedInt:cppValue.Value().periodEnd.Value()];
+            }
+            value.gridCarbonIntensity = [NSNumber numberWithShort:cppValue.Value().gridCarbonIntensity];
+            value.gridCarbonLevel = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().gridCarbonLevel)];
+            value.localCarbonIntensity = [NSNumber numberWithShort:cppValue.Value().localCarbonIntensity];
+            value.localCarbonLevel = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().localCarbonLevel)];
+        }
+        return value;
+    }
+    case Attributes::ForecastConditions::Id: {
+        using TypeInfo = Attributes::ForecastConditions::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRElectricalGridConditionsClusterElectricalGridConditionsStruct * newElement_0;
+                newElement_0 = [MTRElectricalGridConditionsClusterElectricalGridConditionsStruct new];
+                newElement_0.periodStart = [NSNumber numberWithUnsignedInt:entry_0.periodStart];
+                if (entry_0.periodEnd.IsNull()) {
+                    newElement_0.periodEnd = nil;
+                } else {
+                    newElement_0.periodEnd = [NSNumber numberWithUnsignedInt:entry_0.periodEnd.Value()];
+                }
+                newElement_0.gridCarbonIntensity = [NSNumber numberWithShort:entry_0.gridCarbonIntensity];
+                newElement_0.gridCarbonLevel = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.gridCarbonLevel)];
+                newElement_0.localCarbonIntensity = [NSNumber numberWithShort:entry_0.localCarbonIntensity];
+                newElement_0.localCarbonLevel = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.localCarbonLevel)];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    default: {
+        // Not a known ElectricalGridConditions attribute.
         break;
     }
     }
@@ -10634,6 +10818,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
         return value;
     }
     default: {
+        // Not a known DoorLock attribute.
         break;
     }
     }
@@ -10920,6 +11105,7 @@ static id _Nullable DecodeAttributeValueForWindowCoveringCluster(AttributeId aAt
         return value;
     }
     default: {
+        // Not a known WindowCovering attribute.
         break;
     }
     }
@@ -11004,14 +11190,14 @@ static id _Nullable DecodeAttributeValueForClosureControlCluster(AttributeId aAt
             } else {
                 value.positioning = nil;
             }
-            if (cppValue.Value().latching.HasValue()) {
-                if (cppValue.Value().latching.Value().IsNull()) {
-                    value.latching = nil;
+            if (cppValue.Value().latch.HasValue()) {
+                if (cppValue.Value().latch.Value().IsNull()) {
+                    value.latch = nil;
                 } else {
-                    value.latching = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().latching.Value().Value())];
+                    value.latch = [NSNumber numberWithBool:cppValue.Value().latch.Value().Value()];
                 }
             } else {
-                value.latching = nil;
+                value.latch = nil;
             }
             if (cppValue.Value().speed.HasValue()) {
                 if (cppValue.Value().speed.Value().IsNull()) {
@@ -11022,14 +11208,14 @@ static id _Nullable DecodeAttributeValueForClosureControlCluster(AttributeId aAt
             } else {
                 value.speed = nil;
             }
-            if (cppValue.Value().extraInfo.HasValue()) {
-                if (cppValue.Value().extraInfo.Value().IsNull()) {
-                    value.extraInfo = nil;
+            if (cppValue.Value().secureState.HasValue()) {
+                if (cppValue.Value().secureState.Value().IsNull()) {
+                    value.secureState = nil;
                 } else {
-                    value.extraInfo = [NSNumber numberWithUnsignedInt:cppValue.Value().extraInfo.Value().Value()];
+                    value.secureState = [NSNumber numberWithBool:cppValue.Value().secureState.Value().Value()];
                 }
             } else {
-                value.extraInfo = nil;
+                value.secureState = nil;
             }
         }
         return value;
@@ -11052,7 +11238,7 @@ static id _Nullable DecodeAttributeValueForClosureControlCluster(AttributeId aAt
                 value.position = nil;
             }
             if (cppValue.Value().latch.HasValue()) {
-                value.latch = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().latch.Value())];
+                value.latch = [NSNumber numberWithBool:cppValue.Value().latch.Value()];
             } else {
                 value.latch = nil;
             }
@@ -11065,6 +11251,7 @@ static id _Nullable DecodeAttributeValueForClosureControlCluster(AttributeId aAt
         return value;
     }
     default: {
+        // Not a known ClosureControl attribute.
         break;
     }
     }
@@ -11076,27 +11263,27 @@ static id _Nullable DecodeAttributeValueForClosureDimensionCluster(AttributeId a
 {
     using namespace Clusters::ClosureDimension;
     switch (aAttributeId) {
-    case Attributes::Current::Id: {
-        using TypeInfo = Attributes::Current::TypeInfo;
+    case Attributes::CurrentState::Id: {
+        using TypeInfo = Attributes::CurrentState::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        MTRClosureDimensionClusterCurrentStruct * _Nullable value;
+        MTRClosureDimensionClusterCurrentStateStruct * _Nullable value;
         if (cppValue.IsNull()) {
             value = nil;
         } else {
-            value = [MTRClosureDimensionClusterCurrentStruct new];
+            value = [MTRClosureDimensionClusterCurrentStateStruct new];
             if (cppValue.Value().position.HasValue()) {
                 value.position = [NSNumber numberWithUnsignedShort:cppValue.Value().position.Value()];
             } else {
                 value.position = nil;
             }
-            if (cppValue.Value().latching.HasValue()) {
-                value.latching = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().latching.Value())];
+            if (cppValue.Value().latch.HasValue()) {
+                value.latch = [NSNumber numberWithBool:cppValue.Value().latch.Value()];
             } else {
-                value.latching = nil;
+                value.latch = nil;
             }
             if (cppValue.Value().speed.HasValue()) {
                 value.speed = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().speed.Value())];
@@ -11124,7 +11311,7 @@ static id _Nullable DecodeAttributeValueForClosureDimensionCluster(AttributeId a
                 value.position = nil;
             }
             if (cppValue.Value().latch.HasValue()) {
-                value.latch = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().latch.Value())];
+                value.latch = [NSNumber numberWithBool:cppValue.Value().latch.Value()];
             } else {
                 value.latch = nil;
             }
@@ -11244,6 +11431,7 @@ static id _Nullable DecodeAttributeValueForClosureDimensionCluster(AttributeId a
         return value;
     }
     default: {
+        // Not a known ClosureDimension attribute.
         break;
     }
     }
@@ -11456,6 +11644,7 @@ static id _Nullable DecodeAttributeValueForServiceAreaCluster(AttributeId aAttri
         return value;
     }
     default: {
+        // Not a known ServiceArea attribute.
         break;
     }
     }
@@ -11793,6 +11982,7 @@ static id _Nullable DecodeAttributeValueForPumpConfigurationAndControlCluster(At
         return value;
     }
     default: {
+        // Not a known PumpConfigurationAndControl attribute.
         break;
     }
     }
@@ -12690,6 +12880,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
         return value;
     }
     default: {
+        // Not a known Thermostat attribute.
         break;
     }
     }
@@ -12842,6 +13033,7 @@ static id _Nullable DecodeAttributeValueForFanControlCluster(AttributeId aAttrib
         return value;
     }
     default: {
+        // Not a known FanControl attribute.
         break;
     }
     }
@@ -12887,6 +13079,7 @@ static id _Nullable DecodeAttributeValueForThermostatUserInterfaceConfigurationC
         return value;
     }
     default: {
+        // Not a known ThermostatUserInterfaceConfiguration attribute.
         break;
     }
     }
@@ -13520,6 +13713,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
         return value;
     }
     default: {
+        // Not a known ColorControl attribute.
         break;
     }
     }
@@ -13716,6 +13910,7 @@ static id _Nullable DecodeAttributeValueForBallastConfigurationCluster(Attribute
         return value;
     }
     default: {
+        // Not a known BallastConfiguration attribute.
         break;
     }
     }
@@ -13799,6 +13994,7 @@ static id _Nullable DecodeAttributeValueForIlluminanceMeasurementCluster(Attribu
         return value;
     }
     default: {
+        // Not a known IlluminanceMeasurement attribute.
         break;
     }
     }
@@ -13867,6 +14063,7 @@ static id _Nullable DecodeAttributeValueForTemperatureMeasurementCluster(Attribu
         return value;
     }
     default: {
+        // Not a known TemperatureMeasurement attribute.
         break;
     }
     }
@@ -14002,6 +14199,7 @@ static id _Nullable DecodeAttributeValueForPressureMeasurementCluster(AttributeI
         return value;
     }
     default: {
+        // Not a known PressureMeasurement attribute.
         break;
     }
     }
@@ -14070,6 +14268,7 @@ static id _Nullable DecodeAttributeValueForFlowMeasurementCluster(AttributeId aA
         return value;
     }
     default: {
+        // Not a known FlowMeasurement attribute.
         break;
     }
     }
@@ -14138,6 +14337,7 @@ static id _Nullable DecodeAttributeValueForRelativeHumidityMeasurementCluster(At
         return value;
     }
     default: {
+        // Not a known RelativeHumidityMeasurement attribute.
         break;
     }
     }
@@ -14307,6 +14507,7 @@ static id _Nullable DecodeAttributeValueForOccupancySensingCluster(AttributeId a
         return value;
     }
     default: {
+        // Not a known OccupancySensing attribute.
         break;
     }
     }
@@ -14460,6 +14661,7 @@ static id _Nullable DecodeAttributeValueForCarbonMonoxideConcentrationMeasuremen
         return value;
     }
     default: {
+        // Not a known CarbonMonoxideConcentrationMeasurement attribute.
         break;
     }
     }
@@ -14613,6 +14815,7 @@ static id _Nullable DecodeAttributeValueForCarbonDioxideConcentrationMeasurement
         return value;
     }
     default: {
+        // Not a known CarbonDioxideConcentrationMeasurement attribute.
         break;
     }
     }
@@ -14766,6 +14969,7 @@ static id _Nullable DecodeAttributeValueForNitrogenDioxideConcentrationMeasureme
         return value;
     }
     default: {
+        // Not a known NitrogenDioxideConcentrationMeasurement attribute.
         break;
     }
     }
@@ -14919,6 +15123,7 @@ static id _Nullable DecodeAttributeValueForOzoneConcentrationMeasurementCluster(
         return value;
     }
     default: {
+        // Not a known OzoneConcentrationMeasurement attribute.
         break;
     }
     }
@@ -15072,6 +15277,7 @@ static id _Nullable DecodeAttributeValueForPM25ConcentrationMeasurementCluster(A
         return value;
     }
     default: {
+        // Not a known PM25ConcentrationMeasurement attribute.
         break;
     }
     }
@@ -15225,6 +15431,7 @@ static id _Nullable DecodeAttributeValueForFormaldehydeConcentrationMeasurementC
         return value;
     }
     default: {
+        // Not a known FormaldehydeConcentrationMeasurement attribute.
         break;
     }
     }
@@ -15378,6 +15585,7 @@ static id _Nullable DecodeAttributeValueForPM1ConcentrationMeasurementCluster(At
         return value;
     }
     default: {
+        // Not a known PM1ConcentrationMeasurement attribute.
         break;
     }
     }
@@ -15531,6 +15739,7 @@ static id _Nullable DecodeAttributeValueForPM10ConcentrationMeasurementCluster(A
         return value;
     }
     default: {
+        // Not a known PM10ConcentrationMeasurement attribute.
         break;
     }
     }
@@ -15684,6 +15893,7 @@ static id _Nullable DecodeAttributeValueForTotalVolatileOrganicCompoundsConcentr
         return value;
     }
     default: {
+        // Not a known TotalVolatileOrganicCompoundsConcentrationMeasurement attribute.
         break;
     }
     }
@@ -15837,6 +16047,7 @@ static id _Nullable DecodeAttributeValueForRadonConcentrationMeasurementCluster(
         return value;
     }
     default: {
+        // Not a known RadonConcentrationMeasurement attribute.
         break;
     }
     }
@@ -15879,6 +16090,7 @@ static id _Nullable DecodeAttributeValueForWiFiNetworkManagementCluster(Attribut
         return value;
     }
     default: {
+        // Not a known WiFiNetworkManagement attribute.
         break;
     }
     }
@@ -15970,6 +16182,7 @@ static id _Nullable DecodeAttributeValueForThreadBorderRouterManagementCluster(A
         return value;
     }
     default: {
+        // Not a known ThreadBorderRouterManagement attribute.
         break;
     }
     }
@@ -16043,6 +16256,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDirectoryCluster(Attribu
         return value;
     }
     default: {
+        // Not a known ThreadNetworkDirectory attribute.
         break;
     }
     }
@@ -16082,6 +16296,7 @@ static id _Nullable DecodeAttributeValueForWakeOnLANCluster(AttributeId aAttribu
         return value;
     }
     default: {
+        // Not a known WakeOnLAN attribute.
         break;
     }
     }
@@ -16271,6 +16486,7 @@ static id _Nullable DecodeAttributeValueForChannelCluster(AttributeId aAttribute
         return value;
     }
     default: {
+        // Not a known Channel attribute.
         break;
     }
     }
@@ -16327,6 +16543,7 @@ static id _Nullable DecodeAttributeValueForTargetNavigatorCluster(AttributeId aA
         return value;
     }
     default: {
+        // Not a known TargetNavigator attribute.
         break;
     }
     }
@@ -16656,6 +16873,7 @@ static id _Nullable DecodeAttributeValueForMediaPlaybackCluster(AttributeId aAtt
         return value;
     }
     default: {
+        // Not a known MediaPlayback attribute.
         break;
     }
     }
@@ -16719,6 +16937,7 @@ static id _Nullable DecodeAttributeValueForMediaInputCluster(AttributeId aAttrib
         return value;
     }
     default: {
+        // Not a known MediaInput attribute.
         break;
     }
     }
@@ -16731,6 +16950,7 @@ static id _Nullable DecodeAttributeValueForLowPowerCluster(AttributeId aAttribut
     using namespace Clusters::LowPower;
     switch (aAttributeId) {
     default: {
+        // Not a known LowPower attribute.
         break;
     }
     }
@@ -16743,6 +16963,7 @@ static id _Nullable DecodeAttributeValueForKeypadInputCluster(AttributeId aAttri
     using namespace Clusters::KeypadInput;
     switch (aAttributeId) {
     default: {
+        // Not a known KeypadInput attribute.
         break;
     }
     }
@@ -16797,6 +17018,7 @@ static id _Nullable DecodeAttributeValueForContentLauncherCluster(AttributeId aA
         return value;
     }
     default: {
+        // Not a known ContentLauncher attribute.
         break;
     }
     }
@@ -16854,6 +17076,7 @@ static id _Nullable DecodeAttributeValueForAudioOutputCluster(AttributeId aAttri
         return value;
     }
     default: {
+        // Not a known AudioOutput attribute.
         break;
     }
     }
@@ -16920,6 +17143,7 @@ static id _Nullable DecodeAttributeValueForApplicationLauncherCluster(AttributeI
         return value;
     }
     default: {
+        // Not a known ApplicationLauncher attribute.
         break;
     }
     }
@@ -17057,6 +17281,7 @@ static id _Nullable DecodeAttributeValueForApplicationBasicCluster(AttributeId a
         return value;
     }
     default: {
+        // Not a known ApplicationBasic attribute.
         break;
     }
     }
@@ -17069,6 +17294,7 @@ static id _Nullable DecodeAttributeValueForAccountLoginCluster(AttributeId aAttr
     using namespace Clusters::AccountLogin;
     switch (aAttributeId) {
     default: {
+        // Not a known AccountLogin attribute.
         break;
     }
     }
@@ -17241,6 +17467,7 @@ static id _Nullable DecodeAttributeValueForContentControlCluster(AttributeId aAt
         return value;
     }
     default: {
+        // Not a known ContentControl attribute.
         break;
     }
     }
@@ -17253,6 +17480,7 @@ static id _Nullable DecodeAttributeValueForContentAppObserverCluster(AttributeId
     using namespace Clusters::ContentAppObserver;
     switch (aAttributeId) {
     default: {
+        // Not a known ContentAppObserver attribute.
         break;
     }
     }
@@ -17366,6 +17594,7 @@ static id _Nullable DecodeAttributeValueForZoneManagementCluster(AttributeId aAt
         return value;
     }
     default: {
+        // Not a known ZoneManagement attribute.
         break;
     }
     }
@@ -17377,8 +17606,8 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
 {
     using namespace Clusters::CameraAvStreamManagement;
     switch (aAttributeId) {
-    case Attributes::MaxConcurrentVideoEncoders::Id: {
-        using TypeInfo = Attributes::MaxConcurrentVideoEncoders::TypeInfo;
+    case Attributes::MaxConcurrentEncoders::Id: {
+        using TypeInfo = Attributes::MaxConcurrentEncoders::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -17615,8 +17844,8 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
         value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
-    case Attributes::SupportedSnapshotParams::Id: {
-        using TypeInfo = Attributes::SupportedSnapshotParams::TypeInfo;
+    case Attributes::SnapshotCapabilities::Id: {
+        using TypeInfo = Attributes::SnapshotCapabilities::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -17628,13 +17857,19 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                MTRCameraAVStreamManagementClusterSnapshotParamsStruct * newElement_0;
-                newElement_0 = [MTRCameraAVStreamManagementClusterSnapshotParamsStruct new];
+                MTRCameraAVStreamManagementClusterSnapshotCapabilitiesStruct * newElement_0;
+                newElement_0 = [MTRCameraAVStreamManagementClusterSnapshotCapabilitiesStruct new];
                 newElement_0.resolution = [MTRCameraAVStreamManagementClusterVideoResolutionStruct new];
                 newElement_0.resolution.width = [NSNumber numberWithUnsignedShort:entry_0.resolution.width];
                 newElement_0.resolution.height = [NSNumber numberWithUnsignedShort:entry_0.resolution.height];
                 newElement_0.maxFrameRate = [NSNumber numberWithUnsignedShort:entry_0.maxFrameRate];
                 newElement_0.imageCodec = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.imageCodec)];
+                newElement_0.requiresEncodedPixels = [NSNumber numberWithBool:entry_0.requiresEncodedPixels];
+                if (entry_0.requiresHardwareEncoder.HasValue()) {
+                    newElement_0.requiresHardwareEncoder = [NSNumber numberWithBool:entry_0.requiresHardwareEncoder.Value()];
+                } else {
+                    newElement_0.requiresHardwareEncoder = nil;
+                }
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -17809,7 +18044,6 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
                 newElement_0.snapshotStreamID = [NSNumber numberWithUnsignedShort:entry_0.snapshotStreamID];
                 newElement_0.imageCodec = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.imageCodec)];
                 newElement_0.frameRate = [NSNumber numberWithUnsignedShort:entry_0.frameRate];
-                newElement_0.bitRate = [NSNumber numberWithUnsignedInt:entry_0.bitRate];
                 newElement_0.minResolution = [MTRCameraAVStreamManagementClusterVideoResolutionStruct new];
                 newElement_0.minResolution.width = [NSNumber numberWithUnsignedShort:entry_0.minResolution.width];
                 newElement_0.minResolution.height = [NSNumber numberWithUnsignedShort:entry_0.minResolution.height];
@@ -17818,6 +18052,8 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
                 newElement_0.maxResolution.height = [NSNumber numberWithUnsignedShort:entry_0.maxResolution.height];
                 newElement_0.quality = [NSNumber numberWithUnsignedChar:entry_0.quality];
                 newElement_0.referenceCount = [NSNumber numberWithUnsignedChar:entry_0.referenceCount];
+                newElement_0.encodedPixels = [NSNumber numberWithBool:entry_0.encodedPixels];
+                newElement_0.hardwareEncoder = [NSNumber numberWithBool:entry_0.hardwareEncoder];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -18102,6 +18338,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
         return value;
     }
     default: {
+        // Not a known CameraAVStreamManagement attribute.
         break;
     }
     }
@@ -18281,6 +18518,7 @@ static id _Nullable DecodeAttributeValueForCameraAVSettingsUserLevelManagementCl
         return value;
     }
     default: {
+        // Not a known CameraAVSettingsUserLevelManagement attribute.
         break;
     }
     }
@@ -18335,6 +18573,7 @@ static id _Nullable DecodeAttributeValueForWebRTCTransportProviderCluster(Attrib
         return value;
     }
     default: {
+        // Not a known WebRTCTransportProvider attribute.
         break;
     }
     }
@@ -18389,6 +18628,7 @@ static id _Nullable DecodeAttributeValueForWebRTCTransportRequestorCluster(Attri
         return value;
     }
     default: {
+        // Not a known WebRTCTransportRequestor attribute.
         break;
     }
     }
@@ -18449,6 +18689,7 @@ static id _Nullable DecodeAttributeValueForPushAVStreamTransportCluster(Attribut
         return value;
     }
     default: {
+        // Not a known PushAVStreamTransport attribute.
         break;
     }
     }
@@ -18516,6 +18757,7 @@ static id _Nullable DecodeAttributeValueForChimeCluster(AttributeId aAttributeId
         return value;
     }
     default: {
+        // Not a known Chime attribute.
         break;
     }
     }
@@ -19407,6 +19649,7 @@ static id _Nullable DecodeAttributeValueForCommodityTariffCluster(AttributeId aA
         return value;
     }
     default: {
+        // Not a known CommodityTariff attribute.
         break;
     }
     }
@@ -19554,6 +19797,7 @@ static id _Nullable DecodeAttributeValueForEcosystemInformationCluster(Attribute
         return value;
     }
     default: {
+        // Not a known EcosystemInformation attribute.
         break;
     }
     }
@@ -19577,6 +19821,7 @@ static id _Nullable DecodeAttributeValueForCommissionerControlCluster(AttributeI
         return value;
     }
     default: {
+        // Not a known CommissionerControl attribute.
         break;
     }
     }
@@ -19695,6 +19940,7 @@ static id _Nullable DecodeAttributeValueForTLSCertificateManagementCluster(Attri
         return value;
     }
     default: {
+        // Not a known TLSCertificateManagement attribute.
         break;
     }
     }
@@ -19754,6 +20000,7 @@ static id _Nullable DecodeAttributeValueForTLSClientManagementCluster(AttributeI
         return value;
     }
     default: {
+        // Not a known TLSClientManagement attribute.
         break;
     }
     }
@@ -19871,6 +20118,7 @@ static id _Nullable DecodeAttributeValueForMeterIdentificationCluster(AttributeI
         return value;
     }
     default: {
+        // Not a known MeterIdentification attribute.
         break;
     }
     }
@@ -19960,6 +20208,7 @@ static id _Nullable DecodeAttributeValueForCommodityMeteringCluster(AttributeId 
         return value;
     }
     default: {
+        // Not a known CommodityMetering attribute.
         break;
     }
     }
@@ -21526,6 +21775,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
         return value;
     }
     default: {
+        // Not a known UnitTesting attribute.
         break;
     }
     }
@@ -21549,6 +21799,7 @@ static id _Nullable DecodeAttributeValueForSampleMEICluster(AttributeId aAttribu
         return value;
     }
     default: {
+        // Not a known SampleMEI attribute.
         break;
     }
     }
@@ -21782,6 +22033,9 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
     }
     case Clusters::DeviceEnergyManagementMode::Id: {
         return DecodeAttributeValueForDeviceEnergyManagementModeCluster(aPath.mAttributeId, aReader, aError);
+    }
+    case Clusters::ElectricalGridConditions::Id: {
+        return DecodeAttributeValueForElectricalGridConditionsCluster(aPath.mAttributeId, aReader, aError);
     }
     case Clusters::DoorLock::Id: {
         return DecodeAttributeValueForDoorLockCluster(aPath.mAttributeId, aReader, aError);

@@ -29,6 +29,9 @@ import("${nxp_sdk_build_root}/nxp_sdk.gni")
 assert(chip_device_platform == "nxp")
 
 declare_args() {
+  # Enable secondary network interface
+  chip_enable_secondary_nwk_if = false
+
   # Enable OTA encryption
   chip_with_ota_encryption = false
 
@@ -85,13 +88,10 @@ static_library("nxp_platform") {
     "../../common/KeyValueStoreManagerImpl.cpp",
     "../../common/KeyValueStoreManagerImpl.h",
     "../../common/Logging.cpp",
-    "../../common/NXPConfig.cpp",
     "../../common/NXPConfig.h",
     "../../common/NetworkProvisioningServerImpl.h",
     "../../common/PlatformManagerImpl.h",
     "../../common/SoftwareUpdateManagerImpl.h",
-    "../../common/ram_storage.c",
-    "../../common/ram_storage.h",
     "CHIPDevicePlatformConfig.h",
     "PlatformManagerImpl.cpp",
   ]
@@ -99,6 +99,16 @@ static_library("nxp_platform") {
     "${chip_root}/src/app:app_config",
     "${chip_root}/src/app/common:ids",
   ]
+
+  if (nxp_nvm_component == "nvm_fwk" || nxp_nvm_component == "littlefs") {
+    sources += [
+      "../../common/NXPConfig.cpp",
+      "../../common/ram_storage.c",
+      "../../common/ram_storage.h",
+    ]
+  } else if (nxp_nvm_component == "nvs") {
+    sources += [ "../../common/NXPConfigNVS.cpp" ]
+  }
 
   if (chip_enable_ble) {
     sources += [
@@ -155,15 +165,12 @@ static_library("nxp_platform") {
       "../../common/ThreadStackManagerImpl.h",
     ]
 
-    deps += [
-      "${chip_root}/src/app:app_config",
-      "${chip_root}/src/app/common:ids",
-    ]
+    deps += [ "${chip_root}/third_party/openthread:openthread" ]
 
-    if (!nxp_build_matter_standalone_lib) {
-      deps += [ "${chip_root}/third_party/openthread:openthread" ]
-      public_deps +=
-          [ "${chip_root}/third_party/openthread:openthread-platform" ]
+    public_deps += [ "${chip_root}/third_party/openthread:openthread-platform" ]
+
+    if (nxp_enable_matter_cli) {
+      public_deps += [ "${chip_root}/third_party/openthread:openthread_cli" ]
     }
 
     # dep required to include 'lib/spinel/spinel.h' in PlatformManagerImpl.cpp
