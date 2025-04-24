@@ -42,7 +42,6 @@ enum AreaTypeTag : enum8 {
   kGardenDoor = 37;
   kGuestBathroom = 38;
   kGuestBedroom = 39;
-  kGuestRestroom = 40;
   kGuestRoom = 41;
   kGym = 42;
   kHallway = 43;
@@ -50,7 +49,6 @@ enum AreaTypeTag : enum8 {
   kKidsRoom = 45;
   kKidsBedroom = 46;
   kKitchen = 47;
-  kLarder = 48;
   kLaundryRoom = 49;
   kLawn = 50;
   kLibrary = 51;
@@ -75,7 +73,6 @@ enum AreaTypeTag : enum8 {
   kRamp = 70;
   kReceptionRoom = 71;
   kRecreationRoom = 72;
-  kRestroom = 73;
   kRoof = 74;
   kSauna = 75;
   kScullery = 76;
@@ -97,39 +94,13 @@ enum AreaTypeTag : enum8 {
   kUtilityRoom = 92;
   kWard = 93;
   kWorkshop = 94;
+  kToilet = 95;
 }
 
 enum AtomicRequestTypeEnum : enum8 {
   kBeginWrite = 0;
   kCommitWrite = 1;
   kRollbackWrite = 2;
-}
-
-enum FloorSurfaceTag : enum8 {
-  kCarpet = 0;
-  kCeramic = 1;
-  kConcrete = 2;
-  kCork = 3;
-  kDeepCarpet = 4;
-  kDirt = 5;
-  kEngineeredWood = 6;
-  kGlass = 7;
-  kGrass = 8;
-  kHardwood = 9;
-  kLaminate = 10;
-  kLinoleum = 11;
-  kMat = 12;
-  kMetal = 13;
-  kPlastic = 14;
-  kPolishedConcrete = 15;
-  kRubber = 16;
-  kRug = 17;
-  kSand = 18;
-  kStone = 19;
-  kTatami = 20;
-  kTerrazzo = 21;
-  kTile = 22;
-  kVinyl = 23;
 }
 
 enum LandmarkTag : enum8 {
@@ -184,6 +155,13 @@ enum LandmarkTag : enum8 {
   kLaundryWasher = 48;
   kWindow = 49;
   kWineCooler = 50;
+}
+
+enum LocationTag : enum8 {
+  kIndoor = 0;
+  kOutdoor = 1;
+  kInside = 2;
+  kOutside = 3;
 }
 
 enum PositionTag : enum8 {
@@ -254,6 +232,11 @@ struct PowerThresholdStruct {
   nullable PowerThresholdSourceEnum powerThresholdSource = 2;
 }
 
+struct PriceStruct {
+  money amount = 0;
+  CurrencyStruct currency = 1;
+}
+
 struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
@@ -264,11 +247,6 @@ struct LocationDescriptorStruct {
   char_string<128> locationName = 0;
   nullable int16s floorNumber = 1;
   nullable AreaTypeTag areaType = 2;
-}
-
-struct PriceStruct {
-  money amount = 0;
-  CurrencyStruct currency = 1;
 }
 
 struct AtomicAttributeStatusStruct {
@@ -1346,7 +1324,7 @@ cluster TimeFormatLocalization = 44 {
       user. As such, Nodes that visually or audibly convey measurable values to the user need a
       mechanism by which they can be configured to use a user’s preferred unit. */
 cluster UnitLocalization = 45 {
-  revision 1;
+  revision 2;
 
   enum TempUnitEnum : enum8 {
     kFahrenheit = 0;
@@ -1359,6 +1337,7 @@ cluster UnitLocalization = 45 {
   }
 
   attribute access(write: manage) optional TempUnitEnum temperatureUnit = 0;
+  provisional readonly attribute optional TempUnitEnum supportedTemperatureUnits[] = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3860,6 +3839,13 @@ cluster RvcOperationalState = 97 {
     kWaterTankMissing = 69;
     kWaterTankLidOpen = 70;
     kMopCleaningPadMissing = 71;
+    kLowBattery = 72;
+    kCannotReachTargetArea = 73;
+    kDirtyWaterTankFull = 74;
+    kDirtyWaterTankMissing = 75;
+    kWheelsJammed = 76;
+    kBrushJammed = 77;
+    kNavigationSensorObscured = 78;
   }
 
   enum OperationalStateEnum : enum8 {
@@ -3870,6 +3856,10 @@ cluster RvcOperationalState = 97 {
     kSeekingCharger = 64;
     kCharging = 65;
     kDocked = 66;
+    kEmptyingDustBin = 67;
+    kCleaningMop = 68;
+    kFillingWaterTank = 69;
+    kUpdatingMaps = 70;
   }
 
   shared struct ErrorStateStruct {
@@ -6503,7 +6493,7 @@ cluster CarbonMonoxideConcentrationMeasurement = 1036 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -6560,7 +6550,7 @@ cluster CarbonDioxideConcentrationMeasurement = 1037 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -6617,7 +6607,7 @@ cluster NitrogenDioxideConcentrationMeasurement = 1043 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -6674,7 +6664,7 @@ cluster OzoneConcentrationMeasurement = 1045 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -6731,7 +6721,7 @@ cluster Pm25ConcentrationMeasurement = 1066 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -6788,7 +6778,7 @@ cluster FormaldehydeConcentrationMeasurement = 1067 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -6845,7 +6835,7 @@ cluster Pm1ConcentrationMeasurement = 1068 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -6902,7 +6892,7 @@ cluster Pm10ConcentrationMeasurement = 1069 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -6959,7 +6949,7 @@ cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -7016,7 +7006,7 @@ cluster RadonConcentrationMeasurement = 1071 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
