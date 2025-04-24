@@ -43,7 +43,7 @@ CHIP_ERROR Interface::Read(const ConcreteReadAttributePath & aPath, AttributeVal
 {
     switch (aPath.mAttributeId)
     {
-    case Attributes::Current::Id: {
+    case Attributes::CurrentState::Id: {
         typedef GenericCurrentStateStruct T;
         return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetCurrentState(ret); });
     }

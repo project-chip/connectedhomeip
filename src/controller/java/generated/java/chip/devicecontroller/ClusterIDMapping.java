@@ -9405,8 +9405,7 @@ public class ClusterIDMapping {
         }
 
         public enum Event {
-            PriceChange(0L),
-            ForecastChange(1L),;
+            PriceChange(0L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -10828,8 +10827,7 @@ public class ClusterIDMapping {
         }
 
         public enum Event {
-            CurrentConditionsChanged(0L),
-            ForecastConditionsChanged(1L),;
+            CurrentConditionsChanged(0L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -11741,7 +11739,7 @@ public class ClusterIDMapping {
         }
 
         public enum Attribute {
-            Current(0L),
+            CurrentState(0L),
             Target(1L),
             Resolution(2L),
             StepValue(3L),
