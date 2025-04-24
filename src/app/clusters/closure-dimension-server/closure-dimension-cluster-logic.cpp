@@ -123,7 +123,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericCurren
     if (validateIncomingCurrentStatePosition)
     {
         //  If the position member is present in the incoming CurrentState, we need to check if the Positioning
-        //  feature is supported by the device. If the Positioning feature is not supported, return an error.
+        //  feature is supported by the closure. If the Positioning feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
         // We don't need to check if values are present since the check was done above.
@@ -140,7 +140,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericCurren
     if (validateIncomingCurrentStateLatch)
     {
         //  If the latching member is present in the incoming CurrentState, we need to check if the MotionLatching
-        //  feature is supported by the device. If the MotionLatching feature is not supported, return an error.
+        //  feature is supported by the closure. If the MotionLatching feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
         // We don't need to check is values are present since the check was done above.
@@ -156,7 +156,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericCurren
     if (validateIncomingCurrentStateSpeed)
     {
         //  If the speed member is present in the incoming CurrentState, we need to check if the Speed feature is
-        //  supported by the device. If the Speed feature is not supported, return an error.
+        //  supported by the closure. If the Speed feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
         const Globals::ThreeLevelAutoEnum & speed = incomingCurrentState.Value().speed.Value();
@@ -249,7 +249,7 @@ CHIP_ERROR ClusterLogic::SetTarget(const DataModel::Nullable<GenericTargetStruct
     if (validateIncomingTargetPosition)
     {
         //  If the position member is present in the incoming Target, we need to check if the Positioning
-        //  feature is supported by the device. If the Positioning feature is not supported, return an error.
+        //  feature is supported by the closure. If the Positioning feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
         // We don't need to check if values are present since the check was done above.
@@ -272,7 +272,7 @@ CHIP_ERROR ClusterLogic::SetTarget(const DataModel::Nullable<GenericTargetStruct
     if (validateIncomingTargetLatch)
     {
         //  If the latching member is present in the incoming Target, we need to check if the MotionLatching
-        //  feature is supported by the device. If the MotionLatching feature is not supported, return an error.
+        //  feature is supported by the closure. If the MotionLatching feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
         // We don't need to check is values are present since the check was done above.
@@ -288,7 +288,7 @@ CHIP_ERROR ClusterLogic::SetTarget(const DataModel::Nullable<GenericTargetStruct
     if (validateIncomingTargetSpeed)
     {
         //  If the speed member is present in the incoming Target, we need to check if the Speed feature is
-        //  supported by the device. If the Speed feature is not supported, return an error.
+        //  supported by the closure. If the Speed feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
         const Globals::ThreeLevelAutoEnum & speed = incomingTarget.Value().speed.Value();
@@ -648,14 +648,14 @@ CHIP_ERROR ClusterLogic::GetClusterRevision(Attributes::ClusterRevision::TypeInf
 Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Optional<bool> latch,
                                             Optional<Globals::ThreeLevelAutoEnum> speed)
 {
-    VerifyOrDieWithMsg(mInitialized, AppServer, "Unexpected command received when device is yet to be initialized");
+    VerifyOrDieWithMsg(mInitialized, AppServer, "Unexpected command received when closure is yet to be initialized");
 
     Status status = Status::Success;
 
     //  If all command parameters don't have a value, return InvalidCommand
     VerifyOrReturnError(position.HasValue() || latch.HasValue() || speed.HasValue(), Status::InvalidCommand);
 
-    // TODO: If this command is sent while the device is in a non-compatible internal-state, a status code of
+    // TODO: If this command is sent while the closure is in a non-compatible internal-state, a status code of
     // INVALID_IN_STATE SHALL be returned.
 
     GenericTargetStruct target{};
@@ -665,7 +665,7 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
     {
         VerifyOrReturnError((position.Value() <= kPercents100thsMaxValue), Status::ConstraintError);
 
-        // If the Limitation Feature is active, the device will automatically offset the Target.Position value to fit within
+        // If the Limitation Feature is active, the closure will automatically offset the Target.Position value to fit within
         // LimitRange.Min and LimitRange.Max.
         Structs::RangePercent100thsStruct::Type limitRange;
 
@@ -724,7 +724,7 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
 Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t numberOfSteps,
                                        Optional<Globals::ThreeLevelAutoEnum> speed)
 {
-    VerifyOrDieWithMsg(mInitialized, NotSpecified, "Unexpected command recieved when device is yet to be initialized");
+    VerifyOrDieWithMsg(mInitialized, NotSpecified, "Unexpected command recieved when closure is yet to be initialized");
 
     // Return UnsupportedCommand if Positioning feature is not supported.
     VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), Status::UnsupportedCommand);
@@ -763,7 +763,7 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
     uint32_t delta       = numberOfSteps * stepValue;
     uint32_t newPosition = 0;
 
-    // check if device supports Limitation feature, if yes fetch the LimitRange values
+    // check if closure supports Limitation feature, if yes fetch the LimitRange values
     bool limitSupported = mConformance.HasFeature(Feature::kLimitation) ? true : false;
 
     Structs::RangePercent100thsStruct::Type limitRange;
