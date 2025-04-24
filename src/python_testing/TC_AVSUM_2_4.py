@@ -54,7 +54,7 @@ class TC_AVSUM_2_4(MatterBaseTest, AVSUMTestBase):
             asserts.assert_equal(preset.settings.zoom, position.zoom)
 
     def desc_TC_AVSUM_2_4(self) -> str:
-        return "[TC-AVSUM-2.4] Attributes with DUT as Server"
+        return "[TC-AVSUM-2.4] MPTZMoveToPreset command validation"
 
     def steps_TC_AVSUM_2_4(self) -> list[TestStep]:
         steps = [
