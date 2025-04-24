@@ -48,6 +48,8 @@ import logging
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from mobly import asserts
+
 from TC_SEPRTestBase import CommodityPriceTestBaseHelper
 
 logger = logging.getLogger(__name__)
@@ -146,6 +148,8 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
                                                                       payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
         except TimeoutError:
             asserts.fail("Unable to establish a CASE session over TCP to the device. Does the device support TCP?")
+
+        asserts.assert_equal(device.sessionAllowsLargePayload, True, "Session does not have associated TCP connection")
 
         self.step("2")
         # TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster
