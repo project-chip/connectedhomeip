@@ -1023,13 +1023,11 @@ void ApplicationInit()
                       Span<DataVersion>(gComposedDeviceDataVersions), ""_span, 1);
     AddDeviceEndpoint(&ComposedTempSensor1, &bridgedTempSensorEndpoint,
                       Span<const EmberAfDeviceType>(gComposedTempSensorDeviceTypes),
-                      Span<DataVersion>(gComposedTempSensor1DataVersions),
-                      "AABBCCDDEEFFGGHHIIJJKKLLMMNNOO01"_span,
+                      Span<DataVersion>(gComposedTempSensor1DataVersions), "AABBCCDDEEFFGGHHIIJJKKLLMMNNOO01"_span,
                       gComposedDevice.GetEndpointId());
     AddDeviceEndpoint(&ComposedTempSensor2, &bridgedTempSensorEndpoint,
                       Span<const EmberAfDeviceType>(gComposedTempSensorDeviceTypes),
-                      Span<DataVersion>(gComposedTempSensor2DataVersions),
-                      "AABBCCDDEEFFGGHHIIJJKKLLMMNNOO02"_span,
+                      Span<DataVersion>(gComposedTempSensor2DataVersions), "AABBCCDDEEFFGGHHIIJJKKLLMMNNOO02"_span,
                       gComposedDevice.GetEndpointId());
 
     // Add 4 lights for the Action Clusters tests
