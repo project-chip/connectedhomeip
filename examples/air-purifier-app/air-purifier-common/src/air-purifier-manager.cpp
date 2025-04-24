@@ -435,7 +435,7 @@ void AirPurifierManager::HeatingCallback()
     if (speedSetting.IsNull() || speedSetting.Value() == 0)
     {
         DataModel::Nullable<uint8_t> newSpeedSetting(5);
-        // TODO: what causes this to happen? Seems like ther other ones also need updating.
+        // TODO: what causes this to happen? Seems like the other ones also need updating.
         SetSpeedSetting(newSpeedSetting);
     }
 }
