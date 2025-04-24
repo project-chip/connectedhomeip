@@ -343,12 +343,12 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 await self.read_and_validate_operror(step="7x", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kMopCleaningPadMissing)
             if self.check_pics("RVCOPSTATE.S.M.ERR_BATTERY_LOW"):
                 test_step = "Manually put the device in the low battery error state"
-                self.print_step("7w", test_step)
+                self.print_step("7y", test_step)
                 if self.is_ci:
                     self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "MopCleaningPadMissing"})
                 else:
                     self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
-                await self.read_and_validate_operror(step="7y", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kLowBattery)
+                await self.read_and_validate_operror(step="7z", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kLowBattery)
 
 
 if __name__ == "__main__":
