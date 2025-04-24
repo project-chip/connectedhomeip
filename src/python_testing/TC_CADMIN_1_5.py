@@ -56,8 +56,8 @@ class TC_CADMIN_1_5(MatterBaseTest):
         def __post_init__(self):
             self.cm = int(self.service.txt_record.get('CM', None))
             self.d = int(self.service.txt_record.get('D', None))
-    
-        def __str__(self) -> str:     
+
+        def __str__(self) -> str:
             return f"Service CM={self.cm}, D={self.d}"
 
         def matches(self, expected_cm: int, expected_d: int) -> bool:
@@ -70,7 +70,7 @@ class TC_CADMIN_1_5(MatterBaseTest):
         discovery = mdns_discovery.MdnsDiscovery(verbose_logging=True)
         discovery._service_types = [mdns_discovery.MdnsServiceType.COMMISSIONABLE.value]
         await discovery._discover(discovery_timeout_sec=240, log_output=False)
-        
+
         if mdns_discovery.MdnsServiceType.COMMISSIONABLE.value in discovery._discovered_services:
             return discovery._discovered_services[mdns_discovery.MdnsServiceType.COMMISSIONABLE.value]
         return []
@@ -98,13 +98,13 @@ class TC_CADMIN_1_5(MatterBaseTest):
             # Not on last attempt, wait and retry
             if attempt < max_attempts - 1:
                 logging.info(f"Waiting for service with CM={expected_cm_value} and D={expected_discriminator}, "
-                            f"attempt {attempt+1}/{max_attempts}")
+                             f"attempt {attempt+1}/{max_attempts}")
                 sleep(delay_sec)
             else:
                 # Final retry attempt failed
                 asserts.fail(f"Failed to find DNS-SD advertisement with CM={expected_cm_value} and "
-                            f"discriminator={expected_discriminator} after {max_attempts} attempts. "
-                            f"Found services: {[str(s) for s in services]}")
+                             f"discriminator={expected_discriminator} after {max_attempts} attempts. "
+                             f"Found services: {[str(s) for s in services]}")
 
     async def commission_on_network(self, setup_code: int, discriminator: int, expected_error: int = 0):
         # This is expected to error as steps 4 and 7 expects timeout issue or pase connection error to occur due to commissioning window being closed already
