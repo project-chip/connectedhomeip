@@ -38,4 +38,7 @@ declare_args() {
   chip_data_model_extra_logging =
       current_os == "linux" || current_os == "ios" || current_os == "mac" ||
       current_os == "android"
+
+  # Flag that controls whether the camera server is enabled
+  matter_enable_camera_server = false
 }
