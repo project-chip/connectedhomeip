@@ -43,7 +43,7 @@ class PrefixCppDocComment:
         self.value_len = len(token.value)  # includes /***/ AND whitespace
         self.value = token.value[3:-2].strip()
 
-    def appply_to_idl(self, idl: Idl, content: str):
+    def apply_to_idl(self, idl: Idl, content: str):
         if self.start_pos is None:
             return
 
@@ -691,7 +691,7 @@ class ParserWithLines:
         idl.clusters = [c for c in clusters.values()]
 
         for comment in self.transformer.doc_comments:
-            comment.appply_to_idl(idl, file)
+            comment.apply_to_idl(idl, file)
 
         if self.merge_globals:
             idl = _merge_global_types_into_clusters(idl)
