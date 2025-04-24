@@ -44,8 +44,8 @@ public:
 
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
 
-    // For now this is a place holder and the Delegate could be removed
-    // There is no delegated methods since these are largely implemented in the
+    // For now this is a placeholder and the Delegate could be removed
+    // There are no delegated methods since these are largely implemented in the
     // commodity-price-server.cpp Instance class
 
 protected:
@@ -55,10 +55,10 @@ protected:
 class Instance : public AttributeAccessInterface
 {
 public:
-    Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature) :
+    Instance(EndpointId aEndpointId, Delegate & aDelegate, BitMask<Feature> aFeatures) :
         AttributeAccessInterface(MakeOptional(aEndpointId), Id), mDelegate(aDelegate), mFeature(aFeature)
     {
-        /* set the base class delegates endpointId */
+        /* set the base class delegate's endpointId */
         mDelegate.SetEndpointId(aEndpointId);
         mEndpointId = aEndpointId;
     }
@@ -75,12 +75,12 @@ public:
     CHIP_ERROR SetCurrentConditions(DataModel::Nullable<Structs::ElectricalGridConditionsStruct::Type>);
     CHIP_ERROR SetForecastConditions(const DataModel::List<const Structs::ElectricalGridConditionsStruct::Type> &);
 
-    // Send CurrentConditionsChanged events
+    // Generate CurrentConditionsChanged events
     Protocols::InteractionModel::Status GenerateCurrentConditionsChangedEvent();
 
 private:
     Delegate & mDelegate;
-    BitMask<Feature> mFeature;
+    BitMask<Feature> mFeatures;
 
     EndpointId mEndpointId;
 
