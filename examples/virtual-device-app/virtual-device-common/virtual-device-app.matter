@@ -3879,7 +3879,7 @@ endpoint 1 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x0;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 6;
 
     handle command Identify;
     handle command TriggerEffect;
