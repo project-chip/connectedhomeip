@@ -652,7 +652,7 @@ using structured comments at the top of the test file. To use this structured
 format, use the `--load-from-env` flag with the `run_python_tests.py` runner.
 
 Ex:
-`scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ICDM_2_1.py'`
+`out/venv/bin/python ./scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ICDM_2_1.py`
 
 ## Running ALL or a subset of tests when changing application code
 
