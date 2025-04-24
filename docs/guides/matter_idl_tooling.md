@@ -68,9 +68,9 @@ spec).
 
 ## Linting `.matter` files for devices
 
-For device validation, `./scripts/idl_lint.py` provides the ability to validate
-a matter file for some basic conformance logic. These rules are expressed in
-`scripts/rules.matterlint`.
+For device validation, `matter-idl-lint` provides the ability to validate a
+matter file for some basic conformance logic. These rules are expressed in
+`.matterlint`.
 
 The rules generally are:
 
@@ -82,5 +82,5 @@ The rules generally are:
 Usage:
 
 ```sh
-./scripts/idl_lint.py ./examples/window-app/common/window-app.matter
+matter-idl-lint examples/window-app/common/window-app.matter
 ```

@@ -3692,6 +3692,11 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         XCTAssertEqual(controller.devices.count, 1);
     }
 
+    // Wait for the report processing to finish, so the MTRDevice object may dealloc
+    [controller syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+
     // report should still be ongoing
     XCTAssertFalse(subscriptionReportEnd1);
     XCTAssertEqual(controller.devices.count, 0);

@@ -802,7 +802,7 @@ cluster TimeFormatLocalization = 44 {
       user. As such, Nodes that visually or audibly convey measurable values to the user need a
       mechanism by which they can be configured to use a user’s preferred unit. */
 cluster UnitLocalization = 45 {
-  revision 1;
+  revision 2;
 
   enum TempUnitEnum : enum8 {
     kFahrenheit = 0;
@@ -815,6 +815,7 @@ cluster UnitLocalization = 45 {
   }
 
   attribute access(write: manage) optional TempUnitEnum temperatureUnit = 0;
+  provisional readonly attribute optional TempUnitEnum supportedTemperatureUnits[] = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1536,10 +1537,6 @@ provisional cluster CommodityPrice = 149 {
     nullable CommodityPriceStruct currentPrice = 0;
   }
 
-  info event ForecastChange = 1 {
-    nullable CommodityPriceStruct priceForecast[] = 0;
-  }
-
   readonly attribute TariffUnitEnum tariffUnit = 0;
   readonly attribute nullable CurrencyStruct currency = 1;
   readonly attribute nullable CommodityPriceStruct currentPrice = 2;
@@ -1816,7 +1813,6 @@ endpoint 1 {
 
   server cluster CommodityPrice {
     emits event PriceChange;
-    emits event ForecastChange;
     ram      attribute tariffUnit;
     callback attribute currency;
     callback attribute currentPrice;

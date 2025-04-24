@@ -6448,6 +6448,7 @@ public class ChipClusters {
     public static final long CLUSTER_ID = 45L;
 
     private static final long TEMPERATURE_UNIT_ATTRIBUTE_ID = 0L;
+    private static final long SUPPORTED_TEMPERATURE_UNITS_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -6463,6 +6464,10 @@ public class ChipClusters {
     @Deprecated
     public long initWithDevice(long devicePtr, int endpointId) {
       return 0L;
+    }
+
+    public interface SupportedTemperatureUnitsAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Integer> value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -6514,6 +6519,32 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, TEMPERATURE_UNIT_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readSupportedTemperatureUnitsAttribute(
+        SupportedTemperatureUnitsAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_TEMPERATURE_UNITS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SUPPORTED_TEMPERATURE_UNITS_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeSupportedTemperatureUnitsAttribute(
+        SupportedTemperatureUnitsAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_TEMPERATURE_UNITS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SUPPORTED_TEMPERATURE_UNITS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(

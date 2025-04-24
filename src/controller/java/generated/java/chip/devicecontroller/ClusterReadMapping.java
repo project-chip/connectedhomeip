@@ -1776,6 +1776,17 @@ public class ClusterReadMapping {
           readUnitLocalizationTemperatureUnitCommandParams
         );
         result.put("readTemperatureUnitAttribute", readUnitLocalizationTemperatureUnitAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readUnitLocalizationSupportedTemperatureUnitsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readUnitLocalizationSupportedTemperatureUnitsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.UnitLocalizationCluster) cluster).readSupportedTemperatureUnitsAttribute(
+              (ChipClusters.UnitLocalizationCluster.SupportedTemperatureUnitsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedUnitLocalizationClusterSupportedTemperatureUnitsAttributeCallback(),
+          readUnitLocalizationSupportedTemperatureUnitsCommandParams
+        );
+        result.put("readSupportedTemperatureUnitsAttribute", readUnitLocalizationSupportedTemperatureUnitsAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readUnitLocalizationGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readUnitLocalizationGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
