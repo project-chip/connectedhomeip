@@ -49,7 +49,6 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
-
 from TC_SEPRTestBase import CommodityPriceTestBaseHelper
 
 logger = logging.getLogger(__name__)
