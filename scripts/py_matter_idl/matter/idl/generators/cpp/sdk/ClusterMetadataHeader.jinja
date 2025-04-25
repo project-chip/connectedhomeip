@@ -21,22 +21,21 @@ inline constexpr uint32_t kRevision = {{cluster.revision}};
 namespace Attributes {
 {% for attribute in cluster.attributes | reject("global_attribute") -%}
 namespace {{attribute.definition.name | upfirst}} {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = {{attribute.definition.name | upfirst}}::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ {{ attribute | extract_attribute_quality_flags | join(", ") }} },
-    .readPrivilege  = {% if attribute.is_readable -%}
+inline constexpr DataModel::AttributeEntry kMetadataEntry(
+    {{attribute.definition.name | upfirst}}::Id,
+    BitFlags<DataModel::AttributeQualityFlags>{ {{ attribute | extract_attribute_quality_flags | join(", ") }} },
+    {% if attribute.is_readable -%}
         {{attribute.readacl | as_privilege}}
       {%- else -%}
         std::nullopt
       {%- endif -%}
     ,
-    .writePrivilege = {% if attribute.is_writable -%}
+    {% if attribute.is_writable -%}
         {{attribute.writeacl | as_privilege}}
       {%- else -%}
         std::nullopt
       {%- endif -%}
-    ,
-};
+);
 } // namespace {{attribute.definition.name | upfirst}}
 {% endfor %}
 
@@ -45,11 +44,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 {% for command in cluster.commands -%}
 namespace {{command.name | upfirst}} {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = {{cluster.name | upfirst}}::Commands::{{command.name | upfirst}}::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ {{ command | extract_command_quality_flags | join(", ") }} },
-    .invokePrivilege = {{ command.invokeacl | as_privilege}},
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(
+    {{cluster.name | upfirst}}::Commands::{{command.name | upfirst}}::Id,
+    BitFlags<DataModel::CommandQualityFlags>{ {{ command | extract_command_quality_flags | join(", ") }} },
+    {{ command.invokeacl | as_privilege}}
+);
 } // namespace {{command.name | upfirst}}
 {% endfor %}
 } // namespace Commands
