@@ -79,11 +79,11 @@ class TC_CLCTRL_4_2(MatterBaseTest):
 
     @async_test_body
     async def test_TC_CLCTRL_4_2(self):
-        asserts.assert_true('PIXIT.CLCTRL.FullMotionDuration' in self.matter_test_config.global_test_params,
-                            "PIXIT.CLCTRL.FullMotionDuration must be included on the command line in "
-                            "the --int-arg flag as PIXIT.CLCTRL.FullMotionDuration:<duration>")
+        asserts.assert_true('PIXIT.CLCTRL.LatchingDuration' in self.matter_test_config.global_test_params,
+                            "PIXIT.CLCTRL.LatchingDuration must be included on the command line in "
+                            "the --int-arg flag as PIXIT.CLCTRL.LatchingDuration:<duration>")
         
-        latching_duration = self.matter_test_config.global_test_params['PIXIT.CLCTRL.FullMotionDuration']
+        latching_duration = self.matter_test_config.global_test_params['PIXIT.CLCTRL.LatchingDuration']
         is_manual_latching = True if self.check_pics('CLCTRL.S.M.ManualLatching') is not None else False
 
         endpoint = self.get_endpoint(default=1)
