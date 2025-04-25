@@ -100,9 +100,9 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             try:
                 await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"latch": True}))
                 logging.info("MoveTo command with Latch field when feature not supported was accepted")
-            except Exception as e:
+            except InteractionModelError as e:
                 logging.error(f"MoveTo with Latch when feature not supported failed: {e}")
-                asserts.assert_false(True, "MoveTo with Latch when feature not supported should be accepted")
+                asserts.assert_equal(e.status, Status.Success, "Expected Success status for MoveTo with Latch when feature not supported")
         
         self.step("3b")
         # Test Speed field if Speed feature is not supported
@@ -110,9 +110,9 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             try:
                 await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"speed": 1}))  # Low speed
                 logging.info("MoveTo command with Speed field when feature not supported was accepted")
-            except Exception as e:
+            except InteractionModelError as e:
                 logging.error(f"MoveTo with Speed when feature not supported failed: {e}")
-                asserts.assert_false(True, "MoveTo with Speed when feature not supported should be accepted")
+                asserts.assert_equal(e.status, Status.Success, "Expected Success status for MoveTo with Speed when feature not supported")
         
         self.step("3c")
         # Test Position field if Positioning feature is not supported
@@ -120,9 +120,9 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             try:
                 await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"position": 0}))  # CloseInFull
                 logging.info("MoveTo command with Position field when feature not supported was accepted")
-            except Exception as e:
+            except InteractionModelError as e:
                 logging.error(f"MoveTo with Position when feature not supported failed: {e}")
-                asserts.assert_false(True, "MoveTo with Position when feature not supported should be accepted")
+                asserts.assert_equal(e.status, Status.Success, "Expected Success status for MoveTo with Position when feature not supported")
 
         # STEP 4
         self.step("4a")
@@ -132,12 +132,10 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                 await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"position": 6}))
                 logging.error("MoveTo command with invalid Position should have failed but succeeded")
                 asserts.assert_true(False, "MoveTo command with invalid Position should have failed but succeeded")
-            except Exception as e:
+            except InteractionModelError as e:
                 logging.info(f"Expected exception caught for invalid Position: {e}")
-                # Verify that we got a Constraint Error
-                asserts.assert_true("CONSTRAINT_ERROR" in str(e), 
-                                    f"Expected CONSTRAINT_ERROR for invalid Position but got: {e}")
-        
+                asserts.assert_equal(e.status, Status.ConstraintError, f"Expected CONSTRAINT_ERROR for invalid Position but got: {e}")
+                
         self.step("4b")
         # Test invalid Speed value
         if is_ps_feature_supported and is_sp_feature_supported:
@@ -145,12 +143,10 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                 await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"speed": 4}))
                 logging.error("MoveTo command with invalid Speed should have failed but succeeded")
                 asserts.assert_true(False, "MoveTo command with invalid Speed should have failed but succeeded")
-            except Exception as e:
-                logging.info(f"Expected exception caught for invalid Speed: {e}")
-                # Verify that we got a Constraint Error
-                asserts.assert_true("CONSTRAINT_ERROR" in str(e), 
-                                    f"Expected CONSTRAINT_ERROR for invalid Speed but got: {e}")
-        
+            except InteractionModelError as e:
+                logging.info(f"Expected exception caught for invalid Position: {e}")
+                asserts.assert_equal(e.status, Status.ConstraintError, f"Expected CONSTRAINT_ERROR for invalid Speed but got: {e}")
+                
         self.step("4c")
         # Test invalid Position and valid Speed
         if is_ps_feature_supported and is_sp_feature_supported:
@@ -158,11 +154,9 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                 await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"position": 6, "speed": 3}))
                 logging.error("MoveTo command with invalid Position and valid Speed should have failed but succeeded")
                 asserts.assert_true(False, "MoveTo command with invalid Position and valid Speed should have failed but succeeded")
-            except Exception as e:
+            except InteractionModelError as e:
                 logging.info(f"Expected exception caught for invalid Position and valid Speed: {e}")
-                # Verify that we got a Constraint Error
-                asserts.assert_true("CONSTRAINT_ERROR" in str(e), 
-                                    f"Expected CONSTRAINT_ERROR for invalid Position but got: {e}")
+                asserts.assert_equal(e.status, Status.ConstraintError, f"Expected CONSTRAINT_ERROR for invalid Position and valid Speed but got: {e}")
         
         self.step("4d")
         # Test valid Position and invalid Speed
@@ -171,11 +165,9 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                 await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"position": 0, "speed": 4}))
                 logging.error("MoveTo command with valid Position and invalid Speed should have failed but succeeded")
                 asserts.assert_true(False, "MoveTo command with valid Position and invalid Speed should have failed but succeeded")
-            except Exception as e:
+            except InteractionModelError as e:
                 logging.info(f"Expected exception caught for valid Position and invalid Speed: {e}")
-                # Verify that we got a Constraint Error
-                asserts.assert_true("CONSTRAINT_ERROR" in str(e), 
-                                    f"Expected CONSTRAINT_ERROR for invalid Speed but got: {e}")
+                asserts.assert_equal(e.status, Status.ConstraintError, f"Expected CONSTRAINT_ERROR for valid Position and invalid Speed but got: {e}")
 
 if __name__ == "__main__":
     default_matter_test_main()
