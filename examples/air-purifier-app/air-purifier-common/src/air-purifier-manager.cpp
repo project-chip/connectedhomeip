@@ -205,7 +205,6 @@ void AirPurifierManager::HandleOnOff(AttributeId attributeId, uint8_t type, uint
     uint8_t new_percent;
     if (on)
     {
-        ChipLogProgress(NotSpecified, "======================== Handle ON");
         // If either of these come back as NULL, that should mean the fan is operating in auto mode.
         // I have no idea what that means for this case, so I'll just set them to high because this
         // is just an example.
@@ -214,8 +213,12 @@ void AirPurifierManager::HandleOnOff(AttributeId attributeId, uint8_t type, uint
         // than practical.
         DataModel::Nullable<Percent> percent = GetPercentSetting();
         DataModel::Nullable<uint8_t> speed   = GetSpeedSetting();
-        uint8_t speedMax                     = 100;
-        FanControl::Attributes::SpeedMax::Get(mEndpointId, &speedMax);
+        uint8_t speedMax                     = GetSpeedMax();
+        if (speedMax == 0)
+        {
+            ChipLogError(NotSpecified, "Out of bounds value for SpeedMax, setting to default (1)");
+            speedMax = 1;
+        }
         if (percent.IsNull() && speed.IsNull())
         {
             // Operating in auto mode, set to 100
@@ -248,7 +251,6 @@ void AirPurifierManager::HandleOnOff(AttributeId attributeId, uint8_t type, uint
     }
     else
     {
-        ChipLogProgress(NotSpecified, "======================== Handle OFF");
         new_percent = 0;
         new_speed   = 0;
     }
@@ -259,7 +261,7 @@ void AirPurifierManager::HandleOnOff(AttributeId attributeId, uint8_t type, uint
 
 void AirPurifierManager::PercentSettingWriteCallback(uint8_t aNewPercentSetting)
 {
-    ChipLogDetail(NotSpecified, "AirPurifierManager::PercentSettingWriteCallback: %d", aNewPercentSetting);
+    ChipLogDetail(NotSpecified, "AirPurifierManager::PercentSettingWriteCallback: %d", static_cast<int>(aNewPercentSetting));
     if (mOnOffClusterOn)
     {
         Status status = FanControl::Attributes::PercentCurrent::Set(mEndpointId, aNewPercentSetting);
@@ -274,7 +276,7 @@ void AirPurifierManager::PercentSettingWriteCallback(uint8_t aNewPercentSetting)
 
 void AirPurifierManager::SpeedSettingWriteCallback(uint8_t aNewSpeedSetting)
 {
-    ChipLogDetail(NotSpecified, "AirPurifierManager::SpeedSettingWriteCallback: %d", aNewSpeedSetting);
+    ChipLogDetail(NotSpecified, "AirPurifierManager::SpeedSettingWriteCallback: %d", static_cast<int>(aNewSpeedSetting));
     if (mOnOffClusterOn)
     {
         Status status = FanControl::Attributes::SpeedCurrent::Set(mEndpointId, aNewSpeedSetting);
@@ -398,6 +400,18 @@ DataModel::Nullable<Percent> AirPurifierManager::GetPercentSetting()
     }
 
     return percentSetting;
+}
+
+uint8_t AirPurifierManager::GetSpeedMax()
+{
+    uint8_t speedMax = 1;
+    Status status    = FanControl::Attributes::SpeedMax::Get(mEndpointId, &speedMax);
+    if (status != Status::Success)
+    {
+        ChipLogError(NotSpecified, "AirPurifierManager::GetPercentSetting: failed to get SpeedMax attribute: %d",
+                     to_underlying(status));
+    }
+    return speedMax;
 }
 
 void AirPurifierManager::HandleThermostatAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)

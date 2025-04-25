@@ -28,6 +28,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --int-arg pixit_fan_start_time:1
 #       --endpoint 1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -76,7 +77,7 @@ class TC_FAN_4_1(MatterBaseTest):
         spd = ""
         if spd_check:
             spd = "If SPD is not supported, skip this step and the next 6 steps. "
-        return [TestStep(start_step, f"{spd}Set the {attribute_to_set} to {value}. If the write returns INVALID_IN_STATE, skip the next three steps", "INVALID_IN_STATE or SUCCESS"),
+        return [TestStep(start_step, f"{spd}Set the {attribute_to_set} to {value}. If the write returns INVALID_IN_STATE, skip the next six steps", "INVALID_IN_STATE or SUCCESS"),
                 TestStep(start_step + 1, "Read the FanMode", f"Verify FanMode is set to {verify_mode}"),
                 TestStep(start_step + 2, "Read PercentSetting", f"Verify PercentSetting is {verify_percent}"),
                 TestStep(start_step + 3, "Wait for PIXIT.FanStartTime seconds"),
@@ -108,19 +109,26 @@ class TC_FAN_4_1(MatterBaseTest):
                  ]
         num = 16
         num_substeps = 7
-        steps.extend(self._sub_step(num, "PercentSetting", "1", "lowest supported mode above Off", "1", "1"))
+        steps.extend(self._sub_step(num, attribute_to_set="PercentSetting", value="1",
+                     verify_mode="lowest supported mode above Off", verify_percent="1", verify_speed="1"))
         num += num_substeps
-        steps.extend(self._sub_step(num, "PercentSetting", "0", "Off", "0", "0"))
+        steps.extend(self._sub_step(num, attribute_to_set="PercentSetting", value="0",
+                     verify_mode="Off", verify_percent="0", verify_speed="0"))
         num += num_substeps
-        steps.extend(self._sub_step(num, "FanMode", "High", "High", "not 0", "not 0"))
+        steps.extend(self._sub_step(num, attribute_to_set="FanMode", value="High",
+                     verify_mode="High", verify_percent="not 0", verify_speed="not 0"))
         num += num_substeps
-        steps.extend(self._sub_step(num, "FanMode", "Off", "Off", "0", "0"))
+        steps.extend(self._sub_step(num, attribute_to_set="FanMode", value="Off",
+                     verify_mode="Off", verify_percent="0", verify_speed="0"))
         num += num_substeps
-        steps.extend(self._sub_step(num, "SpeedSetting", "SpeedMax", "High", "not 0", "SpeedMax", spd_check=True))
+        steps.extend(self._sub_step(num, attribute_to_set="SpeedSetting", value="SpeedMax",
+                     verify_mode="High", verify_percent="not 0", verify_speed="SpeedMax", spd_check=True))
         num += num_substeps
-        steps.extend(self._sub_step(num, "SpeedSetting", "0", "Off", "0", "0", spd_check=True))
+        steps.extend(self._sub_step(num, attribute_to_set="SpeedSetting", value="0",
+                     verify_mode="Off", verify_percent="0", verify_speed="0", spd_check=True))
         num += num_substeps
-        steps.extend(self._sub_step(num, "PercentSetting", "100", "High", "100", "SpeedMax"))
+        steps.extend(self._sub_step(num, attribute_to_set="PercentSetting", value="100",
+                     verify_mode="High", verify_percent="100", verify_speed="SpeedMax"))
         num += num_substeps
 
         steps.append(TestStep(
@@ -143,7 +151,7 @@ class TC_FAN_4_1(MatterBaseTest):
         # Wait for the entire duration of the test because this fan may be slow. The test will time out before this does. That's fine.
         timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
 
-        wait_s = self.user_params.get('pixit_fan_start_time', 1)
+        wait_s = self.user_params.get('pixit_fan_start_time', 5)
 
         self.step(2)
         sub = ClusterAttributeChangeAccumulator(fan)
@@ -266,19 +274,19 @@ class TC_FAN_4_1(MatterBaseTest):
             step_num += num_substeps
 
         lowest_mode = self.get_fan_modes(supported_fan_modes)[1]
-        await verify_onoff_off(fan.Attributes.PercentSetting(1), lowest_mode, 1, 1)
-        await verify_onoff_off(fan.Attributes.PercentSetting(0), fan.Enums.FanModeEnum.kOff, 0, 0)
-        await verify_onoff_off(fan.Attributes.FanMode(fan.Enums.FanModeEnum.kHigh), fan.Enums.FanModeEnum.kHigh, None, None)
-        await verify_onoff_off(fan.Attributes.FanMode(fan.Enums.FanModeEnum.kOff), fan.Enums.FanModeEnum.kOff, 0, 0)
+        await verify_onoff_off(attr=fan.Attributes.PercentSetting(1), expected_mode=lowest_mode, expected_percent_setting=1, expected_speed_setting=1)
+        await verify_onoff_off(attr=fan.Attributes.PercentSetting(0), expected_mode=fan.Enums.FanModeEnum.kOff, expected_percent_setting=0, expected_speed_setting=0)
+        await verify_onoff_off(attr=fan.Attributes.FanMode(fan.Enums.FanModeEnum.kHigh), expected_mode=fan.Enums.FanModeEnum.kHigh, expected_percent_setting=None, expected_speed_setting=None)
+        await verify_onoff_off(attr=fan.Attributes.FanMode(fan.Enums.FanModeEnum.kOff), expected_mode=fan.Enums.FanModeEnum.kOff, expected_percent_setting=0, expected_speed_setting=0)
         if has_spd:
-            await verify_onoff_off(fan.Attributes.SpeedSetting(speed_max), fan.Enums.FanModeEnum.kHigh, None, speed_max)
-            await verify_onoff_off(fan.Attributes.SpeedSetting(0), fan.Enums.FanModeEnum.kOff, 0, 0)
+            await verify_onoff_off(attr=fan.Attributes.SpeedSetting(speed_max), expected_mode=fan.Enums.FanModeEnum.kHigh, expected_percent_setting=None, expected_speed_setting=speed_max)
+            await verify_onoff_off(attr=fan.Attributes.SpeedSetting(0), expected_mode=fan.Enums.FanModeEnum.kOff, expected_percent_setting=0, expected_speed_setting=0)
         else:
             for i in range(2*num_substeps + 1):
                 self.skip_step(step_num + i)
             step_num += 2 * num_substeps
 
-        await verify_onoff_off(fan.Attributes.PercentSetting(100), fan.Enums.FanModeEnum.kHigh, 100, speed_max)
+        await verify_onoff_off(attr=fan.Attributes.PercentSetting(100), expected_mode=fan.Enums.FanModeEnum.kHigh, expected_percent_setting=100, expected_speed_setting=speed_max)
 
         self.step(step_num)
         percent_setting_before_on = await self.read_single_attribute_check_success(cluster=fan, attribute=fan.Attributes.PercentSetting)
@@ -317,7 +325,7 @@ class TC_FAN_4_1(MatterBaseTest):
 
 
 # TODO: need to add tests and probably handlers to check what happens when the step command is given when the on/off cluster is off
-# Also what happens when the on/off cluster is turned of while the step is a-steppin'
+# Also what happens when the on/off cluster is turned off while the step is a-steppin'
 
 if __name__ == "__main__":
     default_matter_test_main()

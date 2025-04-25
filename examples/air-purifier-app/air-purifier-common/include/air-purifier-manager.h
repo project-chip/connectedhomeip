@@ -135,8 +135,7 @@ private:
      */
     AirPurifierManager(EndpointId aEndpointId, EndpointId aAirQualitySensorEndpointId, EndpointId aTemperatureSensorEndpointId,
                        EndpointId aHumiditySensorEndpointId, EndpointId aThermostatEndpointId) :
-        FanControl::Delegate(aEndpointId),
-        mEndpointId(aEndpointId),
+        FanControl::Delegate(aEndpointId), mEndpointId(aEndpointId),
         activatedCarbonFilterInstance(&activatedCarbonFilterDelegate, mEndpointId, ActivatedCarbonFilterMonitoring::Id,
                                       static_cast<uint32_t>(gActivatedCarbonFeatureMap.to_ulong()),
                                       ResourceMonitoring::DegradationDirectionEnum::kDown, true),
@@ -164,6 +163,7 @@ private:
     void SetSpeedSetting(DataModel::Nullable<uint8_t> aNewSpeedSetting);
     DataModel::Nullable<uint8_t> GetSpeedSetting();
     DataModel::Nullable<Percent> GetPercentSetting();
+    uint8_t GetSpeedMax();
 
     void HandleThermostatAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value);
     void ThermostatHeatingSetpointWriteCallback(int16_t aNewHeatingSetpoint);
