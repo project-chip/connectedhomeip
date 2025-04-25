@@ -148,7 +148,8 @@ class TC_CLDIM_4_1(MatterBaseTest):
         self.step("3a")
         try:
             await self.send_single_cmd(
-                cmd=Clusters.Objects.ClosureDimension.Commands.Step(Direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease, NumberOfSteps=65535),
+                cmd=Clusters.Objects.ClosureDimension.Commands.Step(
+                    Direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease, NumberOfSteps=65535),
                 endpoint=endpoint
             )
         except InteractionModelError as e:
@@ -176,7 +177,8 @@ class TC_CLDIM_4_1(MatterBaseTest):
         self.step("4a")
         try:
             await self.send_single_cmd(
-                cmd=Clusters.Objects.ClosureDimension.Commands.Step(Direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease, NumberOfSteps=2),
+                cmd=Clusters.Objects.ClosureDimension.Commands.Step(
+                    Direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease, NumberOfSteps=2),
                 endpoint=endpoint
             )
         except InteractionModelError as e:
@@ -213,12 +215,13 @@ class TC_CLDIM_4_1(MatterBaseTest):
             if is_speed_supported:
                 asserts.assert_greater_equal(current_state.Speed, 0, "CurrentState Speed is outside allowed range")
                 asserts.assert_less_equal(current_state.Speed, 3, "CurrentState Speed is outside allowed range")
-        
+
         # STEP 4e: Send Step command to increase position by 2 steps
         self.step("4e")
         try:
             await self.send_single_cmd(
-                cmd=Clusters.Objects.ClosureDimension.Commands.Step(Direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease, NumberOfSteps=2),
+                cmd=Clusters.Objects.ClosureDimension.Commands.Step(
+                    Direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease, NumberOfSteps=2),
                 endpoint=endpoint
             )
         except InteractionModelError as e:
