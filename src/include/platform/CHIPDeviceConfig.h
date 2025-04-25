@@ -477,7 +477,7 @@
 /**
  * CHIP_DEVICE_CONFIG_WIFIPAF_DISCOVERY_TIMEOUT_SECS
  *
- * The max amount of time (in seconds) the chip controller will discover Wi-Fi PAF devices
+ * The max amount of time (in seconds) the chip controller will try to discover Wi-Fi PAF devices
  */
 #ifndef CHIP_DEVICE_CONFIG_WIFIPAF_DISCOVERY_TIMEOUT_SECS
 #define CHIP_DEVICE_CONFIG_WIFIPAF_DISCOVERY_TIMEOUT_SECS (15 * 60)
