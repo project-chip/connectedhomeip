@@ -54,33 +54,6 @@ public:
     WebRTCClient(int id) { client_id = id; }
 };
 
-// Function to read file content into a string
-char * readFile(const char * filename)
-{
-    FILE * file = fopen(filename, "r");
-    if (!file)
-    {
-        printf("Could not open %s\n", filename);
-        return NULL;
-    }
-    fseek(file, 0, SEEK_END);
-    long size = ftell(file);
-    fseek(file, 0, SEEK_SET);
-    char * content = (char *) malloc(size + 1);
-    fread(content, 1, size, file);
-    content[size] = '\0';
-    fclose(file);
-    return content;
-}
-
-// Function to read file content into a string
-std::string readFileString(std::string filename)
-{
-    std::ifstream ifs("myfile.txt");
-    std::string content((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
-    return content;
-}
-
 // Function to create a new WebRTC client
 void * CreateWebrtcClient(int id)
 {
@@ -94,9 +67,6 @@ void InitialisePeerConnection(void * Client)
     rtc::InitLogger(rtc::LogLevel::Verbose);
 
     WebRTCClient * client = static_cast<WebRTCClient *>(Client);
-
-    // Add default ICE servers to the configuration
-    client->config.iceServers.emplace_back("stun.l.google.com:19302");
 
     // Create a new peer connection
     client->pc = std::make_shared<rtc::PeerConnection>(client->config);
