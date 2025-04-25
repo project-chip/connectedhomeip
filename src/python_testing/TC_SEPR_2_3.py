@@ -160,8 +160,8 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
         details = cluster.Bitmaps.CommodityPriceDetailBitmap.kDescription
         val = await self.send_get_detailed_forecast_request(details=details)
 
-        await self.test_priceForecast(endpoint=endpoint, cluster=cluster,
-                                      priceForecast=val.priceForecast, details=details)
+        self.check_CommodityPriceForecast(cluster=cluster,
+                                          priceForecast=val.priceForecast, details=details)
 
         self.step("4")
         # TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to False
@@ -169,8 +169,8 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
         details = cluster.Bitmaps.CommodityPriceDetailBitmap.kComponents
         val = await self.send_get_detailed_forecast_request(details=details)
 
-        await self.test_priceForecast(endpoint=endpoint, cluster=cluster,
-                                      priceForecast=val.priceForecast, details=details)
+        self.check_CommodityPriceForecast(cluster=cluster,
+                                          priceForecast=val.priceForecast, details=details)
 
         self.step("5")
         # TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey
@@ -185,8 +185,8 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
                                                              attribute=cluster.Attributes.PriceForecast)
 
-        await self.test_priceForecast(endpoint=endpoint, cluster=cluster,
-                                      priceForecast=val, details=details)
+        self.check_CommodityPriceForecast(cluster=cluster,
+                                          priceForecast=val, details=details)
 
         self.step("6")
         # TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to True,
@@ -194,8 +194,8 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
         details = cluster.Bitmaps.CommodityPriceDetailBitmap.kDescription
         val = await self.send_get_detailed_forecast_request(details=details)
 
-        await self.test_priceForecast(endpoint=endpoint, cluster=cluster,
-                                      priceForecast=val.priceForecast, details=details)
+        self.check_CommodityPriceForecast(cluster=cluster,
+                                          priceForecast=val.priceForecast, details=details)
 
         self.step("7")
         # TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to False
@@ -203,8 +203,8 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
         details = cluster.Bitmaps.CommodityPriceDetailBitmap.kComponents
         val = await self.send_get_detailed_forecast_request(details=details)
 
-        await self.test_priceForecast(endpoint=endpoint, cluster=cluster,
-                                      priceForecast=val.priceForecast, details=details)
+        self.check_CommodityPriceForecast(cluster=cluster,
+                                          priceForecast=val.priceForecast, details=details)
 
         self.step("8")
         # TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to True
@@ -213,8 +213,8 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
 
         val = await self.send_get_detailed_forecast_request(details=details)
 
-        await self.test_priceForecast(endpoint=endpoint, cluster=cluster,
-                                      priceForecast=val.priceForecast, details=details)
+        self.check_CommodityPriceForecast(cluster=cluster,
+                                          priceForecast=val.priceForecast, details=details)
 
 
 if __name__ == "__main__":

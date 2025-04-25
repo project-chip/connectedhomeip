@@ -169,8 +169,8 @@ class TC_SEPR_2_2(CommodityPriceTestBaseHelper, MatterBaseTest):
                 val.currentPrice, cluster.Structs.CommodityPriceStruct), "val must be of type CommodityPriceStruct")
 
             # The other aspects of this verification are handled by the helper
-            await self.test_checkCommodityPriceStruct(endpoint=endpoint, cluster=cluster, struct=val.CurrentPrice,
-                                                      details=details)
+            self.check_CommodityPriceStruct(cluster=cluster, struct=val.CurrentPrice,
+                                            details=details)
 
         self.step("5")
         # TH sends command GetDetailedPriceRequest with Details=CommodityPriceDetailBitmap.Description set to False
@@ -183,8 +183,8 @@ class TC_SEPR_2_2(CommodityPriceTestBaseHelper, MatterBaseTest):
                 val.currentPrice, cluster.Structs.CommodityPriceStruct), "val must be of type CommodityPriceStruct")
 
             # The other aspects of this verification are handled by the helper
-            await self.test_checkCommodityPriceStruct(endpoint=endpoint, cluster=cluster, struct=val.CurrentPrice,
-                                                      details=details)
+            self.check_CommodityPriceStruct(cluster=cluster, struct=val.CurrentPrice,
+                                            details=details)
 
         self.step("6")
         # TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.SEPR.TESTEVENT_TRIGGERKEY
@@ -204,9 +204,9 @@ class TC_SEPR_2_2(CommodityPriceTestBaseHelper, MatterBaseTest):
                 newCurrentPrice, cluster.Structs.CommodityPriceStruct), "val must be of type CommodityPriceStruct")
 
             # The other aspects of this verification are handled by the helper
-            await self.test_checkCommodityPriceStruct(endpoint=endpoint, cluster=cluster,
-                                                      struct=newCurrentPrice,
-                                                      details=details)
+            self.check_CommodityPriceStruct(cluster=cluster,
+                                            struct=newCurrentPrice,
+                                            details=details)
 
         self.step("6a")
         # TH reads CurrentPrice attribute.
@@ -217,7 +217,7 @@ class TC_SEPR_2_2(CommodityPriceTestBaseHelper, MatterBaseTest):
         if val is not NullValue:
             asserts.assert_true(isinstance(
                 val, cluster.Structs.CommodityPriceStruct), "val must be of type CommodityPriceStruct")
-            await self.test_checkCommodityPriceStruct(endpoint=endpoint, cluster=cluster, struct=val)
+            self.check_CommodityPriceStruct(cluster=cluster, struct=val)
 
         asserts.assert_equal(val, newCurrentPrice, "CurrentPrice is not equal to NewCurrentPrice")
 
@@ -234,8 +234,8 @@ class TC_SEPR_2_2(CommodityPriceTestBaseHelper, MatterBaseTest):
                 val.currentPrice, cluster.Structs.CommodityPriceStruct), "val must be of type CommodityPriceStruct")
 
             # The other aspects of this verification are handled by the helper
-            await self.test_checkCommodityPriceStruct(endpoint=endpoint, cluster=cluster, struct=val.currentPrice,
-                                                      details=details)
+            self.check_CommodityPriceStruct(cluster=cluster, struct=val.currentPrice,
+                                            details=details)
 
         self.step("8")
         # TH sends command GetDetailedPriceRequest with Details=CommodityPriceDetailBitmap.Description set to False
@@ -248,8 +248,8 @@ class TC_SEPR_2_2(CommodityPriceTestBaseHelper, MatterBaseTest):
                 val.currentPrice, cluster.Structs.CommodityPriceStruct), "val must be of type CommodityPriceStruct")
 
             # The other aspects of this verification are handled by the helper
-            await self.test_checkCommodityPriceStruct(endpoint=endpoint, cluster=cluster, struct=val.currentPrice,
-                                                      details=details)
+            self.check_CommodityPriceStruct(cluster=cluster, struct=val.currentPrice,
+                                            details=details)
 
         self.step("9")
         # TH sends command GetDetailedPriceRequest with Details=CommodityPriceDetailBitmap.Description set to True
@@ -262,8 +262,8 @@ class TC_SEPR_2_2(CommodityPriceTestBaseHelper, MatterBaseTest):
                 val.currentPrice, cluster.Structs.CommodityPriceStruct), "val must be of type CommodityPriceStruct")
 
             # The other aspects of this verification are handled by the helper
-            await self.test_checkCommodityPriceStruct(endpoint=endpoint, cluster=cluster, struct=val.currentPrice,
-                                                      details=details)
+            self.check_CommodityPriceStruct(cluster=cluster, struct=val.currentPrice,
+                                            details=details)
 
 
 if __name__ == "__main__":

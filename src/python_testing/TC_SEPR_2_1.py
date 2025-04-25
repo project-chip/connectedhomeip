@@ -110,7 +110,7 @@ class TC_SEPR_2_1(CommodityPriceTestBaseHelper, MatterBaseTest):
         if val is not NullValue:
             asserts.assert_true(isinstance(
                 val, Globals.Structs.CurrencyStruct), "val must be of type CurrencyStruct")
-            await self.test_checkCurrencyStruct(endpoint=endpoint, cluster=cluster, struct=val)
+            self.check_CurrencyStruct(cluster=cluster, struct=val)
 
         self.step("4")
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
@@ -118,7 +118,7 @@ class TC_SEPR_2_1(CommodityPriceTestBaseHelper, MatterBaseTest):
         if val is not NullValue:
             asserts.assert_true(isinstance(
                 val, cluster.Structs.CommodityPriceStruct), "val must be of type CommodityPriceStruct")
-            await self.test_checkCommodityPriceStruct(endpoint=endpoint, cluster=cluster, struct=val)
+            self.check_CommodityPriceStruct(cluster=cluster, struct=val)
 
         self.step("5")
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.PriceForecast):
@@ -131,8 +131,8 @@ class TC_SEPR_2_1(CommodityPriceTestBaseHelper, MatterBaseTest):
                 cluster.Structs.CommodityPriceStruct, allow_empty=True)
             for item in val:
                 # In the PriceForecast attribute we must not have Description or Components in this returned list
-                await self.test_checkCommodityPriceStruct(endpoint=endpoint, cluster=cluster, struct=item,
-                                                          details=Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap(0))
+                self.check_CommodityPriceStruct(cluster=cluster, struct=item,
+                                                details=Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap(0))
 
 
 if __name__ == "__main__":

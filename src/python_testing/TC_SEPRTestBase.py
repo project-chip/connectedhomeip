@@ -39,13 +39,12 @@ class CommodityPriceTestBaseHelper:
     kEventTriggerPriceUpdate = 0x0095000000000000
     kEventTriggerForecastUpdate = 0x0095000000000001
 
-    async def test_priceForecast(self,
-                                 endpoint: int = None,
-                                 cluster: Clusters.CommodityPrice = None,
-                                 priceForecast: list = None,
-                                 details: Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap
-                                 = Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap(0)
-                                 ):
+    def check_CommodityPriceForecast(self,
+                                     cluster: Clusters.CommodityPrice = None,
+                                     priceForecast: list = None,
+                                     details: Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap
+                                     = Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap(0)
+                                     ):
 
         # Verify that the DUT response contains GetDetailedForecastResponse with a
         # list of CommodityPriceStruct entries (it may be empty) and shall have not more than 56 entries.
@@ -60,16 +59,15 @@ class CommodityPriceTestBaseHelper:
                                   self.kMaxForecastEntries, "PriceForecast list must be less than 56 entries")
         for item in priceForecast:
             # The other aspects of this verification are handled by the helper
-            await self.test_checkCommodityPriceStruct(endpoint=endpoint, cluster=cluster, struct=item,
-                                                      details=details,
-                                                      now_time_must_be_within_period=False)  # Do not check time limits for forecast
+            self.check_CommodityPriceStruct(cluster=cluster, struct=item,
+                                            details=details,
+                                            now_time_must_be_within_period=False)  # Do not check time limits for forecast
 
-    async def test_checkCommodityPriceStruct(self,
-                                             endpoint: int = None,
-                                             cluster: Clusters.CommodityPrice = None,
-                                             struct: Clusters.CommodityPrice.Structs.CommodityPriceStruct = None,
-                                             details: Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap = 0,
-                                             now_time_must_be_within_period: bool = True):
+    def check_CommodityPriceStruct(self,
+                                   cluster: Clusters.CommodityPrice = None,
+                                   struct: Clusters.CommodityPrice.Structs.CommodityPriceStruct = None,
+                                   details: Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap = 0,
+                                   now_time_must_be_within_period: bool = True):
         """now_time_must_be_within_period - When verifying a 'CurrentPrice' then 
            the CurrentPrice has a single period, and so 'now' time must be within
            the current period.
@@ -126,24 +124,22 @@ class CommodityPriceTestBaseHelper:
                     "Components attribute must contain CommodityPriceComponentStruct elements",
                     allow_empty=True)
                 for item in struct.components:
-                    await self.test_checkCommodityPriceComponentStruct(endpoint=endpoint, cluster=cluster, struct=item)
+                    self.check_CommodityPriceComponentStruct(cluster=cluster, struct=item)
                 asserts.assert_less_equal(len(struct.components), self.kMaxComponentsPerPrice,
                                           f"Components must have at most {self.kMaxComponentsPerPrice} entries!")
         else:
             asserts.assert_is_none(struct.components)
 
-    async def test_checkCurrencyStruct(self,
-                                       endpoint: int = None,
-                                       cluster: Clusters.CommodityPrice = None,
-                                       struct: Globals.Structs.CurrencyStruct = None):
+    def check_CurrencyStruct(self,
+                             cluster: Clusters.CommodityPrice = None,
+                             struct: Globals.Structs.CurrencyStruct = None):
         matter_asserts.assert_valid_uint16(struct.currency, 'Currency')
         asserts.assert_less_equal(struct.currency, 999)
         matter_asserts.assert_valid_uint8(struct.decimalPoints, 'DecimalPoints')
 
-    async def test_checkCommodityPriceComponentStruct(self,
-                                                      endpoint: int = None,
-                                                      cluster: Clusters.CommodityPrice = None,
-                                                      struct: Clusters.CommodityPrice.Structs.CommodityPriceComponentStruct = None):
+    def check_CommodityPriceComponentStruct(self,
+                                            cluster: Clusters.CommodityPrice = None,
+                                            struct: Clusters.CommodityPrice.Structs.CommodityPriceComponentStruct = None):
         matter_asserts.assert_valid_int64(struct.price, 'Price')
         matter_asserts.assert_valid_enum(
             struct.source, "Source attribute must return a TariffPriceTypeEnum", Globals.Enums.TariffPriceTypeEnum)
@@ -156,11 +152,12 @@ class CommodityPriceTestBaseHelper:
         logger.info(
             f"  Component: price: {struct.price} source: {struct.source}, desc: {struct.description} tariffComponentID: {struct.tariffComponentID}")
 
-    async def send_get_detailed_price_request(self, endpoint: int = None,
+    async def send_get_detailed_price_request(self, endpoint=None,
                                               details: Clusters.CommodityPrice.Bitmaps =
                                               Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap(0),
                                               timedRequestTimeoutMs: int = 3000,
                                               expected_status: Status = Status.Success):
+        """If endpoint is None then it falls through to use the matter test config value"""
         try:
             result = await self.send_single_cmd(cmd=Clusters.CommodityPrice.Commands.GetDetailedPriceRequest(
                 details=details),
@@ -175,11 +172,12 @@ class CommodityPriceTestBaseHelper:
             asserts.assert_equal(e.status, expected_status,
                                  "Unexpected error returned")
 
-    async def send_get_detailed_forecast_request(self, endpoint: int = None,
+    async def send_get_detailed_forecast_request(self, endpoint=None,
                                                  details: Clusters.CommodityPrice.Bitmaps =
                                                  Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap(0),
                                                  timedRequestTimeoutMs: int = 3000,
                                                  expected_status: Status = Status.Success):
+        """If endpoint is None then it falls through to use the matter test config value"""
         try:
             result = await self.send_single_cmd(cmd=Clusters.CommodityPrice.Commands.GetDetailedForecastRequest(
                 details=details),
