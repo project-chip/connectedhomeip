@@ -8139,6 +8139,7 @@ endpoint 0 {
 
   server cluster UnitLocalization {
     persist  attribute temperatureUnit default = 0;
+    callback attribute supportedTemperatureUnits;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
