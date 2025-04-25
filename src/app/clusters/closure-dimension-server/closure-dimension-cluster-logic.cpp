@@ -527,7 +527,7 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
         if (mConformance.HasFeature(Feature::kLimitation))
         {
             Structs::RangePercent100thsStruct::Type limitRange;
-            
+
             VerifyOrReturnError(GetLimitRange(limitRange) == CHIP_NO_ERROR, Status::Failure);
 
             if (position.Value() > limitRange.max)
