@@ -161,11 +161,6 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: linux
-            - name: Initialize CodeQL
-              if: ${{ inputs.run-codeql  }}
-              uses: github/codeql-action/init@v3
-              with:
-                  languages: "cpp"
             - name: Setup and Build Simulated Device
               run: |
                   BUILD_TYPE=simulated
@@ -270,11 +265,6 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target linux-fake-tests build"
-            - name: Perform CodeQL Analysis
-              if: ${{ inputs.run-codeql  }}
-              uses: ./.github/actions/perform-codeql-analysis
-              with:
-                language: cpp
 
             - name: Uploading core files
               uses: actions/upload-artifact@v4

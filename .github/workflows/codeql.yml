@@ -17,7 +17,7 @@ on:
   workflow_dispatch:
 #   push:
 #     branches: [ "master", "sve*", "test_event_*", "v1.*" ]
-#   pull_request:
+  pull_request:
   schedule:
     - cron: '0 5 * * *'
 
