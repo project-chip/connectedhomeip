@@ -98,7 +98,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
         # Test Latch field if Latching feature is not supported
         if not is_lt_feature_supported:
             try:
-                response = await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"latch": True}))
+                await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"latch": True}))
                 logging.info("MoveTo command with Latch field when feature not supported was accepted")
             except Exception as e:
                 logging.error(f"MoveTo with Latch when feature not supported failed: {e}")
@@ -108,7 +108,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
         # Test Speed field if Speed feature is not supported
         if not is_sp_feature_supported:
             try:
-                response = await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"speed": 1}))  # Low speed
+                await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"speed": 1}))  # Low speed
                 logging.info("MoveTo command with Speed field when feature not supported was accepted")
             except Exception as e:
                 logging.error(f"MoveTo with Speed when feature not supported failed: {e}")
@@ -118,7 +118,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
         # Test Position field if Positioning feature is not supported
         if not is_ps_feature_supported:
             try:
-                response = await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"position": 0}))  # CloseInFull
+                await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"position": 0}))  # CloseInFull
                 logging.info("MoveTo command with Position field when feature not supported was accepted")
             except Exception as e:
                 logging.error(f"MoveTo with Position when feature not supported failed: {e}")
@@ -129,7 +129,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
         # Test invalid Position value
         if is_ps_feature_supported:
             try:
-                response = await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"position": 6}))
+                await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"position": 6}))
                 logging.error("MoveTo command with invalid Position should have failed but succeeded")
                 asserts.assert_true(False, "MoveTo command with invalid Position should have failed but succeeded")
             except Exception as e:
@@ -142,7 +142,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
         # Test invalid Speed value
         if is_ps_feature_supported and is_sp_feature_supported:
             try:
-                response = await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"speed": 4}))
+                await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"speed": 4}))
                 logging.error("MoveTo command with invalid Speed should have failed but succeeded")
                 asserts.assert_true(False, "MoveTo command with invalid Speed should have failed but succeeded")
             except Exception as e:
@@ -155,7 +155,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
         # Test invalid Position and valid Speed
         if is_ps_feature_supported and is_sp_feature_supported:
             try:
-                response = await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"position": 6, "speed": 3}))
+                await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"position": 6, "speed": 3}))
                 logging.error("MoveTo command with invalid Position and valid Speed should have failed but succeeded")
                 asserts.assert_true(False, "MoveTo command with invalid Position and valid Speed should have failed but succeeded")
             except Exception as e:
@@ -168,7 +168,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
         # Test valid Position and invalid Speed
         if is_ps_feature_supported and is_sp_feature_supported:
             try:
-                response = await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"position": 0, "speed": 4}))
+                await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"position": 0, "speed": 4}))
                 logging.error("MoveTo command with valid Position and invalid Speed should have failed but succeeded")
                 asserts.assert_true(False, "MoveTo command with valid Position and invalid Speed should have failed but succeeded")
             except Exception as e:
