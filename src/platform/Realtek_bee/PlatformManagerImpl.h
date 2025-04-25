@@ -24,6 +24,8 @@
 #pragma once
 
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.h>
+#include <mem_config.h>
+#include "os_task.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -46,6 +48,9 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
+
+protected:
+    void _RunEventLoop(void);
 
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
@@ -85,6 +90,15 @@ inline PlatformManager & PlatformMgr(void)
 inline PlatformManagerImpl & PlatformMgrImpl(void)
 {
     return PlatformManagerImpl::sInstance;
+}
+
+
+inline void PlatformManagerImpl::_RunEventLoop(void)
+{
+#if defined(FEATURE_TRUSTZONE_ENABLE) && (FEATURE_TRUSTZONE_ENABLE == 1)
+    os_alloc_secure_ctx(1024);
+#endif
+    Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_RunEventLoop();
 }
 
 } // namespace DeviceLayer

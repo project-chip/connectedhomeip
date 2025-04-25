@@ -48,6 +48,7 @@
 #include <DeviceCallbacks.h>
 
 #include <os_mem.h>
+#include <os_task.h>
 
 #if CONFIG_ENABLE_PW_RPC
 #include "Rpc.h"
@@ -192,6 +193,10 @@ CHIP_ERROR AppTask::StartAppTask()
 
 void AppTask::AppTaskMain(void * pvParameter)
 {
+#if defined(FEATURE_TRUSTZONE_ENABLE) && (FEATURE_TRUSTZONE_ENABLE == 1)
+    os_alloc_secure_ctx(1024);
+#endif
+
     AppEvent event;
 
     sAppTask.Init();
