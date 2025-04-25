@@ -129,35 +129,35 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace SetUTCTime {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = TimeSynchronization::Commands::SetUTCTime::Id,
+    .commandId       = SetUTCTime::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace SetUTCTime
 namespace SetTrustedTimeSource {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = TimeSynchronization::Commands::SetTrustedTimeSource::Id,
+    .commandId       = SetTrustedTimeSource::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace SetTrustedTimeSource
 namespace SetTimeZone {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = TimeSynchronization::Commands::SetTimeZone::Id,
+    .commandId       = SetTimeZone::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace SetTimeZone
 namespace SetDSTOffset {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = TimeSynchronization::Commands::SetDSTOffset::Id,
+    .commandId       = SetDSTOffset::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace SetDSTOffset
 namespace SetDefaultNTP {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = TimeSynchronization::Commands::SetDefaultNTP::Id,
+    .commandId       = SetDefaultNTP::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };

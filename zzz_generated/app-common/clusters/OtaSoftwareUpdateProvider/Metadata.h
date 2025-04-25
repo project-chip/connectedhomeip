@@ -23,21 +23,21 @@ namespace Attributes {} // namespace Attributes
 namespace Commands {
 namespace QueryImage {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = OtaSoftwareUpdateProvider::Commands::QueryImage::Id,
+    .commandId       = QueryImage::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace QueryImage
 namespace ApplyUpdateRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Id,
+    .commandId       = ApplyUpdateRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace ApplyUpdateRequest
 namespace NotifyUpdateApplied {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Id,
+    .commandId       = NotifyUpdateApplied::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
