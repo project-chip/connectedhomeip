@@ -45,11 +45,24 @@ NS_ASSUME_NONNULL_BEGIN
 + (BOOL)startAppWithName:(NSString *)name arguments:(NSArray<NSString *> *)arguments payload:(NSString *)payload;
 
 /**
- * Same thing as startAppWithName, but also starts a controller on a test fabric, commissions the
+ * Same thing as startAppWithName, but also commissions the application on
+ * controller with the provided node ID.
+ */
+- (void)startCommissionedAppWithName:(NSString *)name
+                           arguments:(NSArray<NSString *> *)arguments
+                          controller:(MTRDeviceController *)controller
+                             payload:(NSString *)payload
+                              nodeID:(NSNumber *)nodeID;
+
+/**
+ * Same thing, but also starts a controller on a test fabric, commissions the
  * application with the provided node ID and returns the controller.  The app
  * and controller will be killed at the end of the current suite.
  */
-+ (nullable MTRDeviceController *)startCommissionedAppWithName:(NSString *)name arguments:(NSArray<NSString *> *)arguments payload:(NSString *)payload nodeID:(NSNumber *)nodeID;
++ (nullable MTRDeviceController *)startCommissionedAppWithName:(NSString *)name
+                                                     arguments:(NSArray<NSString *> *)arguments
+                                                       payload:(NSString *)payload
+                                                        nodeID:(NSNumber *)nodeID;
 
 /**
  * Same thing, but will decide on a commissioning payload itself instead of

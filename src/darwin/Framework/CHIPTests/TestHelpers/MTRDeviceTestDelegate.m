@@ -26,6 +26,13 @@
     }
 }
 
+- (void)_deviceInternalStateChanged:(MTRDevice *)device
+{
+    if (self.onInternalStateChanged != nil) {
+        self.onInternalStateChanged();
+    }
+}
+
 - (void)device:(MTRDevice *)device receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
 {
     if (self.onAttributeDataReceived != nil) {

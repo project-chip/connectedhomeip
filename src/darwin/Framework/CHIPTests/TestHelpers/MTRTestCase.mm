@@ -199,6 +199,11 @@ static MTRMockCB * sMockCB;
     return controller;
 }
 
++ (void)controllerWithSuiteScopeCreatedBySubclass
+{
+    sControllerFactoryScope = MTRTestScopeSuite; // Make sure we don't shut down the controller too early.
+}
+
 #if HAVE_NSTASK
 - (NSTask *)createTaskForPath:(NSString *)path
 {
