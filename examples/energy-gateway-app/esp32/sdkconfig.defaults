@@ -66,3 +66,6 @@ CONFIG_ENABLE_OTA_REQUESTOR=y
 
 # Enable test triggers used by the CommidityPrice tests
 CONFIG_CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_PRICE_TRIGGER=y
+
+# Enable test triggers used by the ElectricalGridConditions tests
+CONFIG_CHIP_DEVICE_CONFIG_ENABLE_ELECTRICAL_GRID_CONDITIONS_TRIGGER=y
