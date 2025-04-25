@@ -22,8 +22,8 @@ import chip.clusters as Clusters
 from chip.clusters import Globals
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.timeoperations import utc_time_in_matter_epoch
 from chip.testing import matter_asserts
+from chip.testing.timeoperations import utc_time_in_matter_epoch
 from mobly import asserts
 
 logger = logging.getLogger(__name__)

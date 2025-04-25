@@ -47,7 +47,7 @@ import logging
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, run_if_endpoint_matches, has_feature
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
 from TC_SEPRTestBase import CommodityPriceTestBaseHelper
 
