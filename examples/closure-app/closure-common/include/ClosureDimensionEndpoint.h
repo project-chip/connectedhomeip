@@ -88,7 +88,7 @@ public:
     */
    CHIP_ERROR Init();
 
-   void SetLogic(ClusterLogic * logic) { gLogic = logic; }
+   void SetLogic(ClusterLogic * logic) { mLogic = logic; }
 
    ClusterLogic * GetLogic() const { return mLogic; }
 

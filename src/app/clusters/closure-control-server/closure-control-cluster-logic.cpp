@@ -666,13 +666,6 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<Ta
     VerifyOrReturnError(state == MainStateEnum::kMoving || state == MainStateEnum::kWaitingForMotion
                         || state == MainStateEnum::kStopped, Status::InvalidInState);
 
-    // Once the MoveTo action is successfully completed, the server will set OverallTarget and MainState.
-    VerifyOrReturnError(mDelegate.HandleMoveToCommand(position, latch, speed) == Status::Success, Status::Failure);
-    
-    DataModel::Nullable<GenericOverallTarget> setTarget;
-    setTarget.SetNonNull(target);
-    VerifyOrReturnError(SetOverallTarget(setTarget) == CHIP_NO_ERROR, Status::Failure);
-
     if (mDelegate.IsReadyToMove())
     {
         VerifyOrReturnError(SetMainState(MainStateEnum::kMoving) == CHIP_NO_ERROR, Status::Failure,
@@ -684,7 +677,11 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<Ta
                                 ChipLogError(AppServer, "MoveTo Command: Failed to set MainState to kWaitingForMotion"));
     }
 
+    // Once the MoveTo action is successfully completed, the server will set OverallTarget and MainState.
+    VerifyOrReturnError(mDelegate.HandleMoveToCommand(position, latch, speed) == Status::Success, Status::Failure);
     
+    VerifyOrReturnError(SetOverallTarget(target) == CHIP_NO_ERROR, Status::Failure);
+
     return status;
 }
 

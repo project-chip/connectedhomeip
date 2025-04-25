@@ -51,9 +51,37 @@ using Protocols::InteractionModel::Status;
 class PrintOnlyDelegate : public DelegateBase
 {
 public:
+    enum Action_t : uint8_t
+    {
+        MOVE_ACTION = 0,
+        MOVE_AND_LATCH_ACTION,
+        STOP_ACTION,
+        CALIBRATE_ACTION,
+        TARGET_CHANGE_ACTION,
 
+        INVALID_ACTION
+    };
+
+    uint32_t mMovingTime                          = 0;
+    uint32_t mCalibratingTime                     = 0;
+    uint32_t mWaitingTime                         = 0;
+    DataModel::Nullable<ElapsedS> mCountDownTime  = DataModel::NullNullable;
+    const uint32_t kExampleCalibrateCountDown     = 10;
+    const uint32_t kExampleMotionCountDown        = 15;
+    const uint32_t kExampleWaitforMotionCountDown = 15;
+
+    /**
+     * @brief Set the callback for closure control action intiated and completed
+     *
+     * @param [in] aActionInitiated_CB action intitated callback
+     * @param [in] aActionCompleted_CB action completed callback
+     */
+    typedef void (*Callback_fn_initiated)(Action_t action);
+    typedef void (*Callback_fn_completed)(Action_t action);
+    void SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB);
     PrintOnlyDelegate(EndpointId endpoint) : mEndpoint(endpoint) {}
 
+    virtual ~PrintOnlyDelegate() = default;
     // Override for the DelegateBase Virtual functions
     Protocols::InteractionModel::Status HandleStopCommand() override;
     Protocols::InteractionModel::Status HandleMoveToCommand(const Optional<TargetPositionEnum> & tag, const Optional<bool> & latch,
@@ -65,20 +93,48 @@ public:
     
     bool IsManualLatchingNeeded() override;
     bool IsReadyToMove() override;
-    ElapsedS GetCalibrationCountdownTime() override;
+    ElapsedS GetCalibrationCountdownTime() override { return kExampleCalibrateCountDown; };
     ElapsedS GetMovingCountdownTime() override;
     ElapsedS GetWaitingForMotionCountdownTime() override;
 
+    void SetLogic(ClusterLogic * logic) { mLogic = logic; }
+
+    ClusterLogic * GetLogic() const { return mLogic; }
+
+    DataModel::Nullable<ElapsedS> GetRemainingTime();
+
     /**
-     * @brief Initializes the PrintOnlyDelegate instance.
-     * 
-     * @return CHIP_ERROR indicating the result of the initialization.
+     * @brief Handles the countdown timer expiration event
      */
-    CHIP_ERROR Init();
+    void HandleCountdownTimeExpired();
+
+    /**
+     * @brief Checks if the device can move or need pre-motion stages to complete
+     * @return true if device is ready to move
+     *         false if device is not ready to move
+     */
+    bool IsDeviceReadytoMove();
+
+    /**
+     * @brief Handles the motion request of Closure
+     * @param [in] latchNeeded - true if latch is needed
+     * @param [in] NewTarget - true if target is changed
+     * @return Protocols::InteractionModel::Status - success or failure
+     */
+    Protocols::InteractionModel::Status HandleMotion();
+
+    PositioningEnum GetStatePositionFromTarget(TargetPositionEnum targetPosition);
+
+    bool IsPreStageComplete();
 
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
-    std::unordered_set<ClosureErrorEnum> currentErrors;
+    ClusterLogic * mLogic;
+
+    bool isManualLatch = false;
+
+    Callback_fn_initiated mActionInitiated_CB;
+    Callback_fn_completed mActionCompleted_CB;
 };
 
 /**
@@ -114,7 +170,7 @@ public:
      * 
      * @return Reference to the PrintOnlyDelegate instance.
      */
-    PrintOnlyDelegate & getDelegate() { return mDelegate; }
+    PrintOnlyDelegate & GetDelegate() { return mDelegate; }
 
 private:
     EndpointId mEndpoint = kInvalidEndpointId;

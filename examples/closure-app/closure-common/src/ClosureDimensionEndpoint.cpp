@@ -24,6 +24,7 @@
 #include <app/clusters/closure-dimension-server/closure-dimension-delegate.h>
 #include <app/clusters/closure-dimension-server/closure-dimension-matter-context.h>
 #include <app/clusters/closure-dimension-server/closure-dimension-server.h>
+#include <platform/CHIPDeviceLayer.h>
 
 namespace {
     constexpr chip::Percent100ths LIMIT_RANGE_MIN = 0;
@@ -39,26 +40,28 @@ using Protocols::InteractionModel::Status;
  
 CHIP_ERROR PrintOnlyDelegate::Init()
 {
-    ChipLogProgress(AppServer, "PrintOnlyDelegate::Init start");
-    GenericCurrentStateStruct current;
-    current.position.SetValue(0);
-    current.latching.SetValue(false);
-    current.speed.SetValue(Globals::ThreeLevelAutoEnum::kAuto);
-    mLogic.SetCurrentState(current);
-
-    GenericTargetStruct target;
-    target.position.SetValue(0);
-    target.latch.SetValue(false);
-    target.speed.SetValue(Globals::ThreeLevelAutoEnum::kAuto);
-    mLogic.SetTarget(target);
+    CHIP_ERROR err;
+    chip::app::DataModel::Nullable<GenericCurrentStateStruct> current;
+    current.Value().position.SetValue(0);
+    current.Value().latch.SetValue(false);
+    current.Value().speed.SetValue(Globals::ThreeLevelAutoEnum::kAuto);
+    err = mLogic->SetCurrentState(current);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+    chip::app::DataModel::Nullable<GenericTargetStruct> target;
+    target.Value().position.SetValue(0);
+    target.Value().latch.SetValue(false);
+    target.Value().speed.SetValue(Globals::ThreeLevelAutoEnum::kAuto);
+    err = mLogic->SetTarget(target);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
 
     Structs::RangePercent100thsStruct::Type limitRange;
     limitRange.min = LIMIT_RANGE_MIN;
     limitRange.max = LIMIT_RANGE_MAX;
-    mLogic.SetLimitRange(limitRange);
+    err = mLogic->SetLimitRange(limitRange);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
 
-    mLogic.SetStepValue(STEP);
-    ChipLogProgress(AppServer, "PrintOnlyDelegate::Init done");
+    err = mLogic->SetStepValue(STEP);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
     return CHIP_NO_ERROR;
 }
 
@@ -70,30 +73,23 @@ void PrintOnlyDelegate::SetCallbacks(Callback_fn_initiated aActionInitiated_CB, 
 
 static void MotionTimerEventHandler(System::Layer * systemLayer, void * data)
 {
-    ClosureDimensionDelegate * delegate = reinterpret_cast<ClosureDimensionDelegate *>(data);
+    PrintOnlyDelegate * delegate = reinterpret_cast<PrintOnlyDelegate *>(data);
     delegate->SetDeviceMoving(false);
-    GenericTargetStruct target;
-    GenericCurrentStateStruct current;
+    chip::app::DataModel::Nullable<GenericTargetStruct> target;
+    chip::app::DataModel::Nullable<GenericCurrentStateStruct> current;
 
-    delegate->getLogic()->GetTarget(target);
-    current.position.SetValue(static_cast<uint16_t>(target.position.Value()));
-    if (target.latch.HasValue())
+    delegate->GetLogic()->GetTarget(target);
+    current.Value().position.SetValue(static_cast<uint16_t>(target.Value().position.Value()));
+    if (target.Value().latch.HasValue())
     {
-        if (target.latch.Value() == TargetLatchEnum::kUnlatch)
-        {
-            current.latching.SetValue(LatchingEnum::kNotLatched);
-        }
-        else
-        {
-            current.latching.SetValue(LatchingEnum::kLatchedAndSecured);
-        }
+        current.Value().latch.SetValue(target.Value().latch.Value());
     }
 
-    if (target.speed.HasValue())
+    if (target.Value().speed.HasValue())
     {
-        current.speed.SetValue(target.speed.Value());
+        current.Value().speed.SetValue(target.Value().speed.Value());
     }
-    delegate->getLogic()->SetCurrentState(current);
+    delegate->GetLogic()->SetCurrentState(current);
 
     if (delegate->mActionCompleted_CB)
     {
@@ -140,30 +136,29 @@ Status PrintOnlyDelegate::HandleSetTarget(const Optional<Percent100ths> & pos, c
     ChipLogProgress(AppServer, "HandleSetTarget");
     bool motionNeeded = false;
     bool latchNeeded  = false;
-    GenericTargetStruct target;
+    chip::app::DataModel::Nullable<GenericTargetStruct> target;
     Status status = Status::Success;
 
-    ClusterState state             = GetLogic()->GetState();
-    ClusterConformance conformance = GetLogic()->GetConformance();
+    ClusterState state = GetLogic()->GetState();
 
-    if (pos.HasValue() && (pos.Value() != state.currentState.position.Value()))
+    if (pos.HasValue() && (pos.Value() != state.currentState.Value().position.Value()))
     {
         motionNeeded    = true;
-        target.position = pos;
+        target.Value().position = pos;
     }
 
     if (latch.HasValue())
     {
         latchNeeded  = true;
-        target.latch = latch;
+        target.Value().latch = latch;
     }
 
     if (speed.HasValue())
     {
-        if (!state.currentState.speed.HasValue() || (state.currentState.speed.Value() != speed.Value()))
+        if (!state.currentState.Value().speed.HasValue() || (state.currentState.Value().speed.Value() != speed.Value()))
         {
             motionNeeded = true;
-            target.speed = speed;
+            target.Value().speed = speed;
         }
     }
     // If device is already at TargetState ,no Action is required will give Status::Success
@@ -182,7 +177,7 @@ Status PrintOnlyDelegate::HandleSetTarget(const Optional<Percent100ths> & pos, c
 
 static void HandleStepMotion(System::Layer * systemLayer, void * data)
 {
-    ClosureDimensionDelegate * delegate = reinterpret_cast<ClosureDimensionDelegate *>(data);
+    PrintOnlyDelegate * delegate = reinterpret_cast<PrintOnlyDelegate *>(data);
     VerifyOrReturn(delegate != nullptr, void());
 
     ClusterState state = delegate->GetLogic()->GetState();
@@ -192,15 +187,15 @@ static void HandleStepMotion(System::Layer * systemLayer, void * data)
     uint32_t newPos;
     if (direction == StepDirectionEnum::kDecrease)
     {
-        newPos = std::max((state.target.position.Value() + 0), (state.currentState.position.Value() - state.stepValue));
+        newPos = std::max((state.target.Value().position.Value() + 0), (state.currentState.Value().position.Value() - state.stepValue));
     }
     else
     {
-        newPos = std::min((state.target.position.Value() + 0), (state.currentState.position.Value() + state.stepValue));
+        newPos = std::min((state.target.Value().position.Value() + 0), (state.currentState.Value().position.Value() + state.stepValue));
     }
     state.currentState.Value().position.SetValue(newPos);
     delegate->GetLogic()->SetCurrentState(state.currentState);
-    if (state.target.Value().position.Value() == state.currentState.position.Value())
+    if (state.target.Value().position.Value() == state.currentState.Value().position.Value())
     {
         (void) DeviceLayer::SystemLayer().CancelTimer(HandleStepMotion, delegate);
         if (delegate->mActionCompleted_CB)
@@ -210,7 +205,7 @@ static void HandleStepMotion(System::Layer * systemLayer, void * data)
     }
     else
     {
-        (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds16(delegate->kExampleStepCountDown),
+        (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds16(kExampleStepCountDown),
                                                      HandleStepMotion, delegate);
     }
 
