@@ -115,28 +115,32 @@ class TC_CLCTRL_2_1(MatterBaseTest):
         # Check for device features to validate OverallState structure
         feature_map = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
         logging.info(f"FeatureMap: 0x{feature_map:x}")       
+        
+        is_latching_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kMotionLatching
+        is_positioning_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kPositioning
+        is_speed_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kSpeed
 
         if overall_state is not NullValue:
             # Check Positioning feature in OverallState - PS feature (bit 0)
-            if feature_map & (1 << 0) and overall_state.positioning is not NullValue:
+            if is_positioning_supported and overall_state.positioning is not NullValue:
                 asserts.assert_less_equal(overall_state.positioning, 5, "OverallState.positioning is out of range")
                 asserts.assert_greater_equal(overall_state.positioning, 0, "OverallState.positioning is out of range")
                 logging.info(f"OverallState.positioning: {overall_state.positioning}")
         
             # Check MotionLatching feature in OverallState - LT feature (bit 1)
-            if feature_map & (1 << 1) and overall_state.latch is not NullValue:
+            if is_latching_supported and overall_state.latch is not NullValue:
                 asserts.assert_true(isinstance(overall_state.latch, bool), "OverallState.latch is not a boolean value")
                 logging.info(f"OverallState.latch: {overall_state.latch}")
         
             # Check Speed feature in OverallState - SP feature (bit 3)
-            if feature_map & (1 << 3) and overall_state.speed is not NullValue:
+            if is_speed_supported and overall_state.speed is not NullValue:
                 asserts.assert_less_equal(overall_state.speed, 3, "OverallState.speed is out of range")
                 asserts.assert_greater_equal(overall_state.speed, 0, "OverallState.speed is out of range")
                 logging.info(f"OverallState.speed: {overall_state.speed}")
 
             # Check SecureState attribute in OverallState
-            if attributes.SecureState.attribute_id in attribute_list:
-                asserts.assert_true(isinstance(overall_state.secure_state, bool), "OverallState.SecureState is not a boolean value")
+            if is_positioning_supported or is_latching_supported:
+                asserts.assert_true(isinstance(overall_state.secureState, bool), "OverallState.SecureState is not a boolean value")
         else:
             logging.info("OverallState is NULL, skipping steps")
             
