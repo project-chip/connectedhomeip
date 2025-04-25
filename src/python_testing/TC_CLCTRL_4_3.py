@@ -34,6 +34,7 @@
 import logging
 
 import chip.clusters as Clusters
+from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -86,14 +87,11 @@ class TC_CLCTRL_4_3(MatterBaseTest):
         # STEP 2: Send MoveTo command with no fields
         self.step(2)
         try:
-            response = await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({}))
+            await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({}))
             logging.error("MoveTo command with no fields should have failed but succeeded")
             asserts.assert_true(False, "MoveTo command with no fields should have failed but succeeded")
-        except Exception as e:
-            logging.info(f"Expected exception caught: {e}")
-            # Verify that we got an Invalid Command error
-            asserts.assert_true("INVALID_COMMAND" in str(e), 
-                                f"Expected INVALID_COMMAND error but got: {e}")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.InvalidCommand, "Expected InvalidCommand error")
             
         # STEP 3
         self.step("3a")        
