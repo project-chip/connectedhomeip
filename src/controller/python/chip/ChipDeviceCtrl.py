@@ -47,7 +47,7 @@ import dacite  # type: ignore
 
 from . import FabricAdmin
 from . import clusters as Clusters
-from . import discovery, webrtc
+from . import discovery
 from .bdx import Bdx
 from .clusters import Attribute as ClusterAttribute
 from .clusters import ClusterObjects as ClusterObjects
@@ -56,7 +56,6 @@ from .clusters.CHIPClusters import ChipClusters
 from .crypto import p256keypair
 from .interaction_model import SessionParameters, SessionParametersStruct
 from .native import PyChipError
-from .webrtc import callbacks, types
 
 __all__ = ["ChipDeviceController", "CommissioningParameters"]
 
