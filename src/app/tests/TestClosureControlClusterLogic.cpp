@@ -125,10 +125,7 @@ public:
         return Status::Success;
     }
     Status HandleCalibrateCommand() override { return Status::Success; }
-    CHIP_ERROR GetCurrentErrorAtIndex(size_t index, ClosureErrorEnum & closureError) override
-    {
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR GetCurrentErrorAtIndex(size_t index, ClosureErrorEnum & closureError) override { return CHIP_NO_ERROR; }
 
     bool IsManualLatchingNeeded() override { return false; }
     bool IsReadyToMove() override { return true; }
