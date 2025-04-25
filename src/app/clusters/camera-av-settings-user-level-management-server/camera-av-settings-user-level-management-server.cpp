@@ -1302,3 +1302,10 @@ void CameraAvSettingsUserLevelMgmtServer::HandleDPTZRelativeMove(HandlerContext 
  *
  */
 void MatterCameraAvSettingsUserLevelManagementPluginServerInitCallback() {}
+
+/** @brief Camera AV Settings User Level Management Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ */
+void MatterCameraAvSettingsUserLevelManagementPluginServerShutdownCallback() {}
