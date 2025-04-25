@@ -87,10 +87,15 @@ struct ClusterInfo
     ClusterInfo(DataVersion version) : dataVersion(version) {}
 };
 
-// constants used to narrow binary expressions
+// Constants used to narrow binary expressions
 constexpr uint8_t kPrivilegeBits   = 5;
 constexpr uint8_t kAttrQualityBits = 7;
-constexpr uint8_t kCmmdQualityBits = 3;
+constexpr uint8_t kCmdQualityBits  = 3;
+
+// Masks used in the narrowing of binary expressions
+constexpr uint8_t kPrivilegeMask   = ((1 << kPrivilegeBits) - 1);
+constexpr uint8_t kAttrQualityMask = ((1 << kAttrQualityBits) - 1);
+constexpr uint8_t kCmdQualityMask  = ((1 << kCmdQualityBits) - 1);
 
 enum class AttributeQualityFlags : uint32_t
 {
@@ -107,24 +112,22 @@ struct AttributeEntry
 
     // Constructor
 
-    _StartBitFieldInit // Disabling '-Wconversion' & '-Wconversion'
+    _StartBitFieldInit; // Disabling '-Wconversion' & '-Wconversion'
 
         constexpr AttributeEntry(AttributeId id                                  = 0,
                                  BitMask<AttributeQualityFlags> attrQualityFlags = BitMask<AttributeQualityFlags>(),
                                  std::optional<Access::Privilege> readPriv       = std::nullopt,
                                  std::optional<Access::Privilege> writePriv      = std::nullopt) :
         attributeId{ id },
-        mask{ attrQualityFlags.Raw() & ((1 << kAttrQualityBits) - 1),                              // Narrowing expression to 7 bits
-              (readPriv.has_value() ? to_underlying(*readPriv) : 0) & ((1 << kPrivilegeBits) - 1), // Narrowing expression to 5 bits
-              (writePriv.has_value() ? to_underlying(*writePriv) : 0) & ((1 << kPrivilegeBits) - 1) }
-    // Narrowing expression to 5 bits
+        mask{ attrQualityFlags.Raw() & kAttrQualityMask - 1,
+              (readPriv.has_value() ? to_underlying(*readPriv) : 0) & kPrivilegeMask,
+              (writePriv.has_value() ? to_underlying(*writePriv) : 0) & kPrivilegeMask }
     {}
 
-    _EndBitFieldInit // Enabling '-Wconversion' & '-Wconversion'
+    _EndBitFieldInit; // Enabling '-Wconversion' & '-Wconversion'
 
-        // Getter for mask.readPrivilege
-        constexpr std::optional<Access::Privilege>
-        GetReadPrivilege() const
+    // Getter for mask.readPrivilege
+    constexpr std::optional<Access::Privilege> GetReadPrivilege() const
     {
         if (ReadAllowed())
         {
@@ -154,17 +157,18 @@ private:
 
         // attribute quality flags
         //
-        // flags is a uint32_t bitfield of size 7, in order to accomodate all
-        // the different values of "enum class AttributeQualityFlags".
+        // flags is a uint32_t bitfield of size kAttrQualityBits (aka 7),
+        // in order to accomodate all the different values of
+        // "enum class AttributeQualityFlags".
         //
         // Consider that any modification on the declaration of
         // "enum class AttributeQualityFlags" will affect flags.
-        std::underlying_type_t<AttributeQualityFlags> flags : 7;
+        std::underlying_type_t<AttributeQualityFlags> flags : kAttrQualityBits;
 
         // read/write access privilege variables
         //
-        // readPrivilege is a uint8_t bitfield of size 5, in order to accomodate all
-        // the different values of "enum class Privilege".
+        // readPrivilege is a uint8_t bitfield of size kPrivilegeBits (aka 5),
+        // in order to accomodate all the different values of "enum class Privilege".
         // Same case for writePrivilege.
         //
         // Consider that any modification on the declaration of "enum class Privilege"
@@ -173,8 +177,8 @@ private:
         // The use of bitfields means that each variable holds an individual
         // Access::Privilege value, as a bitwise value. This allows us to
         // handle Access::Privilege information without any bit fiddling.
-        std::underlying_type_t<Access::Privilege> readPrivilege : 5;
-        std::underlying_type_t<Access::Privilege> writePrivilege : 5;
+        std::underlying_type_t<Access::Privilege> readPrivilege : kPrivilegeBits;
+        std::underlying_type_t<Access::Privilege> writePrivilege : kPrivilegeBits;
     };
 
     // Static ASSERT to check size of mask type "attribute_entry_mask_t"
@@ -200,21 +204,20 @@ struct AcceptedCommandEntry
 
     // Constructor
 
-    _StartBitFieldInit // Disabling '-Wconversion' & '-Wconversion'
+    _StartBitFieldInit; // Disabling '-Wconversion' & '-Wconversion'
 
         constexpr AcceptedCommandEntry(CommandId id                                 = 0,
                                        BitMask<CommandQualityFlags> cmdQualityFlags = BitMask<CommandQualityFlags>(),
                                        Access::Privilege invokePriv                 = Access::Privilege::kOperate) :
         commandId(id),
-        mask{ cmdQualityFlags.Raw() & ((1 << kCmmdQualityBits) - 1),    // Narrowing expression to 3 bits
-              to_underlying(invokePriv) & ((1 << kPrivilegeBits) - 1) } // Narrowing expression to 5 bits
+        mask{ cmdQualityFlags.Raw() & kCmdQualityMask,
+              to_underlying(invokePriv) & kPrivilegeMask }
     {}
 
-    _EndBitFieldInit // Enabling '-Wconversion' & '-Wconversion'
+    _EndBitFieldInit; // Enabling '-Wconversion' & '-Wconversion'
 
-        // Getter for mask.invokePrivilege
-        constexpr Access::Privilege
-        GetInvokePrivilege() const
+    // Getter for mask.invokePrivilege
+    constexpr Access::Privilege GetInvokePrivilege() const
     {
         return static_cast<Access::Privilege>(mask.invokePrivilege);
     }
