@@ -19,6 +19,7 @@
 #pragma once
 
 #include <cstdint>
+#include <lib/support/TypeTraits.h>
 
 namespace chip {
 namespace Access {
@@ -34,6 +35,20 @@ enum class Privilege : uint8_t
     kManage     = 1 << 3,
     kAdminister = 1 << 4
 };
+constexpr std::underlying_type_t<Privilege> kAccessPrivilegeBits = 5;
+constexpr std::underlying_type_t<Privilege> kAccessPrivilegeMask = ((1 << kAccessPrivilegeBits) - 1);
+
+// Quick check for kAccessPrivilegeBits to be correct
+static_assert((to_underlying(Privilege::kView) & kAccessPrivilegeMask) == to_underlying(Privilege::kView),
+              "All of PrivilegeFlags Must Fit in kAccessPrivilegeBits");
+static_assert((to_underlying(Privilege::kProxyView) & kAccessPrivilegeMask) == to_underlying(Privilege::kProxyView),
+              "All of PrivilegeFlags Must Fit in kAccessPrivilegeBits");
+static_assert((to_underlying(Privilege::kOperate) & kAccessPrivilegeMask) == to_underlying(Privilege::kOperate),
+              "All of PrivilegeFlags Must Fit in kAccessPrivilegeBits");
+static_assert((to_underlying(Privilege::kManage) & kAccessPrivilegeMask) == to_underlying(Privilege::kManage),
+              "All of PrivilegeFlags Must Fit in kAccessPrivilegeBits");
+static_assert((to_underlying(Privilege::kAdminister) & kAccessPrivilegeMask) == to_underlying(Privilege::kAdminister),
+              "All of PrivilegeFlags Must Fit in kAccessPrivilegeBits");
 
 } // namespace Access
 } // namespace chip

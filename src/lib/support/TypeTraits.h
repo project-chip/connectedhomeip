@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <stddef.h>
 #include <type_traits>
 
 #if __has_include(<utility>) // For C++23 and later, include <utility> if available
@@ -74,5 +75,15 @@ constexpr std::underlying_type_t<T> to_underlying(T e)
  */
 template <typename T>
 using TemplatedTrueType = std::true_type;
+
+/**
+ * @brief This template is designed to test if an enumeration is below n bits
+ */
+template <auto t_enum, auto bits, auto offset = 0>
+constexpr bool CheckEnumBits()
+{
+    constexpr std::underlying_type_t<typeof(t_enum)> mask = (std::underlying_type_t<typeof(t_enum)>(1) << bits) - 1;
+    return ((to_underlying(t_enum) >> offset) & mask) == (to_underlying(t_enum) >> offset);
+}
 
 } // namespace chip

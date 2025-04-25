@@ -77,13 +77,12 @@ struct ClusterInfo
     /// for this structure.
     ClusterInfo(DataVersion version) : dataVersion(version) {}
     DataVersion dataVersion; // current cluster data version,
-    // This cannot be compressed
+    // This cannot be compressed yet
     BitFlags<ClusterQualityFlags> flags;
 };
 
 enum class AttributeQualityFlags : uint32_t
 {
-
     kListAttribute   = 0x0004, // This attribute is a list attribute
     kFabricScoped    = 0x0008, // 'F' quality on attributes
     kFabricSensitive = 0x0010, // 'S' quality on attributes
@@ -97,6 +96,20 @@ enum class AttributeQualityFlags : uint32_t
 // kChangesOmitted  = 0b0100000
 // kTimed           = 0b1000000
 
+constexpr size_t kAttrQFlagsBits   = 5;
+constexpr size_t kAttrQFlagsOffset = 2;
+
+static_assert(CheckEnumBits<AttributeQualityFlags::kListAttribute, kAttrQFlagsBits, kAttrQFlagsOffset>(),
+              "All AttributeQualityFlags must fit inside kAttrQFlagsBits when kAttrQFlagsOffset applied");
+static_assert(CheckEnumBits<AttributeQualityFlags::kFabricScoped, kAttrQFlagsBits, kAttrQFlagsOffset>(),
+              "All AttributeQualityFlags must fit inside kAttrQFlagsBits when kAttrQFlagsOffset applied");
+static_assert(CheckEnumBits<AttributeQualityFlags::kFabricSensitive, kAttrQFlagsBits, kAttrQFlagsOffset>(),
+              "All AttributeQualityFlags must fit inside kAttrQFlagsBits when kAttrQFlagsOffset applied");
+static_assert(CheckEnumBits<AttributeQualityFlags::kChangesOmitted, kAttrQFlagsBits, kAttrQFlagsOffset>(),
+              "All AttributeQualityFlags must fit inside kAttrQFlagsBits when kAttrQFlagsOffset applied");
+static_assert(CheckEnumBits<AttributeQualityFlags::kTimed, kAttrQFlagsBits, kAttrQFlagsOffset>(),
+              "All AttributeQualityFlags must fit inside kAttrQFlagsBits when kAttrQFlagsOffset applied");
+
 struct AttributeEntry
 {
 
@@ -104,14 +117,17 @@ struct AttributeEntry
         constexpr AttributeEntry(AttributeId attributeId, BitFlags<AttributeQualityFlags> flags,
                                  std::optional<Access::Privilege> readPrivilege  = Access::Privilege::kView,
                                  std::optional<Access::Privilege> writePrivilege = Access::Privilege::kOperate) :
-        attributeId_{ attributeId },
-        flags_{ flags.Raw() }, readPrivilege_{ !readPrivilege ? 0 : chip::to_underlying(readPrivilege.value()) },
+        attributeId_{ attributeId }, flags_{ flags.Raw() >> kAttrQFlagsOffset },
+        readPrivilege_{ !readPrivilege ? 0 : chip::to_underlying(readPrivilege.value()) },
         writePrivilege_{ !writePrivilege ? 0 : chip::to_underlying(writePrivilege.value()) }
     {}
     EndBitFieldInit;
 
     constexpr AttributeId GetAttributeId() const { return attributeId_; }
-    constexpr BitFlags<AttributeQualityFlags> GetAttributeQualityFlags() const { return BitFlags<AttributeQualityFlags>{ flags_ }; }
+    constexpr BitFlags<AttributeQualityFlags> GetAttributeQualityFlags() const
+    {
+        return BitFlags<AttributeQualityFlags>{ std::underlying_type_t<AttributeQualityFlags>(flags_) << kAttrQFlagsOffset };
+    }
     constexpr std::optional<Access::Privilege> GetReadPrivilege() const
     {
         if (!readPrivilege_)
@@ -126,11 +142,28 @@ struct AttributeEntry
     }
 
 private:
-    AttributeId attributeId_;
-    std::underlying_type_t<AttributeQualityFlags> flags_;
-    std::underlying_type_t<Access::Privilege> readPrivilege_;
-    std::underlying_type_t<Access::Privilege> writePrivilege_;
+    AttributeId attributeId_;                                                                 // 4
+    std::underlying_type_t<AttributeQualityFlags> flags_ : kAttrQFlagsBits;                   // 4
+    std::underlying_type_t<Access::Privilege> readPrivilege_ : Access::kAccessPrivilegeBits;  // 1
+    std::underlying_type_t<Access::Privilege> writePrivilege_ : Access::kAccessPrivilegeBits; // 1
 };
+
+// From 10 + padding 6 = 16 bytes
+// to   7 + 1 = 8 bytes
+static_assert(sizeof(AttributeEntry) == 8);
+
+// Sanity checks
+static_assert(AttributeEntry{ 0, AttributeQualityFlags::kTimed }.GetAttributeQualityFlags().Has(AttributeQualityFlags::kTimed));
+static_assert(
+    !AttributeEntry{ 0, AttributeQualityFlags::kTimed }.GetAttributeQualityFlags().Has(AttributeQualityFlags::kListAttribute));
+static_assert(!AttributeEntry{ 0, AttributeQualityFlags::kTimed, std::nullopt }.GetReadPrivilege());
+static_assert(AttributeEntry{ 0, AttributeQualityFlags::kTimed, Access::Privilege::kAdminister }.GetReadPrivilege().value() ==
+              Access::Privilege::kAdminister);
+static_assert(
+    !AttributeEntry{ 0, AttributeQualityFlags::kTimed, Access::Privilege::kAdminister, std::nullopt }.GetWritePrivilege());
+static_assert(AttributeEntry{ 0, AttributeQualityFlags::kTimed, Access::Privilege::kAdminister, Access::Privilege::kAdminister }
+                  .GetWritePrivilege()
+                  .value() == Access::Privilege::kAdminister);
 
 // Bitmask values for different Command qualities.
 // We need 3 bits for this one
@@ -140,6 +173,17 @@ enum class CommandQualityFlags : uint32_t
     kTimed        = 0x0002, // `T` quality on commands
     kLargeMessage = 0x0004, // `L` quality on commands
 };
+// We need 3 bits to handle it
+// kFabricScoped = 0b001
+// kTimed        = 0b010
+// kLargeMessage = 0b100
+constexpr size_t kCommandQFlagsBits = 3;
+static_assert(CheckEnumBits<CommandQualityFlags::kFabricScoped, kCommandQFlagsBits>(),
+              "All CommandQualityFlags must fir inside kCommandQFlagsBits bits");
+static_assert(CheckEnumBits<CommandQualityFlags::kTimed, kCommandQFlagsBits>(),
+              "All CommandQualityFlags must fir inside kCommandQFlagsBits bits");
+static_assert(CheckEnumBits<CommandQualityFlags::kLargeMessage, kCommandQFlagsBits>(),
+              "All CommandQualityFlags must fir inside kCommandQFlagsBits bits");
 
 struct AcceptedCommandEntry
 {
@@ -147,8 +191,7 @@ struct AcceptedCommandEntry
     // Lets keep the interface the same
     constexpr AcceptedCommandEntry(CommandId commandId = 0, BitFlags<CommandQualityFlags> flags = {},
                                    Access::Privilege invokePrivilege = Access::Privilege::kOperate) :
-        commandId_{ commandId },
-        flags_{ flags.Raw() }, privilege_{ chip::to_underlying(invokePrivilege) }
+        commandId_{ commandId }, flags_{ flags.Raw() }, privilege_{ chip::to_underlying(invokePrivilege) }
     {}
     EndBitFieldInit;
     constexpr CommandId GetCommandId() const { return commandId_; };
@@ -157,11 +200,17 @@ struct AcceptedCommandEntry
 
 private:
     // AcceptedCommandEntry will be 32bit aligned
-    CommandId commandId_;
-    std::underlying_type_t<CommandQualityFlags> flags_ : 3;
-    std::underlying_type_t<Access::Privilege> privilege_ : 5;
-    // There are still 24bits here
+    CommandId commandId_;                                                                // 4 byte -> 4 byte
+    std::underlying_type_t<CommandQualityFlags> flags_ : kCommandQFlagsBits;             // 4 byte -> 3 bit
+    std::underlying_type_t<Access::Privilege> privilege_ : Access::kAccessPrivilegeBits; // 1 byte -> 5 bit
+                                                                                         // -----------------
+                                                                                         // 9 bytes -> 5 bytes
+    // because alignment there are 3 more bytes here                32-bit/4-byte Alignment 7 bytes -> 3 bytes
 };
+
+// From 9 + padding 7 = 16 bytes
+// to   5 + padding 3 = 8 bytes
+static_assert(sizeof(AcceptedCommandEntry) == 8);
 
 /// Represents a device type that resides on an endpoint
 struct DeviceTypeEntry
@@ -178,3 +227,6 @@ struct DeviceTypeEntry
 } // namespace DataModel
 } // namespace app
 } // namespace chip
+
+#undef StartBitFieldInit
+#undef EndBitFieldInit
