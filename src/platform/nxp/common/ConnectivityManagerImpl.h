@@ -131,13 +131,26 @@ private:
     static ConnectivityManagerImpl sInstance;
 
     // ===== Private members reserved for use by this class only.
+    bool mBorderRouterInit = false;
+
+#if CONFIG_CHIP_ETHERNET  && !CHIP_DEVICE_CONFIG_ENABLE_WPA
+    enum class ConnectivityFlags : uint16_t{
+        kHaveIPv4InternetConnectivity = 0x0001,
+        kHaveIPv6InternetConnectivity = 0x0002,
+        kAwaitingConnectivity         = 0x0010,
+    };
+    BitFlags<ConnectivityFlags> mFlags;
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA || CONFIG_CHIP_ETHERNET
+    void UpdateInternetConnectivityState(void);
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
     ConnectivityManager::WiFiStationMode mWiFiStationMode;
     ConnectivityManager::WiFiStationState mWiFiStationState;
     ConnectivityManager::WiFiAPMode mWiFiAPMode;
     uint32_t mWiFiStationReconnectIntervalMS;
-    bool mBorderRouterInit = false;
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
     bool mWifiManagerInit = false;
 
     enum WiFiEventGroup{
@@ -160,7 +173,6 @@ private:
 
     void OnStationConnected(void);
     void OnStationDisconnected(void);
-    void UpdateInternetConnectivityState(void);
 #if CHIP_ENABLE_OPENTHREAD
     void BrHandleStateChange();
     static void LockThreadStack();
