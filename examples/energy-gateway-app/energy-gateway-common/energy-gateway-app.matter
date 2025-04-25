@@ -1575,10 +1575,6 @@ provisional cluster ElectricalGridConditions = 160 {
     nullable ElectricalGridConditionsStruct currentConditions = 0;
   }
 
-  info event ForecastConditionsChanged = 1 {
-    nullable ElectricalGridConditionsStruct forecastConditions[] = 0;
-  }
-
   attribute nullable boolean localGenerationAvailable = 0;
   readonly attribute nullable ElectricalGridConditionsStruct currentConditions = 1;
   readonly attribute optional ElectricalGridConditionsStruct forecastConditions[] = 2;
@@ -1851,7 +1847,6 @@ endpoint 1 {
 
   server cluster ElectricalGridConditions {
     emits event CurrentConditionsChanged;
-    emits event ForecastConditionsChanged;
     callback attribute localGenerationAvailable;
     callback attribute currentConditions;
     callback attribute forecastConditions;
