@@ -59,7 +59,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
             TestStep("4e", "Check MainState to ensure movement is occurring"),
             TestStep("5a", "Skip if no countdown time reported"),
             TestStep("5b", "Wait until the operation should be complete"),
-            TestStep("5c", "Verify that the MainState is Stopped(0)"),#
+            TestStep("5c", "Verify that the MainState is Stopped(0)"),
             TestStep("6a", "Skip if countdown time reported in Step 4c is NULL"),
             TestStep("6b", "Start a movement to open position"),
             TestStep("6c", "Check CountdownTime during movement"),
