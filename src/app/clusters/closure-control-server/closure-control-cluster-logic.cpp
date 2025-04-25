@@ -226,7 +226,7 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mState.mOverallState != overallState, CHIP_NO_ERROR);
 
-    
+
     if(overallState.IsNull())
     {
         // Mark OverallState attribute as dirty only if value changes.
@@ -235,10 +235,10 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
             mState.mOverallState.SetNull();
             mMatterContext.MarkDirty(Attributes::OverallState::Id);
         }
-        
+
         return CHIP_NO_ERROR;
     }
-    
+
     const GenericOverallState & incomingOverallState = overallState.Value();
 
     // Validate the incomging Positioning value and featureMap conformance.
@@ -283,14 +283,14 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
 
     mState.mOverallState.SetNonNull(overallState.Value());
     mMatterContext.MarkDirty(Attributes::OverallState::Id);
-        
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ClusterLogic::SetOverallTarget(const DataModel::Nullable<GenericOverallTarget> & overallTarget)
 {
     assertChipStackLockedByCurrentThread();
-    
+
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mState.mOverallTarget != overallTarget, CHIP_NO_ERROR);
 
@@ -302,7 +302,7 @@ CHIP_ERROR ClusterLogic::SetOverallTarget(const DataModel::Nullable<GenericOvera
             mState.mOverallTarget.SetNull();
             mMatterContext.MarkDirty(Attributes::OverallState::Id);
         }
-        
+
         return CHIP_NO_ERROR;
     }
 
@@ -317,7 +317,7 @@ CHIP_ERROR ClusterLogic::SetOverallTarget(const DataModel::Nullable<GenericOvera
 
         VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallTarget.position.Value()) != TargetPositionEnum::kUnknownEnumValue,
                                 CHIP_ERROR_INVALID_ARGUMENT);
-                                
+
         VerifyOrReturnError(IsSupportedOverallTargetPositioning(incomingOverallTarget.position.Value()), CHIP_ERROR_INVALID_ARGUMENT);
     }
 
@@ -342,7 +342,7 @@ CHIP_ERROR ClusterLogic::SetOverallTarget(const DataModel::Nullable<GenericOvera
 
     mState.mOverallTarget.SetNonNull(overallTarget.Value());
     mMatterContext.MarkDirty(Attributes::OverallTarget::Id);
-    
+
     return CHIP_NO_ERROR;
 }
 
@@ -458,9 +458,9 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<Ta
                                                                      Optional<Globals::ThreeLevelAutoEnum> speed)
 {
     VerifyOrDieWithMsg(mIsInitialized, AppServer, "MoveTo Command called before Initialization of closure");
-    
+
     GenericOverallTarget target;
-    
+
     VerifyOrReturnError(position.HasValue() || latch.HasValue() || speed.HasValue(), Status::InvalidCommand);
 
     if (position.HasValue() && mConformance.HasFeature(Feature::kPositioning))
@@ -490,12 +490,12 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<Ta
 
     MainStateEnum state;
     VerifyOrReturnError(GetMainState(state) == CHIP_NO_ERROR, Status::Failure);
-    
+
     // If the MoveTo command is received in any state other than 'Moving', 'WaitingForMotion', or 'Stopped', an error code
     // INVALID_IN_STATE shall be returned.
     VerifyOrReturnError(state == MainStateEnum::kMoving || state == MainStateEnum::kWaitingForMotion ||
                             state == MainStateEnum::kStopped, Status::InvalidInState);
- 
+
     if (mDelegate.IsReadyToMove())
     {
         VerifyOrReturnError(SetMainState(MainStateEnum::kMoving) == CHIP_NO_ERROR, Status::Failure,
@@ -511,7 +511,7 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<Ta
     VerifyOrReturnError(mDelegate.HandleMoveToCommand(position, latch, speed) == Status::Success, Status::Failure);
 
     VerifyOrReturnError(SetOverallTarget(DataModel::MakeNullable(target)) == CHIP_NO_ERROR, Status::Failure);
- 
+
     return Status::Success;
 }
 
