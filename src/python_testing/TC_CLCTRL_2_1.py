@@ -34,7 +34,7 @@
 import logging
 
 import chip.clusters as Clusters
-import chip.Types
+import chip.Types as Types
 
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
@@ -84,7 +84,7 @@ class TC_CLCTRL_2_1(MatterBaseTest):
         if attributes.CountdownTime.attribute_id in attribute_list:
             countdown_time = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
             logging.info(f"CountdownTime: {countdown_time}")
-            if countdown_time is not NullValue:
+            if countdown_time is not Types.NullValue:
                 asserts.assert_less_equal(countdown_time, 259200, "CountdownTime attribute is out of range")
                 asserts.assert_greater_equal(countdown_time, 0, "CountdownTime attribute is out of range")
         else:
@@ -120,20 +120,20 @@ class TC_CLCTRL_2_1(MatterBaseTest):
         is_positioning_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kPositioning
         is_speed_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kSpeed
 
-        if overall_state is not NullValue:
+        if overall_state is not Types.NullValue:
             # Check Positioning feature in OverallState - PS feature (bit 0)
-            if is_positioning_supported and overall_state.positioning is not NullValue:
+            if is_positioning_supported and overall_state.positioning is not Types.NullValue:
                 asserts.assert_less_equal(overall_state.positioning, 5, "OverallState.positioning is out of range")
                 asserts.assert_greater_equal(overall_state.positioning, 0, "OverallState.positioning is out of range")
                 logging.info(f"OverallState.positioning: {overall_state.positioning}")
         
             # Check MotionLatching feature in OverallState - LT feature (bit 1)
-            if is_latching_supported and overall_state.latch is not NullValue:
+            if is_latching_supported and overall_state.latch is not Types.NullValue:
                 asserts.assert_true(isinstance(overall_state.latch, bool), "OverallState.latch is not a boolean value")
                 logging.info(f"OverallState.latch: {overall_state.latch}")
         
             # Check Speed feature in OverallState - SP feature (bit 3)
-            if is_speed_supported and overall_state.speed is not NullValue:
+            if is_speed_supported and overall_state.speed is not Types.NullValue:
                 asserts.assert_less_equal(overall_state.speed, 3, "OverallState.speed is out of range")
                 asserts.assert_greater_equal(overall_state.speed, 0, "OverallState.speed is out of range")
                 logging.info(f"OverallState.speed: {overall_state.speed}")
@@ -149,7 +149,7 @@ class TC_CLCTRL_2_1(MatterBaseTest):
         overall_target = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallTarget)
         logging.info(f"OverallTarget: {overall_target}")
         
-        if overall_target is not NullValue:
+        if overall_target is not Types.NullValue:
             # Check Positioning feature in OverallTarget
             if feature_map & (1 << 0):  # PS feature (bit 0)
                 asserts.assert_less_equal(overall_target.position, 4, "OverallTarget.position is out of range")
