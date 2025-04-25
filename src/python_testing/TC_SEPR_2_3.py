@@ -47,7 +47,7 @@ import logging
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, run_if_endpoint_matches, has_feature
 from mobly import asserts
 from TC_SEPRTestBase import CommodityPriceTestBaseHelper
 
@@ -134,9 +134,8 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
 
         return steps
 
-    @async_test_body
+    @run_if_endpoint_matches(has_feature(cluster, cluster.Bitmaps.Feature.kForecasting))
     async def test_TC_SEPR_2_3(self):
-        # pylint: disable=too-many-locals, too-many-statements
         """Run the test steps."""
         endpoint = self.get_endpoint()
 

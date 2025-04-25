@@ -139,7 +139,6 @@ class TC_SEPR_2_2(CommodityPriceTestBaseHelper, MatterBaseTest):
 
     @run_if_endpoint_matches(has_cluster(cluster))
     async def test_TC_SEPR_2_2(self):
-        # pylint: disable=too-many-locals, too-many-statements
         """Run the test steps."""
         endpoint = self.get_endpoint()
 
