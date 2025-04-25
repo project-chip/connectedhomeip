@@ -21,26 +21,26 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace WindowStatus {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = WindowStatus::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/WindowStatus::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{},
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace WindowStatus
 namespace AdminFabricIndex {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = AdminFabricIndex::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/AdminFabricIndex::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{},
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace AdminFabricIndex
 namespace AdminVendorId {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = AdminVendorId::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/AdminVendorId::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{},
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace AdminVendorId
 
@@ -49,23 +49,23 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace OpenCommissioningWindow {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = AdministratorCommissioning::Commands::OpenCommissioningWindow::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
-    .invokePrivilege = Access::Privilege::kAdminister,
+    /*.commandId       =*/AdministratorCommissioning::Commands::OpenCommissioningWindow::Id,
+    /*.flags           =*/BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
+    /*.invokePrivilege =*/Access::Privilege::kAdminister,
 };
 } // namespace OpenCommissioningWindow
 namespace OpenBasicCommissioningWindow {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
-    .invokePrivilege = Access::Privilege::kAdminister,
+    /*.commandId       =*/AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id,
+    /*.flags           =*/BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
+    /*.invokePrivilege =*/Access::Privilege::kAdminister,
 };
 } // namespace OpenBasicCommissioningWindow
 namespace RevokeCommissioning {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = AdministratorCommissioning::Commands::RevokeCommissioning::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
-    .invokePrivilege = Access::Privilege::kAdminister,
+    /*.commandId       =*/AdministratorCommissioning::Commands::RevokeCommissioning::Id,
+    /*.flags           =*/BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
+    /*.invokePrivilege =*/Access::Privilege::kAdminister,
 };
 } // namespace RevokeCommissioning
 

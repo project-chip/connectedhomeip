@@ -21,18 +21,18 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace ActiveLocale {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ActiveLocale::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kManage,
+    /*.attributeId   =*/ActiveLocale::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{},
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/Access::Privilege::kManage,
 };
 } // namespace ActiveLocale
 namespace SupportedLocales {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = SupportedLocales::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/SupportedLocales::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace SupportedLocales
 

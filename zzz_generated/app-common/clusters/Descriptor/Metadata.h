@@ -21,42 +21,42 @@ inline constexpr uint32_t kRevision = 2;
 namespace Attributes {
 namespace DeviceTypeList {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = DeviceTypeList::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/DeviceTypeList::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace DeviceTypeList
 namespace ServerList {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ServerList::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/ServerList::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace ServerList
 namespace ClientList {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ClientList::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/ClientList::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace ClientList
 namespace PartsList {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PartsList::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/PartsList::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace PartsList
 namespace TagList {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = TagList::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/TagList::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace TagList
 

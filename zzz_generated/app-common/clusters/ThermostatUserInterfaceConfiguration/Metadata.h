@@ -21,26 +21,26 @@ inline constexpr uint32_t kRevision = 2;
 namespace Attributes {
 namespace TemperatureDisplayMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = TemperatureDisplayMode::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
+    /*.attributeId   =*/TemperatureDisplayMode::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{},
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/Access::Privilege::kOperate,
 };
 } // namespace TemperatureDisplayMode
 namespace KeypadLockout {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = KeypadLockout::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kManage,
+    /*.attributeId   =*/KeypadLockout::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{},
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/Access::Privilege::kManage,
 };
 } // namespace KeypadLockout
 namespace ScheduleProgrammingVisibility {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ScheduleProgrammingVisibility::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kManage,
+    /*.attributeId   =*/ScheduleProgrammingVisibility::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{},
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/Access::Privilege::kManage,
 };
 } // namespace ScheduleProgrammingVisibility
 

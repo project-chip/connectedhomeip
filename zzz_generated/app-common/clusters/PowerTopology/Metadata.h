@@ -21,18 +21,18 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace AvailableEndpoints {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = AvailableEndpoints::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/AvailableEndpoints::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace AvailableEndpoints
 namespace ActiveEndpoints {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ActiveEndpoints::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/ActiveEndpoints::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace ActiveEndpoints
 

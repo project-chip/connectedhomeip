@@ -21,34 +21,34 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace MaxRootCertificates {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MaxRootCertificates::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/MaxRootCertificates::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{},
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace MaxRootCertificates
 namespace ProvisionedRootCertificates {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ProvisionedRootCertificates::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/ProvisionedRootCertificates::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace ProvisionedRootCertificates
 namespace MaxClientCertificates {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MaxClientCertificates::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/MaxClientCertificates::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{},
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace MaxClientCertificates
 namespace ProvisionedClientCertificates {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ProvisionedClientCertificates::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/ProvisionedClientCertificates::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace ProvisionedClientCertificates
 
@@ -57,65 +57,65 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace ProvisionRootCertificate {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = TlsCertificateManagement::Commands::ProvisionRootCertificate::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kAdminister,
+    /*.commandId       =*/TlsCertificateManagement::Commands::ProvisionRootCertificate::Id,
+    /*.flags           =*/BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    /*.invokePrivilege =*/Access::Privilege::kAdminister,
 };
 } // namespace ProvisionRootCertificate
 namespace FindRootCertificate {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = TlsCertificateManagement::Commands::FindRootCertificate::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kOperate,
+    /*.commandId       =*/TlsCertificateManagement::Commands::FindRootCertificate::Id,
+    /*.flags           =*/BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    /*.invokePrivilege =*/Access::Privilege::kOperate,
 };
 } // namespace FindRootCertificate
 namespace LookupRootCertificate {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = TlsCertificateManagement::Commands::LookupRootCertificate::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kOperate,
+    /*.commandId       =*/TlsCertificateManagement::Commands::LookupRootCertificate::Id,
+    /*.flags           =*/BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    /*.invokePrivilege =*/Access::Privilege::kOperate,
 };
 } // namespace LookupRootCertificate
 namespace RemoveRootCertificate {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = TlsCertificateManagement::Commands::RemoveRootCertificate::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kAdminister,
+    /*.commandId       =*/TlsCertificateManagement::Commands::RemoveRootCertificate::Id,
+    /*.flags           =*/BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    /*.invokePrivilege =*/Access::Privilege::kAdminister,
 };
 } // namespace RemoveRootCertificate
 namespace TLSClientCSR {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = TlsCertificateManagement::Commands::TLSClientCSR::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kAdminister,
+    /*.commandId       =*/TlsCertificateManagement::Commands::TLSClientCSR::Id,
+    /*.flags           =*/BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    /*.invokePrivilege =*/Access::Privilege::kAdminister,
 };
 } // namespace TLSClientCSR
 namespace ProvisionClientCertificate {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = TlsCertificateManagement::Commands::ProvisionClientCertificate::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kAdminister,
+    /*.commandId       =*/TlsCertificateManagement::Commands::ProvisionClientCertificate::Id,
+    /*.flags           =*/BitFlags<DataModel::CommandQualityFlags>{},
+    /*.invokePrivilege =*/Access::Privilege::kAdminister,
 };
 } // namespace ProvisionClientCertificate
 namespace FindClientCertificate {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = TlsCertificateManagement::Commands::FindClientCertificate::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kOperate,
+    /*.commandId       =*/TlsCertificateManagement::Commands::FindClientCertificate::Id,
+    /*.flags           =*/BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    /*.invokePrivilege =*/Access::Privilege::kOperate,
 };
 } // namespace FindClientCertificate
 namespace LookupClientCertificate {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = TlsCertificateManagement::Commands::LookupClientCertificate::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kOperate,
+    /*.commandId       =*/TlsCertificateManagement::Commands::LookupClientCertificate::Id,
+    /*.flags           =*/BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    /*.invokePrivilege =*/Access::Privilege::kOperate,
 };
 } // namespace LookupClientCertificate
 namespace RemoveClientCertificate {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = TlsCertificateManagement::Commands::RemoveClientCertificate::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kAdminister,
+    /*.commandId       =*/TlsCertificateManagement::Commands::RemoveClientCertificate::Id,
+    /*.flags           =*/BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    /*.invokePrivilege =*/Access::Privilege::kAdminister,
 };
 } // namespace RemoveClientCertificate
 

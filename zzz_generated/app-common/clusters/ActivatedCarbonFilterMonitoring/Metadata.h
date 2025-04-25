@@ -21,50 +21,50 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace Condition {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Condition::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/Condition::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{},
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace Condition
 namespace DegradationDirection {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = DegradationDirection::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/DegradationDirection::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{},
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace DegradationDirection
 namespace ChangeIndication {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ChangeIndication::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/ChangeIndication::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{},
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace ChangeIndication
 namespace InPlaceIndicator {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = InPlaceIndicator::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/InPlaceIndicator::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{},
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace InPlaceIndicator
 namespace LastChangedTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = LastChangedTime::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
+    /*.attributeId   =*/LastChangedTime::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{},
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/Access::Privilege::kOperate,
 };
 } // namespace LastChangedTime
 namespace ReplacementProductList {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ReplacementProductList::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/ReplacementProductList::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace ReplacementProductList
 
@@ -73,9 +73,9 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace ResetCondition {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ActivatedCarbonFilterMonitoring::Commands::ResetCondition::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
+    /*.commandId       =*/ActivatedCarbonFilterMonitoring::Commands::ResetCondition::Id,
+    /*.flags           =*/BitFlags<DataModel::CommandQualityFlags>{},
+    /*.invokePrivilege =*/Access::Privilege::kOperate,
 };
 } // namespace ResetCondition
 

@@ -21,34 +21,34 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace SupportedZoneSources {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = SupportedZoneSources::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/SupportedZoneSources::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace SupportedZoneSources
 namespace Zones {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Zones::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/Zones::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace Zones
 namespace Triggers {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Triggers::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
+    /*.attributeId   =*/Triggers::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/Access::Privilege::kOperate,
 };
 } // namespace Triggers
 namespace Sensitivity {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Sensitivity::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
+    /*.attributeId   =*/Sensitivity::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{},
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/Access::Privilege::kOperate,
 };
 } // namespace Sensitivity
 
@@ -57,30 +57,30 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace CreateTwoDCartesianZone {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ZoneManagement::Commands::CreateTwoDCartesianZone::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
+    /*.commandId       =*/ZoneManagement::Commands::CreateTwoDCartesianZone::Id,
+    /*.flags           =*/BitFlags<DataModel::CommandQualityFlags>{},
+    /*.invokePrivilege =*/Access::Privilege::kManage,
 };
 } // namespace CreateTwoDCartesianZone
 namespace UpdateTwoDCartesianZone {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ZoneManagement::Commands::UpdateTwoDCartesianZone::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
+    /*.commandId       =*/ZoneManagement::Commands::UpdateTwoDCartesianZone::Id,
+    /*.flags           =*/BitFlags<DataModel::CommandQualityFlags>{},
+    /*.invokePrivilege =*/Access::Privilege::kManage,
 };
 } // namespace UpdateTwoDCartesianZone
 namespace GetTwoDCartesianZone {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ZoneManagement::Commands::GetTwoDCartesianZone::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
+    /*.commandId       =*/ZoneManagement::Commands::GetTwoDCartesianZone::Id,
+    /*.flags           =*/BitFlags<DataModel::CommandQualityFlags>{},
+    /*.invokePrivilege =*/Access::Privilege::kManage,
 };
 } // namespace GetTwoDCartesianZone
 namespace RemoveZone {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ZoneManagement::Commands::RemoveZone::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
+    /*.commandId       =*/ZoneManagement::Commands::RemoveZone::Id,
+    /*.flags           =*/BitFlags<DataModel::CommandQualityFlags>{},
+    /*.invokePrivilege =*/Access::Privilege::kManage,
 };
 } // namespace RemoveZone
 

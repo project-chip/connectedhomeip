@@ -21,50 +21,50 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace Accuracy {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Accuracy::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/Accuracy::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{},
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace Accuracy
 namespace CumulativeEnergyImported {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CumulativeEnergyImported::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/CumulativeEnergyImported::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{},
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace CumulativeEnergyImported
 namespace CumulativeEnergyExported {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CumulativeEnergyExported::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/CumulativeEnergyExported::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{},
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace CumulativeEnergyExported
 namespace PeriodicEnergyImported {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PeriodicEnergyImported::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/PeriodicEnergyImported::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{},
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace PeriodicEnergyImported
 namespace PeriodicEnergyExported {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PeriodicEnergyExported::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/PeriodicEnergyExported::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{},
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace PeriodicEnergyExported
 namespace CumulativeEnergyReset {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CumulativeEnergyReset::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/CumulativeEnergyReset::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{},
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace CumulativeEnergyReset
 

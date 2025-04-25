@@ -21,18 +21,18 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace OutputList {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = OutputList::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/OutputList::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace OutputList
 namespace CurrentOutput {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CurrentOutput::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/CurrentOutput::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{},
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace CurrentOutput
 
@@ -41,16 +41,16 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace SelectOutput {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = AudioOutput::Commands::SelectOutput::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
+    /*.commandId       =*/AudioOutput::Commands::SelectOutput::Id,
+    /*.flags           =*/BitFlags<DataModel::CommandQualityFlags>{},
+    /*.invokePrivilege =*/Access::Privilege::kOperate,
 };
 } // namespace SelectOutput
 namespace RenameOutput {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = AudioOutput::Commands::RenameOutput::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
+    /*.commandId       =*/AudioOutput::Commands::RenameOutput::Id,
+    /*.flags           =*/BitFlags<DataModel::CommandQualityFlags>{},
+    /*.invokePrivilege =*/Access::Privilege::kManage,
 };
 } // namespace RenameOutput
 

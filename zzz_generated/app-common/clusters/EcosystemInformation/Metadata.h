@@ -21,18 +21,18 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace DeviceDirectory {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = DeviceDirectory::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kManage,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/DeviceDirectory::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    /*.readPrivilege =*/Access::Privilege::kManage,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace DeviceDirectory
 namespace LocationDirectory {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = LocationDirectory::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kManage,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/LocationDirectory::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    /*.readPrivilege =*/Access::Privilege::kManage,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace LocationDirectory
 

@@ -23,26 +23,29 @@ namespace Attributes {} // namespace Attributes
 namespace Commands {
 namespace GetSetupPIN {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = AccountLogin::Commands::GetSetupPIN::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped,
-                                                                 DataModel::CommandQualityFlags::kTimed },
-    .invokePrivilege = Access::Privilege::kAdminister,
+    /*.commandId       =*/AccountLogin::Commands::GetSetupPIN::Id,
+    /*.flags           =*/
+    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped,
+                                              DataModel::CommandQualityFlags::kTimed },
+    /*.invokePrivilege =*/Access::Privilege::kAdminister,
 };
 } // namespace GetSetupPIN
 namespace Login {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = AccountLogin::Commands::Login::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped,
-                                                                 DataModel::CommandQualityFlags::kTimed },
-    .invokePrivilege = Access::Privilege::kAdminister,
+    /*.commandId       =*/AccountLogin::Commands::Login::Id,
+    /*.flags           =*/
+    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped,
+                                              DataModel::CommandQualityFlags::kTimed },
+    /*.invokePrivilege =*/Access::Privilege::kAdminister,
 };
 } // namespace Login
 namespace Logout {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = AccountLogin::Commands::Logout::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped,
-                                                                 DataModel::CommandQualityFlags::kTimed },
-    .invokePrivilege = Access::Privilege::kOperate,
+    /*.commandId       =*/AccountLogin::Commands::Logout::Id,
+    /*.flags           =*/
+    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped,
+                                              DataModel::CommandQualityFlags::kTimed },
+    /*.invokePrivilege =*/Access::Privilege::kOperate,
 };
 } // namespace Logout
 

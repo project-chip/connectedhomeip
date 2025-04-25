@@ -23,9 +23,9 @@ namespace Attributes {} // namespace Attributes
 namespace Commands {
 namespace SendKey {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = KeypadInput::Commands::SendKey::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
+    /*.commandId       =*/KeypadInput::Commands::SendKey::Id,
+    /*.flags           =*/BitFlags<DataModel::CommandQualityFlags>{},
+    /*.invokePrivilege =*/Access::Privilege::kOperate,
 };
 } // namespace SendKey
 

@@ -21,18 +21,18 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace Ssid {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Ssid::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/Ssid::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{},
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace Ssid
 namespace PassphraseSurrogate {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PassphraseSurrogate::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kManage,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/PassphraseSurrogate::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{},
+    /*.readPrivilege =*/Access::Privilege::kManage,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace PassphraseSurrogate
 
@@ -41,9 +41,9 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace NetworkPassphraseRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = WiFiNetworkManagement::Commands::NetworkPassphraseRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
+    /*.commandId       =*/WiFiNetworkManagement::Commands::NetworkPassphraseRequest::Id,
+    /*.flags           =*/BitFlags<DataModel::CommandQualityFlags>{},
+    /*.invokePrivilege =*/Access::Privilege::kManage,
 };
 } // namespace NetworkPassphraseRequest
 

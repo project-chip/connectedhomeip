@@ -21,34 +21,34 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace ThreadMetrics {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ThreadMetrics::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/ThreadMetrics::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace ThreadMetrics
 namespace CurrentHeapFree {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CurrentHeapFree::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/CurrentHeapFree::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{},
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace CurrentHeapFree
 namespace CurrentHeapUsed {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CurrentHeapUsed::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/CurrentHeapUsed::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{},
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace CurrentHeapUsed
 namespace CurrentHeapHighWatermark {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CurrentHeapHighWatermark::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/CurrentHeapHighWatermark::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{},
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace CurrentHeapHighWatermark
 
@@ -57,9 +57,9 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace ResetWatermarks {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = SoftwareDiagnostics::Commands::ResetWatermarks::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
+    /*.commandId       =*/SoftwareDiagnostics::Commands::ResetWatermarks::Id,
+    /*.flags           =*/BitFlags<DataModel::CommandQualityFlags>{},
+    /*.invokePrivilege =*/Access::Privilege::kManage,
 };
 } // namespace ResetWatermarks
 
