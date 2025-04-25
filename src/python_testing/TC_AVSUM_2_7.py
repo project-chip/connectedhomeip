@@ -81,7 +81,6 @@ class TC_AVSUM_2_7(MatterBaseTest, AVSUMTestBase):
         endpoint = self.get_endpoint(default=1)
 
         self.step(1)  # Already done, immediately go to step 2
-        attribute_list_avsum = await self.read_avsum_attribute_expect_success(endpoint, attributesAVSUM.AttributeList)
 
         self.step(2)
         # Create a dummy stream ID, initially it will fail. And a new viewport, that will also fail
