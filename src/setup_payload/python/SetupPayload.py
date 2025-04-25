@@ -58,7 +58,7 @@ class CommissioningFlow(enum.IntEnum):
 
 
 class SetupPayload:
-    def __init__(self, discriminator, pincode, rendezvous=4, flow=CommissioningFlow.Standard, vid=0, pid=0):
+    def __init__(self, discriminator, pincode, rendezvous=4, flow=CommissioningFlow.Standard, vid=0, pid=0, include_vid_pid=False):
         self.long_discriminator = discriminator
         self.short_discriminator = discriminator >> 8
         self.pincode = pincode
@@ -66,6 +66,7 @@ class SetupPayload:
         self.flow = flow
         self.vid = vid
         self.pid = pid
+        self.include_vid_pid = include_vid_pid
 
     def p_print(self):
         print('{:<{}} :{}'.format('Flow', 24, self.flow))
@@ -94,12 +95,12 @@ class SetupPayload:
     def manualcode_dict(self):
         return {
             'version': 0,
-            'vid_pid_present': 0 if self.flow == CommissioningFlow.Standard else 1,
+            'vid_pid_present': 1 if self.flow != CommissioningFlow.Standard or self.include_vid_pid else 0,
             'discriminator': self.short_discriminator,
             'pincode_lsb': self.pincode & 0x3FFF,    # 14 ls-bits
             'pincode_msb': self.pincode >> 14,       # 13 ms-bits
-            'vid': 0 if self.flow == CommissioningFlow.Standard else self.vid,
-            'pid': 0 if self.flow == CommissioningFlow.Standard else self.pid,
+            'vid': self.vid if self.flow != CommissioningFlow.Standard or self.include_vid_pid else 0,
+            'pid': self.pid if self.flow != CommissioningFlow.Standard or self.include_vid_pid else 0,
             'padding': 0,
         }
 
@@ -123,8 +124,8 @@ class SetupPayload:
         chunk1 = str(int(bits[CHUNK1_START:CHUNK1_START + CHUNK1_LEN].to01(), 2)).zfill(1)
         chunk2 = str(int(bits[CHUNK2_START:CHUNK2_START + CHUNK2_LEN].to01(), 2)).zfill(5)
         chunk3 = str(int(bits[CHUNK3_START:CHUNK3_START + CHUNK3_LEN].to01(), 2)).zfill(4)
-        chunk4 = str(self.vid).zfill(5) if self.flow != CommissioningFlow.Standard else ''
-        chunk5 = str(self.pid).zfill(5) if self.flow != CommissioningFlow.Standard else ''
+        chunk4 = str(self.vid).zfill(5) if self.flow != CommissioningFlow.Standard or self.include_vid_pid else ''
+        chunk5 = str(self.pid).zfill(5) if self.flow != CommissioningFlow.Standard or self.include_vid_pid else ''
         payload = '{}{}{}{}{}'.format(chunk1, chunk2, chunk3, chunk4, chunk5)
         return '{}{}'.format(payload, calc_check_digit(payload))
 
@@ -210,8 +211,9 @@ def parse(payload):
 @click.option('--product-id', '-pid', type=click.IntRange(0, 0xFFFF), default=0, help='Product ID')
 @click.option('--discovery-cap-bitmask', '-dm', type=click.IntRange(0, 7), default=4, help='Commissionable device discovery capability bitmask. 0:SoftAP, 1:BLE, 2:OnNetwork. Default: OnNetwork')
 @click.option('--commissioning-flow', '-cf', type=click.IntRange(0, 2), default=0, help='Commissioning flow, 0:Standard, 1:User-Intent, 2:Custom')
-def generate(passcode, discriminator, vendor_id, product_id, discovery_cap_bitmask, commissioning_flow):
-    payload = SetupPayload(discriminator, passcode, discovery_cap_bitmask, commissioning_flow, vendor_id, product_id)
+@click.option('--include-vid-pid', '-ivp', is_flag=True, default=False, help='Include Vendor ID and Product ID in the manual code explicitly')
+def generate(passcode, discriminator, vendor_id, product_id, discovery_cap_bitmask, commissioning_flow, include_vid_pid):
+    payload = SetupPayload(discriminator, passcode, discovery_cap_bitmask, commissioning_flow, vendor_id, product_id, include_vid_pid)
     print("Manualcode : {}".format(payload.generate_manualcode()))
     print("QRCode     : {}".format(payload.generate_qrcode()))
 
