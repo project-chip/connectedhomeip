@@ -799,7 +799,7 @@ CHIP_ERROR WiFiPAFEndPoint::GetPktSn(Encoding::LittleEndian::Reader reader, Sequ
     SuccessOrExit(err);
     if (rxFlags.Has(WiFiPAFTP::HeaderFlags::kHandshake))
     {
-        // Handkshake message => No ack/sn
+        // Handshake message => No ack/sn
         return CHIP_ERROR_INTERNAL;
     }
     // Always has header flag
