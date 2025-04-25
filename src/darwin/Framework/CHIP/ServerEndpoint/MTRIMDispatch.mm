@@ -35,7 +35,20 @@ namespace {
 
 // Code assumes there is only a single OTA provider and it lives on EP0
 constexpr EndpointId kOtaProviderEndpointId = 0;
-Global<OtaProviderServer> gOtaProviderServer(kOtaProviderEndpointId);
+
+/**
+ * A OTAProviderServer with a fixed endpoint id, so that it
+ * can be used as a Gloval<> (i.e. supports a constructor without arguments)
+ */
+class FixedOtaProviderServer : public OtaProviderServer {
+public:
+    FixedOtaProviderServer()
+        : OtaProviderServer(kOtaProviderEndpointId)
+    {
+    }
+};
+
+Global<FixedOtaProviderServer> gOtaProviderServer(kOtaProviderEndpointId);
 
 } // anonymous namespace
 
