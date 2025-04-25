@@ -54,6 +54,7 @@ private:
 };
 
 CHIP_ERROR SetSoilMeasurementAccuracy(EndpointId endpointId, const Structs::MeasurementAccuracyStruct::Type & accuracy);
+CHIP_ERROR SetSoilMoistureMeasuredValue(EndpointId endpointId, const DataModel::Nullable<uint16_t> & soilMoistureMeasuredValue);
 
 MeasurementData * SoilMeasurementDataForEndpoint(EndpointId endpointId);
 

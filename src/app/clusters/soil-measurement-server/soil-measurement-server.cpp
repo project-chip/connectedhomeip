@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -117,7 +118,7 @@ CHIP_ERROR SetSoilMoistureMeasuredValue(EndpointId endpointId, const DataModel::
 
     data->soilMoistureMeasuredValue = soilMoistureMeasuredValue;
 
-    MatterReportingAttributeChangeCallback(endpointId, SoilMeasurement::Id, soilMoistureMeasuredValue::Id);
+    MatterReportingAttributeChangeCallback(endpointId, SoilMeasurement::Id, SoilMoistureMeasuredValue::Id);
 
     return CHIP_NO_ERROR;
 }
