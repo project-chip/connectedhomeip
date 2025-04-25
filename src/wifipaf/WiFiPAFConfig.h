@@ -75,7 +75,7 @@
  *  @def WIFIPAF_CONFIG_IMMEDIATE_ACK_WINDOW_THRESHOLD
  *
  *  @brief
- *    If an end point's receive window drops equal to or below this value, it will send an immediate acknowledgement
+ *    If an end point's receive window drops to this value or below it, it will send an immediate acknowledgement
  *    packet to re-open its window instead of waiting for the send-ack timer to expire.
  *
  */
