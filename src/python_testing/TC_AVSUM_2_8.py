@@ -37,7 +37,7 @@
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, has_feature, run_if_endpoint_matches
 from TC_AVSUMTestBase import AVSUMTestBase
 
 
@@ -63,12 +63,13 @@ class TC_AVSUM_2_8(MatterBaseTest, AVSUMTestBase):
 
     def pics_TC_AVSUM_2_8(self) -> list[str]:
         pics = [
-            "AVSUM.S", "AVSM.S"
+            "AVSUM.S", "AVSUM.S.F00", "AVSM.S"
         ]
         return pics
 
     @run_if_endpoint_matches(has_feature(Clusters.CameraAvSettingsUserLevelManagement,
-                                         Clusters.CameraAvSettingsUserLevelManagement.Bitmaps.Feature.kDigitalPTZ))
+                                         Clusters.CameraAvSettingsUserLevelManagement.Bitmaps.Feature.kDigitalPTZ) and
+                             has_cluster(Clusters.CameraAvStreamManagement))
     async def test_TC_AVSUM_2_8(self):
         clusterAVSTR = Clusters.Objects.CameraAvStreamManagement
         attributesAVSTR = clusterAVSTR.Attributes

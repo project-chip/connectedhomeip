@@ -37,7 +37,7 @@
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, has_feature, run_if_endpoint_matches
 from TC_AVSUMTestBase import AVSUMTestBase
 
 
@@ -53,23 +53,24 @@ class TC_AVSUM_2_7(MatterBaseTest, AVSUMTestBase):
             TestStep(3, "Send DPTZSetVieport with an unknown stream ID, verify NotFound response"),
             TestStep(4, "Send a VideoStreamAllocate command to AVStreamManagement to allocate a video stream ID. Record the returned ID"),
             TestStep(5, "Send DPTZSetVieport with a the viewport created in Step 2. Verify ConstraintError response"),
-            TestStep(6, "Create a viewport with valid AR that is larger than the camera sensor"),
+            TestStep(6, "Create a viewport with valid aspect ratio that is larger than the camera sensor"),
             TestStep(7, "Send DPTZSetVieport with a the viewport created in Step 6. Verify ConstraintError response"),
             TestStep(8, "Create a valid viewport give the dimensions of the sensor and the device resolution"),
             TestStep(9, "Send DPTZSetVieport with a the viewport created in Step 9. Verify success"),
-            TestStep(10, "Modify the valid viewport so that the AR is invalid"),
+            TestStep(10, "Modify the valid viewport so that the aspect ratio is invalid"),
             TestStep(11, "Send DPTZSetVieport with a the viewport created in Step 10. Verify ConstraintError response"),
         ]
         return steps
 
     def pics_TC_AVSUM_2_7(self) -> list[str]:
         pics = [
-            "AVSUM.S", "AVSM.S"
+            "AVSUM.S", "AVSUM.S.F00", "AVSM.S"
         ]
         return pics
 
     @run_if_endpoint_matches(has_feature(Clusters.CameraAvSettingsUserLevelManagement,
-                                         Clusters.CameraAvSettingsUserLevelManagement.Bitmaps.Feature.kDigitalPTZ))
+                                         Clusters.CameraAvSettingsUserLevelManagement.Bitmaps.Feature.kDigitalPTZ) and
+                             has_cluster(Clusters.CameraAvStreamManagement))
     async def test_TC_AVSUM_2_7(self):
         clusterAVSTR = Clusters.Objects.CameraAvStreamManagement
         attributesAVSTR = clusterAVSTR.Attributes
@@ -120,7 +121,7 @@ class TC_AVSUM_2_7(MatterBaseTest, AVSUMTestBase):
         await self.send_dptz_set_viewport_command(endpoint, videoStreamID, passingviewport)
 
         self.step(10)
-        # Deliberately mess with the AR, ensure that the viewport setting fails.
+        # Deliberately mess with the aspect ratio, ensure that the viewport setting fails.
         failingviewport = Clusters.CameraAvSettingsUserLevelManagement.Structs.ViewportStruct(x1=x1, y1=viewportheight//2,
                                                                                               x2=sensordimensions.sensorWidth,
                                                                                               y2=viewportheight)
