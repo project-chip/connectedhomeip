@@ -148,7 +148,7 @@ private:
     // This performs a deep copy into mCurrentPrice so that the caller of the SetCurrentPrice can free its memory
     CHIP_ERROR CopyPrice(const DataModel::Nullable<Structs::CommodityPriceStruct::Type> & src);
 
-    // This performs a deep copy into mPriceForecast so that the caller of the SetPriceForecast can free its memory
+    // This performs a deep copy into mPriceForecast so that the caller of SetPriceForecast can free its memory
     CHIP_ERROR CopyPriceForecast(const DataModel::List<const Structs::CommodityPriceStruct::Type> & src);
 
     // Helper function to clear buffer storage
