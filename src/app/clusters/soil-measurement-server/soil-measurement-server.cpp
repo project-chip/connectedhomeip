@@ -110,14 +110,27 @@ MeasurementData * SoilMeasurementDataForEndpoint(EndpointId endpointId)
     return &gMeasurements[index];
 }
 
+CHIP_ERROR SetSoilMoistureMeasuredValue(EndpointId endpointId, const DataModel::Nullable<uint16_t> & soilMoistureMeasuredValue)
+{
+    MeasurementData * data = SoilMeasurementDataForEndpoint(endpointId);
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    data->soilMoistureMeasuredValue = soilMoistureMeasuredValue;
+
+    MatterReportingAttributeChangeCallback(endpointId, SoilMeasurement::Id, soilMoistureMeasuredValue::Id);
+
+    return CHIP_NO_ERROR;
+}
+
+// This function is intended for the application to set the soil measurement accuracy limits to the proper values during init.
+// Given the limits are fixed, it is not intended to be changes at runtime, hence why this function does not report the change.
+// The application should call this function only once during init.
 CHIP_ERROR SetSoilMeasurementAccuracy(EndpointId endpointId, const MeasurementAccuracyStruct::Type & measurementLimits)
 {
     MeasurementData * data = SoilMeasurementDataForEndpoint(endpointId);
     VerifyOrReturnError(data != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     data->soilMoistureMeasurementLimits = measurementLimits;
-
-    // MatterReportingAttributeChangeCallback(endpointId, SoilMeasurement::Id, soilMoistureMeasurementLimits::Id);
 
     return CHIP_NO_ERROR;
 }
