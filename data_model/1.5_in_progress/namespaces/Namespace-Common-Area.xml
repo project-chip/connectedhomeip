@@ -128,10 +128,10 @@ Davis, CA 95616, USA
     <tag id="0x0034" name="LivingRoom"/>
     <tag id="0x0035" name="Lounge"/>
     <tag id="0x0036" name="MediaTvRoom"/>
-    <tag id="0x0037" name="Mud Room">
+    <tag id="0x0037" name="MudRoom">
       <description>A space used to remove soiled garments prior to entering the domicile proper</description>
     </tag>
-    <tag id="0x0038" name="Music Room"/>
+    <tag id="0x0038" name="MusicRoom"/>
     <tag id="0x0039" name="Nursery"/>
     <tag id="0x003A" name="Office"/>
     <tag id="0x003B" name="OutdoorKitchen"/>
