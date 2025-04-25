@@ -524,10 +524,10 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
 
         // If the Limitation Feature is active, the closure will automatically offset the Target.Position value to fit within
         // LimitRange.Min and LimitRange.Max.
-        Structs::RangePercent100thsStruct::Type limitRange;
-
         if (mConformance.HasFeature(Feature::kLimitation))
         {
+            Structs::RangePercent100thsStruct::Type limitRange;
+            
             VerifyOrReturnError(GetLimitRange(limitRange) == CHIP_NO_ERROR, Status::Failure);
 
             if (position.Value() > limitRange.max)
