@@ -26,6 +26,18 @@ from mobly import asserts
 
 
 class TC_CNET_4_9(MatterBaseTest):
+    """
+    [TC-CNET-4.2] [Thread] Verification for attributes check [DUT-Server].
+    Example Usage:
+        To run the test case, use the following command:
+        ```bash
+        python src/python_testing/TC_CNET_4_9.py --commissioning-method ble-wifi -discriminator <discriminator> -passcode <passcode> \
+               --endpoint <endpoint_value> --wifi-ssid <wifi_ssid> --wifi-passphrase <wifi_credentials>
+        ```
+        Where `<endpoint_value>` should be replaced with the actual endpoint
+        number for the Network Commissioning cluster on the DUT.
+    """
+
     def steps_TC_CNET_4_9(self):
         return [
             TestStep("Precondition", "TH is commissioned", is_commissioning=True),
@@ -76,8 +88,28 @@ class TC_CNET_4_9(MatterBaseTest):
 
         # TH reads Networks attribute from the DUT and saves the number of entries as NumNetworks
         self.step(2)
-        networks = await self.read_single_attribute_check_success(cluster=Clusters.NetworkCommissioning, attribute=Clusters.NetworkCommissioning.Attributes.Networks)
+
+        connected_network_count = {}
+        networks_dict = await self.read_single_attribute_all_endpoints(cluster=Clusters.NetworkCommissioning, attribute=Clusters.NetworkCommissioning.Attributes.Networks)
+
+        logging.info(f"Networks by endpoint: {networks_dict}")
+
+        # Verify that there is only one connected network across all endpoints
+        for ep in networks_dict:
+            connected_network_count[ep] = sum(map(lambda x: x.connected, networks_dict[ep]))
+            logging.info(f"Connected networks count by endpoint: {connected_network_count}")
+            asserts.assert_equal(sum(connected_network_count.values()), 1,
+                                 "Verify that only one entry has connected status as TRUE across ALL endpoints")
+
+        endpoint = self.get_endpoint()
+        networks = networks_dict[endpoint]
         num_networks = len(networks)
+        current_cluster_connected = connected_network_count[endpoint] == 1
+
+        if not current_cluster_connected:
+            logging.info("Current cluster is not connected, skipping all remaining test steps")
+            self.skip_all_remaining_steps(3)
+            return
 
         userwifi_netidx = next((i for i, network in enumerate(
             networks) if network.networkID == ssid.encode("utf-8")), None)
@@ -89,26 +121,8 @@ class TC_CNET_4_9(MatterBaseTest):
         # Verify that the Networks attribute list has an entry with: Connected field value is of type bool and has the value true
         asserts.assert_true(is_valid_bool_value(networks[userwifi_netidx].connected),
                             "Network Connected attribute field is not a boolean")
-        asserts.assert_true(networks[userwifi_netidx].connected, "Network Connected attribute field is not a true")
-
-        # Verify that the connected network is the only one across all endpoints
-        networks_dict = await self.read_single_attribute_all_endpoints(cluster=Clusters.NetworkCommissioning, attribute=Clusters.NetworkCommissioning.Attributes.Networks)
-
-        logging.info(f"Networks by endpoint: {networks_dict}")
-        connected_network_count = {}
-        for ep in networks_dict:
-            connected_network_count[ep] = sum(map(lambda x: x.connected, networks_dict[ep]))
-
-        logging.info(f"Connected networks count by endpoint: {connected_network_count}")
-        asserts.assert_equal(sum(connected_network_count.values()), 1,
-                             "Verify that only one entry has connected status as TRUE across ALL endpoints")
-
-        current_cluster_connected = connected_network_count[self.get_endpoint()] == 1
-
-        if not current_cluster_connected:
-            logging.info("Current cluster is not connected, skipping all remaining test steps")
-            self.skip_all_remaining_steps()
-            return
+        asserts.assert_true(networks[userwifi_netidx].connected,
+                            "Network Connected attribute field is not a true")
 
         # TH finds the index of the Networks list entry with NetworkID field value PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and saves it as Userwifi_netidx
         self.step(3)  # Done in previous step. The value is userwifi_netidx
@@ -116,7 +130,8 @@ class TC_CNET_4_9(MatterBaseTest):
         # TH sends RemoveNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field set to 1
         self.step(4)
 
-        cmd = Clusters.NetworkCommissioning.Commands.RemoveNetwork(networkID=networks[userwifi_netidx].networkID, breadcrumb=1)
+        cmd = Clusters.NetworkCommissioning.Commands.RemoveNetwork(
+            networkID=networks[userwifi_netidx].networkID, breadcrumb=1)
         result = await self.send_single_cmd(cmd=cmd)
 
         # Verify that DUT sends NetworkConfigResponse to command with the following fields: NetworkingStatus is success and NetworkIndex is 'Userwifi_netidx'
@@ -129,20 +144,26 @@ class TC_CNET_4_9(MatterBaseTest):
 
         # TH reads Networks attribute from the DUT
         self.step(5)
-        networks_after_removal = await self.read_single_attribute_check_success(cluster=Clusters.NetworkCommissioning, attribute=Clusters.NetworkCommissioning.Attributes.Networks)
+        connected_network_count_after_removal = {}
+        networks_after_removal_dict = await self.read_single_attribute_all_endpoints(cluster=Clusters.NetworkCommissioning, attribute=Clusters.NetworkCommissioning.Attributes.Networks)
 
         # Verify that the Networks attribute list has 'NumNetworks' - 1 entries
         expected_num_networks = num_networks - 1
 
-        asserts.assert_equal(len(networks_after_removal), expected_num_networks,
-                             f"Networks attribute length is not equal as NumNetworks {expected_num_networks}")
+        logging.info(f"Networks by endpoint: {networks_after_removal_dict}")
+
+        for ep in networks_after_removal_dict:
+            connected_network_count_after_removal[ep] = sum(map(lambda x: x.connected, networks_after_removal_dict[ep]))
+            logging.info(f"Connected networks count by endpoint: {connected_network_count_after_removal}")
+            asserts.assert_equal(sum(connected_network_count_after_removal.values()), expected_num_networks,
+                                 "Verify that no entry has connected status as TRUE across ALL endpoints")
 
         # TH reads LastNetworkingStatus attribute from the DUT
         self.step(6)
         last_networking_status = await self.read_single_attribute_check_success(cluster=Clusters.NetworkCommissioning, attribute=Clusters.NetworkCommissioning.Attributes.LastNetworkingStatus)
 
         # Verify that DUT sends LastNetworkingStatus as Success which is 0 or null if 'NumNetworks' - 1 == 0 entries.
-        if len(networks_after_removal) == 0:
+        if len(networks_after_removal_dict[endpoint]) == 0:
             asserts.assert_equal(last_networking_status, NullValue,
                                  "LastNetworkingStatus should be Null when Networks list is empty")
         else:
@@ -154,7 +175,7 @@ class TC_CNET_4_9(MatterBaseTest):
         last_network_id = await self.read_single_attribute_check_success(cluster=Clusters.NetworkCommissioning, attribute=Clusters.NetworkCommissioning.Attributes.LastNetworkID)
 
         # Verify that DUT sends LastNetworkID as PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID or null if 'NumNetworks' - 1 == 0 entries.
-        if len(networks_after_removal) == 0:
+        if len(networks_after_removal_dict[endpoint]) == 0:
             asserts.assert_equal(last_network_id, NullValue, "Network ID was not Null")
         else:
             asserts.assert_equal(last_network_id, ssid, f"Network ID is {last_network_id} and not {ssid}")
@@ -197,14 +218,30 @@ class TC_CNET_4_9(MatterBaseTest):
 
         # TH reads Networks attribute from the DUT
         self.step(12)
-        networks = await self.read_single_attribute_check_success(cluster=Clusters.NetworkCommissioning, attribute=Clusters.NetworkCommissioning.Attributes.Networks)
+        connected_network_count = {}
+
+        networks_dict = await self.read_single_attribute_all_endpoints(cluster=Clusters.NetworkCommissioning, attribute=Clusters.NetworkCommissioning.Attributes.Networks)
 
         # Verify that the Networks attribute list contains 'NumNetworks' entries and has an entry with the following fields:
         # NetworkID is the hex representation of the ASCII values for PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
         # Connected is of type bool and has the value true
 
-        asserts.assert_equal(len(networks), num_networks,
-                             f"Network length is not equal to NumNetworks: {num_networks}")
+        logging.info(f"Networks by endpoint: {networks_dict}")
+
+        for ep in networks_dict:
+            connected_network_count[ep] = sum(map(lambda x: x.connected, networks_dict[ep]))
+            logging.info(f"Connected networks count by endpoint: {connected_network_count}")
+            asserts.assert_equal(sum(connected_network_count.values()), 1,
+                                 "Verify that only one entry has connected status as TRUE across ALL endpoints")
+
+        networks = networks_dict[endpoint]
+        num_networks = len(networks)
+        current_cluster_connected = connected_network_count[endpoint] == 1
+
+        if not current_cluster_connected:
+            logging.info("Current cluster is not connected, skipping all remaining test steps")
+            self.skip_all_remaining_steps(13)
+            return
 
         for network in networks:
             asserts.assert_equal(network.networkID, ssid.encode(
@@ -253,11 +290,19 @@ class TC_CNET_4_9(MatterBaseTest):
 
         # TH reads Networks attribute from the DUT
         self.step(17)
-        networks = await self.read_single_attribute_check_success(cluster=Clusters.NetworkCommissioning, attribute=Clusters.NetworkCommissioning.Attributes.Networks)
+        connected_network_count = {}
 
-        # Verify that the Networks attribute list has 'NumNetworks' - 1 entries and does NOT contain an entry with the NetworkID for PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
-        asserts.assert_equal(len(networks), num_networks - 1,
-                             f"Networks length: {len(networks)} should be {num_networks - 1}")
+        networks_dict = await self.read_single_attribute_all_endpoints(cluster=Clusters.NetworkCommissioning, attribute=Clusters.NetworkCommissioning.Attributes.Networks)
+
+        logging.info(f"Networks by endpoint: {networks_dict}")
+
+        for ep in networks_dict:
+            connected_network_count[ep] = sum(map(lambda x: x.connected, networks_dict[ep]))
+            logging.info(f"Connected networks count by endpoint: {connected_network_count}")
+            asserts.assert_equal(sum(connected_network_count.values()), num_networks - 1,
+                                 "Verify that no entry has connected status as TRUE across ALL endpoints")
+
+        networks = networks_dict[endpoint]
 
         userwifi_netidx = next((i for i, network in enumerate(
             networks) if network.networkID == ssid.encode("utf-8")), None)
@@ -285,7 +330,25 @@ class TC_CNET_4_9(MatterBaseTest):
 
         # TH reads Networks attribute from the DUT
         self.step(20)
-        networks = await self.read_single_attribute_check_success(cluster=Clusters.NetworkCommissioning, attribute=Clusters.NetworkCommissioning.Attributes.Networks)
+        connected_network_count = {}
+
+        networks_dict = await self.read_single_attribute_all_endpoints(cluster=Clusters.NetworkCommissioning, attribute=Clusters.NetworkCommissioning.Attributes.Networks)
+
+        logging.info(f"Networks by endpoint: {networks_dict}")
+
+        for ep in networks_dict:
+            connected_network_count[ep] = sum(map(lambda x: x.connected, networks_dict[ep]))
+            logging.info(f"Connected networks count by endpoint: {connected_network_count}")
+            asserts.assert_equal(sum(connected_network_count.values()), 1,
+                                 "Verify that only one entry has connected status as TRUE across ALL endpoints")
+
+        networks = networks_dict[endpoint]
+        current_cluster_connected = connected_network_count[endpoint] == 1
+
+        if not current_cluster_connected:
+            logging.info("Current cluster is not connected, skipping all remaining test steps")
+            self.skip_all_remaining_steps(21)
+            return
 
         userwifi_netidx = next((i for i, network in enumerate(
             networks) if network.networkID == ssid.encode("utf-8")), None)
