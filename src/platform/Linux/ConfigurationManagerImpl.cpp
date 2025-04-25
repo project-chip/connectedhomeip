@@ -118,6 +118,13 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         SuccessOrExit(err);
     }
 
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_ConfigurationVersion))
+    {
+        // The first boot after factory reset of the Node.
+        err = StoreConfigurationVersion(1);
+        SuccessOrExit(err);
+    }
+
     err = CHIP_NO_ERROR;
 
 exit:
@@ -143,13 +150,13 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
     {
         if ((addr->ifa_addr) && (addr->ifa_addr->sa_family == AF_PACKET))
         {
-            if (strncmp(addr->ifa_name, CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME, IFNAMSIZ) == 0)
+            if (strncmp(addr->ifa_name, CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME, Inet::InterfaceId::kMaxIfNameLength) == 0)
             {
                 mac = (struct sockaddr_ll *) addr->ifa_addr;
                 break;
             }
 
-            if (strncmp(addr->ifa_name, "lo", IFNAMSIZ) != 0 && !mac)
+            if (strncmp(addr->ifa_name, "lo", Inet::InterfaceId::kMaxIfNameLength) != 0 && !mac)
             {
                 mac = (struct sockaddr_ll *) addr->ifa_addr;
             }
@@ -374,6 +381,16 @@ CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
     }
 
     return err;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetConfigurationVersion(uint32_t & configurationVersion)
+{
+    return ReadConfigValue(PosixConfig::kConfigKey_ConfigurationVersion, configurationVersion);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreConfigurationVersion(uint32_t configurationVersion)
+{
+    return WriteConfigValue(PosixConfig::kConfigKey_ConfigurationVersion, configurationVersion);
 }
 
 ConfigurationManager & ConfigurationMgrImpl()

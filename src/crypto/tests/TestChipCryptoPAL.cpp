@@ -325,7 +325,7 @@ TEST_F(TestChipCryptoPAL, TestAES_CTR_128CryptTestVectors)
 TEST_F(TestChipCryptoPAL, TestAES_CCM_128EncryptTestVectors)
 {
     HeapChecker heapChecker;
-    int numOfTestVectors = ArraySize(ccm_128_test_vectors);
+    int numOfTestVectors = MATTER_ARRAY_SIZE(ccm_128_test_vectors);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
@@ -369,7 +369,7 @@ TEST_F(TestChipCryptoPAL, TestAES_CCM_128EncryptTestVectors)
 TEST_F(TestChipCryptoPAL, TestAES_CCM_128DecryptTestVectors)
 {
     HeapChecker heapChecker;
-    int numOfTestVectors = ArraySize(ccm_128_test_vectors);
+    int numOfTestVectors = MATTER_ARRAY_SIZE(ccm_128_test_vectors);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
@@ -404,7 +404,7 @@ TEST_F(TestChipCryptoPAL, TestAES_CCM_128DecryptTestVectors)
 TEST_F(TestChipCryptoPAL, TestAES_CCM_128EncryptInvalidNonceLen)
 {
     HeapChecker heapChecker;
-    int numOfTestVectors = ArraySize(ccm_128_test_vectors);
+    int numOfTestVectors = MATTER_ARRAY_SIZE(ccm_128_test_vectors);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
@@ -433,7 +433,7 @@ TEST_F(TestChipCryptoPAL, TestAES_CCM_128EncryptInvalidNonceLen)
 TEST_F(TestChipCryptoPAL, TestAES_CCM_128EncryptInvalidTagLen)
 {
     HeapChecker heapChecker;
-    int numOfTestVectors = ArraySize(ccm_128_test_vectors);
+    int numOfTestVectors = MATTER_ARRAY_SIZE(ccm_128_test_vectors);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
@@ -462,7 +462,7 @@ TEST_F(TestChipCryptoPAL, TestAES_CCM_128EncryptInvalidTagLen)
 TEST_F(TestChipCryptoPAL, TestAES_CCM_128DecryptInvalidNonceLen)
 {
     HeapChecker heapChecker;
-    int numOfTestVectors = ArraySize(ccm_128_test_vectors);
+    int numOfTestVectors = MATTER_ARRAY_SIZE(ccm_128_test_vectors);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
@@ -563,7 +563,7 @@ TEST_F(TestChipCryptoPAL, TestAsn1Conversions)
     static_assert(sizeof(kDerSigConvDerCase4) == (sizeof(kDerSigConvRawCase4) + chip::Crypto::kMax_ECDSA_X9Dot62_Asn1_Overhead),
                   "kDerSigConvDerCase4 must have worst case overhead");
 
-    int numOfTestVectors = ArraySize(kDerSigConvTestVectors);
+    int numOfTestVectors = MATTER_ARRAY_SIZE(kDerSigConvTestVectors);
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
         const der_sig_conv_vector * vector = &kDerSigConvTestVectors[vectorIndex];
@@ -601,7 +601,7 @@ TEST_F(TestChipCryptoPAL, TestAsn1Conversions)
 TEST_F(TestChipCryptoPAL, TestRawIntegerToDerValidCases)
 {
     HeapChecker heapChecker;
-    int numOfTestCases = ArraySize(kRawIntegerToDerVectors);
+    int numOfTestCases = MATTER_ARRAY_SIZE(kRawIntegerToDerVectors);
 
     for (int testIdx = 0; testIdx < numOfTestCases; testIdx++)
     {
@@ -810,7 +810,7 @@ TEST_F(TestChipCryptoPAL, TestReadDerLengthInvalidCases)
 TEST_F(TestChipCryptoPAL, TestHash_SHA256)
 {
     HeapChecker heapChecker;
-    unsigned int numOfTestCases     = ArraySize(hash_sha256_test_vectors);
+    unsigned int numOfTestCases     = MATTER_ARRAY_SIZE(hash_sha256_test_vectors);
     unsigned int numOfTestsExecuted = 0;
 
     for (numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
@@ -821,13 +821,13 @@ TEST_F(TestChipCryptoPAL, TestHash_SHA256)
         bool success = memcmp(v.hash, out_buffer, sizeof(out_buffer)) == 0;
         EXPECT_TRUE(success);
     }
-    EXPECT_EQ(numOfTestsExecuted, ArraySize(hash_sha256_test_vectors));
+    EXPECT_EQ(numOfTestsExecuted, MATTER_ARRAY_SIZE(hash_sha256_test_vectors));
 }
 
 TEST_F(TestChipCryptoPAL, TestHash_SHA256_Stream)
 {
     HeapChecker heapChecker;
-    unsigned int numOfTestCases     = ArraySize(hash_sha256_test_vectors);
+    unsigned int numOfTestCases     = MATTER_ARRAY_SIZE(hash_sha256_test_vectors);
     unsigned int numOfTestsExecuted = 0;
     CHIP_ERROR error                = CHIP_NO_ERROR;
 
@@ -867,7 +867,7 @@ TEST_F(TestChipCryptoPAL, TestHash_SHA256_Stream)
         EXPECT_TRUE(success);
     }
 
-    EXPECT_EQ(numOfTestsExecuted, ArraySize(hash_sha256_test_vectors));
+    EXPECT_EQ(numOfTestsExecuted, MATTER_ARRAY_SIZE(hash_sha256_test_vectors));
 
     // Test partial digests
     uint8_t source_buf[2 * kSHA256_Hash_Length];
@@ -955,7 +955,7 @@ TEST_F(TestChipCryptoPAL, TestHash_SHA256_Stream)
 TEST_F(TestChipCryptoPAL, TestHMAC_SHA256_RawKey)
 {
     HeapChecker heapChecker;
-    int numOfTestCases     = ArraySize(hmac_sha256_test_vectors_raw_key);
+    int numOfTestCases     = MATTER_ARRAY_SIZE(hmac_sha256_test_vectors_raw_key);
     int numOfTestsExecuted = 0;
     TestHMAC_sha mHMAC;
 
@@ -977,7 +977,7 @@ TEST_F(TestChipCryptoPAL, TestHMAC_SHA256_RawKey)
 TEST_F(TestChipCryptoPAL, TestHMAC_SHA256_KeyHandle)
 {
     HeapChecker heapChecker;
-    int numOfTestCases     = ArraySize(hmac_sha256_test_vectors_key_handle);
+    int numOfTestCases     = MATTER_ARRAY_SIZE(hmac_sha256_test_vectors_key_handle);
     int numOfTestsExecuted = 0;
     TestHMAC_sha mHMAC;
 
@@ -1009,7 +1009,7 @@ TEST_F(TestChipCryptoPAL, TestHMAC_SHA256_KeyHandle)
 TEST_F(TestChipCryptoPAL, TestHKDF_SHA256)
 {
     HeapChecker heapChecker;
-    int numOfTestCases     = ArraySize(hkdf_sha256_test_vectors);
+    int numOfTestCases     = MATTER_ARRAY_SIZE(hkdf_sha256_test_vectors);
     int numOfTestsExecuted = 0;
     TestHKDF_sha mHKDF;
 
@@ -1299,7 +1299,7 @@ TEST_F(TestChipCryptoPAL, TestAddEntropySources)
 TEST_F(TestChipCryptoPAL, TestPBKDF2_SHA256_TestVectors)
 {
     HeapChecker heapChecker;
-    int numOfTestVectors = ArraySize(pbkdf2_sha256_test_vectors);
+    int numOfTestVectors = MATTER_ARRAY_SIZE(pbkdf2_sha256_test_vectors);
     int numOfTestsRan    = 0;
     TestPBKDF2_sha256 pbkdf1;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
@@ -1558,14 +1558,14 @@ TEST_F(TestChipCryptoPAL, TestCSR_GenByKeypair)
 
     Test_P256Keypair keypair;
     EXPECT_EQ(keypair.Initialize(ECPKeyTarget::ECDSA), CHIP_NO_ERROR);
-    EXPECT_EQ(keypair.NewCertificateSigningRequest(csr, length), CHIP_NO_ERROR);
-    EXPECT_GT(length, 0u);
+    ASSERT_EQ(keypair.NewCertificateSigningRequest(csr, length), CHIP_NO_ERROR);
+    ASSERT_GT(length, 2u);
 
     P256PublicKey pubkey;
     CHIP_ERROR err = VerifyCertificateSigningRequest(csr, length, pubkey);
     if (err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
     {
-        EXPECT_EQ(err, CHIP_NO_ERROR);
+        ASSERT_EQ(err, CHIP_NO_ERROR);
         EXPECT_EQ(pubkey.Length(), kP256_PublicKey_Length);
         EXPECT_EQ(memcmp(pubkey.ConstBytes(), keypair.Pubkey().ConstBytes(), pubkey.Length()), 0);
 
@@ -1611,7 +1611,7 @@ TEST_F(TestChipCryptoPAL, TestSPAKE2P_spake2p_FEMul)
     HeapChecker heapChecker;
     uint8_t fe_out[kMAX_FE_Length];
 
-    int numOfTestVectors = ArraySize(fe_mul_tvs);
+    int numOfTestVectors = MATTER_ARRAY_SIZE(fe_mul_tvs);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
@@ -1646,7 +1646,7 @@ TEST_F(TestChipCryptoPAL, TestSPAKE2P_spake2p_FELoadWrite)
     HeapChecker heapChecker;
     uint8_t fe_out[kMAX_FE_Length];
 
-    int numOfTestVectors = ArraySize(fe_rw_tvs);
+    int numOfTestVectors = MATTER_ARRAY_SIZE(fe_rw_tvs);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
@@ -1676,7 +1676,7 @@ TEST_F(TestChipCryptoPAL, TestSPAKE2P_spake2p_Mac)
     uint8_t mac[kMAX_Hash_Length];
     MutableByteSpan mac_span{ mac };
 
-    int numOfTestVectors = ArraySize(hmac_tvs);
+    int numOfTestVectors = MATTER_ARRAY_SIZE(hmac_tvs);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
@@ -1707,7 +1707,7 @@ TEST_F(TestChipCryptoPAL, TestSPAKE2P_spake2p_PointMul)
     uint8_t output[kMAX_Point_Length];
     size_t out_len = sizeof(output);
 
-    int numOfTestVectors = ArraySize(point_mul_tvs);
+    int numOfTestVectors = MATTER_ARRAY_SIZE(point_mul_tvs);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
@@ -1745,7 +1745,7 @@ TEST_F(TestChipCryptoPAL, TestSPAKE2P_spake2p_PointMulAdd)
     uint8_t output[kMAX_Point_Length];
     size_t out_len = sizeof(output);
 
-    int numOfTestVectors = ArraySize(point_muladd_tvs);
+    int numOfTestVectors = MATTER_ARRAY_SIZE(point_muladd_tvs);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
@@ -1789,7 +1789,7 @@ TEST_F(TestChipCryptoPAL, TestSPAKE2P_spake2p_PointLoadWrite)
     uint8_t output[kMAX_Point_Length];
     size_t out_len = sizeof(output);
 
-    int numOfTestVectors = ArraySize(point_rw_tvs);
+    int numOfTestVectors = MATTER_ARRAY_SIZE(point_rw_tvs);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
@@ -1818,7 +1818,7 @@ TEST_F(TestChipCryptoPAL, TestSPAKE2P_spake2p_PointLoadWrite)
 TEST_F(TestChipCryptoPAL, TestSPAKE2P_spake2p_PointIsValid)
 {
     HeapChecker heapChecker;
-    int numOfTestVectors = ArraySize(point_valid_tvs);
+    int numOfTestVectors = MATTER_ARRAY_SIZE(point_valid_tvs);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
@@ -1882,7 +1882,7 @@ TEST_F(TestChipCryptoPAL, TestSPAKE2P_RFC)
     uint8_t Vverifier[kMAX_Hash_Length];
     size_t Vverifier_len = sizeof(Vverifier);
 
-    int numOfTestVectors = ArraySize(rfc_tvs);
+    int numOfTestVectors = MATTER_ARRAY_SIZE(rfc_tvs);
     int numOfTestsRan    = 0;
     // static_assert(sizeof(Spake2p_Context) < 1024, "Allocate more bytes for Spake2p Context");
     // printf("Sizeof spake2pcontext %lu\n", sizeof(Spake2p_Context));
@@ -2878,14 +2878,14 @@ TEST_F(TestChipCryptoPAL, TestX509_ReplaceCertIfResignedCertFound)
     const TestCase kTestCases[] = {
         { sTestCert_PAI_FFF2_8001_Cert, nullptr, 5, sTestCert_PAI_FFF2_8001_Cert },
         { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList3, 0, sTestCert_PAI_FFF2_8001_Cert },
-        { sTestCert_PAI_FFF1_8000_Cert, TestCandidateCertsList1, ArraySize(TestCandidateCertsList1), sTestCert_PAI_FFF1_8000_Cert },
-        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList2, ArraySize(TestCandidateCertsList2), sTestCert_PAI_FFF2_8001_Cert },
-        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList3, ArraySize(TestCandidateCertsList3), sTestCert_PAI_FFF2_8001_Resigned_Cert },
-        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList4, ArraySize(TestCandidateCertsList4), sTestCert_PAI_FFF2_8001_Resigned_Cert },
-        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList5, ArraySize(TestCandidateCertsList5), sTestCert_PAI_FFF2_8001_Cert },
-        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList6, ArraySize(TestCandidateCertsList6), sTestCert_PAI_FFF2_8001_Cert },
-        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList7, ArraySize(TestCandidateCertsList7), sTestCert_PAI_FFF2_8001_Resigned_Cert },
-        { sTestCert_PAI_FFF2_NoPID_Cert, TestCandidateCertsList7, ArraySize(TestCandidateCertsList7), sTestCert_PAI_FFF2_NoPID_Resigned_Cert },
+        { sTestCert_PAI_FFF1_8000_Cert, TestCandidateCertsList1, MATTER_ARRAY_SIZE(TestCandidateCertsList1), sTestCert_PAI_FFF1_8000_Cert },
+        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList2, MATTER_ARRAY_SIZE(TestCandidateCertsList2), sTestCert_PAI_FFF2_8001_Cert },
+        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList3, MATTER_ARRAY_SIZE(TestCandidateCertsList3), sTestCert_PAI_FFF2_8001_Resigned_Cert },
+        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList4, MATTER_ARRAY_SIZE(TestCandidateCertsList4), sTestCert_PAI_FFF2_8001_Resigned_Cert },
+        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList5, MATTER_ARRAY_SIZE(TestCandidateCertsList5), sTestCert_PAI_FFF2_8001_Cert },
+        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList6, MATTER_ARRAY_SIZE(TestCandidateCertsList6), sTestCert_PAI_FFF2_8001_Cert },
+        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList7, MATTER_ARRAY_SIZE(TestCandidateCertsList7), sTestCert_PAI_FFF2_8001_Resigned_Cert },
+        { sTestCert_PAI_FFF2_NoPID_Cert, TestCandidateCertsList7, MATTER_ARRAY_SIZE(TestCandidateCertsList7), sTestCert_PAI_FFF2_NoPID_Resigned_Cert },
     };
     // clang-format on
 
@@ -2902,16 +2902,16 @@ TEST_F(TestChipCryptoPAL, TestX509_ReplaceCertIfResignedCertFound)
     // Error case: invalid input argument for referenceCertificate
     {
         ByteSpan outCert;
-        CHIP_ERROR result =
-            ReplaceCertIfResignedCertFound(ByteSpan(), TestCandidateCertsList7, ArraySize(TestCandidateCertsList7), outCert);
+        CHIP_ERROR result = ReplaceCertIfResignedCertFound(ByteSpan(), TestCandidateCertsList7,
+                                                           MATTER_ARRAY_SIZE(TestCandidateCertsList7), outCert);
         EXPECT_EQ(result, CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     // Error case: invalid input argument for one of the certificates in the candidateCertificates list
     {
         ByteSpan outCert;
-        CHIP_ERROR result =
-            ReplaceCertIfResignedCertFound(ByteSpan(), TestCandidateCertsList8, ArraySize(TestCandidateCertsList8), outCert);
+        CHIP_ERROR result = ReplaceCertIfResignedCertFound(ByteSpan(), TestCandidateCertsList8,
+                                                           MATTER_ARRAY_SIZE(TestCandidateCertsList8), outCert);
         EXPECT_EQ(result, CHIP_ERROR_INVALID_ARGUMENT);
     }
 }
@@ -3016,4 +3016,226 @@ TEST_F(TestChipCryptoPAL, TestGroup_PrivacyKeyDerivation)
     encryption_key = ByteSpan(kGroupOperationalKey3, sizeof(kGroupOperationalKey3));
     EXPECT_EQ(CHIP_NO_ERROR, DeriveGroupPrivacyKey(encryption_key, privacy_key));
     EXPECT_EQ(0, memcmp(privacy_key.data(), kGroupPrivacyKey3, sizeof(kGroupPrivacyKey3)));
+}
+
+// Test vectors for this come from Matter Spec test vectors (Matter spec Appendix F.5).
+TEST_F(TestChipCryptoPAL, GenerateVendorFabricBindingMessageWorks)
+{
+    const uint8_t kSomePublicKeyBytes[] = { 0x04, 0xd5, 0x9f, 0x3e, 0xb0, 0xb9, 0xc2, 0x16, 0xa4, 0x6f, 0x04, 0x0a, 0xff,
+                                            0xdf, 0xd5, 0x58, 0x17, 0xca, 0x8a, 0x3d, 0xc9, 0x21, 0xaa, 0x62, 0x4d, 0xa5,
+                                            0x16, 0x8b, 0xa9, 0x07, 0x66, 0xd7, 0x3b, 0xf0, 0x8e, 0x48, 0x0c, 0xd0, 0xf5,
+                                            0xcc, 0x94, 0x65, 0x3a, 0x92, 0xd7, 0x77, 0x19, 0xd9, 0xb0, 0x04, 0x74, 0x7d,
+                                            0x5f, 0x7d, 0xa3, 0x9d, 0xed, 0xb6, 0x7e, 0xc5, 0x4f, 0x7c, 0xbc, 0x6a, 0xde };
+
+    Crypto::P256PublicKey rootPublicKey(kSomePublicKeyBytes);
+    FabricId kFabricId = 0x1122334455667788ULL;
+    uint16_t kVendorId = 0xFFF1U;
+
+    // Try with invalid FabricBinding version.
+    {
+        uint8_t bigEnoughBuffer[Crypto::kVendorFabricBindingMessageV1Size];
+        MutableByteSpan vendorFabricBindingMessage{ bigEnoughBuffer };
+        EXPECT_EQ(GenerateVendorFabricBindingMessage(static_cast<Crypto::FabricBindingVersion>(123u), rootPublicKey, kFabricId,
+                                                     kVendorId, vendorFabricBindingMessage),
+                  CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // Try with buffer too small.
+    {
+        uint8_t bufferTooSmall[Crypto::kVendorFabricBindingMessageV1Size - 1];
+        MutableByteSpan bufferTooSmallSpan{ bufferTooSmall };
+        EXPECT_EQ(GenerateVendorFabricBindingMessage(Crypto::FabricBindingVersion::kVersion1, rootPublicKey, kFabricId, kVendorId,
+                                                     bufferTooSmallSpan),
+                  CHIP_ERROR_BUFFER_TOO_SMALL);
+    }
+
+    // Try with a correct set of arguments, expect success and matching payload.
+    {
+        const uint8_t kExpectedFabricBindingMessage[] = {
+            0x01, 0x04, 0xd5, 0x9f, 0x3e, 0xb0, 0xb9, 0xc2, 0x16, 0xa4, 0x6f, 0x04, 0x0a, 0xff, 0xdf, 0xd5, 0x58, 0x17, 0xca,
+            0x8a, 0x3d, 0xc9, 0x21, 0xaa, 0x62, 0x4d, 0xa5, 0x16, 0x8b, 0xa9, 0x07, 0x66, 0xd7, 0x3b, 0xf0, 0x8e, 0x48, 0x0c,
+            0xd0, 0xf5, 0xcc, 0x94, 0x65, 0x3a, 0x92, 0xd7, 0x77, 0x19, 0xd9, 0xb0, 0x04, 0x74, 0x7d, 0x5f, 0x7d, 0xa3, 0x9d,
+            0xed, 0xb6, 0x7e, 0xc5, 0x4f, 0x7c, 0xbc, 0x6a, 0xde, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0xff, 0xf1
+        };
+
+        uint8_t bigEnoughBuffer[Crypto::kVendorFabricBindingMessageV1Size + 1];
+        MutableByteSpan vendorFabricBindingMessage{ bigEnoughBuffer };
+        EXPECT_EQ(GenerateVendorFabricBindingMessage(Crypto::FabricBindingVersion::kVersion1, rootPublicKey, kFabricId, kVendorId,
+                                                     vendorFabricBindingMessage),
+                  CHIP_NO_ERROR);
+        EXPECT_TRUE(vendorFabricBindingMessage.data_equal(ByteSpan{ kExpectedFabricBindingMessage }));
+    }
+}
+
+// Test vectors for this come from Matter Spec test vectors (Matter spec Appendix F.5).
+TEST_F(TestChipCryptoPAL, GenerateVendorIdVerificationToBeSignedWorks)
+{
+    FabricIndex kFabricIndex = 5u;
+
+    const uint8_t kVendorFabricBindingMessage[76] = {
+        0x01, 0x04, 0xd5, 0x9f, 0x3e, 0xb0, 0xb9, 0xc2, 0x16, 0xa4, 0x6f, 0x04, 0x0a, 0xff, 0xdf, 0xd5, 0x58, 0x17, 0xca,
+        0x8a, 0x3d, 0xc9, 0x21, 0xaa, 0x62, 0x4d, 0xa5, 0x16, 0x8b, 0xa9, 0x07, 0x66, 0xd7, 0x3b, 0xf0, 0x8e, 0x48, 0x0c,
+        0xd0, 0xf5, 0xcc, 0x94, 0x65, 0x3a, 0x92, 0xd7, 0x77, 0x19, 0xd9, 0xb0, 0x04, 0x74, 0x7d, 0x5f, 0x7d, 0xa3, 0x9d,
+        0xed, 0xb6, 0x7e, 0xc5, 0x4f, 0x7c, 0xbc, 0x6a, 0xde, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0xff, 0xf1,
+    };
+    ByteSpan kVendorFabricBindingMessageSpan{ kVendorFabricBindingMessage };
+
+    const uint8_t kVidVerificationStatementSample[85] = {
+        0x21, 0xfa, 0xc0, 0xe7, 0xd0, 0x08, 0x94, 0x73, 0xf1, 0x5c, 0x2d, 0xfe, 0xfe, 0x54, 0x6f, 0xff, 0xa0,
+        0xb0, 0x0a, 0x8b, 0xb2, 0x32, 0x32, 0x84, 0xaf, 0x77, 0x38, 0xf9, 0xb3, 0x21, 0xd0, 0x0b, 0xbf, 0x2b,
+        0xff, 0x94, 0x2c, 0x82, 0x15, 0xc4, 0x98, 0xdf, 0xdd, 0xb1, 0xb6, 0x6b, 0x34, 0xfb, 0xd7, 0xdb, 0x31,
+        0x8a, 0xd7, 0x54, 0x82, 0x9c, 0xd5, 0xca, 0x1d, 0x9c, 0xf5, 0x3b, 0xeb, 0x2c, 0x93, 0x57, 0x1a, 0xf3,
+        0x52, 0x57, 0xee, 0xad, 0x67, 0x14, 0xf6, 0x8e, 0x91, 0x0f, 0x7b, 0xb7, 0xac, 0x9a, 0x90, 0x9a, 0x72,
+    };
+    ByteSpan kVidVerificationStatementSampleSpan{ kVidVerificationStatementSample };
+
+    const uint8_t kAttestationChallenge1[16] = {
+        0x90, 0x4b, 0x82, 0xe6, 0x6e, 0x98, 0x57, 0x85, 0xb4, 0xa3, 0xff, 0x18, 0xc2, 0x59, 0x47, 0xf3,
+    };
+    ByteSpan kAttestationChallengeSpan1{ kAttestationChallenge1 };
+
+    const uint8_t kClientChallenge1[32] = {
+        0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xaf, 0xb0,
+        0xb1, 0xb2, 0xb3, 0xb4, 0xb5, 0xb6, 0xb7, 0xb8, 0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf, 0xc0,
+    };
+    ByteSpan kClientChallengeSpan1{ kClientChallenge1 };
+
+    // Try with buffer too small.
+    {
+        uint8_t smallBuffer[Crypto::kVendorIdVerificationTbsV1MaxSize - 1];
+        MutableByteSpan vendorIdVerificationTbsTooSmall{ smallBuffer };
+
+        EXPECT_EQ(GenerateVendorIdVerificationToBeSigned(kFabricIndex, kClientChallengeSpan1, kAttestationChallengeSpan1,
+                                                         kVendorFabricBindingMessageSpan, kVidVerificationStatementSampleSpan,
+                                                         vendorIdVerificationTbsTooSmall),
+                  CHIP_ERROR_BUFFER_TOO_SMALL);
+    }
+
+    // Try with invalid FabricBinding version.
+    {
+        const uint8_t kVendorFabricBindingMessageBadVersion[76] = {
+            0x55, 0x04, 0xd5, 0x9f, 0x3e, 0xb0, 0xb9, 0xc2, 0x16, 0xa4, 0x6f, 0x04, 0x0a, 0xff, 0xdf, 0xd5, 0x58, 0x17, 0xca,
+            0x8a, 0x3d, 0xc9, 0x21, 0xaa, 0x62, 0x4d, 0xa5, 0x16, 0x8b, 0xa9, 0x07, 0x66, 0xd7, 0x3b, 0xf0, 0x8e, 0x48, 0x0c,
+            0xd0, 0xf5, 0xcc, 0x94, 0x65, 0x3a, 0x92, 0xd7, 0x77, 0x19, 0xd9, 0xb0, 0x04, 0x74, 0x7d, 0x5f, 0x7d, 0xa3, 0x9d,
+            0xed, 0xb6, 0x7e, 0xc5, 0x4f, 0x7c, 0xbc, 0x6a, 0xde, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0xff, 0xf1,
+        };
+
+        uint8_t bigEnoughBuffer[Crypto::kVendorIdVerificationTbsV1MaxSize];
+        MutableByteSpan vendorIdVerificationTbs{ bigEnoughBuffer };
+
+        EXPECT_EQ(GenerateVendorIdVerificationToBeSigned(kFabricIndex, kClientChallengeSpan1, kAttestationChallengeSpan1,
+                                                         ByteSpan{ kVendorFabricBindingMessageBadVersion },
+                                                         kVidVerificationStatementSampleSpan, vendorIdVerificationTbs),
+                  CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // Try with invalid attestation challenge size.
+    {
+        uint8_t bigEnoughBuffer[Crypto::kVendorIdVerificationTbsV1MaxSize];
+        MutableByteSpan vendorIdVerificationTbs{ bigEnoughBuffer };
+
+        ByteSpan kAttestationChallengeWrongSize{ kAttestationChallengeSpan1.data(), kAttestationChallengeSpan1.size() - 1 };
+        EXPECT_EQ(GenerateVendorIdVerificationToBeSigned(kFabricIndex, kClientChallengeSpan1, kAttestationChallengeWrongSize,
+                                                         kVendorFabricBindingMessageSpan, kVidVerificationStatementSampleSpan,
+                                                         vendorIdVerificationTbs),
+                  CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // Try with invalid client challenge size.
+    {
+        uint8_t bigEnoughBuffer[Crypto::kVendorIdVerificationTbsV1MaxSize];
+        MutableByteSpan vendorIdVerificationTbs{ bigEnoughBuffer };
+
+        ByteSpan kClientChallengeWrongSize{ kClientChallengeSpan1.data(), kClientChallengeSpan1.size() - 1 };
+        EXPECT_EQ(GenerateVendorIdVerificationToBeSigned(kFabricIndex, kClientChallengeWrongSize, kAttestationChallengeSpan1,
+                                                         kVendorFabricBindingMessageSpan, kVidVerificationStatementSampleSpan,
+                                                         vendorIdVerificationTbs),
+                  CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // Try with invalid client challenge size.
+    {
+        uint8_t bigEnoughBuffer[Crypto::kVendorIdVerificationTbsV1MaxSize];
+        MutableByteSpan vendorIdVerificationTbs{ bigEnoughBuffer };
+
+        ByteSpan kClientChallengeWrongSize{ kClientChallengeSpan1.data(), kClientChallengeSpan1.size() - 1 };
+        EXPECT_EQ(GenerateVendorIdVerificationToBeSigned(kFabricIndex, kClientChallengeWrongSize, kAttestationChallengeSpan1,
+                                                         kVendorFabricBindingMessageSpan, kVidVerificationStatementSampleSpan,
+                                                         vendorIdVerificationTbs),
+                  CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // Try with fabric binding message that is empty (invalid).
+    {
+        uint8_t bigEnoughBuffer[Crypto::kVendorIdVerificationTbsV1MaxSize];
+        MutableByteSpan vendorIdVerificationTbs{ bigEnoughBuffer };
+
+        ByteSpan kEmptyVendorFabricBindingMessageSpan{};
+        EXPECT_EQ(GenerateVendorIdVerificationToBeSigned(kFabricIndex, kClientChallengeSpan1, kAttestationChallengeSpan1,
+                                                         kEmptyVendorFabricBindingMessageSpan, kVidVerificationStatementSampleSpan,
+                                                         vendorIdVerificationTbs),
+                  CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // Success case without VidVerificationStatement.
+    {
+        const uint8_t kExpectedVendorIdVerificationTbs[126] = {
+            0x01, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xaf, 0xb0, 0xb1,
+            0xb2, 0xb3, 0xb4, 0xb5, 0xb6, 0xb7, 0xb8, 0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf, 0xc0, 0x90, 0x4b, 0x82,
+            0xe6, 0x6e, 0x98, 0x57, 0x85, 0xb4, 0xa3, 0xff, 0x18, 0xc2, 0x59, 0x47, 0xf3, 0x05, 0x01, 0x04, 0xd5, 0x9f,
+            0x3e, 0xb0, 0xb9, 0xc2, 0x16, 0xa4, 0x6f, 0x04, 0x0a, 0xff, 0xdf, 0xd5, 0x58, 0x17, 0xca, 0x8a, 0x3d, 0xc9,
+            0x21, 0xaa, 0x62, 0x4d, 0xa5, 0x16, 0x8b, 0xa9, 0x07, 0x66, 0xd7, 0x3b, 0xf0, 0x8e, 0x48, 0x0c, 0xd0, 0xf5,
+            0xcc, 0x94, 0x65, 0x3a, 0x92, 0xd7, 0x77, 0x19, 0xd9, 0xb0, 0x04, 0x74, 0x7d, 0x5f, 0x7d, 0xa3, 0x9d, 0xed,
+            0xb6, 0x7e, 0xc5, 0x4f, 0x7c, 0xbc, 0x6a, 0xde, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0xff, 0xf1,
+        };
+        ByteSpan kExpectedVendorIdVerificationTbsSpan{ kExpectedVendorIdVerificationTbs };
+
+        uint8_t bigEnoughBuffer[Crypto::kVendorIdVerificationTbsV1MaxSize];
+        MutableByteSpan vendorIdVerificationTbs{ bigEnoughBuffer };
+
+        ByteSpan kEmptyVidVerificationStatementSpan{};
+        EXPECT_EQ(GenerateVendorIdVerificationToBeSigned(kFabricIndex, kClientChallengeSpan1, kAttestationChallengeSpan1,
+                                                         kVendorFabricBindingMessageSpan, kEmptyVidVerificationStatementSpan,
+                                                         vendorIdVerificationTbs),
+                  CHIP_NO_ERROR);
+        EXPECT_TRUE(vendorIdVerificationTbs.data_equal(kExpectedVendorIdVerificationTbsSpan));
+    }
+
+    // Success case with VidVerificationStatement.
+    {
+        const uint8_t kExpectedVendorIdVerificationTbs[211] = {
+            0x01, 0xc1, 0xc2, 0xc3, 0xc4, 0xc5, 0xc6, 0xc7, 0xc8, 0xc9, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf, 0xd0, 0xd1, 0xd2, 0xd3,
+            0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf, 0xe0, 0x14, 0x5f, 0x2e, 0xf3, 0x9e, 0x3e, 0x4f,
+            0xfc, 0xf5, 0x64, 0x9c, 0x09, 0x09, 0xcb, 0xc8, 0xe4, 0x05, 0x01, 0x04, 0xd5, 0x9f, 0x3e, 0xb0, 0xb9, 0xc2, 0x16, 0xa4,
+            0x6f, 0x04, 0x0a, 0xff, 0xdf, 0xd5, 0x58, 0x17, 0xca, 0x8a, 0x3d, 0xc9, 0x21, 0xaa, 0x62, 0x4d, 0xa5, 0x16, 0x8b, 0xa9,
+            0x07, 0x66, 0xd7, 0x3b, 0xf0, 0x8e, 0x48, 0x0c, 0xd0, 0xf5, 0xcc, 0x94, 0x65, 0x3a, 0x92, 0xd7, 0x77, 0x19, 0xd9, 0xb0,
+            0x04, 0x74, 0x7d, 0x5f, 0x7d, 0xa3, 0x9d, 0xed, 0xb6, 0x7e, 0xc5, 0x4f, 0x7c, 0xbc, 0x6a, 0xde, 0x11, 0x22, 0x33, 0x44,
+            0x55, 0x66, 0x77, 0x88, 0xff, 0xf1, 0x21, 0xfa, 0xc0, 0xe7, 0xd0, 0x08, 0x94, 0x73, 0xf1, 0x5c, 0x2d, 0xfe, 0xfe, 0x54,
+            0x6f, 0xff, 0xa0, 0xb0, 0x0a, 0x8b, 0xb2, 0x32, 0x32, 0x84, 0xaf, 0x77, 0x38, 0xf9, 0xb3, 0x21, 0xd0, 0x0b, 0xbf, 0x2b,
+            0xff, 0x94, 0x2c, 0x82, 0x15, 0xc4, 0x98, 0xdf, 0xdd, 0xb1, 0xb6, 0x6b, 0x34, 0xfb, 0xd7, 0xdb, 0x31, 0x8a, 0xd7, 0x54,
+            0x82, 0x9c, 0xd5, 0xca, 0x1d, 0x9c, 0xf5, 0x3b, 0xeb, 0x2c, 0x93, 0x57, 0x1a, 0xf3, 0x52, 0x57, 0xee, 0xad, 0x67, 0x14,
+            0xf6, 0x8e, 0x91, 0x0f, 0x7b, 0xb7, 0xac, 0x9a, 0x90, 0x9a, 0x72,
+        };
+        ByteSpan kExpectedVendorIdVerificationTbsSpan{ kExpectedVendorIdVerificationTbs };
+
+        const uint8_t kAttestationChallenge2[16] = {
+            0x14, 0x5f, 0x2e, 0xf3, 0x9e, 0x3e, 0x4f, 0xfc, 0xf5, 0x64, 0x9c, 0x09, 0x09, 0xcb, 0xc8, 0xe4,
+        };
+        ByteSpan kAttestationChallengeSpan2{ kAttestationChallenge2 };
+
+        const uint8_t kClientChallenge2[32] = {
+            0xc1, 0xc2, 0xc3, 0xc4, 0xc5, 0xc6, 0xc7, 0xc8, 0xc9, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf, 0xd0,
+            0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf, 0xe0,
+        };
+        ByteSpan kClientChallengeSpan2{ kClientChallenge2 };
+
+        uint8_t bigEnoughBuffer[Crypto::kVendorIdVerificationTbsV1MaxSize];
+        MutableByteSpan vendorIdVerificationTbs{ bigEnoughBuffer };
+
+        EXPECT_EQ(GenerateVendorIdVerificationToBeSigned(kFabricIndex, kClientChallengeSpan2, kAttestationChallengeSpan2,
+                                                         kVendorFabricBindingMessageSpan, kVidVerificationStatementSampleSpan,
+                                                         vendorIdVerificationTbs),
+                  CHIP_NO_ERROR);
+        EXPECT_TRUE(vendorIdVerificationTbs.data_equal(kExpectedVendorIdVerificationTbsSpan));
+    }
 }
