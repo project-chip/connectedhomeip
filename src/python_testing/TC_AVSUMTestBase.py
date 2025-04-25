@@ -125,7 +125,7 @@ class AVSUMTestBase:
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
-    async def send_dptz_relative_move_command(self, endpoint, streamID, deltaX: int =None, deltaY: int = None, 
+    async def send_dptz_relative_move_command(self, endpoint, streamID, deltaX: int = None, deltaY: int = None, 
                                               zoomDelta: int = None, expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=Clusters.CameraAvSettingsUserLevelManagement.Commands.DPTZRelativeMove(
