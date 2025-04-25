@@ -1200,5 +1200,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                             spec_location="EndpointUniqueId attribute"
                         )
                         self.fail_current_test()
+
+
 if __name__ == "__main__":
     default_matter_test_main()
