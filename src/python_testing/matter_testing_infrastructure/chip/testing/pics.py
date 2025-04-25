@@ -19,6 +19,7 @@ import json
 import os
 import typing
 import xml.etree.ElementTree as ET
+from typing import Optional
 
 
 def attribute_pics_str(pics_base: str, id: int) -> str:
@@ -104,8 +105,8 @@ def read_pics_from_file(path: str) -> dict[str, bool]:
             return parse_pics(lines)
 
 
-def parse_pixit_xml(contents: str) -> dict[str, str]:
-    pixit: dict[str, str] = {}
+def parse_pixit_xml(contents: str) -> dict[str, Optional[str]]:
+    pixit: dict[str, Optional[str]] = {}
     mytree = ET.fromstring(contents)
     for pi in mytree.iter('pixitItem'):
         name_elem = pi.find('itemNumber')
@@ -123,7 +124,7 @@ def parse_pixit_xml(contents: str) -> dict[str, str]:
     return pixit
 
 
-def read_pixit_from_file(path: str) -> dict[str, str]:
+def read_pixit_from_file(path: str) -> dict[str, Optional[str]]:
     """ Reads a dictionary of PIXITS from a file (ci format) or directory (xml format). """
     pixit_dict = {}
     if os.path.isdir(os.path.abspath(path)):

@@ -689,7 +689,7 @@ class MatterTestConfig:
     thread_operational_dataset: Optional[str] = None
 
     pics: dict[bool, str] = field(default_factory=dict)
-    pixit: dict[str, str] = field(default_factory=dict)
+    pixit: dict[str, Optional[str]] = field(default_factory=dict)
     # Node ID for basic DUT
     dut_node_ids: List[int] = field(default_factory=list)
     # Node ID to use for controller/commissioner
