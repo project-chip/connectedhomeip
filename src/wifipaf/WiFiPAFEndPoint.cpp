@@ -774,7 +774,7 @@ SequenceNumber_t WiFiPAFEndPoint::AdjustRemoteReceiveWindow(SequenceNumber_t las
     // Newest unacked sent sequence number never exceeds current (and by extension, new and un-wrapped)
     //  window boundary, so it never wraps relative to last received ack, if new window boundary would not
     //  also wrap.
-    static_assert(std::is_same<SequenceNumber_t, uint8_t>::value, "Type of SequenceNumber_t is unexpected.");
+    static_assert(std::is_same_v<SequenceNumber_t, uint8_t>, "Type of SequenceNumber_t is unexpected.");
     // Define new window boundary (inclusive) as uint16_t, so its value can temporarily exceed UINT8_MAX.
     uint16_t newRemoteWindowBoundary = static_cast<uint16_t>(lastReceivedAck + maxRemoteWindowSize);
 
