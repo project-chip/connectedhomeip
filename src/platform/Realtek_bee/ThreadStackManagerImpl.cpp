@@ -18,16 +18,14 @@
 /**
  *    @file
  *          Provides an implementation of the ThreadStackManager object for the
- *          Qorvo QPG platform using the Qorvo QPG library and the OpenThread
+ *          Realtek Bee platform using the Realtek Bee library and the OpenThread
  *          stack.
  *
  */
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.hpp>
-// #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp>
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.cpp>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
 
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
@@ -64,9 +62,8 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
     ChipLogProgress(DeviceLayer, "GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>::DoInit");
     err = GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>::DoInit();
     SuccessOrExit(err);
-    //  err = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(otInst);
-    ChipLogProgress(DeviceLayer, "GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>::DoInit");
-    err = GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>::DoInit(otInst);
+    err = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(otInst);
+    ChipLogProgress(DeviceLayer, "GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit");
     SuccessOrExit(err);
 
 exit:

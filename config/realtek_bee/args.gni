@@ -40,7 +40,7 @@ chip_enable_nfc_onboarding_payload = false
 chip_build_libshell = false
 chip_enable_ota_requestor = false
 
-chip_system_config_use_open_thread_inet_endpoints = true
+chip_system_config_use_openthread_inet_endpoints = true
 chip_with_lwip = false
 openthread_root = ""
 chip_openthread_target = "${chip_root}/config/realtek_bee/openthread:openthread"

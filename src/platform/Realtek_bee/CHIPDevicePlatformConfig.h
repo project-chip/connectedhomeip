@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Platform-specific configuration overrides for the chip Device Layer
- *          on Qorvo QPG platforms.
+ *          on Realtek Bee platforms.
  */
 
 #pragma once
