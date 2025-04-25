@@ -54,7 +54,8 @@ enum class Type : uint8_t
     kBle,
     kTcp,
     kWiFiPAF,
-    kLast = kWiFiPAF, // This is not an actual transport type, it just refers to the last transport type
+    kNfc,
+    kLast = kNfc, // This is not an actual transport type, it just refers to the last transport type
 };
 
 /**
@@ -81,6 +82,8 @@ public:
     }
 
     NodeId GetRemoteId() const { return mRemoteId; }
+
+    uint16_t GetNFCShortId() const { return mNFCShortId; }
 
     Type GetTransportType() const { return mTransportType; }
     PeerAddress & SetTransportType(Type type)
@@ -110,7 +113,7 @@ public:
     bool operator==(const PeerAddress & other) const
     {
         return (mTransportType == other.mTransportType) && (mIPAddress == other.mIPAddress) && (mPort == other.mPort) &&
-            (mInterface == other.mInterface);
+            (mInterface == other.mInterface) && (mNFCShortId == other.mNFCShortId);
     }
 
     bool operator!=(const PeerAddress & other) const { return !(*this == other); }
@@ -179,6 +182,9 @@ public:
             // Note that BLE does not currently use any specific address.
             snprintf(buf, bufSize, "BLE");
             break;
+        case Type::kNfc:
+            snprintf(buf, bufSize, "NFC:%d", mNFCShortId);
+            break;
         default:
             snprintf(buf, bufSize, "ERROR");
             break;
@@ -190,6 +196,8 @@ public:
     static PeerAddress Uninitialized() { return PeerAddress(Inet::IPAddress::Any, Type::kUndefined); }
 
     static PeerAddress BLE() { return PeerAddress(Type::kBle); }
+    static PeerAddress NFC() { return PeerAddress(Type::kNfc); }
+    static PeerAddress NFC(const uint16_t shortId) { return PeerAddress(Type::kNfc, shortId); }
     static PeerAddress UDP(const Inet::IPAddress & addr) { return PeerAddress(addr, Type::kUdp); }
     static PeerAddress UDP(const Inet::IPAddress & addr, uint16_t port) { return UDP(addr).SetPort(port); }
 
@@ -236,6 +244,8 @@ public:
     }
 
 private:
+    PeerAddress(Type type, uint16_t shortId) : mTransportType(type), mNFCShortId(shortId) {}
+
     static PeerAddress FromString(char * addrStr, uint16_t port, Type type)
     {
         Inet::IPAddress addr;
@@ -248,6 +258,7 @@ private:
     uint16_t mPort               = CHIP_PORT; ///< Relevant for UDP data sending.
     Inet::InterfaceId mInterface = Inet::InterfaceId::Null();
     NodeId mRemoteId             = 0;
+    uint16_t mNFCShortId         = 0;
 };
 
 } // namespace Transport
