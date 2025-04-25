@@ -254,9 +254,7 @@ CHIP_ERROR emberAfGetEndpointUniqueIdForEndPoint(EndpointId endpoint, MutableCha
 
     // Copy the unique ID into the provided span
     CharSpan targetSpan(epConfig->endpointUniqueIdBuffer, epConfig->endpointUniqueIdSize);
-    CopyCharSpanToMutableCharSpanWithTruncation(targetSpan, epUniqueIdSpan);
-
-    return CHIP_NO_ERROR;
+    return CopyCharSpanToMutableCharSpan(targetSpan, epUniqueIdSpan);
 }
 #endif
 
