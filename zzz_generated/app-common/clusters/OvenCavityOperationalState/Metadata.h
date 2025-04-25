@@ -71,13 +71,6 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 } // namespace Attributes
 
 namespace Commands {
-namespace Pause {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = OvenCavityOperationalState::Commands::Pause::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-} // namespace Pause
 namespace Stop {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .commandId       = OvenCavityOperationalState::Commands::Stop::Id,
@@ -92,13 +85,6 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Start
-namespace Resume {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = OvenCavityOperationalState::Commands::Resume::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-} // namespace Resume
 
 } // namespace Commands
 } // namespace OvenCavityOperationalState
