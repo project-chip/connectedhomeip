@@ -36,7 +36,7 @@ class ElectricalGridConditionsTestBaseHelper:
     kEventTriggerForecastConditionsUpdate = 0x00A0000000000001
 
     def check_ForecastConditions(self,
-                                 cluster: Clusters.ElectricalGridConditions = None,
+                                 cluster: Clusters.ElectricalGridConditions = Clusters.ElectricalGridConditions,
                                  forecastConditions: list = None):
         matter_asserts.assert_list(forecastConditions, "ForecastConditions must be a list")
         matter_asserts.assert_list_element_type(
@@ -51,7 +51,7 @@ class ElectricalGridConditionsTestBaseHelper:
             self.check_ElectricalGridConditionsStruct(cluster=cluster, struct=item)
 
     def check_ElectricalGridConditionsStruct(self,
-                                             cluster: Clusters.ElectricalGridConditions = None,
+                                             cluster: Clusters.ElectricalGridConditions = Clusters.ElectricalGridConditions,
                                              struct: Clusters.ElectricalGridConditions.Structs.ElectricalGridConditionsStruct = None):
         matter_asserts.assert_valid_uint32(struct.periodStart, 'PeriodStart')
         if struct.periodEnd is not NullValue:
