@@ -226,11 +226,10 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mState.mOverallState != overallState, CHIP_NO_ERROR);
 
-
-    if(overallState.IsNull())
+    if (overallState.IsNull())
     {
         // Mark OverallState attribute as dirty only if value changes.
-        if(!mState.mOverallState.IsNull())
+        if (!mState.mOverallState.IsNull())
         {
             mState.mOverallState.SetNull();
             mMatterContext.MarkDirty(Attributes::OverallState::Id);
@@ -248,9 +247,11 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
         // feature is supported by the device. If the Positioning feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-        VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallState.positioning.Value().Value()) != PositioningEnum::kUnknownEnumValue,
-                                CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(IsSupportedOverallStatePositioning(incomingOverallState.positioning.Value().Value()), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallState.positioning.Value().Value()) !=
+                                PositioningEnum::kUnknownEnumValue,
+                            CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(IsSupportedOverallStatePositioning(incomingOverallState.positioning.Value().Value()),
+                            CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     // Validate the incomging Latch featureMap conformance.
@@ -268,8 +269,9 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
         // supported by the device. If the Speed feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-        VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallState.speed.Value().Value()) != Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
-                                CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallState.speed.Value().Value()) !=
+                                Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
+                            CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     // Validate the incomging SecureState value and featureMap conformance.
@@ -294,10 +296,10 @@ CHIP_ERROR ClusterLogic::SetOverallTarget(const DataModel::Nullable<GenericOvera
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mState.mOverallTarget != overallTarget, CHIP_NO_ERROR);
 
-    if(overallTarget.IsNull())
+    if (overallTarget.IsNull())
     {
         // Mark OverallTarget attribute as dirty only if value changes.
-        if(!mState.mOverallTarget.IsNull())
+        if (!mState.mOverallTarget.IsNull())
         {
             mState.mOverallTarget.SetNull();
             mMatterContext.MarkDirty(Attributes::OverallState::Id);
@@ -316,9 +318,10 @@ CHIP_ERROR ClusterLogic::SetOverallTarget(const DataModel::Nullable<GenericOvera
         VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
         VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallTarget.position.Value()) != TargetPositionEnum::kUnknownEnumValue,
-                                CHIP_ERROR_INVALID_ARGUMENT);
+                            CHIP_ERROR_INVALID_ARGUMENT);
 
-        VerifyOrReturnError(IsSupportedOverallTargetPositioning(incomingOverallTarget.position.Value()), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(IsSupportedOverallTargetPositioning(incomingOverallTarget.position.Value()),
+                            CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     // Validate the incoming Latch featureMap conformance.
@@ -336,7 +339,8 @@ CHIP_ERROR ClusterLogic::SetOverallTarget(const DataModel::Nullable<GenericOvera
         // supported by the device. If the Speed feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-        VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallTarget.speed.Value()) != Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
+        VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallTarget.speed.Value()) !=
+                                Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
                             CHIP_ERROR_INVALID_ARGUMENT);
     }
 
@@ -494,7 +498,8 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<Ta
     // If the MoveTo command is received in any state other than 'Moving', 'WaitingForMotion', or 'Stopped', an error code
     // INVALID_IN_STATE shall be returned.
     VerifyOrReturnError(state == MainStateEnum::kMoving || state == MainStateEnum::kWaitingForMotion ||
-                            state == MainStateEnum::kStopped, Status::InvalidInState);
+                            state == MainStateEnum::kStopped,
+                        Status::InvalidInState);
 
     if (mDelegate.IsReadyToMove())
     {
