@@ -2107,6 +2107,7 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * TemperatureUnit                                                   | 0x0000 |
+| * SupportedTemperatureUnits                                         | 0x0001 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -6822,7 +6823,6 @@ private:
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
 | * PriceChange                                                       | 0x0000 |
-| * ForecastChange                                                    | 0x0001 |
 \*----------------------------------------------------------------------------*/
 
 /*
@@ -8128,7 +8128,6 @@ private:
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
 | * CurrentConditionsChanged                                          | 0x0000 |
-| * ForecastConditionsChanged                                         | 0x0001 |
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
@@ -18952,8 +18951,10 @@ void registerClusterUnitLocalization(Commands & commands, CredentialIssuerComman
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<ReadAttribute>(Id, "temperature-unit", Attributes::TemperatureUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                      //
+        make_unique<ReadAttribute>(Id, "temperature-unit", Attributes::TemperatureUnit::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "supported-temperature-units", Attributes::SupportedTemperatureUnits::Id,
+                                   credsIssuerConfig),                                                                     //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -18962,6 +18963,9 @@ void registerClusterUnitLocalization(Commands & commands, CredentialIssuerComman
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<WriteAttribute<chip::app::Clusters::UnitLocalization::TempUnitEnum>>(
             Id, "temperature-unit", 0, UINT8_MAX, Attributes::TemperatureUnit::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::UnitLocalization::TempUnitEnum>>>(
+            Id, "supported-temperature-units", Attributes::SupportedTemperatureUnits::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -18972,9 +18976,11 @@ void registerClusterUnitLocalization(Commands & commands, CredentialIssuerComman
         make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
-                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "temperature-unit", Attributes::TemperatureUnit::Id, credsIssuerConfig),            //
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                      //
+        make_unique<SubscribeAttribute>(Id, "temperature-unit", Attributes::TemperatureUnit::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "supported-temperature-units", Attributes::SupportedTemperatureUnits::Id,
+                                        credsIssuerConfig),                                                                     //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -23360,12 +23366,10 @@ void registerClusterCommodityPrice(Commands & commands, CredentialIssuerCommands
         //
         // Events
         //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                     //
-        make_unique<ReadEvent>(Id, "price-change", Events::PriceChange::Id, credsIssuerConfig),            //
-        make_unique<ReadEvent>(Id, "forecast-change", Events::ForecastChange::Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                //
-        make_unique<SubscribeEvent>(Id, "price-change", Events::PriceChange::Id, credsIssuerConfig),       //
-        make_unique<SubscribeEvent>(Id, "forecast-change", Events::ForecastChange::Id, credsIssuerConfig), //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                               //
+        make_unique<ReadEvent>(Id, "price-change", Events::PriceChange::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                          //
+        make_unique<SubscribeEvent>(Id, "price-change", Events::PriceChange::Id, credsIssuerConfig), //
     };
 
     commands.RegisterCluster(clusterName, clusterCommands);
@@ -24176,12 +24180,10 @@ void registerClusterElectricalGridConditions(Commands & commands, CredentialIssu
         //
         // Events
         //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                                            //
-        make_unique<ReadEvent>(Id, "current-conditions-changed", Events::CurrentConditionsChanged::Id, credsIssuerConfig),        //
-        make_unique<ReadEvent>(Id, "forecast-conditions-changed", Events::ForecastConditionsChanged::Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                                       //
-        make_unique<SubscribeEvent>(Id, "current-conditions-changed", Events::CurrentConditionsChanged::Id, credsIssuerConfig),   //
-        make_unique<SubscribeEvent>(Id, "forecast-conditions-changed", Events::ForecastConditionsChanged::Id, credsIssuerConfig), //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                                          //
+        make_unique<ReadEvent>(Id, "current-conditions-changed", Events::CurrentConditionsChanged::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                                     //
+        make_unique<SubscribeEvent>(Id, "current-conditions-changed", Events::CurrentConditionsChanged::Id, credsIssuerConfig), //
     };
 
     commands.RegisterCluster(clusterName, clusterCommands);
