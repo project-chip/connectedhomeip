@@ -53,6 +53,7 @@ class TC_FAN_4_1(MatterBaseTest):
 
     def get_fan_modes(self, fan_mode_sequence: Clusters.FanControl.Enums.FanModeSequenceEnum):
         # TODO: put this in a common location once all the fan stuff is landed
+        # https://github.com/project-chip/matter-test-scripts/issues/550
         sequence = Clusters.FanControl.Enums.FanModeSequenceEnum
         mode = Clusters.FanControl.Enums.FanModeEnum
 
@@ -122,10 +123,12 @@ class TC_FAN_4_1(MatterBaseTest):
         steps.extend(self._sub_step(num, "PercentSetting", "100", "High", "100", "SpeedMax"))
         num += num_substeps
 
-        steps.append(TestStep(num, "TH sends On command to the On/Off cluster", "DUT returns SUCCESS"))
-        steps.append(TestStep(num + 1, "TH awaits the following attribute reports (order does not matter): PercentCurrent is 100, SpeedCurrent is SpeedMax (if SPD feature is supported)", "Reports are received"))
-        steps.append(TestStep(num + 2, "TH sets PercentSetting to 50", "Response is SUCCESS or INVALID_IN_STATE"))
-        steps.append(TestStep(num + 3, "If the response was SUCCESS, TH awaits the following attribute reports (order does not matter): PercentCurrent is 50, PercentSetting is 50", "Report(s) are received"))
+        steps.append(TestStep(
+            num, "TH reads the PercentSetting and SpeedSetting (if supported) values and saves as `percent_setting_before_on` and `speed_setting_before_on`"))
+        steps.append(TestStep(num + 1, "TH sends On command to the On/Off cluster", "DUT returns SUCCESS"))
+        steps.append(TestStep(num + 2, "TH awaits the following attribute reports (order does not matter): PercentCurrent is `percent_setting_before_on`, SpeedCurrent is `speed_setting_before_on` (if SPD feature is supported)", "Reports are received"))
+        steps.append(TestStep(num + 3, "TH sets PercentSetting to 50", "Response is SUCCESS or INVALID_IN_STATE"))
+        steps.append(TestStep(num + 4, "If the response was SUCCESS, TH awaits the following attribute reports (order does not matter): PercentCurrent is 50, PercentSetting is 50", "Report(s) are received"))
         return steps
 
     def pics_TC_FAN_4_1(self) -> list[str]:
@@ -278,14 +281,21 @@ class TC_FAN_4_1(MatterBaseTest):
         await verify_onoff_off(fan.Attributes.PercentSetting(100), fan.Enums.FanModeEnum.kHigh, 100, speed_max)
 
         self.step(step_num)
+        percent_setting_before_on = await self.read_single_attribute_check_success(cluster=fan, attribute=fan.Attributes.PercentSetting)
+        if has_spd:
+            speed_setting_before_on = await self.read_single_attribute_check_success(cluster=fan, attribute=fan.Attributes.SpeedSetting)
+        step_num += 1
+
+        self.step(step_num)
         await self.send_single_cmd(cmd=Clusters.OnOff.Commands.On())
         step_num += 1
 
         self.step(step_num)
-        awaiting = [AttributeValue(endpoint_id=self.get_endpoint(), attribute=fan.Attributes.PercentCurrent, value=100)]
+        awaiting = [AttributeValue(endpoint_id=self.get_endpoint(
+        ), attribute=fan.Attributes.PercentCurrent, value=percent_setting_before_on)]
         if has_spd:
             awaiting.append(AttributeValue(endpoint_id=self.get_endpoint(),
-                            attribute=fan.Attributes.SpeedCurrent, value=speed_max))
+                            attribute=fan.Attributes.SpeedCurrent, value=speed_setting_before_on))
         sub.await_all_final_values_reported(expected_final_values=awaiting, timeout_sec=timeout)
         sub.reset()
         step_num += 1
