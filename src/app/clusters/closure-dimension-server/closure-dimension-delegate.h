@@ -63,7 +63,13 @@ public:
      */
     virtual Protocols::InteractionModel::Status HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
                                                            const Optional<Globals::ThreeLevelAutoEnum> & speed) = 0;
-    
+
+    /**
+     * @brief Checks whether this closurepanel needs manual latching.
+     *
+     * @return true if manual latching is needed
+     *         false if manual latching not needed
+     */
     virtual bool IsManualLatchingNeeded() = 0;
 };
 
