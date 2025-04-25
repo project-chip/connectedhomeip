@@ -15,7 +15,6 @@
 #  limitations under the License.
 #
 
-import asyncio as aio
 import concurrent.futures
 
 import chip.webrtc
@@ -65,7 +64,6 @@ def GetLocalSDP(Client):
 
 
 def GetCandidates():
-    handle = _GetWebRTCLibraryHandle()
     return chip.webrtc.callbacks.future_ice.result()
 
 
