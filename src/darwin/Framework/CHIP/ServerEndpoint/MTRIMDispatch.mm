@@ -35,7 +35,7 @@ namespace {
 
 // Code assumes there is only a single OTA provider and it lives on EP0
 constexpr EndpointId kOtaProviderEndpointId = 0;
-Global<OtaProviderLogic> gOtaProviderLogic;
+Global<OtaProviderServer> gOtaProviderServer(kOtaProviderEndpointId);
 
 } // anonymous namespace
 
@@ -47,7 +47,7 @@ void SetDelegate(EndpointId endpointId, OTAProviderDelegate * delegate)
         ChipLogError(AppServer, "Cannot set OTA provider for endpoint %d: not a valid OTA provider endpoint.", endpointId);
         return;
     }
-    gOtaProviderLogic->SetDelegate(delegate);
+    gOtaProviderServer->SetDelegate(delegate);
 }
 
 } // namespace chip::app::Clusters::OTAProvider
@@ -84,59 +84,20 @@ namespace app {
 
     void DispatchSingleClusterCommand(const ConcreteCommandPath & aPath, TLV::TLVReader & aReader, CommandHandler * aCommandObj)
     {
-        // TODO: Consider having MTRServerCluster register a
-        // CommandHandlerInterface/ServerClusterInterface for command dispatch.
+        // TODO: Consider having MTRServerCluster register the
+        // ServerClusterInterface for command dispatch.
         // But OTA would need some special-casing in any case, to call into the
         // existing cluster implementation.
+        SubjectDescriptor subjectDescriptor = aCommandObj->GetSubjectDescriptor();
 
-        using Protocols::InteractionModel::Status;
-        using namespace OtaSoftwareUpdateProvider::Commands;
+        DataModel::InvokeRequest invokeRequest;
+        invokeRequest.path = aPath;
+        invokeRequest.subjectDescriptor = &subjectDescriptor;
 
-        // This command passed ServerClusterCommandExists so we know it's one of our
-        // supported commands.
-        //
-        // The code below is a double-check in case configuration is not valid.
-        //
-        if ((aPath.mClusterId != OtaSoftwareUpdateProvider::Id) || (aPath.mEndpointId != kOtaProviderEndpointId)) {
-            aCommandObj->AddStatus(aPath, Status::UnsupportedCluster);
-            return;
-        }
+        std::optional<DataModel::ActionReturnStatus> result = gOtaProviderServer.InvokeCommand(
+            invokeRequest, aReader, aCommandObj);
 
-        std::optional<DataModel::ActionReturnStatus> result;
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        switch (aPath.mCommandId) {
-        case QueryImage::Id: {
-            QueryImage::DecodableType commandData;
-            err = DataModel::Decode(aReader, commandData);
-            if (err == CHIP_NO_ERROR) {
-                result = gOtaProviderLogic->QueryImage(aPath, commandData, aCommandObj);
-            }
-            break;
-        }
-        case ApplyUpdateRequest::Id: {
-            ApplyUpdateRequest::DecodableType commandData;
-            err = DataModel::Decode(aReader, commandData);
-            if (err == CHIP_NO_ERROR) {
-                result = gOtaProviderLogic->ApplyUpdateRequest(aPath, commandData, aCommandObj);
-            }
-            break;
-        }
-        case NotifyUpdateApplied::Id: {
-            NotifyUpdateApplied::DecodableType commandData;
-            err = DataModel::Decode(aReader, commandData);
-            if (err == CHIP_NO_ERROR) {
-                result = gOtaProviderLogic->NotifyUpdateApplied(aPath, commandData, aCommandObj);
-            }
-            break;
-        }
-        default:
-            break;
-        }
-
-        if (CHIP_NO_ERROR != err) {
-            aCommandObj->AddStatus(aPath, Status::InvalidCommand);
-        } else if (result.has_value()) {
+        if (result.has_value()) {
             // Provider indicates that handler status or data was already set (or will be set asynchronously) by
             // returning std::nullopt. If any other value is returned, it is requesting that a status is set. This
             // includes CHIP_NO_ERROR: in this case CHIP_NO_ERROR would mean set a `status success on the command`

@@ -58,7 +58,7 @@ namespace {
 
 DataVersion gMockDataVersion = 0;
 
-OtaProviderLogic gOtaProviderLogic;
+OtaProviderServer gOtaProviderServer(kOtaProviderDynamicEndpointId);
 
 } // anonymous namespace
 
@@ -75,7 +75,7 @@ void SetDelegate(chip::EndpointId endpointId, OTAProviderDelegate * delegate)
                      kOtaProviderDynamicEndpointId);
         return;
     }
-    gOtaProviderLogic.SetDelegate(delegate);
+    gOtaProviderServer.SetDelegate(delegate);
 }
 
 } // namespace OTAProvider
@@ -86,58 +86,16 @@ using Protocols::InteractionModel::Status;
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aPath, TLV::TLVReader & aReader, CommandHandler * aCommandObj)
 {
-    // This command passed ServerClusterCommandExists so we know it's one of our
-    // supported commands.
-    //
-    // The code below is a double-check in case configuration is not valid.
-    if ((aPath.mClusterId != OtaSoftwareUpdateProvider::Id) || (aPath.mEndpointId != kOtaProviderDynamicEndpointId))
-    {
-        aCommandObj->AddStatus(aPath, Status::UnsupportedCluster);
-        return;
-    }
-    using namespace OtaSoftwareUpdateProvider::Commands;
+    SubjectDescriptor subjectDescriptor = aCommandObj->GetSubjectDescriptor();
 
-    std::optional<DataModel::ActionReturnStatus> result;
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    DataModel::InvokeRequest invokeRequest;
+    invokeRequest.path = aPath;
+    invokeRequest.subjectDescriptor = &subjectDescriptor;
 
-    switch (aPath.mCommandId)
-    {
-    case QueryImage::Id: {
-        QueryImage::DecodableType commandData;
-        err = DataModel::Decode(aReader, commandData);
-        if (err == CHIP_NO_ERROR)
-        {
-            result = gOtaProviderLogic.QueryImage(aPath, commandData, aCommandObj);
-        }
-        break;
-    }
-    case ApplyUpdateRequest::Id: {
-        ApplyUpdateRequest::DecodableType commandData;
-        err = DataModel::Decode(aReader, commandData);
-        if (err == CHIP_NO_ERROR)
-        {
-            result = gOtaProviderLogic.ApplyUpdateRequest(aPath, commandData, aCommandObj);
-        }
-        break;
-    }
-    case NotifyUpdateApplied::Id: {
-        NotifyUpdateApplied::DecodableType commandData;
-        err = DataModel::Decode(aReader, commandData);
-        if (err == CHIP_NO_ERROR)
-        {
-            result = gOtaProviderLogic.NotifyUpdateApplied(aPath, commandData, aCommandObj);
-        }
-        break;
-    }
-    default:
-        break;
-    }
+    std::optional<DataModel::ActionReturnStatus> result = gOtaProviderServer.InvokeCommand(
+        invokeRequest, aReader, aCommandObj);
 
-    if (CHIP_NO_ERROR != err)
-    {
-        aCommandObj->AddStatus(aPath, Status::InvalidCommand);
-    }
-    else if (result.has_value())
+    if (result.has_value())
     {
         // Provider indicates that handler status or data was already set (or will be set asynchronously) by
         // returning std::nullopt. If any other value is returned, it is requesting that a status is set. This
