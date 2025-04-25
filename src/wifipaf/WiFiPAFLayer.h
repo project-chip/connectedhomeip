@@ -34,7 +34,7 @@ namespace WiFiPAF {
  *
  *  Number of unsigned 4-bit representations of supported transport protocol
  *  versions encapsulated in a PAFTransportCapabilitiesRequestMessage.
- *  Defined by CHIP over PAFTP protocol specification.
+ *  Defined by the Matter PAFTP protocol specification.
  */
 #define NUM_PAFTP_SUPPORTED_PROTOCOL_VERSIONS 8
 
