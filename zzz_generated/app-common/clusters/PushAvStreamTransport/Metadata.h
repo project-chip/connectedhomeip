@@ -77,7 +77,7 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
 } // namespace SetTransportStatus
 namespace ManuallyTriggerTransport {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = PushAvStreamTransport::Commands::ManuallyTriggerTransport::Id,
+    .commandId       = ManuallyTriggerTransport::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kOperate,
 };
