@@ -16,7 +16,7 @@
 #
 
 import ctypes
-from ctypes import (c_char_p, c_uint32, c_void_p)
+from ctypes import c_char_p, c_uint32, c_void_p
 
 import chip.native
 from chip.webrtc.types import (ErrorCallback_t, IceCallback_t, PeerConnectedCallback_t, PeerDisconnectedCallback_t,
