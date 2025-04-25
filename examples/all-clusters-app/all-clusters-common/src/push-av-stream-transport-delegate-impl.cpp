@@ -167,6 +167,6 @@ void emberAfPushAvStreamTransportClusterInitCallback(EndpointId endpoint)
     sPushAvStramTransportInstance->Init();
 
     sPushAvStramTransportClusterServerInstance =
-        std::make_unique<PushAvStreamTransportServer>(endpoint, *sPushAvStramTransportInstance.get());
+        std::make_unique<PushAvStreamTransportServer>(*sPushAvStramTransportInstance.get(), endpoint);
     sPushAvStramTransportClusterServerInstance->Init();
 }

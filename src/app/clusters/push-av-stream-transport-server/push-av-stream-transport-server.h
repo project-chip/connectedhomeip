@@ -171,17 +171,17 @@ appropriate
     virtual CHIP_ERROR PersistentAttributesLoadedCallback() = 0;
 };
 
-class PushAvStreamTransportServer : private AttributeAccessInterface, private CommandHandlerInterface
+class PushAvStreamTransportServer : public AttributeAccessInterface, public CommandHandlerInterface
 {
 public:
     /**
      * Creates a Push AV Stream Transport server instance. The Init() function needs to be called for this instance to be registered
      * and called by the interaction model at the appropriate times.
-     * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
      * @param aDelegate A reference to the delegate to be used by this server.
+     * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    PushAvStreamTransportServer(EndpointId endpointId, PushAvStreamTransportDelegate & delegate);
+    PushAvStreamTransportServer(PushAvStreamTransportDelegate & delegate, EndpointId endpointId);
 
     ~PushAvStreamTransportServer() override;
 

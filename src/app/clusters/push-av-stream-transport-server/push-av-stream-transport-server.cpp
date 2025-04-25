@@ -44,9 +44,10 @@ namespace app {
 namespace Clusters {
 namespace PushAvStreamTransport {
 
-PushAvStreamTransportServer::PushAvStreamTransportServer(EndpointId aEndpointId, PushAvStreamTransportDelegate & aDelegate) :
+PushAvStreamTransportServer::PushAvStreamTransportServer(PushAvStreamTransportDelegate & aDelegate, EndpointId aEndpointId) :
+    AttributeAccessInterface(MakeOptional(aEndpointId), PushAvStreamTransport::Id),
     CommandHandlerInterface(MakeOptional(aEndpointId), PushAvStreamTransport::Id),
-    AttributeAccessInterface(MakeOptional(aEndpointId), PushAvStreamTransport::Id), mDelegate(aDelegate)
+    mDelegate(aDelegate)
 {}
 
 PushAvStreamTransportServer::~PushAvStreamTransportServer()
@@ -251,7 +252,6 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
     Commands::AllocatePushTransportResponse::Type response;
     auto & transportOptions = commandData.transportOptions;
 
-    FabricIndex peerFabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
     uint16_t ep                 = emberAfGetClusterServerEndpointIndex(transportOptions.endpointID, TlsCertificateManagement::Id,
                                                                        MATTER_DM_TLS_CERTIFICATE_MANAGEMENT_CLUSTER_CLIENT_ENDPOINT_COUNT);
 
@@ -420,9 +420,9 @@ void PushAvStreamTransportServer::HandleManuallyTriggerTransport(
 
     if (transportConfiguration->transportStatus == TransportStatusEnum::kInactive)
     {
-        auto status = static_cast<uint8_t>(StatusCodeEnum::kInvalidTransportStatus);
+        auto clusterStatus = static_cast<uint8_t>(StatusCodeEnum::kInvalidTransportStatus);
         ChipLogError(Zcl, "HandleManuallyTriggerTransport: Invalid Transport status");
-        ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, status);
+        ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, clusterStatus);
         return;
     }
     if (transportConfiguration->transportOptions.HasValue())
@@ -430,9 +430,9 @@ void PushAvStreamTransportServer::HandleManuallyTriggerTransport(
         if (transportConfiguration->transportOptions.Value().triggerOptions.triggerType == TransportTriggerTypeEnum::kContinuous)
         {
             {
-                auto status = static_cast<uint8_t>(StatusCodeEnum::kInvalidTriggerType);
+                auto clusterStatus = static_cast<uint8_t>(StatusCodeEnum::kInvalidTriggerType);
                 ChipLogError(Zcl, "HandleManuallyTriggerTransport: Invalid Trigger type");
-                ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, status);
+                ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, clusterStatus);
                 return;
             }
         }
