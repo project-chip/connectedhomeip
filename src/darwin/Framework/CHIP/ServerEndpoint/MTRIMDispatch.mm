@@ -107,7 +107,7 @@ namespace app {
         invokeRequest.path = aPath;
         invokeRequest.subjectDescriptor = &subjectDescriptor;
 
-        std::optional<DataModel::ActionReturnStatus> result = gOtaProviderServer.InvokeCommand(
+        std::optional<DataModel::ActionReturnStatus> result = gOtaProviderServer->InvokeCommand(
             invokeRequest, aReader, aCommandObj);
 
         if (result.has_value()) {
