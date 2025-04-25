@@ -27,6 +27,10 @@ namespace ClosureControl {
 
 using namespace Protocols::InteractionModel;
 
+namespace {
+    constexpr uint8_t kCurrentErrorListSize  = 10;
+} //namespace
+
 /*
     ClusterLogic Implementation
 */
@@ -241,21 +245,24 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
     const GenericOverallState & incomingOverallState = overallState.Value();
 
     // Validate the incomging Positioning value and featureMap conformance.
-    if (incomingOverallState.positioning.HasValue() && !incomingOverallState.positioning.Value().IsNull())
+    if (incomingOverallState.positioning.HasValue())
     {
         // If the positioning member is present in the incoming OverallState, we need to check if the Positioning
         // feature is supported by the device. If the Positioning feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-        VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallState.positioning.Value().Value()) !=
-                                PositioningEnum::kUnknownEnumValue,
-                            CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(IsSupportedOverallStatePositioning(incomingOverallState.positioning.Value().Value()),
-                            CHIP_ERROR_INVALID_ARGUMENT);
+        if (!incomingOverallState.positioning.Value().IsNull()) 
+        {
+            VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallState.positioning.Value().Value()) !=
+                PositioningEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(IsSupportedOverallStatePositioning(incomingOverallState.positioning.Value().Value()),
+                CHIP_ERROR_INVALID_ARGUMENT);  
+        }
+
     }
 
     // Validate the incomging Latch featureMap conformance.
-    if (incomingOverallState.latch.HasValue() && !incomingOverallState.latch.Value().IsNull())
+    if (incomingOverallState.latch.HasValue())
     {
         // If the latching member is present in the incoming OverallState, we need to check if the MotionLatching
         // feature is supported by the device. If the MotionLatching feature is not supported, return an error.
@@ -263,19 +270,22 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
     }
 
     // Validate the incomging Speed value and featureMap conformance.
-    if (incomingOverallState.speed.HasValue() && !incomingOverallState.speed.Value().IsNull())
+    if (incomingOverallState.speed.HasValue())
     {
         // If the speed member is present in the incoming OverallState, we need to check if the Speed feature is
         // supported by the device. If the Speed feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-        VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallState.speed.Value().Value()) !=
-                                Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
-                            CHIP_ERROR_INVALID_ARGUMENT);
+        if (!incomingOverallState.speed.Value().IsNull()) 
+        {
+            VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallState.speed.Value().Value()) !=
+            Globals::ThreeLevelAutoEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT); 
+        }
+
     }
 
-    // Validate the incomging SecureState value and featureMap conformance.
-    if (incomingOverallState.secureState.HasValue() && !incomingOverallState.secureState.Value().IsNull())
+    // Validate the incomging SecureState featureMap conformance.
+    if (incomingOverallState.secureState.HasValue())
     {
         // If the secureState member is present in the OverallState, we need to check if the Speed feature is
         // supported by the device. If the Speed feature is not supported, return an error.
@@ -407,7 +417,8 @@ CHIP_ERROR ClusterLogic::GetCurrentErrorList(const AttributeValueEncoder::ListEn
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    for (size_t i = 0; true; i++)
+    // List can contain atmost only 10 Error
+    for (size_t i = 0; i < kCurrentErrorListSize; i++)
     {
         ClosureErrorEnum error;
 
@@ -448,7 +459,7 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleStop()
     // A status code of SUCCESS SHALL always be returned, regardless if it is in above states or not.
     if ((state == MainStateEnum::kCalibrating) || (state == MainStateEnum::kMoving) || (state == MainStateEnum::kWaitingForMotion))
     {
-        // Set the MainState to 'Stopped' only if the stop command handling is successfully completed.
+        // Set the MainState to 'Stopped' only if the delegate call to HandleMoveToCommand is successful.
         VerifyOrReturnError(mDelegate.HandleStopCommand() == Status::Success, Status::Failure);
 
         VerifyOrReturnError(SetMainState(MainStateEnum::kStopped) == CHIP_NO_ERROR, Status::Failure,
@@ -512,7 +523,7 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<Ta
                             ChipLogError(AppServer, "MoveTo Command: Failed to set MainState to kWaitingForMotion"));
     }
 
-    // Once the MoveTo action is successfully completed, the server will set OverallTarget and MainState.
+    // Set OverallTarget and MainState only if the delegate call to HandleMoveToCommand is successful
     VerifyOrReturnError(mDelegate.HandleMoveToCommand(position, latch, speed) == Status::Success, Status::Failure);
 
     VerifyOrReturnError(SetOverallTarget(DataModel::MakeNullable(target)) == CHIP_NO_ERROR, Status::Failure);
@@ -529,18 +540,15 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleCalibrate()
     MainStateEnum state;
     VerifyOrReturnError(GetMainState(state) == CHIP_NO_ERROR, Status::Failure);
 
-    // If Calibrate command is received when already in the Calibrating state, the server SHALL respond with a status code of
-    // SUCCESS.
-    if (state == MainStateEnum::kCalibrating)
-    {
-        return Status::Success;
-    }
+    // If Calibrate command is received when already in the Calibrating state, 
+    // the server SHALL respond with a status code of SUCCESS.
+    VerifyOrReturnValue(state != MainStateEnum::kCalibrating, Status::Success);
 
     // If the Calibrate command is invoked in any state other than 'Stopped', the server shall respond with INVALID_IN_STATE.
     // This check excludes the 'Calibrating' MainState as it is already validated above
     VerifyOrReturnError(state == MainStateEnum::kStopped, Status::InvalidInState);
 
-    // Set the MainState to 'Calibrating' only if the Calibrate command handling is successfully completed.
+    // Set the MainState to 'Calibrating' only if the delegate call to HandleCalibrateCommand is successful
     VerifyOrReturnError(mDelegate.HandleCalibrateCommand() == Status::Success, Status::Failure);
 
     VerifyOrReturnError(SetMainState(MainStateEnum::kCalibrating) == CHIP_NO_ERROR, Status::Failure,
