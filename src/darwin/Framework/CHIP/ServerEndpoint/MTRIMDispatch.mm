@@ -38,7 +38,7 @@ constexpr EndpointId kOtaProviderEndpointId = 0;
 
 /**
  * A OTAProviderServer with a fixed endpoint id, so that it
- * can be used as a Gloval<> (i.e. supports a constructor without arguments)
+ * can be used as a Global<> (i.e. supports a constructor without arguments)
  */
 class FixedOtaProviderServer : public OtaProviderServer {
 public:
