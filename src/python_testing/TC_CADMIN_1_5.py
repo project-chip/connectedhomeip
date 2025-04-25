@@ -54,8 +54,23 @@ class TC_CADMIN_1_5(MatterBaseTest):
         d: Optional[int] = None
 
         def __post_init__(self):
-            self.cm = int(self.service.txt_record.get('CM', None))
-            self.d = int(self.service.txt_record.get('D', None))
+            # Safely convert CM value to int if present
+            cm_value = self.service.txt_record.get('CM')
+            if cm_value is not None:
+                try:
+                    self.cm = int(cm_value)
+                except (ValueError, TypeError):
+                    logging.warning(f"Could not convert CM value '{cm_value}' to integer")
+                    self.cm = None
+            
+            # Safely convert D value to int if present
+            d_value = self.service.txt_record.get('D')
+            if d_value is not None:
+                try:
+                    self.d = int(d_value)
+                except (ValueError, TypeError):
+                    logging.warning(f"Could not convert discriminator value '{d_value}' to integer")
+                    self.d = None
 
         def __str__(self) -> str:
             return f"Service CM={self.cm}, D={self.d}"
