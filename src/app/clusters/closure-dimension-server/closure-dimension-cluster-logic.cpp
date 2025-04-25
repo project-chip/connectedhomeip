@@ -69,11 +69,11 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericCurren
 
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mState.currentState != incomingCurrentState, CHIP_NO_ERROR);
-    
-    if(incomingCurrentState.IsNull()) 
-    {   
+
+    if(incomingCurrentState.IsNull())
+    {
         // Mark CurrentState attribute as dirty only if value changes.
-        if(!mState.currentState.IsNull()) 
+        if(!mState.currentState.IsNull())
         {
             mState.currentState.SetNull();
             mMatterContext.MarkDirty(Attributes::CurrentState::Id);
@@ -89,7 +89,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericCurren
         VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
         // We don't need to check if values are present since the check was done above.
-        VerifyOrReturnError(incomingCurrentState.Value().position.Value() <= kPercents100thsMaxValue, 
+        VerifyOrReturnError(incomingCurrentState.Value().position.Value() <= kPercents100thsMaxValue,
                                 CHIP_ERROR_INVALID_ARGUMENT);
     }
 
@@ -126,7 +126,7 @@ CHIP_ERROR ClusterLogic::SetTarget(const DataModel::Nullable<GenericTargetStruct
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mState.target != incomingTarget, CHIP_NO_ERROR);
 
-    
+
     if (incomingTarget.IsNull())
     {
         // Mark Target attribute as dirty only if value changes.
@@ -137,7 +137,7 @@ CHIP_ERROR ClusterLogic::SetTarget(const DataModel::Nullable<GenericTargetStruct
         }
         return CHIP_NO_ERROR;
     }
-    
+
     // Validate the incoming Position value has valid input parameters and FeatureMap conformance.
     if (incomingTarget.Value().position.HasValue())
     {

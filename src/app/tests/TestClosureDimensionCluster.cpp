@@ -86,7 +86,7 @@ public:
         conformance  = ClusterConformance();
         logic        = std::make_unique<ClusterLogic>(mockDelegate, mockContext);
 
-        conformance.OptionalAttributes().Clear(OptionalAttributeEnum::kOverflow);      
+        conformance.OptionalAttributes().Clear(OptionalAttributeEnum::kOverflow);
         // Add values to attributes need to be set in Init()
         initParams.modulationType       = ModulationTypeEnum::kOpacity;
         initParams.rotationAxis         = RotationAxisEnum::kBottom;
