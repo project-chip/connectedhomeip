@@ -18,5 +18,17 @@
 
 #pragma once
 
-void ElectricalPriceApplicationInit();
-void ElectricalPriceApplicationShutdown();
+#include <app-common/zap-generated/cluster-enums.h>
+#include <app/util/config.h>
+#include <cstring>
+#include <lib/core/CHIPError.h>
+#include <lib/support/BitMask.h>
+#include <protocols/Protocols.h>
+#include <time.h>
+
+/**
+ * @brief   Helper function to get current timestamp in Epoch format
+ *
+ * @param   chipEpoch reference to hold return timestamp
+ */
+CHIP_ERROR GetEpochTS(uint32_t & chipEpoch);
