@@ -34,6 +34,7 @@ class TC_AVSM_2_5(MatterBaseTest):
 
     def steps_TC_AVSM_2_5(self) -> list[TestStep]:
         return [
+            TestStep("precondition", "Commissioning, already done", is_commissioning=True),
             TestStep(1, "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on TH_SERVER", "Verify ADO is supported."),
             TestStep(2, "TH reads AllocatedAudioStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
                      "Verify the number of allocated snapshot streams in the list is 0."),
@@ -61,6 +62,9 @@ class TC_AVSM_2_5(MatterBaseTest):
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
         commands = Clusters.CameraAvStreamManagement.Commands
+
+        self.step("precondition")
+        # Commission DUT - already done
 
         self.step(1)
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
