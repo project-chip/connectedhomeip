@@ -24,40 +24,40 @@ from mobly import asserts
 logger = logging.getLogger(__name__)
 
 
-class TC_AVSM_2_10(MatterBaseTest):
-    def desc_TC_AVSM_2_10(self) -> str:
-        return "[TC-AVSM-2.10] Validate CaptureSnapshot Functionality with Server as DUT"
+class TC_AVSM_2_11(MatterBaseTest):
+    def desc_TC_AVSM_2_11(self) -> str:
+        return "[TC-AVSM-2.11] Validate SetStreamPriorities Functionality with Server as DUT"
 
-    def pics_TC_AVSM_2_10(self):
+    def pics_TC_AVSM_2_11(self):
         return ["AVSM.S"]
 
-    def steps_TC_AVSM_2_10(self) -> list[TestStep]:
+    def steps_TC_AVSM_2_11(self) -> list[TestStep]:
         return [
             TestStep("precondition", "DUT commissioned and preconditions", is_commissioning=True),
             TestStep(
                 1,
-                "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on TH_SERVER",
-                "Verify SNP is supported.",
-            ),
-            TestStep(
-                2,
                 "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
                 "Verify the number of allocated snapshot streams in the list is 1. Store StreamID as aStreamID.",
             ),
             TestStep(
+                2,
+                "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER.",
+                "Verify the number of allocated video streams in the list is 0.",
+            ),
+            TestStep(
                 3,
-                "TH sends the CaptureSnapshot command with SnapshotStreamID set to aStreamID.",
-                "DUT responds with CaptureSnapshotResponse command with the image in the Data field.",
+                "TH reads AllocatedAudioStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "Verify the number of allocated audio streams in the list is 0.",
             ),
             TestStep(
                 4,
-                "TH sends the CaptureSnapshot command with SnapshotStreamID set to Null.",
-                "DUT responds with NOT_FOUND status code.",
+                "TH reads SupportedStreamUsages attribute from CameraAVStreamManagement Cluster on TH_SERVER.",
+                "Store this value in aSupportedStreamUsages.",
             ),
             TestStep(
                 5,
-                "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
-                "DUT responds with CaptureSnapshotResponse command with the image in the Data field.",
+                "TH sends the SetStreamPriorities command with StreamPriorities set as a subset of aSupportedStreamUsages.",
+                "DUT responds with a INVALID_IN_STATE status code.",
             ),
             TestStep(
                 6,
@@ -66,13 +66,18 @@ class TC_AVSM_2_10(MatterBaseTest):
             ),
             TestStep(
                 7,
-                "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
-                "Verify the number of allocated snapshot streams in the list is 0.",
+                "TH sends the SetStreamPriorities command with StreamPriorities set as a subset of aSupportedStreamUsages.",
+                "DUT responds with a SUCCESS status code.",
             ),
             TestStep(
                 8,
-                "TH sends the CaptureSnapshot command with SnapshotStreamID set to Null.",
-                "DUT responds with NOT_FOUND status code.",
+                "TH sends the SetStreamPriorities command with StreamPriorities containing a StreamUsage not in aSupportedStreamUsages.",
+                "DUT responds with a INVALID_DATA_TYPE status code.",
+            ),
+            TestStep(
+                9,
+                "TH sends the SetStreamPriorities command with StreamPriorities containing duplicate StreamUsage values from aSupportedStreamUsages.",
+                "DUT responds with a CONSTRAINT_ERROR status code.",
             ),
         ]
 
@@ -117,7 +122,7 @@ class TC_AVSM_2_10(MatterBaseTest):
             pass
 
     @async_test_body
-    async def test_TC_AVSM_2_10(self):
+    async def test_TC_AVSM_2_11(self):
         endpoint = self.get_endpoint(default=1)
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
@@ -128,12 +133,6 @@ class TC_AVSM_2_10(MatterBaseTest):
         await self._precondition_one_allocated_snp_stream()
 
         self.step(1)
-        aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        logger.info(f"Rx'd FeatureMap: {aFeatureMap}")
-        snpSupport = (aFeatureMap & cluster.Bitmaps.Feature.kSnapshot) > 0
-        asserts.assert_true(snpSupport, "Snapshot Feature is not supported.")
-
-        self.step(2)
         aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
         )
@@ -141,30 +140,34 @@ class TC_AVSM_2_10(MatterBaseTest):
         asserts.assert_equal(len(aAllocatedSnapshotStreams), 1, "The number of allocated snapshot streams in the list is not 1.")
         aStreamID = aAllocatedSnapshotStreams[0].snapshotStreamID
 
+        self.step(2)
+        aAllocatedVideoStreams = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
+        )
+        logger.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
+        asserts.assert_equal(len(aAllocatedVideoStreams), 0, "The number of allocated video streams in the list is not 0")
+
         self.step(3)
-        try:
-            captureSnapshotResponse = await self.send_single_cmd(
-                endpoint=endpoint, cmd=commands.CaptureSnapshot(snapshotStreamID=(aStreamID))
-            )
-            logger.info(f"Rx'd CaptureSnapshotResponse: {captureSnapshotResponse}")
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
+        aAllocatedAudioStreams = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams
+        )
+        logger.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
+        asserts.assert_equal(len(aAllocatedAudioStreams), 0, "The number of allocated audio streams in the list is not 0.")
 
         self.step(4)
-        try:
-            await self.send_single_cmd(endpoint=endpoint, cmd=commands.CaptureSnapshot(snapshotStreamID=(aStreamID + 1)))
-            asserts.assert_true(False, "Unexpected success when expecting NOT_FOUND")
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.NotFound, "Unexpected error returned")
-            pass
+        aSupportedStreamUsages = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.SupportedStreamUsages
+        )
+        logger.info(f"Rx'd SupportedStreamUsages: {aSupportedStreamUsages}")
 
         self.step(5)
         try:
-            captureSnapshotResponse = await self.send_single_cmd(endpoint=endpoint, cmd=commands.CaptureSnapshot())
-            logger.info(f"Rx'd CaptureSnapshotResponse: {captureSnapshotResponse}")
+            await self.send_single_cmd(
+                endpoint=endpoint, cmd=commands.SetStreamPriorities(streamPriorities=(aSupportedStreamUsages))
+            )
+            asserts.assert_true(False, "Unexpected success when expecting INVALID_IN_STATE")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            asserts.assert_equal(e.status, Status.InvalidInState, "Unexpected error returned")
             pass
 
         self.step(6)
@@ -175,18 +178,34 @@ class TC_AVSM_2_10(MatterBaseTest):
             pass
 
         self.step(7)
-        aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
-        )
-        logger.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
-        asserts.assert_equal(len(aAllocatedSnapshotStreams), 0, "The number of allocated snapshot streams in the list is not 0.")
+        try:
+            await self.send_single_cmd(
+                endpoint=endpoint, cmd=commands.SetStreamPriorities(streamPriorities=(aSupportedStreamUsages))
+            )
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            pass
 
         self.step(8)
         try:
-            captureSnapshotResponse = await self.send_single_cmd(endpoint=endpoint, cmd=commands.CaptureSnapshot())
-            asserts.assert_true(False, "Unexpected success when expecting NOT_FOUND")
+            notSupportedStreamUsage = next((e for e in cluster.Enums.StreamUsageEnum if e not in aSupportedStreamUsages), None)
+            await self.send_single_cmd(
+                endpoint=endpoint, cmd=commands.SetStreamPriorities(streamPriorities=([notSupportedStreamUsage]))
+            )
+            asserts.assert_true(False, "Unexpected success when expecting INVALID_DATA_TYPE ")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.NotFound, "Unexpected error returned")
+            asserts.assert_equal(e.status, Status.InvalidDataType, "Unexpected error returned")
+            pass
+
+        self.step(9)
+        try:
+            await self.send_single_cmd(
+                endpoint=endpoint,
+                cmd=commands.SetStreamPriorities(streamPriorities=(aSupportedStreamUsages + aSupportedStreamUsages)),
+            )
+            asserts.assert_true(False, "Unexpected success when expecting CONSTRAINT_ERROR ")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected error returned")
             pass
 
 
