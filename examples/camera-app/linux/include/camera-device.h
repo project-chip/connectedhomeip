@@ -31,6 +31,7 @@
 #define STREAM_GST_DEST_IP "127.0.0.1"
 #define VIDEO_STREAM_GST_DEST_PORT 5000
 #define AUDIO_STREAM_GST_DEST_PORT 5001
+// TODO: Define a configuration flag and enable/disable during the build. Configure this after the controller/TH side UI is ready.
 // Enable to use test src instead of hardware source for testing purposes.
 // #define AV_STREAM_GST_USE_TEST_SRC
 

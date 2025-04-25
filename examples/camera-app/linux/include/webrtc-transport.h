@@ -45,18 +45,16 @@ public:
     bool CanSendAudio() override;
 
 private:
-    // Dummy implementation to indicate if video can be sent
+    // Transport is registered after peer connection is established for receiving the video and audio buffers.
+    // Hence keeping the default values as true for canSendVideo, canSendAudio
     bool mCanSendVideo = true;
-
-    // Dummy implementation to indicate if audio can be sent
     bool mCanSendAudio = true;
 
-    uint16_t sessionID;
-    uint64_t nodeID;
+    uint16_t mSessionID;
+    uint64_t mNodeID;
     uint32_t mAudioSampleTimestamp;
     uint32_t mVideoSampleTimestamp;
-    std::shared_ptr<rtc::PeerConnection> peerConnection;
+    std::shared_ptr<rtc::PeerConnection> mPeerConnection;
     std::shared_ptr<rtc::Track> mVideoTrack;
     std::shared_ptr<rtc::Track> mAudioTrack;
-    rtc::Description::Video media;
 };

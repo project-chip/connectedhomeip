@@ -169,7 +169,7 @@ void WebRTCProviderManager::RegisterWebrtcTransport(uint16_t sessionId)
         return;
     }
 
-    if (!mMediaController)
+    if (mMediaController == nullptr)
     {
         ChipLogProgress(Camera, "mMediaController is null. Failed to Register WebRTC Transport");
         return;

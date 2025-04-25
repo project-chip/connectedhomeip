@@ -37,6 +37,11 @@ using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
 
 using namespace Camera;
 
+// Using Gstreamer video test source's ball animation pattern for the live streaming visual verification.
+// Refer https://gstreamer.freedesktop.org/documentation/videotestsrc/index.html?gi-language=c#GstVideoTestSrcPattern
+
+const int kBallAnimationPattern = 18;
+
 CameraDevice::CameraDevice()
 {
     InitializeCameraDevice();
@@ -56,7 +61,7 @@ CameraDevice::CameraDevice()
     mCameraAVStreamManager.SetCameraDeviceHAL(this);
     mCameraAVSettingsUserLevelManager.SetCameraDeviceHAL(this);
 
-    // Set the MediaController in WebRTCProviderManager.
+    // Provider manager uses the Media controller to register WebRTC Transport with media controller for AV source data
     mWebRTCProviderManager.SetMediaController(&mMediaController);
 
     mCameraAVSettingsUserLevelManager.SetCameraDeviceHAL(this);
@@ -155,7 +160,13 @@ GstElement * CameraDevice::CreateSnapshotPipeline(const std::string & device, in
 GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int width, int height, int framerate,
                                                CameraError & error)
 {
-    GstElement *pipeline, *source, *capsfilter, *videoconvert, *videoscale, *x264enc, *rtph264pay, *udpsink;
+    GstElement * pipeline     = nullptr;
+    GstElement * source       = nullptr;
+    GstElement * capsfilter   = nullptr;
+    GstElement * videoconvert = nullptr;
+    GstElement * x264enc      = nullptr;
+    GstElement * rtph264pay   = nullptr;
+    GstElement * udpsink      = nullptr;
 
     // Create the pipeline elements
     pipeline = gst_pipeline_new("video-pipeline");
@@ -168,16 +179,28 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
 #endif
     capsfilter   = gst_element_factory_make("capsfilter", "filter");
     videoconvert = gst_element_factory_make("videoconvert", "videoconvert");
-    videoscale   = gst_element_factory_make("videoscale", "videoscale");
     x264enc      = gst_element_factory_make("x264enc", "encoder");
     rtph264pay   = gst_element_factory_make("rtph264pay", "rtph264");
     udpsink      = gst_element_factory_make("udpsink", "udpsink");
 
-    if (!pipeline || !source || !capsfilter || !videoconvert || !videoscale || !x264enc || !rtph264pay || !udpsink)
+    if (pipeline == nullptr || source == nullptr || capsfilter == nullptr || videoconvert == nullptr || x264enc == nullptr ||
+        rtph264pay == nullptr || udpsink == nullptr)
     {
         ChipLogError(Camera, "Not all elements could be created.");
         if (pipeline)
             gst_object_unref(pipeline);
+        if (source)
+            gst_object_unref(source);
+        if (capsfilter)
+            gst_object_unref(capsfilter);
+        if (videoconvert)
+            gst_object_unref(videoconvert);
+        if (x264enc)
+            gst_object_unref(x264enc);
+        if (rtph264pay)
+            gst_object_unref(rtph264pay);
+        if (udpsink)
+            gst_object_unref(udpsink);
         error = CameraError::ERROR_INIT_FAILED;
         return nullptr;
     }
@@ -186,10 +209,23 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
     gst_bin_add_many(GST_BIN(pipeline), source, capsfilter, videoconvert, x264enc, rtph264pay, udpsink, NULL);
 
     // Link the elements
-    if (gst_element_link_many(source, capsfilter, videoconvert, x264enc, rtph264pay, udpsink, NULL) != TRUE)
+    if (!gst_element_link_many(source, capsfilter, videoconvert, x264enc, rtph264pay, udpsink, NULL))
     {
         ChipLogError(Camera, "Elements could not be linked.");
-        gst_object_unref(pipeline);
+        if (pipeline)
+            gst_object_unref(pipeline);
+        if (source)
+            gst_object_unref(source);
+        if (capsfilter)
+            gst_object_unref(capsfilter);
+        if (videoconvert)
+            gst_object_unref(videoconvert);
+        if (x264enc)
+            gst_object_unref(x264enc);
+        if (rtph264pay)
+            gst_object_unref(rtph264pay);
+        if (udpsink)
+            gst_object_unref(udpsink);
         error = CameraError::ERROR_INIT_FAILED;
         return nullptr;
     }
@@ -219,7 +255,13 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
 // Helper function to create a GStreamer pipeline
 GstElement * CameraDevice::CreateAudioPipeline(const std::string & device, int channels, int sampleRate, CameraError & error)
 {
-    GstElement *pipeline, *source, *capsfilter, *audioconvert, *opusenc, *rtpopuspay, *udpsink;
+    GstElement * pipeline     = nullptr;
+    GstElement * source       = nullptr;
+    GstElement * capsfilter   = nullptr;
+    GstElement * audioconvert = nullptr;
+    GstElement * opusenc      = nullptr;
+    GstElement * rtpopuspay   = nullptr;
+    GstElement * udpsink      = nullptr;
 
     // Create the pipeline elements
     pipeline = gst_pipeline_new("audio-pipeline");
@@ -236,11 +278,24 @@ GstElement * CameraDevice::CreateAudioPipeline(const std::string & device, int c
     rtpopuspay   = gst_element_factory_make("rtpopuspay", "rtpopuspay");
     udpsink      = gst_element_factory_make("udpsink", "udpsink");
 
-    if (!pipeline || !source || !capsfilter || !audioconvert || !opusenc || !rtpopuspay || !udpsink)
+    if (pipeline == nullptr || source == nullptr || capsfilter == nullptr || audioconvert == nullptr || opusenc == nullptr ||
+        rtpopuspay == nullptr || udpsink == nullptr)
     {
         ChipLogError(Camera, "Not all elements could be created.");
         if (pipeline)
             gst_object_unref(pipeline);
+        if (source)
+            gst_object_unref(source);
+        if (capsfilter)
+            gst_object_unref(capsfilter);
+        if (audioconvert)
+            gst_object_unref(audioconvert);
+        if (opusenc)
+            gst_object_unref(opusenc);
+        if (rtpopuspay)
+            gst_object_unref(rtpopuspay);
+        if (udpsink)
+            gst_object_unref(udpsink);
         error = CameraError::ERROR_INIT_FAILED;
         return nullptr;
     }
@@ -261,10 +316,23 @@ GstElement * CameraDevice::CreateAudioPipeline(const std::string & device, int c
     gst_bin_add_many(GST_BIN(pipeline), source, capsfilter, audioconvert, opusenc, rtpopuspay, udpsink, NULL);
 
     // Link elements
-    if (gst_element_link_many(source, capsfilter, audioconvert, opusenc, rtpopuspay, udpsink, NULL) != TRUE)
+    if (!gst_element_link_many(source, capsfilter, audioconvert, opusenc, rtpopuspay, udpsink, NULL))
     {
         ChipLogError(Camera, "Elements could not be linked.");
-        gst_object_unref(pipeline);
+        if (pipeline)
+            gst_object_unref(pipeline);
+        if (source)
+            gst_object_unref(source);
+        if (capsfilter)
+            gst_object_unref(capsfilter);
+        if (audioconvert)
+            gst_object_unref(audioconvert);
+        if (opusenc)
+            gst_object_unref(opusenc);
+        if (rtpopuspay)
+            gst_object_unref(rtpopuspay);
+        if (udpsink)
+            gst_object_unref(udpsink);
         error = CameraError::ERROR_INIT_FAILED;
         return nullptr;
     }
