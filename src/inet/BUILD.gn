@@ -179,6 +179,13 @@ static_library("inet") {
     public_deps += [ ":inet_zephyr_socket" ]
   }
 
+  if (chip_device_platform == "darwin") {
+    sources += [
+      "Darwin/InterfacesMonitor.h",
+      "Darwin/InterfacesMonitor.mm",
+    ]
+  }
+
   if (chip_with_nlfaultinjection) {
     sources += [
       "InetFaultInjection.cpp",
@@ -196,7 +203,7 @@ static_library("inet") {
   cflags = [ "-Wconversion" ]
   if (current_os == "nuttx") {
     cflags -= [ "-Wconversion" ]
-  } else if (chip_system_config_use_network_framework) {
+  } else if (chip_device_platform == "darwin") {
     cflags += [ "-fobjc-arc" ]
   }
 }
