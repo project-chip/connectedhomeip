@@ -144,6 +144,7 @@ silabs_executable("closure_app") {
     "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
     "src/ClosureManager.cpp",
+    "src/ClosureManager.cpp",
     "src/DataModelCallbacks.cpp",
   ]
 

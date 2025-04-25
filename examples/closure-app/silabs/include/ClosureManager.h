@@ -1,7 +1,11 @@
 /*
  *
+<<<<<<< HEAD
  *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
+=======
+ *    Copyright (c) 2022 Project CHIP Authors
+>>>>>>> 2f1934c3f5 (Closure app changes)
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,6 +19,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+<<<<<<< HEAD
 
 /*
  * @class ClosureManager
@@ -53,4 +58,16 @@ private:
     chip::app::Clusters::ClosureControl::ClosureControlEndpoint ep1{ kClosureEndpoint };
     chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint ep2{ kClosurePanel1Endpoint };
     chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint ep3{ kClosurePanel2Endpoint };
-};
+
+public:
+    static ClosureManager sClosureMgr;
+
+    /**
+    * @brief Initializes the ClosureManager.
+    *
+    * This method sets up the necessary resources and configurations required
+    * for the Closure Application to function properly.
+    */
+    void Init();
+
+}; // namespace Clusters
