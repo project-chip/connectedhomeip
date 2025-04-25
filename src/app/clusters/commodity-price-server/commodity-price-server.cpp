@@ -368,29 +368,21 @@ CHIP_ERROR Instance::CopyCharSpan(const CharSpan src, Platform::ScopedMemoryBuff
 
 CHIP_ERROR Instance::CopyPrice(const DataModel::Nullable<Structs::CommodityPriceStruct::Type> & src)
 {
-    if (mCurrentPrice.IsNull())
-    {
-        // Check that the buffer for priceStruct and components should be nullptr
-        VerifyOrDie(mOwnedCurrentPriceStructBuffer.Get() == nullptr);
-        VerifyOrDie(mOwnedCurrentPriceComponentBuffer.Get() == nullptr);
-    }
-    else
-    {
-        // Free the priceStruct
-        if (mOwnedCurrentPriceStructBuffer.Get() != nullptr)
-        {
-            mOwnedCurrentPriceStructBuffer.Free();
-        }
 
-        // Free the .components
-        if (mOwnedCurrentPriceComponentBuffer.Get() != nullptr)
-        {
-            mOwnedCurrentPriceComponentBuffer.Free();
-        }
-
-        // The .description is held within a ScopedBuffer so the
-        // CopyCharSpan() will take care of that for us
+    // Free the priceStruct
+    if (mOwnedCurrentPriceStructBuffer.Get() != nullptr)
+    {
+        mOwnedCurrentPriceStructBuffer.Free();
     }
+
+    // Free the .components
+    if (mOwnedCurrentPriceComponentBuffer.Get() != nullptr)
+    {
+        mOwnedCurrentPriceComponentBuffer.Free();
+    }
+
+    // The .description is held within a ScopedBuffer so the
+    // CopyCharSpan() will take care of that for us
 
     // At this point we should have free'd all previous memory
     if (src.IsNull())
@@ -489,44 +481,30 @@ CHIP_ERROR Instance::SetForecast(const DataModel::List<const Structs::CommodityP
 
 void Instance::CheckAndFreeForecastBuffers()
 {
-    if (mPriceForecast.size() == 0)
+    // Free everything if allocated
+    if (mOwnedForecastPriceStructBuffer.Get() != nullptr)
     {
-        VerifyOrDie(mOwnedForecastPriceStructBuffer.Get() == nullptr);
-        for (size_t i = 0; i < kMaxForecastEntries; i++)
-        {
-            VerifyOrDie(mOwnedForecastPriceComponentBuffer[i].Get() == nullptr);
-            for (size_t j = 0; j < kMaxComponentsPerPriceEntry; j++)
-            {
-                VerifyOrDie(mOwnedForecastPriceComponentDescriptionBuffer[i][j].Get() == nullptr);
-            }
-            VerifyOrDie(mOwnedForecastPriceDescriptionBuffer[i].Get() == nullptr);
-        }
-    }
-    else
-    {
-        // Free everything
-        VerifyOrDie(mOwnedForecastPriceStructBuffer.Get() != nullptr);
         mOwnedForecastPriceStructBuffer.Free();
+    }
 
-        for (size_t i = 0; i < kMaxForecastEntries; i++)
+    for (size_t i = 0; i < kMaxForecastEntries; i++)
+    {
+        if (mOwnedForecastPriceComponentBuffer[i].Get() != nullptr)
         {
-            if (mOwnedForecastPriceComponentBuffer[i].Get() != nullptr)
-            {
-                mOwnedForecastPriceComponentBuffer[i].Free();
-            }
+            mOwnedForecastPriceComponentBuffer[i].Free();
+        }
 
-            for (size_t j = 0; j < kMaxComponentsPerPriceEntry; j++)
+        for (size_t j = 0; j < kMaxComponentsPerPriceEntry; j++)
+        {
+            if (mOwnedForecastPriceComponentDescriptionBuffer[i][j].Get() != nullptr)
             {
-                if (mOwnedForecastPriceComponentDescriptionBuffer[i][j].Get() != nullptr)
-                {
-                    mOwnedForecastPriceComponentDescriptionBuffer[i][j].Free();
-                }
+                mOwnedForecastPriceComponentDescriptionBuffer[i][j].Free();
             }
+        }
 
-            if (mOwnedForecastPriceDescriptionBuffer[i].Get() != nullptr)
-            {
-                mOwnedForecastPriceDescriptionBuffer[i].Free();
-            }
+        if (mOwnedForecastPriceDescriptionBuffer[i].Get() != nullptr)
+        {
+            mOwnedForecastPriceDescriptionBuffer[i].Free();
         }
     }
 }
