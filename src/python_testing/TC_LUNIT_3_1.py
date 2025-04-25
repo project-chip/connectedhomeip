@@ -89,11 +89,11 @@ class TC_LUNIT_3_1(MatterBaseTest):
         features = await self.read_lunit_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
         self.supports_TEMP = bool(features & Clusters.UnitLocalization.Bitmaps.Feature.kTemperatureUnit)
 
-        # Step 0 - Commissioning, already done", is_commissioning=True),
+        # Step 0 - Commissioning, already done", is_commissioning=True)
 
         self.step(0)  # commissioning - already done
 
-        # Step 1 - TH reads from the DUT the TemperatureUnit attribute"),
+        # Step 1 - TH reads from the DUT the TemperatureUnit attribute")
         self.step(1)
         if self.supports_TEMP:
             temperature_unit = await self.read_lunit_attribute_expect_success(endpoint=endpoint, attribute=attributes.TemperatureUnit)
@@ -103,7 +103,7 @@ class TC_LUNIT_3_1(MatterBaseTest):
             asserts.assert_less_equal(temperature_unit, Clusters.Objects.UnitLocalization.Enums.TempUnitEnum.kKelvin,
                                       "TemperatureUnit has to be Fahrenheit, Celsius or Kelvin")
 
-            # Step 2 - TH reads from the DUT the SupportedTemperatureUnits attribute"),
+            # Step 2 - TH reads from the DUT the SupportedTemperatureUnits attribute")
             self.step(2)
             supported_temperature_units = await self.read_lunit_attribute_expect_success(endpoint=endpoint, attribute=attributes.SupportedTemperatureUnits)
             asserts.assert_greater_equal(len(supported_temperature_units), 2,
@@ -116,7 +116,7 @@ class TC_LUNIT_3_1(MatterBaseTest):
                 asserts.assert_less_equal(unit, Clusters.Objects.UnitLocalization.Enums.TempUnitEnum.kKelvin,
                                           "Each entry in SupportedTemperatureUnits has to be Fahrenheit, Celsius or Kelvin")
 
-            # Step 3 - With each entry in SupportedUnitsList, TH writes to the DUT the TemperatureUnit attribute"),
+            # Step 3 - With each entry in SupportedUnitsList, TH writes to the DUT the TemperatureUnit attribute")
             self.step(3)
             for unit in supported_temperature_units:
                 await self.write_lunit_temp_unit(endpoint=endpoint, temp_unit=unit, expected_status=Status.Success)
@@ -131,7 +131,7 @@ class TC_LUNIT_3_1(MatterBaseTest):
                 if unit not in supported_temperature_units:
                     unsupported_temperature_units.append(unit)
 
-            # Step 5 - With each entry in UnsupportedUnitsList, TH writes to the DUT the TemperatureUnit attribute"),
+            # Step 5 - With each entry in UnsupportedUnitsList, TH writes to the DUT the TemperatureUnit attribute")
             self.step(5)
             for unit in unsupported_temperature_units:
                 await self.write_lunit_temp_unit(endpoint=endpoint, temp_unit=unit, expected_status=Status.InvalidInState)
