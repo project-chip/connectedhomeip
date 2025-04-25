@@ -846,7 +846,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
         WiFiPAF::WiFiPAFSession * pChkSession  = pafLayer.GetPAFInfo(WiFiPAF::PafInfoAccess::kAccNodeId, chkSessionInfo);
         if (pChkSession == nullptr)
         {
-            // The PAF session has not existed
+            // The PAF session does not exist.
             ChipLogProgress(Controller, "WiFi-PAF: Subscribing to the NAN-USD devices, nodeId: %lu",
                             params.GetPeerAddress().GetRemoteId());
             if (!DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
