@@ -23,6 +23,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Chime;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
 using namespace chip::app::Clusters::CameraAvStreamManagement;
+using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
 
 template <typename T>
 using List   = chip::app::DataModel::List<T>;
@@ -41,30 +42,77 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
         std::make_unique<WebRTCTransportProviderServer>(mCameraDevice->GetWebRTCProviderDelegate(), mEndpoint);
 
     // Fetch all initialization parameters for CameraAVStreamMgmt Server
-    BitFlags<Feature> features;
-    features.Set(Feature::kSnapshot);
+    BitFlags<CameraAvStreamManagement::Feature> features;
+    features.Set(CameraAvStreamManagement::Feature::kSnapshot);
+    features.Set(CameraAvStreamManagement::Feature::kVideo);
+    if (mCameraDevice->GetCameraHALInterface().HasMicrophone())
+    {
+        features.Set(CameraAvStreamManagement::Feature::kAudio);
+    }
+
+    features.Set(CameraAvStreamManagement::Feature::kHighDynamicRange);
+
     BitFlags<OptionalAttribute> optionalAttrs;
-    optionalAttrs.Set(chip::app::Clusters::CameraAvStreamManagement::OptionalAttribute::kNightVision);
-    optionalAttrs.Set(chip::app::Clusters::CameraAvStreamManagement::OptionalAttribute::kNightVisionIllum);
+    optionalAttrs.Set(OptionalAttribute::kNightVision);
+    optionalAttrs.Set(OptionalAttribute::kNightVisionIllum);
+
     uint32_t maxConcurrentVideoEncoders  = mCameraDevice->GetCameraHALInterface().GetMaxConcurrentVideoEncoders();
     uint32_t maxEncodedPixelRate         = mCameraDevice->GetCameraHALInterface().GetMaxEncodedPixelRate();
     VideoSensorParamsStruct sensorParams = mCameraDevice->GetCameraHALInterface().GetVideoSensorParams();
     bool nightVisionCapable              = mCameraDevice->GetCameraHALInterface().GetNightVisionCapable();
     VideoResolutionStruct minViewport    = mCameraDevice->GetCameraHALInterface().GetMinViewport();
     std::vector<RateDistortionTradeOffStruct> rateDistortionTradeOffPoints = {};
-    uint32_t maxContentBufferSize                                          = 1024;
+
+    uint32_t maxContentBufferSize = mCameraDevice->GetCameraHALInterface().GetMaxContentBufferSize();
     AudioCapabilitiesStruct micCapabilities{};
     AudioCapabilitiesStruct spkrCapabilities{};
-    TwoWayTalkSupportTypeEnum twowayTalkSupport               = TwoWayTalkSupportTypeEnum::kNotSupported;
-    std::vector<SnapshotParamsStruct> supportedSnapshotParams = {};
-    uint32_t maxNetworkBandwidth                              = 64;
-    std::vector<StreamUsageEnum> supportedStreamUsages        = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
+    TwoWayTalkSupportTypeEnum twowayTalkSupport                  = TwoWayTalkSupportTypeEnum::kNotSupported;
+    std::vector<SnapshotCapabilitiesStruct> snapshotCapabilities = {};
+    uint32_t maxNetworkBandwidth                                 = mCameraDevice->GetCameraHALInterface().GetMaxNetworkBandwidth();
+    std::vector<StreamUsageEnum> supportedStreamUsages           = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
 
     // Instantiate the CameraAVStreamMgmt Server
     mAVStreamMgmtServerPtr = std::make_unique<CameraAVStreamMgmtServer>(
         mCameraDevice->GetCameraAVStreamMgmtDelegate(), mEndpoint, features, optionalAttrs, maxConcurrentVideoEncoders,
         maxEncodedPixelRate, sensorParams, nightVisionCapable, minViewport, rateDistortionTradeOffPoints, maxContentBufferSize,
-        micCapabilities, spkrCapabilities, twowayTalkSupport, supportedSnapshotParams, maxNetworkBandwidth, supportedStreamUsages);
+        micCapabilities, spkrCapabilities, twowayTalkSupport, snapshotCapabilities, maxNetworkBandwidth, supportedStreamUsages);
+
+    // Fetch all initialization parameters for CameraAVSettingsUserLevelMgmt Server
+    BitFlags<CameraAvSettingsUserLevelManagement::Feature, uint32_t> avsumFeatures(
+        CameraAvSettingsUserLevelManagement::Feature::kDigitalPTZ, CameraAvSettingsUserLevelManagement::Feature::kMechanicalPan,
+        CameraAvSettingsUserLevelManagement::Feature::kMechanicalTilt,
+        CameraAvSettingsUserLevelManagement::Feature::kMechanicalZoom,
+        CameraAvSettingsUserLevelManagement::Feature::kMechanicalPresets);
+    BitFlags<CameraAvSettingsUserLevelManagement::OptionalAttributes, uint32_t> avsumAttrs(
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kMptzPosition,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kMaxPresets,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kMptzPresets,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kDptzRelativeMove,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kZoomMax,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kTiltMin,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kTiltMax,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMin,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMax);
+    const uint8_t appMaxPresets = 5;
+
+    // Instantiate the CameraAVSettingsUserLevelMgmt Server
+    mAVSettingsUserLevelMgmtServerPtr = std::make_unique<CameraAvSettingsUserLevelMgmtServer>(
+        mEndpoint, mCameraDevice->GetCameraAVSettingsUserLevelMgmtDelegate(), avsumFeatures, avsumAttrs, appMaxPresets);
+
+    mAVSettingsUserLevelMgmtServerPtr->SetPanMin(mCameraDevice->GetCameraHALInterface().GetPanMin());
+    mAVSettingsUserLevelMgmtServerPtr->SetPanMax(mCameraDevice->GetCameraHALInterface().GetPanMax());
+    mAVSettingsUserLevelMgmtServerPtr->SetTiltMin(mCameraDevice->GetCameraHALInterface().GetTiltMin());
+    mAVSettingsUserLevelMgmtServerPtr->SetTiltMax(mCameraDevice->GetCameraHALInterface().GetTiltMax());
+    mAVSettingsUserLevelMgmtServerPtr->SetZoomMax(mCameraDevice->GetCameraHALInterface().GetZoomMax());
+}
+
+void CameraApp::InitializeCameraAVStreamMgmt()
+{
+    // Set the attribute defaults
+    mAVStreamMgmtServerPtr->SetHDRModeEnabled(mCameraDevice->GetCameraHALInterface().GetHDRMode());
+    mAVStreamMgmtServerPtr->SetViewport(mCameraDevice->GetCameraHALInterface().GetViewport());
+
+    mAVStreamMgmtServerPtr->Init();
 }
 
 void CameraApp::InitCameraDeviceClusters()
@@ -74,7 +122,9 @@ void CameraApp::InitCameraDeviceClusters()
 
     mChimeServerPtr->Init();
 
-    mAVStreamMgmtServerPtr->Init();
+    mAVSettingsUserLevelMgmtServerPtr->Init();
+
+    InitializeCameraAVStreamMgmt();
 }
 
 static constexpr EndpointId kCameraEndpointId = 1;

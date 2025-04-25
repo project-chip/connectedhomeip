@@ -136,14 +136,17 @@ enum
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     kDeviceOption_icdActiveModeDurationMs,
     kDeviceOption_icdIdleModeDuration,
-#endif // CHIP_ENABLE_ICD_SERVER
+#endif
+#if ENABLE_CAMERA_SERVER
+    kDeviceOption_Camera_DeferredOffer,
+#endif
 };
 
 constexpr unsigned kAppUsageLength = 64;
 
 OptionDef sDeviceOptionDefs[] = {
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-    { "ble-device", kArgumentRequired, kDeviceOption_BleDevice },
+    { "ble-controller", kArgumentRequired, kDeviceOption_BleDevice },
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     { "wifi", kNoArgument, kDeviceOption_WiFi },
@@ -220,14 +223,17 @@ OptionDef sDeviceOptionDefs[] = {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     { "icdActiveModeDurationMs", kArgumentRequired, kDeviceOption_icdActiveModeDurationMs },
     { "icdIdleModeDuration", kArgumentRequired, kDeviceOption_icdIdleModeDuration },
-#endif // CHIP_ENABLE_ICD_SERVER
+#endif
+#if ENABLE_CAMERA_SERVER
+    { "camera-deferred-offer", kNoArgument, kDeviceOption_Camera_DeferredOffer },
+#endif
     {}
 };
 
 const char * sDeviceOptionHelp =
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-    "  --ble-device <number>\n"
-    "       The device number for CHIPoBLE, without 'hci' prefix, can be found by hciconfig.\n"
+    "  --ble-controller <selector>\n"
+    "       BLE controller selector, see example or platform docs for details\n"
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     "\n"
@@ -402,6 +408,11 @@ const char * sDeviceOptionHelp =
     "  --icdIdleModeDuration <icdIdleModeDuration>\n"
     "       Sets the ICD idle mode durations (in seconds). (Default: 300)\n"
     "       This defines the how long the ICD server can stay in idle mode.\n"
+#endif
+#if ENABLE_CAMERA_SERVER
+    "\n"
+    "  --camera-deferred-offer\n"
+    "       Indicates the delayed processing hint of the WebRTC Provider.\n"
 #endif
     "\n";
 
@@ -819,6 +830,12 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
             // Covert from seconds to mini seconds
             LinuxDeviceOptions::GetInstance().icdIdleModeDurationMs.SetValue(chip::System::Clock::Milliseconds32(value * 1000));
         }
+        break;
+    }
+#endif
+#if ENABLE_CAMERA_SERVER
+    case kDeviceOption_Camera_DeferredOffer: {
+        LinuxDeviceOptions::GetInstance().cameraDeferredOffer = true;
         break;
     }
 #endif
