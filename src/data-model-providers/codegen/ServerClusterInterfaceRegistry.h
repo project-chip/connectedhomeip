@@ -22,6 +22,7 @@
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
+#include <new>
 
 namespace chip {
 namespace app {
@@ -101,17 +102,20 @@ public:
 
     [[nodiscard]] constexpr ServerClusterRegistration & Registration()
     {
-        return *reinterpret_cast<ServerClusterRegistration *>(mRegistration);
+        return *std::launder(reinterpret_cast<ServerClusterRegistration *>(mRegistration));
     }
 
     [[nodiscard]] constexpr const ServerClusterRegistration & Registration() const
     {
-        return *reinterpret_cast<const ServerClusterRegistration *>(mRegistration);
+        return *std::launder(reinterpret_cast<const ServerClusterRegistration *>(mRegistration));
     }
 
-    [[nodiscard]] constexpr SERVER_CLUSTER & Cluster() { return *reinterpret_cast<SERVER_CLUSTER *>(mCluster); }
+    [[nodiscard]] constexpr SERVER_CLUSTER & Cluster() { return *std::launder(reinterpret_cast<SERVER_CLUSTER *>(mCluster)); }
 
-    [[nodiscard]] constexpr const SERVER_CLUSTER & Cluster() const { return *reinterpret_cast<const SERVER_CLUSTER *>(mCluster); }
+    [[nodiscard]] constexpr const SERVER_CLUSTER & Cluster() const
+    {
+        return *std::launder(reinterpret_cast<const SERVER_CLUSTER *>(mCluster));
+    }
 
 private:
     alignas(SERVER_CLUSTER) uint8_t mCluster[sizeof(SERVER_CLUSTER)]                            = { 0 };
