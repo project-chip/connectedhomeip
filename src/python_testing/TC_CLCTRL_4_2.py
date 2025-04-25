@@ -143,7 +143,7 @@ class TC_CLCTRL_4_2(MatterBaseTest):
             self.step("4b")
             try:
                 await self.send_single_cmd(
-                    cmd=Clusters.Objects.ClosureControl.Commands.MoveTo(Latch=True),
+                    cmd=Clusters.Objects.ClosureControl.Commands.MoveTo(latch=True),
                     endpoint=endpoint
                 )
             except InteractionModelError as e:
@@ -228,7 +228,7 @@ class TC_CLCTRL_4_2(MatterBaseTest):
         asserts.assert_true(hasattr(overall_target, "latch"), "OverallTarget.Latch field missing")
         asserts.assert_false(overall_target.latch, "OverallTarget.Latch is not False")
         
-        is_speed_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kSP
+        is_speed_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kSpeed
         if is_speed_supported:
             asserts.assert_true(hasattr(overall_target, "speed"), "OverallTarget.Speed field missing")
             asserts.assert_is_not_none(overall_target.speed, "OverallTarget.Speed is None")
