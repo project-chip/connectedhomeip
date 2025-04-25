@@ -755,9 +755,7 @@
             "FeatureMap"
         ],
         "Camera AV Settings User Level Management": ["MPTZPosition"],
-        "Push AV Stream Transport" :[
-            "CurrentConnections"
-        ]
+        "Push AV Stream Transport": ["CurrentConnections"]
     },
     "mandatoryDeviceTypes": "0x0016",
     "defaultReportingPolicy": "mandatory",
