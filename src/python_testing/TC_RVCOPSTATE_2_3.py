@@ -62,6 +62,14 @@ def state_enum_to_text(state_enum):
         return "Charging(0x41)"
     elif state_enum == Clusters.RvcOperationalState.Enums.OperationalStateEnum.kDocked:
         return "Docked(0x42)"
+    elif state_enum == Clusters.RvcOperationalState.Enums.OperationalStateEnum.kEmptyingDustBin:
+        return "EmptyingDustBin(0x43)"
+    elif state_enum == Clusters.RvcOperationalState.Enums.OperationalStateEnum.kCleaningMop:
+        return "CleaningMop(0x44)"
+    elif state_enum == Clusters.RvcOperationalState.Enums.OperationalStateEnum.kFillingWaterTank:
+        return "FillingWaterTank(0x45)"
+    elif state_enum == Clusters.RvcOperationalState.Enums.OperationalStateEnum.kUpdatingMaps:
+        return "UpdatingMaps(0x46)"
     else:
         return "UnknownEnumValue"
 
@@ -92,6 +100,22 @@ def error_enum_to_text(error_enum):
         return "WaterTankLidOpen(0x46)"
     elif error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kMopCleaningPadMissing:
         return "MopCleaningPadMissing(0x47)"
+    elif error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kLowBattery:
+        return "LowBattery(0x48)"
+    elif error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kCannotReachTargetArea:
+        return "CannotReachTargetArea(0x49)"
+    elif error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kDirtyWaterTankFull:
+        return "DirtyWaterTankFull(0x4A)"
+    elif error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kDirtyWaterTankMissing:
+        return "DirtyWaterTankMissing(0x4B)"
+    elif error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kWheelsJammed:
+        return "WheelsJammed(0x4C)"
+    elif error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kBrushJammed:
+        return "BrushJammed(0x4D)"
+    elif error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kNavigationSensorObscured:
+        return "NavigationSensorObscured(0x4E)"
+    else:
+        return "UnknownEnumValue"
 
 
 class TC_RVCOPSTATE_2_3(MatterBaseTest):
