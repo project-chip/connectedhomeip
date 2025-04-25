@@ -170,17 +170,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 position=Clusters.ClosureControl.Bitmaps.Position.kSignature,
             ))
         except InteractionModelError as e:
-            if e.status == Status.UNSUPPORTED_CLUSTER:
-                logging.info("Test step skipped")
-                return
-            else:
-                raise
-        # Check if the command was sent successfully
-        if not type_matches(e.status, Status.SUCCESS):
-            logging.error(f"Failed to send command MoveTo: {e.status}")
-            return
-        else:
-            logging.info("Command MoveTo sent successfully")
+            asserts.assert_equal(
+                e.status, Status.Success, "Unexpected error returned")
+            pass
 
         # STEP 3b: If the attribute is supported on the cluster, TH reads from the DUT the OverallTaget attribute
         self.step("3b")
@@ -193,9 +185,10 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             if is_lt_feature_supported:
                 asserts.assert_false(overall_target.Latch, "OverallTarget.Latch is not False")
             if is_sp_feature_supported:
-                asserts.assert_range(overall_target.Speed, 0, 3, "OverallTarget.Speed is out of range")
+                asserts.assert_range(overall_target.Speed, Clusters.ClosureControl.Bitmaps.Speed.kLow,
+                                     Clusters.ClosureControl.Bitmaps.Speed.kAuto, "OverallTarget.Speed is out of range")
         else:
-            logging.info("OverallTarget attribute is not supported on the cluster, skipping this step.")
+            asserts.assert_true(False, "OverallTarget attribute is not supported.")
             return
 
         # STEP 3c: TH waits for PIXIT.CLCTRL.FullMotionDuration seconds
@@ -212,7 +205,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             logging.info(f"Waiting for {full_motion_duration} seconds")
             await self.wait(full_motion_duration)
         else:
-            logging.info("No wait time specified, continuing without waiting")
+            logging.info("FullMotionDuration is 0, skipping wait")
 
         # STEP 3d: If the attribute is supported on the cluster, TH reads from the DUT the OverallState attribute
         self.step("3d")
@@ -231,7 +224,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             else:
                 logging.info("SecureState is NULL.")
         else:
-            logging.info("OverallState attribute is not supported on the cluster, skipping this step.")
+            asserts.assert_true(False, "OverallState attribute is not supported.")
             return
 
         # STEP 3e: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
@@ -245,7 +238,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             if is_stopped:
                 logging.info("MainState is in the stopped state")
         else:
-            logging.info("MainState attribute is not supported on the cluster, skipping this step.")
+            asserts.assert_true(False, "MainState attribute is not supported.")
             return
 
         # STEP 4a: If VT feature is not supported on the cluster, skip steps 4b to 4f
@@ -265,17 +258,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 position=Clusters.ClosureControl.Bitmaps.Position.kVentilation,
             ))
         except InteractionModelError as e:
-            if e.status == Status.UNSUPPORTED_CLUSTER:
-                logging.info("Test step skipped")
-                return
-            else:
-                raise
-        # Check if the command was sent successfully
-        if not type_matches(e.status, Status.SUCCESS):
-            logging.error(f"Failed to send command MoveTo: {e.status}")
-            return
-        else:
-            logging.info("Command MoveTo sent successfully")
+            asserts.assert_equal(
+                e.status, Status.Success, "Unexpected error returned")
+            pass
 
         # STEP 4c: If the attribute is supported on the cluster, TH reads from the DUT the OverallTaget attribute
         self.step("4c")
@@ -293,7 +278,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             if is_sp_feature_supported:
                 asserts.assert_range(overall_target.Speed, 0, 3, "OverallTarget.Speed is out of range")
         else:
-            logging.info("OverallTarget attribute is not supported on the cluster, skipping this step.")
+            asserts.assert_true(False, "OverallTarget attribute is not supported.")
             return
 
         # STEP 4d: TH waits for PIXIT.CLCTRL.FullMotionDuration seconds
@@ -302,17 +287,8 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         if is_skipped == True:
             logging.info("Test step skipped")
             return
-        if full_motion_duration is None:
-            logging.error("PIXIT.CLCTRL.FullMotionDuration is not defined")
-            return
-        if full_motion_duration < 0:
-            logging.error("PIXIT.CLCTRL.FullMotionDuration is negative")
-            return
-        if full_motion_duration > 0:
-            logging.info(f"Waiting for {full_motion_duration} seconds")
-            await self.wait(full_motion_duration)
-        else:
-            logging.info("No wait time specified, continuing without waiting")
+        logging.info(f"Waiting for {full_motion_duration} seconds")
+        await self.wait(full_motion_duration)
 
         # STEP 4e: If the attribute is supported on the cluster, TH reads from the DUT the OverallState attribute
         self.step("4e")
@@ -334,7 +310,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             else:
                 logging.info("SecureState is NULL.")
         else:
-            logging.info("OverallState attribute is not supported on the cluster, skipping this step.")
+            asserts.assert_true(False, "OverallState attribute is not supported.")
             return
 
         # STEP 4f: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
@@ -352,7 +328,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             if is_stopped:
                 logging.info("MainState is in the stopped state")
         else:
-            logging.info("MainState attribute is not supported on the cluster, skipping this step.")
+            asserts.assert_true(False, "MainState attribute is not supported.")
             return
         is_skipped = False
 
@@ -374,17 +350,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 position=Clusters.ClosureControl.Bitmaps.Position.kPedestrian,
             ))
         except InteractionModelError as e:
-            if e.status == Status.UNSUPPORTED_CLUSTER:
-                logging.info("Test step skipped")
-                return
-            else:
-                raise
-        # Check if the command was sent successfully
-        if not type_matches(e.status, Status.SUCCESS):
-            logging.error(f"Failed to send command MoveTo: {e.status}")
-            return
-        else:
-            logging.info("Command MoveTo sent successfully")
+            asserts.assert_equal(
+                e.status, Status.Success, "Unexpected error returned")
+            pass
 
         # STEP 5c: If the attribute is supported on the cluster, TH reads from the DUT the OverallTaget attribute
         self.step("5c")
@@ -402,7 +370,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             if is_sp_feature_supported:
                 asserts.assert_range(overall_target.Speed, 0, 3, "OverallTarget.Speed is out of range")
         else:
-            logging.info("OverallTarget attribute is not supported on the cluster, skipping this step.")
+            asserts.assert_true(False, "OverallTarget attribute is not supported.")
             return
 
         # STEP 5d: TH waits for PIXIT.CLCTRL.FullMotionDuration seconds
@@ -411,17 +379,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         if is_skipped == True:
             logging.info("Test step skipped")
             return
-        if full_motion_duration is None:
-            logging.error("PIXIT.CLCTRL.FullMotionDuration is not defined")
-            return
-        if full_motion_duration < 0:
-            logging.error("PIXIT.CLCTRL.FullMotionDuration is negative")
-            return
-        if full_motion_duration > 0:
-            logging.info(f"Waiting for {full_motion_duration} seconds")
-            await self.wait(full_motion_duration)
-        else:
-            logging.info("No wait time specified, continuing without waiting")
+
+        logging.info(f"Waiting for {full_motion_duration} seconds")
+        await self.wait(full_motion_duration)
 
         # STEP 5e: If the attribute is supported on the cluster, TH reads from the DUT the OverallState attribute
         self.step("5e")
@@ -443,7 +403,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             else:
                 logging.info("SecureState is NULL.")
         else:
-            logging.info("OverallState attribute is not supported on the cluster, skipping this step.")
+            asserts.assert_true(False, "OverallState attribute is not supported.")
             return
 
         # STEP 5f: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
@@ -461,7 +421,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             if is_stopped:
                 logging.info("MainState is in the stopped state")
         else:
-            logging.info("MainState attribute is not supported on the cluster, skipping this step.")
+            asserts.assert_true(False, "MainState attribute is not supported.")
             return
         is_skipped = False
 
@@ -473,17 +433,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 position=Clusters.ClosureControl.Bitmaps.Position.kOpenInFull,
             ))
         except InteractionModelError as e:
-            if e.status == Status.UNSUPPORTED_CLUSTER:
-                logging.info("Test step skipped")
-                return
-            else:
-                raise
-        # Check if the command was sent successfully
-        if not type_matches(e.status, Status.SUCCESS):
-            logging.error(f"Failed to send command MoveTo: {e.status}")
-            return
-        else:
-            logging.info("Command MoveTo sent successfully")
+            asserts.assert_equal(
+                e.status, Status.Success, "Unexpected error returned")
+            pass
 
         # STEP 6b: If the attribute is supported on the cluster, TH reads from the DUT the OverallTaget attribute
         self.step("6b")
@@ -498,23 +450,14 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             if is_sp_feature_supported:
                 asserts.assert_range(overall_target.Speed, 0, 3, "OverallTarget.Speed is out of range")
         else:
-            logging.info("OverallTarget attribute is not supported on the cluster, skipping this step.")
+            asserts.assert_true(False, "OverallTarget attribute is not supported.")
             return
 
         # STEP 6c: TH waits for PIXIT.CLCTRL.FullMotionDuration seconds
         self.step("6c")
 
-        if full_motion_duration is None:
-            logging.error("PIXIT.CLCTRL.FullMotionDuration is not defined")
-            return
-        if full_motion_duration < 0:
-            logging.error("PIXIT.CLCTRL.FullMotionDuration is negative")
-            return
-        if full_motion_duration > 0:
-            logging.info(f"Waiting for {full_motion_duration} seconds")
-            await self.wait(full_motion_duration)
-        else:
-            logging.info("No wait time specified, continuing without waiting")
+        logging.info(f"Waiting for {full_motion_duration} seconds")
+        await self.wait(full_motion_duration)
 
         # STEP 6d: If the attribute is supported on the cluster, TH reads from the DUT the OverallState attribute
         self.step("6d")
@@ -533,7 +476,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             else:
                 logging.info("SecureState is NULL.")
         else:
-            logging.info("OverallState attribute is not supported on the cluster, skipping this step.")
+            asserts.assert_true(False, "OverallState attribute is not supported.")
             return
 
         # STEP 6e: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
@@ -547,7 +490,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             if is_stopped:
                 logging.info("MainState is in the stopped state")
         else:
-            logging.info("MainState attribute is not supported on the cluster, skipping this step.")
+            asserts.assert_true(False, "MainState attribute is not supported.")
             return
 
         # STEP 7a: TH sends command MoveTo with Position = CloseInFull
@@ -558,17 +501,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 position=Clusters.ClosureControl.Bitmaps.Position.kCloseInFull,
             ))
         except InteractionModelError as e:
-            if e.status == Status.UNSUPPORTED_CLUSTER:
-                logging.info("Test step skipped")
-                return
-            else:
-                raise
-        # Check if the command was sent successfully
-        if not type_matches(e.status, Status.SUCCESS):
-            logging.error(f"Failed to send command MoveTo: {e.status}")
-            return
-        else:
-            logging.info("Command MoveTo sent successfully")
+            asserts.assert_equal(
+                e.status, Status.Success, "Unexpected error returned")
+            pass
 
         # STEP 7b: If the attribute is supported on the cluster, TH reads from the DUT the OverallTaget attribute
         self.step("7b")
@@ -583,23 +518,14 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             if is_sp_feature_supported:
                 asserts.assert_range(overall_target.Speed, 0, 3, "OverallTarget.Speed is out of range")
         else:
-            logging.info("OverallTarget attribute is not supported on the cluster, skipping this step.")
+            asserts.assert_true(False, "OverallTarget attribute is not supported.")
             return
 
         # STEP 7c: TH waits for PIXIT.CLCTRL.FullMotionDuration seconds
         self.step("7c")
 
-        if full_motion_duration is None:
-            logging.error("PIXIT.CLCTRL.FullMotionDuration is not defined")
-            return
-        if full_motion_duration < 0:
-            logging.error("PIXIT.CLCTRL.FullMotionDuration is negative")
-            return
-        if full_motion_duration > 0:
-            logging.info(f"Waiting for {full_motion_duration} seconds")
-            await self.wait(full_motion_duration)
-        else:
-            logging.info("No wait time specified, continuing without waiting")
+        logging.info(f"Waiting for {full_motion_duration} seconds")
+        await self.wait(full_motion_duration)
 
         # STEP 7d: If the attribute is supported on the cluster, TH reads from the DUT the OverallState attribute
         self.step("7d")
@@ -618,7 +544,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             else:
                 logging.info("SecureState is NULL.")
         else:
-            logging.info("OverallState attribute is not supported on the cluster, skipping this step.")
+            asserts.assert_true(False, "OverallState attribute is not supported.")
             return
 
         # STEP 7e: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
@@ -632,7 +558,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             if is_stopped:
                 logging.info("MainState is in the stopped state")
         else:
-            logging.info("MainState attribute is not supported on the cluster, skipping this step.")
+            asserts.assert_true(False, "MainState attribute is not supported.")
             return
 
         # STEP 8a: If SP feature is not supported on the cluster, skip steps 8b to 8g
@@ -653,17 +579,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 speed=Clusters.ClosureControl.Bitmaps.Speed.kHigh,
             ))
         except InteractionModelError as e:
-            if e.status == Status.UNSUPPORTED_CLUSTER:
-                logging.info("Test step skipped")
-                return
-            else:
-                raise
-        # Check if the command was sent successfully
-        if not type_matches(e.status, Status.SUCCESS):
-            logging.error(f"Failed to send command MoveTo: {e.status}")
-            return
-        else:
-            logging.info("Command MoveTo sent successfully")
+            asserts.assert_equal(
+                e.status, Status.Success, "Unexpected error returned")
+            pass
 
         # STEP 8c: If the attribute is supported on the cluster, TH reads from the DUT the OverallTaget attribute
         self.step("8c")
@@ -681,7 +599,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             if is_lt_feature_supported:
                 asserts.assert_false(overall_target.Latch, "OverallTarget.Latch is not False")
         else:
-            logging.info("OverallTarget attribute is not supported on the cluster, skipping this step.")
+            asserts.assert_true(False, "OverallTarget attribute is not supported.")
             return
 
         # STEP 8d: If the attribute is supported on the cluster, TH reads from the DUT the OverallState attribute
@@ -703,7 +621,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             else:
                 logging.info("SecureState is NULL.")
         else:
-            logging.info("OverallState attribute is not supported on the cluster, skipping this step.")
+            asserts.assert_true(False, "OverallState attribute is not supported.")
             return
 
         # STEP 8e: TH sends command MoveTo with Speed = Low
@@ -717,17 +635,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 speed=Clusters.ClosureControl.Bitmaps.Speed.kLow,
             ))
         except InteractionModelError as e:
-            if e.status == Status.UNSUPPORTED_CLUSTER:
-                logging.info("Test step skipped")
-                return
-            else:
-                raise
-        # Check if the command was sent successfully
-        if not type_matches(e.status, Status.SUCCESS):
-            logging.error(f"Failed to send command MoveTo: {e.status}")
-            return
-        else:
-            logging.info("Command MoveTo sent successfully")
+            asserts.assert_equal(
+                e.status, Status.Success, "Unexpected error returned")
+            pass
 
         # STEP 8f: If the attribute is supported on the cluster, TH reads from the DUT the OverallTaget attribute
         self.step("8f")
@@ -744,7 +654,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             if is_lt_feature_supported:
                 asserts.assert_false(overall_target.Latch, "OverallTarget.Latch is not False")
         else:
-            logging.info("OverallTarget attribute is not supported on the cluster, skipping this step.")
+            asserts.assert_true(False, "OverallTarget attribute is not supported.")
             return
 
         # STEP 8g: If the attribute is supported on the cluster, TH reads from the DUT the OverallState attribute
@@ -767,7 +677,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             else:
                 logging.info("SecureState is NULL.")
         else:
-            logging.info("OverallState attribute is not supported on the cluster, skipping this step.")
+            asserts.assert_true(False, "OverallState attribute is not supported.")
             return
         is_skipped = False
 
@@ -790,17 +700,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 event_trigger=self.matter_test_config.get("PIXIT.CLCTRL.TEST_EVENT_TRIGGER"),
             ))
         except InteractionModelError as e:
-            if e.status == Status.UNSUPPORTED_CLUSTER:
-                logging.info("Test step skipped")
-                return
-            else:
-                raise
-        # Check if the command was sent successfully
-        if not type_matches(e.status, Status.SUCCESS):
-            logging.error(f"Failed to send command TestEventTrigger: {e.status}")
-            return
-        else:
-            logging.info("Command TestEventTrigger sent successfully")
+            asserts.assert_equal(
+                e.status, Status.Success, "Unexpected error returned")
+            pass
 
         # STEP 9c: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
         self.step("9c")
@@ -813,7 +715,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             logging.info(f"MainState: {main_state}")
             asserts.assert_equal(main_state, Clusters.ClosureControl.Bitmaps.MainState.kProtected, "MainState is not Protected")
         else:
-            logging.info("MainState attribute is not supported on the cluster, skipping this step.")
+            asserts.assert_true(False, "MainState attribute is not supported.")
             return
 
         # STEP 9d: TH sends command MoveTo with Position = CloseInFull
@@ -827,11 +729,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 position=Clusters.ClosureControl.Bitmaps.Position.kCloseInFull,
             ))
         except InteractionModelError as e:
-            if e.status == Status.UNSUPPORTED_CLUSTER:
-                logging.info("Test step skipped")
-                return
-            else:
-                raise
+            asserts.assert_equal(
+                e.status, Status.Success, "Unexpected error returned")
+            pass
         # Check if the command was sent invalid state
         if e.status == Status.INVALID_STATE:
             logging.info("Command MoveTo is invalid while MainState is Protected")
@@ -851,17 +751,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 event_trigger=self.matter_test_config.get("PIXIT.CLCTRL.TEST_EVENT_TRIGGER"),
             ))
         except InteractionModelError as e:
-            if e.status == Status.UNSUPPORTED_CLUSTER:
-                logging.info("Test step skipped")
-                return
-            else:
-                raise
-        # Check if the command was sent successfully
-        if not type_matches(e.status, Status.SUCCESS):
-            logging.error(f"Failed to send command TestEventTrigger: {e.status}")
-            return
-        else:
-            logging.info("Command TestEventTrigger sent successfully")
+            asserts.assert_equal(
+                e.status, Status.Success, "Unexpected error returned")
+            pass
 
         # STEP 9f: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
         self.step("9f")
@@ -878,7 +770,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             if is_stopped:
                 logging.info("MainState is in the stopped state")
         else:
-            logging.info("MainState attribute is not supported on the cluster, skipping this step.")
+            asserts.assert_true(False, "MainState attribute is not supported.")
             return
         is_skipped = False
 
@@ -901,17 +793,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 event_trigger=self.matter_test_config.get("PIXIT.CLCTRL.TEST_EVENT_TRIGGER"),
             ))
         except InteractionModelError as e:
-            if e.status == Status.UNSUPPORTED_CLUSTER:
-                logging.info("Test step skipped")
-                return
-            else:
-                raise
-        # Check if the command was sent successfully
-        if not type_matches(e.status, Status.SUCCESS):
-            logging.error(f"Failed to send command TestEventTrigger: {e.status}")
-            return
-        else:
-            logging.info("Command TestEventTrigger sent successfully")
+            asserts.assert_equal(
+                e.status, Status.Success, "Unexpected error returned")
+            pass
 
         # STEP 10c: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
         self.step("10c")
@@ -924,7 +808,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             logging.info(f"MainState: {main_state}")
             asserts.assert_equal(main_state, Clusters.ClosureControl.Bitmaps.MainState.kDisengaged, "MainState is not Disengaged")
         else:
-            logging.info("MainState attribute is not supported on the cluster, skipping this step.")
+            asserts.assert_true(False, "MainState attribute is not supported.")
             return
 
         # STEP 10d: TH sends command MoveTo with Position = CloseInFull
@@ -938,17 +822,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 position=Clusters.ClosureControl.Bitmaps.Position.kCloseInFull,
             ))
         except InteractionModelError as e:
-            if e.status == Status.UNSUPPORTED_CLUSTER:
-                logging.info("Test step skipped")
-                return
-            else:
-                raise
-        # Check if the command was sent invalid state
-        if e.status == Status.INVALID_STATE:
-            logging.info("Command MoveTo is invalid while MainState is Disengaged")
-        else:
-            logging.error(f"Failed to send command MoveTo: {e.status}")
-            return
+            asserts.assert_equal(
+                e.status, Status.Success, "Unexpected error returned")
+            pass
 
         # STEP 10e: TH sends TestEventTrigger command to General Diagnostic Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState Test Event Clear
         self.step("10e")
@@ -962,17 +838,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 event_trigger=self.matter_test_config.get("PIXIT.CLCTRL.TEST_EVENT_TRIGGER"),
             ))
         except InteractionModelError as e:
-            if e.status == Status.UNSUPPORTED_CLUSTER:
-                logging.info("Test step skipped")
-                return
-            else:
-                raise
-        # Check if the command was sent successfully
-        if not type_matches(e.status, Status.SUCCESS):
-            logging.error(f"Failed to send command TestEventTrigger: {e.status}")
-            return
-        else:
-            logging.info("Command TestEventTrigger sent successfully")
+            asserts.assert_equal(
+                e.status, Status.Success, "Unexpected error returned")
+            pass
 
         # STEP 10f: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
         self.step("10f")
@@ -989,7 +857,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             if is_stopped:
                 logging.info("MainState is in the stopped state")
         else:
-            logging.info("MainState attribute is not supported on the cluster, skipping this step.")
+            asserts.assert_true(False, "MainState attribute is not supported.")
             return
         is_skipped = False
 
@@ -1011,17 +879,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 position=Clusters.ClosureControl.Bitmaps.Position.kOpenInFull,
             ))
         except InteractionModelError as e:
-            if e.status == Status.UNSUPPORTED_CLUSTER:
-                logging.info("Test step skipped")
-                return
-            else:
-                raise
-        # Check if the command was sent successfully
-        if not type_matches(e.status, Status.SUCCESS):
-            logging.error(f"Failed to send command MoveTo: {e.status}")
-            return
-        else:
-            logging.info("Command MoveTo sent successfully")
+            asserts.assert_equal(
+                e.status, Status.Success, "Unexpected error returned")
+            pass
 
         # STEP 11c: If the attribute is supported on the cluster, TH reads from the DUT the OverallTaget attribute
         self.step("11c")
@@ -1039,7 +899,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             if is_sp_feature_supported:
                 asserts.assert_range(overall_target.Speed, 0, 3, "OverallTarget.Speed is out of range")
         else:
-            logging.info("OverallTarget attribute is not supported on the cluster, skipping this step.")
+            asserts.assert_true(False, "OverallTarget attribute is not supported.")
             return
 
         # STEP 11d: TH waits for 2 seconds
@@ -1048,7 +908,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         if is_skipped == True:
             logging.info("Test step skipped")
             return
-        sleep(2)
+        await self.wait(2)
         logging.info("Waiting for 2 seconds")
 
         # STEP 11e: If the attribute is supported on the cluster, TH reads from the DUT the OverallState attribute
@@ -1071,7 +931,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             else:
                 logging.info("SecureState is NULL.")
         else:
-            logging.info("OverallState attribute is not supported on the cluster, skipping this step.")
+            asserts.assert_true(False, "OverallState attribute is not supported.")
             return
 
         # STEP 11f: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
@@ -1088,7 +948,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             if is_stopped:
                 logging.info("MainState is in the stopped state")
         else:
-            logging.info("MainState attribute is not supported on the cluster, skipping this step.")
+            asserts.assert_true(False, "MainState attribute is not supported.")
             return
 
         # STEP 11g: TH sends command MoveTo with Position = CloseInFull
@@ -1102,17 +962,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 position=Clusters.ClosureControl.Bitmaps.Position.kCloseInFull,
             ))
         except InteractionModelError as e:
-            if e.status == Status.UNSUPPORTED_CLUSTER:
-                logging.info("Test step skipped")
-                return
-            else:
-                raise
-        # Check if the command was sent successfully
-        if not type_matches(e.status, Status.SUCCESS):
-            logging.error(f"Failed to send command MoveTo: {e.status}")
-            return
-        else:
-            logging.info("Command MoveTo sent successfully")
+            asserts.assert_equal(
+                e.status, Status.Success, "Unexpected error returned")
+            pass
 
         # STEP 11h: If the attribute is supported on the cluster, TH reads from the DUT the OverallTaget attribute
         self.step("11h")
@@ -1130,7 +982,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             if is_sp_feature_supported:
                 asserts.assert_range(overall_target.Speed, 0, 3, "OverallTarget.Speed is out of range")
         else:
-            logging.info("OverallTarget attribute is not supported on the cluster, skipping this step.")
+            asserts.assert_true(False, "OverallTarget attribute is not supported.")
             return
 
         # STEP 11i: TH waits for 2 seconds
@@ -1139,7 +991,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         if is_skipped == True:
             logging.info("Test step skipped")
             return
-        sleep(2)
+        await self.wait(2)
         logging.info("Waiting for 2 seconds")
 
         # STEP 11j: If the attribute is supported on the cluster, TH reads from the DUT the OverallState attribute
@@ -1162,7 +1014,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             else:
                 logging.info("SecureState is NULL.")
         else:
-            logging.info("OverallState attribute is not supported on the cluster, skipping this step.")
+            asserts.assert_true(False, "OverallState attribute is not supported.")
             return
 
         # STEP 11k: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
@@ -1180,7 +1032,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             if is_stopped:
                 logging.info("MainState is in the stopped state")
         else:
-            logging.info("MainState attribute is not supported on the cluster, skipping this step.")
+            asserts.assert_true(False, "MainState attribute is not supported.")
             return
         is_skipped = False
 
