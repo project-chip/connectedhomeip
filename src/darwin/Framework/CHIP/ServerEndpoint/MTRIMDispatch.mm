@@ -48,7 +48,7 @@ public:
     }
 };
 
-Global<FixedOtaProviderServer> gOtaProviderServer(kOtaProviderEndpointId);
+Global<FixedOtaProviderServer> gOtaProviderServer;
 
 } // anonymous namespace
 
