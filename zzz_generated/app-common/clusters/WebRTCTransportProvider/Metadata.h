@@ -20,11 +20,9 @@ inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 namespace CurrentSessions {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CurrentSessions::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kManage,
-    .writePrivilege = std::nullopt,
+inline constexpr DataModel::AttributeEntry kMetadataEntry{
+    CurrentSessions::Id, BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    Access::Privilege::kManage, std::nullopt
 };
 } // namespace CurrentSessions
 
@@ -32,38 +30,33 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 
 namespace Commands {
 namespace SolicitOffer {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = WebRTCTransportProvider::Commands::SolicitOffer::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kOperate,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
+    WebRTCTransportProvider::Commands::SolicitOffer::Id,
+    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped }, Access::Privilege::kOperate
 };
 } // namespace SolicitOffer
 namespace ProvideOffer {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = WebRTCTransportProvider::Commands::ProvideOffer::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kOperate,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
+    WebRTCTransportProvider::Commands::ProvideOffer::Id,
+    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped }, Access::Privilege::kOperate
 };
 } // namespace ProvideOffer
 namespace ProvideAnswer {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = WebRTCTransportProvider::Commands::ProvideAnswer::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kOperate,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
+    WebRTCTransportProvider::Commands::ProvideAnswer::Id,
+    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped }, Access::Privilege::kOperate
 };
 } // namespace ProvideAnswer
 namespace ProvideICECandidates {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = WebRTCTransportProvider::Commands::ProvideICECandidates::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kOperate,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
+    WebRTCTransportProvider::Commands::ProvideICECandidates::Id,
+    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped }, Access::Privilege::kOperate
 };
 } // namespace ProvideICECandidates
 namespace EndSession {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = WebRTCTransportProvider::Commands::EndSession::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kOperate,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
+    WebRTCTransportProvider::Commands::EndSession::Id,
+    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped }, Access::Privilege::kOperate
 };
 } // namespace EndSession
 

@@ -120,15 +120,17 @@ struct AttributeEntry
     constexpr AttributeEntry(AttributeId id = 0, BitMask<AttributeQualityFlags> attrQualityFlags = BitMask<AttributeQualityFlags>(),
                              std::optional<Access::Privilege> readPriv  = std::nullopt,
                              std::optional<Access::Privilege> writePriv = std::nullopt) :
-        attributeId{ id },
-        mask{ attrQualityFlags.Raw() & kAttrQualityMask, (readPriv.has_value() ? to_underlying(*readPriv) : 0) & kPrivilegeMask,
-              (writePriv.has_value() ? to_underlying(*writePriv) : 0) & kPrivilegeMask }
+        attributeId{ id }, mask{
+            .flags          = attrQualityFlags.Raw() & kAttrQualityMask,
+            .readPrivilege  = readPriv.has_value() ? (to_underlying(*readPriv) & kPrivilegeMask) : 0,
+            .writePrivilege = writePriv.has_value() ? (to_underlying(*writePriv) & kPrivilegeMask) : 0,
+        }
     {}
 
     _EndBitFieldInit; // Enabling '-Wconversion' & '-Wconversion'
 
     // Getter for mask.readPrivilege
-    constexpr std::optional<Access::Privilege> GetReadPrivilege() const
+    [[nodiscard]] constexpr std::optional<Access::Privilege> GetReadPrivilege() const
     {
         if (ReadAllowed())
         {
@@ -138,7 +140,7 @@ struct AttributeEntry
     }
 
     // Getter for mask.writePrivilege
-    constexpr std::optional<Access::Privilege> GetWritePrivilege() const
+    [[nodiscard]] constexpr std::optional<Access::Privilege> GetWritePrivilege() const
     {
         if (WriteAllowed())
         {
@@ -147,10 +149,10 @@ struct AttributeEntry
         return std::nullopt;
     }
 
-    constexpr bool HasFlags(AttributeQualityFlags f) const { return (mask.flags & chip::to_underlying(f)) != 0; }
+    [[nodiscard]] constexpr bool HasFlags(AttributeQualityFlags f) const { return (mask.flags & chip::to_underlying(f)) != 0; }
 
-    constexpr bool ReadAllowed() const { return mask.readPrivilege != 0; }
-    constexpr bool WriteAllowed() const { return mask.writePrivilege != 0; }
+    [[nodiscard]] constexpr bool ReadAllowed() const { return mask.readPrivilege != 0; }
+    [[nodiscard]] constexpr bool WriteAllowed() const { return mask.writePrivilege != 0; }
 
 private:
     struct attribute_entry_mask_t
@@ -211,16 +213,21 @@ struct AcceptedCommandEntry
 
     constexpr AcceptedCommandEntry(CommandId id = 0, BitMask<CommandQualityFlags> cmdQualityFlags = BitMask<CommandQualityFlags>(),
                                    Access::Privilege invokePriv = Access::Privilege::kOperate) :
-        commandId(id),
-        mask{ cmdQualityFlags.Raw() & kCmdQualityMask, to_underlying(invokePriv) & kPrivilegeMask }
+        commandId(id), mask{
+            .flags           = cmdQualityFlags.Raw() & kCmdQualityMask,
+            .invokePrivilege = to_underlying(invokePriv) & kPrivilegeMask,
+        }
     {}
 
     _EndBitFieldInit; // Enabling '-Wconversion' & '-Wconversion'
 
     // Getter for mask.invokePrivilege
-    constexpr Access::Privilege GetInvokePrivilege() const { return static_cast<Access::Privilege>(mask.invokePrivilege); }
+    [[nodiscard]] constexpr Access::Privilege GetInvokePrivilege() const
+    {
+        return static_cast<Access::Privilege>(mask.invokePrivilege);
+    }
 
-    constexpr bool HasFlags(CommandQualityFlags f) const { return (mask.flags & chip::to_underlying(f)) != 0; }
+    [[nodiscard]] constexpr bool HasFlags(CommandQualityFlags f) const { return (mask.flags & chip::to_underlying(f)) != 0; }
 
 private:
     struct accepted_command_entry_mask_t
