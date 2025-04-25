@@ -151,18 +151,18 @@ class TC_CLCTRL_2_1(MatterBaseTest):
         
         if overall_target is not Types.NullValue:
             # Check Positioning feature in OverallTarget
-            if feature_map & (1 << 0):  # PS feature (bit 0)
+            if is_positioning_supported:  # PS feature (bit 0)
                 asserts.assert_less_equal(overall_target.position, 4, "OverallTarget.position is out of range")
                 asserts.assert_greater_equal(overall_target.position, 0, "OverallTarget.position is out of range")
                 logging.info(f"OverallTarget.position: {overall_target.position}")
         
             # Check MotionLatching feature in OverallTarget
-            if feature_map & (1 << 1):  # LT feature (bit 1)
+            if is_latching_supported:  # LT feature (bit 1)
                 asserts.assert_true(isinstance(overall_target.latch, bool), "OverallTarget.latch is not a boolean value")
                 logging.info(f"OverallTarget.latch: {overall_target.latch}")
         
             # Check Speed feature in OverallTarget
-            if feature_map & (1 << 3):  # SP feature (bit 3)
+            if is_speed_supported:  # SP feature (bit 3)
                 asserts.assert_less_equal(overall_target.speed, 3, "OverallTarget.speed is out of range")
                 asserts.assert_greater_equal(overall_target.speed, 0, "OverallTarget.speed is out of range")
                 logging.info(f"OverallTarget.speed: {overall_target.speed}")
