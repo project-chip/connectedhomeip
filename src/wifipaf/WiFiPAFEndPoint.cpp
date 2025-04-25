@@ -830,7 +830,7 @@ CHIP_ERROR WiFiPAFEndPoint::DebugPktAckSn(const PktDirect_t pktDirect, Encoding:
     VerifyOrReturnError(err == CHIP_NO_ERROR, err);
     if (rxFlags.Has(WiFiPAFTP::HeaderFlags::kHandshake))
     {
-        // Handkshake message => No ack/sn
+        // Handshake message => No ack/sn
         return CHIP_NO_ERROR;
     }
 
