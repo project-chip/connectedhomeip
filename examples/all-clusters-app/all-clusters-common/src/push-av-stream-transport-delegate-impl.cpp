@@ -78,13 +78,12 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::SetTransportSt
 {
     for (PushAvStream & stream : pushavStreams)
     {
-        for(uint16_t connectionID : connectionIDList)
+        for (uint16_t connectionID : connectionIDList)
         {
             if (stream.id == connectionID)
             {
                 stream.transportConfig.transportStatus = transportStatus;
                 ChipLogError(Zcl, "Set Transport Status for Push AV Stream with ID: %d", connectionID);
-
             }
             else
             {
@@ -95,17 +94,17 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::SetTransportSt
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status
-    PushAvStreamTransportManager::ManuallyTriggerTransport(const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
-                             const Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> & timeControl)
+Protocols::InteractionModel::Status PushAvStreamTransportManager::ManuallyTriggerTransport(
+    const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
+    const Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> & timeControl)
 {
     // TODO: Validates the requested stream usage against the camera's resource management and stream priority policies.
     return Status::Success;
 }
 
 Protocols::InteractionModel::Status
-    PushAvStreamTransportManager::FindTransport(const Optional<DataModel::Nullable<uint16_t>> & connectionID,
-                  DataModel::List<const TransportConfigurationStruct> & outtransportConfigurations)
+PushAvStreamTransportManager::FindTransport(const Optional<DataModel::Nullable<uint16_t>> & connectionID,
+                                            DataModel::List<const TransportConfigurationStruct> & outtransportConfigurations)
 {
     configList.clear();
     for (PushAvStream & stream : pushavStreams)
@@ -117,10 +116,9 @@ Protocols::InteractionModel::Status
         else if (connectionID.Value().Value() == stream.id)
         {
             configList.push_back(stream.transportConfig);
-
         }
     }
-    outtransportConfigurations = DataModel::List<const TransportConfigurationStruct>(configList.data(),configList.size());
+    outtransportConfigurations = DataModel::List<const TransportConfigurationStruct>(configList.data(), configList.size());
     return Status::Success;
 }
 

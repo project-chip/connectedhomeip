@@ -44,7 +44,8 @@ public:
     Protocols::InteractionModel::Status DeallocatePushTransport(const uint16_t connectionID);
     Protocols::InteractionModel::Status ModifyPushTransport(const uint16_t connectionID,
                                                             const TransportOptionsDecodeableStruct & transportOptions);
-    Protocols::InteractionModel::Status SetTransportStatus(const std::vector<uint16_t> connectionIDList, TransportStatusEnum transportStatus);
+    Protocols::InteractionModel::Status SetTransportStatus(const std::vector<uint16_t> connectionIDList,
+                                                           TransportStatusEnum transportStatus);
 
     Protocols::InteractionModel::Status
     ManuallyTriggerTransport(const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
@@ -53,9 +54,8 @@ public:
     FindTransport(const Optional<DataModel::Nullable<uint16_t>> & connectionID,
                   DataModel::List<const TransportConfigurationStruct> & outtransportConfigurations);
 
-    CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage,
-                                           const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                           const Optional<DataModel::Nullable<uint16_t>> & audioStreamId);
+    CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                                   const Optional<DataModel::Nullable<uint16_t>> & audioStreamId);
 
     void OnAttributeChanged(AttributeId attributeId);
     CHIP_ERROR LoadCurrentConnections(std::vector<TransportConfigurationStruct> & currentConnections);

@@ -96,7 +96,8 @@ public:
      *   @return Success if the stream transport status is successfully set; otherwise, the command SHALL be rejected with an
      * appropriate error.
      */
-    virtual Protocols::InteractionModel::Status SetTransportStatus(const std::vector<uint16_t> connectionIDList, TransportStatusEnum transportStatus) = 0;
+    virtual Protocols::InteractionModel::Status SetTransportStatus(const std::vector<uint16_t> connectionIDList,
+                                                                   TransportStatusEnum transportStatus) = 0;
     /**
      *   @brief Handle Command Delegate to request the Node to manually start the specified push transport.
      *
