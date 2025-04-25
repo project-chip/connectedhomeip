@@ -127,15 +127,6 @@ public:
     Status HandleCalibrateCommand() override { return Status::Success; }
     CHIP_ERROR GetCurrentErrorAtIndex(size_t index, ClosureErrorEnum & closureError) override
     {
-        if (index >= currentErrors.size())
-        {
-            return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED; // Invalid index
-        }
-
-        auto it = currentErrors.begin();
-        std::advance(it, index);
-        closureError = *it;
-
         return CHIP_NO_ERROR;
     }
 
