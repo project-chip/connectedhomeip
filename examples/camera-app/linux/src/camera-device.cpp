@@ -261,7 +261,7 @@ GstElement * CameraDevice::CreateAudioPipeline(const std::string & device, int c
     gst_bin_add_many(GST_BIN(pipeline), source, capsfilter, audioconvert, opusenc, rtpopuspay, udpsink, NULL);
 
     // Link elements
-    if (gst_element_link_many(source, capsfilter, audioconvert, opusenc, rtpopuspay, udpsink, NULL))
+    if (gst_element_link_many(source, capsfilter, audioconvert, opusenc, rtpopuspay, udpsink, NULL) != TRUE)
     {
         ChipLogError(Camera, "Elements could not be linked.");
         gst_object_unref(pipeline);

@@ -22,7 +22,7 @@
 #include <app/server/Server.h>
 #include <controller/InvokeInteraction.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <transport/webrtc-transport.h>
+#include <webrtc-transport.h>
 
 #include <iostream>
 
@@ -84,7 +84,7 @@ void WebRTCProviderManager::Init()
 void WebRTCProviderManager::CloseConnection()
 {
     // Clean up all the Webrtc Transports
-    webrtcTransportMap.clear();
+    mWebrtcTransportMap.clear();
 
     // Close the data channel and peer connection if they exist
     if (mDataChannel)
@@ -164,7 +164,7 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
 
 void WebRTCProviderManager::RegisterWebrtcTransport(uint16_t sessionId)
 {
-    if (webrtcTransportMap.find(sessionId) == webrtcTransportMap.end())
+    if (mWebrtcTransportMap.find(sessionId) == mWebrtcTransportMap.end())
     {
         return;
     }
@@ -174,7 +174,7 @@ void WebRTCProviderManager::RegisterWebrtcTransport(uint16_t sessionId)
         ChipLogProgress(Camera, "mMediaController is null. Failed to Register WebRTC Transport");
         return;
     }
-    mMediaController->RegisterTransport(webrtcTransportMap[sessionId].get(), mVideoStreamID, mAudioStreamID);
+    mMediaController->RegisterTransport(mWebrtcTransportMap[sessionId].get(), mVideoStreamID, mAudioStreamID);
 }
 
 CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession)
@@ -231,9 +231,9 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     mOriginatingEndpointId = args.originatingEndpointId;
     mCurrentSessionId      = args.sessionId;
 
-    if (webrtcTransportMap.find(args.sessionId) == webrtcTransportMap.end())
+    if (mWebrtcTransportMap.find(args.sessionId) == mWebrtcTransportMap.end())
     {
-        webrtcTransportMap[args.sessionId] =
+        mWebrtcTransportMap[args.sessionId] =
             std::unique_ptr<WebrtcTransport>(new WebrtcTransport(args.sessionId, mPeerId.GetNodeId(), mPeerConnection));
     }
 
@@ -283,10 +283,10 @@ CHIP_ERROR WebRTCProviderManager::HandleEndSession(uint16_t sessionId, WebRTCEnd
                                                    DataModel::Nullable<uint16_t> videoStreamID,
                                                    DataModel::Nullable<uint16_t> audioStreamID)
 {
-    if (webrtcTransportMap.find(sessionId) != webrtcTransportMap.end())
+    if (mWebrtcTransportMap.find(sessionId) != mWebrtcTransportMap.end())
     {
         ChipLogProgress(Camera, "Delete Webrtc Transport for the session: %u", sessionId);
-        webrtcTransportMap.erase(sessionId);
+        mWebrtcTransportMap.erase(sessionId);
     }
 
     if (mCurrentSessionId == sessionId)

@@ -24,7 +24,7 @@
 #include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
 #include <media-controller.h>
 #include <rtc/rtc.hpp>
-#include <transport/webrtc-transport.h>
+#include <webrtc-transport.h>
 
 #include <unordered_map>
 
@@ -97,7 +97,7 @@ private:
     chip::Callback::Callback<chip::OnDeviceConnected> mOnConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnConnectionFailureCallback;
 
-    std::unordered_map<uint16_t, std::unique_ptr<WebrtcTransport>> webrtcTransportMap;
+    std::unordered_map<uint16_t, std::unique_ptr<WebrtcTransport>> mWebrtcTransportMap;
 
     uint16_t mVideoStreamID;
     uint16_t mAudioStreamID;

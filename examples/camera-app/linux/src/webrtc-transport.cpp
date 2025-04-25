@@ -17,25 +17,28 @@
  */
 
 #include <lib/support/logging/CHIPLogging.h>
-#include <transport/webrtc-transport.h>
+#include <webrtc-transport.h>
 
 WebrtcTransport::WebrtcTransport(uint16_t sessionID, uint64_t nodeID, std::shared_ptr<rtc::PeerConnection> mPeerConnection)
 {
     ChipLogProgress(Camera, "WebrtcTransport created for sessionID: %u", sessionID);
-    sessionID            = sessionID;
-    nodeID               = nodeID;
-    peerConnection       = mPeerConnection;
-    timestamp            = 0;
+    sessionID             = sessionID;
+    nodeID                = nodeID;
+    peerConnection        = mPeerConnection;
+    mVideoSampleTimestamp = 0;
+    mAudioSampleTimestamp = 0;
+
+    // Create video track
     const rtc::SSRC ssrc = 42;
     media                = rtc::Description::Video("video", rtc::Description::Direction::SendOnly);
     media.addH264Codec(96);
     media.setBitrate(3000);
     media.addSSRC(ssrc, "video-send");
-    // TODO: role actpass in remote answer description, need to set as Active/Passive based on local offer description
-    track = peerConnection->addTrack(media);
-    // auto rtpConfig  = std::make_shared<rtc::RtpPacketizationConfig>(ssrc, "video-send", 96, rtc::H264RtpPacketizer::ClockRate);
-    // auto packetizer = std::make_shared<rtc::H264RtpPacketizer>(rtpConfig);
-    // track->setMediaHandler(packetizer);
+    mVideoTrack = peerConnection->addTrack(media);
+
+    // Create audio track
+    auto audioDesc = rtc::Description::Audio();
+    mAudioTrack    = peerConnection->addTrack(audioDesc);
 }
 
 WebrtcTransport::~WebrtcTransport()
@@ -49,32 +52,40 @@ void WebrtcTransport::SendVideo(const char * data, size_t size, uint16_t videoSt
     auto * b           = reinterpret_cast<const std::byte *>(data);
     rtc::binary sample = {};
     sample.assign(b, b + size);
-    int sampleDuration_us = 1000 * 1000 / 30;
-    timestamp += sampleDuration_us;
-    rtc::FrameInfo frameInfo(timestamp);
+    int sampleDurationUs = 1000 * 1000 / 30;
+    rtc::FrameInfo frameInfo(mVideoSampleTimestamp);
     frameInfo.payloadType = 96;
-    track->sendFrame(sample, frameInfo);
+    mVideoSampleTimestamp += sampleDurationUs;
+    mVideoTrack->sendFrame(sample, frameInfo);
 }
 
-// Dummy implementation of SendAudio method
+// Implementation of SendAudio method
 void WebrtcTransport::SendAudio(const char * data, size_t size, uint16_t audioStreamID)
 {
-    // Placeholder for actual WebRTC implementation to send audio data
+    auto * b           = reinterpret_cast<const std::byte *>(data);
+    rtc::binary sample = {};
+    sample.assign(b, b + size);
+    // Default sample rate 48000 Hz, frame duration is 20ms
+    int samplesPerFrame = (48000 * 20) / 1000; // 960 samples per frame
+    rtc::FrameInfo frameInfo(mAudioSampleTimestamp);
+    frameInfo.payloadType = 111;
+    mAudioSampleTimestamp += samplesPerFrame;
+    mAudioTrack->sendFrame(sample, frameInfo);
 }
 
-// Dummy implementation of SendAudioVideo method
+// Implementation of SendAudioVideo method
 void WebrtcTransport::SendAudioVideo(const char * data, size_t size, uint16_t videoStreamID, uint16_t audioStreamID)
 {
     // Placeholder for actual WebRTC implementation to send synchronized audio/video data
 }
 
-// Dummy implementation of CanSendVideo method
+// Implementation of CanSendVideo method
 bool WebrtcTransport::CanSendVideo()
 {
     return mCanSendVideo;
 }
 
-// Dummy implementation of CanSendAudio method
+// Implementation of CanSendAudio method
 bool WebrtcTransport::CanSendAudio()
 {
     return mCanSendAudio;

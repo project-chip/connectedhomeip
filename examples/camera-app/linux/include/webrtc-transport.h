@@ -53,8 +53,10 @@ private:
 
     uint16_t sessionID;
     uint64_t nodeID;
-    uint32_t timestamp;
+    uint32_t mAudioSampleTimestamp;
+    uint32_t mVideoSampleTimestamp;
     std::shared_ptr<rtc::PeerConnection> peerConnection;
-    std::shared_ptr<rtc::Track> track;
+    std::shared_ptr<rtc::Track> mVideoTrack;
+    std::shared_ptr<rtc::Track> mAudioTrack;
     rtc::Description::Video media;
 };
