@@ -25,6 +25,7 @@
  */
 
 #pragma once
+
 #include "ClosureControlEndpoint.h"
 #include "ClosureDimensionEndpoint.h"
 #include <lib/core/DataModelTypes.h>

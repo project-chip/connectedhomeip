@@ -89,7 +89,7 @@ public:
      *
      * @return Reference to the PrintOnlyDelegate instance.
      */
-    PrintOnlyDelegate & getDelegate() { return mDelegate; }
+    PrintOnlyDelegate & GetDelegate() { return mDelegate; }
 
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
