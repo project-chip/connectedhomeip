@@ -62,7 +62,7 @@ class TC_CADMIN_1_5(MatterBaseTest):
                 except (ValueError, TypeError):
                     logging.warning(f"Could not convert CM value '{cm_value}' to integer")
                     self.cm = None
-            
+
             # Safely convert D value to int if present
             d_value = self.service.txt_record.get('D')
             if d_value is not None:
