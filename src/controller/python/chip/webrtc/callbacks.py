@@ -1,6 +1,6 @@
 import logging
 
-from chip.webrtc.types import (ErrorCallback_t, IceCallback_t, SdpAnswerCallback_t, SdpOfferCallback_t, StatsCallback_t)
+from chip.webrtc.types import ErrorCallback_t, IceCallback_t, SdpAnswerCallback_t, SdpOfferCallback_t, StatsCallback_t
 
 future_offer = None
 future_ice = None
