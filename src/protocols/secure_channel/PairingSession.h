@@ -183,9 +183,9 @@ protected:
         }
 
         Optional<uintptr_t> protocolData;
-        if (report.IsBusy() && report.GetMinimumWaitTime().HasValue())
+        if (report.IsBusy() && report.GetMinimumWaitTime().has_value())
         {
-            System::Clock::Milliseconds16 minimumWaitTime = report.GetMinimumWaitTime().Value();
+            System::Clock::Milliseconds16 minimumWaitTime = report.GetMinimumWaitTime().value();
             ChipLogProgress(SecureChannel, "Received busy status report with minimum wait time: %u ms", minimumWaitTime.count());
             protocolData.Emplace(minimumWaitTime.count());
         }

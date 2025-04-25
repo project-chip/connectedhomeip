@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <optional>
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/StatusReport.h>
 
@@ -76,7 +77,7 @@ CHIP_ERROR StatusReport::Parse(System::PacketBufferHandle buf)
             Encoding::LittleEndian::Reader reader(mProtocolData->Start(), mProtocolData->DataLength());
             uint16_t tmpMinimumWaitTime = 0;
             ReturnErrorOnFailure(reader.Read16(&tmpMinimumWaitTime).StatusCode());
-            mMinimumWaitTime.SetValue(System::Clock::Milliseconds16(tmpMinimumWaitTime));
+            mMinimumWaitTime = std::make_optional<System::Clock::Milliseconds16>(tmpMinimumWaitTime);
         }
     }
     else
@@ -126,7 +127,7 @@ System::PacketBufferHandle StatusReport::MakeBusyStatusReportMessage(System::Clo
 
     // Build a busy status report
     StatusReport statusReport(GeneralStatusCode::kBusy, Protocols::SecureChannel::Id, kProtocolCodeBusy, std::move(handle));
-    statusReport.mMinimumWaitTime.SetValue(minimumWaitTime);
+    statusReport.mMinimumWaitTime = std::make_optional<System::Clock::Milliseconds16>(minimumWaitTime);
 
     // Build the status report message
     handle = System::PacketBufferHandle::New(statusReport.Size());

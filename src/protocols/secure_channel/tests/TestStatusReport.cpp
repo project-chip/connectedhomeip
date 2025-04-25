@@ -125,8 +125,8 @@ TEST_F(TestStatusReport, TestMakeBusyStatusReport)
     EXPECT_EQ(reportToParse.GetProtocolId(), protocolId);
     EXPECT_EQ(reportToParse.GetProtocolCode(), protocolCode);
     EXPECT_TRUE(reportToParse.IsBusy());
-    EXPECT_TRUE(reportToParse.GetMinimumWaitTime().HasValue());
-    EXPECT_EQ(reportToParse.GetMinimumWaitTime().Value(), minimumWaitTime);
+    EXPECT_TRUE(reportToParse.GetMinimumWaitTime().has_value());
+    EXPECT_EQ(reportToParse.GetMinimumWaitTime().value(), minimumWaitTime);
 }
 
 // Test Suite

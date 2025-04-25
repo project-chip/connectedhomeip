@@ -20,6 +20,7 @@
 
 #include <lib/core/Optional.h>
 #include <lib/support/BufferWriter.h>
+#include <optional>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
 #include <system/SystemClock.h>
@@ -99,9 +100,8 @@ public:
     /**
      * Returns the minimum wait time if the status report is of type busy.
      * If status report is not busy, then this is an empty optional.
-     * If parsing the minimum wait time fails, then this is an empty optional.
      */
-    Optional<System::Clock::Milliseconds16> GetMinimumWaitTime() const { return mMinimumWaitTime; }
+    std::optional<System::Clock::Milliseconds16> GetMinimumWaitTime() const { return mMinimumWaitTime; }
 
     /**
      *  Returns true if the status report is of type busy.
@@ -121,7 +121,7 @@ private:
     GeneralStatusCode mGeneralCode;
     Protocols::Id mProtocolId;
     uint16_t mProtocolCode;
-    Optional<System::Clock::Milliseconds16> mMinimumWaitTime = Optional<System::Clock::Milliseconds16>::Missing();
+    std::optional<System::Clock::Milliseconds16> mMinimumWaitTime;
     System::PacketBufferHandle mProtocolData;
 };
 
