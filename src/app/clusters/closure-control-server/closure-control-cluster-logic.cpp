@@ -83,7 +83,7 @@ bool ClusterLogic::IsSupportedMainState(MainStateEnum mainState)
 
 bool ClusterLogic::IsValidMainStateTransition(MainStateEnum mainState)
 {
-    // TODO: Implement the MainState state machin to validate transitions
+    // TODO: Implement the MainState state machine to validate transitions
     return true;
 }
 
@@ -605,8 +605,6 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleStop()
     // Stop command can only be supported if closure doesnt support instantaneous features
     VerifyOrReturnError(!mConformance.HasFeature(Feature::kInstantaneous), Status::UnsupportedCommand);
 
-    Status status = Status::Success;
-
     MainStateEnum state;
     VerifyOrReturnError(GetMainState(state) == CHIP_NO_ERROR, Status::Failure);
 
@@ -621,15 +619,13 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleStop()
                             ChipLogError(AppServer, "Stop Command: Failed to set MainState to Stopped"));
     }
 
-    return status;
+    return Status::Success;
 }
 
 chip::Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPositionEnum> position, Optional<bool> latch,
                                                                      Optional<Globals::ThreeLevelAutoEnum> speed)
 {
     VerifyOrDieWithMsg(mIsInitialized, AppServer, "MoveTo Command called before Initialization of closure");
-
-    Status status = Status::Success;
 
     MainStateEnum state;
     VerifyOrReturnError(GetMainState(state) == CHIP_NO_ERROR, Status::Failure);
@@ -668,13 +664,22 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<Ta
     VerifyOrReturnError(state == MainStateEnum::kMoving || state == MainStateEnum::kWaitingForMotion ||
                             state == MainStateEnum::kStopped,
                         Status::InvalidInState);
-
+    
+    if (mDelegate.IsReadyToMove())
+    {
+        VerifyOrReturnError(SetMainState(MainStateEnum::kMoving) == CHIP_NO_ERROR, Status::Failure,
+                                ChipLogError(AppServer, "MoveTo Command: Failed to set MainState to Moving"));
+    }
+    else
+    {
+    VerifyOrReturnError(SetMainState(MainStateEnum::kWaitingForMotion) == CHIP_NO_ERROR, Status::Failure,
+                            ChipLogError(AppServer, "MoveTo Command: Failed to set MainState to kWaitingForMotion"));
+    }
+    
     // Once the MoveTo action is successfully completed, the server will set OverallTarget and MainState.
     VerifyOrReturnError(mDelegate.HandleMoveToCommand(position, latch, speed) == Status::Success, Status::Failure);
 
-    DataModel::Nullable<GenericOverallTarget> setTarget;
-    setTarget.SetNonNull(target);
-    VerifyOrReturnError(SetOverallTarget(setTarget) == CHIP_NO_ERROR, Status::Failure);
+    VerifyOrReturnError(SetOverallTarget(DataModel::Nullable(target)) == CHIP_NO_ERROR, Status::Failure);
 
     if (mDelegate.IsReadyToMove())
     {
@@ -687,14 +692,12 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<Ta
                             ChipLogError(AppServer, "MoveTo Command: Failed to set MainState to kWaitingForMotion"));
     }
 
-    return status;
+    return Status::Success;
 }
 
 chip::Protocols::InteractionModel::Status ClusterLogic::HandleCalibrate()
 {
     VerifyOrDieWithMsg(mIsInitialized, AppServer, "Calibrate Command called before Initialization of closure");
-
-    Status status = Status::Success;
 
     VerifyOrReturnError(mConformance.HasFeature(Feature::kCalibration), Status::UnsupportedCommand);
 
@@ -718,7 +721,7 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleCalibrate()
     VerifyOrReturnError(SetMainState(MainStateEnum::kCalibrating) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Calibrate Command: Failed to set MainState to Calibrating"));
 
-    return status;
+    return Status::Success;
 }
 
 CHIP_ERROR ClusterLogic::PostOperationalErrorEvent(const DataModel::List<const ClosureErrorEnum> & errorState)
