@@ -2077,7 +2077,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 2;
 
     handle command Identify;
   }

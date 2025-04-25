@@ -16,34 +16,28 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include "EnergyGatewayAppCommonMain.h"
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-
+#include <app/data-model/Nullable.h>
 #include <lib/support/CodeUtils.h>
 
-#include "ElectricalGridConditionsDelegate.h"
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::DataModel;
+using namespace chip::app::Clusters;
 
-CHIP_ERROR ElectricalGridConditionsInit(chip::EndpointId endpointId);
-CHIP_ERROR ElectricalGridConditionsShutdown();
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace ElectricalGridConditions {
-
-/** @brief Helper function to return the singleton ElectricalGridConditionsInstance instance
+/*
+ *  @brief  Creates a Delegate and Instance for CommodityPrice clusters
  *
- * This is needed to support TestEventTriggers which are called outside of any
- * class context. This allows the Delegate instance in which to invoke the test
- * events on.
- *
- * This function is typically found in main.cpp or wherever the singleton is created.
+ * The Instance is a container around the Delegate, so
+ * create the Delegate first, then wrap it in the Instance
+ * Then call the Instance->Init() to register the attribute and command handlers
  */
-ElectricalGridConditionsInstance * GetElectricalGridConditionsInstance();
+void ElectricalPriceApplicationInit() {}
 
-} // namespace ElectricalGridConditions
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+void ElectricalPriceApplicationShutdown()
+{
+    ChipLogDetail(AppServer, "Energy Gateway App : ElectricalPriceApplicationShutdown()");
+}

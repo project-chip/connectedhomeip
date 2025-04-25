@@ -1828,15 +1828,6 @@
           ]
         },
         {
-          "name": "Electrical Grid Conditions",
-          "code": 160,
-          "mfgCode": null,
-          "define": "ELECTRICAL_GRID_CONDITIONS_CLUSTER",
-          "side": "client",
-          "enabled": 1,
-          "apiMaturity": "provisional"
-        },
-        {
           "name": "Door Lock",
           "code": 257,
           "mfgCode": null,
