@@ -42,13 +42,13 @@ public:
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
     CHIP_ERROR SetSupportedTemperatureUnits(DataModel::List<TempUnitEnum> & units);
-    DataModel::List<TempUnitEnum> GetSupportedTemperatureUnits(void) { return mSupportedTemperatureUnits; }
+    DataModel::List<TempUnitEnum> & GetSupportedTemperatureUnits(void) { return mSupportedTemperatureUnits; }
 
 private:
     UnitLocalizationServer() : AttributeAccessInterface(Optional<EndpointId>::Missing(), UnitLocalization::Id) {}
 
-    CHIP_ERROR ReadSupportedTemperatureUnits(EndpointId endpoint, AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadClusterRevision(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadSupportedTemperatureUnits(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadClusterRevision(AttributeValueEncoder & aEncoder);
 
     static UnitLocalizationServer mInstance;
     DataModel::List<TempUnitEnum> mSupportedTemperatureUnits{ DataModel::List<TempUnitEnum>(mUnitsBuffer) };
