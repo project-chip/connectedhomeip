@@ -21,26 +21,26 @@ inline constexpr uint32_t kRevision = 2;
 namespace Attributes {
 namespace NumberOfPositions {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = NumberOfPositions::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/NumberOfPositions::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{},
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace NumberOfPositions
 namespace CurrentPosition {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CurrentPosition::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/CurrentPosition::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{},
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace CurrentPosition
 namespace MultiPressMax {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MultiPressMax::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/MultiPressMax::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{},
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace MultiPressMax
 

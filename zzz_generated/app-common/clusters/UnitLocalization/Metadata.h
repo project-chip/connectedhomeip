@@ -21,18 +21,18 @@ inline constexpr uint32_t kRevision = 2;
 namespace Attributes {
 namespace TemperatureUnit {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = TemperatureUnit::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kManage,
+    /*.attributeId   =*/TemperatureUnit::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{},
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/Access::Privilege::kManage,
 };
 } // namespace TemperatureUnit
 namespace SupportedTemperatureUnits {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = SupportedTemperatureUnits::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
+    /*.attributeId   =*/SupportedTemperatureUnits::Id,
+    /*.flags         =*/BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    /*.readPrivilege =*/Access::Privilege::kView,
+    /*.writePrivilege=*/std::nullopt,
 };
 } // namespace SupportedTemperatureUnits
 

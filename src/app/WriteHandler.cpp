@@ -125,7 +125,7 @@ std::optional<bool> WriteHandler::IsListAttributePath(const ConcreteAttributePat
         return std::nullopt;
     }
 
-    return info->flags.Has(DataModel::AttributeQualityFlags::kListAttribute);
+    return info->GetAttributeQualityFlags().Has(DataModel::AttributeQualityFlags::kListAttribute);
 }
 
 Status WriteHandler::HandleWriteRequestMessage(Messaging::ExchangeContext * apExchangeContext,
@@ -790,7 +790,7 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
     }
 
     // Allow writes on writable attributes only
-    VerifyOrReturnValue(attributeEntry->writePrivilege.has_value(), Status::UnsupportedWrite);
+    VerifyOrReturnValue(attributeEntry->GetWritePrivilege().has_value(), Status::UnsupportedWrite);
 
     bool checkAcl = true;
     if (mLastSuccessfullyWrittenPath.has_value())
@@ -825,7 +825,7 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
     }
 
     // validate that timed write is enforced
-    VerifyOrReturnValue(IsTimedWrite() || !attributeEntry->flags.Has(DataModel::AttributeQualityFlags::kTimed),
+    VerifyOrReturnValue(IsTimedWrite() || !attributeEntry->GetAttributeQualityFlags().Has(DataModel::AttributeQualityFlags::kTimed),
                         Status::NeedsTimedInteraction);
 
     return Status::Success;

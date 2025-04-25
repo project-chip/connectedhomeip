@@ -76,7 +76,7 @@ DataModel::ActionReturnStatus ReadGlobalAttributeFromMetadata(DataModel::Provide
             {
                 // NOTE: cast to u64 because TLV encodes all numbers the same (no TLV sideffects)
                 //       and this reduces template variants for Encode, saving flash.
-                ReturnErrorOnFailure(listEncodeHelper.Encode(static_cast<uint64_t>(entry.commandId)));
+                ReturnErrorOnFailure(listEncodeHelper.Encode(static_cast<uint64_t>(entry.GetCommandId())));
             }
             return CHIP_NO_ERROR;
         });
@@ -95,7 +95,7 @@ DataModel::ActionReturnStatus ReadGlobalAttributeFromMetadata(DataModel::Provide
             {
                 // NOTE: cast to u64 because TLV encodes all numbers the same (no TLV sideffects)
                 //       and this reduces template variants for Encode, saving flash.
-                ReturnErrorOnFailure(listEncodeHelper.Encode(static_cast<uint64_t>(entry.attributeId)));
+                ReturnErrorOnFailure(listEncodeHelper.Encode(static_cast<uint64_t>(entry.GetAttributeId())));
             }
             return CHIP_NO_ERROR;
         });

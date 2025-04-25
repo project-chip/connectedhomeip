@@ -147,7 +147,7 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
             // Position on the correct attribute if we have a start point
             mAttributeIndex = 0;
             while ((mAttributeIndex < mAttributes.size()) &&
-                   (mAttributes[mAttributeIndex].attributeId != mPosition.mOutputPath.mAttributeId))
+                   (mAttributes[mAttributeIndex].GetAttributeId() != mPosition.mOutputPath.mAttributeId))
             {
                 mAttributeIndex++;
             }
@@ -202,7 +202,7 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
 
     if (mAttributeIndex < mAttributes.size())
     {
-        return mAttributes[mAttributeIndex].attributeId;
+        return mAttributes[mAttributeIndex].GetAttributeId();
     }
 
     // Finished the data model, start with global attributes
