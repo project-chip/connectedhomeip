@@ -28,10 +28,16 @@ logger = logging.getLogger(__name__)
 
 class ElectricalGridConditionsTestBaseHelper:
 
-    async def test_ForecastConditions(self,
-                                      endpoint: int = None,
-                                      cluster: Clusters.ElectricalGridConditions = None,
-                                      forecastConditions: list = None):
+    # Spec derived constants
+    kMaxForecastEntries = 56    # Maximum number of list entries for Forecasts
+
+    # Test event trigger IDs
+    kEventTriggerCurrentConditionsUpdate = 0x00A0000000000000
+    kEventTriggerForecastConditionsUpdate = 0x00A0000000000001
+
+    def check_ForecastConditions(self,
+                                 cluster: Clusters.ElectricalGridConditions = None,
+                                 forecastConditions: list = None):
         matter_asserts.assert_list(forecastConditions, "ForecastConditions must be a list")
         matter_asserts.assert_list_element_type(
             forecastConditions, cluster.Structs.ElectricalGridConditionsStruct,
@@ -39,14 +45,14 @@ class ElectricalGridConditionsTestBaseHelper:
             allow_empty=True)
 
         asserts.assert_less_equal(len(forecastConditions),
-                                  56, "ForecastConditions list must be less than 56 entries")
+                                  self.kMaxForecastEntries,
+                                  f"ForecastConditions list must be less than {self.kMaxForecastEntries} entries")
         for item in forecastConditions:
-            await self.test_checkElectricalGridConditionsStruct(endpoint=endpoint, cluster=cluster, struct=item)
+            self.check_ElectricalGridConditionsStruct(cluster=cluster, struct=item)
 
-    async def test_checkElectricalGridConditionsStruct(self,
-                                                       endpoint: int = None,
-                                                       cluster: Clusters.ElectricalGridConditions = None,
-                                                       struct: Clusters.ElectricalGridConditions.Structs.ElectricalGridConditionsStruct = None):
+    def check_ElectricalGridConditionsStruct(self,
+                                             cluster: Clusters.ElectricalGridConditions = None,
+                                             struct: Clusters.ElectricalGridConditions.Structs.ElectricalGridConditionsStruct = None):
         matter_asserts.assert_valid_uint32(struct.periodStart, 'PeriodStart')
         if struct.periodEnd is not NullValue:
             matter_asserts.assert_valid_uint32(struct.periodEnd, 'PeriodEnd')
@@ -57,11 +63,13 @@ class ElectricalGridConditionsTestBaseHelper:
         matter_asserts.assert_valid_enum(
             struct.localCarbonLevel, "LocalCarbonLevel attribute must return a ThreeLevelEnum", cluster.Enums.ThreeLevelEnum)
 
+        logger.info(f"EGC: from: {self.convert_epoch_s_to_time(struct.periodStart, tz=None)} to {self.convert_epoch_s_to_time(struct.periodEnd, tz=None)} : GridC: {struct.gridCarbonIntensity} / GridCLevel: {struct.gridCarbonLevel} / LocalC: {struct.localCarbonIntensity} / LocalCLevel: {struct.localCarbonLevel}")
+
     async def send_test_event_trigger_current_conditions_update(self):
-        await self.send_test_event_triggers(eventTrigger=0x00A0000000000000)
+        await self.send_test_event_triggers(eventTrigger=self.kEventTriggerCurrentConditionsUpdate)
 
     async def send_test_event_trigger_forecast_conditions_update(self):
-        await self.send_test_event_triggers(eventTrigger=0x00A0000000000001)
+        await self.send_test_event_triggers(eventTrigger=self.kEventTriggerForecastConditionsUpdate)
 
     def convert_epoch_s_to_time(self, epoch_s, tz=timezone.utc):
         if epoch_s is not NullValue:
@@ -70,4 +78,4 @@ class ElectricalGridConditionsTestBaseHelper:
 
             return matter_epoch + delta_from_epoch
         else:
-            return "None"
+            return None

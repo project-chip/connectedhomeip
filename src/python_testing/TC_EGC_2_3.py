@@ -42,7 +42,7 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from TC_EGCTestBase import ElectricalGridConditionsTestBaseHelper
 
 logger = logging.getLogger(__name__)
@@ -61,7 +61,7 @@ class EGC_2_3(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
         """This function returns a list of PICS for this test case that must be True for the test to be run"""
         return [
             "EGC.S",
-            "EGC.F00(FORE)"
+            "EGC.F00"
         ]
 
     def steps_EGC_2_3(self) -> list[TestStep]:
@@ -76,7 +76,7 @@ class EGC_2_3(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
         ]
         return steps
 
-    @run_if_endpoint_matches(has_cluster(Clusters.ElectricalGridConditions))
+    @run_if_endpoint_matches(has_feature(cluster, cluster.Bitmaps.Feature.kForecasting))
     async def test_EGC_2_3(self):
         endpoint = self.get_endpoint()
         attributes = cluster.Attributes
@@ -99,8 +99,8 @@ class EGC_2_3(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
                                                              attribute=attributes.ForecastConditions)
 
-        await self.test_ForecastConditions(endpoint=endpoint, cluster=cluster,
-                                           forecastConditions=val)
+        self.check_ForecastConditions(cluster=cluster,
+                                      forecastConditions=val)
 
 
 if __name__ == "__main__":

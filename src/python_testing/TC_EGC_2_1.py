@@ -94,12 +94,12 @@ class EGC_2_1(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
         if val is not NullValue:
             asserts.assert_true(isinstance(
                 val, cluster.Structs.ElectricalGridConditionsStruct), "val must be of type ElectricalGridConditionsStruct")
-            await self.test_checkElectricalGridConditionsStruct(endpoint=endpoint, cluster=cluster, struct=val)
+            self.check_ElectricalGridConditionsStruct(cluster=cluster, struct=val)
 
         self.step("4")
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.ForecastConditions):
             val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ForecastConditions)
-            await self.test_ForecastConditions(endpoint=endpoint, cluster=cluster, forecastConditions=val)
+            self.check_ForecastConditions(cluster=cluster, forecastConditions=val)
 
 
 if __name__ == "__main__":

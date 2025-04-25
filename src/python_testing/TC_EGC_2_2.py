@@ -112,8 +112,8 @@ class EGC_2_2(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
                 newCurrentConditions, cluster.Structs.ElectricalGridConditionsStruct), "val must be of type ElectricalGridConditionsStruct")
 
             # The other aspects of this verification are handled by the helper
-            await self.test_checkElectricalGridConditionsStruct(endpoint=endpoint, cluster=cluster,
-                                                                struct=newCurrentConditions)
+            self.check_ElectricalGridConditionsStruct(cluster=cluster,
+                                                      struct=newCurrentConditions)
 
         self.step("4a")
         # TH reads from the DUT the CurrentConditions attribute.
@@ -124,7 +124,7 @@ class EGC_2_2(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
         if val is not NullValue:
             asserts.assert_true(isinstance(
                 val, cluster.Structs.ElectricalGridConditionsStruct), "val must be of type ElectricalGridConditionsStruct")
-            await self.test_checkElectricalGridConditionsStruct(endpoint=endpoint, cluster=cluster, struct=val)
+            self.check_ElectricalGridConditionsStruct(cluster=cluster, struct=val)
 
         asserts.assert_equal(val, newCurrentConditions, "CurrentConditions is not equal to NewCurrentConditions")
 
