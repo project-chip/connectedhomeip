@@ -46,8 +46,7 @@ namespace PushAvStreamTransport {
 
 PushAvStreamTransportServer::PushAvStreamTransportServer(PushAvStreamTransportDelegate & aDelegate, EndpointId aEndpointId) :
     AttributeAccessInterface(MakeOptional(aEndpointId), PushAvStreamTransport::Id),
-    CommandHandlerInterface(MakeOptional(aEndpointId), PushAvStreamTransport::Id),
-    mDelegate(aDelegate)
+    CommandHandlerInterface(MakeOptional(aEndpointId), PushAvStreamTransport::Id), mDelegate(aDelegate)
 {}
 
 PushAvStreamTransportServer::~PushAvStreamTransportServer()
@@ -252,8 +251,8 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
     Commands::AllocatePushTransportResponse::Type response;
     auto & transportOptions = commandData.transportOptions;
 
-    uint16_t ep                 = emberAfGetClusterServerEndpointIndex(transportOptions.endpointID, TlsCertificateManagement::Id,
-                                                                       MATTER_DM_TLS_CERTIFICATE_MANAGEMENT_CLUSTER_CLIENT_ENDPOINT_COUNT);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(transportOptions.endpointID, TlsCertificateManagement::Id,
+                                                       MATTER_DM_TLS_CERTIFICATE_MANAGEMENT_CLUSTER_CLIENT_ENDPOINT_COUNT);
 
     if (ep == kEmberInvalidEndpointIndex)
     {
