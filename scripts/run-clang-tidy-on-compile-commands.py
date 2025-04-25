@@ -207,16 +207,26 @@ class TidyState:
 
 
 def find_darwin_gcc_sysroot():
-    for line in subprocess.check_output(
-        "xcodebuild -sdk -version".split(), text=True
-    ).splitlines():
-        if not line.startswith("Path: "):
-            continue
-        path = line[line.find(": ") + 2:]
-        if "/MacOSX.platform/" not in path:
-            continue
-        logging.info("Found %s" % path)
-        return path
+    try:
+        for line in subprocess.check_output(
+            "xcodebuild -sdk -version".split(), text=True
+        ).splitlines():
+            if not line.startswith("Path: "):
+                continue
+            path = line[line.find(": ") + 2:]
+            if "/MacOSX.platform/" not in path:
+                continue
+            logging.info("Found %s" % path)
+            return path
+    except Exception:
+        # lets try with xcrun
+        try:
+            path = subprocess.check_output(
+                "xcrun --sdk macosx --show-sdk-path".split(), text=True
+            )
+            return path.strip()
+        except Exception:
+            pass
 
     # A hard-coded value that works on default installations
     logging.warning("Using default platform sdk path. This may be incorrect.")
