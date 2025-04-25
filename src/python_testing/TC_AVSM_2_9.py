@@ -150,7 +150,7 @@ class TC_AVSM_2_9(MatterBaseTest):
 
         self.step(3)
         try:
-            await self.send_single_cmd(endpoint=endpoint, cmd=commands.VideoStreamDeallocate(videoStreamID=(aStreamIDToDelete+1)))
+            await self.send_single_cmd(endpoint=endpoint, cmd=commands.VideoStreamDeallocate(videoStreamID=(aStreamIDToDelete + 1)))
             asserts.assert_true(False, "Unexpected success when expecting NOT_FOUND")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.NotFound, "Unexpected error returned")
