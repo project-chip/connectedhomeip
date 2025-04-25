@@ -695,6 +695,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         {
         case chip::app::Clusters::UnitLocalization::Attributes::TemperatureUnit::Id:
             return "TemperatureUnit";
+        case chip::app::Clusters::UnitLocalization::Attributes::SupportedTemperatureUnits::Id:
+            return "SupportedTemperatureUnits";
         case chip::app::Clusters::UnitLocalization::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::UnitLocalization::Attributes::AcceptedCommandList::Id:
@@ -1587,10 +1589,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedModes";
         case chip::app::Clusters::OvenMode::Attributes::CurrentMode::Id:
             return "CurrentMode";
-        case chip::app::Clusters::OvenMode::Attributes::StartUpMode::Id:
-            return "StartUpMode";
-        case chip::app::Clusters::OvenMode::Attributes::OnMode::Id:
-            return "OnMode";
         case chip::app::Clusters::OvenMode::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::OvenMode::Attributes::AcceptedCommandList::Id:
@@ -1662,10 +1660,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedModes";
         case chip::app::Clusters::LaundryWasherMode::Attributes::CurrentMode::Id:
             return "CurrentMode";
-        case chip::app::Clusters::LaundryWasherMode::Attributes::StartUpMode::Id:
-            return "StartUpMode";
-        case chip::app::Clusters::LaundryWasherMode::Attributes::OnMode::Id:
-            return "OnMode";
         case chip::app::Clusters::LaundryWasherMode::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::LaundryWasherMode::Attributes::AcceptedCommandList::Id:
@@ -1687,10 +1681,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedModes";
         case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Attributes::CurrentMode::Id:
             return "CurrentMode";
-        case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Attributes::StartUpMode::Id:
-            return "StartUpMode";
-        case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Attributes::OnMode::Id:
-            return "OnMode";
         case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Attributes::AcceptedCommandList::Id:
@@ -1831,10 +1821,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedModes";
         case chip::app::Clusters::DishwasherMode::Attributes::CurrentMode::Id:
             return "CurrentMode";
-        case chip::app::Clusters::DishwasherMode::Attributes::StartUpMode::Id:
-            return "StartUpMode";
-        case chip::app::Clusters::DishwasherMode::Attributes::OnMode::Id:
-            return "OnMode";
         case chip::app::Clusters::DishwasherMode::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::DishwasherMode::Attributes::AcceptedCommandList::Id:
@@ -5308,14 +5294,10 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
     case chip::app::Clusters::OvenCavityOperationalState::Id: {
         switch (id)
         {
-        case chip::app::Clusters::OvenCavityOperationalState::Commands::Pause::Id:
-            return "Pause";
         case chip::app::Clusters::OvenCavityOperationalState::Commands::Stop::Id:
             return "Stop";
         case chip::app::Clusters::OvenCavityOperationalState::Commands::Start::Id:
             return "Start";
-        case chip::app::Clusters::OvenCavityOperationalState::Commands::Resume::Id:
-            return "Resume";
         default:
             return "Unknown";
         }
