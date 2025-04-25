@@ -1413,6 +1413,7 @@ cluster RvcCleanMode = 85 {
     kDeepClean = 16384;
     kVacuum = 16385;
     kMop = 16386;
+    kVacuumThenMop = 16387;
   }
 
   enum StatusCode : enum8 {
