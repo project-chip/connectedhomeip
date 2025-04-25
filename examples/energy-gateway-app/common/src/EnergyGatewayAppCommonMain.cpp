@@ -17,6 +17,7 @@
  */
 
 #include "EnergyGatewayAppCommonMain.h"
+#include "ElectricalGridConditionsMain.h"
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -35,7 +36,12 @@ using namespace chip::app::Clusters;
  * create the Delegate first, then wrap it in the Instance
  * Then call the Instance->Init() to register the attribute and command handlers
  */
-void ElectricalPriceApplicationInit() {}
+void ElectricalPriceApplicationInit()
+{
+    EndpointId kElectricalEnergyTariffEndpointId = 1;
+
+    VerifyOrDie(ElectricalGridConditionsInit(kElectricalEnergyTariffEndpointId) == CHIP_NO_ERROR);
+}
 
 void ElectricalPriceApplicationShutdown()
 {
