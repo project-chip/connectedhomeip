@@ -43,13 +43,13 @@ enum class OptionalAttributeEnum : uint32_t
  */
 struct ClusterConformance
 {
-    uint32_t & FeatureMap() { return mFeatureMap; }
-    const uint32_t & FeatureMap() const { return mFeatureMap; }
+    BitFlags<Feature> & FeatureMap() { return mFeatureMap; }
+    const BitFlags<Feature> & FeatureMap() const { return mFeatureMap; }
 
     BitFlags<OptionalAttributeEnum> & OptionalAttributes() { return mOptionalAttributes; }
     const BitFlags<OptionalAttributeEnum> & OptionalAttributes() const { return mOptionalAttributes; }
 
-    inline bool HasFeature(Feature feature) const { return mFeatureMap & to_underlying(feature); }
+    inline bool HasFeature(Feature aFeature) const { return mFeatureMap.Has(aFeature); }
 
     /**
      * @brief Function determines if Cluster conformance is valid
@@ -122,7 +122,7 @@ struct ClusterConformance
     }
 
 private:
-    uint32_t mFeatureMap;
+    BitFlags<Feature> mFeatureMap;
     BitFlags<OptionalAttributeEnum> mOptionalAttributes;
 };
 
@@ -290,7 +290,7 @@ public:
     CHIP_ERROR GetRotationAxis(RotationAxisEnum & rotationAxis);
     CHIP_ERROR GetOverflow(OverflowEnum & overflow);
     CHIP_ERROR GetModulationType(ModulationTypeEnum & modulationType);
-    CHIP_ERROR GetFeatureMap(Attributes::FeatureMap::TypeInfo::Type & featureMap);
+    CHIP_ERROR GetFeatureMap(BitFlags<Feature> & featureMap);
     CHIP_ERROR GetClusterRevision(Attributes::ClusterRevision::TypeInfo::Type & clusterRevision);
 
     /**

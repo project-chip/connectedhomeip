@@ -69,125 +69,55 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericCurren
 
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mState.currentState != incomingCurrentState, CHIP_NO_ERROR);
-
-    DataModel::Nullable<GenericCurrentStateStruct> & clusterCurrentState = mState.currentState;
-
-    bool validateClusterCurrentStateMembers  = false;
-    bool validateClusterCurrentStatePosition = false;
-    bool validateClusterCurrentStateLatch    = false;
-    bool validateClusterCurrentStateSpeed    = false;
-
-    bool validateIncomingCurrentStateMembers  = false;
-    bool validateIncomingCurrentStatePosition = false;
-    bool validateIncomingCurrentStateLatch    = false;
-    bool validateIncomingCurrentStateSpeed    = false;
-
-    bool requirePositioningUpdate = false;
-    bool requireLatchUpdate       = false;
-    bool requireSpeedUpdate       = false;
-
-    /*
-        Determine checks that need to be executed based on current and provided values
-    */
-
-    // Determine CurrentState member values, if a value is present, if it is null or if it has a valid value, to determine what
-    // checks need to be executed.
-    if (!clusterCurrentState.IsNull())
-    {
-
-        // If the CurrentState has a value, we need to check internal members to validate if we need to mark the attribute as dirty.
-        validateClusterCurrentStateMembers = true;
-
-        validateClusterCurrentStatePosition = clusterCurrentState.Value().position.HasValue();
-        validateClusterCurrentStateLatch    = clusterCurrentState.Value().latch.HasValue();
-        validateClusterCurrentStateSpeed    = clusterCurrentState.Value().speed.HasValue();
+    
+    if(incomingCurrentState.IsNull()) 
+    {   
+        // Mark CurrentState attribute as dirty only if value changes.
+        if(!mState.currentState.IsNull()) 
+        {
+            mState.currentState.SetNull();
+            mMatterContext.MarkDirty(Attributes::CurrentState::Id);
+        }
+        return CHIP_NO_ERROR;
     }
-
-    // Determine CurrentState member values, if a value is present, if it is null or if it has a valid value, to determine what
-    // checks need to be executed.
-    if (!incomingCurrentState.IsNull())
-    {
-        // If the provided CurrentState has a value, we need to check its members to validate
-        validateIncomingCurrentStateMembers = true;
-
-        validateIncomingCurrentStatePosition = incomingCurrentState.Value().position.HasValue();
-        validateIncomingCurrentStateLatch    = incomingCurrentState.Value().latch.HasValue();
-        validateIncomingCurrentStateSpeed    = incomingCurrentState.Value().speed.HasValue();
-    }
-
-    /*
-        Validate incoming values and FeatureMap Conformance
-    */
 
     // Validate the incoming Position value has valid input parameters and FeatureMap conformance.
-    if (validateIncomingCurrentStatePosition)
+    if (incomingCurrentState.Value().position.HasValue())
     {
         //  If the position member is present in the incoming CurrentState, we need to check if the Positioning
         //  feature is supported by the closure. If the Positioning feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
         // We don't need to check if values are present since the check was done above.
-        const Percent100ths & position = incomingCurrentState.Value().position.Value();
-        VerifyOrReturnError(position <= kPercents100thsMaxValue, CHIP_ERROR_INVALID_ARGUMENT);
-
-        // We need to update the cluster positioning value if
-        // - cluster does not have value; the value will necessarily be updated
-        // - cluster and incoming values are different
-        requirePositioningUpdate = !validateClusterCurrentStatePosition || clusterCurrentState.Value().position.Value() != position;
+        VerifyOrReturnError(incomingCurrentState.Value().position.Value() <= kPercents100thsMaxValue, 
+                                CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    // Validate the incoming latch value has valid input parameters and FeatureMap conformance.
-    if (validateIncomingCurrentStateLatch)
+    // Validate the incoming latch value has valid FeatureMap conformance.
+    if (incomingCurrentState.Value().latch.HasValue())
     {
         //  If the latching member is present in the incoming CurrentState, we need to check if the MotionLatching
         //  feature is supported by the closure. If the MotionLatching feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-        // We don't need to check is values are present since the check was done above.
-        const bool & latch = incomingCurrentState.Value().latch.Value();
-
-        // We need to update the cluster positioning value if
-        // - cluster does not have value; the value will necessarily be updated
-        // - cluster and incoming values are different
-        requireLatchUpdate = !validateClusterCurrentStateLatch || clusterCurrentState.Value().latch.Value() != latch;
     }
 
     // Validate the incoming Speed value has valid input parameters and FeatureMap conformance.
-    if (validateIncomingCurrentStateSpeed)
+    if (incomingCurrentState.Value().speed.HasValue())
     {
         //  If the speed member is present in the incoming CurrentState, we need to check if the Speed feature is
         //  supported by the closure. If the Speed feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-        const Globals::ThreeLevelAutoEnum & speed = incomingCurrentState.Value().speed.Value();
-
-        VerifyOrReturnError(EnsureKnownEnumValue(speed) != Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
+        VerifyOrReturnError(EnsureKnownEnumValue(incomingCurrentState.Value().speed.Value()) != Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
                             CHIP_ERROR_INVALID_ARGUMENT);
-
-        // We need to update the cluster position value if
-        // - cluster does not have value; the value will necessarily be updated
-        // - cluster and incoming values are different
-        requireSpeedUpdate = !validateClusterCurrentStateSpeed || clusterCurrentState.Value().speed.Value() != speed;
     }
 
-    /*
-        Update the cluster state and mark it as dirty if necessary
-    */
-
-    // Cluster CurrentState going from non-null to null
-    if (validateClusterCurrentStateMembers && !validateIncomingCurrentStateMembers)
-    {
-        clusterCurrentState.SetNull();
-        mMatterContext.MarkDirty(Attributes::CurrentState::Id);
-    }
-    else if (requirePositioningUpdate || requireLatchUpdate || requireSpeedUpdate)
-    {
-        clusterCurrentState.SetNonNull(incomingCurrentState.Value());
-        mMatterContext.MarkDirty(Attributes::CurrentState::Id);
-    }
+    mState.currentState.SetNonNull(incomingCurrentState.Value());
+    mMatterContext.MarkDirty(Attributes::CurrentState::Id);
 
     return CHIP_NO_ERROR;
 }
+
 
 CHIP_ERROR ClusterLogic::SetTarget(const DataModel::Nullable<GenericTargetStruct> & incomingTarget)
 {
@@ -196,127 +126,56 @@ CHIP_ERROR ClusterLogic::SetTarget(const DataModel::Nullable<GenericTargetStruct
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mState.target != incomingTarget, CHIP_NO_ERROR);
 
-    DataModel::Nullable<GenericTargetStruct> & clusterTarget = mState.target;
-
-    bool validateClusterTargetMembers  = false;
-    bool validateClusterTargetPosition = false;
-    bool validateClusterTargetLatch    = false;
-    bool validateClusterTargetSpeed    = false;
-
-    bool validateIncomingTargetMembers  = false;
-    bool validateIncomingTargetPosition = false;
-    bool validateIncomingTargetLatch    = false;
-    bool validateIncomingTargetSpeed    = false;
-
-    bool requirePositioningUpdate = false;
-    bool requireLatchUpdate       = false;
-    bool requireSpeedUpdate       = false;
-
-    /*
-        Determine checks that need to be executed based on current and provided values
-    */
-
-    // Determine Target member values, if a value is present, if it is null or if it has a valid value, to determine what
-    // checks need to be executed.
-    if (!clusterTarget.IsNull())
+    
+    if (incomingTarget.IsNull())
     {
-
-        // If the Target has a value, we need to check internal members to validate if we need to mark the attribute as dirty.
-        validateClusterTargetMembers = true;
-
-        validateClusterTargetPosition = clusterTarget.Value().position.HasValue();
-        validateClusterTargetLatch    = clusterTarget.Value().latch.HasValue();
-        validateClusterTargetSpeed    = clusterTarget.Value().speed.HasValue();
+        // Mark Target attribute as dirty only if value changes.
+        if (!mState.target.IsNull())
+        {
+            mState.target.SetNull();
+            mMatterContext.MarkDirty(Attributes::Target::Id);
+        }
+        return CHIP_NO_ERROR;
     }
-
-    // Determine Target member values, if a value is present, if it is null or if it has a valid value, to determine what
-    // checks need to be executed.
-    if (!incomingTarget.IsNull())
-    {
-        // If the provided Target has a value, we need to check its members to validate
-        validateIncomingTargetMembers = true;
-
-        validateIncomingTargetPosition = incomingTarget.Value().position.HasValue();
-        validateIncomingTargetLatch    = incomingTarget.Value().latch.HasValue();
-        validateIncomingTargetSpeed    = incomingTarget.Value().speed.HasValue();
-    }
-
-    /*
-        Validate incoming values and FeatureMap Conformance
-    */
-
+    
     // Validate the incoming Position value has valid input parameters and FeatureMap conformance.
-    if (validateIncomingTargetPosition)
+    if (incomingTarget.Value().position.HasValue())
     {
         //  If the position member is present in the incoming Target, we need to check if the Positioning
         //  feature is supported by the closure. If the Positioning feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
         // We don't need to check if values are present since the check was done above.
-        const Percent100ths & position = incomingTarget.Value().position.Value();
-        VerifyOrReturnError(position <= kPercents100thsMaxValue, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(incomingTarget.Value().position.Value() <= kPercents100thsMaxValue, CHIP_ERROR_INVALID_ARGUMENT);
 
         // Incoming Target Position value SHALL follow the scaling from Resolution Attribute.
         Percent100ths resolution;
         ReturnErrorOnFailure(GetResolution(resolution));
         VerifyOrReturnError(incomingTarget.Value().position.Value() % resolution == 0, CHIP_ERROR_INVALID_ARGUMENT,
                             ChipLogError(NotSpecified, "Target Position value SHALL follow the scaling from Resolution Attribute"));
-
-        // We need to update the cluster position value if
-        // - cluster does not have value; the value will necessarily be updated
-        // - cluster and incoming values are different
-        requirePositioningUpdate = !validateClusterTargetPosition || clusterTarget.Value().position.Value() != position;
     }
 
-    // Validate the incoming latch value has valid input parameters and FeatureMap conformance.
-    if (validateIncomingTargetLatch)
+    // Validate the incoming latch value has valid FeatureMap conformance.
+    if (incomingTarget.Value().latch.HasValue())
     {
         //  If the latching member is present in the incoming Target, we need to check if the MotionLatching
         //  feature is supported by the closure. If the MotionLatching feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-        // We don't need to check is values are present since the check was done above.
-        const bool & latch = incomingTarget.Value().latch.Value();
-
-        // We need to update the cluster positioning value if
-        // - cluster does not have value; the value will necessarily be updated
-        // - cluster and incoming values are different
-        requireLatchUpdate = !validateClusterTargetLatch || clusterTarget.Value().latch.Value() != latch;
     }
 
     // Validate the incoming Speed value has valid input parameters and FeatureMap conformance.
-    if (validateIncomingTargetSpeed)
+    if (incomingTarget.Value().speed.HasValue())
     {
         //  If the speed member is present in the incoming Target, we need to check if the Speed feature is
         //  supported by the closure. If the Speed feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-        const Globals::ThreeLevelAutoEnum & speed = incomingTarget.Value().speed.Value();
-
-        VerifyOrReturnError(EnsureKnownEnumValue(speed) != Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
+        VerifyOrReturnError(EnsureKnownEnumValue(incomingTarget.Value().speed.Value()) != Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
                             CHIP_ERROR_INVALID_ARGUMENT);
-
-        // We need to update the cluster positioning value if
-        // - cluster does not have value; the value will necessarily be updated
-        // - cluster and incoming values are different
-        requireSpeedUpdate = !validateClusterTargetSpeed || clusterTarget.Value().speed.Value() != speed;
     }
 
-    /*
-        Update the cluster state and mark it as dirty if necessary
-    */
-
-    // Cluster target going from non-null to null
-    if (validateClusterTargetMembers && !validateIncomingTargetMembers)
-    {
-        clusterTarget.SetNull();
-        mMatterContext.MarkDirty(Attributes::Target::Id);
-    }
-    else if (requirePositioningUpdate || requireLatchUpdate || requireSpeedUpdate)
-    {
-        clusterTarget.SetNonNull(incomingTarget.Value());
-        mMatterContext.MarkDirty(Attributes::Target::Id);
-    }
+    mState.target.SetNonNull(incomingTarget.Value());
+    mMatterContext.MarkDirty(Attributes::Target::Id);
 
     return CHIP_NO_ERROR;
 }
@@ -467,6 +326,7 @@ CHIP_ERROR ClusterLogic::SetLimitRange(const Structs::RangePercent100thsStruct::
 
 CHIP_ERROR ClusterLogic::SetTranslationDirection(const TranslationDirectionEnum translationDirection)
 {
+    // This attribute is not supposed to change once the initialization is completed.
     VerifyOrReturnError(!mInitialized, CHIP_ERROR_INCORRECT_STATE);
 
     VerifyOrReturnError(mConformance.HasFeature(Feature::kTranslation), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
@@ -484,6 +344,7 @@ CHIP_ERROR ClusterLogic::SetTranslationDirection(const TranslationDirectionEnum 
 
 CHIP_ERROR ClusterLogic::SetRotationAxis(const RotationAxisEnum rotationAxis)
 {
+    // This attribute is not supposed to change once the initialization is completed
     VerifyOrReturnError(!mInitialized, CHIP_ERROR_INCORRECT_STATE);
 
     VerifyOrReturnError(mConformance.HasFeature(Feature::kRotation), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
@@ -530,6 +391,7 @@ CHIP_ERROR ClusterLogic::SetOverflow(const OverflowEnum overflow)
 
 CHIP_ERROR ClusterLogic::SetModulationType(const ModulationTypeEnum modulationType)
 {
+    // This attribute is not supposed to change once the initialization is completed
     VerifyOrReturnError(!mInitialized, CHIP_ERROR_INCORRECT_STATE);
 
     VerifyOrReturnError(mConformance.HasFeature(Feature::kModulation), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
@@ -631,7 +493,7 @@ CHIP_ERROR ClusterLogic::GetModulationType(ModulationTypeEnum & modulationType)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::GetFeatureMap(Attributes::FeatureMap::TypeInfo::Type & featureMap)
+CHIP_ERROR ClusterLogic::GetFeatureMap(BitFlags<Feature> & featureMap)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
     featureMap = mConformance.FeatureMap();
@@ -649,8 +511,6 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
                                             Optional<Globals::ThreeLevelAutoEnum> speed)
 {
     VerifyOrDieWithMsg(mInitialized, AppServer, "Unexpected command received when closure is yet to be initialized");
-
-    Status status = Status::Success;
 
     //  If all command parameters don't have a value, return InvalidCommand
     VerifyOrReturnError(position.HasValue() || latch.HasValue() || speed.HasValue(), Status::InvalidCommand);
@@ -714,11 +574,9 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
     // Target should only be set when delegate function returns status as Success. Return failure otherwise
     VerifyOrReturnError(mDelegate.HandleSetTarget(position, latch, speed) == Status::Success, Status::Failure);
 
-    DataModel::Nullable<GenericTargetStruct> nullableTarget;
-    nullableTarget.SetNonNull(target);
-    VerifyOrReturnError(SetTarget(nullableTarget) == CHIP_NO_ERROR, Status::Failure);
+    VerifyOrReturnError(SetTarget(DataModel::MakeNullable(target)) == CHIP_NO_ERROR, Status::Failure);
 
-    return status;
+    return Status::Success;
 }
 
 Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t numberOfSteps,
@@ -732,8 +590,6 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
     // Return ConstraintError if command parameters are out of bounds
     VerifyOrReturnError(direction != StepDirectionEnum::kUnknownEnumValue, Status::ConstraintError);
     VerifyOrReturnError(numberOfSteps > 0, Status::ConstraintError);
-
-    Status status = Status::Success;
 
     GenericTargetStruct stepTarget{};
 
@@ -806,11 +662,9 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
     VerifyOrReturnError(mDelegate.HandleStep(direction, numberOfSteps, speed) == Status::Success, Status::Failure);
 
     stepTarget.position.SetValue(static_cast<Percent100ths>(newPosition));
-    DataModel::Nullable<GenericTargetStruct> nullableTarget;
-    nullableTarget.SetNonNull(stepTarget);
-    VerifyOrReturnError(SetTarget(nullableTarget) == CHIP_NO_ERROR, Status::Failure);
+    VerifyOrReturnError(SetTarget(DataModel::MakeNullable(stepTarget)) == CHIP_NO_ERROR, Status::Failure);
 
-    return status;
+    return Status::Success;
 }
 
 } // namespace ClosureDimension

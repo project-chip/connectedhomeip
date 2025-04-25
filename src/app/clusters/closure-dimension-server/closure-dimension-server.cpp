@@ -89,7 +89,7 @@ CHIP_ERROR Interface::Read(const ConcreteReadAttributePath & aPath, AttributeVal
         return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetModulationType(ret); });
     }
     case Attributes::FeatureMap::Id: {
-        typedef Attributes::FeatureMap::TypeInfo::Type T;
+        typedef BitFlags<Feature> T;
         return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetFeatureMap(ret); });
     }
     case Attributes::ClusterRevision::Id: {
