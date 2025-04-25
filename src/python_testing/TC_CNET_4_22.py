@@ -16,25 +16,6 @@
 #
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
-#
-# === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs:
-#   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --commissioning-method ble-thread
-#       --discriminator 1234
-#       --passcode 20202021
-#       --int-arg PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET
-#       --int-arg PIXIT.CNET.ENDPOINT_THREAD:0
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factory-reset: true
-#     quiet: true
-# === END CI TEST ARGUMENTS ===
 
 import random
 import string
@@ -48,6 +29,20 @@ from mobly import asserts
 
 
 class TC_CNET_4_22(MatterBaseTest):
+    """
+    [TC-CNET-4.22] [Thread] Verification for ScanNetworks command [DUT-Server].
+    Example Usage:
+        To run the test case, use the following command:
+        ```bash
+        python src/python_testing/TC_CNET_4_22.py --commissioning-method ble-thread -discriminator <discriminator> -passcode <passcode> \
+               --endpoint <endpoint_value> --thread-dataset-hex <dataset_value>
+        ```
+        Where `<endpoint_value>` should be replaced with the actual endpoint
+        number for the Network Commissioning cluster on the DUT, and
+        `<dataset_value>` should be replaced with the Thread Operational Dataset
+        in hexadecimal format.
+    """
+
     def steps_TC_CNET_4_22(self):
         return [
             TestStep('Precondition', 'TH is commissioned', is_commissioning=True),
