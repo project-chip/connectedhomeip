@@ -42,13 +42,11 @@ namespace ClosureControl {
  * according to specific business logic. It is designed to be used as a delegate for the Closure Control cluster.
  *
  * @note This implementation is a "PrintOnly" delegate, which may primarily log or print command handling actions.
- *
- * @param mEndpoint The endpoint ID associated with this delegate.
  */
 class PrintOnlyDelegate : public DelegateBase
 {
 public:
-    PrintOnlyDelegate(EndpointId endpoint) {}
+    PrintOnlyDelegate() {}
 
     // Override for the DelegateBase Virtual functions
     Protocols::InteractionModel::Status HandleStopCommand() override;
@@ -73,7 +71,7 @@ class ClosureControlEndpoint
 {
 public:
     ClosureControlEndpoint(EndpointId endpoint) :
-        mEndpoint(endpoint), mContext(mEndpoint), mDelegate(mEndpoint), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
+        mEndpoint(endpoint), mContext(mEndpoint), mDelegate(), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
     {}
 
     /**

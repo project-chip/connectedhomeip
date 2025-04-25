@@ -44,14 +44,8 @@ Status PrintOnlyDelegate::HandleStep(const StepDirectionEnum & direction, const 
 
 CHIP_ERROR ClosureDimensionEndpoint::Init()
 {
-    ChipLogProgress(AppServer, "ClosureDimensionEndpoint::Init start");
-
     ClusterConformance conformance = { .featureMap = 255, .supportsOverflow = true };
-
     ReturnErrorOnFailure(mLogic.Init(conformance));
     ReturnErrorOnFailure(mInterface.Init());
-
-    ChipLogProgress(AppServer, "ClosureDimensionEndpoint::Init end");
-
     return CHIP_NO_ERROR;
 }

@@ -72,8 +72,6 @@ ClosureManager ClosureManager::sClosureMgr;
 
 void ClosureManager::Init()
 {
-    ChipLogProgress(AppServer, "Closure-app ClosureManager Init Start.");
-
     DeviceLayer::PlatformMgr().LockChipStack();
 
     // Closure endpoints initilization
@@ -87,6 +85,4 @@ void ClosureManager::Init()
     SetTagList(/* endpoint= */ 3, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kEp3TagList));
 
     DeviceLayer::PlatformMgr().UnlockChipStack();
-
-    ChipLogProgress(AppServer, "Closure-app ClosureManager Init Done.");
 }
