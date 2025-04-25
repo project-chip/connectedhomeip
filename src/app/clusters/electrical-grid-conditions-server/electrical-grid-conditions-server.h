@@ -22,12 +22,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/InteractionModelEngine.h>
-#include <app/MessageDef/StatusIB.h>
-#include <app/reporting/reporting.h>
-#include <app/util/attribute-storage.h>
 #include <lib/core/CHIPError.h>
-#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
@@ -35,7 +30,7 @@ namespace Clusters {
 namespace ElectricalGridConditions {
 
 // Spec-defined constraints
-constexpr uint8_t kMaxForecastEntries = 56; // TODO not mentioned in the spec!
+constexpr uint8_t kMaxForecastEntries = 56;
 
 class Delegate
 {
@@ -46,7 +41,7 @@ public:
 
     // For now this is a placeholder and the Delegate could be removed
     // There are no delegated methods since these are largely implemented in the
-    // commodity-price-server.cpp Instance class
+    // electrical-grid-conditions-server.cpp Instance class
 
 protected:
     EndpointId mEndpointId = 0;
@@ -56,7 +51,7 @@ class Instance : public AttributeAccessInterface
 {
 public:
     Instance(EndpointId aEndpointId, Delegate & aDelegate, BitMask<Feature> aFeatures) :
-        AttributeAccessInterface(MakeOptional(aEndpointId), Id), mDelegate(aDelegate), mFeature(aFeature)
+        AttributeAccessInterface(MakeOptional(aEndpointId), Id), mDelegate(aDelegate), mFeatures(aFeatures)
     {
         /* set the base class delegate's endpointId */
         mDelegate.SetEndpointId(aEndpointId);

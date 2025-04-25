@@ -23,7 +23,6 @@
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
-#include <app/util/attribute-storage.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -54,7 +53,7 @@ void Instance::Shutdown()
 
 bool Instance::HasFeature(Feature aFeature) const
 {
-    return mFeature.Has(aFeature);
+    return mFeatures.Has(aFeature);
 }
 
 // AttributeAccessInterface
@@ -83,7 +82,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 
     /* FeatureMap - is held locally */
     case FeatureMap::Id:
-        return aEncoder.Encode(mFeature);
+        return aEncoder.Encode(mFeatures);
     }
 
     /* Allow all other unhandled attributes to fall through to Ember */
@@ -96,25 +95,8 @@ CHIP_ERROR Instance::SetLocalGenerationAvailable(DataModel::Nullable<bool> newVa
     DataModel::Nullable<bool> oldValue = mLocalGenerationAvailable;
 
     mLocalGenerationAvailable = newValue;
-    bool bChanged             = false;
 
-    if (oldValue.IsNull() && newValue.IsNull())
-    {
-        // both null -> unchanged
-        bChanged = false;
-    }
-    else if (oldValue.IsNull() != newValue.IsNull())
-    {
-        // one null, one not -> changed
-        bChanged = true;
-    }
-    else
-    {
-        // both not null -> it's therefore safe to compare values
-        bChanged = oldValue.Value() != newValue.Value();
-    }
-
-    if (bChanged)
+    if (oldValue != newValue)
     {
         if (newValue.IsNull())
         {
