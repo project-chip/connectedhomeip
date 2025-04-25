@@ -63,6 +63,10 @@ source_set("boolean-state-configuration-test-event-trigger") {
   sources = [ "${chip_root}/src/app/clusters/boolean-state-configuration-server/BooleanStateConfigurationTestEventTriggerHandler.h" ]
 }
 
+source_set("commodity-price-test-event-trigger") {
+  sources = [ "${chip_root}/src/app/clusters/commodity-price-server/CommodityPriceTestEventTriggerHandler.h" ]
+}
+
 source_set("energy-evse-test-event-trigger") {
   sources = [ "${chip_root}/src/app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h" ]
 }
@@ -105,6 +109,7 @@ source_set("app-main") {
   public_deps = [
     ":boolean-state-configuration-test-event-trigger",
     ":commissioner-main",
+    ":commodity-price-test-event-trigger",
     ":device-energy-management-test-event-trigger",
     ":energy-evse-test-event-trigger",
     ":energy-reporting-test-event-trigger",
