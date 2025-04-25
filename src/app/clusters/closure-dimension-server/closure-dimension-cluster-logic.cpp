@@ -304,12 +304,10 @@ CHIP_ERROR ClusterLogic::SetLimitRange(const Structs::RangePercent100thsStruct::
     ReturnErrorOnFailure(GetResolution(resolution));
     VerifyOrReturnError(
         limitRange.min % resolution == 0, CHIP_ERROR_INVALID_ARGUMENT,
-        ChipLogError(NotSpecified,
-                     "LimitRange.Min SHALL be equal to an integer multiple of the Resolution attribute."));
+        ChipLogError(NotSpecified, "LimitRange.Min SHALL be equal to an integer multiple of the Resolution attribute."));
     VerifyOrReturnError(
         limitRange.max % resolution == 0, CHIP_ERROR_INVALID_ARGUMENT,
-        ChipLogError(NotSpecified,
-                     "LimitRange.Max SHALL be equal to an integer multiple of the Resolution attribute."));
+        ChipLogError(NotSpecified, "LimitRange.Max SHALL be equal to an integer multiple of the Resolution attribute."));
 
     if ((limitRange.min != mState.limitRange.min) || (limitRange.max != mState.limitRange.max))
     {
@@ -547,7 +545,7 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
     // If latch field is present and MotionLatching feature is not supported, we should not set target.latch value.
     if (latch.HasValue() && mConformance.HasFeature(Feature::kMotionLatching))
     {
-       VerifyOrReturnError(!mDelegate.IsManualLatchingNeeded(), Status::InvalidAction);
+        VerifyOrReturnError(!mDelegate.IsManualLatchingNeeded(), Status::InvalidAction);
 
         target.latch = latch;
     }
