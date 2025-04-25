@@ -16786,6 +16786,7 @@ class RvcCleanMode(Cluster):
             kDeepClean = 0x4000
             kVacuum = 0x4001
             kMop = 0x4002
+            kVacuumThenMop = 0x4003
             # kUnknownEnumValue intentionally not defined. This enum never goes
             # through DataModel::Decode, likely because it is a part of a derived
             # cluster. As a result having kUnknownEnumValue in this enum is error
