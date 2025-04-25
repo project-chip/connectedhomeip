@@ -55,4 +55,10 @@ CHIP_ERROR ProvideOfferCommand::RunCommand()
     return WebRTCManager::Instance().ProvideOffer(webrtcSessionId, streamUsage);
 }
 
+CHIP_ERROR ProvideIceCandidatesCommand::RunCommand()
+{
+    std::cout << "Run ProvideIceCandidatesCommand" << std::endl;
+    return WebRTCManager::Instance().ProvideICECandidates();
+}
+
 } // namespace webrtc

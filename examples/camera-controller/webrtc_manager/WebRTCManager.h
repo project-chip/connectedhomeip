@@ -48,7 +48,7 @@ public:
     CHIP_ERROR ProvideOffer(chip::app::DataModel::Nullable<uint16_t> webRTCSessionID,
                             chip::app::Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage);
 
-    CHIP_ERROR ProvideICECandidates(uint16_t webRTCSessionID);
+    CHIP_ERROR ProvideICECandidates();
 
     static void HandleWebRTCProviderResponse(const chip::app::ConcreteCommandPath & path, const chip::app::StatusIB & status,
                                              chip::TLV::TLVReader * data);

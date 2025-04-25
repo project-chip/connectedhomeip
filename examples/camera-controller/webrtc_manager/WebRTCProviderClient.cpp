@@ -66,7 +66,7 @@ CHIP_ERROR WebRTCProviderClient::ProvideOffer(
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WebRTCProviderClient::ProvideICECandidates(uint16_t webRTCSessionID, DataModel::List<const chip::CharSpan> ICECandidates)
+CHIP_ERROR WebRTCProviderClient::ProvideICECandidates(DataModel::List<const chip::CharSpan> ICECandidates)
 {
     ChipLogProgress(Camera, "Sending ProvideICECandidates to node " ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
 
@@ -74,7 +74,7 @@ CHIP_ERROR WebRTCProviderClient::ProvideICECandidates(uint16_t webRTCSessionID, 
     mCommandType = CommandType::kProvideICECandidates;
 
     // Stash data in class members so the CommandSender can safely reference them async
-    mProvideICECandidatesData.webRTCSessionID = webRTCSessionID;
+    mProvideICECandidatesData.webRTCSessionID = mCurrentSessionId;
     mProvideICECandidatesData.ICECandidates   = ICECandidates;
 
     // Attempt to find or establish a CASE session to the target PeerId.

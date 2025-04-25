@@ -68,9 +68,6 @@ CHIP_ERROR WebRTCManager::SetRemoteDescription(uint16_t webRTCSessionID, const s
     ChipLogProgress(Camera, "WebRTCManager::SetRemoteDescription");
     mPeerConnection->setRemoteDescription(sdp);
 
-    // Schedule the ProvideICECandidates() call to run asynchronously.
-    // DeviceLayer::SystemLayer().ScheduleLambda([this, webRTCSessionID]() { ProvideICECandidates(webRTCSessionID); });
-
     return CHIP_NO_ERROR;
 }
 
@@ -219,7 +216,7 @@ CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> webRTCSessi
     return err;
 }
 
-CHIP_ERROR WebRTCManager::ProvideICECandidates(uint16_t webRTCSessionID)
+CHIP_ERROR WebRTCManager::ProvideICECandidates()
 {
     ChipLogProgress(Camera, "Sending ProvideICECandidates command to the peer device");
 
@@ -239,7 +236,7 @@ CHIP_ERROR WebRTCManager::ProvideICECandidates(uint16_t webRTCSessionID)
 
     auto ICECandidates = chip::app::DataModel::List<const chip::CharSpan>(candidateSpans.data(), candidateSpans.size());
 
-    CHIP_ERROR err = mWebRTCProviderClient.ProvideICECandidates(webRTCSessionID, ICECandidates);
+    CHIP_ERROR err = mWebRTCProviderClient.ProvideICECandidates(ICECandidates);
 
     if (err != CHIP_NO_ERROR)
     {

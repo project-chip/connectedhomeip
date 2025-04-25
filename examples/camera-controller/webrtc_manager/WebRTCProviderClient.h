@@ -89,14 +89,13 @@ public:
      * to inform the remote side about potential network endpoints it can use to establish or
      * enhance a WebRTC session.
      *
-     * @param webRTCSessionID   The unique identifier for the WebRTC session to which these
-     *                          ICE candidates apply.
      * @param ICECandidates     A list of ICE candidate strings. Each string typically follows
      *                          the "candidate:" syntax defined in the ICE specification.
      *
      * @return CHIP_NO_ERROR on success, or an appropriate CHIP_ERROR on failure.
      */
-    CHIP_ERROR ProvideICECandidates(uint16_t webRTCSessionID, chip::app::DataModel::List<const chip::CharSpan> ICECandidates);
+    CHIP_ERROR ProvideICECandidates(chip::app::DataModel::List<const chip::CharSpan> ICECandidates);
+
 
     /////////// CommandSender Callback Interface /////////
     virtual void OnResponse(chip::app::CommandSender * client, const chip::app::ConcreteCommandPath & path,

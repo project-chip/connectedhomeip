@@ -60,4 +60,17 @@ private:
     chip::Optional<uint8_t> mWebRTCSessionId;
 };
 
+class ProvideIceCandidatesCommand : public CHIPCommand
+{
+public:
+    ProvideIceCandidatesCommand(CredentialIssuerCommands * credIssuerCommands) :
+        CHIPCommand("provide-ice-candidates", credIssuerCommands)
+    {}
+
+    /////////// CHIPCommand Interface /////////
+    CHIP_ERROR RunCommand() override;
+
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(1); }
+};
+
 } // namespace webrtc
