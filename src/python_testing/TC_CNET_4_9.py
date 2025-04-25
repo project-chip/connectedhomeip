@@ -27,7 +27,7 @@ from mobly import asserts
 
 class TC_CNET_4_9(MatterBaseTest):
     """
-    [TC-CNET-4.2] [Thread] Verification for attributes check [DUT-Server].
+    [TC-CNET-4.9] [Wi-Fi] Verification for RemoveNetwork Command [DUT-Server].
     Example Usage:
         To run the test case, use the following command:
         ```bash
