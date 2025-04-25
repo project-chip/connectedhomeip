@@ -104,8 +104,8 @@ struct AttributeEntry
         constexpr AttributeEntry(AttributeId attributeId, BitFlags<AttributeQualityFlags> flags,
                                  std::optional<Access::Privilege> readPrivilege  = Access::Privilege::kView,
                                  std::optional<Access::Privilege> writePrivilege = Access::Privilege::kOperate) :
-        attributeId_{ attributeId }, flags_{ flags.Raw() },
-        readPrivilege_{ !readPrivilege ? 0 : chip::to_underlying(readPrivilege.value()) },
+        attributeId_{ attributeId },
+        flags_{ flags.Raw() }, readPrivilege_{ !readPrivilege ? 0 : chip::to_underlying(readPrivilege.value()) },
         writePrivilege_{ !writePrivilege ? 0 : chip::to_underlying(writePrivilege.value()) }
     {}
     EndBitFieldInit;
@@ -147,7 +147,8 @@ struct AcceptedCommandEntry
     // Lets keep the interface the same
     constexpr AcceptedCommandEntry(CommandId commandId = 0, BitFlags<CommandQualityFlags> flags = {},
                                    Access::Privilege invokePrivilege = Access::Privilege::kOperate) :
-        commandId_{ commandId }, flags_{ flags.Raw() }, privilege_{ chip::to_underlying(invokePrivilege) }
+        commandId_{ commandId },
+        flags_{ flags.Raw() }, privilege_{ chip::to_underlying(invokePrivilege) }
     {}
     EndBitFieldInit;
     constexpr CommandId GetCommandId() const { return commandId_; };
