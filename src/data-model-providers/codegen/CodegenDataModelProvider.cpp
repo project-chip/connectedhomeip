@@ -107,7 +107,7 @@ DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & cluster
             .Set(AttributeQualityFlags::kListAttribute, (attribute.attributeType == ZCL_ARRAY_ATTRIBUTE_TYPE))
             .Set(DataModel::AttributeQualityFlags::kTimed, attribute.MustUseTimedWrite()),
         RequiredPrivilege::ForReadAttribute(attributePath),
-        !attribute.IsReadOnly() ? RequiredPrivilege::ForWriteAttribute(attributePath) : static_cast<Access::Privilege>(0));
+        attribute.IsReadOnly() ? std::nullopt : std::make_optional(RequiredPrivilege::ForWriteAttribute(attributePath)));
 
     // NOTE: we do NOT provide additional info for:
     //    - IsExternal/IsSingleton/IsAutomaticallyPersisted is not used by IM handling
@@ -377,7 +377,7 @@ CHIP_ERROR CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path
     //   - fixed value (no such flag exists, so this is not a quality flag we set/track)
     DataModel::AttributeEntry globalListEntry(0, /* default initial value, attributeId is assigned later */
                                               DataModel::AttributeQualityFlags::kListAttribute, Access::Privilege::kView,
-                                              static_cast<Access::Privilege>(0));
+                                              std::nullopt);
 
     for (auto & attribute : GlobalAttributesNotInMetadata)
     {
