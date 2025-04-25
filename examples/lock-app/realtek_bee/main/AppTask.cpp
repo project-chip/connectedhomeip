@@ -74,6 +74,11 @@ using namespace ::chip::DeviceLayer;
 #define APP_EVENT_QUEUE_SIZE 10
 #define LOCK_ENDPOINT_ID (1)
 
+#if DLPS_EN
+extern "C" bool zbmac_pm_check_inactive(void);
+extern "C" void zbmac_pm_initiate_wakeup(void);
+#endif
+
 namespace {
 
 static DeviceCallbacks EchoCallbacks;
@@ -205,6 +210,12 @@ void AppTask::AppTaskMain(void * pvParameter)
         /* Task pend until we have stuff to do */
         if (xQueueReceive(sAppEventQueue, &event, portMAX_DELAY) == pdTRUE)
         {
+#if DLPS_EN
+            if (zbmac_pm_check_inactive())
+            {
+                zbmac_pm_initiate_wakeup();
+            }
+#endif
             sAppTask.DispatchEvent(&event);
         }
     }

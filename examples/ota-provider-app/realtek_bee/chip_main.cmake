@@ -83,11 +83,14 @@ list(
     -DCHIP_PROJECT=1
     -DCHIP_DEVICE_LAYER_TARGET=Realtek_bee
     -DCHIP_HAVE_CONFIG_H
-#    -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
 )
 
 if (matter_dac_key_encryption)
-list(APPEND chip_main_flags -DCONFIG_DAC_KEY_ENC=1)
+list(
+    APPEND chip_main_flags 
+    
+    -DCONFIG_DAC_KEY_ENC=1
+)
 endif (matter_dac_key_encryption)
 
 if (matter_enable_persistentstorage_audit)
