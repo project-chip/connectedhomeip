@@ -32,7 +32,7 @@ using namespace chip::app::Clusters::UnitLocalization::Attributes;
 
 UnitLocalizationServer UnitLocalizationServer::mInstance;
 
-UnitLocalizationServer & UnitLocalizationServer::Instance(void)
+UnitLocalizationServer & UnitLocalizationServer::Instance()
 {
     return UnitLocalizationServer::mInstance;
 }
@@ -52,7 +52,6 @@ CHIP_ERROR UnitLocalizationServer::SetSupportedTemperatureUnits(DataModel::List<
     VerifyOrReturnError(units.size() >= kMinSupportedLocalizationUnits, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     VerifyOrReturnError(units.size() <= kMaxSupportedLocalizationUnits, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
-    memset(mUnitsBuffer, 0, kMaxSupportedLocalizationUnits);
     size_t i = 0;
     for (auto & item : units)
     {
