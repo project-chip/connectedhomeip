@@ -105,9 +105,6 @@ CHIP_ERROR WebRTCManager::HandleAnswer(uint16_t sessionId, const std::string & s
     rtc::Description answerDesc(sdp, rtc::Description::Type::Answer);
     mPeerConnection->setRemoteDescription(answerDesc);
 
-    // Schedule the ProvideICECandidates() call to run asynchronously.
-    // DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() { ProvideICECandidates(sessionId); });
-
     return CHIP_NO_ERROR;
 }
 
@@ -143,7 +140,6 @@ CHIP_ERROR WebRTCManager::HandleICECandidates(uint16_t sessionId, const std::vec
                                std::string(candidate.SDPMid.Value().begin(), candidate.SDPMid.Value().end())));
         }
     }
-    // DeviceLayer::SystemLayer().ScheduleLambda([this, webRTCSessionID]() { ProvideICECandidates(webRTCSessionID); });
 
     return CHIP_NO_ERROR;
 }
@@ -320,7 +316,7 @@ CHIP_ERROR WebRTCManager::ProvideAnswer(uint16_t sessionId, const std::string & 
     return err;
 }
 
-CHIP_ERROR WebRTCManager::ProvideICECandidates(uint16_t sessionId)
+CHIP_ERROR WebRTCManager::ProvideICECandidates()
 {
     ChipLogProgress(Camera, "Sending ProvideICECandidates command to the peer device");
 
@@ -330,7 +326,7 @@ CHIP_ERROR WebRTCManager::ProvideICECandidates(uint16_t sessionId)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    CHIP_ERROR err = mWebRTCProviderClient.ProvideICECandidates(sessionId, mLocalCandidates);
+    CHIP_ERROR err = mWebRTCProviderClient.ProvideICECandidates(mLocalCandidates);
 
     if (err != CHIP_NO_ERROR)
     {

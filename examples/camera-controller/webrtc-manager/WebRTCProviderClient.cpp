@@ -162,7 +162,7 @@ CHIP_ERROR WebRTCProviderClient::ProvideAnswer(uint16_t webRTCSessionId, const s
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WebRTCProviderClient::ProvideICECandidates(uint16_t webRTCSessionId, const std::vector<std::string> & iceCandidates)
+CHIP_ERROR WebRTCProviderClient::ProvideICECandidates(const std::vector<std::string> & iceCandidates)
 {
     ChipLogProgress(Camera, "Sending ProvideICECandidates to node " ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
 
@@ -184,7 +184,7 @@ CHIP_ERROR WebRTCProviderClient::ProvideICECandidates(uint16_t webRTCSessionId, 
         mICECandidateStructList.push_back(iceCandidate);
     }
     // Stash data in class members so the CommandSender can safely reference them async
-    mProvideICECandidatesData.webRTCSessionID = webRTCSessionId;
+    mProvideICECandidatesData.webRTCSessionID = mCurrentSessionId;
     mProvideICECandidatesData.ICECandidates =
         chip::app::DataModel::List<const ICECandidateStruct>(mICECandidateStructList.data(), mICECandidateStructList.size());
 

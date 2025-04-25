@@ -115,13 +115,11 @@ public:
      * to inform the remote side about potential network endpoints it can use to establish or
      * enhance a WebRTC session.
      *
-     * @param webRTCSessionId   The unique identifier for the WebRTC session to which these
-     *                          ICE candidates apply.
      * @param ICECandidates     A list of ICE candidate structs.
      *
      * @return CHIP_NO_ERROR on success, or an appropriate CHIP_ERROR on failure.
      */
-    CHIP_ERROR ProvideICECandidates(uint16_t webRTCSessionId, const std::vector<std::string> & iceCandidates);
+    CHIP_ERROR ProvideICECandidates(const std::vector<std::string> & iceCandidates);
 
     /**
      * @brief Notify WebRTCProviderClient that the Offer command has been received.
