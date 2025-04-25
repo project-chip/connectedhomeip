@@ -35,6 +35,13 @@ WebRTCManager::WebRTCManager() : mWebRTCRequestorServer(kWebRTCRequesterDynamicE
 
 WebRTCManager::~WebRTCManager()
 {
+    // Close the data channel and peer connection if they exist
+    if (mDataChannel)
+    {
+        mDataChannel->close();
+        mDataChannel.reset();
+    }
+
     if (mPeerConnection)
     {
         mPeerConnection->close();
@@ -115,6 +122,7 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
         ChipLogProgress(Camera, "[Gathering State: %d]", static_cast<int>(state));
     });
 
+    // Add a media track so that controller can receive video
     // TODO get track configuration from allocated streams
     // use fixed values for now
     mMedia = rtc::Description::Video("video", rtc::Description::Direction::RecvOnly);
@@ -132,6 +140,27 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
             ChipLogError(Camera, "Failed to send video frame");
         }
     });
+
+    // Create a data channel for this offerer
+    mDataChannel = mPeerConnection->createDataChannel("test");
+
+    if (mDataChannel)
+    {
+        mDataChannel->onOpen(
+            [&]() { ChipLogProgress(Camera, "[DataChannel open: %s]", mDataChannel ? mDataChannel->label().c_str() : "unknown"); });
+
+        mDataChannel->onClosed([&]() {
+            ChipLogProgress(Camera, "[DataChannel closed: %s]", mDataChannel ? mDataChannel->label().c_str() : "unknown");
+        });
+
+        mDataChannel->onMessage([](auto data) {
+            if (std::holds_alternative<std::string>(data))
+            {
+                ChipLogProgress(Camera, "[Received: %s]", std::get<std::string>(data).c_str());
+            }
+        });
+    }
+
     mPeerConnection->setLocalDescription();
 
     return CHIP_NO_ERROR;
