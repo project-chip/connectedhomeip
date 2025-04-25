@@ -549,6 +549,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestChoiceConformanceSupport.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestConformanceSupport.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestConformanceTest.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestDefaultWarnings.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestIdChecks.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestMatterTestingSupport.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestSpecParsingDeviceType.py'
