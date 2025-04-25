@@ -49,9 +49,9 @@ class TC_CLCTRL_4_3(MatterBaseTest):
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Send MoveTo command with no fields"),
-            TestStep("3a", "Send MoveTo command with fields where corresponding feature is not supported - !Latch"),
+            TestStep("3a", "Send MoveTo command with fields where corresponding feature is not supported - !MotionLatching"),
             TestStep("3b", "Send MoveTo command with fields where corresponding feature is not supported - !Speed"),
-            TestStep("3c", "Send MoveTo command with fields where corresponding feature is not supported - !Position"),
+            TestStep("3c", "Send MoveTo command with fields where corresponding feature is not supported - !Positioning"),
             TestStep("4a", "Send MoveTo command with invalid data in fields - invalid Position"),
             TestStep("4b", "Send MoveTo command with invalid data in fields - invalid Speed"),
             TestStep("4c", "Send MoveTo command with invalid data in fields - invalid Position and valid Speed"),
@@ -71,17 +71,17 @@ class TC_CLCTRL_4_3(MatterBaseTest):
         
         endpoint = self.get_endpoint(default=1)
         
+        # STEP 1: Commission DUT to TH
+        self.step(1)
+        cluster = Clusters.Objects.ClosureControl
+        
         # Read the feature map
         feature_map = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=Clusters.ClosureControl.Attributes.FeatureMap)
         logging.info(f"FeatureMap: {feature_map}")
 
-        is_ps_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kPosition
-        is_lt_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kLatch
+        is_ps_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kPositioning
+        is_lt_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kMotionLatching
         is_sp_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kSpeed
-        
-        # STEP 1: Commission DUT to TH
-        self.step(1)
-        cluster = Clusters.Objects.ClosureControl
         
         # STEP 2: Send MoveTo command with no fields
         self.step(2)
