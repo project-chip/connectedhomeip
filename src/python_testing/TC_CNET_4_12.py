@@ -129,7 +129,7 @@ class TC_CNET_4_12(MatterBaseTest):
     @async_test_body
     async def test_TC_CNET_4_12(self):
 
-        wait_time_reboot = 10
+        # wait_time_reboot = 10
 
         # Pre-Conditions
         self.step('precondition-1')
@@ -213,10 +213,10 @@ class TC_CNET_4_12(MatterBaseTest):
                 userth_netidx = idx
                 asserts.assert_true(network.connected, "Thread network not connected")
                 break
-        asserts.assert_true(userth_netidx is not None, "Thread network not found")
         logger.info(f'Step #3: Networks attribute: {network.networkID}')
         logger.info(f'Step #3: Networks attribute: {thread_network_id_bytes_th1}')
         logger.info(f'Step #3: Networks attribute: {userth_netidx}')
+        asserts.assert_true(userth_netidx is not None, "Thread network not found")
 
         self.step(4)
         cmd = Clusters.NetworkCommissioning.Commands.RemoveNetwork(networkID=thread_network_id_bytes_th1, breadcrumb=1)
@@ -309,9 +309,7 @@ class TC_CNET_4_12(MatterBaseTest):
         #                      "The Breadcrumb attribute is not 2")
 
         self.step(10)
-        # await asyncio.sleep(10)
-        # Workaround 600s
-        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=600)
+        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0)
         resp = await self.send_single_cmd(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
@@ -323,62 +321,11 @@ class TC_CNET_4_12(MatterBaseTest):
         logger.info(f'Step #10 - ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
 
         self.step(11)
-        # Back to Thread 1
-
-        # Remove Thread 2
-        cmd = Clusters.NetworkCommissioning.Commands.RemoveNetwork(networkID=thread_network_id_bytes_th2, breadcrumb=2)
-        resp = await self.send_single_cmd(
-            dev_ctrl=self.default_controller,
-            node_id=self.dut_node_id,
-            cmd=cmd
-        )
-        logger.info(f'Step #11: RemoveNetwork response ({vars(resp)})')
-        logger.info(f'Step #11: RemoveNetwork Status is success ({resp.networkingStatus})')
-        logger.info(f'Step #11: RemoveNetwork NetworkIndex: ({resp.networkIndex})')
-
-        # Remove Thread 2: Verify that the DUT responds with Remove Network with NetworkingStatus as 'Success'(0)
-        asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
-                             "Network was not removed")
-        asserts.assert_equal(resp.networkIndex, userth_netidx, "The network index is not as expected.")
-
-        # Remove Thread 2: add Thread 1
-        cmd = Clusters.NetworkCommissioning.Commands.AddOrUpdateThreadNetwork(
-            operationalDataset=thread_dataset_1_bytes, breadcrumb=1)
-        resp = await self.send_single_cmd(
-            dev_ctrl=self.default_controller,
-            node_id=self.dut_node_id,
-            cmd=cmd
-        )
-        logger.info(f'Step #11: AddOrUpdateThreadNetwork response ({vars(resp)})')
-        logger.info(f'Step #11: AddOrUpdateThreadNetwork Status is success ({resp.networkingStatus})')
-        # Verify that the DUT responds with AddThreadNetwork with NetworkingStatus as 'Success'(0)
-        asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
-                             "Failure status returned from AddThreadNetwork")
-        debug_text = resp.debugText
-        # asserts.assert_true(debug_text is None or debug_text == '' or len(debug_text) <= 512,
-        #                     "debugText must be None, empty or have a maximum length of 512 characters.")
-
-        networks = await self.read_single_attribute_check_success(
-            cluster=Clusters.NetworkCommissioning,
-            attribute=Clusters.NetworkCommissioning.Attributes.Networks
-        )
-        logger.info(f'Step #11: Networks attribute: {networks}')
-
-        # Connect Thread #1
-        cmd = Clusters.NetworkCommissioning.Commands.ConnectNetwork(networkID=thread_network_id_bytes_th1, breadcrumb=1)
-        resp = await self.send_single_cmd(
-            dev_ctrl=self.default_controller,
-            node_id=self.dut_node_id,
-            cmd=cmd
-        )
-        logger.info(f'Step #11: ConnectNetwork resp VARS ({vars(resp)})')
-        logger.info(f'Step #11: ConnectNetwork Status is success ({resp.networkingStatus})')
-        # Verify that the DUT responds with AddThreadNConnectNetworketwork with NetworkingStatus as 'Success'(0)
-        asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
-                             "Failure status returned from ConnectNetwork")
-
-        # Wait for the device to establish connection with the new Thread network
-        await asyncio.sleep(wait_time_reboot)
+        # Step 11: When the failsafe is disarmed, the device should automatically return to Thread 1.
+        # This means the Thread 2 network will be removed,
+        # and the device will reconnect to Thread 1 without further intervention.
+        await asyncio.sleep(connect_max_time_seconds + 5)
+        logger.info(f'Step #11 - DUT automatically return to Thread 1')
 
         self.step(12)
         networks = await self.read_single_attribute_check_success(
@@ -390,7 +337,7 @@ class TC_CNET_4_12(MatterBaseTest):
         # Expire the session and re-establish the new session reading attribute (Breadcrum)
         resp = self.default_controller.ExpireSessions(self.dut_node_id)
         logger.info(f'Step #12: Expire the session and re-establish the new session: {resp}')
-        await asyncio.sleep(wait_time_reboot)
+        await asyncio.sleep(connect_max_time_seconds + 5)
 
         breadcrumb_info = await self.read_single_attribute_check_success(
             cluster=Clusters.GeneralCommissioning,
@@ -462,7 +409,7 @@ class TC_CNET_4_12(MatterBaseTest):
                              "Failure status returned from ConnectNetwork")
 
         # Wait for the device to establish connection with the new Thread network
-        await asyncio.sleep(wait_time_reboot)
+        await asyncio.sleep(connect_max_time_seconds + 5)
 
         self.step(17)
         # THREAD_2 - successfully connects to the DUT from previous step
@@ -476,7 +423,7 @@ class TC_CNET_4_12(MatterBaseTest):
         # Expire the session and re-establish the new session reading attribute (Breadcrum)
         resp = self.default_controller.ExpireSessions(self.dut_node_id)
         logger.info(f'Step #17: Expire the session and re-establish the new session: {resp}')
-        await asyncio.sleep(wait_time_reboot)
+        await asyncio.sleep(connect_max_time_seconds + 5)
 
         self.step(18)
         breadcrumb_info = await self.read_single_attribute_check_success(
