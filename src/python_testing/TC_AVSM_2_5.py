@@ -37,7 +37,7 @@ class TC_AVSM_2_5(MatterBaseTest):
             TestStep("precondition", "Commissioning, already done", is_commissioning=True),
             TestStep(1, "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on TH_SERVER", "Verify ADO is supported."),
             TestStep(2, "TH reads AllocatedAudioStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
-                     "Verify the number of allocated snapshot streams in the list is 0."),
+                     "Verify the number of allocated audio streams in the list is 0."),
             TestStep(3, "TH reads MicrophoneCapabilities attribute from CameraAVStreamManagement Cluster on TH_SERVER.",
                      "Store this value in aMicrophoneCapabilities."),
             TestStep(4, "TH reads RankedVideoStreamPrioritiesList attribute from CameraAVStreamManagement Cluster on TH_SERVER.",
@@ -75,7 +75,7 @@ class TC_AVSM_2_5(MatterBaseTest):
         self.step(2)
         aAllocatedAudioStreams = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams)
         logger.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
-        asserts.assert_equal(len(aAllocatedAudioStreams), 0, "The number of AllocatedAudioStreams is not 0.")
+        asserts.assert_equal(len(aAllocatedAudioStreams), 0, "The number of allocated audio streams in the list is not 0.")
 
         self.step(3)
         aMicrophoneCapabilities = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneCapabilities)
@@ -104,7 +104,7 @@ class TC_AVSM_2_5(MatterBaseTest):
         self.step(6)
         aAllocatedAudioStreams = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams)
         logger.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
-        asserts.assert_equal(len(AllocatedAudioStreams), 1, "The number of AllocatedAudioStreams in is not 1.")
+        asserts.assert_equal(len(aAllocatedAudioStreams), 1, "The number of allocated audio streams in the list is not 1.")
 
         self.step(7)
         try:
