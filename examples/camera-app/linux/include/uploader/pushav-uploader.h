@@ -18,14 +18,29 @@
 
 #pragma once
 
+#include <atomic>
+#include <curl/curl.h>
+#include <mutex>
 #include <queue>
 #include <string>
-#include <mutex>
-#include <atomic>
 #include <thread>
-#include <curl/curl.h>
 
-class PushAVUploader {
+typedef struct upload_data_info
+{
+    char * data;
+    int size;
+    int bytes_read;
+} PushAvUploadInfo;
+
+typedef struct cerficates_info
+{
+    std::string root_cert;
+    std::string dev_cert;
+    std::string dev_key;
+} PushAVCertPath;
+
+class PushAVUploader
+{
 public:
     PushAVUploader();
     ~PushAVUploader();
@@ -36,7 +51,7 @@ public:
 
 private:
     void process_queue();
-    void upload_data(std::pair<std::string, std::string> data);
+    void upload_data(std::pair<std::string, std::string> data, PushAVCertPath * path = nullptr);
 
     std::queue<std::pair <std::string, std::string>> av_data;
     std::mutex queue_mutex;

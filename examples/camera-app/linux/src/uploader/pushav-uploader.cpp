@@ -17,11 +17,9 @@
  */
 
 #include "pushav-uploader.h"
+#include <fstream>
+#include <iostream>
 #include <lib/support/logging/CHIPLogging.h>
-
-static size_t pushAVCurlCallback(void *contents, size_t size, size_t nmemb, void *userp) {
-  return 0;
-}
 
 PushAVUploader::PushAVUploader() : running(false) {}
 
@@ -36,13 +34,13 @@ void PushAVUploader::process_queue() {
            std::lock_guard<std::mutex> lock(queue_mutex);
            if (!av_data.empty()) {
                 data = av_data.front();
+                upload_data(data);
                 av_data.pop();
             }
-        }
-        if (!av_data.empty()) {
-            upload_data(data);
-        } else {
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            else
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            }
         }
     }
 }
@@ -70,32 +68,82 @@ void PushAVUploader::add_uploadData(std::string& filename, std::string& url) {
     av_data.push(data);
 }
 
-void PushAVUploader::upload_data(std::pair<std::string, std::string> data) {
-    CURL* curl = curl_easy_init();
-    if (!curl) {
+size_t PushAvUploadCb(void * ptr, size_t size, size_t nmemb, void * stream)
+{
+    int len                   = (int) (size * nmemb);
+    PushAvUploadInfo * upload = (PushAvUploadInfo *) stream;
+    if (ptr == NULL)
+    {
+        ChipLogError(Camera, "ptr is null");
+        return 0;
+    }
+    if ((size == 0) || (nmemb == 0) || ((size * nmemb) < 1))
+    {
+        ChipLogError(Camera, "_upload_file_read_callback size = %d nmemb = %d %d\n", size, nmemb, size * nmemb);
+        return 0;
+    }
+    int buffer_size = size * nmemb;
+    int remaining   = upload->size - upload->bytes_read;
+    int to_copy     = (remaining < buffer_size) ? remaining : buffer_size;
+
+    if (to_copy)
+    {
+        memcpy(ptr, upload->data + upload->bytes_read, to_copy);
+        upload->bytes_read += to_copy;
+    }
+    return to_copy;
+}
+void PushAVUploader::upload_data(std::pair<std::string, std::string> data, PushAVCertPath * path)
+{
+    CURL * curl = curl_easy_init();
+    if (!curl)
+    {
         ChipLogError(Camera, "Failed to initialize CURL");
         return;
     }
-    curl_mime *form;
-    curl_mimepart *field;
-    struct curl_slist *header;
-    std::string response;
+    if (!path)
+    {
+        path            = new PushAVCertPath;
+        path->root_cert = "/root/.pavstest/certs/server/root.pem";
+        path->dev_cert  = "/root/.pavstest/certs/device/dev.pem";
+        path->dev_key   = "/root/.pavstest/certs/device/dev.key";
+    }
 
-    form = curl_mime_init(curl);
-    field = curl_mime_addpart(form);
-    curl_mime_name(field, "file");
-    curl_mime_filedata(field, data.first.c_str());
-    header = curl_slist_append(header, "Content-Type: multipart/form-data");
-
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
-    curl_easy_setopt(curl, CURLOPT_MIMEPOST, form);
-    curl_easy_setopt(curl, CURLOPT_URL, data.second.c_str());
-    //TODO:Enable below code for saving the response header
-    //curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, pushAVCurlCallback);
-    //curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);    
+    std::ifstream file(data.first.c_str(), std::ios::binary);
+    if (!file)
+    {
+        ChipLogError(Camera, "Failed to open file");
+        return;
+    }
+    int size = file.tellg();
+    file.seekg(0, std::ios::beg);
+    std::vector<char> buffer(size);
+    if (!file.read(buffer.data(), size))
+    {
+        ChipLogError(Camera, "Failed to read file into buffer");
+        return;
+    }
+    file.close();
+    PushAvUploadInfo upload;
+    upload.data                 = buffer.data();
+    upload.size                 = size;
+    upload.bytes_read           = 0;
+    struct curl_slist * headers = nullptr;
+    headers                     = curl_slist_append(headers, "Content-Type: application/cfmv");
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    std::string fullUrl = data.second + data.first;
+    curl_easy_setopt(curl, CURLOPT_URL, fullUrl.c_str());
     curl_easy_setopt(curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
-    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
-    curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 1);    
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, true);
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
+    curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, static_cast<curl_off_t>(size));
+    curl_easy_setopt(curl, CURLOPT_CAINFO, path->root_cert.c_str());
+    curl_easy_setopt(curl, CURLOPT_SSLCERT, path->dev_cert.c_str());
+    curl_easy_setopt(curl, CURLOPT_SSLKEY, path->dev_key.c_str());
+    curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
+    curl_easy_setopt(curl, CURLOPT_READFUNCTION, PushAvUploadCb);
+    curl_easy_setopt(curl, CURLOPT_READDATA, upload);
 
     CURLcode res = curl_easy_perform(curl);
 
@@ -104,9 +152,7 @@ void PushAVUploader::upload_data(std::pair<std::string, std::string> data) {
     } else {
         ChipLogError(Camera, "CURL uploaded file  %s", data.first.c_str());
     }
-
-    curl_mime_free(form);
     curl_easy_cleanup(curl);
-    curl_slist_free_all(header);
+    curl_slist_free_all(headers);
 }
 
