@@ -23,71 +23,115 @@ extern "C" {
 #include <libavutil/timestamp.h>
 }
 
+/**
+ * @struct buffer_data
+ * @brief Contains buffer information for custom IO operations
+ */
 struct buffer_data
 {
     uint8_t * ptr;
     size_t size; ///< size left in the buffer
 };
+
 /**
  * @class PushAVClipRecorder
- * @brief Manages the recording of video and/or audio clips into segmented files (e.g., for DASH/CMAF).
- *
- * This class handles pushing packets into queues, processing them to write to output files,
- * and managing clip segmentation based on duration.
+ * @brief Manages multimedia clip recording with DASH/CMAF segmentation
+ * 
+ * Handles video/audio stream processing, packet queueing, and segmented file output
  */
 class PushAVClipRecorder
 {
 public:
-    /**
-     * @brief Constructs a PushAVClipRecorder instance.
-     *
-     * @param id A unique identifier for the recorder instance.
-     * @param outputPath The base output directory for recorded clips.
-     * @param hasVideo Whether video recording is enabled.
-     * @param hasAudio Whether audio recording is enabled.
-     */
-    PushAVClipRecorder(const std::string & id, const std::string & outputPath, bool hasVideo = true, bool hasAudio = false);
 
     /**
-     * @brief Destructor. Ensures all resources are properly released.
+     * @struct ClipInfoStruct
+     * @brief Contains clip configuration and runtime state
      */
+    struct ClipInfoStruct {
+        bool mHasVideo = true;                          ///< Video recording enabled flag
+        bool mHasAudio = false;                         ///< Audio recording enabled flag
+        int mclipId = 0;                                ///< Current clip identifier
+        int mMaxClipDuration = 10;                      ///< Maximum clip duration in seconds
+        int mSegDuration = 4;                           ///< Segment duration in seconds
+        std::string mRecorderId;                        ///< Unique recorder identifier
+        std::string mOutputPath;                        ///< Base output directory path
+        const std::vector<AVCodecID> mSupportedCodec = {///< Supported codecs
+            AV_CODEC_ID_OPUS,
+            AV_CODEC_ID_H264
+        };
+        AVRational mInputTb = { 1, 1000000 };           ///< Input time base (microseconds)
+    };
+
+    /**
+     * @struct AudioInfoStruct
+     * @brief Audio stream configuration parameters
+     */
+    struct AudioInfoStruct {
+    uint64_t mChannelLayout = AV_CH_LAYOUT_STEREO;      ///< Audio channel layout
+    uint16_t mAudioStreamID = 1;                        ///< Audio stream identifier
+    int mChannels = 2;                                  ///< Number of audio channels
+    AVCodecID mAudioCodecId = AV_CODEC_ID_OPUS;         ///< Audio codec identifier
+    int mSampleRate = 48000;                            ///< Sampling rate in Hz
+    int mBitRate = 20000;                               ///< Audio bitrate in bps
+    int64_t a_pts = 0;                                  ///< Audio presentation timestamp
+    int64_t a_dts = 0;                                  ///< Audio decoding timestamp
+    int aStreamIndex = -1;                              ///< Audio stream index
+    int mAudioFrameDuration = 960;                      ///< Audio frame duration in samples
+    AVRational mAudioTb = { 1, 48000 };                 ///< Audio time base
+    };
+
+    /**
+     * @struct VideoInfoStruct
+     * @brief Video stream configuration parameters
+     */
+    struct VideoInfoStruct {
+        AVCodecID mVideoCodecId = AV_CODEC_ID_H264;     ///< Video codec identifier
+        uint16_t mVideoStreamID = 0;                    ///< Video stream identifier
+        int64_t v_pts = 3000;                           ///< Video presentation timestamp
+        int64_t v_dts = 3000;                           ///< Video decoding timestamp
+        int mWidth = 320;                               ///< Video frame width
+        int mHeight = 240;                              ///< Video frame height
+        int mFrameRate = 15;                            ///< Video frame rate (fps)
+        int mVideoFrameDuration = 66667;                ///< Video frame duration (μs)
+        AVRational mVideoTb = { 1, 90000 };             ///< Video time base
+        int vStreamIndex = -1;                          ///< Video stream index
+    };
+
+    /// @name Construction/Destruction
+    /// @{
+    PushAVClipRecorder();
     ~PushAVClipRecorder();
+    /// @}
 
-    /**
-     * @brief Starts the recording process in a separate thread.
-     */
+    /// @name Recording Control
+    /// @{
     void Start();
-
-    /**
-     * @brief Stops the recording process and cleans up resources.
-     */
     void Stop();
+    /// @}
 
     /**
-     * @brief Pushes a packet into the appropriate queue (video or audio).
-     *
-     * @param packet The packet to be added to the queue.
-     * @param isVideo Whether the packet is a video packet.
+     * @brief Enqueues media data for processing
+     * @param data Raw media data pointer
+     * @param size Data size in bytes
+     * @param streamRecorderId Stream identifier
+     * @param isVideo True for video data, false for audio
      */
-    void PushPacket(AVPacket * packet, bool isVideo);
+    void PushPacket(const char* data, size_t size, uint16_t streamRecorderId, bool isVideo);
+    std::atomic<bool> mRunning; ///< Recording activity flag
 
 private:
-    bool mHasVideo;
-    bool mHasAudio;
-    int mclipId = 0;
-    std::string mId;
-    std::string mOutputPath;
-
+    /// @name Stream Configuration
+    /// @{
+    ClipInfoStruct mClipInfo;    ///< Clip configuration parameters
+    AudioInfoStruct mAudioInfo;  ///< Audio stream parameters
+    VideoInfoStruct mVideoInfo;  ///< Video stream parameters
+    /// @}
     std::thread mWorker;
     std::mutex mQueueMutex;
-    std::atomic<bool> mRunning;
     std::condition_variable mCondition;
 
-    std::string mOutputPrefix;
-    std::string mInitSegName;
-    std::string mMediaSegName;
     bool mMetadataSet = false;
-
+    int mMaxQueueSize = 150;
     AVFormatContext * mFmtCtx   = nullptr;
     AVFormatContext * mInFmtCtx = nullptr;
     AVStream * mVideoStream     = nullptr;
@@ -95,14 +139,14 @@ private:
     int mLastFragmentId         = 0;
 
     int64_t mCurrentClipStartPts    = AV_NOPTS_VALUE;
-    int64_t mFragmentDuration       = 4 * AV_TIME_BASE;
-    const int64_t MAX_CLIP_DURATION = 10 * AV_TIME_BASE;
-    const size_t MAX_QUEUE_SIZE     = 150;
-
     std::queue<AVPacket *> audioQueue;
     std::queue<AVPacket *> videoQueue;
-    bool started_writing = false;
     PushAVUploader uploader;
+    bool mFoundFirstIFrame = false;
+
+    bool isH264Iframe(const uint8_t * data_ptr, unsigned int data_len);
+
+    AVPacket * createPacket(const uint8_t * data, int size, bool isVideo);
 
     /**
      * @brief Processes queued packets and writes them to the output file.
@@ -117,8 +161,7 @@ private:
      * @param init_seg_pattern Pattern for initialization segments.
      * @param media_seg_pattern Pattern for media segments.
      */
-    void SetupOutput(const std::string & output_prefix, const std::string & init_seg_pattern, const std::string & media_seg_pattern,
-                     int video);
+    void SetupOutput(const std::string & output_prefix, const std::string & init_seg_pattern, const std::string & media_seg_pattern);
 
     /**
      * @brief Starts the clip recording process.

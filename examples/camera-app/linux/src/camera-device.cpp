@@ -235,7 +235,7 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
     GstCaps * caps = gst_caps_new_simple("video/x-raw", "width", G_TYPE_INT, width, "height", G_TYPE_INT, height, "format",
                                          G_TYPE_STRING, "NV12", // Adjust format as needed
                                          "framerate", GST_TYPE_FRACTION, framerate, 1, NULL);
-    ChipLogError(Camera, "KODAM width %d, height %d, framerate %d", width, height, framerate);
+    ChipLogError(Camera, "width %d, height %d, framerate %d", width, height, framerate);
 
     // Set video test src pattern
 #ifdef AV_STREAM_GST_USE_TEST_SRC
@@ -299,7 +299,7 @@ GstElement * CameraDevice::CreateAudioPipeline(const std::string & device, int c
         error = CameraError::ERROR_INIT_FAILED;
         return nullptr;
     }
-    ChipLogError(Camera, "KODAM channel %d, sampleRate %d", channels, sampleRate);
+    ChipLogError(Camera, "channel %d, sampleRate %d", channels, sampleRate);
     // Create GstCaps for the audio source
     GstCaps * caps = gst_caps_new_simple("audio/x-raw", "format", G_TYPE_STRING, "S16LE","channels", G_TYPE_INT, channels, "rate", G_TYPE_INT, sampleRate, NULL);
 
@@ -311,6 +311,10 @@ GstElement * CameraDevice::CreateAudioPipeline(const std::string & device, int c
 
     // Unref the caps to free memory
     gst_caps_unref(caps);
+
+    g_object_set(G_OBJECT(source), "do-timestamp", TRUE, NULL);
+
+    g_object_set(G_OBJECT(opusenc), "frame-size", 20, NULL);
 
     // Add elements to the pipeline
     gst_bin_add_many(GST_BIN(pipeline), source, capsfilter, audioconvert, opusenc, udpsink, NULL);
