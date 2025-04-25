@@ -25,6 +25,7 @@
 #include <app/clusters/closure-dimension-server/closure-dimension-matter-context.h>
 #include <app/clusters/closure-dimension-server/closure-dimension-server.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <cmsis_os2.h>
 
 namespace {
     constexpr chip::Percent100ths LIMIT_RANGE_MIN = 0;
@@ -41,18 +42,22 @@ using Protocols::InteractionModel::Status;
 CHIP_ERROR PrintOnlyDelegate::Init()
 {
     CHIP_ERROR err;
-    chip::app::DataModel::Nullable<GenericCurrentStateStruct> current;
-    current.Value().position.SetValue(0);
-    current.Value().latch.SetValue(false);
-    current.Value().speed.SetValue(Globals::ThreeLevelAutoEnum::kAuto);
-    err = mLogic->SetCurrentState(current);
+    GenericCurrentStateStruct currentState{ Optional<Percent100ths>(0), Optional<bool>(false),
+        Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
+
+    err = mLogic->SetCurrentState(chip::app::DataModel::MakeNullable(currentState));
+    // ChipLogProgress(AppServer, "SetCurrentState p1");
+    // osDelay(1000);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err);
-    chip::app::DataModel::Nullable<GenericTargetStruct> target;
-    target.Value().position.SetValue(0);
-    target.Value().latch.SetValue(false);
-    target.Value().speed.SetValue(Globals::ThreeLevelAutoEnum::kAuto);
-    err = mLogic->SetTarget(target);
+    GenericTargetStruct targetState{ Optional<Percent100ths>(0), Optional<bool>(false),
+        Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
+    // chip::app::DataModel::Nullable<GenericTargetStruct> target;
+    // target.Value().position.SetValue(0);
+    // target.Value().latch.SetValue(false);
+    // target.Value().speed.SetValue(Globals::ThreeLevelAutoEnum::kAuto);
+    err = mLogic->SetTarget(chip::app::DataModel::MakeNullable(targetState));
     VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+
 
     Structs::RangePercent100thsStruct::Type limitRange;
     limitRange.min = LIMIT_RANGE_MIN;
@@ -60,8 +65,10 @@ CHIP_ERROR PrintOnlyDelegate::Init()
     err = mLogic->SetLimitRange(limitRange);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err);
 
+
     err = mLogic->SetStepValue(STEP);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+
     return CHIP_NO_ERROR;
 }
 
@@ -237,6 +244,7 @@ bool PrintOnlyDelegate::IsManualLatchingNeeded()
 CHIP_ERROR ClosureDimensionEndpoint::Init()
 {
     ChipLogProgress(AppServer, "ClosureDimensionEndpoint::Init start");
+    osDelay(1000);
     
     ClusterConformance conformance;
     conformance.FeatureMap() = 255;
@@ -248,10 +256,14 @@ CHIP_ERROR ClosureDimensionEndpoint::Init()
     clusterInitParameters.translationDirection = TranslationDirectionEnum::kDownward;
      
     ReturnErrorOnFailure(mLogic.Init(conformance, clusterInitParameters));
+    ChipLogProgress(AppServer, "mLogicInit done");
+    osDelay(1000);
     ReturnErrorOnFailure(mInterface.Init());
+    ChipLogProgress(AppServer, "interfaceInit done");
+    osDelay(1000);
     ReturnErrorOnFailure(mDelegate.Init());
       
     ChipLogProgress(AppServer, "ClosureDimensionEndpoint::Init end");
-      
+    osDelay(1000);
     return CHIP_NO_ERROR;
 }

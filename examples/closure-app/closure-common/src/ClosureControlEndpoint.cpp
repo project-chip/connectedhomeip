@@ -376,11 +376,6 @@ CHIP_ERROR PrintOnlyDelegate::GetCurrentErrorAtIndex(size_t index, ClosureErrorE
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PrintOnlyDelegate::SetCurrentErrorInList(const ClosureErrorEnum & closureError)
-{
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR ClosureControlEndpoint::Init()
 {
     ChipLogProgress(AppServer, "ClosureControlEndpoint::Init start");

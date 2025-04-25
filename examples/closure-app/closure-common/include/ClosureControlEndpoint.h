@@ -89,7 +89,6 @@ public:
     Protocols::InteractionModel::Status HandleCalibrateCommand() override;
     
     CHIP_ERROR GetCurrentErrorAtIndex(size_t index, ClosureErrorEnum & closureError) override;
-    CHIP_ERROR SetCurrentErrorInList(const ClosureErrorEnum & closureError) override;
     
     bool IsManualLatchingNeeded() override;
     bool IsReadyToMove() override;
