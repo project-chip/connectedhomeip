@@ -108,7 +108,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
         # Test Speed field if Speed feature is not supported
         if not is_sp_feature_supported:
             try:
-                await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"speed": 1}))  # Low speed
+                await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"speed": Clusters.Globals.ThreeLevelAutoEnum.kLow}))  # Low speed
                 logging.info("MoveTo command with Speed field when feature not supported was accepted")
             except InteractionModelError as e:
                 logging.error(f"MoveTo with Speed when feature not supported failed: {e}")
@@ -118,7 +118,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
         # Test Position field if Positioning feature is not supported
         if not is_ps_feature_supported:
             try:
-                await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"position": 0}))  # CloseInFull
+                await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"position": Clusters.ClosureControl.Enums.TargetPositionEnum.kCloseInFull}))  # CloseInFull
                 logging.info("MoveTo command with Position field when feature not supported was accepted")
             except InteractionModelError as e:
                 logging.error(f"MoveTo with Position when feature not supported failed: {e}")
@@ -151,7 +151,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
         # Test invalid Position and valid Speed
         if is_ps_feature_supported and is_sp_feature_supported:
             try:
-                await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"position": 6, "speed": 3}))
+                await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"position": 6, "speed": Clusters.Globals.ThreeLevelAutoEnum.kHigh}))
                 logging.error("MoveTo command with invalid Position and valid Speed should have failed but succeeded")
                 asserts.assert_true(False, "MoveTo command with invalid Position and valid Speed should have failed but succeeded")
             except InteractionModelError as e:
@@ -162,7 +162,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
         # Test valid Position and invalid Speed
         if is_ps_feature_supported and is_sp_feature_supported:
             try:
-                await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"position": 0, "speed": 4}))
+                await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"position": Clusters.ClosureControl.Enums.TargetPositionEnum.kCloseInFull, "speed": 4}))
                 logging.error("MoveTo command with valid Position and invalid Speed should have failed but succeeded")
                 asserts.assert_true(False, "MoveTo command with valid Position and invalid Speed should have failed but succeeded")
             except InteractionModelError as e:
