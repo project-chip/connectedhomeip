@@ -139,11 +139,11 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    bool IsManualLatchingNeeded() { return false; }
-    bool IsReadyToMove() { return true; }
-    ElapsedS GetCalibrationCountdownTime() { return 30; }
-    ElapsedS GetMovingCountdownTime() { return 20; }
-    ElapsedS GetWaitingForMotionCountdownTime() { return 10; }
+    bool IsManualLatchingNeeded() override { return false; }
+    bool IsReadyToMove() override { return true; }
+    ElapsedS GetCalibrationCountdownTime() override { return 30; }
+    ElapsedS GetMovingCountdownTime() override { return 20; }
+    ElapsedS GetWaitingForMotionCountdownTime() override { return 10; }
 
 private:
     std::unordered_set<ClosureErrorEnum> currentErrors;
@@ -1007,7 +1007,6 @@ TEST_F(TestClosureControlClusterLogic, StopCommand_InCalibrationMainState)
     mockContext.ResetReportedAttributeId();
 
     MainStateEnum state;
-    DataModel::Nullable<ElapsedS> countdownTime;
 
     EXPECT_EQ(logic->HandleStop(), Status::Success);
     EXPECT_EQ(logic->GetMainState(state), CHIP_NO_ERROR);
@@ -1046,7 +1045,6 @@ TEST_F(TestClosureControlClusterLogic, StopCommand_InWaitingForMotionMainState)
     mockContext.ResetReportedAttributeId();
 
     MainStateEnum state;
-    DataModel::Nullable<ElapsedS> countdownTime;
 
     EXPECT_EQ(logic->HandleStop(), Status::Success);
     EXPECT_EQ(logic->GetMainState(state), CHIP_NO_ERROR);
