@@ -68,6 +68,7 @@ RUN set -x \
     libnspr4-dev \
     libpango1.0-dev \
     libpixman-1-dev \
+    libpcsclite1 \
     libreadline-dev \
     libssl-dev \
     libtool \
@@ -80,6 +81,7 @@ RUN set -x \
     ninja-build \
     openjdk-8-jdk \
     pkg-config \
+    pcscd \
     python3 \
     python3-dev \
     python3-pip \
