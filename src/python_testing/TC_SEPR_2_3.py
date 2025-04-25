@@ -67,7 +67,7 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
         """Return the PICS definitions associated with this test."""
         pics = [
             "SEPR.S",
-            "SEPR.F00(FORE)"
+            "SEPR.F00"
         ]
         return pics
 
