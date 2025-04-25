@@ -37,12 +37,12 @@ UnitLocalizationServer & UnitLocalizationServer::Instance()
     return UnitLocalizationServer::mInstance;
 }
 
-CHIP_ERROR UnitLocalizationServer::ReadSupportedTemperatureUnits(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+CHIP_ERROR UnitLocalizationServer::ReadSupportedTemperatureUnits(AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.Encode(UnitLocalizationServer::Instance().GetSupportedTemperatureUnits());
+    return aEncoder.Encode(GetSupportedTemperatureUnits());
 }
 
-CHIP_ERROR UnitLocalizationServer::ReadClusterRevision(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+CHIP_ERROR UnitLocalizationServer::ReadClusterRevision(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.Encode(kClusterRevision);
 }
@@ -70,10 +70,10 @@ CHIP_ERROR UnitLocalizationServer::Read(const ConcreteReadAttributePath & aPath,
     switch (aPath.mAttributeId)
     {
     case SupportedTemperatureUnits::Id: {
-        return ReadSupportedTemperatureUnits(aPath.mEndpointId, aEncoder);
+        return ReadSupportedTemperatureUnits(aEncoder);
     }
     case ClusterRevision::Id: {
-        return ReadClusterRevision(aPath.mEndpointId, aEncoder);
+        return ReadClusterRevision(aEncoder);
     }
     default: {
         break;
