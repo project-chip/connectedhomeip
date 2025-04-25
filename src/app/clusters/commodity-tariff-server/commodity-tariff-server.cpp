@@ -122,30 +122,15 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
 
     switch (handlerContext.mRequestPath.mCommandId)
     {
+    case GetTariffComponent::Id:
+        HandleCommand<GetTariffComponent::DecodableType>(
+            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleGetTariffComponent(ctx, commandData); });
+        return;        
     case GetDayEntry::Id:
         HandleCommand<GetDayEntry::DecodableType>(
             handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleGetDayEntry(ctx, commandData); });
         return;
-    case GetTariffComponent::Id:
-        HandleCommand<GetTariffComponent::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleGetTariffComponent(ctx, commandData); });
-        return;
     }
-}
-
-void Instance::HandleGetDayEntry(HandlerContext & ctx, const Commands::GetDayEntry::DecodableType & commandData)
-{
-    Commands::GetDayEntryResponse::Type response;
-
-    Status status = mDelegate.GetDayEntryById(commandData.dayEntryID, response.dayEntry);
-    if (status != Status::Success)
-    {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-        return;
-    }
-
-    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
 }
 
 void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::GetTariffComponent::DecodableType & commandData)
@@ -163,7 +148,20 @@ void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::Ge
     }
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
+}
+
+void Instance::HandleGetDayEntry(HandlerContext & ctx, const Commands::GetDayEntry::DecodableType & commandData)
+{
+    Commands::GetDayEntryResponse::Type response;
+
+    Status status = mDelegate.GetDayEntryById(commandData.dayEntryID, response.dayEntry);
+    if (status != Status::Success)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+        return;
+    }
+
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
 } // namespace CommodityTariff
