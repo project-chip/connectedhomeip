@@ -15,12 +15,12 @@
 #    limitations under the License.
 
 import logging
-from chip.clusters import CameraAvStreamManagement, WebRTCTransportProvider
+
 from chip import webrtc
+from chip.clusters import CameraAvStreamManagement, WebRTCTransportProvider
 from chip.clusters.Types import NullValue
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from chip.webrtc import (ErrorCallback_t,  PeerConnectedCallback_t,
-                         PeerDisconnectedCallback_t, SdpAnswerCallback_t,  StatsCallback_t)
+from chip.webrtc import ErrorCallback_t, PeerConnectedCallback_t, PeerDisconnectedCallback_t, SdpAnswerCallback_t, StatsCallback_t
 from mobly import asserts
 from test_plan_support import commission_if_required
 
