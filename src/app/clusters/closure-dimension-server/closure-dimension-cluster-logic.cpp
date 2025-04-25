@@ -88,7 +88,6 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericCurren
         //  feature is supported by the closure. If the Positioning feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-        // We don't need to check if values are present since the check was done above.
         VerifyOrReturnError(incomingCurrentState.Value().position.Value() <= kPercents100thsMaxValue, CHIP_ERROR_INVALID_ARGUMENT);
     }
 
@@ -143,7 +142,6 @@ CHIP_ERROR ClusterLogic::SetTarget(const DataModel::Nullable<GenericTargetStruct
         //  feature is supported by the closure. If the Positioning feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-        // We don't need to check if values are present since the check was done above.
         VerifyOrReturnError(incomingTarget.Value().position.Value() <= kPercents100thsMaxValue, CHIP_ERROR_INVALID_ARGUMENT);
 
         // Incoming Target Position value SHALL follow the scaling from Resolution Attribute.
@@ -307,11 +305,11 @@ CHIP_ERROR ClusterLogic::SetLimitRange(const Structs::RangePercent100thsStruct::
     VerifyOrReturnError(
         limitRange.min % resolution == 0, CHIP_ERROR_INVALID_ARGUMENT,
         ChipLogError(NotSpecified,
-                     "LimitRange.Min and LimitRange.Max SHALL be equal to an integer multiple of the Resolution attribute."));
+                     "LimitRange.Min SHALL be equal to an integer multiple of the Resolution attribute."));
     VerifyOrReturnError(
         limitRange.max % resolution == 0, CHIP_ERROR_INVALID_ARGUMENT,
         ChipLogError(NotSpecified,
-                     "LimitRange.Min and LimitRange.Max SHALL be equal to an integer multiple of the Resolution attribute."));
+                     "LimitRange.Max SHALL be equal to an integer multiple of the Resolution attribute."));
 
     if ((limitRange.min != mState.limitRange.min) || (limitRange.max != mState.limitRange.max))
     {
@@ -537,7 +535,7 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
                 position.Value() = limitRange.max;
             }
 
-            if (position.Value() < limitRange.min)
+            else if (position.Value() < limitRange.min)
             {
                 position.Value() = limitRange.min;
             }
@@ -549,10 +547,7 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
     // If latch field is present and MotionLatching feature is not supported, we should not set target.latch value.
     if (latch.HasValue() && mConformance.HasFeature(Feature::kMotionLatching))
     {
-        if (mDelegate.IsManualLatchingNeeded())
-        {
-            return Status::InvalidAction;
-        }
+       VerifyOrReturnError(!mDelegate.IsManualLatchingNeeded(), Status::InvalidAction);
 
         target.latch = latch;
     }

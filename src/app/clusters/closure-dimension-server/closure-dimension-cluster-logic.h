@@ -93,7 +93,7 @@ struct ClusterConformance
             (HasFeature(Feature::kRotation) && HasFeature(Feature::kModulation)) ||
             (HasFeature(Feature::kModulation) && HasFeature(Feature::kTranslation)))
         {
-            ChipLogError(NotSpecified,
+            ChipLogError(AppServer,
                          "Validation failed: Only one of Translation, Rotation or Modulation feature can be enabled.");
             return false;
         }
