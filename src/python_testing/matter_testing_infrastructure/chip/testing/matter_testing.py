@@ -1753,6 +1753,33 @@ class MatterBaseTest(base_test.BaseTestClass):
             logging.info("========= EOF on STDIN =========")
             return None
 
+    def user_verify_snap_shot(self,
+                              prompt_msg: str,
+                              image_stream: str) -> Optional[str]:
+        """Show Image Verification Prompt and wait for user validation.
+        Used to verify WebRTC related TCs.
+
+        Args:
+            prompt_msg (str): Message for TH UI prompt and input function.
+            Indicates what is expected from the user.
+
+        Returns:
+            str: User input or none if input is closed.
+        """
+        if self.runner_hook:
+            self.runner_hook.show_image_prompt(
+              msg=prompt_msg,
+              img_hex_str=image_stream
+            )
+
+        logging.info("========= USER PROMPT for Image Verification =========")
+        logging.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
+        try:
+            return input()
+        except EOFError:
+            logging.info("========= EOF on STDIN =========")
+            return None
+
     def user_verify_video_stream(self,
                                  prompt_msg: str) -> Optional[str]:
         """Show Video Verification Prompt and wait for user validation.
@@ -1768,7 +1795,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         if self.runner_hook:
             self.runner_hook.show_video_prompt(msg=prompt_msg)
 
-        logging.info(f"========= USER PROMPT for Video Stream Verification =========")
+        logging.info("========= USER PROMPT for Video Stream Verification =========")
         logging.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
         try:
             return input()
