@@ -61,7 +61,7 @@ static_library("Darwin") {
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
     "DnssdContexts.cpp",
-    "DnssdHostNameRegistrar.cpp",
+    "DnssdHostNameRegistrar.mm",
     "DnssdImpl.cpp",
     "DnssdImpl.h",
     "DnssdType.cpp",
@@ -78,6 +78,8 @@ static_library("Darwin") {
     "SystemTimeSupport.cpp",
     "UserDefaults.h",
     "UserDefaults.mm",
+    "inet/InterfacesMonitor.h",
+    "inet/InterfacesMonitor.mm",
     "system/SystemLayerImplDispatch.h",
     "system/SystemLayerImplDispatch.mm",
   ]
