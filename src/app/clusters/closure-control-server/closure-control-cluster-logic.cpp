@@ -28,8 +28,8 @@ namespace ClosureControl {
 using namespace Protocols::InteractionModel;
 
 namespace {
-    constexpr uint8_t kCurrentErrorListSize  = 10;
-} //namespace
+constexpr uint8_t kCurrentErrorListSize = 10;
+} // namespace
 
 /*
     ClusterLogic Implementation
@@ -254,11 +254,11 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
         if (!incomingOverallState.positioning.Value().IsNull())
         {
             VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallState.positioning.Value().Value()) !=
-                PositioningEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
+                                    PositioningEnum::kUnknownEnumValue,
+                                CHIP_ERROR_INVALID_ARGUMENT);
             VerifyOrReturnError(IsSupportedOverallStatePositioning(incomingOverallState.positioning.Value().Value()),
-                CHIP_ERROR_INVALID_ARGUMENT);
+                                CHIP_ERROR_INVALID_ARGUMENT);
         }
-
     }
 
     // Validate the incomging Latch featureMap conformance.
@@ -279,9 +279,9 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
         if (!incomingOverallState.speed.Value().IsNull())
         {
             VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallState.speed.Value().Value()) !=
-            Globals::ThreeLevelAutoEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
+                                    Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
+                                CHIP_ERROR_INVALID_ARGUMENT);
         }
-
     }
 
     // Validate the incomging SecureState featureMap conformance.
