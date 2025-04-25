@@ -89,11 +89,10 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aPath, TLV::TLVRea
     SubjectDescriptor subjectDescriptor = aCommandObj->GetSubjectDescriptor();
 
     DataModel::InvokeRequest invokeRequest;
-    invokeRequest.path = aPath;
+    invokeRequest.path              = aPath;
     invokeRequest.subjectDescriptor = &subjectDescriptor;
 
-    std::optional<DataModel::ActionReturnStatus> result = gOtaProviderServer.InvokeCommand(
-        invokeRequest, aReader, aCommandObj);
+    std::optional<DataModel::ActionReturnStatus> result = gOtaProviderServer.InvokeCommand(invokeRequest, aReader, aCommandObj);
 
     if (result.has_value())
     {
