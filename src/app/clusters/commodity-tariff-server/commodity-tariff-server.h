@@ -26,18 +26,13 @@
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/reporting/reporting.h>
-#include <app/util/attribute-storage.h>
-#include <lib/core/CHIPError.h>
-
-#include <list>
-#include <string>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace CommodityTariff {
 
-typedef DataModel::Nullable<uint32_t> epoch_s;
+typedef uint32_t epoch_s;
 
 class Delegate
 {
@@ -108,8 +103,6 @@ private:
 
     // Internal Application API to set attribute values
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-     // NOTE there are no writable attributes
-    //CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
     // CommandHandlerInterface
     void InvokeCommand(HandlerContext & handlerContext) override;
