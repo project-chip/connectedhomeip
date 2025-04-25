@@ -121,7 +121,7 @@ class TC_AVSUM_2_6(MatterBaseTest, AVSUMTestBase):
         self.step(8)
         # Remove and verify empty
         await self.send_remove_preset_command(endpoint, max_presets_dut)
-        mptz_presets_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPresets)        
+        mptz_presets_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPresets)
         asserts.assert_true(not mptz_presets_dut, "Added Preset not removed despite invocation of MPTZRemovePreset")
 
 

@@ -60,14 +60,14 @@ class TC_AVSUM_2_7(MatterBaseTest, AVSUMTestBase):
             TestStep(7, "Send DPTZSetVieport with a the viewport created in Step 6. Verify ConstraintError response"),
             TestStep(8, "Create a valid viewport give the dimensions of the sensor and the device resolution"),
             TestStep(9, "Send DPTZSetVieport with a the viewport created in Step 9. Verify success"),
-            TestStep(10,"Modify the valid viewport so that the AR is invalid"),
-            TestStep(11,"Send DPTZSetVieport with a the viewport created in Step 10. Verify ConstraintError response"),
+            TestStep(10, "Modify the valid viewport so that the AR is invalid"),
+            TestStep(11, "Send DPTZSetVieport with a the viewport created in Step 10. Verify ConstraintError response"),
         ]
         return steps
 
     def pics_TC_AVSUM_2_7(self) -> list[str]:
         pics = [
-            "AVSUM.S","AVSM.S"
+            "AVSUM.S", "AVSM.S"
         ]
         return pics
 
@@ -85,7 +85,7 @@ class TC_AVSUM_2_7(MatterBaseTest, AVSUMTestBase):
         self.step(2)
         # Create a dummy stream ID, initially it will fail. And a new viewport, that will also fail
         failingvideostreamID = 5
-        smallfailingviewport = Clusters.CameraAvSettingsUserLevelManagement.Structs.ViewportStruct(x1=1,y1=10,x2=1,y2=10)
+        smallfailingviewport = Clusters.CameraAvSettingsUserLevelManagement.Structs.ViewportStruct(x1=1, y1=10, x2=1, y2=10)
 
         self.step(3)
         # Send a dptzsetviewport for the dodgy stream
@@ -102,7 +102,7 @@ class TC_AVSUM_2_7(MatterBaseTest, AVSUMTestBase):
         self.step(6)
         # Send a dptzsetviewport for the correct stream but with an invalid viewport larger than the sensor call deal with dimension viewport
         sensordimensions = await self.read_avstr_attribute_expect_success(endpoint, attributesAVSTR.VideoSensorParams)
-        largefailingviewport = Clusters.CameraAvSettingsUserLevelManagement.Structs.ViewportStruct(x1=0,y1=0,
+        largefailingviewport = Clusters.CameraAvSettingsUserLevelManagement.Structs.ViewportStruct(x1=0, y1=0,
                                                                                                    x2=sensordimensions.sensorWidth+16,
                                                                                                    y2=sensordimensions.sensorHeight+9)
 
@@ -116,9 +116,9 @@ class TC_AVSUM_2_7(MatterBaseTest, AVSUMTestBase):
         viewportwidth = viewport.x2 - viewport.x1
         viewportheight = viewport.y2 - viewport.y1
         x1 = sensordimensions.sensorWidth - viewportwidth
-        
+
         self.step(8)
-        passingviewport = Clusters.CameraAvSettingsUserLevelManagement.Structs.ViewportStruct(x1=x1,y1=0,
+        passingviewport = Clusters.CameraAvSettingsUserLevelManagement.Structs.ViewportStruct(x1=x1, y1=0,
                                                                                               x2=sensordimensions.sensorWidth,
                                                                                               y2=viewportheight)
         self.step(9)
@@ -126,11 +126,12 @@ class TC_AVSUM_2_7(MatterBaseTest, AVSUMTestBase):
 
         self.step(10)
         # Deliberately mess with the AR, ensure that the viewport setting fails.
-        failingviewport = Clusters.CameraAvSettingsUserLevelManagement.Structs.ViewportStruct(x1=x1,y1=viewportheight//2,
+        failingviewport = Clusters.CameraAvSettingsUserLevelManagement.Structs.ViewportStruct(x1=x1, y1=viewportheight//2,
                                                                                               x2=sensordimensions.sensorWidth,
                                                                                               y2=viewportheight)
         self.step(11)
         await self.send_dptz_set_viewport_command(endpoint, videoStreamID, failingviewport, expected_status=Status.ConstraintError)
+
 
 if __name__ == "__main__":
     default_matter_test_main()

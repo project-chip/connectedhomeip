@@ -60,13 +60,13 @@ class TC_AVSUM_2_8(MatterBaseTest, AVSUMTestBase):
             TestStep(7, "Setup deltaX and deltaY to move beyond the cartesian plan, send via DPTZRelativeMove. Verify success"),
             TestStep(8, "Setup deltaX to move the viewport to the right, send via DPTZRelativeMove. Verify success"),
             TestStep(9, "Setup deltaY to move the viewport down, send via DPTZRelativeMove. Verify success"),
-            TestStep(10,"Repeatedly invoke DPTZRelativeMove with a Zoom Delta of 100%, verify no error on max out of sensor size"),
+            TestStep(10, "Repeatedly invoke DPTZRelativeMove with a Zoom Delta of 100%, verify no error on max out of sensor size"),
         ]
         return steps
 
     def pics_TC_AVSUM_2_8(self) -> list[str]:
         pics = [
-            "AVSUM.S","AVSM.S"
+            "AVSUM.S", "AVSM.S"
         ]
         return pics
 
@@ -82,7 +82,7 @@ class TC_AVSUM_2_8(MatterBaseTest, AVSUMTestBase):
         self.step(1)  # Already done, immediately go to step 2
 
         self.step(2)
-        # Create a dummy stream ID, initially it will fail. 
+        # Create a dummy stream ID, initially it will fail.
         failingvideostreamID = 5
 
         # Send a dptzrelativemove for the dodgy stream
@@ -109,7 +109,7 @@ class TC_AVSUM_2_8(MatterBaseTest, AVSUMTestBase):
         viewportwidth = viewport.x2 - viewport.x1
         viewportheight = viewport.y2 - viewport.y1
         x1 = sensordimensions.sensorWidth - viewportwidth
-        passingviewport = Clusters.CameraAvSettingsUserLevelManagement.Structs.ViewportStruct(x1=x1,y1=0,
+        passingviewport = Clusters.CameraAvSettingsUserLevelManagement.Structs.ViewportStruct(x1=x1, y1=0,
                                                                                               x2=sensordimensions.sensorWidth,
                                                                                               y2=viewportheight)
         await self.send_dptz_set_viewport_command(endpoint, videoStreamID, passingviewport)
@@ -127,7 +127,7 @@ class TC_AVSUM_2_8(MatterBaseTest, AVSUMTestBase):
         self.step(9)
         # Send a dptzrelativemove based on the new viewport, move down
         await self.send_dptz_relative_move_command(endpoint, videoStreamID, deltaY=100)
- 
+
         self.step(10)
         # Send a dptzrelativemove based on the new viewport, zoom to beyond sensor size
         currentsize = (viewport.x2-viewport.x1) * (viewport.y2-viewport.y1)

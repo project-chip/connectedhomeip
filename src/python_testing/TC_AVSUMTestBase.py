@@ -125,7 +125,7 @@ class AVSUMTestBase:
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
-    async def send_dptz_relative_move_command(self, endpoint, streamID, deltaX: int = None, deltaY: int = None, 
+    async def send_dptz_relative_move_command(self, endpoint, streamID, deltaX: int = None, deltaY: int = None,
                                               zoomDelta: int = None, expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=Clusters.CameraAvSettingsUserLevelManagement.Commands.DPTZRelativeMove(
@@ -194,12 +194,12 @@ class AVSUMTestBase:
                 minFrameRate=30,
                 maxFrameRate=120,
                 minResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(width=400, height=300),
-                maxResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(width=1920, height=1080), #16/9
+                maxResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(width=1920, height=1080),  # 16/9
                 minBitRate=20000,
                 maxBitRate=150000,
                 minFragmentLen=2000,
                 maxFragmentLen=8000
-                ),
+            ),
                 endpoint=endpoint)
 
             asserts.assert_equal(expected_status, Status.Success)
