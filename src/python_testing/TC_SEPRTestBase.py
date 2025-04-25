@@ -22,6 +22,7 @@ import chip.clusters as Clusters
 from chip.clusters import Globals
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
+from chip.testing.timeoperations import utc_time_in_matter_epoch
 from chip.testing import matter_asserts
 from mobly import asserts
 
@@ -81,7 +82,7 @@ class CommodityPriceTestBaseHelper:
 
         if now_time_must_be_within_period:  # Only check time limits when dealing with current price (not list of Forecast)
             # - verify that the PeriodStart is in the past.
-            now_time_epoch_s = self.get_current_time_as_epoch_s()
+            now_time_epoch_s = utc_time_in_matter_epoch() // 1000000
             asserts.assert_less_equal(struct.periodStart, now_time_epoch_s,
                                       "PeriodStart must not be in the past")
 
@@ -197,21 +198,6 @@ class CommodityPriceTestBaseHelper:
 
     async def send_test_event_trigger_forecast_update(self):
         await self.send_test_event_triggers(eventTrigger=self.kEventTriggerForecastUpdate)
-
-    def get_current_time_as_epoch_s(self):
-        """Returns current time in UTC in Matter Epoch_S"""
-        # Matter epoch is 0 hours, 0 minutes, 0 seconds on Jan 1, 2000 UTC
-        now_time = datetime.now()     # Get time in local time
-
-        # Shift to UTC so we can use timezone aware subtraction from Matter epoch in UTC
-        now_time = now_time.astimezone(timezone.utc)
-
-        matter_base_time = datetime(2000, 1, 1, 0, 0, 0, 0, tzinfo=timezone.utc)
-
-        now_time_delta = now_time - matter_base_time
-
-        now_time_epoch_s = int(now_time_delta.total_seconds())
-        return now_time_epoch_s
 
     def convert_epoch_s_to_time(self, epoch_s, tz=timezone.utc):
         if epoch_s is not NullValue:
