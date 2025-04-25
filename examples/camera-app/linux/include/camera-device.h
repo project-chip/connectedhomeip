@@ -33,12 +33,29 @@
 #define VIDEO_STREAM_GST_DEST_PORT 5000
 #define AUDIO_STREAM_GST_DEST_PORT 5001
 
-#define MAX_CONTENT_BUFFER_SIZE_BYTES (1024)
-#define MAX_ENCODED_PIXEL_RATE (10000)
-#define MAX_CONCURRENT_VIDEO_ENCODERS (1)
-#define MAX_NETWORK_BANDWIDTH_MBPS (64)
-#define MICROPHONE_MIN_LEVEL (1)
-#define MICROPHONE_MAX_LEVEL (254)
+// Camera Constraints set to typical values.
+// TODO: Look into ways to fetch from hardware, if required/possible.
+static constexpr uint32_t kMaxContentBufferSizeBytes = 4096;
+static constexpr uint32_t kMaxNetworkBandwidthMbps   = 128;
+static constexpr uint8_t kMaxConcurrentEncoders      = 1;
+static constexpr uint32_t kMaxEncodedPixelRate       = 27648000; // 720p at 30fps
+static constexpr uint8_t kMicrophoneMinLevel         = 1;
+static constexpr uint8_t kMicrophoneMaxLevel         = 254;  // Spec constraint
+static constexpr uint8_t kMicrophoneMaxChannelCount  = 8;    // Spec Constraint in AudioStreamAllocate
+static constexpr uint16_t kMinResolutionWidth        = 320;  // Low SD resolution
+static constexpr uint16_t kMinResolutionHeight       = 240;  // Low SD resolution
+static constexpr uint16_t kMaxResolutionWidth        = 1920; // 1080p resolution
+static constexpr uint16_t kMaxResolutionHeight       = 1080; // 1080p resolution
+static constexpr uint16_t kSnapshotStreamFrameRate   = 30;
+static constexpr uint16_t kMaxVideoFrameRate         = 120;
+static constexpr uint16_t kMinVideoFrameRate         = 15;
+static constexpr uint32_t kMinBitRateBps             = 10000;   // 10 kbps
+static constexpr uint32_t kMaxBitRateBps             = 2000000; // 2 mbps
+static constexpr uint32_t kMinFragLenMsec            = 1000;    // 1 sec
+static constexpr uint32_t kMaxFragLenMsec            = 10000;   // 10 sec
+static constexpr uint16_t kVideoSensorWidthPixels    = 640;     // 640X480 resolution
+static constexpr uint16_t kVideoSensorHeightPixels   = 480;     // 640X480 resolution
+
 #define INVALID_SPKR_LEVEL (0)
 
 namespace Camera {
@@ -66,52 +83,64 @@ public:
     CameraDeviceInterface::CameraHALInterface & GetCameraHALInterface() { return *this; }
 
     // HAL interface impl
-    CameraError InitializeCameraDevice();
+    CameraError InitializeCameraDevice() override;
 
-    CameraError InitializeStreams();
+    CameraError InitializeStreams() override;
 
     CameraError CaptureSnapshot(const chip::app::DataModel::Nullable<uint16_t> streamID, const VideoResolutionStruct & resolution,
-                                ImageSnapshot & outImageSnapshot);
+                                ImageSnapshot & outImageSnapshot) override;
 
-    CameraError StartVideoStream(uint16_t streamID);
+    CameraError StartVideoStream(uint16_t streamID) override;
 
     // Stop video stream
-    CameraError StopVideoStream(uint16_t streamID);
+    CameraError StopVideoStream(uint16_t streamID) override;
 
     // Start audio stream
-    CameraError StartAudioStream(uint16_t streamID);
+    CameraError StartAudioStream(uint16_t streamID) override;
 
     // Stop audio stream
-    CameraError StopAudioStream(uint16_t streamID);
+    CameraError StopAudioStream(uint16_t streamID) override;
 
     // Start snapshot stream
-    CameraError StartSnapshotStream(uint16_t streamID);
+    CameraError StartSnapshotStream(uint16_t streamID) override;
 
     // Stop snapshot stream
-    CameraError StopSnapshotStream(uint16_t streamID);
+    CameraError StopSnapshotStream(uint16_t streamID) override;
 
-    uint8_t GetMaxConcurrentVideoEncoders();
+    uint8_t GetMaxConcurrentEncoders() override;
 
-    uint32_t GetMaxEncodedPixelRate();
+    uint32_t GetMaxEncodedPixelRate() override;
 
-    VideoSensorParamsStruct & GetVideoSensorParams();
+    VideoSensorParamsStruct & GetVideoSensorParams() override;
 
-    bool GetNightVisionCapable();
+    bool GetNightVisionCapable() override;
 
-    VideoResolutionStruct & GetMinViewport();
+    VideoResolutionStruct & GetMinViewport() override;
 
-    uint32_t GetMaxContentBufferSize();
+    std::vector<RateDistortionTradeOffStruct> & GetRateDistortionTradeOffPoints() override;
 
-    uint32_t GetMaxNetworkBandwidth();
+    uint32_t GetMaxContentBufferSize() override;
 
-    uint16_t GetCurrentFrameRate();
+    AudioCapabilitiesStruct & GetMicrophoneCapabilities() override;
 
-    CameraError SetHDRMode(bool hdrMode);
-    bool GetHDRMode() { return mHDREnabled; }
+    AudioCapabilitiesStruct & GetSpeakerCapabilities() override;
+
+    std::vector<SnapshotCapabilitiesStruct> & GetSnapshotCapabilities() override;
+
+    uint32_t GetMaxNetworkBandwidth() override;
+
+    uint16_t GetCurrentFrameRate() override;
+
+    CameraError SetHDRMode(bool hdrMode) override;
+    bool GetHDRMode() override { return mHDREnabled; }
+
+    std::vector<StreamUsageEnum> & GetSupportedStreamUsages() override;
+
+    std::vector<StreamUsageEnum> & GetRankedStreamPriorities() override { return mRankedStreamPriorities; }
 
     // Sets the Default Camera Viewport
-    CameraError SetViewport(const ViewportStruct & viewPort);
-    const ViewportStruct & GetViewport() { return mViewport; }
+    CameraError SetViewport(const ViewportStruct & viewPort) override;
+    const ViewportStruct & GetViewport() override { return mViewport; }
 
     /**
      * Sets the Viewport for a specific stream. The implementation of this HAL API is responsible
@@ -125,32 +154,32 @@ public:
     CameraError SetViewport(VideoStream & stream, const ViewportStruct & viewport);
 
     // Currently, defaulting to not supporting speaker.
-    bool HasSpeaker() { return false; }
+    bool HasSpeaker() override { return false; }
 
     // Mute/Unmute speaker.
-    CameraError SetSpeakerMuted(bool muteSpeaker) { return CameraError::ERROR_NOT_IMPLEMENTED; }
+    CameraError SetSpeakerMuted(bool muteSpeaker) override { return CameraError::ERROR_NOT_IMPLEMENTED; }
 
     // Set speaker volume level.
-    CameraError SetSpeakerVolume(uint8_t speakerVol) { return CameraError::ERROR_NOT_IMPLEMENTED; }
+    CameraError SetSpeakerVolume(uint8_t speakerVol) override { return CameraError::ERROR_NOT_IMPLEMENTED; }
 
     // Get the speaker max and min levels.
-    uint8_t GetSpeakerMaxLevel() { return INVALID_SPKR_LEVEL; }
-    uint8_t GetSpeakerMinLevel() { return INVALID_SPKR_LEVEL; }
+    uint8_t GetSpeakerMaxLevel() override { return INVALID_SPKR_LEVEL; }
+    uint8_t GetSpeakerMinLevel() override { return INVALID_SPKR_LEVEL; }
 
     // Does camera have a microphone
-    bool HasMicrophone() { return true; }
+    bool HasMicrophone() override { return true; }
 
     // Mute/Unmute microphone.
-    CameraError SetMicrophoneMuted(bool muteMicrophone);
-    bool GetMicrophoneMuted() { return mMicrophoneMuted; }
+    CameraError SetMicrophoneMuted(bool muteMicrophone) override;
+    bool GetMicrophoneMuted() override { return mMicrophoneMuted; }
 
     // Set microphone volume level.
-    CameraError SetMicrophoneVolume(uint8_t microphoneVol);
-    uint8_t GetMicrophoneVolume() { return mMicrophoneVol; }
+    CameraError SetMicrophoneVolume(uint8_t microphoneVol) override;
+    uint8_t GetMicrophoneVolume() override { return mMicrophoneVol; }
 
     // Get the microphone max and min levels.
-    uint8_t GetMicrophoneMaxLevel() { return MICROPHONE_MAX_LEVEL; }
-    uint8_t GetMicrophoneMinLevel() { return MICROPHONE_MIN_LEVEL; }
+    uint8_t GetMicrophoneMaxLevel() override { return kMicrophoneMaxLevel; }
+    uint8_t GetMicrophoneMinLevel() override { return kMicrophoneMinLevel; }
 
     int16_t GetPanMin();
 
@@ -166,11 +195,11 @@ public:
     CameraError SetTilt(int16_t aTilt);
     CameraError SetZoom(uint8_t aZoom);
 
-    std::vector<VideoStream> & GetAvailableVideoStreams() { return videoStreams; }
+    std::vector<VideoStream> & GetAvailableVideoStreams() override { return videoStreams; }
 
-    std::vector<AudioStream> & GetAvailableAudioStreams() { return audioStreams; }
+    std::vector<AudioStream> & GetAvailableAudioStreams() override { return audioStreams; }
 
-    std::vector<SnapshotStream> & GetAvailableSnapshotStreams() { return snapshotStreams; }
+    std::vector<SnapshotStream> & GetAvailableSnapshotStreams() override { return snapshotStreams; }
 
 private:
     int videoDeviceFd = -1;
@@ -200,17 +229,19 @@ private:
 
     DefaultMediaController mMediaController;
 
-    uint16_t mCurrentVideoFrameRate = 0;
-    bool mHDREnabled                = false;
-    bool mMicrophoneMuted           = false;
-    uint8_t mMicrophoneMinLevel     = MICROPHONE_MIN_LEVEL;
-    uint8_t mMicrophoneMaxLevel     = MICROPHONE_MAX_LEVEL;
-    uint8_t mMicrophoneVol          = MICROPHONE_MIN_LEVEL;
-    uint16_t mPan                   = chip::app::Clusters::CameraAvSettingsUserLevelManagement::kDefaultPan;
-    uint16_t mTilt                  = chip::app::Clusters::CameraAvSettingsUserLevelManagement::kDefaultTilt;
-    int8_t mZoom                    = chip::app::Clusters::CameraAvSettingsUserLevelManagement::kDefaultZoom;
+    uint16_t mPan  = chip::app::Clusters::CameraAvSettingsUserLevelManagement::kDefaultPan;
+    uint16_t mTilt = chip::app::Clusters::CameraAvSettingsUserLevelManagement::kDefaultTilt;
+    int8_t mZoom   = chip::app::Clusters::CameraAvSettingsUserLevelManagement::kDefaultZoom;
     // Use a standard 1080p aspect ratio
     chip::app::Clusters::CameraAvStreamManagement::ViewportStruct mViewport = { 320, 585, 2240, 1665 };
+    uint16_t mCurrentVideoFrameRate                                         = 0;
+    bool mHDREnabled                                                        = false;
+    bool mMicrophoneMuted                                                   = false;
+    uint8_t mMicrophoneMinLevel                                             = kMicrophoneMinLevel;
+    uint8_t mMicrophoneMaxLevel                                             = kMicrophoneMaxLevel;
+    uint8_t mMicrophoneVol                                                  = kMicrophoneMinLevel;
+
+    std::vector<StreamUsageEnum> mRankedStreamPriorities = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
 };
 
 } // namespace Camera

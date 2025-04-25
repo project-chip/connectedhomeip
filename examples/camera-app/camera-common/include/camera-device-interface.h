@@ -30,6 +30,10 @@ using chip::app::Clusters::CameraAvStreamManagement::VideoResolutionStruct;
 using chip::app::Clusters::CameraAvStreamManagement::VideoSensorParamsStruct;
 using chip::app::Clusters::CameraAvStreamManagement::VideoStreamStruct;
 using chip::app::Clusters::CameraAvStreamManagement::ViewportStruct;
+using chip::app::Clusters::CameraAvStreamManagement::AudioCapabilitiesStruct;
+using chip::app::Clusters::CameraAvStreamManagement::SnapshotCapabilitiesStruct;
+using chip::app::Clusters::CameraAvStreamManagement::RateDistortionTradeOffStruct;
+using chip::app::Clusters::CameraAvStreamManagement::StreamUsageEnum;
 
 struct VideoStream
 {
@@ -165,7 +169,7 @@ public:
         virtual CameraError StopSnapshotStream(uint16_t streamID) = 0;
 
         // Get the maximum number of concurrent encoders supported by camera.
-        virtual uint8_t GetMaxConcurrentVideoEncoders() = 0;
+        virtual uint8_t GetMaxConcurrentEncoders() = 0;
 
         // Get the maximum data rate in encoded pixels per second that the
         // camera can produce given the hardware encoders it has.
@@ -182,9 +186,21 @@ public:
         // its viewport.
         virtual VideoResolutionStruct & GetMinViewport() = 0;
 
+        // Get the rate distortion tradeoff points(min bitrate for resolutions) for video codecs.
+        virtual std::vector<RateDistortionTradeOffStruct> & GetRateDistortionTradeOffPoints() = 0;
+
         // Get the maximum size of content buffer in bytes. This buffer holds
         // compressed and/or raw audio/video content.
         virtual uint32_t GetMaxContentBufferSize() = 0;
+
+        // Get microphone capabilities.
+        virtual AudioCapabilitiesStruct & GetMicrophoneCapabilities() = 0;
+
+        // Get speaker capabilities.
+        virtual AudioCapabilitiesStruct & GetSpeakerCapabilities() = 0;
+
+        // Get snapshot capabilities
+        virtual std::vector<SnapshotCapabilitiesStruct> & GetSnapshotCapabilities() = 0;
 
         // Get the maximum network bandwidth(mbps) that the camera would consume
         // for transmission of its media streams.
@@ -198,6 +214,14 @@ public:
 
         // Get the current camera HDR mode.
         virtual bool GetHDRMode() = 0;
+
+        // Get Supported Stream usages; Typically set by manudacturer.
+        // This also sets the default priority of the stream usages.
+        virtual std::vector<StreamUsageEnum> & GetSupportedStreamUsages() = 0;
+
+        // Get Ranked stream priorities as an ordered list. This is expected to
+        // be a subset of the SupportedStreamUsages.
+        virtual std::vector<StreamUsageEnum> & GetRankedStreamPriorities() = 0;
 
         // Does camera have a speaker
         virtual bool HasSpeaker() = 0;
