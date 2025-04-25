@@ -6448,6 +6448,7 @@ public class ChipClusters {
     public static final long CLUSTER_ID = 45L;
 
     private static final long TEMPERATURE_UNIT_ATTRIBUTE_ID = 0L;
+    private static final long SUPPORTED_TEMPERATURE_UNITS_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -6463,6 +6464,10 @@ public class ChipClusters {
     @Deprecated
     public long initWithDevice(long devicePtr, int endpointId) {
       return 0L;
+    }
+
+    public interface SupportedTemperatureUnitsAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Integer> value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -6514,6 +6519,32 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, TEMPERATURE_UNIT_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readSupportedTemperatureUnitsAttribute(
+        SupportedTemperatureUnitsAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_TEMPERATURE_UNITS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SUPPORTED_TEMPERATURE_UNITS_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeSupportedTemperatureUnitsAttribute(
+        SupportedTemperatureUnitsAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_TEMPERATURE_UNITS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SUPPORTED_TEMPERATURE_UNITS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -19324,32 +19355,6 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void pause(OperationalCommandResponseCallback callback) {
-      pause(callback, 0);
-    }
-
-    public void pause(OperationalCommandResponseCallback callback, int timedInvokeTimeoutMs) {
-      final long commandId = 0L;
-
-      ArrayList<StructElement> elements = new ArrayList<>();
-      StructType commandArgs = new StructType(elements);
-      invoke(new InvokeCallbackImpl(callback) {
-          @Override
-          public void onResponse(StructType invokeStructValue) {
-          final long commandResponseStateFieldID = 0L;
-          ChipStructs.OvenCavityOperationalStateClusterErrorStateStruct commandResponseState = null;
-          for (StructElement element: invokeStructValue.value()) {
-            if (element.contextTagNum() == commandResponseStateFieldID) {
-              if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
-                StructType castingValue = element.value(StructType.class);
-                commandResponseState = ChipStructs.OvenCavityOperationalStateClusterErrorStateStruct.decodeTlv(castingValue);
-              }
-            }
-          }
-          callback.onSuccess(commandResponseState);
-        }}, commandId, commandArgs, timedInvokeTimeoutMs);
-    }
-
     public void stop(OperationalCommandResponseCallback callback) {
       stop(callback, 0);
     }
@@ -19382,32 +19387,6 @@ public class ChipClusters {
 
     public void start(OperationalCommandResponseCallback callback, int timedInvokeTimeoutMs) {
       final long commandId = 2L;
-
-      ArrayList<StructElement> elements = new ArrayList<>();
-      StructType commandArgs = new StructType(elements);
-      invoke(new InvokeCallbackImpl(callback) {
-          @Override
-          public void onResponse(StructType invokeStructValue) {
-          final long commandResponseStateFieldID = 0L;
-          ChipStructs.OvenCavityOperationalStateClusterErrorStateStruct commandResponseState = null;
-          for (StructElement element: invokeStructValue.value()) {
-            if (element.contextTagNum() == commandResponseStateFieldID) {
-              if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
-                StructType castingValue = element.value(StructType.class);
-                commandResponseState = ChipStructs.OvenCavityOperationalStateClusterErrorStateStruct.decodeTlv(castingValue);
-              }
-            }
-          }
-          callback.onSuccess(commandResponseState);
-        }}, commandId, commandArgs, timedInvokeTimeoutMs);
-    }
-
-    public void resume(OperationalCommandResponseCallback callback) {
-      resume(callback, 0);
-    }
-
-    public void resume(OperationalCommandResponseCallback callback, int timedInvokeTimeoutMs) {
-      final long commandId = 3L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       StructType commandArgs = new StructType(elements);
@@ -19786,8 +19765,6 @@ public class ChipClusters {
 
     private static final long SUPPORTED_MODES_ATTRIBUTE_ID = 0L;
     private static final long CURRENT_MODE_ATTRIBUTE_ID = 1L;
-    private static final long START_UP_MODE_ATTRIBUTE_ID = 2L;
-    private static final long ON_MODE_ATTRIBUTE_ID = 3L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -19848,14 +19825,6 @@ public class ChipClusters {
 
     public interface SupportedModesAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<ChipStructs.OvenModeClusterModeOptionStruct> value);
-    }
-
-    public interface StartUpModeAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Integer value);
-    }
-
-    public interface OnModeAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Integer value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -19924,76 +19893,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, CURRENT_MODE_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readStartUpModeAttribute(
-        StartUpModeAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, START_UP_MODE_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, START_UP_MODE_ATTRIBUTE_ID, true);
-    }
-
-    public void writeStartUpModeAttribute(DefaultClusterCallback callback, Integer value) {
-      writeStartUpModeAttribute(callback, value, 0);
-    }
-
-    public void writeStartUpModeAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = value != null ? new UIntType(value) : new NullType();
-      writeAttribute(new WriteAttributesCallbackImpl(callback), START_UP_MODE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeStartUpModeAttribute(
-        StartUpModeAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, START_UP_MODE_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, START_UP_MODE_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readOnModeAttribute(
-        OnModeAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ON_MODE_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ON_MODE_ATTRIBUTE_ID, true);
-    }
-
-    public void writeOnModeAttribute(DefaultClusterCallback callback, Integer value) {
-      writeOnModeAttribute(callback, value, 0);
-    }
-
-    public void writeOnModeAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = value != null ? new UIntType(value) : new NullType();
-      writeAttribute(new WriteAttributesCallbackImpl(callback), ON_MODE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeOnModeAttribute(
-        OnModeAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ON_MODE_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ON_MODE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -20831,8 +20730,6 @@ public class ChipClusters {
 
     private static final long SUPPORTED_MODES_ATTRIBUTE_ID = 0L;
     private static final long CURRENT_MODE_ATTRIBUTE_ID = 1L;
-    private static final long START_UP_MODE_ATTRIBUTE_ID = 2L;
-    private static final long ON_MODE_ATTRIBUTE_ID = 3L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -20893,14 +20790,6 @@ public class ChipClusters {
 
     public interface SupportedModesAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<ChipStructs.LaundryWasherModeClusterModeOptionStruct> value);
-    }
-
-    public interface StartUpModeAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Integer value);
-    }
-
-    public interface OnModeAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Integer value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -20969,76 +20858,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, CURRENT_MODE_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readStartUpModeAttribute(
-        StartUpModeAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, START_UP_MODE_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, START_UP_MODE_ATTRIBUTE_ID, true);
-    }
-
-    public void writeStartUpModeAttribute(DefaultClusterCallback callback, Integer value) {
-      writeStartUpModeAttribute(callback, value, 0);
-    }
-
-    public void writeStartUpModeAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = value != null ? new UIntType(value) : new NullType();
-      writeAttribute(new WriteAttributesCallbackImpl(callback), START_UP_MODE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeStartUpModeAttribute(
-        StartUpModeAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, START_UP_MODE_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, START_UP_MODE_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readOnModeAttribute(
-        OnModeAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ON_MODE_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ON_MODE_ATTRIBUTE_ID, true);
-    }
-
-    public void writeOnModeAttribute(DefaultClusterCallback callback, Integer value) {
-      writeOnModeAttribute(callback, value, 0);
-    }
-
-    public void writeOnModeAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = value != null ? new UIntType(value) : new NullType();
-      writeAttribute(new WriteAttributesCallbackImpl(callback), ON_MODE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeOnModeAttribute(
-        OnModeAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ON_MODE_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ON_MODE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -21203,8 +21022,6 @@ public class ChipClusters {
 
     private static final long SUPPORTED_MODES_ATTRIBUTE_ID = 0L;
     private static final long CURRENT_MODE_ATTRIBUTE_ID = 1L;
-    private static final long START_UP_MODE_ATTRIBUTE_ID = 2L;
-    private static final long ON_MODE_ATTRIBUTE_ID = 3L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -21265,14 +21082,6 @@ public class ChipClusters {
 
     public interface SupportedModesAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<ChipStructs.RefrigeratorAndTemperatureControlledCabinetModeClusterModeOptionStruct> value);
-    }
-
-    public interface StartUpModeAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Integer value);
-    }
-
-    public interface OnModeAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Integer value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -21341,76 +21150,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, CURRENT_MODE_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readStartUpModeAttribute(
-        StartUpModeAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, START_UP_MODE_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, START_UP_MODE_ATTRIBUTE_ID, true);
-    }
-
-    public void writeStartUpModeAttribute(DefaultClusterCallback callback, Integer value) {
-      writeStartUpModeAttribute(callback, value, 0);
-    }
-
-    public void writeStartUpModeAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = value != null ? new UIntType(value) : new NullType();
-      writeAttribute(new WriteAttributesCallbackImpl(callback), START_UP_MODE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeStartUpModeAttribute(
-        StartUpModeAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, START_UP_MODE_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, START_UP_MODE_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readOnModeAttribute(
-        OnModeAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ON_MODE_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ON_MODE_ATTRIBUTE_ID, true);
-    }
-
-    public void writeOnModeAttribute(DefaultClusterCallback callback, Integer value) {
-      writeOnModeAttribute(callback, value, 0);
-    }
-
-    public void writeOnModeAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = value != null ? new UIntType(value) : new NullType();
-      writeAttribute(new WriteAttributesCallbackImpl(callback), ON_MODE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeOnModeAttribute(
-        OnModeAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ON_MODE_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ON_MODE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -23147,8 +22886,6 @@ public class ChipClusters {
 
     private static final long SUPPORTED_MODES_ATTRIBUTE_ID = 0L;
     private static final long CURRENT_MODE_ATTRIBUTE_ID = 1L;
-    private static final long START_UP_MODE_ATTRIBUTE_ID = 2L;
-    private static final long ON_MODE_ATTRIBUTE_ID = 3L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -23209,14 +22946,6 @@ public class ChipClusters {
 
     public interface SupportedModesAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<ChipStructs.DishwasherModeClusterModeOptionStruct> value);
-    }
-
-    public interface StartUpModeAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Integer value);
-    }
-
-    public interface OnModeAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Integer value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -23285,76 +23014,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, CURRENT_MODE_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readStartUpModeAttribute(
-        StartUpModeAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, START_UP_MODE_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, START_UP_MODE_ATTRIBUTE_ID, true);
-    }
-
-    public void writeStartUpModeAttribute(DefaultClusterCallback callback, Integer value) {
-      writeStartUpModeAttribute(callback, value, 0);
-    }
-
-    public void writeStartUpModeAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = value != null ? new UIntType(value) : new NullType();
-      writeAttribute(new WriteAttributesCallbackImpl(callback), START_UP_MODE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeStartUpModeAttribute(
-        StartUpModeAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, START_UP_MODE_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, START_UP_MODE_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readOnModeAttribute(
-        OnModeAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ON_MODE_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ON_MODE_ATTRIBUTE_ID, true);
-    }
-
-    public void writeOnModeAttribute(DefaultClusterCallback callback, Integer value) {
-      writeOnModeAttribute(callback, value, 0);
-    }
-
-    public void writeOnModeAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = value != null ? new UIntType(value) : new NullType();
-      writeAttribute(new WriteAttributesCallbackImpl(callback), ON_MODE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeOnModeAttribute(
-        OnModeAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ON_MODE_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ON_MODE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(

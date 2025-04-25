@@ -323,3 +323,8 @@ RUN apt-get remove -y python3-gi
 RUN pip install --break-system-packages --no-cache-dir \
     python_lib/obj/src/python_testing/matter_testing_infrastructure/chip-testing._build_wheel/chip_testing-*.whl \
     python_lib/controller/python/chip*.whl
+
+# Copy device attestation revocation set and device attestation test vectors
+RUN mkdir -p credentials/test/revoked-attestation-certificates
+COPY --from=chip-build-cert-bins /root/connectedhomeip/credentials/test/revoked-attestation-certificates/dac-provider-test-vectors credentials/test/revoked-attestation-certificates/dac-provider-test-vectors
+COPY --from=chip-build-cert-bins /root/connectedhomeip/credentials/test/revoked-attestation-certificates/revocation-sets credentials/test/revoked-attestation-certificates/revocation-sets

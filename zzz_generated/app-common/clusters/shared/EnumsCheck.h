@@ -68,7 +68,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::AreaTypeTag va
     case EnumType::kGardenDoor:
     case EnumType::kGuestBathroom:
     case EnumType::kGuestBedroom:
-    case EnumType::kGuestRestroom:
     case EnumType::kGuestRoom:
     case EnumType::kGym:
     case EnumType::kHallway:
@@ -76,7 +75,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::AreaTypeTag va
     case EnumType::kKidsRoom:
     case EnumType::kKidsBedroom:
     case EnumType::kKitchen:
-    case EnumType::kLarder:
     case EnumType::kLaundryRoom:
     case EnumType::kLawn:
     case EnumType::kLibrary:
@@ -101,7 +99,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::AreaTypeTag va
     case EnumType::kRamp:
     case EnumType::kReceptionRoom:
     case EnumType::kRecreationRoom:
-    case EnumType::kRestroom:
     case EnumType::kRoof:
     case EnumType::kSauna:
     case EnumType::kScullery:
@@ -123,6 +120,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::AreaTypeTag va
     case EnumType::kUtilityRoom:
     case EnumType::kWard:
     case EnumType::kWorkshop:
+    case EnumType::kToilet:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -161,40 +159,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::DegradationDire
     {
     case EnumType::kUp:
     case EnumType::kDown:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::FloorSurfaceTag val)
-{
-    using EnumType = Globals::FloorSurfaceTag;
-    switch (val)
-    {
-    case EnumType::kCarpet:
-    case EnumType::kCeramic:
-    case EnumType::kConcrete:
-    case EnumType::kCork:
-    case EnumType::kDeepCarpet:
-    case EnumType::kDirt:
-    case EnumType::kEngineeredWood:
-    case EnumType::kGlass:
-    case EnumType::kGrass:
-    case EnumType::kHardwood:
-    case EnumType::kLaminate:
-    case EnumType::kLinoleum:
-    case EnumType::kMat:
-    case EnumType::kMetal:
-    case EnumType::kPlastic:
-    case EnumType::kPolishedConcrete:
-    case EnumType::kRubber:
-    case EnumType::kRug:
-    case EnumType::kSand:
-    case EnumType::kStone:
-    case EnumType::kTatami:
-    case EnumType::kTerrazzo:
-    case EnumType::kTile:
-    case EnumType::kVinyl:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -271,6 +235,20 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::LevelValueEnum 
     case EnumType::kMedium:
     case EnumType::kHigh:
     case EnumType::kCritical:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::LocationTag val)
+{
+    using EnumType = Globals::LocationTag;
+    switch (val)
+    {
+    case EnumType::kIndoor:
+    case EnumType::kOutdoor:
+    case EnumType::kInside:
+    case EnumType::kOutside:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
