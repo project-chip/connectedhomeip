@@ -21,7 +21,6 @@ from datetime import datetime, timedelta, timezone
 import chip.clusters as Clusters
 from chip.clusters import Globals
 from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
 from chip.testing import matter_asserts
 from chip.testing.timeoperations import utc_time_in_matter_epoch
 from mobly import asserts
@@ -156,42 +155,26 @@ class CommodityPriceTestBaseHelper:
     async def send_get_detailed_price_request(self, endpoint=None,
                                               details: Clusters.CommodityPrice.Bitmaps =
                                               Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap(0),
-                                              timedRequestTimeoutMs: int = 3000,
-                                              expected_status: Status = Status.Success):
+                                              timedRequestTimeoutMs: int = 3000):
         """If endpoint is None then it falls through to use the matter test config value"""
-        try:
-            result = await self.send_single_cmd(cmd=Clusters.CommodityPrice.Commands.GetDetailedPriceRequest(
-                details=details),
-                endpoint=endpoint,
-                timedRequestTimeoutMs=timedRequestTimeoutMs)
+        result = await self.send_single_cmd(cmd=Clusters.CommodityPrice.Commands.GetDetailedPriceRequest(
+            details=details),
+            endpoint=endpoint,
+            timedRequestTimeoutMs=timedRequestTimeoutMs)
 
-            return result
-
-        except InteractionModelError as e:
-            asserts.assert_not_equal(e.status, Status.Success,
-                                     "We had an IM exception, but still got Success?")
-            asserts.assert_equal(e.status, expected_status,
-                                 "Unexpected error returned")
+        return result
 
     async def send_get_detailed_forecast_request(self, endpoint=None,
                                                  details: Clusters.CommodityPrice.Bitmaps =
                                                  Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap(0),
-                                                 timedRequestTimeoutMs: int = 3000,
-                                                 expected_status: Status = Status.Success):
+                                                 timedRequestTimeoutMs: int = 3000):
         """If endpoint is None then it falls through to use the matter test config value"""
-        try:
-            result = await self.send_single_cmd(cmd=Clusters.CommodityPrice.Commands.GetDetailedForecastRequest(
-                details=details),
-                endpoint=endpoint,
-                timedRequestTimeoutMs=timedRequestTimeoutMs)
+        result = await self.send_single_cmd(cmd=Clusters.CommodityPrice.Commands.GetDetailedForecastRequest(
+            details=details),
+            endpoint=endpoint,
+            timedRequestTimeoutMs=timedRequestTimeoutMs)
 
-            return result
-
-        except InteractionModelError as e:
-            asserts.assert_not_equal(e.status, Status.Success,
-                                     "We had an IM exception, but still got Success?")
-            asserts.assert_equal(e.status, expected_status,
-                                 "Unexpected error returned")
+        return result
 
     async def send_test_event_trigger_price_update(self):
         await self.send_test_event_triggers(eventTrigger=self.kEventTriggerPriceUpdate)
