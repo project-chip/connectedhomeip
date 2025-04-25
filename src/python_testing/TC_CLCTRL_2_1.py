@@ -84,7 +84,7 @@ class TC_CLCTRL_2_1(MatterBaseTest):
         if attributes.CountdownTime.attribute_id in attribute_list:
             countdown_time = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
             logging.info(f"CountdownTime: {countdown_time}")
-            if countdown_time is not None:
+            if countdown_time is not NullValue:
                 asserts.assert_less_equal(countdown_time, 259200, "CountdownTime attribute is out of range")
                 asserts.assert_greater_equal(countdown_time, 0, "CountdownTime attribute is out of range")
         else:
@@ -114,22 +114,22 @@ class TC_CLCTRL_2_1(MatterBaseTest):
         
         # Check for device features to validate OverallState structure
         feature_map = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
-        logging.info(f"FeatureMap: 0x{feature_map:x}")
+        logging.info(f"FeatureMap: 0x{feature_map:x}")       
 
         if overall_state is not NullValue:
             # Check Positioning feature in OverallState - PS feature (bit 0)
-            if feature_map & (1 << 0) and overall_state.positioning is not None:
+            if feature_map & (1 << 0) and overall_state.positioning is not NullValue:
                 asserts.assert_less_equal(overall_state.positioning, 5, "OverallState.positioning is out of range")
                 asserts.assert_greater_equal(overall_state.positioning, 0, "OverallState.positioning is out of range")
                 logging.info(f"OverallState.positioning: {overall_state.positioning}")
         
             # Check MotionLatching feature in OverallState - LT feature (bit 1)
-            if feature_map & (1 << 1) and overall_state.latch is not None:
+            if feature_map & (1 << 1) and overall_state.latch is not NullValue:
                 asserts.assert_true(isinstance(overall_state.latch, bool), "OverallState.latch is not a boolean value")
                 logging.info(f"OverallState.latch: {overall_state.latch}")
         
             # Check Speed feature in OverallState - SP feature (bit 3)
-            if feature_map & (1 << 3) and overall_state.speed is not None:
+            if feature_map & (1 << 3) and overall_state.speed is not NullValue:
                 asserts.assert_less_equal(overall_state.speed, 3, "OverallState.speed is out of range")
                 asserts.assert_greater_equal(overall_state.speed, 0, "OverallState.speed is out of range")
                 logging.info(f"OverallState.speed: {overall_state.speed}")
