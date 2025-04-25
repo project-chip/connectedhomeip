@@ -21,25 +21,26 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "AppTask.h"
-#include "BindingHandler.h"
 #include "Globals.h"
 #include "util/RealtekObserver.h"
 
-#include <DeviceInfoProviderImpl.h>
+#include <app/server/OnboardingCodesUtil.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.h>
+#include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/clusters/identify-server/identify-server.h>
-#include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/endpoint-config-api.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <data-model-providers/codegen/Instance.h>
+
 #include <inet/EndPointStateOpenThread.h>
-#include <setup_payload/OnboardingCodesUtil.h>
+
+#include <DeviceInfoProviderImpl.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
@@ -61,12 +62,12 @@ using namespace ::chip::app;
 using namespace ::chip::TLV;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
-using namespace app::Clusters::Descriptor::Structs;
 
 #include <platform/CHIPDeviceLayer.h>
 
-#define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 5000
-#define RESET_TRIGGER_TIMEOUT 1500
+#define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3500
+#define RESET_TRIGGER_TIMEOUT   1500
+#define BLE_ADV_TRIGGER_TIMEOUT 1500
 
 #if CONFIG_DAC_KEY_ENC
 #define APP_TASK_STACK_SIZE (8 * 1024)
@@ -76,67 +77,12 @@ using namespace app::Clusters::Descriptor::Structs;
 
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
+#define LIGHT_ENDPOINT_ID (1)
 
 namespace {
 
-#if (CONFIG_1_TO_2_ZAP || CONFIG_1_TO_8_ZAP || CONFIG_1_TO_12_ZAP)
-
-// Switches Namespace: 0x43, tag 0x08 (Custom)
-constexpr const uint8_t kNamespaceSwitches = 0x43;
-constexpr const uint8_t kTagCustom         = 0x08;
-
-const SemanticTagStruct::Type switch1TagList[]  = { { .namespaceID = kNamespaceSwitches,
-                                                      .tag         = kTagCustom,
-                                                      .label       = chip::Optional<chip::app::DataModel::Nullable<chip::CharSpan>>(
-                                                         { chip::app::DataModel::MakeNullable(chip::CharSpan("Switch1", 7)) }) } };
-const SemanticTagStruct::Type switch2TagList[]  = { { .namespaceID = kNamespaceSwitches,
-                                                      .tag         = kTagCustom,
-                                                      .label       = Optional<DataModel::Nullable<CharSpan>>(
-                                                         DataModel::MakeNullable(CharSpan("Switch2", 7))) } };
-const SemanticTagStruct::Type switch3TagList[]  = { { .namespaceID = kNamespaceSwitches,
-                                                      .tag         = kTagCustom,
-                                                      .label       = Optional<DataModel::Nullable<CharSpan>>(
-                                                         DataModel::MakeNullable(CharSpan("Switch3", 7))) } };
-const SemanticTagStruct::Type switch4TagList[]  = { { .namespaceID = kNamespaceSwitches,
-                                                      .tag         = kTagCustom,
-                                                      .label       = Optional<DataModel::Nullable<CharSpan>>(
-                                                         DataModel::MakeNullable(CharSpan("Switch4", 7))) } };
-const SemanticTagStruct::Type switch5TagList[]  = { { .namespaceID = kNamespaceSwitches,
-                                                      .tag         = kTagCustom,
-                                                      .label       = Optional<DataModel::Nullable<CharSpan>>(
-                                                         DataModel::MakeNullable(CharSpan("Switch5", 7))) } };
-const SemanticTagStruct::Type switch6TagList[]  = { { .namespaceID = kNamespaceSwitches,
-                                                      .tag         = kTagCustom,
-                                                      .label       = Optional<DataModel::Nullable<CharSpan>>(
-                                                         DataModel::MakeNullable(CharSpan("Switch6", 7))) } };
-const SemanticTagStruct::Type switch7TagList[]  = { { .namespaceID = kNamespaceSwitches,
-                                                      .tag         = kTagCustom,
-                                                      .label       = Optional<DataModel::Nullable<CharSpan>>(
-                                                         DataModel::MakeNullable(CharSpan("Switch7", 7))) } };
-const SemanticTagStruct::Type switch8TagList[]  = { { .namespaceID = kNamespaceSwitches,
-                                                      .tag         = kTagCustom,
-                                                      .label       = Optional<DataModel::Nullable<CharSpan>>(
-                                                         DataModel::MakeNullable(CharSpan("Switch8", 7))) } };
-const SemanticTagStruct::Type switch9TagList[]  = { { .namespaceID = kNamespaceSwitches,
-                                                      .tag         = kTagCustom,
-                                                      .label       = Optional<DataModel::Nullable<CharSpan>>(
-                                                         DataModel::MakeNullable(CharSpan("Switch9", 7))) } };
-const SemanticTagStruct::Type switch11TagList[] = { { .namespaceID = kNamespaceSwitches,
-                                                      .tag         = kTagCustom,
-                                                      .label       = Optional<DataModel::Nullable<CharSpan>>(
-                                                          DataModel::MakeNullable(CharSpan("Switch11", 8))) } };
-const SemanticTagStruct::Type switch12TagList[] = { { .namespaceID = kNamespaceSwitches,
-                                                      .tag         = kTagCustom,
-                                                      .label       = Optional<DataModel::Nullable<CharSpan>>(
-                                                          DataModel::MakeNullable(CharSpan("Switch12", 8))) } };
-const SemanticTagStruct::Type switch13TagList[] = { { .namespaceID = kNamespaceSwitches,
-                                                      .tag         = kTagCustom,
-                                                      .label       = Optional<DataModel::Nullable<CharSpan>>(
-                                                          DataModel::MakeNullable(CharSpan("Switch13", 8))) } };
-#endif
-
 static DeviceCallbacks EchoCallbacks;
-
+constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 TaskHandle_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
 
@@ -201,7 +147,7 @@ void OnTriggerIdentifyEffect(Identify * identify)
 void OnIdentifyStart(Identify *)
 {
     ChipLogProgress(Zcl, "OnIdentifyStart");
-    identifyLED.Blink(500, 500);
+    identifyLED.Blink(500,500);
 }
 
 void OnIdentifyStop(Identify *)
@@ -211,7 +157,10 @@ void OnIdentifyStop(Identify *)
 }
 
 Identify gIdentify = {
-    chip::EndpointId{ 1 },   OnIdentifyStart, OnIdentifyStop, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
+    chip::EndpointId{ 1 },
+    OnIdentifyStart, 
+    OnIdentifyStop, 
+    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
     OnTriggerIdentifyEffect,
 };
 
@@ -265,10 +214,12 @@ void AppTask::InitServer(intptr_t arg)
     // Init ZCL Data Model and start server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
+    // We only have network commissioning on endpoint 0.
+    emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 
     chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
     nativeParams.lockCb                = LockOpenThreadTask;
@@ -287,8 +238,6 @@ void AppTask::InitServer(intptr_t arg)
 
     chip::Server::GetInstance().Init(initParams);
 
-    InitTag();
-
     static RealtekObserver sRealtekObserver;
     chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sRealtekObserver);
 
@@ -300,9 +249,7 @@ void AppTask::InitGpio()
 {
     LEDWidget::InitGpio();
 
-    appStatusLED.Init(APP_LED);
-    appStatusLED.Set(true);
-
+    lightStatusLED.Init(LIGHT_STATE_LED);
     identifyLED.Init(IDENTIFY_STATE_LED);
     systemStatusLED.Init(SYSTEM_STATE_LED);
 
@@ -311,12 +258,16 @@ void AppTask::InitGpio()
 
 CHIP_ERROR AppTask::Init()
 {
-    size_t check_mem_peak;
+    size_t check_mem_peak; 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ChipLogProgress(DeviceLayer, "Light switch App Demo!");
+    ChipLogProgress(DeviceLayer, "Lighting App Demo!");
 
-    chip::DeviceManager::CHIPDeviceManager & deviceMgr = chip::DeviceManager::CHIPDeviceManager::GetInstance();
-    err                                                = deviceMgr.Init(&EchoCallbacks);
+#if CONFIG_ENABLE_PW_RPC
+    chip::rpc::Init();
+#endif
+
+	chip::DeviceManager::CHIPDeviceManager & deviceMgr = chip::DeviceManager::CHIPDeviceManager::GetInstance();
+    err = deviceMgr.Init(&EchoCallbacks);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "DeviceManagerInit() - ERROR!");
@@ -334,75 +285,118 @@ CHIP_ERROR AppTask::Init()
     chip::Shell::Engine::Root().RunMainLoop();
 #endif
 
-    check_mem_peak = os_mem_peek(RAM_TYPE_DATA_ON);
-    ChipLogProgress(DeviceLayer, "os_mem_peek(RAM_TYPE_DATA_ON) : (%u)", check_mem_peak);
+	check_mem_peak = os_mem_peek(RAM_TYPE_DATA_ON);
+	ChipLogProgress(DeviceLayer, "os_mem_peek(RAM_TYPE_DATA_ON) : (%u)", check_mem_peak);
 
-    // Setup switch
-    LightSwitch::GetInstance().Init();
+    //Setup light
+    err = LightingMgr().Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "LightingMgr().Init() failed");
+        return err;
+    }
+    LightingMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
     return err;
 }
 
-void AppTask::SwitchActionEventHandler(AppEvent * aEvent)
+
+void AppTask::LightingActionEventHandler(AppEvent * aEvent)
 {
+    LightingManager::Action_t action;
+
     if (aEvent->Type == AppEvent::kEventType_Button)
     {
-        if (aEvent->ButtonEvent.ButtonIdx == APP_TOGGLE_BUTTON)
+        // Toggle light
+        if (LightingMgr().IsTurnedOn())
         {
-            LightSwitch::GetInstance().InitiateActionSwitch(1, Action::Toggle);
+            action = LightingManager::OFF_ACTION;
         }
-        else if (aEvent->ButtonEvent.ButtonIdx == APP_GENERIC_SWITCH_BUTTON)
+        else
         {
-            if (aEvent->ButtonEvent.Action == true)
-            {
-                ChipLogProgress(NotSpecified, "Switch release press");
-                LightSwitch::GetInstance().GenericSwitchReleasePress();
-            }
-            else
-            {
-                ChipLogProgress(NotSpecified, "Switch initial press");
-                LightSwitch::GetInstance().GenericSwitchInitialPress();
-            }
+            action = LightingManager::ON_ACTION;
         }
+
+        sAppTask.mSyncClusterToButtonAction = true;
+        LightingMgr().InitiateAction(action, 0, 0, 0);
+    }
+    if (aEvent->Type == AppEvent::kEventType_Level && aEvent->ButtonEvent.Action != 0)
+    {
+        // Toggle Dimming of light between 2 fixed levels
+        uint8_t val = 0x0;
+        val         = LightingMgr().GetLevel() == 0x40 ? 0xfe : 0x40;
+        action      = LightingManager::LEVEL_ACTION;
+
+        sAppTask.mSyncClusterToButtonAction = true;
+        LightingMgr().InitiateAction(action, 0, 1, &val);
+    }
+}
+
+void AppTask::BLEStartAdvertising(intptr_t arg)
+{
+    if (ConnectivityMgr().IsBLEAdvertisingEnabled())
+    {
+        ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+    }
+    else
+    {
+        ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+    }
+}
+
+void AppTask::BLEAdvEventHandler(AppEvent * aEvent)
+{
+    if (aEvent->ButtonEvent.ButtonIdx != APP_BLE_ADV_BUTTON)
+    {
+        return;
+    }
+
+    if (aEvent->Type == AppEvent::kEventType_Button && aEvent->ButtonEvent.Action == true)
+    {
+        PlatformMgr().ScheduleWork(AppTask::BLEStartAdvertising, 0);
     }
 }
 
 void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnPressed)
 {
-    if (btnIdx != APP_FUNCTION_BUTTON && btnIdx != APP_TOGGLE_BUTTON && btnIdx != APP_GENERIC_SWITCH_BUTTON)
+    if (btnIdx != APP_TOGGLE_BUTTON &&
+        btnIdx != APP_FUNCTION_BUTTON &&
+        btnIdx != APP_LEVEL_BUTTON &&
+        btnIdx != APP_BLE_ADV_BUTTON)
     {
         return;
     }
+
     ChipLogProgress(NotSpecified, "ButtonEventHandler %d, %d", btnIdx, btnPressed);
+
     AppEvent button_event              = {};
     button_event.Type                  = AppEvent::kEventType_Button;
     button_event.ButtonEvent.ButtonIdx = btnIdx;
-    button_event.ButtonEvent.Action    = btnPressed ? true : false;
+    button_event.ButtonEvent.Action    = btnPressed ? true:false;
 
-    switch (btnIdx)
+    if (btnIdx == APP_TOGGLE_BUTTON && btnPressed == 1)
     {
-    case APP_TOGGLE_BUTTON: {
-        if (!btnPressed)
-        {
-            return;
-        }
-
-        ChipLogProgress(NotSpecified, "Toggle Button pressed");
-        button_event.Handler = SwitchActionEventHandler;
-        break;
+        // Hand off to Light handler - On/Off light
+        button_event.Handler = LightingActionEventHandler;
     }
-    case APP_GENERIC_SWITCH_BUTTON: {
-        button_event.Handler = SwitchActionEventHandler;
-        break;
+    else if (btnIdx == APP_LEVEL_BUTTON)
+    {
+        // Hand off to Light handler - Change level of light
+        button_event.Type    = AppEvent::kEventType_Level;
+        button_event.Handler = LightingActionEventHandler;
     }
-    case APP_FUNCTION_BUTTON: {
+    else if (btnIdx == APP_FUNCTION_BUTTON)
+    {
+        // Hand off to Functionality handler - depends on duration of press
         button_event.Handler = FunctionHandler;
-        break;
     }
-    default: {
-        // invalid button
+    else if(btnIdx == APP_BLE_ADV_BUTTON)
+    {
+        button_event.Handler = BLEAdvEventHandler;
+    }
+    else
+    {
         return;
-    }
     }
 
     sAppTask.PostEvent(&button_event);
@@ -427,15 +421,28 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     // If we reached here, the button was held for factoryreset
     if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_Reset)
     {
+        ChipLogProgress(NotSpecified, "[BTN] BLE advertising selected.");
+
+        // Start timer for FACTORY_RESET_CANCEL_WINDOW_TIMEOUT to allow user to cancel, if required.
+        sAppTask.StartTimer(BLE_ADV_TRIGGER_TIMEOUT);
+        sAppTask.mFunction = kFunction_BLEAdv;
+
+        // Turn off all LEDs before starting blink to make sure blink is coordinated.
+        systemStatusLED.Set(false);
+        systemStatusLED.Blink(50, 950);
+    }
+    else if(sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_BLEAdv)
+    {
         ChipLogProgress(NotSpecified, "[BTN] Factory Reset selected. Release within %us to cancel.",
                         FACTORY_RESET_CANCEL_WINDOW_TIMEOUT / 1000);
 
         // Start timer for FACTORY_RESET_CANCEL_WINDOW_TIMEOUT to allow user to cancel, if required.
         sAppTask.StartTimer(FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
         sAppTask.mFunction = kFunction_FactoryReset;
+
         // Turn off all LEDs before starting blink to make sure blink is coordinated.
         systemStatusLED.Set(false);
-        systemStatusLED.Blink(500, 500);
+        systemStatusLED.Blink(500,500);
     }
     else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
     {
@@ -458,6 +465,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
         {
             ChipLogProgress(NotSpecified, "[BTN] Hold to select function:");
             ChipLogProgress(NotSpecified, "[BTN] - Reset (0-1.5s)");
+            ChipLogProgress(NotSpecified, "[BTN] - Start/Stop BLE Advertising (1.5-3s)");
             ChipLogProgress(NotSpecified, "[BTN] - Factory Reset (>6.5s)");
 
             sAppTask.StartTimer(RESET_TRIGGER_TIMEOUT);
@@ -474,6 +482,13 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
 
             chip::DeviceManager::CHIPDeviceManager::GetInstance().Shutdown();
             WDT_SystemReset(RESET_ALL, SW_RESET_APP_START);
+        }
+        else if(sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_BLEAdv)
+        {
+            sAppTask.CancelTimer();
+            sAppTask.mFunction = kFunction_NoneSelected;
+
+            PlatformMgr().ScheduleWork(AppTask::BLEStartAdvertising, 0);
         }
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
         {
@@ -511,6 +526,38 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
     });
 }
 
+void AppTask::ActionInitiated(LightingManager::Action_t aAction)
+{
+    // Placeholder for light action
+    if (aAction == LightingManager::ON_ACTION)
+    {
+        ChipLogProgress(NotSpecified, "Light goes on");
+    }
+    else if (aAction == LightingManager::OFF_ACTION)
+    {
+        ChipLogProgress(NotSpecified, "Light goes off ");
+    }
+}
+
+void AppTask::ActionCompleted(LightingManager::Action_t aAction)
+{
+    // Placeholder for light action completed
+    if (aAction == LightingManager::ON_ACTION)
+    {
+        ChipLogProgress(NotSpecified, "Light On Action has been completed");
+    }
+    else if (aAction == LightingManager::OFF_ACTION)
+    {
+        ChipLogProgress(NotSpecified, "Light Off Action has been completed");
+    }
+
+    if (sAppTask.mSyncClusterToButtonAction)
+    {
+        sAppTask.UpdateClusterState();
+        sAppTask.mSyncClusterToButtonAction = false;
+    }
+}
+
 void AppTask::PostEvent(const AppEvent * aEvent)
 {
     if (sAppEventQueue != nullptr)
@@ -519,7 +566,7 @@ void AppTask::PostEvent(const AppEvent * aEvent)
         if (xPortIsInsideInterrupt())
         {
             BaseType_t higherPrioTaskWoken = pdFALSE;
-            status                         = xQueueSendFromISR(sAppEventQueue, aEvent, &higherPrioTaskWoken);
+            status              = xQueueSendFromISR(sAppEventQueue, aEvent, &higherPrioTaskWoken);
             portYIELD_FROM_ISR(higherPrioTaskWoken);
         }
         else
@@ -551,39 +598,27 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 }
 
 /**
- * Update cluster status after application level changes
+ * Update cluster status after press button
  */
-void AppTask::UpdateClusterState(void) {}
-
-void AppTask::InitTag()
+void AppTask::UpdateClusterState(void)
 {
-#if CONFIG_DEFAULT_ZAP
-#elif CONFIG_1_TO_2_ZAP
-    SetTagList(1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch1TagList));
-    SetTagList(2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch2TagList));
-    SetTagList(3, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch3TagList));
-#elif CONFIG_1_TO_8_ZAP
-    SetTagList(1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch1TagList));
-    SetTagList(2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch2TagList));
-    SetTagList(3, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch3TagList));
-    SetTagList(4, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch4TagList));
-    SetTagList(5, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch5TagList));
-    SetTagList(6, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch6TagList));
-    SetTagList(7, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch7TagList));
-    SetTagList(8, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch8TagList));
-    SetTagList(9, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch9TagList));
-#elif CONFIG_1_TO_11_ZAP
-    SetTagList(1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch1TagList));
-    SetTagList(2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch2TagList));
-    SetTagList(3, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch3TagList));
-    SetTagList(4, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch4TagList));
-    SetTagList(5, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch5TagList));
-    SetTagList(6, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch6TagList));
-    SetTagList(7, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch7TagList));
-    SetTagList(8, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch8TagList));
-    SetTagList(9, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch9TagList));
-    SetTagList(11, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch11TagList));
-    SetTagList(12, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch12TagList));
-    SetTagList(13, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch13TagList));
-#endif
+    SystemLayer().ScheduleLambda([] {
+        ChipLogProgress(NotSpecified, "UpdateClusterState");
+
+        // Write the new on/off value
+        Protocols::InteractionModel::Status status =
+            Clusters::OnOff::Attributes::OnOff::Set(LIGHT_ENDPOINT_ID, LightingMgr().IsTurnedOn());
+
+        if (status != Protocols::InteractionModel::Status::Success)
+        {
+            ChipLogError(NotSpecified, "ERR: updating on/off %x", to_underlying(status));
+        }
+
+        // Write new level value
+        status = Clusters::LevelControl::Attributes::CurrentLevel::Set(LIGHT_ENDPOINT_ID, LightingMgr().GetLevel());
+        if (status != Protocols::InteractionModel::Status::Success)
+        {
+            ChipLogError(NotSpecified, "ERR: updating level %x", to_underlying(status));
+        }
+    });
 }

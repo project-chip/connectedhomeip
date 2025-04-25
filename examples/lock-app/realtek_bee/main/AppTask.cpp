@@ -22,6 +22,7 @@
 #include "AppEvent.h"
 #include "AppTask.h"
 #include "Globals.h"
+#include "util/RealtekObserver.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/TestEventTriggerDelegate.h>
@@ -229,6 +230,9 @@ void AppTask::InitServer(intptr_t arg)
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
     chip::Server::GetInstance().Init(initParams);
+    
+    static RealtekObserver sRealtekObserver;
+    chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sRealtekObserver);
 
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
