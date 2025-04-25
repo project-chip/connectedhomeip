@@ -114,13 +114,11 @@ struct AttributeEntry
 
     _StartBitFieldInit; // Disabling '-Wconversion' & '-Wconversion'
 
-        constexpr AttributeEntry(AttributeId id                                  = 0,
-                                 BitMask<AttributeQualityFlags> attrQualityFlags = BitMask<AttributeQualityFlags>(),
-                                 std::optional<Access::Privilege> readPriv       = std::nullopt,
-                                 std::optional<Access::Privilege> writePriv      = std::nullopt) :
+    constexpr AttributeEntry(AttributeId id = 0, BitMask<AttributeQualityFlags> attrQualityFlags = BitMask<AttributeQualityFlags>(),
+                             std::optional<Access::Privilege> readPriv  = std::nullopt,
+                             std::optional<Access::Privilege> writePriv = std::nullopt) :
         attributeId{ id },
-        mask{ attrQualityFlags.Raw() & kAttrQualityMask - 1,
-              (readPriv.has_value() ? to_underlying(*readPriv) : 0) & kPrivilegeMask,
+        mask{ attrQualityFlags.Raw() & kAttrQualityMask - 1, (readPriv.has_value() ? to_underlying(*readPriv) : 0) & kPrivilegeMask,
               (writePriv.has_value() ? to_underlying(*writePriv) : 0) & kPrivilegeMask }
     {}
 
@@ -206,21 +204,16 @@ struct AcceptedCommandEntry
 
     _StartBitFieldInit; // Disabling '-Wconversion' & '-Wconversion'
 
-        constexpr AcceptedCommandEntry(CommandId id                                 = 0,
-                                       BitMask<CommandQualityFlags> cmdQualityFlags = BitMask<CommandQualityFlags>(),
-                                       Access::Privilege invokePriv                 = Access::Privilege::kOperate) :
+    constexpr AcceptedCommandEntry(CommandId id = 0, BitMask<CommandQualityFlags> cmdQualityFlags = BitMask<CommandQualityFlags>(),
+                                   Access::Privilege invokePriv = Access::Privilege::kOperate) :
         commandId(id),
-        mask{ cmdQualityFlags.Raw() & kCmdQualityMask,
-              to_underlying(invokePriv) & kPrivilegeMask }
+        mask{ cmdQualityFlags.Raw() & kCmdQualityMask, to_underlying(invokePriv) & kPrivilegeMask }
     {}
 
     _EndBitFieldInit; // Enabling '-Wconversion' & '-Wconversion'
 
     // Getter for mask.invokePrivilege
-    constexpr Access::Privilege GetInvokePrivilege() const
-    {
-        return static_cast<Access::Privilege>(mask.invokePrivilege);
-    }
+    constexpr Access::Privilege GetInvokePrivilege() const { return static_cast<Access::Privilege>(mask.invokePrivilege); }
 
     constexpr bool HasFlags(CommandQualityFlags f) const { return (mask.flags & chip::to_underlying(f)) != 0; }
 
