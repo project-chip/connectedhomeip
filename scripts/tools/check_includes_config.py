@@ -142,6 +142,7 @@ ALLOW: Dict[str, Set[str]] = {
     'src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h': {'vector'},
     'src/app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h': {'string', 'vector'},
     'src/app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-server.h': {'string', 'vector'},
+    'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-server.h': {'vector'},
     'src/credentials/attestation_verifier/FileAttestationTrustStore.h': {'vector'},
     'src/credentials/attestation_verifier/FileAttestationTrustStore.cpp': {'string'},
     'src/credentials/attestation_verifier/TestDACRevocationDelegateImpl.cpp': {'fstream'},
