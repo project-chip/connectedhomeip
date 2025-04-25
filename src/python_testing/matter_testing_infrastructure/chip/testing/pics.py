@@ -111,15 +111,15 @@ def parse_pixit_xml(contents: str) -> dict[str, Optional[str]]:
     for pi in mytree.iter('pixitItem'):
         name_elem = pi.find('itemNumber')
         support_elem = pi.find('support')
-        # Raise an error if element is None
-        if name_elem is None:
+        # Ensure name_elem is found and assign its text value
+        if name_elem is not None:
+           # Use empty string if name_elem.text is None or empty string
+            name = name_elem.text or ""
+        else:
             raise ValueError(f"PICS XML item missing 'itemNumber' element: {ET.tostring(pi, encoding='unicode')}")
-        # Raise an error if text is None
-        name = name_elem.text
-        support = support_elem.text
+        # Ensure support_elem is found, or assign None
+        support = support_elem.text if support_elem is not None else None
         pixit[name] = support
-        if name is None:
-            raise ValueError(f"PICS XML item 'itemNumber' element missing text: {ET.tostring(pi, encoding='unicode')}")
 
     return pixit
 
