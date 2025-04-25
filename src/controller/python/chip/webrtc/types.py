@@ -18,7 +18,6 @@
 from ctypes import CFUNCTYPE, POINTER, c_char_p, c_int, c_uint32
 
 
-
 class ErrorType(c_int):
     InvalidLocalOffer = 0
     InvalidRemoteOffer = 1
