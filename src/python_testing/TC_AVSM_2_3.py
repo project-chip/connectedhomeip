@@ -17,7 +17,6 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
@@ -35,13 +34,26 @@ class TC_AVSM_2_3(MatterBaseTest):
     def steps_TC_AVSM_2_3(self) -> list[TestStep]:
         return [
             TestStep("precondition", "DUT commissioned and preconditions", is_commissioning=True),
-            TestStep(1, "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on TH_SERVER", "Verify SNP & (WMARK|OSD) is supported."),
-            TestStep(2, "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
-                     "Verify the number of allocated snapshot streams in the list is 1. Store StreamID as aStreamID. If WMARK is supported, store WaterMarkEnabled as aWmark. If OSD is supported, store OSDEnabled as aOSD."),
-            TestStep(3, "TH sends the SnapshotStreamModify command with SnapshotStreamID set to aStreamID. If WMARK is supported, set WaterMarkEnabled to !aWmark`and if OSD is supported, set OSDEnabled to `!aOSD in the command.",
-                     "DUT responds with a SUCCESS status code."),
-            TestStep(4, "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
-                     "Verify the following: If WMARK is supported, verify WaterMarkEnabled == !aWmark. If OSD is supported, verify OSDEnabled == !aOSD."),
+            TestStep(
+                1,
+                "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "Verify SNP & (WMARK|OSD) is supported.",
+            ),
+            TestStep(
+                2,
+                "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "Verify the number of allocated snapshot streams in the list is 1. Store StreamID as aStreamID. If WMARK is supported, store WaterMarkEnabled as aWmark. If OSD is supported, store OSDEnabled as aOSD.",
+            ),
+            TestStep(
+                3,
+                "TH sends the SnapshotStreamModify command with SnapshotStreamID set to aStreamID. If WMARK is supported, set WaterMarkEnabled to !aWmark`and if OSD is supported, set OSDEnabled to `!aOSD in the command.",
+                "DUT responds with a SUCCESS status code.",
+            ),
+            TestStep(
+                4,
+                "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "Verify the following: If WMARK is supported, verify WaterMarkEnabled == !aWmark. If OSD is supported, verify OSDEnabled == !aOSD.",
+            ),
         ]
 
     async def _precondition_one_allocated_snp_stream(self):
@@ -57,13 +69,17 @@ class TC_AVSM_2_3(MatterBaseTest):
         asserts.assert_true(snpSupport, "Snapshot Feature is not supported.")
 
         # Check if snapshot stream has already been allocated
-        aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams)
+        aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
+        )
         logger.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
         if len(aAllocatedSnapshotStreams) > 0:
             return
 
         # Allocate one for the test steps based on SnapshotCapabilities
-        aSnapshotCapabilities = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.SnapshotCapabilities)
+        aSnapshotCapabilities = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.SnapshotCapabilities
+        )
         logger.info(f"Rx'd SnapshotCapabilities: {aSnapshotCapabilities}")
 
         asserts.assert_greater(len(aSnapshotCapabilities), 0, "SnapshotCapabilities list is empty")
@@ -73,7 +89,7 @@ class TC_AVSM_2_3(MatterBaseTest):
                 maxFrameRate=aSnapshotCapabilities[0].maxFrameRate,
                 minResolution=aSnapshotCapabilities[0].resolution,
                 maxResolution=aSnapshotCapabilities[0].resolution,
-                quality=90
+                quality=90,
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
         except InteractionModelError as e:
@@ -94,14 +110,20 @@ class TC_AVSM_2_3(MatterBaseTest):
         self.step(1)
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
         logger.info(f"Rx'd FeatureMap: {aFeatureMap}")
-        snpSupport = ((aFeatureMap & cluster.Bitmaps.Feature.kSnapshot) > 0)
-        wmarkSupport = ((aFeatureMap & cluster.Bitmaps.Feature.kWatermark) > 0)
-        osdSupport = ((aFeatureMap & cluster.Bitmaps.Feature.kOnScreenDisplay) > 0)
+        snpSupport = (aFeatureMap & cluster.Bitmaps.Feature.kSnapshot) > 0
+        wmarkSupport = (aFeatureMap & cluster.Bitmaps.Feature.kWatermark) > 0
+        osdSupport = (aFeatureMap & cluster.Bitmaps.Feature.kOnScreenDisplay) > 0
         logger.info(f"Rx'd snpSupport: {snpSupport}, wmarkSupport: {wmarkSupport}, osdSupport: {osdSupport}")
-        asserts.assert_true((snpSupport and (wmarkSupport or osdSupport)), cluster.Bitmaps.Feature.kSnapshot, "SNP & (WMARK|OSD) is supported is not supported.")
+        asserts.assert_true(
+            (snpSupport and (wmarkSupport or osdSupport)),
+            cluster.Bitmaps.Feature.kSnapshot,
+            "SNP & (WMARK|OSD) is supported is not supported.",
+        )
 
         self.step(2)
-        aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams)
+        aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
+        )
         logger.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
         asserts.assert_equal(len(aAllocatedSnapshotStreams), 1, "The number of allocated snapshot streams in the list is not 1.")
         aStreamID = aAllocatedSnapshotStreams[0].snapshotStreamID
@@ -116,7 +138,9 @@ class TC_AVSM_2_3(MatterBaseTest):
             pass
 
         self.step(4)
-        aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams)
+        aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
+        )
         logger.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
         # TODO: SnapshotStreamStruct does not have WaterMarkEnabled and OSDEnabled fields. Update This.
 

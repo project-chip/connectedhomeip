@@ -17,9 +17,7 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from mobly import asserts
 
 logger = logging.getLogger(__name__)
 
@@ -36,25 +34,71 @@ class TC_AVSM_2_1(MatterBaseTest):
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH reads MaxConcurrentEncoders attribute.", "Verify that the DUT response contains an uint8 value."),
             TestStep(3, "TH reads MaxEncodedPixelRate attribute.", "Verify that the DUT response contains an uint32 value."),
-            TestStep(4, "TH reads VideoSensorParams attribute.", "Verify that the DUT response contains a VideoSensorParamsStruct value."),
+            TestStep(
+                4, "TH reads VideoSensorParams attribute.", "Verify that the DUT response contains a VideoSensorParamsStruct value."
+            ),
             TestStep(5, "TH reads NightVisionCapable attribute.", "Verify that the DUT response contains a bool value."),
             TestStep(6, "TH reads MinViewport attribute.", "Verify that the DUT response contains a VideoResolutionStruct value."),
-            TestStep(7, "TH reads RateDistortionTradeOffPoints attribute.", "Verify that the DUT response contains a list of RateDistortionTradeOffPointsStruct entries."),
+            TestStep(
+                7,
+                "TH reads RateDistortionTradeOffPoints attribute.",
+                "Verify that the DUT response contains a list of RateDistortionTradeOffPointsStruct entries.",
+            ),
             TestStep(8, "TH reads MaxContentBufferSize attribute.", "Verify that the DUT response contains an uint32 value."),
-            TestStep(9, "TH reads MicrophoneCapabilities attribute.", "Verify that the DUT response contains an AudioCapabilitiesStruct value."),
-            TestStep(10, "TH reads SpeakerCapabilities attribute.", "Verify that the DUT response contains an AudioCapabilitiesStruct value."),
-            TestStep(11, "TH reads TwoWayTalkSupport attribute.", "Verify that the DUT response contains a TwoWayTalkSupportTypeEnum value."),
-            TestStep(12, "TH reads SnapshotCapabilities attribute.", "Verify that the DUT response contains a list of SnapshotCapabilitiesStruct entries."),
+            TestStep(
+                9,
+                "TH reads MicrophoneCapabilities attribute.",
+                "Verify that the DUT response contains an AudioCapabilitiesStruct value.",
+            ),
+            TestStep(
+                10,
+                "TH reads SpeakerCapabilities attribute.",
+                "Verify that the DUT response contains an AudioCapabilitiesStruct value.",
+            ),
+            TestStep(
+                11,
+                "TH reads TwoWayTalkSupport attribute.",
+                "Verify that the DUT response contains a TwoWayTalkSupportTypeEnum value.",
+            ),
+            TestStep(
+                12,
+                "TH reads SnapshotCapabilities attribute.",
+                "Verify that the DUT response contains a list of SnapshotCapabilitiesStruct entries.",
+            ),
             TestStep(13, "TH reads MaxNetworkBandwidth attribute.", "Verify that the DUT response contains an uint32 value."),
             TestStep(14, "TH reads CurrentFrameRate attribute.", "Verify that the DUT response contains an uint16 value."),
             TestStep(15, "TH reads HDRModeEnabled attribute.", "Verify that the DUT response contains a bool value."),
-            TestStep(16, "TH reads SupportedStreamUsages attribute.", "Verify that the DUT response contains a list of StreamUsageEnum entries."),
-            TestStep(17, "TH reads AllocatedVideoStreams attribute.", "Verify that the DUT response contains a list of VideoStreamStruct entries."),
-            TestStep(18, "TH reads AllocatedAudioStreams attribute.", "Verify that the DUT response contains a list of AudioStreamStruct entries."),
-            TestStep(19, "TH reads AllocatedSnapshotStreams attribute.", "Verify that the DUT response contains a list of AudioStreamStruct entries."),
-            TestStep(20, "TH reads RankedVideoStreamPrioritiesList attribute.", "Verify that the DUT response contains a list of StreamUsageEnum entries."),
-            TestStep(21, "TH reads SoftRecordingPrivacyModeEnabled attribute.", "Verify that the DUT response contains a bool value."),
-            TestStep(22, "TH reads SoftLivestreamPrivacyModeEnabled attribute.", "Verify that the DUT response contains a bool value."),
+            TestStep(
+                16,
+                "TH reads SupportedStreamUsages attribute.",
+                "Verify that the DUT response contains a list of StreamUsageEnum entries.",
+            ),
+            TestStep(
+                17,
+                "TH reads AllocatedVideoStreams attribute.",
+                "Verify that the DUT response contains a list of VideoStreamStruct entries.",
+            ),
+            TestStep(
+                18,
+                "TH reads AllocatedAudioStreams attribute.",
+                "Verify that the DUT response contains a list of AudioStreamStruct entries.",
+            ),
+            TestStep(
+                19,
+                "TH reads AllocatedSnapshotStreams attribute.",
+                "Verify that the DUT response contains a list of AudioStreamStruct entries.",
+            ),
+            TestStep(
+                20,
+                "TH reads RankedVideoStreamPrioritiesList attribute.",
+                "Verify that the DUT response contains a list of StreamUsageEnum entries.",
+            ),
+            TestStep(
+                21, "TH reads SoftRecordingPrivacyModeEnabled attribute.", "Verify that the DUT response contains a bool value."
+            ),
+            TestStep(
+                22, "TH reads SoftLivestreamPrivacyModeEnabled attribute.", "Verify that the DUT response contains a bool value."
+            ),
             TestStep(23, "TH reads HardPrivacyModeOn attribute.", "Verify that the DUT response contains a bool value."),
             TestStep(24, "TH reads NightVision attribute.", "Verify that the DUT response contains a TriStateAutoEnum value."),
             TestStep(25, "TH reads NightVisionIllum attribute.", "Verify that the DUT response contains a TriStateAutoEnum value."),
@@ -72,9 +116,13 @@ class TC_AVSM_2_1(MatterBaseTest):
             TestStep(37, "TH reads ImageFlipHorizontal attribute.", "Verify that the DUT response contains a bool value."),
             TestStep(38, "TH reads ImageFlipVertical attribute.", "Verify that the DUT response contains a bool value."),
             TestStep(39, "TH reads LocalVideoRecordingEnabled attribute.", "Verify that the DUT response contains a bool value."),
-            TestStep(40, "TH reads LocalSnapshotRecordingEnabled attribute.", "Verify that the DUT response contains a bool value."),
+            TestStep(
+                40, "TH reads LocalSnapshotRecordingEnabled attribute.", "Verify that the DUT response contains a bool value."
+            ),
             TestStep(41, "TH reads StatusLightEnabled attribute.", "Verify that the DUT response contains a bool value."),
-            TestStep(42, "TH reads StatusLightBrightness attribute.", "Verify that the DUT response contains a ThreeLevelAutoEnum value.")
+            TestStep(
+                42, "TH reads StatusLightBrightness attribute.", "Verify that the DUT response contains a ThreeLevelAutoEnum value."
+            ),
         ]
 
     @async_test_body
@@ -88,22 +136,30 @@ class TC_AVSM_2_1(MatterBaseTest):
 
         self.step(2)
         if self.pics_guard(self.check_pics("AVSM.S.A0000")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.MaxConcurrentEncoders)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.MaxConcurrentEncoders
+            )
             logger.info(f"Rx'd MaxConcurrentEncoders: {value}")
 
         self.step(3)
         if self.pics_guard(self.check_pics("AVSM.S.A0001")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.MaxEncodedPixelRate)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.MaxEncodedPixelRate
+            )
             logger.info(f"Rx'd MaxEncodedPixelRate: {value}")
 
         self.step(4)
         if self.pics_guard(self.check_pics("AVSM.S.A0002")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.VideoSensorParams)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.VideoSensorParams
+            )
             logger.info(f"Rx'd VideoSensorParams: {value}")
 
         self.step(5)
         if self.pics_guard(self.check_pics("AVSM.S.A0003")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.NightVisionCapable)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.NightVisionCapable
+            )
             logger.info(f"Rx'd NightVisionCapable: {value}")
 
         self.step(6)
@@ -113,88 +169,121 @@ class TC_AVSM_2_1(MatterBaseTest):
 
         self.step(7)
         if self.pics_guard(self.check_pics("AVSM.S.A0005")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.RateDistortionTradeOffPoints)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.RateDistortionTradeOffPoints
+            )
             logger.info(f"Rx'd RateDistortionTradeOffPoints: {value}")
 
         self.step(8)
         if self.pics_guard(self.check_pics("AVSM.S.A0006")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.MaxContentBufferSize)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.MaxContentBufferSize
+            )
             logger.info(f"Rx'd MaxContentBufferSize: {value}")
 
         self.step(9)
         if self.pics_guard(self.check_pics("AVSM.S.A0007")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneCapabilities)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneCapabilities
+            )
             logger.info(f"Rx'd MicrophoneCapabilities: {value}")
 
         self.step(10)
         if self.pics_guard(self.check_pics("AVSM.S.A0008")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerCapabilities)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerCapabilities
+            )
             logger.info(f"Rx'd SpeakerCapabilities: {value}")
 
         self.step(11)
         if self.pics_guard(self.check_pics("AVSM.S.A0009")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.TwoWayTalkSupport)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.TwoWayTalkSupport
+            )
             logger.info(f"Rx'd TwoWayTalkSupport: {value}")
 
         self.step(12)
         if self.pics_guard(self.check_pics("AVSM.S.A000A")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.SnapshotCapabilities)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.SnapshotCapabilities
+            )
             logger.info(f"Rx'd SnapshotCapabilities: {value}")
 
         self.step(13)
         if self.pics_guard(self.check_pics("AVSM.S.A000B")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.MaxNetworkBandwidth)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.MaxNetworkBandwidth
+            )
             logger.info(f"Rx'd MaxNetworkBandwidth: {value}")
 
         self.step(14)
         if self.pics_guard(self.check_pics("AVSM.S.A000C")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.CurrentFrameRate)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.CurrentFrameRate
+            )
             logger.info(f"Rx'd CurrentFrameRate: {value}")
 
         self.step(15)
         if self.pics_guard(self.check_pics("AVSM.S.A000D")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.HDRModeEnabled)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.HDRModeEnabled
+            )
             logger.info(f"Rx'd HDRModeEnabled: {value}")
 
         self.step(16)
         if self.pics_guard(self.check_pics("AVSM.S.A000E")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.SupportedStreamUsages)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.SupportedStreamUsages
+            )
             logger.info(f"Rx'd SupportedStreamUsages: {value}")
-
 
         self.step(17)
         if self.pics_guard(self.check_pics("AVSM.S.A000F")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
+            )
             logger.info(f"Rx'd AllocatedVideoStreams: {value}")
 
         self.step(18)
         if self.pics_guard(self.check_pics("AVSM.S.A0010")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams
+            )
             logger.info(f"Rx'd AllocatedAudioStreams: {value}")
 
         self.step(19)
         if self.pics_guard(self.check_pics("AVSM.S.A0011")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
+            )
             logger.info(f"Rx'd AllocatedSnapshotStreams: {value}")
 
         self.step(20)
         if self.pics_guard(self.check_pics("AVSM.S.A0012")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.RankedVideoStreamPrioritiesList)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.RankedVideoStreamPrioritiesList
+            )
             logger.info(f"Rx'd RankedVideoStreamPrioritiesList: {value}")
 
         self.step(21)
         if self.pics_guard(self.check_pics("AVSM.S.A0013")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.SoftRecordingPrivacyModeEnabled)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.SoftRecordingPrivacyModeEnabled
+            )
             logger.info(f"Rx'd SoftRecordingPrivacyModeEnabled: {value}")
 
         self.step(22)
         if self.pics_guard(self.check_pics("AVSM.S.A0014")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.SoftLivestreamPrivacyModeEnabled)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.SoftLivestreamPrivacyModeEnabled
+            )
             logger.info(f"Rx'd SoftLivestreamPrivacyModeEnabled: {value}")
 
         self.step(23)
         if self.pics_guard(self.check_pics("AVSM.S.A0015")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.HardPrivacyModeOn)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.HardPrivacyModeOn
+            )
             logger.info(f"Rx'd HardPrivacyModeOn: {value}")
 
         self.step(24)
@@ -204,7 +293,9 @@ class TC_AVSM_2_1(MatterBaseTest):
 
         self.step(25)
         if self.pics_guard(self.check_pics("AVSM.S.A0017")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.NightVisionIllum)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.NightVisionIllum
+            )
             logger.info(f"Rx'd NightVisionIllum: {value}")
 
         self.step(26)
@@ -219,42 +310,58 @@ class TC_AVSM_2_1(MatterBaseTest):
 
         self.step(28)
         if self.pics_guard(self.check_pics("AVSM.S.A001A")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerVolumeLevel)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerVolumeLevel
+            )
             logger.info(f"Rx'd SpeakerVolumeLevel: {value}")
 
         self.step(29)
         if self.pics_guard(self.check_pics("AVSM.S.A001B")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerMaxLevel)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerMaxLevel
+            )
             logger.info(f"Rx'd SpeakerMaxLevel: {value}")
 
         self.step(30)
         if self.pics_guard(self.check_pics("AVSM.S.A001C")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerMinLevel)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerMinLevel
+            )
             logger.info(f"Rx'd SpeakerMinLevel: {value}")
 
         self.step(31)
         if self.pics_guard(self.check_pics("AVSM.S.A001D")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneMuted)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneMuted
+            )
             logger.info(f"Rx'd MicrophoneMuted: {value}")
 
         self.step(32)
         if self.pics_guard(self.check_pics("AVSM.S.A001E")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneVolumeLevel)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneVolumeLevel
+            )
             logger.info(f"Rx'd MicrophoneVolumeLevel: {value}")
 
         self.step(33)
         if self.pics_guard(self.check_pics("AVSM.S.A001F")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneMaxLevel)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneMaxLevel
+            )
             logger.info(f"Rx'd MicrophoneMaxLevel: {value}")
 
         self.step(34)
         if self.pics_guard(self.check_pics("AVSM.S.A0020")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneMinLevel)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneMinLevel
+            )
             logger.info(f"Rx'd MicrophoneMinLevel: {value}")
 
         self.step(35)
         if self.pics_guard(self.check_pics("AVSM.S.A0021")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneAGCEnabled)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneAGCEnabled
+            )
             logger.info(f"Rx'd MicrophoneAGCEnabled: {value}")
 
         self.step(36)
@@ -264,32 +371,44 @@ class TC_AVSM_2_1(MatterBaseTest):
 
         self.step(37)
         if self.pics_guard(self.check_pics("AVSM.S.A0023")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.ImageFlipHorizontal)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.ImageFlipHorizontal
+            )
             logger.info(f"Rx'd ImageFlipHorizontal: {value}")
 
         self.step(38)
         if self.pics_guard(self.check_pics("AVSM.S.A0024")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.ImageFlipVertical)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.ImageFlipVertical
+            )
             logger.info(f"Rx'd ImageFlipVertical: {value}")
 
         self.step(39)
         if self.pics_guard(self.check_pics("AVSM.S.A0025")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.LocalVideoRecordingEnabled)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.LocalVideoRecordingEnabled
+            )
             logger.info(f"Rx'd LocalVideoRecordingEnabled: {value}")
 
         self.step(40)
         if self.pics_guard(self.check_pics("AVSM.S.A002")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.LocalSnapshotRecordingEnabled)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.LocalSnapshotRecordingEnabled
+            )
             logger.info(f"Rx'd LocalSnapshotRecordingEnabled: {value}")
 
         self.step(41)
         if self.pics_guard(self.check_pics("AVSM.S.A0027")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.StatusLightEnabled)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.StatusLightEnabled
+            )
             logger.info(f"Rx'd StatusLightEnabled: {value}")
 
         self.step(42)
         if self.pics_guard(self.check_pics("AVSM.S.A0028")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.StatusLightBrightness)
+            value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.StatusLightBrightness
+            )
             logger.info(f"Rx'd StatusLightBrightness: {value}")
 
 
