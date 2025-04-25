@@ -55,4 +55,14 @@ CHIP_ERROR ProvideOfferCommand::RunCommand()
     return WebRTCManager::Instance().ProvideOffer(webrtcSessionId, streamUsage);
 }
 
+CHIP_ERROR SolicitOfferCommand::RunCommand()
+{
+    std::cout << "Run SolicitOfferCommand" << std::endl;
+
+    // Convert the stream usage into its enum type:
+    auto streamUsage = static_cast<app::Clusters::WebRTCTransportProvider::StreamUsageEnum>(mStreamUsage);
+
+    return WebRTCManager::Instance().SolicitOffer(streamUsage);
+}
+
 } // namespace webrtc
