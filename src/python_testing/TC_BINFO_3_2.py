@@ -49,7 +49,7 @@ class TC_BINFO_3_2(MatterBaseTest):
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
     def desc_TC_BINFO_3_2(self) -> str:
-        return "[TC-BOOLCFG-3.2] Attributes with DUT as Server"
+        return "[TC-BINFO-3.2] Attributes with DUT as Server"
 
     def steps_TC_BINFO_3_2(self) -> list[TestStep]:
         steps = [
