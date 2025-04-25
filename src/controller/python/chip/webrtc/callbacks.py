@@ -1,13 +1,6 @@
-import base64
-import concurrent.futures
-import json
 import logging
-import signal
-from functools import partial
 
-from chip.native import PyChipError
-from chip.webrtc.types import (ErrorCallback_t, IceCallback_t, PeerConnectedCallback_t, PeerDisconnectedCallback_t,
-                               SdpAnswerCallback_t, SdpOfferCallback_t, StatsCallback_t)
+from chip.webrtc.types import (ErrorCallback_t, IceCallback_t, SdpAnswerCallback_t, SdpOfferCallback_t, StatsCallback_t)
 
 future_offer = None
 future_ice = None
