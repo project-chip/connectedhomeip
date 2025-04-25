@@ -213,7 +213,8 @@ def parse(payload):
 @click.option('--commissioning-flow', '-cf', type=click.IntRange(0, 2), default=0, help='Commissioning flow, 0:Standard, 1:User-Intent, 2:Custom')
 @click.option('--include-vid-pid', '-ivp', is_flag=True, default=False, help='Include Vendor ID and Product ID in the manual code explicitly')
 def generate(passcode, discriminator, vendor_id, product_id, discovery_cap_bitmask, commissioning_flow, include_vid_pid):
-    payload = SetupPayload(discriminator, passcode, discovery_cap_bitmask, commissioning_flow, vendor_id, product_id, include_vid_pid)
+    payload = SetupPayload(discriminator, passcode, discovery_cap_bitmask,
+                           commissioning_flow, vendor_id, product_id, include_vid_pid)
     print("Manualcode : {}".format(payload.generate_manualcode()))
     print("QRCode     : {}".format(payload.generate_qrcode()))
 
