@@ -118,7 +118,7 @@ struct AttributeEntry
                              std::optional<Access::Privilege> readPriv  = std::nullopt,
                              std::optional<Access::Privilege> writePriv = std::nullopt) :
         attributeId{ id },
-        mask{ attrQualityFlags.Raw() & kAttrQualityMask - 1, (readPriv.has_value() ? to_underlying(*readPriv) : 0) & kPrivilegeMask,
+        mask{ attrQualityFlags.Raw() & kAttrQualityMask, (readPriv.has_value() ? to_underlying(*readPriv) : 0) & kPrivilegeMask,
               (writePriv.has_value() ? to_underlying(*writePriv) : 0) & kPrivilegeMask }
     {}
 
