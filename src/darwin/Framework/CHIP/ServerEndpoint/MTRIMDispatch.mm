@@ -101,7 +101,7 @@ namespace app {
         // ServerClusterInterface for command dispatch.
         // But OTA would need some special-casing in any case, to call into the
         // existing cluster implementation.
-        SubjectDescriptor subjectDescriptor = aCommandObj->GetSubjectDescriptor();
+        Access::SubjectDescriptor subjectDescriptor = aCommandObj->GetSubjectDescriptor();
 
         DataModel::InvokeRequest invokeRequest;
         invokeRequest.path = aPath;
