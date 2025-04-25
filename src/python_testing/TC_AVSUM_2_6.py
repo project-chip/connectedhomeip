@@ -102,7 +102,7 @@ class TC_AVSUM_2_6(MatterBaseTest, AVSUMTestBase):
             notFound = True
             for mptzpreset in mptz_presets_dut:
                 if mptzpreset.presetID == presetID:
-                    found = False
+                    notFound = False
                     break
 
             asserts.assert_true(notFound, "Preset not removed despite invocation of MPTZRemovePreset")
