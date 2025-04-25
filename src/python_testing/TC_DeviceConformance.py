@@ -495,15 +495,17 @@ class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
 
     def test_TC_DESC_2_3(self):
         self.step(0)  # done in setup class
+        problems = []
 
         self.step(1)
-        self.problems.extend(self.check_root_endpoint_for_application_device_types())
+        problems.extend(self.check_root_endpoint_for_application_device_types())
 
         self.step(2)
-        self.problems.extend(self.check_all_application_device_types_superset())
+        problems.extend(self.check_all_application_device_types_superset())
 
         self.step(3)
-        if self.problems:
+        self.problems.extend(problems)
+        if problems:
             self.fail_current_test("One or more application device type endpoint violations")
 
 
