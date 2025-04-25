@@ -44,11 +44,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{
 namespace Commands {
 {% for command in cluster.commands -%}
 namespace {{command.name | upfirst}} {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
     {{cluster.name | upfirst}}::Commands::{{command.name | upfirst}}::Id,
     BitFlags<DataModel::CommandQualityFlags>{ {{ command | extract_command_quality_flags | join(", ") }} },
     {{ command.invokeacl | as_privilege}}
-);
+};
 } // namespace {{command.name | upfirst}}
 {% endfor %}
 } // namespace Commands
