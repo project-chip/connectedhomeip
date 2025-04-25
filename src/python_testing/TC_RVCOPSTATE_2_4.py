@@ -175,69 +175,69 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
             await self.read_operational_state_with_check(12, rvc_op_states.kSeekingCharger)
 
             await self.send_go_home_cmd_with_check(13, op_errors.kNoError)
-        
+
         # State EmptyingDustBin is not GoHome-Compatible
         if self.check_pics("RVCOPSTATE.S.M.ST_EMPTYINGDUSTBIN"):
             step_name = "Manually put the device in the EMPTYING DUST BIN operational state"
             self.print_step(14, step_name)
-            
+
             if self.is_ci:
                 self.write_to_app_pipe({"Name": "Reset"})
                 self.write_to_app_pipe({"Name": "Docked"})
                 self.write_to_app_pipe({"Name": "EmptyingDustBin"})
             else:
                 self.wait_for_user_input(prompt_msg=f"{step_name}, and press Enter when ready.")
-            
+
             await self.read_operational_state_with_check(15, rvc_op_states.kEmptyingDustBin)
-            
+
             await self.send_go_home_cmd_with_check(16, op_errors.kCommandInvalidInState)
-        
+
         # State CleaningMop is not GoHome-Compatible
         if self.check_pics("RVCOPSTATE.S.M.ST_CLEANINGMOP"):
             step_name = "Manually put the device in the CLEANING MOP operational state"
             self.print_step(17, step_name)
-            
+
             if self.is_ci:
                 self.write_to_app_pipe({"Name": "Reset"})
                 self.write_to_app_pipe({"Name": "Docked"})
                 self.write_to_app_pipe({"Name": "CleaningMop"})
             else:
                 self.wait_for_user_input(prompt_msg=f"{step_name}, and press Enter when ready.")
-            
+
             await self.read_operational_state_with_check(18, rvc_op_states.kCleaningMop)
-            
+
             await self.send_go_home_cmd_with_check(19, op_errors.kCommandInvalidInState)
-        
+
         # State FillingWaterTank is not GoHome-Compatible
-        if self.check_pics("RVCOPSTATE.S.M.ST_FILLINGWATERNK"):
+        if self.check_pics("RVCOPSTATE.S.M.ST_FILLINGWATERTNK"):
             step_name = "Manually put the device in the FILLING WATER TANK operational state"
             self.print_step(20, step_name)
-            
+
             if self.is_ci:
                 self.write_to_app_pipe({"Name": "Reset"})
                 self.write_to_app_pipe({"Name": "Docked"})
                 self.write_to_app_pipe({"Name": "FillingWaterTank"})
             else:
                 self.wait_for_user_input(prompt_msg=f"{step_name}, and press Enter when ready.")
-            
+
             await self.read_operational_state_with_check(21, rvc_op_states.kFillingWaterTank)
-            
+
             await self.send_go_home_cmd_with_check(22, op_errors.kCommandInvalidInState)
-        
+
         # State UpdatingMaps is not GoHome-Compatible
         if self.check_pics("RVCOPSTATE.S.M.ST_UPDATINGMAPS"):
             step_name = "Manually put the device in the UPDATING MAPS operational state"
             self.print_step(23, step_name)
-            
+
             if self.is_ci:
                 self.write_to_app_pipe({"Name": "Reset"})
                 self.write_to_app_pipe({"Name": "Docked"})
                 self.write_to_app_pipe({"Name": "UpdatingMaps"})
             else:
                 self.wait_for_user_input(prompt_msg=f"{step_name}, and press Enter when ready.")
-            
+
             await self.read_operational_state_with_check(24, rvc_op_states.kUpdatingMaps)
-            
+
             await self.send_go_home_cmd_with_check(25, op_errors.kCommandInvalidInState)
 
 

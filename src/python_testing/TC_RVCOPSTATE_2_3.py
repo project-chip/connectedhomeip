@@ -375,21 +375,20 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
                 self.write_to_app_pipe({"Name": "EmptyingDustBin"})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
-            
+
             await self.read_operational_state_with_check(47, rvc_op_states.kEmptyingDustBin)
-            
+
             # EmptyingDustBin is not Pause compatible
             await self.send_pause_cmd_with_check(48, op_errors.kCommandInvalidInState)
-            
-            # !!! TODO: missing test step from test plan !!!
+
             test_step = "Manually put the device in the EmptyingDustBin(0x43) operational state and RVC Run Mode cluster's CurrentMode attribute set to a mode with the Idle mode tag"
             self.print_step(49, test_step)
             if not self.is_ci:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
-            
+
             # EmptyingDustBin is not Resume compatible
             await self.send_resume_cmd_with_check(49, op_errors.kCommandInvalidInState)
-        
+
         if self.check_pics("RVCOPSTATE.S.M.ST_CLEANINGMOP"):
             test_step = "Manually put the device in the CleaningMop(0x44) operational state"
             self.print_step(50, test_step)
@@ -397,21 +396,20 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
                 self.write_to_app_pipe({"Name": "CleaningMop"})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
-            
+
             await self.read_operational_state_with_check(51, rvc_op_states.kCleaningMop)
-            
+
             # CleaningMop is not Pause compatible
             await self.send_pause_cmd_with_check(52, op_errors.kCommandInvalidInState)
-            
-            # !!! TODO: missing test step from test plan !!!
+
             test_step = "Manually put the device in the CleaningMop(0x44) operational state and RVC Run Mode cluster's CurrentMode attribute set to a mode with the Idle mode tag"
             self.print_step(53, test_step)
             if not self.is_ci:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
-            
+
             # CleaningMop is not Resume compatible
             await self.send_resume_cmd_with_check(53, op_errors.kCommandInvalidInState)
-        
+
         if self.check_pics("RVCOPSTATE.S.M.ST_FILLINGWATERTNK"):
             test_step = "Manually put the device in the FillingWaterTank(0x45) operational state"
             self.print_step(54, test_step)
@@ -419,21 +417,20 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
                 self.write_to_app_pipe({"Name": "FillingWaterTank"})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
-            
+
             await self.read_operational_state_with_check(55, rvc_op_states.kFillingWaterTank)
-            
+
             # FillingWaterTank is not Pause compatible
             await self.send_pause_cmd_with_check(56, op_errors.kCommandInvalidInState)
-            
-            # !!! TODO: missing test step from test plan !!!
+
             test_step = "Manually put the device in the FillingWaterTank(0x45) operational state and RVC Run Mode cluster's CurrentMode attribute set to a mode with the Idle mode tag"
             self.print_step(57, test_step)
             if not self.is_ci:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
-            
+
             # FillingWaterTank is not Resume compatible
             await self.send_resume_cmd_with_check(57, op_errors.kCommandInvalidInState)
-        
+
         if self.check_pics("RVCOPSTATE.S.M.ST_UPDATINGMAPS"):
             test_step = "Manually put the device in the UpdatingMaps(0x46) operational state"
             self.print_step(58, test_step)
@@ -441,18 +438,17 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
                 self.write_to_app_pipe({"Name": "UpdatingMaps"})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
-            
+
             await self.read_operational_state_with_check(59, rvc_op_states.kUpdatingMaps)
-            
+
             # UpdatingMaps is not Pause compatible
             await self.send_pause_cmd_with_check(60, op_errors.kCommandInvalidInState)
-            
-            # !!! TODO: missing test step from test plan !!!
+
             test_step = "Manually put the device in the UpdatingMaps(0x46) operational state and RVC Run Mode cluster's CurrentMode attribute set to a mode with the Idle mode tag"
             self.print_step(61, test_step)
             if not self.is_ci:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
-            
+
             # UpdatingMaps is not Resume compatible
             await self.send_resume_cmd_with_check(61, op_errors.kCommandInvalidInState)
 
