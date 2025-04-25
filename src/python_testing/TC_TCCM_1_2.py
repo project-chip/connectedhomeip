@@ -58,8 +58,6 @@ class TC_TCCM_1_2(MatterBaseTest, ModeBaseClusterChecks):
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH reads from the DUT the SupportedModes attribute."),
             TestStep(3, "TH reads from the DUT the CurrentMode attribute."),
-            TestStep(4, "TH reads from the DUT the OnMode attribute."),
-            TestStep(5, "TH reads from the DUT the StartUpMode attribute.")
         ]
         return steps
 

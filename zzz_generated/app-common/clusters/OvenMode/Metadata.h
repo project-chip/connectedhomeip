@@ -35,22 +35,6 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .writePrivilege = std::nullopt,
 };
 } // namespace CurrentMode
-namespace StartUpMode {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = StartUpMode::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-} // namespace StartUpMode
-namespace OnMode {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = OnMode::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-} // namespace OnMode
 
 } // namespace Attributes
 
