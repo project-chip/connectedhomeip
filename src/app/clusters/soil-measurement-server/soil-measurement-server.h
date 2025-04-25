@@ -17,6 +17,7 @@
  */
 
 #include <app-common/zap-generated/cluster-enums.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
@@ -29,25 +30,32 @@ namespace app {
 namespace Clusters {
 namespace SoilMeasurement {
 
-inline constexpr uint16_t kClusterRevision              = 1;
-inline constexpr uint8_t kMinSupportedLocalizationUnits = 2;
-inline constexpr uint8_t kMaxSupportedLocalizationUnits = 3;
+struct MeasurementData
+{
+    Structs::MeasurementAccuracyStruct::Type soilMoistureMeasurementLimits;
+    chip::app::DataModel::Nullable<uint16_t> soilMoistureMeasuredValue;
+};
 
-class SoilMeasurementServer : public AttributeAccessInterface
+inline constexpr uint16_t kClusterRevision = 1;
+
+class SoilMeasurementAttrAccess : public AttributeAccessInterface
 {
 public:
-    // Register for the SoilMeasurement cluster on all endpoints.
-    static SoilMeasurementServer & Instance();
+    // Register for the SoilMeasurement on all endpoints.
+    SoilMeasurementAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), Clusters::SoilMeasurement::Id) {}
+    ~SoilMeasurementAttrAccess() { Shutdown(); }
+
+    CHIP_ERROR Init();
+    void Shutdown();
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
-    SoilMeasurementServer() : AttributeAccessInterface(Optional<EndpointId>::Missing(), SoilMeasurement::Id) {}
-
-    CHIP_ERROR ReadClusterRevision(AttributeValueEncoder & aEncoder);
-
-    static SoilMeasurementServer mInstance;
 };
+
+CHIP_ERROR SetSoilMeasurementAccuracy(EndpointId endpointId, const Structs::MeasurementAccuracyStruct::Type & accuracy);
+
+MeasurementData * SoilMeasurementDataForEndpoint(EndpointId endpointId);
 
 } // namespace SoilMeasurement
 } // namespace Clusters
