@@ -64,20 +64,27 @@ def parse_pics(lines: typing.List[str]) -> dict[str, bool]:
 
 
 def parse_pics_xml(contents: str) -> dict[str, bool]:
-    pics = {}
+    pics: dict[str, bool] = {}
     mytree = ET.fromstring(contents)
     for pi in mytree.iter('picsItem'):
-        name_element = pi.find('itemNumber')
-        if name_element is None or name_element.text is None:
-            raise ValueError("Missing or empty 'itemNumber' in picsItem")
-        name = name_element.text
+        name_elem = pi.find('itemNumber')
+        support_elem = pi.find('support')
 
-        support_element = pi.find('support')
-        if support_element is None or support_element.text is None:
-            raise ValueError("Missing or empty 'support' in picsItem")
-        support = support_element.text.lower()
+        # Raise an error if either element is None
+        if name_elem is None:
+            raise ValueError(f"PICS XML item missing 'itemNumber' element: {ET.tostring(pi, encoding='unicode')}")
+        if support_elem is None:
+            raise ValueError(f"PICS XML item missing 'support' element: {ET.tostring(pi, encoding='unicode')}")
 
-        pics[name] = int(json.loads(support)) == 1
+        # Raise an error if either text is None
+        name = name_elem.text
+        support = support_elem.text
+        if name is None:
+            raise ValueError(f"PICS XML item 'itemNumber' element missing text: {ET.tostring(pi, encoding='unicode')}")
+        if support is None:
+            raise ValueError(f"PICS XML item 'support' element missing text: {ET.tostring(pi, encoding='unicode')}")
+
+        pics[name] = int(json.loads(support.lower())) == 1
     return pics
 
 
@@ -97,33 +104,34 @@ def read_pics_from_file(path: str) -> dict[str, bool]:
             return parse_pics(lines)
 
 
-def parse_pixit_xml(contents: str) -> dict[str, bool]:
-    pixit = {}
+def parse_pixit_xml(contents: str) -> dict[str, str]:
+    pixit: dict[str, str] = {}
     mytree = ET.fromstring(contents)
     for pi in mytree.iter('pixitItem'):
-        # Ensure 'itemNumber' exists and is not empty
-        name_element = pi.find('itemNumber')
-        if name_element is None or name_element.text is None:
-            raise ValueError("Missing or empty 'itemNumber' in pixitItem")
-        name = name_element.text
+        name_elem = pi.find('itemNumber')
+        support_elem = pi.find('support')
 
-        # Ensure 'support' exists and is not empty
-        support_element = pi.find('support')
-        if support_element is None or support_element.text is None:
-            raise ValueError("Missing or empty 'support' in pixitItem")
-        support = support_element.text.lower()
+        # Raise an error if either element is None
+        if name_elem is None:
+            raise ValueError(f"PICS XML item missing 'itemNumber' element: {ET.tostring(pi, encoding='unicode')}")
+        if support_elem is None:
+            raise ValueError(f"PICS XML item missing 'support' element: {ET.tostring(pi, encoding='unicode')}")
 
-        # Convert 'support' to a boolean value
-        if support not in ["true", "false"]:
-            raise ValueError(f"Invalid value for 'support': {support}")
-        pixit[name] = json.loads(support)
-    return pixit
+        # Raise an error if either text is None
+        name = name_elem.text
+        support = support_elem.text
+        pixit[name] = support
+        if name is None:
+            raise ValueError(f"PICS XML item 'itemNumber' element missing text: {ET.tostring(pi, encoding='unicode')}")
+        if support is None:
+            raise ValueError(f"PICS XML item 'support' element missing text: {ET.tostring(pi, encoding='unicode')}")
+        return pixit
 
 
-def read_pixit_from_file(path: str) -> dict[str, bool]:
+def read_pixit_from_file(path: str) -> dict[str, str]:
     """ Reads a dictionary of PIXITS from a file (ci format) or directory (xml format). """
+    pixit_dict = {}
     if os.path.isdir(os.path.abspath(path)):
-        pixit_dict = {}
         for filename in glob.glob(f'{path}/*.xml'):
             with open(filename, 'r') as f:
                 contents = f.read()
@@ -131,4 +139,7 @@ def read_pixit_from_file(path: str) -> dict[str, bool]:
         return pixit_dict
 
     else:
-        return {}
+        with open(filename, 'r') as f:
+            contents = f.read()
+            pixit_dict.update(parse_pixit_xml(contents))
+        return pixit_dict
