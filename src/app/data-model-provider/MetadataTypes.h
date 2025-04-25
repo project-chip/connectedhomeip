@@ -133,7 +133,7 @@ struct AttributeEntry
     // Getter for mask.readPrivilege
     [[nodiscard]] constexpr std::optional<Access::Privilege> GetReadPrivilege() const
     {
-        if (ReadAllowed())
+        if (mask.readPrivilege != 0)
         {
             return static_cast<Access::Privilege>(mask.readPrivilege);
         }
@@ -143,7 +143,7 @@ struct AttributeEntry
     // Getter for mask.writePrivilege
     [[nodiscard]] constexpr std::optional<Access::Privilege> GetWritePrivilege() const
     {
-        if (WriteAllowed())
+        if (mask.writePrivilege != 0)
         {
             return static_cast<Access::Privilege>(mask.writePrivilege);
         }
@@ -151,9 +151,6 @@ struct AttributeEntry
     }
 
     [[nodiscard]] constexpr bool HasFlags(AttributeQualityFlags f) const { return (mask.flags & chip::to_underlying(f)) != 0; }
-
-    [[nodiscard]] constexpr bool ReadAllowed() const { return mask.readPrivilege != 0; }
-    [[nodiscard]] constexpr bool WriteAllowed() const { return mask.writePrivilege != 0; }
 
 private:
     struct attribute_entry_mask_t

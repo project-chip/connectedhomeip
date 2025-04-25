@@ -790,7 +790,7 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
     }
 
     // Allow writes on writable attributes only
-    VerifyOrReturnValue(attributeEntry->WriteAllowed(), Status::UnsupportedWrite);
+    VerifyOrReturnValue(attributeEntry->GetWritePrivilege().has_value(), Status::UnsupportedWrite);
 
     bool checkAcl = true;
     if (mLastSuccessfullyWrittenPath.has_value())

@@ -117,7 +117,7 @@ TEST(TestDefaultServerCluster, AttributesDefault)
     {
         ASSERT_EQ(data[i].HasFlags(AttributeQualityFlags::kListAttribute), (i >= 2));
         ASSERT_EQ(data[i].GetReadPrivilege(), Access::Privilege::kView);
-        ASSERT_FALSE(data[i].WriteAllowed());
+        ASSERT_FALSE(data[i].GetWritePrivilege().has_value());
     }
 }
 

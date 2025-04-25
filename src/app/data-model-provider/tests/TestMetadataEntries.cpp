@@ -107,24 +107,24 @@ TEST(TestMetadataEntries, TestAttributePrivilegeEncoding)
             AttributeEntry a(123, {}, rp, wp);
 
             // assert that we can set the read and write privilege
-            EXPECT_TRUE(a.ReadAllowed());
+            EXPECT_TRUE(a.GetReadPrivilege().has_value());
             EXPECT_EQ(a.GetReadPrivilege(), rp);
 
-            EXPECT_TRUE(a.WriteAllowed());
+            EXPECT_TRUE(a.GetWritePrivilege().has_value());
             EXPECT_EQ(a.GetWritePrivilege(), wp);
         }
 
         // test with one privilege unset
         AttributeEntry a_ro(123, {}, rp, std::nullopt);
-        EXPECT_FALSE(a_ro.WriteAllowed());
+        EXPECT_FALSE(a_ro.GetWritePrivilege().has_value());
         EXPECT_EQ(a_ro.GetWritePrivilege(), std::nullopt);
-        EXPECT_TRUE(a_ro.ReadAllowed());
+        EXPECT_TRUE(a_ro.GetReadPrivilege().has_value());
         EXPECT_EQ(a_ro.GetReadPrivilege(), rp);
 
         AttributeEntry a_wo(123, {}, std::nullopt, rp);
-        EXPECT_TRUE(a_wo.WriteAllowed());
+        EXPECT_TRUE(a_wo.GetWritePrivilege().has_value());
         EXPECT_EQ(a_wo.GetWritePrivilege(), rp);
-        EXPECT_FALSE(a_wo.ReadAllowed());
+        EXPECT_FALSE(a_wo.GetReadPrivilege().has_value());
         EXPECT_EQ(a_wo.GetReadPrivilege(), std::nullopt);
     }
 }

@@ -1196,7 +1196,7 @@ TEST_F(TestCodegenModelViaMocks, FindAttribute)
     ASSERT_TRUE(info.has_value());
     EXPECT_FALSE(info->HasFlags(AttributeQualityFlags::kListAttribute));       // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_EQ(info->GetReadPrivilege(), chip::Access::Privilege::kAdminister); // NOLINT(bugprone-unchecked-optional-access)
-    EXPECT_FALSE(info->WriteAllowed());                                        // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_FALSE(info->GetWritePrivilege().has_value());                       // NOLINT(bugprone-unchecked-optional-access)
 }
 
 // global attributes are EXPLICITLY supported
