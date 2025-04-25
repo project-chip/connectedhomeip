@@ -668,11 +668,11 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<Ta
     if (mDelegate.IsReadyToMove())
     {
         VerifyOrReturnError(SetMainState(MainStateEnum::kMoving) == CHIP_NO_ERROR, Status::Failure,
-                                ChipLogError(AppServer, "MoveTo Command: Failed to set MainState to Moving"));
+                            ChipLogError(AppServer, "MoveTo Command: Failed to set MainState to Moving"));
     }
     else
     {
-    VerifyOrReturnError(SetMainState(MainStateEnum::kWaitingForMotion) == CHIP_NO_ERROR, Status::Failure,
+        VerifyOrReturnError(SetMainState(MainStateEnum::kWaitingForMotion) == CHIP_NO_ERROR, Status::Failure,
                             ChipLogError(AppServer, "MoveTo Command: Failed to set MainState to kWaitingForMotion"));
     }
 
