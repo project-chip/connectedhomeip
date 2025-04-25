@@ -251,12 +251,12 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
         // feature is supported by the device. If the Positioning feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-        if (!incomingOverallState.positioning.Value().IsNull()) 
+        if (!incomingOverallState.positioning.Value().IsNull())
         {
             VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallState.positioning.Value().Value()) !=
                 PositioningEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
             VerifyOrReturnError(IsSupportedOverallStatePositioning(incomingOverallState.positioning.Value().Value()),
-                CHIP_ERROR_INVALID_ARGUMENT);  
+                CHIP_ERROR_INVALID_ARGUMENT);
         }
 
     }
@@ -276,10 +276,10 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
         // supported by the device. If the Speed feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-        if (!incomingOverallState.speed.Value().IsNull()) 
+        if (!incomingOverallState.speed.Value().IsNull())
         {
             VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallState.speed.Value().Value()) !=
-            Globals::ThreeLevelAutoEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT); 
+            Globals::ThreeLevelAutoEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
         }
 
     }
@@ -540,7 +540,7 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleCalibrate()
     MainStateEnum state;
     VerifyOrReturnError(GetMainState(state) == CHIP_NO_ERROR, Status::Failure);
 
-    // If Calibrate command is received when already in the Calibrating state, 
+    // If Calibrate command is received when already in the Calibrating state,
     // the server SHALL respond with a status code of SUCCESS.
     VerifyOrReturnValue(state != MainStateEnum::kCalibrating, Status::Success);
 
