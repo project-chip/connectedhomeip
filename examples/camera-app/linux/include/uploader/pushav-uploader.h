@@ -45,13 +45,13 @@ public:
     PushAVUploader();
     ~PushAVUploader();
 
-    void start();
-    void stop();
-    void add_uploadData(std::string& filename, std::string& url);
+    void Start();
+    void Stop();
+    void AddFileToUpload(std::string& filename, std::string& url);
 
 private:
-    void process_queue();
-    void upload_data(std::pair<std::string, std::string> data, PushAVCertPath * path = nullptr);
+    void ProcessUploadQueue();
+    void UploadData(std::pair<std::string, std::string> data);
 
     std::queue<std::pair <std::string, std::string>> av_data;
     std::mutex queue_mutex;

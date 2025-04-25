@@ -24,19 +24,20 @@
 PushAVUploader::PushAVUploader() : running(false) {}
 
 PushAVUploader::~PushAVUploader() {
-    stop();
+    Stop();
 }
 
-void PushAVUploader::process_queue() {
+void PushAVUploader::ProcessUploadQueue() {
     while (running) {
 	std::pair<std::string, std::string> data;
         {
            std::lock_guard<std::mutex> lock(queue_mutex);
            if (!av_data.empty()) {
                 data = av_data.front();
-                upload_data(data);
                 av_data.pop();
             }
+            if (!data.first.empty())
+                UploadData(data);
             else
             {
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -45,14 +46,14 @@ void PushAVUploader::process_queue() {
     }
 }
 
-void PushAVUploader::start() {
+void PushAVUploader::Start() {
     if (!running) {
         running = true;
-        uploader_thread = std::thread(&PushAVUploader::process_queue, this);
+        uploader_thread = std::thread(&PushAVUploader::ProcessUploadQueue, this);
     }
 }
 
-void PushAVUploader::stop() {
+void PushAVUploader::Stop() {
     if (running) {
         running = false;
         if (uploader_thread.joinable()) {
@@ -61,7 +62,7 @@ void PushAVUploader::stop() {
     }
 }
 
-void PushAVUploader::add_uploadData(std::string& filename, std::string& url) {
+void PushAVUploader::AddFileToUpload(std::string& filename, std::string& url) {
     ChipLogError(Camera, "Added file name %s to queue", filename.c_str());
     std::lock_guard<std::mutex> lock(queue_mutex);
     auto data = make_pair(filename, url);
@@ -93,7 +94,7 @@ size_t PushAvUploadCb(void * ptr, size_t size, size_t nmemb, void * stream)
     }
     return to_copy;
 }
-void PushAVUploader::upload_data(std::pair<std::string, std::string> data, PushAVCertPath * path)
+void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
 {
     CURL * curl = curl_easy_init();
     if (!curl)
@@ -101,13 +102,12 @@ void PushAVUploader::upload_data(std::pair<std::string, std::string> data, PushA
         ChipLogError(Camera, "Failed to initialize CURL");
         return;
     }
-    if (!path)
-    {
-        path            = new PushAVCertPath;
-        path->root_cert = "/root/.pavstest/certs/server/root.pem";
-        path->dev_cert  = "/root/.pavstest/certs/device/dev.pem";
-        path->dev_key   = "/root/.pavstest/certs/device/dev.key";
-    }
+
+    //TODO: Remove these values and get details from trasport/recoder
+    PushAVCertPath path;
+    path.root_cert = "/root/.pavstest/certs/server/root.pem";
+    path.dev_cert  = "/root/.pavstest/certs/device/dev.pem";
+    path.dev_key   = "/root/.pavstest/certs/device/dev.key";
 
     std::ifstream file(data.first.c_str(), std::ios::binary);
     if (!file)
@@ -129,7 +129,7 @@ void PushAVUploader::upload_data(std::pair<std::string, std::string> data, PushA
     upload.size                 = size;
     upload.bytes_read           = 0;
     struct curl_slist * headers = nullptr;
-    headers                     = curl_slist_append(headers, "Content-Type: application/cfmv");
+    headers                     = curl_slist_append(headers, "Content-Type: application/*");
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     std::string fullUrl = data.second + data.first;
     curl_easy_setopt(curl, CURLOPT_URL, fullUrl.c_str());
@@ -138,9 +138,9 @@ void PushAVUploader::upload_data(std::pair<std::string, std::string> data, PushA
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, true);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
     curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, static_cast<curl_off_t>(size));
-    curl_easy_setopt(curl, CURLOPT_CAINFO, path->root_cert.c_str());
-    curl_easy_setopt(curl, CURLOPT_SSLCERT, path->dev_cert.c_str());
-    curl_easy_setopt(curl, CURLOPT_SSLKEY, path->dev_key.c_str());
+    curl_easy_setopt(curl, CURLOPT_CAINFO, path.root_cert.c_str());
+    curl_easy_setopt(curl, CURLOPT_SSLCERT, path.dev_cert.c_str());
+    curl_easy_setopt(curl, CURLOPT_SSLKEY, path.dev_key.c_str());
     curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
     curl_easy_setopt(curl, CURLOPT_READFUNCTION, PushAvUploadCb);
     curl_easy_setopt(curl, CURLOPT_READDATA, upload);

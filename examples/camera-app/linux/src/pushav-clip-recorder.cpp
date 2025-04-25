@@ -1,6 +1,7 @@
 #include "pushav-clip-recorder.h"
 #include <lib/support/logging/CHIPLogging.h>
 #include <cstring>
+#include <sys/stat.h>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -181,7 +182,7 @@ void PushAVClipRecorder::Start()
     }
     mRunning = true;
     mWorker  = std::thread(&PushAVClipRecorder::StartClipRecord, this);
-    uploader.start();
+    uploader.Start();
     ChipLogProgress(Camera, "Recording started for ID: %s", mClipInfo.mRecorderId.c_str());
 }
 
@@ -349,6 +350,7 @@ bool PushAVClipRecorder::ProcessBuffersAndWrite() {
         std::string initSegName      = prefix + "_init-stream$RepresentationID$.fmp4";
         std::string mediaSegName     = prefix + "_chunk-stream$RepresentationID$-$Number%05d$.cmfv";
         mInFmtCtx                 = avformat_alloc_context();
+	// 1MB buffer size
         int avio_ctx_buffer_size  = 1048576;
         uint8_t * avio_ctx_buffer = (uint8_t *) av_malloc(avio_ctx_buffer_size);
         struct buffer_data data   = { 0 }; 
@@ -430,19 +432,35 @@ bool PushAVClipRecorder::ProcessBuffersAndWrite() {
 
     if (currentFragmentId > mLastFragmentId || finalizing/* && check is frag exists*/)
     {
-        mLastFragmentId = currentFragmentId;
         char buffer[256];
         std::string prefix = mClipInfo.mRecorderId + "_clip_" + std::to_string(mClipInfo.mclipId);
-        sprintf(buffer, "%s_chunk-stream0-%05d.cmfv", (mClipInfo.mOutputPath + prefix).c_str(), currentFragmentId);
-        std::string filename(buffer);
-	//TODO: Remove hardcoding and get details from transport and upload that url
-        std::string url = "https://localhost:1234/streams/1";
-        uploader.add_uploadData(filename, url);
+	if (currentFragmentId == 1)
+        {
+            sprintf(buffer, "%s_init-stream0.fmp4", (mClipInfo.mOutputPath + prefix).c_str());
+            CheckAndUploadFile(buffer);
+            sprintf(buffer, "%s_init-stream1.fmp4", (mClipInfo.mOutputPath + prefix).c_str());
+            CheckAndUploadFile(buffer);
+        }
+        else
+        {
+            sprintf(buffer, "%s_chunk-stream0-%05d.cmfv", (mClipInfo.mOutputPath + prefix).c_str(), mLastFragmentId);
+            CheckAndUploadFile(buffer);
+            sprintf(buffer, "%s_chunk-stream1-%05d.cmfv", (mClipInfo.mOutputPath + prefix).c_str(), mLastFragmentId);
+            CheckAndUploadFile(buffer);
+
+        }
+
         if(finalizing) {
             mLastFragmentId = 0;
             finalizing = false;
-            //TODO logic to upload initstreams, mpd
+            sprintf(buffer, "%s_chunk-stream0-%05d.cmfv", (mClipInfo.mOutputPath + prefix).c_str(), mLastFragmentId);
+            CheckAndUploadFile(buffer);
+            sprintf(buffer, "%s_chunk-stream1-%05d.cmfv", (mClipInfo.mOutputPath + prefix).c_str(), mLastFragmentId);
+            CheckAndUploadFile(buffer);
+            sprintf(buffer, "%s_recorder1.mpd", (mClipInfo.mOutputPath + prefix).c_str());
+            CheckAndUploadFile(buffer);
         }
+        mLastFragmentId = currentFragmentId;
     }
     return true;
 }
@@ -473,4 +491,24 @@ void PushAVClipRecorder::finalize_current_clip()
 {
     CleanupOutput();
     mClipInfo.mclipId++;
+}
+
+bool PushAVClipRecorder::CheckAndUploadFile(char * path)
+{
+    if (fileExists(path))
+    {
+	//TODO: Remove hardcoding, url need to get from transport
+        std::string url = "https://localhost:1234/streams/1";
+        std::string filename(path);
+        ChipLogError(Camera, "Uploading file %s", filename);
+        uploader.AddFileToUpload(filename, url);
+        return true;
+    }
+    return false;
+}
+
+bool PushAVClipRecorder::fileExists(const std::string & path)
+{
+    struct stat buffer;
+    return (stat(path.c_str(), &buffer) == 0);
 }

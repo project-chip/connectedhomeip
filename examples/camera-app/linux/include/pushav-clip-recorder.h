@@ -117,6 +117,8 @@ public:
      * @param isVideo True for video data, false for audio
      */
     void PushPacket(const char* data, size_t size, uint16_t streamRecorderId, bool isVideo);
+    bool fileExists(const std::string & path);
+    bool CheckAndUploadFile(char * path);
     std::atomic<bool> mRunning; ///< Recording activity flag
 
 private:
