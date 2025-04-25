@@ -138,8 +138,8 @@ class TC_CLCTRL_7_1(MatterBaseTest):
         asserts.assert_false(overall_state.latch, "OverallState.Latch is not False")
         
         if is_speed_supported:
-            asserts.assert_greater_equal(overall_state.speed, 0, "OverallState.Speed is not 0")
-            asserts.assert_less_equal(overall_state.speed, 3, "OverallState.Speed is not in range [0, 3]")
+            asserts.assert_greater_equal(overall_state.speed, Clusters.Globals.ThreeLevelAutoEnum.kAuto, "OverallState.Speed is not greater than 0")
+            asserts.assert_less_equal(overall_state.speed, Clusters.Globals.ThreeLevelAutoEnum.kHigh, "OverallState.Speed is not in range [0, 3]")
         
         # Check SecureState if it exists
         if hasattr(overall_state, "secureState"):
@@ -147,8 +147,7 @@ class TC_CLCTRL_7_1(MatterBaseTest):
 
         # STEP 4
         self.step("4a")
-        manual_latching = self.check_pics('CLCTRL.S.M.ManualLatching')
-        if not manual_latching:
+        if not is_manual_latching:
             logging.info("Manual latching not required, skipping steps 4b and 4c")
             self.step("4b")
             logging.info("Test step skipped")
@@ -169,7 +168,7 @@ class TC_CLCTRL_7_1(MatterBaseTest):
 
         # STEP 5
         self.step("5a")
-        if manual_latching:
+        if is_manual_latching:
             logging.info("Manual latching required, skipping steps 5b to 5d")
             self.step("5b")
             logging.info("Test step skipped")
@@ -192,7 +191,7 @@ class TC_CLCTRL_7_1(MatterBaseTest):
             asserts.assert_equal(overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum.kCloseInFull, "OverallTarget.Position is not CloseInFull(0)")
             
             if is_speed_supported:
-                asserts.assert_true(0 <= overall_target.speed <= 3, f"OverallTarget.Speed out of range: {overall_target.speed}")
+                asserts.assert_true(Clusters.Globals.ThreeLevelAutoEnum.kAuto <= overall_target.speed <= Clusters.Globals.ThreeLevelAutoEnum.kHigh, f"OverallTarget.Speed out of range: {overall_target.speed}")
             
             self.step("5d")
             logging.info(f"Waiting for {latching_duration} seconds to complete latching")
@@ -207,8 +206,8 @@ class TC_CLCTRL_7_1(MatterBaseTest):
         asserts.assert_true(overall_state.latch, "OverallState.Latch is not True")
         
         if is_speed_supported:
-            asserts.assert_greater_equal(overall_state.speed, 0, "OverallState.Speed is not 0")
-            asserts.assert_less_equal(overall_state.speed, 3, "OverallState.Speed is not in range [0, 3]")    
+            asserts.assert_greater_equal(overall_state.speed, Clusters.Globals.ThreeLevelAutoEnum.kAuto, "OverallState.Speed is not greater than 0")
+            asserts.assert_less_equal(overall_state.speed, Clusters.Globals.ThreeLevelAutoEnum.kHigh, "OverallState.Speed is not in range [0, 3]")    
     
         if hasattr(overall_state, "secureState"):
             asserts.assert_true(overall_state.secureState, "OverallState.SecureState is not True")
@@ -239,8 +238,8 @@ class TC_CLCTRL_7_1(MatterBaseTest):
         asserts.assert_false(overall_state.latch, "OverallState.Latch is not False")
         
         if is_speed_supported:
-            asserts.assert_greater_equal(overall_state.speed, 0, "OverallState.Speed is not 0")
-            asserts.assert_less_equal(overall_state.speed, 3, "OverallState.Speed is not in range [0, 3]") 
+            asserts.assert_greater_equal(overall_state.speed, Clusters.Globals.ThreeLevelAutoEnum.kAuto, "OverallState.Speed is not greater than 0")
+            asserts.assert_less_equal(overall_state.speed, Clusters.Globals.ThreeLevelAutoEnum.kHigh, "OverallState.Speed is not in range [0, 3]") 
         
         if hasattr(overall_state, "secureState"):
             asserts.assert_false(overall_state.secureState, "OverallState.SecureState is not False")
