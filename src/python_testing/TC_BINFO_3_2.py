@@ -25,6 +25,8 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --endpoint 0
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -95,12 +97,12 @@ class TC_BINFO_3_2(MatterBaseTest):
         asserts.assert_greater_equal(initialConfigurationVersion, 1, "ConfigurationVersion attribute is out of range")
 
         self.step(3)
-        if not self.is_pics_sdk_ci_only:
-            self.wait_for_user_input(
-                prompt_msg="Change the configuration version in a way which results in functionality to be added or removed, then continue")
-        else:
+        if self.is_pics_sdk_ci_only:
             command_dict = {"Name": "SimulateConfigurationVersionChange"}
             self._send_named_pipe_command(command_dict)
+        else:
+            self.wait_for_user_input(
+                prompt_msg="Change the configuration version in a way which results in functionality to be added or removed, then continue")
 
         self.step(4)
         newConfigurationVersion = await self.read_binfo_attribute_expect_success(endpoint=endpoint, attribute=attributes.ConfigurationVersion)
