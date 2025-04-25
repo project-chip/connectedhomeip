@@ -52,18 +52,15 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ OperationalError::Id,
 
 namespace Commands {
 namespace Pause {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ RvcOperationalState::Commands::Pause::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Pause::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace Pause
 namespace Resume {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ RvcOperationalState::Commands::Resume::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Resume::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace Resume
 namespace GoHome {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ RvcOperationalState::Commands::GoHome::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ GoHome::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace GoHome
 

@@ -22,21 +22,21 @@ namespace Attributes {} // namespace Attributes
 
 namespace Commands {
 namespace GetSetupPIN {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ AccountLogin::Commands::GetSetupPIN::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ GetSetupPIN::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{
                                                                      DataModel::CommandQualityFlags::kFabricScoped,
                                                                      DataModel::CommandQualityFlags::kTimed },
                                                                  Access::Privilege::kAdminister };
 } // namespace GetSetupPIN
 namespace Login {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ AccountLogin::Commands::Login::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Login::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{
                                                                      DataModel::CommandQualityFlags::kFabricScoped,
                                                                      DataModel::CommandQualityFlags::kTimed },
                                                                  Access::Privilege::kAdminister };
 } // namespace Login
 namespace Logout {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ AccountLogin::Commands::Logout::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Logout::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{
                                                                      DataModel::CommandQualityFlags::kFabricScoped,
                                                                      DataModel::CommandQualityFlags::kTimed },

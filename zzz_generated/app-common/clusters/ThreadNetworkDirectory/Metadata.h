@@ -39,18 +39,17 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ ThreadNetworkTableSiz
 namespace Commands {
 namespace AddNetwork {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    ThreadNetworkDirectory::Commands::AddNetwork::Id,
-    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed }, Access::Privilege::kManage
+    AddNetwork::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed }, Access::Privilege::kManage
 };
 } // namespace AddNetwork
 namespace RemoveNetwork {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    ThreadNetworkDirectory::Commands::RemoveNetwork::Id,
-    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed }, Access::Privilege::kManage
+    RemoveNetwork::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
+    Access::Privilege::kManage
 };
 } // namespace RemoveNetwork
 namespace GetOperationalDataset {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ThreadNetworkDirectory::Commands::GetOperationalDataset::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ GetOperationalDataset::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace GetOperationalDataset

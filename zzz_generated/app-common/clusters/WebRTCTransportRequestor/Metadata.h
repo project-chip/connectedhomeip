@@ -30,23 +30,19 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{
 
 namespace Commands {
 namespace Offer {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ WebRTCTransportRequestor::Commands::Offer::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Offer::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace Offer
 namespace Answer {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ WebRTCTransportRequestor::Commands::Answer::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Answer::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace Answer
 namespace ICECandidates {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ WebRTCTransportRequestor::Commands::ICECandidates::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ICECandidates::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace ICECandidates
 namespace End {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ WebRTCTransportRequestor::Commands::End::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ End::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace End
 

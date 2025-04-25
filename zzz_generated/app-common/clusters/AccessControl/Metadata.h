@@ -64,8 +64,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{
 namespace Commands {
 namespace ReviewFabricRestrictions {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    AccessControl::Commands::ReviewFabricRestrictions::Id,
-    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped }, Access::Privilege::kAdminister
+    ReviewFabricRestrictions::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    Access::Privilege::kAdminister
 };
 } // namespace ReviewFabricRestrictions
 

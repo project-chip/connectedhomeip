@@ -69,18 +69,15 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ TestEventTriggersEnab
 
 namespace Commands {
 namespace TestEventTrigger {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ GeneralDiagnostics::Commands::TestEventTrigger::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ TestEventTrigger::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kManage };
 } // namespace TestEventTrigger
 namespace TimeSnapshot {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ GeneralDiagnostics::Commands::TimeSnapshot::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ TimeSnapshot::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace TimeSnapshot
 namespace PayloadTestRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ GeneralDiagnostics::Commands::PayloadTestRequest::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ PayloadTestRequest::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kManage };
 } // namespace PayloadTestRequest
 

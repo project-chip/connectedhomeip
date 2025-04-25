@@ -59,13 +59,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ SensorFault::Id, BitF
 
 namespace Commands {
 namespace SuppressAlarm {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ BooleanStateConfiguration::Commands::SuppressAlarm::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SuppressAlarm::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace SuppressAlarm
 namespace EnableDisableAlarm {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ BooleanStateConfiguration::Commands::EnableDisableAlarm::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ EnableDisableAlarm::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace EnableDisableAlarm
 

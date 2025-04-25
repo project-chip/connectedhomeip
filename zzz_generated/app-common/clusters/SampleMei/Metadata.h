@@ -28,13 +28,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ FlipFlop::Id, BitFlag
 
 namespace Commands {
 namespace Ping {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SampleMei::Commands::Ping::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Ping::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace Ping
 namespace AddArguments {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SampleMei::Commands::AddArguments::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ AddArguments::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace AddArguments
 

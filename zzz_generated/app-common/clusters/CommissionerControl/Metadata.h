@@ -29,13 +29,12 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ SupportedDeviceCatego
 
 namespace Commands {
 namespace RequestCommissioningApproval {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ CommissionerControl::Commands::RequestCommissioningApproval::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ RequestCommissioningApproval::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kManage };
 } // namespace RequestCommissioningApproval
 namespace CommissionNode {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ CommissionerControl::Commands::CommissionNode::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ CommissionNode::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kManage };
 } // namespace CommissionNode
 

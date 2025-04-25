@@ -40,12 +40,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ Supported::Id, BitFla
 
 namespace Commands {
 namespace Reset {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ DishwasherAlarm::Commands::Reset::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Reset::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace Reset
 namespace ModifyEnabledAlarms {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ DishwasherAlarm::Commands::ModifyEnabledAlarms::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ModifyEnabledAlarms::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace ModifyEnabledAlarms

@@ -80,29 +80,25 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ SupportsDNSResolve::I
 
 namespace Commands {
 namespace SetUTCTime {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ TimeSynchronization::Commands::SetUTCTime::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SetUTCTime::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kAdminister };
 } // namespace SetUTCTime
 namespace SetTrustedTimeSource {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    TimeSynchronization::Commands::SetTrustedTimeSource::Id,
-    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped }, Access::Privilege::kAdminister
+    SetTrustedTimeSource::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    Access::Privilege::kAdminister
 };
 } // namespace SetTrustedTimeSource
 namespace SetTimeZone {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ TimeSynchronization::Commands::SetTimeZone::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SetTimeZone::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kManage };
 } // namespace SetTimeZone
 namespace SetDSTOffset {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ TimeSynchronization::Commands::SetDSTOffset::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SetDSTOffset::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kManage };
 } // namespace SetDSTOffset
 namespace SetDefaultNTP {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ TimeSynchronization::Commands::SetDefaultNTP::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SetDefaultNTP::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kAdminister };
 } // namespace SetDefaultNTP
 

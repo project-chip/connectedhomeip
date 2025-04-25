@@ -70,19 +70,18 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ MaximumCheckInBackOff
 namespace Commands {
 namespace RegisterClient {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    IcdManagement::Commands::RegisterClient::Id,
-    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped }, Access::Privilege::kManage
+    RegisterClient::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    Access::Privilege::kManage
 };
 } // namespace RegisterClient
 namespace UnregisterClient {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    IcdManagement::Commands::UnregisterClient::Id,
-    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped }, Access::Privilege::kManage
+    UnregisterClient::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    Access::Privilege::kManage
 };
 } // namespace UnregisterClient
 namespace StayActiveRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ IcdManagement::Commands::StayActiveRequest::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ StayActiveRequest::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kManage };
 } // namespace StayActiveRequest
 

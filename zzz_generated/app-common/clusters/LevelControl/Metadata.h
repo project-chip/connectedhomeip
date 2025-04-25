@@ -80,47 +80,40 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ StartUpCurrentLevel::
 
 namespace Commands {
 namespace MoveToLevel {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ LevelControl::Commands::MoveToLevel::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MoveToLevel::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace MoveToLevel
 namespace Move {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ LevelControl::Commands::Move::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Move::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace Move
 namespace Step {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ LevelControl::Commands::Step::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Step::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace Step
 namespace Stop {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ LevelControl::Commands::Stop::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Stop::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace Stop
 namespace MoveToLevelWithOnOff {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ LevelControl::Commands::MoveToLevelWithOnOff::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MoveToLevelWithOnOff::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace MoveToLevelWithOnOff
 namespace MoveWithOnOff {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ LevelControl::Commands::MoveWithOnOff::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MoveWithOnOff::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace MoveWithOnOff
 namespace StepWithOnOff {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ LevelControl::Commands::StepWithOnOff::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ StepWithOnOff::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace StepWithOnOff
 namespace StopWithOnOff {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ LevelControl::Commands::StopWithOnOff::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ StopWithOnOff::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace StopWithOnOff
 namespace MoveToClosestFrequency {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ LevelControl::Commands::MoveToClosestFrequency::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MoveToClosestFrequency::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace MoveToClosestFrequency

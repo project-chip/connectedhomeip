@@ -56,13 +56,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{
 
 namespace Commands {
 namespace SelectAreas {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ServiceArea::Commands::SelectAreas::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SelectAreas::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace SelectAreas
 namespace SkipArea {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ServiceArea::Commands::SkipArea::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SkipArea::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace SkipArea
 

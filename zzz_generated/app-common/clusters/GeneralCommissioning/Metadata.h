@@ -66,23 +66,22 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ TCUpdateDeadline::Id,
 
 namespace Commands {
 namespace ArmFailSafe {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ GeneralCommissioning::Commands::ArmFailSafe::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ArmFailSafe::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kAdminister };
 } // namespace ArmFailSafe
 namespace SetRegulatoryConfig {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ GeneralCommissioning::Commands::SetRegulatoryConfig::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SetRegulatoryConfig::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kAdminister };
 } // namespace SetRegulatoryConfig
 namespace CommissioningComplete {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    GeneralCommissioning::Commands::CommissioningComplete::Id,
-    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped }, Access::Privilege::kAdminister
+    CommissioningComplete::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    Access::Privilege::kAdminister
 };
 } // namespace CommissioningComplete
 namespace SetTCAcknowledgements {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ GeneralCommissioning::Commands::SetTCAcknowledgements::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SetTCAcknowledgements::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kAdminister };
 } // namespace SetTCAcknowledgements

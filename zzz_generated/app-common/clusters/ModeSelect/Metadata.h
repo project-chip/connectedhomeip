@@ -50,8 +50,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ OnMode::Id, BitFlags<
 
 namespace Commands {
 namespace ChangeToMode {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ModeSelect::Commands::ChangeToMode::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ChangeToMode::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace ChangeToMode
 

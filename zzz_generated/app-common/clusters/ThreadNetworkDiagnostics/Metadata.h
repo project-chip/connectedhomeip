@@ -297,8 +297,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ Rloc16::Id, BitFlags<
 
 namespace Commands {
 namespace ResetCounts {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ThreadNetworkDiagnostics::Commands::ResetCounts::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ResetCounts::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kManage };
 } // namespace ResetCounts
 

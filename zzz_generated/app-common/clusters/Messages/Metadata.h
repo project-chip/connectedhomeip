@@ -37,14 +37,14 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{
 namespace Commands {
 namespace PresentMessagesRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    Messages::Commands::PresentMessagesRequest::Id,
-    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped }, Access::Privilege::kOperate
+    PresentMessagesRequest::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    Access::Privilege::kOperate
 };
 } // namespace PresentMessagesRequest
 namespace CancelMessagesRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    Messages::Commands::CancelMessagesRequest::Id,
-    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped }, Access::Privilege::kOperate
+    CancelMessagesRequest::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    Access::Privilege::kOperate
 };
 } // namespace CancelMessagesRequest
 

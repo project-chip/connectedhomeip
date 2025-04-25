@@ -36,23 +36,19 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ TimerState::Id, BitFl
 
 namespace Commands {
 namespace SetTimer {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Timer::Commands::SetTimer::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SetTimer::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace SetTimer
 namespace ResetTimer {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Timer::Commands::ResetTimer::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ResetTimer::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace ResetTimer
 namespace AddTime {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Timer::Commands::AddTime::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ AddTime::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace AddTime
 namespace ReduceTime {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Timer::Commands::ReduceTime::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ReduceTime::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace ReduceTime
 

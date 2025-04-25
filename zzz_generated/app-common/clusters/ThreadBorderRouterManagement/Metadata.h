@@ -49,28 +49,24 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ PendingDatasetTimesta
 
 namespace Commands {
 namespace GetActiveDatasetRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    ThreadBorderRouterManagement::Commands::GetActiveDatasetRequest::Id, BitFlags<DataModel::CommandQualityFlags>{},
-    Access::Privilege::kManage
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ GetActiveDatasetRequest::Id,
+                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+                                                                 Access::Privilege::kManage };
 } // namespace GetActiveDatasetRequest
 namespace GetPendingDatasetRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    ThreadBorderRouterManagement::Commands::GetPendingDatasetRequest::Id, BitFlags<DataModel::CommandQualityFlags>{},
-    Access::Privilege::kManage
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ GetPendingDatasetRequest::Id,
+                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+                                                                 Access::Privilege::kManage };
 } // namespace GetPendingDatasetRequest
 namespace SetActiveDatasetRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    ThreadBorderRouterManagement::Commands::SetActiveDatasetRequest::Id, BitFlags<DataModel::CommandQualityFlags>{},
-    Access::Privilege::kManage
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SetActiveDatasetRequest::Id,
+                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+                                                                 Access::Privilege::kManage };
 } // namespace SetActiveDatasetRequest
 namespace SetPendingDatasetRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    ThreadBorderRouterManagement::Commands::SetPendingDatasetRequest::Id, BitFlags<DataModel::CommandQualityFlags>{},
-    Access::Privilege::kManage
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SetPendingDatasetRequest::Id,
+                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+                                                                 Access::Privilege::kManage };
 } // namespace SetPendingDatasetRequest
 
 } // namespace Commands

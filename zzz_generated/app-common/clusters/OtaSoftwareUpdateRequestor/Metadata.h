@@ -42,7 +42,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ UpdateStateProgress::
 
 namespace Commands {
 namespace AnnounceOTAProvider {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ AnnounceOTAProvider::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace AnnounceOTAProvider

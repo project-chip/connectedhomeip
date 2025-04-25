@@ -32,13 +32,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ IdentifyType::Id, Bit
 
 namespace Commands {
 namespace Identify {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Identify::Commands::Identify::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Identify::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kManage };
 } // namespace Identify
 namespace TriggerEffect {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Identify::Commands::TriggerEffect::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ TriggerEffect::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kManage };
 } // namespace TriggerEffect
 

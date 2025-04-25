@@ -29,21 +29,12 @@ namespace CurrentMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry{ CurrentMode::Id, BitFlags<DataModel::AttributeQualityFlags>{},
                                                            Access::Privilege::kView, std::nullopt };
 } // namespace CurrentMode
-namespace StartUpMode {
-inline constexpr DataModel::AttributeEntry kMetadataEntry{ StartUpMode::Id, BitFlags<DataModel::AttributeQualityFlags>{},
-                                                           Access::Privilege::kView, Access::Privilege::kOperate };
-} // namespace StartUpMode
-namespace OnMode {
-inline constexpr DataModel::AttributeEntry kMetadataEntry{ OnMode::Id, BitFlags<DataModel::AttributeQualityFlags>{},
-                                                           Access::Privilege::kView, Access::Privilege::kOperate };
-} // namespace OnMode
 
 } // namespace Attributes
 
 namespace Commands {
 namespace ChangeToMode {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ LaundryWasherMode::Commands::ChangeToMode::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ChangeToMode::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace ChangeToMode
 

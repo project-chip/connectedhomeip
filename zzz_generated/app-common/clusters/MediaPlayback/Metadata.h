@@ -72,72 +72,59 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{
 
 namespace Commands {
 namespace Play {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MediaPlayback::Commands::Play::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Play::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace Play
 namespace Pause {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MediaPlayback::Commands::Pause::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Pause::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace Pause
 namespace Stop {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MediaPlayback::Commands::Stop::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Stop::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace Stop
 namespace StartOver {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MediaPlayback::Commands::StartOver::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ StartOver::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace StartOver
 namespace Previous {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MediaPlayback::Commands::Previous::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Previous::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace Previous
 namespace Next {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MediaPlayback::Commands::Next::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Next::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace Next
 namespace Rewind {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MediaPlayback::Commands::Rewind::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Rewind::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace Rewind
 namespace FastForward {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MediaPlayback::Commands::FastForward::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ FastForward::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace FastForward
 namespace SkipForward {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MediaPlayback::Commands::SkipForward::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SkipForward::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace SkipForward
 namespace SkipBackward {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MediaPlayback::Commands::SkipBackward::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SkipBackward::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace SkipBackward
 namespace Seek {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MediaPlayback::Commands::Seek::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Seek::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace Seek
 namespace ActivateAudioTrack {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MediaPlayback::Commands::ActivateAudioTrack::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ActivateAudioTrack::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace ActivateAudioTrack
 namespace ActivateTextTrack {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MediaPlayback::Commands::ActivateTextTrack::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ActivateTextTrack::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace ActivateTextTrack
 namespace DeactivateTextTrack {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MediaPlayback::Commands::DeactivateTextTrack::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ DeactivateTextTrack::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace DeactivateTextTrack

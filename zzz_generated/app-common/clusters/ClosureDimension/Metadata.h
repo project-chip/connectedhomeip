@@ -68,13 +68,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ ModulationType::Id, B
 
 namespace Commands {
 namespace SetTarget {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ClosureDimension::Commands::SetTarget::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SetTarget::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace SetTarget
 namespace Step {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ClosureDimension::Commands::Step::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Step::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace Step
 

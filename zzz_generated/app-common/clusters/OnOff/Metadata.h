@@ -44,33 +44,28 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ StartUpOnOff::Id, Bit
 
 namespace Commands {
 namespace Off {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ OnOff::Commands::Off::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Off::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace Off
 namespace On {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ OnOff::Commands::On::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ On::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace On
 namespace Toggle {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ OnOff::Commands::Toggle::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Toggle::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace Toggle
 namespace OffWithEffect {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ OnOff::Commands::OffWithEffect::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ OffWithEffect::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace OffWithEffect
 namespace OnWithRecallGlobalScene {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ OnOff::Commands::OnWithRecallGlobalScene::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ OnWithRecallGlobalScene::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace OnWithRecallGlobalScene
 namespace OnWithTimedOff {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ OnOff::Commands::OnWithTimedOff::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ OnWithTimedOff::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace OnWithTimedOff
 

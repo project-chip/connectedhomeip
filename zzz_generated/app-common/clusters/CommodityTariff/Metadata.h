@@ -118,13 +118,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ DefaultRandomizationT
 
 namespace Commands {
 namespace GetTariffComponent {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ CommodityTariff::Commands::GetTariffComponent::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ GetTariffComponent::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace GetTariffComponent
 namespace GetDayEntry {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ CommodityTariff::Commands::GetDayEntry::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ GetDayEntry::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace GetDayEntry
 

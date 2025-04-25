@@ -122,38 +122,31 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ SafetyStatus::Id, Bit
 
 namespace Commands {
 namespace UpOrOpen {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ WindowCovering::Commands::UpOrOpen::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ UpOrOpen::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace UpOrOpen
 namespace DownOrClose {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ WindowCovering::Commands::DownOrClose::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ DownOrClose::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace DownOrClose
 namespace StopMotion {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ WindowCovering::Commands::StopMotion::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ StopMotion::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace StopMotion
 namespace GoToLiftValue {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ WindowCovering::Commands::GoToLiftValue::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ GoToLiftValue::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace GoToLiftValue
 namespace GoToLiftPercentage {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ WindowCovering::Commands::GoToLiftPercentage::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ GoToLiftPercentage::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace GoToLiftPercentage
 namespace GoToTiltValue {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ WindowCovering::Commands::GoToTiltValue::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ GoToTiltValue::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace GoToTiltValue
 namespace GoToTiltPercentage {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ WindowCovering::Commands::GoToTiltPercentage::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ GoToTiltPercentage::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace GoToTiltPercentage
 

@@ -48,13 +48,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ BoostState::Id, BitFl
 
 namespace Commands {
 namespace Boost {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ WaterHeaterManagement::Commands::Boost::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Boost::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kManage };
 } // namespace Boost
 namespace CancelBoost {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ WaterHeaterManagement::Commands::CancelBoost::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ CancelBoost::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kManage };
 } // namespace CancelBoost
 

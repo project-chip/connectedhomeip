@@ -35,20 +35,20 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{
 namespace Commands {
 namespace ProvisionEndpoint {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    TlsClientManagement::Commands::ProvisionEndpoint::Id,
-    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped }, Access::Privilege::kAdminister
+    ProvisionEndpoint::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    Access::Privilege::kAdminister
 };
 } // namespace ProvisionEndpoint
 namespace FindEndpoint {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    TlsClientManagement::Commands::FindEndpoint::Id,
-    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped }, Access::Privilege::kOperate
+    FindEndpoint::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    Access::Privilege::kOperate
 };
 } // namespace FindEndpoint
 namespace RemoveEndpoint {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    TlsClientManagement::Commands::RemoveEndpoint::Id,
-    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped }, Access::Privilege::kAdminister
+    RemoveEndpoint::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    Access::Privilege::kAdminister
 };
 } // namespace RemoveEndpoint
 

@@ -76,8 +76,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ ExpiryDate::Id, BitFl
 
 namespace Commands {
 namespace SelfTestRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SmokeCoAlarm::Commands::SelfTestRequest::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SelfTestRequest::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace SelfTestRequest
 

@@ -292,38 +292,34 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ SetpointHoldExpiryTim
 
 namespace Commands {
 namespace SetpointRaiseLower {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Thermostat::Commands::SetpointRaiseLower::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SetpointRaiseLower::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace SetpointRaiseLower
 namespace SetWeeklySchedule {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Thermostat::Commands::SetWeeklySchedule::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SetWeeklySchedule::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kManage };
 } // namespace SetWeeklySchedule
 namespace GetWeeklySchedule {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Thermostat::Commands::GetWeeklySchedule::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ GetWeeklySchedule::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace GetWeeklySchedule
 namespace ClearWeeklySchedule {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Thermostat::Commands::ClearWeeklySchedule::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ClearWeeklySchedule::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kManage };
 } // namespace ClearWeeklySchedule
 namespace SetActiveScheduleRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Thermostat::Commands::SetActiveScheduleRequest::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SetActiveScheduleRequest::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace SetActiveScheduleRequest
 namespace SetActivePresetRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Thermostat::Commands::SetActivePresetRequest::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SetActivePresetRequest::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace SetActivePresetRequest
 namespace AtomicRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Thermostat::Commands::AtomicRequest::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ AtomicRequest::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kManage };
 } // namespace AtomicRequest
 

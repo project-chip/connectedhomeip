@@ -31,32 +31,32 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{
 namespace Commands {
 namespace SolicitOffer {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    WebRTCTransportProvider::Commands::SolicitOffer::Id,
-    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped }, Access::Privilege::kOperate
+    SolicitOffer::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    Access::Privilege::kOperate
 };
 } // namespace SolicitOffer
 namespace ProvideOffer {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    WebRTCTransportProvider::Commands::ProvideOffer::Id,
-    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped }, Access::Privilege::kOperate
+    ProvideOffer::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    Access::Privilege::kOperate
 };
 } // namespace ProvideOffer
 namespace ProvideAnswer {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    WebRTCTransportProvider::Commands::ProvideAnswer::Id,
-    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped }, Access::Privilege::kOperate
+    ProvideAnswer::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    Access::Privilege::kOperate
 };
 } // namespace ProvideAnswer
 namespace ProvideICECandidates {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    WebRTCTransportProvider::Commands::ProvideICECandidates::Id,
-    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped }, Access::Privilege::kOperate
+    ProvideICECandidates::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    Access::Privilege::kOperate
 };
 } // namespace ProvideICECandidates
 namespace EndSession {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    WebRTCTransportProvider::Commands::EndSession::Id,
-    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped }, Access::Privilege::kOperate
+    EndSession::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    Access::Privilege::kOperate
 };
 } // namespace EndSession
 

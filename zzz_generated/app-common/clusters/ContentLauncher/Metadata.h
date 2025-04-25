@@ -35,13 +35,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ SupportedStreamingPro
 
 namespace Commands {
 namespace LaunchContent {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ContentLauncher::Commands::LaunchContent::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ LaunchContent::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace LaunchContent
 namespace LaunchURL {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ContentLauncher::Commands::LaunchURL::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ LaunchURL::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace LaunchURL
 

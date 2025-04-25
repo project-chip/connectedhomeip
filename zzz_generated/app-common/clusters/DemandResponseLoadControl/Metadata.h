@@ -64,34 +64,29 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ DefaultRandomDuration
 
 namespace Commands {
 namespace RegisterLoadControlProgramRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    DemandResponseLoadControl::Commands::RegisterLoadControlProgramRequest::Id, BitFlags<DataModel::CommandQualityFlags>{},
-    Access::Privilege::kOperate
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ RegisterLoadControlProgramRequest::Id,
+                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+                                                                 Access::Privilege::kOperate };
 } // namespace RegisterLoadControlProgramRequest
 namespace UnregisterLoadControlProgramRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    DemandResponseLoadControl::Commands::UnregisterLoadControlProgramRequest::Id, BitFlags<DataModel::CommandQualityFlags>{},
-    Access::Privilege::kOperate
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ UnregisterLoadControlProgramRequest::Id,
+                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+                                                                 Access::Privilege::kOperate };
 } // namespace UnregisterLoadControlProgramRequest
 namespace AddLoadControlEventRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    DemandResponseLoadControl::Commands::AddLoadControlEventRequest::Id, BitFlags<DataModel::CommandQualityFlags>{},
-    Access::Privilege::kOperate
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ AddLoadControlEventRequest::Id,
+                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+                                                                 Access::Privilege::kOperate };
 } // namespace AddLoadControlEventRequest
 namespace RemoveLoadControlEventRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    DemandResponseLoadControl::Commands::RemoveLoadControlEventRequest::Id, BitFlags<DataModel::CommandQualityFlags>{},
-    Access::Privilege::kOperate
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ RemoveLoadControlEventRequest::Id,
+                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+                                                                 Access::Privilege::kOperate };
 } // namespace RemoveLoadControlEventRequest
 namespace ClearLoadControlEventsRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    DemandResponseLoadControl::Commands::ClearLoadControlEventsRequest::Id, BitFlags<DataModel::CommandQualityFlags>{},
-    Access::Privilege::kOperate
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ClearLoadControlEventsRequest::Id,
+                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+                                                                 Access::Privilege::kOperate };
 } // namespace ClearLoadControlEventsRequest
 
 } // namespace Commands

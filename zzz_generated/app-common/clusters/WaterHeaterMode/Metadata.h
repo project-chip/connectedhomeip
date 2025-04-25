@@ -34,8 +34,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ CurrentMode::Id, BitF
 
 namespace Commands {
 namespace ChangeToMode {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ WaterHeaterMode::Commands::ChangeToMode::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ChangeToMode::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace ChangeToMode
 

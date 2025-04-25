@@ -72,8 +72,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ AirflowDirection::Id,
 
 namespace Commands {
 namespace Step {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ FanControl::Commands::Step::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Step::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace Step
 

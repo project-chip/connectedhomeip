@@ -32,7 +32,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ PassphraseSurrogate::
 
 namespace Commands {
 namespace NetworkPassphraseRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ WiFiNetworkManagement::Commands::NetworkPassphraseRequest::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ NetworkPassphraseRequest::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kManage };
 } // namespace NetworkPassphraseRequest

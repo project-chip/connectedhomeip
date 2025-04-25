@@ -68,13 +68,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ LevelStep::Id, BitFla
 
 namespace Commands {
 namespace Open {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ValveConfigurationAndControl::Commands::Open::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Open::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace Open
 namespace Close {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ValveConfigurationAndControl::Commands::Close::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Close::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace Close
 

@@ -37,20 +37,20 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ AdminVendorId::Id, Bi
 namespace Commands {
 namespace OpenCommissioningWindow {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    AdministratorCommissioning::Commands::OpenCommissioningWindow::Id,
-    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed }, Access::Privilege::kAdminister
+    OpenCommissioningWindow::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
+    Access::Privilege::kAdminister
 };
 } // namespace OpenCommissioningWindow
 namespace OpenBasicCommissioningWindow {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id,
-    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed }, Access::Privilege::kAdminister
+    OpenBasicCommissioningWindow::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
+    Access::Privilege::kAdminister
 };
 } // namespace OpenBasicCommissioningWindow
 namespace RevokeCommissioning {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    AdministratorCommissioning::Commands::RevokeCommissioning::Id,
-    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed }, Access::Privilege::kAdminister
+    RevokeCommissioning::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
+    Access::Privilege::kAdminister
 };
 } // namespace RevokeCommissioning
 

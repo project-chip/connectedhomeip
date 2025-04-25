@@ -46,18 +46,15 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ OverallTarget::Id, Bi
 
 namespace Commands {
 namespace Stop {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ClosureControl::Commands::Stop::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Stop::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace Stop
 namespace MoveTo {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ClosureControl::Commands::MoveTo::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MoveTo::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace MoveTo
 namespace Calibrate {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ClosureControl::Commands::Calibrate::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Calibrate::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kManage };
 } // namespace Calibrate
 

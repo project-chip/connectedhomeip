@@ -46,23 +46,22 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ Sensitivity::Id, BitF
 
 namespace Commands {
 namespace CreateTwoDCartesianZone {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ZoneManagement::Commands::CreateTwoDCartesianZone::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ CreateTwoDCartesianZone::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kManage };
 } // namespace CreateTwoDCartesianZone
 namespace UpdateTwoDCartesianZone {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ZoneManagement::Commands::UpdateTwoDCartesianZone::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ UpdateTwoDCartesianZone::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kManage };
 } // namespace UpdateTwoDCartesianZone
 namespace GetTwoDCartesianZone {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ZoneManagement::Commands::GetTwoDCartesianZone::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ GetTwoDCartesianZone::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kManage };
 } // namespace GetTwoDCartesianZone
 namespace RemoveZone {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ZoneManagement::Commands::RemoveZone::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ RemoveZone::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kManage };
 } // namespace RemoveZone
 

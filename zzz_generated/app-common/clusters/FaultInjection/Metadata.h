@@ -22,12 +22,11 @@ namespace Attributes {} // namespace Attributes
 
 namespace Commands {
 namespace FailAtFault {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ FaultInjection::Commands::FailAtFault::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ FailAtFault::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kManage };
 } // namespace FailAtFault
 namespace FailRandomlyAtFault {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ FaultInjection::Commands::FailRandomlyAtFault::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ FailRandomlyAtFault::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kManage };
 } // namespace FailRandomlyAtFault

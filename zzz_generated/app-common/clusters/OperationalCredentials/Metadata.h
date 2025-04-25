@@ -54,55 +54,51 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ CurrentFabricIndex::I
 
 namespace Commands {
 namespace AttestationRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ OperationalCredentials::Commands::AttestationRequest::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ AttestationRequest::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kAdminister };
 } // namespace AttestationRequest
 namespace CertificateChainRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ OperationalCredentials::Commands::CertificateChainRequest::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ CertificateChainRequest::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kAdminister };
 } // namespace CertificateChainRequest
 namespace CSRRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ OperationalCredentials::Commands::CSRRequest::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ CSRRequest::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kAdminister };
 } // namespace CSRRequest
 namespace AddNOC {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ OperationalCredentials::Commands::AddNOC::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ AddNOC::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kAdminister };
 } // namespace AddNOC
 namespace UpdateNOC {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    OperationalCredentials::Commands::UpdateNOC::Id,
-    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped }, Access::Privilege::kAdminister
+    UpdateNOC::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    Access::Privilege::kAdminister
 };
 } // namespace UpdateNOC
 namespace UpdateFabricLabel {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    OperationalCredentials::Commands::UpdateFabricLabel::Id,
-    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped }, Access::Privilege::kAdminister
+    UpdateFabricLabel::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    Access::Privilege::kAdminister
 };
 } // namespace UpdateFabricLabel
 namespace RemoveFabric {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ OperationalCredentials::Commands::RemoveFabric::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ RemoveFabric::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kAdminister };
 } // namespace RemoveFabric
 namespace AddTrustedRootCertificate {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ OperationalCredentials::Commands::AddTrustedRootCertificate::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ AddTrustedRootCertificate::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kAdminister };
 } // namespace AddTrustedRootCertificate
 namespace SetVIDVerificationStatement {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    OperationalCredentials::Commands::SetVIDVerificationStatement::Id,
-    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped }, Access::Privilege::kAdminister
+    SetVIDVerificationStatement::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    Access::Privilege::kAdminister
 };
 } // namespace SetVIDVerificationStatement
 namespace SignVIDVerificationRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ OperationalCredentials::Commands::SignVIDVerificationRequest::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SignVIDVerificationRequest::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kAdminister };
 } // namespace SignVIDVerificationRequest

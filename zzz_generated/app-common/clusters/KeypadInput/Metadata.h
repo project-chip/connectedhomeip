@@ -22,8 +22,7 @@ namespace Attributes {} // namespace Attributes
 
 namespace Commands {
 namespace SendKey {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ KeypadInput::Commands::SendKey::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SendKey::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace SendKey
 

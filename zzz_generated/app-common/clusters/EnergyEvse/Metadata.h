@@ -124,43 +124,40 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ SessionEnergyDischarg
 namespace Commands {
 namespace Disable {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    EnergyEvse::Commands::Disable::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
-    Access::Privilege::kOperate
+    Disable::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed }, Access::Privilege::kOperate
 };
 } // namespace Disable
 namespace EnableCharging {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    EnergyEvse::Commands::EnableCharging::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
+    EnableCharging::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     Access::Privilege::kOperate
 };
 } // namespace EnableCharging
 namespace EnableDischarging {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    EnergyEvse::Commands::EnableDischarging::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
+    EnableDischarging::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     Access::Privilege::kOperate
 };
 } // namespace EnableDischarging
 namespace StartDiagnostics {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    EnergyEvse::Commands::StartDiagnostics::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
+    StartDiagnostics::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     Access::Privilege::kOperate
 };
 } // namespace StartDiagnostics
 namespace SetTargets {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    EnergyEvse::Commands::SetTargets::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
-    Access::Privilege::kOperate
+    SetTargets::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed }, Access::Privilege::kOperate
 };
 } // namespace SetTargets
 namespace GetTargets {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    EnergyEvse::Commands::GetTargets::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
-    Access::Privilege::kOperate
+    GetTargets::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed }, Access::Privilege::kOperate
 };
 } // namespace GetTargets
 namespace ClearTargets {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    EnergyEvse::Commands::ClearTargets::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
+    ClearTargets::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     Access::Privilege::kOperate
 };
 } // namespace ClearTargets

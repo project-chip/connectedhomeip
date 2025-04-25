@@ -42,12 +42,12 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{
 
 namespace Commands {
 namespace GetDetailedPriceRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ CommodityPrice::Commands::GetDetailedPriceRequest::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ GetDetailedPriceRequest::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace GetDetailedPriceRequest
 namespace GetDetailedForecastRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ CommodityPrice::Commands::GetDetailedForecastRequest::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ GetDetailedForecastRequest::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace GetDetailedForecastRequest

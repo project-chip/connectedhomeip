@@ -22,8 +22,7 @@ namespace Attributes {} // namespace Attributes
 
 namespace Commands {
 namespace Sleep {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ LowPower::Commands::Sleep::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Sleep::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace Sleep
 

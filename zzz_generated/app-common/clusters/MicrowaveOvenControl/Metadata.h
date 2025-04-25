@@ -62,13 +62,12 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ WattRating::Id, BitFl
 
 namespace Commands {
 namespace SetCookingParameters {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MicrowaveOvenControl::Commands::SetCookingParameters::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SetCookingParameters::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace SetCookingParameters
 namespace AddMoreTime {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MicrowaveOvenControl::Commands::AddMoreTime::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ AddMoreTime::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace AddMoreTime
 

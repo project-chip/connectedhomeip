@@ -38,8 +38,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ Enabled::Id, BitFlags
 
 namespace Commands {
 namespace PlayChimeSound {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Chime::Commands::PlayChimeSound::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ PlayChimeSound::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace PlayChimeSound
 

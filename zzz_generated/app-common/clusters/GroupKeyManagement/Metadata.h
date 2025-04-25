@@ -45,26 +45,26 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ MaxGroupKeysPerFabric
 namespace Commands {
 namespace KeySetWrite {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    GroupKeyManagement::Commands::KeySetWrite::Id,
-    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped }, Access::Privilege::kAdminister
+    KeySetWrite::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    Access::Privilege::kAdminister
 };
 } // namespace KeySetWrite
 namespace KeySetRead {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    GroupKeyManagement::Commands::KeySetRead::Id,
-    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped }, Access::Privilege::kAdminister
+    KeySetRead::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    Access::Privilege::kAdminister
 };
 } // namespace KeySetRead
 namespace KeySetRemove {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    GroupKeyManagement::Commands::KeySetRemove::Id,
-    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped }, Access::Privilege::kAdminister
+    KeySetRemove::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    Access::Privilege::kAdminister
 };
 } // namespace KeySetRemove
 namespace KeySetReadAllIndices {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    GroupKeyManagement::Commands::KeySetReadAllIndices::Id,
-    BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped }, Access::Privilege::kAdminister
+    KeySetReadAllIndices::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    Access::Privilege::kAdminister
 };
 } // namespace KeySetReadAllIndices
 

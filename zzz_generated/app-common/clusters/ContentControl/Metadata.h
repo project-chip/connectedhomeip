@@ -62,52 +62,46 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ BlockUnrated::Id, Bit
 
 namespace Commands {
 namespace UpdatePIN {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ContentControl::Commands::UpdatePIN::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ UpdatePIN::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace UpdatePIN
 namespace ResetPIN {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ContentControl::Commands::ResetPIN::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ResetPIN::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace ResetPIN
 namespace Enable {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ContentControl::Commands::Enable::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Enable::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace Enable
 namespace Disable {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ContentControl::Commands::Disable::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Disable::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace Disable
 namespace AddBonusTime {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ContentControl::Commands::AddBonusTime::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ AddBonusTime::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace AddBonusTime
 namespace SetScreenDailyTime {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ContentControl::Commands::SetScreenDailyTime::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SetScreenDailyTime::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace SetScreenDailyTime
 namespace BlockUnratedContent {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ContentControl::Commands::BlockUnratedContent::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ BlockUnratedContent::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace BlockUnratedContent
 namespace UnblockUnratedContent {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ContentControl::Commands::UnblockUnratedContent::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ UnblockUnratedContent::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace UnblockUnratedContent
 namespace SetOnDemandRatingThreshold {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ContentControl::Commands::SetOnDemandRatingThreshold::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SetOnDemandRatingThreshold::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace SetOnDemandRatingThreshold
 namespace SetScheduledContentRatingThreshold {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ContentControl::Commands::SetScheduledContentRatingThreshold::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SetScheduledContentRatingThreshold::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace SetScheduledContentRatingThreshold

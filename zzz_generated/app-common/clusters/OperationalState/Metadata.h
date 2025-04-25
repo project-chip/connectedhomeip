@@ -52,23 +52,19 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ OperationalError::Id,
 
 namespace Commands {
 namespace Pause {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ OperationalState::Commands::Pause::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Pause::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace Pause
 namespace Stop {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ OperationalState::Commands::Stop::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Stop::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace Stop
 namespace Start {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ OperationalState::Commands::Start::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Start::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace Start
 namespace Resume {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ OperationalState::Commands::Resume::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Resume::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace Resume
 

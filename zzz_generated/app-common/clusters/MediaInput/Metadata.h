@@ -34,23 +34,19 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ CurrentInput::Id, Bit
 
 namespace Commands {
 namespace SelectInput {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MediaInput::Commands::SelectInput::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SelectInput::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace SelectInput
 namespace ShowInputStatus {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MediaInput::Commands::ShowInputStatus::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ShowInputStatus::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace ShowInputStatus
 namespace HideInputStatus {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MediaInput::Commands::HideInputStatus::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ HideInputStatus::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace HideInputStatus
 namespace RenameInput {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MediaInput::Commands::RenameInput::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ RenameInput::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kManage };
 } // namespace RenameInput
 

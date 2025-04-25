@@ -34,18 +34,15 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ CurrentApp::Id, BitFl
 
 namespace Commands {
 namespace LaunchApp {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ApplicationLauncher::Commands::LaunchApp::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ LaunchApp::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace LaunchApp
 namespace StopApp {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ApplicationLauncher::Commands::StopApp::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ StopApp::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace StopApp
 namespace HideApp {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ApplicationLauncher::Commands::HideApp::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ HideApp::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace HideApp
 

@@ -76,8 +76,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ OverrunCount::Id, Bit
 
 namespace Commands {
 namespace ResetCounts {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ WiFiNetworkDiagnostics::Commands::ResetCounts::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ResetCounts::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace ResetCounts
 

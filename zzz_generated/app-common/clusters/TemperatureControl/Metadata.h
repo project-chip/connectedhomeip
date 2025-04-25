@@ -51,8 +51,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{
 
 namespace Commands {
 namespace SetTemperature {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ TemperatureControl::Commands::SetTemperature::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SetTemperature::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace SetTemperature
 

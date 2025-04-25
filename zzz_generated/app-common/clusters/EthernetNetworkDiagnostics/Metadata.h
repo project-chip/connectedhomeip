@@ -60,8 +60,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ TimeSinceReset::Id, B
 
 namespace Commands {
 namespace ResetCounts {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ EthernetNetworkDiagnostics::Commands::ResetCounts::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ResetCounts::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kManage };
 } // namespace ResetCounts
 

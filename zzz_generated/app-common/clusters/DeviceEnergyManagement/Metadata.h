@@ -57,44 +57,39 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ OptOutState::Id, BitF
 
 namespace Commands {
 namespace PowerAdjustRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ DeviceEnergyManagement::Commands::PowerAdjustRequest::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ PowerAdjustRequest::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace PowerAdjustRequest
 namespace CancelPowerAdjustRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ DeviceEnergyManagement::Commands::CancelPowerAdjustRequest::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ CancelPowerAdjustRequest::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace CancelPowerAdjustRequest
 namespace StartTimeAdjustRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ DeviceEnergyManagement::Commands::StartTimeAdjustRequest::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ StartTimeAdjustRequest::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace StartTimeAdjustRequest
 namespace PauseRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ DeviceEnergyManagement::Commands::PauseRequest::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ PauseRequest::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace PauseRequest
 namespace ResumeRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ DeviceEnergyManagement::Commands::ResumeRequest::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ResumeRequest::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace ResumeRequest
 namespace ModifyForecastRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ DeviceEnergyManagement::Commands::ModifyForecastRequest::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ModifyForecastRequest::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace ModifyForecastRequest
 namespace RequestConstraintBasedForecast {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    DeviceEnergyManagement::Commands::RequestConstraintBasedForecast::Id, BitFlags<DataModel::CommandQualityFlags>{},
-    Access::Privilege::kOperate
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ RequestConstraintBasedForecast::Id,
+                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+                                                                 Access::Privilege::kOperate };
 } // namespace RequestConstraintBasedForecast
 namespace CancelRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ DeviceEnergyManagement::Commands::CancelRequest::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ CancelRequest::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace CancelRequest
 

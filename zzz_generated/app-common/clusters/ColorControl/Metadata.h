@@ -238,97 +238,83 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ StartUpColorTemperatu
 
 namespace Commands {
 namespace MoveToHue {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ColorControl::Commands::MoveToHue::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MoveToHue::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace MoveToHue
 namespace MoveHue {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ColorControl::Commands::MoveHue::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MoveHue::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace MoveHue
 namespace StepHue {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ColorControl::Commands::StepHue::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ StepHue::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace StepHue
 namespace MoveToSaturation {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ColorControl::Commands::MoveToSaturation::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MoveToSaturation::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace MoveToSaturation
 namespace MoveSaturation {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ColorControl::Commands::MoveSaturation::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MoveSaturation::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace MoveSaturation
 namespace StepSaturation {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ColorControl::Commands::StepSaturation::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ StepSaturation::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace StepSaturation
 namespace MoveToHueAndSaturation {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ColorControl::Commands::MoveToHueAndSaturation::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MoveToHueAndSaturation::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace MoveToHueAndSaturation
 namespace MoveToColor {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ColorControl::Commands::MoveToColor::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MoveToColor::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace MoveToColor
 namespace MoveColor {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ColorControl::Commands::MoveColor::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MoveColor::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace MoveColor
 namespace StepColor {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ColorControl::Commands::StepColor::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ StepColor::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace StepColor
 namespace MoveToColorTemperature {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ColorControl::Commands::MoveToColorTemperature::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MoveToColorTemperature::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace MoveToColorTemperature
 namespace EnhancedMoveToHue {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ColorControl::Commands::EnhancedMoveToHue::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ EnhancedMoveToHue::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace EnhancedMoveToHue
 namespace EnhancedMoveHue {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ColorControl::Commands::EnhancedMoveHue::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ EnhancedMoveHue::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace EnhancedMoveHue
 namespace EnhancedStepHue {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ColorControl::Commands::EnhancedStepHue::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ EnhancedStepHue::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace EnhancedStepHue
 namespace EnhancedMoveToHueAndSaturation {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ColorControl::Commands::EnhancedMoveToHueAndSaturation::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ EnhancedMoveToHueAndSaturation::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace EnhancedMoveToHueAndSaturation
 namespace ColorLoopSet {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ColorControl::Commands::ColorLoopSet::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ColorLoopSet::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace ColorLoopSet
 namespace StopMoveStep {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ColorControl::Commands::StopMoveStep::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ StopMoveStep::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace StopMoveStep
 namespace MoveColorTemperature {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ColorControl::Commands::MoveColorTemperature::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ MoveColorTemperature::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace MoveColorTemperature
 namespace StepColorTemperature {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ColorControl::Commands::StepColorTemperature::Id,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ StepColorTemperature::Id,
                                                                  BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kOperate };
 } // namespace StepColorTemperature

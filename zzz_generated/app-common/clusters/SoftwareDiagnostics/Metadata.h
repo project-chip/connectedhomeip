@@ -43,8 +43,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{ CurrentHeapHighWaterm
 
 namespace Commands {
 namespace ResetWatermarks {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SoftwareDiagnostics::Commands::ResetWatermarks::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ResetWatermarks::Id, BitFlags<DataModel::CommandQualityFlags>{},
                                                                  Access::Privilege::kManage };
 } // namespace ResetWatermarks
 
