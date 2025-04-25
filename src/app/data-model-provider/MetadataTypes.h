@@ -23,6 +23,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/BitMask.h>
+#include <lib/support/TypeTraits.h>
 
 // Pragma macro to disable the "conversion" and "narrowing" warnings.
 // This is done in some sections of the code in order to allow
@@ -104,6 +105,8 @@ enum class AttributeQualityFlags : uint32_t
     kFabricSensitive = 0x0010, // 'S' quality on attributes
     kChangesOmitted  = 0x0020, // `C` quality on attributes
     kTimed           = 0x0040, // `T` quality on attributes (writes require timed interactions)
+
+    // If you add new items here, remember to change kAttrQualityBits
 };
 
 struct AttributeEntry
@@ -194,6 +197,8 @@ enum class CommandQualityFlags : uint32_t
     kFabricScoped = 0x0001,
     kTimed        = 0x0002, // `T` quality on commands
     kLargeMessage = 0x0004, // `L` quality on commands
+
+    // If you add new items here, remember to change kCmdQualityBits
 };
 
 struct AcceptedCommandEntry
