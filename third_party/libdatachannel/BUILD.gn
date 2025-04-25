@@ -18,6 +18,8 @@ action("build_libdatachannel") {
   outputs = [ "$output_dir/libdatachannel.so" ]
   args = [
     "--target_cpu_type=$current_cpu",
+    "--host_cpu_type=$host_cpu",
+    "--host_os_type=$host_os"
   ]
 }
 
