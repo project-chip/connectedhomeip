@@ -20,6 +20,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-enums.h>
+#include <app/AttributeAccessInterface.h>
 #include <app/cluster-building-blocks/QuieterReporting.h>
 #include <app/clusters/closure-control-server/closure-control-cluster-delegate.h>
 #include <app/clusters/closure-control-server/closure-control-cluster-matter-context.h>
@@ -27,7 +28,6 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <app/AttributeAccessInterface.h>
 
 namespace chip {
 namespace app {
@@ -142,8 +142,7 @@ class ClusterLogic
 public:
     // Instantiates a ClusterLogic class. The caller maintains ownership of the driver and the context, but provides them for use by
     // the ClusterLogic class.
-    ClusterLogic(DelegateBase & delegate, MatterContext & matterContext) : mDelegate(delegate), mMatterContext(matterContext)
-    {}
+    ClusterLogic(DelegateBase & delegate, MatterContext & matterContext) : mDelegate(delegate), mMatterContext(matterContext) {}
 
     ~ClusterLogic() = default;
 
@@ -157,7 +156,7 @@ public:
      *
      * @param[in] conformance
      * @param[in] initParams
-     * 
+     *
      * @return CHIP_ERROR_INCORRECT_STATE if the class has already been initialized.
      *         Set fucntion Specific errors, if set of initParams failed.
      *         CHIP_NO_ERROR on successful Initialization.
@@ -177,23 +176,23 @@ public:
 
     /**
      * @brief Set OverallTarget.
-     * 
+     *
      * @param[in] overallTarget OverallTarget Position, Latch and Speed.
-     * 
+     *
      * @return CHIP_NO_ERROR if set was successful.
      *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      */
     CHIP_ERROR SetOverallState(const DataModel::Nullable<GenericOverallState> & overallState);
-    
+
     /**
      * @brief Function to change the MainState.
      *
      *        See SetCountdownTime function comment below
      */
     CHIP_ERROR SetMainState(MainStateEnum mainState);
-    
+
     /**
      * @brief Public API to trigger countdown time update from the delegate (application layer).
      *        Function calls the SetCountdownTime function with the fromDelegate parameter set to true.
@@ -204,24 +203,24 @@ public:
     {
         return SetCountdownTime(countdownTime, true);
     }
-    
+
     /**
      *  @brief Calls delegate HandleStopCommand function after validating MainState, parameters and conformance.
-     * 
+     *
      *  @return Exits if the cluster is not initialized.
      *          Success if the Stop command not supported from present Mainstate.
      *          UnsupportedCommand if Instantaneous feature is supported.
      *          Success on succesful handling or Error Otherwise
      */
     chip::Protocols::InteractionModel::Status HandleStop();
-    
+
     /**
      *  @brief Calls delegate HandleMoveToCommand function after validating the parameters and conformance.
-     * 
+     *
      *  @param [in] position target position
      *  @param [in] latch Target latch
      *  @param [in] speed Target speed
-     * 
+     *
      *  @return Exits if the cluster is not initialized.
      *          ConstraintError if the input values are out is out of range.
      *          InvalidInState if the MoveTo command not supported from present Mainstate.
@@ -229,22 +228,22 @@ public:
      */
     chip::Protocols::InteractionModel::Status HandleMoveTo(Optional<TargetPositionEnum> position, Optional<bool> latch,
                                                            Optional<Globals::ThreeLevelAutoEnum> speed);
-    
+
     /**
      *  @brief Calls delegate HandleCalibrateCommand function after validating the parameters and conformance.
-     * 
+     *
      *  @return Exits if the cluster is not initialized.
      *          ConstraintError if the input values are out is out of range.
      *          InvalidInState if the Calibrate command not supported from present Mainstate.
      *          Success on succesful handling.
      */
     chip::Protocols::InteractionModel::Status HandleCalibrate();
-    
+
     /**
      * @brief Post event when a reportable error condition is detected
-     * 
+     *
      * @param [in] errorState current error list
-     * 
+     *
      * @return CHIP_NO_ERROR if event posted succesfully
      *         Return error recieved from LogEvent.
      */
@@ -252,7 +251,7 @@ public:
 
     /**
      * @brief Post event, if supported, when the overall operation ends, either successfully or otherwise
-     * 
+     *
      * @return CHIP_NO_ERROR if event posted succesfully
      *         CHIP_NO_ERROR if positioning feature is not supported.
      *         Return error recieved from LogEvent.
@@ -261,9 +260,9 @@ public:
 
     /**
      * @brief Post event, if supported,when the MainStateEnum attribute changes state to and from disengaged
-     * 
+     *
      * @param[in] EngageValue will indicate if the actuator is Engaged or Disengaged
-     * 
+     *
      * @return CHIP_NO_ERROR if event posted succesfully
      *         CHIP_NO_ERROR if manuallyOperable feature is not supported.
      *         Return error recieved from LogEvent.
@@ -272,7 +271,7 @@ public:
 
     /**
      * @brief Post event, if supported, when the SecureState field in the OverallState attribute changes.
-     * 
+     *
      * @param[in] secureValue will indicate whether a closure is securing a space against possible unauthorized entry.
      * @return CHIP_NO_ERROR if event posted succesfully
      *         CHIP_NO_ERROR if feature conformance is not supported
@@ -323,7 +322,7 @@ private:
      *        false, otherwise
      */
     bool IsSupportedOverallStatePositioning(PositioningEnum positioning);
-    
+
     /**
      * @brief Function validates if the requested OverallTarget positioning is supported by the device.
      *        Function validates agaisnt the FeatureMap conformance to validate support.
@@ -352,8 +351,7 @@ private:
      * @param fromDelegate true if the coutdown time is being configured by the delegate, false otherwise
      */
     CHIP_ERROR SetCountdownTime(const DataModel::Nullable<ElapsedS> & countdownTime, bool fromDelegate);
-    
-        
+
     /**
      * @brief API to trigger countdown time update from the cluster logic.
      *        Function calls the SetCountdownTime function with the fromDelegate parameter set to false.
@@ -364,12 +362,12 @@ private:
     {
         return SetCountdownTime(countdownTime, false);
     }
-    
+
     /**
      * @brief Set OverallTarget.
-     * 
+     *
      * @param[in] overallTarget OverallTarget Position, Latch and Speed.
-     * 
+     *
      * @return CHIP_NO_ERROR if set was successful.
      *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.

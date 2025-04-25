@@ -29,7 +29,6 @@ using namespace chip::app::Clusters::ClosureControl;
 
 // TODO: Update the unit tests when the XML is updated to use latest cluster spec
 //       - SecureState isn't present the cluster XML yet
-//       - LatchingEnum is replaced by a bool in the spec
 
 TEST(GenericOverallStateTest, DefaultConstructor)
 {
@@ -42,7 +41,7 @@ TEST(GenericOverallStateTest, DefaultConstructor)
 TEST(GenericOverallStateTest, ParameterizedConstructor)
 {
     auto positioning = Optional<DataModel::Nullable<PositioningEnum>>(MakeNullable(PositioningEnum::kFullyClosed));
-    auto latch    = Optional<DataModel::Nullable<bool>>(MakeNullable(true));
+    auto latch       = Optional<DataModel::Nullable<bool>>(MakeNullable(true));
     auto speed       = Optional<DataModel::Nullable<Globals::ThreeLevelAutoEnum>>(MakeNullable(Globals::ThreeLevelAutoEnum::kAuto));
 
     GenericOverallState state(positioning, latch, speed, NullOptional);
@@ -68,7 +67,7 @@ TEST(GenericOverallStateTest, EqualityOperator)
 
     EXPECT_TRUE(state1 == state2);
 
-    latching2       = Optional<DataModel::Nullable<bool>>(MakeNullable(false));
+    latching2    = Optional<DataModel::Nullable<bool>>(MakeNullable(false));
     state2.latch = latching2;
     EXPECT_FALSE(state1 == state2);
 }
@@ -76,7 +75,7 @@ TEST(GenericOverallStateTest, EqualityOperator)
 TEST(GenericOverallStateTest, CopyConstructor)
 {
     auto positioning = Optional<DataModel::Nullable<PositioningEnum>>(MakeNullable(PositioningEnum::kFullyClosed));
-    auto latch    = Optional<DataModel::Nullable<bool>>(MakeNullable(true));
+    auto latch       = Optional<DataModel::Nullable<bool>>(MakeNullable(true));
     auto speed       = Optional<DataModel::Nullable<Globals::ThreeLevelAutoEnum>>(MakeNullable(Globals::ThreeLevelAutoEnum::kAuto));
 
     GenericOverallState originalState(positioning, latch, speed, NullOptional);
@@ -84,7 +83,7 @@ TEST(GenericOverallStateTest, CopyConstructor)
 
     // Modify the original object
     originalState.positioning = Optional<DataModel::Nullable<PositioningEnum>>(MakeNullable(PositioningEnum::kFullyOpened));
-    originalState.latch    = Optional<DataModel::Nullable<bool>>(MakeNullable(false));
+    originalState.latch       = Optional<DataModel::Nullable<bool>>(MakeNullable(false));
     originalState.speed =
         Optional<DataModel::Nullable<Globals::ThreeLevelAutoEnum>>(MakeNullable(Globals::ThreeLevelAutoEnum::kLow));
 

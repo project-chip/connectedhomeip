@@ -75,36 +75,27 @@ CHIP_ERROR Interface::Read(const ConcreteReadAttributePath & aPath, AttributeVal
     {
     case Attributes::CountdownTime::Id: {
         typedef Attributes::CountdownTime::TypeInfo::Type T;
-        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR {
-            return logic.GetCountdownTime(ret);
-        });
-    }                   
-    
+        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetCountdownTime(ret); });
+    }
+
     case Attributes::MainState::Id: {
         typedef Attributes::MainState::TypeInfo::Type T;
-        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR {
-            return logic.GetMainState(ret);
-        });
+        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetMainState(ret); });
     }
 
     case Attributes::CurrentErrorList::Id: {
-        return aEncoder.EncodeList([&logic = mClusterLogic](const auto & encoder) -> CHIP_ERROR {
-            return logic.GetCurrentErrorList(encoder); 
-        });
+        return aEncoder.EncodeList(
+            [&logic = mClusterLogic](const auto & encoder) -> CHIP_ERROR { return logic.GetCurrentErrorList(encoder); });
     }
 
     case Attributes::OverallState::Id: {
         typedef DataModel::Nullable<GenericOverallState> T;
-        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { 
-            return logic.GetOverallState(ret); 
-        });
+        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetOverallState(ret); });
     }
 
     case Attributes::OverallTarget::Id: {
         typedef DataModel::Nullable<GenericOverallTarget> T;
-        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { 
-            return logic.GetOverallTarget(ret); 
-        });
+        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetOverallTarget(ret); });
     }
 
     default:
@@ -115,7 +106,7 @@ CHIP_ERROR Interface::Read(const ConcreteReadAttributePath & aPath, AttributeVal
 void Interface::InvokeCommand(HandlerContext & handlerContext)
 {
     Status status = Status::UnsupportedCommand;
-    
+
     switch (handlerContext.mRequestPath.mCommandId)
     {
     case Commands::Stop::Id:
