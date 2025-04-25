@@ -17,7 +17,6 @@
 
 from ctypes import CFUNCTYPE, POINTER, c_char_p, c_int, c_uint32
 
-from chip.native import PyChipError
 
 
 class ErrorType(c_int):
