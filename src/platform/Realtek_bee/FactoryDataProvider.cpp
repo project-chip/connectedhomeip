@@ -158,7 +158,10 @@ CHIP_ERROR FactoryDataProvider::GetCertificationDeclaration(MutableByteSpan & ou
 {
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 
-#if CONFIG_FACTORY_DATA
+#if CHIP_USE_DEVICE_CONFIG_CERTIFICATION_DECLARATION
+    constexpr uint8_t kCdForAllExamples[] = CHIP_DEVICE_CONFIG_CERTIFICATION_DECLARATION;
+    err = CopySpanToMutableSpan(ByteSpan{ kCdForAllExamples }, outBuffer);
+#elif CONFIG_FACTORY_DATA
     VerifyOrReturnError(outBuffer.size() >= mFactoryData.dac.cd.len, CHIP_ERROR_BUFFER_TOO_SMALL);
     VerifyOrReturnError(mFactoryData.dac.cd.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
