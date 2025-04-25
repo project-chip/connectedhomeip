@@ -65,8 +65,7 @@ class TC_CNET_4_3(MatterBaseTest):
                      "TH reads InterfaceEnabled attribute from the DUT. Skip this and remaining steps if the connected network is not on the cluster currently being verified.",
                      "Verify that InterfaceEnabled attribute value is true"),
             TestStep(5, "TH reads LastNetworkingStatus attribute from the DUT",
-                     "LastNetworkingStatus attribute value will be within any one of the following values \
-                      Success, NetworkNotFound, OutOfRange, RegulatoryError, UnknownError, null"),
+                     "LastNetworkingStatus attribute value is Success"),
             TestStep(6, "TH reads the LastNetworkID attribute from the DUT",
                      "Verify that LastNetworkID attribute matches the NetworkID value of one of the entries in the Networks attribute list"),
             TestStep(7, "TH reads the LastConnectErrorValue attribute from the DUT",

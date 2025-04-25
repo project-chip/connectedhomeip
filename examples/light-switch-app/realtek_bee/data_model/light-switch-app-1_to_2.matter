@@ -2704,7 +2704,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
   }
 
   server cluster OtaSoftwareUpdateRequestor {
@@ -3062,7 +3062,7 @@ endpoint 1 {
     ram      attribute identifyType default = 0x0;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 6;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -3096,7 +3096,7 @@ endpoint 2 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 6;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -3129,7 +3129,7 @@ endpoint 3 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 6;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -3162,7 +3162,7 @@ endpoint 4 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 6;
 
     handle command Identify;
     handle command TriggerEffect;

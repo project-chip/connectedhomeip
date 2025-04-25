@@ -365,6 +365,7 @@ class HostBuilder(GnBuilder):
         self.board = board
         self.extra_gn_options = []
         self.build_env = {}
+        self.fuzzing_type = fuzzing_type
 
         if enable_rpcs:
             self.extra_gn_options.append('import("//with_pw_rpc.gni")')
@@ -560,7 +561,7 @@ class HostBuilder(GnBuilder):
         if self.board == HostBoard.ARM64:
             self.build_env['PKG_CONFIG_PATH'] = os.path.join(
                 self.SysRootPath('SYSROOT_AARCH64'), 'lib/aarch64-linux-gnu/pkgconfig')
-        if self.app == HostApp.TESTS and self.use_coverage and self.use_clang:
+        if self.app == HostApp.TESTS and self.use_coverage and self.use_clang and self.fuzzing_type == HostFuzzingType.NONE:
             # Every test is expected to have a distinct build ID, so `%m` will be
             # distinct.
             #
@@ -642,7 +643,7 @@ class HostBuilder(GnBuilder):
                            os.path.join(self.coverage_dir, 'html')], title="HTML coverage")
 
         # coverage for clang works by having perfdata for every test run, which are in "*.profraw" files
-        if self.app == HostApp.TESTS and self.use_coverage and self.use_clang:
+        if self.app == HostApp.TESTS and self.use_coverage and self.use_clang and self.fuzzing_type == HostFuzzingType.NONE:
             # Clang coverage config generates "coverage/{name}.profraw" for each test indivdually
             # Here we are merging ALL raw profiles into a single indexed file
 

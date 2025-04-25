@@ -1485,10 +1485,6 @@ cluster DishwasherMode = 89 {
     kLight = 16386;
   }
 
-  bitmap Feature : bitmap32 {
-    kOnOff = 0x1;
-  }
-
   shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
@@ -1502,8 +1498,6 @@ cluster DishwasherMode = 89 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
-  attribute optional nullable int8u startUpMode = 2;
-  attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1517,7 +1511,7 @@ cluster DishwasherMode = 89 {
 
   response struct ChangeToModeResponse = 1 {
     enum8 status = 0;
-    optional char_string statusText = 1;
+    optional char_string<64> statusText = 1;
   }
 
   /** This command is used to change device modes.
@@ -1702,7 +1696,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 5;
   }
 
   server cluster LocalizationConfiguration {
@@ -1887,7 +1881,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 6;
 
     handle command Identify;
     handle command TriggerEffect;
