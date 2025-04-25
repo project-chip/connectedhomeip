@@ -200,7 +200,11 @@ TEST_F(TestClosureDimensionClusterLogic, TestConformanceValid)
     // Validating Only one of Translation, Rotation or Modulation must be enabled. Return false otherwise.
 
     // If Positioning is enabled, all 3 Translation, Rotation and  Modulation are enabled. Return false
-    conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kTranslation).Set(Feature::kRotation).Set(Feature::kModulation);
+    conformance.FeatureMap()
+        .Set(Feature::kPositioning)
+        .Set(Feature::kTranslation)
+        .Set(Feature::kRotation)
+        .Set(Feature::kModulation);
     conformance.OptionalAttributes().Set(OptionalAttributeEnum::kOverflow);
     EXPECT_FALSE(conformance.Valid());
     conformance.FeatureMap().ClearAll();
@@ -1666,7 +1670,11 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommand)
 TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommandWithLimitation)
 {
 
-    conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed).Set(Feature::kLimitation);
+    conformance.FeatureMap()
+        .Set(Feature::kPositioning)
+        .Set(Feature::kMotionLatching)
+        .Set(Feature::kSpeed)
+        .Set(Feature::kLimitation);
     conformance.OptionalAttributes().Clear(OptionalAttributeEnum::kOverflow);
 
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
@@ -1832,7 +1840,11 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommand)
 // - Return constrainError if arguments value are out of bounds
 TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommandWithLimitation)
 {
-    conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed).Set(Feature::kLimitation);
+    conformance.FeatureMap()
+        .Set(Feature::kPositioning)
+        .Set(Feature::kMotionLatching)
+        .Set(Feature::kSpeed)
+        .Set(Feature::kLimitation);
     conformance.OptionalAttributes().Clear(OptionalAttributeEnum::kOverflow);
 
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);

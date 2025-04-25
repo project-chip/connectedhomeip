@@ -70,10 +70,10 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericCurren
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mState.currentState != incomingCurrentState, CHIP_NO_ERROR);
 
-    if(incomingCurrentState.IsNull())
+    if (incomingCurrentState.IsNull())
     {
         // Mark CurrentState attribute as dirty only if value changes.
-        if(!mState.currentState.IsNull())
+        if (!mState.currentState.IsNull())
         {
             mState.currentState.SetNull();
             mMatterContext.MarkDirty(Attributes::CurrentState::Id);
@@ -89,8 +89,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericCurren
         VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
         // We don't need to check if values are present since the check was done above.
-        VerifyOrReturnError(incomingCurrentState.Value().position.Value() <= kPercents100thsMaxValue,
-                                CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(incomingCurrentState.Value().position.Value() <= kPercents100thsMaxValue, CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     // Validate the incoming latch value has valid FeatureMap conformance.
@@ -108,7 +107,8 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericCurren
         //  supported by the closure. If the Speed feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-        VerifyOrReturnError(EnsureKnownEnumValue(incomingCurrentState.Value().speed.Value()) != Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
+        VerifyOrReturnError(EnsureKnownEnumValue(incomingCurrentState.Value().speed.Value()) !=
+                                Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
                             CHIP_ERROR_INVALID_ARGUMENT);
     }
 
@@ -118,14 +118,12 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericCurren
     return CHIP_NO_ERROR;
 }
 
-
 CHIP_ERROR ClusterLogic::SetTarget(const DataModel::Nullable<GenericTargetStruct> & incomingTarget)
 {
     assertChipStackLockedByCurrentThread();
 
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mState.target != incomingTarget, CHIP_NO_ERROR);
-
 
     if (incomingTarget.IsNull())
     {
@@ -170,7 +168,8 @@ CHIP_ERROR ClusterLogic::SetTarget(const DataModel::Nullable<GenericTargetStruct
         //  supported by the closure. If the Speed feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-        VerifyOrReturnError(EnsureKnownEnumValue(incomingTarget.Value().speed.Value()) != Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
+        VerifyOrReturnError(EnsureKnownEnumValue(incomingTarget.Value().speed.Value()) !=
+                                Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
                             CHIP_ERROR_INVALID_ARGUMENT);
     }
 
