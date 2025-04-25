@@ -88,7 +88,7 @@
  *    This is the maximum allowed size of a PAF end point's receive window, defined as the number of fragments the
  *    end point may reliably receive without PAF-layer acknowledgement.
  *
- *    This value must exceed (WIFIPAF_CONFIG_IMMEDIATE_ACK_WINDOW_THRESHOLD + 1), or ***immediate*** stand-alone
+ *    This value must be at least (WIFIPAF_CONFIG_IMMEDIATE_ACK_WINDOW_THRESHOLD + 1), or ***immediate*** stand-alone
  *    acks will forever be sent without delay in response to one another as each peer's window size dips below
  *    WIFIPAF_CONFIG_IMMEDIATE_ACK_WINDOW_THRESHOLD with receipt of any single message fragment.
  *
