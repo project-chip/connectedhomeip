@@ -25,21 +25,17 @@ import sys
 import typing
 from dataclasses import dataclass
 from pprint import pformat, pprint
-from typing import TYPE_CHECKING, Any, Optional
+from typing import Any, Optional
 
 import chip.clusters as Clusters
 import chip.clusters.ClusterObjects
 import chip.tlv
+from chip.ChipDeviceCtrl import ChipDeviceController
 from chip.clusters.Attribute import ValueDecodeFailure
 from chip.testing.conformance import ConformanceException
-from chip.testing.matter_testing import ProblemNotice
+from chip.testing.matter_testing import MatterTestConfig, ProblemNotice
 from chip.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types, dm_from_spec_version
 from mobly import asserts
-
-# Ensure TYPE_CHECKING imports are handled correctly, needed for mypy
-if TYPE_CHECKING:
-    from chip.ChipDeviceCtrl import ChipDeviceController
-    from chip.testing.MatterTest import MatterTestConfig
 
 
 @dataclass
@@ -133,8 +129,8 @@ def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
 class BasicCompositionTests:
     # These attributes are initialized/provided by the inheriting test class (MatterBaseTest)
     # or its setup process. Providing type hints here for mypy.
-    default_controller: "ChipDeviceController"
-    matter_test_config: "MatterTestConfig"
+    default_controller: ChipDeviceController
+    matter_test_config: MatterTestConfig
     user_params: dict[str, Any]
     dut_node_id: int
     problems: list[ProblemNotice]
@@ -237,6 +233,7 @@ class BasicCompositionTests:
             asserts.fail(msg)
 
     def _get_dm(self) -> PrebuiltDataModelDirectory:  # type: ignore[return]
+        # mypy doesn't understand that asserts.fail always raises a TestFailure
         try:
             spec_version = self.endpoints[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SpecificationVersion]
         except KeyError:
