@@ -62,7 +62,7 @@ class TC_AVSUM_2_6(MatterBaseTest, AVSUMTestBase):
 
     def pics_TC_AVSUM_2_6(self) -> list[str]:
         pics = [
-            "AVSUM.S","AVSUM.S.F04"
+            "AVSUM.S", "AVSUM.S.F04"
         ]
         return pics
 
