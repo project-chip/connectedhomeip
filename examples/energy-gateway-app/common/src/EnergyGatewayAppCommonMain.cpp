@@ -18,11 +18,11 @@
 
 #include "EnergyGatewayAppCommonMain.h"
 #include "CommodityPriceMain.h"
+#include "ElectricalGridConditionsMain.h"
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/data-model/Nullable.h>
-#include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 
 using namespace chip;
@@ -67,6 +67,7 @@ void ElectricalEnergyTariffInit()
     EndpointId kElectricalEnergyTariffEndpointId = 1;
 
     VerifyOrDie(CommodityPriceInit(kElectricalEnergyTariffEndpointId) == CHIP_NO_ERROR);
+    VerifyOrDie(ElectricalGridConditionsInit(kElectricalEnergyTariffEndpointId) == CHIP_NO_ERROR);
 
     // set the descriptor TagList to include "ElectricalEnergy" and "Current" (to indicate the ActiveTariff)
     SetTagList(kElectricalEnergyTariffEndpointId,
