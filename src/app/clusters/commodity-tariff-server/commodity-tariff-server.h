@@ -26,8 +26,6 @@
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/reporting/reporting.h>
-#include <app/util/attribute-storage.h>
-#include <lib/core/CHIPError.h>
 
 namespace chip {
 namespace app {
@@ -57,8 +55,12 @@ namespace CommodityTariff {
     X(DayPatterns,                  DataModel::List<Structs::DayPatternStruct::Type>) \
     X(CalendarPeriods,              DataModel::List<Structs::CalendarPeriodStruct::Type>)
 
+#define COMMODITY_TARIFF_PRIMARY_ATTRIBUTES \
+    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES_STUBS \
+    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES_DEV
+
 // Centralized attribute declaration (Current attrs)
-#define COMMODITY_TARIFF_CURRENT_ATTRIBUTES_STUBS \
+#define COMMODITY_TARIFF_CURRENT_ATTRIBUTES \
     X(CurrentDay,                   DataModel::Nullable<Structs::DayStruct::Type>) \
     X(NextDay,                      DataModel::Nullable<Structs::DayStruct::Type>) \
     X(CurrentDayEntry,              DataModel::Nullable<Structs::DayEntryStruct::Type>) \
@@ -67,17 +69,6 @@ namespace CommodityTariff {
     X(NextDayEntryDate,             DataModel::Nullable<uint32_t>) \
     X(CurrentTariffComponents,      DataModel::List<Structs::TariffComponentStruct::Type>) \
     X(NextTariffComponents,         DataModel::List<Structs::TariffComponentStruct::Type>)
-
-#define COMMODITY_TARIFF_CURRENT_ATTRIBUTES_DEV \
-    /*X(CurrentDay,                   DataModel::Nullable<Structs::DayStruct::Type>)*/
-
-#define COMMODITY_TARIFF_PRIMARY_ATTRIBUTES \
-    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES_STUBS \
-    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES_DEV
-
-#define COMMODITY_TARIFF_CURRENT_ATTRIBUTES \
-    COMMODITY_TARIFF_CURRENT_ATTRIBUTES_STUBS \
-    COMMODITY_TARIFF_CURRENT_ATTRIBUTES_DEV
 
 class Delegate
 {
@@ -132,7 +123,6 @@ private:
         virtual CHIP_ERROR Set##attrName(const attrType& newValue) { \
             return CHIP_NO_ERROR; \
         }
-    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
     COMMODITY_TARIFF_CURRENT_ATTRIBUTES
     #undef X
 
@@ -168,8 +158,6 @@ private:
 
     // Internal Application API to set attribute values
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-     // NOTE there are no writable attributes
-    //CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
     // CommandHandlerInterface
     void InvokeCommand(HandlerContext & handlerContext) override;

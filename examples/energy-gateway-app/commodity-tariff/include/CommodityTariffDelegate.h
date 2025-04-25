@@ -69,7 +69,7 @@ protected:    \
     void CleanupValue() override {}; \
 };
 // Generate all classes
-COMMODITY_TARIFF_CURRENT_ATTRIBUTES_STUBS
+COMMODITY_TARIFF_CURRENT_ATTRIBUTES
 #undef X
 
 class CommodityTariffPrimaryData {
@@ -167,31 +167,9 @@ private:
     CommodityTariffPrimaryData mTariffData;
     CommodityTariffCurrentData mCurrentData;
 
-    // Tariff data Attributes
-    //CHIP_ERROR SetTariffInfo(const DataModel::Nullable<Structs::TariffInformationStruct::Type>*);
-    //CHIP_ERROR SetTariffUnit(Globals::TariffUnitEnum);
-    //CHIP_ERROR SetStartDate(const DataModel::Nullable<epoch_s>);
-    //CHIP_ERROR SetDefaultRandomizationOffset(const DataModel::Nullable<int16_t>);
-    //CHIP_ERROR SetDefaultRandomizationType(const DataModel::Nullable<DayEntryRandomizationTypeEnum>);
-    //// List Setters (replace entire lists)
-    //CHIP_ERROR SetCalendarPeriods(const DataModel::List<Structs::CalendarPeriodStruct::Type>*);
-    //CHIP_ERROR SetDayPatterns(const DataModel::List<Structs::DayPatternStruct::Type>*);
-    //CHIP_ERROR SetIndividualDays(const DataModel::List<Structs::DayStruct::Type>*);
-    //CHIP_ERROR SetDayEntries(const DataModel::List<Structs::DayEntryStruct::Type>*);
-    //CHIP_ERROR SetTariffPeriods(const DataModel::List<Structs::TariffPeriodStruct::Type>*);
-    //CHIP_ERROR SetTariffComponents(const DataModel::List<Structs::TariffComponentStruct::Type>*);
-    //// Secondary Attributes
-    //CHIP_ERROR SetCurrentDay(const DataModel::Nullable<Structs::DayStruct::Type>*);
-    //CHIP_ERROR SetNextDay(const DataModel::Nullable<Structs::DayStruct::Type>*);
-    //CHIP_ERROR SetCurrentDayEntry(const DataModel::Nullable<Structs::DayEntryStruct::Type>*);
-    //CHIP_ERROR SetNextDayEntry(const DataModel::Nullable<Structs::DayEntryStruct::Type>*);
-    //CHIP_ERROR SetCurrentDayEntryDate(const DataModel::Nullable<epoch_s>);
-    //CHIP_ERROR SetNextDayEntryDate(const DataModel::Nullable<epoch_s>);
-    //CHIP_ERROR SetCurrentTariffComponents(const DataModel::List<Structs::TariffComponentStruct::Type>*);
-    //CHIP_ERROR SetNextTariffComponents(const DataModel::List<Structs::TariffComponentStruct::Type>*);
     // Generate setters
     #define X(attrName, attrType) \
-        CHIP_ERROR Set##attrName(const attrType& newValue) override { \
+        CHIP_ERROR Set##attrName(const attrType& newValue) { \
             if (mTariffData.attrName.Update(newValue)) { \
                 ChipLogProgress(NotSpecified, "EGW-CTC: The attr %s updated", #attrName);\
                 ReportAttributeChange(Attributes::attrName::Id); \
