@@ -110,22 +110,17 @@ def parse_pixit_xml(contents: str) -> dict[str, str]:
     for pi in mytree.iter('pixitItem'):
         name_elem = pi.find('itemNumber')
         support_elem = pi.find('support')
-
-        # Raise an error if either element is None
+        # Raise an error if element is None
         if name_elem is None:
             raise ValueError(f"PICS XML item missing 'itemNumber' element: {ET.tostring(pi, encoding='unicode')}")
-        if support_elem is None:
-            raise ValueError(f"PICS XML item missing 'support' element: {ET.tostring(pi, encoding='unicode')}")
-
-        # Raise an error if either text is None
+        # Raise an error if text is None
         name = name_elem.text
         support = support_elem.text
         pixit[name] = support
         if name is None:
             raise ValueError(f"PICS XML item 'itemNumber' element missing text: {ET.tostring(pi, encoding='unicode')}")
-        if support is None:
-            raise ValueError(f"PICS XML item 'support' element missing text: {ET.tostring(pi, encoding='unicode')}")
-        return pixit
+
+    return pixit
 
 
 def read_pixit_from_file(path: str) -> dict[str, str]:
