@@ -17,6 +17,7 @@
  */
 
 #include "EnergyGatewayAppCommonMain.h"
+#include "CommodityPriceMain.h"
 #include "ElectricalGridConditionsMain.h"
 
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -29,6 +30,31 @@ using namespace chip::app;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 
+// Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
+constexpr const uint8_t kNamespaceCommodityTariffCommodity = 0x0D;
+
+// CommodityTariffCommodity Namespace: 0x0D
+constexpr const uint8_t kTagElectricalEnergy = 0x00;
+constexpr const uint8_t kTagNaturalGas       = 0x01;
+constexpr const uint8_t kTagWater            = 0x02;
+
+constexpr const uint8_t kNamespaceCommodityTariffChronology = 0x0B;
+// CommodityTariffChronology Namespace: 0x0B
+constexpr const uint8_t kTagCurrent  = 0x00;
+constexpr const uint8_t kTagPrevious = 0x01;
+constexpr const uint8_t kUpcoming    = 0x02;
+
+constexpr const uint8_t kNamespaceCommodityTariffFlow = 0x13;
+// CommodityTariffFlow Namespace: 0x13
+constexpr const uint8_t kTagImport = 0x00;
+constexpr const uint8_t kTagExport = 0x01;
+
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type electricalEnergyTariffTagList[] = {
+    { .namespaceID = kNamespaceCommodityTariffCommodity, .tag = kTagElectricalEnergy },
+    { .namespaceID = kNamespaceCommodityTariffChronology, .tag = kTagCurrent },
+    { .namespaceID = kNamespaceCommodityTariffFlow, .tag = kTagExport }
+};
+
 /*
  *  @brief  Creates a Delegate and Instance for CommodityPrice clusters
  *
@@ -36,14 +62,19 @@ using namespace chip::app::Clusters;
  * create the Delegate first, then wrap it in the Instance
  * Then call the Instance->Init() to register the attribute and command handlers
  */
-void ElectricalPriceApplicationInit()
+void ElectricalEnergyTariffInit()
 {
     EndpointId kElectricalEnergyTariffEndpointId = 1;
 
+    VerifyOrDie(CommodityPriceInit(kElectricalEnergyTariffEndpointId) == CHIP_NO_ERROR);
     VerifyOrDie(ElectricalGridConditionsInit(kElectricalEnergyTariffEndpointId) == CHIP_NO_ERROR);
+
+    // set the descriptor TagList to include "ElectricalEnergy" and "Current" (to indicate the ActiveTariff)
+    SetTagList(kElectricalEnergyTariffEndpointId,
+               Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(electricalEnergyTariffTagList));
 }
 
-void ElectricalPriceApplicationShutdown()
+void ElectricalEnergyTariffShutdown()
 {
-    ChipLogDetail(AppServer, "Energy Gateway App : ElectricalPriceApplicationShutdown()");
+    ChipLogDetail(AppServer, "Energy Gateway App : ElectricalEnergyTariffShutdown()");
 }

@@ -161,6 +161,7 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-x64-lock-ipv6only \
     --target linux-x64-simulated-app1-ipv6only \
     --target linux-x64-lit-icd-ipv6only \
+    --target linux-x64-energy-gateway-ipv6only \
     --target linux-x64-energy-management-ipv6only \
     --target linux-x64-microwave-oven-ipv6only \
     --target linux-x64-rvc-ipv6only \
@@ -186,6 +187,7 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-x64-lock-ipv6only/chip-lock-app out/chip-lock-app \
     && mv out/linux-x64-simulated-app1-ipv6only/chip-app1 out/chip-app1 \
     && mv out/linux-x64-lit-icd-ipv6only/lit-icd-app out/lit-icd-app \
+    && mv out/linux-x64-energy-gateway-ipv6only/chip-energy-gateway-app out/chip-energy-gateway-app \
     && mv out/linux-x64-energy-management-ipv6only/chip-energy-management-app out/chip-energy-management-app \
     && mv out/linux-x64-microwave-oven-ipv6only/chip-microwave-oven-app out/chip-microwave-oven-app \
     && mv out/linux-x64-rvc-ipv6only/chip-rvc-app out/chip-rvc-app \
@@ -215,6 +217,7 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-arm64-lock-ipv6only \
     --target linux-arm64-simulated-app1-ipv6only \
     --target linux-arm64-lit-icd-ipv6only \
+    --target linux-arm64-energy-gateway-ipv6only \
     --target linux-arm64-energy-management-ipv6only \
     --target linux-arm64-microwave-oven-ipv6only \
     --target linux-arm64-rvc-ipv6only \
@@ -240,6 +243,7 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-arm64-lock-ipv6only/chip-lock-app out/chip-lock-app \
     && mv out/linux-arm64-simulated-app1-ipv6only/chip-app1 out/chip-app1 \
     && mv out/linux-arm64-lit-icd-ipv6only/lit-icd-app out/lit-icd-app \
+    && mv out/linux-arm64-energy-gateway-ipv6only/chip-energy-gateway-app out/chip-energy-gateway-app \
     && mv out/linux-arm64-energy-management-ipv6only/chip-energy-management-app out/chip-energy-management-app \
     && mv out/linux-arm64-microwave-oven-ipv6only/chip-microwave-oven-app out/chip-microwave-oven-app \
     && mv out/linux-arm64-rvc-ipv6only/chip-rvc-app out/chip-rvc-app \
@@ -279,6 +283,7 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-ota-requestor-ap
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-lock-app apps/chip-lock-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-app1 apps/chip-app1
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/lit-icd-app apps/lit-icd-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-energy-gateway-app apps/chip-energy-gateway-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-energy-management-app apps/chip-energy-management-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-microwave-oven-app apps/chip-microwave-oven-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-rvc-app apps/chip-rvc-app
@@ -323,3 +328,8 @@ RUN apt-get remove -y python3-gi
 RUN pip install --break-system-packages --no-cache-dir \
     python_lib/obj/src/python_testing/matter_testing_infrastructure/chip-testing._build_wheel/chip_testing-*.whl \
     python_lib/controller/python/chip*.whl
+
+# Copy device attestation revocation set and device attestation test vectors
+RUN mkdir -p credentials/test/revoked-attestation-certificates
+COPY --from=chip-build-cert-bins /root/connectedhomeip/credentials/test/revoked-attestation-certificates/dac-provider-test-vectors credentials/test/revoked-attestation-certificates/dac-provider-test-vectors
+COPY --from=chip-build-cert-bins /root/connectedhomeip/credentials/test/revoked-attestation-certificates/revocation-sets credentials/test/revoked-attestation-certificates/revocation-sets

@@ -194,7 +194,7 @@
         "COMMISSIONER_CONTROL_CLUSTER": ["commissioner-control-server"],
         "COMMISSIONING_CLUSTER": [],
         "COMMODITY_METERING_CLUSTER": [],
-        "COMMODITY_PRICE_CLUSTER": [],
+        "COMMODITY_PRICE_CLUSTER": ["commodity-price-server"],
         "COMMODITY_TARIFF_CLUSTER": [],
         "CONTENT_LAUNCHER_CLUSTER": ["content-launch-server"],
         "CONTENT_CONTROL_CLUSTER": ["content-control-server"],
@@ -334,7 +334,7 @@
         "TVOC_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],
-        "UNIT_LOCALIZATION_CLUSTER": [],
+        "UNIT_LOCALIZATION_CLUSTER": ["unit-localization-server"],
         "UNIT_TESTING_CLUSTER": ["test-cluster-server"],
         "USER_LABEL_CLUSTER": ["user-label-server"],
         "VALVE_CONFIGURATION_AND_CONTROL_CLUSTER": [

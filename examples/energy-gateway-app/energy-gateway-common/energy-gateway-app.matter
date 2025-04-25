@@ -1638,7 +1638,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
   }
 
   server cluster OtaSoftwareUpdateRequestor {
@@ -1829,14 +1829,14 @@ endpoint 1 {
 
   server cluster CommodityPrice {
     emits event PriceChange;
-    ram      attribute tariffUnit;
+    callback attribute tariffUnit;
     callback attribute currency;
     callback attribute currentPrice;
     callback attribute priceForecast;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 4;
 
     handle command GetDetailedPriceRequest;

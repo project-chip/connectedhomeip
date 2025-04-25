@@ -85,6 +85,9 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_BOOLEAN_STATE_CONFIGURATION_TRIGGER
 #include <app/clusters/boolean-state-configuration-server/BooleanStateConfigurationTestEventTriggerHandler.h>
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_PRICE_TRIGGER
+#include <app/clusters/commodity-price-server/CommodityPriceTestEventTriggerHandler.h>
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_ELECTRICAL_GRID_CONDITIONS_TRIGGER
 #include <app/clusters/electrical-grid-conditions-server/ElectricalGridConditionsTestEventTriggerHandler.h>
 #endif
@@ -679,6 +682,10 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 #if CHIP_DEVICE_CONFIG_ENABLE_BOOLEAN_STATE_CONFIGURATION_TRIGGER
     static BooleanStateConfigurationTestEventTriggerHandler sBooleanStateConfigurationTestEventTriggerHandler;
     sTestEventTriggerDelegate.AddHandler(&sBooleanStateConfigurationTestEventTriggerHandler);
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_PRICE_TRIGGER
+    static CommodityPriceTestEventTriggerHandler sCommodityPriceTestEventTriggerHandler;
+    sTestEventTriggerDelegate.AddHandler(&sCommodityPriceTestEventTriggerHandler);
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_ELECTRICAL_GRID_CONDITIONS_TRIGGER
     static ElectricalGridConditionsTestEventTriggerHandler sElectricalGridConditionsTestEventTriggerHandler;
