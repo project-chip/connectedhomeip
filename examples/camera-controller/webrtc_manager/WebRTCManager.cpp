@@ -19,6 +19,7 @@
 #include "WebRTCManager.h"
 
 #include <app/dynamic_server/AccessControl.h>
+#include <arpa/inet.h>
 #include <commands/interactive/InteractiveCommands.h>
 #include <crypto/RandUtils.h>
 #include <lib/support/StringBuilder.h>
@@ -34,13 +35,6 @@ WebRTCManager::WebRTCManager() : mWebRTCRequestorServer(kWebRTCRequesterDynamicE
 
 WebRTCManager::~WebRTCManager()
 {
-    // Close the data channel and peer connection if they exist
-    if (mDataChannel)
-    {
-        mDataChannel->close();
-        mDataChannel.reset();
-    }
-
     if (mPeerConnection)
     {
         mPeerConnection->close();
@@ -91,8 +85,16 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
 
     rtc::InitLogger(rtc::LogLevel::Warning);
 
+    VerifyOrReturnError(initializeSocket(), CHIP_ERROR_INTERNAL);
+
     // Create the peer connection
     rtc::Configuration config;
+
+    // directly configure stun servers for now
+    config.iceServers.emplace_back("stun:stun.l.google.com:19302");
+    config.iceServers.emplace_back("stun:stun1.l.google.com:19302");
+    config.enableIceUdpMux = true;
+
     mPeerConnection = std::make_shared<rtc::PeerConnection>(config);
 
     mPeerConnection->onLocalDescription([this](rtc::Description description) {
@@ -102,7 +104,7 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
     });
 
     mPeerConnection->onLocalCandidate([this](rtc::Candidate candidate) {
-        std::string candidateStr = std::string(candidate);
+        std::string candidateStr = candidate.candidate();
         mLocalCandidates.push_back(candidateStr);
         ChipLogProgress(Camera, "Local Candidate:");
         ChipLogProgress(Camera, "%s", candidateStr.c_str());
@@ -115,27 +117,42 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
         ChipLogProgress(Camera, "[Gathering State: %d]", static_cast<int>(state));
     });
 
-    // Create a data channel for this offerer
-    mDataChannel = mPeerConnection->createDataChannel("test");
+    // TODO get track configuration from allocated streams
+    // use fixed values for now
+    mMedia = rtc::Description::Video("video", rtc::Description::Direction::RecvOnly);
+    mMedia.addH264Codec(VIDEO_H264_CODEC);
+    mMedia.setBitrate(VIDEO_BITRATE);
+    mTrack = mPeerConnection->addTrack(mMedia);
 
-    if (mDataChannel)
-    {
-        mDataChannel->onOpen(
-            [&]() { ChipLogProgress(Camera, "[DataChannel open: %s]", mDataChannel ? mDataChannel->label().c_str() : "unknown"); });
-
-        mDataChannel->onClosed([&]() {
-            ChipLogProgress(Camera, "[DataChannel closed: %s]", mDataChannel ? mDataChannel->label().c_str() : "unknown");
-        });
-
-        mDataChannel->onMessage([](auto data) {
-            if (std::holds_alternative<std::string>(data))
-            {
-                ChipLogProgress(Camera, "[Received: %s]", std::get<std::string>(data).c_str());
-            }
-        });
-    }
+    mDepacketizer = std::make_shared<rtc::H264RtpDepacketizer>();
+    mTrack->setMediaHandler(mDepacketizer);
+    mTrack->onFrame([this](rtc::binary message, rtc::FrameInfo frameInfo) {
+        // send H264 frames to sock so that a client can pick it up to dispaly it.
+        if (sendto(sock, reinterpret_cast<const char *>(message.data()), int(message.size()), 0,
+                   reinterpret_cast<const struct sockaddr *>(&socket_address), sizeof(socket_address)) == -1)
+        {
+            ChipLogError(Camera, "Failed to send video frame");
+        }
+    });
+    mPeerConnection->setLocalDescription();
 
     return CHIP_NO_ERROR;
+}
+
+bool WebRTCManager::initializeSocket()
+{
+    sock = socket(AF_INET, SOCK_DGRAM, 0);
+    if (sock < 0)
+    {
+        ChipLogError(Camera, "Socket creation failed");
+        return false;
+    }
+    socket_address                 = {};
+    socket_address.sin_family      = AF_INET;
+    socket_address.sin_addr.s_addr = inet_addr(LOCALHOST_IP);
+    socket_address.sin_port        = htons(VIDEO_STREAM_DEST_PORT);
+    // Since this is an outbound only socket, no need to bind
+    return true;
 }
 
 CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> webRTCSessionID,
