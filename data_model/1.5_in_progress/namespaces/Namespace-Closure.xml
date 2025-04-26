@@ -74,7 +74,7 @@ Davis, CA 95616, USA
     <tag id="0x0004" name="Gate">
       <description>A movable barrier that controls entry or exit through an opening in a fence, wall, or enclosure.</description>
     </tag>
-    <tag id="0x0005" name="Garage Door">
+    <tag id="0x0005" name="GarageDoor">
       <description>A large, movable barrier that provides access to a garage.</description>
     </tag>
     <tag id="0x0006" name="Door">
