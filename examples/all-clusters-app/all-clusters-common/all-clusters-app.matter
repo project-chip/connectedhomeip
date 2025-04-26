@@ -7508,11 +7508,10 @@ provisional cluster PushAvStreamTransport = 1365 {
     optional epoch_s expiryTime = 9;
   }
 
-  fabric_scoped struct TransportConfigurationStruct {
+  struct TransportConfigurationStruct {
     int16u connectionID = 0;
     TransportStatusEnum transportStatus = 1;
     optional TransportOptionsStruct transportOptions = 2;
-    fabric_idx fabricIndex = 254;
   }
 
   info event PushTransportBegin = 0 {
@@ -7691,11 +7690,10 @@ provisional cluster PushAvStreamTransport = 1365 {
     optional epoch_s expiryTime = 9;
   }
 
-  fabric_scoped struct TransportConfigurationStruct {
+  struct TransportConfigurationStruct {
     int16u connectionID = 0;
     TransportStatusEnum transportStatus = 1;
     optional TransportOptionsStruct transportOptions = 2;
-    fabric_idx fabricIndex = 254;
   }
 
   info event PushTransportBegin = 0 {

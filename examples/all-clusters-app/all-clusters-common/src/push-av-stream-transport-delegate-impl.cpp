@@ -138,7 +138,7 @@ void PushAvStreamTransportManager::OnAttributeChanged(AttributeId attributeId)
 
 void PushAvStreamTransportManager::Init()
 {
-    return;
+    ChipLogError(Zcl, "Push AV Stream Transport Initialized");
 }
 CHIP_ERROR PushAvStreamTransportManager::LoadCurrentConnections(std::vector<TransportConfigurationStruct> & currentConnections)
 {

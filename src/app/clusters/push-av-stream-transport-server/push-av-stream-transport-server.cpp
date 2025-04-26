@@ -231,18 +231,23 @@ TransportConfigurationStruct * PushAvStreamTransportServer::FindStreamTransportC
 uint16_t PushAvStreamTransportServer::GenerateConnectionID()
 {
     static uint16_t lastAssignedConnectionID = 0;
-    uint16_t nextConnectionID;
-
     do
     {
+        uint16_t nextConnectionID;
         if (lastAssignedConnectionID == MAX_PUSH_TRANSPORT_CONNECTION_ID)
+        {
             nextConnectionID = 0;
+        }
         else
-            nextConnectionID = lastAssignedConnectionID + 1;
-    } while (FindStreamTransportConnection(nextConnectionID));
-
-    lastAssignedConnectionID = nextConnectionID;
-    return nextConnectionID;
+        {
+            nextConnectionID = static_cast<uint16_t>(lastAssignedConnectionID + 1);
+        }
+        lastAssignedConnectionID = nextConnectionID;
+        if (FindStreamTransportConnection(nextConnectionID) == nullptr)
+        {
+            return nextConnectionID;
+        }
+    } while (true);
 }
 
 void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & ctx,
@@ -257,7 +262,7 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
     if (ep == kEmberInvalidEndpointIndex)
     {
         auto status = static_cast<uint8_t>(StatusCodeEnum::kInvalidTLSEndpoint);
-        ChipLogError(Zcl, "HandleAllocatePushTransport: Invalid TLSEndpointId not found");
+        ChipLogError(Zcl, "HandleAllocatePushTransport: Valid TLSEndpointId not found");
         ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, status);
         return;
     }
@@ -331,7 +336,7 @@ void PushAvStreamTransportServer::HandleDeallocatePushTransport(
     Status status         = Status::Success;
     uint16_t connectionID = commandData.connectionID;
 
-    if (!FindStreamTransportConnection(connectionID))
+    if (FindStreamTransportConnection(connectionID) == nullptr)
     {
         ChipLogError(Zcl, "HandleDeallocatePushTransport: ConnectionID Not Found.");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
@@ -355,7 +360,7 @@ void PushAvStreamTransportServer::HandleModifyPushTransport(HandlerContext & ctx
     uint16_t connectionID   = commandData.connectionID;
     auto & transportOptions = commandData.transportOptions;
 
-    if (!FindStreamTransportConnection(connectionID))
+    if (FindStreamTransportConnection(connectionID) == nullptr)
     {
         ChipLogError(Zcl, "HandleModifyPushTransport: ConnectionID Not Found.");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
@@ -383,7 +388,7 @@ void PushAvStreamTransportServer::HandleSetTransportStatus(HandlerContext & ctx,
             connectionIDList.push_back(transportConnection.connectionID);
         }
     }
-    else if (!FindStreamTransportConnection(connectionID.Value()))
+    else if (FindStreamTransportConnection(connectionID.Value()) == nullptr)
     {
         ChipLogError(Zcl, "HandleSetTransportStatus: ConnectionID Not Found.");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
@@ -410,7 +415,7 @@ void PushAvStreamTransportServer::HandleManuallyTriggerTransport(
 
     TransportConfigurationStruct * transportConfiguration = FindStreamTransportConnection(connectionID);
 
-    if (!transportConfiguration)
+    if (transportConfiguration == nullptr)
     {
         ChipLogError(Zcl, "HandleManuallyTriggerTransport: ConnectionID Not Found.");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
