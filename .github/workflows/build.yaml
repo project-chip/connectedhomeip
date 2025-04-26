@@ -138,7 +138,7 @@ jobs:
         name: Build on Linux (fake, gcc_release, clang, simulated)
 
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
             image: ghcr.io/project-chip/chip-build:125
@@ -171,6 +171,13 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: linux
+            # CodeQL + this job is consistently failing (in the step "Run Tests with sanitizers")
+            # deactivate until a better workaround is found
+            # - name: Initialize CodeQL
+            #   if: ${{ inputs.run-codeql  }}
+            #   uses: github/codeql-action/init@v3
+            #   with:
+            #       languages: "cpp"
             - name: Setup and Build Simulated Device
               run: |
                   BUILD_TYPE=simulated
@@ -275,6 +282,13 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target linux-fake-tests build"
+            # CodeQL + this job is consistently failing (in the step "Run Tests with sanitizers")
+            # deactivate until a better solution is found
+            # - name: Perform CodeQL Analysis
+            #   if: ${{ inputs.run-codeql  }}
+            #   uses: ./.github/actions/perform-codeql-analysis
+            #   with:
+            #     language: cpp
 
             - name: Uploading core files
               uses: actions/upload-artifact@v4
