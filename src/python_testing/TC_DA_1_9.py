@@ -34,10 +34,6 @@
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --string-arg app_path:out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app
-#       --string-arg dac_provider_base_path:credentials/test/revoked-attestation-certificates/dac-provider-test-vectors
-#       --string-arg revocation_set_base_path:credentials/test/revoked-attestation-certificates/revocation-sets
-#       --string-arg app_log_path:/tmp/TC_DA_1_9
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -61,6 +57,27 @@ class TC_DA_1_9(MatterBaseTest):
         self.dac_provider_base_path = self.matter_test_config.global_test_params.get('dac_provider_base_path')
         self.revocation_set_base_path = self.matter_test_config.global_test_params.get('revocation_set_base_path')
 
+        # Set ROOT_DIR and default app path
+        # if we are running in CI, we expect the app to be in the SDK root
+        # else we expect the app is running in chip-cert-bin docker image
+        # same for dac_provider_base_path and revocation_set_base_path
+        if self.is_pics_sdk_ci_only:
+            ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
+            DEFAULT_APP_PATH = os.path.join(ROOT_DIR, "out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app")
+        else:
+            ROOT_DIR = "/root"
+            DEFAULT_APP_PATH = os.path.join(ROOT_DIR, "apps/chip-all-clusters-app")
+
+        if self.app_path is None:
+            self.app_path = DEFAULT_APP_PATH
+
+        if self.dac_provider_base_path is None:
+            self.dac_provider_base_path = os.path.join(ROOT_DIR, "credentials/test/revoked-attestation-certificates/dac-provider-test-vectors")
+
+        if self.revocation_set_base_path is None:
+            self.revocation_set_base_path = os.path.join(ROOT_DIR, "credentials/test/revoked-attestation-certificates/revocation-sets")
+
+        # Check if paths that we expect to exist do exist
         if self.app_path is None or not os.path.exists(self.app_path):
             asserts.fail("--string-arg app_path:<app_path> is required for this test, please provide the path to the app (eg: all-clusters-app)")
 
