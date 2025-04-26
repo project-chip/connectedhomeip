@@ -135,7 +135,8 @@ def read_pixit_from_file(path: str) -> dict[str, Optional[str]]:
         return pixit_dict
 
     else:
-        with open(path, 'r') as f:
-            contents = f.read()
-            pixit_dict.update(parse_pixit_xml(contents))
+        if path.lower().endswith('.xml'):
+            with open(path, 'r') as f:
+                contents = f.read()
+                pixit_dict.update(parse_pixit_xml(contents))
         return pixit_dict
