@@ -11,7 +11,7 @@ namespace {{asUpperCamelCase name}} {
 namespace Structs {
 {{#zcl_structs}}
 {{#unless has_more_than_one_cluster}}
-{{> cluster_objects_struct header=false}}
+{{> cluster_objects_struct cluster=../name header=false}}
 {{/unless}}
 {{/zcl_structs}}
 } // namespace Structs
