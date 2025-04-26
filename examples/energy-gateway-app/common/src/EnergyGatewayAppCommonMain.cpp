@@ -35,24 +35,27 @@ constexpr const uint8_t kNamespaceCommodityTariffCommodity = 0x0D;
 
 // CommodityTariffCommodity Namespace: 0x0D
 constexpr const uint8_t kTagElectricalEnergy = 0x00;
-constexpr const uint8_t kTagNaturalGas       = 0x01;
-constexpr const uint8_t kTagWater            = 0x02;
+// -- Uncomment to use these - commented out to avoid unused warning
+// constexpr const uint8_t kTagNaturalGas       = 0x01;
+// constexpr const uint8_t kTagWater            = 0x02;
 
 constexpr const uint8_t kNamespaceCommodityTariffChronology = 0x0B;
 // CommodityTariffChronology Namespace: 0x0B
 constexpr const uint8_t kTagCurrent  = 0x00;
-constexpr const uint8_t kTagPrevious = 0x01;
-constexpr const uint8_t kUpcoming    = 0x02;
+// -- Uncomment to use these - commented out to avoid unused warning
+// constexpr const uint8_t kTagPrevious = 0x01;
+// constexpr const uint8_t kUpcoming    = 0x02;
 
 constexpr const uint8_t kNamespaceCommodityTariffFlow = 0x13;
 // CommodityTariffFlow Namespace: 0x13
 constexpr const uint8_t kTagImport = 0x00;
-constexpr const uint8_t kTagExport = 0x01;
+// -- Uncomment to use these - commented out to avoid unused warning
+// constexpr const uint8_t kTagExport = 0x01;
 
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type electricalEnergyTariffTagList[] = {
     { .namespaceID = kNamespaceCommodityTariffCommodity, .tag = kTagElectricalEnergy },
     { .namespaceID = kNamespaceCommodityTariffChronology, .tag = kTagCurrent },
-    { .namespaceID = kNamespaceCommodityTariffFlow, .tag = kTagExport }
+    { .namespaceID = kNamespaceCommodityTariffFlow, .tag = kTagImport }
 };
 
 /*
