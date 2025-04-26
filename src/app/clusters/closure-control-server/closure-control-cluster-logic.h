@@ -296,6 +296,13 @@ public:
     CHIP_ERROR GenerateSecureStateChangedEvent(const bool secureValue);
 
 private:
+
+    bool mIsInitialized = false;
+    DelegateBase & mDelegate;
+    ClusterConformance mConformance;
+    ClusterState mState;
+    MatterContext & mMatterContext;
+
     /**
      * @brief Function validates if the requested mainState is supported by the closure.
      *        Function validates agaisnt the FeatureMap conformance to validate support.
@@ -393,12 +400,6 @@ private:
      *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      */
     CHIP_ERROR SetOverallTarget(const DataModel::Nullable<GenericOverallTarget> & overallTarget);
-
-    bool mIsInitialized = false;
-    DelegateBase & mDelegate;
-    ClusterConformance mConformance;
-    ClusterState mState;
-    MatterContext & mMatterContext;
 };
 
 } // namespace ClosureControl
