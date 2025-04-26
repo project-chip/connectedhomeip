@@ -17,6 +17,7 @@
 
 import logging
 from datetime import datetime, timedelta, timezone
+from typing import Optional
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
@@ -36,8 +37,8 @@ class ElectricalGridConditionsTestBaseHelper:
     kEventTriggerForecastConditionsUpdate = 0x00A0000000000001
 
     def check_ForecastConditions(self,
-                                 cluster: Clusters.ElectricalGridConditions = Clusters.ElectricalGridConditions,
-                                 forecastConditions: list = None):
+                                 cluster: Clusters.ElectricalGridConditions,
+                                 forecastConditions: list):
         matter_asserts.assert_list(forecastConditions, "ForecastConditions must be a list")
         matter_asserts.assert_list_element_type(
             forecastConditions, cluster.Structs.ElectricalGridConditionsStruct,
@@ -51,8 +52,8 @@ class ElectricalGridConditionsTestBaseHelper:
             self.check_ElectricalGridConditionsStruct(cluster=cluster, struct=item)
 
     def check_ElectricalGridConditionsStruct(self,
-                                             cluster: Clusters.ElectricalGridConditions = Clusters.ElectricalGridConditions,
-                                             struct: Clusters.ElectricalGridConditions.Structs.ElectricalGridConditionsStruct = None):
+                                             cluster: Clusters.ElectricalGridConditions,
+                                             struct: Clusters.ElectricalGridConditions.Structs.ElectricalGridConditionsStruct):
         matter_asserts.assert_valid_uint32(struct.periodStart, 'PeriodStart')
         if struct.periodEnd is not NullValue:
             matter_asserts.assert_valid_uint32(struct.periodEnd, 'PeriodEnd')
@@ -71,7 +72,7 @@ class ElectricalGridConditionsTestBaseHelper:
     async def send_test_event_trigger_forecast_conditions_update(self):
         await self.send_test_event_triggers(eventTrigger=self.kEventTriggerForecastConditionsUpdate)
 
-    def convert_epoch_s_to_time(self, epoch_s, tz=timezone.utc):
+    def convert_epoch_s_to_time(self, epoch_s, tz=timezone.utc) -> Optional[datetime]:
         if epoch_s is not NullValue:
             delta_from_epoch = timedelta(seconds=epoch_s)
             matter_epoch = datetime(2000, 1, 1, 0, 0, 0, 0, tz)

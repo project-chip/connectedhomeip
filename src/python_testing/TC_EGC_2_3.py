@@ -39,13 +39,9 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
-
 import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from TC_EGCTestBase import ElectricalGridConditionsTestBaseHelper
-
-logger = logging.getLogger(__name__)
 
 cluster = Clusters.ElectricalGridConditions
 
@@ -99,8 +95,7 @@ class EGC_2_3(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
                                                              attribute=attributes.ForecastConditions)
 
-        self.check_ForecastConditions(cluster=cluster,
-                                      forecastConditions=val)
+        self.check_ForecastConditions(cluster=cluster, forecastConditions=val)
 
 
 if __name__ == "__main__":
