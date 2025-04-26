@@ -43,8 +43,6 @@
 """Define Matter test case TC_SEPR_2_2."""
 
 
-import logging
-
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.testing.matter_testing import (EventChangeCallback, MatterBaseTest, TestStep, default_matter_test_main, has_cluster,
@@ -52,7 +50,6 @@ from chip.testing.matter_testing import (EventChangeCallback, MatterBaseTest, Te
 from mobly import asserts
 from TC_SEPRTestBase import CommodityPriceTestBaseHelper
 
-logger = logging.getLogger(__name__)
 
 cluster = Clusters.CommodityPrice
 

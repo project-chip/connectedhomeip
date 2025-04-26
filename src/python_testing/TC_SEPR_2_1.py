@@ -43,8 +43,6 @@
 """Define Matter test case TC_SEPR_2_1."""
 
 
-import logging
-
 import chip.clusters as Clusters
 from chip.clusters import Globals
 from chip.clusters.Types import NullValue
@@ -53,7 +51,6 @@ from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter
 from mobly import asserts
 from TC_SEPRTestBase import CommodityPriceTestBaseHelper
 
-logger = logging.getLogger(__name__)
 
 cluster = Clusters.CommodityPrice
 
@@ -109,7 +106,7 @@ class TC_SEPR_2_1(CommodityPriceTestBaseHelper, MatterBaseTest):
         if val is not NullValue:
             asserts.assert_true(isinstance(
                 val, Globals.Structs.CurrencyStruct), "val must be of type CurrencyStruct")
-            self.check_CurrencyStruct(cluster=cluster, struct=val)
+            self.check_CurrencyStruct(struct=val)
 
         self.step("4")
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,

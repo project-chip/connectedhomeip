@@ -17,7 +17,7 @@
 
 import logging
 from datetime import datetime, timedelta, timezone
-
+from typing import Optional
 import chip.clusters as Clusters
 from chip.clusters import Globals
 from chip.clusters.Types import NullValue
@@ -40,8 +40,8 @@ class CommodityPriceTestBaseHelper:
     kEventTriggerForecastUpdate = 0x0095000000000001
 
     def check_CommodityPriceForecast(self,
-                                     cluster: Clusters.CommodityPrice = None,
-                                     priceForecast: list = None,
+                                     cluster: Clusters.CommodityPrice,
+                                     priceForecast: list,
                                      details: Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap
                                      = Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap(0)
                                      ):
@@ -64,8 +64,8 @@ class CommodityPriceTestBaseHelper:
                                             now_time_must_be_within_period=False)  # Do not check time limits for forecast
 
     def check_CommodityPriceStruct(self,
-                                   cluster: Clusters.CommodityPrice = None,
-                                   struct: Clusters.CommodityPrice.Structs.CommodityPriceStruct = None,
+                                   cluster: Clusters.CommodityPrice,
+                                   struct: Clusters.CommodityPrice.Structs.CommodityPriceStruct,
                                    details: Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap = 0,
                                    now_time_must_be_within_period: bool = True):
         """now_time_must_be_within_period - When verifying a 'CurrentPrice' then 
@@ -124,22 +124,19 @@ class CommodityPriceTestBaseHelper:
                     "Components attribute must contain CommodityPriceComponentStruct elements",
                     allow_empty=True)
                 for item in struct.components:
-                    self.check_CommodityPriceComponentStruct(cluster=cluster, struct=item)
+                    self.check_CommodityPriceComponentStruct(struct=item)
                 asserts.assert_less_equal(len(struct.components), self.kMaxComponentsPerPrice,
                                           f"Components must have at most {self.kMaxComponentsPerPrice} entries!")
         else:
             asserts.assert_is_none(struct.components)
 
-    def check_CurrencyStruct(self,
-                             cluster: Clusters.CommodityPrice = None,
-                             struct: Globals.Structs.CurrencyStruct = None):
+    def check_CurrencyStruct(self, struct: Globals.Structs.CurrencyStruct):
         matter_asserts.assert_valid_uint16(struct.currency, 'Currency')
         asserts.assert_less_equal(struct.currency, 999)
         matter_asserts.assert_valid_uint8(struct.decimalPoints, 'DecimalPoints')
 
     def check_CommodityPriceComponentStruct(self,
-                                            cluster: Clusters.CommodityPrice = None,
-                                            struct: Clusters.CommodityPrice.Structs.CommodityPriceComponentStruct = None):
+                                            struct: Clusters.CommodityPrice.Structs.CommodityPriceComponentStruct):
         matter_asserts.assert_valid_int64(struct.price, 'Price')
         matter_asserts.assert_valid_enum(
             struct.source, "Source attribute must return a TariffPriceTypeEnum", Globals.Enums.TariffPriceTypeEnum)
@@ -182,7 +179,7 @@ class CommodityPriceTestBaseHelper:
     async def send_test_event_trigger_forecast_update(self):
         await self.send_test_event_triggers(eventTrigger=self.kEventTriggerForecastUpdate)
 
-    def convert_epoch_s_to_time(self, epoch_s, tz=timezone.utc):
+    def convert_epoch_s_to_time(self, epoch_s, tz=timezone.utc) -> Optional[datetime]:
         if epoch_s is not NullValue:
             delta_from_epoch = timedelta(seconds=epoch_s)
             matter_epoch = datetime(2000, 1, 1, 0, 0, 0, 0, tz)
