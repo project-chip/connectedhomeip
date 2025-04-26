@@ -979,8 +979,8 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
         unique_ids = []
         self.print_step("1", "TH reads aggregator DeviceType revision from spec for Endpoint 0")
-        if self.matter_test_config.pixit['PIXIT.DESC.DeviceTypeConformanceList']:
-            aggregator_deviceType_revision = self.matter_test_config.pixit['PIXIT.DESC.DeviceTypeConformanceList']
+        if self.matter_test_config.pics['PIXIT.DESC.DeviceTypeConformanceList']:
+            aggregator_deviceType_revision = self.matter_test_config.pics['PIXIT.DESC.DeviceTypeConformanceList']
         else:
             self.fail_current_test()
         self.print_step("1a.1", "TH reads DeviceTypeList and PartsList attributes from DUT for Endpoint 0")

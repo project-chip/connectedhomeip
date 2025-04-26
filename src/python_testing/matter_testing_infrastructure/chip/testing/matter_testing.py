@@ -68,7 +68,7 @@ from chip.setup_payload import SetupPayload
 from chip.storage import PersistentStorage
 from chip.testing.commissioning import CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices
 from chip.testing.global_attribute_ids import GlobalAttributeIds
-from chip.testing.pics import read_pics_from_file, read_pixit_from_file
+from chip.testing.pics import read_pics_from_file
 from chip.tracing import TracingContext
 from mobly import asserts, base_test, signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
@@ -689,7 +689,6 @@ class MatterTestConfig:
     thread_operational_dataset: Optional[str] = None
 
     pics: dict[bool, str] = field(default_factory=dict)
-    pixit: dict[str, Optional[str]] = field(default_factory=dict)
     # Node ID for basic DUT
     dut_node_ids: List[int] = field(default_factory=list)
     # Node ID to use for controller/commissioner
@@ -1991,7 +1990,6 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.paa_trust_store_path = args.paa_trust_store_path
     config.ble_controller = args.ble_controller
     config.pics = {} if args.PICS is None else read_pics_from_file(args.PICS)
-    config.pixit = {} if args.PICS is None else read_pixit_from_file(args.PICS)
     config.tests = list(chain.from_iterable(args.tests or []))
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
