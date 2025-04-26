@@ -18,6 +18,7 @@
 import logging
 from datetime import datetime, timedelta, timezone
 from typing import Optional
+
 import chip.clusters as Clusters
 from chip.clusters import Globals
 from chip.clusters.Types import NullValue

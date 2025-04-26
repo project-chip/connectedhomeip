@@ -50,7 +50,6 @@ from chip.testing.matter_testing import (EventChangeCallback, MatterBaseTest, Te
 from mobly import asserts
 from TC_SEPRTestBase import CommodityPriceTestBaseHelper
 
-
 cluster = Clusters.CommodityPrice
 
 
