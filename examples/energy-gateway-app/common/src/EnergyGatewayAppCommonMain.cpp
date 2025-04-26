@@ -41,7 +41,7 @@ constexpr const uint8_t kTagElectricalEnergy = 0x00;
 
 constexpr const uint8_t kNamespaceCommodityTariffChronology = 0x0B;
 // CommodityTariffChronology Namespace: 0x0B
-constexpr const uint8_t kTagCurrent  = 0x00;
+constexpr const uint8_t kTagCurrent = 0x00;
 // -- Uncomment to use these - commented out to avoid unused warning
 // constexpr const uint8_t kTagPrevious = 0x01;
 // constexpr const uint8_t kUpcoming    = 0x02;
