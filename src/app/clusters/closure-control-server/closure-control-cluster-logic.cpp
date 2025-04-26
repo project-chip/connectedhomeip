@@ -49,7 +49,7 @@ CHIP_ERROR ClusterLogic::Init(const ClusterConformance & conformance, const Clus
     return CHIP_NO_ERROR;
 }
 
-bool ClusterLogic::IsSupportedMainState(MainStateEnum mainState)
+bool ClusterLogic::IsSupportedMainState(MainStateEnum mainState) const
 {
     bool isSupported = false;
 
@@ -85,13 +85,13 @@ bool ClusterLogic::IsSupportedMainState(MainStateEnum mainState)
     return isSupported;
 }
 
-bool ClusterLogic::IsValidMainStateTransition(MainStateEnum mainState)
+bool ClusterLogic::IsValidMainStateTransition(MainStateEnum mainState) const
 {
     // TODO: Implement the MainState state machine to validate transitions
     return true;
 }
 
-bool ClusterLogic::IsSupportedOverallStatePositioning(PositioningEnum positioning)
+bool ClusterLogic::IsSupportedOverallStatePositioning(PositioningEnum positioning) const
 {
     bool isSupported = false;
 
@@ -121,7 +121,7 @@ bool ClusterLogic::IsSupportedOverallStatePositioning(PositioningEnum positionin
     return isSupported;
 }
 
-bool ClusterLogic::IsSupportedOverallTargetPositioning(TargetPositionEnum positioning)
+bool ClusterLogic::IsSupportedOverallTargetPositioning(TargetPositionEnum positioning) const
 {
     bool isSupported = false;
 
@@ -198,7 +198,7 @@ CHIP_ERROR ClusterLogic::SetMainState(MainStateEnum mainState)
 
     if (mainState == MainStateEnum::kDisengaged)
     {
-        PostEngageStateChangedEvent(false);
+        GenerateEngageStateChangedEvent(false);
     }
 
     mState.mMainState = mainState;
@@ -230,70 +230,61 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mState.mOverallState != overallState, CHIP_NO_ERROR);
 
-    if (overallState.IsNull())
+    if (!overallState.IsNull())
     {
-        // Mark OverallState attribute as dirty only if value changes.
-        if (!mState.mOverallState.IsNull())
+        const GenericOverallState & incomingOverallState = overallState.Value();
+
+        // Validate the incoming Positioning value and featureMap conformance.
+        if (incomingOverallState.positioning.HasValue())
         {
-            mState.mOverallState.SetNull();
-            mMatterContext.MarkDirty(Attributes::OverallState::Id);
+            // If the positioning member is present in the incoming OverallState, we need to check if the Positioning
+            // feature is supported by the closure. If the Positioning feature is not supported, return an error.
+            VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
+            if (!incomingOverallState.positioning.Value().IsNull())
+            {
+                VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallState.positioning.Value().Value()) !=
+                                        PositioningEnum::kUnknownEnumValue,
+                                    CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError(IsSupportedOverallStatePositioning(incomingOverallState.positioning.Value().Value()),
+                                    CHIP_ERROR_INVALID_ARGUMENT);
+            }
         }
 
-        return CHIP_NO_ERROR;
-    }
-
-    const GenericOverallState & incomingOverallState = overallState.Value();
-
-    // Validate the incoming Positioning value and featureMap conformance.
-    if (incomingOverallState.positioning.HasValue())
-    {
-        // If the positioning member is present in the incoming OverallState, we need to check if the Positioning
-        // feature is supported by the device. If the Positioning feature is not supported, return an error.
-        VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-        if (!incomingOverallState.positioning.Value().IsNull())
+        // Validate the incoming Latch featureMap conformance.
+        if (incomingOverallState.latch.HasValue())
         {
-            VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallState.positioning.Value().Value()) !=
-                                    PositioningEnum::kUnknownEnumValue,
-                                CHIP_ERROR_INVALID_ARGUMENT);
-            VerifyOrReturnError(IsSupportedOverallStatePositioning(incomingOverallState.positioning.Value().Value()),
-                                CHIP_ERROR_INVALID_ARGUMENT);
+            // If the latch member is present in the incoming OverallState, we need to check if the MotionLatching
+            // feature is supported by the closure. If the MotionLatching feature is not supported, return an error.
+            VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+        }
+
+        // Validate the incoming Speed value and featureMap conformance.
+        if (incomingOverallState.speed.HasValue())
+        {
+            // If the speed member is present in the incoming OverallState, we need to check if the Speed feature is
+            // supported by the closure. If the Speed feature is not supported, return an error.
+            VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
+            if (!incomingOverallState.speed.Value().IsNull())
+            {
+                VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallState.speed.Value().Value()) !=
+                                        Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
+                                    CHIP_ERROR_INVALID_ARGUMENT);
+            }
+        }
+
+        // Validate the incoming SecureState featureMap conformance.
+        if (incomingOverallState.secureState.HasValue())
+        {
+            // If the secureState member is present in the OverallState, we need to check if the Speed feature is
+            // supported by the closure. If the Speed feature is not supported, return an error.
+            VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) || mConformance.HasFeature(Feature::kMotionLatching),
+                                CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
         }
     }
 
-    // Validate the incoming Latch featureMap conformance.
-    if (incomingOverallState.latch.HasValue())
-    {
-        // If the latch member is present in the incoming OverallState, we need to check if the MotionLatching
-        // feature is supported by the device. If the MotionLatching feature is not supported, return an error.
-        VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    }
-
-    // Validate the incoming Speed value and featureMap conformance.
-    if (incomingOverallState.speed.HasValue())
-    {
-        // If the speed member is present in the incoming OverallState, we need to check if the Speed feature is
-        // supported by the device. If the Speed feature is not supported, return an error.
-        VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-        if (!incomingOverallState.speed.Value().IsNull())
-        {
-            VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallState.speed.Value().Value()) !=
-                                    Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
-                                CHIP_ERROR_INVALID_ARGUMENT);
-        }
-    }
-
-    // Validate the incoming SecureState featureMap conformance.
-    if (incomingOverallState.secureState.HasValue())
-    {
-        // If the secureState member is present in the OverallState, we need to check if the Speed feature is
-        // supported by the device. If the Speed feature is not supported, return an error.
-        VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) || mConformance.HasFeature(Feature::kMotionLatching),
-                            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    }
-
-    mState.mOverallState.SetNonNull(overallState.Value());
+    mState.mOverallState = overallState;
     mMatterContext.MarkDirty(Attributes::OverallState::Id);
 
     return CHIP_NO_ERROR;
@@ -306,55 +297,46 @@ CHIP_ERROR ClusterLogic::SetOverallTarget(const DataModel::Nullable<GenericOvera
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mState.mOverallTarget != overallTarget, CHIP_NO_ERROR);
 
-    if (overallTarget.IsNull())
+    if (!overallTarget.IsNull())
     {
-        // Mark OverallTarget attribute as dirty only if value changes.
-        if (!mState.mOverallTarget.IsNull())
+        const GenericOverallTarget & incomingOverallTarget = overallTarget.Value();
+
+        // Validate the incoming Position value and featureMap conformance.
+        if (incomingOverallTarget.position.HasValue())
         {
-            mState.mOverallTarget.SetNull();
-            mMatterContext.MarkDirty(Attributes::OverallState::Id);
+            // If the position member is present in the incoming OverallTarget, we need to check if the Position
+            // feature is supported by the closure. If the Position feature is not supported, return an error.
+            VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
+            VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallTarget.position.Value()) != TargetPositionEnum::kUnknownEnumValue,
+                                CHIP_ERROR_INVALID_ARGUMENT);
+
+            VerifyOrReturnError(IsSupportedOverallTargetPositioning(incomingOverallTarget.position.Value()),
+                                CHIP_ERROR_INVALID_ARGUMENT);
         }
 
-        return CHIP_NO_ERROR;
+        // Validate the incoming Latch featureMap conformance.
+        if (incomingOverallTarget.latch.HasValue())
+        {
+            // If the latch member is present in the incoming OverallTarget, we need to check if the MotionLatching
+            // feature is supported by the closure. If the MotionLatching feature is not supported, return an error.
+            VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+        }
+
+        // Validate the incoming Speed value and featureMap conformance.
+        if (incomingOverallTarget.speed.HasValue())
+        {
+            // If the speed member is present in the incoming OverallTarget, we need to check if the Speed feature is
+            // supported by the closure. If the Speed feature is not supported, return an error.
+            VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
+            VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallTarget.speed.Value()) !=
+                                    Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
+                                CHIP_ERROR_INVALID_ARGUMENT);
+        }
     }
 
-    const GenericOverallTarget & incomingOverallTarget = overallTarget.Value();
-
-    // Validate the incoming Position value and featureMap conformance.
-    if (incomingOverallTarget.position.HasValue())
-    {
-        // If the position member is present in the incoming OverallTarget, we need to check if the Position
-        // feature is supported by the device. If the Position feature is not supported, return an error.
-        VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-        VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallTarget.position.Value()) != TargetPositionEnum::kUnknownEnumValue,
-                            CHIP_ERROR_INVALID_ARGUMENT);
-
-        VerifyOrReturnError(IsSupportedOverallTargetPositioning(incomingOverallTarget.position.Value()),
-                            CHIP_ERROR_INVALID_ARGUMENT);
-    }
-
-    // Validate the incoming Latch featureMap conformance.
-    if (incomingOverallTarget.latch.HasValue())
-    {
-        // If the latch member is present in the incoming OverallTarget, we need to check if the MotionLatching
-        // feature is supported by the device. If the MotionLatching feature is not supported, return an error.
-        VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    }
-
-    // Validate the incoming Speed value and featureMap conformance.
-    if (incomingOverallTarget.speed.HasValue())
-    {
-        // If the speed member is present in the incoming OverallTarget, we need to check if the Speed feature is
-        // supported by the device. If the Speed feature is not supported, return an error.
-        VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-        VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallTarget.speed.Value()) !=
-                                Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
-                            CHIP_ERROR_INVALID_ARGUMENT);
-    }
-
-    mState.mOverallTarget.SetNonNull(overallTarget.Value());
+    mState.mOverallTarget= overallTarget;
     mMatterContext.MarkDirty(Attributes::OverallTarget::Id);
 
     return CHIP_NO_ERROR;
@@ -401,14 +383,12 @@ CHIP_ERROR ClusterLogic::GetOverallTarget(DataModel::Nullable<GenericOverallTarg
 
 CHIP_ERROR ClusterLogic::GetCurrentErrorList(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     // List can contain at most only 10 Error
     for (size_t i = 0; i < kCurrentErrorListSize; i++)
     {
         ClosureErrorEnum error;
 
-        err = mDelegate.GetCurrentErrorAtIndex(i, error);
+        CHIP_ERROR err = mDelegate.GetCurrentErrorAtIndex(i, error);
 
         // Convert CHIP_ERROR_PROVIDER_LIST_EXHAUSTED to CHIP_NO_ERROR
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
@@ -416,18 +396,14 @@ CHIP_ERROR ClusterLogic::GetCurrentErrorList(const AttributeValueEncoder::ListEn
             return CHIP_NO_ERROR;
         }
 
-        // Exit for other errors occurred apart from CHIP_ERROR_PROVIDER_LIST_EXHAUSTED
+        // Return for other errors occurred apart from CHIP_ERROR_PROVIDER_LIST_EXHAUSTED
         ReturnErrorOnFailure(err);
 
         // Encode the error
-        err = encoder.Encode(error);
-
-        // Check if error occurred while trying to encode
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(encoder.Encode(error));
     }
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 Protocols::InteractionModel::Status ClusterLogic::HandleStop()
@@ -445,7 +421,8 @@ Protocols::InteractionModel::Status ClusterLogic::HandleStop()
     if ((state == MainStateEnum::kCalibrating) || (state == MainStateEnum::kMoving) || (state == MainStateEnum::kWaitingForMotion))
     {
         // Set the MainState to 'Stopped' only if the delegate call to HandleMoveToCommand is successful.
-        VerifyOrReturnError(mDelegate.HandleStopCommand() == Status::Success, Status::Failure);
+        Status status = mDelegate.HandleStopCommand();
+        VerifyOrReturnValue(status == Status::Success, status);
 
         VerifyOrReturnError(SetMainState(MainStateEnum::kStopped) == CHIP_NO_ERROR, Status::Failure,
                             ChipLogError(AppServer, "Stop Command: Failed to set MainState to Stopped"));
@@ -463,11 +440,14 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
 
     VerifyOrReturnError(position.HasValue() || latch.HasValue() || speed.HasValue(), Status::InvalidCommand);
 
-    if (position.HasValue() && mConformance.HasFeature(Feature::kPositioning))
+    if (position.HasValue())
     {
         VerifyOrReturnError(position.Value() != TargetPositionEnum::kUnknownEnumValue, Status::ConstraintError);
 
-        target.position = position;
+        if(mConformance.HasFeature(Feature::kPositioning))
+        {
+            target.position = position;
+        }
     }
 
     if (latch.HasValue() && mConformance.HasFeature(Feature::kMotionLatching))
@@ -481,11 +461,14 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
         target.latch = latch;
     }
 
-    if (speed.HasValue() && mConformance.HasFeature(Feature::kSpeed))
+    if (speed.HasValue())
     {
         VerifyOrReturnError(speed.Value() != Globals::ThreeLevelAutoEnum::kUnknownEnumValue, Status::ConstraintError);
 
-        target.speed = speed;
+        if(mConformance.HasFeature(Feature::kSpeed))
+        {
+            target.speed = speed;
+        }
     }
 
     MainStateEnum state;
@@ -508,8 +491,9 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
                             ChipLogError(AppServer, "MoveTo Command: Failed to set MainState to kWaitingForMotion"));
     }
 
-    // Set OverallTarget and MainState only if the delegate call to HandleMoveToCommand is successful
-    VerifyOrReturnError(mDelegate.HandleMoveToCommand(position, latch, speed) == Status::Success, Status::Failure);
+    // Set OverallTarget only if the delegate call to HandleMoveToCommand is successful
+    Status status = mDelegate.HandleMoveToCommand(position, latch, speed);
+    VerifyOrReturnValue(status == Status::Success, status);
 
     VerifyOrReturnError(SetOverallTarget(DataModel::MakeNullable(target)) == CHIP_NO_ERROR, Status::Failure);
 
@@ -534,7 +518,8 @@ Protocols::InteractionModel::Status ClusterLogic::HandleCalibrate()
     VerifyOrReturnError(state == MainStateEnum::kStopped, Status::InvalidInState);
 
     // Set the MainState to 'Calibrating' only if the delegate call to HandleCalibrateCommand is successful
-    VerifyOrReturnError(mDelegate.HandleCalibrateCommand() == Status::Success, Status::Failure);
+    Status status = mDelegate.HandleCalibrateCommand();
+    VerifyOrReturnValue(status == Status::Success, status);
 
     VerifyOrReturnError(SetMainState(MainStateEnum::kCalibrating) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Calibrate Command: Failed to set MainState to Calibrating"));
@@ -547,7 +532,7 @@ CHIP_ERROR ClusterLogic::GenerateOperationalErrorEvent(const DataModel::List<con
     ReturnErrorOnFailure(SetMainState(MainStateEnum::kError));
 
     Events::OperationalError::Type event{ .errorState = errorState };
-    ReturnErrorOnFailure(mMatterContext.LogClosureEvent(event));
+    ReturnErrorOnFailure(mMatterContext.GenerateEvent(event));
 
     return CHIP_NO_ERROR;
 }
@@ -558,7 +543,7 @@ CHIP_ERROR ClusterLogic::GenerateMovementCompletedEvent()
                         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     Events::MovementCompleted::Type event{};
-    ReturnErrorOnFailure(mMatterContext.LogClosureEvent(event));
+    ReturnErrorOnFailure(mMatterContext.GenerateEvent(event));
 
     return CHIP_NO_ERROR;
 }
@@ -568,7 +553,7 @@ CHIP_ERROR ClusterLogic::GenerateEngageStateChangedEvent(const bool engageValue)
     VerifyOrReturnError(mConformance.HasFeature(Feature::kManuallyOperable), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     Events::EngageStateChanged::Type event{ .engageValue = engageValue };
-    ReturnErrorOnFailure(mMatterContext.LogClosureEvent(event));
+    ReturnErrorOnFailure(mMatterContext.GenerateEvent(event));
 
     return CHIP_NO_ERROR;
 }
@@ -579,7 +564,7 @@ CHIP_ERROR ClusterLogic::GenerateSecureStateChangedEvent(const bool secureValue)
                         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     Events::SecureStateChanged::Type event{ .secureValue = secureValue };
-    ReturnErrorOnFailure(mMatterContext.LogClosureEvent(event));
+    ReturnErrorOnFailure(mMatterContext.GenerateEvent(event));
 
     return CHIP_NO_ERROR;
 }
