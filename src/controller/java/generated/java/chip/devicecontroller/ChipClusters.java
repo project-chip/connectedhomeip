@@ -64562,31 +64562,17 @@ public class ChipClusters {
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
-          final long connectionIDFieldID = 0L;
-          Integer connectionID = null;
-          final long transportOptionsFieldID = 1L;
-          ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct transportOptions = null;
-          final long transportStatusFieldID = 2L;
-          Integer transportStatus = null;
+          final long transportConfigurationFieldID = 0L;
+          ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct transportConfiguration = null;
           for (StructElement element: invokeStructValue.value()) {
-            if (element.contextTagNum() == connectionIDFieldID) {
-              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-                UIntType castingValue = element.value(UIntType.class);
-                connectionID = castingValue.value(Integer.class);
-              }
-            } else if (element.contextTagNum() == transportOptionsFieldID) {
+            if (element.contextTagNum() == transportConfigurationFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
                 StructType castingValue = element.value(StructType.class);
-                transportOptions = ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct.decodeTlv(castingValue);
-              }
-            } else if (element.contextTagNum() == transportStatusFieldID) {
-              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-                UIntType castingValue = element.value(UIntType.class);
-                transportStatus = castingValue.value(Integer.class);
+                transportConfiguration = ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct.decodeTlv(castingValue);
               }
             }
           }
-          callback.onSuccess(connectionID, transportOptions, transportStatus);
+          callback.onSuccess(transportConfiguration);
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
@@ -64634,16 +64620,16 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void setTransportStatus(DefaultClusterCallback callback, Integer connectionID, Integer transportStatus) {
+    public void setTransportStatus(DefaultClusterCallback callback, @Nullable Integer connectionID, Integer transportStatus) {
       setTransportStatus(callback, connectionID, transportStatus, 0);
     }
 
-    public void setTransportStatus(DefaultClusterCallback callback, Integer connectionID, Integer transportStatus, int timedInvokeTimeoutMs) {
+    public void setTransportStatus(DefaultClusterCallback callback, @Nullable Integer connectionID, Integer transportStatus, int timedInvokeTimeoutMs) {
       final long commandId = 4L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long connectionIDFieldID = 0L;
-      BaseTLVType connectionIDtlvValue = new UIntType(connectionID);
+      BaseTLVType connectionIDtlvValue = connectionID != null ? new UIntType(connectionID) : new NullType();
       elements.add(new StructElement(connectionIDFieldID, connectionIDtlvValue));
 
       final long transportStatusFieldID = 1L;
@@ -64702,30 +64688,30 @@ public class ChipClusters {
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
-          final long streamConfigurationsFieldID = 0L;
-          ArrayList<ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct> streamConfigurations = null;
+          final long transportConfigurationsFieldID = 0L;
+          ArrayList<ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct> transportConfigurations = null;
           for (StructElement element: invokeStructValue.value()) {
-            if (element.contextTagNum() == streamConfigurationsFieldID) {
+            if (element.contextTagNum() == transportConfigurationsFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.Array) {
                 ArrayType castingValue = element.value(ArrayType.class);
-                streamConfigurations = castingValue.map((elementcastingValue) -> ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct.decodeTlv(elementcastingValue));
+                transportConfigurations = castingValue.map((elementcastingValue) -> ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct.decodeTlv(elementcastingValue));
               }
             }
           }
-          callback.onSuccess(streamConfigurations);
+          callback.onSuccess(transportConfigurations);
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface AllocatePushTransportResponseCallback extends BaseClusterCallback {
-      void onSuccess(Integer connectionID, ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct transportOptions, Integer transportStatus);
+      void onSuccess(ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct transportConfiguration);
     }
 
     public interface FindTransportResponseCallback extends BaseClusterCallback {
-      void onSuccess(ArrayList<ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct> streamConfigurations);
+      void onSuccess(ArrayList<ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct> transportConfigurations);
     }
 
     public interface CurrentConnectionsAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Integer> value);
+      void onSuccess(List<ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct> value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -64803,7 +64789,7 @@ public class ChipClusters {
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, CURRENT_CONNECTIONS_ATTRIBUTE_ID, true);
@@ -64816,7 +64802,7 @@ public class ChipClusters {
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, CURRENT_CONNECTIONS_ATTRIBUTE_ID, minInterval, maxInterval);

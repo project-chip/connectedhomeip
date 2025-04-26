@@ -29199,7 +29199,8 @@ void registerClusterPushAvStreamTransport(Commands & commands, CredentialIssuerC
         make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::PushAvStreamTransport::SupportedIngestMethodsBitmap>>>(
             Id, "supported-ingest-methods", 0, UINT8_MAX, Attributes::SupportedIngestMethods::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const uint16_t>>>(
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
+            const chip::app::Clusters::PushAvStreamTransport::Structs::TransportConfigurationStruct::Type>>>(
             Id, "current-connections", Attributes::CurrentConnections::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,

@@ -89,9 +89,21 @@ Davis, CA 95616, USA
         <feature name="PS"/>
       </optionalConform>
     </feature>
-    <feature bit="5" code="TR" name="Translation" summary="Drives a translation motion"/>
-    <feature bit="6" code="RO" name="Rotation" summary="Drives a rotation motion"/>
-    <feature bit="7" code="MD" name="Modulation" summary="Modulates a particular flow level (light, air, privacy ...)"/>
+    <feature bit="5" code="TR" name="Translation" summary="Drives a translation motion">
+      <optionalConform choice="b">
+        <feature name="PS"/>
+      </optionalConform>
+    </feature>
+    <feature bit="6" code="RO" name="Rotation" summary="Drives a rotation motion">
+      <optionalConform choice="b">
+        <feature name="PS"/>
+      </optionalConform>
+    </feature>
+    <feature bit="7" code="MD" name="Modulation" summary="Modulates a particular flow level (light, air, privacy ...)">
+      <optionalConform choice="b">
+        <feature name="PS"/>
+      </optionalConform>
+    </feature>
   </features>
   <dataTypes>
     <enum name="ClosureUnitEnum">
@@ -351,6 +363,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0002" name="Resolution" type="percent100ths">
       <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="PS"/>
       </mandatoryConform>
@@ -360,6 +373,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0003" name="StepValue" type="percent100ths">
       <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="PS"/>
       </mandatoryConform>
@@ -369,6 +383,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0004" name="Unit" type="ClosureUnitEnum">
       <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="UT"/>
       </mandatoryConform>
@@ -394,19 +409,21 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0007" name="TranslationDirection" type="TranslationDirectionEnum">
       <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="TR"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0008" name="RotationAxis" type="RotationAxisEnum">
       <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="RO"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0009" name="Overflow" type="OverflowEnum">
       <access read="true" readPrivilege="view"/>
-      <quality persistence="nonVolatile"/>
+      <quality persistence="fixed"/>
       <otherwiseConform>
         <mandatoryConform>
           <feature name="RO"/>
@@ -418,6 +435,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000A" name="ModulationType" type="ModulationTypeEnum">
       <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="MD"/>
       </mandatoryConform>
