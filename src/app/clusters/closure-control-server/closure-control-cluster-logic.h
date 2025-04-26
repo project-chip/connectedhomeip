@@ -296,7 +296,6 @@ public:
     CHIP_ERROR GenerateSecureStateChangedEvent(const bool secureValue);
 
 private:
-
     bool mIsInitialized = false;
     DelegateBase & mDelegate;
     ClusterConformance mConformance;
