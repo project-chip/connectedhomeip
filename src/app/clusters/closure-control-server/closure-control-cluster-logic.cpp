@@ -308,7 +308,8 @@ CHIP_ERROR ClusterLogic::SetOverallTarget(const DataModel::Nullable<GenericOvera
             // feature is supported by the closure. If the Position feature is not supported, return an error.
             VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-            VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallTarget.position.Value()) != TargetPositionEnum::kUnknownEnumValue,
+            VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallTarget.position.Value()) !=
+                                    TargetPositionEnum::kUnknownEnumValue,
                                 CHIP_ERROR_INVALID_ARGUMENT);
 
             VerifyOrReturnError(IsSupportedOverallTargetPositioning(incomingOverallTarget.position.Value()),
@@ -336,7 +337,7 @@ CHIP_ERROR ClusterLogic::SetOverallTarget(const DataModel::Nullable<GenericOvera
         }
     }
 
-    mState.mOverallTarget= overallTarget;
+    mState.mOverallTarget = overallTarget;
     mMatterContext.MarkDirty(Attributes::OverallTarget::Id);
 
     return CHIP_NO_ERROR;
@@ -432,7 +433,7 @@ Protocols::InteractionModel::Status ClusterLogic::HandleStop()
 }
 
 Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPositionEnum> position, Optional<bool> latch,
-                                                                     Optional<Globals::ThreeLevelAutoEnum> speed)
+                                                               Optional<Globals::ThreeLevelAutoEnum> speed)
 {
     VerifyOrDieWithMsg(mIsInitialized, AppServer, "MoveTo Command called before Initialization of closure");
 
@@ -444,7 +445,7 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
     {
         VerifyOrReturnError(position.Value() != TargetPositionEnum::kUnknownEnumValue, Status::ConstraintError);
 
-        if(mConformance.HasFeature(Feature::kPositioning))
+        if (mConformance.HasFeature(Feature::kPositioning))
         {
             target.position = position;
         }
@@ -465,7 +466,7 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
     {
         VerifyOrReturnError(speed.Value() != Globals::ThreeLevelAutoEnum::kUnknownEnumValue, Status::ConstraintError);
 
-        if(mConformance.HasFeature(Feature::kSpeed))
+        if (mConformance.HasFeature(Feature::kSpeed))
         {
             target.speed = speed;
         }
