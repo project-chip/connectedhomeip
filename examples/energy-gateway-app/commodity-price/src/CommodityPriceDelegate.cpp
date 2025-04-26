@@ -35,7 +35,7 @@ using chip::Protocols::InteractionModel::Status;
 // From ISO 4217 (non exhaustive selection)
 // Prices are in 1000th of a penny / cent
 
-const CurrencyStruct::Type currencyGBP  = { .currency = kCurrencyGBP, .decimalPoints = 5 };
+const CurrencyStruct::Type currencyGBP = { .currency = kCurrencyGBP, .decimalPoints = 5 };
 // -- Uncomment to use these - commented out to avoid unused warning
 // const CurrencyStruct::Type currencyCHF  = { .currency = kCurrencyCHF, .decimalPoints = 5 };
 // const CurrencyStruct::Type currencyEURO = { .currency = kCurrencyEURO, .decimalPoints = 5 };
