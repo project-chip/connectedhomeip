@@ -213,7 +213,7 @@ public:
      *          UnsupportedCommand if Instantaneous feature is supported.
      *          Success on succesful handling or Error Otherwise
      */
-    chip::Protocols::InteractionModel::Status HandleStop();
+    Protocols::InteractionModel::Status HandleStop();
 
     /**
      *  @brief Calls delegate HandleMoveToCommand function after validating the parameters and conformance.
@@ -227,7 +227,7 @@ public:
      *          InvalidInState if the MoveTo command not supported from present Mainstate.
      *          Success on succesful handling.
      */
-    chip::Protocols::InteractionModel::Status HandleMoveTo(Optional<TargetPositionEnum> position, Optional<bool> latch,
+    Protocols::InteractionModel::Status HandleMoveTo(Optional<TargetPositionEnum> position, Optional<bool> latch,
                                                            Optional<Globals::ThreeLevelAutoEnum> speed);
 
     /**
@@ -238,7 +238,7 @@ public:
      *          InvalidInState if the Calibrate command not supported from present Mainstate.
      *          Success on succesful handling.
      */
-    chip::Protocols::InteractionModel::Status HandleCalibrate();
+    Protocols::InteractionModel::Status HandleCalibrate();
 
     /**
      * @brief Post event when a reportable error condition is detected

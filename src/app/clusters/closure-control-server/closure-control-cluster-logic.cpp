@@ -193,7 +193,7 @@ CHIP_ERROR ClusterLogic::SetMainState(MainStateEnum mainState)
     // EngageStateChanged event SHALL be generated when the MainStateEnum attribute changes state to and from disengaged state
     if (mState.mMainState == MainStateEnum::kDisengaged)
     {
-        PostEngageStateChangedEvent(true);
+        GenerateEngageStateChangedEvent(true);
     }
 
     if (mainState == MainStateEnum::kDisengaged)
@@ -244,7 +244,7 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
 
     const GenericOverallState & incomingOverallState = overallState.Value();
 
-    // Validate the incomging Positioning value and featureMap conformance.
+    // Validate the incoming Positioning value and featureMap conformance.
     if (incomingOverallState.positioning.HasValue())
     {
         // If the positioning member is present in the incoming OverallState, we need to check if the Positioning
@@ -261,15 +261,15 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
         }
     }
 
-    // Validate the incomging Latch featureMap conformance.
+    // Validate the incoming Latch featureMap conformance.
     if (incomingOverallState.latch.HasValue())
     {
-        // If the latching member is present in the incoming OverallState, we need to check if the MotionLatching
+        // If the latch member is present in the incoming OverallState, we need to check if the MotionLatching
         // feature is supported by the device. If the MotionLatching feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     }
 
-    // Validate the incomging Speed value and featureMap conformance.
+    // Validate the incoming Speed value and featureMap conformance.
     if (incomingOverallState.speed.HasValue())
     {
         // If the speed member is present in the incoming OverallState, we need to check if the Speed feature is
@@ -284,7 +284,7 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
         }
     }
 
-    // Validate the incomging SecureState featureMap conformance.
+    // Validate the incoming SecureState featureMap conformance.
     if (incomingOverallState.secureState.HasValue())
     {
         // If the secureState member is present in the OverallState, we need to check if the Speed feature is
@@ -337,7 +337,7 @@ CHIP_ERROR ClusterLogic::SetOverallTarget(const DataModel::Nullable<GenericOvera
     // Validate the incoming Latch featureMap conformance.
     if (incomingOverallTarget.latch.HasValue())
     {
-        // If the latching member is present in the incoming OverallTarget, we need to check if the MotionLatching
+        // If the latch member is present in the incoming OverallTarget, we need to check if the MotionLatching
         // feature is supported by the device. If the MotionLatching feature is not supported, return an error.
         VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     }
@@ -384,14 +384,7 @@ CHIP_ERROR ClusterLogic::GetOverallState(DataModel::Nullable<GenericOverallState
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
 
-    if (mState.mOverallState.IsNull())
-    {
-        overallState.SetNull();
-    }
-    else
-    {
-        overallState = mState.mOverallState;
-    }
+    overallState = mState.mOverallState;
 
     return CHIP_NO_ERROR;
 }
@@ -401,14 +394,7 @@ CHIP_ERROR ClusterLogic::GetOverallTarget(DataModel::Nullable<GenericOverallTarg
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
 
-    if (mState.mOverallTarget.IsNull())
-    {
-        overallTarget.SetNull();
-    }
-    else
-    {
-        overallTarget = mState.mOverallTarget;
-    }
+    overallTarget = mState.mOverallTarget;
 
     return CHIP_NO_ERROR;
 }
@@ -417,7 +403,7 @@ CHIP_ERROR ClusterLogic::GetCurrentErrorList(const AttributeValueEncoder::ListEn
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // List can contain atmost only 10 Error
+    // List can contain at most only 10 Error
     for (size_t i = 0; i < kCurrentErrorListSize; i++)
     {
         ClosureErrorEnum error;
@@ -427,12 +413,11 @@ CHIP_ERROR ClusterLogic::GetCurrentErrorList(const AttributeValueEncoder::ListEn
         // Convert CHIP_ERROR_PROVIDER_LIST_EXHAUSTED to CHIP_NO_ERROR
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
-            err = CHIP_NO_ERROR;
-            goto exit;
+            return CHIP_NO_ERROR;
         }
 
         // Exit for other errors occurred apart from CHIP_ERROR_PROVIDER_LIST_EXHAUSTED
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(err);
 
         // Encode the error
         err = encoder.Encode(error);
@@ -445,7 +430,7 @@ exit:
     return err;
 }
 
-chip::Protocols::InteractionModel::Status ClusterLogic::HandleStop()
+Protocols::InteractionModel::Status ClusterLogic::HandleStop()
 {
     VerifyOrDieWithMsg(mIsInitialized, AppServer, "Stop Command called before Initialization of closure");
 
@@ -469,7 +454,7 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleStop()
     return Status::Success;
 }
 
-chip::Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPositionEnum> position, Optional<bool> latch,
+Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPositionEnum> position, Optional<bool> latch,
                                                                      Optional<Globals::ThreeLevelAutoEnum> speed)
 {
     VerifyOrDieWithMsg(mIsInitialized, AppServer, "MoveTo Command called before Initialization of closure");
@@ -531,7 +516,7 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<Ta
     return Status::Success;
 }
 
-chip::Protocols::InteractionModel::Status ClusterLogic::HandleCalibrate()
+Protocols::InteractionModel::Status ClusterLogic::HandleCalibrate()
 {
     VerifyOrDieWithMsg(mIsInitialized, AppServer, "Calibrate Command called before Initialization of closure");
 
@@ -557,7 +542,7 @@ chip::Protocols::InteractionModel::Status ClusterLogic::HandleCalibrate()
     return Status::Success;
 }
 
-CHIP_ERROR ClusterLogic::PostOperationalErrorEvent(const DataModel::List<const ClosureErrorEnum> & errorState)
+CHIP_ERROR ClusterLogic::GenerateOperationalErrorEvent(const DataModel::List<const ClosureErrorEnum> & errorState)
 {
     ReturnErrorOnFailure(SetMainState(MainStateEnum::kError));
 
@@ -567,7 +552,7 @@ CHIP_ERROR ClusterLogic::PostOperationalErrorEvent(const DataModel::List<const C
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::PostMovementCompletedEvent()
+CHIP_ERROR ClusterLogic::GenerateMovementCompletedEvent()
 {
     VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) && !mConformance.HasFeature(Feature::kInstantaneous),
                         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
@@ -578,7 +563,7 @@ CHIP_ERROR ClusterLogic::PostMovementCompletedEvent()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::PostEngageStateChangedEvent(const bool engageValue)
+CHIP_ERROR ClusterLogic::GenerateEngageStateChangedEvent(const bool engageValue)
 {
     VerifyOrReturnError(mConformance.HasFeature(Feature::kManuallyOperable), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
@@ -588,7 +573,7 @@ CHIP_ERROR ClusterLogic::PostEngageStateChangedEvent(const bool engageValue)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::PostSecureStateChangedEvent(const bool secureValue)
+CHIP_ERROR ClusterLogic::GenerateSecureStateChangedEvent(const bool secureValue)
 {
     VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) && !mConformance.HasFeature(Feature::kInstantaneous),
                         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
