@@ -18,5 +18,5 @@
 
 #pragma once
 
-void ElectricalPriceApplicationInit();
-void ElectricalPriceApplicationShutdown();
+void ElectricalEnergyTariffInit();
+void ElectricalEnergyTariffShutdown();

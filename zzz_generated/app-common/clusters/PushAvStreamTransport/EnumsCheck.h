@@ -50,7 +50,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(PushAvStreamTransport::
     using EnumType = PushAvStreamTransport::StatusCodeEnum;
     switch (val)
     {
-    case EnumType::kAllocationNotPermitted:
     case EnumType::kInvalidTLSEndpoint:
     case EnumType::kInvalidStream:
     case EnumType::kInvalidURL:
@@ -59,17 +58,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(PushAvStreamTransport::
     case EnumType::kUnsupportedIngestMethod:
     case EnumType::kInvalidTriggerType:
     case EnumType::kInvalidTransportStatus:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(PushAvStreamTransport::StreamMultiplexingEnum val)
-{
-    using EnumType = PushAvStreamTransport::StreamMultiplexingEnum;
-    switch (val)
-    {
-    case EnumType::kInterleaved:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

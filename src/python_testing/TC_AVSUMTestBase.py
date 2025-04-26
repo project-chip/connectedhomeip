@@ -70,6 +70,10 @@ class AVSUMTestBase:
         cluster = Clusters.Objects.CameraAvSettingsUserLevelManagement
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
+    async def read_avstr_attribute_expect_success(self, endpoint, attribute):
+        cluster = Clusters.Objects.CameraAvStreamManagement
+        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
+
     async def check_avsum_attribute(self, attribute, expected_value, endpoint):
         value = await self.read_avsum_attribute_expect_success(endpoint=endpoint, attribute=attribute)
         asserts.assert_equal(value, expected_value,
@@ -91,6 +95,44 @@ class AVSUMTestBase:
         try:
             await self.send_single_cmd(cmd=Clusters.CameraAvSettingsUserLevelManagement.Commands.MPTZMoveToPreset(
                 presetID=presetID),
+                endpoint=endpoint)
+
+            asserts.assert_equal(expected_status, Status.Success)
+
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
+
+    async def send_remove_preset_command(self, endpoint, presetID, expected_status: Status = Status.Success):
+        try:
+            await self.send_single_cmd(cmd=Clusters.CameraAvSettingsUserLevelManagement.Commands.MPTZRemovePreset(
+                presetID=presetID),
+                endpoint=endpoint)
+
+            asserts.assert_equal(expected_status, Status.Success)
+
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
+
+    async def send_dptz_set_viewport_command(self, endpoint, streamID, viewport, expected_status: Status = Status.Success):
+        try:
+            await self.send_single_cmd(cmd=Clusters.CameraAvSettingsUserLevelManagement.Commands.DPTZSetViewport(
+                videoStreamID=streamID,
+                viewport=viewport),
+                endpoint=endpoint)
+
+            asserts.assert_equal(expected_status, Status.Success)
+
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
+
+    async def send_dptz_relative_move_command(self, endpoint, streamID, deltaX: int = None, deltaY: int = None,
+                                              zoomDelta: int = None, expected_status: Status = Status.Success):
+        try:
+            await self.send_single_cmd(cmd=Clusters.CameraAvSettingsUserLevelManagement.Commands.DPTZRelativeMove(
+                videoStreamID=streamID,
+                deltaX=deltaX,
+                deltaY=deltaY,
+                zoomDelta=zoomDelta),
                 endpoint=endpoint)
 
             asserts.assert_equal(expected_status, Status.Success)
@@ -140,6 +182,28 @@ class AVSUMTestBase:
                 endpoint=endpoint)
 
             asserts.assert_equal(expected_status, Status.Success)
+
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
+
+    async def video_stream_allocate_command(self, endpoint, expected_status: Status = Status.Success):
+        try:
+            response = await self.send_single_cmd(cmd=Clusters.CameraAvStreamManagement.Commands.VideoStreamAllocate(
+                streamUsage=1,
+                videoCodec=0,
+                minFrameRate=30,
+                maxFrameRate=120,
+                minResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(width=400, height=300),
+                maxResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(width=1920, height=1080),  # 16/9
+                minBitRate=20000,
+                maxBitRate=150000,
+                minFragmentLen=2000,
+                maxFragmentLen=8000
+            ),
+                endpoint=endpoint)
+
+            asserts.assert_equal(expected_status, Status.Success)
+            return response.videoStreamID
 
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
