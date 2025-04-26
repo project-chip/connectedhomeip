@@ -70,48 +70,39 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericCurren
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mState.currentState != incomingCurrentState, CHIP_NO_ERROR);
 
-    if (incomingCurrentState.IsNull())
+    if (!incomingCurrentState.IsNull())
     {
-        // Mark CurrentState attribute as dirty only if value changes.
-        if (!mState.currentState.IsNull())
+        // Validate the incoming Position value has valid input parameters and FeatureMap conformance.
+        if (incomingCurrentState.Value().position.HasValue())
         {
-            mState.currentState.SetNull();
-            mMatterContext.MarkDirty(Attributes::CurrentState::Id);
+            //  If the position member is present in the incoming CurrentState, we need to check if the Positioning
+            //  feature is supported by the closure. If the Positioning feature is not supported, return an error.
+            VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
+            VerifyOrReturnError(incomingCurrentState.Value().position.Value() <= kPercents100thsMaxValue, CHIP_ERROR_INVALID_ARGUMENT);
         }
-        return CHIP_NO_ERROR;
+
+        // Validate the incoming latch value has valid FeatureMap conformance.
+        if (incomingCurrentState.Value().latch.HasValue())
+        {
+            //  If the latching member is present in the incoming CurrentState, we need to check if the MotionLatching
+            //  feature is supported by the closure. If the MotionLatching feature is not supported, return an error.
+            VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+        }
+
+        // Validate the incoming Speed value has valid input parameters and FeatureMap conformance.
+        if (incomingCurrentState.Value().speed.HasValue())
+        {
+            //  If the speed member is present in the incoming CurrentState, we need to check if the Speed feature is
+            //  supported by the closure. If the Speed feature is not supported, return an error.
+            VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
+            VerifyOrReturnError(EnsureKnownEnumValue(incomingCurrentState.Value().speed.Value()) !=
+                                    Globals::ThreeLevelAutoEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
+        }
     }
 
-    // Validate the incoming Position value has valid input parameters and FeatureMap conformance.
-    if (incomingCurrentState.Value().position.HasValue())
-    {
-        //  If the position member is present in the incoming CurrentState, we need to check if the Positioning
-        //  feature is supported by the closure. If the Positioning feature is not supported, return an error.
-        VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-        VerifyOrReturnError(incomingCurrentState.Value().position.Value() <= kPercents100thsMaxValue, CHIP_ERROR_INVALID_ARGUMENT);
-    }
-
-    // Validate the incoming latch value has valid FeatureMap conformance.
-    if (incomingCurrentState.Value().latch.HasValue())
-    {
-        //  If the latching member is present in the incoming CurrentState, we need to check if the MotionLatching
-        //  feature is supported by the closure. If the MotionLatching feature is not supported, return an error.
-        VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    }
-
-    // Validate the incoming Speed value has valid input parameters and FeatureMap conformance.
-    if (incomingCurrentState.Value().speed.HasValue())
-    {
-        //  If the speed member is present in the incoming CurrentState, we need to check if the Speed feature is
-        //  supported by the closure. If the Speed feature is not supported, return an error.
-        VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-        VerifyOrReturnError(EnsureKnownEnumValue(incomingCurrentState.Value().speed.Value()) !=
-                                Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
-                            CHIP_ERROR_INVALID_ARGUMENT);
-    }
-
-    mState.currentState.SetNonNull(incomingCurrentState.Value());
+    mState.currentState = incomingCurrentState;
     mMatterContext.MarkDirty(Attributes::CurrentState::Id);
 
     return CHIP_NO_ERROR;
@@ -124,54 +115,45 @@ CHIP_ERROR ClusterLogic::SetTarget(const DataModel::Nullable<GenericTargetStruct
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mState.target != incomingTarget, CHIP_NO_ERROR);
 
-    if (incomingTarget.IsNull())
+    if (!incomingTarget.IsNull())
     {
-        // Mark Target attribute as dirty only if value changes.
-        if (!mState.target.IsNull())
+        // Validate the incoming Position value has valid input parameters and FeatureMap conformance.
+        if (incomingTarget.Value().position.HasValue())
         {
-            mState.target.SetNull();
-            mMatterContext.MarkDirty(Attributes::Target::Id);
+            //  If the position member is present in the incoming Target, we need to check if the Positioning
+            //  feature is supported by the closure. If the Positioning feature is not supported, return an error.
+            VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
+            VerifyOrReturnError(incomingTarget.Value().position.Value() <= kPercents100thsMaxValue, CHIP_ERROR_INVALID_ARGUMENT);
+
+            // Incoming Target Position value SHALL follow the scaling from Resolution Attribute.
+            Percent100ths resolution;
+            ReturnErrorOnFailure(GetResolution(resolution));
+            VerifyOrReturnError(incomingTarget.Value().position.Value() % resolution == 0, CHIP_ERROR_INVALID_ARGUMENT,
+                                ChipLogError(NotSpecified, "Target Position value SHALL follow the scaling from Resolution Attribute"));
         }
-        return CHIP_NO_ERROR;
+
+        // Validate the incoming latch value has valid FeatureMap conformance.
+        if (incomingTarget.Value().latch.HasValue())
+        {
+            //  If the latching member is present in the incoming Target, we need to check if the MotionLatching
+            //  feature is supported by the closure. If the MotionLatching feature is not supported, return an error.
+            VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+        }
+
+        // Validate the incoming Speed value has valid input parameters and FeatureMap conformance.
+        if (incomingTarget.Value().speed.HasValue())
+        {
+            //  If the speed member is present in the incoming Target, we need to check if the Speed feature is
+            //  supported by the closure. If the Speed feature is not supported, return an error.
+            VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
+            VerifyOrReturnError(EnsureKnownEnumValue(incomingTarget.Value().speed.Value()) !=
+                                Globals::ThreeLevelAutoEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
+        }
     }
 
-    // Validate the incoming Position value has valid input parameters and FeatureMap conformance.
-    if (incomingTarget.Value().position.HasValue())
-    {
-        //  If the position member is present in the incoming Target, we need to check if the Positioning
-        //  feature is supported by the closure. If the Positioning feature is not supported, return an error.
-        VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-        VerifyOrReturnError(incomingTarget.Value().position.Value() <= kPercents100thsMaxValue, CHIP_ERROR_INVALID_ARGUMENT);
-
-        // Incoming Target Position value SHALL follow the scaling from Resolution Attribute.
-        Percent100ths resolution;
-        ReturnErrorOnFailure(GetResolution(resolution));
-        VerifyOrReturnError(incomingTarget.Value().position.Value() % resolution == 0, CHIP_ERROR_INVALID_ARGUMENT,
-                            ChipLogError(NotSpecified, "Target Position value SHALL follow the scaling from Resolution Attribute"));
-    }
-
-    // Validate the incoming latch value has valid FeatureMap conformance.
-    if (incomingTarget.Value().latch.HasValue())
-    {
-        //  If the latching member is present in the incoming Target, we need to check if the MotionLatching
-        //  feature is supported by the closure. If the MotionLatching feature is not supported, return an error.
-        VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    }
-
-    // Validate the incoming Speed value has valid input parameters and FeatureMap conformance.
-    if (incomingTarget.Value().speed.HasValue())
-    {
-        //  If the speed member is present in the incoming Target, we need to check if the Speed feature is
-        //  supported by the closure. If the Speed feature is not supported, return an error.
-        VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-        VerifyOrReturnError(EnsureKnownEnumValue(incomingTarget.Value().speed.Value()) !=
-                                Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
-                            CHIP_ERROR_INVALID_ARGUMENT);
-    }
-
-    mState.target.SetNonNull(incomingTarget.Value());
+    mState.target = incomingTarget;
     mMatterContext.MarkDirty(Attributes::Target::Id);
 
     return CHIP_NO_ERROR;
