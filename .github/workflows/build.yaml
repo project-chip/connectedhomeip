@@ -81,22 +81,32 @@ jobs:
               run: scripts/run_in_build_env.sh "ninja -C ./out"
             - name: Run Tests
               run: scripts/tests/gn_tests.sh
+            - name: Clean out build output
+              run: rm -rf ./out
             - name: Set up Build Without Detail Logging
               run: scripts/build/gn_gen.sh --args="chip_detail_logging=false"
             - name: Run Build Without Detail Logging
               run: scripts/run_in_build_env.sh "ninja -C ./out"
+            - name: Cleanout build output
+              run: rm -rf ./out
             - name: Set up Build Without Progress Logging
               run: scripts/build/gn_gen.sh --args="chip_detail_logging=false chip_progress_logging=false"
             - name: Run Build Without Progress Logging
               run: scripts/run_in_build_env.sh "ninja -C ./out"
+            - name: Clean out build output
+              run: rm -rf ./out
             - name: Set up Build Without Error Logging
               run: scripts/build/gn_gen.sh --args="chip_detail_logging=false chip_progress_logging=false chip_error_logging=false"
             - name: Run Build Without Error Logging
               run: scripts/run_in_build_env.sh "ninja -C ./out"
+            - name: Clean out build output
+              run: rm -rf ./out
             - name: Set up Build Without Logging
               run: scripts/build/gn_gen.sh --args="chip_logging=false"
             - name: Run Build Without Logging
               run: scripts/run_in_build_env.sh "ninja -C ./out"
+            - name: Clean out build output
+              run: rm -rf ./out
             - name: Uploading core files
               uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}
