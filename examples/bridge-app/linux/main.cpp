@@ -17,6 +17,7 @@
  */
 
 #include <AppMain.h>
+#include <cstdint>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
@@ -44,6 +45,7 @@
 
 #include "CommissionableInit.h"
 #include "Device.h"
+#include "include/main.h"
 #include "main.h"
 #include <app/server/Server.h>
 
@@ -61,6 +63,10 @@ using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters;
 
 namespace {
+
+constexpr char kChipEventFifoPathPrefix[] = "/tmp/chip_bridge_fifo_";
+NamedPipeCommands sChipNamedPipeCommands;
+BridgeCommandDelegate sBridgeCommandDelegate;
 
 const int kNodeLabelSize = 32;
 const int kUniqueIdSize  = 32;
@@ -128,6 +134,8 @@ DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(bridgedDeviceBasicAttrs)
 DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::NodeLabel::Id, CHAR_STRING, kNodeLabelSize, 0), /* NodeLabel */
     DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::Reachable::Id, BOOLEAN, 1, 0),              /* Reachable */
     DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::UniqueID::Id, CHAR_STRING, kUniqueIdSize, 0),
+    DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::ConfigurationVersion::Id, INT32U, 4,
+                              0), /* Configuration Version */
     DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::FeatureMap::Id, BITMAP32, 4, 0), /* feature map */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
@@ -469,6 +477,11 @@ Protocols::InteractionModel::Status HandleReadBridgedDeviceBasicAttribute(Device
     {
         MutableByteSpan zclUniqueIdSpan(buffer, maxReadLength);
         MakeZclCharString(zclUniqueIdSpan, dev->GetUniqueId());
+    }
+    else if ((attributeId == ConfigurationVersion::Id) && (maxReadLength == 4))
+    {
+        uint32_t configVersion = dev->GetConfigurationVersion();
+        memcpy(buffer, &configVersion, sizeof(configVersion));
     }
     else if ((attributeId == ClusterRevision::Id) && (maxReadLength == 2))
     {
@@ -898,6 +911,12 @@ void * bridge_polling_thread(void * context)
                 // TC-BRBINFO-2.2 step 2 "Set reachable to true"
                 TempSensor1.SetReachable(true);
             }
+            if (ch == 'w')
+            {
+                // TC-BRBINFO-3.2 step 3
+                uint32_t configVersion = Light1.GetConfigurationVersion() + 1;
+                Light1.SetConfigurationVersion(configVersion);
+            }
             continue;
         }
 
@@ -1011,6 +1030,14 @@ void ApplicationInit()
         }
     }
 
+    std::string path = kChipEventFifoPathPrefix + std::to_string(getpid());
+
+    if (sChipNamedPipeCommands.Start(path, &sBridgeCommandDelegate) != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
+        sChipNamedPipeCommands.Stop();
+    }
+
     AttributeAccessInterfaceRegistry::Instance().Register(&gPowerAttrAccess);
 }
 
@@ -1018,10 +1045,75 @@ void ApplicationShutdown() {}
 
 int main(int argc, char * argv[])
 {
+    if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to stop CHIP NamedPipeCommands");
+    }
+
     if (ChipLinuxAppInit(argc, argv) != 0)
     {
         return -1;
     }
     ChipLinuxAppMainLoop();
     return 0;
+}
+
+BridgeAppCommandHandler * BridgeAppCommandHandler::FromJSON(const char * json)
+{
+    Json::Reader reader;
+    Json::Value value;
+
+    if (!reader.parse(json, value))
+    {
+        ChipLogError(NotSpecified, "Bridge App: Error parsing JSON with error %s:", reader.getFormattedErrorMessages().c_str());
+        return nullptr;
+    }
+
+    if (value.empty() || !value.isObject())
+    {
+        ChipLogError(NotSpecified, "Bridge App: Invalid JSON command received");
+        return nullptr;
+    }
+
+    if (!value.isMember("Name") || !value["Name"].isString())
+    {
+        ChipLogError(NotSpecified, "Bridge App: Invalid JSON command received: command name is missing");
+        return nullptr;
+    }
+
+    return Platform::New<BridgeAppCommandHandler>(std::move(value));
+}
+
+void BridgeAppCommandHandler::HandleCommand(intptr_t context)
+{
+    auto * self      = reinterpret_cast<BridgeAppCommandHandler *>(context);
+    std::string name = self->mJsonValue["Name"].asString();
+
+    VerifyOrExit(!self->mJsonValue.empty(), ChipLogError(NotSpecified, "Invalid JSON event command received"));
+
+    if (name == "SimulateConfigurationVersionChange")
+    {
+        uint32_t configVersion = Light1.GetConfigurationVersion() + 1;
+        Light1.SetConfigurationVersion(configVersion);
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "Unhandled command '%s': this should never happen", name.c_str());
+        VerifyOrDie(false && "Named pipe command not supported, see log above.");
+    }
+
+exit:
+    Platform::Delete(self);
+}
+
+void BridgeCommandDelegate::OnEventCommandReceived(const char * json)
+{
+    auto handler = BridgeAppCommandHandler::FromJSON(json);
+    if (nullptr == handler)
+    {
+        ChipLogError(NotSpecified, "Bridge App: Unable to instantiate a command handler");
+        return;
+    }
+
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(BridgeAppCommandHandler::HandleCommand, reinterpret_cast<intptr_t>(handler));
 }
