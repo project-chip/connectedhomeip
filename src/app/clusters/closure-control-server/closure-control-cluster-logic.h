@@ -190,7 +190,7 @@ public:
      * @brief Sets the main state of the cluster.
      *        This method also generates the EngageStateChanged event based on MainState transition.
      *        This method also updates the CountdownTime attribute based on MainState
-     * 
+     *
      * @param[in] mainState - The new main state to be set.
      *
      * @return CHIP_NO_ERROR if the main state is set successfully.
