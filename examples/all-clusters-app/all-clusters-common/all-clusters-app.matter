@@ -42,7 +42,6 @@ enum AreaTypeTag : enum8 {
   kGardenDoor = 37;
   kGuestBathroom = 38;
   kGuestBedroom = 39;
-  kGuestRestroom = 40;
   kGuestRoom = 41;
   kGym = 42;
   kHallway = 43;
@@ -50,7 +49,6 @@ enum AreaTypeTag : enum8 {
   kKidsRoom = 45;
   kKidsBedroom = 46;
   kKitchen = 47;
-  kLarder = 48;
   kLaundryRoom = 49;
   kLawn = 50;
   kLibrary = 51;
@@ -75,7 +73,6 @@ enum AreaTypeTag : enum8 {
   kRamp = 70;
   kReceptionRoom = 71;
   kRecreationRoom = 72;
-  kRestroom = 73;
   kRoof = 74;
   kSauna = 75;
   kScullery = 76;
@@ -97,39 +94,13 @@ enum AreaTypeTag : enum8 {
   kUtilityRoom = 92;
   kWard = 93;
   kWorkshop = 94;
+  kToilet = 95;
 }
 
 enum AtomicRequestTypeEnum : enum8 {
   kBeginWrite = 0;
   kCommitWrite = 1;
   kRollbackWrite = 2;
-}
-
-enum FloorSurfaceTag : enum8 {
-  kCarpet = 0;
-  kCeramic = 1;
-  kConcrete = 2;
-  kCork = 3;
-  kDeepCarpet = 4;
-  kDirt = 5;
-  kEngineeredWood = 6;
-  kGlass = 7;
-  kGrass = 8;
-  kHardwood = 9;
-  kLaminate = 10;
-  kLinoleum = 11;
-  kMat = 12;
-  kMetal = 13;
-  kPlastic = 14;
-  kPolishedConcrete = 15;
-  kRubber = 16;
-  kRug = 17;
-  kSand = 18;
-  kStone = 19;
-  kTatami = 20;
-  kTerrazzo = 21;
-  kTile = 22;
-  kVinyl = 23;
 }
 
 enum LandmarkTag : enum8 {
@@ -184,6 +155,13 @@ enum LandmarkTag : enum8 {
   kLaundryWasher = 48;
   kWindow = 49;
   kWineCooler = 50;
+}
+
+enum LocationTag : enum8 {
+  kIndoor = 0;
+  kOutdoor = 1;
+  kInside = 2;
+  kOutside = 3;
 }
 
 enum PositionTag : enum8 {
@@ -254,6 +232,11 @@ struct PowerThresholdStruct {
   nullable PowerThresholdSourceEnum powerThresholdSource = 2;
 }
 
+struct PriceStruct {
+  money amount = 0;
+  CurrencyStruct currency = 1;
+}
+
 struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
@@ -264,11 +247,6 @@ struct LocationDescriptorStruct {
   char_string<128> locationName = 0;
   nullable int16s floorNumber = 1;
   nullable AreaTypeTag areaType = 2;
-}
-
-struct PriceStruct {
-  money amount = 0;
-  CurrencyStruct currency = 1;
 }
 
 struct AtomicAttributeStatusStruct {
@@ -1032,7 +1010,7 @@ cluster Actions = 37 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 cluster BasicInformation = 40 {
-  revision 3;
+  revision 5;
 
   enum ColorEnum : enum8 {
     kBlack = 0;
@@ -1115,6 +1093,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute int32u specificationVersion = 21;
   readonly attribute int16u maxPathsPerInvoke = 22;
+  readonly attribute int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1345,7 +1324,7 @@ cluster TimeFormatLocalization = 44 {
       user. As such, Nodes that visually or audibly convey measurable values to the user need a
       mechanism by which they can be configured to use a user’s preferred unit. */
 cluster UnitLocalization = 45 {
-  revision 1;
+  revision 2;
 
   enum TempUnitEnum : enum8 {
     kFahrenheit = 0;
@@ -1358,6 +1337,7 @@ cluster UnitLocalization = 45 {
   }
 
   attribute access(write: manage) optional TempUnitEnum temperatureUnit = 0;
+  provisional readonly attribute optional TempUnitEnum supportedTemperatureUnits[] = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3003,14 +2983,10 @@ cluster OvenCavityOperationalState = 72 {
     ErrorStateStruct commandResponseState = 0;
   }
 
-  /** Upon receipt, the device SHALL pause its operation if it is possible based on the current function of the server. */
-  command Pause(): OperationalCommandResponse = 0;
   /** Upon receipt, the device SHALL stop its operation if it is at a position where it is safe to do so and/or permitted. */
   command Stop(): OperationalCommandResponse = 1;
   /** Upon receipt, the device SHALL start its operation if it is safe to do so and the device is in an operational state from which it can be started. */
   command Start(): OperationalCommandResponse = 2;
-  /** Upon receipt, the device SHALL resume its operation from the point it was at when it received the Pause command, or from the point when it was paused by means outside of this cluster (for example by manual button press). */
-  command Resume(): OperationalCommandResponse = 3;
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
@@ -3056,8 +3032,6 @@ cluster OvenMode = 73 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
-  attribute optional nullable int8u startUpMode = 2;
-  attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3071,11 +3045,10 @@ cluster OvenMode = 73 {
 
   response struct ChangeToModeResponse = 1 {
     enum8 status = 0;
-    optional char_string statusText = 1;
+    optional char_string<64> statusText = 1;
   }
 
-  /** This command is used to change device modes.
-        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
@@ -3165,10 +3138,6 @@ cluster LaundryWasherMode = 81 {
     kWhites = 16387;
   }
 
-  bitmap Feature : bitmap32 {
-    kOnOff = 0x1;
-  }
-
   shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
@@ -3182,8 +3151,6 @@ cluster LaundryWasherMode = 81 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
-  attribute optional nullable int8u startUpMode = 2;
-  attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3197,7 +3164,7 @@ cluster LaundryWasherMode = 81 {
 
   response struct ChangeToModeResponse = 1 {
     enum8 status = 0;
-    optional char_string statusText = 1;
+    optional char_string<64> statusText = 1;
   }
 
   /** This command is used to change device modes.
@@ -3224,10 +3191,6 @@ cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
     kRapidFreeze = 16385;
   }
 
-  bitmap Feature : bitmap32 {
-    kOnOff = 0x1;
-  }
-
   shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
@@ -3241,8 +3204,6 @@ cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
-  attribute optional nullable int8u startUpMode = 2;
-  attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3256,7 +3217,7 @@ cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
 
   response struct ChangeToModeResponse = 1 {
     enum8 status = 0;
-    optional char_string statusText = 1;
+    optional char_string<64> statusText = 1;
   }
 
   /** This command is used to change device modes.
@@ -3379,6 +3340,7 @@ cluster RvcCleanMode = 85 {
     kDeepClean = 16384;
     kVacuum = 16385;
     kMop = 16386;
+    kVacuumThenMop = 16387;
   }
 
   enum StatusCode : enum8 {
@@ -3501,10 +3463,6 @@ cluster DishwasherMode = 89 {
     kLight = 16386;
   }
 
-  bitmap Feature : bitmap32 {
-    kOnOff = 0x1;
-  }
-
   shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
@@ -3518,8 +3476,6 @@ cluster DishwasherMode = 89 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
-  attribute optional nullable int8u startUpMode = 2;
-  attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3533,7 +3489,7 @@ cluster DishwasherMode = 89 {
 
   response struct ChangeToModeResponse = 1 {
     enum8 status = 0;
-    optional char_string statusText = 1;
+    optional char_string<64> statusText = 1;
   }
 
   /** This command is used to change device modes.
@@ -3751,10 +3707,6 @@ cluster MicrowaveOvenMode = 94 {
     kDefrost = 16385;
   }
 
-  bitmap Feature : bitmap32 {
-    kOnOff = 0x1;
-  }
-
   shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
@@ -3859,6 +3811,13 @@ cluster RvcOperationalState = 97 {
     kWaterTankMissing = 69;
     kWaterTankLidOpen = 70;
     kMopCleaningPadMissing = 71;
+    kLowBattery = 72;
+    kCannotReachTargetArea = 73;
+    kDirtyWaterTankFull = 74;
+    kDirtyWaterTankMissing = 75;
+    kWheelsJammed = 76;
+    kBrushJammed = 77;
+    kNavigationSensorObscured = 78;
   }
 
   enum OperationalStateEnum : enum8 {
@@ -3869,6 +3828,10 @@ cluster RvcOperationalState = 97 {
     kSeekingCharger = 64;
     kCharging = 65;
     kDocked = 66;
+    kEmptyingDustBin = 67;
+    kCleaningMop = 68;
+    kFillingWaterTank = 69;
+    kUpdatingMaps = 70;
   }
 
   shared struct ErrorStateStruct {
@@ -6502,7 +6465,7 @@ cluster CarbonMonoxideConcentrationMeasurement = 1036 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -6559,7 +6522,7 @@ cluster CarbonDioxideConcentrationMeasurement = 1037 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -6616,7 +6579,7 @@ cluster NitrogenDioxideConcentrationMeasurement = 1043 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -6673,7 +6636,7 @@ cluster OzoneConcentrationMeasurement = 1045 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -6730,7 +6693,7 @@ cluster Pm25ConcentrationMeasurement = 1066 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -6787,7 +6750,7 @@ cluster FormaldehydeConcentrationMeasurement = 1067 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -6844,7 +6807,7 @@ cluster Pm1ConcentrationMeasurement = 1068 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -6901,7 +6864,7 @@ cluster Pm10ConcentrationMeasurement = 1069 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -6958,7 +6921,7 @@ cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -7015,7 +6978,7 @@ cluster RadonConcentrationMeasurement = 1071 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -7132,17 +7095,20 @@ provisional cluster CameraAvStreamManagement = 1361 {
     int16u snapshotStreamID = 0;
     ImageCodecEnum imageCodec = 1;
     int16u frameRate = 2;
-    int32u bitRate = 3;
-    VideoResolutionStruct minResolution = 4;
-    VideoResolutionStruct maxResolution = 5;
-    int8u quality = 6;
-    int8u referenceCount = 7;
+    VideoResolutionStruct minResolution = 3;
+    VideoResolutionStruct maxResolution = 4;
+    int8u quality = 5;
+    int8u referenceCount = 6;
+    boolean encodedPixels = 7;
+    boolean hardwareEncoder = 8;
   }
 
-  struct SnapshotParamsStruct {
+  struct SnapshotCapabilitiesStruct {
     VideoResolutionStruct resolution = 0;
     int16u maxFrameRate = 1;
     ImageCodecEnum imageCodec = 2;
+    boolean requiresEncodedPixels = 3;
+    optional boolean requiresHardwareEncoder = 4;
   }
 
   struct RateDistortionTradeOffPointsStruct {
@@ -7183,7 +7149,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
     int16u y2 = 3;
   }
 
-  readonly attribute optional int8u maxConcurrentVideoEncoders = 0;
+  readonly attribute optional int8u maxConcurrentEncoders = 0;
   readonly attribute optional int32u maxEncodedPixelRate = 1;
   readonly attribute optional VideoSensorParamsStruct videoSensorParams = 2;
   readonly attribute optional boolean nightVisionCapable = 3;
@@ -7193,7 +7159,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
   readonly attribute optional AudioCapabilitiesStruct microphoneCapabilities = 7;
   readonly attribute optional AudioCapabilitiesStruct speakerCapabilities = 8;
   readonly attribute optional TwoWayTalkSupportTypeEnum twoWayTalkSupport = 9;
-  readonly attribute optional SnapshotParamsStruct supportedSnapshotParams[] = 10;
+  readonly attribute optional SnapshotCapabilitiesStruct snapshotCapabilities[] = 10;
   readonly attribute int32u maxNetworkBandwidth = 11;
   readonly attribute optional int16u currentFrameRate = 12;
   attribute access(read: manage, write: manage) optional boolean HDRModeEnabled = 13;
@@ -7280,12 +7246,11 @@ provisional cluster CameraAvStreamManagement = 1361 {
   request struct SnapshotStreamAllocateRequest {
     ImageCodecEnum imageCodec = 0;
     int16u maxFrameRate = 1;
-    int32u bitRate = 2;
-    VideoResolutionStruct minResolution = 3;
-    VideoResolutionStruct maxResolution = 4;
-    int8u quality = 5;
-    optional boolean watermarkEnabled = 6;
-    optional boolean OSDEnabled = 7;
+    VideoResolutionStruct minResolution = 2;
+    VideoResolutionStruct maxResolution = 3;
+    int8u quality = 4;
+    optional boolean watermarkEnabled = 5;
+    optional boolean OSDEnabled = 6;
   }
 
   response struct SnapshotStreamAllocateResponse = 8 {
@@ -7307,7 +7272,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
   }
 
   request struct CaptureSnapshotRequest {
-    int16u snapshotStreamID = 0;
+    nullable int16u snapshotStreamID = 0;
     VideoResolutionStruct requestedResolution = 1;
   }
 
@@ -7337,6 +7302,106 @@ provisional cluster CameraAvStreamManagement = 1361 {
   command access(invoke: administer) SetStreamPriorities(SetStreamPrioritiesRequest): DefaultSuccess = 11;
   /** This command SHALL return a Snapshot from the camera. */
   command CaptureSnapshot(CaptureSnapshotRequest): CaptureSnapshotResponse = 12;
+}
+
+/** This cluster provides an interface into controls associated with the operation of a device that provides pan, tilt, and zoom functions, either mechanically, or against a digital image. */
+provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
+  revision 1;
+
+  bitmap Feature : bitmap32 {
+    kDigitalPTZ = 0x1;
+    kMechanicalPan = 0x2;
+    kMechanicalTilt = 0x4;
+    kMechanicalZoom = 0x8;
+    kMechanicalPresets = 0x10;
+  }
+
+  struct MPTZStruct {
+    optional int16s pan = 0;
+    optional int16s tilt = 1;
+    optional int8u zoom = 2;
+  }
+
+  struct MPTZPresetStruct {
+    int8u presetID = 0;
+    char_string<32> name = 1;
+    MPTZStruct settings = 2;
+  }
+
+  shared struct ViewportStruct {
+    int16u x1 = 0;
+    int16u y1 = 1;
+    int16u x2 = 2;
+    int16u y2 = 3;
+  }
+
+  readonly attribute optional MPTZStruct MPTZPosition = 0;
+  readonly attribute optional int8u maxPresets = 1;
+  readonly attribute optional MPTZPresetStruct MPTZPresets[] = 2;
+  readonly attribute optional int16u DPTZRelativeMove[] = 3;
+  readonly attribute optional int8u zoomMax = 4;
+  readonly attribute optional int16s tiltMin = 5;
+  readonly attribute optional int16s tiltMax = 6;
+  readonly attribute optional int16s panMin = 7;
+  readonly attribute optional int16s panMax = 8;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct MPTZSetPositionRequest {
+    optional int16s pan = 0;
+    optional int16s tilt = 1;
+    optional int8u zoom = 2;
+  }
+
+  request struct MPTZRelativeMoveRequest {
+    optional int16s panDelta = 0;
+    optional int16s tiltDelta = 1;
+    optional int8s zoomDelta = 2;
+  }
+
+  request struct MPTZMoveToPresetRequest {
+    int8u presetID = 0;
+  }
+
+  request struct MPTZSavePresetRequest {
+    optional int8u presetID = 0;
+    char_string<32> name = 1;
+  }
+
+  request struct MPTZRemovePresetRequest {
+    int8u presetID = 0;
+  }
+
+  request struct DPTZSetViewportRequest {
+    int16u videoStreamID = 0;
+    ViewportStruct viewport = 1;
+  }
+
+  request struct DPTZRelativeMoveRequest {
+    int16u videoStreamID = 0;
+    optional int16s deltaX = 1;
+    optional int16s deltaY = 2;
+    optional int8s zoomDelta = 3;
+  }
+
+  /** This command SHALL set the values for the pan, tilt, and zoom in the mechanical PTZ. */
+  command MPTZSetPosition(MPTZSetPositionRequest): DefaultSuccess = 0;
+  /** This command SHALL move the device by the delta values relative to the currently defined position. */
+  command MPTZRelativeMove(MPTZRelativeMoveRequest): DefaultSuccess = 1;
+  /** This command SHALL move the camera to the positions specified by the Preset passed. */
+  command MPTZMoveToPreset(MPTZMoveToPresetRequest): DefaultSuccess = 2;
+  /** This command allows creating a new preset or updating the values of an existing one. */
+  command MPTZSavePreset(MPTZSavePresetRequest): DefaultSuccess = 3;
+  /** This command SHALL remove a preset entry from the PresetMptzTable. */
+  command MPTZRemovePreset(MPTZRemovePresetRequest): DefaultSuccess = 4;
+  /** This command allows for setting the digital viewport for a specific Video Stream. */
+  command DPTZSetViewport(DPTZSetViewportRequest): DefaultSuccess = 5;
+  /** This command SHALL change the viewports location by the amount specified in a relative fashion. */
+  command DPTZRelativeMove(DPTZRelativeMoveRequest): DefaultSuccess = 6;
 }
 
 /** This cluster provides facilities to configure and play Chime sounds, such as those used in a doorbell. */
@@ -8001,11 +8066,12 @@ endpoint 0 {
     callback attribute productAppearance;
     callback attribute specificationVersion;
     callback attribute maxPathsPerInvoke;
+    ram      attribute configurationVersion default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 5;
   }
 
   server cluster OtaSoftwareUpdateRequestor {
@@ -8045,6 +8111,7 @@ endpoint 0 {
 
   server cluster UnitLocalization {
     persist  attribute temperatureUnit default = 0;
+    callback attribute supportedTemperatureUnits;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -8421,7 +8488,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 6;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -8592,10 +8659,8 @@ endpoint 1 {
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
 
-    handle command Pause;
     handle command Stop;
     handle command Start;
-    handle command Resume;
     handle command OperationalCommandResponse;
   }
 
@@ -8642,8 +8707,6 @@ endpoint 1 {
   server cluster LaundryWasherMode {
     callback attribute supportedModes;
     callback attribute currentMode;
-    callback attribute startUpMode;
-    callback attribute onMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -8657,8 +8720,6 @@ endpoint 1 {
   server cluster RefrigeratorAndTemperatureControlledCabinetMode {
     callback attribute supportedModes;
     callback attribute currentMode;
-    callback attribute startUpMode;
-    callback attribute onMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -8734,8 +8795,6 @@ endpoint 1 {
   server cluster DishwasherMode {
     callback attribute supportedModes;
     callback attribute currentMode;
-    callback attribute startUpMode;
-    callback attribute onMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -9642,7 +9701,7 @@ endpoint 1 {
 
   server cluster CameraAvStreamManagement {
     callback attribute maxContentBufferSize;
-    callback attribute supportedSnapshotParams;
+    callback attribute snapshotCapabilities;
     callback attribute maxNetworkBandwidth;
     callback attribute supportedStreamUsages;
     callback attribute allocatedSnapshotStreams;
@@ -9660,6 +9719,31 @@ endpoint 1 {
     handle command SetStreamPriorities;
     handle command CaptureSnapshot;
     handle command CaptureSnapshotResponse;
+  }
+
+  server cluster CameraAvSettingsUserLevelManagement {
+    callback attribute MPTZPosition;
+    ram      attribute maxPresets default = 5;
+    callback attribute MPTZPresets;
+    callback attribute DPTZRelativeMove;
+    ram      attribute zoomMax default = 100;
+    ram      attribute tiltMin default = -90;
+    ram      attribute tiltMax default = 90;
+    ram      attribute panMin default = -180;
+    ram      attribute panMax default = 180;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command MPTZSetPosition;
+    handle command MPTZRelativeMove;
+    handle command MPTZMoveToPreset;
+    handle command MPTZSavePreset;
+    handle command MPTZRemovePreset;
+    handle command DPTZSetViewport;
+    handle command DPTZRelativeMove;
   }
 
   server cluster Chime {
@@ -9818,7 +9902,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 6;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -9940,7 +10024,7 @@ endpoint 3 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 6;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -9982,7 +10066,7 @@ endpoint 4 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 6;
   }
 
   server cluster Descriptor {

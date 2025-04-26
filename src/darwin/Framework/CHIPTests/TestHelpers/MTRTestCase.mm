@@ -17,6 +17,7 @@
 #import "MTRTestCase.h"
 
 #import "MTRMockCB.h"
+#import "MTRTestDeclarations.h"
 #import "MTRTestKeys.h"
 #import "MTRTestStorage.h"
 
@@ -37,12 +38,29 @@ static void ClearTaskSet(NSMutableSet<NSTask *> * __strong & tasks)
 }
 #endif // HAVE_NSTASK
 
+static void ClearControllerSet(NSMutableSet<MTRDeviceController *> * __strong & controllers)
+{
+    if (controllers.count != 0) {
+        for (MTRDeviceController * controller in controllers) {
+            [controller shutdown];
+            XCTAssertFalse([controller isRunning]);
+        }
+
+        // Stop the factory, since we auto-started it when bringing up the controllers.
+        [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
+    }
+
+    controllers = nil;
+}
+
 static MTRMockCB * sMockCB;
+static NSMutableSet<MTRDeviceController *> * sStartedControllers;
 
 @implementation MTRTestCase {
 #if HAVE_NSTASK
     NSMutableSet<NSTask *> * _runningTasks;
 #endif // NSTask
+    NSMutableSet<MTRDeviceController *> * _startedControllers;
 }
 
 + (void)setUp
@@ -50,6 +68,13 @@ static MTRMockCB * sMockCB;
     [super setUp];
 
     sMockCB = [[MTRMockCB alloc] init];
+    sStartedControllers = [[NSMutableSet alloc] init];
+
+#ifdef DEBUG
+    // Force our controllers to only advertise on localhost, to avoid DNS-SD
+    // crosstalk.
+    [MTRDeviceController forceLocalhostAdvertisingOnly];
+#endif // DEBUG
 
 #if HAVE_NSTASK
     sRunningCrossTestTasks = [[NSMutableSet alloc] init];
@@ -61,6 +86,8 @@ static MTRMockCB * sMockCB;
 #if HAVE_NSTASK
     ClearTaskSet(sRunningCrossTestTasks);
 #endif // HAVE_NSTASK
+
+    ClearControllerSet(sStartedControllers);
 
     [sMockCB stopMocking];
     sMockCB = nil;
@@ -76,6 +103,7 @@ static MTRMockCB * sMockCB;
 #if HAVE_NSTASK
     _runningTasks = [[NSMutableSet alloc] init];
 #endif // HAVE_NSTASK
+    _startedControllers = [[NSMutableSet alloc] init];
 }
 
 - (void)tearDown
@@ -119,10 +147,12 @@ static MTRMockCB * sMockCB;
     ClearTaskSet(_runningTasks);
 #endif // HAVE_NSTASK
 
+    ClearControllerSet(_startedControllers);
+
     [super tearDown];
 }
 
-+ (id)createControllerOnTestFabric
++ (MTRDeviceController *)_createControllerOnTestFabric
 {
     __auto_type * storage = [[MTRTestStorage alloc] init];
     __auto_type * factoryParams = [[MTRDeviceControllerFactoryParams alloc] initWithStorage:storage];
@@ -135,6 +165,20 @@ static MTRMockCB * sMockCB;
     MTRDeviceController * controller = [factory createControllerOnNewFabric:params error:nil];
     XCTAssertNotNil(controller);
 
+    return controller;
+}
+
++ (MTRDeviceController *)createControllerOnTestFabric
+{
+    MTRDeviceController * controller = [self _createControllerOnTestFabric];
+    [sStartedControllers addObject:controller];
+    return controller;
+}
+
+- (MTRDeviceController *)createControllerOnTestFabric
+{
+    MTRDeviceController * controller = [self.class _createControllerOnTestFabric];
+    [_startedControllers addObject:controller];
     return controller;
 }
 

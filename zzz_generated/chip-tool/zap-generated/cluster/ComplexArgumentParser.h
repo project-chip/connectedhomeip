@@ -32,6 +32,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Struct
 
 static void Finalize(chip::app::Clusters::Globals::Structs::PowerThresholdStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Structs::PriceStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Globals::Structs::PriceStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Structs::TestGlobalStruct::Type & request,
                         Json::Value & value);
 
@@ -66,11 +71,6 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::detail::Structs::DeviceTypeStruct::Type & request);
-
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Structs::PriceStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::Globals::Structs::PriceStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::ApplicationStruct::Type & request,
                         Json::Value & value);
@@ -500,6 +500,12 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::EnergyPreferenc
 
 static void Finalize(chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ElectricalGridConditions::Structs::ElectricalGridConditionsStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ElectricalGridConditions::Structs::ElectricalGridConditionsStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type & request,
                         Json::Value & value);
 
@@ -515,10 +521,10 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ClosureControl:
 
 static void Finalize(chip::app::Clusters::ClosureControl::Structs::OverallTargetStruct::Type & request);
 
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ClosureDimension::Structs::CurrentStruct::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ClosureDimension::Structs::CurrentStateStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::ClosureDimension::Structs::CurrentStruct::Type & request);
+static void Finalize(chip::app::Clusters::ClosureDimension::Structs::CurrentStateStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::ClosureDimension::Structs::RangePercent100thsStruct::Type & request,
@@ -769,10 +775,10 @@ static CHIP_ERROR Setup(const char * label,
 static void Finalize(chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotStreamStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
-                        chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotParamsStruct::Type & request,
+                        chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotCapabilitiesStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotParamsStruct::Type & request);
+static void Finalize(chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotCapabilitiesStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::CameraAvStreamManagement::Structs::RateDistortionTradeOffPointsStruct::Type & request,
@@ -822,12 +828,6 @@ static CHIP_ERROR Setup(const char * label,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::PushAvStreamTransport::Structs::TransportZoneOptionsStruct::Type & request);
-
-static CHIP_ERROR Setup(const char * label,
-                        chip::app::Clusters::PushAvStreamTransport::Structs::MetadataOptionsStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::PushAvStreamTransport::Structs::MetadataOptionsStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::PushAvStreamTransport::Structs::TransportTriggerOptionsStruct::Type & request,

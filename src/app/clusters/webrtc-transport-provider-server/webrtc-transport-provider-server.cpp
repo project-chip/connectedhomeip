@@ -271,13 +271,14 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
 
     // Prepare the arguments for the delegate.
     Delegate::OfferRequestArgs args;
-    args.sessionId       = GenerateSessionId();
-    args.streamUsage     = req.streamUsage;
-    args.videoStreamId   = req.videoStreamID;
-    args.audioStreamId   = req.audioStreamID;
-    args.metadataOptions = req.metadataOptions;
-    args.peerNodeId      = GetNodeIdFromCtx(ctx.mCommandHandler);
-    args.fabricIndex     = ctx.mCommandHandler.GetAccessingFabricIndex();
+    args.sessionId             = GenerateSessionId();
+    args.streamUsage           = req.streamUsage;
+    args.videoStreamId         = req.videoStreamID;
+    args.audioStreamId         = req.audioStreamID;
+    args.metadataOptions       = req.metadataOptions;
+    args.peerNodeId            = GetNodeIdFromCtx(ctx.mCommandHandler);
+    args.fabricIndex           = ctx.mCommandHandler.GetAccessingFabricIndex();
+    args.originatingEndpointId = req.originatingEndpointID;
 
     if (req.ICEServers.HasValue())
     {
@@ -396,14 +397,15 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
 
         // Prepare delegate arguments.
         Delegate::ProvideOfferRequestArgs args;
-        args.sessionId       = GenerateSessionId();
-        args.streamUsage     = req.streamUsage;
-        args.videoStreamId   = videoStreamID;
-        args.audioStreamId   = audioStreamID;
-        args.metadataOptions = req.metadataOptions;
-        args.peerNodeId      = peerNodeId;
-        args.fabricIndex     = peerFabricIndex;
-        args.sdp             = std::string(req.sdp.data(), req.sdp.size());
+        args.sessionId             = GenerateSessionId();
+        args.streamUsage           = req.streamUsage;
+        args.videoStreamId         = videoStreamID;
+        args.audioStreamId         = audioStreamID;
+        args.metadataOptions       = req.metadataOptions;
+        args.peerNodeId            = peerNodeId;
+        args.fabricIndex           = peerFabricIndex;
+        args.sdp                   = std::string(req.sdp.data(), req.sdp.size());
+        args.originatingEndpointId = req.originatingEndpointID;
 
         // Convert ICE servers list from DecodableList to vector.
         if (req.ICEServers.HasValue())
@@ -436,12 +438,8 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
                 std::string(req.ICETransportPolicy.Value().data(), req.ICETransportPolicy.Value().size()));
         }
 
-        // Build a ScopedNodeId using the secure session’s fabric & node ID.
-        ScopedNodeId peerId(peerNodeId, peerFabricIndex);
-
         // Delegate processing: process the SDP offer, gather ICE candidates, create SDP answer, etc.
-        auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
-            mDelegate.HandleProvideOffer(args, outSession, peerId, req.originatingEndpointID));
+        auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleProvideOffer(args, outSession));
         if (!delegateStatus.IsSuccess())
         {
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, delegateStatus);

@@ -146,6 +146,7 @@ def BuildHostTarget():
         TargetPart('lit-icd', app=HostApp.LIT_ICD),
         TargetPart('air-quality-sensor', app=HostApp.AIR_QUALITY_SENSOR),
         TargetPart('network-manager', app=HostApp.NETWORK_MANAGER),
+        TargetPart('energy-gateway', app=HostApp.ENERGY_GATEWAY),
         TargetPart('energy-management', app=HostApp.ENERGY_MANAGEMENT),
         TargetPart('water-leak-detector', app=HostApp.WATER_LEAK_DETECTOR),
         TargetPart('terms-and-conditions', app=HostApp.TERMS_AND_CONDITIONS),
@@ -219,6 +220,7 @@ def BuildEsp32Target():
     target.AppendFixedTargets([
         TargetPart('all-clusters', app=Esp32App.ALL_CLUSTERS),
         TargetPart('all-clusters-minimal', app=Esp32App.ALL_CLUSTERS_MINIMAL),
+        TargetPart('energy-gateway', app=Esp32App.ENERGY_GATEWAY),
         TargetPart('energy-management', app=Esp32App.ENERGY_MANAGEMENT),
         TargetPart('ota-provider', app=Esp32App.OTA_PROVIDER),
         TargetPart('ota-requestor', app=Esp32App.OTA_REQUESTOR),
@@ -270,7 +272,8 @@ def BuildEfr32Target():
         TargetPart('lock', app=Efr32App.LOCK),
         TargetPart('thermostat', app=Efr32App.THERMOSTAT),
         TargetPart('pump', app=Efr32App.PUMP),
-        TargetPart('air-quality-sensor-app', app=Efr32App.AIR_QUALITY_SENSOR)
+        TargetPart('air-quality-sensor-app', app=Efr32App.AIR_QUALITY_SENSOR),
+        TargetPart('closure', app=Efr32App.CLOSURE)
     ])
 
     target.AppendModifier('rpc', enable_rpcs=True)
@@ -816,6 +819,7 @@ def BuildTelinkTarget():
     target.AppendModifier('usb', usb_board_config=True)
     target.AppendModifier('compress-lzma', compress_lzma_config=True)
     target.AppendModifier('thread-analyzer', thread_analyzer_config=True)
+    target.AppendModifier('precompiled-ot', precompiled_ot_config=True)
 
     return target
 
