@@ -35,14 +35,14 @@ public:
 
     void Init();
 
-    CHIP_ERROR SetRemoteDescription(uint16_t webRTCSessionID, const std::string & sdp);
+    CHIP_ERROR HandleAnswer(uint16_t sessionId, const std::string & sdp);
 
     CHIP_ERROR Connnect(chip::Controller::DeviceCommissioner & commissioner, chip::NodeId nodeId, chip::EndpointId endpointId);
 
-    CHIP_ERROR ProvideOffer(chip::app::DataModel::Nullable<uint16_t> webRTCSessionID,
+    CHIP_ERROR ProvideOffer(chip::app::DataModel::Nullable<uint16_t> sessionId,
                             chip::app::Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage);
 
-    CHIP_ERROR ProvideICECandidates(uint16_t webRTCSessionID);
+    CHIP_ERROR ProvideICECandidates(uint16_t sessionId);
 
 private:
     // Make the constructor private to enforce the singleton pattern

@@ -94,6 +94,32 @@ Davis, CA 95616, USA
       <item value="0x4001" name="Cleaning"/>
       <item value="0x4002" name="Mapping"/>
     </enum>
+    <enum name="StatusCodeEnum">
+      <item value="0x41" name="Stuck">
+        <mandatoryConform/>
+      </item>
+      <item value="0x42" name="DustBinMissing">
+        <mandatoryConform/>
+      </item>
+      <item value="0x43" name="DustBinFull">
+        <mandatoryConform/>
+      </item>
+      <item value="0x44" name="WaterTankEmpty">
+        <mandatoryConform/>
+      </item>
+      <item value="0x45" name="WaterTankMissing">
+        <mandatoryConform/>
+      </item>
+      <item value="0x46" name="WaterTankLidOpen">
+        <mandatoryConform/>
+      </item>
+      <item value="0x47" name="MopCleaningPadMissing">
+        <mandatoryConform/>
+      </item>
+      <item value="0x48" name="BatteryLow">
+        <mandatoryConform/>
+      </item>
+    </enum>
     <struct name="ModeOptionStruct">
       <field id="0" name="Label">
         <mandatoryConform/>

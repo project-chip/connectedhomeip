@@ -70,6 +70,10 @@ static constexpr uint16_t ComputeBDXBlockSizeForThread(uint8_t framesPerBlock)
     return 74 + (framesPerBlock - 1) * 95 - 38;
 }
 
+// For now, don't use kMaxThreadFramesPerBdxBlock unless explicitly opted in.
+// The user default will still be respected if it's set.
+constexpr bool kUseSmartBlockSizingForThread = false;
+
 // Timeout for the BDX transfer session. The OTA Spec mandates this should be >= 5 minutes.
 constexpr System::Clock::Timeout kBdxTimeout = System::Clock::Seconds16(5 * 60);
 
@@ -96,10 +100,23 @@ constexpr bdx::TransferRole kBdxRole = bdx::TransferRole::kSender;
 
 - (instancetype)initWithMTROTAImageTransferHandler:(MTROTAImageTransferHandler *)otaImageTransferHandler
 {
+    assertChipStackLockedByCurrentThread();
     if (self = [super init]) {
         _otaImageTransferHandler = otaImageTransferHandler;
     }
     return self;
+}
+
+- (MTROTAImageTransferHandler *)otaImageTransferHandler
+{
+    assertChipStackLockedByCurrentThread();
+    return _otaImageTransferHandler;
+}
+
+- (void)SetOtaImageTransferHandler:(MTROTAImageTransferHandler *)otaImageTransferHandler
+{
+    assertChipStackLockedByCurrentThread();
+    _otaImageTransferHandler = otaImageTransferHandler;
 }
 @end
 
@@ -136,7 +153,14 @@ CHIP_ERROR MTROTAImageTransferHandler::Init(Messaging::ExchangeContext * exchang
 
     uint16_t blockSize;
     if (mIsPeerNodeAKnownThreadDevice) {
-        blockSize = ComputeBDXBlockSizeForThread(Platform::GetUserDefaultBDXThreadFramesPerBlock().value_or(kMaxThreadFramesPerBdxBlock));
+        auto framesPerBlock = Platform::GetUserDefaultBDXThreadFramesPerBlock();
+        if (framesPerBlock.has_value()) {
+            blockSize = ComputeBDXBlockSizeForThread(Platform::GetUserDefaultBDXThreadFramesPerBlock().value());
+        } else if (kUseSmartBlockSizingForThread) {
+            blockSize = ComputeBDXBlockSizeForThread(kMaxThreadFramesPerBdxBlock);
+        } else {
+            blockSize = kMaxBdxBlockSize;
+        }
     } else {
         blockSize = kMaxBdxBlockSize;
     }

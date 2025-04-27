@@ -49,84 +49,84 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace InstantAction {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Actions::Commands::InstantAction::Id,
+    .commandId       = InstantAction::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace InstantAction
 namespace InstantActionWithTransition {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Actions::Commands::InstantActionWithTransition::Id,
+    .commandId       = InstantActionWithTransition::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace InstantActionWithTransition
 namespace StartAction {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Actions::Commands::StartAction::Id,
+    .commandId       = StartAction::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace StartAction
 namespace StartActionWithDuration {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Actions::Commands::StartActionWithDuration::Id,
+    .commandId       = StartActionWithDuration::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace StartActionWithDuration
 namespace StopAction {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Actions::Commands::StopAction::Id,
+    .commandId       = StopAction::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace StopAction
 namespace PauseAction {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Actions::Commands::PauseAction::Id,
+    .commandId       = PauseAction::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace PauseAction
 namespace PauseActionWithDuration {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Actions::Commands::PauseActionWithDuration::Id,
+    .commandId       = PauseActionWithDuration::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace PauseActionWithDuration
 namespace ResumeAction {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Actions::Commands::ResumeAction::Id,
+    .commandId       = ResumeAction::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace ResumeAction
 namespace EnableAction {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Actions::Commands::EnableAction::Id,
+    .commandId       = EnableAction::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace EnableAction
 namespace EnableActionWithDuration {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Actions::Commands::EnableActionWithDuration::Id,
+    .commandId       = EnableActionWithDuration::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace EnableActionWithDuration
 namespace DisableAction {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Actions::Commands::DisableAction::Id,
+    .commandId       = DisableAction::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace DisableAction
 namespace DisableActionWithDuration {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Actions::Commands::DisableActionWithDuration::Id,
+    .commandId       = DisableActionWithDuration::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

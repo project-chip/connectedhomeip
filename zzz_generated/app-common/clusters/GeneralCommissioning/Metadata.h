@@ -105,28 +105,28 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace ArmFailSafe {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = GeneralCommissioning::Commands::ArmFailSafe::Id,
+    .commandId       = ArmFailSafe::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace ArmFailSafe
 namespace SetRegulatoryConfig {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = GeneralCommissioning::Commands::SetRegulatoryConfig::Id,
+    .commandId       = SetRegulatoryConfig::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace SetRegulatoryConfig
 namespace CommissioningComplete {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = GeneralCommissioning::Commands::CommissioningComplete::Id,
+    .commandId       = CommissioningComplete::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace CommissioningComplete
 namespace SetTCAcknowledgements {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = GeneralCommissioning::Commands::SetTCAcknowledgements::Id,
+    .commandId       = SetTCAcknowledgements::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };

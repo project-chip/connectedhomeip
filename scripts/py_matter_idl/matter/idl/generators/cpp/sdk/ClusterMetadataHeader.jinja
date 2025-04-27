@@ -46,7 +46,7 @@ namespace Commands {
 {% for command in cluster.commands -%}
 namespace {{command.name | upfirst}} {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = {{cluster.name | upfirst}}::Commands::{{command.name | upfirst}}::Id,
+    .commandId       = {{command.name | upfirst}}::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ {{ command | extract_command_quality_flags | join(", ") }} },
     .invokePrivilege = {{ command.invokeacl | as_privilege}},
 };

@@ -68,6 +68,8 @@ static_library("camera-controller-utils") {
     "commands/common/HexConversion.h",
     "commands/common/RemoteDataModelLogger.cpp",
     "commands/common/RemoteDataModelLogger.h",
+    "commands/delay/SleepCommand.cpp",
+    "commands/delay/WaitForCommissioneeCommand.cpp",
     "commands/pairing/OpenCommissioningWindowCommand.cpp",
     "commands/pairing/OpenCommissioningWindowCommand.h",
     "commands/pairing/PairingCommand.cpp",
@@ -86,6 +88,7 @@ static_library("camera-controller-utils") {
 
   sources += [ "commands/interactive/InteractiveCommands.cpp" ]
   deps += [
+    "${chip_root}/examples/common/websocket-server",
     "${chip_root}/src/platform/logging:headers",
     "${editline_root}:editline",
   ]

@@ -97,14 +97,14 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace SetCookingParameters {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = MicrowaveOvenControl::Commands::SetCookingParameters::Id,
+    .commandId       = SetCookingParameters::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace SetCookingParameters
 namespace AddMoreTime {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = MicrowaveOvenControl::Commands::AddMoreTime::Id,
+    .commandId       = AddMoreTime::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

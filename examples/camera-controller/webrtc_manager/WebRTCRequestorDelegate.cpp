@@ -35,7 +35,7 @@ CHIP_ERROR WebRTCRequestorDelegate::HandleOffer(uint16_t sessionId, const OfferA
 CHIP_ERROR WebRTCRequestorDelegate::HandleAnswer(uint16_t sessionId, const std::string & sdpAnswer)
 {
     ChipLogProgress(Camera, "WebRTCRequestorDelegate::HandleAnswer");
-    return WebRTCManager::Instance().SetRemoteDescription(sessionId, sdpAnswer);
+    return WebRTCManager::Instance().HandleAnswer(sessionId, sdpAnswer);
 }
 
 CHIP_ERROR WebRTCRequestorDelegate::HandleICECandidates(uint16_t sessionId, const std::vector<std::string> & candidates)

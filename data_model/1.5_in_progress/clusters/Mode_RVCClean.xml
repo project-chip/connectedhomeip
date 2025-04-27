@@ -96,6 +96,11 @@ Davis, CA 95616, USA
       <item value="0x4002" name="Mop"/>
       <item value="0x4003" name="Vacuum then Mop"/>
     </enum>
+    <enum name="StatusCodeEnum">
+      <item value="0x40" name="CleaningInProgress">
+        <mandatoryConform/>
+      </item>
+    </enum>
     <struct name="ModeOptionStruct">
       <field id="0" name="Label">
         <mandatoryConform/>

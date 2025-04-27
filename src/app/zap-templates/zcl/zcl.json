@@ -209,7 +209,13 @@
             "UnitRange",
             "LimitRange"
         ],
-        "Commodity Price": ["Currency", "CurrentPrice"],
+        "Commodity Price": [
+            "TariffUnit",
+            "Currency",
+            "CurrentPrice",
+            "PriceForecast",
+            "FeatureMap"
+        ],
         "Commodity Tariff": [
             "TariffInfo",
             "CurrentDay",

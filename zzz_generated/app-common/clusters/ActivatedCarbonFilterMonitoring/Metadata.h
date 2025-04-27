@@ -73,7 +73,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace ResetCondition {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ActivatedCarbonFilterMonitoring::Commands::ResetCondition::Id,
+    .commandId       = ResetCondition::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

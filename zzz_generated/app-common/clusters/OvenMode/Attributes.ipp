@@ -34,10 +34,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, supportedModes);
     case Attributes::CurrentMode::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, currentMode);
-    case Attributes::StartUpMode::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, startUpMode);
-    case Attributes::OnMode::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, onMode);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():

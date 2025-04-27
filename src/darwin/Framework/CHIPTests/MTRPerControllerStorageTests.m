@@ -2097,12 +2097,6 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 // startControllerWithRootKeys into a test helper.
 - (void)testControllerServer
 {
-#ifdef DEBUG
-    // Force our controllers to only advertise on localhost, to avoid DNS-SD
-    // crosstalk.
-    [MTRDeviceController forceLocalhostAdvertisingOnly];
-#endif // DEBUG
-
     __auto_type queue = dispatch_get_main_queue();
 
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
@@ -3691,6 +3685,11 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
         XCTAssertEqual(controller.devices.count, 1);
     }
+
+    // Wait for the report processing to finish, so the MTRDevice object may dealloc
+    [controller syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
 
     // report should still be ongoing
     XCTAssertFalse(subscriptionReportEnd1);

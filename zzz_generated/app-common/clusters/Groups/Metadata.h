@@ -33,42 +33,42 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace AddGroup {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Groups::Commands::AddGroup::Id,
+    .commandId       = AddGroup::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace AddGroup
 namespace ViewGroup {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Groups::Commands::ViewGroup::Id,
+    .commandId       = ViewGroup::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace ViewGroup
 namespace GetGroupMembership {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Groups::Commands::GetGroupMembership::Id,
+    .commandId       = GetGroupMembership::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace GetGroupMembership
 namespace RemoveGroup {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Groups::Commands::RemoveGroup::Id,
+    .commandId       = RemoveGroup::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace RemoveGroup
 namespace RemoveAllGroups {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Groups::Commands::RemoveAllGroups::Id,
+    .commandId       = RemoveAllGroups::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace RemoveAllGroups
 namespace AddGroupIfIdentifying {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Groups::Commands::AddGroupIfIdentifying::Id,
+    .commandId       = AddGroupIfIdentifying::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kManage,
 };

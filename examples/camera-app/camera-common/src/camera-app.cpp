@@ -122,8 +122,6 @@ void CameraApp::InitCameraDeviceClusters()
 
     mChimeServerPtr->Init();
 
-    mAVStreamMgmtServerPtr->Init();
-
     mAVSettingsUserLevelMgmtServerPtr->Init();
 
     InitializeCameraAVStreamMgmt();

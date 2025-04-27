@@ -29,19 +29,20 @@ namespace RvcCleanMode {
 // Enum for ModeTag
 enum class ModeTag : uint16_t
 {
-    kAuto      = 0x00,
-    kQuick     = 0x01,
-    kQuiet     = 0x02,
-    kLowNoise  = 0x03,
-    kLowEnergy = 0x04,
-    kVacation  = 0x05,
-    kMin       = 0x06,
-    kMax       = 0x07,
-    kNight     = 0x08,
-    kDay       = 0x09,
-    kDeepClean = 0x4000,
-    kVacuum    = 0x4001,
-    kMop       = 0x4002,
+    kAuto          = 0x00,
+    kQuick         = 0x01,
+    kQuiet         = 0x02,
+    kLowNoise      = 0x03,
+    kLowEnergy     = 0x04,
+    kVacation      = 0x05,
+    kMin           = 0x06,
+    kMax           = 0x07,
+    kNight         = 0x08,
+    kDay           = 0x09,
+    kDeepClean     = 0x4000,
+    kVacuum        = 0x4001,
+    kMop           = 0x4002,
+    kVacuumThenMop = 0x4003,
     // kUnknownEnumValue intentionally not defined. This enum never goes
     // through DataModel::Decode, likely because it is a part of a derived
     // cluster. As a result having kUnknownEnumValue in this enum is error

@@ -256,6 +256,55 @@ $ ./fuzz-chip-cert-pw --fuzz=ChipCert.DecodeChipCertFuzzer
 
 ```
 
+### Coverage Report Generation
+
+> [!TIP]
+>
+> Use Coverage Reports to get more insights while writing FuzzTests.
+
+1. Build FuzzTests with coverage instrumentation
+   [Building pw_fuzzer FuzzTests](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/BUILDING.md#pw_fuzzer-fuzztests).
+
+2. Run These FuzzTests using `scripts/tests/run_fuzztest_coverage.py`
+
+    - run them in `Continuous Fuzzing Mode` for as long as possible to get max
+      coverage
+
+3. The path for the HTML Coverage Report will be output after generation
+
+### Coverage Reports and Fuzz Blockers
+
+-   Coverage Reports can give (FuzzTest Developers) insights and help identify
+    `Fuzz Blockers`.
+-   **Fuzz Blocker**: something that prevents a fuzz test from exploring a
+    certain part of the code.
+
+#### Example of Fuzz Blocker Analysis:
+
+-   Screenshot below shows how we can use a Coverage Report to identify a Fuzz
+    Blocker
+-   We can see the number of executions of each line in the report.
+-   Line (#2159) was not reached, in at least 129,452 executions.
+-   The line (#2156) just above it is possibly a Fuzz Blocker.
+
+    -   The `data.fabricId` check is always failing and it is blocking the
+        execution of the function that follows it.
+
+![FuzzBlocker_before](img/fuzzblocker_before.png)
+
+-   Thus, we can adapt our FuzzTest in a way to be able to pass that check.
+-   **Solution**: One approach will be to:
+
+    1. Seed the Fuzzed `NOC` with a valid NOC Certificate
+    2. Fuzz the `FabricId`
+    3. Seed the `FabricId` using the same **valid** `FabricId` included in the
+       valid NOC Cert.
+
+-   After doing this, Screenshot below shows Line #2159 is now reached; We have
+    increased our coverage and we are sure that our FuzzTest is more effective:
+
+![FuzzBlocker_after](img/fuzzblocker_after.png)
+
 ### FAQ
 
 #### What revision should the FuzzTest and Abseil submodules be for running `pw_fuzzer` with FuzzTest?

@@ -144,7 +144,7 @@ async def CreateControllersOnFabric(fabricAdmin: FabricAdmin,
     return controllerList
 
 
-async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, existingNodeId, newNodeId) -> tuple[bool, typing.Optional[Clusters.OperationalCredentials.Commands.NOCResponse], typing.Optional[NOCChain]]:
+async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, existingNodeId, newNodeId, omitCommissioningComplete: bool = False, failSafeDurationSeconds: int = 60) -> tuple[bool, typing.Optional[Clusters.OperationalCredentials.Commands.NOCResponse], typing.Optional[NOCChain]]:
     ''' Perform sequence to commission new fabric using existing commissioned fabric.
 
     Args:
@@ -154,6 +154,8 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
             fabric we are establishing.
         existingNodeId (int): Node ID of the target where an AddNOC needs to be done for a new fabric.
         newNodeId (int): Node ID to use for the target node on the new fabric.
+        omitCommissioningComplete (bool): If true, return after AddNOC, don't do CommissioningComplete. Defaults to False.
+        failSafeDurationSeconds (int): Duration of failsafe to use. Defaults to 60.
 
     Return:
         tuple:  (bool, Optional[nocResp], Optional[NOCChain]: True if successful, False otherwise, along with nocResp, rcacResp value.
@@ -161,7 +163,7 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
     '''
     nocResp = None
 
-    resp = await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(60))
+    resp = await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(failSafeDurationSeconds))
     if resp.errorCode is not generalCommissioning.Enums.CommissioningErrorEnum.kOk:
         return False, nocResp
 
@@ -188,6 +190,11 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
         await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
         return False, nocResp
 
+    # Immediately return if skipping CommissioningComplete is requested.
+    if omitCommissioningComplete:
+        return True, nocResp, chainForAddNOC
+
+    # Send CommissioningComplete to finalize commissioning.
     resp = await newFabricDevCtrl.SendCommand(newNodeId, 0, generalCommissioning.Commands.CommissioningComplete())
 
     if resp.errorCode is not generalCommissioning.Enums.CommissioningErrorEnum.kOk:
@@ -201,7 +208,7 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
     return True, nocResp, chainForAddNOC
 
 
-async def UpdateNOC(devCtrl, existingNodeId, newNodeId):
+async def UpdateNOC(devCtrl, existingNodeId, newNodeId, omitCommissioningComplete: bool = False, failSafeDurationSeconds: int = 600):
     """ Perform sequence to generate a new NOC cert and issue updated NOC to server.
 
     Args:
@@ -212,12 +219,13 @@ async def UpdateNOC(devCtrl, existingNodeId, newNodeId):
         newNodeId (int): Node ID that we would like to update the server to use. This can be
             the same as `existingNodeId` if you wish to keep the node ID unchanged, but only
             update the NOC certificate.
-
+        omitCommissioningComplete (bool): If true, return after UpdateNOC, don't do CommissioningComplete. Defaults to False.
+        failSafeDurationSeconds (int): Duration of failsafe to use. Defaults to 600.
     Return:
         bool: True if successful, False otherwise.
 
     """
-    resp = await devCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(600))
+    resp = await devCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(failSafeDurationSeconds))
     if resp.errorCode is not generalCommissioning.Enums.CommissioningErrorEnum.kOk:
         return False
     csrForUpdateNOC = await devCtrl.SendCommand(
@@ -239,6 +247,11 @@ async def UpdateNOC(devCtrl, existingNodeId, newNodeId):
     # Forget our session since the peer deleted it
     devCtrl.ExpireSessions(existingNodeId)
 
+    # Immediately return if skipping CommissioningComplete is requested.
+    if omitCommissioningComplete:
+        return True
+
+    # Send CommissioningComplete to finalize commissioning.
     resp = await devCtrl.SendCommand(newNodeId, 0, generalCommissioning.Commands.CommissioningComplete())
     if resp.errorCode is not generalCommissioning.Enums.CommissioningErrorEnum.kOk:
         # Expiring the failsafe timer in an attempt to clean up.

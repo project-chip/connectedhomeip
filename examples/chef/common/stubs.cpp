@@ -102,6 +102,10 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type kLeftTagList[] = { 
 #include "oven-mode/chef-oven-mode.h"
 #endif // MATTER_DM_PLUGIN_OVEN_MODE_SERVER
 
+#ifdef MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
+#include "oven-cavity-operational-state/chef-oven-cavity-operational-state.h"
+#endif // MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
+
 Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
                                                                          const EmberAfAttributeMetadata * attributeMetadata,
                                                                          uint8_t * buffer, uint16_t maxReadLength)
@@ -459,6 +463,9 @@ void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
         SetParentEndpointForEndpoint(kTemperatureControlledCabinetEpId, kOvenEpId);
         SetTagList(kTemperatureControlledCabinetEpId,
                    Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(PostionSemanticTag::kTopTagList));
+#ifdef MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
+        Clusters::OvenCavityOperationalState::InitChefOvenCavityOperationalStateCluster();
+#endif // MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
     }
     CooktopCookSurfaceInit(kCooktopEpId);
 }

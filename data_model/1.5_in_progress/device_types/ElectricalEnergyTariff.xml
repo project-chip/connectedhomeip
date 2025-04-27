@@ -99,6 +99,9 @@ Davis, CA 95616, USA
         <condition name="ActiveTariff"/>
       </optionalConform>
     </cluster>
+    <cluster id="0x00A0" name="Electrical Grid Conditions" side="server">
+      <optionalConform/>
+    </cluster>
     <cluster id="0x0700" name="Commodity Tariff" side="server">
       <optionalConform choice="a" more="true" min="1"/>
     </cluster>

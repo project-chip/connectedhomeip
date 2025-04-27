@@ -41,7 +41,7 @@ from typing import Any
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.matter_asserts import assert_valid_uint8
+from chip.testing.matter_asserts import assert_valid_map8
 from matter_testing_infrastructure.chip.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main,
                                                                        has_feature, run_if_endpoint_matches)
 from mobly import asserts
@@ -56,9 +56,9 @@ class TC_FAN_2_4(MatterBaseTest):
     def steps_TC_FAN_2_4(self):
         return [TestStep(1, "[FC] Commissioning already done.", is_commissioning=True),
                 TestStep(2, "[FC] TH reads from the DUT the WindSupport attribute.",
-                         "Verify that the WindSupport attribute value is of uint8 type. Verify that the WindSupport attribute's value is between 1 and 3 inclusive."),
+                         "Verify that the WindSupport attribute value is a map8 bitmap. Verify that the WindSupport attribute's value is between 1 and 3 inclusive."),
                 TestStep(3, "[FC] TH reads from the DUT the WindSetting attribute.",
-                         "Verify that the WindSetting attribute value is of uint8 type. Verify that the WindSetting attribute's value is between 0 and 3 inclusive"),
+                         "Verify that the WindSetting attribute value is a map8 bitmap. Verify that the WindSetting attribute's value is between 0 and 3 inclusive"),
                 TestStep(4, "[FC] TH checks that WindSetting is conformant with WindSupport.",
                          "Verify that all bits set in WindSetting are also set in WindSupport."),
                 TestStep(5, "[FC] TH writes a valid bit from WindSupport to WindSetting.",
@@ -120,8 +120,8 @@ class TC_FAN_2_4(MatterBaseTest):
         self.step(2)
         wind_support = await self.read_setting(attr.WindSupport)
 
-        # Verify that the WindSupport attribute value is of uint8 type
-        assert_valid_uint8(wind_support, "WindSupport")
+        # Verify that the WindSupport attribute value is a map8 bitmap
+        assert_valid_map8(wind_support, "WindSupport")
 
         # Verify that the WindSupport attribute's value is between 1 and 3 inclusive
         asserts.assert_in(wind_support, valid_wind_support_range,
@@ -132,8 +132,8 @@ class TC_FAN_2_4(MatterBaseTest):
         self.step(3)
         wind_setting = await self.read_setting(attr.WindSetting)
 
-        # Verify that the WindSetting attribute value is of uint8 type
-        assert_valid_uint8(wind_setting, "WindSetting")
+        # Verify that the WindSetting attribute value is a map8 bitmap
+        assert_valid_map8(wind_setting, "WindSetting")
 
         # Verify that the WindSetting attribute's value is between 0 and 3 inclusive
         asserts.assert_in(wind_setting, valid_wind_setting_range,

@@ -17,6 +17,7 @@
 #import "MTRTestCase.h"
 
 #import "MTRMockCB.h"
+#import "MTRTestDeclarations.h"
 #import "MTRTestKeys.h"
 #import "MTRTestStorage.h"
 
@@ -68,6 +69,12 @@ static NSMutableSet<MTRDeviceController *> * sStartedControllers;
 
     sMockCB = [[MTRMockCB alloc] init];
     sStartedControllers = [[NSMutableSet alloc] init];
+
+#ifdef DEBUG
+    // Force our controllers to only advertise on localhost, to avoid DNS-SD
+    // crosstalk.
+    [MTRDeviceController forceLocalhostAdvertisingOnly];
+#endif // DEBUG
 
 #if HAVE_NSTASK
     sRunningCrossTestTasks = [[NSMutableSet alloc] init];

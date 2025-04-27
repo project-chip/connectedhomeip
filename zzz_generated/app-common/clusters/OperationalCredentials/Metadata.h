@@ -73,70 +73,70 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace AttestationRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = OperationalCredentials::Commands::AttestationRequest::Id,
+    .commandId       = AttestationRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace AttestationRequest
 namespace CertificateChainRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = OperationalCredentials::Commands::CertificateChainRequest::Id,
+    .commandId       = CertificateChainRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace CertificateChainRequest
 namespace CSRRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = OperationalCredentials::Commands::CSRRequest::Id,
+    .commandId       = CSRRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace CSRRequest
 namespace AddNOC {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = OperationalCredentials::Commands::AddNOC::Id,
+    .commandId       = AddNOC::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace AddNOC
 namespace UpdateNOC {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = OperationalCredentials::Commands::UpdateNOC::Id,
+    .commandId       = UpdateNOC::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace UpdateNOC
 namespace UpdateFabricLabel {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = OperationalCredentials::Commands::UpdateFabricLabel::Id,
+    .commandId       = UpdateFabricLabel::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace UpdateFabricLabel
 namespace RemoveFabric {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = OperationalCredentials::Commands::RemoveFabric::Id,
+    .commandId       = RemoveFabric::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace RemoveFabric
 namespace AddTrustedRootCertificate {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = OperationalCredentials::Commands::AddTrustedRootCertificate::Id,
+    .commandId       = AddTrustedRootCertificate::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace AddTrustedRootCertificate
 namespace SetVIDVerificationStatement {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = OperationalCredentials::Commands::SetVIDVerificationStatement::Id,
+    .commandId       = SetVIDVerificationStatement::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace SetVIDVerificationStatement
 namespace SignVIDVerificationRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = OperationalCredentials::Commands::SignVIDVerificationRequest::Id,
+    .commandId       = SignVIDVerificationRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };

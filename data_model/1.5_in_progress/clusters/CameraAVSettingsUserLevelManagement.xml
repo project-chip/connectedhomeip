@@ -162,6 +162,7 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="MPTZPosition" type="MPTZStruct">
       <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform>
         <orTerm>
           <feature name="MPAN"/>
@@ -180,6 +181,7 @@ Davis, CA 95616, USA
     <attribute id="0x0002" name="MPTZPresets" type="list" default="empty">
       <entry type="MPTZPresetStruct"/>
       <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="MPRESETS"/>
       </mandatoryConform>
@@ -192,6 +194,7 @@ Davis, CA 95616, USA
     <attribute id="0x0003" name="DPTZRelativeMove" type="list" default="empty">
       <entry type="VideoStreamID"/>
       <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="DPTZ"/>
       </mandatoryConform>

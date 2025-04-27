@@ -1776,6 +1776,17 @@ public class ClusterReadMapping {
           readUnitLocalizationTemperatureUnitCommandParams
         );
         result.put("readTemperatureUnitAttribute", readUnitLocalizationTemperatureUnitAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readUnitLocalizationSupportedTemperatureUnitsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readUnitLocalizationSupportedTemperatureUnitsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.UnitLocalizationCluster) cluster).readSupportedTemperatureUnitsAttribute(
+              (ChipClusters.UnitLocalizationCluster.SupportedTemperatureUnitsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedUnitLocalizationClusterSupportedTemperatureUnitsAttributeCallback(),
+          readUnitLocalizationSupportedTemperatureUnitsCommandParams
+        );
+        result.put("readSupportedTemperatureUnitsAttribute", readUnitLocalizationSupportedTemperatureUnitsAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readUnitLocalizationGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readUnitLocalizationGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -6005,28 +6016,6 @@ public class ClusterReadMapping {
           readOvenModeCurrentModeCommandParams
         );
         result.put("readCurrentModeAttribute", readOvenModeCurrentModeAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readOvenModeStartUpModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readOvenModeStartUpModeAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.OvenModeCluster) cluster).readStartUpModeAttribute(
-              (ChipClusters.OvenModeCluster.StartUpModeAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedOvenModeClusterStartUpModeAttributeCallback(),
-          readOvenModeStartUpModeCommandParams
-        );
-        result.put("readStartUpModeAttribute", readOvenModeStartUpModeAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readOvenModeOnModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readOvenModeOnModeAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.OvenModeCluster) cluster).readOnModeAttribute(
-              (ChipClusters.OvenModeCluster.OnModeAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedOvenModeClusterOnModeAttributeCallback(),
-          readOvenModeOnModeCommandParams
-        );
-        result.put("readOnModeAttribute", readOvenModeOnModeAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readOvenModeGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readOvenModeGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -6347,28 +6336,6 @@ public class ClusterReadMapping {
           readLaundryWasherModeCurrentModeCommandParams
         );
         result.put("readCurrentModeAttribute", readLaundryWasherModeCurrentModeAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readLaundryWasherModeStartUpModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readLaundryWasherModeStartUpModeAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.LaundryWasherModeCluster) cluster).readStartUpModeAttribute(
-              (ChipClusters.LaundryWasherModeCluster.StartUpModeAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedLaundryWasherModeClusterStartUpModeAttributeCallback(),
-          readLaundryWasherModeStartUpModeCommandParams
-        );
-        result.put("readStartUpModeAttribute", readLaundryWasherModeStartUpModeAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readLaundryWasherModeOnModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readLaundryWasherModeOnModeAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.LaundryWasherModeCluster) cluster).readOnModeAttribute(
-              (ChipClusters.LaundryWasherModeCluster.OnModeAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedLaundryWasherModeClusterOnModeAttributeCallback(),
-          readLaundryWasherModeOnModeCommandParams
-        );
-        result.put("readOnModeAttribute", readLaundryWasherModeOnModeAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readLaundryWasherModeGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readLaundryWasherModeGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -6461,28 +6428,6 @@ public class ClusterReadMapping {
           readRefrigeratorAndTemperatureControlledCabinetModeCurrentModeCommandParams
         );
         result.put("readCurrentModeAttribute", readRefrigeratorAndTemperatureControlledCabinetModeCurrentModeAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readRefrigeratorAndTemperatureControlledCabinetModeStartUpModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readRefrigeratorAndTemperatureControlledCabinetModeStartUpModeAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.RefrigeratorAndTemperatureControlledCabinetModeCluster) cluster).readStartUpModeAttribute(
-              (ChipClusters.RefrigeratorAndTemperatureControlledCabinetModeCluster.StartUpModeAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedRefrigeratorAndTemperatureControlledCabinetModeClusterStartUpModeAttributeCallback(),
-          readRefrigeratorAndTemperatureControlledCabinetModeStartUpModeCommandParams
-        );
-        result.put("readStartUpModeAttribute", readRefrigeratorAndTemperatureControlledCabinetModeStartUpModeAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readRefrigeratorAndTemperatureControlledCabinetModeOnModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readRefrigeratorAndTemperatureControlledCabinetModeOnModeAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.RefrigeratorAndTemperatureControlledCabinetModeCluster) cluster).readOnModeAttribute(
-              (ChipClusters.RefrigeratorAndTemperatureControlledCabinetModeCluster.OnModeAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedRefrigeratorAndTemperatureControlledCabinetModeClusterOnModeAttributeCallback(),
-          readRefrigeratorAndTemperatureControlledCabinetModeOnModeCommandParams
-        );
-        result.put("readOnModeAttribute", readRefrigeratorAndTemperatureControlledCabinetModeOnModeAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readRefrigeratorAndTemperatureControlledCabinetModeGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readRefrigeratorAndTemperatureControlledCabinetModeGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -7112,28 +7057,6 @@ public class ClusterReadMapping {
           readDishwasherModeCurrentModeCommandParams
         );
         result.put("readCurrentModeAttribute", readDishwasherModeCurrentModeAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readDishwasherModeStartUpModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readDishwasherModeStartUpModeAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.DishwasherModeCluster) cluster).readStartUpModeAttribute(
-              (ChipClusters.DishwasherModeCluster.StartUpModeAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedDishwasherModeClusterStartUpModeAttributeCallback(),
-          readDishwasherModeStartUpModeCommandParams
-        );
-        result.put("readStartUpModeAttribute", readDishwasherModeStartUpModeAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readDishwasherModeOnModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readDishwasherModeOnModeAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.DishwasherModeCluster) cluster).readOnModeAttribute(
-              (ChipClusters.DishwasherModeCluster.OnModeAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedDishwasherModeClusterOnModeAttributeCallback(),
-          readDishwasherModeOnModeCommandParams
-        );
-        result.put("readOnModeAttribute", readDishwasherModeOnModeAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readDishwasherModeGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readDishwasherModeGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

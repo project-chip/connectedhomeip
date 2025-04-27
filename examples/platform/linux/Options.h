@@ -57,6 +57,7 @@ struct LinuxDeviceOptions
     bool wifiSupports5g        = false;
     bool mWiFi                 = false;
     bool mThread               = false;
+    bool cameraDeferredOffer   = false;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     bool mWiFiPAF                = false;
     const char * mWiFiPAFExtCmds = nullptr;

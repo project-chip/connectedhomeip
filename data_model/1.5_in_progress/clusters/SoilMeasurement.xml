@@ -68,14 +68,10 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="SOIL" scope="Endpoint"/>
   <attributes>
-    <attribute id="0x0000" name="SoilMeasurementLimits" type="list">
-      <entry type="MeasurementAccuracyStruct"/>
+    <attribute id="0x0000" name="SoilMoistureMeasurementLimits" type="MeasurementAccuracyStruct">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint>
-        <minCount value="1"/>
-      </constraint>
     </attribute>
     <attribute id="0x0001" name="SoilMoistureMeasuredValue" type="percent">
       <access read="true" readPrivilege="view"/>
@@ -84,10 +80,14 @@ Davis, CA 95616, USA
       <constraint>
         <between>
           <from>
-            <attribute name="SoilMeasurementLimits" value="MinMeasuredValue"/>
+            <attribute name="SoilMoistureMeasurementLimits">
+              <field name="MinMeasuredValue"/>
+            </attribute>
           </from>
           <to>
-            <attribute name="SoilMeasurementLimits" value="MaxMeasuredValue"/>
+            <attribute name="SoilMoistureMeasurementLimits">
+              <field name="MaxMeasuredValue"/>
+            </attribute>
           </to>
         </between>
       </constraint>

@@ -41,7 +41,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace NetworkPassphraseRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = WiFiNetworkManagement::Commands::NetworkPassphraseRequest::Id,
+    .commandId       = NetworkPassphraseRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };

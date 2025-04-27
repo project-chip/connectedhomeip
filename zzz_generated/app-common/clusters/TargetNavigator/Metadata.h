@@ -41,7 +41,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace NavigateTarget {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = TargetNavigator::Commands::NavigateTarget::Id,
+    .commandId       = NavigateTarget::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

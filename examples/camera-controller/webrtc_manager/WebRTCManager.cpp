@@ -54,9 +54,11 @@ void WebRTCManager::Init()
     mWebRTCRequestorServer.Init();
 }
 
-CHIP_ERROR WebRTCManager::SetRemoteDescription(uint16_t webRTCSessionID, const std::string & sdp)
+CHIP_ERROR WebRTCManager::HandleAnswer(uint16_t sessionId, const std::string & sdp)
 {
-    mWebRTCProviderClient.NotifyRemoteDecryptorReceived(webRTCSessionID);
+    ChipLogProgress(Camera, "WebRTCManager::HandleAnswer");
+
+    mWebRTCProviderClient.HandleAnswerReceived(sessionId);
 
     if (!mPeerConnection)
     {
@@ -64,11 +66,10 @@ CHIP_ERROR WebRTCManager::SetRemoteDescription(uint16_t webRTCSessionID, const s
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    ChipLogProgress(Camera, "WebRTCManager::SetRemoteDescription");
     mPeerConnection->setRemoteDescription(sdp);
 
     // Schedule the ProvideICECandidates() call to run asynchronously.
-    DeviceLayer::SystemLayer().ScheduleLambda([this, webRTCSessionID]() { ProvideICECandidates(webRTCSessionID); });
+    DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() { ProvideICECandidates(sessionId); });
 
     return CHIP_NO_ERROR;
 }
@@ -138,13 +139,13 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> webRTCSessionID,
+CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> sessionId,
                                        Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage)
 {
     ChipLogProgress(Camera, "Sending ProvideOffer command to the peer device");
 
     CHIP_ERROR err =
-        mWebRTCProviderClient.ProvideOffer(webRTCSessionID, mLocalDescription, streamUsage, kWebRTCRequesterDynamicEndpointId,
+        mWebRTCProviderClient.ProvideOffer(sessionId, mLocalDescription, streamUsage, kWebRTCRequesterDynamicEndpointId,
                                            MakeOptional(DataModel::NullNullable), // "Null" for video
                                            MakeOptional(DataModel::NullNullable), // "Null" for audio
                                            NullOptional,                          // Omit ICEServers (Optional not present)
@@ -159,7 +160,7 @@ CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> webRTCSessi
     return err;
 }
 
-CHIP_ERROR WebRTCManager::ProvideICECandidates(uint16_t webRTCSessionID)
+CHIP_ERROR WebRTCManager::ProvideICECandidates(uint16_t sessionId)
 {
     ChipLogProgress(Camera, "Sending ProvideICECandidates command to the peer device");
 
@@ -179,7 +180,7 @@ CHIP_ERROR WebRTCManager::ProvideICECandidates(uint16_t webRTCSessionID)
 
     auto ICECandidates = chip::app::DataModel::List<const chip::CharSpan>(candidateSpans.data(), candidateSpans.size());
 
-    CHIP_ERROR err = mWebRTCProviderClient.ProvideICECandidates(webRTCSessionID, ICECandidates);
+    CHIP_ERROR err = mWebRTCProviderClient.ProvideICECandidates(sessionId, ICECandidates);
 
     if (err != CHIP_NO_ERROR)
     {
