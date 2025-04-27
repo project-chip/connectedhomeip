@@ -45196,7 +45196,7 @@ class ContentControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="scheduledContentRatingThreshold", Tag=0x00000004, Type=typing.Optional[str]),
                 ClusterObjectFieldDescriptor(Label="screenDailyTime", Tag=0x00000005, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="remainingScreenTime", Tag=0x00000006, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="blockUnrated", Tag=0x00000007, Type=bool),
+                ClusterObjectFieldDescriptor(Label="blockUnrated", Tag=0x00000007, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -45211,7 +45211,7 @@ class ContentControl(Cluster):
     scheduledContentRatingThreshold: typing.Optional[str] = None
     screenDailyTime: typing.Optional[uint] = None
     remainingScreenTime: typing.Optional[uint] = None
-    blockUnrated: bool = False
+    blockUnrated: typing.Optional[bool] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -45531,9 +45531,9 @@ class ContentControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=bool)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
 
-            value: bool = False
+            value: typing.Optional[bool] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
