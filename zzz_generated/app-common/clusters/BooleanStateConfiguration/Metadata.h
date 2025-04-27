@@ -89,14 +89,14 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace SuppressAlarm {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = BooleanStateConfiguration::Commands::SuppressAlarm::Id,
+    .commandId       = SuppressAlarm::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace SuppressAlarm
 namespace EnableDisableAlarm {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = BooleanStateConfiguration::Commands::EnableDisableAlarm::Id,
+    .commandId       = EnableDisableAlarm::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

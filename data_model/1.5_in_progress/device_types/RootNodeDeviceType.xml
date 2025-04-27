@@ -167,14 +167,14 @@ Davis, CA 95616, USA
       <quality singleton="true"/>
       <mandatoryConform>
         <orTerm>
-          <feature name="SIT"/>
-          <feature name="LIT"/>
+          <condition name="SIT"/>
+          <condition name="LIT"/>
         </orTerm>
       </mandatoryConform>
       <features>
         <feature code="" name="LongIdleTimeSupport">
           <mandatoryConform>
-            <feature name="LIT"/>
+            <condition name="LIT"/>
           </mandatoryConform>
         </feature>
       </features>

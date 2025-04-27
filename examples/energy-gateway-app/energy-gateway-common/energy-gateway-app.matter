@@ -1548,6 +1548,44 @@ provisional cluster CommodityPrice = 149 {
   command GetDetailedForecastRequest(GetDetailedForecastRequestRequest): GetDetailedForecastResponse = 2;
 }
 
+/** The Electrical Grid Conditions Cluster provides the mechanism for communicating electricity grid carbon intensity to devices within the premises in units of Grams of CO2e per kWh. */
+provisional cluster ElectricalGridConditions = 160 {
+  revision 1;
+
+  enum ThreeLevelEnum : enum8 {
+    kLow = 0;
+    kMedium = 1;
+    kHigh = 2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kForecasting = 0x1;
+  }
+
+  struct ElectricalGridConditionsStruct {
+    epoch_s periodStart = 0;
+    nullable epoch_s periodEnd = 1;
+    int16s gridCarbonIntensity = 2;
+    ThreeLevelEnum gridCarbonLevel = 3;
+    int16s localCarbonIntensity = 4;
+    ThreeLevelEnum localCarbonLevel = 5;
+  }
+
+  info event CurrentConditionsChanged = 0 {
+    nullable ElectricalGridConditionsStruct currentConditions = 0;
+  }
+
+  attribute nullable boolean localGenerationAvailable = 0;
+  readonly attribute nullable ElectricalGridConditionsStruct currentConditions = 1;
+  readonly attribute optional ElectricalGridConditionsStruct forecastConditions[] = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 endpoint 0 {
   device type ma_rootdevice = 22, version 3;
   device type ma_otarequestor = 18, version 1;
@@ -1600,7 +1638,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
   }
 
   server cluster OtaSoftwareUpdateRequestor {
@@ -1770,7 +1808,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 6;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -1791,20 +1829,32 @@ endpoint 1 {
 
   server cluster CommodityPrice {
     emits event PriceChange;
-    ram      attribute tariffUnit;
+    callback attribute tariffUnit;
     callback attribute currency;
     callback attribute currentPrice;
     callback attribute priceForecast;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 4;
 
     handle command GetDetailedPriceRequest;
     handle command GetDetailedPriceResponse;
     handle command GetDetailedForecastRequest;
     handle command GetDetailedForecastResponse;
+  }
+
+  server cluster ElectricalGridConditions {
+    emits event CurrentConditionsChanged;
+    callback attribute localGenerationAvailable;
+    callback attribute currentConditions;
+    callback attribute forecastConditions;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 1;
   }
 }
 
