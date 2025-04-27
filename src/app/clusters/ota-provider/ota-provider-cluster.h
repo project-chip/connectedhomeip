@@ -16,12 +16,12 @@
  */
 #pragma once
 
-#include "lib/support/Span.h"
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/OtaSoftwareUpdateProvider/ClusterId.h>
 #include <clusters/OtaSoftwareUpdateProvider/Commands.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 namespace app {
