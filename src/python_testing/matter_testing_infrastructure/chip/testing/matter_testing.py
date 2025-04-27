@@ -38,7 +38,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from enum import Enum, IntFlag
 from itertools import chain
-from typing import Any, Iterable, List, Optional, Tuple
+from typing import Any, Callable, Iterable, List, Optional, Tuple
 
 import chip.testing.conversions as conversions
 import chip.testing.decorators as decorators
@@ -291,6 +291,42 @@ class AttributeValue:
     timestamp_utc: Optional[datetime] = None
 
 
+class AttributeMatcher:
+    """Matcher for a self-descripbed AttributeValue matcher, to be used in `await_all_expected_report_matches` methods.
+
+    This class embodies a predicate for a condition that must be matched by an attribute report.
+
+    A match is considered as having occurred when the `matches` method returns True for an `AttributeValue` report.
+    """
+
+    def __init__(self, description: str):
+        self._description: str = description
+
+    def matches(self, report: AttributeValue) -> bool:
+        """Implementers must override this method to return True when an attribute value matches.
+
+        The condition matched should be clearly expressed by the `description` property.
+        """
+        pass
+
+    @property
+    def description(self):
+        return self._description
+
+    @staticmethod
+    def from_callable(description: str, matcher: Callable[[AttributeValue], bool]) -> "AttributeMatcher":
+        """Take a single callable and wrap it into an AttributeMatcher object. Useful to wrap closures."""
+        class AttributeMatcherFromCallable(AttributeMatcher):
+            def __init__(self, description, matcher: Callable[[AttributeValue], bool]):
+                super().__init__(description)
+                self._matcher = matcher
+
+            def matches(self, report: AttributeValue) -> bool:
+                return self._matcher(report)
+
+        return AttributeMatcherFromCallable(description, matcher)
+
+
 def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float) -> None:
     """Given a queue.Queue hooked-up to an attribute change accumulator, await a given expected sequence of attribute reports.
 
@@ -356,7 +392,7 @@ class ClusterAttributeChangeAccumulator:
 
     Args:
         expected_cluster (ClusterObjects.Cluster): The cluster to subscribe to.
-        expected_attribute (ClusterObjects.ClusterAttributeDescriptor, optional): 
+        expected_attribute (ClusterObjects.ClusterAttributeDescriptor, optional):
             If provided, subscribes to a single attribute. Defaults to None.
     """
 
@@ -374,9 +410,9 @@ class ClusterAttributeChangeAccumulator:
             self._attribute_report_counts = {}
             attrs = [cls for name, cls in inspect.getmembers(self._expected_cluster.Attributes) if inspect.isclass(
                 cls) and issubclass(cls, ClusterObjects.ClusterAttributeDescriptor)]
+            self._attribute_reports: dict[Any, AttributeValue] = {}
             if self._expected_attribute is not None:
                 attrs = [self._expected_attribute]
-            self._attribute_reports = {}
             for a in attrs:
                 self._attribute_report_counts[a] = 0
                 self._attribute_reports[a] = []
@@ -474,6 +510,54 @@ class ClusterAttributeChangeAccumulator:
         for expected_idx, expected_element in enumerate(expected_final_values):
             logging.info(f"  -> {expected_element} found: {last_report_matches.get(expected_idx)}")
         asserts.fail("Did not find all expected last report values before time-out")
+
+    def await_all_expected_report_matches(self, expected_matchers: Iterable[AttributeMatcher], timeout_sec: float = 1.0):
+        """Expect that every predicate in `expected_matchers`, when run against all the incoming reports, reaches true by the end, ignoring timestamps.
+
+        Waits for at least `timeout_sec` seconds.
+
+        This is a form of barrier for a set of attribute changes that should all happen together for an action.
+
+        Note that this does not check against the "last" value of every attribute, only that each expected
+        report was seen at least once.
+        """
+        start_time = time.time()
+        elapsed = 0.0
+        time_remaining = timeout_sec
+
+        report_matches: dict[int, bool] = {idx: False for idx, _ in enumerate(expected_matchers)}
+
+        for matcher in expected_matchers:
+            logging.info(
+                f"--> Matcher waiting: {matcher.description}")
+        logging.info(f"Waiting for {timeout_sec:.1f} seconds for all reports.")
+
+        while time_remaining > 0:
+            # Snapshot copy at the beginning of the loop. This is thread-safe based on the design.
+            all_reports = self._attribute_reports
+
+            # Recompute all last-value matches
+            for expected_idx, matcher in enumerate(expected_matchers):
+                for attribute, reports in all_reports.items():
+                    for report in reports:
+                        if matcher.matches(report) and not report_matches[expected_idx]:
+                            logging.info(f"  --> Found a match for: {matcher.description}")
+                            report_matches[expected_idx] = True
+
+            # Determine if all were met
+            if all(report_matches.values()):
+                logging.info("Found all expected matchers did match.")
+                return
+
+            elapsed = time.time() - start_time
+            time_remaining = timeout_sec - elapsed
+            time.sleep(0.1)
+
+        # If we reach here, there was no early return and we failed to find all the values.
+        logging.error("Reached time-out without finding all expected report values.")
+        for expected_idx, expected_matcher in enumerate(expected_matchers):
+            logging.info(f"  -> {expected_matcher.description}: {report_matches.get(expected_idx)}")
+        asserts.fail("Did not find all expected reports before time-out")
 
     def await_sequence_of_reports(self, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float) -> None:
         """Await a given expected sequence of attribute reports in the accumulator for the endpoint associated.

@@ -169,7 +169,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace KeepActive {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = BridgedDeviceBasicInformation::Commands::KeepActive::Id,
+    .commandId       = KeepActive::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
