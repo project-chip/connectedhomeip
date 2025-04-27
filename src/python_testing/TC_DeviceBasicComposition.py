@@ -983,16 +983,16 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         END_POINT_UNIQUE_ID_LENGTH_BYTES = 32
 
         unique_ids = []
-        non_application_device_types =[ROOT_NODE_DEVICE_TYPE, POWER_SOURCE_DEVICE_TYPE,
-                                       OTA_REQUESTOR_DEVICE_TYPE, OTA_PROVIDER_DEVICE_TYPE,
-                                       BRIDGED_NODE_DEVICE_TYPE, ELECTRICAL_SENSOR_DEVICE_TYPE, 
-                                       DEVICE_ENERGY_MANAGEMENT_DEVICE_TYPE, SECONDARY_NETWORK_INTERFACE_DEVICE_TYPE,
-                                       JOINT_FABRIC_ADMINSTRATOR_DEVICE_TYPE]
+        non_application_device_types = [ROOT_NODE_DEVICE_TYPE, POWER_SOURCE_DEVICE_TYPE,
+                                        OTA_REQUESTOR_DEVICE_TYPE, OTA_PROVIDER_DEVICE_TYPE,
+                                        BRIDGED_NODE_DEVICE_TYPE, ELECTRICAL_SENSOR_DEVICE_TYPE,
+                                        DEVICE_ENERGY_MANAGEMENT_DEVICE_TYPE, SECONDARY_NETWORK_INTERFACE_DEVICE_TYPE,
+                                        JOINT_FABRIC_ADMINSTRATOR_DEVICE_TYPE]
 
         self.print_step("1a", "TH reads DeviceTypeList and PartsList attributes from DUT for Endpoint 0")
         parts_list_ep_0 = self.endpoints[0][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
         listed_device_types_ep_0 = [i.deviceType for i in self.endpoints[0]
-                               [Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]]
+                                    [Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]]
         device_revision_ep_0 = [i.revision for i in self.endpoints[0]
                                 [Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]]
 
@@ -1010,34 +1010,38 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
         self.print_step("1a.3", "Verify that the DeviceTypeList may only contain other Node Device Types (device types with scope=node, it can be any of the following Power Source, OTA Requestor, OTA Provider) next to the Root Node Device Type.")
         if listed_device_types_ep_0:
-            allowed_device_types = {ROOT_NODE_DEVICE_TYPE, 
+            allowed_device_types = {ROOT_NODE_DEVICE_TYPE,
                                     POWER_SOURCE_DEVICE_TYPE,
                                     OTA_REQUESTOR_DEVICE_TYPE,
                                     OTA_PROVIDER_DEVICE_TYPE}
             if not set(listed_device_types_ep_0).issubset(allowed_device_types):
-                self.fail_current_test("Device types not in ROOT_NODE_DEVICE_TYPE, POWER_SOURCE_DEVICE_TYPE, OTA_REQUESTOR_DEVICE_TYPE, OTA_PROVIDER_DEVICE_TYPE")
+                self.fail_current_test(
+                    "Device types not in ROOT_NODE_DEVICE_TYPE, POWER_SOURCE_DEVICE_TYPE, OTA_REQUESTOR_DEVICE_TYPE, OTA_PROVIDER_DEVICE_TYPE")
 
-        #TODO : Step 1b.4.1, 1b.4.2 needs to the run manually as PIXIT.DESC.DeviceTypeConformanceList 
+        # TODO : Step 1b.4.1, 1b.4.2 needs to the run manually as PIXIT.DESC.DeviceTypeConformanceList
         #       should be selected and based on DUT type.
         for device_revision in device_revision_ep_0:
-                    if not device_revision:
-                        self.fail_current_test("Revision is less than 1")
+            if not device_revision:
+                self.fail_current_test("Revision is less than 1")
 
         self.print_step(3, "TH reads PartsList attribute- covered in step 2")
         for endpoint_id, endpoint in self.endpoints.items():
             self.print_step(8, "TH reads ServerList attribute for endpoint :{endpoint_id}".format(endpoint_id=endpoint_id))
             if endpoint_id != 0:
 
-                self.print_step("1b", "TH reads DeviceTypeList and PartsList attributes from DUT for Endpoint {endpoint_id} supported by DUT (except Endpoint 0).".format(endpoint_id=endpoint_id))
+                self.print_step("1b", "TH reads DeviceTypeList and PartsList attributes from DUT for Endpoint {endpoint_id} supported by DUT (except Endpoint 0).".format(
+                    endpoint_id=endpoint_id))
                 parts_list_per_ep_non_0 = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
 
                 listed_device_types_ep_non_0 = [i.deviceType for i in endpoint
-                                                   [Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]]
-                self.print_step("1b.1", "Verify that the DeviceTypeList count is at least one for end point {endpoint_id}".format(endpoint_id=endpoint_id))
+                                                [Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]]
+                self.print_step("1b.1", "Verify that the DeviceTypeList count is at least one for end point {endpoint_id}".format(
+                    endpoint_id=endpoint_id))
                 if not listed_device_types_ep_non_0:
                     self.fail_current_test("DeviceTypeList count is not at least 1")
 
-                self.print_step("1b.2", "the DeviceTypeList contains more than one Application Device Type, verify that all the Application Device Types are part of the same superset for end point {endpoint_id}".format(endpoint_id=endpoint_id))
+                self.print_step("1b.2", "the DeviceTypeList contains more than one Application Device Type, verify that all the Application Device Types are part of the same superset for end point {endpoint_id}".format(
+                    endpoint_id=endpoint_id))
 
                 supersets = get_supersets(self.xml_device_types)
                 for item in non_application_device_types:
@@ -1056,36 +1060,39 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
                     if not device_type_is_part_of_superset:
                         self.fail_current_test("Device type list is more than 1 and it is not matching any superset")
-        
-                self.print_step("1b.3", "Verify the DeviceTypeList does not contain the Root Node Device Type {endpoint_id}".format(endpoint_id=endpoint_id))
+
+                self.print_step("1b.3", "Verify the DeviceTypeList does not contain the Root Node Device Type {endpoint_id}".format(
+                    endpoint_id=endpoint_id))
                 if ROOT_NODE_DEVICE_TYPE in listed_device_types_ep_non_0:
                     self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
-                                      problem="Root node device type is listed on non zero endpoints", 
+                                      problem="Root node device type is listed on non zero endpoints",
                                       spec_location="Root node device type")
                     self.fail_current_test("Root node device type is listed on non zero endpoints")
 
-                #TODO : Step 1b.4.1, 1b.4.2 needs to the run manually as PIXIT.DESC.DeviceTypeConformanceList 
+                # TODO : Step 1b.4.1, 1b.4.2 needs to the run manually as PIXIT.DESC.DeviceTypeConformanceList
                 #       should be selected and based on DUT type.
 
                 self.print_step("1b.4.3", "Revision should not be less than 1")
 
                 device_revision_ep_non_0 = [i.revision for i in endpoint[Clusters.Descriptor]
-                                               [Clusters.Descriptor.Attributes.DeviceTypeList]]
+                                            [Clusters.Descriptor.Attributes.DeviceTypeList]]
                 for device_revision in device_revision_ep_non_0:
                     if not device_revision:
                         self.fail_current_test("Revision is less than 1")
 
-                #TODO : Step 2 and 3 needs to the run manually as PIXIT.DESC.DeviceTypeConformanceList 
+                # TODO : Step 2 and 3 needs to the run manually as PIXIT.DESC.DeviceTypeConformanceList
                 #       should be selected and based on DUT type.
                 self.print_step("4", "TH reads PartsList attribute for each endpoint")
 
                 if parts_list_per_ep_non_0:
                     for ep in parts_list_per_ep_non_0:
-                        self.print_step("4.1", "Endpoint is in the range of 1 to 65534 for endpoint {endpoint_id}".format(endpoint_id=endpoint_id))
+                        self.print_step("4.1", "Endpoint is in the range of 1 to 65534 for endpoint {endpoint_id}".format(
+                            endpoint_id=endpoint_id))
                         if ep not in range(EP_RANGE_MIN, EP_RANGE_MAX):
                             self.fail_current_test("Endpoint is not in the range of 1 to 65534")
 
-                        self.print_step("4.2", "Endpoint is not equal to the Endpoint of the Endpoint where this PartsList was read (i.e. no self-reference) for {endpoint_id}".format(endpoint_id=endpoint_id))
+                        self.print_step(
+                            "4.2", "Endpoint is not equal to the Endpoint of the Endpoint where this PartsList was read (i.e. no self-reference) for {endpoint_id}".format(endpoint_id=endpoint_id))
                         if ep == endpoint_id:
                             self.fail_current_test("Endpoint is self referencing")
         for endpoint_id, endpoint in self.endpoints.items():
@@ -1096,17 +1103,20 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
             taglist = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList]
 
-            self.print_step(5.1, "verifying tagList is in the range of 1 to 6 for endpoint: {endpoint_id}".format(endpoint_id=endpoint_id))
+            self.print_step(5.1, "verifying tagList is in the range of 1 to 6 for endpoint: {endpoint_id}".format(
+                endpoint_id=endpoint_id))
             if taglist:
                 if len(taglist) not in range(TAG_LIST_EP_RANGE_MIN, TAG_LIST_EP_RANGE_MAX):
                     self.fail_current_test("Number of tagList is not in the range of 1 to 6")
 
             no_duplicate_tag = []
             for tag_struct in taglist:
-                self.print_step(5.1, "verifying atleast 1 NamespaceID and tag property in the taglist struct for endpoint: {endpoint_id}".format(endpoint_id=endpoint_id))
+                self.print_step(5.1, "verifying atleast 1 NamespaceID and tag property in the taglist struct for endpoint: {endpoint_id}".format(
+                    endpoint_id=endpoint_id))
                 if not tag_struct.namespaceID:
                     self.fail_current_test("Atleast 1 NamespaceID is not present")
-                self.print_step(5.1, "verifying Tag property in the taglist struct for endpoint: {endpoint_id}".format(endpoint_id=endpoint_id))
+                self.print_step(5.1, "verifying Tag property in the taglist struct for endpoint: {endpoint_id}".format(
+                    endpoint_id=endpoint_id))
                 if not tag_struct.tag:
                     self.fail_current_test("Atleast 1 Tag is not present")
 
@@ -1116,7 +1126,8 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                     self.fail_current_test("Duplicate tag found")
                 no_duplicate_tag.append(tag_struct.tag)
 
-                self.print_step(5.2, "verifying namespaceID value falls under defined namespaces for endpoint: {endpoint_id}".format(endpoint_id=endpoint_id))
+                self.print_step(5.2, "verifying namespaceID value falls under defined namespaces for endpoint: {endpoint_id}".format(
+                    endpoint_id=endpoint_id))
 
                 if tag_struct.mfgCode is None:
                     if tag_struct.namespaceID not in [COMMON_CLOSURE_NAMESPACE_NAMESPACE_ID,
@@ -1139,7 +1150,8 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                         self.fail_current_test("Non manufacturer specific tag is not a tag from namespace defined in spec")
                 else:
 
-                    self.print_step(5.5, "verifying label field is not null in the tag list construct for end point {endpoint_id}".format(endpoint_id=endpoint_id))
+                    self.print_step(5.5, "verifying label field is not null in the tag list construct for end point {endpoint_id}".format(
+                        endpoint_id=endpoint_id))
                     if tag_struct.label is None:
                         self.fail_current_test("The Label field is null when the MfgCode is not null.")
 
@@ -1150,11 +1162,13 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
             descriptor_cluster = endpoint_to_clusters[endpoint_id][Clusters.Descriptor]
             if Clusters.Descriptor.Attributes.EndpointUniqueID in descriptor_cluster:
                 value = descriptor_cluster[Clusters.Descriptor.Attributes.EndpointUniqueID]
-                self.print_step(7.1, "Validate EndpointUniqueId attribute in Descriptor cluster is of string type for endpoint : {endpoint_id}".format(endpoint_id=endpoint_id))
+                self.print_step(7.1, "Validate EndpointUniqueId attribute in Descriptor cluster is of string type for endpoint : {endpoint_id}".format(
+                    endpoint_id=endpoint_id))
                 if isinstance(value, str):
                     if not value:
                         continue
-                    self.print_step(7.2, "Validate EndpointUniqueId attribute in Descriptor cluster is not more than 32 bytes for endpoint : {endpoint_id}".format(endpoint_id=endpoint_id))
+                    self.print_step(7.2, "Validate EndpointUniqueId attribute in Descriptor cluster is not more than 32 bytes for endpoint : {endpoint_id}".format(
+                        endpoint_id=endpoint_id))
                     if len(value) > END_POINT_UNIQUE_ID_LENGTH_BYTES:
                         location = AttributePathLocation(
                             endpoint_id,
@@ -1167,8 +1181,10 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                             problem=f"EndpointUniqueId attribute length is {len(value)} bytes which exceeds the maximum allowed 32 bytes",
                             spec_location="EndpointUniqueId attribute"
                         )
-                        self.fail_current_test("EndpointUniqueId attribute in Descriptor cluster is more than 32 bytes for endpoint")
-                    self.print_step(7.3, "Validate EndpointUniqueId attribute in Descriptor cluster is not a duplicate for endpoint : {endpoint_id}".format(endpoint_id=endpoint_id))
+                        self.fail_current_test(
+                            "EndpointUniqueId attribute in Descriptor cluster is more than 32 bytes for endpoint")
+                    self.print_step(7.3, "Validate EndpointUniqueId attribute in Descriptor cluster is not a duplicate for endpoint : {endpoint_id}".format(
+                        endpoint_id=endpoint_id))
 
                     if value in unique_ids:
                         location = AttributePathLocation(endpoint_id, Clusters.Descriptor.id,
@@ -1194,6 +1210,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                         spec_location="EndpointUniqueId attribute"
                     )
                     self.fail_current_test("EndpointUniqueId attribute is present but not a string")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
