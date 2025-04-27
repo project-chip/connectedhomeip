@@ -246,7 +246,7 @@ void AppTask::InitServer(intptr_t arg)
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
     chip::Server::GetInstance().Init(initParams);
-    
+
     static RealtekObserver sRealtekObserver;
     chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sRealtekObserver);
 

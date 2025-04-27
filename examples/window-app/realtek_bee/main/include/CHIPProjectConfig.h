@@ -157,7 +157,8 @@
 #endif
 #endif
 
-// Set the following define to use the Certification Declaration from CHIPDevicePlatformConfig.h and not use it stored in factory data section
+// Set the following define to use the Certification Declaration from CHIPDevicePlatformConfig.h and not use it stored in factory
+// data section
 #ifndef CHIP_USE_DEVICE_CONFIG_CERTIFICATION_DECLARATION
 #define CHIP_USE_DEVICE_CONFIG_CERTIFICATION_DECLARATION 0
 #endif

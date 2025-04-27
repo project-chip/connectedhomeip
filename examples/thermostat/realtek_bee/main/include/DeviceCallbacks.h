@@ -26,16 +26,16 @@
 #pragma once
 
 #include "CHIPDeviceManager.h"
-//#include <app/util/af-types.h>
-//#include <app/util/basic-types.h>
+// #include <app/util/af-types.h>
+// #include <app/util/basic-types.h>
 #include <platform/CHIPDeviceLayer.h>
 
 class DeviceCallbacks : public chip::DeviceManager::CHIPDeviceManagerCallbacks
 {
 public:
-    virtual void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent *event, intptr_t arg);
+    virtual void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     static void UpdateStatusLED();
 
 private:
-    void OnInternetConnectivityChange(const chip::DeviceLayer::ChipDeviceEvent *event);
+    void OnInternetConnectivityChange(const chip::DeviceLayer::ChipDeviceEvent * event);
 };

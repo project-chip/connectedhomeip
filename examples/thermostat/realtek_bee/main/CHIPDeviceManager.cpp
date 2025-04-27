@@ -25,10 +25,10 @@
 #include <stdlib.h>
 
 #include "CHIPDeviceManager.h"
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
 #include <core/ErrorStr.h>
 #include <platform/Realtek_bee/FactoryDataProvider.h>
+#include <support/CHIPMem.h>
+#include <support/CodeUtils.h>
 
 using namespace ::chip;
 
@@ -55,12 +55,12 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     mCB = cb;
 
     ChipLogProgress(DeviceLayer, "Start to init MemoryInit");
-	err = Platform::MemoryInit();
+    err = Platform::MemoryInit();
     SuccessOrExit(err);
 
-	ChipLogProgress(DeviceLayer, "Start to init InitChipStack");
-	err = PlatformMgr().InitChipStack();
-	SuccessOrExit(err);
+    ChipLogProgress(DeviceLayer, "Start to init InitChipStack");
+    err = PlatformMgr().InitChipStack();
+    SuccessOrExit(err);
 
     ChipLogProgress(DeviceLayer, "Factorydata init");
     err = mFactoryDataProvider.Init();
@@ -80,12 +80,12 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     SuccessOrExit(err);
 
 #if CHIP_ENABLE_OPENTHREAD
-	ChipLogProgress(DeviceLayer, "Initializing OpenThread stack");
-	err = ThreadStackMgr().InitThreadStack();
-	SuccessOrExit(err);
+    ChipLogProgress(DeviceLayer, "Initializing OpenThread stack");
+    err = ThreadStackMgr().InitThreadStack();
+    SuccessOrExit(err);
 
     ChipLogProgress(DeviceLayer, "Set Thread Device Type");
-    
+
 #if CHIP_DEVICE_CONFIG_THREAD_FTD
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
 #else // CHIP_DEVICE_CONFIG_THREAD_FTD
@@ -101,10 +101,10 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
 #endif // CHIP_DEVICE_CONFIG_THREAD_FTD
     SuccessOrExit(err);
 
-	ChipLogProgress(DeviceLayer, "Start OpenThread task");
+    ChipLogProgress(DeviceLayer, "Start OpenThread task");
     err = ThreadStackMgrImpl().StartThreadTask();
     SuccessOrExit(err);
-	ChipLogProgress(DeviceLayer, "Start OpenThread task done!!");
+    ChipLogProgress(DeviceLayer, "Start OpenThread task done!!");
 #endif // CHIP_ENABLE_OPENTHREAD
 
 exit:

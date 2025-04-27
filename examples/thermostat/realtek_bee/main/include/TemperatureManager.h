@@ -25,23 +25,24 @@
 
 using namespace chip;
 
-class TemperatureManager {
+class TemperatureManager
+{
 public:
-	static TemperatureManager &Instance()
-	{
-		static TemperatureManager sTemperatureManager;
-		return sTemperatureManager;
-	};
+    static TemperatureManager & Instance()
+    {
+        static TemperatureManager sTemperatureManager;
+        return sTemperatureManager;
+    };
 
-	CHIP_ERROR Init();
-	void AttributeChangeHandler(EndpointId endpointId, AttributeId attributeId, uint8_t *value, uint16_t size);
-	app::DataModel::Nullable<int16_t> GetLocalTemp();
+    CHIP_ERROR Init();
+    void AttributeChangeHandler(EndpointId endpointId, AttributeId attributeId, uint8_t * value, uint16_t size);
+    app::DataModel::Nullable<int16_t> GetLocalTemp();
 
-	void LogThermostatStatus();
+    void LogThermostatStatus();
 
 private:
-	app::DataModel::Nullable<int16_t> mLocalTempCelsius;
-	int16_t mCoolingCelsiusSetPoint;
-	int16_t mHeatingCelsiusSetPoint;
-	app::Clusters::Thermostat::SystemModeEnum mThermMode;
+    app::DataModel::Nullable<int16_t> mLocalTempCelsius;
+    int16_t mCoolingCelsiusSetPoint;
+    int16_t mHeatingCelsiusSetPoint;
+    app::Clusters::Thermostat::SystemModeEnum mThermMode;
 };

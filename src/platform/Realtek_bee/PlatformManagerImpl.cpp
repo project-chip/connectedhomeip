@@ -22,11 +22,11 @@
  *          for the Realtek platform.
  */
 /* this file behaves like a config.h, comes first */
-#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include "chip_porting.h"
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/FreeRTOS/SystemTimeSupport.h>
-#include "chip_porting.h"
 #include <platform/PlatformManager.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
 namespace chip {

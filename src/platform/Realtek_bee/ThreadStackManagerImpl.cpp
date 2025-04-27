@@ -23,19 +23,19 @@
  *
  */
 /* this file behaves like a config.h, comes first */
-#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include "os_task.h"
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPPlatformMemory.h>
+#include <mem_config.h>
+#include <openthread/heap.h>
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.hpp>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
-#include <lib/support/CHIPMem.h>
-#include <lib/support/CHIPPlatformMemory.h>
-#include <openthread/heap.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platforms/openthread-system.h>
-#include <mem_config.h>
-#include "os_task.h"
 
-extern void otSysInit(int argc, char *argv[]);
+extern void otSysInit(int argc, char * argv[]);
 
 namespace chip {
 namespace DeviceLayer {
@@ -52,19 +52,19 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack(void)
 CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    
+
     mThreadTask = NULL;
 
-	ChipLogProgress(DeviceLayer, "ThreadStackManagerImpl::InitThreadStack");
-	// Initialize the OpenThread platform layer
-	otSysInit(0, NULL);
+    ChipLogProgress(DeviceLayer, "ThreadStackManagerImpl::InitThreadStack");
+    // Initialize the OpenThread platform layer
+    otSysInit(0, NULL);
 
     // Initialize the generic implementation base classes.
-	ChipLogProgress(DeviceLayer, "GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>::DoInit");
+    ChipLogProgress(DeviceLayer, "GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>::DoInit");
     err = GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>::DoInit();
     SuccessOrExit(err);
-	ChipLogProgress(DeviceLayer, "GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit");
-	err = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(otInst);
+    ChipLogProgress(DeviceLayer, "GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit");
+    err = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(otInst);
     SuccessOrExit(err);
 
 exit:
@@ -126,7 +126,7 @@ void ThreadStackManagerImpl::ExecuteThreadTask(void)
     }
 }
 
-#else//USE_FREERTOS_NATIVE_API
+#else // USE_FREERTOS_NATIVE_API
 
 void ThreadStackManagerImpl::SignalThreadActivityPending()
 {
@@ -146,10 +146,10 @@ void ThreadStackManagerImpl::SignalThreadActivityPendingFromISR()
 
 CHIP_ERROR ThreadStackManagerImpl::_StartThreadTask()
 {
-    if(os_task_create(&mThreadTask, CHIP_DEVICE_CONFIG_THREAD_TASK_NAME, ThreadTaskMain, this, CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE,
-                   CHIP_DEVICE_CONFIG_THREAD_TASK_PRIORITY))
+    if (os_task_create(&mThreadTask, CHIP_DEVICE_CONFIG_THREAD_TASK_NAME, ThreadTaskMain, this,
+                       CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE, CHIP_DEVICE_CONFIG_THREAD_TASK_PRIORITY))
     {
-        return CHIP_NO_ERROR;               
+        return CHIP_NO_ERROR;
     }
     return CHIP_ERROR_NO_MEMORY;
 }
@@ -169,7 +169,7 @@ void ThreadStackManagerImpl::ExecuteThreadTask(void)
         os_task_notify_take(1, 0xffffffff, &notify);
     }
 }
-#endif//USE_FREERTOS_NATIVE_API
+#endif // USE_FREERTOS_NATIVE_API
 
 void ThreadStackManagerImpl::GetExtAddress(otExtAddress & aExtAddr)
 {
@@ -177,7 +177,7 @@ void ThreadStackManagerImpl::GetExtAddress(otExtAddress & aExtAddr)
     LockThreadStack();
     extAddr = otLinkGetExtendedAddress(OTInstance());
     UnlockThreadStack();
- 
+
     memcpy(aExtAddr.m8, extAddr->m8, OT_EXT_ADDRESS_SIZE);
 }
 
@@ -190,7 +190,6 @@ void ThreadStackManagerImpl::ThreadTaskMain(void * arg)
 {
     reinterpret_cast<ThreadStackManagerImpl *>(arg)->ExecuteThreadTask();
 }
-
 
 } // namespace DeviceLayer
 } // namespace chip
@@ -218,7 +217,6 @@ extern "C" void otSysEventSignalPending(void)
 #else
     ThreadStackMgrImpl().SignalThreadActivityPendingFromISR();
 #endif
-
 }
 
 extern "C" void * otPlatCAlloc(size_t aNum, size_t aSize)

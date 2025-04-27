@@ -35,7 +35,7 @@ void LightSwitch::Init()
 
 void LightSwitch::InitiateActionSwitch(chip::EndpointId endpointId, uint8_t action)
 {
-    BindingTable & bindingTable        = BindingTable::GetInstance();
+    BindingTable & bindingTable = BindingTable::GetInstance();
     if (!bindingTable.Size())
     {
         ChipLogError(DeviceLayer, "bindingTable empty");
@@ -47,7 +47,7 @@ void LightSwitch::InitiateActionSwitch(chip::EndpointId endpointId, uint8_t acti
     {
         data->EndpointId = endpointId;
         data->ClusterId  = Clusters::OnOff::Id;
-        data->IsGroup = false;
+        data->IsGroup    = false;
 
         for (auto & entry : bindingTable)
         {

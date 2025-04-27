@@ -158,9 +158,9 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
 
     case DeviceEventType::kServerReady:
 #if DLPS_EN
-            matter_gpio_allow_to_enter_dlps();
+        matter_gpio_allow_to_enter_dlps();
 #endif
-    
+
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
         if (!isOTAInitialized)
         {

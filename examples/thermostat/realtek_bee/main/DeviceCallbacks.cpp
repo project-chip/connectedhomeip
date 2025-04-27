@@ -110,7 +110,7 @@ void DeviceCallbacks::UpdateStatusLED()
 
 void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
-    //ChipLogProgress(Zcl, "DeviceEventCallback event_type 0x%x", event->Type);
+    // ChipLogProgress(Zcl, "DeviceEventCallback event_type 0x%x", event->Type);
     switch (event->Type)
     {
     case DeviceEventType::kCHIPoBLEAdvertisingChange:
@@ -142,7 +142,7 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
         sIsNetworkEnabled     = ConnectivityMgr().IsThreadEnabled();
         UpdateStatusLED();
         break;
-    
+
     case DeviceEventType::kCommissioningComplete:
         break;
 
@@ -191,7 +191,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 {
     ClusterId clusterId     = attributePath.mClusterId;
     AttributeId attributeId = attributePath.mAttributeId;
-    //ChipLogProgress(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
+    // ChipLogProgress(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
 
     switch (clusterId)
     {
@@ -200,8 +200,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
                         ChipLogValueMEI(attributeId), type, *value, size);
         break;
     case Thermostat::Id:
-        TemperatureManager::Instance().AttributeChangeHandler(attributePath.mEndpointId, attributeId, value,
-                                            size);
+        TemperatureManager::Instance().AttributeChangeHandler(attributePath.mEndpointId, attributeId, value, size);
     default:
         ChipLogProgress(Zcl, "Unknown cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
         break;

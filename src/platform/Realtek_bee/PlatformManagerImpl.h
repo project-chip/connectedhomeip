@@ -23,9 +23,9 @@
 
 #pragma once
 
-#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.h>
-#include <mem_config.h>
 #include "os_task.h"
+#include <mem_config.h>
+#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -91,7 +91,6 @@ inline PlatformManagerImpl & PlatformMgrImpl(void)
 {
     return PlatformManagerImpl::sInstance;
 }
-
 
 inline void PlatformManagerImpl::_RunEventLoop(void)
 {

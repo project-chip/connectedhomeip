@@ -24,10 +24,10 @@
 
 #pragma once
 
-#include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.h>
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 #include <openthread/tasklet.h>
 #include <openthread/thread.h>
+#include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.h>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 
 #define USE_FREERTOS_NATIVE_API 0
 
@@ -74,7 +74,7 @@ public:
     CHIP_ERROR InitThreadStack(otInstance * otInst);
     void GetExtAddress(otExtAddress & aExtAddr);
     void SignalThreadActivityPending();
-    
+
 #if USE_FREERTOS_NATIVE_API
     BaseType_t SignalThreadActivityPendingFromISR();
 #else
@@ -104,7 +104,7 @@ private:
 #if USE_FREERTOS_NATIVE_API
     TaskHandle_t mThreadTask;
 #else
-    void *mThreadTask; 
+    void * mThreadTask;
 #endif
     void ExecuteThreadTask(void);
     static void ThreadTaskMain(void * arg);

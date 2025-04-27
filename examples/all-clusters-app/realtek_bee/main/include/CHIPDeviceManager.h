@@ -28,8 +28,8 @@
 
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPError.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <lib/support/DLLUtil.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
@@ -81,8 +81,8 @@ public:
 class DLL_EXPORT CHIPDeviceManager
 {
 public:
-    CHIPDeviceManager(const CHIPDeviceManager &)  = delete;
-    CHIPDeviceManager(const CHIPDeviceManager &&) = delete;
+    CHIPDeviceManager(const CHIPDeviceManager &)             = delete;
+    CHIPDeviceManager(const CHIPDeviceManager &&)            = delete;
     CHIPDeviceManager & operator=(const CHIPDeviceManager &) = delete;
 
     static CHIPDeviceManager & GetInstance()

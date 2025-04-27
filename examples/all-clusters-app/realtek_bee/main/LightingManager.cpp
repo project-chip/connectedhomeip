@@ -104,7 +104,7 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint16_t 
         {
             SetLevel(*value);
         }
-        else if(aAction == ON_ACTION || aAction == OFF_ACTION)
+        else if (aAction == ON_ACTION || aAction == OFF_ACTION)
         {
             Set(new_state == kState_On);
         }
