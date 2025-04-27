@@ -202,8 +202,7 @@ add_library(
 )
 
 chip_configure_data_model(chip_main
-#    ZAP_FILE ${matter_example_path}/../realtek_bee/data_model/all-clusters-app.zap
-     ZAP_FILE ${matter_example_path}/../all-clusters-common/all-clusters-app.zap
+    ZAP_FILE ${matter_example_path}/../realtek_bee/data_model/all-clusters-app.zap
 )
 
 if (matter_enable_rpc)
