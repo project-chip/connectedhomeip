@@ -39,6 +39,8 @@ config("config") {
   include_dirs = [
     ".",
     "${chip_root}/examples/common",
+    "${chip_root}/examples/chip-tool",
+    "${chip_root}/examples/chip-tool/commands/common",
     "${chip_root}/examples/platform/linux",
     "${chip_root}/zzz_generated/app-common/app-common",
     "${chip_root}/zzz_generated/chip-tool",
@@ -64,6 +66,23 @@ config("config") {
 
 static_library("jfc-utils") {
   sources = [
+    "${chip_root}/examples/chip-tool/CHIPCommand.h",
+    "${chip_root}/examples/chip-tool/commands/clusters/ModelCommand.cpp",
+    "${chip_root}/examples/chip-tool/commands/clusters/ModelCommand.h",
+    "${chip_root}/examples/chip-tool/commands/common/BDXDiagnosticLogsServerDelegate.cpp",
+    "${chip_root}/examples/chip-tool/commands/common/Command.cpp",
+    "${chip_root}/examples/chip-tool/commands/common/Command.h",
+    "${chip_root}/examples/chip-tool/commands/common/Commands.cpp",
+    "${chip_root}/examples/chip-tool/commands/common/Commands.h",
+    "${chip_root}/examples/chip-tool/commands/common/CredentialIssuerCommands.h",
+    "${chip_root}/examples/chip-tool/commands/common/HexConversion.h",
+    "${chip_root}/examples/chip-tool/commands/common/RemoteDataModelLogger.cpp",
+    "${chip_root}/examples/chip-tool/commands/common/RemoteDataModelLogger.h",
+    "${chip_root}/examples/chip-tool/commands/icd/ICDCommand.cpp",
+    "${chip_root}/examples/chip-tool/commands/icd/ICDCommand.h",
+    "${chip_root}/examples/chip-tool/commands/pairing/OpenCommissioningWindowCommand.cpp",
+    "${chip_root}/examples/chip-tool/commands/pairing/OpenCommissioningWindowCommand.h",
+    "${chip_root}/examples/chip-tool/commands/pairing/ToTLVCert.cpp",
     "${chip_root}/examples/platform/linux/RpcClientProcessor.cpp",
     "${chip_root}/examples/platform/linux/RpcClientProcessor.h",
     "${chip_root}/src/controller/ExamplePersistentStorage.cpp",
@@ -71,33 +90,17 @@ static_library("jfc-utils") {
     "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/ComplexArgumentParser.cpp",
     "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/logging/DataModelLogger.cpp",
     "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/logging/EntryToText.cpp",
-    "commands/clusters/ModelCommand.cpp",
-    "commands/clusters/ModelCommand.h",
-    "commands/common/BDXDiagnosticLogsServerDelegate.cpp",
     "commands/common/CHIPCommand.cpp",
-    "commands/common/CHIPCommand.h",
-    "commands/common/Command.cpp",
-    "commands/common/Command.h",
-    "commands/common/Commands.cpp",
-    "commands/common/Commands.h",
-    "commands/common/CredentialIssuerCommands.h",
-    "commands/common/HexConversion.h",
-    "commands/common/RemoteDataModelLogger.cpp",
-    "commands/common/RemoteDataModelLogger.h",
     "commands/example/ExampleOperationalCredentialsIssuer.cpp",
     "commands/example/ExampleOperationalCredentialsIssuer.h",
-    "commands/icd/ICDCommand.cpp",
-    "commands/icd/ICDCommand.h",
-    "commands/pairing/OpenCommissioningWindowCommand.cpp",
-    "commands/pairing/OpenCommissioningWindowCommand.h",
     "commands/pairing/PairingCommand.cpp",
-    "commands/pairing/ToTLVCert.cpp",
+    "commands/pairing/PairingCommand.h",
   ]
 
   deps = [ "${chip_root}/src/app:events" ]
 
   if (config_use_interactive_mode) {
-    sources += [ "commands/interactive/InteractiveCommands.cpp" ]
+    sources += [ "${chip_root}/examples/chip-tool/commands/interactive/InteractiveCommands.cpp" ]
     deps += [
       "${chip_root}/examples/common/websocket-server",
       "${chip_root}/src/platform/logging:headers",

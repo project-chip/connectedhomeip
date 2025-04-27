@@ -74,7 +74,8 @@ CHIP_ERROR PairingCommand::RunCommand()
 
     // All the AddNOC commands invoked by JFC will have
     // the value below for the CaseAdminSubject field
-    mCredIssuerCmds->SetCredentialIssuerCaseAdminSubject(administratorCaseAdminSubject);
+    (static_cast<ExampleCredentialIssuerCommands *>(mCredIssuerCmds))
+        ->SetCredentialIssuerCaseAdminSubject(administratorCaseAdminSubject);
 
     mDeviceIsICD = false;
 

@@ -49,7 +49,7 @@ public:
 
     chip::Controller::OperationalCredentialsDelegate * GetCredentialIssuer() override { return &mOpCredsIssuer; }
     void SetCredentialIssuerCATValues(chip::CATValues cats) override { mOpCredsIssuer.SetCATValuesForNextNOCRequest(cats); }
-    void SetCredentialIssuerCaseAdminSubject(chip::NodeId caseAdminSubject) override
+    void SetCredentialIssuerCaseAdminSubject(chip::NodeId caseAdminSubject)
     {
         mOpCredsIssuer.SetCaseAdminSubjectForNextNOCRequest(caseAdminSubject);
     }
