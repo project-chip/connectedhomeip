@@ -111,7 +111,7 @@ namespace app {
             invokeRequest, aReader, aCommandObj);
 
         if (result.has_value()) {
-            // Provider indicates that handler status or data was already set (or will be set asynchronously) by
+            // The cluster indicates that handler status or data was already set (or will be set asynchronously) by
             // returning std::nullopt. If any other value is returned, it is requesting that a status is set. This
             // includes CHIP_NO_ERROR: in this case CHIP_NO_ERROR would mean set a `status success on the command`
             aCommandObj->AddStatus(aPath, result->GetStatusCode());
