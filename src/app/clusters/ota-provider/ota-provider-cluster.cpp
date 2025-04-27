@@ -117,7 +117,7 @@ bool OtaProviderLogic::IsValidUpdateTokenWithLogging(ByteSpan updateToken)
 {
     if (updateToken.size() > kUpdateTokenMaxLength || updateToken.size() < kUpdateTokenMinLength)
     {
-        ChipLogError(Zcl, "expected size int [%u, %u] for UpdateToken, got %u", static_cast<unsigned int>(kUpdateTokenMinLength),
+        ChipLogError(Zcl, "Expected size in [%u, %u] for UpdateToken, got %u", static_cast<unsigned int>(kUpdateTokenMinLength),
                      static_cast<unsigned int>(kUpdateTokenMaxLength), static_cast<unsigned int>(updateToken.size()));
         return false;
     }
