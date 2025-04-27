@@ -97,7 +97,7 @@ namespace app {
 
     void DispatchSingleClusterCommand(const ConcreteCommandPath & aPath, TLV::TLVReader & aReader, CommandHandler * aCommandObj)
     {
-        // TODO: Consider having MTRServerCluster register the
+        // TODO: Consider having MTRServerCluster register a
         // ServerClusterInterface for command dispatch.
         // But OTA would need some special-casing in any case, to call into the
         // existing cluster implementation.
