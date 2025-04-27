@@ -14,10 +14,10 @@
  *    limitations under the License.
  */
 
-#include "lib/core/Optional.h"
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/ota-provider/ota-provider-cluster.h>
+#include <lib/core/Optional.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
