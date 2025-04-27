@@ -1309,6 +1309,18 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
     case Clusters::PushAvStreamTransport::Id: {
         switch (aCommand)
         {
+        case Clusters::PushAvStreamTransport::Commands::AllocatePushTransport::Id:
+            return true;
+        case Clusters::PushAvStreamTransport::Commands::DeallocatePushTransport::Id:
+            return true;
+        case Clusters::PushAvStreamTransport::Commands::ModifyPushTransport::Id:
+            return true;
+        case Clusters::PushAvStreamTransport::Commands::SetTransportStatus::Id:
+            return true;
+        case Clusters::PushAvStreamTransport::Commands::ManuallyTriggerTransport::Id:
+            return true;
+        case Clusters::PushAvStreamTransport::Commands::FindTransport::Id:
+            return true;
         default:
             return false;
         }

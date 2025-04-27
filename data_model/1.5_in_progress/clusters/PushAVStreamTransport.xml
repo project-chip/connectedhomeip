@@ -103,10 +103,7 @@ Davis, CA 95616, USA
       <item value="0x05" name="InvalidZone" summary="A specified ZoneID was invalid.">
         <mandatoryConform/>
       </item>
-      <item value="0x06" name="UnsupportedContainerFormat" summary="The specified Container Format is not supported using the selected Ingestion Method.">
-        <mandatoryConform/>
-      </item>
-      <item value="0x07" name="UnsupportedIngestMethod" summary="The specified Ingestion Method is not supported.">
+      <item value="0x06" name="InvalidCombination" summary="The specified combination of Ingestion method and Container format is not supported.">
         <mandatoryConform/>
       </item>
       <item value="0x08" name="InvalidTriggerType" summary="The trigger type is invalid for this command.">
@@ -146,22 +143,15 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
     </enum>
-    <bitmap name="SupportedContainerFormatsBitmap">
-      <bitfield name="CMAF" bit="0" summary="CMAF container format">
-        <mandatoryConform/>
-      </bitfield>
-    </bitmap>
-    <bitmap name="SupportedIngestMethodsBitmap">
-      <bitfield name="CMAFIngest" bit="0" summary="CMAF ingestion format">
-        <mandatoryConform/>
-      </bitfield>
-    </bitmap>
     <struct name="CMAFContainerOptionsStruct">
       <field id="0" name="ChunkDuration" type="uint16" default="4">
         <mandatoryConform/>
       </field>
       <field id="1" name="CENCKey" type="octstr">
-        <optionalConform/>
+        <otherwiseConform>
+          <provisionalConform/>
+          <optionalConform/>
+        </otherwiseConform>
         <constraint>
           <allowed value="16"/>
         </constraint>
@@ -170,6 +160,17 @@ Davis, CA 95616, USA
         <optionalConform>
           <feature name="METADATA"/>
         </optionalConform>
+      </field>
+      <field id="3" name="CENCKeyID" type="octstr">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <field name="CENCKey"/>
+          </mandatoryConform>
+        </otherwiseConform>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
       </field>
     </struct>
     <struct name="ContainerOptionsStruct">
@@ -180,9 +181,17 @@ Davis, CA 95616, USA
         <mandatoryConform>
           <equalTerm>
             <field name="ContainerType"/>
-            <literal value="0"/>
+            <enum name="ContainerFormatEnum" value="CMAF"/>
           </equalTerm>
         </mandatoryConform>
+      </field>
+    </struct>
+    <struct name="SupportedFormatStruct">
+      <field id="0" name="ContainerFormat" type="ContainerFormatEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="IngestMethod" type="IngestMethodsEnum">
+        <mandatoryConform/>
       </field>
     </struct>
     <struct name="TransportConfigurationStruct">
@@ -267,7 +276,7 @@ Davis, CA 95616, USA
         <mandatoryConform>
           <equalTerm>
             <field name="TriggerType"/>
-            <literal value="1"/>
+            <enum name="TransportTriggerTypeEnum" value="Motion"/>
           </equalTerm>
         </mandatoryConform>
       </field>
@@ -277,7 +286,7 @@ Davis, CA 95616, USA
           <andTerm>
             <equalTerm>
               <field name="TriggerType"/>
-              <literal value="1"/>
+              <enum name="TransportTriggerTypeEnum" value="Motion"/>
             </equalTerm>
             <notTerm>
               <feature name="PERZONESENS"/>
@@ -295,7 +304,7 @@ Davis, CA 95616, USA
         <mandatoryConform>
           <equalTerm>
             <field name="TriggerType"/>
-            <literal value="1"/>
+            <enum name="TransportTriggerTypeEnum" value="Motion"/>
           </equalTerm>
         </mandatoryConform>
       </field>
@@ -304,11 +313,11 @@ Davis, CA 95616, USA
           <orTerm>
             <equalTerm>
               <field name="TriggerType"/>
-              <literal value="0"/>
+              <enum name="TransportTriggerTypeEnum" value="Command"/>
             </equalTerm>
             <equalTerm>
               <field name="TriggerType"/>
-              <literal value="1"/>
+              <enum name="TransportTriggerTypeEnum" value="Motion"/>
             </equalTerm>
           </orTerm>
         </mandatoryConform>
@@ -333,17 +342,16 @@ Davis, CA 95616, USA
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="SupportedContainerFormats" type="SupportedContainerFormatsBitmap">
+    <attribute id="0x0000" name="SupportedFormats" type="list">
+      <entry type="SupportedFormatStruct"/>
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
+      <constraint>
+        <minCount value="1"/>
+      </constraint>
     </attribute>
-    <attribute id="0x0001" name="SupportedIngestMethods" type="SupportedIngestMethodsBitmap">
-      <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
-      <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0002" name="CurrentConnections" type="list" default="empty">
+    <attribute id="0x0001" name="CurrentConnections" type="list">
       <entry type="TransportConfigurationStruct"/>
       <access read="true" readPrivilege="view" fabricSensitive="true"/>
       <quality persistence="nonVolatile"/>
@@ -442,7 +450,7 @@ Davis, CA 95616, USA
         <mandatoryConform>
           <equalTerm>
             <field name="TriggerType"/>
-            <literal value="0"/>
+            <enum name="TransportTriggerTypeEnum" value="Command"/>
           </equalTerm>
         </mandatoryConform>
       </field>
@@ -460,7 +468,7 @@ Davis, CA 95616, USA
         <mandatoryConform>
           <equalTerm>
             <field name="TriggerType"/>
-            <literal value="0"/>
+            <enum name="TransportTriggerTypeEnum" value="Command"/>
           </equalTerm>
         </mandatoryConform>
       </field>
