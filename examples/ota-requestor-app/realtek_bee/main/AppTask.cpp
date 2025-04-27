@@ -34,17 +34,16 @@
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/util/endpoint-config-api.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <lib/core/ErrorStr.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <inet/EndPointStateOpenThread.h>
-
 #include <CHIPDeviceManager.h>
 #include <DeviceCallbacks.h>
 
 #include <os_mem.h>
-#include "matter_gpio.h"
+//#include "matter_gpio.h"
 
 #if CONFIG_ENABLE_CHIP_SHELL
 #include <lib/shell/Engine.h>

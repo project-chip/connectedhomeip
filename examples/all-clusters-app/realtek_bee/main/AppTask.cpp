@@ -24,7 +24,6 @@
 #include "Globals.h"
 #include "util/RealtekObserver.h"
 
-#include <app/server/OnboardingCodesUtil.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.h>
@@ -41,6 +40,7 @@
 #include <inet/EndPointStateOpenThread.h>
 
 #include <DeviceInfoProviderImpl.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 

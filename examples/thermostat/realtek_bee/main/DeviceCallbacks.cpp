@@ -33,9 +33,11 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/data-model/Nullable.h>
 #include <app/server/Dnssd.h>
-#include <support/logging/CHIPLogging.h>
-
+#include <lib/core/DataModelTypes.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <ota/OTAInitializer.h>
@@ -50,9 +52,7 @@ using namespace ::chip::System;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceManager;
 
-
 constexpr uint32_t kInitOTARequestorDelaySec = 3;
-
 
 bool sIsNetworkProvisioned = false;
 bool sIsNetworkEnabled     = false;
@@ -191,7 +191,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 {
     ClusterId clusterId     = attributePath.mClusterId;
     AttributeId attributeId = attributePath.mAttributeId;
-    ChipLogProgress(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
+    //ChipLogProgress(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
 
     switch (clusterId)
     {
