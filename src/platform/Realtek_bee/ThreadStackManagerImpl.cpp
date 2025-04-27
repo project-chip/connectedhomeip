@@ -23,17 +23,17 @@
  *
  */
 /* this file behaves like a config.h, comes first */
-#include "os_task.h"
-#include <lib/support/CHIPMem.h>
-#include <lib/support/CHIPPlatformMemory.h>
-#include <mem_config.h>
-#include <openthread/heap.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.hpp>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPPlatformMemory.h>
+#include <openthread/heap.h>
 #include <platforms/openthread-system.h>
+#include <mem_config.h>
+#include "os_task.h"
 
 extern void otSysInit(int argc, char * argv[]);
 
