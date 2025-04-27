@@ -39,6 +39,19 @@ using TransportConfigurationStruct            = Structs::TransportConfigurationS
 
 using TransportOptionsDecodeableStruct = Structs::TransportOptionsStruct::DecodableType;
 
+struct TransportConfigurationStructWithFabricIndex
+{
+    TransportConfigurationStruct transportConfiguration;
+    chip::FabricIndex fabricIndex;
+};
+
+enum class PushAvStreamTransportStatusEnum : uint8_t
+{
+    kBusy    = 0x00,
+    kIdle    = 0x01,
+    kUnknown = 0x02
+};
+
 /** @brief
  *  Defines interfaces for implementing application-specific logic for various aspects of the PushAvStreamTransport Delegate.
  *  Specifically, it defines interfaces for the command handling and loading of the allocated streams.
@@ -119,17 +132,29 @@ appropriate
      *   @brief Handle Command Delegate to get the Stream Options Configuration for the specified push transport.
      *
      *   @param connectionID  [in]     Indicates the allocated connectionID to get the Stream Options Configuration of.
-     *
-     *   @param outtransportConfigurations  [out]     Single item list of mapped transport configuration or list if connectionID is
-     * NULL.
-     *
      *   @return Success if the transport is already allocated; otherwise, the command SHALL be rejected with an appropriate
      *   error.
      *
      */
-    virtual Protocols::InteractionModel::Status
-    FindTransport(const Optional<DataModel::Nullable<uint16_t>> & connectionID,
-                  DataModel::List<const TransportConfigurationStruct> & outtransportConfigurations) = 0;
+    virtual Protocols::InteractionModel::Status FindTransport(const Optional<DataModel::Nullable<uint16_t>> & connectionID) = 0;
+
+    /**
+     * @brief Validates the bandwidth requirement against the camera's resource management
+     *
+     * The implementation SHALL ensure:
+     *  - The requested stream usage (streamUsage) is allowed given the current allocation of
+     *    camera resources (e.g. CPU, memory, network bandwidth).
+     *
+     * @param[in] streamUsage    The desired usage type for the stream (e.g. live view, recording, etc.).
+     * @param[in] videoStreamId  Optional identifier for the requested video stream.
+     * @param[in] audioStreamId  Optional identifier for the requested audio stream.
+     *
+     * @return CHIP_ERROR CHIP_NO_ERROR if the stream usage is valid; an appropriate error code otherwise.
+     */
+
+    virtual CHIP_ERROR ValidateBandwidthLimit(StreamUsageEnum streamUsage,
+                                              const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                                              const Optional<DataModel::Nullable<uint16_t>> & audioStreamId) = 0;
 
     /**
      * @brief Validates the requested stream usage against the camera's resource management
@@ -149,6 +174,8 @@ appropriate
                                            const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                                            const Optional<DataModel::Nullable<uint16_t>> & audioStreamId) = 0;
 
+    virtual PushAvStreamTransportStatusEnum GetTransportStatus(const uint16_t connectionID) = 0;
+
     /**
      *   @brief Delegate callback for notifying change in an attribute.
      *
@@ -162,7 +189,7 @@ appropriate
      * list, at initialization. Once loaded, the cluster server would be serving Reads on these attributes. The list is updatable
      * via the Add/Remove functions for the respective transport connections.
      */
-    virtual CHIP_ERROR LoadCurrentConnections(std::vector<TransportConfigurationStruct> & currentConnections) = 0;
+    virtual CHIP_ERROR LoadCurrentConnections(std::vector<TransportConfigurationStructWithFabricIndex> & currentConnections) = 0;
 
     /**
      *  @brief Callback into the delegate once persistent attributes managed by
@@ -216,10 +243,14 @@ private:
     PushAvStreamTransportDelegate & mDelegate;
 
     // Attributes
+    // Todo: Add SupportedFormats attribute form https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/11504
     BitMask<SupportedContainerFormatsBitmap> mSupportedContainerFormats;
     BitMask<SupportedIngestMethodsBitmap> mSupportedIngestMethods;
     // lists
-    std::vector<TransportConfigurationStruct> mCurrentConnections;
+    /*Moved from TransportConfigurationStruct to TransportConfigurationStructWithFabricIndex
+     * to perform fabric index checks
+     */
+    std::vector<TransportConfigurationStructWithFabricIndex> mCurrentConnections;
 
     /**
      * IM-level implementation of read
@@ -237,9 +268,9 @@ private:
 
     // Helper functions
     uint16_t GenerateConnectionID();
-    TransportConfigurationStruct * FindStreamTransportConnection(const uint16_t connectionID);
+    TransportConfigurationStructWithFabricIndex * FindStreamTransportConnection(const uint16_t connectionID);
     // Add/Remove Management functions for transport
-    UpsertResultEnum UpsertStreamTransportConnection(const TransportConfigurationStruct & transportConfiguration);
+    UpsertResultEnum UpsertStreamTransportConnection(const TransportConfigurationStructWithFabricIndex & transportConfiguration);
 
     void RemoveStreamTransportConnection(const uint16_t connectionID);
 

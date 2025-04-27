@@ -41,7 +41,7 @@ Protocols::InteractionModel::Status
 PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsDecodeableStruct & transportOptions,
                                                     TransportConfigurationStruct & outTransporConfiguration)
 {
-    PushAvStream stream{ outTransporConfiguration.connectionID, outTransporConfiguration };
+    PushAvStream stream{ outTransporConfiguration.connectionID, outTransporConfiguration, PushAvStreamTransportStatusEnum::kIdle };
 
     /*Store the allocated stream persistently*/
     pushavStreams.push_back(stream);
@@ -85,10 +85,6 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::SetTransportSt
                 stream.transportConfig.transportStatus = transportStatus;
                 ChipLogError(Zcl, "Set Transport Status for Push AV Stream with ID: %d", connectionID);
             }
-            else
-            {
-                return Status::NotFound;
-            }
         }
     }
     return Status::Success;
@@ -99,12 +95,19 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::ManuallyTrigge
     const Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> & timeControl)
 {
     // TODO: Validates the requested stream usage against the camera's resource management and stream priority policies.
+    for (PushAvStream & stream : pushavStreams)
+    {
+        if (stream.id == connectionID)
+        {
+            stream.status = PushAvStreamTransportStatusEnum::kBusy;
+            ChipLogError(Zcl, "Transport triggered for Push AV Stream with ID: %d", connectionID);
+        }
+    }
     return Status::Success;
 }
 
 Protocols::InteractionModel::Status
-PushAvStreamTransportManager::FindTransport(const Optional<DataModel::Nullable<uint16_t>> & connectionID,
-                                            DataModel::List<const TransportConfigurationStruct> & outtransportConfigurations)
+PushAvStreamTransportManager::FindTransport(const Optional<DataModel::Nullable<uint16_t>> & connectionID)
 {
     configList.clear();
     for (PushAvStream & stream : pushavStreams)
@@ -115,11 +118,19 @@ PushAvStreamTransportManager::FindTransport(const Optional<DataModel::Nullable<u
         }
         else if (connectionID.Value().Value() == stream.id)
         {
+            ChipLogError(Zcl, "Transport Found for Push AV Stream with ID: %d", connectionID.Value().Value());
             configList.push_back(stream.transportConfig);
         }
     }
-    outtransportConfigurations = DataModel::List<const TransportConfigurationStruct>(configList.data(), configList.size());
     return Status::Success;
+}
+
+CHIP_ERROR PushAvStreamTransportManager::ValidateBandwidthLimit(StreamUsageEnum streamUsage,
+                                                                const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                                                                const Optional<DataModel::Nullable<uint16_t>> & audioStreamId)
+{
+    // TODO: Validates the requested stream usage against the camera's resource management.
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR
@@ -128,7 +139,19 @@ PushAvStreamTransportManager::ValidateStreamUsage(StreamUsageEnum streamUsage,
                                                   const Optional<DataModel::Nullable<uint16_t>> & audioStreamId)
 {
     // TODO: Validates the requested stream usage against the camera's resource management and stream priority policies.
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+PushAvStreamTransportStatusEnum PushAvStreamTransportManager::GetTransportStatus(const uint16_t connectionID)
+{
+    for (PushAvStream & stream : pushavStreams)
+    {
+        if (stream.id == connectionID)
+        {
+            return stream.status;
+        }
+    }
+    return PushAvStreamTransportStatusEnum::kUnknown;
 }
 
 void PushAvStreamTransportManager::OnAttributeChanged(AttributeId attributeId)
@@ -140,7 +163,8 @@ void PushAvStreamTransportManager::Init()
 {
     ChipLogError(Zcl, "Push AV Stream Transport Initialized");
 }
-CHIP_ERROR PushAvStreamTransportManager::LoadCurrentConnections(std::vector<TransportConfigurationStruct> & currentConnections)
+CHIP_ERROR
+PushAvStreamTransportManager::LoadCurrentConnections(std::vector<TransportConfigurationStructWithFabricIndex> & currentConnections)
 {
     ChipLogError(Zcl, "Push AV Current Connections loaded");
 

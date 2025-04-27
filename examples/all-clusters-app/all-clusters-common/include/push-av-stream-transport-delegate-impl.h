@@ -31,6 +31,7 @@ struct PushAvStream
 {
     uint16_t id;
     TransportConfigurationStruct transportConfig;
+    PushAvStreamTransportStatusEnum status;
 };
 
 /**
@@ -50,15 +51,16 @@ public:
     Protocols::InteractionModel::Status
     ManuallyTriggerTransport(const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
                              const Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> & timeControl);
-    Protocols::InteractionModel::Status
-    FindTransport(const Optional<DataModel::Nullable<uint16_t>> & connectionID,
-                  DataModel::List<const TransportConfigurationStruct> & outtransportConfigurations);
+    Protocols::InteractionModel::Status FindTransport(const Optional<DataModel::Nullable<uint16_t>> & connectionID);
 
     CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                                    const Optional<DataModel::Nullable<uint16_t>> & audioStreamId);
+    CHIP_ERROR ValidateBandwidthLimit(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                                      const Optional<DataModel::Nullable<uint16_t>> & audioStreamId);
+    PushAvStreamTransportStatusEnum GetTransportStatus(const uint16_t connectionID);
 
     void OnAttributeChanged(AttributeId attributeId);
-    CHIP_ERROR LoadCurrentConnections(std::vector<TransportConfigurationStruct> & currentConnections);
+    CHIP_ERROR LoadCurrentConnections(std::vector<TransportConfigurationStructWithFabricIndex> & currentConnections);
     CHIP_ERROR PersistentAttributesLoadedCallback();
 
     void Init();
