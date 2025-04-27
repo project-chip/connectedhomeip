@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024,2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +20,6 @@
 #include "ButtonRegistration.h"
 
 #include "ButtonApp.h"
-#include "ButtonBle.h"
 
 #include <lib/support/CodeUtils.h>
 
@@ -28,9 +27,6 @@
 CHIP_ERROR chip::NXP::App::RegisterButtons(void)
 {
     ReturnErrorOnFailure(ButtonMgr().Init());
-
-    static chip::NXP::App::ButtonBle sBleButton;
-    ReturnErrorOnFailure(ButtonMgr().RegisterButton(sBleButton));
 
     static chip::NXP::App::ButtonApp sAppButton;
     ReturnErrorOnFailure(ButtonMgr().RegisterButton(sAppButton));

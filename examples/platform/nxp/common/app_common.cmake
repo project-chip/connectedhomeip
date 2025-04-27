@@ -129,25 +129,33 @@ if (CONFIG_CHIP_APP_LOW_POWER)
     )
 endif()
 
-if (CONFIG_CHIP_APP_BUTTON)
-    target_include_directories(app PRIVATE
-        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/include
+# Button module empty would be chosen in case the app does not support button.
+target_include_directories(app PRIVATE
+    ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/include
+)
+
+if (CONFIG_CHIP_APP_BUTTON_REGISTRATION_DEFAULT)
+    target_sources(app PRIVATE
+        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/source/ButtonRegistrationDefault.cpp
+        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/source/ButtonManager.cpp
     )
-    if (CONFIG_CHIP_APP_BUTTON_REGISTRATION_EMPTY)
-        target_sources(app PRIVATE
-            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/source/ButtonRegistrationEmpty.cpp
-        )
-    elseif (CONFIG_CHIP_APP_BUTTON_REGISTRATION_DEFAULT)
-        target_sources(app PRIVATE
-            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/source/ButtonRegistrationDefault.cpp
-            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/source/ButtonManager.cpp
-        )
-    elseif(CONFIG_CHIP_APP_BUTTON_REGISTRATION_APP_BLE)
-        target_sources(app PRIVATE
-            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/source/ButtonRegistrationAppAndBle.cpp
-            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/source/ButtonManager.cpp
-        )
-    endif()
+elseif(CONFIG_CHIP_APP_BUTTON_REGISTRATION_APP_AND_BLE)
+    target_sources(app PRIVATE
+        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/source/ButtonRegistrationAppAndBle.cpp
+        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/source/ButtonManager.cpp
+    )
+elseif(CONFIG_CHIP_APP_BUTTON_REGISTRATION_APP_ONLY)
+    target_sources(app PRIVATE
+        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/source/ButtonRegistrationAppOnly.cpp
+        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/source/ButtonManager.cpp
+    )
+else ()
+    target_sources(app PRIVATE
+        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/source/ButtonRegistrationEmpty.cpp
+    )
+endif()
+
+if (CONFIG_CHIP_APP_BUTTON)
     if (CONFIG_CHIP_APP_BUTTON_APP)
         target_sources(app PRIVATE
             ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/source/ButtonApp.cpp
