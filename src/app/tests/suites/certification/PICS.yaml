@@ -1980,11 +1980,6 @@ PICS:
           attribute implemented on server?"
       id: DESC.C.A0003
 
-    - label:
-          "Revision should match the revision of that Device Type in the
-          PIXIT.DESC.DeviceTypeConformanceList."
-      id: PIXIT.DESC.DeviceTypeConformanceList
-
     # Device Management Test Plan
     - label:
           "Does the device implement the Basic Information Cluster as a server?"
