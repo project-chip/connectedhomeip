@@ -45,19 +45,20 @@ class PushAvStreamTransportCluster(
   private val endpointId: UShort,
 ) {
   class AllocatePushTransportResponse(
-    val connectionID: UShort,
-    val transportOptions: PushAvStreamTransportClusterTransportOptionsStruct,
-    val transportStatus: UByte,
+    val transportConfiguration: PushAvStreamTransportClusterTransportConfigurationStruct
   )
 
   class FindTransportResponse(
-    val streamConfigurations: List<PushAvStreamTransportClusterTransportConfigurationStruct>
+    val transportConfigurations: List<PushAvStreamTransportClusterTransportConfigurationStruct>
   )
 
-  class CurrentConnectionsAttribute(val value: List<UShort>)
+  class CurrentConnectionsAttribute(
+    val value: List<PushAvStreamTransportClusterTransportConfigurationStruct>
+  )
 
   sealed class CurrentConnectionsAttributeSubscriptionState {
-    data class Success(val value: List<UShort>) : CurrentConnectionsAttributeSubscriptionState()
+    data class Success(val value: List<PushAvStreamTransportClusterTransportConfigurationStruct>) :
+      CurrentConnectionsAttributeSubscriptionState()
 
     data class Error(val exception: Exception) : CurrentConnectionsAttributeSubscriptionState()
 
@@ -129,53 +130,28 @@ class PushAvStreamTransportCluster(
 
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
-    val TAG_CONNECTION_ID: Int = 0
-    var connectionID_decoded: UShort? = null
-
-    val TAG_TRANSPORT_OPTIONS: Int = 1
-    var transportOptions_decoded: PushAvStreamTransportClusterTransportOptionsStruct? = null
-
-    val TAG_TRANSPORT_STATUS: Int = 2
-    var transportStatus_decoded: UByte? = null
+    val TAG_TRANSPORT_CONFIGURATION: Int = 0
+    var transportConfiguration_decoded: PushAvStreamTransportClusterTransportConfigurationStruct? =
+      null
 
     while (!tlvReader.isEndOfContainer()) {
       val tag = tlvReader.peekElement().tag
 
-      if (tag == ContextSpecificTag(TAG_CONNECTION_ID)) {
-        connectionID_decoded = tlvReader.getUShort(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_TRANSPORT_OPTIONS)) {
-        transportOptions_decoded =
-          PushAvStreamTransportClusterTransportOptionsStruct.fromTlv(tag, tlvReader)
-      }
-
-      if (tag == ContextSpecificTag(TAG_TRANSPORT_STATUS)) {
-        transportStatus_decoded = tlvReader.getUByte(tag)
+      if (tag == ContextSpecificTag(TAG_TRANSPORT_CONFIGURATION)) {
+        transportConfiguration_decoded =
+          PushAvStreamTransportClusterTransportConfigurationStruct.fromTlv(tag, tlvReader)
       } else {
         tlvReader.skipElement()
       }
     }
 
-    if (connectionID_decoded == null) {
-      throw IllegalStateException("connectionID not found in TLV")
-    }
-
-    if (transportOptions_decoded == null) {
-      throw IllegalStateException("transportOptions not found in TLV")
-    }
-
-    if (transportStatus_decoded == null) {
-      throw IllegalStateException("transportStatus not found in TLV")
+    if (transportConfiguration_decoded == null) {
+      throw IllegalStateException("transportConfiguration not found in TLV")
     }
 
     tlvReader.exitContainer()
 
-    return AllocatePushTransportResponse(
-      connectionID_decoded,
-      transportOptions_decoded,
-      transportStatus_decoded,
-    )
+    return AllocatePushTransportResponse(transportConfiguration_decoded)
   }
 
   suspend fun deallocatePushTransport(connectionID: UShort, timedInvokeTimeout: Duration? = null) {
@@ -228,7 +204,7 @@ class PushAvStreamTransportCluster(
   }
 
   suspend fun setTransportStatus(
-    connectionID: UShort,
+    connectionID: UShort?,
     transportStatus: UByte,
     timedInvokeTimeout: Duration? = null,
   ) {
@@ -238,7 +214,7 @@ class PushAvStreamTransportCluster(
     tlvWriter.startStructure(AnonymousTag)
 
     val TAG_CONNECTION_ID_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_CONNECTION_ID_REQ), connectionID)
+    connectionID?.let { tlvWriter.put(ContextSpecificTag(TAG_CONNECTION_ID_REQ), connectionID) }
 
     val TAG_TRANSPORT_STATUS_REQ: Int = 1
     tlvWriter.put(ContextSpecificTag(TAG_TRANSPORT_STATUS_REQ), transportStatus)
@@ -312,16 +288,16 @@ class PushAvStreamTransportCluster(
 
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
-    val TAG_STREAM_CONFIGURATIONS: Int = 0
-    var streamConfigurations_decoded:
+    val TAG_TRANSPORT_CONFIGURATIONS: Int = 0
+    var transportConfigurations_decoded:
       List<PushAvStreamTransportClusterTransportConfigurationStruct>? =
       null
 
     while (!tlvReader.isEndOfContainer()) {
       val tag = tlvReader.peekElement().tag
 
-      if (tag == ContextSpecificTag(TAG_STREAM_CONFIGURATIONS)) {
-        streamConfigurations_decoded =
+      if (tag == ContextSpecificTag(TAG_TRANSPORT_CONFIGURATIONS)) {
+        transportConfigurations_decoded =
           buildList<PushAvStreamTransportClusterTransportConfigurationStruct> {
             tlvReader.enterArray(tag)
             while (!tlvReader.isEndOfContainer()) {
@@ -339,13 +315,13 @@ class PushAvStreamTransportCluster(
       }
     }
 
-    if (streamConfigurations_decoded == null) {
-      throw IllegalStateException("streamConfigurations not found in TLV")
+    if (transportConfigurations_decoded == null) {
+      throw IllegalStateException("transportConfigurations not found in TLV")
     }
 
     tlvReader.exitContainer()
 
-    return FindTransportResponse(streamConfigurations_decoded)
+    return FindTransportResponse(transportConfigurations_decoded)
   }
 
   suspend fun readSupportedContainerFormatsAttribute(): UByte {
@@ -540,11 +516,16 @@ class PushAvStreamTransportCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<UShort> =
-      buildList<UShort> {
+    val decodedValue: List<PushAvStreamTransportClusterTransportConfigurationStruct> =
+      buildList<PushAvStreamTransportClusterTransportConfigurationStruct> {
         tlvReader.enterArray(AnonymousTag)
         while (!tlvReader.isEndOfContainer()) {
-          add(tlvReader.getUShort(AnonymousTag))
+          add(
+            PushAvStreamTransportClusterTransportConfigurationStruct.fromTlv(
+              AnonymousTag,
+              tlvReader,
+            )
+          )
         }
         tlvReader.exitContainer()
       }
@@ -593,11 +574,16 @@ class PushAvStreamTransportCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<UShort> =
-            buildList<UShort> {
+          val decodedValue: List<PushAvStreamTransportClusterTransportConfigurationStruct> =
+            buildList<PushAvStreamTransportClusterTransportConfigurationStruct> {
               tlvReader.enterArray(AnonymousTag)
               while (!tlvReader.isEndOfContainer()) {
-                add(tlvReader.getUShort(AnonymousTag))
+                add(
+                  PushAvStreamTransportClusterTransportConfigurationStruct.fromTlv(
+                    AnonymousTag,
+                    tlvReader,
+                  )
+                )
               }
               tlvReader.exitContainer()
             }
