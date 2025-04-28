@@ -18,7 +18,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 import("$dir_pw_build/python.gni")
 
-pw_python_package("matter_yamltests") {
+pw_python_package("matter-yamltests") {
   setup = [
     "setup.py",
     "setup.cfg",
@@ -49,7 +49,7 @@ pw_python_package("matter_yamltests") {
     "matter/yamltests/yaml_loader.py",
   ]
 
-  python_deps = [ "${chip_root}/scripts/py_matter_idl:matter_idl" ]
+  python_deps = [ "${chip_root}/scripts/py_matter_idl:matter-idl" ]
 
   tests = [
     "test_spec_definitions.py",

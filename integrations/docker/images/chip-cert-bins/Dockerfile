@@ -300,9 +300,6 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/python_env python_env
 COPY --from=chip-build-cert-bins /root/connectedhomeip/src/python_testing python_testing/scripts/sdk
 COPY --from=chip-build-cert-bins /root/connectedhomeip/data_model python_testing/data_model
 
-COPY --from=chip-build-cert-bins /root/connectedhomeip/scripts/tests/requirements.txt /tmp/requirements.txt
-RUN pip install --break-system-packages -r /tmp/requirements.txt && rm /tmp/requirements.txt
-
 COPY --from=chip-build-cert-bins /root/connectedhomeip/src/python_testing/requirements.txt /tmp/requirements.txt
 RUN pip install --break-system-packages -r /tmp/requirements.txt && rm /tmp/requirements.txt
 
@@ -321,5 +318,7 @@ RUN set -x && DEBIAN_FRONTEND=noninteractive apt-get update; apt-get install -fy
 RUN apt-get remove -y python3-gi
 
 RUN pip install --break-system-packages --no-cache-dir \
+    python_lib/python/obj/scripts/py_matter_idl/matter-idl._build_wheel/matter_idl-*.whl \
+    python_lib/python/obj/scripts/py_matter_yamltests/matter-yamltests._build_wheel/matter_yamltests-*.whl \
     python_lib/obj/src/python_testing/matter_testing_infrastructure/chip-testing._build_wheel/chip_testing-*.whl \
     python_lib/controller/python/chip*.whl

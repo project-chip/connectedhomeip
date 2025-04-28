@@ -122,6 +122,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     if (chip_enable_python_modules) {
       deps = [
         "${chip_root}/scripts:matter_yamltests_distribution.wheel",
+        "${chip_root}/scripts/py_matter_yamltests:matter-yamltests.wheel",
         "${chip_root}/src/controller/python:chip-repl",
         "${chip_root}/src/python_testing/matter_testing_infrastructure:chip-testing.wheel",
       ]
@@ -252,8 +253,8 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "//:fake_platform_tests",
         "//examples/chef:chef.tests",
         "//scripts/build:build_examples.tests",
-        "//scripts/py_matter_idl:matter_idl.tests",
-        "//scripts/py_matter_yamltests:matter_yamltests.tests",
+        "//scripts/py_matter_idl:matter-idl.tests",
+        "//scripts/py_matter_yamltests:matter-yamltests.tests",
         "//src:tests_run",
         "//src/python_testing/matter_testing_infrastructure:chip-testing.tests",
 
