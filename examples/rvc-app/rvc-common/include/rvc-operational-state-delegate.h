@@ -46,10 +46,13 @@ private:
             to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kSeekingCharger)),
         OperationalState::GenericOperationalState(to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kCharging)),
         OperationalState::GenericOperationalState(to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kDocked)),
-        OperationalState::GenericOperationalState(to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kEmptyingDustBin)),
+        OperationalState::GenericOperationalState(
+            to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kEmptyingDustBin)),
         OperationalState::GenericOperationalState(to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kCleaningMop)),
-        OperationalState::GenericOperationalState(to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kFillingWaterTank)),
-        OperationalState::GenericOperationalState(to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kUpdatingMaps)),
+        OperationalState::GenericOperationalState(
+            to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kFillingWaterTank)),
+        OperationalState::GenericOperationalState(
+            to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kUpdatingMaps)),
     };
     const Span<const CharSpan> mOperationalPhaseList;
 
