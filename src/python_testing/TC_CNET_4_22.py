@@ -63,7 +63,7 @@ class TC_CNET_4_22(MatterBaseTest):
 
     def scan_network_response_thread_scan_results(self, thread_interfaces: list[str]):
 
-        # Check Thread interfaces are not None and length equal to 0
+        # Verify Thread interfaces are not None and length equal to 0
         asserts.assert_true(thread_interfaces is not None, "There are not any Thread interfaces available")
         asserts.assert_true(len(thread_interfaces) > 0, "Expected to find at least one Thread network")
 
@@ -130,7 +130,7 @@ class TC_CNET_4_22(MatterBaseTest):
         logging.info(f"Scan network response: {scan_network_response}")
 
         # Verify that DUT sends ScanNetworksResponse command to the TH with the following fields:
-        # NetworkingStatus field value will be Success
+        # NetworkingStatus field value is Success
         asserts.assert_equal(scan_network_response.networkingStatus, enum.kSuccess,
                              "NetworkingStatus is not Success")
 
@@ -139,7 +139,7 @@ class TC_CNET_4_22(MatterBaseTest):
             debug_text_len = len(scan_network_response.debugText)
             asserts.assert_less_equal(debug_text_len, 512, f"DebugText length {debug_text_len} was out of range")
 
-        # Check WiFiScanResults is None
+        # Verify WiFiScanResults is None
         asserts.assert_true(scan_network_response.wiFiScanResults is None,
                             "WiFi network was found and it was not supposed to be found")
 
@@ -157,7 +157,7 @@ class TC_CNET_4_22(MatterBaseTest):
         logging.info(f"Scan network response: {scan_network_response}")
 
         # Verify that DUT sends ScanNetworksResponse command to the TH with the following fields:
-        # NetworkingStatus field value will be Success
+        # NetworkingStatus field value is Success
         asserts.assert_equal(scan_network_response.networkingStatus, enum.kSuccess,
                              "NetworkingStatus is not Success")
 
@@ -166,7 +166,7 @@ class TC_CNET_4_22(MatterBaseTest):
             debug_text_len = len(scan_network_response.debugText)
             asserts.assert_less_equal(debug_text_len, 512, f"DebugText length {debug_text_len} was out of range")
 
-        # Check WiFiScanResults is None
+        # Verify WiFiScanResults is None
         asserts.assert_true(scan_network_response.wiFiScanResults is None,
                             "WiFi network was found and it was not supposed to be found")
 
@@ -186,7 +186,7 @@ class TC_CNET_4_22(MatterBaseTest):
         logging.info(f"Scan network response: {scan_network_response}")
 
         # Verify that DUT sends ScanNetworksResponse command to the TH with the following fields:
-        # NetworkingStatus field value will be Success
+        # NetworkingStatus field value is Success
         asserts.assert_equal(scan_network_response.networkingStatus, enum.kSuccess,
                              "NetworkingStatus is not Success")
 
@@ -195,7 +195,7 @@ class TC_CNET_4_22(MatterBaseTest):
             debug_text_len = len(scan_network_response.debugText)
             asserts.assert_less_equal(debug_text_len, 512, f"DebugText length {debug_text_len} was out of range")
 
-        # Check WiFiScanResults is None
+        # Verify WiFiScanResults is None
         asserts.assert_true(scan_network_response.wiFiScanResults is None,
                             "WiFi network was found and it was not supposed to be found")
 
