@@ -59,6 +59,9 @@ public:
     virtual CHIP_ERROR DeviceTypes(EndpointId endpointId, ReadOnlyBufferBuilder<DeviceTypeEntry> & builder)       = 0;
     virtual CHIP_ERROR ClientClusters(EndpointId endpointId, ReadOnlyBufferBuilder<ClusterId> & builder)          = 0;
     virtual CHIP_ERROR ServerClusters(EndpointId endpointId, ReadOnlyBufferBuilder<ServerClusterEntry> & builder) = 0;
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+    virtual CHIP_ERROR EndpointUniqueID(EndpointId endpointId, MutableCharSpan & EndpointUniqueId) = 0;
+#endif
 
     /// Attribute lists contain all attributes. This MUST include all global
     /// attributes (See SPEC 7.13 Global Elements / Global Attributes Table).

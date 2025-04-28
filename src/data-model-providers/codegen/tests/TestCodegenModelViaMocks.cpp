@@ -104,6 +104,9 @@ constexpr uint8_t kDeviceTypeId2Version = 11;
 constexpr DeviceTypeId kDeviceTypeId3   = 3;
 constexpr uint8_t kDeviceTypeId3Version = 33;
 
+constexpr DeviceTypeId kDeviceTypeId4   = 1123;
+constexpr uint8_t kDeviceTypeId4Version = 33;
+
 constexpr uint8_t kNamespaceID1 = 123;
 constexpr uint8_t kTag1         = 10;
 constexpr char kLabel1[]        = "Label1";
@@ -119,6 +122,7 @@ static_assert(kEndpointIdThatIsMissing != kInvalidEndpointId);
 static_assert(kEndpointIdThatIsMissing != kMockEndpoint1);
 static_assert(kEndpointIdThatIsMissing != kMockEndpoint2);
 static_assert(kEndpointIdThatIsMissing != kMockEndpoint3);
+static_assert(kEndpointIdThatIsMissing != kMockEndpoint4);
 
 bool operator==(const Access::SubjectDescriptor & a, const Access::SubjectDescriptor & b)
 {
@@ -563,6 +567,18 @@ const MockNodeConfig gTestNodeConfig({
             MockAttributeConfig(kAttributeIdTimedWrite, ZCL_INT32S_ATTRIBUTE_TYPE, MATTER_ATTRIBUTE_FLAG_WRITABLE | MATTER_ATTRIBUTE_FLAG_MUST_USE_TIMED_WRITE),
         }),
     }),
+    MockEndpointConfig(kMockEndpoint4, {
+        MockClusterConfig(MockClusterId(4), {
+            ClusterRevision::Id, FeatureMap::Id, MockAttributeId(4),
+            MockAttributeConfig(Clusters::Descriptor::Attributes::EndpointUniqueID::Id, ZCL_CHAR_STRING_ATTRIBUTE_TYPE),
+        }),
+    }, {
+        { kDeviceTypeId4, kDeviceTypeId4Version },
+    },
+    {}, // Empty semantic tags
+    EndpointComposition::kTree,
+    chip::CharSpan("AABBCCDDEEFFGGHHIIJJKKLLMMNNOO01", strlen("AABBCCDDEEFFGGHHIIJJKKLLMMNNOO01")) // Add endpointUniqueID
+    ),
 });
 // clang-format on
 
@@ -1000,6 +1016,8 @@ void TestEmberScalarTypeWriteNullValueToNullable()
     ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), CHIP_ERROR_WRONG_TLV_TYPE);
 }
 
+} // namespace
+
 uint16_t ReadLe16(const void * buffer)
 {
     const uint8_t * p = reinterpret_cast<const uint8_t *>(buffer);
@@ -1011,8 +1029,6 @@ void WriteLe16(void * buffer, uint16_t value)
     uint8_t * p = reinterpret_cast<uint8_t *>(buffer);
     chip::Encoding::LittleEndian::Write16(p, value);
 }
-
-} // namespace
 
 TEST_F(TestCodegenModelViaMocks, IterateOverEndpoints)
 {
@@ -1026,7 +1042,7 @@ TEST_F(TestCodegenModelViaMocks, IterateOverEndpoints)
 
     auto endpoints = endpointsBuilder.TakeBuffer();
 
-    ASSERT_EQ(endpoints.size(), 3u);
+    ASSERT_EQ(endpoints.size(), 4u);
 
     EXPECT_EQ(endpoints[0].id, kMockEndpoint1);
     EXPECT_EQ(endpoints[0].parentId, kInvalidEndpointId);
@@ -2748,3 +2764,18 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesListClusters)
     model.Registry().Unregister(&fakeClusterServer);
     model.Shutdown();
 }
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+TEST_F(TestCodegenModelViaMocks, EndpointUniqueID)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelProviderWithContext model;
+
+    // Mock endpoint 1 has a unique ID
+    char buffer[chip::app::Clusters::Descriptor::Attributes::EndpointUniqueID::TypeInfo::MaxLength()] = { 0 };
+    MutableCharSpan span(buffer);
+    // Mock endpoint 4 has a unique ID
+    // ASSERT_TRUE(builder.IsEmpty()); // ownership taken above, we start fresh
+    ASSERT_EQ(model.EndpointUniqueID(kMockEndpoint4, span), CHIP_NO_ERROR);
+    EXPECT_TRUE(span.data_equal("AABBCCDDEEFFGGHHIIJJKKLLMMNNOO01"_span));
+}
+#endif
