@@ -115,7 +115,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
 
         # Default values
         min_position = 0
-        max_position = 10000  
+        max_position = 10000
 
         # STEP 2a: Read feature map and determine supported features
         self.step("2a")
@@ -166,7 +166,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
 
         # STEP 4b: Send SetTarget command with Position MaxPosition
         self.step("4b")
-        
+
         try:
             await self.send_single_cmd(
                 cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(Position=max_position),
@@ -313,10 +313,10 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 )
 
                 asserts.fail("Expected ConstraintError for invalid Position")
-                
+
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected status returned")
-        else: 
+        else:
             logging.info("Positioning feature is not supported. Skipping step 6.")
 
         # STEP 7a: If Resolution is unsupported, skip step 7b to 7i
@@ -366,7 +366,8 @@ class TC_CLDIM_3_3(MatterBaseTest):
             if resolution == 1:
                 asserts.assert_equal(current_state.Position, min_position, "CurrentState Position does not match expected value")
             else:
-                asserts.assert_equal(current_state.Position, min_position + resolution, "CurrentState Position does not match expected value")
+                asserts.assert_equal(current_state.Position, min_position + resolution,
+                                     "CurrentState Position does not match expected value")
         else:
             logging.info("CurrentState attribute not supported. Skipping step 7e.")
 
@@ -404,7 +405,8 @@ class TC_CLDIM_3_3(MatterBaseTest):
             if resolution <= 2:
                 asserts.assert_equal(current_state.Position, max_position, "CurrentState Position does not match expected value")
             else:
-                asserts.assert_equal(current_state.Position, max_position - resolution, "CurrentState Position does not match expected value")
+                asserts.assert_equal(current_state.Position, max_position - resolution,
+                                     "CurrentState Position does not match expected value")
         else:
             logging.info("CurrentState attribute not supported. Skipping step 7i.")
 
@@ -424,7 +426,8 @@ class TC_CLDIM_3_3(MatterBaseTest):
         if not is_speed_supported:
             try:
                 await self.send_single_cmd(
-                    cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(Speed=Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kHigh),
+                    cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(
+                        Speed=Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kHigh),
                     endpoint=endpoint
                 )
             except InteractionModelError as e:
@@ -442,7 +445,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 )
 
                 asserts.fail("Expected ConstraintError for invalid Speed")
-                
+
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected status returned")
         else:
@@ -458,11 +461,12 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 )
 
                 asserts.fail("Expected ConstraintError for invalid Speed")
-                
+
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected status returned")
         else:
             logging.info("Speed feature is not supported. Skipping step 11.")
+
 
 if __name__ == "__main__":
     default_matter_test_main()

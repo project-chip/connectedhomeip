@@ -98,7 +98,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
 
         # Default values
         min_position = 0
-        max_position = 10000  
+        max_position = 10000
 
         # STEP 2a: Read feature map and determine supported features
         self.step("2a")
@@ -153,7 +153,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
         if not self.check_pics("CLDIM.S.M.ManualLatching"):
             self.skip("4b")
             self.skip("4c")
-            self.skip("4d")          
+            self.skip("4d")
 
         # STEP 4b: Send SetTarget command with Latch=True
         self.step("4b")
@@ -191,7 +191,8 @@ class TC_CLDIM_3_2(MatterBaseTest):
             current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
 
             if is_positioning_supported:
-                asserts.assert_greater_equal(current_state.Position, min_position, "CurrentState Position is outside expected range")
+                asserts.assert_greater_equal(current_state.Position, min_position,
+                                             "CurrentState Position is outside expected range")
                 asserts.assert_less_equal(current_state.Position, max_position, "CurrentState Position is outside expected range")
             asserts.assert_equal(current_state.Latch, True, "CurrentState Latch is not True")
 
@@ -215,7 +216,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
         self.step("6b")
         if attributes.Target.attribute_id in attribute_list:
             target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
-            
+
             if is_positioning_supported:
                 asserts.assert_greater_equal(target.Position, min_position, "Target Position is outside expected range")
                 asserts.assert_less_equal(target.Position, max_position, "Target Position is outside expected range")
@@ -235,9 +236,10 @@ class TC_CLDIM_3_2(MatterBaseTest):
         self.step("6d")
         if attributes.CurrentState.attribute_id in attribute_list:
             current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
-            
+
             if is_positioning_supported:
-                asserts.assert_greater_equal(current_state.Position, min_position, "CurrentState Position is outside expected range")
+                asserts.assert_greater_equal(current_state.Position, min_position,
+                                             "CurrentState Position is outside expected range")
                 asserts.assert_less_equal(current_state.Position, max_position, "CurrentState Position is outside expected range")
             asserts.assert_equal(current_state.Latch, False, "CurrentState Latch is not False")
 
