@@ -81,8 +81,8 @@ std::optional<CHIP_ERROR> ValidateReadAttributeACL(DataModel::Provider * dataMod
     Privilege requiredPrivilege = Privilege::kView;
     if (info.has_value())
     {
-        // attribute exists, and if is readable, set the correct read privilege
-        requiredPrivilege = info->GetReadPrivilege().has_value() ? info->GetReadPrivilege().value() : requiredPrivilege;
+        // if attribute exists and is readable, set the correct read privilege; otherwise, set default value
+        requiredPrivilege = info->GetReadPrivilege().value_or(requiredPrivilege);
     }
 
     CHIP_ERROR err = GetAccessControl().Check(subjectDescriptor, requestPath, requiredPrivilege);
