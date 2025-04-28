@@ -171,6 +171,11 @@ Additional arguments that can be passed in the `west build` command line :
 | `prj_thread_ftd_wifi_br_ota_fdata.conf`    | Wi-Fi + Thread Border Router, OTA, factory data        | RW61x, RT1060, RT1170 |
 | `prj_thread_ftd_wifi_br_ota_fdata_v2.conf` | Wi-Fi + Thread Border Router, OTA SW v2 , factory data | RW61x, RT1060, RT1170 |
 | `prj_thread_ftd_wifi_br_ota_v2.conf`       | Wi-Fi + Thread Border Router, OTA with SW v2           | RW61x, RT1060, RT1170 |
+| `prj_eth.conf`                             | Ethernet                                               | RW61x frdm
+| `prj_eth_fdata.conf`                       | Ethernet, fatcory data                                 | RW61x frdm
+| `prj_eth_ota.conf`                         | Ethernet,  OTA                                         | RW61x frdm
+| `prj_eth_ota_fdata.conf`                   | Ethernet, fatcory data, OTA                            | RW61x frdm
+| `prj_eth_ota_fdata_v2.conf`                | Ethernet, fatcory data, OTA, SW v2                     | RW61x frdm
 
 The build output can be found under the `build_dir` specified in the
 `west build` command, the binary can be found under the following name :
