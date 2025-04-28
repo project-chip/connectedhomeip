@@ -75,7 +75,7 @@ from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
 
 try:
-    from matter_yamltests.hooks import TestRunnerHooks
+    from matter.yamltests.hooks import TestRunnerHooks
 except ImportError:
     class TestRunnerHooks:
         pass

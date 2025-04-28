@@ -187,8 +187,12 @@ WHEEL=("$OUTPUT_ROOT"/controller/python/chip*.whl)
 WHEEL+=("$OUTPUT_ROOT"/obj/src/python_testing/matter_testing_infrastructure/chip-testing._build_wheel/chip_testing*.whl)
 
 if [ "$install_pytest_requirements" = "yes" ]; then
-    # Add the matter_yamltests_distribution wheel
-    WHEEL+=("$OUTPUT_ROOT"/obj/scripts/matter_yamltests_distribution._build_wheel/matter_yamltests-*.whl)
+    # Add wheels with YAML testing support.
+    WHEEL+=(
+        # Add matter-idl as well as matter-yamltests depends on it.
+        "$OUTPUT_ROOT"/python/obj/scripts/py_matter_idl/matter-idl._build_wheel/matter_idl-*.whl
+        "$OUTPUT_ROOT"/python/obj/scripts/py_matter_yamltests/matter-yamltests._build_wheel/matter_yamltests-*.whl
+    )
 fi
 
 if [ -n "$extra_packages" ]; then

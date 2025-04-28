@@ -25,7 +25,7 @@ runs:
         # In addition to the various setup files, the work directory matters as well,
         # because the bootstrapped Pigweed environment contains absolute paths.
         echo "Calculating bootstrap cache key for '$PWD'"
-        FILES_HASH="${{ hashFiles('scripts/setup/*', 'scripts/py_matter_idl/*', 'third_party/pigweed/**') }}"
+        FILES_HASH="${{ hashFiles('scripts/setup/*', 'scripts/tests/requirements.txt', 'scripts/py_matter_idl/*', 'third_party/pigweed/**') }}"
         case "$RUNNER_OS" in
           macOS) OS_HASH="$(sw_vers | shasum -a 256 | cut -d' ' -f1)";;
           *)     OS_HASH="$(shasum -a 256 /etc/lsb-release | cut -d' ' -f1)";;
