@@ -862,7 +862,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
             WiFiPAF::WiFiPAFSession sessionInfo = { .role          = WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber,
                                                     .nodeId        = nodeId,
                                                     .discriminator = discriminator };
-            ReturnErrorOnFailure(pafLayer.AddPafSession(WiFiPAF::PafInfoAccess::kAccNodeInfo, sessionInfo));
+            ReturnErrorOnFailure(pafLayer.AddPAFSession(WiFiPAF::PAFInfoAccess::kAccNodeInfo, sessionInfo));
             ReturnErrorOnFailure(DeviceLayer::ConnectivityMgr().WiFiPAFSubscribe(
                 discriminator, reinterpret_cast<void *>(this), OnWiFiPAFSubscribeComplete, OnWiFiPAFSubscribeError));
             WiFiPAF::WiFiPAFSession * pSession = pafLayer.GetPAFInfo(WiFiPAF::PafInfoAccess::kAccNodeId, sessionInfo);
