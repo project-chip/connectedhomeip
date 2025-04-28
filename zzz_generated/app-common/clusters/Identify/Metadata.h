@@ -41,14 +41,14 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace Identify {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Identify::Commands::Identify::Id,
+    .commandId       = Identify::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace Identify
 namespace TriggerEffect {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Identify::Commands::TriggerEffect::Id,
+    .commandId       = TriggerEffect::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };

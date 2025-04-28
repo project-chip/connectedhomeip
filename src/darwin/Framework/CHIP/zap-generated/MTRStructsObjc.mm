@@ -82,6 +82,36 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRDataTypePriceStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _amount = @(0);
+
+        _currency = [MTRDataTypeCurrencyStruct new];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDataTypePriceStruct alloc] init];
+
+    other.amount = self.amount;
+    other.currency = self.currency;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: amount:%@; currency:%@; >", NSStringFromClass([self class]), _amount, _currency];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRDataTypeTestGlobalStruct
 - (instancetype)init
 {
@@ -143,36 +173,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: locationName:%@; floorNumber:%@; areaType:%@; >", NSStringFromClass([self class]), _locationName, _floorNumber, _areaType];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRDataTypePriceStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _amount = @(0);
-
-        _currency = [MTRDataTypeCurrencyStruct new];
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRDataTypePriceStruct alloc] init];
-
-    other.amount = self.amount;
-    other.currency = self.currency;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: amount:%@; currency:%@; >", NSStringFromClass([self class]), _amount, _currency];
     return descriptionString;
 }
 
@@ -5198,9 +5198,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _price = nil;
-
-        _priceLevel = nil;
+        _price = @(0);
 
         _source = @(0);
 
@@ -5216,7 +5214,6 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRCommodityPriceClusterCommodityPriceComponentStruct alloc] init];
 
     other.price = self.price;
-    other.priceLevel = self.priceLevel;
     other.source = self.source;
     other.descriptionString = self.descriptionString;
     other.tariffComponentID = self.tariffComponentID;
@@ -5226,7 +5223,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: price:%@; priceLevel:%@; source:%@; descriptionString:%@; tariffComponentID:%@; >", NSStringFromClass([self class]), _price, _priceLevel, _source, _descriptionString, _tariffComponentID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: price:%@; source:%@; descriptionString:%@; tariffComponentID:%@; >", NSStringFromClass([self class]), _price, _source, _descriptionString, _tariffComponentID];
     return descriptionString;
 }
 
@@ -5296,33 +5293,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: currentPrice:%@; >", NSStringFromClass([self class]), _currentPrice];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRCommodityPriceClusterForecastChangeEvent
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _priceForecast = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRCommodityPriceClusterForecastChangeEvent alloc] init];
-
-    other.priceForecast = self.priceForecast;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: priceForecast:%@; >", NSStringFromClass([self class]), _priceForecast];
     return descriptionString;
 }
 
@@ -6787,33 +6757,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRElectricalGridConditionsClusterForecastConditionsChangedEvent
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _forecastConditions = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRElectricalGridConditionsClusterForecastConditionsChangedEvent alloc] init];
-
-    other.forecastConditions = self.forecastConditions;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: forecastConditions:%@; >", NSStringFromClass([self class]), _forecastConditions];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTRDoorLockClusterCredentialStruct
 - (instancetype)init
 {
@@ -7208,14 +7151,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRClosureDimensionClusterCurrentStruct
+@implementation MTRClosureDimensionClusterCurrentStateStruct
 - (instancetype)init
 {
     if (self = [super init]) {
 
         _position = nil;
 
-        _latching = nil;
+        _latch = nil;
 
         _speed = nil;
     }
@@ -7224,10 +7167,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRClosureDimensionClusterCurrentStruct alloc] init];
+    auto other = [[MTRClosureDimensionClusterCurrentStateStruct alloc] init];
 
     other.position = self.position;
-    other.latching = self.latching;
+    other.latch = self.latch;
     other.speed = self.speed;
 
     return other;
@@ -7235,7 +7178,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: position:%@; latching:%@; speed:%@; >", NSStringFromClass([self class]), _position, _latching, _speed];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: position:%@; latch:%@; speed:%@; >", NSStringFromClass([self class]), _position, _latch, _speed];
     return descriptionString;
 }
 
@@ -10309,39 +10252,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRPushAVStreamTransportClusterMetadataOptionsStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _multiplexing = @(0);
-
-        _includeMotionZones = @(0);
-
-        _enableMetadataPrivacySensitive = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRPushAVStreamTransportClusterMetadataOptionsStruct alloc] init];
-
-    other.multiplexing = self.multiplexing;
-    other.includeMotionZones = self.includeMotionZones;
-    other.enableMetadataPrivacySensitive = self.enableMetadataPrivacySensitive;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: multiplexing:%@; includeMotionZones:%@; enableMetadataPrivacySensitive:%@; >", NSStringFromClass([self class]), _multiplexing, _includeMotionZones, _enableMetadataPrivacySensitive];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTRPushAVStreamTransportClusterTransportTriggerOptionsStruct
 - (instancetype)init
 {
@@ -10389,6 +10299,8 @@ NS_ASSUME_NONNULL_BEGIN
         _chunkDuration = @(0);
 
         _cencKey = nil;
+
+        _metadataEnabled = nil;
     }
     return self;
 }
@@ -10399,13 +10311,14 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.chunkDuration = self.chunkDuration;
     other.cencKey = self.cencKey;
+    other.metadataEnabled = self.metadataEnabled;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: chunkDuration:%@; cencKey:%@; >", NSStringFromClass([self class]), _chunkDuration, [_cencKey base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: chunkDuration:%@; cencKey:%@; metadataEnabled:%@; >", NSStringFromClass([self class]), _chunkDuration, [_cencKey base64EncodedStringWithOptions:0], _metadataEnabled];
     return descriptionString;
 }
 
@@ -10464,8 +10377,6 @@ NS_ASSUME_NONNULL_BEGIN
 
         _containerOptions = [MTRPushAVStreamTransportClusterContainerOptionsStruct new];
 
-        _metadataOptions = nil;
-
         _expiryTime = nil;
     }
     return self;
@@ -10484,7 +10395,6 @@ NS_ASSUME_NONNULL_BEGIN
     other.ingestMethod = self.ingestMethod;
     other.containerFormat = self.containerFormat;
     other.containerOptions = self.containerOptions;
-    other.metadataOptions = self.metadataOptions;
     other.expiryTime = self.expiryTime;
 
     return other;
@@ -10492,7 +10402,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; videoStreamID:%@; audioStreamID:%@; endpointID:%@; url:%@; triggerOptions:%@; ingestMethod:%@; containerFormat:%@; containerOptions:%@; metadataOptions:%@; expiryTime:%@; >", NSStringFromClass([self class]), _streamUsage, _videoStreamID, _audioStreamID, _endpointID, _url, _triggerOptions, _ingestMethod, _containerFormat, _containerOptions, _metadataOptions, _expiryTime];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; videoStreamID:%@; audioStreamID:%@; endpointID:%@; url:%@; triggerOptions:%@; ingestMethod:%@; containerFormat:%@; containerOptions:%@; expiryTime:%@; >", NSStringFromClass([self class]), _streamUsage, _videoStreamID, _audioStreamID, _endpointID, _url, _triggerOptions, _ingestMethod, _containerFormat, _containerOptions, _expiryTime];
     return descriptionString;
 }
 
@@ -10507,7 +10417,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _transportStatus = @(0);
 
-        _transportOptions = [MTRPushAVStreamTransportClusterTransportOptionsStruct new];
+        _transportOptions = nil;
     }
     return self;
 }

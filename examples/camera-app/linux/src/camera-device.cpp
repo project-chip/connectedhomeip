@@ -635,6 +635,14 @@ CameraError CameraDevice::SetViewport(const ViewportStruct & viewPort)
     return CameraError::SUCCESS;
 }
 
+CameraError CameraDevice::SetViewport(VideoStream & stream, const ViewportStruct & viewport)
+{
+    ChipLogDetail(Camera, "Setting per stream viewport for stream %d.", stream.videoStreamParams.videoStreamID);
+    ChipLogDetail(Camera, "New viewport. x1=%d, x2=%d, y1=%d, y2=%d.", viewport.x1, viewport.x2, viewport.y1, viewport.y2);
+    stream.viewport = viewport;
+    return CameraError::SUCCESS;
+}
+
 // Mute/Unmute microphone.
 CameraError CameraDevice::SetMicrophoneMuted(bool muteMicrophone)
 {
@@ -653,27 +661,48 @@ CameraError CameraDevice::SetMicrophoneVolume(uint8_t microphoneVol)
 
 int16_t CameraDevice::GetPanMin()
 {
-    return -90;
+    return kMinPanValue;
 }
 
 int16_t CameraDevice::GetPanMax()
 {
-    return 90;
+    return kMaxPanValue;
 }
 
 int16_t CameraDevice::GetTiltMin()
 {
-    return -90;
+    return kMinTiltValue;
 }
 
 int16_t CameraDevice::GetTiltMax()
 {
-    return 90;
+    return kMaxTiltValue;
 }
 
 uint8_t CameraDevice::GetZoomMax()
 {
-    return 75;
+    return kMaxZoomValue;
+}
+
+// Set the Pan level
+CameraError CameraDevice::SetPan(int16_t aPan)
+{
+    mPan = aPan;
+    return CameraError::SUCCESS;
+}
+
+// Set the Tilt level
+CameraError CameraDevice::SetTilt(int16_t aTilt)
+{
+    mTilt = aTilt;
+    return CameraError::SUCCESS;
+}
+
+// Set the Zoom level
+CameraError CameraDevice::SetZoom(uint8_t aZoom)
+{
+    mZoom = aZoom;
+    return CameraError::SUCCESS;
 }
 
 void CameraDevice::InitializeVideoStreams()
@@ -684,8 +713,8 @@ void CameraDevice::InitializeVideoStreams()
                                   VideoCodecEnum::kH264,
                                   15 /* MinFrameRate */,
                                   120 /* MaxFrameRate */,
-                                  { 320, 240 } /* MinResolution */,
-                                  { 640, 480 } /* MaxResolution */,
+                                  { 256, 144 } /* MinResolution */,
+                                  { 1920, 1080 } /* MaxResolution */,
                                   10000 /* MinBitRate */,
                                   2000000 /* MaxBitRate */,
                                   1000 /* MinFragmentLen */,
@@ -694,6 +723,7 @@ void CameraDevice::InitializeVideoStreams()
                                   chip::MakeOptional(static_cast<bool>(false)) /* OSD */,
                                   0 /* RefCount */ },
                                 false,
+                                { mViewport.x1, mViewport.y1, mViewport.x2, mViewport.y2 },
                                 nullptr };
 
     videoStreams.push_back(videoStream);

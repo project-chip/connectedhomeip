@@ -6896,26 +6896,22 @@ public static class WaterHeaterManagementClusterWaterHeaterBoostInfoStruct {
   }
 }
 public static class CommodityPriceClusterCommodityPriceComponentStruct {
-  public Optional<Long> price;
-  public Optional<Integer> priceLevel;
+  public Long price;
   public Integer source;
   public Optional<String> description;
   public Optional<Long> tariffComponentID;
   private static final long PRICE_ID = 0L;
-  private static final long PRICE_LEVEL_ID = 1L;
-  private static final long SOURCE_ID = 2L;
-  private static final long DESCRIPTION_ID = 3L;
-  private static final long TARIFF_COMPONENT_ID_ID = 4L;
+  private static final long SOURCE_ID = 1L;
+  private static final long DESCRIPTION_ID = 2L;
+  private static final long TARIFF_COMPONENT_ID_ID = 3L;
 
   public CommodityPriceClusterCommodityPriceComponentStruct(
-    Optional<Long> price,
-    Optional<Integer> priceLevel,
+    Long price,
     Integer source,
     Optional<String> description,
     Optional<Long> tariffComponentID
   ) {
     this.price = price;
-    this.priceLevel = priceLevel;
     this.source = source;
     this.description = description;
     this.tariffComponentID = tariffComponentID;
@@ -6923,8 +6919,7 @@ public static class CommodityPriceClusterCommodityPriceComponentStruct {
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(PRICE_ID, price.<BaseTLVType>map((nonOptionalprice) -> new IntType(nonOptionalprice)).orElse(new EmptyType())));
-    values.add(new StructElement(PRICE_LEVEL_ID, priceLevel.<BaseTLVType>map((nonOptionalpriceLevel) -> new IntType(nonOptionalpriceLevel)).orElse(new EmptyType())));
+    values.add(new StructElement(PRICE_ID, new IntType(price)));
     values.add(new StructElement(SOURCE_ID, new UIntType(source)));
     values.add(new StructElement(DESCRIPTION_ID, description.<BaseTLVType>map((nonOptionaldescription) -> new StringType(nonOptionaldescription)).orElse(new EmptyType())));
     values.add(new StructElement(TARIFF_COMPONENT_ID_ID, tariffComponentID.<BaseTLVType>map((nonOptionaltariffComponentID) -> new UIntType(nonOptionaltariffComponentID)).orElse(new EmptyType())));
@@ -6936,8 +6931,7 @@ public static class CommodityPriceClusterCommodityPriceComponentStruct {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Optional<Long> price = Optional.empty();
-    Optional<Integer> priceLevel = Optional.empty();
+    Long price = null;
     Integer source = null;
     Optional<String> description = Optional.empty();
     Optional<Long> tariffComponentID = Optional.empty();
@@ -6945,12 +6939,7 @@ public static class CommodityPriceClusterCommodityPriceComponentStruct {
       if (element.contextTagNum() == PRICE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Int) {
           IntType castingValue = element.value(IntType.class);
-          price = Optional.of(castingValue.value(Long.class));
-        }
-      } else if (element.contextTagNum() == PRICE_LEVEL_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
-          IntType castingValue = element.value(IntType.class);
-          priceLevel = Optional.of(castingValue.value(Integer.class));
+          price = castingValue.value(Long.class);
         }
       } else if (element.contextTagNum() == SOURCE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -6971,7 +6960,6 @@ public static class CommodityPriceClusterCommodityPriceComponentStruct {
     }
     return new CommodityPriceClusterCommodityPriceComponentStruct(
       price,
-      priceLevel,
       source,
       description,
       tariffComponentID
@@ -6984,9 +6972,6 @@ public static class CommodityPriceClusterCommodityPriceComponentStruct {
     output.append("CommodityPriceClusterCommodityPriceComponentStruct {\n");
     output.append("\tprice: ");
     output.append(price);
-    output.append("\n");
-    output.append("\tpriceLevel: ");
-    output.append(priceLevel);
     output.append("\n");
     output.append("\tsource: ");
     output.append(source);
@@ -7004,7 +6989,7 @@ public static class CommodityPriceClusterCommodityPriceComponentStruct {
 public static class CommodityPriceClusterCommodityPriceStruct {
   public Long periodStart;
   public @Nullable Long periodEnd;
-  public Optional<ChipStructs.CommodityPriceClusterPriceStruct> price;
+  public Optional<Long> price;
   public Optional<Integer> priceLevel;
   public Optional<String> description;
   public Optional<ArrayList<ChipStructs.CommodityPriceClusterCommodityPriceComponentStruct>> components;
@@ -7018,7 +7003,7 @@ public static class CommodityPriceClusterCommodityPriceStruct {
   public CommodityPriceClusterCommodityPriceStruct(
     Long periodStart,
     @Nullable Long periodEnd,
-    Optional<ChipStructs.CommodityPriceClusterPriceStruct> price,
+    Optional<Long> price,
     Optional<Integer> priceLevel,
     Optional<String> description,
     Optional<ArrayList<ChipStructs.CommodityPriceClusterCommodityPriceComponentStruct>> components
@@ -7035,7 +7020,7 @@ public static class CommodityPriceClusterCommodityPriceStruct {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(PERIOD_START_ID, new UIntType(periodStart)));
     values.add(new StructElement(PERIOD_END_ID, periodEnd != null ? new UIntType(periodEnd) : new NullType()));
-    values.add(new StructElement(PRICE_ID, price.<BaseTLVType>map((nonOptionalprice) -> nonOptionalprice.encodeTlv()).orElse(new EmptyType())));
+    values.add(new StructElement(PRICE_ID, price.<BaseTLVType>map((nonOptionalprice) -> new IntType(nonOptionalprice)).orElse(new EmptyType())));
     values.add(new StructElement(PRICE_LEVEL_ID, priceLevel.<BaseTLVType>map((nonOptionalpriceLevel) -> new IntType(nonOptionalpriceLevel)).orElse(new EmptyType())));
     values.add(new StructElement(DESCRIPTION_ID, description.<BaseTLVType>map((nonOptionaldescription) -> new StringType(nonOptionaldescription)).orElse(new EmptyType())));
     values.add(new StructElement(COMPONENTS_ID, components.<BaseTLVType>map((nonOptionalcomponents) -> ArrayType.generateArrayType(nonOptionalcomponents, (elementnonOptionalcomponents) -> elementnonOptionalcomponents.encodeTlv())).orElse(new EmptyType())));
@@ -7049,7 +7034,7 @@ public static class CommodityPriceClusterCommodityPriceStruct {
     }
     Long periodStart = null;
     @Nullable Long periodEnd = null;
-    Optional<ChipStructs.CommodityPriceClusterPriceStruct> price = Optional.empty();
+    Optional<Long> price = Optional.empty();
     Optional<Integer> priceLevel = Optional.empty();
     Optional<String> description = Optional.empty();
     Optional<ArrayList<ChipStructs.CommodityPriceClusterCommodityPriceComponentStruct>> components = Optional.empty();
@@ -7065,9 +7050,9 @@ public static class CommodityPriceClusterCommodityPriceStruct {
           periodEnd = castingValue.value(Long.class);
         }
       } else if (element.contextTagNum() == PRICE_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
-          StructType castingValue = element.value(StructType.class);
-          price = Optional.of(ChipStructs.CommodityPriceClusterPriceStruct.decodeTlv(castingValue));
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          price = Optional.of(castingValue.value(Long.class));
         }
       } else if (element.contextTagNum() == PRICE_LEVEL_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Int) {
@@ -7178,67 +7163,6 @@ public static class CommodityPriceClusterCurrencyStruct {
     output.append("\n");
     output.append("\tdecimalPoints: ");
     output.append(decimalPoints);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-public static class CommodityPriceClusterPriceStruct {
-  public Long amount;
-  public ChipStructs.CommodityPriceClusterCurrencyStruct currency;
-  private static final long AMOUNT_ID = 0L;
-  private static final long CURRENCY_ID = 1L;
-
-  public CommodityPriceClusterPriceStruct(
-    Long amount,
-    ChipStructs.CommodityPriceClusterCurrencyStruct currency
-  ) {
-    this.amount = amount;
-    this.currency = currency;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(AMOUNT_ID, new IntType(amount)));
-    values.add(new StructElement(CURRENCY_ID, currency.encodeTlv()));
-
-    return new StructType(values);
-  }
-
-  public static CommodityPriceClusterPriceStruct decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    Long amount = null;
-    ChipStructs.CommodityPriceClusterCurrencyStruct currency = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == AMOUNT_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
-          IntType castingValue = element.value(IntType.class);
-          amount = castingValue.value(Long.class);
-        }
-      } else if (element.contextTagNum() == CURRENCY_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
-          StructType castingValue = element.value(StructType.class);
-          currency = ChipStructs.CommodityPriceClusterCurrencyStruct.decodeTlv(castingValue);
-        }
-      }
-    }
-    return new CommodityPriceClusterPriceStruct(
-      amount,
-      currency
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("CommodityPriceClusterPriceStruct {\n");
-    output.append("\tamount: ");
-    output.append(amount);
-    output.append("\n");
-    output.append("\tcurrency: ");
-    output.append(currency);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -9959,39 +9883,39 @@ public static class ClosureControlClusterOverallTargetStruct {
     return output.toString();
   }
 }
-public static class ClosureDimensionClusterCurrentStruct {
+public static class ClosureDimensionClusterCurrentStateStruct {
   public Optional<Integer> position;
-  public Optional<Integer> latching;
+  public Optional<Boolean> latch;
   public Optional<Integer> speed;
   private static final long POSITION_ID = 0L;
-  private static final long LATCHING_ID = 1L;
+  private static final long LATCH_ID = 1L;
   private static final long SPEED_ID = 2L;
 
-  public ClosureDimensionClusterCurrentStruct(
+  public ClosureDimensionClusterCurrentStateStruct(
     Optional<Integer> position,
-    Optional<Integer> latching,
+    Optional<Boolean> latch,
     Optional<Integer> speed
   ) {
     this.position = position;
-    this.latching = latching;
+    this.latch = latch;
     this.speed = speed;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(POSITION_ID, position.<BaseTLVType>map((nonOptionalposition) -> new UIntType(nonOptionalposition)).orElse(new EmptyType())));
-    values.add(new StructElement(LATCHING_ID, latching.<BaseTLVType>map((nonOptionallatching) -> new UIntType(nonOptionallatching)).orElse(new EmptyType())));
+    values.add(new StructElement(LATCH_ID, latch.<BaseTLVType>map((nonOptionallatch) -> new BooleanType(nonOptionallatch)).orElse(new EmptyType())));
     values.add(new StructElement(SPEED_ID, speed.<BaseTLVType>map((nonOptionalspeed) -> new UIntType(nonOptionalspeed)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
 
-  public static ClosureDimensionClusterCurrentStruct decodeTlv(BaseTLVType tlvValue) {
+  public static ClosureDimensionClusterCurrentStateStruct decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
     Optional<Integer> position = Optional.empty();
-    Optional<Integer> latching = Optional.empty();
+    Optional<Boolean> latch = Optional.empty();
     Optional<Integer> speed = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == POSITION_ID) {
@@ -9999,10 +9923,10 @@ public static class ClosureDimensionClusterCurrentStruct {
           UIntType castingValue = element.value(UIntType.class);
           position = Optional.of(castingValue.value(Integer.class));
         }
-      } else if (element.contextTagNum() == LATCHING_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          latching = Optional.of(castingValue.value(Integer.class));
+      } else if (element.contextTagNum() == LATCH_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          latch = Optional.of(castingValue.value(Boolean.class));
         }
       } else if (element.contextTagNum() == SPEED_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -10011,9 +9935,9 @@ public static class ClosureDimensionClusterCurrentStruct {
         }
       }
     }
-    return new ClosureDimensionClusterCurrentStruct(
+    return new ClosureDimensionClusterCurrentStateStruct(
       position,
-      latching,
+      latch,
       speed
     );
   }
@@ -10021,12 +9945,12 @@ public static class ClosureDimensionClusterCurrentStruct {
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("ClosureDimensionClusterCurrentStruct {\n");
+    output.append("ClosureDimensionClusterCurrentStateStruct {\n");
     output.append("\tposition: ");
     output.append(position);
     output.append("\n");
-    output.append("\tlatching: ");
-    output.append(latching);
+    output.append("\tlatch: ");
+    output.append(latch);
     output.append("\n");
     output.append("\tspeed: ");
     output.append(speed);
@@ -10098,7 +10022,7 @@ public static class ClosureDimensionClusterRangePercent100thsStruct {
 }
 public static class ClosureDimensionClusterTargetStruct {
   public Optional<Integer> position;
-  public Optional<Integer> latch;
+  public Optional<Boolean> latch;
   public Optional<Integer> speed;
   private static final long POSITION_ID = 0L;
   private static final long LATCH_ID = 1L;
@@ -10106,7 +10030,7 @@ public static class ClosureDimensionClusterTargetStruct {
 
   public ClosureDimensionClusterTargetStruct(
     Optional<Integer> position,
-    Optional<Integer> latch,
+    Optional<Boolean> latch,
     Optional<Integer> speed
   ) {
     this.position = position;
@@ -10117,7 +10041,7 @@ public static class ClosureDimensionClusterTargetStruct {
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(POSITION_ID, position.<BaseTLVType>map((nonOptionalposition) -> new UIntType(nonOptionalposition)).orElse(new EmptyType())));
-    values.add(new StructElement(LATCH_ID, latch.<BaseTLVType>map((nonOptionallatch) -> new UIntType(nonOptionallatch)).orElse(new EmptyType())));
+    values.add(new StructElement(LATCH_ID, latch.<BaseTLVType>map((nonOptionallatch) -> new BooleanType(nonOptionallatch)).orElse(new EmptyType())));
     values.add(new StructElement(SPEED_ID, speed.<BaseTLVType>map((nonOptionalspeed) -> new UIntType(nonOptionalspeed)).orElse(new EmptyType())));
 
     return new StructType(values);
@@ -10128,7 +10052,7 @@ public static class ClosureDimensionClusterTargetStruct {
       return null;
     }
     Optional<Integer> position = Optional.empty();
-    Optional<Integer> latch = Optional.empty();
+    Optional<Boolean> latch = Optional.empty();
     Optional<Integer> speed = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == POSITION_ID) {
@@ -10137,9 +10061,9 @@ public static class ClosureDimensionClusterTargetStruct {
           position = Optional.of(castingValue.value(Integer.class));
         }
       } else if (element.contextTagNum() == LATCH_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          latch = Optional.of(castingValue.value(Integer.class));
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          latch = Optional.of(castingValue.value(Boolean.class));
         }
       } else if (element.contextTagNum() == SPEED_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -15952,82 +15876,6 @@ public static class PushAvStreamTransportClusterTransportZoneOptionsStruct {
     return output.toString();
   }
 }
-public static class PushAvStreamTransportClusterMetadataOptionsStruct {
-  public Integer multiplexing;
-  public Boolean includeMotionZones;
-  public Boolean enableMetadataPrivacySensitive;
-  private static final long MULTIPLEXING_ID = 0L;
-  private static final long INCLUDE_MOTION_ZONES_ID = 1L;
-  private static final long ENABLE_METADATA_PRIVACY_SENSITIVE_ID = 2L;
-
-  public PushAvStreamTransportClusterMetadataOptionsStruct(
-    Integer multiplexing,
-    Boolean includeMotionZones,
-    Boolean enableMetadataPrivacySensitive
-  ) {
-    this.multiplexing = multiplexing;
-    this.includeMotionZones = includeMotionZones;
-    this.enableMetadataPrivacySensitive = enableMetadataPrivacySensitive;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(MULTIPLEXING_ID, new UIntType(multiplexing)));
-    values.add(new StructElement(INCLUDE_MOTION_ZONES_ID, new BooleanType(includeMotionZones)));
-    values.add(new StructElement(ENABLE_METADATA_PRIVACY_SENSITIVE_ID, new BooleanType(enableMetadataPrivacySensitive)));
-
-    return new StructType(values);
-  }
-
-  public static PushAvStreamTransportClusterMetadataOptionsStruct decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    Integer multiplexing = null;
-    Boolean includeMotionZones = null;
-    Boolean enableMetadataPrivacySensitive = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == MULTIPLEXING_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          multiplexing = castingValue.value(Integer.class);
-        }
-      } else if (element.contextTagNum() == INCLUDE_MOTION_ZONES_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
-          BooleanType castingValue = element.value(BooleanType.class);
-          includeMotionZones = castingValue.value(Boolean.class);
-        }
-      } else if (element.contextTagNum() == ENABLE_METADATA_PRIVACY_SENSITIVE_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
-          BooleanType castingValue = element.value(BooleanType.class);
-          enableMetadataPrivacySensitive = castingValue.value(Boolean.class);
-        }
-      }
-    }
-    return new PushAvStreamTransportClusterMetadataOptionsStruct(
-      multiplexing,
-      includeMotionZones,
-      enableMetadataPrivacySensitive
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("PushAvStreamTransportClusterMetadataOptionsStruct {\n");
-    output.append("\tmultiplexing: ");
-    output.append(multiplexing);
-    output.append("\n");
-    output.append("\tincludeMotionZones: ");
-    output.append(includeMotionZones);
-    output.append("\n");
-    output.append("\tenableMetadataPrivacySensitive: ");
-    output.append(enableMetadataPrivacySensitive);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
 public static class PushAvStreamTransportClusterTransportTriggerOptionsStruct {
   public Integer triggerType;
   public @Nullable Optional<ArrayList<ChipStructs.PushAvStreamTransportClusterTransportZoneOptionsStruct>> motionZones;
@@ -16137,21 +15985,26 @@ public static class PushAvStreamTransportClusterTransportTriggerOptionsStruct {
 public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
   public Integer chunkDuration;
   public Optional<byte[]> CENCKey;
+  public Optional<Boolean> metadataEnabled;
   private static final long CHUNK_DURATION_ID = 0L;
   private static final long CENC_KEY_ID = 1L;
+  private static final long METADATA_ENABLED_ID = 2L;
 
   public PushAvStreamTransportClusterCMAFContainerOptionsStruct(
     Integer chunkDuration,
-    Optional<byte[]> CENCKey
+    Optional<byte[]> CENCKey,
+    Optional<Boolean> metadataEnabled
   ) {
     this.chunkDuration = chunkDuration;
     this.CENCKey = CENCKey;
+    this.metadataEnabled = metadataEnabled;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(CHUNK_DURATION_ID, new UIntType(chunkDuration)));
     values.add(new StructElement(CENC_KEY_ID, CENCKey.<BaseTLVType>map((nonOptionalCENCKey) -> new ByteArrayType(nonOptionalCENCKey)).orElse(new EmptyType())));
+    values.add(new StructElement(METADATA_ENABLED_ID, metadataEnabled.<BaseTLVType>map((nonOptionalmetadataEnabled) -> new BooleanType(nonOptionalmetadataEnabled)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -16162,6 +16015,7 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
     }
     Integer chunkDuration = null;
     Optional<byte[]> CENCKey = Optional.empty();
+    Optional<Boolean> metadataEnabled = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CHUNK_DURATION_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -16173,11 +16027,17 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
           ByteArrayType castingValue = element.value(ByteArrayType.class);
           CENCKey = Optional.of(castingValue.value(byte[].class));
         }
+      } else if (element.contextTagNum() == METADATA_ENABLED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          metadataEnabled = Optional.of(castingValue.value(Boolean.class));
+        }
       }
     }
     return new PushAvStreamTransportClusterCMAFContainerOptionsStruct(
       chunkDuration,
-      CENCKey
+      CENCKey,
+      metadataEnabled
     );
   }
 
@@ -16190,6 +16050,9 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
     output.append("\n");
     output.append("\tCENCKey: ");
     output.append(CENCKey.isPresent() ? Arrays.toString(CENCKey.get()) : "");
+    output.append("\n");
+    output.append("\tmetadataEnabled: ");
+    output.append(metadataEnabled);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -16258,15 +16121,14 @@ public static class PushAvStreamTransportClusterContainerOptionsStruct {
 }
 public static class PushAvStreamTransportClusterTransportOptionsStruct {
   public Integer streamUsage;
-  public Optional<Integer> videoStreamID;
-  public Optional<Integer> audioStreamID;
+  public @Nullable Optional<Integer> videoStreamID;
+  public @Nullable Optional<Integer> audioStreamID;
   public Integer endpointID;
   public String url;
   public ChipStructs.PushAvStreamTransportClusterTransportTriggerOptionsStruct triggerOptions;
   public Integer ingestMethod;
   public Integer containerFormat;
   public ChipStructs.PushAvStreamTransportClusterContainerOptionsStruct containerOptions;
-  public Optional<ChipStructs.PushAvStreamTransportClusterMetadataOptionsStruct> metadataOptions;
   public Optional<Long> expiryTime;
   private static final long STREAM_USAGE_ID = 0L;
   private static final long VIDEO_STREAM_ID_ID = 1L;
@@ -16277,20 +16139,18 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
   private static final long INGEST_METHOD_ID = 6L;
   private static final long CONTAINER_FORMAT_ID = 7L;
   private static final long CONTAINER_OPTIONS_ID = 8L;
-  private static final long METADATA_OPTIONS_ID = 9L;
-  private static final long EXPIRY_TIME_ID = 10L;
+  private static final long EXPIRY_TIME_ID = 9L;
 
   public PushAvStreamTransportClusterTransportOptionsStruct(
     Integer streamUsage,
-    Optional<Integer> videoStreamID,
-    Optional<Integer> audioStreamID,
+    @Nullable Optional<Integer> videoStreamID,
+    @Nullable Optional<Integer> audioStreamID,
     Integer endpointID,
     String url,
     ChipStructs.PushAvStreamTransportClusterTransportTriggerOptionsStruct triggerOptions,
     Integer ingestMethod,
     Integer containerFormat,
     ChipStructs.PushAvStreamTransportClusterContainerOptionsStruct containerOptions,
-    Optional<ChipStructs.PushAvStreamTransportClusterMetadataOptionsStruct> metadataOptions,
     Optional<Long> expiryTime
   ) {
     this.streamUsage = streamUsage;
@@ -16302,22 +16162,20 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
     this.ingestMethod = ingestMethod;
     this.containerFormat = containerFormat;
     this.containerOptions = containerOptions;
-    this.metadataOptions = metadataOptions;
     this.expiryTime = expiryTime;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(STREAM_USAGE_ID, new UIntType(streamUsage)));
-    values.add(new StructElement(VIDEO_STREAM_ID_ID, videoStreamID.<BaseTLVType>map((nonOptionalvideoStreamID) -> new UIntType(nonOptionalvideoStreamID)).orElse(new EmptyType())));
-    values.add(new StructElement(AUDIO_STREAM_ID_ID, audioStreamID.<BaseTLVType>map((nonOptionalaudioStreamID) -> new UIntType(nonOptionalaudioStreamID)).orElse(new EmptyType())));
+    values.add(new StructElement(VIDEO_STREAM_ID_ID, videoStreamID != null ? videoStreamID.<BaseTLVType>map((nonOptionalvideoStreamID) -> new UIntType(nonOptionalvideoStreamID)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(AUDIO_STREAM_ID_ID, audioStreamID != null ? audioStreamID.<BaseTLVType>map((nonOptionalaudioStreamID) -> new UIntType(nonOptionalaudioStreamID)).orElse(new EmptyType()) : new NullType()));
     values.add(new StructElement(ENDPOINT_ID_ID, new UIntType(endpointID)));
     values.add(new StructElement(URL_ID, new StringType(url)));
     values.add(new StructElement(TRIGGER_OPTIONS_ID, triggerOptions.encodeTlv()));
     values.add(new StructElement(INGEST_METHOD_ID, new UIntType(ingestMethod)));
     values.add(new StructElement(CONTAINER_FORMAT_ID, new UIntType(containerFormat)));
     values.add(new StructElement(CONTAINER_OPTIONS_ID, containerOptions.encodeTlv()));
-    values.add(new StructElement(METADATA_OPTIONS_ID, metadataOptions.<BaseTLVType>map((nonOptionalmetadataOptions) -> nonOptionalmetadataOptions.encodeTlv()).orElse(new EmptyType())));
     values.add(new StructElement(EXPIRY_TIME_ID, expiryTime.<BaseTLVType>map((nonOptionalexpiryTime) -> new UIntType(nonOptionalexpiryTime)).orElse(new EmptyType())));
 
     return new StructType(values);
@@ -16328,15 +16186,14 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
       return null;
     }
     Integer streamUsage = null;
-    Optional<Integer> videoStreamID = Optional.empty();
-    Optional<Integer> audioStreamID = Optional.empty();
+    @Nullable Optional<Integer> videoStreamID = null;
+    @Nullable Optional<Integer> audioStreamID = null;
     Integer endpointID = null;
     String url = null;
     ChipStructs.PushAvStreamTransportClusterTransportTriggerOptionsStruct triggerOptions = null;
     Integer ingestMethod = null;
     Integer containerFormat = null;
     ChipStructs.PushAvStreamTransportClusterContainerOptionsStruct containerOptions = null;
-    Optional<ChipStructs.PushAvStreamTransportClusterMetadataOptionsStruct> metadataOptions = Optional.empty();
     Optional<Long> expiryTime = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == STREAM_USAGE_ID) {
@@ -16384,11 +16241,6 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
           StructType castingValue = element.value(StructType.class);
           containerOptions = ChipStructs.PushAvStreamTransportClusterContainerOptionsStruct.decodeTlv(castingValue);
         }
-      } else if (element.contextTagNum() == METADATA_OPTIONS_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
-          StructType castingValue = element.value(StructType.class);
-          metadataOptions = Optional.of(ChipStructs.PushAvStreamTransportClusterMetadataOptionsStruct.decodeTlv(castingValue));
-        }
       } else if (element.contextTagNum() == EXPIRY_TIME_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
@@ -16406,7 +16258,6 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
       ingestMethod,
       containerFormat,
       containerOptions,
-      metadataOptions,
       expiryTime
     );
   }
@@ -16442,9 +16293,6 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
     output.append("\tcontainerOptions: ");
     output.append(containerOptions);
     output.append("\n");
-    output.append("\tmetadataOptions: ");
-    output.append(metadataOptions);
-    output.append("\n");
     output.append("\texpiryTime: ");
     output.append(expiryTime);
     output.append("\n");
@@ -16455,7 +16303,7 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
 public static class PushAvStreamTransportClusterTransportConfigurationStruct {
   public Integer connectionID;
   public Integer transportStatus;
-  public ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct transportOptions;
+  public Optional<ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct> transportOptions;
   private static final long CONNECTION_ID_ID = 0L;
   private static final long TRANSPORT_STATUS_ID = 1L;
   private static final long TRANSPORT_OPTIONS_ID = 2L;
@@ -16463,7 +16311,7 @@ public static class PushAvStreamTransportClusterTransportConfigurationStruct {
   public PushAvStreamTransportClusterTransportConfigurationStruct(
     Integer connectionID,
     Integer transportStatus,
-    ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct transportOptions
+    Optional<ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct> transportOptions
   ) {
     this.connectionID = connectionID;
     this.transportStatus = transportStatus;
@@ -16474,7 +16322,7 @@ public static class PushAvStreamTransportClusterTransportConfigurationStruct {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(CONNECTION_ID_ID, new UIntType(connectionID)));
     values.add(new StructElement(TRANSPORT_STATUS_ID, new UIntType(transportStatus)));
-    values.add(new StructElement(TRANSPORT_OPTIONS_ID, transportOptions.encodeTlv()));
+    values.add(new StructElement(TRANSPORT_OPTIONS_ID, transportOptions.<BaseTLVType>map((nonOptionaltransportOptions) -> nonOptionaltransportOptions.encodeTlv()).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -16485,7 +16333,7 @@ public static class PushAvStreamTransportClusterTransportConfigurationStruct {
     }
     Integer connectionID = null;
     Integer transportStatus = null;
-    ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct transportOptions = null;
+    Optional<ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct> transportOptions = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CONNECTION_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -16500,7 +16348,7 @@ public static class PushAvStreamTransportClusterTransportConfigurationStruct {
       } else if (element.contextTagNum() == TRANSPORT_OPTIONS_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
           StructType castingValue = element.value(StructType.class);
-          transportOptions = ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct.decodeTlv(castingValue);
+          transportOptions = Optional.of(ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct.decodeTlv(castingValue));
         }
       }
     }

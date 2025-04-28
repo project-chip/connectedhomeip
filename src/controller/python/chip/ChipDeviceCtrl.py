@@ -138,6 +138,7 @@ def _DeviceAvailableCallback(closure, device, err):
 @_IssueNOCChainCallbackPythonCallbackFunct
 def _IssueNOCChainCallbackPythonCallback(devCtrl, status: PyChipError, noc: c_void_p, nocLen: int, icac: c_void_p,
                                          icacLen: int, rcac: c_void_p, rcacLen: int, ipk: c_void_p, ipkLen: int, adminSubject: int):
+
     nocChain = NOCChain(None, None, None, None, 0)
     if status.is_success:
         nocBytes = None
@@ -153,6 +154,8 @@ def _IssueNOCChainCallbackPythonCallback(devCtrl, status: PyChipError, noc: c_vo
         if ipkLen > 0:
             ipkBytes = string_at(ipk, ipkLen)[:]
         nocChain = NOCChain(nocBytes, icacBytes, rcacBytes, ipkBytes, adminSubject)
+    else:
+        logging.error(f"Failure to generate NOC Chain: {status}. All NOCChain field will be None and commissioning will fail!")
     devCtrl.NOCChainCallback(nocChain)
 
 
@@ -602,11 +605,11 @@ class ChipDeviceControllerBase():
         return self._isActive
 
     def Shutdown(self):
-        ''' 
+        '''
         Shuts down this controller and reclaims any used resources, including the bound
         C++ constructor instance in the SDK.
 
-        Raises: 
+        Raises:
             ChipStackError: On failure.
 
         Returns:
@@ -649,7 +652,7 @@ class ChipDeviceControllerBase():
         '''
         Checks if the device controller is active.
 
-        Raises: 
+        Raises:
             RuntimeError: On failure.
         '''
         if (not self._isActive):
@@ -666,7 +669,7 @@ class ChipDeviceControllerBase():
         Returns:
             bool: True if is connected, False if not connected.
 
-        Raises: 
+        Raises:
             RuntimeError: If '_isActive' is False (from the call to CheckIsActive).
         '''
         self.CheckIsActive()
@@ -715,7 +718,7 @@ class ChipDeviceControllerBase():
         '''
         Closes the BLE connection for the device controller.
 
-        Raises: 
+        Raises:
             ChipStackError: On failure.
         '''
         self.CheckIsActive()
@@ -734,7 +737,7 @@ class ChipDeviceControllerBase():
 
         WARNING: ONLY CALL THIS IF YOU UNDERSTAND THE SIDE-EFFECTS
 
-        Raises: 
+        Raises:
             ChipStackError: On failure.
         '''
         self.CheckIsActive()
@@ -1042,7 +1045,7 @@ class ChipDeviceControllerBase():
         Returns:
             int: The compressed fabric ID as a 64-bit integer.
 
-        Raises: 
+        Raises:
             ChipStackError: On failure.
         '''
         self.CheckIsActive()
@@ -1056,14 +1059,14 @@ class ChipDeviceControllerBase():
 
         return fabricid.value
 
-    def GetFabricIdInternal(self):
+    def GetFabricIdInternal(self) -> int:
         '''
         Get the fabric ID from the object. Only used to validate cached value from property.
 
         Returns:
-            int: The compressed fabric ID as a 64-bit integer.
+            int: The raw fabric ID as a 64-bit integer.
 
-        Raises: 
+        Raises:
             ChipStackError: On failure.
         '''
         self.CheckIsActive()
@@ -1077,14 +1080,14 @@ class ChipDeviceControllerBase():
 
         return fabricid.value
 
-    def GetFabricIndexInternal(self):
+    def GetFabricIndexInternal(self) -> int:
         '''
         Get the fabric index from the object. Only used to validate cached value from property.
 
         Returns:
-            int: The compressed fabric ID as a 64-bit integer.
+            int: fabric index in local fabric table associated with this controller.
 
-        Raises: 
+        Raises:
             ChipStackError: On failure.
         '''
         self.CheckIsActive()
@@ -1105,7 +1108,7 @@ class ChipDeviceControllerBase():
         Returns:
             int: The compressed fabric ID as a 64-bit integer.
 
-        Raises: 
+        Raises:
             ChipStackError: On failure.
         '''
         self.CheckIsActive()
@@ -1124,14 +1127,14 @@ class ChipDeviceControllerBase():
         Get cluster handler
 
         Returns:
-            ChipClusters: An instance of the ChipClusters class.        
+            ChipClusters: An instance of the ChipClusters class.
         '''
         self.CheckIsActive()
 
         return self._Cluster
 
     async def FindOrEstablishPASESession(self, setupCode: str, nodeid: int, timeoutMs: typing.Optional[int] = None) -> typing.Optional[DeviceProxyWrapper]:
-        ''' 
+        '''
         Returns CommissioneeDeviceProxy if we can find or establish a PASE connection to the specified device
 
         Returns:
@@ -1154,7 +1157,7 @@ class ChipDeviceControllerBase():
         return None
 
     def GetConnectedDeviceSync(self, nodeid, allowPASE=True, timeoutMs: typing.Optional[int] = None, payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
-        ''' 
+        '''
         Gets an OperationalDeviceProxy or CommissioneeDeviceProxy for the specified Node.
 
         Arg:
@@ -1213,7 +1216,7 @@ class ChipDeviceControllerBase():
         return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.OPERATIONAL, self._dmLib)
 
     async def WaitForActive(self, nodeid, *, timeoutSeconds=30.0, stayActiveDurationMs=30000):
-        ''' 
+        '''
         Waits a LIT ICD device to become active. Will send a StayActive command to the device on active to allow human operations.
 
         Args:
@@ -1228,7 +1231,7 @@ class ChipDeviceControllerBase():
 
     async def GetConnectedDevice(self, nodeid, allowPASE: bool = True, timeoutMs: typing.Optional[int] = None,
                                  payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
-        ''' 
+        '''
         Gets an OperationalDeviceProxy or CommissioneeDeviceProxy for the specified Node.
 
         Args:
@@ -1290,7 +1293,7 @@ class ChipDeviceControllerBase():
         return DeviceProxyWrapper(future.result(), DeviceProxyWrapper.DeviceProxyType.OPERATIONAL, self._dmLib)
 
     def ComputeRoundTripTimeout(self, nodeid, upperLayerProcessingTimeoutMs: int = 0):
-        ''' 
+        '''
         Returns a computed timeout value based on the round-trip time it takes for the peer at the other end of the session to
         receive a message, process it and send it back. This is computed based on the session type, the type of transport,
         sleepy characteristics of the target and a caller-provided value for the time it takes to process a message
@@ -1307,7 +1310,7 @@ class ChipDeviceControllerBase():
         return res
 
     def GetRemoteSessionParameters(self, nodeid) -> typing.Optional[SessionParameters]:
-        ''' 
+        '''
         Returns the SessionParameters of reported by the remote node associated with `nodeid`.
         If there is some error in getting SessionParameters None is returned.
 
@@ -1979,7 +1982,7 @@ class ChipDeviceControllerBase():
         '''
         Sets the Identity Protection Key (IPK) for the device controller.
 
-        Raises: 
+        Raises:
             ChipStackError: On failure.
         '''
         self._ChipStack.Call(
@@ -1990,7 +1993,7 @@ class ChipDeviceControllerBase():
         '''
         Populates the Device Controller's GroupDataProvider with known test group info and keys.
 
-        Raises: 
+        Raises:
             ChipStackError: On failure.
         '''
         self.CheckIsActive()
@@ -2346,7 +2349,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
             return await asyncio.futures.wrap_future(ctx.future)
 
     async def CommissionThread(self, discriminator, setupPinCode, nodeId, threadOperationalDataset: bytes, isShortDiscriminator: bool = False) -> int:
-        ''' 
+        '''
         Commissions a Thread device over BLE.
 
         Returns:
@@ -2356,7 +2359,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         return await self.ConnectBLE(discriminator, setupPinCode, nodeId, isShortDiscriminator)
 
     async def CommissionWiFi(self, discriminator, setupPinCode, nodeId, ssid: str, credentials: str, isShortDiscriminator: bool = False) -> int:
-        ''' 
+        '''
         Commissions a Wi-Fi device over BLE.
 
         Returns:
@@ -2366,10 +2369,10 @@ class ChipDeviceController(ChipDeviceControllerBase):
         return await self.ConnectBLE(discriminator, setupPinCode, nodeId, isShortDiscriminator)
 
     def SetWiFiCredentials(self, ssid: str, credentials: str):
-        ''' 
+        '''
         Set the Wi-Fi credentials to set during commissioning.
 
-        Raises: 
+        Raises:
             ChipStackError: On failure.
         '''
         self.CheckIsActive()
@@ -2380,10 +2383,10 @@ class ChipDeviceController(ChipDeviceControllerBase):
         ).raise_on_error()
 
     def SetThreadOperationalDataset(self, threadOperationalDataset):
-        ''' 
+        '''
         Set the Thread operational dataset to set during commissioning.
 
-        Raises: 
+        Raises:
             ChipStackError: On failure.
         '''
         self.CheckIsActive()
@@ -2394,10 +2397,10 @@ class ChipDeviceController(ChipDeviceControllerBase):
         ).raise_on_error()
 
     def ResetCommissioningParameters(self):
-        ''' 
+        '''
         Sets the commissioning parameters back to the default values.
 
-        Raises: 
+        Raises:
             ChipStackError: On failure.
         '''
         self.CheckIsActive()
@@ -2406,10 +2409,10 @@ class ChipDeviceController(ChipDeviceControllerBase):
         ).raise_on_error()
 
     def SetTimeZone(self, offset: int, validAt: int, name: str = ""):
-        ''' 
+        '''
         Set the time zone to set during commissioning. Currently only one time zone entry is supported.
 
-        Raises: 
+        Raises:
             ChipStackError: On failure.
         '''
         self.CheckIsActive()
@@ -2418,10 +2421,10 @@ class ChipDeviceController(ChipDeviceControllerBase):
         ).raise_on_error()
 
     def SetDSTOffset(self, offset: int, validStarting: int, validUntil: int):
-        ''' 
+        '''
         Set the DST offset to set during commissioning. Currently only one DST entry is supported.
 
-        Raises: 
+        Raises:
             ChipStackError: On failure.
         '''
         self.CheckIsActive()
@@ -2430,10 +2433,10 @@ class ChipDeviceController(ChipDeviceControllerBase):
         ).raise_on_error()
 
     def SetTCAcknowledgements(self, tcAcceptedVersion: int, tcUserResponse: int):
-        ''' 
+        '''
         Set the TC acknowledgements to set during commissioning.
 
-        Raises: 
+        Raises:
             ChipStackError: On failure.
         '''
         self.CheckIsActive()
@@ -2442,10 +2445,10 @@ class ChipDeviceController(ChipDeviceControllerBase):
         ).raise_on_error()
 
     def SetSkipCommissioningComplete(self, skipCommissioningComplete: bool):
-        ''' 
+        '''
         Set whether to skip the commissioning complete callback.
 
-        Raises: 
+        Raises:
             ChipStackError: On failure.
         '''
         self.CheckIsActive()
@@ -2454,10 +2457,10 @@ class ChipDeviceController(ChipDeviceControllerBase):
         ).raise_on_error()
 
     def SetDefaultNTP(self, defaultNTP: str):
-        ''' 
+        '''
         Set the DefaultNTP to set during commissioning.
 
-        Raises: 
+        Raises:
             ChipStackError: On failure.
         '''
         self.CheckIsActive()
@@ -2466,10 +2469,10 @@ class ChipDeviceController(ChipDeviceControllerBase):
         ).raise_on_error()
 
     def SetTrustedTimeSource(self, nodeId: int, endpoint: int):
-        ''' 
+        '''
         Set the trusted time source nodeId to set during commissioning. This must be a node on the commissioner fabric.
 
-        Raises: 
+        Raises:
             ChipStackError: On failure.
         '''
         self.CheckIsActive()
@@ -2481,7 +2484,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         '''
         Instructs the auto-commissioner to perform a matching fabric check before commissioning.
 
-        Raises: 
+        Raises:
             ChipStackError: On failure.
         '''
         self.CheckIsActive()
@@ -2490,12 +2493,12 @@ class ChipDeviceController(ChipDeviceControllerBase):
         ).raise_on_error()
 
     def GenerateICDRegistrationParameters(self):
-        ''' 
-        Generates ICD registration parameters for this controller. 
+        '''
+        Generates ICD registration parameters for this controller.
 
         Returns:
-            ICDRegistrationParameters: An object containing the generated parameters 
-            including symmetricKey, checkInNodeId, monitoredSubject, stayActiveMs, 
+            ICDRegistrationParameters: An object containing the generated parameters
+            including symmetricKey, checkInNodeId, monitoredSubject, stayActiveMs,
             and clientType.
         '''
         return ICDRegistrationParameters(
@@ -2511,7 +2514,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         Args:
             parameters: A ICDRegistrationParameters for the parameters used for ICD registration, or None for default arguments.
 
-        Raises: 
+        Raises:
             ChipStackError: On failure.
         '''
         if parameters is None:
@@ -2526,10 +2529,10 @@ class ChipDeviceController(ChipDeviceControllerBase):
         ).raise_on_error()
 
     def DisableICDRegistration(self):
-        ''' 
-        Disables ICD registration. 
+        '''
+        Disables ICD registration.
 
-        Raises: 
+        Raises:
             ChipStackError: On failure.
         '''
         self.CheckIsActive()
@@ -2538,7 +2541,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         ).raise_on_error()
 
     def GetFabricCheckResult(self) -> int:
-        ''' 
+        '''
         Returns the fabric check result if SetCheckMatchingFabric was used.
 
         Returns:
@@ -2565,8 +2568,8 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         The filter can be an integer, a string or None depending on the actual type of selected filter.
 
-        Raises: 
-            ChipStackError: On failure.       
+        Raises:
+            ChipStackError: On failure.
 
         Returns:
             - Effective Node ID of the device (as defined by the assigned NOC)
@@ -2618,12 +2621,12 @@ class ChipDeviceController(ChipDeviceControllerBase):
         return rcac_bytes
 
     async def CommissionWithCode(self, setupPayload: str, nodeid: int, discoveryType: DiscoveryType = DiscoveryType.DISCOVERY_ALL, useNFC: bool = False) -> int:
-        ''' 
+        '''
         Commission with the given nodeid from the setupPayload.
         setupPayload may be a QR or manual code.
         If useNFC is True, the commissioning should use NTL as temporary channel
 
-        Raises: 
+        Raises:
             ChipStackError: On failure.
 
         Returns:
@@ -2641,10 +2644,10 @@ class ChipDeviceController(ChipDeviceControllerBase):
             return await asyncio.futures.wrap_future(ctx.future)
 
     async def CommissionIP(self, ipaddr: str, setupPinCode: int, nodeid: int) -> int:
-        ''' 
+        '''
         DEPRECATED, DO NOT USE! Use `CommissionOnNetwork` or `CommissionWithCode`
 
-        Raises: 
+        Raises:
             ChipStackError: On failure.
 
         Returns:
@@ -2693,13 +2696,13 @@ class ChipDeviceController(ChipDeviceControllerBase):
             return await asyncio.futures.wrap_future(ctx.future)
 
     def SetDACRevocationSetPath(self, dacRevocationSetPath: typing.Optional[str]):
-        ''' 
+        '''
         Set the path to the device attestation revocation set JSON file.
 
         Args:
             dacRevocationSetPath: Path to the JSON file containing the device attestation revocation set.
 
-        Raises: 
+        Raises:
             ChipStackError: On failure.
         '''
         self.CheckIsActive()
@@ -2710,7 +2713,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
 
 class BareChipDeviceController(ChipDeviceControllerBase):
-    ''' 
+    '''
     A bare device controller without AutoCommissioner support.
     '''
 
@@ -2733,7 +2736,7 @@ class BareChipDeviceController(ChipDeviceControllerBase):
             adminVendorId: The adminVendorId of the controller.
             name: The name of the controller, for debugging use only.
 
-        Raises: 
+        Raises:
             ChipStackError: On failure
         '''
         super().__init__(name or f"ctrl(v/{adminVendorId})")

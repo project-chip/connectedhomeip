@@ -41,6 +41,13 @@ enum class ErrorStateEnum : uint8_t
     kWaterTankMissing          = 0x45,
     kWaterTankLidOpen          = 0x46,
     kMopCleaningPadMissing     = 0x47,
+    kLowBattery                = 0x48,
+    kCannotReachTargetArea     = 0x49,
+    kDirtyWaterTankFull        = 0x4A,
+    kDirtyWaterTankMissing     = 0x4B,
+    kWheelsJammed              = 0x4C,
+    kBrushJammed               = 0x4D,
+    kNavigationSensorObscured  = 0x4E,
     // kUnknownEnumValue intentionally not defined. This enum never goes
     // through DataModel::Decode, likely because it is a part of a derived
     // cluster. As a result having kUnknownEnumValue in this enum is error
@@ -51,13 +58,17 @@ enum class ErrorStateEnum : uint8_t
 // Enum for OperationalStateEnum
 enum class OperationalStateEnum : uint8_t
 {
-    kStopped        = 0x00,
-    kRunning        = 0x01,
-    kPaused         = 0x02,
-    kError          = 0x03,
-    kSeekingCharger = 0x40,
-    kCharging       = 0x41,
-    kDocked         = 0x42,
+    kStopped          = 0x00,
+    kRunning          = 0x01,
+    kPaused           = 0x02,
+    kError            = 0x03,
+    kSeekingCharger   = 0x40,
+    kCharging         = 0x41,
+    kDocked           = 0x42,
+    kEmptyingDustBin  = 0x43,
+    kCleaningMop      = 0x44,
+    kFillingWaterTank = 0x45,
+    kUpdatingMaps     = 0x46,
     // kUnknownEnumValue intentionally not defined. This enum never goes
     // through DataModel::Decode, likely because it is a part of a derived
     // cluster. As a result having kUnknownEnumValue in this enum is error

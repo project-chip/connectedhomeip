@@ -19,14 +19,14 @@ namespace ClosureDimension {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-namespace Current {
+namespace CurrentState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Current::Id,
+    .attributeId    = CurrentState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-} // namespace Current
+} // namespace CurrentState
 namespace Target {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = Target::Id,
@@ -113,14 +113,14 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace SetTarget {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ClosureDimension::Commands::SetTarget::Id,
+    .commandId       = SetTarget::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace SetTarget
 namespace Step {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ClosureDimension::Commands::Step::Id,
+    .commandId       = Step::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
