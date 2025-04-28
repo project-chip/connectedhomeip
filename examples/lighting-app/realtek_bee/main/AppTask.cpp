@@ -22,7 +22,9 @@
 #include "AppEvent.h"
 #include "AppTask.h"
 #include "Globals.h"
+#include "util/RealtekObserver.h"
 
+#include <DeviceInfoProviderImpl.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.h>
@@ -31,14 +33,10 @@
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
-#include <data-model-providers/codegen/Instance.h>
-
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-
+#include <data-model-providers/codegen/Instance.h>
 #include <inet/EndPointStateOpenThread.h>
-
-#include <DeviceInfoProviderImpl.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
@@ -47,6 +45,7 @@
 #include <DeviceCallbacks.h>
 
 #include <os_mem.h>
+#include <os_task.h>
 
 #if CONFIG_ENABLE_PW_RPC
 #include "Rpc.h"
@@ -191,6 +190,10 @@ CHIP_ERROR AppTask::StartAppTask()
 
 void AppTask::AppTaskMain(void * pvParameter)
 {
+#if defined(FEATURE_TRUSTZONE_ENABLE) && (FEATURE_TRUSTZONE_ENABLE == 1)
+    os_alloc_secure_ctx(1024);
+#endif
+
     AppEvent event;
 
     sAppTask.Init();
@@ -231,6 +234,9 @@ void AppTask::InitServer(intptr_t arg)
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
     chip::Server::GetInstance().Init(initParams);
+
+    static RealtekObserver sRealtekObserver;
+    chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sRealtekObserver);
 
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
