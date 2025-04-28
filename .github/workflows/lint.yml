@@ -271,7 +271,6 @@ jobs:
             - name: Check for use of 'emberAf' or 'emAf' symbols
               if: always()
               run: |
-                  chmod 400 scripts/find_ember_symbols_prefixes.sh
                   scripts/find_ember_symbols_prefixes.sh \
                   --skip-subtree .github/workflows/lint.yml \
                   --skip-subtree .github/workflows/.wordlist.txt \
