@@ -261,7 +261,7 @@ DataVersion gComposedTempSensor2DataVersions[MATTER_ARRAY_SIZE(bridgedTempSensor
 // ---------------------------------------------------------------------------
 
 int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const EmberAfDeviceType> & deviceTypeList,
-                      const Span<DataVersion> & dataVersionStorage, 
+                      const Span<DataVersion> & dataVersionStorage,
                       #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
                       chip::CharSpan epUniqueId,
                       #endif
