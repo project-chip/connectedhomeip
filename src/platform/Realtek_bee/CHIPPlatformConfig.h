@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Platform-specific configuration overrides for CHIP on
- *          Qorvo QPG platforms.
+ *          Realtek Bee platforms.
  */
 
 #pragma once

@@ -144,3 +144,9 @@
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
 #define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "1.0"
 #endif
+
+// Set the following define to use the Certification Declaration from CHIPDevicePlatformConfig.h and not use it stored in factory
+// data section
+#ifndef CHIP_USE_DEVICE_CONFIG_CERTIFICATION_DECLARATION
+#define CHIP_USE_DEVICE_CONFIG_CERTIFICATION_DECLARATION 0
+#endif

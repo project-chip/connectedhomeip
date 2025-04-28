@@ -34,7 +34,7 @@ namespace app {
 class DefaultAttributePersistenceProvider : protected StorageDelegateWrapper, public AttributePersistenceProvider
 {
 public:
-    DefaultAttributePersistenceProvider() = default;
+    constexpr DefaultAttributePersistenceProvider() {}
 
     CHIP_ERROR Init(PersistentStorageDelegate * storage) { return StorageDelegateWrapper::Init(storage); }
 
