@@ -37,17 +37,12 @@ using chip::Protocols::InteractionModel::Status;
 namespace {
 bool NullableCharSpanEqual(const DataModel::Nullable<CharSpan> & a, const DataModel::Nullable<CharSpan> & b)
 {
-    if (a.IsNull() && b.IsNull())
+    if (a.IsNull() || b.IsNull())
     {
-        return true;
+        return a.IsNull() == b.IsNull();
     }
 
-    if (!a.IsNull() && !b.IsNull())
-    {
-        return a.Value().data_equal(b.Value());
-    }
-
-    return false;
+    return a.Value().data_equal(b.Value());
 }
 } // namespace
 
@@ -63,11 +58,11 @@ Instance::~Instance()
 
 CHIP_ERROR Instance::Init()
 {
-    SetMeterType(std::nullopt);
-    SetPointOfDelivery(std::nullopt);
-    SetMeterSerialNumber(std::nullopt);
-    SetProtocolVersion(std::nullopt);
-    SetPowerThreshold(std::nullopt);
+    mMeterType.SetNull();
+    mPointOfDelivery.SetNull();
+    mMeterSerialNumber.SetNull();
+    mProtocolVersion.SetNull();
+    mPowerThreshold.SetNull();
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
     return CHIP_NO_ERROR;
 }
@@ -179,6 +174,12 @@ CHIP_ERROR Instance::SetProtocolVersion(const DataModel::Nullable<CharSpan> & ne
     return CHIP_NO_ERROR;
 }
 
+bool operator==(const Globals::Structs::PowerThresholdStruct::Type & a, const Globals::Structs::PowerThresholdStruct::Type & b)
+{
+    return a.powerThreshold == b.powerThreshold && a.apparentPowerThreshold == b.apparentPowerThreshold &&
+        a.powerThresholdSource == b.powerThresholdSource;
+}
+
 CHIP_ERROR Instance::SetPowerThreshold(const DataModel::Nullable<Globals::Structs::PowerThresholdStruct::Type> & newValue)
 {
     if (newValue.IsNull())
@@ -192,11 +193,7 @@ CHIP_ERROR Instance::SetPowerThreshold(const DataModel::Nullable<Globals::Struct
     }
     else
     {
-        // This is needed because PowerThresholdStruct has no operator==
-        if (!mPowerThreshold.IsNull() &&
-            (newValue.Value().powerThreshold == mPowerThreshold.Value().powerThreshold &&
-             newValue.Value().apparentPowerThreshold == mPowerThreshold.Value().apparentPowerThreshold &&
-             newValue.Value().powerThresholdSource == mPowerThreshold.Value().powerThresholdSource))
+        if (!mPowerThreshold.IsNull() && mPowerThreshold.Value() == newValue.Value())
         {
             return CHIP_NO_ERROR;
         }

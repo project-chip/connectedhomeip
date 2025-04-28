@@ -60,8 +60,11 @@ public:
     CHIP_ERROR SetPowerThreshold(const DataModel::Nullable<Globals::Structs::PowerThresholdStruct::Type> & value);
 
 private:
+    // The maximum string size of 64 bytes is specified in:
+    // Matter Application Cluster Specification - Meter Identification Cluster
+    static constexpr size_t kMaximumStringSize = 64;
+
     // Attribute storage
-    static constexpr size_t kMaximumStringSize     = 64;
     char mPointOfDeliveryBuf[kMaximumStringSize]   = {};
     char mMeterSerialNumberBuf[kMaximumStringSize] = {};
     char mProtocolVersionBuf[kMaximumStringSize]   = {};
