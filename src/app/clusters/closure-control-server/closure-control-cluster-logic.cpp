@@ -258,9 +258,6 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
 
         // Validate the incoming Speed value and FeatureMap conformance.
         if (incomingOverallState.speed.HasValue())
-        {
-            // If the speed member is present in the incoming OverallState, we need to check if the Speed feature is
-            // supported by the closure. If the Speed feature is not supported, return an error.
             VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
             if (!incomingOverallState.speed.Value().IsNull())

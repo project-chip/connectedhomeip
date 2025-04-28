@@ -42,7 +42,6 @@ enum AreaTypeTag : enum8 {
   kGardenDoor = 37;
   kGuestBathroom = 38;
   kGuestBedroom = 39;
-  kGuestRestroom = 40;
   kGuestRoom = 41;
   kGym = 42;
   kHallway = 43;
@@ -50,7 +49,6 @@ enum AreaTypeTag : enum8 {
   kKidsRoom = 45;
   kKidsBedroom = 46;
   kKitchen = 47;
-  kLarder = 48;
   kLaundryRoom = 49;
   kLawn = 50;
   kLibrary = 51;
@@ -75,7 +73,6 @@ enum AreaTypeTag : enum8 {
   kRamp = 70;
   kReceptionRoom = 71;
   kRecreationRoom = 72;
-  kRestroom = 73;
   kRoof = 74;
   kSauna = 75;
   kScullery = 76;
@@ -97,39 +94,13 @@ enum AreaTypeTag : enum8 {
   kUtilityRoom = 92;
   kWard = 93;
   kWorkshop = 94;
+  kToilet = 95;
 }
 
 enum AtomicRequestTypeEnum : enum8 {
   kBeginWrite = 0;
   kCommitWrite = 1;
   kRollbackWrite = 2;
-}
-
-enum FloorSurfaceTag : enum8 {
-  kCarpet = 0;
-  kCeramic = 1;
-  kConcrete = 2;
-  kCork = 3;
-  kDeepCarpet = 4;
-  kDirt = 5;
-  kEngineeredWood = 6;
-  kGlass = 7;
-  kGrass = 8;
-  kHardwood = 9;
-  kLaminate = 10;
-  kLinoleum = 11;
-  kMat = 12;
-  kMetal = 13;
-  kPlastic = 14;
-  kPolishedConcrete = 15;
-  kRubber = 16;
-  kRug = 17;
-  kSand = 18;
-  kStone = 19;
-  kTatami = 20;
-  kTerrazzo = 21;
-  kTile = 22;
-  kVinyl = 23;
 }
 
 enum LandmarkTag : enum8 {
@@ -186,6 +157,13 @@ enum LandmarkTag : enum8 {
   kWineCooler = 50;
 }
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> eb52279043 (Updated Closure control app and dimension app business logic and server logic)
+>>>>>>> bf3d80f04c (Updated Closure control app and dimension app business logic and server logic)
 enum LocationTag : enum8 {
   kIndoor = 0;
   kOutdoor = 1;
@@ -193,6 +171,7 @@ enum LocationTag : enum8 {
   kOutside = 3;
 }
 
+<<<<<<< HEAD
 enum MeasurementTypeEnum : enum16 {
   kUnspecified = 0;
   kVoltage = 1;
@@ -214,6 +193,13 @@ enum MeasurementTypeEnum : enum16 {
   kSoilMoisture = 17;
 }
 
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> 2f1934c3f5 (Closure app changes)
+=======
+>>>>>>> eb52279043 (Updated Closure control app and dimension app business logic and server logic)
+>>>>>>> bf3d80f04c (Updated Closure control app and dimension app business logic and server logic)
 enum PositionTag : enum8 {
   kLeft = 0;
   kRight = 1;
@@ -303,6 +289,26 @@ struct MeasurementAccuracyStruct {
 struct AtomicAttributeStatusStruct {
   attrib_id attributeID = 0;
   status statusCode = 1;
+<<<<<<< HEAD
+=======
+=======
+struct PowerThresholdStruct {
+  optional power_mw powerThreshold = 0;
+  optional power_mva apparentPowerThreshold = 1;
+  nullable PowerThresholdSourceEnum powerThresholdSource = 2;
+}
+
+struct PriceStruct {
+  money amount = 0;
+  CurrencyStruct currency = 1;
+}
+
+struct TestGlobalStruct {
+  char_string<128> name = 0;
+  nullable TestGlobalBitmap myBitmap = 1;
+  optional nullable TestGlobalEnum myEnum = 2;
+>>>>>>> 2f1934c3f5 (Closure app changes)
+>>>>>>> bf3d80f04c (Updated Closure control app and dimension app business logic and server logic)
 }
 
 struct LocationDescriptorStruct {
@@ -311,6 +317,11 @@ struct LocationDescriptorStruct {
   nullable AreaTypeTag areaType = 2;
 }
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> bf3d80f04c (Updated Closure control app and dimension app business logic and server logic)
 struct PowerThresholdStruct {
   optional power_mw powerThreshold = 0;
   optional power_mva apparentPowerThreshold = 1;
@@ -321,6 +332,21 @@ struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
   optional nullable TestGlobalEnum myEnum = 2;
+<<<<<<< HEAD
+=======
+=======
+struct PriceStruct {
+  money amount = 0;
+  CurrencyStruct currency = 1;
+}
+
+=======
+>>>>>>> eb52279043 (Updated Closure control app and dimension app business logic and server logic)
+struct AtomicAttributeStatusStruct {
+  attrib_id attributeID = 0;
+  status statusCode = 1;
+>>>>>>> 2f1934c3f5 (Closure app changes)
+>>>>>>> bf3d80f04c (Updated Closure control app and dimension app business logic and server logic)
 }
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
@@ -799,7 +825,7 @@ cluster LocalizationConfiguration = 43 {
       user. As such, Nodes that visually or audibly convey measurable values to the user need a
       mechanism by which they can be configured to use a user’s preferred unit. */
 cluster UnitLocalization = 45 {
-  revision 1;
+  revision 2;
 
   enum TempUnitEnum : enum8 {
     kFahrenheit = 0;
@@ -812,6 +838,7 @@ cluster UnitLocalization = 45 {
   }
 
   attribute access(write: manage) optional TempUnitEnum temperatureUnit = 0;
+  provisional readonly attribute optional TempUnitEnum supportedTemperatureUnits[] = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2802,11 +2829,17 @@ endpoint 1 {
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
 <<<<<<< HEAD
+<<<<<<< HEAD
     ram      attribute clusterRevision default = 0x0005;
 =======
+=======
+>>>>>>> bf3d80f04c (Updated Closure control app and dimension app business logic and server logic)
 <<<<<<< HEAD
 =======
     ram      attribute clusterRevision default = 4;
+=======
+    ram      attribute clusterRevision default = 6;
+>>>>>>> eb52279043 (Updated Closure control app and dimension app business logic and server logic)
 
     handle command Identify;
     handle command TriggerEffect;

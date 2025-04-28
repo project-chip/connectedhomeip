@@ -28,12 +28,13 @@
 #include <platform/CHIPDeviceLayer.h>
 
 namespace {
-    const uint32_t kExampleCalibrateCountDown     = 10;
-    const uint32_t kExampleMotionCountDown        = 15;
-    const uint32_t kExampleWaitforMotionCountDown = 15;
+    constexpr uint32_t kExampleCalibrateCountDown     = 10;
+    constexpr uint32_t kExampleMotionCountDown        = 15;
+    constexpr uint32_t kExampleWaitforMotionCountDown = 15;
 } // namespace
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters::ClosureControl;
 
 using Protocols::InteractionModel::Status;
@@ -66,13 +67,13 @@ PositioningEnum ClosureControlDelegate::GetStatePositionFromTarget(TargetPositio
     }
 }
 
-chip::app::DataModel::Nullable<ElapsedS> ClosureControlDelegate::GetRemainingTime()
+DataModel::Nullable<ElapsedS> ClosureControlDelegate::GetRemainingTime()
 {
     
     if (mCountDownTime.IsNull())
-        return chip::app::DataModel::NullNullable;
+        return DataModel::NullNullable;
 
-    return chip::app::DataModel::MakeNullable((mCountDownTime.Value() - static_cast<ElapsedS>(mMovingTime + mWaitingTime + mCalibratingTime)));
+    return DataModel::MakeNullable((mCountDownTime.Value() - static_cast<ElapsedS>(mMovingTime + mWaitingTime + mCalibratingTime)));
 }
 
 static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data)
@@ -84,9 +85,10 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
     delegate->GetLogic()->GetMainState(state);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    auto countdown_time = delegate->GetRemainingTime();
+    DataModel::Nullable<ElapsedS> countdown_time = delegate->GetRemainingTime();
 
-    if (countdown_time.IsNull() || (!countdown_time.IsNull() && countdown_time.Value() > 0))
+    // if (countdown_time.IsNull() || (!countdown_time.IsNull() && countdown_time.Value() > 0))
+    if (countdown_time.IsNull() || countdown_time.Value() > 0)
     {
         if (state == MainStateEnum::kMoving)
         {
@@ -151,7 +153,27 @@ void ClosureControlDelegate::HandleCountdownTimeExpired()
     if (state == MainStateEnum::kMoving)
     {
         chip::DeviceLayer::PlatformMgr().LockChipStack();
-        logic->PostMovementCompletedEvent();
+        // Update OverallState object
+        DataModel::Nullable<GenericOverallTarget> target;
+        GetLogic()->GetOverallTarget(target);
+        GenericOverallState current {};
+        // Copy position if present
+        if (target.Value().position.HasValue())
+        {
+            current.positioning.SetValue(DataModel::MakeNullable(GetStatePositionFromTarget(target.Value().position.Value())));
+        }
+        // Copy latch if present
+        if (target.Value().latch.HasValue())
+        {
+            current.latch.SetValue(DataModel::MakeNullable(target.Value().latch.Value()));
+        }
+        // Copy speed if present
+        if (target.Value().speed.HasValue())
+        {
+            current.speed.SetValue(DataModel::MakeNullable(target.Value().speed.Value()));
+        }
+        GetLogic()->SetOverallState(DataModel::MakeNullable(current));
+        logic->GenerateMovementCompletedEvent();
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     }
     
@@ -206,7 +228,7 @@ Status ClosureControlDelegate::HandleStopCommand()
     mMovingTime = 0;
     mWaitingTime = 0;
     
-    mCountDownTime.SetNull();
+    mCountDownTime.SetNonNull(0);
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     GetLogic()->SetCountdownTimeFromDelegate(mCountDownTime);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
@@ -214,7 +236,7 @@ Status ClosureControlDelegate::HandleStopCommand()
     //Trigger Stop Action.
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
-    VerifyOrReturnError(GetLogic()->PostMovementCompletedEvent() == CHIP_NO_ERROR, Status::Failure);
+    VerifyOrReturnError(GetLogic()->GenerateMovementCompletedEvent() == CHIP_NO_ERROR, Status::Failure);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     return Status::Success;
@@ -235,16 +257,13 @@ Protocols::InteractionModel::Status ClosureControlDelegate::HandleMotion()
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     
     //Trigger Motion Action
-    
-    //TODO: Update Current State
-
     return Status::Success;
 }
 
 CHIP_ERROR ClosureControlDelegate::GetCurrentErrorAtIndex(size_t index, ClosureErrorEnum & closureError)
 {
     // TODO: Add  error list handling
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 
 bool ClosureControlDelegate::IsManualLatchingNeeded()

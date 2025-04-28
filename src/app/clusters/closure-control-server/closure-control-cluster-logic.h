@@ -334,6 +334,10 @@ private:
      * @brief Function validates if the requested overallState positioning is supported by the closure.
      *        Function validates against the FeatureMap conformance to validate support.
      *
+     *        - FullyClosed, FullyOpened, PartiallyOpened and OpenedAtSignature always return true since they are mandatory.
+     *        - OpenedForPedestrian returns true if the Pedestrian feature is supported, false otherwise.
+     *        - OpenedForVentilation returns true if the Ventilation feature is supported, false otherwise.
+     *
      * @param positioning requested Positioning to validate
      *
      * @return true if the requested Positioning is supported
@@ -345,6 +349,10 @@ private:
      * @brief Function validates if the requested OverallTarget positioning is supported by the closure.
      *        Function validates agaisnt the FeatureMap conformance to validate support.
      *
+     *        - CloseInFull, OpenInFull and Signature always return true since they are mandatory.
+     *        - Pedestrian returns true if the Pedestrian feature is supported, false otherwise.
+     *        - Ventilation returns true if the Ventilation feature is supported, false otherwise.
+     *
      * @param positioning requested Positioning to validate
      *
      * @return true if the requested Positioning is supported
@@ -353,9 +361,16 @@ private:
     bool IsSupportedOverallTargetPositioning(TargetPositionEnum positioning) const;
 
     /**
-     * @brief Updates the countdown time based on the Quiet reporting conditions of the attribute.
+     * @brief Update the stored countdown time
+     *        When the attribute should be marked dirty changes based on wether the change is from the delegate or the internal
+     *        cluster processing.
      *
-     * @param fromDelegate true if the countdown time is being configured by the delegate, false otherwise
+     *        If countdown time is changed due to the internal cluster logic, the attribute will be marked dirty,
+     *        otherwise, configured quiet reporting rules apply
+     *
+     *        See Set function comment above for common behavior
+     *
+     * @param fromDelegate true if the coutdown time is being configured by the delegate, false otherwise
      */
     CHIP_ERROR SetCountdownTime(const DataModel::Nullable<ElapsedS> & countdownTime, bool fromDelegate);
 
