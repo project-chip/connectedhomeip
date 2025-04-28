@@ -841,12 +841,12 @@ CHIP_ERROR WiFiPAFEndPoint::DebugPktAckSn(const PktDirect_t pktDirect, Encoding:
     if (rxFlags.Has(WiFiPAFTP::HeaderFlags::kFragmentAck))
     {
         err = static_cast<Encoding::LittleEndian::Reader &>(reader.Skip(SkipOffset)).Read8(&ackNum).StatusCode();
-        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+        ReturnErrorOnFailure(err);
         SkipOffset = 0;
         hasAck     = true;
     }
     err = static_cast<Encoding::LittleEndian::Reader &>(reader.Skip(SkipOffset)).Read8(&snNum).StatusCode();
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+    ReturnErrorOnFailure(err);
 
     StringBuilder<4> AckBuff;
     if (hasAck == false)
