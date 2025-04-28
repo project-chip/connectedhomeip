@@ -346,7 +346,10 @@ CHIP_ERROR emberAfSetDynamicEndpointWithEpUniqueId(uint16_t index, EndpointId id
     emAfEndpoints[index].dataVersions   = dataVersionStorage.data();
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
     MutableCharSpan targetSpan(emAfEndpoints[index].endpointUniqueId);
-    VerifyOrReturnError(CopyCharSpanToMutableCharSpan(endpointUniqueId, targetSpan), CHIP_ERROR_BUFFER_TOO_SMALL);
+    if(CopyCharSpanToMutableCharSpan(endpointUniqueId, targetSpan) != CHIP_NO_ERROR)
+    {
+      return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
 
     // Ensure that the size of emAfEndpoints[index].endpointUniqueId fits within uint8_t
     static_assert(sizeof(emAfEndpoints[0].endpointUniqueId) <= UINT8_MAX,
