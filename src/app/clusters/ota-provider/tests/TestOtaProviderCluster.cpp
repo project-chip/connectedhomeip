@@ -71,7 +71,7 @@ TEST_F(TestOtaProviderLogic, QueryImageValidation)
 
     // Location MUST be 2 bytes.
     static constexpr CharSpan tooLargeLocationSpan = "abc_too_large"_span;
-    input.location                        = MakeOptional(tooLargeLocationSpan);
+    input.location                                 = MakeOptional(tooLargeLocationSpan);
     EXPECT_EQ(logic.QueryImage(kCommandPath, input, nullptr /* handler */), Status::InvalidCommand);
 
     // Valid location (empty is ok).
