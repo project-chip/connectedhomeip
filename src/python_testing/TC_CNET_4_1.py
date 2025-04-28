@@ -68,7 +68,7 @@ class TC_CNET_4_1(MatterBaseTest):
                      "Verify for the presence of an element with value 49 (0x0031) in the ServerList"),
             TestStep(3, "TH reads the MaxNetworks attribute from the DUT",
                      "Verify that MaxNetworks attribute value is within a range of 1 to 255"),
-            TestStep(4, "TH reads the Networks attribute list from the DUT",
+            TestStep(4, "TH reads the Networks attribute list from the DUT on all available endpoints",
                      "Verify that each element in the Networks attribute list has the following fields: 'NetworkID', 'connected'.\n\
                       NetworkID field is of type octstr with a length range 1 to 32 \n\
                       The connected field is of type bool \n\
