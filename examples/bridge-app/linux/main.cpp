@@ -260,15 +260,12 @@ DataVersion gComposedTempSensor2DataVersions[MATTER_ARRAY_SIZE(bridgedTempSensor
 
 // ---------------------------------------------------------------------------
 
-#if !CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
 int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const EmberAfDeviceType> & deviceTypeList,
-                      const Span<DataVersion> & dataVersionStorage, chip::EndpointId parentEndpointId = chip::kInvalidEndpointId)
-#else
-
-int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const EmberAfDeviceType> & deviceTypeList,
-                      const Span<DataVersion> & dataVersionStorage, chip::CharSpan epUniqueId,
+                      const Span<DataVersion> & dataVersionStorage, 
+                      #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+                      chip::CharSpan epUniqueId,
+                      #endif
                       chip::EndpointId parentEndpointId = chip::kInvalidEndpointId)
-#endif
 {
     uint8_t index = 0;
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)

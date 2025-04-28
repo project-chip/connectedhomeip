@@ -1070,8 +1070,10 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                                       spec_location="Root node device type")
                     self.fail_current_test("Root node device type is listed on non zero endpoints")
 
-                # TODO : Step 1b.4.1, 1b.4.2 needs to the run manually as PIXIT.DESC.DeviceTypeConformanceList
-                #       should be selected and based on DUT type.
+                # TODO : Step 1b.4.1, 1b.4.2 needs to be run manually as PIXIT.DESC.DeviceTypeConformanceList
+                #       is not availbale as of now. An issue is created : https://github.com/project-chip/connectedhomeip/issues/38640
+                self.print_step("1b.4.1","Step 1b.4.1 is skipped, test is manually")
+                self.print_step("1b.4.2","Step 1b.4.2 is skipped, test is manually")
 
                 self.print_step("1b.4.3", "Revision should not be less than 1")
 
@@ -1081,8 +1083,11 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                     if not device_revision:
                         self.fail_current_test("Revision is less than 1")
 
-                # TODO : Step 2 and 3 needs to the run manually as PIXIT.DESC.DeviceTypeConformanceList
-                #       should be selected and based on DUT type.
+                # TODO : Step 2 and 3 needs to be run manually as PIXIT.DESC.DeviceTypeConformanceList
+                #       is not availbale as of now. An issue is created : https://github.com/project-chip/connectedhomeip/issues/38640
+                self.print_step("2","Step 2 is skipped, test is manually")
+                self.print_step("3","Step 3 is skipped, test is manually")
+
                 self.print_step("4", "TH reads PartsList attribute for each endpoint")
 
                 if parts_list_per_ep_non_0:
