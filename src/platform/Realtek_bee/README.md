@@ -1,9 +1,9 @@
-# Overview of CHIP Qorvo QPG Adaption
+# Overview of CHIP Realtek Bee Adaption
 
 The following is an overview of the Qorvo adaptation of CHIP. Most of this code
 will have parallels in any new adaptation.
 
-(All file names are relative to `connectedhomeip/src/platform/qpg...`).
+(All file names are relative to `connectedhomeip/src/platform/realtek_bee...`).
 
 `PlatformManagerImpl.h`<br>`PlatformManagerImpl.cpp`
 

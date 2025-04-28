@@ -158,14 +158,17 @@ CHIP_ERROR FactoryDataProvider::GetCertificationDeclaration(MutableByteSpan & ou
 {
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 
-#if CONFIG_FACTORY_DATA
+#if CHIP_USE_DEVICE_CONFIG_CERTIFICATION_DECLARATION
+    constexpr uint8_t kCdForAllExamples[] = CHIP_DEVICE_CONFIG_CERTIFICATION_DECLARATION;
+    err                                   = CopySpanToMutableSpan(ByteSpan{ kCdForAllExamples }, outBuffer);
+#elif CONFIG_FACTORY_DATA
     VerifyOrReturnError(outBuffer.size() >= mFactoryData.dac.cd.len, CHIP_ERROR_BUFFER_TOO_SMALL);
     VerifyOrReturnError(mFactoryData.dac.cd.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
     memcpy(outBuffer.data(), mFactoryData.dac.cd.value, mFactoryData.dac.cd.len);
 
     outBuffer.reduce_size(mFactoryData.dac.cd.len);
-    err = CHIP_NO_ERROR;
+    err                      = CHIP_NO_ERROR;
 #else
     const uint8_t kCdForAllExamples[] = {
         0x30, 0x82, 0x02, 0x19, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x07, 0x02, 0xa0, 0x82, 0x02, 0x0a, 0x30,
@@ -198,7 +201,7 @@ CHIP_ERROR FactoryDataProvider::GetCertificationDeclaration(MutableByteSpan & ou
         0x7c,
     };
 
-    err                      = CopySpanToMutableSpan(ByteSpan(kCdForAllExamples), outBuffer);
+    err = CopySpanToMutableSpan(ByteSpan(kCdForAllExamples), outBuffer);
 #endif // CONFIG_FACTORY_DATA
 
     return err;
