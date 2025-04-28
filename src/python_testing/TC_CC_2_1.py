@@ -214,8 +214,8 @@ class TC_CC_2_1(MatterBaseTest):
             else:
                 asserts.fail("Validation not possible as not data type provided.")
 
-            # if we land at this point it mean validation had passed
-            # check if string has uint and verify is we need to compare against a min or max value
+            # If we land at this point it mean validation had passed
+            # Check if string has uint and verify is we need to compare against a min or max value_verify_first_4bits
             if 'uint' in data_type.name.lower() and (max_len is not None or min_len is not None):
                 if isinstance(min_len, int):
                     logger.info(f"Min len defined validation max range for uint {min_len}")
@@ -227,11 +227,11 @@ class TC_CC_2_1(MatterBaseTest):
                                         f"Attribute {attribute} with value {attr_val} is out of range (max): {max_len}")
             return attr_val
 
-    def _verify_first_4bits(self, numa, numb):
-        # get the first 4 bits and compare them
+    def _verify_lower_4bits(self, numa, numb):
+        # Get the lowest 4 bits and compare them
         tmp_a = numa & (2**4-1)
         tmp_b = numb & (2**4-1)
-        logger.info("Verifying if first 4 bits are equal.")
+        logger.info("Verifying if lower 4 bits are equal.")
         logger.info(f"Num a : {bin(tmp_a)}")
         logger.info(f"Num b : {bin(tmp_b)}")
         asserts.assert_equal(tmp_a, tmp_b, "Lower 4 bits of values are not equal")
@@ -296,13 +296,13 @@ class TC_CC_2_1(MatterBaseTest):
         await self._verify_attribute(self.attributes.ColorLoopStoredEnhancedHue, ValueTypesEnum.UINT16)
 
         self.step("18.a")
-        # read and save FeatureMap attribute
+        # Read and save FeatureMap attribute
         feature_map_value = await self.read_single_attribute_check_success(cluster=self.cluster, endpoint=self.endpoint, attribute=self.attributes.FeatureMap)
 
         self.step(19)
         color_capabilities_value = await self._verify_attribute(self.attributes.ColorCapabilities, ValueTypesEnum.UINT16, max_len=0x001f)
-        # verify the first 4 bits of colorcapabilities are the same on FeatureMap
-        self._verify_first_4bits(feature_map_value, color_capabilities_value)
+        # Verify the lower 4 bits of colorcapabilities are the same on FeatureMap
+        self._verify_lower_4bits(feature_map_value, color_capabilities_value)
 
         self.step(20)
         colortempphysicalminmireds_val = await self._verify_attribute(self.attributes.ColorTempPhysicalMinMireds, ValueTypesEnum.UINT16, min_len=1, max_len=65279)
@@ -339,7 +339,7 @@ class TC_CC_2_1(MatterBaseTest):
             # Verify for NumberOfPrimaries section
             # We are at step 24 before all the number of primaries checks
             current_step = 24
-            # range is defined from 1-6
+            # Range is defined from 1-6
             for primariesindex in range(1, 7):
                 logger.info(
                     f"Skip if the test index {primariesindex} is graeter than NumberOfPrimaries {number_of_primaries_value} ?")
