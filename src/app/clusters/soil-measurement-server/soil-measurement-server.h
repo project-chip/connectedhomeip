@@ -33,10 +33,7 @@ namespace SoilMeasurement {
 struct MeasurementData
 {
     Structs::MeasurementAccuracyStruct::Type soilMoistureMeasurementLimits;
-    chip::app::DataModel::Nullable<uint16_t> soilMoistureMeasuredValue;
 };
-
-inline constexpr uint16_t kClusterRevision = 1;
 
 class SoilMeasurementAttrAccess : public AttributeAccessInterface
 {
@@ -54,7 +51,6 @@ private:
 };
 
 CHIP_ERROR SetSoilMeasurementAccuracy(EndpointId endpointId, const Structs::MeasurementAccuracyStruct::Type & accuracy);
-CHIP_ERROR SetSoilMoistureMeasuredValue(EndpointId endpointId, const DataModel::Nullable<uint16_t> & soilMoistureMeasuredValue);
 
 MeasurementData * SoilMeasurementDataForEndpoint(EndpointId endpointId);
 

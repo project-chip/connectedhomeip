@@ -52,7 +52,6 @@ CHIP_ERROR SoilMeasurementAttrAccess::Init()
     // Initialize the soil moisture measurement limits to default values
     for (auto & measurement : gMeasurements)
     {
-        measurement.soilMoistureMeasuredValue.SetNull();
         measurement.soilMoistureMeasurementLimits = { .measurementType  = MeasurementTypeEnum::kSoilMoisture,
                                                       .measured         = true,
                                                       .minMeasuredValue = 0,
@@ -80,12 +79,6 @@ CHIP_ERROR SoilMeasurementAttrAccess::Read(const ConcreteReadAttributePath & aPa
     case Attributes::SoilMoistureMeasurementLimits::Id: {
         return aEncoder.Encode(data->soilMoistureMeasurementLimits);
     }
-    case Attributes::SoilMoistureMeasuredValue::Id: {
-        return aEncoder.Encode(data->soilMoistureMeasuredValue);
-    }
-    case ClusterRevision::Id: {
-        return aEncoder.Encode(kClusterRevision);
-    }
     default: {
         break;
     }
@@ -109,18 +102,6 @@ MeasurementData * SoilMeasurementDataForEndpoint(EndpointId endpointId)
         return nullptr;
     }
     return &gMeasurements[index];
-}
-
-CHIP_ERROR SetSoilMoistureMeasuredValue(EndpointId endpointId, const DataModel::Nullable<uint16_t> & soilMoistureMeasuredValue)
-{
-    MeasurementData * data = SoilMeasurementDataForEndpoint(endpointId);
-    VerifyOrReturnError(data != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    data->soilMoistureMeasuredValue = soilMoistureMeasuredValue;
-
-    MatterReportingAttributeChangeCallback(endpointId, SoilMeasurement::Id, SoilMoistureMeasuredValue::Id);
-
-    return CHIP_NO_ERROR;
 }
 
 // This function is intended for the application to set the soil measurement accuracy limits to the proper values during init.
