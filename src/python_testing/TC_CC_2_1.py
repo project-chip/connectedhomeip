@@ -146,7 +146,7 @@ class TC_CC_2_1(MatterBaseTest):
     async def verify_primary_index(self, primary_index: int) -> bool:
         # Read all PrimaryN<X,Y,Intensity> attributes available in the cluster
         instance_attribute_names = [attr for attr in self.attributes.__dict__.keys(
-        ) if not attr.startswith("__") and attr.startswith('Primary')]
+        ) if attr.startswith('Primary')]
         # Attributes to search
         primary_list = ["Primary{primary}X", "Primary{primary}Y", "Primary{primary}Intensity"]
         # Validate the expected attribute is found.
@@ -234,7 +234,7 @@ class TC_CC_2_1(MatterBaseTest):
         logger.info("Verifying if first 4 bits are equal.")
         logger.info(f"Num a : {bin(tmp_a)}")
         logger.info(f"Num b : {bin(tmp_b)}")
-        asserts.assert_equal(tmp_a, tmp_b, "Numbers are not equal in bit after bit comparsion")
+        asserts.assert_equal(tmp_a, tmp_b, "Lower 4 bits of values are not equal")
 
     @async_test_body
     async def test_TC_CC_2_1(self):
@@ -254,10 +254,10 @@ class TC_CC_2_1(MatterBaseTest):
         await self._verify_attribute(self.attributes.RemainingTime, ValueTypesEnum.UINT16)
 
         self.step(5)
-        await self._verify_attribute(self.attributes.CurrentX, ValueTypesEnum.UINT16, max_len=0xfeff)
+        await self._verify_attribute(self.attributes.CurrentX, ValueTypesEnum.UINT16, max_len=65279)
 
         self.step(6)
-        await self._verify_attribute(self.attributes.CurrentY, ValueTypesEnum.UINT16, max_len=0xfeff)
+        await self._verify_attribute(self.attributes.CurrentY, ValueTypesEnum.UINT16, max_len=65279)
 
         self.step(7)
         await self._verify_attribute(self.attributes.DriftCompensation, ValueTypesEnum.ENUM, enum_range=range(0, 5))
@@ -266,7 +266,7 @@ class TC_CC_2_1(MatterBaseTest):
         await self._verify_attribute(self.attributes.CompensationText, ValueTypesEnum.STRING, max_len=254)
 
         self.step(9)
-        await self._verify_attribute(self.attributes.ColorTemperatureMireds, ValueTypesEnum.UINT16, min_len=1, max_len=0xfeff)
+        await self._verify_attribute(self.attributes.ColorTemperatureMireds, ValueTypesEnum.UINT16, min_len=1, max_len=65279)
 
         self.step(10)
         await self._verify_attribute(self.attributes.ColorMode, ValueTypesEnum.ENUM, enum_range=range(0, 3))
@@ -305,10 +305,10 @@ class TC_CC_2_1(MatterBaseTest):
         self._verify_first_4bits(feature_map_value, color_capabilities_value)
 
         self.step(20)
-        colortempphysicalminmireds_val = await self._verify_attribute(self.attributes.ColorTempPhysicalMinMireds, ValueTypesEnum.UINT16, min_len=1, max_len=0xfeff)
+        colortempphysicalminmireds_val = await self._verify_attribute(self.attributes.ColorTempPhysicalMinMireds, ValueTypesEnum.UINT16, min_len=1, max_len=65279)
 
         self.step(21)
-        colortempphysicalmaxmireds_val = await self._verify_attribute(self.attributes.ColorTempPhysicalMaxMireds, ValueTypesEnum.UINT16, min_len=1, max_len=0xfeff)
+        colortempphysicalmaxmireds_val = await self._verify_attribute(self.attributes.ColorTempPhysicalMaxMireds, ValueTypesEnum.UINT16, min_len=1, max_len=65279)
 
         self.step(22)
         await self._verify_attribute(self.attributes.CoupleColorTempToLevelMinMireds, ValueTypesEnum.UINT16, min_len=colortempphysicalminmireds_val, max_len=colortempphysicalmaxmireds_val)
@@ -328,7 +328,7 @@ class TC_CC_2_1(MatterBaseTest):
         # Read NumberOfPrimaries from the cluster.
         numberofprimaries_value = await self._verify_attribute(self.attributes.NumberOfPrimaries, ValueTypesEnum.UINT8, min_len=0, max_len=6)
         if numberofprimaries_value == 0:
-            logger.info("NumberOfPrimaries is 0 skipping from 25 to 43.")
+            logger.info("NumberOfPrimaries is 0 skipping steps 25 through 42.")
             for i in range(25, 43):
                 self.skip_step(i)
         else:
@@ -353,44 +353,44 @@ class TC_CC_2_1(MatterBaseTest):
                 # Get the attributes to check then perform guard (at _verify_attribute)
                 current_step += 1
                 self.step(current_step)
-                await self._verify_attribute(getattr(self.attributes, f"Primary{primariesindex}X"), ValueTypesEnum.UINT16, max_len=0xfeff)
+                await self._verify_attribute(getattr(self.attributes, f"Primary{primariesindex}X"), ValueTypesEnum.UINT16, max_len=65279)
                 current_step += 1
                 self.step(current_step)
-                await self._verify_attribute(getattr(self.attributes, f"Primary{primariesindex}Y"), ValueTypesEnum.UINT16, max_len=0xfeff)
+                await self._verify_attribute(getattr(self.attributes, f"Primary{primariesindex}Y"), ValueTypesEnum.UINT16, max_len=65279)
                 current_step += 1
                 self.step(current_step)
                 await self._verify_attribute(getattr(self.attributes, f"Primary{primariesindex}Intensity"), ValueTypesEnum.UINT8)
 
         # No more check numberofprimaries at this point
         self.step(43)
-        await self._verify_attribute(self.attributes.WhitePointX, ValueTypesEnum.UINT16, max_len=0xfeff)
+        await self._verify_attribute(self.attributes.WhitePointX, ValueTypesEnum.UINT16, max_len=65279)
 
         self.step(44)
-        await self._verify_attribute(self.attributes.WhitePointY, ValueTypesEnum.UINT16, max_len=0xfeff)
+        await self._verify_attribute(self.attributes.WhitePointY, ValueTypesEnum.UINT16, max_len=65279)
 
         self.step(45)
-        await self._verify_attribute(self.attributes.ColorPointRX, ValueTypesEnum.UINT16, max_len=0xfeff)
+        await self._verify_attribute(self.attributes.ColorPointRX, ValueTypesEnum.UINT16, max_len=65279)
 
         self.step(46)
-        await self._verify_attribute(self.attributes.ColorPointRY, ValueTypesEnum.UINT16, max_len=0xfeff)
+        await self._verify_attribute(self.attributes.ColorPointRY, ValueTypesEnum.UINT16, max_len=65279)
 
         self.step(47)
         await self._verify_attribute(self.attributes.ColorPointRIntensity, ValueTypesEnum.UINT8)
 
         self.step(48)
-        await self._verify_attribute(self.attributes.ColorPointGX, ValueTypesEnum.UINT16, max_len=0xfeff)
+        await self._verify_attribute(self.attributes.ColorPointGX, ValueTypesEnum.UINT16, max_len=65279)
 
         self.step(49)
-        await self._verify_attribute(self.attributes.ColorPointGY, ValueTypesEnum.UINT16, max_len=0xfeff)
+        await self._verify_attribute(self.attributes.ColorPointGY, ValueTypesEnum.UINT16, max_len=65279)
 
         self.step(50)
         await self._verify_attribute(self.attributes.ColorPointGIntensity, ValueTypesEnum.UINT8)
 
         self.step(51)
-        await self._verify_attribute(self.attributes.ColorPointBX, ValueTypesEnum.UINT16, max_len=0xfeff)
+        await self._verify_attribute(self.attributes.ColorPointBX, ValueTypesEnum.UINT16, max_len=65279)
 
         self.step(52)
-        await self._verify_attribute(self.attributes.ColorPointBY, ValueTypesEnum.UINT16, max_len=0xfeff)
+        await self._verify_attribute(self.attributes.ColorPointBY, ValueTypesEnum.UINT16, max_len=65279)
 
         self.step(53)
         await self._verify_attribute(self.attributes.ColorPointBIntensity, ValueTypesEnum.UINT8)
