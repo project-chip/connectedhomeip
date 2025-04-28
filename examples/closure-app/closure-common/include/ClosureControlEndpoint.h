@@ -18,18 +18,18 @@
 
 #pragma once
 
-#include <app/clusters/closure-control-server/closure-control-cluster-logic.h>
 #include <app/clusters/closure-control-server/closure-control-cluster-delegate.h>
-#include <app/clusters/closure-control-server/closure-control-cluster-objects.h>
+#include <app/clusters/closure-control-server/closure-control-cluster-logic.h>
 #include <app/clusters/closure-control-server/closure-control-cluster-matter-context.h>
+#include <app/clusters/closure-control-server/closure-control-cluster-objects.h>
 #include <app/clusters/closure-control-server/closure-control-server.h>
 
-#include <lib/core/CHIPError.h>
-#include <unordered_set>
-#include <lib/core/DataModelTypes.h>
-#include <protocols/interaction_model/StatusCode.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <cmsis_os2.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
+#include <protocols/interaction_model/StatusCode.h>
+#include <unordered_set>
 
 namespace chip {
 namespace app {
@@ -74,10 +74,10 @@ public:
 
     DataModel::Nullable<ElapsedS> GetRemainingTime();
 
-    uint32_t mMovingTime                          = 0;
-    uint32_t mCalibratingTime                     = 0;
-    uint32_t mWaitingTime                         = 0;
-    DataModel::Nullable<ElapsedS> mCountDownTime  = DataModel::NullNullable;
+    uint32_t mMovingTime                         = 0;
+    uint32_t mCalibratingTime                    = 0;
+    uint32_t mWaitingTime                        = 0;
+    DataModel::Nullable<ElapsedS> mCountDownTime = DataModel::NullNullable;
 
     /**
      * @brief Handles the countdown timer expiration event
@@ -102,7 +102,6 @@ public:
 
 private:
     ClusterLogic * mLogic;
-
 
     /**
      * @brief Function to map TargetPositionEnum to Positioning Enum
@@ -137,7 +136,6 @@ private:
 class ClosureControlEndpoint
 {
 public:
-
     ClosureControlEndpoint(EndpointId endpoint) :
         mEndpoint(endpoint), mContext(mEndpoint), mDelegate(), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
     {

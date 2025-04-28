@@ -17,21 +17,21 @@
  */
 
 #include <ClosureDimensionEndpoint.h>
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/cluster-enums.h>
-#include <protocols/interaction_model/StatusCode.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/closure-dimension-server/closure-dimension-cluster-logic.h>
 #include <app/clusters/closure-dimension-server/closure-dimension-delegate.h>
 #include <app/clusters/closure-dimension-server/closure-dimension-matter-context.h>
 #include <app/clusters/closure-dimension-server/closure-dimension-server.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace {
-    constexpr chip::Percent100ths kLimitRangeMin = 0;
-    constexpr chip::Percent100ths kLimitRangeMax = 10000;
-    constexpr chip::Percent100ths kStep            = 1000;
-    const uint32_t kExampleMotionCountDown = 5;
-    const uint32_t kExampleStepCountDown   = 3000;
+constexpr chip::Percent100ths kLimitRangeMin = 0;
+constexpr chip::Percent100ths kLimitRangeMax = 10000;
+constexpr chip::Percent100ths kStep          = 1000;
+const uint32_t kExampleMotionCountDown       = 5;
+const uint32_t kExampleStepCountDown         = 3000;
 } // namespace
 
 using namespace chip;
@@ -41,11 +41,11 @@ using Protocols::InteractionModel::Status;
 CHIP_ERROR ClosureDimensionDelegate::Init()
 {
     GenericCurrentStateStruct currentState{ Optional<Percent100ths>(0), Optional<bool>(false),
-        Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
+                                            Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
     ReturnErrorOnFailure(mLogic->SetCurrentState(chip::app::DataModel::MakeNullable(currentState)));
 
     GenericTargetStruct targetState{ Optional<Percent100ths>(0), Optional<bool>(false),
-        Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
+                                     Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
     ReturnErrorOnFailure(mLogic->SetTarget(chip::app::DataModel::MakeNullable(targetState)));
 
     Structs::RangePercent100thsStruct::Type limitRange;
@@ -83,9 +83,8 @@ static void MotionTimerEventHandler(System::Layer * systemLayer, void * data)
     delegate->GetLogic()->SetCurrentState(current);
 }
 
-
 Status ClosureDimensionDelegate::HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<bool> & latch,
-    const Optional<Globals::ThreeLevelAutoEnum> & speed)
+                                                 const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
     (void) DeviceLayer::SystemLayer().CancelTimer(MotionTimerEventHandler, this);
 
@@ -108,11 +107,13 @@ static void HandleStepMotion(System::Layer * systemLayer, void * data)
     uint32_t newPos;
     if (direction == StepDirectionEnum::kDecrease)
     {
-        newPos = std::max((state.target.Value().position.Value() + 0), (state.currentState.Value().position.Value() - state.stepValue));
+        newPos =
+            std::max((state.target.Value().position.Value() + 0), (state.currentState.Value().position.Value() - state.stepValue));
     }
     else
     {
-        newPos = std::min((state.target.Value().position.Value() + 0), (state.currentState.Value().position.Value() + state.stepValue));
+        newPos =
+            std::min((state.target.Value().position.Value() + 0), (state.currentState.Value().position.Value() + state.stepValue));
     }
     state.currentState.Value().position.SetValue(newPos);
     delegate->GetLogic()->SetCurrentState(state.currentState);
@@ -122,37 +123,37 @@ static void HandleStepMotion(System::Layer * systemLayer, void * data)
     }
     else
     {
-        (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds16(kExampleStepCountDown),
-                                                     HandleStepMotion, delegate);
+        (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds16(kExampleStepCountDown), HandleStepMotion,
+                                                     delegate);
         // Trigger Step Action
     }
 }
 
 Status ClosureDimensionDelegate::HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
-    const Optional<Globals::ThreeLevelAutoEnum> & speed)
+                                            const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
     mTargetDirection = direction;
     (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds16(kExampleStepCountDown), HandleStepMotion, this);
 
-    //Trigger Step Action
+    // Trigger Step Action
     return Status::Success;
-
 }
 
 bool ClosureDimensionDelegate::IsManualLatchingNeeded()
 {
-     // Check if closure needs manual latching.(manufacture specific)
+    // Check if closure needs manual latching.(manufacture specific)
     return false;
 }
 
 CHIP_ERROR ClosureDimensionEndpoint::Init()
 {
     ClusterConformance conformance;
-    conformance.FeatureMap().Set(Feature::kPositioning)
-                            .Set(Feature::kMotionLatching)
-                            .Set(Feature::kUnit)
-                            .Set(Feature::kLimitation)
-                            .Set(Feature::kSpeed);
+    conformance.FeatureMap()
+        .Set(Feature::kPositioning)
+        .Set(Feature::kMotionLatching)
+        .Set(Feature::kUnit)
+        .Set(Feature::kLimitation)
+        .Set(Feature::kSpeed);
     conformance.OptionalAttributes().Set(OptionalAttributeEnum::kOverflow);
 
     ClusterInitParameters clusterInitParameters;
