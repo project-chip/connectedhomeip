@@ -23,17 +23,17 @@
 #include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
 #include <media-controller.h>
 
+using chip::app::Clusters::CameraAvStreamManagement::AudioCapabilitiesStruct;
 using chip::app::Clusters::CameraAvStreamManagement::AudioStreamStruct;
 using chip::app::Clusters::CameraAvStreamManagement::ImageSnapshot;
+using chip::app::Clusters::CameraAvStreamManagement::RateDistortionTradeOffStruct;
+using chip::app::Clusters::CameraAvStreamManagement::SnapshotCapabilitiesStruct;
 using chip::app::Clusters::CameraAvStreamManagement::SnapshotStreamStruct;
+using chip::app::Clusters::CameraAvStreamManagement::StreamUsageEnum;
 using chip::app::Clusters::CameraAvStreamManagement::VideoResolutionStruct;
 using chip::app::Clusters::CameraAvStreamManagement::VideoSensorParamsStruct;
 using chip::app::Clusters::CameraAvStreamManagement::VideoStreamStruct;
 using chip::app::Clusters::CameraAvStreamManagement::ViewportStruct;
-using chip::app::Clusters::CameraAvStreamManagement::AudioCapabilitiesStruct;
-using chip::app::Clusters::CameraAvStreamManagement::SnapshotCapabilitiesStruct;
-using chip::app::Clusters::CameraAvStreamManagement::RateDistortionTradeOffStruct;
-using chip::app::Clusters::CameraAvStreamManagement::StreamUsageEnum;
 
 struct VideoStream
 {
