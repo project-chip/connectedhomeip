@@ -15,6 +15,7 @@
 #    limitations under the License.
 
 import logging
+from concurrent.futures import Future
 
 from chip import webrtc
 from chip.clusters import WebRTCTransportProvider
@@ -25,6 +26,10 @@ from test_plan_support import commission_if_required
 
 
 class TC_WEBRTC_1_5(MatterBaseTest):
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self._session_established_future = Future()
 
     def steps_TC_WEBRTC_1_5(self) -> list[TestStep]:
         steps = [
@@ -47,6 +52,10 @@ class TC_WEBRTC_1_5(MatterBaseTest):
     def pics_TC_WEBRTC_1_5(self) -> list[str]:
         return ["WEBRTCR", "WEBRTCP"]
 
+    def check_webrtc_session_established(self) -> bool:
+        if not self._session_established_future.result(timeout=30):
+            raise RuntimeError("WebRTC Session not established")
+
     @async_test_body
     async def test_TC_WEBRTC_1_5(self):
         def on_answer(answer, peer):
@@ -57,6 +66,8 @@ class TC_WEBRTC_1_5(MatterBaseTest):
 
         def on_connected(peer):
             logging.debug("on_connected called")
+            if not self._session_established_future.done():
+                self._session_established_future.set_result(True)
 
         def on_disconnected(peer):
             logging.debug("on_disconnected called")
@@ -124,7 +135,10 @@ class TC_WEBRTC_1_5(MatterBaseTest):
             webrtc.SetCandidate(client, candidate)
 
         self.step(6)
-        self.wait_for_user_input("Verify WebRTC session is established")
+        if not self.is_pics_sdk_ci_only:
+            self.wait_for_user_input("Verify WebRTC session is established")
+        else:
+            self.check_webrtc_session_established()
 
         self.step(7)
         await self.send_single_cmd(cmd=WebRTCTransportProvider.Commands.EndSession(
