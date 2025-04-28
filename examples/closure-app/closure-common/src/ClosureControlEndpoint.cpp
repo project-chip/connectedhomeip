@@ -17,20 +17,20 @@
  */
 
 #include <ClosureControlEndpoint.h>
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/cluster-enums.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-#include <app/clusters/closure-control-server/closure-control-cluster-logic.h>
 #include <app/clusters/closure-control-server/closure-control-cluster-delegate.h>
+#include <app/clusters/closure-control-server/closure-control-cluster-logic.h>
 #include <app/clusters/closure-control-server/closure-control-cluster-matter-context.h>
 #include <app/clusters/closure-control-server/closure-control-server.h>
 #include <platform/CHIPDeviceLayer.h>
 
 namespace {
-    constexpr uint32_t kExampleCalibrateCountDown     = 10;
-    constexpr uint32_t kExampleMotionCountDown        = 15;
-    constexpr uint32_t kExampleWaitforMotionCountDown = 15;
+constexpr uint32_t kExampleCalibrateCountDown     = 10;
+constexpr uint32_t kExampleMotionCountDown        = 15;
+constexpr uint32_t kExampleWaitforMotionCountDown = 15;
 } // namespace
 
 using namespace chip;
@@ -47,23 +47,23 @@ PositioningEnum ClosureControlDelegate::GetStatePositionFromTarget(TargetPositio
 {
     switch (targetPosition)
     {
-        case TargetPositionEnum::kCloseInFull:
-            return PositioningEnum::kFullyClosed;
+    case TargetPositionEnum::kCloseInFull:
+        return PositioningEnum::kFullyClosed;
 
-        case TargetPositionEnum::kOpenInFull:
-            return PositioningEnum::kFullyOpened;
+    case TargetPositionEnum::kOpenInFull:
+        return PositioningEnum::kFullyOpened;
 
-        case TargetPositionEnum::kPedestrian:
-            return PositioningEnum::kOpenedForPedestrian;
+    case TargetPositionEnum::kPedestrian:
+        return PositioningEnum::kOpenedForPedestrian;
 
-        case TargetPositionEnum::kVentilation:
-            return PositioningEnum::kOpenedForVentilation;
+    case TargetPositionEnum::kVentilation:
+        return PositioningEnum::kOpenedForVentilation;
 
-        case TargetPositionEnum::kSignature:
-            return PositioningEnum::kOpenedAtSignature;
+    case TargetPositionEnum::kSignature:
+        return PositioningEnum::kOpenedAtSignature;
 
-        default:
-            return PositioningEnum::kUnknownEnumValue;
+    default:
+        return PositioningEnum::kUnknownEnumValue;
     }
 }
 
@@ -136,18 +136,18 @@ void ClosureControlDelegate::HandleCountdownTimeExpired()
 
     mCountDownTime.SetNonNull(0);
     mCalibratingTime = 0;
-    mWaitingTime = 0;
-    mMovingTime = 0;
+    mWaitingTime     = 0;
+    mMovingTime      = 0;
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     logic->SetCountdownTimeFromDelegate(mCountDownTime);
     logic->GetMainState(state);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    if (state == MainStateEnum::kWaitingForMotion &&  ClosureControlDelegate::IsPreStageComplete())
+    if (state == MainStateEnum::kWaitingForMotion && ClosureControlDelegate::IsPreStageComplete())
     {
-            logic->SetMainState(MainStateEnum::kMoving);
-            HandleMotion();
+        logic->SetMainState(MainStateEnum::kMoving);
+        HandleMotion();
     }
 
     if (state == MainStateEnum::kMoving)
@@ -156,7 +156,7 @@ void ClosureControlDelegate::HandleCountdownTimeExpired()
         // Update OverallState object
         DataModel::Nullable<GenericOverallTarget> target;
         GetLogic()->GetOverallTarget(target);
-        GenericOverallState current {};
+        GenericOverallState current{};
         // Copy position if present
         if (target.Value().position.HasValue())
         {
@@ -188,13 +188,13 @@ Status ClosureControlDelegate::HandleCalibrateCommand()
 
     (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOperationalStateTimerTick, this);
 
-    //Trigger Calibrate Action.
+    // Trigger Calibrate Action.
 
     return Status::Success;
 }
 
 Status ClosureControlDelegate::HandleMoveToCommand(const Optional<TargetPositionEnum> & tag, const Optional<bool> & latch,
-                                              const Optional<Globals::ThreeLevelAutoEnum> & speed)
+                                                   const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
     MainStateEnum state;
     chip::DeviceLayer::PlatformMgr().LockChipStack();
@@ -225,15 +225,15 @@ Status ClosureControlDelegate::HandleStopCommand()
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     mCalibratingTime = 0;
-    mMovingTime = 0;
-    mWaitingTime = 0;
+    mMovingTime      = 0;
+    mWaitingTime     = 0;
 
     mCountDownTime.SetNonNull(0);
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     GetLogic()->SetCountdownTimeFromDelegate(mCountDownTime);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    //Trigger Stop Action.
+    // Trigger Stop Action.
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     VerifyOrReturnError(GetLogic()->GenerateMovementCompletedEvent() == CHIP_NO_ERROR, Status::Failure);
@@ -248,7 +248,7 @@ Protocols::InteractionModel::Status ClosureControlDelegate::HandleMotion()
     (void) DeviceLayer::SystemLayer().CancelTimer(onOperationalStateTimerTick, this);
 
     mWaitingTime = 0;
-    mMovingTime = 0;
+    mMovingTime  = 0;
 
     mCountDownTime.SetNonNull(static_cast<uint32_t>(kExampleMotionCountDown));
 
@@ -256,7 +256,7 @@ Protocols::InteractionModel::Status ClosureControlDelegate::HandleMotion()
     (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOperationalStateTimerTick, this);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    //Trigger Motion Action
+    // Trigger Motion Action
     return Status::Success;
 }
 
@@ -268,7 +268,7 @@ CHIP_ERROR ClosureControlDelegate::GetCurrentErrorAtIndex(size_t index, ClosureE
 
 bool ClosureControlDelegate::IsManualLatchingNeeded()
 {
-     // Check if closure needs manual latching.(manufacture specific)
+    // Check if closure needs manual latching.(manufacture specific)
     return false;
 }
 
@@ -305,8 +305,15 @@ ElapsedS ClosureControlDelegate::GetWaitingForMotionCountdownTime()
 CHIP_ERROR ClosureControlEndpoint::Init()
 {
     ClusterConformance conformance;
-    conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed).Set(Feature::kVentilation)
-                            .Set(Feature::kPedestrian).Set(Feature::kCalibration).Set(Feature::kProtection).Set(Feature::kManuallyOperable);
+    conformance.FeatureMap()
+        .Set(Feature::kPositioning)
+        .Set(Feature::kMotionLatching)
+        .Set(Feature::kSpeed)
+        .Set(Feature::kVentilation)
+        .Set(Feature::kPedestrian)
+        .Set(Feature::kCalibration)
+        .Set(Feature::kProtection)
+        .Set(Feature::kManuallyOperable);
     conformance.OptionalAttributes().Set(OptionalAttributeEnum::kCountdownTime);
 
     ClusterInitParameters clusterInitParameters;
@@ -315,4 +322,4 @@ CHIP_ERROR ClosureControlEndpoint::Init()
     ReturnErrorOnFailure(mInterface.Init());
 
     return CHIP_NO_ERROR;
- }
+}
