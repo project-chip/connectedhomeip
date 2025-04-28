@@ -134,7 +134,7 @@ class TC_LUNIT_3_1(MatterBaseTest):
             # Step 5 - With each entry in UnsupportedUnitsList, TH writes to the DUT the TemperatureUnit attribute")
             self.step(5)
             for unit in unsupported_temperature_units:
-                await self.write_lunit_temp_unit(endpoint=endpoint, temp_unit=unit, expected_status=Status.InvalidInState)
+                await self.write_lunit_temp_unit(endpoint=endpoint, temp_unit=unit, expected_status=Status.ConstraintError)
         else:
             logging.info("no TEMP support - all Tests step skipped")
 
