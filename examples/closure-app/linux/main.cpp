@@ -1,5 +1,6 @@
 /*
- *    Copyright (c) 2025 Project CHIP Authors
+ *
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,35 +15,111 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#include "camera-app.h"
-#include "camera-device.h"
 #include <AppMain.h>
-#include <platform/CHIPDeviceConfig.h>
-
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace Camera;
-
-CameraDevice gCameraDevice;
-
+ #include "ClosureControlEndpoint.h"
+ #include "ClosureDimensionEndpoint.h"
+ 
+ #include <platform/CHIPDeviceLayer.h>
+ #include <app/util/attribute-storage.h>
+ #include <app-common/zap-generated/cluster-objects.h>
+ 
+ using namespace chip;
+ using namespace chip::app;
+ using namespace chip::app::Clusters::ClosureControl;
+ using namespace chip::app::Clusters::ClosureDimension;
+ 
+ 
+namespace {
+     
+     // Define the endpoint ID for the Closure
+     constexpr chip::EndpointId kClosureEndpoint       = 1;
+     constexpr chip::EndpointId kClosurePanel1Endpoint = 2;
+     constexpr chip::EndpointId kClosurePanel2Endpoint = 3;
+     
+     
+     // Closure Endpoints
+     ClosureControlEndpoint   ep1(1);
+     ClosureDimensionEndpoint ep2(2);
+     ClosureDimensionEndpoint ep3(3);
+     
+     // Define the Namespace and Tag for the endpoint
+     // Derived from https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-Closure.adoc
+     constexpr const uint8_t kNamespaceClosure      = 0x44;
+     constexpr const uint8_t kTagClosureCovering    = 0x00;
+     // Derived from https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-Closure-Covering.adoc
+     constexpr const uint8_t kNamespaceCovering     = 0x46;
+     constexpr const uint8_t kTagCoveringVenetian   = 0x03;
+     // Derived from https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-ClosurePanel.adoc
+     constexpr const uint8_t kNamespaceClosurePanel = 0x45;
+     constexpr const uint8_t kTagClosurePanelLift   = 0x00;
+     constexpr const uint8_t kTagClosurePanelTilt   = 0x01;
+     
+     
+     // Define the list of semantic tags for the endpoint
+     const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp1TagList[] = {
+         { 
+             .namespaceID = kNamespaceClosure,
+             .tag         = kTagClosureCovering,
+             .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("Closure.Covering"_span)) 
+         },
+         {
+             .namespaceID = kNamespaceCovering,
+             .tag         = kTagCoveringVenetian,
+             .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("Covering.Venetian"_span)) 
+         },
+     };
+     
+     const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp2TagList[] = {
+         { 
+             .namespaceID = kNamespaceClosurePanel,
+             .tag         = kTagClosurePanelLift,
+             .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("ClosurePanel.Lift"_span)) 
+         },
+     };
+     
+     const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp3TagList[] = {
+         { 
+             .namespaceID = kNamespaceClosurePanel,
+             .tag         = kTagClosurePanelTilt,
+             .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("ClosurePanel.Tilt"_span)) 
+         },
+     };
+     
+} // namespace
+ 
 void ApplicationInit()
 {
-    ChipLogProgress(Camera, "Matter Closure Linux App: ApplicationInit()");
-    CameraAppInit(&gCameraDevice);
+    ChipLogProgress(AppServer,"Closure-app ClosureManager Init Start.");
+     
+    DeviceLayer::PlatformMgr().LockChipStack();
+    
+    // Closure endpoints initilization
+    ep1.Init(); 
+    ep2.Init();
+    ep3.Init();
+    
+    // Set Taglist for Closure endpoints
+    SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp1TagList));
+    SetTagList(/* endpoint= */ 2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp2TagList));
+    SetTagList(/* endpoint= */ 3, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp3TagList));
+    
+    DeviceLayer::PlatformMgr().UnlockChipStack();
+    
+    ChipLogProgress(AppServer,"Closure-app ClosureManager Init Done.");
 }
 
 void ApplicationShutdown()
 {
-    CameraAppShutdown();
+    ChipLogDetail(NotSpecified, "ApplicationShutdown()");
 }
 
 int main(int argc, char * argv[])
 {
-    VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
+    if (ChipLinuxAppInit(argc, argv) != 0)
+    {
+        return -1;
+    }
 
     ChipLinuxAppMainLoop();
-
     return 0;
 }

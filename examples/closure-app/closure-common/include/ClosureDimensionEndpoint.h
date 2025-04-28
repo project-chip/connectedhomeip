@@ -37,7 +37,7 @@ namespace ClosureDimension {
 using Protocols::InteractionModel::Status;
 
 /**
-* @class PrintOnlyDelegate
+* @class ClosureDimensionDelegate
 * @brief A delegate class that handles Closure Dimension commands at the application level.
 * 
 * This class is responsible for processing Closure Dimension commands such as Stop, MoveTo, and Calibrate
@@ -47,31 +47,18 @@ using Protocols::InteractionModel::Status;
 * 
 * @param mEndpoint The endpoint ID associated with this delegate.
 */
-class PrintOnlyDelegate : public DelegateBase
+class ClosureDimensionDelegate : public DelegateBase
 {
 public:
 
-   PrintOnlyDelegate(EndpointId endpoint) : mEndpoint(endpoint) 
+   ClosureDimensionDelegate(EndpointId endpoint) : mEndpoint(endpoint) 
    {}
-   virtual ~PrintOnlyDelegate() = default;
+   
+   virtual ~ClosureDimensionDelegate() = default;
 
-   enum Action_t
-   {
-      MOVE_ACTION = 0,
-      MOVE_AND_LATCH_ACTION,
-      STEP_ACTION,
-      TARGET_CHANGE_ACTION,
-      INVALID_ACTION
-   } Action;
-
-   typedef void (*Callback_fn_initiated)(Action_t);
-   typedef void (*Callback_fn_completed)(Action_t);
-   void SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB);
-
-   Callback_fn_initiated mActionInitiated_CB;
-   Callback_fn_completed mActionCompleted_CB;
 
    // Override for the DelegateBase Virtual functions
+   
    Status HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<bool> & latch,
    const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
    Status HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
@@ -79,10 +66,9 @@ public:
       
    bool IsManualLatchingNeeded() override;
 
-   Status HandleMotion(bool latchNeeded, bool motionNeeded, bool newTarget);
-
    /**
-    * @brief Initializes the PrintOnlyDelegate instance.
+    * @brief Initializes the ClosureDimensionDelegate instance.
+    *        Sets the Initial state of Closure.
     * 
     * @return CHIP_ERROR indicating the result of the initialization.
     */
@@ -91,14 +77,6 @@ public:
    void SetLogic(ClusterLogic * logic) { mLogic = logic; }
 
    ClusterLogic * GetLogic() const { return mLogic; }
-
-   bool IsDeviceMoving() const { return isMoving; }
-
-   void SetDeviceMoving(bool moving) { isMoving = moving; }
-
-   Action_t GetAction() const { return mAction; }
-
-   void SetAction(Action_t action) { mAction = action; }
 
    StepDirectionEnum GetTargetDirection() const { return mTargetDirection; }
 
@@ -109,7 +87,6 @@ private:
    bool isMoving                      = false;
    bool isManualLatch                 = false;
    StepDirectionEnum mTargetDirection = StepDirectionEnum::kUnknownEnumValue;
-   Action_t mAction                   = INVALID_ACTION;
    ClusterLogic * mLogic;
 };
 
@@ -148,15 +125,15 @@ public:
    /**
     * @brief Retrieves the delegate associated with this Closure Dimension endpoint.
     * 
-    * @return Reference to the PrintOnlyDelegate instance.
+    * @return Reference to the ClosureDimensionDelegate instance.
     */
-   PrintOnlyDelegate & GetDelegate() { return mDelegate; }
+   ClosureDimensionDelegate & GetDelegate() { return mDelegate; }
    ClusterLogic & GetLogic() { return mLogic; }
 
 private:
    EndpointId mEndpoint = kInvalidEndpointId;
    MatterContext mContext; 
-   PrintOnlyDelegate mDelegate; 
+   ClosureDimensionDelegate mDelegate; 
    ClusterLogic mLogic; 
    Interface mInterface; 
 };

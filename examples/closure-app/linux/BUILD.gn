@@ -30,21 +30,11 @@ config("config") {
   include_dirs = [
     "include",
     "${chip_root}/examples/closure-app/closure-common/include",
-    "${chip_root}/third_party/libdatachannel/repo/include",
-  ]
-}
-
-pkg_config("gstreamer") {
-  packages = [
-    "gstreamer-1.0",
-    "gobject-2.0",
   ]
 }
 
 executable("chip-closure-app") {
   configs += [ ":config" ]
-
-  configs += [ ":gstreamer" ]
 
   sources = [
     "${chip_root}/examples/closure-app/closure-common/src/ClosureControlEndpoint.cpp",
@@ -57,7 +47,6 @@ executable("chip-closure-app") {
     "${chip_root}/examples/closure-app/closure-common",
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/lib",
-    "${chip_root}/third_party/libdatachannel:libdatachannel",
   ]
 
   output_dir = root_out_dir

@@ -34,11 +34,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ClosureControl {
-    
-using Protocols::InteractionModel::Status;
 
 /**
- * @class PrintOnlyDelegate
+ * @class ClosureControlDelegate
  * @brief A delegate class that handles Closure Control commands at the application level.
  * 
  * This class is responsible for processing Closure Control commands such as Stop, MoveTo, and Calibrate
@@ -48,41 +46,15 @@ using Protocols::InteractionModel::Status;
  * 
  * @param mEndpoint The endpoint ID associated with this delegate.
  */
-class PrintOnlyDelegate : public DelegateBase
+class ClosureControlDelegate : public DelegateBase
 {
-public:
-    enum Action_t : uint8_t
-    {
-        MOVE_ACTION = 0,
-        MOVE_AND_LATCH_ACTION,
-        STOP_ACTION,
-        CALIBRATE_ACTION,
-        TARGET_CHANGE_ACTION,
+public:  
+    ClosureControlDelegate(EndpointId endpoint) : mEndpoint(endpoint) {}
 
-        INVALID_ACTION
-    };
-
-    uint32_t mMovingTime                          = 0;
-    uint32_t mCalibratingTime                     = 0;
-    uint32_t mWaitingTime                         = 0;
-    DataModel::Nullable<ElapsedS> mCountDownTime  = DataModel::NullNullable;
-    const uint32_t kExampleCalibrateCountDown     = 10;
-    const uint32_t kExampleMotionCountDown        = 15;
-    const uint32_t kExampleWaitforMotionCountDown = 15;
-
-    /**
-     * @brief Set the callback for closure control action intiated and completed
-     *
-     * @param [in] aActionInitiated_CB action intitated callback
-     * @param [in] aActionCompleted_CB action completed callback
-     */
-    typedef void (*Callback_fn_initiated)(Action_t action);
-    typedef void (*Callback_fn_completed)(Action_t action);
-    void SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB);
-    PrintOnlyDelegate(EndpointId endpoint) : mEndpoint(endpoint) {}
-
-    virtual ~PrintOnlyDelegate() = default;
+    virtual ~ClosureControlDelegate() = default;
+    
     // Override for the DelegateBase Virtual functions
+    
     Protocols::InteractionModel::Status HandleStopCommand() override;
     Protocols::InteractionModel::Status HandleMoveToCommand(const Optional<TargetPositionEnum> & tag, const Optional<bool> & latch,
                                                             const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
@@ -92,27 +64,35 @@ public:
     
     bool IsManualLatchingNeeded() override;
     bool IsReadyToMove() override;
-    ElapsedS GetCalibrationCountdownTime() override { return kExampleCalibrateCountDown; };
+    ElapsedS GetCalibrationCountdownTime() override;
     ElapsedS GetMovingCountdownTime() override;
     ElapsedS GetWaitingForMotionCountdownTime() override;
+    
+    // Delegate specific functions and variables
 
     void SetLogic(ClusterLogic * logic) { mLogic = logic; }
 
     ClusterLogic * GetLogic() const { return mLogic; }
 
     DataModel::Nullable<ElapsedS> GetRemainingTime();
+    
+    uint32_t mMovingTime                          = 0;
+    uint32_t mCalibratingTime                     = 0;
+    uint32_t mWaitingTime                         = 0;
+    DataModel::Nullable<ElapsedS> mCountDownTime  = DataModel::NullNullable;
 
     /**
      * @brief Handles the countdown timer expiration event
      */
     void HandleCountdownTimeExpired();
-
+    
     /**
-     * @brief Checks if the device can move or need pre-motion stages to complete
-     * @return true if device is ready to move
-     *         false if device is not ready to move
+     * @brief Checks if closure has completed prestage or not.
+     * 
+     * @return true, if prestage is completed
+     *         false, if prestage is not completed
      */
-    bool IsDeviceReadytoMove();
+    bool IsPreStageComplete();
 
     /**
      * @brief Handles the motion request of Closure
@@ -122,18 +102,19 @@ public:
      */
     Protocols::InteractionModel::Status HandleMotion();
 
-    PositioningEnum GetStatePositionFromTarget(TargetPositionEnum targetPosition);
-
-    bool IsPreStageComplete();
-
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
     ClusterLogic * mLogic;
-
-    bool isManualLatch = false;
-
-    Callback_fn_initiated mActionInitiated_CB;
-    Callback_fn_completed mActionCompleted_CB;
+    
+    
+    /**
+     * @brief Function to map TargetPositionEnum to Positioning Enum
+     * 
+     * @param [in] targetPosition, TargetPositionEnum which need to mapped
+     * 
+     * @return PositioningEnum
+     */
+    PositioningEnum GetStatePositionFromTarget(TargetPositionEnum targetPosition);
 };
 
 /**
@@ -155,7 +136,9 @@ public:
 
     ClosureControlEndpoint(EndpointId endpoint) :
         mEndpoint(endpoint), mContext(mEndpoint), mDelegate(mEndpoint), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
-    { }
+    {
+        mDelegate.SetLogic(&mLogic);
+    }
 
     /**
      * @brief Initializes the ClosureControlEndpoint instance.
@@ -167,14 +150,14 @@ public:
     /**
      * @brief Retrieves the delegate associated with this Closure Control endpoint.
      * 
-     * @return Reference to the PrintOnlyDelegate instance.
+     * @return Reference to the ClosureControlDelegate instance.
      */
-    PrintOnlyDelegate & GetDelegate() { return mDelegate; }
+    ClosureControlDelegate & GetDelegate() { return mDelegate; }
 
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
     MatterContext mContext; 
-    PrintOnlyDelegate mDelegate; 
+    ClosureControlDelegate mDelegate; 
     ClusterLogic mLogic; 
     Interface mInterface; 
 };
