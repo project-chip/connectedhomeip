@@ -19,9 +19,6 @@
 
 #pragma once
 
-#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
-#include "ColorFormat.h"
-#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
 #include <stdint.h>
 
 class LEDWidget
@@ -36,6 +33,8 @@ public:
     void Animate();
     uint8_t GetLED();
     bool GetLEDStatus(uint8_t led);
+    void SetLevel(uint8_t aLevel);
+    uint8_t GetLevel();
 
 private:
     uint64_t mLastChangeTimeMS;
@@ -47,22 +46,3 @@ private:
 protected:
     uint8_t mLevel;
 };
-
-#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
-class RGBLEDWidget : public LEDWidget
-{
-public:
-    void SetColor(uint8_t red, uint8_t green, uint8_t blue);
-    void GetColor(uint16_t red, uint16_t green, uint16_t blue);
-    void SetLevel(uint8_t aLevel);
-    uint8_t GetLevel();
-    void SetColorFromHSV(uint8_t h, uint8_t s);
-    void SetColorFromXY(uint16_t currentX, uint16_t currentY);
-    void SetColorFromCT(CtColor_t ct);
-
-private:
-    uint8_t red;
-    uint8_t green;
-    uint8_t blue;
-};
-#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)

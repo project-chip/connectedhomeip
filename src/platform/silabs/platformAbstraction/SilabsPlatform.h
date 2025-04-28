@@ -58,6 +58,7 @@ public:
     void StartScheduler(void) override;
 
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+    bool GetRGBLedState(uint8_t led) override;
     // RGB LEDs
     CHIP_ERROR SetLedColor(uint8_t led, uint8_t r, uint8_t g, uint8_t b) override;
     CHIP_ERROR GetLedColor(uint8_t led, uint16_t r, uint16_t g, uint16_t b) override;

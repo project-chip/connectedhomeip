@@ -21,7 +21,9 @@
  */
 
 #include "AppConfig.h"
-#include "ColorFormat.h"
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+#include "RGBLEDWidget.h"
+#endif //(defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
 #include "LightingManager.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -49,14 +51,15 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 #ifdef DIC_ENABLE
         dic_sendmsg("light/state", (const char *) (value ? (*value ? "on" : "off") : "invalid"));
 #endif // DIC_ENABLE
-        LightMgr().InitiateAction(AppEvent::kEventType_Light, *value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION);
+        LightMgr().InitiateAction(AppEvent::kEventType_Light, *value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION,
+                                  value);
     }
     else if (clusterId == LevelControl::Id)
     {
         ChipLogProgress(Zcl, "Level Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);
-
         // WIP Apply attribute change to Light
+        LightMgr().InitiateAction(AppEvent::kEventType_Light, LightingManager::LEVEL_ACTION, value);
     }
     else if (clusterId == ColorControl::Id)
     {
@@ -65,7 +68,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 // WIP Apply attribute change to Light
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
         EndpointId endpoint = attributePath.mEndpointId;
-        ColorData_t colorData;
+        RGBLEDWidget::ColorData_t colorData;
         /* XY color space */
         if (attributeId == ColorControl::Attributes::CurrentX::Id || attributeId == ColorControl::Attributes::CurrentY::Id)
         {
@@ -85,7 +88,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
             ChipLogProgress(Zcl, "New XY color: %u|%u", colorData.xy.x, colorData.xy.y);
             LightMgr().InitiateLightAction(AppEvent::kEventType_Light, LightingManager::COLOR_ACTION_XY, sizeof(colorData),
-                                           (ColorData_t *) &colorData);
+                                           (RGBLEDWidget::ColorData_t *) &colorData);
         }
         /* HSV color space */
         else if (attributeId == ColorControl::Attributes::CurrentHue::Id ||
@@ -104,7 +107,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
             ChipLogProgress(Zcl, "New HSV color: %u|%u", colorData.hsv.h, colorData.hsv.s);
 
             LightMgr().InitiateLightAction(AppEvent::kEventType_Light, LightingManager::COLOR_ACTION_HSV, sizeof(colorData),
-                                           (ColorData_t *) &colorData);
+                                           (RGBLEDWidget::ColorData_t *) &colorData);
         }
 
         else if (attributeId == ColorControl::Attributes::ColorTemperatureMireds::Id)
@@ -118,7 +121,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
             ChipLogProgress(Zcl, "New ColorTemperatureMireds: %u", colorData.ct.ctMireds);
             LightMgr().InitiateLightAction(AppEvent::kEventType_Light, LightingManager::COLOR_ACTION_CT, sizeof(colorData),
-                                           (ColorData_t *) &colorData);
+                                           (RGBLEDWidget::ColorData_t *) &colorData);
         }
 
 #endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)

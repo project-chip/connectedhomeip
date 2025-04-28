@@ -123,8 +123,11 @@ source_set("siwx917-common") {
   ]
 
   if (sl_enable_rgb_led) {
-    sources += [ "${silabs_common_plat_dir}/led/ColorFormat.cpp" ]
-    include_dirs += [ "${silabs_common_plat_dir}/led" ]
+    sources += [
+      # "${silabs_common_plat_dir}/rgb_led/ColorFormat.cpp",
+      "${silabs_common_plat_dir}/rgb_led/RGBLEDWidget.cpp",
+    ]
+    include_dirs += [ "${silabs_common_plat_dir}/rgb_led" ]
   }
 
   if (chip_enable_pw_rpc || chip_build_libshell || sl_uart_log_output) {

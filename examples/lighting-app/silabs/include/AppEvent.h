@@ -18,7 +18,10 @@
  */
 
 #pragma once
-#include "ColorFormat.h"
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+#include "RGBLEDWidget.h"
+#endif //(defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+
 struct AppEvent;
 typedef void (*EventHandler)(AppEvent *);
 
@@ -48,13 +51,16 @@ struct AppEvent
         {
             uint8_t Action;
             int32_t Actor;
+            uint8_t Value;
         } LightEvent;
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
         struct
         {
             uint8_t Action;
             int32_t Actor;
-            ColorData_t Value;
+            RGBLEDWidget::ColorData_t Value;
         } LightControlEvent;
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
     };
 
     EventHandler Handler;

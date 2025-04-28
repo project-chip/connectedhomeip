@@ -35,7 +35,7 @@ constexpr float kHueScaleFactor     = 6.0f;
 constexpr uint8_t kMaxColorValue    = 255;
 
 // to the specified range given as min and max
-RgbColor_t ColorConverter::RgbClamp(uint8_t r, uint8_t g, uint8_t b, uint8_t min, uint8_t max)
+ColorConverter::RgbColor_t ColorConverter::RgbClamp(uint8_t r, uint8_t g, uint8_t b, uint8_t min, uint8_t max)
 {
     RgbColor_t rgb;
     rgb.r = (uint8_t) clamp(r, min, max);
@@ -111,7 +111,7 @@ float ColorConverter::ApplyGammaCorrection(float value)
     return (value <= kGammaThreshold) ? kGammaMultiplier * value : (1.055f * std::pow(value, kGammaExponent)) - kGammaOffset;
 }
 
-RgbColor_t ColorConverter::NormalizeRgb(float r, float g, float b)
+ColorConverter::RgbColor_t ColorConverter::NormalizeRgb(float r, float g, float b)
 {
     RgbColor_t rgb;
     rgb.r = static_cast<uint8_t>(r * kMaxColorValue);
@@ -121,7 +121,7 @@ RgbColor_t ColorConverter::NormalizeRgb(float r, float g, float b)
 }
 
 // Convert XYZ color space to RGB color space
-RgbColor_t ColorConverter::ConvertXYZToRGB(float X, float Y, float Z)
+ColorConverter::RgbColor_t ColorConverter::ConvertXYZToRGB(float X, float Y, float Z)
 {
     // X, Y and Z input refer to a D65/2° standard illuminant.
     // The XYZ values are then converted to RGB values using a standard transformation matrix for the sRGB color space (D65
@@ -209,7 +209,7 @@ void ColorConverter::SetRgbByRegion(uint8_t region, uint8_t v, uint8_t p, uint8_
 }
 
 // Convert color temperature to RGB color space
-RgbColor_t ColorConverter::CTToRgb(CtColor_t ct)
+ColorConverter::RgbColor_t ColorConverter::CTToRgb(CtColor_t ct)
 {
     RgbColor_t rgb;
     float ctCentiKelvin = 10000 / static_cast<float>(ct.ctMireds);
@@ -224,7 +224,7 @@ RgbColor_t ColorConverter::CTToRgb(CtColor_t ct)
 }
 
 // Convert HSV color space to RGB color space
-RgbColor_t ColorConverter::HsvToRgb(HsvColor_t hsv)
+ColorConverter::RgbColor_t ColorConverter::HsvToRgb(HsvColor_t hsv)
 {
     RgbColor_t rgb;
 
@@ -257,7 +257,7 @@ RgbColor_t ColorConverter::HsvToRgb(HsvColor_t hsv)
 }
 
 // Convert XY color space to RGB color space
-RgbColor_t ColorConverter::XYToRgb(uint8_t Level, uint16_t currentX, uint16_t currentY)
+ColorConverter::RgbColor_t ColorConverter::XYToRgb(uint8_t Level, uint16_t currentX, uint16_t currentY)
 {
     // convert xyY color space to RGB
 

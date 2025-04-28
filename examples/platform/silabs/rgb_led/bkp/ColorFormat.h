@@ -19,46 +19,38 @@
 #pragma once
 
 #include <stdint.h>
-struct RgbColor_t
-{
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
-};
-
-struct HsvColor_t
-{
-    uint8_t h;
-    uint8_t s;
-    uint8_t v;
-};
-
-struct XyColor_t
-{
-    uint16_t x;
-    uint16_t y;
-};
-
-struct CtColor_t
-{
-    uint16_t ctMireds;
-};
-// Union of possible color formats
-union ColorData_t
-{
-    HsvColor_t hsv;
-    XyColor_t xy;
-    CtColor_t ct;
-};
 class ColorConverter
 {
 public:
+    struct RgbColor_t
+    {
+        uint8_t r, g, b;
+    };
+    struct XyColor_t
+    {
+        uint16_t x, y;
+    };
+    struct HsvColor_t
+    {
+        uint8_t h, s, v;
+    };
+    struct CtColor_t
+    {
+        uint16_t ctMireds;
+    };
+    // Union of possible color formats
+    union ColorData_t
+    {
+        HsvColor_t hsv;
+        XyColor_t xy;
+        CtColor_t ct;
+    };
     static RgbColor_t HsvToRgb(HsvColor_t hsv);
     static RgbColor_t XYToRgb(uint8_t Level, uint16_t currentX, uint16_t currentY);
     static RgbColor_t CTToRgb(CtColor_t ct);
-    static RgbColor_t RgbClamp(uint8_t r, uint8_t g, uint8_t b, uint8_t min, uint8_t max);
 
 private:
+    static RgbColor_t RgbClamp(uint8_t r, uint8_t g, uint8_t b, uint8_t min, uint8_t max);
     static RgbColor_t ConvertXYZToRGB(float X, float Y, float Z);
     static RgbColor_t NormalizeRgb(float r, float g, float b);
     static float ApplyGammaCorrection(float value);

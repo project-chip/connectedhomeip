@@ -34,6 +34,7 @@ public:
     {
         ON_ACTION = 0,
         OFF_ACTION,
+        LEVEL_ACTION,
         COLOR_ACTION_HSV,
         COLOR_ACTION_CT,
         COLOR_ACTION_XY,
@@ -54,9 +55,9 @@ public:
     void EnableAutoTurnOff(bool aOn);
     void SetAutoTurnOffDuration(uint32_t aDurationInSecs);
     bool IsActionInProgress();
-    bool InitiateAction(int32_t aActor, Action_t aAction);
+    bool InitiateAction(int32_t aActor, Action_t aAction, uint8_t * aValue);
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
-    bool InitiateLightAction(int32_t aActor, Action_t aAction, uint16_t size, ColorData_t * value);
+    bool InitiateLightAction(int32_t aActor, Action_t aAction, uint16_t size, RGBLEDWidget::ColorData_t * value);
 #endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)
     typedef void (*Callback_fn_initiated)(Action_t, int32_t aActor);
     typedef void (*Callback_fn_completed)(Action_t);
@@ -67,6 +68,7 @@ public:
 private:
     friend LightingManager & LightMgr(void);
     State_t mState;
+    uint8_t mLevel;
 
     Callback_fn_initiated mActionInitiated_CB;
     Callback_fn_completed mActionCompleted_CB;

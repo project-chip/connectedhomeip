@@ -21,9 +21,10 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 
-#include "ColorFormat.h"
 #include "LEDWidget.h"
-
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+#include "RGBLEDWidget.h"
+#endif //(defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/server/Server.h>
@@ -141,12 +142,17 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
     bool initiated = false;
     LightingManager::Action_t action;
     int32_t actor;
+    uint8_t value  = aEvent->LightEvent.Value;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     if (aEvent->Type == AppEvent::kEventType_Light)
     {
         action = static_cast<LightingManager::Action_t>(aEvent->LightEvent.Action);
         actor  = aEvent->LightEvent.Actor;
+        if (action == LightingManager::LEVEL_ACTION)
+        {
+            sLightLED.SetLevel(value);
+        }
     }
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {
@@ -160,7 +166,7 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
 
     if (err == CHIP_NO_ERROR)
     {
-        initiated = LightMgr().InitiateAction(actor, action);
+        initiated = LightMgr().InitiateAction(actor, action, NULL);
 
         if (!initiated)
         {
@@ -172,9 +178,8 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
 void AppTask::LightControlEventHandler(AppEvent * aEvent)
 {
-    uint8_t light_action  = aEvent->LightControlEvent.Action;
-    ColorData_t colorData = aEvent->LightControlEvent.Value;
-
+    uint8_t light_action                = aEvent->LightControlEvent.Action;
+    RGBLEDWidget::ColorData_t colorData = aEvent->LightControlEvent.Value;
     // Get currentLevel attribute
     PlatformMgr().LockChipStack();
     Protocols::InteractionModel::Status status;
@@ -188,7 +193,6 @@ void AppTask::LightControlEventHandler(AppEvent * aEvent)
     {
         sLightLED.SetLevel(currentlevel.Value());
     }
-
     switch (light_action)
     {
     case LightingManager::COLOR_ACTION_XY: {
@@ -200,7 +204,7 @@ void AppTask::LightControlEventHandler(AppEvent * aEvent)
     }
     break;
     case LightingManager::COLOR_ACTION_CT: {
-        sLightLED.SetColorFromCT(colorData.ct);
+        sLightLED.SetColorFromCT(colorData.ct.ctMireds);
     }
     break;
     default:
@@ -265,18 +269,19 @@ void AppTask::ActionCompleted(LightingManager::Action_t aAction)
     }
 }
 
-void AppTask::PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction)
+void AppTask::PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction, uint8_t * aValue)
 {
     AppEvent event;
     event.Type              = AppEvent::kEventType_Light;
     event.LightEvent.Actor  = aActor;
     event.LightEvent.Action = aAction;
+    event.LightEvent.Value  = *aValue;
     event.Handler           = LightActionEventHandler;
     PostEvent(&event);
 }
 
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
-void AppTask::PostLightControlActionRequest(int32_t aActor, LightingManager::Action_t aAction, ColorData_t * aValue)
+void AppTask::PostLightControlActionRequest(int32_t aActor, LightingManager::Action_t aAction, RGBLEDWidget::ColorData_t * aValue)
 {
     AppEvent light_event;
     light_event.Type                     = AppEvent::kEventType_Light;
