@@ -101,8 +101,14 @@ protected:
         FabricTableImpl(maxScenesPerFabric, maxScenesPerEndpoint)
     {}
 
-    // Global scene count
+    // Endpoint scene count
     CHIP_ERROR SetEndpointSceneCount(const uint8_t & scene_count);
+
+    // wrapper function around emberAfGetClustersFromEndpoint to allow override when testing
+    virtual uint8_t GetClustersFromEndpoint(ClusterId * clusterList, uint8_t listLen);
+
+    // wrapper function around emberAfGetClusterCountForEndpoint to allow override when testing
+    virtual uint8_t GetClusterCountFromEndpoint();
 }; // class DefaultSceneTableImpl
 
 /// @brief Gets a pointer to the instance of Scene Table Impl, providing EndpointId and Table Size for said endpoint

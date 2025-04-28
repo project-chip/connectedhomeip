@@ -51,7 +51,7 @@ StorageKeyName Serializer::FabricEntryDataKey(FabricIndex fabric, EndpointId end
 // slack in case different clusters are used. Value obtained by using writer.GetLengthWritten at the end of the SceneTableData
 // Serialize method.
 template <>
-constexpr size_t Serializer::kPersistentStorageDataBufferMax()
+constexpr size_t Serializer::kEntryMaxBytes()
 {
     return CHIP_CONFIG_SCENES_MAX_SERIALIZED_SCENE_SIZE_BYTES;
 }
@@ -71,15 +71,9 @@ constexpr uint16_t Serializer::kMaxPerEndpoint()
 // A Full fabric serialized TLV length is 88 bytes, 128 bytes gives some slack.  Tested by running writer.GetLengthWritten at the
 // end of the Serialize method of FabricSceneData
 template <>
-constexpr size_t Serializer::kPersistentFabricBufferMax()
+constexpr size_t Serializer::kFabricMaxBytes()
 {
     return 128;
-}
-
-template <>
-constexpr EndpointId DefaultSceneTableImpl::Super::kEntryEndpointClusterID()
-{
-    return chip::app::Clusters::ScenesManagement::Id;
 }
 
 #include <app/storage/FabricTableImpl.hpp>
@@ -99,9 +93,9 @@ enum class TagScene : uint8_t
 };
 } // namespace
 
-using SceneTableData  = TableEntryData<SceneStorageId, SceneData, Serializer::kPersistentStorageDataBufferMax()>;
-using FabricSceneData = FabricEntryData<SceneStorageId, SceneData, Serializer::kPersistentStorageDataBufferMax(),
-                                        Serializer::kPersistentFabricBufferMax(), kMaxScenesPerFabric>;
+using SceneTableData = TableEntryData<SceneStorageId, SceneData, Serializer::kEntryMaxBytes()>;
+using FabricSceneData =
+    FabricEntryData<SceneStorageId, SceneData, Serializer::kEntryMaxBytes(), Serializer::kFabricMaxBytes(), kMaxScenesPerFabric>;
 
 template class chip::app::Storage::FabricTableImpl<SceneTableBase::SceneStorageId, SceneTableBase::SceneData, kIteratorsMax>;
 
@@ -315,6 +309,21 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveFabric(FabricIndex fabric_index)
 CHIP_ERROR DefaultSceneTableImpl::RemoveEndpoint()
 {
     return FabricTableImpl::RemoveEndpoint();
+}
+
+/// @brief wrapper function around emberAfGetClustersFromEndpoint to allow testing, shimmed in test configuration because
+/// emberAfGetClusterFromEndpoint relies on <app/util/attribute-storage.h>, which relies on zap generated files
+uint8_t DefaultSceneTableImpl::GetClustersFromEndpoint(ClusterId * clusterList, uint8_t listLen)
+{
+    return emberAfGetClustersFromEndpoint(mEndpointId, clusterList, listLen, true);
+}
+
+/// @brief wrapper function around emberAfGetClusterCountForEndpoint to allow testing enforcing a specific count, shimmed in test
+/// configuration because emberAfGetClusterCountForEndpoint relies on <app/util/attribute-storage.h>, which relies on zap generated
+/// files
+uint8_t DefaultSceneTableImpl::GetClusterCountFromEndpoint()
+{
+    return emberAfGetClusterCountForEndpoint(mEndpointId);
 }
 
 void DefaultSceneTableImpl::SetTableSize(uint16_t endpointSceneTableSize)
