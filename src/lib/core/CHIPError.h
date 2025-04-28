@@ -36,13 +36,7 @@
 #include <type_traits>
 
 #if CHIP_CONFIG_ERROR_SOURCE_FULL
-
-#if __cplusplus < 202002L
-#error "std::source_location requires C++20"
-#endif // __cplusplus < 202002L
-
 #include <source_location>
-
 #endif // CHIP_CONFIG_ERROR_SOURCE_FULL
 
 namespace chip {
