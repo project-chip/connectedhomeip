@@ -30,7 +30,8 @@ details.
         -   [Building chip-repl:](#building-chip-repl)
         -   [Activating python virtual env](#activating-python-virtual-env)
         -   [Interacting with CHIP-REPL and the example app](#interacting-with-chip-repl-and-the-example-app)
-            -   [CommodityPrice cluster (to get current and forecast energy prices)](#commodityprice-cluster-to-get-current-and-forecast-energy-prices)
+            -   [CommodityPrice cluster](#commodityprice-cluster)
+            -   [ElectricalGridConditions cluster](#electricalgridconditions-cluster)
 
 <hr>
 
@@ -218,7 +219,9 @@ data (e.g. fabric info).
     Out[1]: 200
 ```
 
-#### CommodityPrice cluster (to get current and forecast energy prices)
+#### CommodityPrice cluster
+
+This allows you to get current and forecast energy prices.
 
 -   Step 4: (In chip-repl) Read `Commodity Price` attributes
 
@@ -511,4 +514,139 @@ i.e. details = 1 (Description ONLY) details = 2 (Components ONLY) details = 3
     │   ]
     )
 
+```
+
+#### ElectricalGridConditions cluster
+
+This allows you to get current and forecast electrical grid conditions. This
+assumes you have already commissioned the app (see above).
+
+-   Step 1: (In chip-repl) Read `Electrical Grid Conditions` attributes
+
+```python
+    # Read from NodeID 200, Endpoint 1, all attributes on ElectricalGridConditions cluster
+    await devCtrl.ReadAttribute(200,[(1, chip.clusters.ElectricalGridConditions)])
+Out[2]:
+
+{
+│   1: {
+│   │   <class 'chip.clusters.Objects.ElectricalGridConditions'>: {
+│   │   │   <class 'chip.clusters.Attribute.DataVersion'>: 2998541776,
+│   │   │   <class 'chip.clusters.Objects.ElectricalGridConditions.Attributes.LocalGenerationAvailable'>: True,
+│   │   │   <class 'chip.clusters.Objects.ElectricalGridConditions.Attributes.ClusterRevision'>: 1,
+│   │   │   <class 'chip.clusters.Objects.ElectricalGridConditions.Attributes.ForecastConditions'>: [],
+│   │   │   <class 'chip.clusters.Objects.ElectricalGridConditions.Attributes.AcceptedCommandList'>: [],
+│   │   │   <class 'chip.clusters.Objects.ElectricalGridConditions.Attributes.FeatureMap'>: 1,
+│   │   │   <class 'chip.clusters.Objects.ElectricalGridConditions.Attributes.CurrentConditions'>: Null,
+│   │   │   <class 'chip.clusters.Objects.ElectricalGridConditions.Attributes.GeneratedCommandList'>: [],
+│   │   │   <class 'chip.clusters.Objects.ElectricalGridConditions.Attributes.AttributeList'>: [
+│   │   │   │   0,
+│   │   │   │   1,
+│   │   │   │   2,
+│   │   │   │   65532,
+│   │   │   │   65533,
+│   │   │   │   65528,
+│   │   │   │   65529,
+│   │   │   │   65531
+│   │   │   ]
+│   │   }
+│   }
+}
+
+```
+
+The response in the default app is a null `CurrentConditions` and an empty
+`ForecastConditions` attribute.
+
+-   Step 2: (In chip-repl) Using TestEvent trigger
+    `eventTrigger=0x00A0000000000000` we can generate a test `CurrentConditions`
+    with sample data
+
+```python
+    # Send a test event trigger NodeID 200, Endpoint 0, with eventTrigger=0x00A0000000000000
+    await devCtrl.SendCommand(200, 0, chip.clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=bytes([b for b in range(16)]), eventTrigger=0x00A0000000000000))
+```
+
+-   Step 3: (In chip-repl) Re-Read `CurrentConditions` attribute (see the values
+    have changed)
+
+```python
+    await devCtrl.ReadAttribute(200,[(1, chip.clusters.ElectricalGridConditions.Attributes.CurrentConditions)])
+    Out[7]:
+
+    {
+    │   1: {
+    │   │   <class 'chip.clusters.Objects.ElectricalGridConditions'>: {
+    │   │   │   <class 'chip.clusters.Attribute.DataVersion'>: 488127616,
+    │   │   │   <class 'chip.clusters.Objects.ElectricalGridConditions.Attributes.CurrentConditions'>: ElectricalGridConditionsStruct(
+    │   │   │   │   periodStart=799154050,
+    │   │   │   │   periodEnd=799155850,
+    │   │   │   │   gridCarbonIntensity=230,
+    │   │   │   │   gridCarbonLevel=<ThreeLevelEnum.kMedium: 1>,
+    │   │   │   │   localCarbonIntensity=0,
+    │   │   │   │   localCarbonLevel=<ThreeLevelEnum.kLow: 0>
+    │   │   │   )
+    │   │   }
+    │   }
+    }
+```
+
+-   Step 4: (In chip-repl) Using TestEvent trigger
+    `eventTrigger=0x00A0000000000001` we can generate a test
+    `ForecastConditions` with sample data
+
+```python
+    # Send a test event trigger NodeID 200, Endpoint 0, with eventTrigger=0x00A0000000000001
+    await devCtrl.SendCommand(200, 0, chip.clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=bytes([b for b in range(16)]), eventTrigger=0x00A0000000000001))
+```
+
+-   Step 5: (In chip-repl) Re-Read `ForecastConditions` attribute (see the
+    values have changed)
+
+```python
+    await devCtrl.ReadAttribute(200,[(1, chip.clusters.ElectricalGridConditions.Attributes.ForecastConditions)])
+    Out[9]:
+
+    {
+    │   1: {
+    │   │   <class 'chip.clusters.Objects.ElectricalGridConditions'>: {
+    │   │   │   <class 'chip.clusters.Attribute.DataVersion'>: 488127617,
+    │   │   │   <class 'chip.clusters.Objects.ElectricalGridConditions.Attributes.ForecastConditions'>: [
+    │   │   │   │   ElectricalGridConditionsStruct(
+    │   │   │   │   │   periodStart=799154301,
+    │   │   │   │   │   periodEnd=799156100,
+    │   │   │   │   │   gridCarbonIntensity=18,
+    │   │   │   │   │   gridCarbonLevel=<ThreeLevelEnum.kLow: 0>,
+    │   │   │   │   │   localCarbonIntensity=18,
+    │   │   │   │   │   localCarbonLevel=<ThreeLevelEnum.kLow: 0>
+    │   │   │   │   ),
+    │   │   │   │   ElectricalGridConditionsStruct(
+    │   │   │   │   │   periodStart=799156101,
+    │   │   │   │   │   periodEnd=799157900,
+    │   │   │   │   │   gridCarbonIntensity=399,
+    │   │   │   │   │   gridCarbonLevel=<ThreeLevelEnum.kHigh: 2>,
+    │   │   │   │   │   localCarbonIntensity=399,
+    │   │   │   │   │   localCarbonLevel=<ThreeLevelEnum.kHigh: 2>
+    │   │   │   │   ),
+    │   │   │   │   ElectricalGridConditionsStruct(
+    │   │   │   │   │   periodStart=799157901,
+    │   │   │   │   │   periodEnd=799159700,
+    │   │   │   │   │   gridCarbonIntensity=165,
+    │   │   │   │   │   gridCarbonLevel=<ThreeLevelEnum.kMedium: 1>,
+    │   │   │   │   │   localCarbonIntensity=165,
+    │   │   │   │   │   localCarbonLevel=<ThreeLevelEnum.kMedium: 1>
+    │   │   │   │   ),
+    ...
+    │   │   │   │   ElectricalGridConditionsStruct(
+    │   │   │   │   │   periodStart=799238901,
+    │   │   │   │   │   periodEnd=799240700,
+    │   │   │   │   │   gridCarbonIntensity=130,
+    │   │   │   │   │   gridCarbonLevel=<ThreeLevelEnum.kMedium: 1>,
+    │   │   │   │   │   localCarbonIntensity=130,
+    │   │   │   │   │   localCarbonLevel=<ThreeLevelEnum.kMedium: 1>
+    │   │   │   │   )
+    │   │   │   ]
+    │   │   }
+    │   }
+    }
 ```
