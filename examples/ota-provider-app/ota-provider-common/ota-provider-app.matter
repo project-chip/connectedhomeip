@@ -1490,8 +1490,8 @@ endpoint 0 {
   }
 
   server cluster OtaSoftwareUpdateProvider {
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap default = 0;
+    callback attribute clusterRevision default = 1;
 
     handle command QueryImage;
     handle command QueryImageResponse;
