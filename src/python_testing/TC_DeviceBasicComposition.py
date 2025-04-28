@@ -1072,8 +1072,8 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
                 # TODO : Step 1b.4.1, 1b.4.2 needs to be run manually as PIXIT.DESC.DeviceTypeConformanceList
                 #       is not availbale as of now. An issue is created : https://github.com/project-chip/connectedhomeip/issues/38640
-                self.print_step("1b.4.1","Step 1b.4.1 is skipped, test is manually")
-                self.print_step("1b.4.2","Step 1b.4.2 is skipped, test is manually")
+                self.print_step("1b.4.1", "Step 1b.4.1 is skipped, test is manually")
+                self.print_step("1b.4.2", "Step 1b.4.2 is skipped, test is manually")
 
                 self.print_step("1b.4.3", "Revision should not be less than 1")
 
@@ -1085,8 +1085,8 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
                 # TODO : Step 2 and 3 needs to be run manually as PIXIT.DESC.DeviceTypeConformanceList
                 #       is not availbale as of now. An issue is created : https://github.com/project-chip/connectedhomeip/issues/38640
-                self.print_step("2","Step 2 is skipped, test is manually")
-                self.print_step("3","Step 3 is skipped, test is manually")
+                self.print_step("2", "Step 2 is skipped, test is manually")
+                self.print_step("3", "Step 3 is skipped, test is manually")
 
                 self.print_step("4", "TH reads PartsList attribute for each endpoint")
 
