@@ -72,7 +72,8 @@ class TC_CNET_4_15(MatterBaseTest):
         self.step(2)
         # TH sends RemoveNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID,
         # which does not match the provisioned network, and Breadcrumb field set to 1
-        network_id = self.matter_test_config.global_test_params['PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID'].encode('utf-8')
+        # Use a random SSID that is unlikely to exist, to avoid requiring testers to set a PIXIT flag
+        network_id = b"NON_EXISTENT_SSID_12345"
 
         logging.info(f"Attempting to remove network with ID: {network_id}")
 
