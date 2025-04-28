@@ -63,22 +63,23 @@ TEST_F(TestOtaProviderLogic, QueryImageValidation)
 
     QueryImage::DecodableType input;
 
-    // without a delegate, command is unsupported
+    // Without a delegate, command is unsupported.
     EXPECT_EQ(logic.QueryImage(kCommandPath, input, nullptr /* handler */), Status::UnsupportedCommand);
 
     MockDelegate mockDelegate;
     logic.SetDelegate(&mockDelegate);
 
-    // location MUST be 2 bytes
+    // Location MUST be 2 bytes.
     input.location = MakeOptional("abc_too_large"_span);
     EXPECT_EQ(logic.QueryImage(kCommandPath, input, nullptr /* handler */), Status::InvalidCommand);
 
-    // valid location (empty is ok)
+    // Valid location (empty is ok).
     input.location = NullOptional;
-    EXPECT_EQ(logic.QueryImage(kCommandPath, input, nullptr /* handler */), std::nullopt);
-    // nullopt means delegate was called
 
-    // metadata too large
+    // Nullopt means delegate was called.
+    EXPECT_EQ(logic.QueryImage(kCommandPath, input, nullptr /* handler */), std::nullopt);
+
+    // Test for metadata too large.
     {
         constexpr size_t kTooLargeMetadataBytes = 513;
 
@@ -91,7 +92,7 @@ TEST_F(TestOtaProviderLogic, QueryImageValidation)
         input.metadataForProvider = NullOptional;
     }
 
-    // valid values, will set some logic
+    // Valid values, will set some logic.
     input.hardwareVersion     = MakeOptional(static_cast<uint16_t>(1234u));
     input.requestorCanConsent = MakeOptional(true);
 
@@ -107,13 +108,13 @@ TEST_F(TestOtaProviderLogic, NotifyUpdateApplied)
 
     NotifyUpdateApplied::DecodableType input;
 
-    // Without a delegate, error out
+    // Without a delegate, error out.
     EXPECT_EQ(logic.NotifyUpdateApplied(kCommandPath, input, nullptr /* handler not used */), Status::UnsupportedCommand);
 
     MockDelegate mockDelegate;
     logic.SetDelegate(&mockDelegate);
 
-    // update token is not valid
+    // Update token is not valid.
     EXPECT_EQ(logic.NotifyUpdateApplied(kCommandPath, input, nullptr /* handler not used */), Status::InvalidCommand);
 
     constexpr uint8_t kUpdateToken[] = { 1, 2, 3, 4, 5, 6, 7, 8 };
@@ -130,13 +131,13 @@ TEST_F(TestOtaProviderLogic, ApplyUpdateRequest)
 
     ApplyUpdateRequest::DecodableType input;
 
-    // Without a delegate, error out
+    // Without a delegate, error out.
     EXPECT_EQ(logic.ApplyUpdateRequest(kCommandPath, input, nullptr /* handler not used */), Status::UnsupportedCommand);
 
     MockDelegate mockDelegate;
     logic.SetDelegate(&mockDelegate);
 
-    // update token is not valid
+    // Update token is not valid.
     EXPECT_EQ(logic.ApplyUpdateRequest(kCommandPath, input, nullptr /* handler not used */), Status::InvalidCommand);
 
     constexpr uint8_t kUpdateToken[] = { 1, 2, 3, 4, 5, 6, 7, 8 };
