@@ -190,6 +190,7 @@ from chip.testing.taglist_and_topology_test import (create_device_type_list_for_
                                                     get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
 from chip.tlv import uint
 from TC_DeviceConformance import get_supersets
+from chip.clusters.Types import Nullable
 
 
 def get_vendor_id(mei: int) -> int:
@@ -1117,7 +1118,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                     self.fail_current_test("Atleast 1 NamespaceID is not present")
                 self.print_step(5.1, "verifying Tag property in the taglist struct for endpoint: {endpoint_id}".format(
                     endpoint_id=endpoint_id))
-                if not tag_struct.tag:
+                if not isinstance(tag_struct.tag, int):
                     self.fail_current_test("Atleast 1 Tag is not present")
 
                 if tag_struct.tag in no_duplicate_tag:
@@ -1129,7 +1130,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                 self.print_step(5.2, "verifying namespaceID value falls under defined namespaces for endpoint: {endpoint_id}".format(
                     endpoint_id=endpoint_id))
 
-                if tag_struct.mfgCode is None:
+                if isinstance(tag_struct.mfgCode, Nullable):
                     if tag_struct.namespaceID not in [COMMON_CLOSURE_NAMESPACE_NAMESPACE_ID,
                                                       COMMON_COMPASS_DIRECTION_NAMESPACE_ID,
                                                       COMMON_COMPASS_LOCATION_NAMESPACE_ID,
