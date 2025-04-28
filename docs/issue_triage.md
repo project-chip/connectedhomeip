@@ -113,6 +113,8 @@ types or functionality) as well as individual examples.
 | `examples/fabric-admin`                        | Yufeng Wang, Terence Hampson |              |
 | `examples/fabric-bridge-app`                   | Yufeng Wang, Terence Hampson |              |
 | `examples/java-matter-controller`              | Yunhan Wang, Yufeng Wang     |              |
+| `examples/jf-admin-app`                        | Doru Gucea                   |              |
+| `examples/jf-control-app`                      | Doru Gucea                   |              |
 | `examples/kotlin-matter-controller`            | Yunhan Wang, Yufeng Wang     |              |
 | `examples/laundry-washer-app`                  |                              | UNMAINTAINED |
 | `examples/lighting-app`                        | Junior Martinez              |              |
