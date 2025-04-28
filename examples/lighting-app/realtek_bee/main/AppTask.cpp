@@ -24,6 +24,7 @@
 #include "Globals.h"
 #include "util/RealtekObserver.h"
 
+#include <DeviceInfoProviderImpl.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.h>
@@ -32,14 +33,10 @@
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
-#include <data-model-providers/codegen/Instance.h>
-
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-
+#include <data-model-providers/codegen/Instance.h>
 #include <inet/EndPointStateOpenThread.h>
-
-#include <DeviceInfoProviderImpl.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
