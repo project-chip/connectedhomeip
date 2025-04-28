@@ -187,7 +187,7 @@ from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocat
                                          async_test_body, default_matter_test_main)
 from chip.testing.taglist_and_topology_test import (create_device_type_list_for_root, create_device_type_lists,
                                                     find_tag_list_problems, find_tree_roots, flat_list_ok,
-                                                    get_direct_children_of_root, parts_list_cycles, separate_endpoint_types)
+                                                    get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
 from chip.tlv import uint
 
 
@@ -749,7 +749,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         flat, tree = separate_endpoint_types(self.endpoints)
 
         self.print_step(5, "Check for cycles in the tree endpoints")
-        cycles = parts_list_cycles(tree, self.endpoints)
+        cycles = parts_list_problems(tree, self.endpoints)
         if len(cycles) != 0:
             for id in cycles:
                 location = AttributePathLocation(endpoint_id=id, cluster_id=cluster_id, attribute_id=attribute_id)
