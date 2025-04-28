@@ -37,13 +37,13 @@ namespace {
 using namespace chip;
 using namespace chip::app::Clusters::ClosureDimension;
 using Protocols::InteractionModel::Status;
- 
+
 CHIP_ERROR ClosureDimensionDelegate::Init()
 {
     GenericCurrentStateStruct currentState{ Optional<Percent100ths>(0), Optional<bool>(false),
         Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
     ReturnErrorOnFailure(mLogic->SetCurrentState(chip::app::DataModel::MakeNullable(currentState)));
-    
+
     GenericTargetStruct targetState{ Optional<Percent100ths>(0), Optional<bool>(false),
         Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
     ReturnErrorOnFailure(mLogic->SetTarget(chip::app::DataModel::MakeNullable(targetState)));
@@ -54,7 +54,7 @@ CHIP_ERROR ClosureDimensionDelegate::Init()
     ReturnErrorOnFailure(mLogic->SetLimitRange(limitRange));
 
     ReturnErrorOnFailure(mLogic->SetStepValue(kStep));
-    
+
     return CHIP_NO_ERROR;
 }
 
@@ -88,9 +88,9 @@ Status ClosureDimensionDelegate::HandleSetTarget(const Optional<Percent100ths> &
     const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
     (void) DeviceLayer::SystemLayer().CancelTimer(MotionTimerEventHandler, this);
-    
+
     (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(kExampleMotionCountDown), MotionTimerEventHandler, this);
-    
+
     // Trigger Motion Action
 
     return Status::Success;
@@ -133,10 +133,10 @@ Status ClosureDimensionDelegate::HandleStep(const StepDirectionEnum & direction,
 {
     mTargetDirection = direction;
     (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds16(kExampleStepCountDown), HandleStepMotion, this);
-    
+
     //Trigger Step Action
     return Status::Success;
-    
+
 }
 
 bool ClosureDimensionDelegate::IsManualLatchingNeeded()
@@ -144,7 +144,7 @@ bool ClosureDimensionDelegate::IsManualLatchingNeeded()
      // Check if closure needs manual latching.(manufacture specific)
     return false;
 }
- 
+
 CHIP_ERROR ClosureDimensionEndpoint::Init()
 {
     ClusterConformance conformance;
@@ -154,12 +154,12 @@ CHIP_ERROR ClosureDimensionEndpoint::Init()
                             .Set(Feature::kLimitation)
                             .Set(Feature::kSpeed);
     conformance.OptionalAttributes().Set(OptionalAttributeEnum::kOverflow);
-    
+
     ClusterInitParameters clusterInitParameters;
-    
+
     ReturnErrorOnFailure(mLogic.Init(conformance, clusterInitParameters));
     ReturnErrorOnFailure(mInterface.Init());
     ReturnErrorOnFailure(mDelegate.Init());
-      
+
     return CHIP_NO_ERROR;
 }

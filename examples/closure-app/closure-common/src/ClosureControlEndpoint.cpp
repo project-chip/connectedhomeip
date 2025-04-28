@@ -65,7 +65,7 @@ PositioningEnum ClosureControlDelegate::GetStatePositionFromTarget(TargetPositio
 
 DataModel::Nullable<ElapsedS> ClosureControlDelegate::GetRemainingTime()
 {
-    
+
     if (mCountDownTime.IsNull())
         return DataModel::NullNullable;
 
@@ -129,12 +129,12 @@ void ClosureControlDelegate::HandleCountdownTimeExpired()
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     (void) DeviceLayer::SystemLayer().CancelTimer(onOperationalStateTimerTick, this);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-    
+
     mCountDownTime.SetNonNull(0);
     mCalibratingTime = 0;
     mWaitingTime = 0;
     mMovingTime = 0;
-    
+
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     logic->SetCountdownTimeFromDelegate(mCountDownTime);
     logic->GetMainState(state);
@@ -172,7 +172,7 @@ void ClosureControlDelegate::HandleCountdownTimeExpired()
         logic->GenerateMovementCompletedEvent();
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     }
-    
+
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     logic->SetMainState(MainStateEnum::kStopped);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
@@ -181,11 +181,11 @@ void ClosureControlDelegate::HandleCountdownTimeExpired()
 Status ClosureControlDelegate::HandleCalibrateCommand()
 {
     mCountDownTime.SetNonNull(static_cast<uint32_t>(kExampleCalibrateCountDown));
-    
+
     (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOperationalStateTimerTick, this);
-    
+
     //Trigger Calibrate Action.
-    
+
     return Status::Success;
 }
 
@@ -210,7 +210,7 @@ Status ClosureControlDelegate::HandleMoveToCommand(const Optional<TargetPosition
         (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOperationalStateTimerTick, this);
         return Status::Success;
     }
-    
+
     return Status::Success;
 }
 
@@ -219,16 +219,16 @@ Status ClosureControlDelegate::HandleStopCommand()
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     (void) DeviceLayer::SystemLayer().CancelTimer(onOperationalStateTimerTick, this);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-    
+
     mCalibratingTime = 0;
     mMovingTime = 0;
     mWaitingTime = 0;
-    
+
     mCountDownTime.SetNonNull(0);
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     GetLogic()->SetCountdownTimeFromDelegate(mCountDownTime);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-    
+
     //Trigger Stop Action.
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
@@ -242,16 +242,16 @@ Protocols::InteractionModel::Status ClosureControlDelegate::HandleMotion()
 {
     // Cancel timer if any motion is in progress
     (void) DeviceLayer::SystemLayer().CancelTimer(onOperationalStateTimerTick, this);
-    
+
     mWaitingTime = 0;
     mMovingTime = 0;
-    
+
     mCountDownTime.SetNonNull(static_cast<uint32_t>(kExampleMotionCountDown));
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOperationalStateTimerTick, this);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-    
+
     //Trigger Motion Action
     return Status::Success;
 }
@@ -304,11 +304,11 @@ CHIP_ERROR ClosureControlEndpoint::Init()
     conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed).Set(Feature::kVentilation)
                             .Set(Feature::kPedestrian).Set(Feature::kCalibration).Set(Feature::kProtection).Set(Feature::kManuallyOperable);
     conformance.OptionalAttributes().Set(OptionalAttributeEnum::kCountdownTime);
-    
+
     ClusterInitParameters clusterInitParameters;
     clusterInitParameters.mMainState = MainStateEnum::kStopped;
     ReturnErrorOnFailure(mLogic.Init(conformance, clusterInitParameters));
     ReturnErrorOnFailure(mInterface.Init());
-     
+
     return CHIP_NO_ERROR;
  }

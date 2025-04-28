@@ -31,18 +31,18 @@ using namespace chip::app::Clusters::ClosureDimension;
 
 
 namespace {
-    
+
     // Define the endpoint ID for the Closure
     constexpr chip::EndpointId kClosureEndpoint       = 1;
     constexpr chip::EndpointId kClosurePanel1Endpoint = 2;
     constexpr chip::EndpointId kClosurePanel2Endpoint = 3;
-    
-    
+
+
     // Closure Endpoints
     ClosureControlEndpoint   ep1(1);
     ClosureDimensionEndpoint ep2(2);
     ClosureDimensionEndpoint ep3(3);
-    
+
     // Define the Namespace and Tag for the endpoint
     // Derived from https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-Closure.adoc
     constexpr const uint8_t kNamespaceClosure      = 0x44;
@@ -54,38 +54,38 @@ namespace {
     constexpr const uint8_t kNamespaceClosurePanel = 0x45;
     constexpr const uint8_t kTagClosurePanelLift   = 0x00;
     constexpr const uint8_t kTagClosurePanelTilt   = 0x01;
-    
-    
+
+
     // Define the list of semantic tags for the endpoint
     const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp1TagList[] = {
-        { 
+        {
             .namespaceID = kNamespaceClosure,
             .tag         = kTagClosureCovering,
-            .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("Closure.Covering"_span)) 
+            .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("Closure.Covering"_span))
         },
         {
             .namespaceID = kNamespaceCovering,
             .tag         = kTagCoveringVenetian,
-            .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("Covering.Venetian"_span)) 
+            .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("Covering.Venetian"_span))
         },
     };
-    
+
     const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp2TagList[] = {
-        { 
+        {
             .namespaceID = kNamespaceClosurePanel,
             .tag         = kTagClosurePanelLift,
-            .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("ClosurePanel.Lift"_span)) 
+            .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("ClosurePanel.Lift"_span))
         },
     };
-    
+
     const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp3TagList[] = {
-        { 
+        {
             .namespaceID = kNamespaceClosurePanel,
             .tag         = kTagClosurePanelTilt,
-            .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("ClosurePanel.Tilt"_span)) 
+            .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("ClosurePanel.Tilt"_span))
         },
     };
-    
+
 } // namespace
 
 ClosureManager ClosureManager::sClosureMgr;
@@ -93,20 +93,20 @@ ClosureManager ClosureManager::sClosureMgr;
 void ClosureManager::Init()
 {
     ChipLogProgress(AppServer,"Closure-app ClosureManager Init Start.");
-    
+
     DeviceLayer::PlatformMgr().LockChipStack();
-    
+
     // Closure endpoints initilization
-    ep1.Init(); 
+    ep1.Init();
     ep2.Init();
     ep3.Init();
-    
+
     // Set Taglist for Closure endpoints
     SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp1TagList));
     SetTagList(/* endpoint= */ 2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp2TagList));
     SetTagList(/* endpoint= */ 3, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp3TagList));
-    
+
     DeviceLayer::PlatformMgr().UnlockChipStack();
-    
+
     ChipLogProgress(AppServer,"Closure-app ClosureManager Init Done.");
 }

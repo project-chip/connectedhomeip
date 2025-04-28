@@ -33,13 +33,13 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ClosureDimension {
-   
+
 using Protocols::InteractionModel::Status;
 
 /**
 * @class ClosureDimensionDelegate
 * @brief A delegate class that handles Closure Dimension commands at the application level.
-* 
+*
 * This class is responsible for processing Closure Dimension commands such as Stop, MoveTo, and Calibrate
 * according to specific business logic. It is designed to be used as a delegate for the Closure Dimension cluster.
 */
@@ -48,23 +48,23 @@ class ClosureDimensionDelegate : public DelegateBase
 public:
 
    ClosureDimensionDelegate() {}
-   
+
    virtual ~ClosureDimensionDelegate() = default;
 
 
    // Override for the DelegateBase Virtual functions
-   
+
    Status HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<bool> & latch,
    const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
    Status HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
       const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
-      
+
    bool IsManualLatchingNeeded() override;
 
    /**
     * @brief Initializes the ClosureDimensionDelegate instance.
     *        Sets the Initial state of Closure.
-    * 
+    *
     * @return CHIP_ERROR indicating the result of the initialization.
     */
    CHIP_ERROR Init();
@@ -87,10 +87,10 @@ private:
 /**
 * @class ClosureDimensionEndpoint
 * @brief Represents a Closure Dimension cluster endpoint.
-* 
+*
 * This class encapsulates the logic and interfaces required to manage a Closure Dimension cluster endpoint.
 * It integrates the delegate, context, logic, and interface components for the endpoint.
-* 
+*
 * @param mEndpoint The endpoint ID associated with this Closure Dimension endpoint.
 * @param mContext The Matter context for the endpoint.
 * @param mDelegate The delegate instance for handling commands.
@@ -106,37 +106,37 @@ public:
    {
       mDelegate.SetLogic(&mLogic);
    }
-   
+
    virtual ~ClosureDimensionEndpoint() = default;
 
    /**
     * @brief Initializes the ClosureDimensionEndpoint instance.
-    * 
+    *
     * @return CHIP_ERROR indicating the result of the initialization.
     */
    CHIP_ERROR Init();
 
    /**
     * @brief Retrieves the delegate associated with this Closure Dimension endpoint.
-    * 
+    *
     * @return Reference to the ClosureDimensionDelegate instance.
     */
    ClosureDimensionDelegate & GetDelegate() { return mDelegate; }
 
    /**
     * @brief Retrieves the Cluster logic object associated with this Closure Dimension endpoint.
-    * 
+    *
     * @return Reference to the ClosureDimensionDelegate instance.
     */
-   
+
    ClusterLogic & GetLogic() { return mLogic; }
 
 private:
    EndpointId mEndpoint = kInvalidEndpointId;
-   MatterContext mContext; 
-   ClosureDimensionDelegate mDelegate; 
-   ClusterLogic mLogic; 
-   Interface mInterface; 
+   MatterContext mContext;
+   ClosureDimensionDelegate mDelegate;
+   ClusterLogic mLogic;
+   Interface mInterface;
 };
 
 } // namespace ClosureDimension
