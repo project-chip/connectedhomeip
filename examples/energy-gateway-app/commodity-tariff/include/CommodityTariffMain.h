@@ -41,6 +41,7 @@
   * This function is typically found in main.cpp or wherever the singleton is created.
   */
  CommodityTariffInstance * GetCommodityTariffInstance();
+ CommodityTariffDelegate * GetCommodityTariffDelegate();
  
  } // namespace CommodityTariff
  } // namespace Clusters

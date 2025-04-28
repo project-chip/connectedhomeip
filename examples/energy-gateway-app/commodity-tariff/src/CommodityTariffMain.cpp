@@ -39,6 +39,16 @@
  {
      return gCommodityTariffInstance.get();
  }
+
+ CommodityTariffDelegate * CommodityTariff::GetCommodityTariffDelegate()
+ {
+     CommodityTariffInstance * mInst = GetCommodityTariffInstance();
+     VerifyOrDieWithMsg(mInst != nullptr, AppServer, "CommodityTariffInstance is null");
+     CommodityTariffDelegate * dg = mInst->GetDelegate();
+     VerifyOrDieWithMsg(dg != nullptr, AppServer, "CommodityTariffDelegate is null");
+ 
+     return dg;
+ }
  
  CHIP_ERROR CommodityTariffInit(EndpointId endpointId)
  {

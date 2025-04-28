@@ -22,8 +22,6 @@
 
 #include <app/clusters/commodity-tariff-server/commodity-tariff-server.h>
 
-#include <fstream>
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;
@@ -35,45 +33,6 @@ using namespace chip::app::Clusters::CommodityTariff::Attributes;
 using namespace chip::app::Clusters::CommodityTariff::Structs;
 
 using chip::Protocols::InteractionModel::Status;
-
-static constexpr const char * default_tariff_data = "./commodity-tariff/DefaultTariff.json";
-
-
-
-
-static bool LoadJsonFile(const char * aFname, Json::Value &jsonValue)
-{
-    bool is_ok = false;
-    std::ifstream ifs;    
-    Json::CharReaderBuilder builder;
-    Json::String errs;
-
-    ifs.open(aFname);
-
-    if (!ifs.good())
-    {
-        ChipLogError(NotSpecified,
-             "AllClusters App: Error open file %s", aFname);
-        goto exit;
-    }
-
-    if (!parseFromStream(builder, ifs, &jsonValue, &errs)) {
-        ChipLogError(NotSpecified,
-             "AllClusters App: Error parsing JSON file %s with error %s:", aFname, errs.c_str());
-        goto exit;
-    }
-
-    if (jsonValue.empty() || !jsonValue.isObject())
-    {
-        ChipLogError(NotSpecified, "Invalid file format %s", aFname);
-        goto exit;
-    }
-
-    is_ok = true;
-
-exit:
-    return is_ok;
-}
 
 CHIP_ERROR CommodityTariffInstance::Init()
 {
@@ -87,18 +46,7 @@ void CommodityTariffInstance::Shutdown()
 
 CommodityTariffDelegate::CommodityTariffDelegate()
 {
-    Json::Value json_root;
 
-    if ( LoadJsonFile(default_tariff_data, json_root) )
-    {
-        ChipLogProgress(NotSpecified, "The default tariff file opened successfully");
-        LoadTariffData(json_root);
-        mTariffData.LoadJson(json_root);        
-    }
-    else
-    {
-        ChipLogError(NotSpecified, "Unable to load default tariff file");
-    }
 }
 
 /*
@@ -127,7 +75,7 @@ CHIP_ERROR CommodityTariffPrimaryData::LoadJson(const Json::Value& root)
     const std::map<std::string, std::function<CHIP_ERROR(const Json::Value&)>> required_tariff_items = {
         {"TariffUnit",          [this](const Json::Value& v){ return TariffUnit.LoadFromJson(v); }},
         {"StartDate",           [this](const Json::Value& v){ return StartDate.LoadFromJson(v); }},
-        {"TariffLabel",         [this](const Json::Value& v){ return TariffInfo.LoadFromJson(v); }},
+        {"TariffInfo",          [this](const Json::Value& v){ return TariffInfo.LoadFromJson(v); }},
         {"DayEntries",          [this](const Json::Value& v){ return DayEntries.LoadFromJson(v); }},
         {"TariffComponents",    [this](const Json::Value& v){ return TariffComponents.LoadFromJson(v); }},
         {"TariffPeriods",       [this](const Json::Value& v){ return TariffPeriods.LoadFromJson(v); }}
@@ -149,14 +97,7 @@ CHIP_ERROR CommodityTariffPrimaryData::LoadJson(const Json::Value& root)
         {
             Json::Value value = root.get(key, Json::Value());
 
-            if (value.isArray())
-            {
-                err = item.second(value);
-            }
-            else
-            {
-                err = item.second(root);
-            }
+            err = item.second(value);
 
             if ( err != CHIP_NO_ERROR )
             {
@@ -206,21 +147,37 @@ CHIP_ERROR CommodityTariffPrimaryData::LoadJson(const Json::Value& root)
 
 // TariffUnitDataClass
 CHIP_ERROR TariffUnitDataClass::LoadFromJson(const Json::Value & json) {
+    if (json.isUInt())
+    {
+        mValue.SetNonNull(static_cast<Globals::TariffUnitEnum>(json.asUInt()));
+    }
     return CHIP_NO_ERROR;
 }
 
 // StartDateDataClass
 CHIP_ERROR StartDateDataClass::LoadFromJson(const Json::Value & json) {
+    if (json.isUInt())
+    {
+        mValue.SetNonNull(static_cast<uint32_t>(json.asUInt()));
+    }
     return CHIP_NO_ERROR;
 }
 
 // DefaultRandomizationOffsetDataClass
 CHIP_ERROR DefaultRandomizationOffsetDataClass::LoadFromJson(const Json::Value & json) {
+    if (json.isUInt())
+    {
+        mValue.SetNonNull(static_cast<int16_t>(json.asUInt()));
+    }
     return CHIP_NO_ERROR;
 }
 
 // DefaultRandomizationTypeDataClass
 CHIP_ERROR DefaultRandomizationTypeDataClass::LoadFromJson(const Json::Value & json) {
+    if (json.isUInt())
+    {
+        mValue.SetNonNull(static_cast<DayEntryRandomizationTypeEnum>(json.asUInt()));
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -342,7 +299,7 @@ CHIP_ERROR TariffInfoDataClass::LoadFromJson(const Json::Value & json)
     return CHIP_NO_ERROR;
 }
 
-bool TariffInfoDataClass::IsValid(const TariffInformationStructType& tariffInfo) const {
+bool TariffInfoDataClass::IsValid(const TariffInformationStructType& tariffInfo) {
 
     if (tariffInfo.IsNull())
     {
@@ -499,7 +456,7 @@ void TariffPeriodItemDataClass::CleanupTariffPeriod(TariffPeriodStructType& peri
     }
 }
 
-bool TariffPeriodItemDataClass::IsValid(const TariffPeriodStructType& period) const {
+bool TariffPeriodItemDataClass::IsValid(const TariffPeriodStructType& period) {
     // Validate label length if present
     if (period.label.IsNull()) {
         return false;
@@ -638,12 +595,11 @@ CHIP_ERROR DayEntryItemDataClass::UpdateValue(const DayEntryStructType& aValue) 
     tempValue.randomizationType = aValue.randomizationType;
 
     // Validate before committing
-    VerifyOrExit(IsValid(tempValue), err = CHIP_ERROR_INVALID_ARGUMENT);
+    //VerifyOrExit(IsValid(tempValue), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     CleanupValue();
     mValue = tempValue;
 
-exit:
     return err;
 }
 
@@ -676,7 +632,7 @@ CHIP_ERROR DayEntryItemDataClass::ParseFromJson(const Json::Value& json, DayEntr
     return err;
 }
 
-bool DayEntryItemDataClass::IsValid(const DayEntryStructType& entry) const {
+bool DayEntryItemDataClass::IsValid(const DayEntryStructType& entry) {
     // Validate startTime (max 1499 = 24h59m in minutes)
     if (entry.startTime > 1499) {
         return false;
@@ -808,7 +764,7 @@ CHIP_ERROR TariffComponentItemDataClass::UpdateValue(const TariffComponentStruct
     }
 
     // Validate before committing
-    VerifyOrExit(IsValid(tempValue), err = CHIP_ERROR_INVALID_ARGUMENT);
+    //VerifyOrExit(IsValid(tempValue), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     CleanupValue();
     mValue = tempValue;
@@ -875,7 +831,7 @@ void TariffComponentItemDataClass::CleanupTariffComponent(TariffComponentStructT
     }
 }
 
-bool TariffComponentItemDataClass::IsValid(const TariffComponentStructType& component) const {
+bool TariffComponentItemDataClass::IsValid(const TariffComponentStructType& component) {
     // Validate required field
     if (component.tariffComponentID == 0) {
         return false;

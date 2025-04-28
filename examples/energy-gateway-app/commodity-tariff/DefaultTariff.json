@@ -1,6 +1,8 @@
 {
-  "TariffLabel": "Residential Peak",
-  "ProviderName": "MetroEnergy Inc",
+  "TariffInfo": {
+    "TariffLabel": "Residential Peak",
+    "ProviderName": "MetroEnergy Inc",
+  },
   "TariffUnit": 0,
   "StartDate": 1672531200,
   "DayEntries": [

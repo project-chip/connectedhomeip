@@ -42,15 +42,14 @@ constexpr bool operator!=(const Globals::Structs::CurrencyStruct::Type & lhs, co
 #define X(attrName, attrType) \
 class attrName##DataClass : public CTC_BaseDataClass<attrType> { \
 public: \
-    attrName##DataClass(attrType& aValueStorage) \
-        : CTC_BaseDataClass<attrType>(aValueStorage) { mValue = aValueStorage; }\
-    ~attrName##DataClass() override = default; \
-    CHIP_ERROR LoadFromJson(const Json::Value& json) override ;/*{ return CHIP_NO_ERROR; }*/ \
+    /*attrName##DataClass(attrType& aValueStorage) \
+        : CTC_BaseDataClass<attrType>(aValueStorage) { mValue = aValueStorage; }*/\
+    /*~attrName##DataClass() = default;*/ \
+    CHIP_ERROR LoadFromJson(const Json::Value& json); \
 protected:    \
-    CHIP_ERROR UpdateValue(const attrType& aValue) override { \
+    /*CHIP_ERROR UpdateValue(const attrType& aValue) { \
         mValue = aValue;        \
-        return CHIP_NO_ERROR; }; \
-    void CleanupValue() override {}; \
+        return CHIP_NO_ERROR; };*/ \
 };
 // Generate all classes
 COMMODITY_TARIFF_PRIMARY_ATTRIBUTES_STUBS
@@ -61,12 +60,12 @@ class attrName##DataClass : public CTC_BaseDataClass<attrType> { \
 public: \
     attrName##DataClass(attrType& aValueStorage) \
         : CTC_BaseDataClass<attrType>(aValueStorage) { mValue = aValueStorage; }\
-    ~attrName##DataClass() override = default; \
+    ~attrName##DataClass() = default; \
 protected:    \
-    CHIP_ERROR UpdateValue(const attrType& aValue) override { \
+    /*CHIP_ERROR UpdateValue(const attrType& aValue) { \
         mValue = aValue;        \
-        return CHIP_NO_ERROR; }; \
-    void CleanupValue() override {}; \
+        return CHIP_NO_ERROR; };*/ \
+    /*void CleanupValue() {};*/ \
 };
 // Generate all classes
 COMMODITY_TARIFF_CURRENT_ATTRIBUTES
@@ -127,14 +126,14 @@ public:
             callback(mTariffData);
         }
     };
-    ~TariffDataUpdater() = default; 
-private:
-    CommodityTariffPrimaryData mTariffData;
-    Callback callback;
+    ~TariffDataUpdater() = default;
 
     CHIP_ERROR LoadJson(const Json::Value & root) { 
         return mTariffData.LoadJson(root);
-    };
+    };    
+private:
+    CommodityTariffPrimaryData mTariffData;
+    Callback callback;
 };
 
 class CommodityTariffDelegate : public CommodityTariff::Delegate
@@ -163,6 +162,12 @@ COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 COMMODITY_TARIFF_CURRENT_ATTRIBUTES
 #undef X
 
+void LoadTariffData(const Json::Value & value)
+{
+    auto cb = [this](const CommodityTariffPrimaryData& data) { this->TariffDataUpdaterCb(data); };
+    updater = std::make_unique<TariffDataUpdater>(cb, value);
+    updater->LoadJson(value);   
+}
 private:
     CommodityTariffPrimaryData mTariffData;
     CommodityTariffCurrentData mCurrentData;
@@ -193,12 +198,6 @@ private:
         MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, attributeId);
     };
 
-    void LoadTariffData(const Json::Value & value)
-    {
-        auto cb = [this](const CommodityTariffPrimaryData& data) { this->TariffDataUpdaterCb(data); };
-        updater = std::make_unique<TariffDataUpdater>(cb, value);
-    }
-
     void TariffDataUpdaterCb(const CommodityTariffPrimaryData& newData) {
         if (!newData.IsValid())
         {
@@ -208,7 +207,6 @@ private:
         {
             UpdateTariffAttributes(newData);
             ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data applied");
-            //updater.reset();
         }
     }
 

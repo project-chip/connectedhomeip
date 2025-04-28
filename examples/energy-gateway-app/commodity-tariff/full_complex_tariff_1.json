@@ -1,0 +1,185 @@
+{
+    "TariffInfo": {
+        "TariffLabel": "Full Tariff One",
+        "ProviderName": "Default Provider",
+        "Currency": {
+            "Currency": 120,
+            "DecimalPoints": 0
+        },
+        "BlockMode": 0
+    },
+    "TariffUnit": 0,
+    "StartDate": 0,
+    "DayEntries": [
+        {
+            "DayEntryID": 10,
+            "StartTime": 0,
+            "Duration": 1500,
+            "RandomizationOffset": 0,
+            "RandomizationType": 0
+        },
+        {
+            "DayEntryID": 20,
+            "StartTime": 0,
+            "Duration": 60,
+            "RandomizationOffset": 0,
+            "RandomizationType": 0
+        },
+        {
+            "DayEntryID": 21,
+            "StartTime": 60,
+            "Duration": 1440,
+            "RandomizationOffset": 0,
+            "RandomizationType": 0
+        },
+        {
+            "DayEntryID": 30,
+            "StartTime": 0,
+            "RandomizationOffset": 0,
+            "RandomizationType": 0
+        },
+        {
+            "DayEntryID": 40,
+            "StartTime": 160,
+            "RandomizationOffset": 0,
+            "RandomizationType": 0
+        }
+    ],
+    "DayPatterns": [
+        {
+            "DayPatternID": 0,
+            "DaysOfWeek": "0x01",
+            "DayEntryIDs": [
+                10
+            ]
+        },
+        {
+            "DayPatternID": 1,
+            "DaysOfWeek": "0x02",
+            "DayEntryIDs": [
+                20,
+                21
+            ]
+        },
+        {
+            "DayPatternID": 2,
+            "DaysOfWeek": "0x7C",
+            "DayEntryIDs": [
+                30
+            ]
+        }
+    ],
+    "CalendarPeriods": [
+        {
+            "StartDate": 0,
+            "DayPatternIDs": [
+                0,
+                1,
+                2
+            ]
+        }
+    ],
+    "IndividualDays": [
+        {
+            "Date": 1745427104,
+            "DayType": 1,
+            "DayEntryIDs": [
+                40
+            ]
+        }
+    ],
+    "TariffComponents": [
+        {
+            "TariffComponentID": 10,
+            "Price": {
+                "PriceType": 0,
+                "Price": 0.15,
+                "PriceLevel": 1
+            },
+            "FriendlyCredit": false,
+            "AuxiliaryLoad": {
+                "Number": 1,
+                "RequiredState": 0
+            },
+            "PeakPeriod": {
+                "Severity": 1,
+                "PeakPeriod": 1
+            },
+            "PowerThreshold": {
+                "PowerThreshold": 2400000,
+                "ApparentPowerThreshold": 120,
+                "PowerThresholdSource": 0
+            },
+            "Threshold": 120,
+            "Label": "Base Tariff Component",
+            "Predicted": false
+        },
+        {
+            "TariffComponentID": 20,
+            "Price": {
+                "PriceType": 0,
+                "Price": 0.2,
+                "PriceLevel": 0
+            },
+            "FriendlyCredit": false,
+            "AuxiliaryLoad": {
+                "Number": 1,
+                "RequiredState": 0
+            },
+            "PeakPeriod": {
+                "Severity": 1,
+                "PeakPeriod": 1
+            },
+            "PowerThreshold": {
+                "PowerThreshold": 4800000,
+                "ApparentPowerThreshold": 240,
+                "PowerThresholdSource": 0
+            },
+            "Threshold": 240,
+            "Label": "Other Tariff Component",
+            "Predicted": false
+        }
+    ],
+    "TariffPeriods": [
+        {
+            "Label": "Simple day",
+            "DayEntryIDs": [
+                10
+            ],
+            "TariffComponentIDs": [
+                10
+            ]
+        },
+        {
+            "Label": "Combo day",
+            "DayEntryIDs": [
+                20,
+                21
+            ],
+            "TariffComponentIDs": [
+                20
+            ]
+        },
+        {
+            "Label": "Another day",
+            "DayEntryIDs": [
+                30
+            ],
+            "TariffComponentIDs": [
+                10,
+                20
+            ]
+        },
+        {
+            "Label": "Holiday",
+            "DayEntryIDs": [
+                40
+            ],
+            "TariffComponentIDs": [
+                20
+            ]
+        }
+    ],
+    "DefaultRandomizationOffset": 0,
+    "DefaultRandomizationType": 0
+}
