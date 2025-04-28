@@ -25,11 +25,10 @@
 #include <app/clusters/closure-dimension-server/closure-dimension-matter-context.h>
 #include <app/clusters/closure-dimension-server/closure-dimension-server.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <cmsis_os2.h>
 
 namespace {
     constexpr chip::Percent100ths kLimitRangeMin = 0;
-    constexpr chip::Percent100ths kLimitRangaMax = 10000;
+    constexpr chip::Percent100ths kLimitRangeMax = 10000;
     constexpr chip::Percent100ths kStep            = 1000;
     const uint32_t kExampleMotionCountDown = 5;
     const uint32_t kExampleStepCountDown   = 3000;
@@ -51,7 +50,7 @@ CHIP_ERROR ClosureDimensionDelegate::Init()
 
     Structs::RangePercent100thsStruct::Type limitRange;
     limitRange.min = kLimitRangeMin;
-    limitRange.max = kLimitRangaMax;
+    limitRange.max = kLimitRangeMax;
     ReturnErrorOnFailure(mLogic->SetLimitRange(limitRange));
 
     ReturnErrorOnFailure(mLogic->SetStepValue(kStep));
@@ -66,7 +65,12 @@ static void MotionTimerEventHandler(System::Layer * systemLayer, void * data)
     chip::app::DataModel::Nullable<GenericCurrentStateStruct> current;
 
     delegate->GetLogic()->GetTarget(target);
-    current.Value().position.SetValue(static_cast<uint16_t>(target.Value().position.Value()));
+    delegate->GetLogic()->GetCurrentState(current);
+    if (target.Value().position.HasValue())
+    {
+        current.Value().position.SetValue(target.Value().position.Value());
+    }
+
     if (target.Value().latch.HasValue())
     {
         current.Value().latch.SetValue(target.Value().latch.Value());
@@ -76,7 +80,6 @@ static void MotionTimerEventHandler(System::Layer * systemLayer, void * data)
     {
         current.Value().speed.SetValue(target.Value().speed.Value());
     }
-    
     delegate->GetLogic()->SetCurrentState(current);
 }
 
@@ -90,7 +93,7 @@ Status ClosureDimensionDelegate::HandleSetTarget(const Optional<Percent100ths> &
     
     // Trigger Motion Action
 
-    return Status::Success;;
+    return Status::Success;
 }
 
 static void HandleStepMotion(System::Layer * systemLayer, void * data)
@@ -144,9 +147,6 @@ bool ClosureDimensionDelegate::IsManualLatchingNeeded()
  
 CHIP_ERROR ClosureDimensionEndpoint::Init()
 {
-    ChipLogProgress(AppServer, "ClosureDimensionEndpoint::Init start");
-    osDelay(1000);
-    
     ClusterConformance conformance;
     conformance.FeatureMap().Set(Feature::kPositioning)
                             .Set(Feature::kMotionLatching)
@@ -158,14 +158,8 @@ CHIP_ERROR ClosureDimensionEndpoint::Init()
     ClusterInitParameters clusterInitParameters;
     
     ReturnErrorOnFailure(mLogic.Init(conformance, clusterInitParameters));
-    ChipLogProgress(AppServer, "mLogicInit done");
-    osDelay(1000);
     ReturnErrorOnFailure(mInterface.Init());
-    ChipLogProgress(AppServer, "interfaceInit done");
-    osDelay(1000);
     ReturnErrorOnFailure(mDelegate.Init());
       
-    ChipLogProgress(AppServer, "ClosureDimensionEndpoint::Init end");
-    osDelay(1000);
     return CHIP_NO_ERROR;
 }

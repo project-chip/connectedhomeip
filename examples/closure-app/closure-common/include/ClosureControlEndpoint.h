@@ -29,6 +29,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <cmsis_os2.h>
  
 namespace chip {
 namespace app {
@@ -115,6 +116,13 @@ private:
      * @return PositioningEnum
      */
     PositioningEnum GetStatePositionFromTarget(TargetPositionEnum targetPosition);
+
+    /**
+     * @brief Function to populate OverallState object with values from OverallTarget
+     * 
+     * @param [in] target, state which need to mapped
+     */
+    void PopulateOverallStateFromTarget(const DataModel::Nullable<GenericOverallTarget> & target, GenericOverallState & state);
 };
 
 /**
