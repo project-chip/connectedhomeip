@@ -51,11 +51,12 @@ class TC_CLCTRL_2_1(MatterBaseTest):
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read AttributeList attribute to determine supported attributes"),
-            TestStep(3, "Read CountdownTime attribute if supported"),
-            TestStep(4, "Read MainState attribute"),
-            TestStep(5, "Read CurrentErrorList attribute"),
-            TestStep(6, "Read OverallState attribute"),
-            TestStep(7, "Read OverallTarget attribute"),
+            TestStep(3, "Read FeatureMap attribute to determine supported features"),
+            TestStep(4, "Read CountdownTime attribute if supported"),
+            TestStep(5, "Read MainState attribute"),
+            TestStep(6, "Read CurrentErrorList attribute"),
+            TestStep(7, "Read OverallState attribute"),
+            TestStep(8, "Read OverallTarget attribute"),
         ]
         return steps
 
@@ -79,8 +80,16 @@ class TC_CLCTRL_2_1(MatterBaseTest):
         attribute_list = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
         logging.info(f"Attribute list: {attribute_list}")
         
-        # STEP 3: Read CountdownTime attribute if supported
+        # STEP 3: Read FeatureMap attribute to determine supported features
         self.step(3)
+        feature_map = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)     
+        
+        is_latching_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kMotionLatching
+        is_positioning_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kPositioning
+        is_speed_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kSpeed
+        
+        # STEP 4: Read CountdownTime attribute if supported
+        self.step(4)
         if attributes.CountdownTime.attribute_id in attribute_list:
             countdown_time = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
             logging.info(f"CountdownTime: {countdown_time}")
@@ -90,15 +99,15 @@ class TC_CLCTRL_2_1(MatterBaseTest):
         else:
             logging.info("CountdownTime attribute not supported, skipping step")
 
-        # STEP 4: Read MainState attribute
-        self.step(4)
+        # STEP 5: Read MainState attribute
+        self.step(5)
         main_state = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
         asserts.assert_less_equal(main_state, Clusters.ClosureControl.Enums.MainStateEnum.kSetupRequired, "MainState attribute is out of range")
         asserts.assert_greater_equal(main_state, Clusters.ClosureControl.Enums.MainStateEnum.kStopped, "MainState attribute is out of range")
         logging.info(f"MainState: {main_state}")
 
-        # STEP 5: Read CurrentErrorList attribute
-        self.step(5)
+        # STEP 6: Read CurrentErrorList attribute
+        self.step(6)
         current_error_list = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentErrorList)
         asserts.assert_less_equal(len(current_error_list), 10, "CurrentErrorList length is out of range")
         for error in current_error_list:
@@ -107,18 +116,10 @@ class TC_CLCTRL_2_1(MatterBaseTest):
             asserts.assert_greater_equal(error, 0x00, "CurrentErrorList value is out of range")
         logging.info(f"CurrentErrorList: {current_error_list}")
 
-        # STEP 6: Read OverallState attribute
-        self.step(6)
+        # STEP 7: Read OverallState attribute
+        self.step(7)
         overall_state = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallState)
         logging.info(f"OverallState: {overall_state}")
-        
-        # Check for device features to validate OverallState structure
-        feature_map = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
-        logging.info(f"FeatureMap: 0x{feature_map:x}")       
-        
-        is_latching_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kMotionLatching
-        is_positioning_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kPositioning
-        is_speed_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kSpeed
 
         if overall_state is not NullValue:
             # Check Positioning feature in OverallState - PS feature (bit 0)
@@ -144,8 +145,8 @@ class TC_CLCTRL_2_1(MatterBaseTest):
         else:
             logging.info("OverallState is NULL, skipping steps")
             
-        # STEP 7: Read OverallTarget attribute
-        self.step(7)
+        # STEP 8: Read OverallTarget attribute
+        self.step(8)
         overall_target = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallTarget)
         logging.info(f"OverallTarget: {overall_target}")
         
