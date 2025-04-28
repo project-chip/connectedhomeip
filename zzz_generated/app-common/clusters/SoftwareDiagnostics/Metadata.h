@@ -57,7 +57,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace ResetWatermarks {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = SoftwareDiagnostics::Commands::ResetWatermarks::Id,
+    .commandId       = ResetWatermarks::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
