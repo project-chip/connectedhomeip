@@ -537,7 +537,7 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
     mSetUpCodePairer.SetBleLayer(mSystemState->BleLayer());
 #endif // CONFIG_NETWORK_LAYER_BLE
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    for (WiFiPAF::PafSessionId_t & pafSessionId : mPafSessionId)
+    for (WiFiPAF::PafSessionId_t & pafSessionId : mPafSessionIds)
     {
         pafSessionId = WiFiPAF::kUndefinedWiFiPafSessionId;
     }
@@ -578,7 +578,7 @@ void DeviceCommissioner::Shutdown()
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    for (WiFiPAF::PafSessionId_t & pafSessionId : mPafSessionId)
+    for (WiFiPAF::PafSessionId_t & pafSessionId : mPafSessionIds)
     {
         if (pafSessionId != WiFiPAF::kUndefinedWiFiPafSessionId)
         {
@@ -840,11 +840,11 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     if (params.GetPeerAddress().GetTransportType() == Transport::Type::kWiFiPAF)
     {
-        auto nodeId                            = params.GetPeerAddress().GetRemoteId();
-        WiFiPAF::WiFiPAFLayer & pafLayer       = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
-        WiFiPAF::WiFiPAFSession chkSessionInfo = { .nodeId = nodeId };
-        WiFiPAF::WiFiPAFSession * existingSession  = pafLayer.GetPAFInfo(WiFiPAF::PafInfoAccess::kAccNodeId, chkSessionInfo);
-        if (pChkSession == nullptr)
+        auto nodeId                               = params.GetPeerAddress().GetRemoteId();
+        WiFiPAF::WiFiPAFLayer & pafLayer          = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
+        WiFiPAF::WiFiPAFSession chkSessionInfo    = { .nodeId = nodeId };
+        WiFiPAF::WiFiPAFSession * existingSession = pafLayer.GetPAFInfo(WiFiPAF::PafInfoAccess::kAccNodeId, chkSessionInfo);
+        if (existingSession == nullptr)
         {
             // The PAF session does not exist.
             ChipLogProgress(Controller, "WiFi-PAF: Subscribing to the NAN-USD devices, nodeId: %lu",
@@ -862,13 +862,13 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
             WiFiPAF::WiFiPAFSession sessionInfo = { .role          = WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber,
                                                     .nodeId        = nodeId,
                                                     .discriminator = discriminator };
-            ReturnErrorOnFailure(pafLayer.AddPAFSession(WiFiPAF::PAFInfoAccess::kAccNodeInfo, sessionInfo));
+            ReturnErrorOnFailure(pafLayer.AddPafSession(WiFiPAF::PafInfoAccess::kAccNodeInfo, sessionInfo));
             ReturnErrorOnFailure(DeviceLayer::ConnectivityMgr().WiFiPAFSubscribe(
                 discriminator, reinterpret_cast<void *>(this), OnWiFiPAFSubscribeComplete, OnWiFiPAFSubscribeError));
             WiFiPAF::WiFiPAFSession * pSession = pafLayer.GetPAFInfo(WiFiPAF::PafInfoAccess::kAccNodeId, sessionInfo);
             if (pSession != nullptr)
             {
-                for (WiFiPAF::PafSessionId_t & pafSessionId : mPafSessionId)
+                for (WiFiPAF::PafSessionId_t & pafSessionId : mPafSessionIds)
                 {
                     if (pafSessionId == WiFiPAF::kUndefinedWiFiPafSessionId)
                     {

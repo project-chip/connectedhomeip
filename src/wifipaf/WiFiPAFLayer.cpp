@@ -471,11 +471,11 @@ CHIP_ERROR WiFiPAFLayer::RmPafSession(PafInfoAccess accType, WiFiPAFSession & Se
         switch (accType)
         {
         case PafInfoAccess::kAccSessionId:
-            if (PafSession.id == SessionInfo.id)
+            if (pafSession.id == SessionInfo.id)
             {
-                ChipLogProgress(WiFiPAF, "Removing session with id: %u", PafSession.id);
+                ChipLogProgress(WiFiPAF, "Removing session with id: %u", pafSession.id);
                 // Clear the slot
-                CleanPafInfo(PafSession);
+                CleanPafInfo(pafSession);
                 return CHIP_NO_ERROR;
             }
             break;
@@ -491,31 +491,31 @@ WiFiPAFSession * WiFiPAFLayer::GetPAFInfo(PafInfoAccess accType, WiFiPAFSession 
 {
     for (WiFiPAFSession & pafSession : mPafInfoVect)
     {
-        if (PafSession.role == kWiFiPafRole_Publisher)
+        if (pafSession.role == kWiFiPafRole_Publisher)
         {
-            if (PafSession.id != kUndefinedWiFiPafSessionId)
-                return &PafSession;
+            if (pafSession.id != kUndefinedWiFiPafSessionId)
+                return &pafSession;
             else
                 continue;
         }
         switch (accType)
         {
         case PafInfoAccess::kAccSessionId:
-            if (PafSession.id == SessionInfo.id)
+            if (pafSession.id == SessionInfo.id)
             {
-                return &PafSession;
+                return &pafSession;
             }
             break;
         case PafInfoAccess::kAccNodeId:
-            if (PafSession.nodeId == SessionInfo.nodeId)
+            if (pafSession.nodeId == SessionInfo.nodeId)
             {
-                return &PafSession;
+                return &pafSession;
             }
             break;
         case PafInfoAccess::kAccDisc:
-            if (PafSession.discriminator == SessionInfo.discriminator)
+            if (pafSession.discriminator == SessionInfo.discriminator)
             {
-                return &PafSession;
+                return &pafSession;
             }
             break;
         default:

@@ -814,7 +814,7 @@ enum nan_service_protocol_type
 };
 #pragma pack(pop)
 
-CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAFAdvertiseParam & InArgs)
+CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAFAdvertiseParams & InArgs)
 {
     GAutoPtr<GError> err;
     guint publish_id;

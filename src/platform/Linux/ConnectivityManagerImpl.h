@@ -262,7 +262,7 @@ private:
     WiFiPAF::WiFiPAFEndPoint mWiFiPAFEndPoint;
     void * mAppState;
     uint16_t mApFreq;
-    CHIP_ERROR _WiFiPAFPublish(WiFiPAFAdvertiseParam & args);
+    CHIP_ERROR _WiFiPAFPublish(WiFiPAFAdvertiseParams & args);
     CHIP_ERROR _WiFiPAFCancelPublish(uint32_t PublishId);
 #endif
 
