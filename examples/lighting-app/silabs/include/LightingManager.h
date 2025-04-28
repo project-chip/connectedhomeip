@@ -68,7 +68,10 @@ public:
 private:
     friend LightingManager & LightMgr(void);
     State_t mState;
-    uint8_t mLevel;
+
+    uint8_t mCurrentLevel;
+    uint8_t mCurrentHue        = 0; // RAM copy of CurrentHue
+    uint8_t mCurrentSaturation = 0; // RAM copy of CurrentSaturation
 
     Callback_fn_initiated mActionInitiated_CB;
     Callback_fn_completed mActionCompleted_CB;

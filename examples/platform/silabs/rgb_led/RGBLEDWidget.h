@@ -53,6 +53,9 @@ public:
     void SetColor(uint8_t r, uint8_t g, uint8_t b);
     void GetColor(uint16_t & r, uint16_t & g, uint16_t & b);
 
+    void Set(bool state);
+    bool GetLEDStatus(uint8_t led);
+
     // Color Conversion Functions
     void SetColorFromHSV(uint8_t h, uint8_t s);
     void SetColorFromXY(uint16_t currentX, uint16_t currentY);
@@ -85,22 +88,3 @@ private:
     uint8_t CalculateT(uint8_t v, uint8_t s, uint32_t remainder);
     void SetRgbByRegion(uint8_t region, uint8_t v, uint8_t p, uint8_t q, uint8_t t, RgbColor_t & rgb);
 };
-
-#if 0
-class RGBLEDWidget : public LEDWidget
-{
-public:
-    void SetColor(uint8_t red, uint8_t green, uint8_t blue);
-    void GetColor(uint16_t red, uint16_t green, uint16_t blue);
-    void SetLevel(uint8_t aLevel);
-    uint8_t GetLevel();
-    void SetColorFromHSV(uint8_t h, uint8_t s);
-    void SetColorFromXY(uint16_t currentX, uint16_t currentY);
-    void SetColorFromCT(uint16_t ct);
-
-private:
-    uint8_t red;
-    uint8_t green;
-    uint8_t blue;
-};
-#endif

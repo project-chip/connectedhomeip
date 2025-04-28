@@ -26,9 +26,16 @@
 using namespace ::chip::System;
 using namespace chip::DeviceLayer::Silabs;
 
+void RGBLEDWidget::Set(bool state)
+{
+    mLastChangeTimeMS = mBlinkOnTimeMS = mBlinkOffTimeMS = 0;
+    GetPlatform().SetLed(state, GetLED());
+    mLedStatus = state;
+}
+
 void RGBLEDWidget::SetColor(uint8_t red, uint8_t green, uint8_t blue)
 {
-    if (GetLEDStatus(GetLED()))
+    if (GetPlatform().GetRGBLedState(GetLED()))
     {
         ChipLogProgress(Zcl, "SetColor : %u|%u|%u", red, green, blue);
         GetPlatform().SetLedColor(GetLED(), red, green, blue);

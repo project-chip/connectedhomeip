@@ -168,7 +168,7 @@ CHIP_ERROR SilabsPlatform::SetLedColor(uint8_t led, uint8_t red, uint8_t green, 
     sl_si91x_simple_rgb_led_set_colour(SL_RGB_LED_INSTANCE(led), rgb_color);
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR SilabsPlatform::GetLedColor(uint8_t led, uint16_t r, uint16_t g, uint16_t b)
+CHIP_ERROR SilabsPlatform::GetLedColor(uint8_t led, uint16_t & r, uint16_t & g, uint16_t & b)
 {
     sl_si91x_simple_rgb_led_get_colour(SL_RGB_LED_INSTANCE(led), &r, &g, &b);
     return CHIP_NO_ERROR;

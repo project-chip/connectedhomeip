@@ -74,7 +74,7 @@ CHIP_ERROR LightingManager::Init()
     status = Clusters::LevelControl::Attributes::CurrentLevel::Get(1, brightness);
     if (status == Protocols::InteractionModel::Status::Success && !brightness.IsNull())
     {
-        mLevel = brightness.Value();
+        mCurrentLevel = brightness.Value();
     }
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
@@ -163,9 +163,9 @@ bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction, uint8_t *
     if (aAction == LEVEL_ACTION)
     {
         action_initiated = true;
-        if (mLevel != *aValue)
+        if (mCurrentLevel != *aValue)
         {
-            mLevel = *aValue;
+            mCurrentLevel = *aValue;
             AppTask::GetAppTask().PostLightActionRequest(aActor, aAction, aValue);
         }
     }
