@@ -103,7 +103,7 @@ class TC_WEBRTC_1_2(MatterBaseTest):
         current_sessions = await self.read_single_attribute_check_success(cluster=WebRTCTransportProvider,
                                                                           attribute=WebRTCTransportProvider.Attributes.CurrentSessions,
                                                                           endpoint=endpoint)
-        asserts.assert_equal(len(current_sessions), 1, f"No Pre-Existing session found")
+        asserts.assert_equal(len(current_sessions), 1, "No Pre-Existing session found")
 
         resolution = CameraAvStreamManagement.Structs.VideoResolutionStruct(
             width=640, height=480
