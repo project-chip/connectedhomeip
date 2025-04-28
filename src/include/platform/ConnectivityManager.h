@@ -178,7 +178,7 @@ public:
     void ClearWiFiStationProvision();
     CHIP_ERROR GetAndLogWiFiStatsCounters();
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    struct WiFiPAFAdvertiseParam
+    struct WiFiPAFAdvertiseParams
     {
         /* Frequency list */
         ReadOnlyBuffer<uint16_t> freq_list;
