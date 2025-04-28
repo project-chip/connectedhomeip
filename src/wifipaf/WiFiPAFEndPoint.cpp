@@ -827,7 +827,7 @@ CHIP_ERROR WiFiPAFEndPoint::DebugPktAckSn(const PktDirect_t pktDirect, Encoding:
     size_t skipOffset = 0;
 
     err = reader.Read8(rxFlags.RawStorage()).StatusCode();
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+    ReturnErrorOnFailure(err);
     if (rxFlags.Has(WiFiPAFTP::HeaderFlags::kHandshake))
     {
         // Handshake message => No ack/sn
