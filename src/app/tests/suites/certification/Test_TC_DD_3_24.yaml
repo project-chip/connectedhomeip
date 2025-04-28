@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name:
-    3.3.24 [TC-DD-3.24] NFC-based commissioning [DUT as Commissionee]
+name: 3.3.24 [TC-DD-3.24] NFC-based commissioning [DUT as Commissionee]
 
 PICS:
     - MCORE.ROLE.COMMISSIONER
@@ -36,7 +35,7 @@ tests:
       disabled: true
 
     - label: "Step 4: Initiate commissioning through NFC interface (NTL) using
-    NodeId and Onboarding payload on command-line"
+        NodeId and Onboarding payload on command-line"
       command: "PairWithCodeThruNFC"
       arguments:
           values:
