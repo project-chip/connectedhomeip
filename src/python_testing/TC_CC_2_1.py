@@ -326,15 +326,15 @@ class TC_CC_2_1(MatterBaseTest):
 
         self.step(24)
         # Read NumberOfPrimaries from the cluster.
-        numberofprimaries_value = await self._verify_attribute(self.attributes.NumberOfPrimaries, ValueTypesEnum.UINT8, min_len=0, max_len=6)
-        if numberofprimaries_value == 0:
+        number_of_primaries_value = await self._verify_attribute(self.attributes.NumberOfPrimaries, ValueTypesEnum.UINT8, min_len=0, max_len=6)
+        if number_of_primaries_value == 0:
             logger.info("NumberOfPrimaries is 0 skipping steps 25 through 42.")
             for i in range(25, 43):
                 self.skip_step(i)
         else:
-            primariesfound = await self._get_totalnumberofprimaries(primaries=numberofprimaries_value)
+            primariesfound = await self._get_totalnumberofprimaries(primaries=number_of_primaries_value)
             logger.info(f"Fetched Primaries attributes {primariesfound}")
-            asserts.assert_equal(numberofprimaries_value, primariesfound,
+            asserts.assert_equal(number_of_primaries_value, primariesfound,
                                  "NumberOfPrimaries does not match with the Primaries attributes found in the cluster.")
             # Verify for NumberOfPrimaries section
             # We are at step 24 before all the number of primaries checks
@@ -342,8 +342,8 @@ class TC_CC_2_1(MatterBaseTest):
             # range is defined from 1-6
             for primariesindex in range(1, 7):
                 logger.info(
-                    f"Skip if the test index {primariesindex} is graeter than NumberOfPrimaries {numberofprimaries_value} ?")
-                if primariesindex > numberofprimaries_value:
+                    f"Skip if the test index {primariesindex} is graeter than NumberOfPrimaries {number_of_primaries_value} ?")
+                if primariesindex > number_of_primaries_value:
                     # Skip the 3 steps
                     logger.info(f"Skipping for NumberOfPrimaries {primariesindex}")
                     for i in range(1, 4):
