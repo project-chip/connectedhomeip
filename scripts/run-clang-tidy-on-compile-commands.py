@@ -209,15 +209,13 @@ class TidyState:
 def find_darwin_gcc_sysroot():
     try:
         for line in subprocess.check_output(
-            "xcodebuild -sdk -version".split(), text=True
+            "xcodebuild -sdk macosx -version".split(), text=True
         ).splitlines():
             if not line.startswith("Path: "):
                 continue
             path = line[line.find(": ") + 2:]
-            if "/MacOSX.platform/" not in path:
-                continue
             logging.info("Found %s" % path)
-            return path
+            return path.strip()
     except Exception:
         # lets try with xcrun
         try:
