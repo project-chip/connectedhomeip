@@ -21,16 +21,20 @@
         "boolean-state-cluster.xml",
         "boolean-state-configuration-cluster.xml",
         "actions-cluster.xml",
-        "bridged-device-basic-information.xml",
+        "bridged-device-basic-information-cluster.xml",
         "camera-av-settings-user-level-management-cluster.xml",
         "camera-av-stream-management-cluster.xml",
         "chime-cluster.xml",
         "chip-ota.xml",
         "channel-cluster.xml",
         "closure-control-cluster.xml",
+        "closure-dimension-cluster.xml",
         "clusters-extensions.xml",
         "color-control-cluster.xml",
         "commissioner-control-cluster.xml",
+        "commodity-metering-cluster.xml",
+        "commodity-price-cluster.xml",
+        "commodity-tariff-cluster.xml",
         "concentration-measurement-cluster.xml",
         "content-launch-cluster.xml",
         "content-app-observer-cluster.xml",
@@ -42,10 +46,12 @@
         "dishwasher-alarm-cluster.xml",
         "dishwasher-mode-cluster.xml",
         "microwave-oven-mode-cluster.xml",
+        "meter-identification-cluster.xml",
         "door-lock-cluster.xml",
         "drlc-cluster.xml",
         "ecosystem-information-cluster.xml",
         "electrical-energy-measurement-cluster.xml",
+        "electrical-grid-conditions-cluster.xml",
         "electrical-power-measurement-cluster.xml",
         "energy-evse-cluster.xml",
         "energy-evse-mode-cluster.xml",
@@ -196,7 +202,27 @@
         ],
         "Bridged Device Basic Information": ["ProductAppearance"],
         "Chime": ["SelectedChime", "Enabled"],
-        "Closure Control": ["OverallState", "OverallTarget"],
+        "Closure Control": ["CountdownTime", "OverallState", "OverallTarget"],
+        "Closure Dimension": [
+            "CurrentState",
+            "Target",
+            "UnitRange",
+            "LimitRange"
+        ],
+        "Commodity Price": [
+            "TariffUnit",
+            "Currency",
+            "CurrentPrice",
+            "PriceForecast",
+            "FeatureMap"
+        ],
+        "Commodity Tariff": [
+            "TariffInfo",
+            "CurrentDay",
+            "NextDay",
+            "CurrentDayEntry",
+            "NextDayEntry"
+        ],
         "Descriptor": ["ClusterRevision", "FeatureMap"],
         "Device Energy Management": [
             "ESAType",
@@ -296,6 +322,7 @@
             "OperatingMode",
             "FeatureMap"
         ],
+        "Meter Identification": ["PowerThreshold"],
         "Occupancy Sensing": [
             "HoldTimeLimits",
             "HoldTime",
@@ -393,7 +420,9 @@
             "Delay",
             "SecurityPolicy",
             "ChannelPage0Mask",
-            "OperationalDatasetComponents"
+            "OperationalDatasetComponents",
+            "ExtAddress",
+            "Rloc16"
         ],
         "Wi-Fi Network Diagnostics": [
             "BSSID",
@@ -638,6 +667,12 @@
             "CumulativeEnergyReset",
             "FeatureMap"
         ],
+        "Electrical Grid Conditions": [
+            "LocalGenerationAvailable",
+            "CurrentConditions",
+            "ForecastConditions",
+            "FeatureMap"
+        ],
         "Electrical Power Measurement": [
             "PowerMode",
             "NumberOfMeasurementTypes",
@@ -687,13 +722,13 @@
             "MicrophoneCapabilities",
             "SpeakerCapabilities",
             "Viewport",
-            "MaxConcurrentVideoEncoders",
+            "MaxConcurrentEncoders",
             "MaxEncodedPixelRate",
             "NightVisionCapable",
             "RateDistortionTradeOffPoints",
             "MaxContentBufferSize",
             "TwoWayTalkSupport",
-            "SupportedSnapshotParams",
+            "SnapshotCapabilities",
             "MaxNetworkBandwidth",
             "CurrentFrameRate",
             "HDRModeEnabled",

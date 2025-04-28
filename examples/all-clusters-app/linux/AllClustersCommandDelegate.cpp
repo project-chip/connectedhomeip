@@ -22,6 +22,7 @@
 #include <app/EventLogging.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/clusters/occupancy-sensor-server/occupancy-sensor-server.h>
+#include <app/clusters/refrigerator-alarm-server/refrigerator-alarm-server.h>
 #include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
 #include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
 #include <app/clusters/switch-server/switch-server.h>
@@ -285,6 +286,47 @@ void HandleSimulateLatchPosition(Json::Value & jsonValue)
 }
 
 /**
+ * Named pipe handler for simulating a Door Opening.
+ *
+ * Usage example:
+ *   echo '{"Name":"SetRefrigeratorDoorStatus", "EndpointId": 1, "DoorOpen": 1}' > /tmp/chip_all_clusters_fifo_1146610
+ *
+ * JSON Arguments:
+ *   - "Name": Must be "SetRefrigeratorDoorStatus"
+ *   - "EndpointId": ID of endpoint
+ *   - "DoorOpen": Status of the Door, open or closed.
+ *
+ * @param jsonValue - JSON payload from named pipe
+ */
+void SetRefrigeratorDoorStatusHandler(Json::Value & jsonValue)
+{
+    bool hasEndpointId = HasNumericField(jsonValue, "EndpointId");
+    bool hasDoorStatus = HasNumericField(jsonValue, "DoorOpen");
+
+    if (!hasEndpointId || !hasDoorStatus)
+    {
+        std::string inputJson = jsonValue.toStyledString();
+        ChipLogError(NotSpecified, "Missing or invalid value for one of EndpointId, DoorOpen in %s", inputJson.c_str());
+        return;
+    }
+    // values to update the door status
+    EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
+    bool doorStatus       = static_cast<bool>(jsonValue["DoorOpen"].asBool());
+    ChipLogDetail(NotSpecified, "SetRefrigeratorDoorStatusHandler State -> %d.", doorStatus);
+    if (!doorStatus)
+    {
+        RefrigeratorAlarmServer::Instance().SetMaskValue(endpointId, doorStatus);
+        ChipLogDetail(NotSpecified, "Refrigeratoralarm status updated to :%d", doorStatus);
+    }
+    else
+    {
+        ChipLogDetail(NotSpecified, "Refrigeratoralarm status updated to :%d", doorStatus);
+        RefrigeratorAlarmServer::Instance().SetMaskValue(endpointId, doorStatus);
+        RefrigeratorAlarmServer::Instance().SetStateValue(endpointId, doorStatus);
+    }
+}
+
+/**
  * Named pipe handler for simulating switch is idle
  *
  * Usage example:
@@ -509,9 +551,24 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
             ChipLogError(NotSpecified, "Invalid Occupancy state to set.");
         }
     }
+    else if (name == "SetRefrigeratorDoorStatus")
+    {
+        SetRefrigeratorDoorStatusHandler(self->mJsonValue);
+    }
+    else if (name == "SimulateConfigurationVersionChange")
+    {
+        uint32_t configurationVersion = 0;
+        ConfigurationMgr().GetConfigurationVersion(configurationVersion);
+        configurationVersion++;
+
+        if (ConfigurationMgr().StoreConfigurationVersion(configurationVersion + 1) != CHIP_NO_ERROR)
+        {
+            ChipLogError(NotSpecified, "Failed to store configuration version:%d", configurationVersion);
+        }
+    }
     else
     {
-        ChipLogError(NotSpecified, "Unhandled command '%s': this hould never happen", name.c_str());
+        ChipLogError(NotSpecified, "Unhandled command '%s': this should never happen", name.c_str());
         VerifyOrDie(false && "Named pipe command not supported, see log above.");
     }
 

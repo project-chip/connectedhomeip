@@ -1040,6 +1040,9 @@ PICS:
     - label: "Does the DUT(server) support the ProductAppearance attribute?"
       id: BRBINFO.S.A0014
 
+    - label: "Does the DUT(server) support the ConfigurationVersion attribute?"
+      id: BRBINFO.S.A0018
+
     #
     # server / Events
     #
@@ -1879,13 +1882,6 @@ PICS:
           "Id of mode the device will successfully transition to, given its
           current state"
       id: PIXIT.DISHM.MODE_CHANGE_OK
-    #
-    # server / features
-    #
-    - label:
-          "Does the device support depending on an On/Off cluster implemented on
-          the same endpoint?"
-      id: DISHM.S.F00
 
     #
     # server / attributes
@@ -1895,12 +1891,6 @@ PICS:
 
     - label: "Does the device implement the CurrentMode attribute?"
       id: DISHM.S.A0001
-
-    - label: "Does the device implement the StartUpMode attribute?"
-      id: DISHM.S.A0002
-
-    - label: "Does the device implement the OnMode attribute?"
-      id: DISHM.S.A0003
 
     #
     # server / Commands received
@@ -2093,6 +2083,9 @@ PICS:
 
     - label: "Does the DUT(server) support the MaxPathsPerInvoke attribute?"
       id: BINFO.S.A0016
+
+    - label: "Does the DUT(server) support the ConfigurationVersion attribute?"
+      id: BINFO.S.A0018
 
     #####
     - label: "Does the DUT(server) support the NOC list attribute?"
@@ -9053,9 +9046,6 @@ PICS:
     - label: "Does the DUT support testing the Running(0x01) operational state"
       id: OVENOPSTATE.S.M.ST_RUNNING
 
-    - label: "Does the DUT support testing the Paused(0x02) operational state"
-      id: OVENOPSTATE.S.M.ST_PAUSED
-
     - label: "Does the DUT support testing the Error(0x03) operational state?"
       id: OVENOPSTATE.S.M.ST_ERROR
 
@@ -9104,17 +9094,12 @@ PICS:
       id: OVENOPSTATE.S.E01
 
     #Server Commands Received
-    - label: "Does the device implement receiving the Pause command?"
-      id: OVENOPSTATE.S.C00.Rsp
 
     - label: "Does the device implement receiving the Stop command?"
       id: OVENOPSTATE.S.C01.Rsp
 
     - label: "Does the device implement receiving the Start command?"
       id: OVENOPSTATE.S.C02.Rsp
-
-    - label: "Does the device implement receiving the Resume command?"
-      id: OVENOPSTATE.S.C03.Rsp
 
     #Commands generated
     - label:
@@ -9257,14 +9242,6 @@ PICS:
       id: PIXIT.LWM.MODE_CHANGE_OK
 
     #
-    # server / features
-    #
-    - label:
-          "Does the device support depending on an On/Off cluster implemented on
-          the same endpoint?"
-      id: LWM.S.F00
-
-    #
     # server / attributes
     #
     - label: "Does the device implement the SupportedModes attribute?"
@@ -9272,12 +9249,6 @@ PICS:
 
     - label: "Does the device implement the CurrentMode attribute?"
       id: LWM.S.A0001
-
-    - label: "Does the device implement the StartUpMode attribute?"
-      id: LWM.S.A0002
-
-    - label: "Does the device implement the OnMode attribute?"
-      id: LWM.S.A0003
 
     #
     # server / Commands received
@@ -9309,14 +9280,6 @@ PICS:
     #      "Id of mode the device will successfully transition to, given its
     #      current state"
     #  id: PIXIT.DRYERCTRL.S.MODE_CHANGE_OK
-
-    #
-    # server / features
-    #
-    - label:
-          "Does the device support depending on an On/Off cluster implemented on
-          the same endpoint?"
-      id: DRYERCTRL.S.F00
 
     #
     # server / attributes
@@ -9352,14 +9315,6 @@ PICS:
       id: PIXIT.OTCCM.MODE_CHANGE_OK
 
     #
-    # server / features
-    #
-    - label:
-          "Does the device support depending on an On/Off cluster implemented on
-          the same endpoint?"
-      id: OTCCM.S.F00
-
-    #
     # server / attributes
     #
     - label: "Does the device implement the SupportedModes attribute?"
@@ -9367,12 +9322,6 @@ PICS:
 
     - label: "Does the device implement the CurrentMode attribute?"
       id: OTCCM.S.A0001
-
-    - label: "Does the device implement the StartUpMode attribute?"
-      id: OTCCM.S.A0002
-
-    - label: "Does the device implement the OnMode attribute?"
-      id: OTCCM.S.A0003
 
     #
     # server / Commands received
@@ -9459,24 +9408,12 @@ PICS:
     - label: "Can the mode changed by manually control at the device?"
       id: TCCM.S.M.CAN_MANUALLY_CONTROLLED
 
-    #Features
-    - label:
-          "Does the device support depending on an On/Off cluster implemented on
-          the same endpoint?"
-      id: TCCM.S.F00
-
     #Server Attributes
     - label: "Does the device implement the SupportedModes attribute?"
       id: TCCM.S.A0000
 
     - label: "Does the device implement the CurrentMode attribute?"
       id: TCCM.S.A0001
-
-    - label: "Does the device implement the StartUpMode attribute?"
-      id: TCCM.S.A0002
-
-    - label: "Does the device implement the OnMode attribute?"
-      id: TCCM.S.A0003
 
     #Commands received
     - label: "Does the device implement receiving the ChangeToMode command?"

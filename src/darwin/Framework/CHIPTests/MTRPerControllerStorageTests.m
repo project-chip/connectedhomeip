@@ -29,6 +29,7 @@
 #import "MTRFabricInfoChecker.h"
 #import "MTRTestCase+ServerAppRunner.h"
 #import "MTRTestCase.h"
+#import "MTRTestControllerDelegate.h"
 #import "MTRTestDeclarations.h"
 #import "MTRTestKeys.h"
 #import "MTRTestPerControllerStorage.h"
@@ -40,44 +41,6 @@ static const uint16_t kSubscriptionTimeoutInSeconds = 60;
 static NSString * kOnboardingPayload = @"MT:-24J0AFN00KA0648G00";
 static const uint16_t kTestVendorId = 0xFFF1u;
 static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
-
-@interface MTRPerControllerStorageTestsControllerDelegate : NSObject <MTRDeviceControllerDelegate>
-@property (nonatomic, strong) XCTestExpectation * expectation;
-@property (nonatomic, strong) NSNumber * deviceID;
-@end
-
-@implementation MTRPerControllerStorageTestsControllerDelegate
-- (id)initWithExpectation:(XCTestExpectation *)expectation newNodeID:(NSNumber *)newNodeID
-{
-    self = [super init];
-    if (self) {
-        _expectation = expectation;
-        _deviceID = newNodeID;
-    }
-    return self;
-}
-
-- (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError *)error
-{
-    XCTAssertEqual(error.code, 0);
-
-    __auto_type * params = [[MTRCommissioningParameters alloc] init];
-
-    NSError * commissionError = nil;
-    [controller commissionNodeWithID:self.deviceID commissioningParams:params error:&commissionError];
-    XCTAssertNil(commissionError);
-
-    // Keep waiting for controller:commissioningComplete:
-}
-
-- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError *)error
-{
-    XCTAssertEqual(error.code, 0);
-    [_expectation fulfill];
-    _expectation = nil;
-}
-
-@end
 
 @interface MTRPerControllerStorageTestsSuspensionDelegate : NSObject <MTRDeviceControllerDelegate>
 @property (nonatomic, strong) XCTestExpectation * expectation;
@@ -334,6 +297,21 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     BOOL _localTestStorageEnabledBeforeUnitTest;
 }
 
++ (void)setUp
+{
+    // Start one instance of all-clusters-app that the various tests below can
+    // then use, so we're not doing quite as much startup logging.  Though it's
+    // not clear that the ResetCommissionee logging is really shorter, so maybe
+    // we should start these on a per-test basis, e.g. in
+    // commissionWithController:newNodeID:onboardingPayload:
+    [super setUp];
+
+    BOOL started = [self startAppWithName:@"all-clusters"
+                                arguments:@[]
+                                  payload:kOnboardingPayload];
+    XCTAssertTrue(started);
+}
+
 - (void)setUp
 {
     // Set detectLeaks true first, in case our superclass wants to do something
@@ -383,8 +361,8 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Pairing Complete"];
 
-    __auto_type * deviceControllerDelegate = [[MTRPerControllerStorageTestsControllerDelegate alloc] initWithExpectation:expectation
-                                                                                                               newNodeID:newNodeID];
+    __auto_type * deviceControllerDelegate = [[MTRTestControllerDelegate alloc] initWithExpectation:expectation
+                                                                                          newNodeID:newNodeID];
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.device_controller_delegate", DISPATCH_QUEUE_SERIAL);
 
     [controller setDeviceControllerDelegate:deviceControllerDelegate queue:callbackQueue];
@@ -2119,12 +2097,6 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 // startControllerWithRootKeys into a test helper.
 - (void)testControllerServer
 {
-#ifdef DEBUG
-    // Force our controllers to only advertise on localhost, to avoid DNS-SD
-    // crosstalk.
-    [MTRDeviceController forceLocalhostAdvertisingOnly];
-#endif // DEBUG
-
     __auto_type queue = dispatch_get_main_queue();
 
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
@@ -3713,6 +3685,11 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
         XCTAssertEqual(controller.devices.count, 1);
     }
+
+    // Wait for the report processing to finish, so the MTRDevice object may dealloc
+    [controller syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
 
     // report should still be ongoing
     XCTAssertFalse(subscriptionReportEnd1);

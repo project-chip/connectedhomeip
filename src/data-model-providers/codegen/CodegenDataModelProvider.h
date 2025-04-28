@@ -21,10 +21,10 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
-#include <app/data-model-provider/MetadataList.h>
 #include <app/util/af-types.h>
 #include <data-model-providers/codegen/ServerClusterInterfaceRegistry.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/support/ReadOnlyBuffer.h>
 
 namespace chip {
 namespace app {
@@ -44,6 +44,9 @@ namespace app {
 class CodegenDataModelProvider : public DataModel::Provider
 {
 public:
+    // access to the typed global singleton of this class.
+    static CodegenDataModelProvider & Instance();
+
     /// clears out internal caching. Especially useful in unit tests,
     /// where path caching does not really apply (the same path may result in different outcomes)
     void Reset() { mPreviouslyFoundCluster = std::nullopt; }
@@ -67,15 +70,18 @@ public:
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
     /// attribute tree iteration
-    CHIP_ERROR Endpoints(DataModel::ListBuilder<DataModel::EndpointEntry> & out) override;
-    CHIP_ERROR SemanticTags(EndpointId endpointId, DataModel::ListBuilder<SemanticTag> & builder) override;
-    CHIP_ERROR DeviceTypes(EndpointId endpointId, DataModel::ListBuilder<DataModel::DeviceTypeEntry> & builder) override;
-    CHIP_ERROR ClientClusters(EndpointId endpointId, DataModel::ListBuilder<ClusterId> & builder) override;
-    CHIP_ERROR ServerClusters(EndpointId endpointId, DataModel::ListBuilder<DataModel::ServerClusterEntry> & builder) override;
-    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, DataModel::ListBuilder<CommandId> & builder) override;
+    CHIP_ERROR Endpoints(ReadOnlyBufferBuilder<DataModel::EndpointEntry> & out) override;
+    CHIP_ERROR SemanticTags(EndpointId endpointId, ReadOnlyBufferBuilder<SemanticTag> & builder) override;
+    CHIP_ERROR DeviceTypes(EndpointId endpointId, ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & builder) override;
+    CHIP_ERROR ClientClusters(EndpointId endpointId, ReadOnlyBufferBuilder<ClusterId> & builder) override;
+    CHIP_ERROR ServerClusters(EndpointId endpointId, ReadOnlyBufferBuilder<DataModel::ServerClusterEntry> & builder) override;
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+    CHIP_ERROR EndpointUniqueID(EndpointId endpointId, MutableCharSpan & epUniqueId) override;
+#endif
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
-                                DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder) override;
-    CHIP_ERROR Attributes(const ConcreteClusterPath & path, DataModel::ListBuilder<DataModel::AttributeEntry> & builder) override;
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     void Temporary_ReportAttributeChanged(const AttributePathParams & path) override;
 

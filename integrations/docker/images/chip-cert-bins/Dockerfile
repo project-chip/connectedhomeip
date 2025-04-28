@@ -68,6 +68,7 @@ RUN set -x \
     libnspr4-dev \
     libpango1.0-dev \
     libpixman-1-dev \
+    libpcsclite1 \
     libreadline-dev \
     libssl-dev \
     libtool \
@@ -80,6 +81,7 @@ RUN set -x \
     ninja-build \
     openjdk-8-jdk \
     pkg-config \
+    pcscd \
     python3 \
     python3-dev \
     python3-pip \
@@ -161,6 +163,7 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-x64-lock-ipv6only \
     --target linux-x64-simulated-app1-ipv6only \
     --target linux-x64-lit-icd-ipv6only \
+    --target linux-x64-energy-gateway-ipv6only \
     --target linux-x64-energy-management-ipv6only \
     --target linux-x64-microwave-oven-ipv6only \
     --target linux-x64-rvc-ipv6only \
@@ -186,6 +189,7 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-x64-lock-ipv6only/chip-lock-app out/chip-lock-app \
     && mv out/linux-x64-simulated-app1-ipv6only/chip-app1 out/chip-app1 \
     && mv out/linux-x64-lit-icd-ipv6only/lit-icd-app out/lit-icd-app \
+    && mv out/linux-x64-energy-gateway-ipv6only/chip-energy-gateway-app out/chip-energy-gateway-app \
     && mv out/linux-x64-energy-management-ipv6only/chip-energy-management-app out/chip-energy-management-app \
     && mv out/linux-x64-microwave-oven-ipv6only/chip-microwave-oven-app out/chip-microwave-oven-app \
     && mv out/linux-x64-rvc-ipv6only/chip-rvc-app out/chip-rvc-app \
@@ -215,6 +219,7 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-arm64-lock-ipv6only \
     --target linux-arm64-simulated-app1-ipv6only \
     --target linux-arm64-lit-icd-ipv6only \
+    --target linux-arm64-energy-gateway-ipv6only \
     --target linux-arm64-energy-management-ipv6only \
     --target linux-arm64-microwave-oven-ipv6only \
     --target linux-arm64-rvc-ipv6only \
@@ -240,6 +245,7 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-arm64-lock-ipv6only/chip-lock-app out/chip-lock-app \
     && mv out/linux-arm64-simulated-app1-ipv6only/chip-app1 out/chip-app1 \
     && mv out/linux-arm64-lit-icd-ipv6only/lit-icd-app out/lit-icd-app \
+    && mv out/linux-arm64-energy-gateway-ipv6only/chip-energy-gateway-app out/chip-energy-gateway-app \
     && mv out/linux-arm64-energy-management-ipv6only/chip-energy-management-app out/chip-energy-management-app \
     && mv out/linux-arm64-microwave-oven-ipv6only/chip-microwave-oven-app out/chip-microwave-oven-app \
     && mv out/linux-arm64-rvc-ipv6only/chip-rvc-app out/chip-rvc-app \
@@ -279,6 +285,7 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-ota-requestor-ap
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-lock-app apps/chip-lock-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-app1 apps/chip-app1
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/lit-icd-app apps/lit-icd-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-energy-gateway-app apps/chip-energy-gateway-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-energy-management-app apps/chip-energy-management-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-microwave-oven-app apps/chip-microwave-oven-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-rvc-app apps/chip-rvc-app
@@ -312,6 +319,19 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/integrations/mock_server 
 # PIP requires MASON package compilation, which seems to require a JDK
 RUN set -x && DEBIAN_FRONTEND=noninteractive apt-get update; apt-get install -fy openjdk-8-jdk
 
+# TODO: remove this dependency conflict workaround --> issue: #37975
+# python3-gi is being installed as a dependency by 'openjdk-8-jdk'. python3-gi is not wanted since it installs PyGObject 3.48.2 (which we are not using),
+# This issue showed up when we pinned pygobject==3.50.0 in the chip-repl in https://github.com/project-chip/connectedhomeip/pull/37948
+# having pygobject ==3.50.0 being installed through pip creates a conflict, and pip can not unintstall the PyGObject (python3-gi's version) because the system APT installed it
+# Error log:
+#   ERROR: Cannot uninstall 'PyGObject'. It is a distutils installed project and thus we cannot accurately determine which files belong to it which would lead to only a partial uninstall.
+RUN apt-get remove -y python3-gi
+
 RUN pip install --break-system-packages --no-cache-dir \
     python_lib/obj/src/python_testing/matter_testing_infrastructure/chip-testing._build_wheel/chip_testing-*.whl \
     python_lib/controller/python/chip*.whl
+
+# Copy device attestation revocation set and device attestation test vectors
+RUN mkdir -p credentials/test/revoked-attestation-certificates
+COPY --from=chip-build-cert-bins /root/connectedhomeip/credentials/test/revoked-attestation-certificates/dac-provider-test-vectors credentials/test/revoked-attestation-certificates/dac-provider-test-vectors
+COPY --from=chip-build-cert-bins /root/connectedhomeip/credentials/test/revoked-attestation-certificates/revocation-sets credentials/test/revoked-attestation-certificates/revocation-sets

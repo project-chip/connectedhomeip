@@ -42,7 +42,6 @@ enum AreaTypeTag : enum8 {
   kGardenDoor = 37;
   kGuestBathroom = 38;
   kGuestBedroom = 39;
-  kGuestRestroom = 40;
   kGuestRoom = 41;
   kGym = 42;
   kHallway = 43;
@@ -50,7 +49,6 @@ enum AreaTypeTag : enum8 {
   kKidsRoom = 45;
   kKidsBedroom = 46;
   kKitchen = 47;
-  kLarder = 48;
   kLaundryRoom = 49;
   kLawn = 50;
   kLibrary = 51;
@@ -75,7 +73,6 @@ enum AreaTypeTag : enum8 {
   kRamp = 70;
   kReceptionRoom = 71;
   kRecreationRoom = 72;
-  kRestroom = 73;
   kRoof = 74;
   kSauna = 75;
   kScullery = 76;
@@ -97,39 +94,13 @@ enum AreaTypeTag : enum8 {
   kUtilityRoom = 92;
   kWard = 93;
   kWorkshop = 94;
+  kToilet = 95;
 }
 
 enum AtomicRequestTypeEnum : enum8 {
   kBeginWrite = 0;
   kCommitWrite = 1;
   kRollbackWrite = 2;
-}
-
-enum FloorSurfaceTag : enum8 {
-  kCarpet = 0;
-  kCeramic = 1;
-  kConcrete = 2;
-  kCork = 3;
-  kDeepCarpet = 4;
-  kDirt = 5;
-  kEngineeredWood = 6;
-  kGlass = 7;
-  kGrass = 8;
-  kHardwood = 9;
-  kLaminate = 10;
-  kLinoleum = 11;
-  kMat = 12;
-  kMetal = 13;
-  kPlastic = 14;
-  kPolishedConcrete = 15;
-  kRubber = 16;
-  kRug = 17;
-  kSand = 18;
-  kStone = 19;
-  kTatami = 20;
-  kTerrazzo = 21;
-  kTile = 22;
-  kVinyl = 23;
 }
 
 enum LandmarkTag : enum8 {
@@ -186,6 +157,13 @@ enum LandmarkTag : enum8 {
   kWineCooler = 50;
 }
 
+enum LocationTag : enum8 {
+  kIndoor = 0;
+  kOutdoor = 1;
+  kInside = 2;
+  kOutside = 3;
+}
+
 enum PositionTag : enum8 {
   kLeft = 0;
   kRight = 1;
@@ -196,6 +174,12 @@ enum PositionTag : enum8 {
   kColumn = 6;
 }
 
+enum PowerThresholdSourceEnum : enum8 {
+  kContract = 0;
+  kRegulator = 1;
+  kEquipment = 2;
+}
+
 enum RelativePositionTag : enum8 {
   kUnder = 0;
   kNextTo = 1;
@@ -204,6 +188,19 @@ enum RelativePositionTag : enum8 {
   kAbove = 4;
   kFrontOf = 5;
   kBehind = 6;
+}
+
+enum TariffPriceTypeEnum : enum8 {
+  kStandard = 0;
+  kCritical = 1;
+  kVirtual = 2;
+  kIncentive = 3;
+  kIncentiveSignal = 4;
+}
+
+enum TariffUnitEnum : enum8 {
+  kKWh = 0;
+  kKVAh = 1;
 }
 
 enum TestGlobalEnum : enum8 {
@@ -222,6 +219,22 @@ enum ThreeLevelAutoEnum : enum8 {
 bitmap TestGlobalBitmap : bitmap32 {
   kFirstBit = 0x1;
   kSecondBit = 0x2;
+}
+
+struct CurrencyStruct {
+  int16u currency = 0;
+  int8u decimalPoints = 1;
+}
+
+struct PowerThresholdStruct {
+  optional power_mw powerThreshold = 0;
+  optional power_mva apparentPowerThreshold = 1;
+  nullable PowerThresholdSourceEnum powerThresholdSource = 2;
+}
+
+struct PriceStruct {
+  money amount = 0;
+  CurrencyStruct currency = 1;
 }
 
 struct TestGlobalStruct {
@@ -293,13 +306,13 @@ cluster Identify = 3 {
 
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 cluster Descriptor = 29 {
-  revision 2;
+  revision 3;
 
   bitmap Feature : bitmap32 {
     kTagList = 0x1;
   }
 
-  struct DeviceTypeStruct {
+  shared struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
   }
@@ -308,7 +321,7 @@ cluster Descriptor = 29 {
     nullable vendor_id mfgCode = 0;
     enum8 namespaceID = 1;
     enum8 tag = 2;
-    optional nullable char_string label = 3;
+    optional nullable char_string<64> label = 3;
   }
 
   readonly attribute DeviceTypeStruct deviceTypeList[] = 0;
@@ -316,6 +329,7 @@ cluster Descriptor = 29 {
   readonly attribute cluster_id clientList[] = 2;
   readonly attribute endpoint_no partsList[] = 3;
   readonly attribute optional SemanticTagStruct tagList[] = 4;
+  readonly attribute optional char_string<32> endpointUniqueID = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -474,7 +488,7 @@ cluster AccessControl = 31 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 cluster BasicInformation = 40 {
-  revision 3;
+  revision 5;
 
   enum ColorEnum : enum8 {
     kBlack = 0;
@@ -557,6 +571,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute int32u specificationVersion = 21;
   readonly attribute int16u maxPathsPerInvoke = 22;
+  readonly attribute int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1612,7 +1627,7 @@ labels. */
 cluster FixedLabel = 64 {
   revision 1; // NOTE: Default/not specifically set
 
-  struct LabelStruct {
+  shared struct LabelStruct {
     char_string<16> label = 0;
     char_string<16> value = 1;
   }
@@ -1836,7 +1851,7 @@ cluster OccupancySensing = 1030 {
 cluster CarbonMonoxideConcentrationMeasurement = 1036 {
   revision 3;
 
-  enum LevelValueEnum : enum8 {
+  shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -1844,13 +1859,13 @@ cluster CarbonMonoxideConcentrationMeasurement = 1036 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : enum8 {
+  shared enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : enum8 {
+  shared enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -1879,7 +1894,7 @@ cluster CarbonMonoxideConcentrationMeasurement = 1036 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -1893,7 +1908,7 @@ cluster CarbonMonoxideConcentrationMeasurement = 1036 {
 cluster CarbonDioxideConcentrationMeasurement = 1037 {
   revision 3;
 
-  enum LevelValueEnum : enum8 {
+  shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -1901,13 +1916,13 @@ cluster CarbonDioxideConcentrationMeasurement = 1037 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : enum8 {
+  shared enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : enum8 {
+  shared enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -1936,7 +1951,7 @@ cluster CarbonDioxideConcentrationMeasurement = 1037 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -1950,7 +1965,7 @@ cluster CarbonDioxideConcentrationMeasurement = 1037 {
 cluster NitrogenDioxideConcentrationMeasurement = 1043 {
   revision 3;
 
-  enum LevelValueEnum : enum8 {
+  shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -1958,13 +1973,13 @@ cluster NitrogenDioxideConcentrationMeasurement = 1043 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : enum8 {
+  shared enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : enum8 {
+  shared enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -1993,7 +2008,7 @@ cluster NitrogenDioxideConcentrationMeasurement = 1043 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2007,7 +2022,7 @@ cluster NitrogenDioxideConcentrationMeasurement = 1043 {
 cluster OzoneConcentrationMeasurement = 1045 {
   revision 3;
 
-  enum LevelValueEnum : enum8 {
+  shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -2015,13 +2030,13 @@ cluster OzoneConcentrationMeasurement = 1045 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : enum8 {
+  shared enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : enum8 {
+  shared enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -2050,7 +2065,7 @@ cluster OzoneConcentrationMeasurement = 1045 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2064,7 +2079,7 @@ cluster OzoneConcentrationMeasurement = 1045 {
 cluster Pm25ConcentrationMeasurement = 1066 {
   revision 3;
 
-  enum LevelValueEnum : enum8 {
+  shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -2072,13 +2087,13 @@ cluster Pm25ConcentrationMeasurement = 1066 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : enum8 {
+  shared enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : enum8 {
+  shared enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -2107,7 +2122,7 @@ cluster Pm25ConcentrationMeasurement = 1066 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2121,7 +2136,7 @@ cluster Pm25ConcentrationMeasurement = 1066 {
 cluster FormaldehydeConcentrationMeasurement = 1067 {
   revision 3;
 
-  enum LevelValueEnum : enum8 {
+  shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -2129,13 +2144,13 @@ cluster FormaldehydeConcentrationMeasurement = 1067 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : enum8 {
+  shared enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : enum8 {
+  shared enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -2164,7 +2179,7 @@ cluster FormaldehydeConcentrationMeasurement = 1067 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2178,7 +2193,7 @@ cluster FormaldehydeConcentrationMeasurement = 1067 {
 cluster Pm1ConcentrationMeasurement = 1068 {
   revision 3;
 
-  enum LevelValueEnum : enum8 {
+  shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -2186,13 +2201,13 @@ cluster Pm1ConcentrationMeasurement = 1068 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : enum8 {
+  shared enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : enum8 {
+  shared enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -2221,7 +2236,7 @@ cluster Pm1ConcentrationMeasurement = 1068 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2235,7 +2250,7 @@ cluster Pm1ConcentrationMeasurement = 1068 {
 cluster Pm10ConcentrationMeasurement = 1069 {
   revision 3;
 
-  enum LevelValueEnum : enum8 {
+  shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -2243,13 +2258,13 @@ cluster Pm10ConcentrationMeasurement = 1069 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : enum8 {
+  shared enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : enum8 {
+  shared enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -2278,7 +2293,7 @@ cluster Pm10ConcentrationMeasurement = 1069 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2292,7 +2307,7 @@ cluster Pm10ConcentrationMeasurement = 1069 {
 cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
   revision 3;
 
-  enum LevelValueEnum : enum8 {
+  shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -2300,13 +2315,13 @@ cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : enum8 {
+  shared enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : enum8 {
+  shared enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -2335,7 +2350,7 @@ cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2349,7 +2364,7 @@ cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
 cluster RadonConcentrationMeasurement = 1071 {
   revision 3;
 
-  enum LevelValueEnum : enum8 {
+  shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -2357,13 +2372,13 @@ cluster RadonConcentrationMeasurement = 1071 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : enum8 {
+  shared enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : enum8 {
+  shared enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -2392,7 +2407,7 @@ cluster RadonConcentrationMeasurement = 1071 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2453,8 +2468,9 @@ endpoint 0 {
     callback attribute capabilityMinima;
     callback attribute specificationVersion;
     callback attribute maxPathsPerInvoke;
+    callback attribute configurationVersion default = 1;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 5;
   }
 
   server cluster LocalizationConfiguration {
@@ -2615,7 +2631,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 6;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -2654,7 +2670,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 6;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -2696,7 +2712,7 @@ endpoint 3 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 6;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -2739,7 +2755,7 @@ endpoint 4 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 6;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -2780,7 +2796,7 @@ endpoint 5 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 6;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -2821,7 +2837,7 @@ endpoint 6 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 6;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -2863,7 +2879,7 @@ endpoint 7 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 6;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -2905,7 +2921,7 @@ endpoint 8 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 6;
 
     handle command Identify;
     handle command TriggerEffect;

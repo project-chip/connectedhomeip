@@ -11624,8 +11624,94 @@
       clusters:
           # In-progress for maybe Matter 1.5
           - ClosureControl
+          - ClosureDimension
+          - CommodityMetering
+          - CommodityPrice
+          - CommodityTariff
+          - MeterIdentification
+          - TLSClientManagement
+      attributes:
+          ThreadNetworkDiagnostics:
+              # In-progress for maybe Matter 1.5
+              - ExtAddress
+              - Rloc16
+      commands:
+          OperationalCredentials:
+              # In-progress for Matter 1.5: VID Verification feature
+              - SetVIDVerificationStatement
+              - SignVIDVerificationRequest
+              - SignVIDVerificationResponse
+      structs:
+          Globals:
+              # In-progress for maybe Matter 1.5
+              - CurrencyStruct
+              - PowerThresholdStruct
+              - PriceStruct
+      struct fields:
+          OperationalCredentials:
+              # In-progress for Matter 1.5: VID Verification feature
+              FabricDescriptorStruct:
+                  - vidVerificationStatement
+              NOCStruct:
+                  - vvsc
+      enums:
+          Globals:
+              # In-progress for maybe Matter 1.5
+              - PowerThresholdSourceEnum
+              - TariffPriceTypeEnum
+              - TariffUnitEnum
+      enum values:
+          ElectricalPowerMeasurement:
+              # In-progress for maybe Matter 1.5
+              MeasurementTypeEnum:
+                  - ApparentEnergy
+                  - ReactiveEnergy
+          ElectricalEnergyMeasurement:
+              # In-progress for maybe Matter 1.5
+              MeasurementTypeEnum:
+                  - ApparentEnergy
+                  - ReactiveEnergy
+          RVCCleanMode:
+              # In progress for maybe Matter 1.5
+              ModeTag:
+                  - VacuumThenMop
+          RVCOperationalState:
+              # Additional error and operational states:
+              # in-progress for maybe Matter 1.5
+              ErrorStateEnum:
+                  - LowBattery
+                  - CannotReachTargetArea
+                  - DirtyWaterTankFull
+                  - DirtyWaterTankMissing
+                  - WheelsJammed
+                  - BrushJammed
+                  - NavigationSensorObscured
+              OperationalStateEnum:
+                  - EmptyingDustBin
+                  - CleaningMop
+                  - FillingWaterTank
+                  - UpdatingMaps
       device types:
           # In-progress for maybe Matter 1.5
+          - Awning
+          - Barrier
+          - Cabinet
           - Camera
+          - Door
+          - Blind
+          - ClosureBase
+          - Curtain
+          - ElectricalEnergyTariff
+          - ElectricalMeter
+          - ElectricalUtilityMeter
+          - GarageDoor
+          - Gate
+          - MeterReferencePoint
+          - MountedDimmableLoadControl
           - MountedOnOffControl
+          - Pergola
+          - Screen
+          - Shade
+          - Shutter
           - ThermostatController
+          - Window

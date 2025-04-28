@@ -24,7 +24,9 @@
  **/
 #include "DeviceCallbacks.h"
 #include "Globals.h"
-
+#if DLPS_EN
+#include "matter_gpio.h"
+#endif
 #include "BoltLockManager.h"
 #include "CHIPDeviceManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -155,6 +157,10 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
         break;
 
     case DeviceEventType::kServerReady:
+#if DLPS_EN
+        matter_gpio_allow_to_enter_dlps();
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
         if (!isOTAInitialized)
         {

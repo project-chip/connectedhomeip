@@ -42,7 +42,6 @@ enum AreaTypeTag : enum8 {
   kGardenDoor = 37;
   kGuestBathroom = 38;
   kGuestBedroom = 39;
-  kGuestRestroom = 40;
   kGuestRoom = 41;
   kGym = 42;
   kHallway = 43;
@@ -50,7 +49,6 @@ enum AreaTypeTag : enum8 {
   kKidsRoom = 45;
   kKidsBedroom = 46;
   kKitchen = 47;
-  kLarder = 48;
   kLaundryRoom = 49;
   kLawn = 50;
   kLibrary = 51;
@@ -75,7 +73,6 @@ enum AreaTypeTag : enum8 {
   kRamp = 70;
   kReceptionRoom = 71;
   kRecreationRoom = 72;
-  kRestroom = 73;
   kRoof = 74;
   kSauna = 75;
   kScullery = 76;
@@ -97,39 +94,13 @@ enum AreaTypeTag : enum8 {
   kUtilityRoom = 92;
   kWard = 93;
   kWorkshop = 94;
+  kToilet = 95;
 }
 
 enum AtomicRequestTypeEnum : enum8 {
   kBeginWrite = 0;
   kCommitWrite = 1;
   kRollbackWrite = 2;
-}
-
-enum FloorSurfaceTag : enum8 {
-  kCarpet = 0;
-  kCeramic = 1;
-  kConcrete = 2;
-  kCork = 3;
-  kDeepCarpet = 4;
-  kDirt = 5;
-  kEngineeredWood = 6;
-  kGlass = 7;
-  kGrass = 8;
-  kHardwood = 9;
-  kLaminate = 10;
-  kLinoleum = 11;
-  kMat = 12;
-  kMetal = 13;
-  kPlastic = 14;
-  kPolishedConcrete = 15;
-  kRubber = 16;
-  kRug = 17;
-  kSand = 18;
-  kStone = 19;
-  kTatami = 20;
-  kTerrazzo = 21;
-  kTile = 22;
-  kVinyl = 23;
 }
 
 enum LandmarkTag : enum8 {
@@ -186,6 +157,13 @@ enum LandmarkTag : enum8 {
   kWineCooler = 50;
 }
 
+enum LocationTag : enum8 {
+  kIndoor = 0;
+  kOutdoor = 1;
+  kInside = 2;
+  kOutside = 3;
+}
+
 enum PositionTag : enum8 {
   kLeft = 0;
   kRight = 1;
@@ -196,6 +174,12 @@ enum PositionTag : enum8 {
   kColumn = 6;
 }
 
+enum PowerThresholdSourceEnum : enum8 {
+  kContract = 0;
+  kRegulator = 1;
+  kEquipment = 2;
+}
+
 enum RelativePositionTag : enum8 {
   kUnder = 0;
   kNextTo = 1;
@@ -204,6 +188,19 @@ enum RelativePositionTag : enum8 {
   kAbove = 4;
   kFrontOf = 5;
   kBehind = 6;
+}
+
+enum TariffPriceTypeEnum : enum8 {
+  kStandard = 0;
+  kCritical = 1;
+  kVirtual = 2;
+  kIncentive = 3;
+  kIncentiveSignal = 4;
+}
+
+enum TariffUnitEnum : enum8 {
+  kKWh = 0;
+  kKVAh = 1;
 }
 
 enum TestGlobalEnum : enum8 {
@@ -222,6 +219,22 @@ enum ThreeLevelAutoEnum : enum8 {
 bitmap TestGlobalBitmap : bitmap32 {
   kFirstBit = 0x1;
   kSecondBit = 0x2;
+}
+
+struct CurrencyStruct {
+  int16u currency = 0;
+  int8u decimalPoints = 1;
+}
+
+struct PowerThresholdStruct {
+  optional power_mw powerThreshold = 0;
+  optional power_mva apparentPowerThreshold = 1;
+  nullable PowerThresholdSourceEnum powerThresholdSource = 2;
+}
+
+struct PriceStruct {
+  money amount = 0;
+  CurrencyStruct currency = 1;
 }
 
 struct TestGlobalStruct {
@@ -370,13 +383,13 @@ cluster Groups = 4 {
 
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 cluster Descriptor = 29 {
-  revision 2;
+  revision 3;
 
   bitmap Feature : bitmap32 {
     kTagList = 0x1;
   }
 
-  struct DeviceTypeStruct {
+  shared struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
   }
@@ -385,7 +398,7 @@ cluster Descriptor = 29 {
     nullable vendor_id mfgCode = 0;
     enum8 namespaceID = 1;
     enum8 tag = 2;
-    optional nullable char_string label = 3;
+    optional nullable char_string<64> label = 3;
   }
 
   readonly attribute DeviceTypeStruct deviceTypeList[] = 0;
@@ -393,6 +406,7 @@ cluster Descriptor = 29 {
   readonly attribute cluster_id clientList[] = 2;
   readonly attribute endpoint_no partsList[] = 3;
   readonly attribute optional SemanticTagStruct tagList[] = 4;
+  readonly attribute optional char_string<32> endpointUniqueID = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -530,7 +544,7 @@ cluster AccessControl = 31 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 cluster BasicInformation = 40 {
-  revision 3;
+  revision 5;
 
   enum ColorEnum : enum8 {
     kBlack = 0;
@@ -613,6 +627,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute int32u specificationVersion = 21;
   readonly attribute int16u maxPathsPerInvoke = 22;
+  readonly attribute int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -799,7 +814,7 @@ cluster LocalizationConfiguration = 43 {
       user. As such, Nodes that visually or audibly convey measurable values to the user need a
       mechanism by which they can be configured to use a user’s preferred unit. */
 cluster UnitLocalization = 45 {
-  revision 1;
+  revision 2;
 
   enum TempUnitEnum : enum8 {
     kFahrenheit = 0;
@@ -812,6 +827,7 @@ cluster UnitLocalization = 45 {
   }
 
   attribute access(write: manage) optional TempUnitEnum temperatureUnit = 0;
+  provisional readonly attribute optional TempUnitEnum supportedTemperatureUnits[] = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1521,7 +1537,7 @@ cluster SoftwareDiagnostics = 52 {
 
 /** The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems */
 cluster ThreadNetworkDiagnostics = 53 {
-  revision 2;
+  revision 3;
 
   enum ConnectionStatusEnum : enum8 {
     kConnected = 0;
@@ -1674,6 +1690,8 @@ cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute nullable octet_string<4> channelPage0Mask = 60;
   readonly attribute nullable OperationalDatasetComponents operationalDatasetComponents = 61;
   readonly attribute NetworkFaultEnum activeNetworkFaultsList[] = 62;
+  provisional readonly attribute nullable int64u extAddress = 63;
+  provisional readonly attribute nullable int16u rloc16 = 64;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1681,7 +1699,7 @@ cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  /** Reception of this command SHALL reset the OverrunCount attributes to 0 */
+  /** Reception of this command SHALL reset the following attributes to 0: */
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
 }
 
@@ -2086,7 +2104,7 @@ labels. */
 cluster FixedLabel = 64 {
   revision 1; // NOTE: Default/not specifically set
 
-  struct LabelStruct {
+  shared struct LabelStruct {
     char_string<16> label = 0;
     char_string<16> value = 1;
   }
@@ -2104,7 +2122,7 @@ cluster FixedLabel = 64 {
 cluster UserLabel = 65 {
   revision 1; // NOTE: Default/not specifically set
 
-  struct LabelStruct {
+  shared struct LabelStruct {
     char_string<16> label = 0;
     char_string<16> value = 1;
   }
@@ -2217,20 +2235,15 @@ cluster IcdManagement = 70 {
 }
 
 /** This cluster provides an interface for controlling a Closure device. */
-cluster ClosureControl = 260 {
+provisional cluster ClosureControl = 260 {
   revision 1;
 
   enum ClosureErrorEnum : enum8 {
-    kBlocked = 0;
-    kTemperatureLimited = 1;
-    kMaintenanceRequired = 2;
-    kInternalInterference = 3;
-  }
-
-  enum LatchingEnum : enum8 {
-    kLatchedAndSecured = 0;
-    kLatchedButNotSecured = 1;
-    kNotLatched = 2;
+    kPhysicallyBlocked = 0;
+    kBlockedBySensor = 1;
+    kTemperatureLimited = 2;
+    kMaintenanceRequired = 3;
+    kInternalInterference = 4;
   }
 
   enum MainStateEnum : enum8 {
@@ -2242,7 +2255,6 @@ cluster ClosureControl = 260 {
     kProtected = 5;
     kDisengaged = 6;
     kSetupRequired = 7;
-    kPendingFallback = 8;
   }
 
   enum PositioningEnum : enum8 {
@@ -2254,39 +2266,12 @@ cluster ClosureControl = 260 {
     kOpenedAtSignature = 5;
   }
 
-  enum RestingProcedureEnum : enum8 {
-    kDoNothing = 0;
-    kReturnToFullyOpened = 1;
-    kReturnToFullyClosed = 2;
-  }
-
-  enum TagLatchEnum : enum8 {
-    kLatch = 0;
-    kUnlatch = 1;
-  }
-
-  enum TagPositionEnum : enum8 {
+  enum TargetPositionEnum : enum8 {
     kCloseInFull = 0;
     kOpenInFull = 1;
     kPedestrian = 2;
     kVentilation = 3;
     kSignature = 4;
-    kSequenceNextStep = 5;
-    kPedestrianNextStep = 6;
-  }
-
-  enum TriggerConditionEnum : enum8 {
-    kAfterDelay = 0;
-    kAfterApplicativeTrigger = 1;
-    kAfterDelayOrApplicativeTrigger = 2;
-  }
-
-  enum TriggerPositionEnum : enum8 {
-    kAtFullyClosed = 0;
-    kAtFullyOpened = 1;
-    kInBetween = 2;
-    kAtVentilation = 3;
-    kAtPedestrian = 4;
   }
 
   bitmap Feature : bitmap32 {
@@ -2299,20 +2284,34 @@ cluster ClosureControl = 260 {
     kCalibration = 0x40;
     kProtection = 0x80;
     kManuallyOperable = 0x100;
-    kFallback = 0x200;
   }
 
   struct OverallStateStruct {
-    optional PositioningEnum positioning = 0;
-    optional LatchingEnum latching = 1;
-    optional ThreeLevelAutoEnum speed = 2;
-    optional bitmap32 extraInfo = 3;
+    optional nullable PositioningEnum positioning = 0;
+    optional nullable boolean latch = 1;
+    optional nullable ThreeLevelAutoEnum speed = 2;
+    optional nullable boolean secureState = 3;
   }
 
   struct OverallTargetStruct {
-    optional TagPositionEnum tagPosition = 0;
-    optional TagLatchEnum tagLatch = 1;
+    optional TargetPositionEnum position = 0;
+    optional boolean latch = 1;
     optional ThreeLevelAutoEnum speed = 2;
+  }
+
+  critical event OperationalError = 0 {
+    ClosureErrorEnum errorState[] = 0;
+  }
+
+  info event MovementCompleted = 1 {
+  }
+
+  info event EngageStateChanged = 2 {
+    boolean engageValue = 0;
+  }
+
+  info event SecureStateChanged = 3 {
+    boolean secureValue = 0;
   }
 
   readonly attribute optional nullable elapsed_s countdownTime = 0;
@@ -2320,11 +2319,6 @@ cluster ClosureControl = 260 {
   readonly attribute ClosureErrorEnum currentErrorList[] = 2;
   readonly attribute nullable OverallStateStruct overallState = 3;
   readonly attribute nullable OverallTargetStruct overallTarget = 4;
-  readonly attribute optional RestingProcedureEnum restingProcedure = 5;
-  readonly attribute optional TriggerConditionEnum triggerCondition = 6;
-  readonly attribute optional TriggerPositionEnum triggerPosition = 7;
-  readonly attribute optional elapsed_s waitingDelay = 8;
-  readonly attribute optional elapsed_s kickoffTimer = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2333,28 +2327,17 @@ cluster ClosureControl = 260 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct MoveToRequest {
-    optional TagPositionEnum tag = 0;
-    optional TagLatchEnum latch = 1;
+    optional TargetPositionEnum position = 0;
+    optional boolean latch = 1;
     optional ThreeLevelAutoEnum speed = 2;
   }
 
-  request struct ConfigureFallbackRequest {
-    optional RestingProcedureEnum restingProcedure = 0;
-    optional TriggerConditionEnum triggerCondition = 1;
-    optional TriggerPositionEnum triggerPosition = 2;
-    optional elapsed_s waitingDelay = 3;
-  }
-
-  /** On receipt of this command, the device SHALL stop its operation if it is at a position where it is safe to do so and/or permitted. */
+  /** On receipt of this command, the closure SHALL stop its movement as fast as the closure is able too. */
   command Stop(): DefaultSuccess = 0;
-  /** Upon receipt, this SHALL move the product in the most fitting state following the data as follows: */
+  /** This command is used to move the device to a specific position, latch and/or perform the movement at specific speed. */
   command MoveTo(MoveToRequest): DefaultSuccess = 1;
-  /** Upon receipt, this SHALL initiate a calibration. */
+  /** This command is used to trigger a calibration of the device. */
   command access(invoke: manage) Calibrate(): DefaultSuccess = 2;
-  /** Upon receipt, this SHALL configure the Fallback feature behavior using the data as follows: */
-  command ConfigureFallback(ConfigureFallbackRequest): DefaultSuccess = 3;
-  /** Upon receipt, this SHALL cancel the current PendingFallback. */
-  command CancelFallback(): DefaultSuccess = 4;
 }
 
 endpoint 0 {
@@ -2414,11 +2397,12 @@ endpoint 0 {
     callback attribute capabilityMinima;
     callback attribute specificationVersion;
     callback attribute maxPathsPerInvoke;
+    callback attribute configurationVersion default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 5;
   }
 
   server cluster OtaSoftwareUpdateRequestor {
@@ -2741,17 +2725,17 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_closurebase = 560, version 1;
+  device type ma_closure = 560, version 1;
 
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0;
-    ram      attribute identifyType default = 0x05;
+    ram      attribute identifyType default = 0x00;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 6;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -2765,12 +2749,12 @@ endpoint 1 {
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
 
-    handle command AddGroup;
     handle command AddGroupResponse;
-    handle command ViewGroup;
+    handle command AddGroup;
     handle command ViewGroupResponse;
-    handle command GetGroupMembership;
+    handle command ViewGroup;
     handle command GetGroupMembershipResponse;
+    handle command GetGroupMembership;
     handle command RemoveGroup;
     handle command RemoveGroupResponse;
     handle command RemoveAllGroups;
@@ -2790,6 +2774,7 @@ endpoint 1 {
   }
 
   server cluster ClosureControl {
+    callback attribute countdownTime;
     ram      attribute mainState;
     callback attribute currentErrorList;
     callback attribute overallState;
@@ -2800,7 +2785,9 @@ endpoint 1 {
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
 
+    handle command Stop;
     handle command MoveTo;
+    handle command Calibrate;
   }
 }
 

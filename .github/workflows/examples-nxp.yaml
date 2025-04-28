@@ -18,12 +18,15 @@ on:
     push:
         branches:
             - master
-            - 'v*-branch'
+            - "v*-branch"
     pull_request:
     merge_group:
 
 concurrency:
-    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+    group:
+        ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name ==
+        'pull_request' && github.event.number) || (github.event_name ==
+        'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
 env:
@@ -40,7 +43,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp:120
+            image: ghcr.io/project-chip/chip-build-nxp:127
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -49,8 +52,8 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                platform: nxp
-                extra-submodule-parameters: --recursive
+                  platform: nxp
+                  extra-submodule-parameters: --recursive
 
             - name: Detect changed paths
               uses: dorny/paths-filter@v3
@@ -64,7 +67,7 @@ jobs:
               uses: ./.github/actions/setup-size-reports
               if: ${{ !env.ACT }}
               with:
-                gh-context: ${{ toJson(github) }}
+                  gh-context: ${{ toJson(github) }}
 
             - name: Build K32W0 examples
               run: |
@@ -145,16 +148,20 @@ jobs:
                       --copy-artifacts-to out/artifacts \
                   "
             - name: Build RT1060 thermostat example app
-              if: github.event_name == 'push' || steps.changed_paths.outputs.nxp == 'true'
+              if:
+                  github.event_name == 'push' || steps.changed_paths.outputs.nxp
+                  == 'true'
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rt1060-freertos-thermostat-thread-wifi-evkc-iwx12 \
+                      --target nxp-rt1060-freertos-thermostat-thread-wifi-matter-shell-evkc-iwx12 \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
             - name: Build RT1060 laundry-washer example app
-              if: github.event_name == 'push' || steps.changed_paths.outputs.nxp == 'true'
+              if:
+                  github.event_name == 'push' || steps.changed_paths.outputs.nxp
+                  == 'true'
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
@@ -168,7 +175,9 @@ jobs:
               run: rm -rf ./out
 
             - name: Build RT1170 all clusters example app
-              if: github.event_name == 'push' || steps.changed_paths.outputs.nxp == 'true'
+              if:
+                  github.event_name == 'push' || steps.changed_paths.outputs.nxp
+                  == 'true'
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
@@ -181,12 +190,14 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rt1170-freertos-thermostat-thread-wifi-iwx12 \
+                      --target nxp-rt1170-freertos-thermostat-thread-wifi-matter-shell-iwx12 \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
             - name: Build RT1170 laundry-washer example app
-              if: github.event_name == 'push' || steps.changed_paths.outputs.nxp == 'true'
+              if:
+                  github.event_name == 'push' || steps.changed_paths.outputs.nxp
+                  == 'true'
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
@@ -210,12 +221,14 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rw61x-freertos-thermostat-thread-wifi \
+                      --target nxp-rw61x-freertos-thermostat-thread-wifi-matter-shell \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
             - name: Build RW61X laundry-washer example app
-              if: github.event_name == 'push' || steps.changed_paths.outputs.nxp == 'true'
+              if:
+                  github.event_name == 'push' || steps.changed_paths.outputs.nxp
+                  == 'true'
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
@@ -231,7 +244,7 @@ jobs:
               uses: ./.github/actions/upload-size-reports
               if: ${{ !env.ACT }}
               with:
-                platform-name: NXP-FREERTOS
+                  platform-name: NXP-FREERTOS
     zephyr:
         name: ZEPHYR
 
@@ -239,7 +252,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp-zephyr:119
+            image: ghcr.io/project-chip/chip-build-nxp-zephyr:125
 
         steps:
             - name: Checkout
@@ -247,7 +260,7 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                platform: nxp
+                  platform: nxp
             - name: Detect changed paths
               uses: dorny/paths-filter@v3
               id: changed_paths
@@ -256,7 +269,9 @@ jobs:
                       nxp:
                         - '**/nxp/**'
             - name: Build NXP Zephyr examples
-              if: github.event_name == 'push' || steps.changed_paths.outputs.nxp == 'true'
+              if:
+                  github.event_name == 'push' || steps.changed_paths.outputs.nxp
+                  == 'true'
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \

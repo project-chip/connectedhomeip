@@ -19,8 +19,9 @@
 #include "OTAProviderDelegateBridge.h"
 
 #include <app/MessageDef/StatusIB.h>
-#include <app/clusters/ota-provider/ota-provider.h>
+#include <app/clusters/ota-provider/CodegenIntegration.h>
 #include <app/data-model/List.h>
+#include <clusters/OtaSoftwareUpdateProvider/Enums.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
 
@@ -142,7 +143,7 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
 
     bool hasUpdate = false;
     Commands::QueryImageResponse::Type response;
-    response.status = OTAQueryStatus::kNotAvailable;
+    response.status = OtaSoftwareUpdateProvider::StatusEnum::kNotAvailable;
 
     char uriBuffer[kMaxBDXURILen];
     MutableCharSpan uri(uriBuffer);
@@ -164,8 +165,8 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
     auto iterator = commandData.protocolsSupported.begin();
     while (iterator.Next())
     {
-        OTADownloadProtocol protocol = iterator.GetValue();
-        if (protocol == OTADownloadProtocol::kBDXSynchronous)
+        OtaSoftwareUpdateProvider::DownloadProtocolEnum protocol = iterator.GetValue();
+        if (protocol == OtaSoftwareUpdateProvider::DownloadProtocolEnum::kBDXSynchronous)
         {
             isBDXProtocolSupported = true;
             break;
@@ -185,7 +186,7 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
     // If the protocol requested is not supported, return status - Protocol Not Supported
     if (!isBDXProtocolSupported)
     {
-        response.status = OTAQueryStatus::kDownloadProtocolNotSupported;
+        response.status = OtaSoftwareUpdateProvider::StatusEnum::kDownloadProtocolNotSupported;
         err             = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
         ExitNow();
     }
@@ -238,7 +239,7 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
     // If update is not available, return the delegate response
     if (!hasUpdate)
     {
-        response.status = OTAQueryStatus::kNotAvailable;
+        response.status = OtaSoftwareUpdateProvider::StatusEnum::kNotAvailable;
         err             = CHIP_ERROR_INTERNAL;
         ExitNow();
     }
@@ -281,16 +282,16 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
     }
 
     status = static_cast<uint8_t>(jStatus);
-    if (status == static_cast<uint8_t>(OTAQueryStatus::kNotAvailable))
+    if (status == static_cast<uint8_t>(OtaSoftwareUpdateProvider::StatusEnum::kNotAvailable))
     {
         err             = CHIP_ERROR_INTERNAL;
-        response.status = OTAQueryStatus::kNotAvailable;
+        response.status = OtaSoftwareUpdateProvider::StatusEnum::kNotAvailable;
         ExitNow();
     }
-    else if (status == static_cast<uint8_t>(OTAQueryStatus::kBusy))
+    else if (status == static_cast<uint8_t>(OtaSoftwareUpdateProvider::StatusEnum::kBusy))
     {
         err                    = CHIP_ERROR_BUSY;
-        response.status        = OTAQueryStatus::kBusy;
+        response.status        = OtaSoftwareUpdateProvider::StatusEnum::kBusy;
         boxedDelayedActionTime = env->CallObjectMethod(jResponse, getDelayedActionTimeMethod);
         response.delayedActionTime.SetValue(
             static_cast<uint32_t>(JniReferences::GetInstance().LongToPrimitive(boxedDelayedActionTime)));
@@ -302,7 +303,7 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
     jFilePath              = (jstring) env->CallObjectMethod(jResponse, getFilePathMethod);
 
     {
-        response.status = OTAQueryStatus::kUpdateAvailable;
+        response.status = OtaSoftwareUpdateProvider::StatusEnum::kUpdateAvailable;
         if (jSoftwareVersion != nullptr)
         {
             response.softwareVersion.SetValue(
@@ -329,7 +330,7 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
             if (err == CHIP_ERROR_BUSY)
             {
                 ChipLogError(Controller, "Responding with Busy due to being in the middle of handling another BDX transfer");
-                response.status = OTAQueryStatus::kBusy;
+                response.status = OtaSoftwareUpdateProvider::StatusEnum::kBusy;
                 response.delayedActionTime.SetValue(kDelayedActionTimeSeconds);
                 // We do not reset state when we get the busy error because that means we are locked in a BDX transfer
                 // session with another requestor when we get this query image request. We do not want to interrupt the
@@ -422,7 +423,7 @@ void OTAProviderDelegateBridge::HandleApplyUpdateRequest(CommandHandler * comman
     jAction            = env->CallIntMethod(jResponse, getActionMethod);
     jDelayedActionTime = env->CallLongMethod(jResponse, getDelayedActionTimeMethod);
 
-    response.action            = static_cast<OTAApplyUpdateAction>(jAction);
+    response.action            = static_cast<OtaSoftwareUpdateProvider::ApplyUpdateActionEnum>(jAction);
     response.delayedActionTime = static_cast<uint32_t>(jDelayedActionTime);
     commandObj->AddResponse(cachedCommandPath, response);
     return;

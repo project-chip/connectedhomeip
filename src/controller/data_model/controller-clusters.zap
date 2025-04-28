@@ -1697,6 +1697,15 @@
           ]
         },
         {
+          "name": "Commodity Price",
+          "code": 149,
+          "mfgCode": null,
+          "define": "COMMODITY_PRICE_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "apiMaturity": "provisional"
+        },
+        {
           "name": "Device Energy Management",
           "code": 152,
           "mfgCode": null,
@@ -1817,6 +1826,15 @@
               "isEnabled": 1
             }
           ]
+        },
+        {
+          "name": "Electrical Grid Conditions",
+          "code": 160,
+          "mfgCode": null,
+          "define": "ELECTRICAL_GRID_CONDITIONS_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "apiMaturity": "provisional"
         },
         {
           "name": "Door Lock",
@@ -2466,7 +2484,6 @@
           "define": "THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
-          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "GetActiveDatasetRequest",
@@ -2501,7 +2518,6 @@
           "define": "THREAD_NETWORK_DIRECTORY_CLUSTER",
           "side": "client",
           "enabled": 1,
-          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "AddNetwork",
@@ -2975,6 +2991,65 @@
               "isEnabled": 1
             }
           ]
+        },
+        {
+          "name": "Commodity Tariff",
+          "code": 1792,
+          "mfgCode": null,
+          "define": "COMMODITY_TARIFF_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "commands": [
+            {
+              "name": "GetTariffComponent",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "GetTariffComponentResponse",
+              "code": 0,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "GetDayEntry",
+              "code": 1,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "GetDayEntryResponse",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 1,
+              "isEnabled": 1
+            }
+          ]
+        },
+        {
+          "name": "Meter Identification",
+          "code": 2822,
+          "mfgCode": null,
+          "define": "METER_IDENTIFICATION_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "apiMaturity": "provisional"
+        },
+        {
+          "name": "Commodity Metering",
+          "code": 2823,
+          "mfgCode": null,
+          "define": "COMMODITY_METERING_CLUSTER",
+          "side": "client",
+          "enabled": 1
         },
         {
           "name": "Unit Testing",

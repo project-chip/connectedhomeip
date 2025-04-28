@@ -1,27 +1,33 @@
-#!/usr/bin/env python
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import dataclasses
 import functools
 import logging
-import sys
-from pathlib import Path
-from typing import Dict, Optional, Set
+import pprint
+from typing import Dict, List, Optional
 
+import click
 from lark import Lark
 from lark.lexer import Token
 from lark.visitors import Transformer, v_args
 
-try:
-    from matter.idl.matter_idl_types import AccessPrivilege
-except ModuleNotFoundError:
-    sys.path.append(str(Path(__file__).resolve().parent / ".." / ".."))
-    from matter.idl.matter_idl_types import AccessPrivilege
-
-from matter.idl.matter_idl_types import (ApiMaturity, Attribute, AttributeInstantiation, AttributeOperation, AttributeQuality,
-                                         AttributeStorage, Bitmap, Cluster, Command, CommandInstantiation, CommandQuality,
-                                         ConstantEntry, DataType, DeviceType, Endpoint, Enum, Event, EventPriority, EventQuality,
-                                         Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct, StructQuality,
-                                         StructTag)
+from matter.idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute, AttributeInstantiation, AttributeOperation,
+                                         AttributeQuality, AttributeStorage, Bitmap, Cluster, Command, CommandInstantiation,
+                                         CommandQuality, ConstantEntry, DataType, DeviceType, Endpoint, Enum, Event, EventPriority,
+                                         EventQuality, Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct,
+                                         StructQuality, StructTag)
 
 
 def UnionOfAllFlags(flags_list):
@@ -46,7 +52,7 @@ class PrefixCppDocComment:
             actual_pos += 1
 
         # A doc comment will apply to any supported element assuming it immediately
-        # preceeds id (skipping whitespace)
+        # precedes id (skipping whitespace)
         for item in self.supported_types(idl):
             meta = item.parse_meta
             if meta and meta.start_pos == actual_pos:
@@ -156,6 +162,9 @@ class MatterIdlTransformer(Transformer):
     def bool_default_false(self, _):
         return False
 
+    def shared_element(self, _):
+        return True
+
     def provisional_api_maturity(self, _):
         return ApiMaturity.PROVISIONAL
 
@@ -198,12 +207,16 @@ class MatterIdlTransformer(Transformer):
         return ConstantEntry(name=id, code=number, api_maturity=api_maturity)
 
     @v_args(inline=True)
-    def enum(self, id, type, *entries):
-        return Enum(name=id, base_type=type, entries=list(entries))
+    def enum(self, shared, id, type, *entries):
+        if shared is None:
+            shared = False
+        return Enum(name=id, base_type=type, entries=list(entries), is_shared=shared)
 
     @v_args(inline=True)
-    def bitmap(self, id, type, *entries):
-        return Bitmap(name=id, base_type=type, entries=list(entries))
+    def bitmap(self, shared, id, type, *entries):
+        if shared is None:
+            shared = False
+        return Bitmap(name=id, base_type=type, entries=list(entries), is_shared=shared)
 
     def field(self, args):
         data_type, name = args[0], args[1]
@@ -415,8 +428,10 @@ class MatterIdlTransformer(Transformer):
         return Attribute(definition=definition, qualities=qualities, **acl)
 
     @v_args(inline=True)
-    def struct(self, qualities, id, *fields):
-        return Struct(name=id, qualities=qualities, fields=list(fields))
+    def struct(self, shared, qualities, id, *fields):
+        if shared is None:
+            shared = False
+        return Struct(name=id, qualities=qualities, fields=list(fields), is_shared=shared)
 
     @v_args(inline=True)
     def request_struct(self, value):
@@ -515,9 +530,11 @@ class MatterIdlTransformer(Transformer):
             elif isinstance(item, Enum):
                 global_enums.append(dataclasses.replace(item, is_global=True))
             elif isinstance(item, Bitmap):
-                global_bitmaps.append(dataclasses.replace(item, is_global=True))
+                global_bitmaps.append(
+                    dataclasses.replace(item, is_global=True))
             elif isinstance(item, Struct):
-                global_structs.append(dataclasses.replace(item, is_global=True))
+                global_structs.append(
+                    dataclasses.replace(item, is_global=True))
             else:
                 raise Exception("UNKNOWN idl content item: %r" % item)
 
@@ -533,9 +550,9 @@ class MatterIdlTransformer(Transformer):
             self.doc_comments.append(PrefixCppDocComment(token))
 
 
-def _referenced_type_names(cluster: Cluster) -> Set[str]:
+def _referenced_type_names(cluster: Cluster) -> List[str]:
     """
-    Return the names of all data types referenced by the given cluster.
+    Return the ORDERED and UNIQUE names of all data types referenced by the given cluster.
     """
     types = set()
     for s in cluster.structs:
@@ -549,7 +566,9 @@ def _referenced_type_names(cluster: Cluster) -> Set[str]:
     for a in cluster.attributes:
         types.add(a.definition.data_type.name)
 
-    return types
+    # We want things to be ordered, so that AST ordering (and insert of globals)
+    # is well behaved/reproducible
+    return sorted(types)
 
 
 class GlobalMapping:
@@ -562,7 +581,8 @@ class GlobalMapping:
         self.enum_map = {e.name: e for e in idl.global_enums}
         self.struct_map = {s.name: s for s in idl.global_structs}
 
-        self.global_types = set(self.bitmap_map.keys()).union(set(self.enum_map.keys())).union(set(self.struct_map.keys()))
+        self.global_types = set(self.bitmap_map.keys()).union(
+            set(self.enum_map.keys())).union(set(self.struct_map.keys()))
 
         # Spec does not enforce unique naming in bitmap/enum/struct, however in practice
         # if we have both enum Foo and bitmap Foo for example, it would be impossible
@@ -578,6 +598,14 @@ class GlobalMapping:
         This happens recursively.
         """
         global_types_added = set()
+
+        # cluster types are already accessible, so no need to add them back
+        global_types_added = global_types_added.union(
+            [v.name for v in cluster.bitmaps])
+        global_types_added = global_types_added.union(
+            [v.name for v in cluster.structs])
+        global_types_added = global_types_added.union(
+            [v.name for v in cluster.enums])
 
         changed = True
         while changed:
@@ -612,6 +640,7 @@ def _merge_global_types_into_clusters(idl: Idl) -> Idl:
     clusters reference those type names
     """
     mapping = GlobalMapping(idl)
+
     return dataclasses.replace(idl, clusters=[mapping.merge_global_types_into_cluster(cluster) for cluster in idl.clusters])
 
 
@@ -688,40 +717,35 @@ def CreateParser(skip_meta: bool = False, merge_globals=True):
     return ParserWithLines(skip_meta, merge_globals)
 
 
-if __name__ == '__main__':
-    # This Parser is generally not intended to be run as a stand-alone binary.
+# Supported log levels, mapping string values required for argument
+# parsing into logging constants
+__LOG_LEVELS__ = {
+    'debug': logging.DEBUG,
+    'info': logging.INFO,
+    'warn': logging.WARN,
+    'fatal': logging.FATAL,
+}
+
+
+@click.command()
+@click.option(
+    '--log-level',
+    default='INFO',
+    type=click.Choice(list(__LOG_LEVELS__.keys()), case_sensitive=False),
+    help='Determines the verbosity of script output.')
+@click.argument('filename')
+def main(log_level, filename=None):
+    # The IDL parser is generally not intended to be run as a stand-alone binary.
     # The ability to run is for debug and to print out the parsed AST.
-    import pprint
 
-    import click
+    logging.basicConfig(
+        level=__LOG_LEVELS__[log_level],
+        format='%(asctime)s %(levelname)-7s %(message)s',
+    )
 
-    # Supported log levels, mapping string values required for argument
-    # parsing into logging constants
-    __LOG_LEVELS__ = {
-        'debug': logging.DEBUG,
-        'info': logging.INFO,
-        'warn': logging.WARN,
-        'fatal': logging.FATAL,
-    }
+    logging.info("Starting to parse ...")
+    data = CreateParser().parse(open(filename).read(), file_name=filename)
+    logging.info("Parse completed")
 
-    @click.command()
-    @click.option(
-        '--log-level',
-        default='INFO',
-        type=click.Choice(list(__LOG_LEVELS__.keys()), case_sensitive=False),
-        help='Determines the verbosity of script output.')
-    @click.argument('filename')
-    def main(log_level, filename=None):
-        logging.basicConfig(
-            level=__LOG_LEVELS__[log_level],
-            format='%(asctime)s %(levelname)-7s %(message)s',
-        )
-
-        logging.info("Starting to parse ...")
-        data = CreateParser().parse(open(filename).read(), file_name=filename)
-        logging.info("Parse completed")
-
-        logging.info("Data:")
-        pprint.pp(data)
-
-    main(auto_envvar_prefix='CHIP')
+    logging.info("Data:")
+    pprint.pp(data)
