@@ -843,7 +843,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
         auto nodeId                            = params.GetPeerAddress().GetRemoteId();
         WiFiPAF::WiFiPAFLayer & pafLayer       = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
         WiFiPAF::WiFiPAFSession chkSessionInfo = { .nodeId = nodeId };
-        WiFiPAF::WiFiPAFSession * pChkSession  = pafLayer.GetPAFInfo(WiFiPAF::PafInfoAccess::kAccNodeId, chkSessionInfo);
+        WiFiPAF::WiFiPAFSession * existingSession  = pafLayer.GetPAFInfo(WiFiPAF::PafInfoAccess::kAccNodeId, chkSessionInfo);
         if (pChkSession == nullptr)
         {
             // The PAF session does not exist.
