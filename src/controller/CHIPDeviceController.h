@@ -870,7 +870,7 @@ private:
     static void OnWiFiPAFSubscribeComplete(void * appState);
     static void OnWiFiPAFSubscribeError(void * appState, CHIP_ERROR err);
     RendezvousParameters mRendezvousParametersForDeviceDiscoveredOverWiFiPAF;
-    WiFiPAF::PafSessionId_t mPafSessionId[WIFIPAF_LAYER_NUM_PAF_ENDPOINTS];
+    WiFiPAF::PafSessionId_t mPafSessionIds[WIFIPAF_LAYER_NUM_PAF_ENDPOINTS];
 #endif
 
     static void OnBasicFailure(void * context, CHIP_ERROR err);
