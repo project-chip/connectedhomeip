@@ -74,7 +74,7 @@ class TC_BRBINFO_3_2(MatterBaseTest):
         if app_pid == 0:
             asserts.fail("The --app-pid flag must be set when usage of door state simulation named pipe is required (e.g. CI)")
 
-        app_pipe = f"/tmp/chip_beige_fifo_{app_pid}"
+        app_pipe = f"/tmp/chip_bridge_fifo_{app_pid}"
         command = json.dumps(command_dict)
 
         # Sends an out-of-band command to the sample app
