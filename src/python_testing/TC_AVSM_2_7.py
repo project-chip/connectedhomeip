@@ -39,7 +39,7 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -130,7 +130,9 @@ class TC_AVSM_2_7(MatterBaseTest):
             ),
         ]
 
-    @async_test_body
+    @run_if_endpoint_matches(
+        has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kVideo)
+    )
     async def test_TC_AVSM_2_7(self):
         endpoint = self.get_endpoint(default=1)
         cluster = Clusters.CameraAvStreamManagement
@@ -220,6 +222,7 @@ class TC_AVSM_2_7(MatterBaseTest):
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=notSupportedStreamUsage,
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
+                minFrameRate=aVideoSensorParams.maxFPS,
                 maxFrameRate=aVideoSensorParams.maxFPS,
                 minResolution=aRateDistortionTradeOffPoints[0].resolution,
                 maxResolution=aRateDistortionTradeOffPoints[0].resolution,
@@ -229,9 +232,16 @@ class TC_AVSM_2_7(MatterBaseTest):
                 maxFragmentLen=4000,
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
-            asserts.assert_true(False, "Unexpected success when expecting CONSTRAIN_ERROR")
+            asserts.assert_true(
+                False,
+                "Unexpected success when expecting CONSTRAIN_ERROR due to StreamUsage set to a value not in aRankedStreamPriorities",
+            )
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected error returned when expecting CONSTRAIN_ERROR")
+            asserts.assert_equal(
+                e.status,
+                Status.ConstraintError,
+                "Unexpected error returned when expecting CONSTRAIN_ERROR due to StreamUsage set to a value not in aRankedStreamPriorities",
+            )
             pass
 
         self.step(11)
@@ -249,9 +259,15 @@ class TC_AVSM_2_7(MatterBaseTest):
                 maxFragmentLen=4000,
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
-            asserts.assert_true(False, "Unexpected success when expecting CONSTRAIN_ERROR")
+            asserts.assert_true(
+                False, "Unexpected success when expecting CONSTRAIN_ERROR due to MinFrameRate set to 0(outside of valid range)"
+            )
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected error returned when expecting CONSTRAIN_ERROR")
+            asserts.assert_equal(
+                e.status,
+                Status.ConstraintError,
+                "Unexpected error returned when expecting CONSTRAIN_ERROR due to MinFrameRate set to 0(outside of valid range)",
+            )
             pass
 
         self.step(12)
@@ -269,9 +285,13 @@ class TC_AVSM_2_7(MatterBaseTest):
                 maxFragmentLen=4000,
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
-            asserts.assert_true(False, "Unexpected success when expecting CONSTRAIN_ERROR")
+            asserts.assert_true(False, "Unexpected success when expecting CONSTRAIN_ERROR due to MinFrameRate > MaxFrameRate")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected error returned when expecting CONSTRAIN_ERROR")
+            asserts.assert_equal(
+                e.status,
+                Status.ConstraintError,
+                "Unexpected error returned when expecting CONSTRAIN_ERROR due to MinFrameRate > MaxFrameRate",
+            )
             pass
 
         self.step(13)
@@ -289,9 +309,15 @@ class TC_AVSM_2_7(MatterBaseTest):
                 maxFragmentLen=4000,
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
-            asserts.assert_true(False, "Unexpected success when expecting CONSTRAIN_ERROR")
+            asserts.assert_true(
+                False, "Unexpected success when expecting CONSTRAIN_ERROR due to MinBitRate set to 0(outside of valid range)"
+            )
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected error returned when expecting CONSTRAIN_ERROR")
+            asserts.assert_equal(
+                e.status,
+                Status.ConstraintError,
+                "Unexpected error returned when expecting CONSTRAIN_ERROR due to MinBitRate set to 0(outside of valid range)",
+            )
             pass
 
         self.step(14)
@@ -309,9 +335,13 @@ class TC_AVSM_2_7(MatterBaseTest):
                 maxFragmentLen=4000,
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
-            asserts.assert_true(False, "Unexpected success when expecting CONSTRAIN_ERROR")
+            asserts.assert_true(False, "Unexpected success when expecting CONSTRAIN_ERROR due to MinBitRate > MaxBitRate")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected error returned when expecting CONSTRAIN_ERROR")
+            asserts.assert_equal(
+                e.status,
+                Status.ConstraintError,
+                "Unexpected error returned when expecting CONSTRAIN_ERROR due to MinBitRate > MaxBitRate",
+            )
             pass
 
         self.step(15)
@@ -329,9 +359,13 @@ class TC_AVSM_2_7(MatterBaseTest):
                 maxFragmentLen=4000,
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
-            asserts.assert_true(False, "Unexpected success when expecting CONSTRAIN_ERROR")
+            asserts.assert_true(False, "Unexpected success when expecting CONSTRAIN_ERROR due to MinFragmentLen > MaxFragmentLen")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected error returned when expecting CONSTRAIN_ERROR")
+            asserts.assert_equal(
+                e.status,
+                Status.ConstraintError,
+                "Unexpected error returned when expecting CONSTRAIN_ERROR due to MinFragmentLen > MaxFragmentLen",
+            )
             pass
 
 

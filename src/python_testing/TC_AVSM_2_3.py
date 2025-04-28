@@ -39,13 +39,14 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
+from TC_AVSMTestBase import AVSMTestBase
 
 logger = logging.getLogger(__name__)
 
 
-class TC_AVSM_2_3(MatterBaseTest):
+class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
     def desc_TC_AVSM_2_3(self) -> str:
         return "[TC-AVSM-2.3] Validate Snapshot Stream Modification functionality with Server as DUT"
 
@@ -77,47 +78,9 @@ class TC_AVSM_2_3(MatterBaseTest):
             ),
         ]
 
-    async def _precondition_one_allocated_snp_stream(self):
-        endpoint = self.get_endpoint(default=1)
-        cluster = Clusters.CameraAvStreamManagement
-        attr = Clusters.CameraAvStreamManagement.Attributes
-        commands = Clusters.CameraAvStreamManagement.Commands
-
-        # First verify that SNP is supported
-        aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        logger.info(f"Rx'd FeatureMap: {aFeatureMap}")
-        snpSupport = (aFeatureMap & cluster.Bitmaps.Feature.kSnapshot) > 0
-        asserts.assert_true(snpSupport, "Snapshot Feature is not supported.")
-
-        # Check if snapshot stream has already been allocated
-        aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
-        )
-        logger.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
-        if len(aAllocatedSnapshotStreams) > 0:
-            return
-
-        # Allocate one for the test steps based on SnapshotCapabilities
-        aSnapshotCapabilities = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attr.SnapshotCapabilities
-        )
-        logger.info(f"Rx'd SnapshotCapabilities: {aSnapshotCapabilities}")
-
-        asserts.assert_greater(len(aSnapshotCapabilities), 0, "SnapshotCapabilities list is empty")
-        try:
-            snpStreamAllocateCmd = commands.SnapshotStreamAllocate(
-                imageCodec=aSnapshotCapabilities[0].imageCodec,
-                maxFrameRate=aSnapshotCapabilities[0].maxFrameRate,
-                minResolution=aSnapshotCapabilities[0].resolution,
-                maxResolution=aSnapshotCapabilities[0].resolution,
-                quality=90,
-            )
-            await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
-
-    @async_test_body
+    @run_if_endpoint_matches(
+        has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kSnapshot)
+    )
     async def test_TC_AVSM_2_3(self):
         endpoint = self.get_endpoint(default=1)
         cluster = Clusters.CameraAvStreamManagement
@@ -126,7 +89,7 @@ class TC_AVSM_2_3(MatterBaseTest):
 
         self.step("precondition")
         # Commission DUT - already done
-        await self._precondition_one_allocated_snp_stream()
+        await self.precondition_one_allocated_snapshot_stream()
 
         self.step(1)
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)

@@ -39,7 +39,7 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -105,7 +105,9 @@ class TC_AVSM_2_5(MatterBaseTest):
             ),
         ]
 
-    @async_test_body
+    @run_if_endpoint_matches(
+        has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kAudio)
+    )
     async def test_TC_AVSM_2_5(self):
         endpoint = self.get_endpoint(default=1)
         cluster = Clusters.CameraAvStreamManagement
@@ -174,9 +176,15 @@ class TC_AVSM_2_5(MatterBaseTest):
                 bitDepth=aMicrophoneCapabilities.supportedBitDepths[0],
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=adoStreamAllocateCmd)
-            asserts.assert_true(False, "Unexpected success when expecting CONSTRAINT_ERROR")
+            asserts.assert_true(
+                False, "Unexpected success when expecting CONSTRAINT_ERROR due to ChannelCount set to 16(outside of valid range)"
+            )
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected status returned when expecting CONSTRAINT_ERROR")
+            asserts.assert_equal(
+                e.status,
+                Status.ConstraintError,
+                "Unexpected status returned when expecting CONSTRAINT_ERROR due to ChannelCount set to 16(outside of valid range)",
+            )
             pass
 
         self.step(8)
@@ -190,9 +198,15 @@ class TC_AVSM_2_5(MatterBaseTest):
                 bitDepth=48,
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=adoStreamAllocateCmd)
-            asserts.assert_true(False, "Unexpected success when expecting CONSTRAINT_ERROR")
+            asserts.assert_true(
+                False, "Unexpected success when expecting CONSTRAINT_ERROR due to BitDepth set to 48(outside of valid range)"
+            )
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected status returned when expecting CONSTRAINT_ERROR")
+            asserts.assert_equal(
+                e.status,
+                Status.ConstraintError,
+                "Unexpected status returned when expecting CONSTRAINT_ERROR due to BitDepth set to 48(outside of valid range)",
+            )
             pass
 
         self.step(9)
@@ -206,9 +220,15 @@ class TC_AVSM_2_5(MatterBaseTest):
                 bitDepth=aMicrophoneCapabilities.supportedBitDepths[0],
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=adoStreamAllocateCmd)
-            asserts.assert_true(False, "Unexpected success when expecting CONSTRAINT_ERROR")
+            asserts.assert_true(
+                False, "Unexpected success when expecting CONSTRAINT_ERROR due to SampleRate set to 0(outside of valid range)"
+            )
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected status returned when expecting CONSTRAINT_ERROR")
+            asserts.assert_equal(
+                e.status,
+                Status.ConstraintError,
+                "Unexpected status returned when expecting CONSTRAINT_ERROR due to SampleRate set to 0(outside of valid range)",
+            )
             pass
 
         self.step(10)
@@ -222,9 +242,15 @@ class TC_AVSM_2_5(MatterBaseTest):
                 bitDepth=aMicrophoneCapabilities.supportedBitDepths[0],
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=adoStreamAllocateCmd)
-            asserts.assert_true(False, "Unexpected success when expecting CONSTRAINT_ERROR")
+            asserts.assert_true(
+                False, "Unexpected success when expecting CONSTRAINT_ERROR due to BitRate set to 0(outside of valid range)"
+            )
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected status returned when expecting CONSTRAINT_ERROR")
+            asserts.assert_equal(
+                e.status,
+                Status.ConstraintError,
+                "Unexpected status returned when expecting CONSTRAINT_ERROR due to BitRate set to 0(outside of valid range)",
+            )
             pass
 
 

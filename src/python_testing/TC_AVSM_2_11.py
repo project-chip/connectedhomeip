@@ -39,13 +39,14 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
+from TC_AVSMTestBase import AVSMTestBase
 
 logger = logging.getLogger(__name__)
 
 
-class TC_AVSM_2_11(MatterBaseTest):
+class TC_AVSM_2_11(MatterBaseTest, AVSMTestBase):
     def desc_TC_AVSM_2_11(self) -> str:
         return "[TC-AVSM-2.11] Validate SetStreamPriorities Functionality with Server as DUT"
 
@@ -102,47 +103,11 @@ class TC_AVSM_2_11(MatterBaseTest):
             ),
         ]
 
-    async def _precondition_one_allocated_snp_stream(self):
-        endpoint = self.get_endpoint(default=1)
-        cluster = Clusters.CameraAvStreamManagement
-        attr = Clusters.CameraAvStreamManagement.Attributes
-        commands = Clusters.CameraAvStreamManagement.Commands
-
-        # First verify that SNP is supported
-        aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        logger.info(f"Rx'd FeatureMap: {aFeatureMap}")
-        snpSupport = (aFeatureMap & cluster.Bitmaps.Feature.kSnapshot) > 0
-        asserts.assert_true(snpSupport, "Snapshot Feature is not supported.")
-
-        # Check if snapshot stream has already been allocated
-        aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
-        )
-        logger.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
-        if len(aAllocatedSnapshotStreams) > 0:
-            return
-
-        # Allocate one for the test steps based on SnapshotCapabilities
-        aSnapshotCapabilities = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attr.SnapshotCapabilities
-        )
-        logger.info(f"Rx'd SnapshotCapabilities: {aSnapshotCapabilities}")
-
-        asserts.assert_greater(len(aSnapshotCapabilities), 0, "SnapshotCapabilities list is empty")
-        try:
-            snpStreamAllocateCmd = commands.SnapshotStreamAllocate(
-                imageCodec=aSnapshotCapabilities[0].imageCodec,
-                maxFrameRate=aSnapshotCapabilities[0].maxFrameRate,
-                minResolution=aSnapshotCapabilities[0].resolution,
-                maxResolution=aSnapshotCapabilities[0].resolution,
-                quality=90,
-            )
-            await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
-
-    @async_test_body
+    @run_if_endpoint_matches(
+        has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kSnapshot)
+        and has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kAudio)
+        and has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kVideo)
+    )
     async def test_TC_AVSM_2_11(self):
         endpoint = self.get_endpoint(default=1)
         cluster = Clusters.CameraAvStreamManagement
@@ -151,7 +116,7 @@ class TC_AVSM_2_11(MatterBaseTest):
 
         self.step("precondition")
         # Commission DUT - already done
-        await self._precondition_one_allocated_snp_stream()
+        await self.precondition_one_allocated_snapshot_stream()
 
         self.step(1)
         aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
@@ -184,11 +149,18 @@ class TC_AVSM_2_11(MatterBaseTest):
         self.step(5)
         try:
             await self.send_single_cmd(
-                endpoint=endpoint, cmd=commands.SetStreamPriorities(streamPriorities=(aSupportedStreamUsages))
+                endpoint=endpoint, cmd=commands.SetStreamPriorities(streamPriorities=(aSupportedStreamUsages[:-1]))
             )
-            asserts.assert_true(False, "Unexpected success when expecting INVALID_IN_STATE")
+            asserts.assert_true(
+                False,
+                "Unexpected success when expecting INVALID_IN_STATE due to StreamPriorities set as a subset of aSupportedStreamUsages",
+            )
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.InvalidInState, "Unexpected error returned")
+            asserts.assert_equal(
+                e.status,
+                Status.InvalidInState,
+                "Unexpected error returned when expecting INVALID_IN_STATE due to StreamPriorities set as a subset of aSupportedStreamUsages",
+            )
             pass
 
         self.step(6)
@@ -213,9 +185,16 @@ class TC_AVSM_2_11(MatterBaseTest):
             await self.send_single_cmd(
                 endpoint=endpoint, cmd=commands.SetStreamPriorities(streamPriorities=([notSupportedStreamUsage]))
             )
-            asserts.assert_true(False, "Unexpected success when expecting INVALID_DATA_TYPE ")
+            asserts.assert_true(
+                False,
+                "Unexpected success when expecting INVALID_DATA_TYPE due to StreamPriorities containing a StreamUsage not in aSupportedStreamUsages",
+            )
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.InvalidDataType, "Unexpected error returned")
+            asserts.assert_equal(
+                e.status,
+                Status.InvalidDataType,
+                "Unexpected error returned expecting INVALID_DATA_TYPE due to StreamPriorities containing a StreamUsage not in aSupportedStreamUsages",
+            )
             pass
 
         self.step(9)
@@ -224,9 +203,16 @@ class TC_AVSM_2_11(MatterBaseTest):
                 endpoint=endpoint,
                 cmd=commands.SetStreamPriorities(streamPriorities=(aSupportedStreamUsages + aSupportedStreamUsages)),
             )
-            asserts.assert_true(False, "Unexpected success when expecting CONSTRAINT_ERROR ")
+            asserts.assert_true(
+                False,
+                "Unexpected success when expecting CONSTRAINT_ERROR due to StreamPriorities containing duplicate StreamUsage values from aSupportedStreamUsages",
+            )
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected error returned")
+            asserts.assert_equal(
+                e.status,
+                Status.ConstraintError,
+                "Unexpected error returned when expecting CONSTRAINT_ERROR due to StreamPriorities containing duplicate StreamUsage values from aSupportedStreamUsages",
+            )
             pass
 
 

@@ -39,7 +39,7 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -88,14 +88,12 @@ class TC_AVSM_2_2(MatterBaseTest):
                 "TH sends the SnapshotStreamAllocate command with values from step 3 except with Quality set to 101(outside of valid range).",
                 "DUT responds with a CONSTRAINT_ERROR status code.",
             ),
-            TestStep(
-                8,
-                "TH sends the SnapshotStreamAllocate command with values from step 3 except with Quality set to 101(outside of valid range).",
-                "DUT responds with a CONSTRAINT_ERROR status code.",
-            ),
+            # NOTE: Test Plan has a step 8, which is a duplicate of step 7, so it has not been added here.
         ]
 
-    @async_test_body
+    @run_if_endpoint_matches(
+        has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kSnapshot)
+    )
     async def test_TC_AVSM_2_2(self):
         endpoint = self.get_endpoint(default=1)
         cluster = Clusters.CameraAvStreamManagement
@@ -150,15 +148,21 @@ class TC_AVSM_2_2(MatterBaseTest):
         try:
             snpStreamAllocateCmd = commands.SnapshotStreamAllocate(
                 imageCodec=aSnapshotCapabilities[0].imageCodec,
-                maxFrameRate=aSnapshotCapabilities[0].maxFrameRate,
+                maxFrameRate=0,
                 minResolution=aSnapshotCapabilities[0].resolution,
-                maxResolution=0,
+                maxResolution=aSnapshotCapabilities[0].resolution,
                 quality=90,
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
-            asserts.assert_true(False, "Unexpected success when expecting CONSTRAINT_ERROR")
+            asserts.assert_true(
+                False, "Unexpected success when expecting CONSTRAINT_ERROR due to MaxFrameRate set to 0(outside of valid range)"
+            )
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected status returned when expecting CONSTRAINT_ERROR")
+            asserts.assert_equal(
+                e.status,
+                Status.ConstraintError,
+                "Unexpected status returned when expecting CONSTRAINT_ERROR due to MaxFrameRate set to 0(outside of valid range)",
+            )
             pass
 
         self.step(7)
@@ -171,24 +175,15 @@ class TC_AVSM_2_2(MatterBaseTest):
                 quality=101,
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
-            asserts.assert_true(False, "Unexpected success when expecting CONSTRAINT_ERROR")
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected status returned when expecting CONSTRAINT_ERROR")
-            pass
-
-        self.step(8)
-        try:
-            snpStreamAllocateCmd = commands.SnapshotStreamAllocate(
-                imageCodec=aSnapshotCapabilities[0].imageCodec,
-                maxFrameRate=aSnapshotCapabilities[0].maxFrameRate,
-                minResolution=aSnapshotCapabilities[0].resolution,
-                maxResolution=aSnapshotCapabilities[0].resolution,
-                quality=101,
+            asserts.assert_true(
+                False, "Unexpected success when expecting CONSTRAINT_ERROR due to Quality set to 101(outside of valid range)"
             )
-            await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
-            asserts.assert_true(False, "Unexpected success when expecting CONSTRAINT_ERROR")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected status returned when expecting CONSTRAINT_ERROR")
+            asserts.assert_equal(
+                e.status,
+                Status.ConstraintError,
+                "Unexpected status returned when expecting CONSTRAINT_ERROR due to Quality set to 101(outside of valid range)",
+            )
             pass
 
 
