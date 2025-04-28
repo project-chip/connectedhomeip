@@ -38,6 +38,8 @@ using namespace chip::app::Clusters::ClosureControl;
 
 using Protocols::InteractionModel::Status;
 
+ClosureControlEndpoint ClosureControlEndpoint::sClosureCntrlEndpoint(0);
+
 PositioningEnum ClosureControlDelegate::GetStatePositionFromTarget(TargetPositionEnum targetPosition)
 {
     switch (targetPosition)

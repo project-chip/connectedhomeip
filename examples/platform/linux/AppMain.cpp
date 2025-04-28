@@ -97,6 +97,9 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_CLOSURE_CONTROL_TRIGGER
+#include <app/clusters/closure-control-server/closure-control-test-event-trigger-handler.h>
+#endif
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDManager.h> // nogncheck
 #endif
@@ -692,6 +695,10 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 #if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER
     static DeviceEnergyManagementTestEventTriggerHandler sDeviceEnergyManagementTestEventTriggerHandler;
     sTestEventTriggerDelegate.AddHandler(&sDeviceEnergyManagementTestEventTriggerHandler);
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_CLOSURE_CONTROL_TRIGGER
+    static ClosureControlTestEventTriggerHandler sClosureControlTestEventTriggerHandler;
+    sTestEventTriggerDelegate.AddHandler(&sClosureControlTestEventTriggerHandler);
 #endif
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     sTestEventTriggerDelegate.AddHandler(&Server::GetInstance().GetICDManager());

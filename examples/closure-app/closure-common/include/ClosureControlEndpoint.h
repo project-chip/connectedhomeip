@@ -139,6 +139,8 @@ public:
     {
         mDelegate.SetLogic(&mLogic);
     }
+    
+    static ClosureControlEndpoint sClosureCntrlEndpoint;
 
     /**
      * @brief Initializes the ClosureControlEndpoint instance.

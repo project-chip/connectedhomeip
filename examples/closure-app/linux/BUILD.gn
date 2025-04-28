@@ -39,6 +39,7 @@ executable("chip-closure-app") {
   sources = [
     "${chip_root}/examples/closure-app/closure-common/src/ClosureControlEndpoint.cpp",
     "${chip_root}/examples/closure-app/closure-common/src/ClosureDimensionEndpoint.cpp",
+    "${chip_root}/examples/closure-app/closure-common/src/ClosureTestEventTriggers.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
   ]

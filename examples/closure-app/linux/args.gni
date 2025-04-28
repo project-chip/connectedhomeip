@@ -26,3 +26,4 @@ chip_project_config_include_dirs =
 chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 
 matter_enable_tracing_support = true
+chip_enable_closure_control_trigger = true

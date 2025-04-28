@@ -23,6 +23,8 @@
  #include <app/util/attribute-storage.h>
  #include <app-common/zap-generated/cluster-objects.h>
  
+#include <app/clusters/closure-control-server/closure-control-test-event-trigger-handler.h>
+ 
  using namespace chip;
  using namespace chip::app;
  using namespace chip::app::Clusters::ClosureControl;

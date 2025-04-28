@@ -33,6 +33,7 @@ declare_args() {
   chip_enable_energy_reporting_trigger = false
   chip_enable_water_heater_management_trigger = false
   chip_enable_device_energy_management_trigger = false
+  chip_enable_closure_control_trigger = false
 }
 
 config("app-main-config") {
@@ -77,6 +78,10 @@ source_set("device-energy-management-test-event-trigger") {
   sources = [ "${chip_root}/src/app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h" ]
 }
 
+source_set("closure-control-test-event-trigger") {
+  sources = [ "${chip_root}/src/app/clusters/closure-control-server/closure-control-test-event-trigger-handler.h" ]
+}
+
 source_set("app-main") {
   defines = [ "ENABLE_TRACING=${matter_enable_tracing_support}" ]
   sources = [
@@ -100,6 +105,7 @@ source_set("app-main") {
     ":boolean-state-configuration-test-event-trigger",
     ":commissioner-main",
     ":device-energy-management-test-event-trigger",
+    ":closure-control-test-event-trigger",
     ":energy-evse-test-event-trigger",
     ":energy-reporting-test-event-trigger",
     ":smco-test-event-trigger",
@@ -159,6 +165,7 @@ source_set("app-main") {
     "CHIP_DEVICE_CONFIG_ENABLE_WATER_HEATER_MANAGEMENT_TRIGGER=${chip_enable_water_heater_management_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_WIFI_DIAGNOSTIC_TRIGGER=${chip_enable_wifi_diagnostics_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER=${chip_enable_device_energy_management_trigger}",
+    "CHIP_DEVICE_CONFIG_ENABLE_CLOSURE_CONTROL_TRIGGER=${chip_enable_closure_control_trigger}"
   ]
 
   public_configs = [ ":app-main-config" ]
