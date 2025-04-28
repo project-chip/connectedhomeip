@@ -43,14 +43,11 @@ namespace ClosureControl {
  * This class is responsible for processing Closure Control commands such as Stop, MoveTo, and Calibrate
  * according to specific business logic. It is designed to be used as a delegate for the Closure Control cluster.
  * 
- * @note This implementation is a "PrintOnly" delegate, which may primarily log or print command handling actions.
- * 
- * @param mEndpoint The endpoint ID associated with this delegate.
  */
 class ClosureControlDelegate : public DelegateBase
 {
 public:  
-    ClosureControlDelegate(EndpointId endpoint) : mEndpoint(endpoint) {}
+    ClosureControlDelegate() {}
 
     virtual ~ClosureControlDelegate() = default;
     
@@ -104,7 +101,6 @@ public:
     Protocols::InteractionModel::Status HandleMotion();
 
 private:
-    EndpointId mEndpoint = kInvalidEndpointId;
     ClusterLogic * mLogic;
     
     
@@ -143,7 +139,7 @@ class ClosureControlEndpoint
 public:
 
     ClosureControlEndpoint(EndpointId endpoint) :
-        mEndpoint(endpoint), mContext(mEndpoint), mDelegate(mEndpoint), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
+        mEndpoint(endpoint), mContext(mEndpoint), mDelegate(), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
     {
         mDelegate.SetLogic(&mLogic);
     }
