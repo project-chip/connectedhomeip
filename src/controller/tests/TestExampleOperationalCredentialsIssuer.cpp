@@ -38,6 +38,9 @@ namespace {
 static constexpr size_t kNodeId   = 999;
 static constexpr size_t kFabricId = 1000;
 
+constexpr char kOperationalCredentialsRootCertificateStorage[]         = "ExampleCARootCert";
+constexpr char kOperationalCredentialsIntermediateCertificateStorage[] = "ExampleCAIntermediateCert";
+
 class ExampleOperationalCredentialsIssuerTest : public ::testing::Test
 {
 public:
@@ -117,12 +120,12 @@ TEST_F(ExampleOperationalCredentialsIssuerTest, SuccessfulyGeneratesNOCChainAfte
     uint16_t rcacBufLen = static_cast<uint16_t>(std::min(rcacSpan.size(), static_cast<size_t>(UINT16_MAX)));
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    PERSISTENT_KEY_OP(uint64_t{ 0 }, chip::Controller::kOperationalCredentialsRootCertificateStorage, key,
+    PERSISTENT_KEY_OP(uint64_t{ 0 }, kOperationalCredentialsRootCertificateStorage, key,
                       err = mPersistentStorageDelegate.SyncSetKeyValue(key, rcacSpan.data(), rcacBufLen));
 
     ASSERT_EQ(CHIP_NO_ERROR, err);
 
-    PERSISTENT_KEY_OP(uint64_t{ 0 }, chip::Controller::kOperationalCredentialsIntermediateCertificateStorage, key,
+    PERSISTENT_KEY_OP(uint64_t{ 0 }, kOperationalCredentialsIntermediateCertificateStorage, key,
                       err =
                           mPersistentStorageDelegate.SyncSetKeyValue(key, icacSpan.data(), static_cast<uint16_t>(icacSpan.size())));
 
