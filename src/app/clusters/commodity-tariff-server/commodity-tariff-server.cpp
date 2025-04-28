@@ -36,7 +36,7 @@ namespace app {
 namespace Clusters {
 namespace CommodityTariff {
 
-CHIP_ERROR Instance::Init()
+CHIP_ERROR CommodityTariffServer::Init()
 {
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
@@ -44,19 +44,19 @@ CHIP_ERROR Instance::Init()
     return CHIP_NO_ERROR;
 }
 
-void Instance::Shutdown()
+void CommodityTariffServer::Shutdown()
 {
     CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
-bool Instance::HasFeature(Feature aFeature) const
+bool CommodityTariffServer::HasFeature(Feature aFeature) const
 {
     return mFeature.Has(aFeature);
 }
 
 // AttributeAccessInterface
-CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR CommodityTariffServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     switch (aPath.mAttributeId)
     {
@@ -116,7 +116,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     return CHIP_NO_ERROR;
 }
 
-void Instance::InvokeCommand(HandlerContext & handlerContext)
+void CommodityTariffServer::InvokeCommand(HandlerContext & handlerContext)
 {
     using namespace Commands;
 
@@ -133,7 +133,7 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
     }
 }
 
-void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::GetTariffComponent::DecodableType & commandData)
+void CommodityTariffServer::HandleGetTariffComponent(HandlerContext & ctx, const Commands::GetTariffComponent::DecodableType & commandData)
 {
     Commands::GetTariffComponentResponse::Type response;
 
@@ -150,7 +150,7 @@ void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::Ge
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
-void Instance::HandleGetDayEntry(HandlerContext & ctx, const Commands::GetDayEntry::DecodableType & commandData)
+void CommodityTariffServer::HandleGetDayEntry(HandlerContext & ctx, const Commands::GetDayEntry::DecodableType & commandData)
 {
     Commands::GetDayEntryResponse::Type response;
 

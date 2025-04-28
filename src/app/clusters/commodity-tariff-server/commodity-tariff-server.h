@@ -18,14 +18,14 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-enums.h>
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/reporting/reporting.h>
+
+#include "CommodityTariffAttrsDataClassesTemplate.h"
 
 namespace chip {
 namespace app {
@@ -34,11 +34,129 @@ namespace CommodityTariff {
 
 typedef uint32_t epoch_s;
 
-class Delegate
+/**
+ * @def COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+ * @brief Macro defining Primary attributes for Commodity Tariff
+ * 
+ * Primary attributes are elements that can only be changed by a special trigger from the updater 
+ * when new tariff data has been obtained. These represent the fundamental tariff configuration.
+ * 
+ * The macro defines the following attributes:
+ * - TariffUnit: The unit of measurement for the tariff (nullable enum)
+ * - StartDate: The starting date of the tariff (nullable uint32)
+ * - DefaultRandomizationOffset: Default offset for randomization (nullable int16)
+ * - DefaultRandomizationType: Default type of randomization (nullable enum)
+ * - CalendarPeriods: List of calendar period structures
+ * - DayPatterns: List of day pattern structures
+ * - IndividualDays: List of individual day structures
+ * - DayEntries: List of day entry structures
+ * - TariffPeriods: List of tariff period structures
+ * - TariffComponents: List of tariff component structures
+ */
+#define COMMODITY_TARIFF_PRIMARY_ATTRIBUTES \
+    X(TariffInfo,                   DataModel::Nullable<Structs::TariffInformationStruct::Type>) \
+    X(TariffUnit,                   DataModel::Nullable<Globals::TariffUnitEnum>) \
+    X(StartDate,                    DataModel::Nullable<uint32_t>) \
+    X(DefaultRandomizationOffset,   DataModel::Nullable<int16_t>) \
+    X(DefaultRandomizationType,     DataModel::Nullable<DayEntryRandomizationTypeEnum>) \
+    X(CalendarPeriods,              DataModel::List<Structs::CalendarPeriodStruct::Type>) \
+    X(DayPatterns,                  DataModel::List<Structs::DayPatternStruct::Type>) \
+    X(IndividualDays,               DataModel::List<Structs::DayStruct::Type>) \
+    X(DayEntries,                   DataModel::List<Structs::DayEntryStruct::Type>) \
+    X(TariffPeriods,                DataModel::List<Structs::TariffPeriodStruct::Type>) \
+    X(TariffComponents,             DataModel::List<Structs::TariffComponentStruct::Type>)
+
+/**
+ * @def COMMODITY_TARIFF_CURRENT_ATTRIBUTES
+ * @brief Macro defining Current attributes for Commodity Tariff
+ * 
+ * Current attributes change internally depending on the current time context. These represent
+ * the dynamically changing state of the tariff system.
+ * 
+ * The macro defines the following attributes:
+ * - CurrentDay: The current day structure (nullable)
+ * - NextDay: The next day structure (nullable)
+ * - CurrentDayEntry: The current day entry structure (nullable)
+ * - NextDayEntry: The next day entry structure (nullable)
+ * - CurrentDayEntryDate: The date of current day entry (nullable uint32)
+ * - NextDayEntryDate: The date of next day entry (nullable uint32)
+ * - CurrentTariffComponents: List of current tariff component structures
+ * - NextTariffComponents: List of next tariff component structures
+ */
+#define COMMODITY_TARIFF_CURRENT_ATTRIBUTES \
+    X(CurrentDay,                   DataModel::Nullable<Structs::DayStruct::Type>) \
+    X(NextDay,                      DataModel::Nullable<Structs::DayStruct::Type>) \
+    X(CurrentDayEntry,              DataModel::Nullable<Structs::DayEntryStruct::Type>) \
+    X(NextDayEntry,                 DataModel::Nullable<Structs::DayEntryStruct::Type>) \
+    X(CurrentDayEntryDate,          DataModel::Nullable<uint32_t>) \
+    X(NextDayEntryDate,             DataModel::Nullable<uint32_t>) \
+    X(CurrentTariffComponents,      DataModel::List<Structs::TariffComponentStruct::Type>) \
+    X(NextTariffComponents,         DataModel::List<Structs::TariffComponentStruct::Type>)
+
+/**
+ * @def X(attrName, attrType)
+ * @brief Macro generating attribute-specific data management classes
+ * 
+ * For each attribute in COMMODITY_TARIFF_PRIMARY_ATTRIBUTES, this macro generates a specialized
+ * data management class that inherits from CTC_BaseDataClass. These classes provide:
+ * - Type-safe storage and access to attribute values
+ * - Change detection and validation mechanisms
+ * - Memory management for complex types
+ * 
+ * The generated classes follow this pattern:
+ * @code
+ * class attrName##DataClass : public CTC_BaseDataClass<attrType> {
+ * public:
+ *     attrName##DataClass(attrType& aValueStorage) : CTC_BaseDataClass<attrType>(aValueStorage) {}
+ *     ~attrName##DataClass() = default;
+ * };
+ * @endcode
+ * 
+ * @see CTC_BaseDataClass for base functionality
+ */
+#define X(attrName, attrType) \
+class attrName##DataClass : public CTC_BaseDataClass<attrType> { \
+public: \
+    attrName##DataClass(attrType& aValueStorage) \
+        : CTC_BaseDataClass<attrType>(aValueStorage) {} \
+    ~attrName##DataClass() override {} \
+};
+COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+#undef X
+
+class CommodityTariffPrimaryData {
+private:
+// 1. First declare storage
+#define X(attrName, attrType) \
+    attrType m##attrName;
+COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+#undef X
+
+public:
+/**
+ * @def X(attrName, attrType)
+ * @brief Macro generating attribute-specific data management objects
+ */
+#define X(attrName, attrType) \
+    attrName##DataClass attrName{m##attrName};
+COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+#undef X
+
+    CommodityTariffPrimaryData() = default;
+    virtual ~CommodityTariffPrimaryData() = default;
+
+    //CHIP_ERROR LoadJson(const Json::Value& root);
+    bool IsValid() const { return __is_valid(); }
+
+protected:
+    virtual bool __is_valid() const { return true; };
+};
+
+class CommodityTariffDataProvider
 {
 public:
-    Delegate()          = default;
-    virtual ~Delegate() = default;
+    CommodityTariffDataProvider()          = default;
+    virtual ~CommodityTariffDataProvider() = default;
 
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
 
@@ -51,38 +169,86 @@ public:
                                                                            DataModel::List<const uint32_t> & dayEntryIDs,
                                                                            Structs::TariffComponentStruct::Type & aTariffComponent) = 0;
 
-    // ------------------------------------------------------------------
-    // Get attribute methods
-    virtual DataModel::Nullable<Structs::TariffInformationStruct::Type> & GetTariffInfo()        = 0;
-    virtual Globals::TariffUnitEnum GetTariffUnit()                                              = 0;
-    virtual DataModel::Nullable<epoch_s> GetStartDate()                                          = 0;
-    virtual DataModel::Nullable<int16_t> GetDefaultRandomizationOffset()                         = 0;
-    virtual DataModel::Nullable<DayEntryRandomizationTypeEnum> GetDefaultRandomizationType()     = 0;
-    virtual DataModel::List<Structs::CalendarPeriodStruct::Type> & GetCalendarPeriods()          = 0;
-    virtual DataModel::List<Structs::DayPatternStruct::Type> & GetDayPatterns()                  = 0;
-    virtual DataModel::List<Structs::DayStruct::Type> & GetIndividualDays()                      = 0;
-    virtual DataModel::List<Structs::DayEntryStruct::Type> & GetDayEntries()                     = 0;
-    virtual DataModel::List<Structs::TariffPeriodStruct::Type> & GetTariffPeriods()              = 0;
-    virtual DataModel::List<Structs::TariffComponentStruct::Type> & GetTariffComponents()        = 0;
+                              
+    void TariffDataUpdate(const CommodityTariffPrimaryData& newData)
+    {
+        if (!newData.IsValid())
+        {
+            ChipLogError(NotSpecified, "EGW-CTC: Tariff data rejected due to inconsistencies");
+        }
+        else
+        {
+    #define X(attrName, attrType) \
+            Set##attrName(newData.attrName.GetValue());
+        COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+    #undef X
+            ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data applied");
+        }
+    }
 
-    virtual DataModel::Nullable<Structs::DayStruct::Type> & GetCurrentDay()                      = 0;
-    virtual DataModel::Nullable<Structs::DayStruct::Type> & GetNextDay()                         = 0;
-    virtual DataModel::Nullable<Structs::DayEntryStruct::Type> & GetCurrentDayEntry()            = 0;
-    virtual DataModel::Nullable<Structs::DayEntryStruct::Type> & GetNextDayEntry()               = 0;
-    virtual DataModel::Nullable<epoch_s> GetCurrentDayEntryDate()                                = 0;
-    virtual DataModel::Nullable<epoch_s> GetNextDayEntryDate()                                   = 0;
-    virtual DataModel::List<Structs::TariffComponentStruct::Type> & GetCurrentTariffComponents() = 0;
-    virtual DataModel::List<Structs::TariffComponentStruct::Type> & GetNextTariffComponents()    = 0;
+/**
+ * @brief Standard getter methods for Primary attributes
+ * 
+ * These methods provide access to the Primary tariff attributes stored in mTariffData.
+ * 
+ * The following getters are generated (one for each attribute in COMMODITY_TARIFF_PRIMARY_ATTRIBUTES):
+ * @code
+ * attrType& Get<attrName>()
+ * @endcode
+ * Where:
+ * - <attrName> is the name of each Primary attribute
+ * - Returns a reference to the attribute's value
+ */
+#define X(attrName, attrType) \
+    attrType& Get##attrName() { return mTariffData.attrName.GetValue(); }
+COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+#undef X
 
+/**
+ * @brief Standard getter methods for Current attributes
+ * 
+ * These methods provide access to the Current tariff attributes stored in mCurrentData.
+ */
+#define X(attrName, attrType) \
+    attrType& Get##attrName() { return m##attrName; }
+COMMODITY_TARIFF_CURRENT_ATTRIBUTES
+#undef X
+
+private:
+    /*  */
+    CommodityTariffPrimaryData mTariffData;
+
+#define X(attrName, attrType) \
+    attrType m##attrName;
+COMMODITY_TARIFF_CURRENT_ATTRIBUTES
+#undef X
+
+/**
+ * @brief Standard setter methods for Primary attributes
+ **/
+#define X(attrName, attrType) \
+CHIP_ERROR Set##attrName(const attrType& newValue) { \
+    if (mTariffData.attrName.Update(newValue)) { \
+        ChipLogProgress(NotSpecified, "EGW-CTC: The attr %s updated", #attrName);\
+        MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, Attributes::attrName::Id); \
+    } \
+    return CHIP_NO_ERROR; \
+}
+COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+#undef X
+
+
+    void UpdateCurrentAttrs();
+    static void MidnightTimerCallback(chip::System::Layer *, void * callbackContext);
 protected:
     EndpointId mEndpointId = 0;
 };
 
-class Instance : public AttributeAccessInterface,
+class CommodityTariffServer : public AttributeAccessInterface,
                               public CommandHandlerInterface
 {
 public:
-    Instance(EndpointId aEndpointId, Delegate & aDelegate, BitMask<Feature> aFeature) :
+    CommodityTariffServer(EndpointId aEndpointId, CommodityTariffDataProvider & aDelegate, BitMask<Feature> aFeature) :
         AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterface(MakeOptional(aEndpointId), Id),
         mDelegate(aDelegate), mFeature(aFeature)
     {
@@ -90,7 +256,7 @@ public:
         mDelegate.SetEndpointId(aEndpointId);
     }
 
-    ~Instance() { Shutdown(); }
+    ~CommodityTariffServer() { Shutdown(); }
 
     CHIP_ERROR Init();
     void Shutdown();
@@ -98,7 +264,7 @@ public:
     bool HasFeature(Feature aFeature) const;
 
 private:
-    Delegate & mDelegate;
+    CommodityTariffDataProvider & mDelegate;
     BitMask<Feature> mFeature;
 
     // Internal Application API to set attribute values
