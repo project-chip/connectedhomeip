@@ -824,7 +824,7 @@ CHIP_ERROR WiFiPAFEndPoint::DebugPktAckSn(const PktDirect_t pktDirect, Encoding:
     CHIP_ERROR err;
     bool hasAck = false;
     SequenceNumber_t ackNum, snNum;
-    size_t SkipOffset = 0;
+    size_t skipOffset = 0;
 
     err = reader.Read8(rxFlags.RawStorage()).StatusCode();
     VerifyOrReturnError(err == CHIP_NO_ERROR, err);
