@@ -48,8 +48,6 @@ public:
                const OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData, app::CommandHandler * handler);
 
 private:
-    OTAProviderDelegate * mDelegate = nullptr;
-
     /// Convenience method that returns if the internal delegate is null and will log
     /// an error if the check returns true
     bool IsNullDelegateWithLogging(EndpointId endpointIdForLogging);
@@ -57,6 +55,8 @@ private:
     /// convenience method that checks an update token for validity and logs
     /// on error (when returning false).
     static bool IsValidUpdateTokenWithLogging(ByteSpan updateToken);
+
+    OTAProviderDelegate * mDelegate = nullptr;
 };
 
 /// Integration of OTA provider logic within the matter data model
