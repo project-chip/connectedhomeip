@@ -42,17 +42,12 @@ using Protocols::InteractionModel::Status;
 * 
 * This class is responsible for processing Closure Dimension commands such as Stop, MoveTo, and Calibrate
 * according to specific business logic. It is designed to be used as a delegate for the Closure Dimension cluster.
-* 
-* @note This implementation is a "PrintOnly" delegate, which may primarily log or print command handling actions.
-* 
-* @param mEndpoint The endpoint ID associated with this delegate.
 */
 class ClosureDimensionDelegate : public DelegateBase
 {
 public:
 
-   ClosureDimensionDelegate(EndpointId endpoint) : mEndpoint(endpoint) 
-   {}
+   ClosureDimensionDelegate() {}
    
    virtual ~ClosureDimensionDelegate() = default;
 
@@ -83,7 +78,6 @@ public:
    void SetTargetDirection(StepDirectionEnum direction) { mTargetDirection = direction; }
 
 private:
-   EndpointId mEndpoint = kInvalidEndpointId;
    bool isMoving                      = false;
    bool isManualLatch                 = false;
    StepDirectionEnum mTargetDirection = StepDirectionEnum::kUnknownEnumValue;
@@ -108,7 +102,7 @@ class ClosureDimensionEndpoint
 public:
 
    ClosureDimensionEndpoint(EndpointId endpoint) :
-       mEndpoint(endpoint), mContext(mEndpoint), mDelegate(mEndpoint), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
+       mEndpoint(endpoint), mContext(mEndpoint), mDelegate(), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
    {
       mDelegate.SetLogic(&mLogic);
    }
@@ -128,6 +122,13 @@ public:
     * @return Reference to the ClosureDimensionDelegate instance.
     */
    ClosureDimensionDelegate & GetDelegate() { return mDelegate; }
+
+   /**
+    * @brief Retrieves the Cluster logic object associated with this Closure Dimension endpoint.
+    * 
+    * @return Reference to the ClosureDimensionDelegate instance.
+    */
+   
    ClusterLogic & GetLogic() { return mLogic; }
 
 private:
