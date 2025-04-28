@@ -39,71 +39,39 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{
 
 namespace Commands {
 namespace AllocatePushTransport {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ AllocatePushTransport::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
-                                                                 Access::Privilege::kManage };
-} // namespace AllocatePushTransport
-namespace DeallocatePushTransport {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ DeallocatePushTransport::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
-                                                                 Access::Privilege::kManage };
-} // namespace DeallocatePushTransport
-namespace ModifyPushTransport {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ModifyPushTransport::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
-                                                                 Access::Privilege::kManage };
-} // namespace ModifyPushTransport
-namespace SetTransportStatus {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SetTransportStatus::Id, BitFlags<DataModel::CommandQualityFlags>{},
-                                                                 Access::Privilege::kManage };
-} // namespace SetTransportStatus
-namespace ManuallyTriggerTransport {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ ManuallyTriggerTransport::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
-                                                                 Access::Privilege::kOperate };
-} // namespace ManuallyTriggerTransport
-namespace FindTransport {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ FindTransport::Id, BitFlags<DataModel::CommandQualityFlags>{},
-                                                                 Access::Privilege::kOperate };
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = AllocatePushTransport::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kManage,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
+    AllocatePushTransport::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    Access::Privilege::kManage
 };
 } // namespace AllocatePushTransport
 namespace DeallocatePushTransport {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DeallocatePushTransport::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kManage,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
+    DeallocatePushTransport::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    Access::Privilege::kManage
 };
 } // namespace DeallocatePushTransport
 namespace ModifyPushTransport {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ModifyPushTransport::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kManage,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
+    ModifyPushTransport::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    Access::Privilege::kManage
 };
 } // namespace ModifyPushTransport
 namespace SetTransportStatus {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = SetTransportStatus::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kManage,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
+    SetTransportStatus::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    Access::Privilege::kManage
 };
 } // namespace SetTransportStatus
 namespace ManuallyTriggerTransport {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ManuallyTriggerTransport::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kOperate,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
+    ManuallyTriggerTransport::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    Access::Privilege::kOperate
 };
 } // namespace ManuallyTriggerTransport
 namespace FindTransport {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = FindTransport::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kOperate,
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
+    FindTransport::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    Access::Privilege::kOperate
 };
 } // namespace FindTransport
 
