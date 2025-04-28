@@ -489,7 +489,7 @@ CHIP_ERROR WiFiPAFLayer::RmPafSession(PafInfoAccess accType, WiFiPAFSession & Se
 
 WiFiPAFSession * WiFiPAFLayer::GetPAFInfo(PafInfoAccess accType, WiFiPAFSession & SessionInfo)
 {
-    for (WiFiPAFSession & PafSession : mPafInfoVect)
+    for (WiFiPAFSession & pafSession : mPafInfoVect)
     {
         if (PafSession.role == kWiFiPafRole_Publisher)
         {
