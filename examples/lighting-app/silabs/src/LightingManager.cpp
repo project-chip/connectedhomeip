@@ -28,7 +28,7 @@
 #include <lib/support/TypeTraits.h>
 
 using namespace chip;
-
+using namespace ::chip::app;
 using namespace ::chip::app::Clusters;
 using namespace ::chip::app::Clusters::OnOff;
 using namespace ::chip::DeviceLayer;
@@ -71,7 +71,7 @@ CHIP_ERROR LightingManager::Init()
     OnOffServer::Instance().getOnOffValue(1, &currentLedState);
     app::DataModel::Nullable<uint8_t> brightness;
     // Read brightness value
-    status = Clusters::LevelControl::Attributes::CurrentLevel::Get(kExampleEndpointId, brightness);
+    status = Clusters::LevelControl::Attributes::CurrentLevel::Get(1, brightness);
     if (status == Protocols::InteractionModel::Status::Success && !brightness.IsNull())
     {
         mLevel = brightness.Value();
