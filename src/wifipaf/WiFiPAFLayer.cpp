@@ -466,7 +466,7 @@ CHIP_ERROR WiFiPAFLayer::AddPafSession(PafInfoAccess accType, WiFiPAFSession & S
 
 CHIP_ERROR WiFiPAFLayer::RmPafSession(PafInfoAccess accType, WiFiPAFSession & SessionInfo)
 {
-    for (WiFiPAFSession & PafSession : mPafInfoVect)
+    for (WiFiPAFSession & pafSession : mPafInfoVect)
     {
         switch (accType)
         {
