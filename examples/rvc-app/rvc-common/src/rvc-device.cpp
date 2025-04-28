@@ -395,6 +395,34 @@ void RvcDevice::HandleErrorEvent(const std::string & error)
     {
         err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kMopCleaningPadMissing);
     }
+    else if (error == "LowBattery")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kLowBattery);
+    }
+    else if (error == "CannotReachTargetArea")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kCannotReachTargetArea);
+    }
+    else if (error == "DirtyWaterTankFull")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kDirtyWaterTankFull);
+    }
+    else if (error == "DirtyWaterTankMissing")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kDirtyWaterTankMissing);
+    }
+    else if (error == "WheelsJammed")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kWheelsJammed);
+    }
+    else if (error == "BrushJammed")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kBrushJammed);
+    }
+    else if (error == "NavigationSensorObscured")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kNavigationSensorObscured);
+    }
     else
     {
         ChipLogError(NotSpecified, "Unhandled command: The 'Error' key of the 'ErrorEvent' message is not valid.");
