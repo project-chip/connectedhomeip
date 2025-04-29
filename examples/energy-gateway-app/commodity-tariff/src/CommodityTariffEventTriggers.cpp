@@ -29,9 +29,28 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::CommodityTariff;
 using namespace chip::app::Clusters::CommodityTariff::Structs;
 
-static constexpr const char * default_tariff_data = "./DefaultTariff.json";
-//static constexpr const char * tariff_data_1 ="./full_complex_tariff_1.json";
-//static constexpr const char * tariff_data_2 ="./full_complex_tariff_2.json";
+uint8_t presetIndex = 0;
+
+namespace TariffPresets {
+    static constexpr const char* kTariff1 =  "./DefaultTariff.json";;
+    static constexpr const char* kTariff2 ="./full_complex_tariff_1.json";
+    static constexpr const char* kTariff3 ="./full_complex_tariff_2.json";
+
+    // Array of all presets
+    static constexpr std::array<const char*, 3> kAllPresets = {
+        kTariff1,
+        kTariff2,
+        kTariff3
+    };
+
+    // Number of presets (compile-time constant)
+    static constexpr size_t kCount = kAllPresets.size();
+
+    // Safe accessor function
+    static constexpr const char* GetPreset(size_t index) {
+        return (index < kCount) ? kAllPresets[index] : nullptr;
+    }
+}
 
 static bool LoadJsonFile(const char * aFname, Json::Value &jsonValue)
 {
@@ -69,17 +88,29 @@ exit:
 
 void SetTestEventTrigger_TariffDataUpdated()
 {
-   CommodityTariffDelegate * dg = GetCommodityTariffDelegate();
-   Json::Value json_root;
-   if ( LoadJsonFile(default_tariff_data, json_root) )
-   {
-       ChipLogProgress(NotSpecified, "The default tariff file opened successfully");
-       dg->LoadTariffData(json_root);     
-   }
-   else
-   {
-       ChipLogError(NotSpecified, "Unable to load default tariff file");
-   }
+    CommodityTariffDelegate * dg = GetCommodityTariffDelegate();
+
+    if (const char* preset = TariffPresets::GetPreset(presetIndex))
+    {
+        Json::Value json_root;
+        ChipLogProgress(NotSpecified, "Tariff preset file %s", preset);
+        if ( LoadJsonFile(preset, json_root) )
+        {
+            ChipLogProgress(NotSpecified, "The tariff file opened successfully");
+            dg->LoadTariffData(json_root);
+        }
+        else
+        {
+            ChipLogError(NotSpecified, "Unable to load tariff file");
+        }
+        presetIndex++;
+    }
+    else
+    {
+        ChipLogProgress(NotSpecified, "Tariff data erasing");
+        dg->CleanupTariffData();
+        presetIndex = 0;
+    }
 }
 
 void SetTestEventTrigger_TariffDataClear()

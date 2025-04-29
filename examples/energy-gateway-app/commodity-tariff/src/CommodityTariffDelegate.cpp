@@ -284,7 +284,7 @@ CHIP_ERROR TariffInfoDataClass::LoadFromJson(const Json::Value & json)
         tmp_cur.currency = static_cast<uint16_t>(json["Currency"]["Currency"].asUInt());
         tmp_cur.decimalPoints = static_cast<uint8_t>(json["Currency"]["DecimalPoints"].asUInt());
 
-        tempValue.currency.Value().SetNonNull(tmp_cur);
+        tempValue.currency =MakeOptional(DataModel::Nullable<Globals::Structs::CurrencyStruct::Type>(tmp_cur));
     }
 
     if (json.isMember("blockMode"))
@@ -299,7 +299,7 @@ CHIP_ERROR TariffInfoDataClass::LoadFromJson(const Json::Value & json)
     return CHIP_NO_ERROR;
 }
 
-bool TariffInfoDataClass::IsValid(const TariffInformationStructType& tariffInfo) {
+bool TariffInfoDataClass::IsValid(const TariffInformationStructType& tariffInfo) const {
 
     if (tariffInfo.IsNull())
     {
@@ -456,7 +456,7 @@ void TariffPeriodItemDataClass::CleanupTariffPeriod(TariffPeriodStructType& peri
     }
 }
 
-bool TariffPeriodItemDataClass::IsValid(const TariffPeriodStructType& period) {
+bool TariffPeriodItemDataClass::IsValid(const TariffPeriodStructType& period) const {
     // Validate label length if present
     if (period.label.IsNull()) {
         return false;
@@ -632,7 +632,7 @@ CHIP_ERROR DayEntryItemDataClass::ParseFromJson(const Json::Value& json, DayEntr
     return err;
 }
 
-bool DayEntryItemDataClass::IsValid(const DayEntryStructType& entry) {
+bool DayEntryItemDataClass::IsValid(const DayEntryStructType& entry) const {
     // Validate startTime (max 1499 = 24h59m in minutes)
     if (entry.startTime > 1499) {
         return false;
@@ -831,7 +831,7 @@ void TariffComponentItemDataClass::CleanupTariffComponent(TariffComponentStructT
     }
 }
 
-bool TariffComponentItemDataClass::IsValid(const TariffComponentStructType& component) {
+bool TariffComponentItemDataClass::IsValid(const TariffComponentStructType& component) const {
     // Validate required field
     if (component.tariffComponentID == 0) {
         return false;

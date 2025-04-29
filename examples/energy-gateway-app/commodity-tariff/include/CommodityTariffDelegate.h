@@ -42,15 +42,11 @@ constexpr bool operator!=(const Globals::Structs::CurrencyStruct::Type & lhs, co
 #define X(attrName, attrType) \
 class attrName##DataClass : public CTC_BaseDataClass<attrType> { \
 public: \
-    /*attrName##DataClass(attrType& aValueStorage) \
-        : CTC_BaseDataClass<attrType>(aValueStorage) { mValue = aValueStorage; }*/\
-    /*~attrName##DataClass() = default;*/ \
+    attrName##DataClass(attrType& aValueStorage) \
+        : CTC_BaseDataClass<attrType>(aValueStorage) { mValue = aValueStorage; } \
+    ~attrName##DataClass() = default; \
     CHIP_ERROR LoadFromJson(const Json::Value& json); \
-protected:    \
-    /*CHIP_ERROR UpdateValue(const attrType& aValue) { \
-        mValue = aValue;        \
-        return CHIP_NO_ERROR; };*/ \
-};
+};    
 // Generate all classes
 COMMODITY_TARIFF_PRIMARY_ATTRIBUTES_STUBS
 #undef X
@@ -90,7 +86,15 @@ COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
     ~CommodityTariffPrimaryData() = default;
 
     CHIP_ERROR LoadJson(const Json::Value& root);
+
     bool IsValid() const { return true; }
+
+    void EraseData() {
+#define X(attrName, attrType) \
+        attrName.CleanupValue();
+COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+#undef X
+    }   
 };
 
 class CommodityTariffCurrentData {
@@ -167,6 +171,11 @@ void LoadTariffData(const Json::Value & value)
     auto cb = [this](const CommodityTariffPrimaryData& data) { this->TariffDataUpdaterCb(data); };
     updater = std::make_unique<TariffDataUpdater>(cb, value);
     updater->LoadJson(value);   
+}
+
+void CleanupTariffData()
+{
+    mTariffData.EraseData();
 }
 private:
     CommodityTariffPrimaryData mTariffData;
