@@ -765,7 +765,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceAdded(WpaSupplicant1 * proxy, const
     }
 }
 
-void ConnectivityManagerImpl::_OnWpaInterfaceRemoved(WpaSupplicant1 * proxy, const char * path, GVariant * properties)
+void ConnectivityManagerImpl::_OnWpaInterfaceRemoved(WpaSupplicant1 * proxy, const char * path)
 {
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
@@ -824,12 +824,11 @@ void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * sourceObject, GAsyncRes
                 return self->_OnWpaInterfaceAdded(proxy, path, properties);
             }),
             this);
-        g_signal_connect(
-            mWpaSupplicant.proxy, "interface-removed",
-            G_CALLBACK(+[](WpaSupplicant1 * proxy, const char * path, GVariant * properties, ConnectivityManagerImpl * self) {
-                return self->_OnWpaInterfaceRemoved(proxy, path, properties);
-            }),
-            this);
+        g_signal_connect(mWpaSupplicant.proxy, "interface-removed",
+                         G_CALLBACK(+[](WpaSupplicant1 * proxy, const char * path, ConnectivityManagerImpl * self) {
+                             return self->_OnWpaInterfaceRemoved(proxy, path);
+                         }),
+                         this);
 
         wpa_supplicant_1_call_get_interface(mWpaSupplicant.proxy, sWiFiIfName, nullptr,
                                             reinterpret_cast<GAsyncReadyCallback>(

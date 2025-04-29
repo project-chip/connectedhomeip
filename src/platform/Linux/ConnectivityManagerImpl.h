@@ -226,7 +226,7 @@ private:
     CHIP_ERROR StopAutoScan();
 
     void _OnWpaProxyReady(GObject * sourceObject, GAsyncResult * res);
-    void _OnWpaInterfaceRemoved(WpaSupplicant1 * proxy, const char * path, GVariant * properties);
+    void _OnWpaInterfaceRemoved(WpaSupplicant1 * proxy, const char * path);
     void _OnWpaInterfaceAdded(WpaSupplicant1 * proxy, const char * path, GVariant * properties);
     void _OnWpaPropertiesChanged(WpaSupplicant1Interface * proxy, GVariant * properties);
     void _OnWpaInterfaceScanDone(WpaSupplicant1Interface * proxy, gboolean success);
