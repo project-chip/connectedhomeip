@@ -25,9 +25,10 @@
 
 namespace {
 
+using namespace chip;
 using namespace mdns::Minimal;
 
-class TestHeapQName : public ::testing::Test
+class TestQNameString : public ::testing::Test
 {
 public:
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
