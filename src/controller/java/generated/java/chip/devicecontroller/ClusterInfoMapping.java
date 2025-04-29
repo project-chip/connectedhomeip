@@ -31907,19 +31907,19 @@ public class ClusterInfoMapping {
 
     Map<String, CommandParameterInfo> contentAppObservercontentAppMessageCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo contentAppObservercontentAppMessagedataCommandParameterInfo = new CommandParameterInfo("data", Optional.class, String.class);
+    CommandParameterInfo contentAppObservercontentAppMessagedataCommandParameterInfo = new CommandParameterInfo("data", String.class, String.class);
     contentAppObservercontentAppMessageCommandParams.put("data",contentAppObservercontentAppMessagedataCommandParameterInfo);
 
-    CommandParameterInfo contentAppObservercontentAppMessageencodingHintCommandParameterInfo = new CommandParameterInfo("encodingHint", String.class, String.class);
+    CommandParameterInfo contentAppObservercontentAppMessageencodingHintCommandParameterInfo = new CommandParameterInfo("encodingHint", Optional.class, String.class);
     contentAppObservercontentAppMessageCommandParams.put("encodingHint",contentAppObservercontentAppMessageencodingHintCommandParameterInfo);
     InteractionInfo contentAppObservercontentAppMessageInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.ContentAppObserverCluster) cluster)
           .contentAppMessage((ChipClusters.ContentAppObserverCluster.ContentAppMessageResponseCallback) callback
-           , (Optional<String>)
+           , (String)
              commandArguments.get("data")
 
-           , (String)
+           , (Optional<String>)
              commandArguments.get("encodingHint")
 
             );

@@ -60550,20 +60550,20 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void contentAppMessage(ContentAppMessageResponseCallback callback, Optional<String> data, String encodingHint) {
+    public void contentAppMessage(ContentAppMessageResponseCallback callback, String data, Optional<String> encodingHint) {
       contentAppMessage(callback, data, encodingHint, 0);
     }
 
-    public void contentAppMessage(ContentAppMessageResponseCallback callback, Optional<String> data, String encodingHint, int timedInvokeTimeoutMs) {
+    public void contentAppMessage(ContentAppMessageResponseCallback callback, String data, Optional<String> encodingHint, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long dataFieldID = 0L;
-      BaseTLVType datatlvValue = data.<BaseTLVType>map((nonOptionaldata) -> new StringType(nonOptionaldata)).orElse(new EmptyType());
+      BaseTLVType datatlvValue = new StringType(data);
       elements.add(new StructElement(dataFieldID, datatlvValue));
 
       final long encodingHintFieldID = 1L;
-      BaseTLVType encodingHinttlvValue = new StringType(encodingHint);
+      BaseTLVType encodingHinttlvValue = encodingHint.<BaseTLVType>map((nonOptionalencodingHint) -> new StringType(nonOptionalencodingHint)).orElse(new EmptyType());
       elements.add(new StructElement(encodingHintFieldID, encodingHinttlvValue));
 
       StructType commandArgs = new StructType(elements);
