@@ -32,14 +32,15 @@ def _evaluate_choices(location: AttributePathLocation, counts: dict[Choice, int]
 
 def evaluate_feature_choice_conformance(endpoint_id: int, cluster_id: int, xml_clusters: dict[int, XmlCluster], feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> list[ChoiceConformanceProblemNotice]:
     all_features = [1 << i for i in range(32)]
-    all_features = [f for f in all_features if f in xml_clusters[cluster_id].features.keys()]
+    all_features = [f for f in all_features if uint(f) in xml_clusters[cluster_id].features.keys()]
 
     # Other pieces of the 10.2 test check for unknown features, so just remove them here to check choice conformance
     counts: dict[Choice, int] = {}
     for f in all_features:
-        xml_feature = xml_clusters[cluster_id].features[f]
+        xml_feature = xml_clusters[cluster_id].features[uint(f)]
         conformance_decision_with_choice = xml_feature.conformance(feature_map, attribute_list, all_command_list)
-        _add_to_counts_if_required(conformance_decision_with_choice, (feature_map & f), counts)
+        if isinstance(conformance_decision_with_choice, ConformanceDecisionWithChoice):
+            _add_to_counts_if_required(conformance_decision_with_choice, (feature_map & uint(f)) != 0, counts)
 
     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
                                      attribute_id=GlobalAttributeIds.FEATURE_MAP_ID)
@@ -53,7 +54,8 @@ def evaluate_attribute_choice_conformance(endpoint_id: int, cluster_id: int, xml
     for attribute_id in all_attributes:
         conformance_decision_with_choice = xml_clusters[cluster_id].attributes[attribute_id].conformance(
             feature_map, attribute_list, all_command_list)
-        _add_to_counts_if_required(conformance_decision_with_choice, attribute_id in attribute_list, counts)
+        if isinstance(conformance_decision_with_choice, ConformanceDecisionWithChoice):
+            _add_to_counts_if_required(conformance_decision_with_choice, attribute_id in attribute_list, counts)
 
     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
                                      attribute_id=GlobalAttributeIds.ATTRIBUTE_LIST_ID)
@@ -67,7 +69,8 @@ def evaluate_command_choice_conformance(endpoint_id: int, cluster_id: int, xml_c
     for command_id in all_commands:
         conformance_decision_with_choice = xml_clusters[cluster_id].accepted_commands[command_id].conformance(
             feature_map, attribute_list, all_command_list)
-        _add_to_counts_if_required(conformance_decision_with_choice, command_id in all_command_list, counts)
+        if isinstance(conformance_decision_with_choice, ConformanceDecisionWithChoice):
+            _add_to_counts_if_required(conformance_decision_with_choice, command_id in all_command_list, counts)
 
     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
                                      attribute_id=GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)
