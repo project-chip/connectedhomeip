@@ -395,7 +395,7 @@ public:
         "freq_list=[freq#1],[freq#2]...[freq#n]"
             [freq#1] - [freq#n]: frequence number, separated by ','
 */
-static uint16_t WiFiPAFGet_FreqList(const char * args, ReadOnlyBufferBuilder<uint16_t> & knownFreqListBuilder)
+static CHIP_ERROR WiFiPAFGet_FreqList(const char * args, ReadOnlyBufferBuilder<uint16_t> & knownFreqListBuilder)
 {
     const char hdstr[] = "freq_list=";
     std::vector<uint16_t> freq_vect;
@@ -403,7 +403,7 @@ static uint16_t WiFiPAFGet_FreqList(const char * args, ReadOnlyBufferBuilder<uin
     auto pos = argstrn.find(hdstr);
     if (pos == std::string::npos)
     {
-        return 0;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
     std::string nums = argstrn.substr(pos + strlen(hdstr));
     std::stringstream ss(nums);
@@ -414,13 +414,8 @@ static uint16_t WiFiPAFGet_FreqList(const char * args, ReadOnlyBufferBuilder<uin
     }
     uint16_t freq_size = freq_vect.size();
     CHIP_ERROR err     = knownFreqListBuilder.EnsureAppendCapacity(freq_size);
-    VerifyOrReturnValue(err == CHIP_NO_ERROR, 0);
-    for (int i = 0; i < freq_size; i++)
-    {
-        err = knownFreqListBuilder.Append(freq_vect[i]);
-        VerifyOrReturnValue(err == CHIP_NO_ERROR, i);
-    }
-    return freq_size;
+    ReturnErrorOnFailure(err);
+    return knownFreqListBuilder.AppendElements({ freq_vect.data(), freq_vect.size() });
 }
 #endif
 
@@ -559,8 +554,10 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
             ChipLogProgress(WiFiPAF, "Wi-Fi Management started");
 
             ReadOnlyBufferBuilder<uint16_t> knownFreqListBuilder;
-            WiFiPAFGet_FreqList(LinuxDeviceOptions::GetInstance().mWiFiPAFExtCmds, knownFreqListBuilder);
-            DeviceLayer::ConnectivityMgr().SetWiFiPAFPublishParam(knownFreqListBuilder);
+            err = WiFiPAFGet_FreqList(LinuxDeviceOptions::GetInstance().mWiFiPAFExtCmds, knownFreqListBuilder);
+            SuccessOrExit(err);
+            ReadOnlyBuffer<uint16_t> freq_list = knownFreqListBuilder.TakeBuffer();
+            DeviceLayer::ConnectivityMgr().SetWiFiPAFPublishParam(std::move(freq_list));
         }
     }
 
