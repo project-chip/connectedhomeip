@@ -233,6 +233,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "TotalVolatileOrganicCompoundsConcentrationMeasurement";
     case chip::app::Clusters::RadonConcentrationMeasurement::Id:
         return "RadonConcentrationMeasurement";
+    case chip::app::Clusters::SoilMeasurement::Id:
+        return "SoilMeasurement";
     case chip::app::Clusters::WiFiNetworkManagement::Id:
         return "WiFiNetworkManagement";
     case chip::app::Clusters::ThreadBorderRouterManagement::Id:
@@ -452,6 +454,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "PartsList";
         case chip::app::Clusters::Descriptor::Attributes::TagList::Id:
             return "TagList";
+        case chip::app::Clusters::Descriptor::Attributes::EndpointUniqueID::Id:
+            return "EndpointUniqueID";
         case chip::app::Clusters::Descriptor::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::Descriptor::Attributes::AcceptedCommandList::Id:
@@ -1589,10 +1593,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedModes";
         case chip::app::Clusters::OvenMode::Attributes::CurrentMode::Id:
             return "CurrentMode";
-        case chip::app::Clusters::OvenMode::Attributes::StartUpMode::Id:
-            return "StartUpMode";
-        case chip::app::Clusters::OvenMode::Attributes::OnMode::Id:
-            return "OnMode";
         case chip::app::Clusters::OvenMode::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::OvenMode::Attributes::AcceptedCommandList::Id:
@@ -1664,10 +1664,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedModes";
         case chip::app::Clusters::LaundryWasherMode::Attributes::CurrentMode::Id:
             return "CurrentMode";
-        case chip::app::Clusters::LaundryWasherMode::Attributes::StartUpMode::Id:
-            return "StartUpMode";
-        case chip::app::Clusters::LaundryWasherMode::Attributes::OnMode::Id:
-            return "OnMode";
         case chip::app::Clusters::LaundryWasherMode::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::LaundryWasherMode::Attributes::AcceptedCommandList::Id:
@@ -1689,10 +1685,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedModes";
         case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Attributes::CurrentMode::Id:
             return "CurrentMode";
-        case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Attributes::StartUpMode::Id:
-            return "StartUpMode";
-        case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Attributes::OnMode::Id:
-            return "OnMode";
         case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Attributes::AcceptedCommandList::Id:
@@ -1833,10 +1825,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedModes";
         case chip::app::Clusters::DishwasherMode::Attributes::CurrentMode::Id:
             return "CurrentMode";
-        case chip::app::Clusters::DishwasherMode::Attributes::StartUpMode::Id:
-            return "StartUpMode";
-        case chip::app::Clusters::DishwasherMode::Attributes::OnMode::Id:
-            return "OnMode";
         case chip::app::Clusters::DishwasherMode::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::DishwasherMode::Attributes::AcceptedCommandList::Id:
@@ -3890,6 +3878,27 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::SoilMeasurement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::Id:
+            return "SoilMoistureMeasurementLimits";
+        case chip::app::Clusters::SoilMeasurement::Attributes::SoilMoistureMeasuredValue::Id:
+            return "SoilMoistureMeasuredValue";
+        case chip::app::Clusters::SoilMeasurement::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::SoilMeasurement::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::SoilMeasurement::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::SoilMeasurement::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::SoilMeasurement::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::WiFiNetworkManagement::Id: {
         switch (id)
         {
@@ -5310,14 +5319,10 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
     case chip::app::Clusters::OvenCavityOperationalState::Id: {
         switch (id)
         {
-        case chip::app::Clusters::OvenCavityOperationalState::Commands::Pause::Id:
-            return "Pause";
         case chip::app::Clusters::OvenCavityOperationalState::Commands::Stop::Id:
             return "Stop";
         case chip::app::Clusters::OvenCavityOperationalState::Commands::Start::Id:
             return "Start";
-        case chip::app::Clusters::OvenCavityOperationalState::Commands::Resume::Id:
-            return "Resume";
         default:
             return "Unknown";
         }

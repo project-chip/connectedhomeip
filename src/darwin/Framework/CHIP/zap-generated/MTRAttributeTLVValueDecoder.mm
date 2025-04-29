@@ -637,6 +637,22 @@ static id _Nullable DecodeAttributeValueForDescriptorCluster(AttributeId aAttrib
         }
         return value;
     }
+    case Attributes::EndpointUniqueID::Id: {
+        using TypeInfo = Attributes::EndpointUniqueID::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSString * _Nonnull value;
+        value = AsString(cppValue);
+        if (value == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            *aError = err;
+            return nil;
+        }
+        return value;
+    }
     default: {
         // Not a known Descriptor attribute.
         break;
@@ -16055,6 +16071,97 @@ static id _Nullable DecodeAttributeValueForRadonConcentrationMeasurementCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeAttributeValueForSoilMeasurementCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::SoilMeasurement;
+    switch (aAttributeId) {
+    case Attributes::SoilMoistureMeasurementLimits::Id: {
+        using TypeInfo = Attributes::SoilMoistureMeasurementLimits::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTRDataTypeMeasurementAccuracyStruct * _Nonnull value;
+        value = [MTRDataTypeMeasurementAccuracyStruct new];
+        value.measurementType = [NSNumber numberWithUnsignedShort:chip::to_underlying(cppValue.measurementType)];
+        value.measured = [NSNumber numberWithBool:cppValue.measured];
+        value.minMeasuredValue = [NSNumber numberWithLongLong:cppValue.minMeasuredValue];
+        value.maxMeasuredValue = [NSNumber numberWithLongLong:cppValue.maxMeasuredValue];
+        { // Scope for our temporary variables
+            auto * array_1 = [NSMutableArray new];
+            auto iter_1 = cppValue.accuracyRanges.begin();
+            while (iter_1.Next()) {
+                auto & entry_1 = iter_1.GetValue();
+                MTRDataTypeMeasurementAccuracyRangeStruct * newElement_1;
+                newElement_1 = [MTRDataTypeMeasurementAccuracyRangeStruct new];
+                newElement_1.rangeMin = [NSNumber numberWithLongLong:entry_1.rangeMin];
+                newElement_1.rangeMax = [NSNumber numberWithLongLong:entry_1.rangeMax];
+                if (entry_1.percentMax.HasValue()) {
+                    newElement_1.percentMax = [NSNumber numberWithUnsignedShort:entry_1.percentMax.Value()];
+                } else {
+                    newElement_1.percentMax = nil;
+                }
+                if (entry_1.percentMin.HasValue()) {
+                    newElement_1.percentMin = [NSNumber numberWithUnsignedShort:entry_1.percentMin.Value()];
+                } else {
+                    newElement_1.percentMin = nil;
+                }
+                if (entry_1.percentTypical.HasValue()) {
+                    newElement_1.percentTypical = [NSNumber numberWithUnsignedShort:entry_1.percentTypical.Value()];
+                } else {
+                    newElement_1.percentTypical = nil;
+                }
+                if (entry_1.fixedMax.HasValue()) {
+                    newElement_1.fixedMax = [NSNumber numberWithUnsignedLongLong:entry_1.fixedMax.Value()];
+                } else {
+                    newElement_1.fixedMax = nil;
+                }
+                if (entry_1.fixedMin.HasValue()) {
+                    newElement_1.fixedMin = [NSNumber numberWithUnsignedLongLong:entry_1.fixedMin.Value()];
+                } else {
+                    newElement_1.fixedMin = nil;
+                }
+                if (entry_1.fixedTypical.HasValue()) {
+                    newElement_1.fixedTypical = [NSNumber numberWithUnsignedLongLong:entry_1.fixedTypical.Value()];
+                } else {
+                    newElement_1.fixedTypical = nil;
+                }
+                [array_1 addObject:newElement_1];
+            }
+            CHIP_ERROR err = iter_1.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value.accuracyRanges = array_1;
+        }
+        return value;
+    }
+    case Attributes::SoilMoistureMeasuredValue::Id: {
+        using TypeInfo = Attributes::SoilMoistureMeasuredValue::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+        }
+        return value;
+    }
+    default: {
+        // Not a known SoilMeasurement attribute.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeAttributeValueForWiFiNetworkManagementCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::WiFiNetworkManagement;
@@ -18675,8 +18782,125 @@ static id _Nullable DecodeAttributeValueForPushAVStreamTransportCluster(Attribut
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+                MTRPushAVStreamTransportClusterTransportConfigurationStruct * newElement_0;
+                newElement_0 = [MTRPushAVStreamTransportClusterTransportConfigurationStruct new];
+                newElement_0.connectionID = [NSNumber numberWithUnsignedShort:entry_0.connectionID];
+                newElement_0.transportStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportStatus)];
+                if (entry_0.transportOptions.HasValue()) {
+                    newElement_0.transportOptions = [MTRPushAVStreamTransportClusterTransportOptionsStruct new];
+                    newElement_0.transportOptions.streamUsage = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.Value().streamUsage)];
+                    if (entry_0.transportOptions.Value().videoStreamID.HasValue()) {
+                        if (entry_0.transportOptions.Value().videoStreamID.Value().IsNull()) {
+                            newElement_0.transportOptions.videoStreamID = nil;
+                        } else {
+                            newElement_0.transportOptions.videoStreamID = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.Value().videoStreamID.Value().Value()];
+                        }
+                    } else {
+                        newElement_0.transportOptions.videoStreamID = nil;
+                    }
+                    if (entry_0.transportOptions.Value().audioStreamID.HasValue()) {
+                        if (entry_0.transportOptions.Value().audioStreamID.Value().IsNull()) {
+                            newElement_0.transportOptions.audioStreamID = nil;
+                        } else {
+                            newElement_0.transportOptions.audioStreamID = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.Value().audioStreamID.Value().Value()];
+                        }
+                    } else {
+                        newElement_0.transportOptions.audioStreamID = nil;
+                    }
+                    newElement_0.transportOptions.endpointID = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.Value().endpointID];
+                    newElement_0.transportOptions.url = AsString(entry_0.transportOptions.Value().url);
+                    if (newElement_0.transportOptions.url == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        *aError = err;
+                        return nil;
+                    }
+                    newElement_0.transportOptions.triggerOptions = [MTRPushAVStreamTransportClusterTransportTriggerOptionsStruct new];
+                    newElement_0.transportOptions.triggerOptions.triggerType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.Value().triggerOptions.triggerType)];
+                    if (entry_0.transportOptions.Value().triggerOptions.motionZones.HasValue()) {
+                        if (entry_0.transportOptions.Value().triggerOptions.motionZones.Value().IsNull()) {
+                            newElement_0.transportOptions.triggerOptions.motionZones = nil;
+                        } else {
+                            { // Scope for our temporary variables
+                                auto * array_7 = [NSMutableArray new];
+                                auto iter_7 = entry_0.transportOptions.Value().triggerOptions.motionZones.Value().Value().begin();
+                                while (iter_7.Next()) {
+                                    auto & entry_7 = iter_7.GetValue();
+                                    MTRPushAVStreamTransportClusterTransportZoneOptionsStruct * newElement_7;
+                                    newElement_7 = [MTRPushAVStreamTransportClusterTransportZoneOptionsStruct new];
+                                    if (entry_7.zone.IsNull()) {
+                                        newElement_7.zone = nil;
+                                    } else {
+                                        newElement_7.zone = [NSNumber numberWithUnsignedShort:entry_7.zone.Value()];
+                                    }
+                                    if (entry_7.sensitivity.HasValue()) {
+                                        newElement_7.sensitivity = [NSNumber numberWithUnsignedChar:entry_7.sensitivity.Value()];
+                                    } else {
+                                        newElement_7.sensitivity = nil;
+                                    }
+                                    [array_7 addObject:newElement_7];
+                                }
+                                CHIP_ERROR err = iter_7.GetStatus();
+                                if (err != CHIP_NO_ERROR) {
+                                    *aError = err;
+                                    return nil;
+                                }
+                                newElement_0.transportOptions.triggerOptions.motionZones = array_7;
+                            }
+                        }
+                    } else {
+                        newElement_0.transportOptions.triggerOptions.motionZones = nil;
+                    }
+                    if (entry_0.transportOptions.Value().triggerOptions.motionSensitivity.HasValue()) {
+                        if (entry_0.transportOptions.Value().triggerOptions.motionSensitivity.Value().IsNull()) {
+                            newElement_0.transportOptions.triggerOptions.motionSensitivity = nil;
+                        } else {
+                            newElement_0.transportOptions.triggerOptions.motionSensitivity = [NSNumber numberWithUnsignedChar:entry_0.transportOptions.Value().triggerOptions.motionSensitivity.Value().Value()];
+                        }
+                    } else {
+                        newElement_0.transportOptions.triggerOptions.motionSensitivity = nil;
+                    }
+                    if (entry_0.transportOptions.Value().triggerOptions.motionTimeControl.HasValue()) {
+                        newElement_0.transportOptions.triggerOptions.motionTimeControl = [MTRPushAVStreamTransportClusterTransportMotionTriggerTimeControlStruct new];
+                        newElement_0.transportOptions.triggerOptions.motionTimeControl.initialDuration = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.Value().triggerOptions.motionTimeControl.Value().initialDuration];
+                        newElement_0.transportOptions.triggerOptions.motionTimeControl.augmentationDuration = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.Value().triggerOptions.motionTimeControl.Value().augmentationDuration];
+                        newElement_0.transportOptions.triggerOptions.motionTimeControl.maxDuration = [NSNumber numberWithUnsignedInt:entry_0.transportOptions.Value().triggerOptions.motionTimeControl.Value().maxDuration];
+                        newElement_0.transportOptions.triggerOptions.motionTimeControl.blindDuration = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.Value().triggerOptions.motionTimeControl.Value().blindDuration];
+                    } else {
+                        newElement_0.transportOptions.triggerOptions.motionTimeControl = nil;
+                    }
+                    if (entry_0.transportOptions.Value().triggerOptions.maxPreRollLen.HasValue()) {
+                        newElement_0.transportOptions.triggerOptions.maxPreRollLen = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.Value().triggerOptions.maxPreRollLen.Value()];
+                    } else {
+                        newElement_0.transportOptions.triggerOptions.maxPreRollLen = nil;
+                    }
+                    newElement_0.transportOptions.ingestMethod = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.Value().ingestMethod)];
+                    newElement_0.transportOptions.containerFormat = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.Value().containerFormat)];
+                    newElement_0.transportOptions.containerOptions = [MTRPushAVStreamTransportClusterContainerOptionsStruct new];
+                    newElement_0.transportOptions.containerOptions.containerType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.Value().containerOptions.containerType)];
+                    if (entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.HasValue()) {
+                        newElement_0.transportOptions.containerOptions.cmafContainerOptions = [MTRPushAVStreamTransportClusterCMAFContainerOptionsStruct new];
+                        newElement_0.transportOptions.containerOptions.cmafContainerOptions.chunkDuration = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().chunkDuration];
+                        if (entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CENCKey.HasValue()) {
+                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.cencKey = AsData(entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CENCKey.Value());
+                        } else {
+                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.cencKey = nil;
+                        }
+                        if (entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().metadataEnabled.HasValue()) {
+                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled = [NSNumber numberWithBool:entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().metadataEnabled.Value()];
+                        } else {
+                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled = nil;
+                        }
+                    } else {
+                        newElement_0.transportOptions.containerOptions.cmafContainerOptions = nil;
+                    }
+                    if (entry_0.transportOptions.Value().expiryTime.HasValue()) {
+                        newElement_0.transportOptions.expiryTime = [NSNumber numberWithUnsignedInt:entry_0.transportOptions.Value().expiryTime.Value()];
+                    } else {
+                        newElement_0.transportOptions.expiryTime = nil;
+                    }
+                } else {
+                    newElement_0.transportOptions = nil;
+                }
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -22117,6 +22341,9 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
     }
     case Clusters::RadonConcentrationMeasurement::Id: {
         return DecodeAttributeValueForRadonConcentrationMeasurementCluster(aPath.mAttributeId, aReader, aError);
+    }
+    case Clusters::SoilMeasurement::Id: {
+        return DecodeAttributeValueForSoilMeasurementCluster(aPath.mAttributeId, aReader, aError);
     }
     case Clusters::WiFiNetworkManagement::Id: {
         return DecodeAttributeValueForWiFiNetworkManagementCluster(aPath.mAttributeId, aReader, aError);

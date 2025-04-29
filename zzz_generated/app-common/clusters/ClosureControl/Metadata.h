@@ -65,21 +65,21 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace Stop {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ClosureControl::Commands::Stop::Id,
+    .commandId       = Stop::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Stop
 namespace MoveTo {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ClosureControl::Commands::MoveTo::Id,
+    .commandId       = MoveTo::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace MoveTo
 namespace Calibrate {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ClosureControl::Commands::Calibrate::Id,
+    .commandId       = Calibrate::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };

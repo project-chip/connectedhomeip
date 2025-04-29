@@ -861,7 +861,7 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0010" name="LocalTemperatureCalibration" type="int8s" default="0">
+    <attribute id="0x0010" name="LocalTemperatureCalibration" type="SignedTemperature" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <optionalConform>
@@ -968,7 +968,7 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0019" name="MinSetpointDeadBand" type="int8s" default="20">
+    <attribute id="0x0019" name="MinSetpointDeadBand" type="SignedTemperature" default="20">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform>
@@ -1090,7 +1090,7 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0034" name="OccupiedSetback" type="uint8" default="null">
+    <attribute id="0x0034" name="OccupiedSetback" type="UnsignedTemperature" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform>
@@ -1107,7 +1107,7 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0035" name="OccupiedSetbackMin" type="uint8" default="null">
+    <attribute id="0x0035" name="OccupiedSetbackMin" type="UnsignedTemperature" default="null">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="fixed"/>
       <mandatoryConform>
@@ -1119,7 +1119,7 @@ Davis, CA 95616, USA
         </max>
       </constraint>
     </attribute>
-    <attribute id="0x0036" name="OccupiedSetbackMax" type="uint8" default="null">
+    <attribute id="0x0036" name="OccupiedSetbackMax" type="UnsignedTemperature" default="null">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="fixed"/>
       <mandatoryConform>
@@ -1134,7 +1134,7 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0037" name="UnoccupiedSetback" type="uint8" default="null">
+    <attribute id="0x0037" name="UnoccupiedSetback" type="UnsignedTemperature" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform>
@@ -1154,7 +1154,7 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0038" name="UnoccupiedSetbackMin" type="uint8" default="null">
+    <attribute id="0x0038" name="UnoccupiedSetbackMin" type="UnsignedTemperature" default="null">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="fixed"/>
       <mandatoryConform>
@@ -1169,7 +1169,7 @@ Davis, CA 95616, USA
         </max>
       </constraint>
     </attribute>
-    <attribute id="0x0039" name="UnoccupiedSetbackMax" type="uint8" default="null">
+    <attribute id="0x0039" name="UnoccupiedSetbackMax" type="UnsignedTemperature" default="null">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="fixed"/>
       <mandatoryConform>
@@ -1187,7 +1187,7 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x003A" name="EmergencyHeatDelta" type="uint8" default="255">
+    <attribute id="0x003A" name="EmergencyHeatDelta" type="UnsignedTemperature" default="255">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <optionalConform/>

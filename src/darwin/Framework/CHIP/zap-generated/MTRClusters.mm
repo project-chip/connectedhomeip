@@ -1268,6 +1268,11 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeTagListID) params:params];
 }
 
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeEndpointUniqueIDWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeEndpointUniqueIDID) params:params];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeGeneratedCommandListID) params:params];
@@ -16424,6 +16429,45 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeRadonConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeClusterRevisionID) params:params];
+}
+
+@end
+
+@implementation MTRClusterSoilMeasurement
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeSoilMoistureMeasurementLimitsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSoilMeasurementID) attributeID:@(MTRAttributeIDTypeClusterSoilMeasurementAttributeSoilMoistureMeasurementLimitsID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeSoilMoistureMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSoilMeasurementID) attributeID:@(MTRAttributeIDTypeClusterSoilMeasurementAttributeSoilMoistureMeasuredValueID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSoilMeasurementID) attributeID:@(MTRAttributeIDTypeClusterSoilMeasurementAttributeGeneratedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSoilMeasurementID) attributeID:@(MTRAttributeIDTypeClusterSoilMeasurementAttributeAcceptedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSoilMeasurementID) attributeID:@(MTRAttributeIDTypeClusterSoilMeasurementAttributeAttributeListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSoilMeasurementID) attributeID:@(MTRAttributeIDTypeClusterSoilMeasurementAttributeFeatureMapID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSoilMeasurementID) attributeID:@(MTRAttributeIDTypeClusterSoilMeasurementAttributeClusterRevisionID) params:params];
 }
 
 @end

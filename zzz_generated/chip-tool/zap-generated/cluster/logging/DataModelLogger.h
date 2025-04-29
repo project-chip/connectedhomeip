@@ -24,10 +24,22 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Globals::Structs::CurrencyStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::Globals::Structs::PowerThresholdStruct::DecodableType & value);
+                           const chip::app::Clusters::Globals::Structs::PriceStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::Globals::Structs::PriceStruct::DecodableType & value);
+                           const chip::app::Clusters::Globals::Structs::MeasurementAccuracyRangeStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Globals::Structs::MeasurementAccuracyStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Globals::Structs::AtomicAttributeStatusStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Globals::Structs::PowerThresholdStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Globals::Structs::TestGlobalStruct::DecodableType & value);
@@ -45,16 +57,10 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::detail::Structs::MeasurementAccuracyStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::DecodableType & value);
-
-static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::detail::Structs::DeviceTypeStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::detail::Structs::ApplicationStruct::DecodableType & value);
-
-static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::Globals::Structs::AtomicAttributeStatusStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::detail::Structs::ErrorStateStruct::DecodableType & value);
@@ -508,9 +514,6 @@ LogValue(const char * label, size_t indent,
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
          const chip::app::Clusters::PushAvStreamTransport::Structs::TransportZoneOptionsStruct::DecodableType & value);
-
-static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::PushAvStreamTransport::Structs::MetadataOptionsStruct::DecodableType & value);
 
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,

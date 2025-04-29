@@ -217,7 +217,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace MfgSpecificPing {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = BasicInformation::Commands::MfgSpecificPing::Id,
+    .commandId       = MfgSpecificPing::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

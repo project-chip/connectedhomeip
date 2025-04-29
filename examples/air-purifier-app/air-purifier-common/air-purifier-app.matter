@@ -164,6 +164,27 @@ enum LocationTag : enum8 {
   kOutside = 3;
 }
 
+enum MeasurementTypeEnum : enum16 {
+  kUnspecified = 0;
+  kVoltage = 1;
+  kActiveCurrent = 2;
+  kReactiveCurrent = 3;
+  kApparentCurrent = 4;
+  kActivePower = 5;
+  kReactivePower = 6;
+  kApparentPower = 7;
+  kRMSVoltage = 8;
+  kRMSCurrent = 9;
+  kRMSPower = 10;
+  kFrequency = 11;
+  kPowerFactor = 12;
+  kNeutralCurrent = 13;
+  kElectricalEnergy = 14;
+  kReactiveEnergy = 15;
+  kApparentEnergy = 16;
+  kSoilMoisture = 17;
+}
+
 enum PositionTag : enum8 {
   kLeft = 0;
   kRight = 1;
@@ -226,21 +247,33 @@ struct CurrencyStruct {
   int8u decimalPoints = 1;
 }
 
-struct PowerThresholdStruct {
-  optional power_mw powerThreshold = 0;
-  optional power_mva apparentPowerThreshold = 1;
-  nullable PowerThresholdSourceEnum powerThresholdSource = 2;
-}
-
 struct PriceStruct {
   money amount = 0;
   CurrencyStruct currency = 1;
 }
 
-struct TestGlobalStruct {
-  char_string<128> name = 0;
-  nullable TestGlobalBitmap myBitmap = 1;
-  optional nullable TestGlobalEnum myEnum = 2;
+struct MeasurementAccuracyRangeStruct {
+  int64s rangeMin = 0;
+  int64s rangeMax = 1;
+  optional percent100ths percentMax = 2;
+  optional percent100ths percentMin = 3;
+  optional percent100ths percentTypical = 4;
+  optional int64u fixedMax = 5;
+  optional int64u fixedMin = 6;
+  optional int64u fixedTypical = 7;
+}
+
+struct MeasurementAccuracyStruct {
+  MeasurementTypeEnum measurementType = 0;
+  boolean measured = 1;
+  int64s minMeasuredValue = 2;
+  int64s maxMeasuredValue = 3;
+  MeasurementAccuracyRangeStruct accuracyRanges[] = 4;
+}
+
+struct AtomicAttributeStatusStruct {
+  attrib_id attributeID = 0;
+  status statusCode = 1;
 }
 
 struct LocationDescriptorStruct {
@@ -249,9 +282,16 @@ struct LocationDescriptorStruct {
   nullable AreaTypeTag areaType = 2;
 }
 
-struct AtomicAttributeStatusStruct {
-  attrib_id attributeID = 0;
-  status statusCode = 1;
+struct PowerThresholdStruct {
+  optional power_mw powerThreshold = 0;
+  optional power_mva apparentPowerThreshold = 1;
+  nullable PowerThresholdSourceEnum powerThresholdSource = 2;
+}
+
+struct TestGlobalStruct {
+  char_string<128> name = 0;
+  nullable TestGlobalBitmap myBitmap = 1;
+  optional nullable TestGlobalEnum myEnum = 2;
 }
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
@@ -304,9 +344,81 @@ cluster Identify = 3 {
   command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
 
+/** Attributes and commands for switching devices between 'On' and 'Off' states. */
+cluster OnOff = 6 {
+  revision 6;
+
+  enum DelayedAllOffEffectVariantEnum : enum8 {
+    kDelayedOffFastFade = 0;
+    kNoFade = 1;
+    kDelayedOffSlowFade = 2;
+  }
+
+  enum DyingLightEffectVariantEnum : enum8 {
+    kDyingLightFadeOff = 0;
+  }
+
+  enum EffectIdentifierEnum : enum8 {
+    kDelayedAllOff = 0;
+    kDyingLight = 1;
+  }
+
+  enum StartUpOnOffEnum : enum8 {
+    kOff = 0;
+    kOn = 1;
+    kToggle = 2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kLighting = 0x1;
+    kDeadFrontBehavior = 0x2;
+    kOffOnly = 0x4;
+  }
+
+  bitmap OnOffControlBitmap : bitmap8 {
+    kAcceptOnlyWhenOn = 0x1;
+  }
+
+  readonly attribute boolean onOff = 0;
+  readonly attribute optional boolean globalSceneControl = 16384;
+  attribute optional int16u onTime = 16385;
+  attribute optional int16u offWaitTime = 16386;
+  attribute access(write: manage) optional nullable StartUpOnOffEnum startUpOnOff = 16387;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct OffWithEffectRequest {
+    EffectIdentifierEnum effectIdentifier = 0;
+    enum8 effectVariant = 1;
+  }
+
+  request struct OnWithTimedOffRequest {
+    OnOffControlBitmap onOffControl = 0;
+    int16u onTime = 1;
+    int16u offWaitTime = 2;
+  }
+
+  /** On receipt of this command, a device SHALL enter its ‘Off’ state. This state is device dependent, but it is recommended that it is used for power off or similar functions. On receipt of the Off command, the OnTime attribute SHALL be set to 0. */
+  command Off(): DefaultSuccess = 0;
+  /** On receipt of this command, a device SHALL enter its ‘On’ state. This state is device dependent, but it is recommended that it is used for power on or similar functions. On receipt of the On command, if the value of the OnTime attribute is equal to 0, the device SHALL set the OffWaitTime attribute to 0. */
+  command On(): DefaultSuccess = 1;
+  /** On receipt of this command, if a device is in its ‘Off’ state it SHALL enter its ‘On’ state. Otherwise, if it is in its ‘On’ state it SHALL enter its ‘Off’ state. On receipt of the Toggle command, if the value of the OnOff attribute is equal to FALSE and if the value of the OnTime attribute is equal to 0, the device SHALL set the OffWaitTime attribute to 0. If the value of the OnOff attribute is equal to TRUE, the OnTime attribute SHALL be set to 0. */
+  command Toggle(): DefaultSuccess = 2;
+  /** The OffWithEffect command allows devices to be turned off using enhanced ways of fading. */
+  command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
+  /** The OnWithRecallGlobalScene command allows the recall of the settings when the device was turned off. */
+  command OnWithRecallGlobalScene(): DefaultSuccess = 65;
+  /** The OnWithTimedOff command allows devices to be turned on for a specific duration with a guarded off duration so that SHOULD the device be subsequently switched off, further OnWithTimedOff commands, received during this time, are prevented from turning the devices back on. */
+  command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
+}
+
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 cluster Descriptor = 29 {
-  revision 2;
+  revision 3;
 
   bitmap Feature : bitmap32 {
     kTagList = 0x1;
@@ -321,7 +433,7 @@ cluster Descriptor = 29 {
     nullable vendor_id mfgCode = 0;
     enum8 namespaceID = 1;
     enum8 tag = 2;
-    optional nullable char_string label = 3;
+    optional nullable char_string<64> label = 3;
   }
 
   readonly attribute DeviceTypeStruct deviceTypeList[] = 0;
@@ -329,6 +441,7 @@ cluster Descriptor = 29 {
   readonly attribute cluster_id clientList[] = 2;
   readonly attribute endpoint_no partsList[] = 3;
   readonly attribute optional SemanticTagStruct tagList[] = 4;
+  readonly attribute optional char_string<32> endpointUniqueID = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2666,7 +2779,7 @@ endpoint 0 {
     callback attribute maxPathsPerInvoke;
     callback attribute configurationVersion default = 1;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 5;
   }
 
   server cluster OtaSoftwareUpdateRequestor {
@@ -2811,10 +2924,23 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 6;
 
     handle command Identify;
     handle command TriggerEffect;
+  }
+
+  server cluster OnOff {
+    ram      attribute onOff default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 6;
+
+    handle command Off;
+    handle command On;
+    handle command Toggle;
   }
 
   server cluster Descriptor {
@@ -2894,7 +3020,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 6;
 
     handle command Identify;
   }
@@ -3121,7 +3247,7 @@ endpoint 3 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 6;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -3162,7 +3288,7 @@ endpoint 4 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 6;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -3203,7 +3329,7 @@ endpoint 5 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 6;
 
     handle command Identify;
     handle command TriggerEffect;

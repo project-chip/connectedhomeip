@@ -1076,6 +1076,16 @@ void emberAfRadonConcentrationMeasurementClusterShutdownCallback(chip::EndpointI
 /**
  * @param endpoint    Endpoint that is being initialized
  */
+void emberAfSoilMeasurementClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfSoilMeasurementClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfWiFiNetworkManagementClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -5434,6 +5444,45 @@ chip::Protocols::InteractionModel::Status MatterRadonConcentrationMeasurementClu
 void emberAfRadonConcentrationMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
+// Soil Measurement Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfSoilMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterSoilMeasurementClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfSoilMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterSoilMeasurementClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterSoilMeasurementClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                              EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfSoilMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
 // Wi-Fi Network Management Cluster
 //
 
@@ -6895,24 +6944,6 @@ bool emberAfAccessControlClusterReviewFabricRestrictionsCallback(
 bool emberAfBasicInformationClusterMfgSpecificPingCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::BasicInformation::Commands::MfgSpecificPing::DecodableType & commandData);
-/**
- * @brief OTA Software Update Provider Cluster QueryImage Command callback (from client)
- */
-bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData);
-/**
- * @brief OTA Software Update Provider Cluster ApplyUpdateRequest Command callback (from client)
- */
-bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::DecodableType & commandData);
-/**
- * @brief OTA Software Update Provider Cluster NotifyUpdateApplied Command callback (from client)
- */
-bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData);
 /**
  * @brief OTA Software Update Requestor Cluster AnnounceOTAProvider Command callback (from client)
  */

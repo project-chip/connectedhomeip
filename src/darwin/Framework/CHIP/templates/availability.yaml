@@ -11671,6 +11671,10 @@
               MeasurementTypeEnum:
                   - ApparentEnergy
                   - ReactiveEnergy
+          RVCCleanMode:
+              # In progress for maybe Matter 1.5
+              ModeTag:
+                  - VacuumThenMop
           RVCOperationalState:
               # Additional error and operational states:
               # in-progress for maybe Matter 1.5

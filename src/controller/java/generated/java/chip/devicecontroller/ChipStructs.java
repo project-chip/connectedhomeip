@@ -11311,6 +11311,263 @@ public static class OccupancySensingClusterHoldTimeLimitsStruct {
     return output.toString();
   }
 }
+public static class SoilMeasurementClusterMeasurementAccuracyStruct {
+  public Integer measurementType;
+  public Boolean measured;
+  public Long minMeasuredValue;
+  public Long maxMeasuredValue;
+  public ArrayList<ChipStructs.SoilMeasurementClusterMeasurementAccuracyRangeStruct> accuracyRanges;
+  private static final long MEASUREMENT_TYPE_ID = 0L;
+  private static final long MEASURED_ID = 1L;
+  private static final long MIN_MEASURED_VALUE_ID = 2L;
+  private static final long MAX_MEASURED_VALUE_ID = 3L;
+  private static final long ACCURACY_RANGES_ID = 4L;
+
+  public SoilMeasurementClusterMeasurementAccuracyStruct(
+    Integer measurementType,
+    Boolean measured,
+    Long minMeasuredValue,
+    Long maxMeasuredValue,
+    ArrayList<ChipStructs.SoilMeasurementClusterMeasurementAccuracyRangeStruct> accuracyRanges
+  ) {
+    this.measurementType = measurementType;
+    this.measured = measured;
+    this.minMeasuredValue = minMeasuredValue;
+    this.maxMeasuredValue = maxMeasuredValue;
+    this.accuracyRanges = accuracyRanges;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(MEASUREMENT_TYPE_ID, new UIntType(measurementType)));
+    values.add(new StructElement(MEASURED_ID, new BooleanType(measured)));
+    values.add(new StructElement(MIN_MEASURED_VALUE_ID, new IntType(minMeasuredValue)));
+    values.add(new StructElement(MAX_MEASURED_VALUE_ID, new IntType(maxMeasuredValue)));
+    values.add(new StructElement(ACCURACY_RANGES_ID, ArrayType.generateArrayType(accuracyRanges, (elementaccuracyRanges) -> elementaccuracyRanges.encodeTlv())));
+
+    return new StructType(values);
+  }
+
+  public static SoilMeasurementClusterMeasurementAccuracyStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer measurementType = null;
+    Boolean measured = null;
+    Long minMeasuredValue = null;
+    Long maxMeasuredValue = null;
+    ArrayList<ChipStructs.SoilMeasurementClusterMeasurementAccuracyRangeStruct> accuracyRanges = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == MEASUREMENT_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          measurementType = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == MEASURED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          measured = castingValue.value(Boolean.class);
+        }
+      } else if (element.contextTagNum() == MIN_MEASURED_VALUE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          minMeasuredValue = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == MAX_MEASURED_VALUE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          maxMeasuredValue = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == ACCURACY_RANGES_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          accuracyRanges = castingValue.map((elementcastingValue) -> ChipStructs.SoilMeasurementClusterMeasurementAccuracyRangeStruct.decodeTlv(elementcastingValue));
+        }
+      }
+    }
+    return new SoilMeasurementClusterMeasurementAccuracyStruct(
+      measurementType,
+      measured,
+      minMeasuredValue,
+      maxMeasuredValue,
+      accuracyRanges
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("SoilMeasurementClusterMeasurementAccuracyStruct {\n");
+    output.append("\tmeasurementType: ");
+    output.append(measurementType);
+    output.append("\n");
+    output.append("\tmeasured: ");
+    output.append(measured);
+    output.append("\n");
+    output.append("\tminMeasuredValue: ");
+    output.append(minMeasuredValue);
+    output.append("\n");
+    output.append("\tmaxMeasuredValue: ");
+    output.append(maxMeasuredValue);
+    output.append("\n");
+    output.append("\taccuracyRanges: ");
+    output.append(accuracyRanges);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class SoilMeasurementClusterMeasurementAccuracyRangeStruct {
+  public Long rangeMin;
+  public Long rangeMax;
+  public Optional<Integer> percentMax;
+  public Optional<Integer> percentMin;
+  public Optional<Integer> percentTypical;
+  public Optional<Long> fixedMax;
+  public Optional<Long> fixedMin;
+  public Optional<Long> fixedTypical;
+  private static final long RANGE_MIN_ID = 0L;
+  private static final long RANGE_MAX_ID = 1L;
+  private static final long PERCENT_MAX_ID = 2L;
+  private static final long PERCENT_MIN_ID = 3L;
+  private static final long PERCENT_TYPICAL_ID = 4L;
+  private static final long FIXED_MAX_ID = 5L;
+  private static final long FIXED_MIN_ID = 6L;
+  private static final long FIXED_TYPICAL_ID = 7L;
+
+  public SoilMeasurementClusterMeasurementAccuracyRangeStruct(
+    Long rangeMin,
+    Long rangeMax,
+    Optional<Integer> percentMax,
+    Optional<Integer> percentMin,
+    Optional<Integer> percentTypical,
+    Optional<Long> fixedMax,
+    Optional<Long> fixedMin,
+    Optional<Long> fixedTypical
+  ) {
+    this.rangeMin = rangeMin;
+    this.rangeMax = rangeMax;
+    this.percentMax = percentMax;
+    this.percentMin = percentMin;
+    this.percentTypical = percentTypical;
+    this.fixedMax = fixedMax;
+    this.fixedMin = fixedMin;
+    this.fixedTypical = fixedTypical;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(RANGE_MIN_ID, new IntType(rangeMin)));
+    values.add(new StructElement(RANGE_MAX_ID, new IntType(rangeMax)));
+    values.add(new StructElement(PERCENT_MAX_ID, percentMax.<BaseTLVType>map((nonOptionalpercentMax) -> new UIntType(nonOptionalpercentMax)).orElse(new EmptyType())));
+    values.add(new StructElement(PERCENT_MIN_ID, percentMin.<BaseTLVType>map((nonOptionalpercentMin) -> new UIntType(nonOptionalpercentMin)).orElse(new EmptyType())));
+    values.add(new StructElement(PERCENT_TYPICAL_ID, percentTypical.<BaseTLVType>map((nonOptionalpercentTypical) -> new UIntType(nonOptionalpercentTypical)).orElse(new EmptyType())));
+    values.add(new StructElement(FIXED_MAX_ID, fixedMax.<BaseTLVType>map((nonOptionalfixedMax) -> new UIntType(nonOptionalfixedMax)).orElse(new EmptyType())));
+    values.add(new StructElement(FIXED_MIN_ID, fixedMin.<BaseTLVType>map((nonOptionalfixedMin) -> new UIntType(nonOptionalfixedMin)).orElse(new EmptyType())));
+    values.add(new StructElement(FIXED_TYPICAL_ID, fixedTypical.<BaseTLVType>map((nonOptionalfixedTypical) -> new UIntType(nonOptionalfixedTypical)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static SoilMeasurementClusterMeasurementAccuracyRangeStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long rangeMin = null;
+    Long rangeMax = null;
+    Optional<Integer> percentMax = Optional.empty();
+    Optional<Integer> percentMin = Optional.empty();
+    Optional<Integer> percentTypical = Optional.empty();
+    Optional<Long> fixedMax = Optional.empty();
+    Optional<Long> fixedMin = Optional.empty();
+    Optional<Long> fixedTypical = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == RANGE_MIN_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          rangeMin = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == RANGE_MAX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          rangeMax = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == PERCENT_MAX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          percentMax = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == PERCENT_MIN_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          percentMin = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == PERCENT_TYPICAL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          percentTypical = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == FIXED_MAX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fixedMax = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == FIXED_MIN_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fixedMin = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == FIXED_TYPICAL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fixedTypical = Optional.of(castingValue.value(Long.class));
+        }
+      }
+    }
+    return new SoilMeasurementClusterMeasurementAccuracyRangeStruct(
+      rangeMin,
+      rangeMax,
+      percentMax,
+      percentMin,
+      percentTypical,
+      fixedMax,
+      fixedMin,
+      fixedTypical
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("SoilMeasurementClusterMeasurementAccuracyRangeStruct {\n");
+    output.append("\trangeMin: ");
+    output.append(rangeMin);
+    output.append("\n");
+    output.append("\trangeMax: ");
+    output.append(rangeMax);
+    output.append("\n");
+    output.append("\tpercentMax: ");
+    output.append(percentMax);
+    output.append("\n");
+    output.append("\tpercentMin: ");
+    output.append(percentMin);
+    output.append("\n");
+    output.append("\tpercentTypical: ");
+    output.append(percentTypical);
+    output.append("\n");
+    output.append("\tfixedMax: ");
+    output.append(fixedMax);
+    output.append("\n");
+    output.append("\tfixedMin: ");
+    output.append(fixedMin);
+    output.append("\n");
+    output.append("\tfixedTypical: ");
+    output.append(fixedTypical);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class ThreadNetworkDirectoryClusterThreadNetworkStruct {
   public byte[] extendedPanID;
   public String networkName;
@@ -15876,82 +16133,6 @@ public static class PushAvStreamTransportClusterTransportZoneOptionsStruct {
     return output.toString();
   }
 }
-public static class PushAvStreamTransportClusterMetadataOptionsStruct {
-  public Integer multiplexing;
-  public Boolean includeMotionZones;
-  public Boolean enableMetadataPrivacySensitive;
-  private static final long MULTIPLEXING_ID = 0L;
-  private static final long INCLUDE_MOTION_ZONES_ID = 1L;
-  private static final long ENABLE_METADATA_PRIVACY_SENSITIVE_ID = 2L;
-
-  public PushAvStreamTransportClusterMetadataOptionsStruct(
-    Integer multiplexing,
-    Boolean includeMotionZones,
-    Boolean enableMetadataPrivacySensitive
-  ) {
-    this.multiplexing = multiplexing;
-    this.includeMotionZones = includeMotionZones;
-    this.enableMetadataPrivacySensitive = enableMetadataPrivacySensitive;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(MULTIPLEXING_ID, new UIntType(multiplexing)));
-    values.add(new StructElement(INCLUDE_MOTION_ZONES_ID, new BooleanType(includeMotionZones)));
-    values.add(new StructElement(ENABLE_METADATA_PRIVACY_SENSITIVE_ID, new BooleanType(enableMetadataPrivacySensitive)));
-
-    return new StructType(values);
-  }
-
-  public static PushAvStreamTransportClusterMetadataOptionsStruct decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    Integer multiplexing = null;
-    Boolean includeMotionZones = null;
-    Boolean enableMetadataPrivacySensitive = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == MULTIPLEXING_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          multiplexing = castingValue.value(Integer.class);
-        }
-      } else if (element.contextTagNum() == INCLUDE_MOTION_ZONES_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
-          BooleanType castingValue = element.value(BooleanType.class);
-          includeMotionZones = castingValue.value(Boolean.class);
-        }
-      } else if (element.contextTagNum() == ENABLE_METADATA_PRIVACY_SENSITIVE_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
-          BooleanType castingValue = element.value(BooleanType.class);
-          enableMetadataPrivacySensitive = castingValue.value(Boolean.class);
-        }
-      }
-    }
-    return new PushAvStreamTransportClusterMetadataOptionsStruct(
-      multiplexing,
-      includeMotionZones,
-      enableMetadataPrivacySensitive
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("PushAvStreamTransportClusterMetadataOptionsStruct {\n");
-    output.append("\tmultiplexing: ");
-    output.append(multiplexing);
-    output.append("\n");
-    output.append("\tincludeMotionZones: ");
-    output.append(includeMotionZones);
-    output.append("\n");
-    output.append("\tenableMetadataPrivacySensitive: ");
-    output.append(enableMetadataPrivacySensitive);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
 public static class PushAvStreamTransportClusterTransportTriggerOptionsStruct {
   public Integer triggerType;
   public @Nullable Optional<ArrayList<ChipStructs.PushAvStreamTransportClusterTransportZoneOptionsStruct>> motionZones;
@@ -16061,21 +16242,26 @@ public static class PushAvStreamTransportClusterTransportTriggerOptionsStruct {
 public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
   public Integer chunkDuration;
   public Optional<byte[]> CENCKey;
+  public Optional<Boolean> metadataEnabled;
   private static final long CHUNK_DURATION_ID = 0L;
   private static final long CENC_KEY_ID = 1L;
+  private static final long METADATA_ENABLED_ID = 2L;
 
   public PushAvStreamTransportClusterCMAFContainerOptionsStruct(
     Integer chunkDuration,
-    Optional<byte[]> CENCKey
+    Optional<byte[]> CENCKey,
+    Optional<Boolean> metadataEnabled
   ) {
     this.chunkDuration = chunkDuration;
     this.CENCKey = CENCKey;
+    this.metadataEnabled = metadataEnabled;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(CHUNK_DURATION_ID, new UIntType(chunkDuration)));
     values.add(new StructElement(CENC_KEY_ID, CENCKey.<BaseTLVType>map((nonOptionalCENCKey) -> new ByteArrayType(nonOptionalCENCKey)).orElse(new EmptyType())));
+    values.add(new StructElement(METADATA_ENABLED_ID, metadataEnabled.<BaseTLVType>map((nonOptionalmetadataEnabled) -> new BooleanType(nonOptionalmetadataEnabled)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -16086,6 +16272,7 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
     }
     Integer chunkDuration = null;
     Optional<byte[]> CENCKey = Optional.empty();
+    Optional<Boolean> metadataEnabled = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CHUNK_DURATION_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -16097,11 +16284,17 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
           ByteArrayType castingValue = element.value(ByteArrayType.class);
           CENCKey = Optional.of(castingValue.value(byte[].class));
         }
+      } else if (element.contextTagNum() == METADATA_ENABLED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          metadataEnabled = Optional.of(castingValue.value(Boolean.class));
+        }
       }
     }
     return new PushAvStreamTransportClusterCMAFContainerOptionsStruct(
       chunkDuration,
-      CENCKey
+      CENCKey,
+      metadataEnabled
     );
   }
 
@@ -16114,6 +16307,9 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
     output.append("\n");
     output.append("\tCENCKey: ");
     output.append(CENCKey.isPresent() ? Arrays.toString(CENCKey.get()) : "");
+    output.append("\n");
+    output.append("\tmetadataEnabled: ");
+    output.append(metadataEnabled);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -16182,15 +16378,14 @@ public static class PushAvStreamTransportClusterContainerOptionsStruct {
 }
 public static class PushAvStreamTransportClusterTransportOptionsStruct {
   public Integer streamUsage;
-  public Optional<Integer> videoStreamID;
-  public Optional<Integer> audioStreamID;
+  public @Nullable Optional<Integer> videoStreamID;
+  public @Nullable Optional<Integer> audioStreamID;
   public Integer endpointID;
   public String url;
   public ChipStructs.PushAvStreamTransportClusterTransportTriggerOptionsStruct triggerOptions;
   public Integer ingestMethod;
   public Integer containerFormat;
   public ChipStructs.PushAvStreamTransportClusterContainerOptionsStruct containerOptions;
-  public Optional<ChipStructs.PushAvStreamTransportClusterMetadataOptionsStruct> metadataOptions;
   public Optional<Long> expiryTime;
   private static final long STREAM_USAGE_ID = 0L;
   private static final long VIDEO_STREAM_ID_ID = 1L;
@@ -16201,20 +16396,18 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
   private static final long INGEST_METHOD_ID = 6L;
   private static final long CONTAINER_FORMAT_ID = 7L;
   private static final long CONTAINER_OPTIONS_ID = 8L;
-  private static final long METADATA_OPTIONS_ID = 9L;
-  private static final long EXPIRY_TIME_ID = 10L;
+  private static final long EXPIRY_TIME_ID = 9L;
 
   public PushAvStreamTransportClusterTransportOptionsStruct(
     Integer streamUsage,
-    Optional<Integer> videoStreamID,
-    Optional<Integer> audioStreamID,
+    @Nullable Optional<Integer> videoStreamID,
+    @Nullable Optional<Integer> audioStreamID,
     Integer endpointID,
     String url,
     ChipStructs.PushAvStreamTransportClusterTransportTriggerOptionsStruct triggerOptions,
     Integer ingestMethod,
     Integer containerFormat,
     ChipStructs.PushAvStreamTransportClusterContainerOptionsStruct containerOptions,
-    Optional<ChipStructs.PushAvStreamTransportClusterMetadataOptionsStruct> metadataOptions,
     Optional<Long> expiryTime
   ) {
     this.streamUsage = streamUsage;
@@ -16226,22 +16419,20 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
     this.ingestMethod = ingestMethod;
     this.containerFormat = containerFormat;
     this.containerOptions = containerOptions;
-    this.metadataOptions = metadataOptions;
     this.expiryTime = expiryTime;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(STREAM_USAGE_ID, new UIntType(streamUsage)));
-    values.add(new StructElement(VIDEO_STREAM_ID_ID, videoStreamID.<BaseTLVType>map((nonOptionalvideoStreamID) -> new UIntType(nonOptionalvideoStreamID)).orElse(new EmptyType())));
-    values.add(new StructElement(AUDIO_STREAM_ID_ID, audioStreamID.<BaseTLVType>map((nonOptionalaudioStreamID) -> new UIntType(nonOptionalaudioStreamID)).orElse(new EmptyType())));
+    values.add(new StructElement(VIDEO_STREAM_ID_ID, videoStreamID != null ? videoStreamID.<BaseTLVType>map((nonOptionalvideoStreamID) -> new UIntType(nonOptionalvideoStreamID)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(AUDIO_STREAM_ID_ID, audioStreamID != null ? audioStreamID.<BaseTLVType>map((nonOptionalaudioStreamID) -> new UIntType(nonOptionalaudioStreamID)).orElse(new EmptyType()) : new NullType()));
     values.add(new StructElement(ENDPOINT_ID_ID, new UIntType(endpointID)));
     values.add(new StructElement(URL_ID, new StringType(url)));
     values.add(new StructElement(TRIGGER_OPTIONS_ID, triggerOptions.encodeTlv()));
     values.add(new StructElement(INGEST_METHOD_ID, new UIntType(ingestMethod)));
     values.add(new StructElement(CONTAINER_FORMAT_ID, new UIntType(containerFormat)));
     values.add(new StructElement(CONTAINER_OPTIONS_ID, containerOptions.encodeTlv()));
-    values.add(new StructElement(METADATA_OPTIONS_ID, metadataOptions.<BaseTLVType>map((nonOptionalmetadataOptions) -> nonOptionalmetadataOptions.encodeTlv()).orElse(new EmptyType())));
     values.add(new StructElement(EXPIRY_TIME_ID, expiryTime.<BaseTLVType>map((nonOptionalexpiryTime) -> new UIntType(nonOptionalexpiryTime)).orElse(new EmptyType())));
 
     return new StructType(values);
@@ -16252,15 +16443,14 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
       return null;
     }
     Integer streamUsage = null;
-    Optional<Integer> videoStreamID = Optional.empty();
-    Optional<Integer> audioStreamID = Optional.empty();
+    @Nullable Optional<Integer> videoStreamID = null;
+    @Nullable Optional<Integer> audioStreamID = null;
     Integer endpointID = null;
     String url = null;
     ChipStructs.PushAvStreamTransportClusterTransportTriggerOptionsStruct triggerOptions = null;
     Integer ingestMethod = null;
     Integer containerFormat = null;
     ChipStructs.PushAvStreamTransportClusterContainerOptionsStruct containerOptions = null;
-    Optional<ChipStructs.PushAvStreamTransportClusterMetadataOptionsStruct> metadataOptions = Optional.empty();
     Optional<Long> expiryTime = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == STREAM_USAGE_ID) {
@@ -16308,11 +16498,6 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
           StructType castingValue = element.value(StructType.class);
           containerOptions = ChipStructs.PushAvStreamTransportClusterContainerOptionsStruct.decodeTlv(castingValue);
         }
-      } else if (element.contextTagNum() == METADATA_OPTIONS_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
-          StructType castingValue = element.value(StructType.class);
-          metadataOptions = Optional.of(ChipStructs.PushAvStreamTransportClusterMetadataOptionsStruct.decodeTlv(castingValue));
-        }
       } else if (element.contextTagNum() == EXPIRY_TIME_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
@@ -16330,7 +16515,6 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
       ingestMethod,
       containerFormat,
       containerOptions,
-      metadataOptions,
       expiryTime
     );
   }
@@ -16366,9 +16550,6 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
     output.append("\tcontainerOptions: ");
     output.append(containerOptions);
     output.append("\n");
-    output.append("\tmetadataOptions: ");
-    output.append(metadataOptions);
-    output.append("\n");
     output.append("\texpiryTime: ");
     output.append(expiryTime);
     output.append("\n");
@@ -16379,7 +16560,7 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
 public static class PushAvStreamTransportClusterTransportConfigurationStruct {
   public Integer connectionID;
   public Integer transportStatus;
-  public ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct transportOptions;
+  public Optional<ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct> transportOptions;
   private static final long CONNECTION_ID_ID = 0L;
   private static final long TRANSPORT_STATUS_ID = 1L;
   private static final long TRANSPORT_OPTIONS_ID = 2L;
@@ -16387,7 +16568,7 @@ public static class PushAvStreamTransportClusterTransportConfigurationStruct {
   public PushAvStreamTransportClusterTransportConfigurationStruct(
     Integer connectionID,
     Integer transportStatus,
-    ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct transportOptions
+    Optional<ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct> transportOptions
   ) {
     this.connectionID = connectionID;
     this.transportStatus = transportStatus;
@@ -16398,7 +16579,7 @@ public static class PushAvStreamTransportClusterTransportConfigurationStruct {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(CONNECTION_ID_ID, new UIntType(connectionID)));
     values.add(new StructElement(TRANSPORT_STATUS_ID, new UIntType(transportStatus)));
-    values.add(new StructElement(TRANSPORT_OPTIONS_ID, transportOptions.encodeTlv()));
+    values.add(new StructElement(TRANSPORT_OPTIONS_ID, transportOptions.<BaseTLVType>map((nonOptionaltransportOptions) -> nonOptionaltransportOptions.encodeTlv()).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -16409,7 +16590,7 @@ public static class PushAvStreamTransportClusterTransportConfigurationStruct {
     }
     Integer connectionID = null;
     Integer transportStatus = null;
-    ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct transportOptions = null;
+    Optional<ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct> transportOptions = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CONNECTION_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -16424,7 +16605,7 @@ public static class PushAvStreamTransportClusterTransportConfigurationStruct {
       } else if (element.contextTagNum() == TRANSPORT_OPTIONS_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
           StructType castingValue = element.value(StructType.class);
-          transportOptions = ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct.decodeTlv(castingValue);
+          transportOptions = Optional.of(ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct.decodeTlv(castingValue));
         }
       }
     }

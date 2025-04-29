@@ -49,39 +49,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRDataTypePowerThresholdStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _powerThreshold = nil;
-
-        _apparentPowerThreshold = nil;
-
-        _powerThresholdSource = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRDataTypePowerThresholdStruct alloc] init];
-
-    other.powerThreshold = self.powerThreshold;
-    other.apparentPowerThreshold = self.apparentPowerThreshold;
-    other.powerThresholdSource = self.powerThresholdSource;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: powerThreshold:%@; apparentPowerThreshold:%@; powerThresholdSource:%@; >", NSStringFromClass([self class]), _powerThreshold, _apparentPowerThreshold, _powerThresholdSource];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTRDataTypePriceStruct
 - (instancetype)init
 {
@@ -112,34 +79,118 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRDataTypeTestGlobalStruct
+@implementation MTRDataTypeMeasurementAccuracyRangeStruct
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _name = @"";
+        _rangeMin = @(0);
 
-        _myBitmap = nil;
+        _rangeMax = @(0);
 
-        _myEnum = nil;
+        _percentMax = nil;
+
+        _percentMin = nil;
+
+        _percentTypical = nil;
+
+        _fixedMax = nil;
+
+        _fixedMin = nil;
+
+        _fixedTypical = nil;
     }
     return self;
 }
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRDataTypeTestGlobalStruct alloc] init];
+    auto other = [[MTRDataTypeMeasurementAccuracyRangeStruct alloc] init];
 
-    other.name = self.name;
-    other.myBitmap = self.myBitmap;
-    other.myEnum = self.myEnum;
+    other.rangeMin = self.rangeMin;
+    other.rangeMax = self.rangeMax;
+    other.percentMax = self.percentMax;
+    other.percentMin = self.percentMin;
+    other.percentTypical = self.percentTypical;
+    other.fixedMax = self.fixedMax;
+    other.fixedMin = self.fixedMin;
+    other.fixedTypical = self.fixedTypical;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: name:%@; myBitmap:%@; myEnum:%@; >", NSStringFromClass([self class]), _name, _myBitmap, _myEnum];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: rangeMin:%@; rangeMax:%@; percentMax:%@; percentMin:%@; percentTypical:%@; fixedMax:%@; fixedMin:%@; fixedTypical:%@; >", NSStringFromClass([self class]), _rangeMin, _rangeMax, _percentMax, _percentMin, _percentTypical, _fixedMax, _fixedMin, _fixedTypical];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDataTypeMeasurementAccuracyStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _measurementType = @(0);
+
+        _measured = @(0);
+
+        _minMeasuredValue = @(0);
+
+        _maxMeasuredValue = @(0);
+
+        _accuracyRanges = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDataTypeMeasurementAccuracyStruct alloc] init];
+
+    other.measurementType = self.measurementType;
+    other.measured = self.measured;
+    other.minMeasuredValue = self.minMeasuredValue;
+    other.maxMeasuredValue = self.maxMeasuredValue;
+    other.accuracyRanges = self.accuracyRanges;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: measurementType:%@; measured:%@; minMeasuredValue:%@; maxMeasuredValue:%@; accuracyRanges:%@; >", NSStringFromClass([self class]), _measurementType, _measured, _minMeasuredValue, _maxMeasuredValue, _accuracyRanges];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDataTypeAtomicAttributeStatusStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _attributeID = @(0);
+
+        _statusCode = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDataTypeAtomicAttributeStatusStruct alloc] init];
+
+    other.attributeID = self.attributeID;
+    other.statusCode = self.statusCode;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: attributeID:%@; statusCode:%@; >", NSStringFromClass([self class]), _attributeID, _statusCode];
     return descriptionString;
 }
 
@@ -178,31 +229,67 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRDataTypeAtomicAttributeStatusStruct
+@implementation MTRDataTypePowerThresholdStruct
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _attributeID = @(0);
+        _powerThreshold = nil;
 
-        _statusCode = @(0);
+        _apparentPowerThreshold = nil;
+
+        _powerThresholdSource = nil;
     }
     return self;
 }
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRDataTypeAtomicAttributeStatusStruct alloc] init];
+    auto other = [[MTRDataTypePowerThresholdStruct alloc] init];
 
-    other.attributeID = self.attributeID;
-    other.statusCode = self.statusCode;
+    other.powerThreshold = self.powerThreshold;
+    other.apparentPowerThreshold = self.apparentPowerThreshold;
+    other.powerThresholdSource = self.powerThresholdSource;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: attributeID:%@; statusCode:%@; >", NSStringFromClass([self class]), _attributeID, _statusCode];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: powerThreshold:%@; apparentPowerThreshold:%@; powerThresholdSource:%@; >", NSStringFromClass([self class]), _powerThreshold, _apparentPowerThreshold, _powerThresholdSource];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDataTypeTestGlobalStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _name = @"";
+
+        _myBitmap = nil;
+
+        _myEnum = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDataTypeTestGlobalStruct alloc] init];
+
+    other.name = self.name;
+    other.myBitmap = self.myBitmap;
+    other.myEnum = self.myEnum;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: name:%@; myBitmap:%@; myEnum:%@; >", NSStringFromClass([self class]), _name, _myBitmap, _myEnum];
     return descriptionString;
 }
 
@@ -10252,39 +10339,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRPushAVStreamTransportClusterMetadataOptionsStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _multiplexing = @(0);
-
-        _includeMotionZones = @(0);
-
-        _enableMetadataPrivacySensitive = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRPushAVStreamTransportClusterMetadataOptionsStruct alloc] init];
-
-    other.multiplexing = self.multiplexing;
-    other.includeMotionZones = self.includeMotionZones;
-    other.enableMetadataPrivacySensitive = self.enableMetadataPrivacySensitive;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: multiplexing:%@; includeMotionZones:%@; enableMetadataPrivacySensitive:%@; >", NSStringFromClass([self class]), _multiplexing, _includeMotionZones, _enableMetadataPrivacySensitive];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTRPushAVStreamTransportClusterTransportTriggerOptionsStruct
 - (instancetype)init
 {
@@ -10332,6 +10386,8 @@ NS_ASSUME_NONNULL_BEGIN
         _chunkDuration = @(0);
 
         _cencKey = nil;
+
+        _metadataEnabled = nil;
     }
     return self;
 }
@@ -10342,13 +10398,14 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.chunkDuration = self.chunkDuration;
     other.cencKey = self.cencKey;
+    other.metadataEnabled = self.metadataEnabled;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: chunkDuration:%@; cencKey:%@; >", NSStringFromClass([self class]), _chunkDuration, [_cencKey base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: chunkDuration:%@; cencKey:%@; metadataEnabled:%@; >", NSStringFromClass([self class]), _chunkDuration, [_cencKey base64EncodedStringWithOptions:0], _metadataEnabled];
     return descriptionString;
 }
 
@@ -10407,8 +10464,6 @@ NS_ASSUME_NONNULL_BEGIN
 
         _containerOptions = [MTRPushAVStreamTransportClusterContainerOptionsStruct new];
 
-        _metadataOptions = nil;
-
         _expiryTime = nil;
     }
     return self;
@@ -10427,7 +10482,6 @@ NS_ASSUME_NONNULL_BEGIN
     other.ingestMethod = self.ingestMethod;
     other.containerFormat = self.containerFormat;
     other.containerOptions = self.containerOptions;
-    other.metadataOptions = self.metadataOptions;
     other.expiryTime = self.expiryTime;
 
     return other;
@@ -10435,7 +10489,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; videoStreamID:%@; audioStreamID:%@; endpointID:%@; url:%@; triggerOptions:%@; ingestMethod:%@; containerFormat:%@; containerOptions:%@; metadataOptions:%@; expiryTime:%@; >", NSStringFromClass([self class]), _streamUsage, _videoStreamID, _audioStreamID, _endpointID, _url, _triggerOptions, _ingestMethod, _containerFormat, _containerOptions, _metadataOptions, _expiryTime];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; videoStreamID:%@; audioStreamID:%@; endpointID:%@; url:%@; triggerOptions:%@; ingestMethod:%@; containerFormat:%@; containerOptions:%@; expiryTime:%@; >", NSStringFromClass([self class]), _streamUsage, _videoStreamID, _audioStreamID, _endpointID, _url, _triggerOptions, _ingestMethod, _containerFormat, _containerOptions, _expiryTime];
     return descriptionString;
 }
 
@@ -10450,7 +10504,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _transportStatus = @(0);
 
-        _transportOptions = [MTRPushAVStreamTransportClusterTransportOptionsStruct new];
+        _transportOptions = nil;
     }
     return self;
 }
