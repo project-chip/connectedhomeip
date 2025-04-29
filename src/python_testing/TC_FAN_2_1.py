@@ -85,7 +85,7 @@ class TC_FAN_2_1(MatterBaseTest):
         # Read attribute value
         value = await self.read_setting(attribute)
 
-        asserts.assert_is_instance(value, type, 
+        asserts.assert_is_instance(value, type,
                                    f"[FC] {attribute.__name__} result ({value}) isn't of type {type.__name__}")
 
         # Verify response is valid (value is within expected range)
@@ -110,7 +110,7 @@ class TC_FAN_2_1(MatterBaseTest):
         elif fan_mode_sequence == 5:
             fan_modes = [fm_enum.kOff, fm_enum.kHigh]
 
-        fan_modes = [f for f in fan_modes if not (remove_auto and f == fm_enum.kAuto)]    
+        fan_modes = [f for f in fan_modes if not (remove_auto and f == fm_enum.kAuto)]
         return fan_modes
 
     def pics_TC_FAN_2_1(self) -> list[str]:
@@ -151,7 +151,7 @@ class TC_FAN_2_1(MatterBaseTest):
         #   attribute is a valid sequence (auto only)
         supported_fan_mode_sequence_values = auto_fan_mode_sequence_values if supports_auto else non_auto_fan_mode_sequence_values
         asserts.assert_in(fan_mode_sequence, supported_fan_mode_sequence_values,
-                              f"[FC] FanModeSequence attribute value ({fan_mode_sequence}:{fan_mode_sequence.name}) is not a supoorted sequence: [{', '.join(f'{seq}:{seq.name}' for seq in supported_fan_mode_sequence_values)}].")
+                          f"[FC] FanModeSequence attribute value ({fan_mode_sequence}:{fan_mode_sequence.name}) is not a supoorted sequence: [{', '.join(f'{seq}:{seq.name}' for seq in supported_fan_mode_sequence_values)}].")
 
         # *** STEP 4 ***
         # TH reads from the DUT the FanMode attribute value
