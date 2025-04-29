@@ -460,21 +460,6 @@ class Globals:
             decimalPoints: 'uint' = 0
 
         @dataclass
-        class PowerThresholdStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="powerThreshold", Tag=0, Type=typing.Optional[int]),
-                        ClusterObjectFieldDescriptor(Label="apparentPowerThreshold", Tag=1, Type=typing.Optional[int]),
-                        ClusterObjectFieldDescriptor(Label="powerThresholdSource", Tag=2, Type=typing.Union[Nullable, Globals.Enums.PowerThresholdSourceEnum]),
-                    ])
-
-            powerThreshold: 'typing.Optional[int]' = None
-            apparentPowerThreshold: 'typing.Optional[int]' = None
-            powerThresholdSource: 'typing.Union[Nullable, Globals.Enums.PowerThresholdSourceEnum]' = NullValue
-
-        @dataclass
         class PriceStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -488,19 +473,17 @@ class Globals:
             currency: 'Globals.Structs.CurrencyStruct' = field(default_factory=lambda: Globals.Structs.CurrencyStruct())
 
         @dataclass
-        class TestGlobalStruct(ClusterObject):
+        class AtomicAttributeStatusStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="name", Tag=0, Type=str),
-                        ClusterObjectFieldDescriptor(Label="myBitmap", Tag=1, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="myEnum", Tag=2, Type=typing.Union[None, Nullable, Globals.Enums.TestGlobalEnum]),
+                        ClusterObjectFieldDescriptor(Label="attributeID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="statusCode", Tag=1, Type=uint),
                     ])
 
-            name: 'str' = ""
-            myBitmap: 'typing.Union[Nullable, uint]' = NullValue
-            myEnum: 'typing.Union[None, Nullable, Globals.Enums.TestGlobalEnum]' = None
+            attributeID: 'uint' = 0
+            statusCode: 'uint' = 0
 
         @dataclass
         class LocationDescriptorStruct(ClusterObject):
@@ -518,17 +501,34 @@ class Globals:
             areaType: 'typing.Union[Nullable, Globals.Enums.AreaTypeTag]' = NullValue
 
         @dataclass
-        class AtomicAttributeStatusStruct(ClusterObject):
+        class PowerThresholdStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="attributeID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="statusCode", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="powerThreshold", Tag=0, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="apparentPowerThreshold", Tag=1, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="powerThresholdSource", Tag=2, Type=typing.Union[Nullable, Globals.Enums.PowerThresholdSourceEnum]),
                     ])
 
-            attributeID: 'uint' = 0
-            statusCode: 'uint' = 0
+            powerThreshold: 'typing.Optional[int]' = None
+            apparentPowerThreshold: 'typing.Optional[int]' = None
+            powerThresholdSource: 'typing.Union[Nullable, Globals.Enums.PowerThresholdSourceEnum]' = NullValue
+
+        @dataclass
+        class TestGlobalStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="name", Tag=0, Type=str),
+                        ClusterObjectFieldDescriptor(Label="myBitmap", Tag=1, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="myEnum", Tag=2, Type=typing.Union[None, Nullable, Globals.Enums.TestGlobalEnum]),
+                    ])
+
+            name: 'str' = ""
+            myBitmap: 'typing.Union[Nullable, uint]' = NullValue
+            myEnum: 'typing.Union[None, Nullable, Globals.Enums.TestGlobalEnum]' = None
 
 
 
