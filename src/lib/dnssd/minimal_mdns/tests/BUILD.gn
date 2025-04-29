@@ -25,6 +25,7 @@ chip_test_suite("tests") {
 
   test_sources = [
     "TestMinimalMdnsAllocator.cpp",
+    "TestQueries.cpp",
     "TestQueryReplyFilter.cpp",
     "TestRecordData.cpp",
     "TestResponseSender.cpp",
