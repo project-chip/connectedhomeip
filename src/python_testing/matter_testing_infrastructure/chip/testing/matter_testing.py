@@ -527,69 +527,6 @@ class ClusterAttributeChangeAccumulator:
             logging.info(f"  -> {expected_element} found: {last_report_matches.get(expected_idx)}")
         asserts.fail("Did not find all expected last report values before time-out")
 
-    def get_last_attribute_report_value(self, endpoint, attribute: ClusterObjects.ClusterAttributeDescriptor, timeout_sec: float = 1.0):
-        """
-        Gets the last reported value for a specific attribute within a given timeout period.
-
-        Args:
-            endpoint (int): The endpoint identifier.
-            attribute (ClusterObjects.ClusterAttributeDescriptor): The attribute for which a report will be looked for.
-            timeout_sec (float): The maximum time to wait for the report.
-
-        Returns:
-            The attribute value from the last report or None if no reports for the specified attribute were found.
-        """
-        start_time = time.time()
-        elapsed = 0.0
-        time_remaining = timeout_sec
-
-        logging.info(
-            f"--> Getting the last report for the {attribute.__name__} attribute on endpoint {endpoint}, waiting for {timeout_sec:.1f} seconds.")
-
-        first_match_found = False
-        timestamp_utc = None
-        old_report = None
-        while time_remaining > 0:
-            # Snapshot copy at the beginning of the loop. This is thread-safe based on the design
-            all_reports = self._attribute_reports
-
-            # Recompute all last-value matches
-            # Iterating in reverse order to match with the last report first
-            for report in reversed(all_reports.get(attribute, [])):
-                if report.endpoint_id == endpoint:
-                    # - Get the timestamp of the first matching attribute report
-                    # - Since multiple reports for the same attribue are possible,
-                    #   the one with a timestamp greater than the one in the first
-                    #   match is the last report, which means that a new report
-                    #   arrived during the timeout period
-                    # - If now new report arrived during the timeout period, the
-                    #   last report's value will be used
-                    if not first_match_found:
-                        timestamp_utc = report.timestamp_utc
-                        first_match_found = True
-                        old_report = report
-                    if report.timestamp_utc > timestamp_utc:
-                        logging.info(f"--> Last report for the {attribute.__name__} attribute found - value: {report.value}")
-                        return report.value
-
-            elapsed = time.time() - start_time
-            time_remaining = timeout_sec - elapsed
-            time.sleep(0.1)
-
-        # If we reach here, no new report arrived before the timeout
-        # Returning the last report's value
-        if first_match_found:
-            logging.info(f"--> Last report for the {attribute.__name__} attribute found - value: {old_report.value}")
-            return old_report.value
-
-        # Returning None if no reports for the specified attribute were found
-        logging.info(f"--> No reports for the {attribute.__name__} attribute were found.")
-        return None
-
-    def await_all_final_values_reported_threshold(self, value_expectations: Iterable[AttributeValueExpected], timeout_sec: float = 1.0):
-        """Expect that every `value_expectations` report is the last value reported for the given attribute and complies
-        with the comparisson type (greater than / greater or equal than / less than / less or equal than), ignoring timestamps.
-
     def await_all_expected_report_matches(self, expected_matchers: Iterable[AttributeMatcher], timeout_sec: float = 1.0):
         """Expect that every predicate in `expected_matchers`, when run against all the incoming reports, reaches true by the end, ignoring timestamps.
 
@@ -702,6 +639,130 @@ class ClusterAttributeChangeAccumulator:
         """
         await_sequence_of_reports(report_queue=self.attribute_queue, endpoint_id=self._endpoint_id,
                                   attribute=attribute, sequence=sequence, timeout_sec=timeout_sec)
+
+    def await_all_final_values_reported_threshold(self, value_expectations: Iterable[AttributeValueExpected], timeout_sec: float = 1.0):
+        """Expect that every `value_expectations` report is the last value reported for the given attribute and complies
+        with the comparisson type (greater than / greater or equal than / less than / less or equal than), ignoring timestamps.
+
+        Waits for at least `timeout_sec` seconds.
+
+        This is a form of barrier for a set of attribute changes that should all happen together for an action.
+        """
+        start_time = time.time()
+        elapsed = 0.0
+        time_remaining = timeout_sec
+        values = []
+
+        last_report_matches: dict[int, bool] = {idx: False for idx, _ in enumerate(value_expectations)}
+
+        for element in value_expectations:
+            logging.info(
+                f"[FC] --> Expecting report for the {element.attribute.__name__} attribute. Comparisson: {element.comparisson_type.name}. Value: {element.threshold_value}. Endpoint {element.endpoint_id}.")
+        logging.info(f"Waiting for {timeout_sec:.1f} seconds for all reports.")
+
+        while time_remaining > 0:
+            # Snapshot copy at the beginning of the loop. This is thread-safe based on the design
+            all_reports = self._attribute_reports
+
+            # Recompute all last-value matches
+            for expected_idx, expected_element in enumerate(value_expectations):
+                last_value = None
+                for report in all_reports.get(expected_element.attribute, []):
+                    if report.endpoint_id == expected_element.endpoint_id:
+                        last_value = report.value
+                        values.append(last_value)
+
+                # Perform the comparison
+                if last_value is not None:
+                    if expected_element.comparisson_type == ComparisonEnum.GreaterThan:
+                        last_report_matches[expected_idx] = (last_value > expected_element.threshold_value)
+                    elif expected_element.comparisson_type == ComparisonEnum.GreaterThanOrEqual:
+                        last_report_matches[expected_idx] = (last_value >= expected_element.threshold_value)
+                    elif expected_element.comparisson_type == ComparisonEnum.LessThan:
+                        last_report_matches[expected_idx] = (last_value < expected_element.threshold_value)
+                    elif expected_element.comparisson_type == ComparisonEnum.LessThanOrEqual:
+                        last_report_matches[expected_idx] = (last_value <= expected_element.threshold_value)
+                    elif expected_element.comparisson_type == ComparisonEnum.Equal:
+                        last_report_matches[expected_idx] = (last_value == expected_element.threshold_value)
+
+                    logging.info(f"[FC] --> Value reported for {expected_element.attribute.__name__} attribute: {last_value}")
+
+            # Determine if all were met
+            if all(last_report_matches.values()):
+                logging.info(f"[FC] Found all expected reports were true.")
+                return tuple(values)
+
+            elapsed = time.time() - start_time
+            time_remaining = timeout_sec - elapsed
+            time.sleep(0.1)
+
+        # If we reach here, there was no early return and we failed to find all the values.
+        logging.error("[FC] Reached time-out without finding all expected report values for threshold.")
+        logging.info("[FC] Result:")
+        for expected_idx, expected_element in enumerate(value_expectations):
+            found_str = "Found:   " if last_report_matches.get(expected_idx) else "Not found"
+            logging.info(
+                f"[FC]   -> {found_str} [Attribute: {expected_element.attribute.__name__}, comparisson: {expected_element.comparisson_type.name}, value: {expected_element.threshold_value}, endpoint: {expected_element.endpoint_id}]")
+        asserts.fail("[FC] Did not find all expected last report values for threshold before time-out")
+
+    def get_last_attribute_report_value(self, endpoint, attribute: ClusterObjects.ClusterAttributeDescriptor, timeout_sec: float = 1.0):
+        """
+        Gets the last reported value for a specific attribute within a given timeout period.
+
+        Args:
+            endpoint (int): The endpoint identifier.
+            attribute (ClusterObjects.ClusterAttributeDescriptor): The attribute for which a report will be looked for.
+            timeout_sec (float): The maximum time to wait for the report.
+
+        Returns:
+            The attribute value from the last report or None if no reports for the specified attribute were found.
+        """
+        start_time = time.time()
+        elapsed = 0.0
+        time_remaining = timeout_sec
+
+        logging.info(
+            f"--> Getting the last report for the {attribute.__name__} attribute on endpoint {endpoint}, waiting for {timeout_sec:.1f} seconds.")
+
+        first_match_found = False
+        timestamp_utc = None
+        old_report = None
+        while time_remaining > 0:
+            # Snapshot copy at the beginning of the loop. This is thread-safe based on the design
+            all_reports = self._attribute_reports
+
+            # Recompute all last-value matches
+            # Iterating in reverse order to match with the last report first
+            for report in reversed(all_reports.get(attribute, [])):
+                if report.endpoint_id == endpoint:
+                    # - Get the timestamp of the first matching attribute report
+                    # - Since multiple reports for the same attribue are possible,
+                    #   the one with a timestamp greater than the one in the first
+                    #   match is the last report, which means that a new report
+                    #   arrived during the timeout period
+                    # - If now new report arrived during the timeout period, the
+                    #   last report's value will be used
+                    if not first_match_found:
+                        timestamp_utc = report.timestamp_utc
+                        first_match_found = True
+                        old_report = report
+                    if report.timestamp_utc > timestamp_utc:
+                        logging.info(f"--> Last report for the {attribute.__name__} attribute found - value: {report.value}")
+                        return report.value
+
+            elapsed = time.time() - start_time
+            time_remaining = timeout_sec - elapsed
+            time.sleep(0.1)
+
+        # If we reach here, no new report arrived before the timeout
+        # Returning the last report's value
+        if first_match_found:
+            logging.info(f"--> Last report for the {attribute.__name__} attribute found - value: {old_report.value}")
+            return old_report.value
+
+        # Returning None if no reports for the specified attribute were found
+        logging.info(f"--> No reports for the {attribute.__name__} attribute were found.")
+        return None
 
     @property
     def attribute_queue(self) -> queue.Queue:
