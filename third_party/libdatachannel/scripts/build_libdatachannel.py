@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
+import optparse
 import os
 import subprocess
 import sys
-import optparse
 
 
 def main(argv):
