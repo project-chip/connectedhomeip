@@ -148,41 +148,6 @@ private:
         }
     }
 
-    /**
-     * Lexicographically increments a string.
-     *
-     * @param string A string to lexicographically increment
-     */
-    static std::string IncrementString(const std::string && string)
-    {
-        // The lexicographically smallest and largest characters
-        constexpr char minC = ' ', maxC = '~';
-
-        std::string ret{ minC };
-
-        auto rit = string.rbegin();
-        while (rit != string.rend())
-        {
-            if (maxC == *rit)
-            {
-                ++rit;
-                if (rit == string.rend())
-                {
-                    ret = string + ret;
-                    break;
-                }
-            }
-            else
-            {
-                ret = string;
-                ++(*(ret.rbegin() + distance(string.rbegin(), rit)));
-                break;
-            }
-        }
-
-        return ret;
-    }
-
     void SaveAttributes()
     {
         mInstance = GetInstance();
@@ -213,68 +178,6 @@ private:
             mInstance->SetMeterSerialNumber(mMeterSerialNumber);
             mInstance->SetProtocolVersion(mProtocolVersion);
             mInstance->SetPowerThreshold(mPowerThreshold);
-        }
-    }
-
-    void IncreaseAttributes()
-    {
-        VerifyOrDieWithMsg(mInstance, AppServer, "Meter Identification instance is null");
-        if (mInstance->GetMeterType().IsNull())
-        {
-            mInstance->SetMeterType(DataModel::MakeNullable(MeterTypeEnum::kUtility));
-        }
-        else
-        {
-            mInstance->SetMeterType(
-                DataModel::MakeNullable(static_cast<MeterTypeEnum>(1 + to_underlying(mInstance->GetMeterType().Value()))));
-        }
-
-        if (mInstance->GetPointOfDelivery().IsNull())
-        {
-            mInstance->SetPointOfDelivery(DataModel::MakeNullable(CharSpan::fromCharString("")));
-        }
-        else
-        {
-            const auto value = mInstance->GetPointOfDelivery().Value();
-            mInstance->SetPointOfDelivery(DataModel::MakeNullable(
-                CharSpan::fromCharString(IncrementString(std::string(value.data(), value.size())).c_str())));
-        }
-
-        if (mInstance->GetMeterSerialNumber().IsNull())
-        {
-            mInstance->SetMeterSerialNumber(DataModel::MakeNullable(CharSpan::fromCharString("")));
-        }
-        else
-        {
-            const auto value = mInstance->GetMeterSerialNumber().Value();
-            mInstance->SetMeterSerialNumber(DataModel::MakeNullable(
-                CharSpan::fromCharString(IncrementString(std::string(value.data(), value.size())).c_str())));
-        }
-
-        if (mInstance->GetProtocolVersion().IsNull())
-        {
-            mInstance->SetProtocolVersion(DataModel::MakeNullable(CharSpan::fromCharString("")));
-        }
-        else
-        {
-            const auto value = mInstance->GetProtocolVersion().Value();
-            mInstance->SetProtocolVersion(DataModel::MakeNullable(
-                CharSpan::fromCharString(IncrementString(std::string(value.data(), value.size())).c_str())));
-        }
-
-        if (mInstance->GetPowerThreshold().IsNull())
-        {
-            mInstance->SetPowerThreshold(DataModel::MakeNullable(Globals::Structs::PowerThresholdStruct::Type(
-                { Optional<int64_t>(0), Optional<int64_t>(0), Globals::PowerThresholdSourceEnum::kContract })));
-        }
-        else
-        {
-            auto powerThreshold = mInstance->GetPowerThreshold();
-            ++powerThreshold.Value().powerThreshold.Value();
-            ++powerThreshold.Value().apparentPowerThreshold.Value();
-            powerThreshold.Value().powerThresholdSource.Value() = static_cast<Globals::PowerThresholdSourceEnum>(
-                1 + to_underlying(powerThreshold.Value().powerThresholdSource.Value()));
-            mInstance->SetPowerThreshold(std::move(powerThreshold));
         }
     }
 
