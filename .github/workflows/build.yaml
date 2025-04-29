@@ -75,9 +75,7 @@ jobs:
               uses: github/codeql-action/init@v3
               with:
                   languages: "cpp"
-                  # security-and-quality has more checks than security-extended, but ends up with too many false positives.
-                  # queries: security-and-quality
-                  queries: security-extended
+                  queries: security-extended, security-and-quality
             - name: Setup Build
               run: scripts/build/gn_gen.sh --args="chip_config_memory_debug_checks=true chip_config_memory_debug_dmalloc=false"
             - name: Run Build
