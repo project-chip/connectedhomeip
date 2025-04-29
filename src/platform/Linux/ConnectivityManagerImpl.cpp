@@ -741,7 +741,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceAdded(WpaSupplicant1 * proxy, const
         return;
     }
 
-    mWpaSupplicant.interfacePath = const_cast<gchar *>(path);
+    mWpaSupplicant.interfacePath = g_strdup(path);
     if (mWpaSupplicant.interfacePath)
     {
         mWpaSupplicant.state = GDBusWpaSupplicant::WpaState::GOT_INTERFACE_PATH;
