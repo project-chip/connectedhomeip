@@ -229,12 +229,12 @@ class NxpBuilder(GnBuilder):
 
         match board:
             case NxpBoard.RW61X:
-                if NxpOsUsed.FREERTOS:
+                if self.os_env is NxpOsUsed.FREERTOS:
                     return "frdmrw612"
                 else:
                     return "frdm_rw612"
             case NxpBoard.RT1060:
-                if NxpBoardVariant.EVKC:
+                if board_variant is NxpBoardVariant.EVKC:
                     return "evkcmimxrt1060"
                 else:
                     return "evkbmimxrt1060"
@@ -245,7 +245,7 @@ class NxpBuilder(GnBuilder):
             case NxpBoard.K32W1:
                 return "k32w148evk"
             case NxpBoard.MCXW71:
-                if board_variant == NxpBoardVariant.FRDM:
+                if board_variant is NxpBoardVariant.FRDM:
                     return "frdmmcxw71"
                 else:
                     return "mcxw72evk"
