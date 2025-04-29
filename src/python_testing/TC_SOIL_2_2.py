@@ -92,8 +92,8 @@ class TC_SOIL_2_2(MatterBaseTest):
             command_dict = {"Name": "SetSimulatedSoilMoisture", "SoilMoistureValue": irand, "EndpointId": endpoint}
             self._send_named_pipe_command(command_dict)
         else:
-        self.wait_for_user_input(
-            prompt_msg="Perform action to change the moisture of the measured medium and wait for measurement, then continue")
+            self.wait_for_user_input(
+                prompt_msg="Perform action to change the moisture of the measured medium and wait for measurement, then continue")
 
         self.step(5)
         measurement_after_action = await self.read_soil_attribute_expect_success(endpoint=endpoint, attribute=attributes.SoilMoistureMeasuredValue)
