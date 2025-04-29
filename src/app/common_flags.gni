@@ -25,6 +25,9 @@ declare_args() {
   # communicated to OperationalSessionSetup API consumers.
   chip_enable_busy_handling_for_operational_session_setup = true
 
+  # Flag that sets path to zap-generated app-common directory
+  chip_app_zap_dir = chip_root + "/zzz_generated/app-common"
+
   # Controls whether the device commissioning process requires the user to
   # acknowledge terms and conditions during commissioning.
   chip_terms_and_conditions_required = false

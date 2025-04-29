@@ -56,6 +56,12 @@ public:
     virtual CHIP_ERROR FlashErasePage(uint32_t addr) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     virtual CHIP_ERROR FlashWritePage(uint32_t addr, const uint8_t * data, size_t size) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
+    /**
+     * @brief Function trigger the platform to execute a software reset.
+     *              Anything after this function will not be executed since the device will reboot.
+     */
+    virtual void SoftwareReset(void) = 0;
+
     // BLE Specific Method
 
 protected:

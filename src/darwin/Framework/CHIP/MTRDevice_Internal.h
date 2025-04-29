@@ -146,7 +146,11 @@ MTR_DIRECT_MEMBERS
 // Returns YES if any non-null delegates were found
 - (BOOL)_iterateDelegatesWithBlock:(void(NS_NOESCAPE ^ _Nullable)(MTRDeviceDelegateInfo * delegateInfo))block;
 
+// For subclasses to call while holding lock
 - (BOOL)_delegateExists;
+
+// For device controller or other objects to call
+- (BOOL)delegateExists;
 
 // Must be called by subclasses or MTRDevice implementation only.
 - (void)_delegateAdded:(id<MTRDeviceDelegate>)delegate;
@@ -179,6 +183,10 @@ MTR_DIRECT_MEMBERS
 
 - (void)_forgetAttributeWaiter:(MTRAttributeValueWaiter *)attributeValueWaiter;
 
+@end
+
+@interface MTRDevice (MatterPrivateForInternalDragonsDoNotFeed)
+- (void)_deviceMayBeReachable;
 @end
 
 #pragma mark - MTRDevice internal state monitoring

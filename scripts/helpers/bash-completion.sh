@@ -34,7 +34,7 @@ _chip_app() {
     _init_completion -s || return
 
     case "$prev" in
-        --ble-device)
+        --ble-controller)
             readarray -t words < <(ls -I '*:*' /sys/class/bluetooth)
             # Get the list of Bluetooth devices without the 'hci' prefix.
             readarray -t COMPREPLY < <(compgen -W "${words[*]#hci}" -- "$cur")

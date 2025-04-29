@@ -244,3 +244,10 @@ void MatterAdministratorCommissioningPluginServerInitCallback()
     CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gAdminCommissioningServer);
     AttributeAccessInterfaceRegistry::Instance().Register(&gAdminCommissioningServer);
 }
+
+void MatterAdministratorCommissioningPluginServerShutdownCallback()
+{
+    ChipLogProgress(Zcl, "Shutdown Admin Commissioning cluster.");
+    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(&gAdminCommissioningServer);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAdminCommissioningServer);
+}

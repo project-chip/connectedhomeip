@@ -22,6 +22,7 @@
 #include "WindowCoveringManager.h"
 #include "air-quality-instance.h"
 #include "app-common/zap-generated/ids/Clusters.h"
+#include "camera-av-settings-user-level-management-instance.h"
 #include "device-energy-management-modes.h"
 #include "dishwasher-mode.h"
 #include "energy-evse-modes.h"

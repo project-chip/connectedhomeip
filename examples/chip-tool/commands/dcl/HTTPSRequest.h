@@ -16,6 +16,8 @@
  *
  */
 
+#pragma once
+
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
 
@@ -26,13 +28,22 @@ namespace chip {
 namespace tool {
 namespace https {
 
+enum class HttpsSecurityMode
+{
+    kDefault           = 0,
+    kDisableValidation = 1, // Use HTTPS, but disable all validations (cert, server name, ...)
+    kDisableHttps      = 2, // Disable HTTPS, i.e. use plain HTTP
+};
+
 CHIP_ERROR Request(std::string url, Json::Value & jsonResponse,
                    const chip::Optional<uint32_t> & optionalExpectedSize       = chip::NullOptional,
-                   const chip::Optional<const char *> & optionalExpectedDigest = chip::NullOptional);
+                   const chip::Optional<const char *> & optionalExpectedDigest = chip::NullOptional,
+                   HttpsSecurityMode securityMode                              = HttpsSecurityMode::kDefault);
 
 CHIP_ERROR Request(std::string hostname, uint16_t port, std::string path, Json::Value & jsonResponse,
                    const chip::Optional<uint32_t> & optionalExpectedSize       = chip::NullOptional,
-                   const chip::Optional<const char *> & optionalExpectedDigest = chip::NullOptional);
+                   const chip::Optional<const char *> & optionalExpectedDigest = chip::NullOptional,
+                   HttpsSecurityMode securityMode                              = HttpsSecurityMode::kDefault);
 
 } // namespace https
 } // namespace tool

@@ -15,6 +15,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+#include "AccessControl.h"
+
 #include <access/SubjectDescriptor.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -51,10 +54,6 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 
 namespace {
-
-// TODO: Maybe consider making this configurable?  See also
-// AccessControl.cpp.
-constexpr EndpointId kSupportedEndpoint = 0;
 
 DataVersion gMockDataVersion = 0;
 
@@ -118,14 +117,17 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aPath, TLV::TLVRea
 } // namespace chip
 
 /**
- * Called by the OTA provider cluster server to determine an index
- * into its array.
+ * Returns the index of the given endpoint in the list of all endpoints that might support the given cluster server.
  */
 uint16_t emberAfGetClusterServerEndpointIndex(EndpointId endpoint, ClusterId cluster, uint16_t fixedClusterServerEndpointCount)
 {
-    if (endpoint == kSupportedEndpoint && cluster == OtaSoftwareUpdateProvider::Id)
+    if (endpoint == kOtaProviderDynamicEndpointId && cluster == OtaSoftwareUpdateProvider::Id)
     {
         return 0;
+    }
+    else if (endpoint == kWebRTCRequesterDynamicEndpointId && cluster == WebRTCTransportRequestor::Id)
+    {
+        return 1;
     }
 
     return UINT16_MAX;
@@ -145,14 +147,18 @@ uint16_t emberAfGetServerAttributeCount(EndpointId endpoint, ClusterId cluster)
 
 uint16_t emberAfEndpointCount(void)
 {
-    return 1;
+    return 2;
 }
 
 uint16_t emberAfIndexFromEndpoint(EndpointId endpoint)
 {
-    if (endpoint == kSupportedEndpoint)
+    if (endpoint == kOtaProviderDynamicEndpointId)
     {
         return 0;
+    }
+    else if (endpoint == kWebRTCRequesterDynamicEndpointId)
+    {
+        return 1;
     }
 
     return UINT16_MAX;
@@ -160,15 +166,27 @@ uint16_t emberAfIndexFromEndpoint(EndpointId endpoint)
 
 EndpointId emberAfEndpointFromIndex(uint16_t index)
 {
-    // Index must be valid here, so 0.
-    return kSupportedEndpoint;
+    if (index == 0)
+    {
+        return kOtaProviderDynamicEndpointId;
+    }
+    else if (index == 1)
+    {
+        return kWebRTCRequesterDynamicEndpointId;
+    }
+
+    return UINT16_MAX;
 }
 
 Optional<ClusterId> emberAfGetNthClusterId(EndpointId endpoint, uint8_t n, bool server)
 {
-    if (endpoint == kSupportedEndpoint && n == 0 && server)
+    if (endpoint == kOtaProviderDynamicEndpointId && n == 0 && server)
     {
         return MakeOptional(OtaSoftwareUpdateProvider::Id);
+    }
+    else if (endpoint == kWebRTCRequesterDynamicEndpointId && n == 0 && server)
+    {
+        return MakeOptional(WebRTCTransportRequestor::Id);
     }
 
     return NullOptional;
@@ -186,7 +204,12 @@ bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId cluster
 
 uint8_t emberAfClusterCount(EndpointId endpoint, bool server)
 {
-    if (endpoint == kSupportedEndpoint && server)
+    if (endpoint == kOtaProviderDynamicEndpointId && server)
+    {
+        return 1;
+    }
+
+    if (endpoint == kWebRTCRequesterDynamicEndpointId && server)
     {
         return 1;
     }
@@ -209,7 +232,14 @@ Optional<AttributeId> emberAfGetServerAttributeIdByIndex(EndpointId endpoint, Cl
 
 uint8_t emberAfClusterIndex(EndpointId endpoint, ClusterId clusterId, EmberAfClusterMask mask)
 {
-    if (endpoint == kSupportedEndpoint && clusterId == OtaSoftwareUpdateProvider::Id && (mask & MATTER_CLUSTER_FLAG_SERVER))
+    if (endpoint == kOtaProviderDynamicEndpointId && clusterId == OtaSoftwareUpdateProvider::Id &&
+        (mask & MATTER_CLUSTER_FLAG_SERVER))
+    {
+        return 0;
+    }
+
+    if (endpoint == kWebRTCRequesterDynamicEndpointId && clusterId == WebRTCTransportRequestor::Id &&
+        (mask & MATTER_CLUSTER_FLAG_SERVER))
     {
         return 0;
     }
@@ -223,11 +253,16 @@ bool emberAfEndpointIndexIsEnabled(uint16_t index)
 }
 
 namespace {
-const CommandId acceptedCommands[]  = { Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::Id,
-                                        Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Id,
-                                        Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Id, kInvalidCommandId };
-const CommandId generatedCommands[] = { Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::Id,
-                                        Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::Id, kInvalidCommandId };
+
+const CommandId acceptedOtaProviderCommands[] = { Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::Id,
+                                                  Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Id,
+                                                  Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Id,
+                                                  kInvalidCommandId };
+
+const CommandId generatedOtaProviderCommands[] = { Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::Id,
+                                                   Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::Id,
+                                                   kInvalidCommandId };
+
 const EmberAfCluster otaProviderCluster{
     .clusterId            = Clusters::OtaSoftwareUpdateProvider::Id,
     .attributes           = nullptr,
@@ -235,19 +270,47 @@ const EmberAfCluster otaProviderCluster{
     .clusterSize          = 0,
     .mask                 = MATTER_CLUSTER_FLAG_SERVER,
     .functions            = nullptr,
-    .acceptedCommandList  = acceptedCommands,
-    .generatedCommandList = generatedCommands,
+    .acceptedCommandList  = acceptedOtaProviderCommands,
+    .generatedCommandList = generatedOtaProviderCommands,
     .eventList            = nullptr,
     .eventCount           = 0,
 };
+
 const EmberAfEndpointType otaProviderEndpoint{ .cluster = &otaProviderCluster, .clusterCount = 1, .endpointSize = 0 };
+
+const CommandId acceptedWebRTCRequestorCommands[] = { Clusters::WebRTCTransportRequestor::Commands::Offer::Id,
+                                                      Clusters::WebRTCTransportRequestor::Commands::Answer::Id,
+                                                      Clusters::WebRTCTransportRequestor::Commands::ICECandidates::Id,
+                                                      Clusters::WebRTCTransportRequestor::Commands::End::Id, kInvalidCommandId };
+
+const CommandId generatedWebRTCRequestorCommands[] = { kInvalidCommandId };
+
+const EmberAfCluster webRTCReqeustorCluster{
+    .clusterId            = Clusters::WebRTCTransportRequestor::Id,
+    .attributes           = nullptr,
+    .attributeCount       = 0,
+    .clusterSize          = 0,
+    .mask                 = MATTER_CLUSTER_FLAG_SERVER,
+    .functions            = nullptr,
+    .acceptedCommandList  = acceptedWebRTCRequestorCommands,
+    .generatedCommandList = generatedWebRTCRequestorCommands,
+    .eventList            = nullptr,
+    .eventCount           = 0,
+};
+
+const EmberAfEndpointType webRTCRequestorEndpoint{ .cluster = &webRTCReqeustorCluster, .clusterCount = 1, .endpointSize = 0 };
+
 } // namespace
 
 const EmberAfEndpointType * emberAfFindEndpointType(EndpointId endpoint)
 {
-    if (endpoint == kSupportedEndpoint)
+    if (endpoint == kOtaProviderDynamicEndpointId)
     {
         return &otaProviderEndpoint;
+    }
+    else if (endpoint == kWebRTCRequesterDynamicEndpointId)
+    {
+        return &webRTCRequestorEndpoint;
     }
 
     return nullptr;
@@ -255,9 +318,14 @@ const EmberAfEndpointType * emberAfFindEndpointType(EndpointId endpoint)
 
 const EmberAfCluster * emberAfFindServerCluster(EndpointId endpoint, ClusterId cluster)
 {
-    if (endpoint == kSupportedEndpoint && cluster == Clusters::OtaSoftwareUpdateProvider::Id)
+    if (endpoint == kOtaProviderDynamicEndpointId && cluster == Clusters::OtaSoftwareUpdateProvider::Id)
     {
         return &otaProviderCluster;
+    }
+
+    if (endpoint == kWebRTCRequesterDynamicEndpointId && cluster == Clusters::WebRTCTransportRequestor::Id)
+    {
+        return &webRTCReqeustorCluster;
     }
 
     return nullptr;
@@ -339,6 +407,11 @@ const EmberAfCluster * emberAfFindClusterInType(const EmberAfEndpointType * endp
     if ((endpointType == &otaProviderEndpoint) && (clusterId == Clusters::OtaSoftwareUpdateProvider::Id))
     {
         return &otaProviderCluster;
+    }
+
+    if ((endpointType == &webRTCRequestorEndpoint) && (clusterId == Clusters::WebRTCTransportRequestor::Id))
+    {
+        return &webRTCReqeustorCluster;
     }
 
     return nullptr;

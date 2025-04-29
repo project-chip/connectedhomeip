@@ -100,7 +100,7 @@ gboolean WiFiIPChangeListener(GIOChannel * ch, GIOCondition /* condition */, voi
                 {
                     if (routeInfo->rta_type == IFA_LOCAL)
                     {
-                        char name[IFNAMSIZ];
+                        char name[Inet::InterfaceId::kMaxIfNameLength];
                         if (if_indextoname(addressMessage->ifa_index, name) == nullptr)
                         {
                             ChipLogError(DeviceLayer, "Error %d when getting the interface name at index: %d", errno,

@@ -671,3 +671,10 @@ config("specs_default") {
     ldflags = cflags
   }
 }
+
+config("link_as_needed") {
+  # ld64.lld on clang used by Apple does not have a --as-needed option
+  if (current_os != "mac" && current_os != "ios") {
+    ldflags = [ "-Wl,--as-needed" ]
+  }
+}

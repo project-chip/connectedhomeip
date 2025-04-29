@@ -32,7 +32,7 @@
 #include <lib/support/DLLUtil.h>
 #include <lib/support/SafeInt.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 #include <lwip/netif.h>
 #include <lwip/sys.h>
 #include <lwip/tcpip.h>
@@ -56,7 +56,7 @@
 #include <zephyr/net/net_if.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
 
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 #include <inet/UDPEndPointImplOpenThread.h>
 #endif
 
@@ -66,7 +66,7 @@
 namespace chip {
 namespace Inet {
 
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 CHIP_ERROR InterfaceId::GetInterfaceName(char * nameBuf, size_t nameBufSize) const
 {
     if (mPlatformInterface && nameBufSize >= kMaxIfNameLength)
@@ -188,7 +188,7 @@ bool InterfaceAddressIterator::HasBroadcastAddress()
 
 #endif
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 
 CHIP_ERROR InterfaceId::GetInterfaceName(char * nameBuf, size_t nameBufSize) const
 {

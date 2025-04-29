@@ -152,8 +152,8 @@ DECLARE_DYNAMIC_CLUSTER(OnOff::Id, onOffAttrs, ZAP_CLUSTER_MASK(SERVER), onOffIn
 
 // Declare Bridged Light endpoint
 DECLARE_DYNAMIC_ENDPOINT(bridgedLightEndpoint, bridgedLightClusters);
-DataVersion gLight1DataVersions[ArraySize(bridgedLightClusters)];
-DataVersion gLight2DataVersions[ArraySize(bridgedLightClusters)];
+DataVersion gLight1DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
+DataVersion gLight2DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
 
 DeviceOnOff Light1("Light 1", "Office");
 DeviceOnOff Light2("Light 2", "Office");
@@ -162,10 +162,10 @@ DeviceTempSensor TempSensor1("TempSensor 1", "Office", minMeasuredValue, maxMeas
 DeviceTempSensor TempSensor2("TempSensor 2", "Office", minMeasuredValue, maxMeasuredValue, initialMeasuredValue);
 
 // Declare Bridged endpoints used for Action clusters
-DataVersion gActionLight1DataVersions[ArraySize(bridgedLightClusters)];
-DataVersion gActionLight2DataVersions[ArraySize(bridgedLightClusters)];
-DataVersion gActionLight3DataVersions[ArraySize(bridgedLightClusters)];
-DataVersion gActionLight4DataVersions[ArraySize(bridgedLightClusters)];
+DataVersion gActionLight1DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
+DataVersion gActionLight2DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
+DataVersion gActionLight3DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
+DataVersion gActionLight4DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
 
 DeviceOnOff ActionLight1("Action Light 1", "Room 1");
 DeviceOnOff ActionLight2("Action Light 2", "Room 1");
@@ -209,8 +209,8 @@ DECLARE_DYNAMIC_CLUSTER(TemperatureMeasurement::Id, tempSensorAttrs, ZAP_CLUSTER
 
 // Declare Bridged Light endpoint
 DECLARE_DYNAMIC_ENDPOINT(bridgedTempSensorEndpoint, bridgedTempSensorClusters);
-DataVersion gTempSensor1DataVersions[ArraySize(bridgedTempSensorClusters)];
-DataVersion gTempSensor2DataVersions[ArraySize(bridgedTempSensorClusters)];
+DataVersion gTempSensor1DataVersions[MATTER_ARRAY_SIZE(bridgedTempSensorClusters)];
+DataVersion gTempSensor2DataVersions[MATTER_ARRAY_SIZE(bridgedTempSensorClusters)];
 
 // ---------------------------------------------------------------------------
 //
@@ -237,9 +237,9 @@ DECLARE_DYNAMIC_CLUSTER(Descriptor::Id, descriptorAttrs, ZAP_CLUSTER_MASK(SERVER
     DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(bridgedComposedDeviceEndpoint, bridgedComposedDeviceClusters);
-DataVersion gComposedDeviceDataVersions[ArraySize(bridgedComposedDeviceClusters)];
-DataVersion gComposedTempSensor1DataVersions[ArraySize(bridgedTempSensorClusters)];
-DataVersion gComposedTempSensor2DataVersions[ArraySize(bridgedTempSensorClusters)];
+DataVersion gComposedDeviceDataVersions[MATTER_ARRAY_SIZE(bridgedComposedDeviceClusters)];
+DataVersion gComposedTempSensor1DataVersions[MATTER_ARRAY_SIZE(bridgedTempSensorClusters)];
+DataVersion gComposedTempSensor2DataVersions[MATTER_ARRAY_SIZE(bridgedTempSensorClusters)];
 
 } // namespace
 

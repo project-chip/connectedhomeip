@@ -122,9 +122,9 @@ else()
 endif()
 
 
-# if (BOARD STREQUAL "native_posix")
+# if (BOARD STREQUAL "native_sim")
 #     matter_add_gn_arg_string("target_cpu" "x86")
-# elseif (BOARD STREQUAL "native_posix_64")
+# elseif (BOARD STREQUAL "native_sim/native/64")
 #     matter_add_gn_arg_string("target_cpu" "x64")
 # endif()
 

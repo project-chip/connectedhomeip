@@ -108,7 +108,7 @@ void SensorManager::TemperatureUpdateEventHandler(AppEvent * aEvent)
 #else
     static uint8_t nbOfRepetition = 0;
     static uint8_t simulatedIndex = 0;
-    if (simulatedIndex >= ArraySize(mSimulatedTemp))
+    if (simulatedIndex >= MATTER_ARRAY_SIZE(mSimulatedTemp))
     {
         simulatedIndex = 0;
     }

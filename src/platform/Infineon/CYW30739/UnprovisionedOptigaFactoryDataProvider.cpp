@@ -67,7 +67,7 @@ CHIP_ERROR UnprovisionedOptigaFactoryDataProvider::ProvisionDataOnce()
 
     ChipLogProgress(DeviceLayer, "Provisioning Optiga data");
 
-    for (size_t i = 0; i < ArraySize(configs); i++)
+    for (size_t i = 0; i < MATTER_ARRAY_SIZE(configs); i++)
     {
         ProvisionDataFromConfig(configs[i].key, configs[i].object_id, configs[i].object_type);
     }

@@ -217,7 +217,7 @@ public:
         return TCP(addr).SetPort(port).SetInterface(interface);
     }
 
-    static PeerAddress WiFiPAF(NodeId remoteId) { return PeerAddress(Type::kWiFiPAF); }
+    static PeerAddress WiFiPAF(NodeId remoteId) { return PeerAddress(Type::kWiFiPAF, remoteId); }
 
     static PeerAddress Multicast(chip::FabricId fabric, chip::GroupId group)
     {

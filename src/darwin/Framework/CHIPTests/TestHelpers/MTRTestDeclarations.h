@@ -44,7 +44,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable NSArray<NSNumber *> *)_fetchClusterIndexForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID;
 - (nullable MTRDeviceClusterData *)_fetchClusterDataForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
 - (nullable NSDictionary<NSString *, id> *)getStoredDeviceDataForNodeID:(NSNumber *)nodeID;
-- (NSArray<NSNumber *> *)nodesWithStoredData;
+@property (readonly, nonatomic) NSArray<NSNumber *> * nodesWithStoredData;
 @end
 
 // Declare internal methods for testing

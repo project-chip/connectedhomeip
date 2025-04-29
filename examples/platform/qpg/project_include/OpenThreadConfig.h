@@ -82,6 +82,16 @@
 
 #define OPENTHREAD_PLATFORM_NEXUS 0
 
+#if !defined(OPENTHREAD_FTD) && !defined(OPENTHREAD_MTD)
+#if defined(CHIP_DEVICE_CONFIG_THREAD_FTD) && CHIP_DEVICE_CONFIG_THREAD_FTD
+#define OPENTHREAD_FTD 1
+#define OPENTHREAD_MTD 0
+#else
+#define OPENTHREAD_FTD 0
+#define OPENTHREAD_MTD 1
+#endif
+#endif
+
 // Use the Qorvo-supplied default platform configuration for remainder
 // of OpenThread config options.
 //

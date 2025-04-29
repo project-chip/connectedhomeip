@@ -1,3 +1,11 @@
 {{! Override the getter name because some of our properties start with things
     like "new" or "init" }}
-@property (nonatomic, copy{{#unless (isStrEqual (asGetterName label) (asStructPropertyName label))}}, getter={{asGetterName label}}{{/unless}}) {{asObjectiveCType type cluster}} {{asStructPropertyName label}} {{! Caller provides availability~}}
+@property (nonatomic, copy{{#unless (isStrEqual (asGetterName label) (asStructPropertyName label))}}, getter={{asGetterName label}}{{/unless}})
+{{~! If our cluster is just the upper-camel-case version of originalCluster,
+     then use originalCluster, with its spaces, etc, as the cluster name for
+     the type, since that's what's stored in the database. }}
+{{~#if (isStrEqual cluster (asUpperCamelCase originalCluster preserveAcronyms=true))~}}
+{{~asObjectiveCType type originalCluster~}}
+{{~else~}}
+{{~asObjectiveCType type cluster~}}
+{{~/if}} {{asStructPropertyName label}} {{! Caller provides availability~}}

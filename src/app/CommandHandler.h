@@ -17,7 +17,7 @@
  */
 #pragma once
 
-#include <app/CommandHandlerExchangeInterface.h>
+#include <access/SubjectDescriptor.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/EncodableToTLV.h>
 #include <app/data-model/Encode.h>
@@ -25,6 +25,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/IntrusiveList.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <messaging/ExchangeContext.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {

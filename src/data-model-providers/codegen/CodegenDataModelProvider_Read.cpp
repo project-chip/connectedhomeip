@@ -102,6 +102,11 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::ReadAttribute(const Data
                   ChipLogValueMEI(request.path.mClusterId), request.path.mEndpointId, ChipLogValueMEI(request.path.mAttributeId),
                   request.path.mExpanded);
 
+    if (auto * cluster = mRegistry.Get(request.path); cluster != nullptr)
+    {
+        return cluster->ReadAttribute(request, encoder);
+    }
+
     auto metadata = Ember::FindAttributeMetadata(request.path);
 
     // Explicit failure in finding a suitable metadata

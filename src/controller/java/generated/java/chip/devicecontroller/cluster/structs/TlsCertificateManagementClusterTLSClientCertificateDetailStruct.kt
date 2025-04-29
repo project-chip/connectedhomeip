@@ -17,6 +17,7 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import java.util.Optional
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
@@ -25,8 +26,8 @@ import matter.tlv.TlvWriter
 
 class TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
   val ccdid: UInt,
-  val clientCertificate: ByteArray,
-  val intermediateCertificates: List<ByteArray>,
+  val clientCertificate: Optional<ByteArray>,
+  val intermediateCertificates: Optional<List<ByteArray>>,
 ) {
   override fun toString(): String = buildString {
     append("TlsCertificateManagementClusterTLSClientCertificateDetailStruct {\n")
@@ -40,12 +41,18 @@ class TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
     tlvWriter.apply {
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_CCDID), ccdid)
-      put(ContextSpecificTag(TAG_CLIENT_CERTIFICATE), clientCertificate)
-      startArray(ContextSpecificTag(TAG_INTERMEDIATE_CERTIFICATES))
-      for (item in intermediateCertificates.iterator()) {
-        put(AnonymousTag, item)
+      if (clientCertificate.isPresent) {
+        val optclientCertificate = clientCertificate.get()
+        put(ContextSpecificTag(TAG_CLIENT_CERTIFICATE), optclientCertificate)
       }
-      endArray()
+      if (intermediateCertificates.isPresent) {
+        val optintermediateCertificates = intermediateCertificates.get()
+        startArray(ContextSpecificTag(TAG_INTERMEDIATE_CERTIFICATES))
+        for (item in optintermediateCertificates.iterator()) {
+          put(AnonymousTag, item)
+        }
+        endArray()
+      }
       endStructure()
     }
   }
@@ -61,14 +68,25 @@ class TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
     ): TlsCertificateManagementClusterTLSClientCertificateDetailStruct {
       tlvReader.enterStructure(tlvTag)
       val ccdid = tlvReader.getUInt(ContextSpecificTag(TAG_CCDID))
-      val clientCertificate = tlvReader.getByteArray(ContextSpecificTag(TAG_CLIENT_CERTIFICATE))
+      val clientCertificate =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CLIENT_CERTIFICATE))) {
+          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_CLIENT_CERTIFICATE)))
+        } else {
+          Optional.empty()
+        }
       val intermediateCertificates =
-        buildList<ByteArray> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_INTERMEDIATE_CERTIFICATES))
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getByteArray(AnonymousTag))
-          }
-          tlvReader.exitContainer()
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_INTERMEDIATE_CERTIFICATES))) {
+          Optional.of(
+            buildList<ByteArray> {
+              tlvReader.enterArray(ContextSpecificTag(TAG_INTERMEDIATE_CERTIFICATES))
+              while (!tlvReader.isEndOfContainer()) {
+                add(tlvReader.getByteArray(AnonymousTag))
+              }
+              tlvReader.exitContainer()
+            }
+          )
+        } else {
+          Optional.empty()
         }
 
       tlvReader.exitContainer()

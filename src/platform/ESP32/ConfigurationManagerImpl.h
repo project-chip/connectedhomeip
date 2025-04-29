@@ -35,6 +35,7 @@
 #include <platform/internal/GenericConnectivityManagerImpl_NoBLE.h>
 #endif
 
+#include <freertos/timers.h>
 #include <platform/ESP32/ESP32Config.h>
 
 namespace chip {

@@ -2,7 +2,7 @@
 Matter-specific assertions building on top of Mobly asserts.
 """
 
-from typing import Any, List, Optional, Type, TypeVar
+from typing import Any, Callable, List, Optional, Type, TypeVar
 
 from mobly import asserts
 
@@ -156,6 +156,23 @@ def assert_list(value: Any, description: str, min_length: Optional[int] = None, 
     if max_length is not None:
         asserts.assert_less_equal(len(value), max_length,
                                   f"{description} must not exceed {max_length} elements")
+
+
+def assert_all(value: List[T], condition: Callable[[T], bool], description: str) -> None:
+    """
+    Asserts that all elements in the list satisfy the provided condition.
+
+    Args:
+        value (List[T]): The list of elements to check.
+        condition (Callable[[T], bool]): A function that takes an element from value and returns True if it meets the condition, False otherwise.
+        description: User-defined description for error messages
+
+    Raises:
+        AssertionError: If any element in the list does not satisfy the condition.
+    """
+    assert_list(value, description)
+    for i, item in enumerate(value):
+        asserts.assert_true(condition(item), f"Element at index {i} does not satisfy the condition: {description}")
 
 
 def assert_list_element_type(value: List[Any], expected_type: Type[T], description: str, allow_empty: bool = False) -> None:

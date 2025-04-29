@@ -47,8 +47,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTRCommissioningParameters: %p, has ssid: %d, has thread dataset: %d>", self,
-                     self.wifiSSID != nil, self.threadOperationalDataset != nil];
+    return [NSString stringWithFormat:@"<MTRCommissioningParameters: %p, has ssid: %d, has thread dataset: %d>, accepted terms: %@, accepted terms version: %@", self,
+                     self.wifiSSID != nil, self.threadOperationalDataset != nil,
+                     self.acceptedTermsAndConditions, self.acceptedTermsAndConditionsVersion];
 }
 
 @end

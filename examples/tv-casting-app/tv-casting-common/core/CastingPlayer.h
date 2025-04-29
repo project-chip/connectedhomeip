@@ -210,11 +210,15 @@ public:
      * otherwise. StopConnecting() can only be called by the client during the CastingPlayer/Commissioner-Generated passcode
      * commissioning flow. Calling StopConnecting() during the Client/Commissionee-Generated commissioning flow will return a
      * CHIP_ERROR_INCORRECT_STATE error.
+     *
+     * @note This method will free the calling object as a side effect.
      */
     CHIP_ERROR StopConnecting();
 
     /**
      * @brief Sets the internal connection state of this CastingPlayer to "disconnected"
+     *
+     * @note This method will free the calling object as a side effect.
      */
     void Disconnect();
 
@@ -278,7 +282,11 @@ public:
     /**
      * @brief Return the current state of the CastingPlayer
      */
-    ConnectionState GetConnectionState() const { return mConnectionState; }
+    ConnectionState GetConnectionState() const
+    {
+        ChipLogError(AppServer, "CastingPlayer::GetConnectionState() state: %d", mConnectionState);
+        return mConnectionState;
+    }
 
 private:
     std::vector<memory::Strong<Endpoint>> mEndpoints;
@@ -318,6 +326,8 @@ private:
     /**
      * @brief resets this CastingPlayer's state and calls mOnCompleted with the CHIP_ERROR. Also, after calling mOnCompleted, it
      * clears mOnCompleted by setting it to a nullptr.
+     *
+     * @note This method will free the calling object as a side effect.
      */
     void resetState(CHIP_ERROR err);
 

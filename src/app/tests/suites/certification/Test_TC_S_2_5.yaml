@@ -40,11 +40,7 @@ tests:
           b0b1b2b3b4b5b6b7b8b9babbbcbdbebf EpochStartTime1: 1110001 EpochKey2:
           c0c1c2c3c4c5c6c7c8c9cacbcccdcecf EpochStartTime2: 1110002"
       verification: |
-          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 1,
-          "groupKeySecurityPolicy": 0, "epochKey0":
-          "a0a1a2a3a4a5a6a7a8a9aaabacadaeaf", "epochStartTime0": 1110000,"epochKey1":
-          "b0b1b2b3b4b5b6b7b8b9babbbcbdbebf", "epochStartTime1": 1110001,"epochKey2":
-          "c0c1c2c3c4c5c6c7c8c9cacbcccdcecf", "epochStartTime2": 1110002 }' 1 0
+          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": "0x01a1","groupKeySecurityPolicy": 0, "epochKey0":"a0a1a2a3a4a5a6a7a8a9aaabacadaeaf","epochStartTime0": 1110000,"epochKey1":"b0b1b2b3b4b5b6b7b8b9babbbcbdbebf", "epochStartTime1": 1110001,"epochKey2":"c0c1c2c3c4c5c6c7c8c9cacbcccdcecf", "epochStartTime2": 1110002 }' 1 0
 
           Verify the "status is success" on the TH(Chip-tool)  Log  and below is the sample log provided for the raspi platform:
 

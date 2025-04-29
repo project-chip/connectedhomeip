@@ -378,23 +378,7 @@ tests:
                       {
                           AdminNodeID: TH1CommissionerNodeId,
                           AdminPasscodeID: null,
-                          ChangeType: 2,
-                          LatestValue:
-                              {
-                                  Privilege: 5,
-                                  AuthMode: 2,
-                                  Subjects: [TH1CommissionerNodeId],
-                                  Targets: null,
-                                  FabricIndex: TH1FabricIndex,
-                              },
-                          FabricIndex: TH1FabricIndex,
-                      }
-          - values:
-                - value:
-                      {
-                          AdminNodeID: TH1CommissionerNodeId,
-                          AdminPasscodeID: null,
-                          ChangeType: 1,
+                          ChangeType: 0,
                           LatestValue:
                               {
                                   Privilege: 5,
@@ -435,23 +419,7 @@ tests:
                       {
                           AdminNodeID: TH2CommissionerNodeId,
                           AdminPasscodeID: null,
-                          ChangeType: 2,
-                          LatestValue:
-                              {
-                                  Privilege: 5,
-                                  AuthMode: 2,
-                                  Subjects: [TH2CommissionerNodeId],
-                                  Targets: null,
-                                  FabricIndex: TH2FabricIndex,
-                              },
-                          FabricIndex: TH2FabricIndex,
-                      }
-          - values:
-                - value:
-                      {
-                          AdminNodeID: TH2CommissionerNodeId,
-                          AdminPasscodeID: null,
-                          ChangeType: 1,
+                          ChangeType: 0,
                           LatestValue:
                               {
                                   Privilege: 5,

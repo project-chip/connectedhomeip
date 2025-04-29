@@ -77,6 +77,21 @@ rt_sdk("sdk") {
     include_dirs += [ "${example_platform_dir}/board/${evkname}/" ]
     sources += [ "${example_platform_dir}/board/${evkname}/pin_mux.c" ]
   }
+
+  if (iw416_transceiver || w8801_transceiver || iwx12_transceiver) {
+    if (evkname == "evkmimxrt1060") {
+      include_dirs += [ "${example_platform_dir}/board/evkbmimxrt1060/" ]
+      sources +=
+          [ "${example_platform_dir}/board/evkbmimxrt1060/sdmmc_config.c" ]
+      sources +=
+          [ "${example_platform_dir}/board/evkbmimxrt1060/wifi_bt_config.c" ]
+    } else {
+      include_dirs += [ "${example_platform_dir}/board/${evkname}/" ]
+      sources += [ "${example_platform_dir}/board/${evkname}/sdmmc_config.c" ]
+      sources += [ "${example_platform_dir}/board/${evkname}/wifi_bt_config.c" ]
+    }
+  }
+
   sources += [ "${example_platform_dir}/board/hardware_init.c" ]
   sources += [ "${example_platform_dir}/board/clock_config.c" ]
   sources += [ "${example_platform_dir}/board/board.c" ]
@@ -154,7 +169,8 @@ rt_executable("thermostat") {
       # to customize BLE advertising data
       defines += [ "CONFIG_CHIP_CUSTOM_BLE_ADV_DATA=1" ]
       include_dirs += [ "${chip_root}/src/platform/nxp/common/ble_zephyr" ]
-      sources += [ "../../common/main/BleZephyrManagerApp.cpp" ]
+      sources +=
+          [ "${common_example_dir}/app_ble/source/BleZephyrManagerApp.cpp" ]
     } else {
       # Empty implementation, default matter advertising data
       sources += [
@@ -192,9 +208,7 @@ rt_executable("thermostat") {
     "${common_example_dir}/device_callbacks/source/CommonDeviceCallbacks.cpp",
     "${common_example_dir}/device_manager/source/CHIPDeviceManager.cpp",
     "${common_example_dir}/icd/source/ICDUtil.cpp",
-    "${common_example_dir}/matter_button/source/ButtonDefault.cpp",
-    "${common_example_dir}/matter_button/source/ButtonManager.cpp",
-    "${common_example_dir}/matter_button/source/ButtonRegistrationDefault.cpp",
+    "${common_example_dir}/matter_button/source/ButtonRegistrationEmpty.cpp",
   ]
 
   deps = [
@@ -287,7 +301,7 @@ rt_executable("thermostat") {
   ]
 
   if (evkname == "evkcmimxrt1060") {
-    ldflags += [ "-Wl,--defsym=gEVKCFlashSize_d=0x1000000" ]
+    ldflags += [ "-Wl,--defsym=gFlashSize_d=0x1000000" ]
   }
   if (enable_ota_provider) {
     # As the OTA file will be stored in the littlefs file system, it is required to increase the size of the file system

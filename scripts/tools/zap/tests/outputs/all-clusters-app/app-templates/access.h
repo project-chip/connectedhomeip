@@ -33,9 +33,6 @@
     /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: view */ \
     0x0000001F, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     0x0000001F, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
-    /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
-    /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
     /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
@@ -50,10 +47,6 @@
     /* Cluster: Energy Preference, Attribute: CurrentEnergyBalance, Privilege: view */ \
     /* Cluster: Energy Preference, Attribute: CurrentLowPowerModeSensitivity, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
@@ -76,9 +69,6 @@
     /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: view */ \
     0x00000000, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     0x00000001, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
-    /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
-    /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
     /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     0x00000000, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
@@ -93,10 +83,6 @@
     /* Cluster: Energy Preference, Attribute: CurrentEnergyBalance, Privilege: view */ \
     /* Cluster: Energy Preference, Attribute: CurrentLowPowerModeSensitivity, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
@@ -119,9 +105,6 @@
     /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: view */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
-    /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
-    /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
     /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
@@ -136,10 +119,6 @@
     /* Cluster: Energy Preference, Attribute: CurrentEnergyBalance, Privilege: view */ \
     /* Cluster: Energy Preference, Attribute: CurrentLowPowerModeSensitivity, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \

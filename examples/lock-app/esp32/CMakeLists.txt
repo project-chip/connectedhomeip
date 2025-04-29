@@ -61,10 +61,6 @@ add_subdirectory(third_party/connectedhomeip/third_party/pigweed/repo)
 add_subdirectory(third_party/connectedhomeip/third_party/nanopb/repo)
 add_subdirectory(third_party/connectedhomeip/examples/platform/esp32/pw_sys_io)
 
-get_target_property(_target_cxx_flags pw_build.cpp17._public_config INTERFACE_COMPILE_OPTIONS)
-list(REMOVE_ITEM _target_cxx_flags $<$<COMPILE_LANGUAGE:CXX>:-std=c++17>)
-list(APPEND _target_cxx_flags $<$<COMPILE_LANGUAGE:CXX>:-std=gnu++17>)
-set_target_properties(pw_build.cpp17._public_config PROPERTIES INTERFACE_COMPILE_OPTIONS "${_target_cxx_flags}")
 endif(CONFIG_ENABLE_PW_RPC)
 
 flashing_script()

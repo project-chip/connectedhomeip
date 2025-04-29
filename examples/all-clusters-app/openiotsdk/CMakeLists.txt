@@ -60,6 +60,7 @@ target_sources(${APP_TARGET}
         ${ALL_CLUSTERS_COMMON}/src/smco-stub.cpp
         ${ALL_CLUSTERS_COMMON}/src/bridged-actions-stub.cpp
         ${ALL_CLUSTERS_COMMON}/src/air-quality-instance.cpp
+        ${ALL_CLUSTERS_COMMON}/src/chime-instance.cpp
         ${ALL_CLUSTERS_COMMON}/src/concentration-measurement-instances.cpp
         ${ALL_CLUSTERS_COMMON}/src/fan-stub.cpp
         ${ALL_CLUSTERS_COMMON}/src/oven-modes.cpp

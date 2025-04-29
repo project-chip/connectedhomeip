@@ -210,7 +210,7 @@ class ChimeCluster(private val controller: MatterController, private val endpoin
     }
   }
 
-  suspend fun readActiveChimeIDAttribute(): UByte {
+  suspend fun readSelectedChimeAttribute(): UByte {
     val ATTRIBUTE_ID: UInt = 1u
 
     val attributePath =
@@ -232,7 +232,7 @@ class ChimeCluster(private val controller: MatterController, private val endpoin
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Activechimeid attribute not found in response" }
+    requireNotNull(attributeData) { "Selectedchime attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
@@ -241,7 +241,7 @@ class ChimeCluster(private val controller: MatterController, private val endpoin
     return decodedValue
   }
 
-  suspend fun writeActiveChimeIDAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
+  suspend fun writeSelectedChimeAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 1u
 
     val tlvWriter = TlvWriter()
@@ -281,7 +281,7 @@ class ChimeCluster(private val controller: MatterController, private val endpoin
     }
   }
 
-  suspend fun subscribeActiveChimeIDAttribute(
+  suspend fun subscribeSelectedChimeAttribute(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
@@ -316,7 +316,7 @@ class ChimeCluster(private val controller: MatterController, private val endpoin
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { "Activechimeid attribute not found in Node State update" }
+          requireNotNull(attributeData) { "Selectedchime attribute not found in Node State update" }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)

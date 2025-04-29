@@ -35,6 +35,7 @@ source_set("types") {
     "attribute-metadata.cpp",
     "attribute-metadata.h",
     "basic-types.h",
+    "cluster-config.h",
     "ember-strings.cpp",
     "ember-strings.h",
     "endpoint-config-defines.h",
@@ -53,7 +54,11 @@ source_set("types") {
 
 # This source set also depends on data-model
 source_set("af-types") {
-  sources = [ "af-types.h" ]
+  sources = [
+    "AttributesChangedListener.h",
+    "MarkAttributeDirty.h",
+    "af-types.h",
+  ]
   deps = [
     ":types",
     "${chip_root}/src/app:paths",

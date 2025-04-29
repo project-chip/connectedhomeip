@@ -119,3 +119,8 @@ void emberAfRvcOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 
     gRvcOperationalStateInstance->Init();
 }
+
+void emberAfRvcOperationalStateClusterShutdownCallback(chip::EndpointId endpointId)
+{
+    RvcOperationalState::Shutdown();
+}

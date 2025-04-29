@@ -158,7 +158,7 @@ class TC_CGEN_2_9(MatterBaseTest):
         await self.remove_commissioner_fabric()
 
         # Close the commissioner session with the device to clean up resources
-        commissioner.CloseSession(nodeid=self.dut_node_id)
+        commissioner.MarkSessionDefunct(nodeid=self.dut_node_id)
 
         # Step 6: Put device in commissioning mode (requiring user input, so skip in CI)
         self.step(6)

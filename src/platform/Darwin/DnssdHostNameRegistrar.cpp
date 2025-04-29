@@ -154,7 +154,7 @@ void LogDetails(InetInterfacesVector inetInterfaces, Inet6InterfacesVector inet6
 
     for (auto interfaceId : interfaceIds)
     {
-        char interfaceName[IFNAMSIZ] = {};
+        char interfaceName[Inet::InterfaceId::kMaxIfNameLength] = {};
         if_indextoname(interfaceId, interfaceName);
         ChipLogProgress(Discovery, "\t%s (%u)", interfaceName, interfaceId);
         LogDetails(interfaceId, inetInterfaces, inet6Interfaces);
@@ -290,24 +290,12 @@ CHIP_ERROR HostNameRegistrar::Register()
     {
         ReturnErrorOnFailure(ResetSharedConnection());
 
-        InetInterfacesVector inetInterfaces;
-        Inet6InterfacesVector inet6Interfaces;
-        // Instead of mInterfaceId (which will not match any actual interface),
-        // use kDNSServiceInterfaceIndexAny and restrict to loopback interfaces.
-        GetInterfaceAddresses(kDNSServiceInterfaceIndexAny, mAddressType, inetInterfaces, inet6Interfaces,
-                              true /* searchLoopbackOnly */);
+        // Just register the loopback IPv6 address, on mInterfaceId so that the
+        // resolution code finds it there.
+        auto loopbackIPAddress = Inet::IPAddress::Loopback(Inet::IPAddressType::kIPv6);
+        in6_addr loopbackAddr  = loopbackIPAddress.ToIPv6();
 
-        // But we register the IPs with mInterfaceId, not the actual interface
-        // IDs, so that resolution code that is grouping addresses by interface
-        // ends up doing the right thing, since we registered our SRV record on
-        // mInterfaceId.
-        //
-        // And only register the IPv6 ones, for simplicity.
-        for (auto & interface : inet6Interfaces)
-        {
-            ReturnErrorOnFailure(RegisterInterface(mInterfaceId, interface.second, kDNSServiceType_AAAA));
-        }
-        return CHIP_NO_ERROR;
+        return RegisterInterface(mInterfaceId, loopbackAddr, kDNSServiceType_AAAA);
     }
 
     return StartMonitorInterfaces(^(InetInterfacesVector inetInterfaces, Inet6InterfacesVector inet6Interfaces) {

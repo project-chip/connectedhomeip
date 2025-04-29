@@ -52,6 +52,7 @@ public:
         AddArgument("commissioner-vendor-id", 0, UINT16_MAX, &mCommissionerVendorId,
             "The vendor id to use for darwin-framework-tool. If not provided, chip::VendorId::TestVendor1 (65521, 0xFFF1) will be "
             "used.");
+        AddArgument("use-xpc", &mUseXPC, "Use a controller that will connect to an XPC endpoint instead of talking to devices directly. If a string argument is provided, it must identify a Mach service name that can be used to connect to a remote endpoint. If no argument is provided, a local endpoint will be used.");
     }
 
     /////////// Command Interface /////////
@@ -168,4 +169,5 @@ private:
     chip::Optional<char *> mPaaTrustStorePath;
     chip::Optional<chip::VendorId> mCommissionerVendorId;
     std::string mCurrentIdentity;
+    chip::Optional<chip::app::DataModel::Nullable<char *>> mUseXPC;
 };

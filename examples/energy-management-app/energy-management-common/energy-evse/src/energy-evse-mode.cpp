@@ -41,7 +41,7 @@ void EnergyEvseModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Comma
 
 CHIP_ERROR EnergyEvseModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -50,7 +50,7 @@ CHIP_ERROR EnergyEvseModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::
 
 CHIP_ERROR EnergyEvseModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -60,7 +60,7 @@ CHIP_ERROR EnergyEvseModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_
 
 CHIP_ERROR EnergyEvseModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }

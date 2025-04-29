@@ -267,7 +267,7 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-tool apps/chip-t
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-shell apps/chip-shell
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-cert apps/chip-cert
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-all-clusters-app apps/chip-all-clusters-app
-COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-all-clusters-app-nlfaultinject apps/hip-all-clusters-app-nlfaultinject
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-all-clusters-app-nlfaultinject apps/chip-all-clusters-app-nlfaultinject
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-all-clusters-minimal-app apps/chip-all-clusters-minimal-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-lighting-app apps/chip-lighting-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-tv-casting-app apps/chip-tv-casting-app
@@ -306,8 +306,19 @@ RUN pip install --break-system-packages -r /tmp/requirements.txt && rm /tmp/requ
 COPY --from=chip-build-cert-bins /root/connectedhomeip/src/python_testing/requirements.txt /tmp/requirements.txt
 RUN pip install --break-system-packages -r /tmp/requirements.txt && rm /tmp/requirements.txt
 
+# Stage 3.2: Setup the Mock Server
+COPY --from=chip-build-cert-bins /root/connectedhomeip/integrations/mock_server mock_server
+
 # PIP requires MASON package compilation, which seems to require a JDK
 RUN set -x && DEBIAN_FRONTEND=noninteractive apt-get update; apt-get install -fy openjdk-8-jdk
+
+# TODO: remove this dependency conflict workaround --> issue: #37975
+# python3-gi is being installed as a dependency by 'openjdk-8-jdk'. python3-gi is not wanted since it installs PyGObject 3.48.2 (which we are not using),
+# This issue showed up when we pinned pygobject==3.50.0 in the chip-repl in https://github.com/project-chip/connectedhomeip/pull/37948
+# having pygobject ==3.50.0 being installed through pip creates a conflict, and pip can not unintstall the PyGObject (python3-gi's version) because the system APT installed it
+# Error log:
+#   ERROR: Cannot uninstall 'PyGObject'. It is a distutils installed project and thus we cannot accurately determine which files belong to it which would lead to only a partial uninstall.
+RUN apt-get remove -y python3-gi
 
 RUN pip install --break-system-packages --no-cache-dir \
     python_lib/obj/src/python_testing/matter_testing_infrastructure/chip-testing._build_wheel/chip_testing-*.whl \

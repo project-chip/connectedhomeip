@@ -26,15 +26,20 @@
 
 #include "AppConfig.h"
 #include "AppEvent.h"
+#include "AppTask.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/switch-server/switch-server.h>
+#include <cmsis_os2.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::DeviceLayer;
+using namespace chip::DeviceLayer::Silabs;
 
 LightSwitchMgr LightSwitchMgr::sSwitch;
 
@@ -94,6 +99,18 @@ void LightSwitchMgr::GenericSwitchOnShortRelease()
     DeviceLayer::PlatformMgr().ScheduleWork(GenericSwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
 }
 
+StepModeEnum LightSwitchMgr::getStepMode()
+{
+    return stepDirection;
+}
+
+void LightSwitchMgr::changeStepMode()
+{
+    stepDirection = (stepDirection == StepModeEnum::kUp) ? StepModeEnum::kDown : StepModeEnum::kUp;
+    ChipLogProgress(AppServer, "Step direction changed. Current Step Direction : %s",
+                    ((LightSwitchMgr::GetInstance().getStepMode() == StepModeEnum::kUp) ? "kUp" : "kDown"));
+}
+
 void LightSwitchMgr::TriggerLightSwitchAction(LightSwitchAction action, bool isGroupCommand)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
@@ -122,6 +139,22 @@ void LightSwitchMgr::TriggerLightSwitchAction(LightSwitchAction action, bool isG
         break;
     }
 
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+}
+
+void LightSwitchMgr::TriggerLevelControlAction(LevelControl::StepModeEnum stepMode, bool isGroupCommand)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+
+    data->clusterId = chip::app::Clusters::LevelControl::Id;
+    data->isGroup   = isGroupCommand;
+    data->commandId = LevelControl::Commands::StepWithOnOff::Id;
+    BindingCommandData::Step stepData{ .stepMode       = stepMode,
+                                       .stepSize       = LightSwitchMgr::stepCommand.stepSize,
+                                       .transitionTime = LightSwitchMgr::stepCommand.transitionTime };
+    stepData.optionsMask.Set(LightSwitchMgr::stepCommand.optionsMask);
+    stepData.optionsOverride.Set(LightSwitchMgr::stepCommand.optionsOverride);
+    data->commandData = stepData;
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
 }
 
@@ -158,4 +191,25 @@ void LightSwitchMgr::GenericSwitchWorkerFunction(intptr_t context)
     }
 
     Platform::Delete(data);
+}
+
+void LightSwitchMgr::SwitchActionEventHandler(uint16_t eventType)
+{
+    switch (eventType)
+    {
+    case AppEvent::kEventType_ActionButtonPressed:
+        LightSwitchMgr::GetInstance().GenericSwitchOnInitialPress();
+        break;
+    case AppEvent::kEventType_ActionButtonReleased:
+        LightSwitchMgr::GetInstance().GenericSwitchOnShortRelease();
+        break;
+    case AppEvent::kEventType_TriggerLevelControlAction:
+        LightSwitchMgr::GetInstance().TriggerLevelControlAction(LightSwitchMgr::GetInstance().getStepMode());
+        break;
+    case AppEvent::kEventType_TriggerToggle:
+        LightSwitchMgr::GetInstance().TriggerLightSwitchAction(LightSwitchMgr::LightSwitchAction::Toggle);
+        break;
+    default:
+        break;
+    }
 }

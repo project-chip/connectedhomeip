@@ -127,8 +127,9 @@ CHIP_ERROR TimedHandler::HandleTimedRequestAction(Messaging::ExchangeContext * a
     // will send nothing and the other side will have to time out to realize
     // it's missed its window).
     auto delay = System::Clock::Milliseconds32(timeoutMs);
-    aExchangeContext->SetResponseTimeout(
-        std::max(delay, aExchangeContext->GetSessionHandle()->ComputeRoundTripTimeout(app::kExpectedIMProcessingTime)));
+    aExchangeContext->SetResponseTimeout(std::max(delay,
+                                                  aExchangeContext->GetSessionHandle()->ComputeRoundTripTimeout(
+                                                      app::kExpectedIMProcessingTime, false /*isFirstMessageOnExchange*/)));
     ReturnErrorOnFailure(StatusResponse::Send(Status::Success, aExchangeContext, /* aExpectResponse = */ true));
 
     // Now just wait for the client.

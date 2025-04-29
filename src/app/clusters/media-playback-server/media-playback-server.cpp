@@ -711,3 +711,8 @@ void MatterMediaPlaybackPluginServerInitCallback()
 {
     app::AttributeAccessInterfaceRegistry::Instance().Register(&gMediaPlaybackAttrAccess);
 }
+
+void MatterMediaPlaybackPluginServerShutdownCallback()
+{
+    app::AttributeAccessInterfaceRegistry::Instance().Unregister(&gMediaPlaybackAttrAccess);
+}

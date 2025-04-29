@@ -31,6 +31,7 @@
 #include <lib/support/BitFlags.h>
 #include <lib/support/Pool.h>
 #include <messaging/ExchangeContext.h>
+#include <messaging/ReliableMessageAnalyticsDelegate.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
@@ -185,6 +186,15 @@ public:
      */
     void RegisterSessionUpdateDelegate(SessionUpdateDelegate * sessionUpdateDelegate);
 
+#if CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+    /**
+     *  Registers a delegate interested in analytic information
+     *
+     *  @param[in] analyticsDelegate - Pointer to delegate for reporting analytic
+     */
+    void RegisterAnalyticsDelegate(ReliableMessageAnalyticsDelegate * analyticsDelegate);
+#endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+
     /**
      * Map a send error code to the error code we should actually use for
      * success checks.  This maps some error codes to CHIP_NO_ERROR as
@@ -245,10 +255,18 @@ private:
 
     void TicklessDebugDumpRetransTable(const char * log);
 
+#if CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+    void NotifyMessageSendAnalytics(const RetransTableEntry & entry, const SessionHandle & sessionHandle,
+                                    const ReliableMessageAnalyticsDelegate::EventType & eventType);
+#endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+
     // ReliableMessageProtocol Global tables for timer context
     ObjectPool<RetransTableEntry, CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE> mRetransTable;
 
     SessionUpdateDelegate * mSessionUpdateDelegate = nullptr;
+#if CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+    ReliableMessageAnalyticsDelegate * mAnalyticsDelegate = nullptr;
+#endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
 
     static System::Clock::Timeout sAdditionalMRPBackoffTime;
 };
