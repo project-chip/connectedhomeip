@@ -58,7 +58,7 @@ jobs:
                 gh-context: ${{ toJson(github) }}
 
             - name: Update Zephyr version 4.1.0 (develop) to specific revision (for developers purpose)
-              run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py ff9e4298eed995de8a73c7bc1dad4e9031906b6e"
+              run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py e40edc8c253550af22eb5e87648bb4cd045aa317"
 
             - name: Build example Telink (B92 retention) Air Quality Sensor App
               # Run test for master and s07641069 PRs
@@ -74,20 +74,19 @@ jobs:
             - name: clean out build output
               run: rm -rf ./out
 
-            # Disabled due to RAM overflow
-            #- name: Build example Telink (W91) All Clusters App
+            - name: Build example Telink (W91) All Clusters App
               # Run test for master and s07641069 PRs
-            #  if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
-            #  run: |
-            #      ./scripts/run_in_build_env.sh \
-            #        "./scripts/build/build_examples.py --target 'telink-tlsr9118bdk40d-all-clusters' build"
-            #      .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-            #        telink tlsr9118bdk40d all-clusters-app \
-            #        out/telink-tlsr9118bdk40d-all-clusters/zephyr/zephyr.elf \
-            #        /tmp/bloat_reports/
+              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9118bdk40d-all-clusters' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tlsr9118bdk40d all-clusters-app \
+                    out/telink-tlsr9118bdk40d-all-clusters/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
 
-            #- name: clean out build output
-            #  run: rm -rf ./out
+            - name: clean out build output
+              run: rm -rf ./out
 
             - name: Build example Telink (B92) All Clusters Minimal App
               # Run test for master and s07641069 PRs
@@ -167,61 +166,57 @@ jobs:
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
 
-            # Disable due to boot_partition overflowing
-            #- name: Build example Telink (tl321x) Lighting App with OTA (LZMA), Factory Data
-              # Run test for master and all PRs
-            #  run: |
-            #      ./scripts/run_in_build_env.sh \
-            #        "./scripts/build/build_examples.py --target 'telink-tl3218x-light-ota-compress-lzma-factory-data' build"
-            #      .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-            #        telink tl3218x light-app-ota-compress-lzma-factory-data \
-            #        out/telink-tl3218x-light-ota-compress-lzma-factory-data/zephyr/zephyr.elf \
-            #        /tmp/bloat_reports/
-
-            #- name: clean out build output (keep tools)
-            #  run: rm -rf ./out/telink*
-
-            # Disabled due to error section `rodata' will not fit in region `ROM' (`ROM' overflowed by 39656 bytes)
-            #- name: Build example Telink (tl721x) Lighting App with OTA, Shell, Factory Data
-              # Run test for master and all PRs
-            #  run: |
-            #      ./scripts/run_in_build_env.sh \
-            #        "./scripts/build/build_examples.py --target 'telink-tl7218x-light-ota-shell-factory-data' build"
-            #      .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-            #        telink tl7218x light-app-ota-shell-factory-data \
-            #        out/telink-tl7218x-light-ota-shell-factory-data/zephyr/zephyr.elf \
-            #        /tmp/bloat_reports/
-
-            #- name: clean out build output (keep tools)
-            #  run: rm -rf ./out/telink*
-
-            # Removed compress-lzma due to error boot_partition overflows
-            - name: Build example Telink (tl721x retention) Light Switch App with OTA (LZMA), Factory Data
+            - name: Build example Telink (tl321x) Lighting App with OTA (LZMA), Factory Data
               # Run test for master and all PRs
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tl7218x_retention-light-switch-ota-factory-data' build"
+                    "./scripts/build/build_examples.py --target 'telink-tl3218x-light-ota-compress-lzma-factory-data' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tl7218x_retention light-switch-app-ota-factory-data \
-                    out/telink-tl7218x_retention-light-switch-ota-factory-data/zephyr/zephyr.elf \
+                    telink tl3218x light-app-ota-compress-lzma-factory-data \
+                    out/telink-tl3218x-light-ota-compress-lzma-factory-data/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
 
-            # Commented due to boot_partition overflows and ROM overflow without compress-lzma
-            #- name: Build example Telink (B92) Light Switch App with OTA (LZMA), Shell, Factory Data
+            - name: Build example Telink (tl721x) Lighting App with OTA, Shell, Factory Data
               # Run test for master and all PRs
-            #  run: |
-            #      ./scripts/run_in_build_env.sh \
-            #        "./scripts/build/build_examples.py --target 'telink-tlsr9528a-light-switch-ota-compress-lzma-shell-factory-data' build"
-            #      .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-            #        telink tlsr9528a light-switch-app-ota-compress-lzma-shell-factory-data \
-            #        out/telink-tlsr9528a-light-switch-ota-compress-lzma-shell-factory-data/zephyr/zephyr.elf \
-            #        /tmp/bloat_reports/
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tl7218x-light-ota-shell-factory-data' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tl7218x light-app-ota-shell-factory-data \
+                    out/telink-tl7218x-light-ota-shell-factory-data/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
 
-            #- name: clean out build output
-            #  run: rm -rf ./out
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
+
+            - name: Build example Telink (tl721x retention) Light Switch App with OTA (LZMA), Factory Data
+              # Run test for master and all PRs
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tl7218x_retention-light-switch-ota-compress-lzma-factory-data' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tl7218x_retention light-switch-app-ota-compress-lzma-factory-data \
+                    out/telink-tl7218x_retention-light-switch-ota-compress-lzma-factory-data/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
+
+            - name: Build example Telink (B92) Light Switch App with OTA (LZMA), Shell, Factory Data
+              # Run test for master and all PRs
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a-light-switch-ota-compress-lzma-shell-factory-data' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tlsr9528a light-switch-app-ota-compress-lzma-shell-factory-data \
+                    out/telink-tlsr9528a-light-switch-ota-compress-lzma-shell-factory-data/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: clean out build output
+              run: rm -rf ./out
 
             - name: Build example Telink (B92) Lock App with DFU
               # Run test for master and s07641069 PRs
