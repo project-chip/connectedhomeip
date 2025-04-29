@@ -170,7 +170,6 @@ void MatterAlarmsPluginServerShutdownCallback() {}
 void MatterTimePluginServerShutdownCallback() {}
 void MatterAclPluginServerShutdownCallback() {}
 void MatterPollControlPluginServerShutdownCallback() {}
-void MatterUnitLocalizationPluginServerShutdownCallback() {}
 void MatterProxyValidPluginServerShutdownCallback() {}
 void MatterProxyDiscoveryPluginServerShutdownCallback() {}
 void MatterProxyConfigurationPluginServerShutdownCallback() {}
