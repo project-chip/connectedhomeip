@@ -9788,15 +9788,15 @@ endpoint 1 {
   }
 
   server cluster MeterIdentification {
-    ram      attribute meterType;
-    ram      attribute pointOfDelivery;
-    ram      attribute meterSerialNumber;
-    ram      attribute protocolVersion;
+    callback attribute meterType;
+    callback attribute pointOfDelivery;
+    callback attribute meterSerialNumber;
+    callback attribute protocolVersion;
     callback attribute powerThreshold;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
