@@ -233,6 +233,9 @@ static BOOL AttributeIsSpecifiedInDescriptorCluster(AttributeId aAttributeId)
     case Attributes::TagList::Id: {
         return YES;
     }
+    case Attributes::EndpointUniqueID::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

@@ -637,6 +637,22 @@ static id _Nullable DecodeAttributeValueForDescriptorCluster(AttributeId aAttrib
         }
         return value;
     }
+    case Attributes::EndpointUniqueID::Id: {
+        using TypeInfo = Attributes::EndpointUniqueID::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSString * _Nonnull value;
+        value = AsString(cppValue);
+        if (value == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            *aError = err;
+            return nil;
+        }
+        return value;
+    }
     default: {
         // Not a known Descriptor attribute.
         break;

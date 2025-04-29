@@ -27,8 +27,7 @@ public:
     WebRTCRequestorDelegate()  = default;
     ~WebRTCRequestorDelegate() = default;
 
-    CHIP_ERROR HandleOffer(uint16_t sessionId, const OfferArgs & args,
-                           chip::app::Clusters::WebRTCTransportRequestor::WebRTCSessionTypeStruct & outSession) override;
+    CHIP_ERROR HandleOffer(uint16_t sessionId, const OfferArgs & args) override;
 
     CHIP_ERROR HandleAnswer(uint16_t sessionId, const std::string & sdpAnswer) override;
 

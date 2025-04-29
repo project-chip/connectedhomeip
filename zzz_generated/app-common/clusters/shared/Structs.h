@@ -423,32 +423,6 @@ using DecodableType = Type;
 
 } // namespace CurrencyStruct
 
-namespace PowerThresholdStruct {
-enum class Fields : uint8_t
-{
-    kPowerThreshold         = 0,
-    kApparentPowerThreshold = 1,
-    kPowerThresholdSource   = 2,
-};
-
-struct Type
-{
-public:
-    Optional<int64_t> powerThreshold;
-    Optional<int64_t> apparentPowerThreshold;
-    DataModel::Nullable<Globals::PowerThresholdSourceEnum> powerThresholdSource;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace PowerThresholdStruct
-
 namespace PriceStruct {
 enum class Fields : uint8_t
 {
@@ -473,20 +447,18 @@ using DecodableType = Type;
 
 } // namespace PriceStruct
 
-namespace TestGlobalStruct {
+namespace AtomicAttributeStatusStruct {
 enum class Fields : uint8_t
 {
-    kName     = 0,
-    kMyBitmap = 1,
-    kMyEnum   = 2,
+    kAttributeID = 0,
+    kStatusCode  = 1,
 };
 
 struct Type
 {
 public:
-    chip::CharSpan name;
-    DataModel::Nullable<chip::BitMask<Globals::TestGlobalBitmap>> myBitmap;
-    Optional<DataModel::Nullable<Globals::TestGlobalEnum>> myEnum;
+    chip::AttributeId attributeID = static_cast<chip::AttributeId>(0);
+    uint8_t statusCode            = static_cast<uint8_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -497,7 +469,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace TestGlobalStruct
+} // namespace AtomicAttributeStatusStruct
 
 namespace LocationDescriptorStruct {
 enum class Fields : uint8_t
@@ -525,18 +497,20 @@ using DecodableType = Type;
 
 } // namespace LocationDescriptorStruct
 
-namespace AtomicAttributeStatusStruct {
+namespace PowerThresholdStruct {
 enum class Fields : uint8_t
 {
-    kAttributeID = 0,
-    kStatusCode  = 1,
+    kPowerThreshold         = 0,
+    kApparentPowerThreshold = 1,
+    kPowerThresholdSource   = 2,
 };
 
 struct Type
 {
 public:
-    chip::AttributeId attributeID = static_cast<chip::AttributeId>(0);
-    uint8_t statusCode            = static_cast<uint8_t>(0);
+    Optional<int64_t> powerThreshold;
+    Optional<int64_t> apparentPowerThreshold;
+    DataModel::Nullable<Globals::PowerThresholdSourceEnum> powerThresholdSource;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -547,7 +521,33 @@ public:
 
 using DecodableType = Type;
 
-} // namespace AtomicAttributeStatusStruct
+} // namespace PowerThresholdStruct
+
+namespace TestGlobalStruct {
+enum class Fields : uint8_t
+{
+    kName     = 0,
+    kMyBitmap = 1,
+    kMyEnum   = 2,
+};
+
+struct Type
+{
+public:
+    chip::CharSpan name;
+    DataModel::Nullable<chip::BitMask<Globals::TestGlobalBitmap>> myBitmap;
+    Optional<DataModel::Nullable<Globals::TestGlobalEnum>> myEnum;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace TestGlobalStruct
 
 } // namespace Structs
 } // namespace Globals

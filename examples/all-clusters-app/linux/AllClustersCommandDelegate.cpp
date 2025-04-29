@@ -555,6 +555,17 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     {
         SetRefrigeratorDoorStatusHandler(self->mJsonValue);
     }
+    else if (name == "SimulateConfigurationVersionChange")
+    {
+        uint32_t configurationVersion = 0;
+        ConfigurationMgr().GetConfigurationVersion(configurationVersion);
+        configurationVersion++;
+
+        if (ConfigurationMgr().StoreConfigurationVersion(configurationVersion + 1) != CHIP_NO_ERROR)
+        {
+            ChipLogError(NotSpecified, "Failed to store configuration version:%d", configurationVersion);
+        }
+    }
     else
     {
         ChipLogError(NotSpecified, "Unhandled command '%s': this should never happen", name.c_str());

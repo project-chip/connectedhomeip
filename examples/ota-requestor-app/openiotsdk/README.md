@@ -58,7 +58,7 @@ controller you used to perform the commissioning step above.
 Example command:
 
 ```
-chip-tool otasoftwareupdaterequestor announce-ota-provider 1234 0 2 0 4321 0
+chip-tool otasoftwareupdaterequestor announce-otaprovider 1234 0 2 0 4321 0
 ```
 
 The `OTA Requestor` application with node ID 1234 will process this command and
