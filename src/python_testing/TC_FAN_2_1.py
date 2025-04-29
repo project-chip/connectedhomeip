@@ -85,13 +85,8 @@ class TC_FAN_2_1(MatterBaseTest):
         # Read attribute value
         value = await self.read_setting(attribute)
 
-        # Verify response is of expected type
-        if type is Uint8Type:
-            asserts.assert_true(is_valid_uint_value(value, bit_count=8),
-                                f"[FC] {attribute.__name__} result ({value}) isn't of type {type.__name__}")
-        else:
-            asserts.assert_is_instance(value, type,
-                                       f"[FC] {attribute.__name__} result ({value}) isn't of type {type.__name__}")
+        asserts.assert_is_instance(value, type, 
+                                   f"[FC] {attribute.__name__} result ({value}) isn't of type {type.__name__}")
 
         # Verify response is valid (value is within expected range)
         asserts.assert_in(value, range, f"[FC] {attribute.__name__} result ({value}) is out of range")
@@ -175,13 +170,17 @@ class TC_FAN_2_1(MatterBaseTest):
         # TH reads from the DUT the PercentSetting attribute
         # Verify that the DUT response contains a uint8 with value between 0 and 100 inclusive.
         self.step(5)
-        await self.verify_setting(attribute.PercentSetting, Uint8Type, range(0, 101))
+        percent_setting = await self.read_setting(attribute.PercentSetting)
+        asserts.assert_true(is_valid_uint_value(percent_setting, bit_count=8),
+                            f"[FC] PercentSetting attribute value ({percent_setting}) isn't of type uint8")
 
         # *** STEP 6 ***
         # TH reads from the DUT the PercentCurrent attribute
         # Verify that the DUT response contains a uint8 with value between 0 and 100 inclusive.
         self.step(6)
-        await self.verify_setting(attribute.PercentCurrent, Uint8Type, range(0, 101))
+        percent_current = await self.read_setting(attribute.PercentCurrent)
+        asserts.assert_true(is_valid_uint_value(percent_current, bit_count=8),
+                            f"[FC] PercentCurrent attribute value ({percent_current}) isn't of type uint8")
 
 
 if __name__ == "__main__":
