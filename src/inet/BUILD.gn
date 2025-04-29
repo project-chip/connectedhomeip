@@ -183,6 +183,8 @@ static_library("inet") {
     sources += [
       "Darwin/InterfacesMonitor.h",
       "Darwin/InterfacesMonitor.mm",
+      "Darwin/UDPEndPointImplNetworkFrameworkDebug.h",
+      "Darwin/UDPEndPointImplNetworkFrameworkDebug.mm",
     ]
   }
 

@@ -33,11 +33,7 @@
 
 #define INET_PORTSTRLEN 6
 
-#define NETWORK_FRAMEWORK_DEBUG 1
-
-#if NETWORK_FRAMEWORK_DEBUG
-#include <arpa/inet.h>
-#endif // NETWORK_FRAMEWORK_DEBUG
+#include <inet/Darwin/UDPEndPointImplNetworkFrameworkDebug.h>
 
 using namespace chip::Inet::Darwin;
 
@@ -133,175 +129,6 @@ bool CompareEndPoints(nw_endpoint_t a, nw_endpoint_t b)
 
     return false; // Unknown family
 }
-
-#if !NETWORK_FRAMEWORK_DEBUG
-void DebugPrintListenerState(nw_listener_state_t state) {};
-void DebugPrintConnectionState(nw_connection_state_t state) {};
-void DebugPrintConnection(const nw_connection_t aConnection) {};
-void DebugPrintConnectionGroupState(nw_connection_group_state_t state) {};
-#else
-constexpr const char * kNilConnection = "The connection is nil.";
-constexpr const char * kNilPath = "The connection path is nil.";
-constexpr const char * kNilPathSourceEndPoint = "The connection path source endpoint is nil.";
-constexpr const char * kNilPathDestinationEndPoint = "The connection path destination endpoint is nil.";
-constexpr const char * kPathStatusInvalid = "This path is not valid.";
-constexpr const char * kPathStatusUnsatisfied = "The path is not available for use.";
-constexpr const char * kPathStatusSatisfied = "The path is available to establish connections and send data.";
-constexpr const char * kPathStatusSatisfiable = "The path is not currently available, but establishing a new connection may activate the path.";
-
-constexpr const char * kListenerStateInvalid = "Listener: Invalid";
-constexpr const char * kListenerStateWaiting = "Listener: Waiting";
-constexpr const char * kListenerStateFailed = "Listener: Failed";
-constexpr const char * kListenerStateReady = "Listener: Ready";
-constexpr const char * kListenerStateCancelled = "Listener: Cancelled";
-
-constexpr const char * kConnectionGroupStateInvalid = "Connection Group: Invalid";
-constexpr const char * kConnectionGroupStateWaiting = "Connection Group: Waiting";
-constexpr const char * kConnectionGroupStateFailed = "Connection Group: Failed";
-constexpr const char * kConnectionGroupStateReady = "Connection Group: Ready";
-constexpr const char * kConnectionGroupStateCancelled = "Connection Group: Cancelled";
-
-constexpr const char * kConnectionStateInvalid = "Connection: Invalid";
-constexpr const char * kConnectionStateWaiting = "Connection: Waiting";
-constexpr const char * kConnectionStatePreparing = "Connection: Preparing";
-constexpr const char * kConnectionStateFailed = "Connection: Failed";
-constexpr const char * kConnectionStateReady = "Connection: Ready";
-constexpr const char * kConnectionStateCancelled = "Connection: Cancelled";
-
-void DebugPrintConnectionGroupState(nw_connection_group_state_t state)
-{
-    const char * str = nullptr;
-
-    switch (state) {
-    case nw_connection_group_state_invalid:
-        str = kConnectionGroupStateInvalid;
-        break;
-    case nw_connection_group_state_waiting:
-        str = kConnectionGroupStateWaiting;
-        break;
-    case nw_connection_group_state_ready:
-        str = kConnectionGroupStateReady;
-        break;
-    case nw_connection_group_state_failed:
-        str = kConnectionGroupStateFailed;
-        break;
-    case nw_connection_group_state_cancelled:
-        str = kConnectionGroupStateCancelled;
-        break;
-    default:
-        chipDie();
-    }
-
-    ChipLogDetail(Inet, "%s", str);
-}
-
-void DebugPrintConnectionState(nw_connection_state_t state)
-{
-    const char * str = nullptr;
-
-    switch (state) {
-    case nw_connection_state_invalid:
-        str = kConnectionStateInvalid;
-        break;
-    case nw_connection_state_preparing:
-        str = kConnectionStatePreparing;
-        break;
-    case nw_connection_state_waiting:
-        str = kConnectionStateWaiting;
-        break;
-    case nw_connection_state_failed:
-        str = kConnectionStateFailed;
-        break;
-    case nw_connection_state_ready:
-        str = kConnectionStateReady;
-        break;
-    case nw_connection_state_cancelled:
-        str = kConnectionStateCancelled;
-        break;
-    default:
-        chipDie();
-    }
-
-    ChipLogDetail(Inet, "%s", str);
-}
-
-void DebugPrintListenerState(nw_listener_state_t state)
-{
-    const char * str = nullptr;
-
-    switch (state) {
-    case nw_listener_state_invalid:
-        str = kListenerStateInvalid;
-        break;
-    case nw_listener_state_waiting:
-        str = kListenerStateWaiting;
-        break;
-    case nw_listener_state_failed:
-        str = kListenerStateFailed;
-        break;
-    case nw_listener_state_ready:
-        str = kListenerStateReady;
-        break;
-    case nw_listener_state_cancelled:
-        str = kListenerStateCancelled;
-        break;
-    default:
-        chipDie();
-    }
-
-    ChipLogDetail(Inet, "%s", str);
-}
-
-void DebugPrintConnectionPathStatus(nw_path_t path)
-{
-    const char * str = nullptr;
-
-    __auto_type status = nw_path_get_status(path);
-    switch (status) {
-    case nw_path_status_invalid:
-        str = kPathStatusInvalid;
-        break;
-    case nw_path_status_unsatisfied:
-        str = kPathStatusUnsatisfied;
-        break;
-    case nw_path_status_satisfied:
-        str = kPathStatusSatisfied;
-        break;
-    case nw_path_status_satisfiable:
-        str = kPathStatusSatisfiable;
-        break;
-    default:
-        chipDie();
-    }
-
-    ChipLogError(Inet, "%s", str);
-}
-
-void DebugPrintConnection(const nw_connection_t aConnection)
-{
-    VerifyOrReturn(nil != aConnection, ChipLogError(Inet, "%s", kNilConnection));
-
-    __auto_type path = nw_connection_copy_current_path(aConnection);
-    VerifyOrReturn(nil != path, ChipLogError(Inet, "%s", kNilPath));
-    DebugPrintConnectionPathStatus(path);
-
-    __auto_type srcEndPoint = nw_path_copy_effective_local_endpoint(path);
-    VerifyOrReturn(nil != srcEndPoint, ChipLogError(Inet, "%s", kNilPathSourceEndPoint));
-
-    __auto_type dstEndPoint = nw_path_copy_effective_remote_endpoint(path);
-    VerifyOrReturn(nil != dstEndPoint, ChipLogError(Inet, "%s", kNilPathDestinationEndPoint));
-
-    __auto_type * srcAddress = nw_endpoint_copy_address_string(srcEndPoint);
-    __auto_type srcPort = nw_endpoint_get_port(srcEndPoint);
-    __auto_type * dstAddress = nw_endpoint_copy_address_string(dstEndPoint);
-    __auto_type dstPort = nw_endpoint_get_port(dstEndPoint);
-
-    ChipLogError(Inet, "Connection source: %s:%u destination: %s:%u", srcAddress, srcPort, dstAddress, dstPort);
-
-    free(srcAddress);
-    free(dstAddress);
-}
-#endif
 }
 
 namespace chip {
@@ -310,9 +137,6 @@ namespace Inet {
     CHIP_ERROR UDPEndPointImplNetworkFramework::BindImpl(IPAddressType addressType, const IPAddress & address, uint16_t port,
         InterfaceId intfId)
     {
-#if NETWORK_FRAMEWORK_DEBUG
-        ChipLogError(Inet, "%s (%p)", __func__, this);
-#endif
         __auto_type configure_tls = NW_PARAMETERS_DISABLE_PROTOCOL;
         mParameters = nw_parameters_create_secure_udp(configure_tls, NW_PARAMETERS_DEFAULT_CONFIGURATION);
         VerifyOrReturnError(nullptr != mParameters, CHIP_ERROR_INVALID_ARGUMENT, ReleaseAll());
@@ -371,10 +195,6 @@ namespace Inet {
 
     CHIP_ERROR UDPEndPointImplNetworkFramework::SendMsgImpl(const IPPacketInfo * pktInfo, System::PacketBufferHandle && msg)
     {
-#if NETWORK_FRAMEWORK_DEBUG
-        ChipLogError(Inet, "%s (%p)", __func__, this);
-#endif
-
         // Ensure we have an actual message to send.
         VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -472,8 +292,6 @@ namespace Inet {
 
     CHIP_ERROR UDPEndPointImplNetworkFramework::IPAnyJoinLeaveMulticastGroup(nw_endpoint_t endpoint, bool join)
     {
-        ChipLogError(Inet, "%s", __func__);
-
         if (nullptr == mConnectionGroup) {
             VerifyOrReturnError(join, CHIP_ERROR_NOT_FOUND); // Nothing ever joined, can't leave!
 
@@ -604,14 +422,7 @@ namespace Inet {
         aPacketInfo.SrcPort = nw_endpoint_get_port(src_endpoint);
         aPacketInfo.DestPort = nw_endpoint_get_port(dest_endpoint);
 
-#if NETWORK_FRAMEWORK_DEBUG
-        char srcAddrStr[IPAddress::kMaxStringLength + 1 /*null terminator */];
-        char dstAddrStr[IPAddress::kMaxStringLength + 1 /*null terminator */];
-        aPacketInfo.SrcAddress.ToString(srcAddrStr);
-        aPacketInfo.DestAddress.ToString(dstAddrStr);
-        ChipLogError(Inet, "Packet received from %s to %s", srcAddrStr, dstAddrStr);
-#endif
-
+        DebugPrintPacketInfo(aPacketInfo);
         return CHIP_NO_ERROR;
     }
 
@@ -645,18 +456,13 @@ namespace Inet {
         char portStr[INET_PORTSTRLEN];
         snprintf(portStr, sizeof(portStr), "%u", aPort);
 
-#if NETWORK_FRAMEWORK_DEBUG
-        ChipLogError(Inet, "Create endpoint for ip(%s) port(%s)", addrStr, portStr);
-#endif
-
-        return nw_endpoint_create_host(addrStr, portStr);
+        __auto_type endpoint = nw_endpoint_create_host(addrStr, portStr);
+        DebugPrintEndPoint(endpoint);
+        return endpoint;
     }
 
     CHIP_ERROR UDPEndPointImplNetworkFramework::StartListeners()
     {
-#if NETWORK_FRAMEWORK_DEBUG
-        ChipLogError(Inet, "%s", __func__);
-#endif
         VerifyOrReturnError(mListeners.empty(), CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(nullptr == mListenerQueue, CHIP_ERROR_INCORRECT_STATE);
 
