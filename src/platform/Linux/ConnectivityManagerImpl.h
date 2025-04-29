@@ -60,12 +60,23 @@
 #include <vector>
 
 namespace chip {
-namespace Inet {
-class IPAddress;
-} // namespace Inet
-} // namespace chip
 
-namespace chip {
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+
+template <>
+struct GAutoPtrDeleter<WpaSupplicant1BSS>
+{
+    using deleter = GObjectDeleter;
+};
+
+template <>
+struct GAutoPtrDeleter<WpaSupplicant1Network>
+{
+    using deleter = GObjectDeleter;
+};
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+
 namespace DeviceLayer {
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -92,7 +103,7 @@ struct GDBusWpaSupplicant
     WpaScanningState scanState      = WpaScanningState::IDLE;
     WpaSupplicant1 * proxy          = nullptr;
     WpaSupplicant1Interface * iface = nullptr;
-    WpaSupplicant1BSS * bss         = nullptr;
+    GAutoPtr<WpaSupplicant1BSS> bss;
     GAutoPtr<char> interfacePath;
     GAutoPtr<char> networkPath;
 };

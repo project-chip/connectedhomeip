@@ -81,23 +81,6 @@ using namespace ::chip::WiFiPAF;
 #endif
 
 namespace chip {
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-
-template <>
-struct GAutoPtrDeleter<WpaSupplicant1BSS>
-{
-    using deleter = GObjectDeleter;
-};
-
-template <>
-struct GAutoPtrDeleter<WpaSupplicant1Network>
-{
-    using deleter = GObjectDeleter;
-};
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
-
 namespace DeviceLayer {
 
 ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
@@ -619,17 +602,10 @@ void ConnectivityManagerImpl::_OnWpaBssProxyReady(GObject * sourceObject, GAsync
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
     WpaSupplicant1BSS * bss = wpa_supplicant_1_bss_proxy_new_for_bus_finish(res, &err.GetReceiver());
-
-    if (mWpaSupplicant.bss)
-    {
-        g_object_unref(mWpaSupplicant.bss);
-        mWpaSupplicant.bss = nullptr;
-    }
-
     if (bss != nullptr && err.get() == nullptr)
     {
-        mWpaSupplicant.bss = bss;
         ChipLogProgress(DeviceLayer, "wpa_supplicant: connected to wpa_supplicant bss proxy");
+        mWpaSupplicant.bss.reset(bss);
     }
     else
     {
@@ -769,17 +745,12 @@ void ConnectivityManagerImpl::_OnWpaInterfaceRemoved(WpaSupplicant1 * proxy, con
         mWpaSupplicant.state = GDBusWpaSupplicant::WpaState::NO_INTERFACE_PATH;
 
         mWpaSupplicant.interfacePath.reset();
+        mWpaSupplicant.bss.reset();
 
         if (mWpaSupplicant.iface)
         {
             g_object_unref(mWpaSupplicant.iface);
             mWpaSupplicant.iface = nullptr;
-        }
-
-        if (mWpaSupplicant.bss)
-        {
-            g_object_unref(mWpaSupplicant.bss);
-            mWpaSupplicant.bss = nullptr;
         }
 
         mWpaSupplicant.scanState = GDBusWpaSupplicant::WpaScanningState::IDLE;
