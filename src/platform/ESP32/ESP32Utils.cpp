@@ -282,8 +282,10 @@ CHIP_ERROR ESP32Utils::SetWiFiStationProvision(const Internal::DeviceNetworkInfo
     memset(&wifiConfig, 0, sizeof(wifiConfig));
     memcpy(wifiConfig.sta.ssid, wifiSSID, std::min(strlen(wifiSSID) + 1, sizeof(wifiConfig.sta.ssid)));
     memcpy(wifiConfig.sta.password, netInfo.WiFiKey, std::min((size_t) netInfo.WiFiKeyLen, sizeof(wifiConfig.sta.password)));
+#ifdef CONFIG_WIFI_SCAN_ALL_CHANNEL_MODE
     wifiConfig.sta.scan_method = WIFI_ALL_CHANNEL_SCAN;
     wifiConfig.sta.sort_method = WIFI_CONNECT_AP_BY_SIGNAL;
+#endif // CONFIG_WIFI_SCAN_ALL_CHANNEL_MODE
 
     // Configure the ESP WiFi interface.
     esp_err_t err = esp_wifi_set_config(WIFI_IF_STA, &wifiConfig);

@@ -614,6 +614,14 @@ menu "CHIP Device Layer"
             help
                 The maximum number of networks to return as a result of a CHIP NetworkProvisioning:ScanNetworks request.
 
+        config WIFI_SCAN_ALL_CHANNEL_MODE
+            bool "Enable All-channel Scan Mode"
+            default n
+            depends on ENABLE_WIFI_STATION
+            help
+                Select to enable all-channel scan mode for Wi-Fi station. Note that this option might increase the time of
+                the station connecting to the AP by about 1-2 seconds.
+
         config WIFI_SCAN_COMPLETION_TIMEOUT
             int "WiFi Scan Completion Timeout (ms)"
             range 0 65535
