@@ -100,6 +100,7 @@ class NxpBoardVariant(Enum):
     EVKC = auto()
     EVKB = auto()
 
+
 class NxpApp(Enum):
     LIGHTING = auto()
     CONTACT = auto()
@@ -226,7 +227,7 @@ class NxpBuilder(GnBuilder):
 
     def BoardVariantName(self, board, os_env, board_variant):
 
-         match board:
+        match board:
             case NxpBoard.RW61X:
                 if NxpOsUsed.FREERTOS:
                     return "frdmrw612"
@@ -238,17 +239,17 @@ class NxpBuilder(GnBuilder):
                 else:
                     return "evkbmimxrt1060"
             case NxpBoard.RT1170:
-                    return "evkbmimxrt1170"
+                return "evkbmimxrt1170"
             case NxpBoard.K32W0:
-                    return "k32w0"
+                return "k32w0"
             case NxpBoard.K32W1:
-                    return "k32w148evk"
+                return "k32w148evk"
             case NxpBoard.MCXW71:
                 if board_variant == NxpBoardVariant.FRDM:
                     return "frdmmcxw71"
                 else:
                     return "mcxw72evk"
-                
+
             case _:
                 raise Exception("Unknown NXP board")
 
