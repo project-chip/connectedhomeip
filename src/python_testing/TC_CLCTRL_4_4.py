@@ -107,7 +107,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
         
         # Read feature map to determine feature support
         feature_map = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=Clusters.ClosureControl.Attributes.FeatureMap)
-        is_ps_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kPosition
+        is_ps_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kPositioning
         
         if not is_ps_feature_supported:
             logging.info("Positioning feature not supported, skipping remaining test steps")
@@ -124,7 +124,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
         
         self.step("4c")
         # Now initiate a movement to closed position
-        await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"position": 0}))  # CloseInFull
+        await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"position": Clusters.ClosureControl.Enums.TargetPositionEnum.kCloseInFull}))
         
         self.step("4d")
         # Check CountdownTime immediately after initiating movement
@@ -141,7 +141,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
         self.step("4e")
         # Check MainState to ensure movement is occurring
         main_state = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=Clusters.ClosureControl.Attributes.MainState)
-        asserts.assert_equal(main_state, 1, "MainState should be Moving(1) during motion")
+        asserts.assert_equal(main_state, Clusters.ClosureControl.Enums.MainStateEnum.kMoving, "MainState should be Moving(1) during motion")
         
         # STEP 5: Verify the CountdownTime becomes 0 when an operation completes
         self.step("5a")
@@ -150,8 +150,8 @@ class TC_CLCTRL_4_4(MatterBaseTest):
             return
         
         self.step("5b")
-        # Wait until the operation should be complete (with some margin)
-        time.sleep(stored_countdown_time + 2)
+        # Wait until the operation should be complete 
+        time.sleep(stored_countdown_time)
         
         # Check CountdownTime after operation should be complete
         countdown_time = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=Clusters.ClosureControl.Attributes.CountdownTime)
@@ -160,7 +160,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
         self.step("5c")
         # Check MainState to ensure movement has stopped
         main_state = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=Clusters.ClosureControl.Attributes.MainState)
-        asserts.assert_equal(main_state, 0, "MainState should be Stopped(0) when operation completes")
+        asserts.assert_equal(main_state, Clusters.ClosureControl.Enums.MainStateEnum.kStopped, "MainState should be Stopped(0) when operation completes")
         
         # STEP 6: Verify the CountdownTime behavior when an operation is interrupted
         self.step("6a")
@@ -170,7 +170,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
         
         self.step("6b")
         # Start a movement to open position
-        await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"position": 1}))  # OpenInFull
+        await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"position": Clusters.ClosureControl.Enums.TargetPositionEnum.kOpenInFull}))
             
         self.step("6c")
         # Check CountdownTime during movement
