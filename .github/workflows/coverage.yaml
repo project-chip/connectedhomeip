@@ -75,7 +75,6 @@ jobs:
                 cd src/controller/python/test/unit_tests/
                 python -m coverage run -m unittest -v
                 coverage xml
-                mv coverage.xml ../../../../../
             - name: Upload coverage reports to Codecov with GitHub Action
               uses: codecov/codecov-action@v5
               env:
@@ -83,6 +82,6 @@ jobs:
             - name: clean output
               shell: bash
               run: |
-                rm -rf src/controller/python/test/unit_tests/.coverage
                 rm -rf out pyenv
-                rm coverage.xml
+                rm src/controller/python/test/unit_tests/coverage.xml
+                rm -rf src/controller/python/test/unit_tests/.coverage
