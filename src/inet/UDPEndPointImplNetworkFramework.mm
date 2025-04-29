@@ -39,6 +39,8 @@
 #include <arpa/inet.h>
 #endif // NETWORK_FRAMEWORK_DEBUG
 
+using namespace chip::Inet::Darwin;
+
 namespace {
 constexpr uint64_t kSendTimeoutInSeconds = 10 * NSEC_PER_SEC;
 constexpr uint64_t kConnectTimeoutInSeconds = 10 * NSEC_PER_SEC;
@@ -311,16 +313,6 @@ namespace Inet {
 #if NETWORK_FRAMEWORK_DEBUG
         ChipLogError(Inet, "%s (%p)", __func__, this);
 #endif
-
-        IPAddress targetAddress = address;
-        if (intfId.IsPresent()) {
-            auto allowedInterfaceId = InterfaceId(InterfaceId::PlatformType(kDNSServiceInterfaceIndexLocalOnly));
-            if (allowedInterfaceId != intfId) {
-                return CHIP_ERROR_NOT_IMPLEMENTED;
-            }
-            Inet::IPAddress::FromString("::1", targetAddress);
-        }
-
         __auto_type configure_tls = NW_PARAMETERS_DISABLE_PROTOCOL;
         mParameters = nw_parameters_create_secure_udp(configure_tls, NW_PARAMETERS_DEFAULT_CONFIGURATION);
         VerifyOrReturnError(nullptr != mParameters, CHIP_ERROR_INVALID_ARGUMENT, ReleaseAll());
@@ -334,36 +326,19 @@ namespace Inet {
         CHIP_ERROR err = ConfigureProtocol(addressType, mParameters);
         VerifyOrReturnError(CHIP_NO_ERROR == err, err, ReleaseAll());
 
-#if INET_CONFIG_ENABLE_IPV4
-        // Note: Network.framework does not provide an API to set the SO_REUSEPORT socket option.
-        // This limitation is not an issue when the port is set to 0, as the platform will choose a random port.
-        //
-        // However, when both INET_CONFIG_ENABLE_IPV4 and CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY are enabled,
-        // the system attempts to create two endpoints—one over IPv6 and another over IPv4—both using the same port
-        // specified by CHIP_UDC_PORT.
-        //
-        // This results in a binding failure due to "Address already in use" since both IPv4 and IPv6 endpoints
-        // try to use the same port.
-        //
-        // A potential solution would be to define separate ports for IPv4 and IPv6 (e.g., CHIP_UDC_PORT_IPv4 and CHIP_UDC_PORT_IPv6).
-        // For now, as a workaround, we set the port to 0 for IPv4 when a specific port is needed, allowing the platform to
-        // auto-assign an available port and avoid the conflict.
-        if (IPAddressType::kIPv4 == addressType && port != 0) {
-            port = 0;
-        }
-#endif // INET_CONFIG_ENABLE_IPV4
-
-        __auto_type endpoint = GetEndPoint(addressType, targetAddress, port);
-        VerifyOrReturnError(nullptr != endpoint, CHIP_ERROR_INTERNAL, ReleaseAll());
-        nw_parameters_set_local_endpoint(mParameters, endpoint);
-
         mConnectionQueue = dispatch_queue_create("inet_dispatch_global", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         VerifyOrReturnError(nullptr != mConnectionQueue, CHIP_ERROR_NO_MEMORY, ReleaseAll());
 
         mSystemQueue = static_cast<System::LayerDispatch &>(GetSystemLayer()).GetDispatchQueue();
         mAddrType = addressType;
+        mAddr = address;
+        mRequestedPort = port;
         mWorkFlagStrong = Platform::MakeShared<WorkFlag>();
         mWorkFlagWeak = mWorkFlagStrong;
+
+        __auto_type monitorQueue = dispatch_queue_create("inet_dispatch_interfaces_monitor", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        err = InterfacesMonitor::Init(monitorQueue, addressType, intfId);
+        VerifyOrReturnError(CHIP_NO_ERROR == err, err, ReleaseAll());
 
         PrepareConnections();
         return CHIP_NO_ERROR;
@@ -381,12 +356,17 @@ namespace Inet {
 
     uint16_t UDPEndPointImplNetworkFramework::GetBoundPort() const
     {
-        return nw_listener_get_port(mListener);
+        // If no listeners have been created yet, return the initially requested port.
+        VerifyOrReturnValue(!mListeners.empty(), mRequestedPort);
+
+        // Otherwise, return the actual port assigned to the first listener.
+        __auto_type listener = mListeners.begin()->second;
+        return nw_listener_get_port(listener);
     }
 
     CHIP_ERROR UDPEndPointImplNetworkFramework::ListenImpl()
     {
-        return StartListener();
+        return StartListeners();
     }
 
     CHIP_ERROR UDPEndPointImplNetworkFramework::SendMsgImpl(const IPPacketInfo * pktInfo, System::PacketBufferHandle && msg)
@@ -462,16 +442,16 @@ namespace Inet {
         OnMessageReceived = nullptr;
         OnReceiveError = nullptr;
 
+        StopMonitorInterfaces();
         ReleaseConnections();
         ReleaseConnectionGroup();
-        ReleaseListener();
+        ReleaseListeners();
 
         mParameters = nullptr;
 
         mConnectionQueue = nullptr;
 
         mListenerQueue = nullptr;
-        mListenerSemaphore = nullptr;
 
         mConnectionGroupQueue = nullptr;
         mConnectionGroupSemaphore = nullptr;
@@ -650,7 +630,7 @@ namespace Inet {
 #endif // INET_CONFIG_ENABLE_IPV4
         {
             aAddress.ToString(addrStr);
-            if (interfaceIndex != InterfaceId::Null()) {
+            if (interfaceIndex != InterfaceId::Null() && aAddress.IsIPv6LinkLocal()) {
                 char interface[InterfaceId::kMaxIfNameLength + 1] = {}; // +1 to prepend '%'
                 interface[0] = '%';
                 interface[1] = 0;
@@ -672,34 +652,75 @@ namespace Inet {
         return nw_endpoint_create_host(addrStr, portStr);
     }
 
-    CHIP_ERROR UDPEndPointImplNetworkFramework::StartListener()
+    CHIP_ERROR UDPEndPointImplNetworkFramework::StartListeners()
     {
-        VerifyOrReturnError(nullptr == mListener, CHIP_ERROR_INCORRECT_STATE);
-        VerifyOrReturnError(nullptr == mListenerSemaphore, CHIP_ERROR_INCORRECT_STATE);
+#if NETWORK_FRAMEWORK_DEBUG
+        ChipLogError(Inet, "%s", __func__);
+#endif
+        VerifyOrReturnError(mListeners.empty(), CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(nullptr == mListenerQueue, CHIP_ERROR_INCORRECT_STATE);
-
-        mListener = nw_listener_create(mParameters);
-        VerifyOrReturnError(nullptr != mListener, CHIP_ERROR_INCORRECT_STATE, ReleaseAll());
-
-        mListenerSemaphore = dispatch_semaphore_create(0);
-        VerifyOrReturnError(nullptr != mListenerSemaphore, CHIP_ERROR_NO_MEMORY, ReleaseAll());
 
         mListenerQueue = dispatch_queue_create("inet_dispatch_listener", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         VerifyOrReturnError(nullptr != mListenerQueue, CHIP_ERROR_NO_MEMORY, ReleaseAll());
 
-        nw_listener_set_queue(mListener, mListenerQueue);
-        nw_listener_set_new_connection_handler(mListener, ^(nw_connection_t connection) {
+        // If the target interface is kDNSServiceInterfaceIndexLocalOnly, just register the loopback addresses.
+        if (IsLocalOnly()) {
+            __auto_type addr = Inet::IPAddress::Loopback(Inet::IPAddressType::kIPv6);
+            return StartListenerOnAddress(addr);
+        }
+
+        // If the target address is bit IPAddress::Any, juts register this specific addresses.
+        if (mAddr != IPAddress::Any) {
+            return StartListenerOnAddress(mAddr, GetInterfaceId());
+        }
+
+        __auto_type semaphore = dispatch_semaphore_create(0);
+        VerifyOrReturnError(semaphore != nullptr, CHIP_ERROR_NO_MEMORY);
+
+        CHIP_ERROR err = StartMonitorInterfaces(^(InetInterfacesVector inetInterfaces, Inet6InterfacesVector inet6Interfaces) {
+            ReturnOnFailure(ReleaseListeners());
+            RegisterInterfaces(inetInterfaces);
+            RegisterInterfaces(inet6Interfaces);
+            dispatch_semaphore_signal(semaphore);
+        });
+        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+
+        // Wait until the first list of interfaces has been handled
+        __auto_type timeout = dispatch_time(DISPATCH_TIME_NOW, kListenerTimeoutInSeconds);
+        dispatch_semaphore_wait(semaphore, timeout);
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR UDPEndPointImplNetworkFramework::StartListenerOnAddress(const IPAddress & address, InterfaceId intfId)
+    {
+        const uint16_t port = GetBoundPort();
+        __auto_type endpoint = GetEndPoint(address.Type(), address, port, intfId);
+        VerifyOrReturnError(nullptr != endpoint, CHIP_ERROR_INVALID_ARGUMENT);
+
+        __auto_type parameters = nw_parameters_copy(mParameters);
+        VerifyOrReturnError(nullptr != parameters, CHIP_ERROR_NO_MEMORY);
+        nw_parameters_set_local_endpoint(parameters, endpoint);
+
+        __auto_type listener = nw_listener_create(parameters);
+        VerifyOrReturnError(nullptr != listener, CHIP_ERROR_INTERNAL);
+
+        nw_listener_set_queue(listener, mListenerQueue);
+        nw_listener_set_new_connection_handler(listener, ^(nw_connection_t connection) {
             StartConnectionFromListener(connection);
         });
 
+        __auto_type semaphore = dispatch_semaphore_create(0);
+        VerifyOrReturnError(nullptr != semaphore, CHIP_ERROR_NO_MEMORY, ReleaseAll());
+
         __block CHIP_ERROR err = CHIP_ERROR_INTERNAL;
-        nw_listener_set_state_changed_handler(mListener, ^(nw_listener_state_t state, nw_error_t error) {
+        nw_listener_set_state_changed_handler(listener, ^(nw_listener_state_t state, nw_error_t error) {
             DebugPrintListenerState(state);
 
             switch (state) {
             case nw_listener_state_invalid:
                 err = CHIP_ERROR_INCORRECT_STATE;
-                nw_listener_cancel(mListener);
+                nw_listener_cancel(listener);
                 break;
 
             case nw_listener_state_waiting:
@@ -713,7 +734,7 @@ namespace Inet {
 
             case nw_listener_state_ready:
                 err = CHIP_NO_ERROR;
-                dispatch_semaphore_signal(mListenerSemaphore);
+                dispatch_semaphore_signal(semaphore);
                 break;
 
             case nw_listener_state_cancelled:
@@ -721,23 +742,47 @@ namespace Inet {
                     err = CHIP_ERROR_CONNECTION_ABORTED;
                 }
 
-                dispatch_semaphore_signal(mListenerSemaphore);
+                dispatch_semaphore_signal(semaphore);
                 break;
             }
         });
 
-        nw_listener_start(mListener);
+        nw_listener_start(listener);
         __auto_type timeout = dispatch_time(DISPATCH_TIME_NOW, kListenerTimeoutInSeconds);
-        dispatch_semaphore_wait(mListenerSemaphore, timeout);
-        nw_listener_set_state_changed_handler(mListener, nil);
+        dispatch_semaphore_wait(semaphore, timeout);
+        nw_listener_set_state_changed_handler(listener, nil);
 
-        if (CHIP_NO_ERROR != err) {
-            mListener = nullptr;
-            mListenerSemaphore = nullptr;
-            mListenerQueue = nullptr;
+        if (CHIP_NO_ERROR == err) {
+            mListeners.insert(std::make_pair(address, listener));
+        }
+        return err;
+    }
+
+    CHIP_ERROR UDPEndPointImplNetworkFramework::ReleaseListeners()
+    {
+        for (auto & it : mListeners) {
+            ReturnErrorOnFailure(ReleaseListener(it.second));
         }
 
-        return err;
+        mListeners.clear();
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR UDPEndPointImplNetworkFramework::ReleaseListener(nw_listener_t listener)
+    {
+        __auto_type semaphore = dispatch_semaphore_create(0);
+        VerifyOrReturnError(nullptr != semaphore, CHIP_ERROR_NO_MEMORY);
+
+        nw_listener_set_state_changed_handler(listener, ^(nw_listener_state_t state, nw_error_t error) {
+            DebugPrintListenerState(state);
+            if (state == nw_listener_state_cancelled) {
+                dispatch_semaphore_signal(semaphore);
+            }
+        });
+
+        nw_listener_cancel(listener);
+        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+        return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR UDPEndPointImplNetworkFramework::GetConnection(const IPPacketInfo * aPktInfo)
@@ -750,7 +795,8 @@ namespace Inet {
         __auto_type parameters = nw_parameters_copy(mParameters);
         VerifyOrReturnError(parameters != nullptr, CHIP_ERROR_NO_MEMORY);
 
-        nw_parameters_set_local_endpoint(parameters, nullptr);
+        __auto_type localEndpoint = GetEndPoint(mAddrType, aPktInfo->SrcAddress, aPktInfo->SrcPort, aPktInfo->Interface);
+        nw_parameters_set_local_endpoint(parameters, localEndpoint);
         __auto_type connection = nw_connection_create(endpoint, parameters); // Let system pick ephemeral port
         VerifyOrReturnError(nullptr != connection, CHIP_ERROR_INCORRECT_STATE);
 
@@ -986,25 +1032,6 @@ namespace Inet {
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR UDPEndPointImplNetworkFramework::ReleaseListener()
-    {
-        VerifyOrReturnError(nullptr != mListener, CHIP_ERROR_INCORRECT_STATE);
-        VerifyOrReturnError(nullptr != mListenerSemaphore, CHIP_ERROR_INCORRECT_STATE);
-        VerifyOrReturnError(nullptr != mListenerQueue, CHIP_ERROR_INCORRECT_STATE);
-
-        nw_listener_set_state_changed_handler(mListener, ^(nw_listener_state_t state, nw_error_t error) {
-            if (state == nw_listener_state_cancelled) {
-                dispatch_semaphore_signal(mListenerSemaphore);
-            }
-        });
-
-        nw_listener_cancel(mListener);
-        dispatch_semaphore_wait(mListenerSemaphore, DISPATCH_TIME_FOREVER);
-        mListener = nullptr;
-
-        return CHIP_NO_ERROR;
-    }
-
     void UDPEndPointImplNetworkFramework::PrepareConnections()
     {
         CFDictionaryValueCallBacks valueCallbacks = {
@@ -1112,6 +1139,17 @@ namespace Inet {
 
         free(keys);
         return match;
+    }
+
+    bool operator<(const IPAddress & lhs, const IPAddress & rhs)
+    {
+        for (int i = 0; i < 4; ++i) {
+            if (lhs.Addr[i] < rhs.Addr[i])
+                return true;
+            if (lhs.Addr[i] > rhs.Addr[i])
+                return false;
+        }
+        return false;
     }
 
 } // namespace Inet

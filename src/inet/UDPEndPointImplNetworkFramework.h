@@ -23,12 +23,15 @@
 
 #pragma once
 
+#include <inet/Darwin/InterfacesMonitor.h>
 #include <inet/EndPointStateNetworkFramework.h>
+
+#include <map>
 
 namespace chip {
 namespace Inet {
 
-class UDPEndPointImplNetworkFramework : public UDPEndPoint, public EndPointStateNetworkFramework
+class UDPEndPointImplNetworkFramework : public UDPEndPoint, public EndPointStateNetworkFramework, public Darwin::InterfacesMonitor
 {
 public:
     UDPEndPointImplNetworkFramework(EndPointManager<UDPEndPoint> & endPointManager) : UDPEndPoint(endPointManager) {}
@@ -51,8 +54,6 @@ private:
     CHIP_ERROR SendMsgImpl(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle && msg) override;
     void CloseImpl() override;
 
-    nw_listener_t mListener                        = nullptr;
-    dispatch_semaphore_t mListenerSemaphore        = nullptr;
     dispatch_queue_t mListenerQueue                = nullptr;
     dispatch_queue_t mConnectionQueue              = nullptr;
     dispatch_queue_t mSystemQueue                  = nullptr;
@@ -74,12 +75,10 @@ private:
     Platform::SharedPtr<WorkFlag> mWorkFlagStrong;
 
     CHIP_ERROR ConfigureProtocol(IPAddressType aAddressType, const nw_parameters_t & aParameters);
-    CHIP_ERROR StartListener();
     nw_endpoint_t GetEndPoint(const IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort,
                               InterfaceId interfaceIndex = InterfaceId::Null());
     CHIP_ERROR GetPacketInfo(const nw_connection_t & aConnection, IPPacketInfo & aPacketInfo);
     void HandleDataReceived(nw_connection_t aConnection);
-    CHIP_ERROR ReleaseListener();
     void ReleaseAll();
 
     CHIP_ERROR StartConnectionGroup(nw_group_descriptor_t groupDescriptor);
@@ -96,6 +95,28 @@ private:
     bool CreateConnectionWrapper(nw_connection_t connection);
     bool ClearConnectionWrapper(nw_connection_t connection);
     nw_connection_t FindConnection(const IPPacketInfo & pktInfo);
+
+    std::map<IPAddress, nw_listener_t> mListeners;
+    CHIP_ERROR StartListeners();
+    CHIP_ERROR StartListenerOnAddress(const IPAddress & address, InterfaceId intfId = InterfaceId::Null());
+    CHIP_ERROR ReleaseListener(nw_listener_t listener);
+    CHIP_ERROR ReleaseListeners();
+
+    template <typename InterfaceVec>
+    void RegisterInterfaces(const InterfaceVec & interfaces)
+    {
+        for (const auto & iface : interfaces)
+        {
+            IPAddress addr(iface.second);
+            if (mListeners.find(addr) == mListeners.end())
+            {
+                LogErrorOnFailure(StartListenerOnAddress(addr, static_cast<chip::Inet::InterfaceId>(iface.first)));
+            }
+        }
+    }
+
+    IPAddress mAddr         = IPAddress::Any;
+    uint16_t mRequestedPort = 0;
 };
 
 using UDPEndPointImpl = UDPEndPointImplNetworkFramework;

@@ -38,9 +38,16 @@ namespace Inet {
         public:
             ~InterfacesMonitor();
 
+            CHIP_ERROR Init(dispatch_queue_t workQueue, Inet::IPAddressType addressType, InterfaceId interfaceId)
+            {
+                return Init(workQueue, addressType, interfaceId.GetPlatformInterface());
+            }
+
             CHIP_ERROR Init(dispatch_queue_t workQueue, Inet::IPAddressType addressType, uint32_t interfaceId);
 
             bool IsLocalOnly() const { return mInterfaceId == kDNSServiceInterfaceIndexLocalOnly; };
+
+            InterfaceId GetInterfaceId() const { return InterfaceId(static_cast<InterfaceId::PlatformType>(mInterfaceId)); };
 
             CHIP_ERROR StartMonitorInterfaces(OnInterfaceChanges interfaceChangesBlock);
             void StopMonitorInterfaces();
