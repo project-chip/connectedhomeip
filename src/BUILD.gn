@@ -51,6 +51,7 @@ if (chip_build_tests) {
     deps = []
     tests = [
       "${chip_root}/src/access/tests",
+      "${chip_root}/src/app/clusters/ota-provider/tests",
       "${chip_root}/src/app/cluster-building-blocks/tests",
       "${chip_root}/src/app/data-model-provider/tests",
       "${chip_root}/src/app/data-model/tests",
