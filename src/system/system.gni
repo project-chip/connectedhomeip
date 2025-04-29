@@ -21,7 +21,8 @@ declare_args() {
   chip_system_config_use_lwip = chip_with_lwip && current_os == "freertos"
 
   # Use Network.framework API
-  chip_system_config_use_network_framework = false
+  chip_system_config_use_network_framework =
+      current_os == "mac" || current_os == "ios"
 
   # Mutex implementation: posix, freertos, none.
   chip_system_config_locking = ""
