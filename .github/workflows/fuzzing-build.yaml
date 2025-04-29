@@ -68,7 +68,7 @@ jobs:
 
     build_darwin_fuzzing:
         name: Build on Darwin
-        runs-on: macos-13
+        runs-on: macos-14
         if: github.actor != 'restyled-io[bot]'
 
         steps:
@@ -87,7 +87,7 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
-                        --target darwin-x64-all-clusters-no-ble-asan-libfuzzer-clang \
+                        --target darwin-arm64-all-clusters-no-ble-asan-libfuzzer-clang \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "

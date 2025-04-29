@@ -69,15 +69,32 @@ class App:
         return False
 
     def factoryReset(self):
+        reset_start = time.monotonic()
+        logging.error("FACTORY RESET: %s" % self.command)
+        logging.error("self.killed: %s" % self.killed)
+        stop_start = time.monotonic()
         wasRunning = (not self.killed) and self.stop()
+        stop_end = time.monotonic()
+        logging.error("wasRunning: %s, took %s to stop" % (wasRunning, stop_end - stop_start))
 
         for kvs in self.kvsPathSet:
             if os.path.exists(kvs):
+                unlink_start = time.monotonic()
                 os.unlink(kvs)
+                unlink_end = time.monotonic()
+                logging.error("UNLINKING: %s, took %s" % (kvs, unlink_start - unlink_end))
 
         if wasRunning:
-            return self.start()
+            start_start = time.monotonic()
+            started = self.start()
+            start_end = time.monotonic()
+            logging.error("STARTED: %s in %s" % (started, start_end - start_start))
+            reset_end = time.monotonic()
+            logging.error("RESET DONE, took %s" % (reset_end - reset_start))
+            return started
 
+        reset_end = time.monotonic()
+        logging.error("RESET DONE, took %s" % (reset_end - reset_start))
         return True
 
     def waitForAnyAdvertisement(self):
@@ -163,7 +180,7 @@ class App:
                 if exit_code:
                     raise Exception('Subprocess failed with exit code: %d' % exit_code)
             except subprocess.TimeoutExpired:
-                logging.debug('Subprocess did not terminate on SIGTERM, killing it now')
+                logging.error('Subprocess did not terminate on SIGTERM, killing it now')
                 self.process.kill()
                 # The exit code when using Python subprocess will be the signal used to kill it.
                 # Ideally, we would recover the original exit code, but the process was already
