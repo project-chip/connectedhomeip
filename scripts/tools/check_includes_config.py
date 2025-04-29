@@ -196,6 +196,8 @@ ALLOW: Dict[str, Set[str]] = {
     'src/controller/CHIPDeviceController.cpp': {'string'},
     'src/qrcodetool/setup_payload_commands.cpp': {'string'},
     'src/access/AccessRestrictionProvider.h': {'vector', 'map'},
+    'src/inet/Darwin/InterfacesMonitor.h': {'vector'},
+    'src/inet/Darwin/InterfacesMonitor.mm': {'set'},
     # nrfconnect test runner
     'src/test_driver/nrfconnect/main/runner.cpp': {'vector'},
 }
