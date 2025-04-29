@@ -35,6 +35,7 @@ import logging
 import time
 
 import chip.clusters as Clusters
+from chip.clusters.Types import NullValue
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -131,12 +132,12 @@ class TC_CLCTRL_4_4(MatterBaseTest):
         countdown_time = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=Clusters.ClosureControl.Attributes.CountdownTime)
         
         # CountdownTime should be either a positive value or NULL
-        if countdown_time is not None:
+        if countdown_time is not NullValue:
             asserts.assert_true(countdown_time > 0, "CountdownTime should be positive during movement")
             stored_countdown_time = countdown_time
         else:
             logging.info("CountdownTime returned NULL, device does not provide time estimates")
-            stored_countdown_time = None
+            stored_countdown_time = NullValue
         
         self.step("4e")
         # Check MainState to ensure movement is occurring
@@ -145,7 +146,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
         
         # STEP 5: Verify the CountdownTime becomes 0 when an operation completes
         self.step("5a")
-        if stored_countdown_time is None:
+        if stored_countdown_time is NullValue:
             logging.info("CountdownTime returned NULL, skipping remaining steps.")
             return
         
@@ -164,7 +165,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
         
         # STEP 6: Verify the CountdownTime behavior when an operation is interrupted
         self.step("6a")
-        if stored_countdown_time is None:
+        if stored_countdown_time is NullValue:
             logging.info("CountdownTime returned NULL, skipping remaining steps.")
             return
         
