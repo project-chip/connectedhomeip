@@ -151,7 +151,6 @@ matter_structs_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/PowerSourceClusterWiredFaultChangeType.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/PushAvStreamTransportClusterCMAFContainerOptionsStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/PushAvStreamTransportClusterContainerOptionsStruct.kt",
-  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/PushAvStreamTransportClusterMetadataOptionsStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/PushAvStreamTransportClusterTransportConfigurationStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/PushAvStreamTransportClusterTransportOptionsStruct.kt",

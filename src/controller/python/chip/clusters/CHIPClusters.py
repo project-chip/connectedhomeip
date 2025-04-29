@@ -583,6 +583,12 @@ class ChipClusters:
                 "type": "",
                 "reportable": True,
             },
+            0x00000005: {
+                "attributeName": "EndpointUniqueID",
+                "attributeId": 0x00000005,
+                "type": "str",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -13491,7 +13497,7 @@ class ChipClusters:
             0x00000002: {
                 "attributeName": "CurrentConnections",
                 "attributeId": 0x00000002,
-                "type": "int",
+                "type": "",
                 "reportable": True,
             },
             0x0000FFF8: {

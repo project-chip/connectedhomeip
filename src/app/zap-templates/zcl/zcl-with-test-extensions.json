@@ -328,7 +328,14 @@
             "OperatingMode",
             "FeatureMap"
         ],
-        "Meter Identification": ["PowerThreshold"],
+        "Meter Identification": [
+            "MeterType",
+            "PointOfDelivery",
+            "MeterSerialNumber",
+            "ProtocolVersion",
+            "PowerThreshold",
+            "FeatureMap"
+        ],
         "Occupancy Sensing": [
             "HoldTimeLimits",
             "HoldTime",

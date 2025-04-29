@@ -460,21 +460,6 @@ class Globals:
             decimalPoints: 'uint' = 0
 
         @dataclass
-        class PowerThresholdStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="powerThreshold", Tag=0, Type=typing.Optional[int]),
-                        ClusterObjectFieldDescriptor(Label="apparentPowerThreshold", Tag=1, Type=typing.Optional[int]),
-                        ClusterObjectFieldDescriptor(Label="powerThresholdSource", Tag=2, Type=typing.Union[Nullable, Globals.Enums.PowerThresholdSourceEnum]),
-                    ])
-
-            powerThreshold: 'typing.Optional[int]' = None
-            apparentPowerThreshold: 'typing.Optional[int]' = None
-            powerThresholdSource: 'typing.Union[Nullable, Globals.Enums.PowerThresholdSourceEnum]' = NullValue
-
-        @dataclass
         class PriceStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -488,19 +473,17 @@ class Globals:
             currency: 'Globals.Structs.CurrencyStruct' = field(default_factory=lambda: Globals.Structs.CurrencyStruct())
 
         @dataclass
-        class TestGlobalStruct(ClusterObject):
+        class AtomicAttributeStatusStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="name", Tag=0, Type=str),
-                        ClusterObjectFieldDescriptor(Label="myBitmap", Tag=1, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="myEnum", Tag=2, Type=typing.Union[None, Nullable, Globals.Enums.TestGlobalEnum]),
+                        ClusterObjectFieldDescriptor(Label="attributeID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="statusCode", Tag=1, Type=uint),
                     ])
 
-            name: 'str' = ""
-            myBitmap: 'typing.Union[Nullable, uint]' = NullValue
-            myEnum: 'typing.Union[None, Nullable, Globals.Enums.TestGlobalEnum]' = None
+            attributeID: 'uint' = 0
+            statusCode: 'uint' = 0
 
         @dataclass
         class LocationDescriptorStruct(ClusterObject):
@@ -518,17 +501,34 @@ class Globals:
             areaType: 'typing.Union[Nullable, Globals.Enums.AreaTypeTag]' = NullValue
 
         @dataclass
-        class AtomicAttributeStatusStruct(ClusterObject):
+        class PowerThresholdStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="attributeID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="statusCode", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="powerThreshold", Tag=0, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="apparentPowerThreshold", Tag=1, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="powerThresholdSource", Tag=2, Type=typing.Union[Nullable, Globals.Enums.PowerThresholdSourceEnum]),
                     ])
 
-            attributeID: 'uint' = 0
-            statusCode: 'uint' = 0
+            powerThreshold: 'typing.Optional[int]' = None
+            apparentPowerThreshold: 'typing.Optional[int]' = None
+            powerThresholdSource: 'typing.Union[Nullable, Globals.Enums.PowerThresholdSourceEnum]' = NullValue
+
+        @dataclass
+        class TestGlobalStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="name", Tag=0, Type=str),
+                        ClusterObjectFieldDescriptor(Label="myBitmap", Tag=1, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="myEnum", Tag=2, Type=typing.Union[None, Nullable, Globals.Enums.TestGlobalEnum]),
+                    ])
+
+            name: 'str' = ""
+            myBitmap: 'typing.Union[Nullable, uint]' = NullValue
+            myEnum: 'typing.Union[None, Nullable, Globals.Enums.TestGlobalEnum]' = None
 
 
 
@@ -2061,6 +2061,7 @@ class Descriptor(Cluster):
                 ClusterObjectFieldDescriptor(Label="clientList", Tag=0x00000002, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="partsList", Tag=0x00000003, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="tagList", Tag=0x00000004, Type=typing.Optional[typing.List[Descriptor.Structs.SemanticTagStruct]]),
+                ClusterObjectFieldDescriptor(Label="endpointUniqueID", Tag=0x00000005, Type=typing.Optional[str]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -2073,6 +2074,7 @@ class Descriptor(Cluster):
     clientList: typing.List[uint] = field(default_factory=lambda: [])
     partsList: typing.List[uint] = field(default_factory=lambda: [])
     tagList: typing.Optional[typing.List[Descriptor.Structs.SemanticTagStruct]] = None
+    endpointUniqueID: typing.Optional[str] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -2194,6 +2196,22 @@ class Descriptor(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[Descriptor.Structs.SemanticTagStruct]])
 
             value: typing.Optional[typing.List[Descriptor.Structs.SemanticTagStruct]] = None
+
+        @dataclass
+        class EndpointUniqueID(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000001D
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[str])
+
+            value: typing.Optional[str] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -16622,6 +16640,7 @@ class RvcCleanMode(Cluster):
             kDeepClean = 0x4000
             kVacuum = 0x4001
             kMop = 0x4002
+            kVacuumThenMop = 0x4003
             # kUnknownEnumValue intentionally not defined. This enum never goes
             # through DataModel::Decode, likely because it is a part of a derived
             # cluster. As a result having kUnknownEnumValue in this enum is error
@@ -48704,7 +48723,7 @@ class PushAvStreamTransport(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="supportedContainerFormats", Tag=0x00000000, Type=uint),
                 ClusterObjectFieldDescriptor(Label="supportedIngestMethods", Tag=0x00000001, Type=uint),
-                ClusterObjectFieldDescriptor(Label="currentConnections", Tag=0x00000002, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="currentConnections", Tag=0x00000002, Type=typing.List[PushAvStreamTransport.Structs.TransportConfigurationStruct]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -48714,7 +48733,7 @@ class PushAvStreamTransport(Cluster):
 
     supportedContainerFormats: uint = 0
     supportedIngestMethods: uint = 0
-    currentConnections: typing.List[uint] = field(default_factory=lambda: [])
+    currentConnections: typing.List[PushAvStreamTransport.Structs.TransportConfigurationStruct] = field(default_factory=lambda: [])
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -48739,28 +48758,19 @@ class PushAvStreamTransport(Cluster):
             kUnknownEnumValue = 1
 
         class StatusCodeEnum(MatterIntEnum):
-            kAllocationNotPermitted = 0x02
-            kInvalidTLSEndpoint = 0x03
-            kInvalidStream = 0x04
-            kInvalidURL = 0x05
-            kInvalidZone = 0x06
-            kUnsupportedContainerFormat = 0x07
-            kUnsupportedIngestMethod = 0x08
-            kInvalidTriggerType = 0x09
-            kInvalidTransportStatus = 0x10
+            kInvalidTLSEndpoint = 0x02
+            kInvalidStream = 0x03
+            kInvalidURL = 0x04
+            kInvalidZone = 0x05
+            kUnsupportedContainerFormat = 0x06
+            kUnsupportedIngestMethod = 0x07
+            kInvalidTriggerType = 0x08
+            kInvalidTransportStatus = 0x09
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 0
-
-        class StreamMultiplexingEnum(MatterIntEnum):
-            kInterleaved = 0x00
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 1
 
         class StreamUsageEnum(MatterIntEnum):
             kInternal = 0x00
@@ -48805,6 +48815,7 @@ class PushAvStreamTransport(Cluster):
     class Bitmaps:
         class Feature(IntFlag):
             kPerZoneSensitivity = 0x1
+            kMetadata = 0x2
 
         class SupportedContainerFormatsBitmap(IntFlag):
             kCmaf = 0x1
@@ -48844,21 +48855,6 @@ class PushAvStreamTransport(Cluster):
             sensitivity: 'typing.Optional[uint]' = None
 
         @dataclass
-        class MetadataOptionsStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="multiplexing", Tag=0, Type=PushAvStreamTransport.Enums.StreamMultiplexingEnum),
-                        ClusterObjectFieldDescriptor(Label="includeMotionZones", Tag=1, Type=bool),
-                        ClusterObjectFieldDescriptor(Label="enableMetadataPrivacySensitive", Tag=2, Type=bool),
-                    ])
-
-            multiplexing: 'PushAvStreamTransport.Enums.StreamMultiplexingEnum' = 0
-            includeMotionZones: 'bool' = False
-            enableMetadataPrivacySensitive: 'bool' = False
-
-        @dataclass
         class TransportTriggerOptionsStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -48885,10 +48881,12 @@ class PushAvStreamTransport(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="chunkDuration", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="CENCKey", Tag=1, Type=typing.Optional[bytes]),
+                        ClusterObjectFieldDescriptor(Label="metadataEnabled", Tag=2, Type=typing.Optional[bool]),
                     ])
 
             chunkDuration: 'uint' = 0
             CENCKey: 'typing.Optional[bytes]' = None
+            metadataEnabled: 'typing.Optional[bool]' = None
 
         @dataclass
         class ContainerOptionsStruct(ClusterObject):
@@ -48910,28 +48908,26 @@ class PushAvStreamTransport(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="streamUsage", Tag=0, Type=PushAvStreamTransport.Enums.StreamUsageEnum),
-                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=1, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=2, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=1, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=2, Type=typing.Union[None, Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="endpointID", Tag=3, Type=uint),
                         ClusterObjectFieldDescriptor(Label="url", Tag=4, Type=str),
                         ClusterObjectFieldDescriptor(Label="triggerOptions", Tag=5, Type=PushAvStreamTransport.Structs.TransportTriggerOptionsStruct),
                         ClusterObjectFieldDescriptor(Label="ingestMethod", Tag=6, Type=PushAvStreamTransport.Enums.IngestMethodsEnum),
                         ClusterObjectFieldDescriptor(Label="containerFormat", Tag=7, Type=PushAvStreamTransport.Enums.ContainerFormatEnum),
                         ClusterObjectFieldDescriptor(Label="containerOptions", Tag=8, Type=PushAvStreamTransport.Structs.ContainerOptionsStruct),
-                        ClusterObjectFieldDescriptor(Label="metadataOptions", Tag=9, Type=typing.Optional[PushAvStreamTransport.Structs.MetadataOptionsStruct]),
-                        ClusterObjectFieldDescriptor(Label="expiryTime", Tag=10, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="expiryTime", Tag=9, Type=typing.Optional[uint]),
                     ])
 
             streamUsage: 'PushAvStreamTransport.Enums.StreamUsageEnum' = 0
-            videoStreamID: 'typing.Optional[uint]' = None
-            audioStreamID: 'typing.Optional[uint]' = None
+            videoStreamID: 'typing.Union[None, Nullable, uint]' = None
+            audioStreamID: 'typing.Union[None, Nullable, uint]' = None
             endpointID: 'uint' = 0
             url: 'str' = ""
             triggerOptions: 'PushAvStreamTransport.Structs.TransportTriggerOptionsStruct' = field(default_factory=lambda: PushAvStreamTransport.Structs.TransportTriggerOptionsStruct())
             ingestMethod: 'PushAvStreamTransport.Enums.IngestMethodsEnum' = 0
             containerFormat: 'PushAvStreamTransport.Enums.ContainerFormatEnum' = 0
             containerOptions: 'PushAvStreamTransport.Structs.ContainerOptionsStruct' = field(default_factory=lambda: PushAvStreamTransport.Structs.ContainerOptionsStruct())
-            metadataOptions: 'typing.Optional[PushAvStreamTransport.Structs.MetadataOptionsStruct]' = None
             expiryTime: 'typing.Optional[uint]' = None
 
         @dataclass
@@ -48942,12 +48938,12 @@ class PushAvStreamTransport(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="connectionID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="transportStatus", Tag=1, Type=PushAvStreamTransport.Enums.TransportStatusEnum),
-                        ClusterObjectFieldDescriptor(Label="transportOptions", Tag=2, Type=PushAvStreamTransport.Structs.TransportOptionsStruct),
+                        ClusterObjectFieldDescriptor(Label="transportOptions", Tag=2, Type=typing.Optional[PushAvStreamTransport.Structs.TransportOptionsStruct]),
                     ])
 
             connectionID: 'uint' = 0
             transportStatus: 'PushAvStreamTransport.Enums.TransportStatusEnum' = 0
-            transportOptions: 'PushAvStreamTransport.Structs.TransportOptionsStruct' = field(default_factory=lambda: PushAvStreamTransport.Structs.TransportOptionsStruct())
+            transportOptions: 'typing.Optional[PushAvStreamTransport.Structs.TransportOptionsStruct]' = None
 
     class Commands:
         @dataclass
@@ -48977,14 +48973,10 @@ class PushAvStreamTransport(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="connectionID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="transportOptions", Tag=1, Type=PushAvStreamTransport.Structs.TransportOptionsStruct),
-                        ClusterObjectFieldDescriptor(Label="transportStatus", Tag=2, Type=PushAvStreamTransport.Enums.TransportStatusEnum),
+                        ClusterObjectFieldDescriptor(Label="transportConfiguration", Tag=0, Type=PushAvStreamTransport.Structs.TransportConfigurationStruct),
                     ])
 
-            connectionID: uint = 0
-            transportOptions: PushAvStreamTransport.Structs.TransportOptionsStruct = field(default_factory=lambda: PushAvStreamTransport.Structs.TransportOptionsStruct())
-            transportStatus: PushAvStreamTransport.Enums.TransportStatusEnum = 0
+            transportConfiguration: PushAvStreamTransport.Structs.TransportConfigurationStruct = field(default_factory=lambda: PushAvStreamTransport.Structs.TransportConfigurationStruct())
 
         @dataclass
         class DeallocatePushTransport(ClusterCommand):
@@ -49031,11 +49023,11 @@ class PushAvStreamTransport(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="connectionID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="connectionID", Tag=0, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="transportStatus", Tag=1, Type=PushAvStreamTransport.Enums.TransportStatusEnum),
                     ])
 
-            connectionID: uint = 0
+            connectionID: typing.Union[Nullable, uint] = NullValue
             transportStatus: PushAvStreamTransport.Enums.TransportStatusEnum = 0
 
         @dataclass
@@ -49085,10 +49077,10 @@ class PushAvStreamTransport(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="streamConfigurations", Tag=0, Type=typing.List[PushAvStreamTransport.Structs.TransportConfigurationStruct]),
+                        ClusterObjectFieldDescriptor(Label="transportConfigurations", Tag=0, Type=typing.List[PushAvStreamTransport.Structs.TransportConfigurationStruct]),
                     ])
 
-            streamConfigurations: typing.List[PushAvStreamTransport.Structs.TransportConfigurationStruct] = field(default_factory=lambda: [])
+            transportConfigurations: typing.List[PushAvStreamTransport.Structs.TransportConfigurationStruct] = field(default_factory=lambda: [])
 
     class Attributes:
         @dataclass
@@ -49135,9 +49127,9 @@ class PushAvStreamTransport(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.List[PushAvStreamTransport.Structs.TransportConfigurationStruct])
 
-            value: typing.List[uint] = field(default_factory=lambda: [])
+            value: typing.List[PushAvStreamTransport.Structs.TransportConfigurationStruct] = field(default_factory=lambda: [])
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
