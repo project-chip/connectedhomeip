@@ -15,33 +15,32 @@
  *    limitations under the License.
  */
 
- #include <pw_unit_test/framework.h>
+#include <pw_unit_test/framework.h>
 
- #include <lib/core/StringBuilderAdapters.h>
- #include <lib/dnssd/minimal_mdns/Query.h>
- #include <lib/dnssd/minimal_mdns/QueryBuilder.h>
- #include <lib/dnssd/minimal_mdns/QueryReplyFilter.h>
- #include <lib/dnssd/minimal_mdns/core/QName.h>
- #include <lib/dnssd/minimal_mdns/core/tests/QNameStrings.h>
+#include <lib/core/StringBuilderAdapters.h>
+#include <lib/dnssd/minimal_mdns/core/QName.h>
+#include <lib/dnssd/minimal_mdns/core/tests/QNameStrings.h>
+#include <lib/dnssd/minimal_mdns/Query.h>
+#include <lib/dnssd/minimal_mdns/QueryBuilder.h>
+#include <lib/dnssd/minimal_mdns/QueryReplyFilter.h>
 
- namespace {
+namespace {
 
- using namespace chip;
- using namespace mdns::Minimal;
+using namespace chip;
+using namespace mdns::Minimal;
 
- const auto kTestOperationalName = testing::TestQName<4>({ "1234567898765432-ABCDEFEDCBAABCDE", "_matter", "_tcp", "local" });
+const auto kTestOperationalName = testing::TestQName<4>({ "1234567898765432-ABCDEFEDCBAABCDE", "_matter", "_tcp", "local" });
 
- mdns::Minimal::Query query(kTestOperationalName.Full());
+mdns::Minimal::Query query(kTestOperationalName.Full());
 
- TEST(TestQueries, TestQuery)
- {
-     EXPECT_EQ(query.GetClass(), QClass::IN);
-     EXPECT_EQ(query.GetType(), QType::ANY);
-     EXPECT_EQ(query.IsAnswerViaUnicast(), true);
+TEST(TestQueries, TestQuery)
+{
+    EXPECT_EQ(query.GetClass(), QClass::IN);
+    EXPECT_EQ(query.GetType(), QType::ANY);
+    EXPECT_EQ(query.IsAnswerViaUnicast(), true);
 
-     EXPECT_EQ(query.SetClass(QClass::ANY).GetClass(), QClass::ANY);
-     EXPECT_EQ(query.SetType(QType::AAAA).GetType(), QType::AAAA);
-     EXPECT_EQ(query.SetAnswerViaUnicast(false).IsAnswerViaUnicast(), false);
- }
- } // namespace
- 
+    EXPECT_EQ(query.SetClass(QClass::ANY).GetClass(), QClass::ANY);
+    EXPECT_EQ(query.SetType(QType::AAAA).GetType(), QType::AAAA);
+    EXPECT_EQ(query.SetAnswerViaUnicast(false).IsAnswerViaUnicast(), false);
+}
+} // namespace

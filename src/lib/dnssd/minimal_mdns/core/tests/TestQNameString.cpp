@@ -16,31 +16,30 @@
  *    limitations under the License.
  */
 
- #include <pw_unit_test/framework.h>
+#include <pw_unit_test/framework.h>
 
- #include <lib/core/StringBuilderAdapters.h>
- #include <lib/dnssd/minimal_mdns/core/HeapQName.h>
- #include <lib/dnssd/minimal_mdns/core/QNameString.h>
- #include <lib/dnssd/minimal_mdns/core/tests/QNameStrings.h>
+#include <lib/core/StringBuilderAdapters.h>
+#include <lib/dnssd/minimal_mdns/core/HeapQName.h>
+#include <lib/dnssd/minimal_mdns/core/QNameString.h>
+#include <lib/dnssd/minimal_mdns/core/tests/QNameStrings.h>
 
- namespace {
- 
- using namespace mdns::Minimal;
- 
- class TestHeapQName : public ::testing::Test
- {
- public:
-     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
-     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
- };
- 
- TEST_F(TestQNameString, Construction)
- {
-     {
-         const testing::TestQName<2> kShort({ "some", "test" });
-         QNameString heapQName(kShort.Serialized());
-         EXPECT_NE(heapQName.c_str(), "");
-     }
- }
- } // namespace
- 
+namespace {
+
+using namespace mdns::Minimal;
+
+class TestHeapQName : public ::testing::Test
+{
+public:
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+};
+
+TEST_F(TestQNameString, Construction)
+{
+    {
+        const testing::TestQName<2> kShort({ "some", "test" });
+        QNameString heapQName(kShort.Serialized());
+        EXPECT_NE(heapQName.c_str(), "");
+    }
+}
+} // namespace
