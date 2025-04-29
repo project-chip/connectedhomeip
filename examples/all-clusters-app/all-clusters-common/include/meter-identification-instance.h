@@ -1,7 +1,7 @@
 #pragma once
 
 #include <app/clusters/meter-identification-server/meter-identification-server.h>
-#include <json/value.h>
+#include <json/json.h>
 
 namespace chip {
 namespace app {
