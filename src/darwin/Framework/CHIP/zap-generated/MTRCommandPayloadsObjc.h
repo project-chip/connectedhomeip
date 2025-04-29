@@ -12193,11 +12193,7 @@ MTR_PROVISIONALLY_AVAILABLE
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRPushAVStreamTransportClusterAllocatePushTransportResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull connectionID MTR_PROVISIONALLY_AVAILABLE;
-
-@property (nonatomic, copy) MTRPushAVStreamTransportClusterTransportOptionsStruct * _Nonnull transportOptions MTR_PROVISIONALLY_AVAILABLE;
-
-@property (nonatomic, copy) NSNumber * _Nonnull transportStatus MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRPushAVStreamTransportClusterTransportConfigurationStruct * _Nonnull transportConfiguration MTR_PROVISIONALLY_AVAILABLE;
 
 /**
  * Initialize an MTRPushAVStreamTransportClusterAllocatePushTransportResponseParams with a response-value dictionary
@@ -12278,7 +12274,7 @@ MTR_PROVISIONALLY_AVAILABLE
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRPushAVStreamTransportClusterSetTransportStatusParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull connectionID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable connectionID MTR_PROVISIONALLY_AVAILABLE;
 
 @property (nonatomic, copy) NSNumber * _Nonnull transportStatus MTR_PROVISIONALLY_AVAILABLE;
 /**
@@ -12374,7 +12370,7 @@ MTR_PROVISIONALLY_AVAILABLE
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRPushAVStreamTransportClusterFindTransportResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSArray * _Nonnull streamConfigurations MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull transportConfigurations MTR_PROVISIONALLY_AVAILABLE;
 
 /**
  * Initialize an MTRPushAVStreamTransportClusterFindTransportResponseParams with a response-value dictionary

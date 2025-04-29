@@ -57,28 +57,28 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace CreateTwoDCartesianZone {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ZoneManagement::Commands::CreateTwoDCartesianZone::Id,
+    .commandId       = CreateTwoDCartesianZone::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace CreateTwoDCartesianZone
 namespace UpdateTwoDCartesianZone {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ZoneManagement::Commands::UpdateTwoDCartesianZone::Id,
+    .commandId       = UpdateTwoDCartesianZone::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace UpdateTwoDCartesianZone
 namespace GetTwoDCartesianZone {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ZoneManagement::Commands::GetTwoDCartesianZone::Id,
+    .commandId       = GetTwoDCartesianZone::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace GetTwoDCartesianZone
 namespace RemoveZone {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ZoneManagement::Commands::RemoveZone::Id,
+    .commandId       = RemoveZone::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };

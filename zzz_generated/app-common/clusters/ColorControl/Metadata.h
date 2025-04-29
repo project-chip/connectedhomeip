@@ -441,133 +441,133 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace MoveToHue {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ColorControl::Commands::MoveToHue::Id,
+    .commandId       = MoveToHue::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace MoveToHue
 namespace MoveHue {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ColorControl::Commands::MoveHue::Id,
+    .commandId       = MoveHue::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace MoveHue
 namespace StepHue {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ColorControl::Commands::StepHue::Id,
+    .commandId       = StepHue::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace StepHue
 namespace MoveToSaturation {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ColorControl::Commands::MoveToSaturation::Id,
+    .commandId       = MoveToSaturation::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace MoveToSaturation
 namespace MoveSaturation {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ColorControl::Commands::MoveSaturation::Id,
+    .commandId       = MoveSaturation::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace MoveSaturation
 namespace StepSaturation {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ColorControl::Commands::StepSaturation::Id,
+    .commandId       = StepSaturation::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace StepSaturation
 namespace MoveToHueAndSaturation {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ColorControl::Commands::MoveToHueAndSaturation::Id,
+    .commandId       = MoveToHueAndSaturation::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace MoveToHueAndSaturation
 namespace MoveToColor {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ColorControl::Commands::MoveToColor::Id,
+    .commandId       = MoveToColor::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace MoveToColor
 namespace MoveColor {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ColorControl::Commands::MoveColor::Id,
+    .commandId       = MoveColor::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace MoveColor
 namespace StepColor {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ColorControl::Commands::StepColor::Id,
+    .commandId       = StepColor::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace StepColor
 namespace MoveToColorTemperature {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ColorControl::Commands::MoveToColorTemperature::Id,
+    .commandId       = MoveToColorTemperature::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace MoveToColorTemperature
 namespace EnhancedMoveToHue {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ColorControl::Commands::EnhancedMoveToHue::Id,
+    .commandId       = EnhancedMoveToHue::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace EnhancedMoveToHue
 namespace EnhancedMoveHue {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ColorControl::Commands::EnhancedMoveHue::Id,
+    .commandId       = EnhancedMoveHue::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace EnhancedMoveHue
 namespace EnhancedStepHue {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ColorControl::Commands::EnhancedStepHue::Id,
+    .commandId       = EnhancedStepHue::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace EnhancedStepHue
 namespace EnhancedMoveToHueAndSaturation {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ColorControl::Commands::EnhancedMoveToHueAndSaturation::Id,
+    .commandId       = EnhancedMoveToHueAndSaturation::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace EnhancedMoveToHueAndSaturation
 namespace ColorLoopSet {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ColorControl::Commands::ColorLoopSet::Id,
+    .commandId       = ColorLoopSet::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace ColorLoopSet
 namespace StopMoveStep {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ColorControl::Commands::StopMoveStep::Id,
+    .commandId       = StopMoveStep::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace StopMoveStep
 namespace MoveColorTemperature {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ColorControl::Commands::MoveColorTemperature::Id,
+    .commandId       = MoveColorTemperature::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace MoveColorTemperature
 namespace StepColorTemperature {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ColorControl::Commands::StepColorTemperature::Id,
+    .commandId       = StepColorTemperature::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
