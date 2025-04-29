@@ -331,7 +331,7 @@ public:
                              uint32_t aMaxContentBufferSize, const AudioCapabilitiesStruct & aMicrophoneCapabilities,
                              const AudioCapabilitiesStruct & aSpkrCapabilities, TwoWayTalkSupportTypeEnum aTwoWayTalkSupport,
                              const std::vector<SnapshotCapabilitiesStruct> & aSnapshotCapabilities, uint32_t aMaxNetworkBandwidth,
-                             const std::vector<StreamUsageEnum> & aSupportedStreamUsages, 
+                             const std::vector<StreamUsageEnum> & aSupportedStreamUsages,
                              const std::vector<StreamUsageEnum> & aRankedStreamPriorities);
 
     ~CameraAVStreamMgmtServer() override;
