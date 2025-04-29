@@ -41,6 +41,7 @@
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
+#include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/dbus/wpa/DBusWpa.h>
 #include <platform/Linux/dbus/wpa/DBusWpaBss.h>
 #include <platform/Linux/dbus/wpa/DBusWpaInterface.h>
@@ -92,8 +93,8 @@ struct GDBusWpaSupplicant
     WpaSupplicant1 * proxy          = nullptr;
     WpaSupplicant1Interface * iface = nullptr;
     WpaSupplicant1BSS * bss         = nullptr;
-    gchar * interfacePath           = nullptr;
-    gchar * networkPath             = nullptr;
+    GAutoPtr<char> interfacePath;
+    GAutoPtr<char> networkPath;
 };
 #endif
 
