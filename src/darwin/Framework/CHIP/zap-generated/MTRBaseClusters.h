@@ -2239,7 +2239,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command RetrieveLogsRequest
  *
- * Retrieving diagnostic logs from a Node
+ * Reception of this command starts the process of retrieving diagnostic logs from a Node.
  */
 - (void)retrieveLogsRequestWithParams:(MTRDiagnosticLogsClusterRetrieveLogsRequestParams *)params completion:(void (^)(MTRDiagnosticLogsClusterRetrieveLogsResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
