@@ -52,7 +52,6 @@
 #include <clusters/ContentAppObserver/EnumsCheck.h>
 #include <clusters/ContentControl/EnumsCheck.h>
 #include <clusters/ContentLauncher/EnumsCheck.h>
-#include <clusters/DemandResponseLoadControl/EnumsCheck.h>
 #include <clusters/Descriptor/EnumsCheck.h>
 #include <clusters/DeviceEnergyManagement/EnumsCheck.h>
 #include <clusters/DeviceEnergyManagementMode/EnumsCheck.h>
