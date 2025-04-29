@@ -493,7 +493,7 @@ namespace Inet {
 
         // Wait until the first list of interfaces has been handled
         __auto_type timeout = dispatch_time(DISPATCH_TIME_NOW, kListenerTimeoutInSeconds);
-        dispatch_semaphore_wait(semaphore, timeout);
+        dispatch_semaphore_wait(semaphore, timeout); // NOLINT(clang-analyzer-optin.performance.GCDAntipattern)
 
         return CHIP_NO_ERROR;
     }
@@ -555,7 +555,7 @@ namespace Inet {
 
         nw_listener_start(listener);
         __auto_type timeout = dispatch_time(DISPATCH_TIME_NOW, kListenerTimeoutInSeconds);
-        dispatch_semaphore_wait(semaphore, timeout);
+        dispatch_semaphore_wait(semaphore, timeout); // NOLINT(clang-analyzer-optin.performance.GCDAntipattern)
         nw_listener_set_state_changed_handler(listener, nil);
 
         if (CHIP_NO_ERROR == err) {
@@ -587,7 +587,7 @@ namespace Inet {
         });
 
         nw_listener_cancel(listener);
-        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER); // NOLINT(clang-analyzer-optin.performance.GCDAntipattern)
         return CHIP_NO_ERROR;
     }
 
@@ -695,7 +695,7 @@ namespace Inet {
 
         nw_connection_start(connection);
         __auto_type timeout = dispatch_time(DISPATCH_TIME_NOW, kConnectTimeoutInSeconds);
-        dispatch_semaphore_wait(semaphore, timeout);
+        dispatch_semaphore_wait(semaphore, timeout); // NOLINT(clang-analyzer-optin.performance.GCDAntipattern)
 
         if (err != CHIP_NO_ERROR) {
             ClearConnectionWrapper(connection);
@@ -812,7 +812,7 @@ namespace Inet {
         nw_connection_group_start(mConnectionGroup);
 
         dispatch_time_t timeout = dispatch_time(DISPATCH_TIME_NOW, kConnectionGroupTimeoutInSeconds);
-        dispatch_semaphore_wait(mConnectionGroupSemaphore, timeout);
+        dispatch_semaphore_wait(mConnectionGroupSemaphore, timeout); // NOLINT(clang-analyzer-optin.performance.GCDAntipattern)
 
         nw_connection_group_set_state_changed_handler(mConnectionGroup, nil);
 
@@ -832,7 +832,7 @@ namespace Inet {
         });
 
         nw_connection_group_cancel(mConnectionGroup);
-        dispatch_semaphore_wait(mConnectionGroupSemaphore, DISPATCH_TIME_FOREVER);
+        dispatch_semaphore_wait(mConnectionGroupSemaphore, DISPATCH_TIME_FOREVER); // NOLINT(clang-analyzer-optin.performance.GCDAntipattern)
         mConnectionGroup = nullptr;
 
         return CHIP_NO_ERROR;
