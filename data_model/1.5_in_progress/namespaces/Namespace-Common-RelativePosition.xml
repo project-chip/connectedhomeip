@@ -60,7 +60,7 @@ Davis, CA 95616, USA
 <namespace xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd namespace namespace.xsd" id="0x0012" name="Common Relative Position">
   <tags>
     <tag id="0x0000" name="Under"/>
-    <tag id="0x0001" name="Next To">
+    <tag id="0x0001" name="NextTo">
       <description>Area in proximity to the point of reference</description>
     </tag>
     <tag id="0x0002" name="Around">
@@ -68,7 +68,7 @@ Davis, CA 95616, USA
     </tag>
     <tag id="0x0003" name="On"/>
     <tag id="0x0004" name="Above"/>
-    <tag id="0x0005" name="Front Of"/>
+    <tag id="0x0005" name="FrontOf"/>
     <tag id="0x0006" name="Behind"/>
   </tags>
 </namespace>

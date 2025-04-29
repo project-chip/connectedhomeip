@@ -1,27 +1,33 @@
-#!/usr/bin/env python
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import dataclasses
 import functools
 import logging
-import sys
-from pathlib import Path
+import pprint
 from typing import Dict, List, Optional
 
+import click
 from lark import Lark
 from lark.lexer import Token
 from lark.visitors import Transformer, v_args
 
-try:
-    from matter.idl.matter_idl_types import AccessPrivilege
-except ModuleNotFoundError:
-    sys.path.append(str(Path(__file__).resolve().parent / ".." / ".."))
-    from matter.idl.matter_idl_types import AccessPrivilege
-
-from matter.idl.matter_idl_types import (ApiMaturity, Attribute, AttributeInstantiation, AttributeOperation, AttributeQuality,
-                                         AttributeStorage, Bitmap, Cluster, Command, CommandInstantiation, CommandQuality,
-                                         ConstantEntry, DataType, DeviceType, Endpoint, Enum, Event, EventPriority, EventQuality,
-                                         Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct, StructQuality,
-                                         StructTag)
+from matter.idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute, AttributeInstantiation, AttributeOperation,
+                                         AttributeQuality, AttributeStorage, Bitmap, Cluster, Command, CommandInstantiation,
+                                         CommandQuality, ConstantEntry, DataType, DeviceType, Endpoint, Enum, Event, EventPriority,
+                                         EventQuality, Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct,
+                                         StructQuality, StructTag)
 
 
 def UnionOfAllFlags(flags_list):
@@ -46,7 +52,7 @@ class PrefixCppDocComment:
             actual_pos += 1
 
         # A doc comment will apply to any supported element assuming it immediately
-        # preceeds id (skipping whitespace)
+        # precedes id (skipping whitespace)
         for item in self.supported_types(idl):
             meta = item.parse_meta
             if meta and meta.start_pos == actual_pos:
@@ -711,40 +717,35 @@ def CreateParser(skip_meta: bool = False, merge_globals=True):
     return ParserWithLines(skip_meta, merge_globals)
 
 
-if __name__ == '__main__':
-    # This Parser is generally not intended to be run as a stand-alone binary.
+# Supported log levels, mapping string values required for argument
+# parsing into logging constants
+__LOG_LEVELS__ = {
+    'debug': logging.DEBUG,
+    'info': logging.INFO,
+    'warn': logging.WARN,
+    'fatal': logging.FATAL,
+}
+
+
+@click.command()
+@click.option(
+    '--log-level',
+    default='INFO',
+    type=click.Choice(list(__LOG_LEVELS__.keys()), case_sensitive=False),
+    help='Determines the verbosity of script output.')
+@click.argument('filename')
+def main(log_level, filename=None):
+    # The IDL parser is generally not intended to be run as a stand-alone binary.
     # The ability to run is for debug and to print out the parsed AST.
-    import pprint
 
-    import click
+    logging.basicConfig(
+        level=__LOG_LEVELS__[log_level],
+        format='%(asctime)s %(levelname)-7s %(message)s',
+    )
 
-    # Supported log levels, mapping string values required for argument
-    # parsing into logging constants
-    __LOG_LEVELS__ = {
-        'debug': logging.DEBUG,
-        'info': logging.INFO,
-        'warn': logging.WARN,
-        'fatal': logging.FATAL,
-    }
+    logging.info("Starting to parse ...")
+    data = CreateParser().parse(open(filename).read(), file_name=filename)
+    logging.info("Parse completed")
 
-    @click.command()
-    @click.option(
-        '--log-level',
-        default='INFO',
-        type=click.Choice(list(__LOG_LEVELS__.keys()), case_sensitive=False),
-        help='Determines the verbosity of script output.')
-    @click.argument('filename')
-    def main(log_level, filename=None):
-        logging.basicConfig(
-            level=__LOG_LEVELS__[log_level],
-            format='%(asctime)s %(levelname)-7s %(message)s',
-        )
-
-        logging.info("Starting to parse ...")
-        data = CreateParser().parse(open(filename).read(), file_name=filename)
-        logging.info("Parse completed")
-
-        logging.info("Data:")
-        pprint.pp(data)
-
-    main(auto_envvar_prefix='CHIP')
+    logging.info("Data:")
+    pprint.pp(data)

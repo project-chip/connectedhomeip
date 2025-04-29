@@ -1589,7 +1589,10 @@ Davis, CA 95616, USA
           <desc/>
         </constraint>
       </field>
-      <field id="3" name="LocalEndTime" type="epoch-s">
+      <field id="3" name="LocalStartTime" type="epoch-s">
+        <optionalConform/>
+      </field>
+      <field id="4" name="LocalEndTime" type="epoch-s">
         <optionalConform/>
       </field>
     </command>

@@ -80,10 +80,16 @@ Davis, CA 95616, USA
       <optionalConform choice="b" more="true" min="1"/>
     </feature>
     <feature bit="4" code="APPE" name="ApparentEnergy" summary="Measurements report apparent energy">
-      <optionalConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
     </feature>
     <feature bit="5" code="REAE" name="ReactiveEnergy" summary="Measurements report reactive energy">
-      <optionalConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
     </feature>
   </features>
   <dataTypes>
@@ -142,9 +148,12 @@ Davis, CA 95616, USA
         </constraint>
       </field>
       <field id="5" name="ApparentEnergy" type="energy-mVAh">
-        <mandatoryConform>
-          <feature name="APPE"/>
-        </mandatoryConform>
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="APPE"/>
+          </mandatoryConform>
+        </otherwiseConform>
         <constraint>
           <between>
             <from value="0"/>
@@ -153,9 +162,12 @@ Davis, CA 95616, USA
         </constraint>
       </field>
       <field id="6" name="ReactiveEnergy" type="energy-mVARh">
-        <mandatoryConform>
-          <feature name="REAE"/>
-        </mandatoryConform>
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="REAE"/>
+          </mandatoryConform>
+        </otherwiseConform>
         <constraint>
           <between>
             <from value="0"/>

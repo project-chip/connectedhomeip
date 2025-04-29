@@ -18,6 +18,10 @@ import xml.sax.handler
 from dataclasses import dataclass
 from typing import List, Optional, Union
 
+import click
+
+from matter.idl.generators.idl import IdlGenerator
+from matter.idl.generators.storage import InMemoryStorage
 from matter.idl.matter_idl_types import Idl
 from matter.idl.zapxml.handlers import Context, ZapXmlHandler
 
@@ -95,7 +99,7 @@ class ParseSource:
     # actual filename to use, None if the source is a filename already
     name: Optional[str] = None
 
-    @ property
+    @property
     def source_file_name(self):
         if self.name:
             return self.name
@@ -120,3 +124,45 @@ def ParseXmls(sources: List[ParseSource], include_meta_data=True) -> Idl:
         parser.parse(source.source)
 
     return handler.Finish()
+
+
+# Supported log levels, mapping string values required for argument
+# parsing into logging constants
+__LOG_LEVELS__ = {
+    'debug': logging.DEBUG,
+    'info': logging.INFO,
+    'warn': logging.WARN,
+    'fatal': logging.FATAL,
+}
+
+
+@click.command()
+@click.option(
+    '--log-level',
+    default='INFO',
+    show_default=True,
+    type=click.Choice(list(__LOG_LEVELS__.keys()), case_sensitive=False),
+    help='Determines the verbosity of script output.')
+@click.option(
+    '--no-print',
+    show_default=True,
+    default=False,
+    is_flag=True,
+    help='Do not print output data (parsed data)')
+@click.argument('filenames', nargs=-1)
+def main(log_level, no_print, filenames):
+    logging.basicConfig(
+        level=__LOG_LEVELS__[log_level],
+        format='%(asctime)s %(levelname)-7s %(message)s',
+    )
+
+    logging.info("Starting to parse ...")
+
+    sources = [ParseSource(source=name) for name in filenames]
+    data = ParseXmls(sources)
+    logging.info("Parse completed")
+
+    if not no_print:
+        storage = InMemoryStorage()
+        IdlGenerator(storage=storage, idl=data).render(dry_run=False)
+        print(storage.content)

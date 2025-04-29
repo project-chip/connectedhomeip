@@ -162,9 +162,7 @@ mcxw71_k32w1_executable("contact_sensor_app") {
   }
 
   if (nxp_use_factory_data) {
-    include_dirs +=
-        [ "${chip_root}/src/platform/nxp/common/factory_data/legacy" ]
-    deps += [ "${chip_root}/src/platform/nxp:nxp_factory_data" ]
+    # Custom factory data files can be added here
   }
 
   if (chip_enable_ota_requestor) {

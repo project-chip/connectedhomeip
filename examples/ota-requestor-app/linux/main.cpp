@@ -38,6 +38,7 @@ using chip::OTAImageProcessorImpl;
 using chip::PeerId;
 using chip::Server;
 using chip::VendorId;
+using chip::app::Clusters::GeneralDiagnostics::BootReasonEnum;
 using chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
 using chip::Callback::Callback;
 using chip::System::Layer;
@@ -312,6 +313,14 @@ int main(int argc, char * argv[])
         {
             ChipLogError(SoftwareUpdate, "Buffer too small for the new image file path: %s", kImageExecPath);
             return -1;
+        }
+
+        // Set the boot reason to SoftwareUpdateCompleted since the OTA requestor is going to boot into the new image after applying
+        // the firmware update.
+        CHIP_ERROR err = ConfigurationMgr().StoreBootReason(to_underlying(BootReasonEnum::kSoftwareUpdateCompleted));
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(SoftwareUpdate, "Failed to store boot reason - SoftwareUpdateCompleted");
         }
 
         argv[0] = kImageExecPath;

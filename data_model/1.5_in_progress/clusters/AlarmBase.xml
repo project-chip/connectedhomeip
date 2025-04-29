@@ -57,9 +57,10 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" name="Alarm Base Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" name="Alarm Base Cluster" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Changed event field ID&apos;s to match SDK"/>
   </revisionHistory>
   <clusterIds>
     <clusterId name="Alarm Base"/>
@@ -117,16 +118,16 @@ Davis, CA 95616, USA
     <event id="0x00" name="Notify" priority="info">
       <access readPrivilege="view"/>
       <mandatoryConform/>
-      <field id="1" name="Active" type="AlarmBitmap" default="0">
+      <field id="0" name="Active" type="AlarmBitmap" default="0">
         <mandatoryConform/>
       </field>
-      <field id="2" name="Inactive" type="AlarmBitmap" default="0">
+      <field id="1" name="Inactive" type="AlarmBitmap" default="0">
         <mandatoryConform/>
       </field>
-      <field id="3" name="State" type="AlarmBitmap" default="0">
+      <field id="2" name="State" type="AlarmBitmap" default="0">
         <mandatoryConform/>
       </field>
-      <field id="4" name="Mask" type="AlarmBitmap" default="0">
+      <field id="3" name="Mask" type="AlarmBitmap" default="0">
         <mandatoryConform/>
       </field>
     </event>

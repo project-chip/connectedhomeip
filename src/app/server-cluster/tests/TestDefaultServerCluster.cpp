@@ -20,7 +20,6 @@
 #include <access/Privilege.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/ConcreteClusterPath.h>
-#include <app/data-model-provider/MetadataList.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
@@ -31,6 +30,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLVReader.h>
+#include <lib/support/ReadOnlyBuffer.h>
 
 #include <cstdlib>
 #include <optional>
@@ -97,7 +97,7 @@ TEST(TestDefaultServerCluster, AttributesDefault)
 {
     FakeDefaultServerCluster cluster({ 1, 2 });
 
-    DataModel::ListBuilder<AttributeEntry> attributes;
+    ReadOnlyBufferBuilder<AttributeEntry> attributes;
 
     ASSERT_EQ(cluster.Attributes({ 1, 1 }, attributes), CHIP_NO_ERROR);
 
@@ -136,11 +136,11 @@ TEST(TestDefaultServerCluster, CommandsDefault)
 {
     FakeDefaultServerCluster cluster({ 1, 2 });
 
-    DataModel::ListBuilder<AcceptedCommandEntry> acceptedCommands;
+    ReadOnlyBufferBuilder<AcceptedCommandEntry> acceptedCommands;
     ASSERT_EQ(cluster.AcceptedCommands({ 1, 1 }, acceptedCommands), CHIP_NO_ERROR);
     ASSERT_TRUE(acceptedCommands.TakeBuffer().empty());
 
-    DataModel::ListBuilder<CommandId> generatedCommands;
+    ReadOnlyBufferBuilder<CommandId> generatedCommands;
     ASSERT_EQ(cluster.GeneratedCommands({ 1, 1 }, generatedCommands), CHIP_NO_ERROR);
     ASSERT_TRUE(generatedCommands.TakeBuffer().empty());
 }

@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 
-#include <app/data-model-provider/MetadataList.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/ReadOnlyBuffer.h>
 
 namespace chef {
 namespace DeviceTypes {
@@ -63,7 +63,7 @@ bool EndpointHasDeviceType(chip::EndpointId endpoint, chip::DeviceTypeId deviceT
  * Returns a list of all endpoints that have the specified device type in their respective device types list.
  * Endpoints list is fetched using DataModelProvider. Device type match is checked using EndpointHasDeviceType.
  */
-chip::app::DataModel::ListBuilder<chip::EndpointId> GetAllEndpointsHavingDeviceType(chip::DeviceTypeId deviceTypeId);
+chip::ReadOnlyBuffer<chip::EndpointId> GetAllEndpointsHavingDeviceType(chip::DeviceTypeId deviceTypeId);
 
 } // namespace DeviceTypes
 } // namespace chef

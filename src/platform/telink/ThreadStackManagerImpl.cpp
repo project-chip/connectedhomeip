@@ -28,6 +28,8 @@
 #include <platform/telink/ThreadStackManagerImpl.h>
 
 #include <lib/support/CodeUtils.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
+#include <platform/KeyValueStoreManager.h>
 #include <platform/ThreadStackManager.h>
 
 namespace chip {
@@ -80,13 +82,28 @@ void ThreadStackManagerImpl::_NotifySrpClearAllComplete()
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
+CHIP_ERROR ThreadStackManagerImpl::CommitConfiguration(void)
+{
+    // OpenThread persists the network configuration on AttachToThreadNetwork, so simply remove
+    // the backup, so that it cannot be restored. If no backup could be found, it means that the
+    // configuration has not been modified since the fail-safe was armed, so return with no error.
+    CHIP_ERROR error = PersistedStorage::KeyValueStoreMgr().Delete(DefaultStorageKeyAllocator::FailSafeNetworkConfig().KeyName());
+
+    return error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND ? CHIP_NO_ERROR : error;
+}
+
 CHIP_ERROR
 ThreadStackManagerImpl::_AttachToThreadNetwork(const Thread::OperationalDataset & dataset,
                                                NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback)
 {
     CHIP_ERROR result = CHIP_NO_ERROR;
 
-    if (mRadioBlocked)
+    Thread::OperationalDataset current_dataset;
+    ThreadStackMgrImpl().GetThreadProvision(current_dataset);
+    if (dataset.AsByteSpan().data_equal(current_dataset.AsByteSpan()) && callback == nullptr)
+        return CHIP_NO_ERROR;
+
+    if (mRadioBlocked || mReadyToAttach)
     {
         /* On Telink platform it's not possible to rise Thread network when its used by BLE,
            so just mark that it's provisioned and rise Thread after BLE disconnect */

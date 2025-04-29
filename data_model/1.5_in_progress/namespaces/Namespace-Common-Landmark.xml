@@ -59,61 +59,61 @@ Davis, CA 95616, USA
 -->
 <namespace xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd namespace namespace.xsd" id="0x0011" name="Common Landmark">
   <tags>
-    <tag id="0x0000" name="Air Conditioner"/>
-    <tag id="0x0001" name="Air Purifier"/>
-    <tag id="0x0002" name="Back Door"/>
-    <tag id="0x0003" name="Bar Stool"/>
-    <tag id="0x0004" name="Bath Mat"/>
+    <tag id="0x0000" name="AirConditioner"/>
+    <tag id="0x0001" name="AirPurifier"/>
+    <tag id="0x0002" name="BackDoor"/>
+    <tag id="0x0003" name="BarStool"/>
+    <tag id="0x0004" name="BathMat"/>
     <tag id="0x0005" name="Bathtub"/>
     <tag id="0x0006" name="Bed"/>
     <tag id="0x0007" name="Bookshelf"/>
     <tag id="0x0008" name="Chair"/>
-    <tag id="0x0009" name="Christmas Tree"/>
-    <tag id="0x000A" name="Coat Rack"/>
-    <tag id="0x000B" name="Coffee Table"/>
-    <tag id="0x000C" name="Cooking Range"/>
+    <tag id="0x0009" name="ChristmasTree"/>
+    <tag id="0x000A" name="CoatRack"/>
+    <tag id="0x000B" name="CoffeeTable"/>
+    <tag id="0x000C" name="CookingRange"/>
     <tag id="0x000D" name="Couch"/>
     <tag id="0x000E" name="Countertop"/>
     <tag id="0x000F" name="Cradle"/>
     <tag id="0x0010" name="Crib"/>
     <tag id="0x0011" name="Desk"/>
-    <tag id="0x0012" name="Dining Table"/>
+    <tag id="0x0012" name="DiningTable"/>
     <tag id="0x0013" name="Dishwasher"/>
     <tag id="0x0014" name="Door"/>
     <tag id="0x0015" name="Dresser"/>
-    <tag id="0x0016" name="Laundry Dryer"/>
+    <tag id="0x0016" name="LaundryDryer"/>
     <tag id="0x0017" name="Fan"/>
     <tag id="0x0018" name="Fireplace"/>
     <tag id="0x0019" name="Freezer"/>
-    <tag id="0x001A" name="Front Door"/>
-    <tag id="0x001B" name="High Chair"/>
-    <tag id="0x001C" name="Kitchen Island"/>
+    <tag id="0x001A" name="FrontDoor"/>
+    <tag id="0x001B" name="HighChair"/>
+    <tag id="0x001C" name="KitchenIsland"/>
     <tag id="0x001D" name="Lamp"/>
-    <tag id="0x001E" name="Litter Box"/>
+    <tag id="0x001E" name="LitterBox"/>
     <tag id="0x001F" name="Mirror"/>
     <tag id="0x0020" name="Nightstand"/>
     <tag id="0x0021" name="Oven"/>
-    <tag id="0x0022" name="Pet Bed"/>
-    <tag id="0x0023" name="Pet Bowl"/>
-    <tag id="0x0024" name="Pet Crate">
+    <tag id="0x0022" name="PetBed"/>
+    <tag id="0x0023" name="PetBowl"/>
+    <tag id="0x0024" name="PetCrate">
       <description>An indoor furnishing for pets to rest or sleep inside</description>
     </tag>
     <tag id="0x0025" name="Refrigerator"/>
-    <tag id="0x0026" name="Scratching Post"/>
-    <tag id="0x0027" name="Shoe Rack"/>
+    <tag id="0x0026" name="ScratchingPost"/>
+    <tag id="0x0027" name="ShoeRack"/>
     <tag id="0x0028" name="Shower">
       <description>An area where a showerhead dispenses water for people to shower</description>
     </tag>
-    <tag id="0x0029" name="Side Door"/>
+    <tag id="0x0029" name="SideDoor"/>
     <tag id="0x002A" name="Sink"/>
     <tag id="0x002B" name="Sofa"/>
     <tag id="0x002C" name="Stove"/>
     <tag id="0x002D" name="Table"/>
     <tag id="0x002E" name="Toilet"/>
-    <tag id="0x002F" name="Trash Can"/>
-    <tag id="0x0030" name="Laundry Washer"/>
+    <tag id="0x002F" name="TrashCan"/>
+    <tag id="0x0030" name="LaundryWasher"/>
     <tag id="0x0031" name="Window"/>
-    <tag id="0x0032" name="Wine Cooler">
+    <tag id="0x0032" name="WineCooler">
       <description>A type of refrigerator that is shelved to hold wine bottles and (typically) display them through a glass front</description>
     </tag>
   </tags>

@@ -60,8 +60,8 @@ Davis, CA 95616, USA
 <namespace xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd namespace namespace.xsd" id="0x000E" name="Laundry">
   <tags>
     <tag id="0x0000" name="Normal"/>
-    <tag id="0x0001" name="Light Dry"/>
-    <tag id="0x0002" name="Extra Dry"/>
-    <tag id="0x0003" name="No Dry"/>
+    <tag id="0x0001" name="LightDry"/>
+    <tag id="0x0002" name="ExtraDry"/>
+    <tag id="0x0003" name="NoDry"/>
   </tags>
 </namespace>

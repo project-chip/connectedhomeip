@@ -79,7 +79,7 @@ DefaultServerCluster::DefaultServerCluster(const ConcreteClusterPath & path) : m
     mDataVersion = Crypto::GetRandU32();
 }
 
-CHIP_ERROR DefaultServerCluster::Attributes(const ConcreteClusterPath & path, DataModel::ListBuilder<AttributeEntry> & builder)
+CHIP_ERROR DefaultServerCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<AttributeEntry> & builder)
 {
 
     return builder.ReferenceExisting(GlobalAttributes());
@@ -122,12 +122,12 @@ DefaultServerCluster::InvokeCommand(const InvokeRequest & request, chip::TLV::TL
 }
 
 CHIP_ERROR DefaultServerCluster::AcceptedCommands(const ConcreteClusterPath & path,
-                                                  DataModel::ListBuilder<AcceptedCommandEntry> & builder)
+                                                  ReadOnlyBufferBuilder<AcceptedCommandEntry> & builder)
 {
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DefaultServerCluster::GeneratedCommands(const ConcreteClusterPath & path, DataModel::ListBuilder<CommandId> & builder)
+CHIP_ERROR DefaultServerCluster::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
 {
     return CHIP_NO_ERROR;
 }

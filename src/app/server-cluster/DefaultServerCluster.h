@@ -62,7 +62,7 @@ public:
     /// is required.
     ///
     /// Default implementation just returns the global attributes required by the API contract.
-    CHIP_ERROR Attributes(const ConcreteClusterPath & path, DataModel::ListBuilder<DataModel::AttributeEntry> & builder) override;
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     ///////////////////////////////////// Command Support /////////////////////////////////////////////////////////
 
@@ -77,12 +77,12 @@ public:
     ///
     /// Default implementation is a NOOP (no list items generated)
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
-                                DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
     /// Must only be implemented if commands that return values are supported by the cluster.
     ///
     /// Default implementation is a NOOP (no list items generated)
-    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, DataModel::ListBuilder<CommandId> & builder) override;
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 
     /// Returns all global attributes that the spec defines in `7.13 Global Elements / Table 93: Global Attributes`
     static Span<const DataModel::AttributeEntry> GlobalAttributes();

@@ -66,7 +66,7 @@ Davis, CA 95616, USA
     <cluster id="0x0752" name="Joint Fabric Datastore" side="server">
       <mandatoryConform/>
     </cluster>
-    <cluster id="0x0753" name="Joint Fabric PKI" side="server">
+    <cluster id="0x0753" name="Joint Fabric Administrator" side="server">
       <mandatoryConform/>
     </cluster>
   </clusters>

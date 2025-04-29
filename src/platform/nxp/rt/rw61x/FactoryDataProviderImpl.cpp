@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (c) 2020-2022 Project CHIP Authors
- *    Copyright 2023-2024 NXP
+ *    Copyright 2023-2025 NXP
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -53,6 +53,10 @@ extern "C" {
 #define FACTORY_DATA_PROVIDER_PRINTF(...)
 #endif
 
+#if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
+#error("OTA FACTORY DATA PROCESSOR NOT SUPPORTED WITH THIS FACTORY DATA PRVD IMPL")
+#endif
+
 /* Grab symbol for the base address from the linker file. */
 extern uint32_t __FACTORY_DATA_START_OFFSET[];
 extern uint32_t __FACTORY_DATA_SIZE[];
@@ -67,13 +71,13 @@ FactoryDataProviderImpl FactoryDataProviderImpl::sInstance;
 
 static constexpr size_t kPrivateKeyBlobLength = Crypto::kP256_PrivateKey_Length + ELS_BLOB_METADATA_SIZE + ELS_WRAP_OVERHEAD;
 
-CHIP_ERROR FactoryDataProviderImpl::DecryptAes128Ecb(uint8_t * dest, uint8_t * source, const uint8_t * aes128Key)
+CHIP_ERROR FactoryDataProviderImpl::DecryptAesEcb(uint8_t * dest, uint8_t * source)
 {
     uint8_t res = 0;
     mbedtls_aes_context aesCtx;
 
     mbedtls_aes_init(&aesCtx);
-    res = mbedtls_aes_setkey_dec(&aesCtx, aes128Key, 128U);
+    res = mbedtls_aes_setkey_dec(&aesCtx, pAesKey, pAESKeySize);
     VerifyOrReturnError(res == 0, CHIP_ERROR_INTERNAL);
 
     res = mbedtls_aes_crypt_ecb(&aesCtx, MBEDTLS_AES_DECRYPT, source, dest);
@@ -268,7 +272,7 @@ CHIP_ERROR FactoryDataProviderImpl::ReadAndCheckFactoryDataInFlash(void)
             {
                 return CHIP_ERROR_INTERNAL;
             }
-            ReturnErrorOnFailure(DecryptAes128Ecb(&factoryDataRamBuffer[i * 16], &currentBlock[0], pAesKey));
+            ReturnErrorOnFailure(DecryptAesEcb(&factoryDataRamBuffer[i * 16], &currentBlock[0]));
         }
 
         /* Calculate SHA256 value over the factory data and compare with stored value */
@@ -281,17 +285,6 @@ CHIP_ERROR FactoryDataProviderImpl::ReadAndCheckFactoryDataInFlash(void)
 
     ChipLogProgress(DeviceLayer, "factory data hash check is successful!");
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR FactoryDataProviderImpl::SetAes128Key(const uint8_t * keyAes128)
-{
-    CHIP_ERROR error = CHIP_ERROR_INVALID_ARGUMENT;
-    if (keyAes128 != nullptr)
-    {
-        pAesKey = keyAes128;
-        error   = CHIP_NO_ERROR;
-    }
-    return error;
 }
 
 CHIP_ERROR FactoryDataProviderImpl::SetEncryptionMode(EncryptionMode mode)
@@ -350,8 +343,6 @@ CHIP_ERROR FactoryDataProviderImpl::ELS_ConvertDacKey()
     uint32_t KeyAddr;
     uint32_t factoryDataAddress = (uint32_t) __FACTORY_DATA_START_OFFSET;
     uint32_t factoryDataSize    = (uint32_t) __FACTORY_DATA_SIZE;
-
-    VerifyOrReturnError(factoryDataRamBuffer != nullptr, CHIP_ERROR_INTERNAL);
 
     uint8_t * data = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(newSize));
     /* Import pain DAC key and generate the blob */
@@ -443,5 +434,11 @@ CHIP_ERROR FactoryDataProviderImpl::ReplaceWithBlob(uint8_t * data, uint8_t * bl
 
     return CHIP_NO_ERROR;
 }
+
+FactoryDataProvider & FactoryDataPrvdImpl()
+{
+    return FactoryDataProviderImpl::sInstance;
+}
+
 } // namespace DeviceLayer
 } // namespace chip
