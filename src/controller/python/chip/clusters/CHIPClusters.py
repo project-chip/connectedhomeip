@@ -11245,6 +11245,56 @@ class ChipClusters:
             },
         },
     }
+    _SOIL_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "SoilMeasurement",
+        "clusterId": 0x00000430,
+        "commands": {
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "SoilMoistureMeasurementLimits",
+                "attributeId": 0x00000000,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "SoilMoistureMeasuredValue",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _WI_FI_NETWORK_MANAGEMENT_CLUSTER_INFO = {
         "clusterName": "WiFiNetworkManagement",
         "clusterId": 0x00000451,
@@ -15293,6 +15343,7 @@ class ChipClusters:
         0x0000042D: _PM10_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         0x0000042E: _TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         0x0000042F: _RADON_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x00000430: _SOIL_MEASUREMENT_CLUSTER_INFO,
         0x00000451: _WI_FI_NETWORK_MANAGEMENT_CLUSTER_INFO,
         0x00000452: _THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER_INFO,
         0x00000453: _THREAD_NETWORK_DIRECTORY_CLUSTER_INFO,
@@ -15434,6 +15485,7 @@ class ChipClusters:
         "Pm10ConcentrationMeasurement": _PM10_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         "TotalVolatileOrganicCompoundsConcentrationMeasurement": _TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         "RadonConcentrationMeasurement": _RADON_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "SoilMeasurement": _SOIL_MEASUREMENT_CLUSTER_INFO,
         "WiFiNetworkManagement": _WI_FI_NETWORK_MANAGEMENT_CLUSTER_INFO,
         "ThreadBorderRouterManagement": _THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER_INFO,
         "ThreadNetworkDirectory": _THREAD_NETWORK_DIRECTORY_CLUSTER_INFO,
