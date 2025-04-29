@@ -128,6 +128,7 @@
 #include <clusters/ServiceArea/AttributeIds.h>
 #include <clusters/SmokeCoAlarm/AttributeIds.h>
 #include <clusters/SoftwareDiagnostics/AttributeIds.h>
+#include <clusters/SoilMeasurement/AttributeIds.h>
 #include <clusters/Switch/AttributeIds.h>
 #include <clusters/TargetNavigator/AttributeIds.h>
 #include <clusters/TemperatureControl/AttributeIds.h>

@@ -5245,6 +5245,37 @@ static BOOL AttributeIsSpecifiedInRadonConcentrationMeasurementCluster(Attribute
     }
     }
 }
+static BOOL AttributeIsSpecifiedInSoilMeasurementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::SoilMeasurement;
+    switch (aAttributeId) {
+    case Attributes::SoilMoistureMeasurementLimits::Id: {
+        return YES;
+    }
+    case Attributes::SoilMoistureMeasuredValue::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known SoilMeasurement attribute.
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInWiFiNetworkManagementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::WiFiNetworkManagement;
@@ -7099,6 +7130,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::RadonConcentrationMeasurement::Id: {
         return AttributeIsSpecifiedInRadonConcentrationMeasurementCluster(aAttributeId);
+    }
+    case Clusters::SoilMeasurement::Id: {
+        return AttributeIsSpecifiedInSoilMeasurementCluster(aAttributeId);
     }
     case Clusters::WiFiNetworkManagement::Id: {
         return AttributeIsSpecifiedInWiFiNetworkManagementCluster(aAttributeId);

@@ -80,6 +80,139 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Globals::Structs::Pric
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::Globals::Structs::MeasurementAccuracyRangeStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("MeasurementAccuracyRangeStruct.rangeMin", "rangeMin",
+                                                                  value.isMember("rangeMin")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("MeasurementAccuracyRangeStruct.rangeMax", "rangeMax",
+                                                                  value.isMember("rangeMax")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "rangeMin");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.rangeMin, value["rangeMin"]));
+    valueCopy.removeMember("rangeMin");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "rangeMax");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.rangeMax, value["rangeMax"]));
+    valueCopy.removeMember("rangeMax");
+
+    if (value.isMember("percentMax"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "percentMax");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.percentMax, value["percentMax"]));
+    }
+    valueCopy.removeMember("percentMax");
+
+    if (value.isMember("percentMin"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "percentMin");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.percentMin, value["percentMin"]));
+    }
+    valueCopy.removeMember("percentMin");
+
+    if (value.isMember("percentTypical"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "percentTypical");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.percentTypical, value["percentTypical"]));
+    }
+    valueCopy.removeMember("percentTypical");
+
+    if (value.isMember("fixedMax"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fixedMax");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fixedMax, value["fixedMax"]));
+    }
+    valueCopy.removeMember("fixedMax");
+
+    if (value.isMember("fixedMin"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fixedMin");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fixedMin, value["fixedMin"]));
+    }
+    valueCopy.removeMember("fixedMin");
+
+    if (value.isMember("fixedTypical"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fixedTypical");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fixedTypical, value["fixedTypical"]));
+    }
+    valueCopy.removeMember("fixedTypical");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::Globals::Structs::MeasurementAccuracyRangeStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.rangeMin);
+    ComplexArgumentParser::Finalize(request.rangeMax);
+    ComplexArgumentParser::Finalize(request.percentMax);
+    ComplexArgumentParser::Finalize(request.percentMin);
+    ComplexArgumentParser::Finalize(request.percentTypical);
+    ComplexArgumentParser::Finalize(request.fixedMax);
+    ComplexArgumentParser::Finalize(request.fixedMin);
+    ComplexArgumentParser::Finalize(request.fixedTypical);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::Globals::Structs::MeasurementAccuracyStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("MeasurementAccuracyStruct.measurementType", "measurementType",
+                                                                  value.isMember("measurementType")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("MeasurementAccuracyStruct.measured", "measured", value.isMember("measured")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("MeasurementAccuracyStruct.minMeasuredValue", "minMeasuredValue",
+                                                                  value.isMember("minMeasuredValue")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("MeasurementAccuracyStruct.maxMeasuredValue", "maxMeasuredValue",
+                                                                  value.isMember("maxMeasuredValue")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("MeasurementAccuracyStruct.accuracyRanges", "accuracyRanges",
+                                                                  value.isMember("accuracyRanges")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "measurementType");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.measurementType, value["measurementType"]));
+    valueCopy.removeMember("measurementType");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "measured");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.measured, value["measured"]));
+    valueCopy.removeMember("measured");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "minMeasuredValue");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.minMeasuredValue, value["minMeasuredValue"]));
+    valueCopy.removeMember("minMeasuredValue");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "maxMeasuredValue");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.maxMeasuredValue, value["maxMeasuredValue"]));
+    valueCopy.removeMember("maxMeasuredValue");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "accuracyRanges");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.accuracyRanges, value["accuracyRanges"]));
+    valueCopy.removeMember("accuracyRanges");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::Globals::Structs::MeasurementAccuracyStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.measurementType);
+    ComplexArgumentParser::Finalize(request.measured);
+    ComplexArgumentParser::Finalize(request.minMeasuredValue);
+    ComplexArgumentParser::Finalize(request.maxMeasuredValue);
+    ComplexArgumentParser::Finalize(request.accuracyRanges);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::Globals::Structs::AtomicAttributeStatusStruct::Type & request,
                                         Json::Value & value)
 {
