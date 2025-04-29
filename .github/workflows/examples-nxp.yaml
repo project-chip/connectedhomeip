@@ -142,7 +142,7 @@ jobs:
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
                       --target nxp-rt1060-freertos-all-clusters-wifi-iw416-cmake \
-                      --target nxp-rt1060-freertos-all-clusters-wifi-w8801-no_ble-cmake \
+                      --target nxp-rt1060-freertos-all-clusters-wifi-w8801-no-ble-cmake \
                       --target nxp-rt1060-freertos-all-clusters-wifi-ota-evkc-iwx12-cmake \
                       build \
                   "
@@ -238,6 +238,5 @@ jobs:
                       --target nxp-rw61x-zephyr-all-clusters \
                       --target nxp-rw61x-zephyr-thermostat \
                       --target nxp-rw61x-zephyr-laundry-washer-factory \
-                      --target nxp-rw61x_eth-zephyr-thermostat-ethernet \
                       build \
                   "

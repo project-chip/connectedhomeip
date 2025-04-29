@@ -13,7 +13,7 @@ linux-{arm64,x64}-{address-resolve-tool,air-purifier,air-quality-sensor,all-clus
 linux-x64-efr32-test-runner[-clang]
 imx-{all-clusters-app,all-clusters-minimal-app,chip-tool,lighting-app,ota-provider-app,thermostat}[-release]
 infineon-psoc6-{all-clusters,all-clusters-minimal,light,lock}[-ota][-trustm][-updateimage]
-nxp-{k32w0,k32w1,mcxw71,rt1060,rt1170,rw61x,rw61x_eth}-{freertos,zephyr}-{all-clusters,contact-sensor,laundry-washer,lighting,lock-app,thermostat}[-cmake][-dac-conversion][-ethernet][-evkc][-factory][-factory-build][-frdm][-fro32k][-iw416][-iwx12][-lit][-log-all][-log-error][-log-none][-log-progress][-low-power][-matter-shell][-mtd][-no_ble][-ota][-rdbga][-rotating-id][-smu2][-sw-v2][-thread][-w8801][-wifi]
+nxp-{k32w0,k32w1,mcxw71,rt1060,rt1170,rw61x}-{freertos,zephyr}-{all-clusters,contact-sensor,laundry-washer,lighting,lock-app,thermostat}[-cmake][-dac-conversion][-ethernet][-evkc][-factory][-factory-build][-frdm][-fro32k][-iw416][-iwx12][-lit][-log-all][-log-error][-log-none][-log-progress][-low-power][-matter-shell][-mtd][-no-ble][-ota][-rotating-id][-smu2][-sw-v2][-thread][-w8801][-wifi]
 mbed-cy8cproto_062_4343w-{all-clusters,all-clusters-minimal,light,lock,ota-requestor,pigweed,shell}[-debug][-develop][-release]
 mw320-all-clusters-app
 nrf-{nrf52840dk,nrf52840dongle,nrf5340dk}-{all-clusters,all-clusters-minimal,light,light-switch,lock,pump,pump-controller,shell,window-covering}[-rpc]
