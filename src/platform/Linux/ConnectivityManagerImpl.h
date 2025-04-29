@@ -64,6 +64,12 @@ namespace chip {
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 
 template <>
+struct GAutoPtrDeleter<WpaSupplicant1>
+{
+    using deleter = GObjectDeleter;
+};
+
+template <>
 struct GAutoPtrDeleter<WpaSupplicant1BSS>
 {
     using deleter = GObjectDeleter;
@@ -107,7 +113,7 @@ struct GDBusWpaSupplicant
 
     WpaState state             = WpaState::INIT;
     WpaScanningState scanState = WpaScanningState::IDLE;
-    WpaSupplicant1 * proxy     = nullptr;
+    GAutoPtr<WpaSupplicant1> proxy;
     GAutoPtr<WpaSupplicant1Interface> iface;
     GAutoPtr<WpaSupplicant1BSS> bss;
     GAutoPtr<char> interfacePath;
