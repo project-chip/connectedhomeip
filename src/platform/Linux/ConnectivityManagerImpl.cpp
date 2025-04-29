@@ -417,6 +417,10 @@ void ConnectivityManagerImpl::_SetWiFiAPIdleTimeout(System::Clock::Timeout val)
     DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveAPState(); });
 }
 
+void ConnectivityManagerImpl::UpdateEthernetNetworkStatus() {
+    
+}
+
 void ConnectivityManagerImpl::UpdateNetworkStatus()
 {
     Network configuredNetwork;

@@ -30,12 +30,29 @@ namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
 
+CHIP_ERROR LinuxEthernetDriver::Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback)
+{
+    ///ConnectivityMgrImpl().SetNetworkStatusChangeCallback(networkStatusChangeCallback);
+    uint8_t interfaceName[kMaxNetworkIDLen];
+    uint8_t interfaceNameLen = 0;
+    ConnectivityUtils::GetEthInterfaceName(SafePointerCast<char *>(interfaceName), sizeof(interfaceName));
+    interfaceNameLen = static_cast<uint8_t>(strlen(SafePointerCast<char *>(interfaceName), sizeof(interfaceName)));
+    networkStatusChangeCallback(
+        Status::kSuccess, MakeOptional(ByteSpan(interfaceName, interfaceNameLen)), NullOptional
+    );
+    return CHIP_NO_ERROR;
+}
+
 NetworkIterator * LinuxEthernetDriver::GetNetworks()
 {
     auto ret = new EthernetNetworkIterator();
     ConnectivityUtils::GetEthInterfaceName(SafePointerCast<char *>(ret->interfaceName), sizeof(ret->interfaceName));
     ret->interfaceNameLen = static_cast<uint8_t>(strnlen(SafePointerCast<char *>(ret->interfaceName), sizeof(ret->interfaceName)));
     return ret;
+}
+
+void LinuxEthernetDriver::Shutdown() {
+    //ConnectivityMgrImpl().SetNetworkStatusChangeCallback(nullptr);
 }
 
 } // namespace NetworkCommissioning

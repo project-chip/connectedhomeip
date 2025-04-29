@@ -234,6 +234,8 @@ public:
 
     uint8_t GetMaxNetworks() override { return 1; };
     NetworkIterator * GetNetworks() override;
+    CHIP_ERROR Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback) override;
+    void Shutdown() override;
 };
 
 } // namespace NetworkCommissioning
