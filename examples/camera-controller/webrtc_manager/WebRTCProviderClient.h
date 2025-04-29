@@ -20,6 +20,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandSender.h>
+#include <app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-server.h>
 #include <controller/CHIPDeviceController.h>
 
 /**
@@ -42,11 +43,15 @@ public:
     {}
 
     /**
-     * @brief Initializes the WebRTCProviderClient with a ScopedNodeId, and EndpointId.
-     * @param peerId         The PeerId (fabric + nodeId) for the remote device.
-     * @param endpointId     The Matter endpoint on the remote device for WebRTCTransportProvider cluster.
+     * @brief Initializes the WebRTCProviderClient with a ScopedNodeId, an EndpointId, and an optional
+     *        pointer to the WebRTCTransportRequestorServer.
+     *
+     * @param peerId              The PeerId (fabric + nodeId) for the remote device.
+     * @param endpointId          The Matter endpoint on the remote device for WebRTCTransportProvider cluster.
+     * @param requestorServer     Pointer to a WebRTCTransportRequestorServer instance.
      */
-    void Init(const chip::ScopedNodeId & peerId, chip::EndpointId endpointId);
+    void Init(const chip::ScopedNodeId & peerId, chip::EndpointId endpointId,
+              chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorServer * requestorServer);
 
     /**
      * @brief Sends a ProvideOffer command to the remote device.
@@ -55,22 +60,22 @@ public:
      * the data remains valid for the asynchronous command flow, and then requests a device connection
      * to eventually send the command.
      *
-     * @param webRTCSessionID        Nullable ID for the WebRTC session.
+     * @param webRTCSessionId        Nullable ID for the WebRTC session.
      * @param sdp                    The raw SDP (Session Description Protocol) data as a standard string.
      * @param streamUsage            An enum value describing how the stream is intended to be used.
-     * @param originatingEndpointID  The endpoint ID that initiates the offer.
-     * @param videoStreamID          Optional Video stream ID if relevant.
-     * @param audioStreamID          Optional Audio stream ID if relevant.
+     * @param originatingEndpointId  The endpoint ID that initiates the offer.
+     * @param videoStreamId          Optional Video stream ID if relevant.
+     * @param audioStreamId          Optional Audio stream ID if relevant.
      * @param ICEServers             Optional list of ICE server structures, if using custom STUN/TURN servers.
      * @param ICETransportPolicy     Optional policy for ICE transport (e.g., 'all', 'relay', etc.).
      *
      * @return CHIP_NO_ERROR on success, or an appropriate CHIP_ERROR on failure.
      */
     CHIP_ERROR
-    ProvideOffer(chip::app::DataModel::Nullable<uint16_t> webRTCSessionID, std::string sdp,
-                 chip::app::Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage, chip::EndpointId originatingEndpointID,
-                 chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamID,
-                 chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamID,
+    ProvideOffer(chip::app::DataModel::Nullable<uint16_t> webRTCSessionId, std::string sdp,
+                 chip::app::Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage, chip::EndpointId originatingEndpointId,
+                 chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId,
+                 chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId,
                  chip::Optional<
                      chip::app::DataModel::List<const chip::app::Clusters::WebRTCTransportProvider::Structs::ICEServerStruct::Type>>
                      ICEServers,
@@ -84,14 +89,24 @@ public:
      * to inform the remote side about potential network endpoints it can use to establish or
      * enhance a WebRTC session.
      *
-     * @param webRTCSessionID   The unique identifier for the WebRTC session to which these
+     * @param webRTCSessionId   The unique identifier for the WebRTC session to which these
      *                          ICE candidates apply.
      * @param ICECandidates     A list of ICE candidate strings. Each string typically follows
      *                          the "candidate:" syntax defined in the ICE specification.
      *
      * @return CHIP_NO_ERROR on success, or an appropriate CHIP_ERROR on failure.
      */
-    CHIP_ERROR ProvideICECandidates(uint16_t webRTCSessionID, chip::app::DataModel::List<const chip::CharSpan> ICECandidates);
+    CHIP_ERROR ProvideICECandidates(uint16_t webRTCSessionId, chip::app::DataModel::List<const chip::CharSpan> ICECandidates);
+
+    /**
+     * @brief Notify WebRTCProviderClient that the Answer command has been received.
+     *
+     * This allows the client to take appropriate transitions upon receiving
+     * confirmation that the remote decryptor has been received.
+     *
+     * @param webRTCSessionId   The unique identifier for the WebRTC session.
+     */
+    void HandleAnswerReceived(uint16_t webRTCSessionId);
 
     /////////// CommandSender Callback Interface /////////
     virtual void OnResponse(chip::app::CommandSender * client, const chip::app::ConcreteCommandPath & path,
@@ -113,6 +128,18 @@ private:
         kProvideICECandidates = 4,
         kEndSession           = 5,
     };
+
+    enum class State : uint8_t
+    {
+        Idle,             ///< Default state, no communication initiated yet
+        Connecting,       ///< Waiting for OnDeviceConnected or OnDeviceConnectionFailure callbacks to be called
+        AwaitingResponse, ///< Waiting for command response from camera
+        AwaitingOffer,    ///< Waiting for Offer command from camera
+        AwaitingAnswer,   ///< Waiting for Answer command from camera
+    };
+
+    void MoveToState(const State targetState);
+    const char * GetStateStr() const;
 
     template <class T>
     CHIP_ERROR SendCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle,
@@ -138,17 +165,29 @@ private:
 
     static void OnDeviceConnected(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
                                   const chip::SessionHandle & sessionHandle);
+
     static void OnDeviceConnectionFailure(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error);
+
+    static void OnSessionEstablishTimeout(chip::System::Layer * systemLayer, void * appState);
+
+    void HandleProvideOfferResponse(chip::TLV::TLVReader & data);
 
     // Private data members
     chip::ScopedNodeId mPeerId;
     chip::EndpointId mEndpointId = chip::kInvalidEndpointId;
     CommandType mCommandType     = CommandType::kUndefined;
+    uint16_t mCurrentSessionId   = 0;
     std::unique_ptr<chip::app::CommandSender> mCommandSender;
+
+    State mState = State::Idle;
+
+    chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorServer * mRequestorServer = nullptr;
 
     // Data needed to send the WebRTCTransportProvider commands
     chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Type mProvideOfferData;
     chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::Type mProvideICECandidatesData;
+    chip::app::Clusters::WebRTCTransportProvider::StreamUsageEnum mCurrentStreamUsage =
+        chip::app::Clusters::WebRTCTransportProvider::StreamUsageEnum::kUnknownEnumValue;
 
     // We store the SDP here so that mProvideOfferData.sdp points to a stable buffer.
     std::string mSdpString;

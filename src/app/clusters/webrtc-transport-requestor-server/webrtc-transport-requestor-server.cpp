@@ -238,15 +238,12 @@ void WebRTCTransportRequestorServer::HandleOffer(HandlerContext & ctx, const Com
     WebRTCSessionTypeStruct outSession;
     // Delegate processing: handle the SDP offer, gather ICE candidates, SDP answer, etc.
     Protocols::InteractionModel::ClusterStatusCode delegateStatus =
-        Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleOffer(sessionId, args, outSession));
+        Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleOffer(sessionId, args));
     if (!delegateStatus.IsSuccess())
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, delegateStatus);
         return;
     }
-
-    // Store the new WebRTCSessionTypeStruct in CurrentSessions.
-    UpsertSession(outSession);
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, delegateStatus);
 }
@@ -256,12 +253,6 @@ void WebRTCTransportRequestorServer::HandleAnswer(HandlerContext & ctx, const Co
     // Extract command fields from the request
     uint16_t sessionId = req.webRTCSessionID;
     auto sdpSpan       = req.sdp;
-
-    // BUG: https://github.com/project-chip/connectedhomeip/issues/38212
-    // FIXME: This Bug has been raised to discuss with dev team about how to handle this issue.
-    // WebRTCRequestorServer shall provide an API to update mCurrentSessions, but whether delegate
-    // can have write access to WebRTCRequestorServer's mCurrentSessions is still under discussion.
-    // For now, we just validate the sdp as mentioned in the specification.
 
     // Check if the session, NodeID are valid
     if (!IsPeerNodeSessionValid(sessionId, ctx))

@@ -48,9 +48,9 @@
         "microwave-oven-mode-cluster.xml",
         "meter-identification-cluster.xml",
         "door-lock-cluster.xml",
-        "drlc-cluster.xml",
         "ecosystem-information-cluster.xml",
         "electrical-energy-measurement-cluster.xml",
+        "electrical-grid-conditions-cluster.xml",
         "electrical-power-measurement-cluster.xml",
         "energy-evse-cluster.xml",
         "energy-evse-mode-cluster.xml",
@@ -113,6 +113,7 @@
         "service-area-cluster.xml",
         "smoke-co-alarm-cluster.xml",
         "software-diagnostics-cluster.xml",
+        "soil-measurement-cluster.xml",
         "switch-cluster.xml",
         "target-navigator-cluster.xml",
         "temperature-control-cluster.xml",
@@ -201,9 +202,20 @@
         ],
         "Bridged Device Basic Information": ["ProductAppearance"],
         "Chime": ["SelectedChime", "Enabled"],
-        "Closure Control": ["OverallState", "OverallTarget"],
-        "Closure Dimension": ["Current", "Target", "UnitRange", "LimitRange"],
-        "Commodity Price": ["Currency", "CurrentPrice"],
+        "Closure Control": ["CountdownTime", "OverallState", "OverallTarget"],
+        "Closure Dimension": [
+            "CurrentState",
+            "Target",
+            "UnitRange",
+            "LimitRange"
+        ],
+        "Commodity Price": [
+            "TariffUnit",
+            "Currency",
+            "CurrentPrice",
+            "PriceForecast",
+            "FeatureMap"
+        ],
         "Commodity Tariff": [
             "TariffInfo",
             "CurrentDay",
@@ -310,7 +322,14 @@
             "OperatingMode",
             "FeatureMap"
         ],
-        "Meter Identification": ["PowerThreshold"],
+        "Meter Identification": [
+            "MeterType",
+            "PointOfDelivery",
+            "MeterSerialNumber",
+            "ProtocolVersion",
+            "PowerThreshold",
+            "FeatureMap"
+        ],
         "Occupancy Sensing": [
             "HoldTimeLimits",
             "HoldTime",
@@ -408,7 +427,9 @@
             "Delay",
             "SecurityPolicy",
             "ChannelPage0Mask",
-            "OperationalDatasetComponents"
+            "OperationalDatasetComponents",
+            "ExtAddress",
+            "Rloc16"
         ],
         "Wi-Fi Network Diagnostics": [
             "BSSID",
@@ -653,6 +674,12 @@
             "CumulativeEnergyReset",
             "FeatureMap"
         ],
+        "Electrical Grid Conditions": [
+            "LocalGenerationAvailable",
+            "CurrentConditions",
+            "ForecastConditions",
+            "FeatureMap"
+        ],
         "Electrical Power Measurement": [
             "PowerMode",
             "NumberOfMeasurementTypes",
@@ -702,13 +729,13 @@
             "MicrophoneCapabilities",
             "SpeakerCapabilities",
             "Viewport",
-            "MaxConcurrentVideoEncoders",
+            "MaxConcurrentEncoders",
             "MaxEncodedPixelRate",
             "NightVisionCapable",
             "RateDistortionTradeOffPoints",
             "MaxContentBufferSize",
             "TwoWayTalkSupport",
-            "SupportedSnapshotParams",
+            "SnapshotCapabilities",
             "MaxNetworkBandwidth",
             "CurrentFrameRate",
             "HDRModeEnabled",
@@ -740,7 +767,8 @@
             "StatusLightBrightness",
             "FeatureMap"
         ],
-        "Camera AV Settings User Level Management": ["MPTZPosition"]
+        "Camera AV Settings User Level Management": ["MPTZPosition"],
+        "Soil Measurement": ["SoilMoistureMeasurementLimits"]
     },
     "mandatoryDeviceTypes": "0x0016",
     "defaultReportingPolicy": "mandatory",

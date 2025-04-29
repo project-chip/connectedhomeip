@@ -40,6 +40,15 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) BOOL detectLeaks;
 
 // Creates a device controller on a new fabric with test keys and test storage.
+//
+// The controller will be shut down, and the controller factory stopped, at the
+// end of the current test.
+- (MTRDeviceController *)createControllerOnTestFabric;
+
+// Creates a device controller on a new fabric with test keys and test storage.
+//
+// The controller will be shut down, and the controller factory stopped, at the
+// end of the test suite.
 + (MTRDeviceController *)createControllerOnTestFabric;
 
 // Provides access to the mock CoreBlueooth instance managed automatically by

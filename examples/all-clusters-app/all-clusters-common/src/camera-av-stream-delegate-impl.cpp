@@ -217,7 +217,7 @@ void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)
     ChipLogProgress(Zcl, "Attribute changed for AttributeId = " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
 }
 
-Protocols::InteractionModel::Status CameraAVStreamManager::CaptureSnapshot(const uint16_t streamID,
+Protocols::InteractionModel::Status CameraAVStreamManager::CaptureSnapshot(const Nullable<uint16_t> streamID,
                                                                            const VideoResolutionStruct & resolution,
                                                                            ImageSnapshot & outImageSnapshot)
 {
@@ -335,8 +335,8 @@ void emberAfCameraAvStreamManagementClusterInitCallback(EndpointId endpoint)
     features.Set(Feature::kSnapshot);
 
     BitFlags<OptionalAttribute> optionalAttrs;
-    optionalAttrs.Set(chip::app::Clusters::CameraAvStreamManagement::OptionalAttribute::kNightVision);
-    optionalAttrs.Set(chip::app::Clusters::CameraAvStreamManagement::OptionalAttribute::kNightVisionIllum);
+    optionalAttrs.Set(OptionalAttribute::kNightVision);
+    optionalAttrs.Set(OptionalAttribute::kNightVisionIllum);
     uint32_t maxConcurrentVideoEncoders  = 1;
     uint32_t maxEncodedPixelRate         = 10000;
     VideoSensorParamsStruct sensorParams = { 4608, 2592, 120, Optional<uint16_t>(30) }; // Typical numbers for Pi camera.
@@ -346,15 +346,15 @@ void emberAfCameraAvStreamManagementClusterInitCallback(EndpointId endpoint)
     uint32_t maxContentBufferSize                                          = 1024;
     AudioCapabilitiesStruct micCapabilities{};
     AudioCapabilitiesStruct spkrCapabilities{};
-    TwoWayTalkSupportTypeEnum twowayTalkSupport               = TwoWayTalkSupportTypeEnum::kNotSupported;
-    std::vector<SnapshotParamsStruct> supportedSnapshotParams = {};
-    uint32_t maxNetworkBandwidth                              = 64;
-    std::vector<StreamUsageEnum> supportedStreamUsages        = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
+    TwoWayTalkSupportTypeEnum twowayTalkSupport                  = TwoWayTalkSupportTypeEnum::kNotSupported;
+    std::vector<SnapshotCapabilitiesStruct> snapshotCapabilities = {};
+    uint32_t maxNetworkBandwidth                                 = 64;
+    std::vector<StreamUsageEnum> supportedStreamUsages           = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
 
     sCameraAVStreamMgmtClusterServerInstance = std::make_unique<CameraAVStreamMgmtServer>(
         *sCameraAVStreamMgrInstance.get(), endpoint, features, optionalAttrs, maxConcurrentVideoEncoders, maxEncodedPixelRate,
         sensorParams, nightVisionCapable, minViewport, rateDistortionTradeOffPoints, maxContentBufferSize, micCapabilities,
-        spkrCapabilities, twowayTalkSupport, supportedSnapshotParams, maxNetworkBandwidth, supportedStreamUsages);
+        spkrCapabilities, twowayTalkSupport, snapshotCapabilities, maxNetworkBandwidth, supportedStreamUsages);
     sCameraAVStreamMgmtClusterServerInstance->Init();
 }
 

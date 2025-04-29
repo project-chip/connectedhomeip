@@ -31,26 +31,18 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import random
-
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+from support_modules.cadmin_support import CADMINSupport
 
 
 class TC_CADMIN_1_19(MatterBaseTest):
-    def generate_unique_random_value(self, value):
-        while True:
-            random_value = random.randint(10000000, 99999999)
-            asserts.assert_equal(random_value, value)
-            return random_value
-
-    async def get_fabrics(self, th: ChipDeviceCtrl) -> int:
-        OC_cluster = Clusters.OperationalCredentials
-        fabrics = await self.read_single_attribute_check_success(dev_ctrl=th, fabric_filtered=False, endpoint=0, cluster=OC_cluster, attribute=OC_cluster.Attributes.Fabrics)
-        return fabrics
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.support = CADMINSupport(self)
 
     def steps_TC_CADMIN_1_19(self) -> list[TestStep]:
         return [
@@ -97,7 +89,7 @@ class TC_CADMIN_1_19(MatterBaseTest):
         self.max_window_duration = duration.maxCumulativeFailsafeSeconds
 
         self.step(2)
-        fabrics = await self.get_fabrics(th=self.th1)
+        fabrics = await self.support.get_fabrics(th=self.th1)
         initial_number_of_fabrics = len(fabrics)
 
         self.step(3)

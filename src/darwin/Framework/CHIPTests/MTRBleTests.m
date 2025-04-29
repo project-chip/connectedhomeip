@@ -63,17 +63,8 @@ MTRDeviceController * sController;
 
     [self.class.mockCoreBluetooth reset];
 
-    sController = [MTRTestCase createControllerOnTestFabric];
+    sController = [self createControllerOnTestFabric];
     XCTAssertNotNil(sController);
-}
-
-- (void)tearDown
-{
-    [sController shutdown];
-    sController = nil;
-    [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
-
-    [super tearDown];
 }
 
 - (void)testBleCommissionableBrowserResultAdditionAndRemoval
