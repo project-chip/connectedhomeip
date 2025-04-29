@@ -21,6 +21,7 @@ from .clusters.discovery_commands import DiscoveryCommands
 from .clusters.equality_commands import EqualityCommands
 from .clusters.log_commands import LogCommands
 from .clusters.system_commands import SystemCommands
+from .clusters.webrtc import WebRTC
 from .pseudo_cluster import PseudoCluster
 
 
@@ -32,11 +33,16 @@ class PseudoClusters:
         return False if self.__get_command(request) is None else True
 
     def is_manual_step(self, request):
-        return (request.cluster == LogCommands().name and
-                request.command == "UserPrompt")
+        return ((request.cluster == LogCommands().name and
+                request.command == "UserPrompt") or request.command == "VerifyVideoStream")
 
     def add(self, cluster: PseudoCluster):
         self.clusters.append(cluster)
+
+    def get_cluster(self, request):
+        for cluster in self.clusters:
+            if request.cluster == cluster.name:
+                return cluster
 
     async def execute(self, request, definitions=None):
         status = {'error': 'FAILURE'}
@@ -68,6 +74,7 @@ def get_default_pseudo_clusters() -> PseudoClusters:
         DiscoveryCommands(),
         EqualityCommands(),
         LogCommands(),
-        SystemCommands()
+        SystemCommands(),
+        WebRTC(),
     ]
     return PseudoClusters(clusters)

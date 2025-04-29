@@ -49,39 +49,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRDataTypePowerThresholdStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _powerThreshold = nil;
-
-        _apparentPowerThreshold = nil;
-
-        _powerThresholdSource = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRDataTypePowerThresholdStruct alloc] init];
-
-    other.powerThreshold = self.powerThreshold;
-    other.apparentPowerThreshold = self.apparentPowerThreshold;
-    other.powerThresholdSource = self.powerThresholdSource;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: powerThreshold:%@; apparentPowerThreshold:%@; powerThresholdSource:%@; >", NSStringFromClass([self class]), _powerThreshold, _apparentPowerThreshold, _powerThresholdSource];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTRDataTypePriceStruct
 - (instancetype)init
 {
@@ -112,34 +79,31 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRDataTypeTestGlobalStruct
+@implementation MTRDataTypeAtomicAttributeStatusStruct
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _name = @"";
+        _attributeID = @(0);
 
-        _myBitmap = nil;
-
-        _myEnum = nil;
+        _statusCode = @(0);
     }
     return self;
 }
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRDataTypeTestGlobalStruct alloc] init];
+    auto other = [[MTRDataTypeAtomicAttributeStatusStruct alloc] init];
 
-    other.name = self.name;
-    other.myBitmap = self.myBitmap;
-    other.myEnum = self.myEnum;
+    other.attributeID = self.attributeID;
+    other.statusCode = self.statusCode;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: name:%@; myBitmap:%@; myEnum:%@; >", NSStringFromClass([self class]), _name, _myBitmap, _myEnum];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: attributeID:%@; statusCode:%@; >", NSStringFromClass([self class]), _attributeID, _statusCode];
     return descriptionString;
 }
 
@@ -178,31 +142,67 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRDataTypeAtomicAttributeStatusStruct
+@implementation MTRDataTypePowerThresholdStruct
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _attributeID = @(0);
+        _powerThreshold = nil;
 
-        _statusCode = @(0);
+        _apparentPowerThreshold = nil;
+
+        _powerThresholdSource = nil;
     }
     return self;
 }
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRDataTypeAtomicAttributeStatusStruct alloc] init];
+    auto other = [[MTRDataTypePowerThresholdStruct alloc] init];
 
-    other.attributeID = self.attributeID;
-    other.statusCode = self.statusCode;
+    other.powerThreshold = self.powerThreshold;
+    other.apparentPowerThreshold = self.apparentPowerThreshold;
+    other.powerThresholdSource = self.powerThresholdSource;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: attributeID:%@; statusCode:%@; >", NSStringFromClass([self class]), _attributeID, _statusCode];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: powerThreshold:%@; apparentPowerThreshold:%@; powerThresholdSource:%@; >", NSStringFromClass([self class]), _powerThreshold, _apparentPowerThreshold, _powerThresholdSource];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDataTypeTestGlobalStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _name = @"";
+
+        _myBitmap = nil;
+
+        _myEnum = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDataTypeTestGlobalStruct alloc] init];
+
+    other.name = self.name;
+    other.myBitmap = self.myBitmap;
+    other.myEnum = self.myEnum;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: name:%@; myBitmap:%@; myEnum:%@; >", NSStringFromClass([self class]), _name, _myBitmap, _myEnum];
     return descriptionString;
 }
 

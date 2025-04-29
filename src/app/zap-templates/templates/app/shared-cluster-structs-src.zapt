@@ -13,7 +13,7 @@ namespace detail {
 namespace Structs {
 {{#zcl_structs}}
 {{#if has_more_than_one_cluster}}
-{{> cluster_objects_struct header=false}}
+{{> cluster_objects_struct cluster="" header=false}}
 {{/if}}
 {{/zcl_structs}}
 } // namespace Structs

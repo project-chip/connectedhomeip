@@ -2631,6 +2631,7 @@ public class ChipClusters {
     private static final long CLIENT_LIST_ATTRIBUTE_ID = 2L;
     private static final long PARTS_LIST_ATTRIBUTE_ID = 3L;
     private static final long TAG_LIST_ATTRIBUTE_ID = 4L;
+    private static final long ENDPOINT_UNIQUE_ID_ATTRIBUTE_ID = 5L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -2812,6 +2813,32 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, TAG_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readEndpointUniqueIDAttribute(
+        CharStringAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ENDPOINT_UNIQUE_ID_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            String value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ENDPOINT_UNIQUE_ID_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeEndpointUniqueIDAttribute(
+        CharStringAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ENDPOINT_UNIQUE_ID_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            String value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ENDPOINT_UNIQUE_ID_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(

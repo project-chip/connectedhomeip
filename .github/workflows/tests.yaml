@@ -504,6 +504,7 @@ jobs:
                       --target linux-x64-lock-ipv6only-no-ble-no-wifi-tsan-clang-test \
                       --target linux-x64-lit-icd-ipv6only-no-ble-no-wifi-tsan-clang-test \
                       --target linux-x64-air-purifier-ipv6only-no-ble-no-wifi-tsan-clang-test \
+                      --target linux-x64-energy-gateway-ipv6only-no-ble-no-wifi-tsan-clang-test \
                       --target linux-x64-energy-management-ipv6only-no-ble-no-wifi-tsan-clang-test \
                       --target linux-x64-microwave-oven-ipv6only-no-ble-no-wifi-tsan-clang-test \
                       --target linux-x64-rvc-ipv6only-no-ble-no-wifi-tsan-clang-test \

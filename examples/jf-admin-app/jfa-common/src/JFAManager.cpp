@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,18 +16,13 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include "JFAManager.h"
 
-#include "ota-provider-delegate.h"
+#include <lib/support/logging/CHIPLogging.h>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace OTAProvider {
+JFAManager JFAManager::sJFA;
 
-void SetDelegate(chip::EndpointId endpointId, OTAProviderDelegate * delegate);
-
+CHIP_ERROR JFAManager::Init()
+{
+    return CHIP_NO_ERROR;
 }
-} // namespace Clusters
-} // namespace app
-} // namespace chip
