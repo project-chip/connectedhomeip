@@ -70,6 +70,12 @@ struct GAutoPtrDeleter<WpaSupplicant1BSS>
 };
 
 template <>
+struct GAutoPtrDeleter<WpaSupplicant1Interface>
+{
+    using deleter = GObjectDeleter;
+};
+
+template <>
 struct GAutoPtrDeleter<WpaSupplicant1Network>
 {
     using deleter = GObjectDeleter;
@@ -99,10 +105,10 @@ struct GDBusWpaSupplicant
         SCANNING,
     };
 
-    WpaState state                  = WpaState::INIT;
-    WpaScanningState scanState      = WpaScanningState::IDLE;
-    WpaSupplicant1 * proxy          = nullptr;
-    WpaSupplicant1Interface * iface = nullptr;
+    WpaState state             = WpaState::INIT;
+    WpaScanningState scanState = WpaScanningState::IDLE;
+    WpaSupplicant1 * proxy     = nullptr;
+    GAutoPtr<WpaSupplicant1Interface> iface;
     GAutoPtr<WpaSupplicant1BSS> bss;
     GAutoPtr<char> interfacePath;
     GAutoPtr<char> networkPath;
