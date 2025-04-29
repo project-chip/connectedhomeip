@@ -214,7 +214,7 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
             await self.send_go_home_cmd_with_check(19, op_errors.kCommandInvalidInState)
 
         # State FillingWaterTank is not GoHome-Compatible
-        if self.check_pics("RVCOPSTATE.S.M.ST_FILLINGWATERNK"):
+        if self.check_pics("RVCOPSTATE.S.M.ST_FILLINGWATERTNK"):
             step_name = "Manually put the device in the FILLING WATER TANK operational state"
             self.print_step(20, step_name)
 
