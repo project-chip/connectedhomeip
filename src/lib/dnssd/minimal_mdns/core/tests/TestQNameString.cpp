@@ -22,7 +22,7 @@
  #include <lib/dnssd/minimal_mdns/core/HeapQName.h>
  #include <lib/dnssd/minimal_mdns/core/QNameString.h>
  #include <lib/dnssd/minimal_mdns/core/tests/QNameStrings.h>
- 
+
  namespace {
  
  using namespace mdns::Minimal;
@@ -38,9 +38,7 @@
  {
      {
          const testing::TestQName<2> kShort({ "some", "test" });
- 
          QNameString heapQName(kShort.Serialized());
- 
          EXPECT_NE(heapQName.c_str(), "");
      }
  }
