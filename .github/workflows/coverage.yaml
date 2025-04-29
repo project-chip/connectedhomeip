@@ -75,12 +75,20 @@ jobs:
                 cd src/controller/python/test/unit_tests/
                 python -m coverage run -m unittest -v
                 coverage xml
-            - name: Upload result and clean output
+            - name: Upload result
               shell: bash
               run: |
+                cd src/controller/python/test/unit_tests/
                 curl -Os https://uploader.codecov.io/latest/linux/codecov
                 chmod +x codecov
-                ./codecov --verbose upload-process --fail-on-error -t ${{ secrets.CODECOV_TOKEN }} -n 'service'-${{ github.run_id }} -F service -f src/controller/python/test/unit_tests/coverage.xml
+                ./codecov --verbose upload-process --fail-on-error -t ${{ secrets.CODECOV_TOKEN }} -n 'service'-${{ github.run_id }} -F service -f coverage.xml
+            - name: Upload coverage reports to Codecov with GitHub Action
+              uses: codecov/codecov-action@v5
+              env:
+                CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+            - name: clean output
+              shell: bash
+              run: |
                 rm -rf src/controller/python/test/unit_tests/coverage.xml
                 rm -rf src/controller/python/test/unit_tests/.coverage
                 rm -rf out pyenv
