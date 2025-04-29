@@ -132,14 +132,14 @@ class TC_FAN_2_1(MatterBaseTest):
 
         if not supports_auto:
             # If Auto is not supported, verify that the FanModeSequence
-            # attribute is a valid sequence (non-Auto)
+            # attribute is a valid sequence (non-auto only)
             asserts.assert_in(fan_mode_sequence, non_auto_values,
-                              f"[FC] FanModeSequence ({fan_mode_sequence}:{fan_mode_sequence.name}) must be a valid FanMode sequence (non-Auto).")
+                              f"[FC] FanModeSequence ({fan_mode_sequence}:{fan_mode_sequence.name}) must be valid (non-auto only).")
         else:
             # If Auto is supported, verify that the FanModeSequence
-            # attribute is a valid sequence (Auto or non-Auto)
-            asserts.assert_in(fan_mode_sequence, non_auto_values + auto_values,
-                              f"[FC] FanModeSequence ({fan_mode_sequence}:{fan_mode_sequence.name}) must be a valid FanMode sequence (Auto or non-Auto).")
+            # attribute is a valid sequence (auto only)
+            asserts.assert_in(fan_mode_sequence, auto_values,
+                              f"[FC] FanModeSequence ({fan_mode_sequence}:{fan_mode_sequence.name}) must be a valid (auto only).")
 
         # *** STEP 4 ***
         # TH reads from the DUT the FanMode attribute value
