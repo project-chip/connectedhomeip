@@ -500,6 +500,7 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                    "./scripts/build/build_examples.py \
                       --target linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test \
+                      --target linux-x64-bridge-ipv6only-no-ble-no-wifi-tsan-clang-test \
                       --target linux-x64-lock-ipv6only-no-ble-no-wifi-tsan-clang-test \
                       --target linux-x64-lit-icd-ipv6only-no-ble-no-wifi-tsan-clang-test \
                       --target linux-x64-air-purifier-ipv6only-no-ble-no-wifi-tsan-clang-test \
@@ -522,6 +523,7 @@ jobs:
               run: |
                   echo -n "" >/tmp/test_env.yaml
                   echo "ALL_CLUSTERS_APP: out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app" >> /tmp/test_env.yaml
+                  echo "BRIDGE_APP: out/linux-x64-bridge-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-bridge-app" >> /tmp/test_env.yaml
                   echo "CHIP_LOCK_APP: out/linux-x64-lock-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-lock-app" >> /tmp/test_env.yaml
                   echo "CAMERA_APP: out/linux-x64-camera/chip-camera-app" >> /tmp/test_env.yaml
                   echo "ENERGY_MANAGEMENT_APP: out/linux-x64-energy-management-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-energy-management-app" >> /tmp/test_env.yaml
