@@ -235,9 +235,9 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
                                          G_TYPE_STRING, "NV12", // Adjust format as needed
                                          "framerate", GST_TYPE_FRACTION, framerate, 1, NULL);
 
-    // Set video test src pattern (ex: 18 -> ball animation) on the source element
+    // Set video test src pattern
 #ifdef AV_STREAM_GST_USE_TEST_SRC
-    g_object_set(source, "pattern", 18, NULL);
+    g_object_set(source, "pattern", kBallAnimationPattern, NULL);
 #endif
 
     // Set the caps on the capsfilter element
