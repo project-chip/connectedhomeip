@@ -577,7 +577,7 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
         {
             ChipLogError(NotSpecified, "Invalid EndpointId to set Soil Moisture value.");
         }
-        else if (soilMoisture < 0 || soilMoisture > 100)
+        else if (soilMoisture > 100)
         {
             ChipLogError(NotSpecified, "Invalid Soil Moisture value to set.");
         }
