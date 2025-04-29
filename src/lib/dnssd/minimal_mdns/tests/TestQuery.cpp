@@ -34,7 +34,7 @@ const auto kTestOperationalName = testing::TestQName<4>({ "1234567898765432-ABCD
 TEST(TestQuery, DefinitionAndRename)
 {
     mdns::Minimal::Query query(kTestOperationalName.Full());
-    
+
     EXPECT_EQ(query.GetClass(), QClass::IN);
     EXPECT_EQ(query.GetType(), QType::ANY);
     EXPECT_EQ(query.IsAnswerViaUnicast(), true);
