@@ -60,7 +60,7 @@ class TC_FAN_2_1(MatterBaseTest):
                 TestStep(2, "[FC] TH checks for support of the Auto feature.",
                          "Save result for future use."),
                 TestStep(3, "[FC] TH reads from the DUT the FanModeSequence attribute.",
-                         "Verify that the DUT response contains a FanModeSequenceEnum with value between 0 and 5 inclusive. If Auto is not supported, verify that the FanModeSequence attribute is a valid sequence (non-Auto). If Auto is supported, verify that the FanModeSequence attribute is a valid sequence (Auto or non-Auto)."),
+                         "Verify that the DUT response contains a FanModeSequenceEnum with value between 0 and 5 inclusive. If Auto is not supported, verify that the FanModeSequence attribute is a valid sequence (non-auto only). If Auto is supported, verify that the FanModeSequence attribute is a valid sequence (auto only)."),
                 TestStep(4, "[FC] TH reads from the DUT the FanMode attribute value.",
                          "Verify that the DUT response contains a FanModeEnum with a value between 0 and 5, excluding 4. Verify that the FanMode attribute value is supported by the FanModeSequence attribute value."),
                 TestStep(5, "[FC] TH reads from the DUT the PercentSetting attribute.",
