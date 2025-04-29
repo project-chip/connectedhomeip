@@ -185,6 +185,8 @@ static_library("inet") {
       "Darwin/InterfacesMonitor.mm",
       "Darwin/UDPEndPointImplNetworkFrameworkDebug.h",
       "Darwin/UDPEndPointImplNetworkFrameworkDebug.mm",
+      "Darwin/UDPEndPointImplNetworkFrameworkListener.h",
+      "Darwin/UDPEndPointImplNetworkFrameworkListener.mm",
     ]
   }
 

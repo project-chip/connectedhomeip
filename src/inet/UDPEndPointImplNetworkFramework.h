@@ -23,15 +23,15 @@
 
 #pragma once
 
-#include <inet/Darwin/InterfacesMonitor.h>
+#include <inet/Darwin/UDPEndPointImplNetworkFrameworkListener.h>
 #include <inet/EndPointStateNetworkFramework.h>
-
-#include <map>
 
 namespace chip {
 namespace Inet {
 
-class UDPEndPointImplNetworkFramework : public UDPEndPoint, public EndPointStateNetworkFramework, public Darwin::InterfacesMonitor
+class UDPEndPointImplNetworkFramework : public UDPEndPoint,
+                                        public EndPointStateNetworkFramework,
+                                        public Darwin::UDPEndPointImplNetworkFrameworkListener
 {
 public:
     UDPEndPointImplNetworkFramework(EndPointManager<UDPEndPoint> & endPointManager) : UDPEndPoint(endPointManager) {}
@@ -39,7 +39,7 @@ public:
     // UDPEndPoint overrides.
     CHIP_ERROR SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback) override;
     InterfaceId GetBoundInterface() const override;
-    uint16_t GetBoundPort() const override;
+    uint16_t GetBoundPort() const override { return UDPEndPointImplNetworkFrameworkListener::GetBoundPort(); }
     void Free() override;
 
 private:
@@ -54,7 +54,6 @@ private:
     CHIP_ERROR SendMsgImpl(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle && msg) override;
     void CloseImpl() override;
 
-    dispatch_queue_t mListenerQueue                = nullptr;
     dispatch_queue_t mConnectionQueue              = nullptr;
     dispatch_queue_t mSystemQueue                  = nullptr;
     nw_connection_group_t mConnectionGroup         = nullptr;
@@ -76,7 +75,7 @@ private:
 
     CHIP_ERROR ConfigureProtocol(IPAddressType aAddressType, const nw_parameters_t & aParameters);
     nw_endpoint_t GetEndPoint(const IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort,
-                              InterfaceId interfaceIndex = InterfaceId::Null());
+                              InterfaceId interfaceIndex = InterfaceId::Null()) override;
     CHIP_ERROR GetPacketInfo(const nw_connection_t & aConnection, IPPacketInfo & aPacketInfo);
     void HandleDataReceived(nw_connection_t aConnection);
     void ReleaseAll();
@@ -88,35 +87,13 @@ private:
     CFMutableDictionaryRef mConnections = nullptr;
     CHIP_ERROR GetConnection(const IPPacketInfo * aPktInfo);
     CHIP_ERROR StartConnection(nw_connection_t aConnection);
-    CHIP_ERROR StartConnectionFromListener(nw_connection_t connection);
+    void StartConnectionFromListener(nw_connection_t connection) override;
     void PrepareConnections();
     CHIP_ERROR ReleaseConnections();
     bool RefreshConnectionTimeout(nw_connection_t connection);
     bool CreateConnectionWrapper(nw_connection_t connection);
     bool ClearConnectionWrapper(nw_connection_t connection);
     nw_connection_t FindConnection(const IPPacketInfo & pktInfo);
-
-    std::map<IPAddress, nw_listener_t> mListeners;
-    CHIP_ERROR StartListeners();
-    CHIP_ERROR StartListenerOnAddress(const IPAddress & address, InterfaceId intfId = InterfaceId::Null());
-    CHIP_ERROR ReleaseListener(nw_listener_t listener);
-    CHIP_ERROR ReleaseListeners();
-
-    template <typename InterfaceVec>
-    void RegisterInterfaces(const InterfaceVec & interfaces)
-    {
-        for (const auto & iface : interfaces)
-        {
-            IPAddress addr(iface.second);
-            if (mListeners.find(addr) == mListeners.end())
-            {
-                LogErrorOnFailure(StartListenerOnAddress(addr, static_cast<chip::Inet::InterfaceId>(iface.first)));
-            }
-        }
-    }
-
-    IPAddress mAddr         = IPAddress::Any;
-    uint16_t mRequestedPort = 0;
 };
 
 using UDPEndPointImpl = UDPEndPointImplNetworkFramework;

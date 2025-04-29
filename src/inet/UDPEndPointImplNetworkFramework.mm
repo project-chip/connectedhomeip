@@ -41,7 +41,6 @@ namespace {
 constexpr uint64_t kSendTimeoutInSeconds = 10 * NSEC_PER_SEC;
 constexpr uint64_t kConnectTimeoutInSeconds = 10 * NSEC_PER_SEC;
 constexpr uint64_t kConnectionAliveTimeoutInSeconds = 60 * NSEC_PER_SEC;
-constexpr uint64_t kListenerTimeoutInSeconds = 10 * NSEC_PER_SEC;
 constexpr uint64_t kConnectionGroupTimeoutInSeconds = 10 * NSEC_PER_SEC;
 
 class WorkFlag {
@@ -155,13 +154,10 @@ namespace Inet {
 
         mSystemQueue = static_cast<System::LayerDispatch &>(GetSystemLayer()).GetDispatchQueue();
         mAddrType = addressType;
-        mAddr = address;
-        mRequestedPort = port;
         mWorkFlagStrong = Platform::MakeShared<WorkFlag>();
         mWorkFlagWeak = mWorkFlagStrong;
 
-        __auto_type monitorQueue = dispatch_queue_create("inet_dispatch_interfaces_monitor", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
-        err = InterfacesMonitor::Init(monitorQueue, addressType, intfId);
+        err = UDPEndPointImplNetworkFrameworkListener::Configure(mParameters, addressType, address, port, intfId);
         VerifyOrReturnError(CHIP_NO_ERROR == err, err, ReleaseAll());
 
         PrepareConnections();
@@ -178,19 +174,11 @@ namespace Inet {
         return InterfaceId::Null();
     }
 
-    uint16_t UDPEndPointImplNetworkFramework::GetBoundPort() const
-    {
-        // If no listeners have been created yet, return the initially requested port.
-        VerifyOrReturnValue(!mListeners.empty(), mRequestedPort);
-
-        // Otherwise, return the actual port assigned to the first listener.
-        __auto_type listener = mListeners.begin()->second;
-        return nw_listener_get_port(listener);
-    }
-
     CHIP_ERROR UDPEndPointImplNetworkFramework::ListenImpl()
     {
-        return StartListeners();
+        CHIP_ERROR error = UDPEndPointImplNetworkFrameworkListener::Listen();
+        VerifyOrDo(CHIP_NO_ERROR == error, ReleaseAll());
+        return error;
     }
 
     CHIP_ERROR UDPEndPointImplNetworkFramework::SendMsgImpl(const IPPacketInfo * pktInfo, System::PacketBufferHandle && msg)
@@ -262,16 +250,13 @@ namespace Inet {
         OnMessageReceived = nullptr;
         OnReceiveError = nullptr;
 
-        StopMonitorInterfaces();
         ReleaseConnections();
         ReleaseConnectionGroup();
-        ReleaseListeners();
+        UDPEndPointImplNetworkFrameworkListener::Unlisten();
 
         mParameters = nullptr;
 
         mConnectionQueue = nullptr;
-
-        mListenerQueue = nullptr;
 
         mConnectionGroupQueue = nullptr;
         mConnectionGroupSemaphore = nullptr;
@@ -461,136 +446,6 @@ namespace Inet {
         return endpoint;
     }
 
-    CHIP_ERROR UDPEndPointImplNetworkFramework::StartListeners()
-    {
-        VerifyOrReturnError(mListeners.empty(), CHIP_ERROR_INCORRECT_STATE);
-        VerifyOrReturnError(nullptr == mListenerQueue, CHIP_ERROR_INCORRECT_STATE);
-
-        mListenerQueue = dispatch_queue_create("inet_dispatch_listener", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
-        VerifyOrReturnError(nullptr != mListenerQueue, CHIP_ERROR_NO_MEMORY, ReleaseAll());
-
-        // If the target interface is kDNSServiceInterfaceIndexLocalOnly, just register the loopback addresses.
-        if (IsLocalOnly()) {
-            __auto_type addr = Inet::IPAddress::Loopback(Inet::IPAddressType::kIPv6);
-            return StartListenerOnAddress(addr);
-        }
-
-        // If the target address is bit IPAddress::Any, juts register this specific addresses.
-        if (mAddr != IPAddress::Any) {
-            return StartListenerOnAddress(mAddr, GetInterfaceId());
-        }
-
-        __auto_type semaphore = dispatch_semaphore_create(0);
-        VerifyOrReturnError(semaphore != nullptr, CHIP_ERROR_NO_MEMORY);
-
-        CHIP_ERROR err = StartMonitorInterfaces(^(InetInterfacesVector inetInterfaces, Inet6InterfacesVector inet6Interfaces) {
-            ReturnOnFailure(ReleaseListeners());
-            RegisterInterfaces(inetInterfaces);
-            RegisterInterfaces(inet6Interfaces);
-            dispatch_semaphore_signal(semaphore);
-        });
-        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
-
-        // Wait until the first list of interfaces has been handled
-        __auto_type timeout = dispatch_time(DISPATCH_TIME_NOW, kListenerTimeoutInSeconds);
-        dispatch_semaphore_wait(semaphore, timeout); // NOLINT(clang-analyzer-optin.performance.GCDAntipattern)
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR UDPEndPointImplNetworkFramework::StartListenerOnAddress(const IPAddress & address, InterfaceId intfId)
-    {
-        const uint16_t port = GetBoundPort();
-        __auto_type endpoint = GetEndPoint(address.Type(), address, port, intfId);
-        VerifyOrReturnError(nullptr != endpoint, CHIP_ERROR_INVALID_ARGUMENT);
-
-        __auto_type parameters = nw_parameters_copy(mParameters);
-        VerifyOrReturnError(nullptr != parameters, CHIP_ERROR_NO_MEMORY);
-        nw_parameters_set_local_endpoint(parameters, endpoint);
-
-        __auto_type listener = nw_listener_create(parameters);
-        VerifyOrReturnError(nullptr != listener, CHIP_ERROR_INTERNAL);
-
-        nw_listener_set_queue(listener, mListenerQueue);
-        nw_listener_set_new_connection_handler(listener, ^(nw_connection_t connection) {
-            StartConnectionFromListener(connection);
-        });
-
-        __auto_type semaphore = dispatch_semaphore_create(0);
-        VerifyOrReturnError(nullptr != semaphore, CHIP_ERROR_NO_MEMORY, ReleaseAll());
-
-        __block CHIP_ERROR err = CHIP_ERROR_INTERNAL;
-        nw_listener_set_state_changed_handler(listener, ^(nw_listener_state_t state, nw_error_t error) {
-            DebugPrintListenerState(state);
-
-            switch (state) {
-            case nw_listener_state_invalid:
-                err = CHIP_ERROR_INCORRECT_STATE;
-                nw_listener_cancel(listener);
-                break;
-
-            case nw_listener_state_waiting:
-                // Nothing to do.
-                break;
-
-            case nw_listener_state_failed:
-                err = CHIP_ERROR_POSIX(nw_error_get_error_code(error));
-                ChipLogError(Inet, "Error: %s", chip::ErrorStr(err));
-                break;
-
-            case nw_listener_state_ready:
-                err = CHIP_NO_ERROR;
-                dispatch_semaphore_signal(semaphore);
-                break;
-
-            case nw_listener_state_cancelled:
-                if (err == CHIP_NO_ERROR) {
-                    err = CHIP_ERROR_CONNECTION_ABORTED;
-                }
-
-                dispatch_semaphore_signal(semaphore);
-                break;
-            }
-        });
-
-        nw_listener_start(listener);
-        __auto_type timeout = dispatch_time(DISPATCH_TIME_NOW, kListenerTimeoutInSeconds);
-        dispatch_semaphore_wait(semaphore, timeout); // NOLINT(clang-analyzer-optin.performance.GCDAntipattern)
-        nw_listener_set_state_changed_handler(listener, nil);
-
-        if (CHIP_NO_ERROR == err) {
-            mListeners.insert(std::make_pair(address, listener));
-        }
-        return err;
-    }
-
-    CHIP_ERROR UDPEndPointImplNetworkFramework::ReleaseListeners()
-    {
-        for (auto & it : mListeners) {
-            ReturnErrorOnFailure(ReleaseListener(it.second));
-        }
-
-        mListeners.clear();
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR UDPEndPointImplNetworkFramework::ReleaseListener(nw_listener_t listener)
-    {
-        __auto_type semaphore = dispatch_semaphore_create(0);
-        VerifyOrReturnError(nullptr != semaphore, CHIP_ERROR_NO_MEMORY);
-
-        nw_listener_set_state_changed_handler(listener, ^(nw_listener_state_t state, nw_error_t error) {
-            DebugPrintListenerState(state);
-            if (state == nw_listener_state_cancelled) {
-                dispatch_semaphore_signal(semaphore);
-            }
-        });
-
-        nw_listener_cancel(listener);
-        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER); // NOLINT(clang-analyzer-optin.performance.GCDAntipattern)
-        return CHIP_NO_ERROR;
-    }
-
     CHIP_ERROR UDPEndPointImplNetworkFramework::GetConnection(const IPPacketInfo * aPktInfo)
     {
         VerifyOrReturnError(nullptr != mParameters, CHIP_ERROR_INCORRECT_STATE);
@@ -609,44 +464,50 @@ namespace Inet {
         return StartConnection(connection);
     }
 
-    CHIP_ERROR UDPEndPointImplNetworkFramework::StartConnectionFromListener(nw_connection_t connection)
+    void UDPEndPointImplNetworkFramework::StartConnectionFromListener(nw_connection_t connection)
     {
-        DebugPrintConnection(connection);
-
-        VerifyOrReturnError(CreateConnectionWrapper(connection), CHIP_ERROR_NO_MEMORY);
-        nw_connection_set_queue(connection, mConnectionQueue);
-        nw_connection_set_state_changed_handler(connection, ^(nw_connection_state_t state, nw_error_t error) {
-            DebugPrintConnectionState(state);
-            switch (state) {
-            case nw_connection_state_ready:
-                HandleDataReceived(connection);
-                break;
-
-            case nw_connection_state_preparing:
-                // Nothing to do.
-                break;
-
-            case nw_connection_state_invalid:
-            case nw_connection_state_waiting:
-                nw_connection_cancel(connection);
-                break;
-
-            case nw_connection_state_failed: {
-                CHIP_ERROR err = CHIP_ERROR_POSIX(nw_error_get_error_code(error));
-                ChipLogError(Inet, "Error: %s", chip::ErrorStr(err));
-                break;
-            }
-
-            case nw_connection_state_cancelled:
-                static_cast<System::LayerDispatch &>(GetSystemLayer()).ScheduleWorkWithBlock(^{
-                    ClearConnectionWrapper(connection);
-                });
-                break;
-            }
+        static_cast<System::LayerDispatch &>(GetSystemLayer()).ScheduleWorkWithBlock(^{
+            LogErrorOnFailure(StartConnection(connection));
         });
+        /*
+                    DebugPrintConnection(connection);
 
-        nw_connection_start(connection);
-        return CHIP_NO_ERROR;
+                    VerifyOrReturn(CreateConnectionWrapper(connection));
+                    nw_connection_set_queue(connection, mConnectionQueue);
+                    nw_connection_set_state_changed_handler(connection, ^(nw_connection_state_t state, nw_error_t error) {
+                        DebugPrintConnectionState(state);
+                        switch (state) {
+                        case nw_connection_state_ready:
+                            HandleDataReceived(connection);
+                            break;
+
+                        case nw_connection_state_preparing:
+                            // Nothing to do.
+                            break;
+
+                        case nw_connection_state_invalid:
+                        case nw_connection_state_waiting:
+                            nw_connection_cancel(connection);
+                            break;
+
+                        case nw_connection_state_failed: {
+                            CHIP_ERROR err = CHIP_ERROR_POSIX(nw_error_get_error_code(error));
+                            ChipLogError(Inet, "Error: %s", chip::ErrorStr(err));
+                            break;
+                        }
+
+                        case nw_connection_state_cancelled:
+                            static_cast<System::LayerDispatch &>(GetSystemLayer()).ScheduleWorkWithBlock(^{
+                                ClearConnectionWrapper(connection);
+                            });
+                            break;
+                        }
+                    });
+
+                    nw_connection_start(connection);
+                });
+                return CHIP_NO_ERROR;
+        */
     }
 
     CHIP_ERROR UDPEndPointImplNetworkFramework::StartConnection(nw_connection_t connection)
@@ -945,17 +806,6 @@ namespace Inet {
 
         free(keys);
         return match;
-    }
-
-    bool operator<(const IPAddress & lhs, const IPAddress & rhs)
-    {
-        for (int i = 0; i < 4; ++i) {
-            if (lhs.Addr[i] < rhs.Addr[i])
-                return true;
-            if (lhs.Addr[i] > rhs.Addr[i])
-                return false;
-        }
-        return false;
     }
 
 } // namespace Inet
