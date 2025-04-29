@@ -538,8 +538,6 @@ jobs:
 
             - name: Convert output file
               run: |
-                scripts/run_in_build_env.sh 'virtualenv pyenv'
-                source pyenv/bin/activate
                 python -m pip install lcov-cobertura
                 lcov_cobertura out/coverage/coverage/lcov_final.info
 
