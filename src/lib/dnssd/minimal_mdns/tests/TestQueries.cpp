@@ -15,19 +15,19 @@
  *    limitations under the License.
  */
 
- #include <pw_unit_test/framework.h>
+#include <pw_unit_test/framework.h>
 
- #include <lib/core/StringBuilderAdapters.h>
- #include <lib/dnssd/minimal_mdns/core/tests/QNameStrings.h>
- #include <lib/dnssd/minimal_mdns/QueryReplyFilter.h>
- #include <lib/dnssd/minimal_mdns/Query.h>
- #include <lib/dnssd/minimal_mdns/QueryBuilder.h>
- #include <lib/dnssd/minimal_mdns/core/QName.h>
- 
- namespace {
- 
- using namespace chip;
- using namespace mdns::Minimal;
+#include <lib/core/StringBuilderAdapters.h>
+#include <lib/dnssd/minimal_mdns/core/tests/QNameStrings.h>
+#include <lib/dnssd/minimal_mdns/QueryReplyFilter.h>
+#include <lib/dnssd/minimal_mdns/Query.h>
+#include <lib/dnssd/minimal_mdns/QueryBuilder.h>
+#include <lib/dnssd/minimal_mdns/core/QName.h>
+
+namespace {
+
+using namespace chip;
+using namespace mdns::Minimal;
 
 const auto kTestOperationalName = testing::TestQName<4>({ "1234567898765432-ABCDEFEDCBAABCDE", "_matter", "_tcp", "local" });
 
