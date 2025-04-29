@@ -94,7 +94,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
         self.step("2b")
         is_countdown_time_supported = Clusters.ClosureControl.Attributes.CountdownTime.attribute_id in attribute_list
         
-        if not countdown_time_supported:
+        if not is_countdown_time_supported :
             logging.info("CountdownTime attribute not supported, skipping test")
             return
         
