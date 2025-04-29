@@ -425,7 +425,7 @@ CHIP_ERROR ConnectivityManagerImpl::InitWiFi()
             wifiConfig.sta.scan_method = WIFI_ALL_CHANNEL_SCAN;
             wifiConfig.sta.sort_method = WIFI_CONNECT_AP_BY_SIGNAL;
 #endif // CONFIG_WIFI_SCAN_ALL_CHANNEL_MODE
-            esp_err_t err              = esp_wifi_set_config(WIFI_IF_STA, &wifiConfig);
+            esp_err_t err = esp_wifi_set_config(WIFI_IF_STA, &wifiConfig);
             if (err != ESP_OK)
             {
                 ChipLogError(DeviceLayer, "esp_wifi_set_config() failed: %s", esp_err_to_name(err));
