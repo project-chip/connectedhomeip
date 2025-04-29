@@ -24,7 +24,7 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-server.h>
 #include <protocols/interaction_model/StatusCode.h>
-#include <transport/pushav-transport.h>
+#include <pushav-transport/pushav-transport.h>
 
 #include <unordered_map>
 
@@ -60,7 +60,7 @@ public:
     Protocols::InteractionModel::Status ModifyPushTransport(const uint16_t connectionID,
                                                             const TransportOptionsDecodeableStruct & transportOptions) override;
 
-    Protocols::InteractionModel::Status SetTransportStatus(const std::vector<uint16_t> connectionIDList,
+    Protocols::InteractionModel::Status SetTransportStatus(const std::vector<uint16_t> & connectionIDList,
                                                            TransportStatusEnum transportStatus) override;
 
     Protocols::InteractionModel::Status ManuallyTriggerTransport(
@@ -69,7 +69,7 @@ public:
 
     Protocols::InteractionModel::Status
     FindTransport(const Optional<DataModel::Nullable<uint16_t>> & connectionID,
-                  DataModel::List<const TransportConfigurationStruct> & outtransportConfigurations) override;
+                  DataModel::List<const TransportConfigurationStruct> & outTransportConfigurations) override;
 
     CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                                    const Optional<DataModel::Nullable<uint16_t>> & audioStreamId);

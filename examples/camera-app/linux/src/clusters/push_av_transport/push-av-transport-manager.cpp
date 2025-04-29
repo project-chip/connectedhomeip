@@ -55,9 +55,12 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsDecode
 PushAvStreamTransportManager::~PushAvStreamTransportManager()
 {
     // Unregister all transports from Media Controller before deleting them. This will ensure that any ongoing streams are stopped.
-    for (auto & transport : mTransportMap)
+    if (mMediaController != nullptr)
     {
-        mMediaController->UnregisterTransport(transport.second.get());
+        for (auto & kv : mTransportMap)
+        {
+            mMediaController->UnregisterTransport(kv.second.get());
+        }
     }
     mTransportMap.clear();
     mTransportOptionsMap.clear();
@@ -97,7 +100,7 @@ PushAvStreamTransportManager::ModifyPushTransport(const uint16_t connectionID,
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status PushAvStreamTransportManager::SetTransportStatus(const std::vector<uint16_t> connectionIDList,
+Protocols::InteractionModel::Status PushAvStreamTransportManager::SetTransportStatus(const std::vector<uint16_t> & connectionIDList,
                                                                                      TransportStatusEnum transportStatus)
 {
     if (connectionIDList.empty())
@@ -151,25 +154,34 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::ManuallyTrigge
 
 Protocols::InteractionModel::Status
 PushAvStreamTransportManager::FindTransport(const Optional<DataModel::Nullable<uint16_t>> & connectionID,
-                                            DataModel::List<const TransportConfigurationStruct> & outtransportConfigurations)
+                                            DataModel::List<const TransportConfigurationStruct> & outTransportConfigurations)
 {
-    if (connectionID.Value().IsNull())
+    if (!connectionID.HasValue())
     {
-        ChipLogError(Camera, "PushAvStreamTransportManager, connectionID is null");
+        ChipLogError(Camera, "PushAvStreamTransportManager, connectionID not available");
         return Status::Failure;
     }
 
     std::vector<TransportConfigurationStruct> configList;
 
-    for (auto & it : mTransportConfigMap)
-    {
-        if (connectionID.Value().Value() == it.first)
+    if (connectionID.Value().IsNull()) {
+        for (auto & it : mTransportConfigMap)
         {
             configList.push_back(it.second);
         }
     }
+    else {
+        for (auto & it : mTransportConfigMap)
+        {
+            if (connectionID.Value().Value() == it.first)
+            {
+                configList.push_back(it.second);
+            }
+        }
+    }
 
-    outtransportConfigurations = DataModel::List<const TransportConfigurationStruct>(configList.data(), configList.size());
+    outTransportConfigurations = DataModel::List<const TransportConfigurationStruct>(configList.data(), configList.size());
+    
     return Status::Success;
 }
 

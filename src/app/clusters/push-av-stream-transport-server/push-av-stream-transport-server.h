@@ -96,7 +96,7 @@ public:
      *   @return Success if the stream transport status is successfully set; otherwise, the command SHALL be rejected with an
      * appropriate error.
      */
-    virtual Protocols::InteractionModel::Status SetTransportStatus(const std::vector<uint16_t> connectionIDList, TransportStatusEnum transportStatus) = 0;
+    virtual Protocols::InteractionModel::Status SetTransportStatus(const std::vector<uint16_t> & connectionIDList, TransportStatusEnum transportStatus) = 0;
     /**
      *   @brief Handle Command Delegate to request the Node to manually start the specified push transport.
      *
@@ -119,7 +119,7 @@ appropriate
      *
      *   @param connectionID  [in]     Indicates the allocated connectionID to get the Stream Options Configuration of.
      *
-     *   @param outtransportConfigurations  [out]     Single item list of mapped transport configuration or list if connectionID is
+     *   @param outTransportConfigurations  [out]     Single item list of mapped transport configuration or list if connectionID is
      * NULL.
      *
      *   @return Success if the transport is already allocated; otherwise, the command SHALL be rejected with an appropriate
@@ -128,7 +128,7 @@ appropriate
      */
     virtual Protocols::InteractionModel::Status
     FindTransport(const Optional<DataModel::Nullable<uint16_t>> & connectionID,
-                  DataModel::List<const TransportConfigurationStruct> & outtransportConfigurations) = 0;
+                  DataModel::List<const TransportConfigurationStruct> & outTransportConfigurations) = 0;
 
     /**
      * @brief Validates the requested stream usage against the camera's resource management
