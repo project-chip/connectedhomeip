@@ -34,6 +34,10 @@
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --string-arg app_path:out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app
+#       --string-arg dac_provider_base_path:credentials/test/revoked-attestation-certificates/dac-provider-test-vectors
+#       --string-arg revocation_set_base_path:credentials/test/revoked-attestation-certificates/revocation-sets
+#       --string-arg app_log_path:/tmp/TC_DA_1_9
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
