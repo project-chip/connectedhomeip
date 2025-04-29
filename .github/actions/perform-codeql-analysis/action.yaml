@@ -19,6 +19,7 @@ runs:
         patterns: |
           -**/third_party/**
           -**/scripts/**
+          -**/tests/**
         input: "sarif-results/${{ inputs.language }}.sarif"
         output: "sarif-results/${{ inputs.language }}.sarif"
 
