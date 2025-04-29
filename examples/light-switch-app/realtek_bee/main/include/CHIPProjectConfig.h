@@ -180,3 +180,9 @@
 #define CONFIG_1_TO_11_ZAP 0
 #define MATTER_BINDING_TABLE_SIZE 20
 #endif
+
+// Set the following define to use the Certification Declaration from CHIPDevicePlatformConfig.h and not use it stored in factory
+// data section
+#ifndef CHIP_USE_DEVICE_CONFIG_CERTIFICATION_DECLARATION
+#define CHIP_USE_DEVICE_CONFIG_CERTIFICATION_DECLARATION 0
+#endif

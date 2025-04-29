@@ -30,6 +30,9 @@ import("${nxp_sdk_build_root}/nxp_sdk.gni")
 assert(chip_device_platform == "nxp")
 
 declare_args() {
+  # Enable secondary network interface
+  chip_enable_secondary_nwk_if = false
+
   # Enable OTA encryption
   chip_with_ota_encryption = false
 
@@ -105,7 +108,10 @@ static_library("nxp_platform") {
     "CHIPDevicePlatformConfig.h",
     "PlatformManagerImpl.cpp",
   ]
-  deps = [ "${chip_root}/src/app:app_config" ]
+  deps = [
+    "${chip_root}/src/app:app_config",
+    "${chip_root}/src/app/common:ids",
+  ]
 
   if (nxp_nvm_component == "nvm_fwk" || nxp_nvm_component == "littlefs") {
     sources += [
@@ -180,15 +186,12 @@ static_library("nxp_platform") {
       "../../common/ThreadStackManagerImpl.h",
     ]
 
-    deps += [
-      "${chip_root}/src/app:app_config",
-      "${chip_root}/src/app/common:ids",
-    ]
+    deps += [ "${chip_root}/third_party/openthread:openthread" ]
 
-    if (!nxp_build_matter_standalone_lib) {
-      deps += [ "${chip_root}/third_party/openthread:openthread" ]
-      public_deps +=
-          [ "${chip_root}/third_party/openthread:openthread-platform" ]
+    public_deps += [ "${chip_root}/third_party/openthread:openthread-platform" ]
+
+    if (nxp_enable_matter_cli) {
+      public_deps += [ "${chip_root}/third_party/openthread:openthread_cli" ]
     }
 
     if (chip_mdns == "platform") {

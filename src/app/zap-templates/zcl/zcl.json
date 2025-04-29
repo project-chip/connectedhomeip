@@ -51,6 +51,7 @@
         "drlc-cluster.xml",
         "ecosystem-information-cluster.xml",
         "electrical-energy-measurement-cluster.xml",
+        "electrical-grid-conditions-cluster.xml",
         "electrical-power-measurement-cluster.xml",
         "energy-evse-cluster.xml",
         "energy-evse-mode-cluster.xml",
@@ -202,8 +203,19 @@
         "Bridged Device Basic Information": ["ProductAppearance"],
         "Chime": ["SelectedChime", "Enabled"],
         "Closure Control": ["CountdownTime", "OverallState", "OverallTarget"],
-        "Closure Dimension": ["Current", "Target", "UnitRange", "LimitRange"],
-        "Commodity Price": ["Currency", "CurrentPrice"],
+        "Closure Dimension": [
+            "CurrentState",
+            "Target",
+            "UnitRange",
+            "LimitRange"
+        ],
+        "Commodity Price": [
+            "TariffUnit",
+            "Currency",
+            "CurrentPrice",
+            "PriceForecast",
+            "FeatureMap"
+        ],
         "Commodity Tariff": [
             "TariffInfo",
             "CurrentDay",
@@ -655,6 +667,12 @@
             "CumulativeEnergyReset",
             "FeatureMap"
         ],
+        "Electrical Grid Conditions": [
+            "LocalGenerationAvailable",
+            "CurrentConditions",
+            "ForecastConditions",
+            "FeatureMap"
+        ],
         "Electrical Power Measurement": [
             "PowerMode",
             "NumberOfMeasurementTypes",
@@ -704,13 +722,13 @@
             "MicrophoneCapabilities",
             "SpeakerCapabilities",
             "Viewport",
-            "MaxConcurrentVideoEncoders",
+            "MaxConcurrentEncoders",
             "MaxEncodedPixelRate",
             "NightVisionCapable",
             "RateDistortionTradeOffPoints",
             "MaxContentBufferSize",
             "TwoWayTalkSupport",
-            "SupportedSnapshotParams",
+            "SnapshotCapabilities",
             "MaxNetworkBandwidth",
             "CurrentFrameRate",
             "HDRModeEnabled",

@@ -100,7 +100,7 @@ struct Timestamp
         kSystem = 0,
         kEpoch
     };
-    Timestamp() {}
+    constexpr Timestamp() = default;
     Timestamp(Type aType, uint64_t aValue) : mType(aType), mValue(aValue) {}
     Timestamp(System::Clock::Timestamp aValue) : mType(Type::kSystem), mValue(aValue.count()) {}
     static Timestamp Epoch(System::Clock::Timestamp aValue)

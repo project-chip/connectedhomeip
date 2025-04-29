@@ -796,6 +796,16 @@ void emberAfDeviceEnergyManagementModeClusterShutdownCallback(chip::EndpointId e
 /**
  * @param endpoint    Endpoint that is being initialized
  */
+void emberAfElectricalGridConditionsClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfElectricalGridConditionsClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfDoorLockClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -4339,6 +4349,44 @@ chip::Protocols::InteractionModel::Status MatterDeviceEnergyManagementModeCluste
 void emberAfDeviceEnergyManagementModeClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
+// Electrical Grid Conditions Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfElectricalGridConditionsClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterElectricalGridConditionsClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfElectricalGridConditionsClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterElectricalGridConditionsClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterElectricalGridConditionsClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfElectricalGridConditionsClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
 // Door Lock Cluster
 //
 
@@ -6848,24 +6896,6 @@ bool emberAfBasicInformationClusterMfgSpecificPingCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::BasicInformation::Commands::MfgSpecificPing::DecodableType & commandData);
 /**
- * @brief OTA Software Update Provider Cluster QueryImage Command callback (from client)
- */
-bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData);
-/**
- * @brief OTA Software Update Provider Cluster ApplyUpdateRequest Command callback (from client)
- */
-bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::DecodableType & commandData);
-/**
- * @brief OTA Software Update Provider Cluster NotifyUpdateApplied Command callback (from client)
- */
-bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData);
-/**
  * @brief OTA Software Update Requestor Cluster AnnounceOTAProvider Command callback (from client)
  */
 bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOTAProviderCallback(
@@ -7314,18 +7344,6 @@ bool emberAfWindowCoveringClusterGoToTiltValueCallback(
 bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::DecodableType & commandData);
-/**
- * @brief Closure Dimension Cluster SetTarget Command callback (from client)
- */
-bool emberAfClosureDimensionClusterSetTargetCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ClosureDimension::Commands::SetTarget::DecodableType & commandData);
-/**
- * @brief Closure Dimension Cluster Step Command callback (from client)
- */
-bool emberAfClosureDimensionClusterStepCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ClosureDimension::Commands::Step::DecodableType & commandData);
 /**
  * @brief Thermostat Cluster SetpointRaiseLower Command callback (from client)
  */

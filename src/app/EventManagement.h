@@ -75,7 +75,7 @@ namespace app {
 inline constexpr const uint32_t kEventManagementProfile = 0x1;
 inline constexpr const uint32_t kFabricIndexTag         = 0x1;
 inline constexpr size_t kMaxEventSizeReserve            = 512;
-constexpr uint16_t kRequiredEventField =
+inline constexpr uint16_t kRequiredEventField =
     (1 << to_underlying(EventDataIB::Tag::kPriority)) | (1 << to_underlying(EventDataIB::Tag::kPath));
 
 /**
@@ -390,6 +390,9 @@ public:
                              EventNumber & generatedEventNumber) override;
 
 private:
+    constexpr EventManagement() = default;
+    static EventManagement sInstance;
+
     class InternalEventOptions : public EventOptions
     {
     public:
@@ -567,9 +570,9 @@ private:
     MonotonicallyIncreasingCounter<EventNumber> * mpEventNumberCounter = nullptr;
 
     EventNumber mLastEventNumber = 0; ///< Last event Number vended
-    Timestamp mLastEventTimestamp;    ///< The timestamp of the last event in this buffer
+    Timestamp mLastEventTimestamp{};  ///< The timestamp of the last event in this buffer
 
-    System::Clock::Milliseconds64 mMonotonicStartupTime;
+    System::Clock::Milliseconds64 mMonotonicStartupTime{};
 
     EventReporter * mpEventReporter = nullptr;
 };
