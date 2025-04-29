@@ -37,11 +37,10 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::SoilMeasurement;
 using namespace chip::app::Clusters::SoilMeasurement::Attributes;
-using namespace chip::app::Clusters::SoilMeasurement::Structs;
 
 MeasurementData gMeasurements[MATTER_DM_SOIL_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
 
-MeasurementAccuracyRangeStruct::Type soilMoistureMeasurementLimitsAccuracyRange[] = {
+Globals::Structs::MeasurementAccuracyRangeStruct::Type soilMoistureMeasurementLimitsAccuracyRange[] = {
     { .rangeMin = 0, .rangeMax = 100, .percentMax = MakeOptional(static_cast<chip::Percent100ths>(10)) }
 };
 
@@ -52,12 +51,14 @@ CHIP_ERROR SoilMeasurementAttrAccess::Init()
     // Initialize the soil moisture measurement limits to default values
     for (auto & measurement : gMeasurements)
     {
-        measurement.soilMoistureMeasurementLimits = { .measurementType  = MeasurementTypeEnum::kSoilMoisture,
-                                                      .measured         = true,
-                                                      .minMeasuredValue = 0,
-                                                      .maxMeasuredValue = 100,
-                                                      .accuracyRanges = DataModel::List<const MeasurementAccuracyRangeStruct::Type>(
-                                                          soilMoistureMeasurementLimitsAccuracyRange) };
+        measurement.soilMoistureMeasurementLimits = {
+            .measurementType  = Globals::MeasurementTypeEnum::kSoilMoisture,
+            .measured         = true,
+            .minMeasuredValue = 0,
+            .maxMeasuredValue = 100,
+            .accuracyRanges   = DataModel::List<const Globals::Structs::MeasurementAccuracyRangeStruct::Type>(
+                soilMoistureMeasurementLimitsAccuracyRange)
+        };
     }
 
     return CHIP_NO_ERROR;
@@ -107,7 +108,8 @@ MeasurementData * SoilMeasurementDataForEndpoint(EndpointId endpointId)
 // This function is intended for the application to set the soil measurement accuracy limits to the proper values during init.
 // Given the limits are fixed, it is not intended to be changes at runtime, hence why this function does not report the change.
 // The application should call this function only once during init.
-CHIP_ERROR SetSoilMeasurementAccuracy(EndpointId endpointId, const MeasurementAccuracyStruct::Type & measurementLimits)
+CHIP_ERROR SetSoilMeasurementAccuracy(EndpointId endpointId,
+                                      const Globals::Structs::MeasurementAccuracyStruct::Type & measurementLimits)
 {
     MeasurementData * data = SoilMeasurementDataForEndpoint(endpointId);
     VerifyOrReturnError(data != nullptr, CHIP_ERROR_INVALID_ARGUMENT);

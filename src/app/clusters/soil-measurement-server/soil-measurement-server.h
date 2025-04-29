@@ -32,7 +32,7 @@ namespace SoilMeasurement {
 
 struct MeasurementData
 {
-    Structs::MeasurementAccuracyStruct::Type soilMoistureMeasurementLimits;
+    Globals::Structs::MeasurementAccuracyStruct::Type soilMoistureMeasurementLimits;
 };
 
 class SoilMeasurementAttrAccess : public AttributeAccessInterface
@@ -50,7 +50,7 @@ public:
 private:
 };
 
-CHIP_ERROR SetSoilMeasurementAccuracy(EndpointId endpointId, const Structs::MeasurementAccuracyStruct::Type & accuracy);
+CHIP_ERROR SetSoilMeasurementAccuracy(EndpointId endpointId, const Globals::Structs::MeasurementAccuracyStruct::Type & accuracy);
 
 MeasurementData * SoilMeasurementDataForEndpoint(EndpointId endpointId);
 
