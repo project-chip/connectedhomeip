@@ -57,10 +57,10 @@ class TC_CLCTRL_4_4(MatterBaseTest):
             TestStep("4c", "Initiate a movement to closed position"),
             TestStep("4d", "Check CountdownTime immediately after initiating movement"),
             TestStep("4e", "Check MainState to ensure movement is occurring"),
-            TestStep("5a", "Skip if no countdown time reported"),
+            TestStep("5a", "Skip if CountdownTime reported in Step 4d is NULL"),
             TestStep("5b", "Wait until the operation should be complete"),
             TestStep("5c", "Verify that the MainState is Stopped(0)"),#
-            TestStep("6a", "Skip if countdown time reported in Step 4c is NULL"),
+            TestStep("6a", "Skip if CountdownTime reported in Step 4d is NULL"),
             TestStep("6b", "Start a movement to open position"),
             TestStep("6c", "Check CountdownTime during movement"),
             TestStep("6d", "Stop the movement"),
@@ -97,7 +97,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
             logging.info("CountdownTime attribute not supported, skipping test")
             return
         
-        # Verify the CountdownTime when no operation is in progress
+        # STEP 3: Verify the CountdownTime when no operation is in progress
         self.step(3)
         countdown_time = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=Clusters.ClosureControl.Attributes.CountdownTime)
         asserts.assert_equal(countdown_time, 0, "CountdownTime should be 0 when no operation is in progress")
@@ -116,7 +116,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
         cluster = Clusters.Objects.ClosureControl
         
         # First ensure we're at open position
-        await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"position": 1}))  # OpenInFull
+        await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"position": Clusters.ClosureControl.Enums.TargetPositionEnum.kOpenInFull}))
         
         self.step("4b")
         # Wait to ensure any previous movement is complete
