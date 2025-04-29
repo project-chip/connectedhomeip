@@ -73,7 +73,6 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     std::vector<StreamUsageEnum> supportedStreamUsages  = mCameraDevice->GetCameraHALInterface().GetSupportedStreamUsages();
     std::vector<StreamUsageEnum> rankedStreamPriorities = mCameraDevice->GetCameraHALInterface().GetRankedStreamPriorities();
 
-
     // Instantiate the CameraAVStreamMgmt Server
     mAVStreamMgmtServerPtr = std::make_unique<CameraAVStreamMgmtServer>(
         mCameraDevice->GetCameraAVStreamMgmtDelegate(), mEndpoint, features, optionalAttrs, maxConcurrentVideoEncoders,
