@@ -51,20 +51,20 @@ class TC_CLCTRL_4_4(MatterBaseTest):
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read the AttributeList"),
             TestStep("2b", "Check if CountdownTime attribute is supported"),
-            TestStep("2c", "Verify the CountdownTime when no operation is in progress"),
-            TestStep("3a", "Prepare the DUT by moving to open position"),
-            TestStep("3b", "Wait until previous movement is complete"),
-            TestStep("3c", "Initiate a movement to closed position"),
-            TestStep("3d", "Check CountdownTime immediately after initiating movement"),
-            TestStep("3e", "Check MainState to ensure movement is occurring"),
-            TestStep("4a", "Skip if no countdown time reported"),
-            TestStep("4b", "Wait until the operation should be complete"),
-            TestStep("4c", "Verify that the MainState is Stopped(0)"),#
-            TestStep("5a", "Skip if countdown time reported in Step 4c is NULL"),
-            TestStep("5b", "Start a movement to open position"),
-            TestStep("5c", "Check CountdownTime during movement"),
-            TestStep("5d", "Stop the movement"),
-            TestStep("5e", "Check CountdownTime after interrupting the movement"),
+            TestStep(3, "Verify the CountdownTime when no operation is in progress"),
+            TestStep("4a", "Prepare the DUT by moving to open position"),
+            TestStep("4b", "Wait until previous movement is complete"),
+            TestStep("4c", "Initiate a movement to closed position"),
+            TestStep("4d", "Check CountdownTime immediately after initiating movement"),
+            TestStep("4e", "Check MainState to ensure movement is occurring"),
+            TestStep("5a", "Skip if no countdown time reported"),
+            TestStep("5b", "Wait until the operation should be complete"),
+            TestStep("5c", "Verify that the MainState is Stopped(0)"),#
+            TestStep("6a", "Skip if countdown time reported in Step 4c is NULL"),
+            TestStep("6b", "Start a movement to open position"),
+            TestStep("6c", "Check CountdownTime during movement"),
+            TestStep("6d", "Stop the movement"),
+            TestStep("6e", "Check CountdownTime after interrupting the movement"),
         ]
         return steps
 
@@ -98,12 +98,12 @@ class TC_CLCTRL_4_4(MatterBaseTest):
             return
         
         # Verify the CountdownTime when no operation is in progress
-        self.step("2c")
+        self.step(3)
         countdown_time = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=Clusters.ClosureControl.Attributes.CountdownTime)
         asserts.assert_equal(countdown_time, 0, "CountdownTime should be 0 when no operation is in progress")
         
-        # STEP 3: Verify the CountdownTime when an operation is initiated
-        self.step("3a")
+        # STEP 4: Verify the CountdownTime when an operation is initiated
+        self.step("4a")
         
         # Read feature map to determine feature support
         feature_map = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=Clusters.ClosureControl.Attributes.FeatureMap)
@@ -118,15 +118,15 @@ class TC_CLCTRL_4_4(MatterBaseTest):
         # First ensure we're at open position
         await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"position": 1}))  # OpenInFull
         
-        self.step("3b")
+        self.step("4b")
         # Wait to ensure any previous movement is complete
         time.sleep(full_motion_duration)
         
-        self.step("3c")
+        self.step("4c")
         # Now initiate a movement to closed position
         await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"position": 0}))  # CloseInFull
         
-        self.step("3d")
+        self.step("4d")
         # Check CountdownTime immediately after initiating movement
         countdown_time = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=Clusters.ClosureControl.Attributes.CountdownTime)
         
@@ -138,18 +138,18 @@ class TC_CLCTRL_4_4(MatterBaseTest):
             logging.info("CountdownTime returned NULL, device does not provide time estimates")
             stored_countdown_time = None
         
-        self.step("3e")
+        self.step("4e")
         # Check MainState to ensure movement is occurring
         main_state = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=Clusters.ClosureControl.Attributes.MainState)
         asserts.assert_equal(main_state, 1, "MainState should be Moving(1) during motion")
         
-        # STEP 4: Verify the CountdownTime becomes 0 when an operation completes
-        self.step("4a")
+        # STEP 5: Verify the CountdownTime becomes 0 when an operation completes
+        self.step("5a")
         if stored_countdown_time is None:
             logging.info("CountdownTime returned NULL, skipping remaining steps.")
             return
         
-        self.step("4b")
+        self.step("5b")
         # Wait until the operation should be complete (with some margin)
         time.sleep(stored_countdown_time + 2)
         
@@ -157,27 +157,27 @@ class TC_CLCTRL_4_4(MatterBaseTest):
         countdown_time = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=Clusters.ClosureControl.Attributes.CountdownTime)
         asserts.assert_equal(countdown_time, 0, "CountdownTime should be 0 when operation completes")
         
-        self.step("4c")
+        self.step("5c")
         # Check MainState to ensure movement has stopped
         main_state = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=Clusters.ClosureControl.Attributes.MainState)
         asserts.assert_equal(main_state, 0, "MainState should be Stopped(0) when operation completes")
         
-        # STEP 5: Verify the CountdownTime behavior when an operation is interrupted
-        self.step("5a")
+        # STEP 6: Verify the CountdownTime behavior when an operation is interrupted
+        self.step("6a")
         if stored_countdown_time is None:
             logging.info("CountdownTime returned NULL, skipping remaining steps.")
             return
         
-        self.step("5b")
+        self.step("6b")
         # Start a movement to open position
         await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"position": 1}))  # OpenInFull
             
-        self.step("5c")
+        self.step("6c")
         # Check CountdownTime during movement
         countdown_time = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=Clusters.ClosureControl.Attributes.CountdownTime)
         asserts.assert_true(countdown_time > 0, "CountdownTime should be positive during movement")
             
-        self.step("5d")
+        self.step("6d")
         # Stop the movement
         stop_cmd_supported = False
         try:
@@ -186,7 +186,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
         except Exception as e:
             logging.info(f"Stop command not supported: {e}")
         
-        self.step("5e")
+        self.step("6e")
         # If Stop command is supported, check that CountdownTime is reset
         if stop_cmd_supported:
             countdown_time = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=Clusters.ClosureControl.Attributes.CountdownTime)
