@@ -26,13 +26,6 @@
 using namespace ::chip::System;
 using namespace chip::DeviceLayer::Silabs;
 
-void RGBLEDWidget::Set(bool state)
-{
-    mLastChangeTimeMS = mBlinkOnTimeMS = mBlinkOffTimeMS = 0;
-    GetPlatform().SetLed(state, GetLED());
-    mLedStatus = state;
-}
-
 void RGBLEDWidget::SetColor(uint8_t red, uint8_t green, uint8_t blue)
 {
     if (GetPlatform().GetRGBLedState(GetLED()))
@@ -87,12 +80,11 @@ constexpr float kHueScaleFactor     = 6.0f;
 constexpr uint8_t kMaxColorValue    = 255;
 
 // to the specified range given as min and max
-RGBLEDWidget::RgbColor_t RGBLEDWidget::RgbClamp(uint8_t r, uint8_t g, uint8_t b, uint8_t min, uint8_t max)
+RGBLEDWidget::RgbColor_t RGBLEDWidget::RgbClamp(RgbColor_t rgb, uint8_t min, uint8_t max)
 {
-    RgbColor_t rgb;
-    rgb.r = (uint8_t) clamp(r, min, max);
-    rgb.g = (uint8_t) clamp(g, min, max);
-    rgb.b = (uint8_t) clamp(b, min, max);
+    rgb.r = static_cast<uint8_t>(clamp(rgb.r, min, max));
+    rgb.g = static_cast<uint8_t>(clamp(rgb.g, min, max));
+    rgb.b = static_cast<uint8_t>(clamp(rgb.b, min, max));
     return rgb;
 }
 
@@ -266,11 +258,11 @@ RGBLEDWidget::RgbColor_t RGBLEDWidget::CTToRgb(uint16_t ctMireds)
     RgbColor_t rgb;
     float ctCentiKelvin = 10000 / static_cast<float>(ctMireds);
 
-    float r = CalculateRed(ctCentiKelvin);
-    float g = CalculateGreen(ctCentiKelvin);
-    float b = CalculateBlue(ctCentiKelvin);
+    rgb.r = CalculateRed(ctCentiKelvin);
+    rgb.g = CalculateGreen(ctCentiKelvin);
+    rgb.b = CalculateBlue(ctCentiKelvin);
 
-    rgb = RgbClamp(r, g, b, 0, kMaxColorValue);
+    rgb = RgbClamp(rgb, 0, kMaxColorValue);
 
     return rgb;
 }

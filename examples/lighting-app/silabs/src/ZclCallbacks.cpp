@@ -54,18 +54,64 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         LightMgr().InitiateAction(AppEvent::kEventType_Light, *value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION,
                                   value);
     }
+    // WIP Apply attribute change to Light
     else if (clusterId == LevelControl::Id)
     {
         ChipLogProgress(Zcl, "Level Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);
-        // WIP Apply attribute change to Light
+
         LightMgr().InitiateAction(AppEvent::kEventType_Light, LightingManager::LEVEL_ACTION, value);
     }
-    else if (clusterId == ColorControl::Id)
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+    // WIP Apply attribute change to Light
+    if (clusterId == ColorControl::Id)
     {
         ChipLogProgress(Zcl, "Color Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);
-// WIP Apply attribute change to Light
+
+        if (clusterId == ColorControl::Id && attributeId == ColorControl::Attributes::CurrentX::Id)
+        {
+            ChipLogProgress(Zcl, "Color Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
+                            ChipLogValueMEI(attributeId), type, *value, size);
+
+            LightMgr().InitiateLightctrlAction(AppEvent::kEventType_Light, LightingManager::COLOR_ACTION_XY, sizeof(value),
+                                               attributeId, value);
+        }
+        else if (clusterId == ColorControl::Id && attributeId == ColorControl::Attributes::CurrentY::Id)
+        {
+            ChipLogProgress(Zcl, "Color Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
+                            ChipLogValueMEI(attributeId), type, *value, size);
+            LightMgr().InitiateLightctrlAction(AppEvent::kEventType_Light, LightingManager::COLOR_ACTION_XY, sizeof(value),
+                                               attributeId, value);
+        }
+        if (clusterId == ColorControl::Id && attributeId == ColorControl::Attributes::CurrentHue::Id)
+        {
+            ChipLogProgress(Zcl, "Color Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
+                            ChipLogValueMEI(attributeId), type, *value, size);
+            LightMgr().InitiateLightctrlAction(AppEvent::kEventType_Light, LightingManager::COLOR_ACTION_HSV, sizeof(value),
+                                               attributeId, value);
+        }
+        else if (clusterId == ColorControl::Id && attributeId == ColorControl::Attributes::CurrentSaturation::Id)
+        {
+            ChipLogProgress(Zcl, "Color Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
+                            ChipLogValueMEI(attributeId), type, *value, size);
+            LightMgr().InitiateLightctrlAction(AppEvent::kEventType_Light, LightingManager::COLOR_ACTION_HSV, sizeof(value),
+                                               attributeId, value);
+        }
+        else if (attributeId == ColorControl::Attributes::ColorTemperatureMireds::Id)
+        {
+            if (size != sizeof(uint16_t))
+            {
+                ChipLogError(Zcl, "Wrong length for ColorControl value: %d", size);
+                return;
+            }
+            LightMgr().InitiateLightctrlAction(AppEvent::kEventType_Light, LightingManager::COLOR_ACTION_CT, sizeof(value),
+                                               attributeId, value);
+        }
+    }
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+#if 0
+                        // WIP Apply attribute change to Light
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
         EndpointId endpoint = attributePath.mEndpointId;
         RGBLEDWidget::ColorData_t colorData;
@@ -126,6 +172,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
 #endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
     }
+#endif
     else if (clusterId == Identify::Id)
     {
         ChipLogProgress(Zcl, "Identify attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",

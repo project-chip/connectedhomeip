@@ -23,6 +23,7 @@
 
 #include "AppEvent.h"
 
+#include <app-common/zap-generated/ids/Attributes.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <cmsis_os2.h>
 #include <lib/core/CHIPError.h>
@@ -58,6 +59,7 @@ public:
     bool InitiateAction(int32_t aActor, Action_t aAction, uint8_t * aValue);
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
     bool InitiateLightAction(int32_t aActor, Action_t aAction, uint16_t size, RGBLEDWidget::ColorData_t * value);
+    bool InitiateLightctrlAction(int32_t aActor, Action_t aAction, uint16_t size, uint32_t aAttributeId, uint8_t * value);
 #endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)
     typedef void (*Callback_fn_initiated)(Action_t, int32_t aActor);
     typedef void (*Callback_fn_completed)(Action_t);
@@ -69,9 +71,12 @@ private:
     friend LightingManager & LightMgr(void);
     State_t mState;
 
-    uint8_t mCurrentLevel;
-    uint8_t mCurrentHue        = 0; // RAM copy of CurrentHue
-    uint8_t mCurrentSaturation = 0; // RAM copy of CurrentSaturation
+    uint8_t mCurrentLevel      = 254; // 0xFE = default
+    uint8_t mCurrentHue        = 0;
+    uint8_t mCurrentSaturation = 0;
+    uint16_t mCurrentX         = 0;
+    uint16_t mCurrentY         = 0;
+    uint16_t mCurrentCTMireds  = 250;
 
     Callback_fn_initiated mActionInitiated_CB;
     Callback_fn_completed mActionCompleted_CB;

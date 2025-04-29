@@ -53,9 +53,6 @@ public:
     void SetColor(uint8_t r, uint8_t g, uint8_t b);
     void GetColor(uint16_t & r, uint16_t & g, uint16_t & b);
 
-    void Set(bool state);
-    bool GetLEDStatus(uint8_t led);
-
     // Color Conversion Functions
     void SetColorFromHSV(uint8_t h, uint8_t s);
     void SetColorFromXY(uint16_t currentX, uint16_t currentY);
@@ -74,8 +71,7 @@ private:
     RgbColor_t CTToRgb(uint16_t ct);
 
     // Color adjustments and conversions
-    RgbColor_t RgbClamp(uint8_t r, uint8_t g, uint8_t b, uint8_t min, uint8_t max);
-    // RgbColor_t RgbClamp(float r, float g, float b, uint8_t min, uint8_t max);
+    RgbColor_t RgbClamp(RgbColor_t rgb, uint8_t min, uint8_t max);
     RgbColor_t ConvertXYZToRGB(float X, float Y, float Z);
     RgbColor_t NormalizeRgb(float r, float g, float b);
     float ApplyGammaCorrection(float value);
