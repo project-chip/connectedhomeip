@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -69,333 +69,485 @@ Davis, CA 95616, USA
   <clusterIds>
     <clusterId id="0x0300" name="Color Control"/>
   </clusterIds>
-  <classification hierarchy="base" role="application" picsCode="CC" primaryTransaction="1"/>
+  <classification hierarchy="base" role="application" picsCode="CC" scope="Endpoint"/>
   <features>
     <feature bit="0" code="HS" name="Hue/Saturation" summary="Supports color specification via hue/saturation.">
       <optionalConform/>
     </feature>
-    <feature bit="1" code="EHUE" name="Enhanced" summary="Enhanced hue is supported.">
+    <feature bit="1" code="EHUE" name="Enhanced Hue" summary="Enhanced hue is supported.">
       <optionalConform/>
     </feature>
-    <feature bit="2" code="CL" name="Color" summary="Color loop is supported.">
+    <feature bit="2" code="CL" name="Color loop" summary="Color loop is supported.">
       <optionalConform/>
     </feature>
     <feature bit="3" code="XY" name="XY" summary="Supports color specification via XY.">
       <optionalConform/>
     </feature>
-    <feature bit="4" code="CT" name="Color" summary="Supports specification of color temperature.">
+    <feature bit="4" code="CT" name="Color temperature" summary="Supports specification of color temperature.">
       <optionalConform/>
     </feature>
   </features>
-  <dataTypes/>
   <attributes>
     <attribute id="0x0000" name="CurrentHue" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile" reportable="true"/>
       <mandatoryConform>
         <feature name="HS"/>
       </mandatoryConform>
-      <constraint type="between" from="0" to="254"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="254"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="CurrentSaturation" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality scene="true" persistence="nonVolatile" reportable="true"/>
       <mandatoryConform>
         <feature name="HS"/>
       </mandatoryConform>
-      <constraint type="between" from="0" to="254"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="254"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0002" name="RemainingTime" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
-      <constraint type="between" from="0" to="65534"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="65534"/>
+        </between>
+      </constraint>
     </attribute>
-    <attribute id="0x0003" name="CurrentX" type="uint16" default="0x616B (0.381)">
+    <attribute id="0x0003" name="CurrentX" type="uint16" default="0x616B">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality scene="true" persistence="nonVolatile" reportable="true"/>
       <mandatoryConform>
         <feature name="XY"/>
       </mandatoryConform>
-      <constraint type="between" from="0" to="0xFEFF"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="0xFEFF"/>
+        </between>
+      </constraint>
     </attribute>
-    <attribute id="0x0004" name="CurrentY" type="uint16" default="0x607D (0.377)">
+    <attribute id="0x0004" name="CurrentY" type="uint16" default="0x607D">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality scene="true" persistence="nonVolatile" reportable="true"/>
       <mandatoryConform>
         <feature name="XY"/>
       </mandatoryConform>
-      <constraint type="between" from="0" to="0xFEFF"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="0xFEFF"/>
+        </between>
+      </constraint>
     </attribute>
-    <attribute id="0x0005" name="DriftCompensation" type="enum8" default="-">
+    <attribute id="0x0005" name="DriftCompensation" type="enum8" default="">
       <enum>
-        <item value="0" name="Item0" summary="None">
+        <item value="0" name="None" summary="None">
           <mandatoryConform/>
         </item>
-        <item value="1" name="Item1" summary="Other / Unknown">
+        <item value="1" name="OtherUnknown" summary="Other / Unknown">
           <mandatoryConform/>
         </item>
-        <item value="2" name="Item2" summary="Temperature monitoring">
+        <item value="2" name="TemperatureMonitoring" summary="Temperature monitoring">
           <mandatoryConform/>
         </item>
-        <item value="3" name="Item3" summary="Optical luminance monitoring and feedback">
+        <item value="3" name="OpticalLuminanceMonitoringAndFeedback" summary="Optical luminance monitoring and feedback">
           <mandatoryConform/>
         </item>
-        <item value="4" name="Item4" summary="Optical color monitoring and feedback">
+        <item value="4" name="OpticalColorMonitoringAndFeedback" summary="Optical color monitoring and feedback">
           <mandatoryConform/>
         </item>
       </enum>
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
-      <constraint type="between" from="0" to="4"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="4"/>
+        </between>
+      </constraint>
     </attribute>
-    <attribute id="0x0006" name="CompensationText" type="string" default="-">
+    <attribute id="0x0006" name="CompensationText" type="string" default="">
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
-      <constraint type="maxLength" value="254"/>
+      <constraint>
+        <maxLength value="254"/>
+      </constraint>
     </attribute>
-    <attribute id="0x0007" name="ColorTemperatureMireds" type="uint16" default="0x00FA (4000K)">
+    <attribute id="0x0007" name="ColorTemperatureMireds" type="uint16" default="0x00FA">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality scene="true" persistence="nonVolatile" reportable="true"/>
       <mandatoryConform>
         <feature name="CT"/>
       </mandatoryConform>
-      <constraint type="between" from="0" to="0xFEFF"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="0xFEFF"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0008" name="ColorMode" type="enum8" default="1">
       <enum>
-        <item value="0" name="Item0">
+        <item value="0" name="CurrentHueAndCurrentSaturation" summary="CurrentHue and CurrentSaturation">
           <mandatoryConform/>
         </item>
-        <item value="1" name="Item1">
+        <item value="1" name="CurrentXAndCurrentY" summary="CurrentX and CurrentY">
           <mandatoryConform/>
         </item>
-        <item value="2" name="Item2">
+        <item value="2" name="ColorTemperatureMireds" summary="ColorTemperatureMireds">
           <mandatoryConform/>
         </item>
       </enum>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="between" from="0" to="2"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="2"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x000F" name="Options" type="map8" default="0">
       <bitmap>
-        <bitfield name="ExecuteIfOff" bit="0" summary="0 – Do not execute command if the On/Off cluster, OnOff attribute is FALSE. +
-                     1 – Execute command if the On/Off cluster, OnOff attribute is FALSE.">
+        <bitfield name="ExecuteIfOff" bit="0" summary="ExecuteIfOff">
           <mandatoryConform/>
         </bitfield>
       </bitmap>
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
-    <attribute id="0x0010" name="NumberOfPrimaries" type="uint8" default="-">
+    <attribute id="0x0010" name="NumberOfPrimaries" type="uint8" default="">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="between" from="0" to="6"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="6"/>
+        </between>
+      </constraint>
     </attribute>
-    <attribute id="0x0011" name="Primary1X" type="uint16" default="-">
+    <attribute id="0x0011" name="Primary1X" type="uint16" default="">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="between" from="0" to="0xFEFF"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="0xFEFF"/>
+        </between>
+      </constraint>
     </attribute>
-    <attribute id="0x0012" name="Primary1Y" type="uint16" default="-">
+    <attribute id="0x0012" name="Primary1Y" type="uint16" default="">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="between" from="0" to="0xFEFF"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="0xFEFF"/>
+        </between>
+      </constraint>
     </attribute>
-    <attribute id="0x0013" name="Primary1Intensity" type="uint8" default="-">
+    <attribute id="0x0013" name="Primary1Intensity" type="uint8" default="">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
-      <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0015" name="Primary2X" type="uint16" default="-">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
-      <mandatoryConform/>
-      <constraint type="between" from="0" to="0xFEFF"/>
-    </attribute>
-    <attribute id="0x0016" name="Primary2Y" type="uint16" default="-">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
-      <mandatoryConform/>
-      <constraint type="between" from="0" to="0xFEFF"/>
-    </attribute>
-    <attribute id="0x0017" name="Primary2Intensity" type="uint8" default="-">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
-      <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0019" name="Primary3X" type="uint16" default="-">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
-      <mandatoryConform/>
-      <constraint type="between" from="0" to="0xFEFF"/>
-    </attribute>
-    <attribute id="0x001A" name="Primary3Y" type="uint16" default="-">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
-      <mandatoryConform/>
-      <constraint type="between" from="0" to="0xFEFF"/>
-    </attribute>
-    <attribute id="0x001B" name="Primary3Intensity" type="uint8" default="-">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0020" name="Primary4X" type="uint16" default="-">
+    <attribute id="0x0015" name="Primary2X" type="uint16" default="">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="between" from="0" to="0xFEFF"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="0xFEFF"/>
+        </between>
+      </constraint>
     </attribute>
-    <attribute id="0x0021" name="Primary4Y" type="uint16" default="-">
+    <attribute id="0x0016" name="Primary2Y" type="uint16" default="">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="between" from="0" to="0xFEFF"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="0xFEFF"/>
+        </between>
+      </constraint>
     </attribute>
-    <attribute id="0x0022" name="Primary4Intensity" type="uint8" default="-">
+    <attribute id="0x0017" name="Primary2Intensity" type="uint8" default="">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
-      <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0024" name="Primary5X" type="uint16" default="-">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
-      <mandatoryConform/>
-      <constraint type="between" from="0" to="0xFEFF"/>
-    </attribute>
-    <attribute id="0x0025" name="Primary5Y" type="uint16" default="-">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
-      <mandatoryConform/>
-      <constraint type="between" from="0" to="0xFEFF"/>
-    </attribute>
-    <attribute id="0x0026" name="Primary5Intensity" type="uint8" default="-">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0028" name="Primary6X" type="uint16" default="-">
+    <attribute id="0x0019" name="Primary3X" type="uint16" default="">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="between" from="0" to="0xFEFF"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="0xFEFF"/>
+        </between>
+      </constraint>
     </attribute>
-    <attribute id="0x0029" name="Primary6Y" type="uint16" default="-">
+    <attribute id="0x001A" name="Primary3Y" type="uint16" default="">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="between" from="0" to="0xFEFF"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="0xFEFF"/>
+        </between>
+      </constraint>
     </attribute>
-    <attribute id="0x002A" name="Primary6Intensity" type="uint8" default="-">
+    <attribute id="0x001B" name="Primary3Intensity" type="uint8" default="">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0030" name="WhitePointX" type="uint16" default="-">
+    <attribute id="0x0020" name="Primary4X" type="uint16" default="">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="0xFEFF"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0021" name="Primary4Y" type="uint16" default="">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="0xFEFF"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0022" name="Primary4Intensity" type="uint8" default="">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="fixed"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0024" name="Primary5X" type="uint16" default="">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="0xFEFF"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0025" name="Primary5Y" type="uint16" default="">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="0xFEFF"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0026" name="Primary5Intensity" type="uint8" default="">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="fixed"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0028" name="Primary6X" type="uint16" default="">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="0xFEFF"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0029" name="Primary6Y" type="uint16" default="">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="0xFEFF"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x002A" name="Primary6Intensity" type="uint8" default="">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="fixed"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0030" name="WhitePointX" type="uint16" default="">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
-      <constraint type="between" from="0" to="0xFEFF"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="0xFEFF"/>
+        </between>
+      </constraint>
     </attribute>
-    <attribute id="0x0031" name="WhitePointY" type="uint16" default="-">
+    <attribute id="0x0031" name="WhitePointY" type="uint16" default="">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
-      <constraint type="between" from="0" to="0xFEFF"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="0xFEFF"/>
+        </between>
+      </constraint>
     </attribute>
-    <attribute id="0x0032" name="ColorPointRX" type="uint16" default="-">
+    <attribute id="0x0032" name="ColorPointRX" type="uint16" default="">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
-      <constraint type="between" from="0" to="0xFEFF"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="0xFEFF"/>
+        </between>
+      </constraint>
     </attribute>
-    <attribute id="0x0033" name="ColorPointRY" type="uint16" default="-">
+    <attribute id="0x0033" name="ColorPointRY" type="uint16" default="">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
-      <constraint type="between" from="0" to="0xFEFF"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="0xFEFF"/>
+        </between>
+      </constraint>
     </attribute>
-    <attribute id="0x0034" name="ColorPointRIntensity" type="uint8" default="-">
+    <attribute id="0x0034" name="ColorPointRIntensity" type="uint8" default="">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0036" name="ColorPointGX" type="uint16" default="-">
+    <attribute id="0x0036" name="ColorPointGX" type="uint16" default="">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
-      <constraint type="between" from="0" to="0xFEFF"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="0xFEFF"/>
+        </between>
+      </constraint>
     </attribute>
-    <attribute id="0x0037" name="ColorPointGY" type="uint16" default="-">
+    <attribute id="0x0037" name="ColorPointGY" type="uint16" default="">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
-      <constraint type="between" from="0" to="0xFEFF"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="0xFEFF"/>
+        </between>
+      </constraint>
     </attribute>
-    <attribute id="0x0038" name="ColorPointGIntensity" type="uint8" default="-">
+    <attribute id="0x0038" name="ColorPointGIntensity" type="uint8" default="">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x003A" name="ColorPointBX" type="uint16" default="-">
+    <attribute id="0x003A" name="ColorPointBX" type="uint16" default="">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
-      <constraint type="between" from="0" to="0xFEFF"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="0xFEFF"/>
+        </between>
+      </constraint>
     </attribute>
-    <attribute id="0x003B" name="ColorPointBY" type="uint16" default="-">
+    <attribute id="0x003B" name="ColorPointBY" type="uint16" default="">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
-      <constraint type="between" from="0" to="0xFEFF"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="0xFEFF"/>
+        </between>
+      </constraint>
     </attribute>
-    <attribute id="0x003C" name="ColorPointBIntensity" type="uint8" default="-">
+    <attribute id="0x003C" name="ColorPointBIntensity" type="uint8" default="">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x4000" name="EnhancedCurrentHue" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality scene="true" persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="EHUE"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x4001" name="EnhancedColorMode" type="enum8" default="1">
       <enum>
-        <item value="0" name="Item0">
+        <item value="0" name="CurrentHueAndCurrentSaturation" summary="CurrentHue and CurrentSaturation">
           <mandatoryConform/>
         </item>
-        <item value="1" name="Item1">
+        <item value="1" name="CurrentXAndCurrentY" summary="CurrentX and CurrentY">
           <mandatoryConform/>
         </item>
-        <item value="2" name="Item2">
+        <item value="2" name="ColorTemperatureMireds" summary="ColorTemperatureMireds">
           <mandatoryConform/>
         </item>
-        <item value="3" name="Item3">
+        <item value="3" name="EnhancedCurrentHueAndCurrentSaturation" summary="EnhancedCurrentHue and CurrentSaturation">
           <mandatoryConform/>
         </item>
       </enum>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality scene="true" persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="between" from="0" to="3"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="3"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x4002" name="ColorLoopActive" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality scene="true" persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="CL"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x4003" name="ColorLoopDirection" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality scene="true" persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="CL"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x4004" name="ColorLoopTime" type="uint16" default="0x0019">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality scene="true" persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="CL"/>
       </mandatoryConform>
@@ -415,21 +567,36 @@ Davis, CA 95616, USA
     <attribute id="0x400A" name="ColorCapabilities" type="map16" default="0">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
-      <constraint type="between" from="0" to="0x001F"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="0x001F"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x400B" name="ColorTempPhysicalMinMireds" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="CT"/>
       </mandatoryConform>
-      <constraint type="between" from="0" to="0xFEFF"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="0xFEFF"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x400C" name="ColorTempPhysicalMaxMireds" type="uint16" default="0xFEFF">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="CT"/>
       </mandatoryConform>
-      <constraint type="between" from="0" to="0xFEFF"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="0xFEFF"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x400D" name="CoupleColorTempToLevelMinMireds" type="uint16" default="MS">
       <access read="true" readPrivilege="view"/>
@@ -439,18 +606,32 @@ Davis, CA 95616, USA
           <attribute name="ColorTemperatureMireds"/>
         </orTerm>
       </mandatoryConform>
-      <constraint type="between" from="ColorTempPhysicalMinMireds" to="ColorTemperatureMireds"/>
+      <constraint>
+        <between>
+          <from>
+            <attribute name="ColorTempPhysicalMinMireds"/>
+          </from>
+          <to>
+            <attribute name="ColorTemperatureMireds"/>
+          </to>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x4010" name="StartUpColorTemperatureMireds" type="uint16" default="MS">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform>
         <orTerm>
           <feature name="CT"/>
           <attribute name="ColorTemperatureMireds"/>
         </orTerm>
       </mandatoryConform>
-      <constraint type="between" from="0" to="0xFEFF"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="0xFEFF"/>
+        </between>
+      </constraint>
     </attribute>
   </attributes>
   <commands>
@@ -461,37 +642,53 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="Hue" type="uint8">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="254"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="254"/>
+          </between>
+        </constraint>
       </field>
       <field id="1" name="Direction" type="enum8">
         <enum>
-          <item value="0" name="Item0" summary="Shortest distance">
+          <item value="0" name="ShortestDistance" summary="Shortest distance">
             <mandatoryConform/>
           </item>
-          <item value="1" name="Item1" summary="Longest distance">
+          <item value="1" name="LongestDistance" summary="Longest distance">
             <mandatoryConform/>
           </item>
-          <item value="2" name="Item2" summary="Up">
+          <item value="2" name="Up" summary="Up">
             <mandatoryConform/>
           </item>
-          <item value="3" name="Item3" summary="Down">
+          <item value="3" name="Down" summary="Down">
             <mandatoryConform/>
           </item>
         </enum>
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="2" name="TransitionTime" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="65534"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="65534"/>
+          </between>
+        </constraint>
       </field>
       <field id="3" name="OptionsMask" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="4" name="OptionsOverride" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x01" name="MoveHue" direction="commandToServer" response="Y">
@@ -501,32 +698,38 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="MoveMode" type="enum8">
         <enum>
-          <item value="0" name="Item0" summary="Stop">
+          <item value="0" name="Stop" summary="Stop">
             <mandatoryConform/>
           </item>
-          <item value="1" name="Item1" summary="Up">
+          <item value="1" name="Up" summary="Up">
             <mandatoryConform/>
           </item>
-          <item value="2" name="Item2" summary="Reserved">
+          <item value="2" name="Reserved" summary="Reserved">
             <mandatoryConform/>
           </item>
-          <item value="3" name="Item3" summary="Down">
+          <item value="3" name="Down" summary="Down">
             <mandatoryConform/>
           </item>
         </enum>
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="Rate" type="uint8">
         <mandatoryConform/>
       </field>
       <field id="2" name="OptionsMask" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="3" name="OptionsOverride" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x02" name="StepHue" direction="commandToServer" response="Y">
@@ -536,21 +739,23 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="StepMode" type="enum8">
         <enum>
-          <item value="0" name="Item0" summary="Reserved">
+          <item value="0" name="Reserved" summary="Reserved">
             <mandatoryConform/>
           </item>
-          <item value="1" name="Item1" summary="Up">
+          <item value="1" name="Up" summary="Up">
             <mandatoryConform/>
           </item>
-          <item value="2" name="Item2" summary="Reserved">
+          <item value="2" name="Reserved" summary="Reserved">
             <mandatoryConform/>
           </item>
-          <item value="3" name="Item3" summary="Down">
+          <item value="3" name="Down" summary="Down">
             <mandatoryConform/>
           </item>
         </enum>
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="StepSize" type="uint8">
         <mandatoryConform/>
@@ -560,11 +765,15 @@ Davis, CA 95616, USA
       </field>
       <field id="3" name="OptionsMask" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="4" name="OptionsOverride" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x03" name="MoveToSaturation" direction="commandToServer" response="Y">
@@ -574,19 +783,33 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="Saturation" type="uint8">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="254"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="254"/>
+          </between>
+        </constraint>
       </field>
       <field id="1" name="TransitionTime" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="65534"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="65534"/>
+          </between>
+        </constraint>
       </field>
       <field id="2" name="OptionsMask" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="3" name="OptionsOverride" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x04" name="MoveSaturation" direction="commandToServer" response="Y">
@@ -596,32 +819,38 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="MoveMode" type="enum8">
         <enum>
-          <item value="0" name="Item0" summary="Stop">
+          <item value="0" name="Stop" summary="Stop">
             <mandatoryConform/>
           </item>
-          <item value="1" name="Item1" summary="Up">
+          <item value="1" name="Up" summary="Up">
             <mandatoryConform/>
           </item>
-          <item value="2" name="Item2" summary="Reserved">
+          <item value="2" name="Reserved" summary="Reserved">
             <mandatoryConform/>
           </item>
-          <item value="3" name="Item3" summary="Down">
+          <item value="3" name="Down" summary="Down">
             <mandatoryConform/>
           </item>
         </enum>
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="Rate" type="uint8">
         <mandatoryConform/>
       </field>
       <field id="2" name="OptionsMask" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="3" name="OptionsOverride" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x05" name="StepSaturation" direction="commandToServer" response="Y">
@@ -631,21 +860,23 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="StepMode" type="enum8">
         <enum>
-          <item value="0" name="Item0" summary="Reserved">
+          <item value="0" name="Reserved" summary="Reserved">
             <mandatoryConform/>
           </item>
-          <item value="1" name="Item1" summary="Up">
+          <item value="1" name="Up" summary="Up">
             <mandatoryConform/>
           </item>
-          <item value="2" name="Item2" summary="Reserved">
+          <item value="2" name="Reserved" summary="Reserved">
             <mandatoryConform/>
           </item>
-          <item value="3" name="Item3" summary="Down">
+          <item value="3" name="Down" summary="Down">
             <mandatoryConform/>
           </item>
         </enum>
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="StepSize" type="uint8">
         <mandatoryConform/>
@@ -655,11 +886,15 @@ Davis, CA 95616, USA
       </field>
       <field id="3" name="OptionsMask" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="4" name="OptionsOverride" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x06" name="MoveToHueAndSaturation" direction="commandToServer" response="Y">
@@ -669,23 +904,42 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="Hue" type="uint8">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="254"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="254"/>
+          </between>
+        </constraint>
       </field>
       <field id="1" name="Saturation" type="uint8">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="254"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="254"/>
+          </between>
+        </constraint>
       </field>
       <field id="2" name="TransitionTime" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="65534"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="65534"/>
+          </between>
+        </constraint>
       </field>
       <field id="3" name="OptionsMask" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="4" name="OptionsOverride" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x07" name="MoveToColor" direction="commandToServer" response="Y">
@@ -695,23 +949,42 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="ColorX" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="0xFEFF"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="0xFEFF"/>
+          </between>
+        </constraint>
       </field>
       <field id="1" name="ColorY" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="0xFEFF"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="0xFEFF"/>
+          </between>
+        </constraint>
       </field>
       <field id="2" name="TransitionTime" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="65534"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="65534"/>
+          </between>
+        </constraint>
       </field>
       <field id="3" name="OptionsMask" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="4" name="OptionsOverride" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x08" name="MoveColor" direction="commandToServer" response="Y">
@@ -727,11 +1000,15 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="OptionsMask" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="3" name="OptionsOverride" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x09" name="StepColor" direction="commandToServer" response="Y">
@@ -747,15 +1024,24 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="TransitionTime" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="65534"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="65534"/>
+          </between>
+        </constraint>
       </field>
       <field id="3" name="OptionsMask" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="4" name="OptionsOverride" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x0A" name="MoveToColorTemperature" direction="commandToServer" response="Y">
@@ -765,19 +1051,33 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="ColorTemperatureMireds" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="0xFEFF"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="0xFEFF"/>
+          </between>
+        </constraint>
       </field>
       <field id="1" name="TransitionTime" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="65534"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="65534"/>
+          </between>
+        </constraint>
       </field>
       <field id="2" name="OptionsMask" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="3" name="OptionsOverride" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x40" name="EnhancedMoveToHue" direction="commandToServer" response="Y">
@@ -790,19 +1090,30 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="Direction" type="enum8">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="2" name="TransitionTime" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="65534"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="65534"/>
+          </between>
+        </constraint>
       </field>
       <field id="3" name="OptionsMask" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="4" name="OptionsOverride" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x41" name="EnhancedMoveHue" direction="commandToServer" response="Y">
@@ -812,18 +1123,24 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="MoveMode" type="enum8">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="Rate" type="uint16">
         <mandatoryConform/>
       </field>
       <field id="2" name="OptionsMask" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="3" name="OptionsOverride" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x42" name="EnhancedStepHue" direction="commandToServer" response="Y">
@@ -833,22 +1150,33 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="StepMode" type="enum8">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="StepSize" type="uint16">
         <mandatoryConform/>
       </field>
       <field id="2" name="TransitionTime" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="65534"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="65534"/>
+          </between>
+        </constraint>
       </field>
       <field id="3" name="OptionsMask" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="4" name="OptionsOverride" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x43" name="EnhancedMoveToHueAndSaturation" direction="commandToServer" response="Y">
@@ -861,19 +1189,33 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="Saturation" type="uint8">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="254"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="254"/>
+          </between>
+        </constraint>
       </field>
       <field id="2" name="TransitionTime" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="65534"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="65534"/>
+          </between>
+        </constraint>
       </field>
       <field id="3" name="OptionsMask" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="4" name="OptionsOverride" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x44" name="ColorLoopSet" direction="commandToServer" response="Y">
@@ -883,51 +1225,57 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="UpdateFlags" type="map8">
         <bitmap>
-          <bitfield name="Reserved" bit="4-7">
+          <bitfield name="UpdateAction" bit="0" summary="UpdateAction">
             <mandatoryConform/>
           </bitfield>
-          <bitfield name="UpdateAction" bit="0">
+          <bitfield name="UpdateDirection" bit="1" summary="UpdateDirection">
             <mandatoryConform/>
           </bitfield>
-          <bitfield name="UpdateDirection" bit="1">
+          <bitfield name="UpdateTime" bit="2" summary="UpdateTime">
             <mandatoryConform/>
           </bitfield>
-          <bitfield name="UpdateTime" bit="2">
+          <bitfield name="UpdateStartHue" bit="3" summary="UpdateStartHue">
             <mandatoryConform/>
           </bitfield>
-          <bitfield name="UpdateStartHue" bit="3">
+          <bitfield name="(Reserved)" from="0x00000004" to="0x00000007" summary="(Reserved)">
             <mandatoryConform/>
           </bitfield>
         </bitmap>
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="Action" type="enum8">
         <enum>
-          <item value="0" name="Item0" summary="De-activate the color loop.">
+          <item value="0" name="DeActivateTheColorLoop" summary="De-activate the color loop.">
             <mandatoryConform/>
           </item>
-          <item value="1" name="Item1" summary="Activate the color loop from the value in the ColorLoopStartEnhancedHue field.">
+          <item value="1" name="ActivateTheColorLoopFromTheValueInTheColorLoopStartEnhancedHueField" summary="Activate the color loop from the value in the ColorLoopStartEnhancedHue field.">
             <mandatoryConform/>
           </item>
-          <item value="2" name="Item2" summary="Activate the color loop from the value of the EnhancedCurrentHue attribute.">
+          <item value="2" name="ActivateTheColorLoopFromTheValueOfTheEnhancedCurrentHueAttribute" summary="Activate the color loop from the value of the EnhancedCurrentHue attribute.">
             <mandatoryConform/>
           </item>
         </enum>
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="2" name="Direction" type="enum8">
         <enum>
-          <item value="0" name="Item0" summary="Decrement the hue in the color loop.">
+          <item value="0" name="DecrementTheHueInTheColorLoop" summary="Decrement the hue in the color loop.">
             <mandatoryConform/>
           </item>
-          <item value="1" name="Item1" summary="Increment the hue in the color loop.">
+          <item value="1" name="IncrementTheHueInTheColorLoop" summary="Increment the hue in the color loop.">
             <mandatoryConform/>
           </item>
         </enum>
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="3" name="Time" type="uint16">
         <mandatoryConform/>
@@ -937,11 +1285,15 @@ Davis, CA 95616, USA
       </field>
       <field id="5" name="OptionsMask" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="6" name="OptionsOverride" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x47" name="StopMoveStep" direction="commandToServer" response="Y">
@@ -955,11 +1307,15 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="OptionsMask" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="OptionsOverride" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x4B" name="MoveColorTemperature" direction="commandToServer" response="Y">
@@ -969,26 +1325,42 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="MoveMode" type="map8">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="Rate" type="uint16">
         <mandatoryConform/>
       </field>
       <field id="2" name="ColorTemperatureMinimumMireds" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="0xFEFF"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="0xFEFF"/>
+          </between>
+        </constraint>
       </field>
       <field id="3" name="ColorTemperatureMaximumMireds" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="0xFEFF"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="0xFEFF"/>
+          </between>
+        </constraint>
       </field>
       <field id="4" name="OptionsMask" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="5" name="OptionsOverride" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x4C" name="StepColorTemperature" direction="commandToServer" response="Y">
@@ -998,30 +1370,51 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="StepMode" type="map8">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="StepSize" type="uint16">
         <mandatoryConform/>
       </field>
       <field id="2" name="TransitionTime" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="65534"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="65534"/>
+          </between>
+        </constraint>
       </field>
       <field id="3" name="ColorTemperatureMinimumMireds" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="0xFEFF"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="0xFEFF"/>
+          </between>
+        </constraint>
       </field>
       <field id="4" name="ColorTemperatureMaximumMireds" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="0xFEFF"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="0xFEFF"/>
+          </between>
+        </constraint>
       </field>
       <field id="5" name="OptionsMask" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="6" name="OptionsOverride" type="map8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
   </commands>

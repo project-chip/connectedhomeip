@@ -462,6 +462,10 @@
 #include <clusters/SoftwareDiagnostics/Commands.h>
 #include <clusters/SoftwareDiagnostics/Events.h>
 #include <clusters/SoftwareDiagnostics/Structs.h>
+#include <clusters/SoilMeasurement/Attributes.h>
+#include <clusters/SoilMeasurement/Commands.h>
+#include <clusters/SoilMeasurement/Events.h>
+#include <clusters/SoilMeasurement/Structs.h>
 #include <clusters/Switch/Attributes.h>
 #include <clusters/Switch/Commands.h>
 #include <clusters/Switch/Events.h>

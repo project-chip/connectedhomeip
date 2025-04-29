@@ -128,6 +128,7 @@
 #include <clusters/ServiceArea/ClusterId.h>
 #include <clusters/SmokeCoAlarm/ClusterId.h>
 #include <clusters/SoftwareDiagnostics/ClusterId.h>
+#include <clusters/SoilMeasurement/ClusterId.h>
 #include <clusters/Switch/ClusterId.h>
 #include <clusters/TargetNavigator/ClusterId.h>
 #include <clusters/TemperatureControl/ClusterId.h>

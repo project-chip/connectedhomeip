@@ -128,6 +128,7 @@
 #include <clusters/ServiceArea/EventIds.h>
 #include <clusters/SmokeCoAlarm/EventIds.h>
 #include <clusters/SoftwareDiagnostics/EventIds.h>
+#include <clusters/SoilMeasurement/EventIds.h>
 #include <clusters/Switch/EventIds.h>
 #include <clusters/TargetNavigator/EventIds.h>
 #include <clusters/TemperatureControl/EventIds.h>

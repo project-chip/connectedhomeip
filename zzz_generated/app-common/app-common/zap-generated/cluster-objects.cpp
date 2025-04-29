@@ -462,6 +462,10 @@
 #include <clusters/SoftwareDiagnostics/Commands.ipp>
 #include <clusters/SoftwareDiagnostics/Events.ipp>
 #include <clusters/SoftwareDiagnostics/Structs.ipp>
+#include <clusters/SoilMeasurement/Attributes.ipp>
+#include <clusters/SoilMeasurement/Commands.ipp>
+#include <clusters/SoilMeasurement/Events.ipp>
+#include <clusters/SoilMeasurement/Structs.ipp>
 #include <clusters/Switch/Attributes.ipp>
 #include <clusters/Switch/Commands.ipp>
 #include <clusters/Switch/Events.ipp>
