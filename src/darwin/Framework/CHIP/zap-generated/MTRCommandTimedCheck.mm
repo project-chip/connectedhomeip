@@ -992,6 +992,15 @@ static BOOL CommandNeedsTimedInvokeInRadonConcentrationMeasurementCluster(Attrib
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInSoilMeasurementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::SoilMeasurement;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInWiFiNetworkManagementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::WiFiNetworkManagement;
@@ -1616,6 +1625,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::RadonConcentrationMeasurement::Id: {
         return CommandNeedsTimedInvokeInRadonConcentrationMeasurementCluster(commandID);
+    }
+    case Clusters::SoilMeasurement::Id: {
+        return CommandNeedsTimedInvokeInSoilMeasurementCluster(commandID);
     }
     case Clusters::WiFiNetworkManagement::Id: {
         return CommandNeedsTimedInvokeInWiFiNetworkManagementCluster(commandID);

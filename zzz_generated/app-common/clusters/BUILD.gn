@@ -120,6 +120,7 @@ template("declare_all_items_target") {
       "${chip_root}/zzz_generated/app-common/clusters/ServiceArea" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/SmokeCoAlarm" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/SoftwareDiagnostics" + invoker.target,
+      "${chip_root}/zzz_generated/app-common/clusters/SoilMeasurement" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/Switch" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/TargetNavigator" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/TemperatureControl" + invoker.target,

@@ -233,6 +233,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "TotalVolatileOrganicCompoundsConcentrationMeasurement";
     case chip::app::Clusters::RadonConcentrationMeasurement::Id:
         return "RadonConcentrationMeasurement";
+    case chip::app::Clusters::SoilMeasurement::Id:
+        return "SoilMeasurement";
     case chip::app::Clusters::WiFiNetworkManagement::Id:
         return "WiFiNetworkManagement";
     case chip::app::Clusters::ThreadBorderRouterManagement::Id:
@@ -3871,6 +3873,27 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::RadonConcentrationMeasurement::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::RadonConcentrationMeasurement::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::SoilMeasurement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::Id:
+            return "SoilMoistureMeasurementLimits";
+        case chip::app::Clusters::SoilMeasurement::Attributes::SoilMoistureMeasuredValue::Id:
+            return "SoilMoistureMeasuredValue";
+        case chip::app::Clusters::SoilMeasurement::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::SoilMeasurement::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::SoilMeasurement::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::SoilMeasurement::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::SoilMeasurement::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";

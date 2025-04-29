@@ -16886,6 +16886,87 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readSoilMeasurementInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readSoilMeasurementSoilMoistureMeasuredValueCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSoilMeasurementSoilMoistureMeasuredValueAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.SoilMeasurementCluster) cluster).readSoilMoistureMeasuredValueAttribute(
+              (ChipClusters.SoilMeasurementCluster.SoilMoistureMeasuredValueAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedSoilMeasurementClusterSoilMoistureMeasuredValueAttributeCallback(),
+          readSoilMeasurementSoilMoistureMeasuredValueCommandParams
+        );
+        result.put("readSoilMoistureMeasuredValueAttribute", readSoilMeasurementSoilMoistureMeasuredValueAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSoilMeasurementGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSoilMeasurementGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.SoilMeasurementCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.SoilMeasurementCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedSoilMeasurementClusterGeneratedCommandListAttributeCallback(),
+          readSoilMeasurementGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readSoilMeasurementGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSoilMeasurementAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSoilMeasurementAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.SoilMeasurementCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.SoilMeasurementCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedSoilMeasurementClusterAcceptedCommandListAttributeCallback(),
+          readSoilMeasurementAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readSoilMeasurementAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSoilMeasurementEventListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSoilMeasurementEventListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.SoilMeasurementCluster) cluster).readEventListAttribute(
+              (ChipClusters.SoilMeasurementCluster.EventListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedSoilMeasurementClusterEventListAttributeCallback(),
+          readSoilMeasurementEventListCommandParams
+        );
+        result.put("readEventListAttribute", readSoilMeasurementEventListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSoilMeasurementAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSoilMeasurementAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.SoilMeasurementCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.SoilMeasurementCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedSoilMeasurementClusterAttributeListAttributeCallback(),
+          readSoilMeasurementAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readSoilMeasurementAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSoilMeasurementFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSoilMeasurementFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.SoilMeasurementCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readSoilMeasurementFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readSoilMeasurementFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSoilMeasurementClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSoilMeasurementClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.SoilMeasurementCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readSoilMeasurementClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readSoilMeasurementClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readWiFiNetworkManagementInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readWiFiNetworkManagementSsidCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readWiFiNetworkManagementSsidAttributeInteractionInfo = new InteractionInfo(
@@ -21772,6 +21853,7 @@ public class ClusterReadMapping {
             put("pm10ConcentrationMeasurement", readPm10ConcentrationMeasurementInteractionInfo());
             put("totalVolatileOrganicCompoundsConcentrationMeasurement", readTotalVolatileOrganicCompoundsConcentrationMeasurementInteractionInfo());
             put("radonConcentrationMeasurement", readRadonConcentrationMeasurementInteractionInfo());
+            put("soilMeasurement", readSoilMeasurementInteractionInfo());
             put("wiFiNetworkManagement", readWiFiNetworkManagementInteractionInfo());
             put("threadBorderRouterManagement", readThreadBorderRouterManagementInteractionInfo());
             put("threadNetworkDirectory", readThreadNetworkDirectoryInteractionInfo());

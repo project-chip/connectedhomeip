@@ -32,6 +32,16 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Struct
 
 static void Finalize(chip::app::Clusters::Globals::Structs::PriceStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Structs::MeasurementAccuracyRangeStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Globals::Structs::MeasurementAccuracyRangeStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Structs::MeasurementAccuracyStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Globals::Structs::MeasurementAccuracyStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Structs::AtomicAttributeStatusStruct::Type & request,
                         Json::Value & value);
 

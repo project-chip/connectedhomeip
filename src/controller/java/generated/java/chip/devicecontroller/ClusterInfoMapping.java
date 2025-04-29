@@ -18145,6 +18145,132 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedSoilMeasurementClusterSoilMoistureMeasurementLimitsAttributeCallback implements ChipClusters.SoilMeasurementCluster.SoilMoistureMeasurementLimitsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ChipStructs.SoilMeasurementClusterMeasurementAccuracyStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.SoilMeasurementClusterMeasurementAccuracyStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedSoilMeasurementClusterSoilMoistureMeasuredValueAttributeCallback implements ChipClusters.SoilMeasurementCluster.SoilMoistureMeasuredValueAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Integer value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedSoilMeasurementClusterGeneratedCommandListAttributeCallback implements ChipClusters.SoilMeasurementCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedSoilMeasurementClusterAcceptedCommandListAttributeCallback implements ChipClusters.SoilMeasurementCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedSoilMeasurementClusterEventListAttributeCallback implements ChipClusters.SoilMeasurementCluster.EventListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedSoilMeasurementClusterAttributeListAttributeCallback implements ChipClusters.SoilMeasurementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
 
   public static class DelegatedWiFiNetworkManagementClusterNetworkPassphraseResponseCallback implements ChipClusters.WiFiNetworkManagementCluster.NetworkPassphraseResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -25316,6 +25442,10 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.RadonConcentrationMeasurementCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("radonConcentrationMeasurement", radonConcentrationMeasurementClusterInfo);
 
+    ClusterInfo soilMeasurementClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.SoilMeasurementCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("soilMeasurement", soilMeasurementClusterInfo);
+
     ClusterInfo wiFiNetworkManagementClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.WiFiNetworkManagementCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("wiFiNetworkManagement", wiFiNetworkManagementClusterInfo);
@@ -25560,6 +25690,7 @@ public class ClusterInfoMapping {
     destination.get("pm10ConcentrationMeasurement").combineCommands(source.get("pm10ConcentrationMeasurement"));
     destination.get("totalVolatileOrganicCompoundsConcentrationMeasurement").combineCommands(source.get("totalVolatileOrganicCompoundsConcentrationMeasurement"));
     destination.get("radonConcentrationMeasurement").combineCommands(source.get("radonConcentrationMeasurement"));
+    destination.get("soilMeasurement").combineCommands(source.get("soilMeasurement"));
     destination.get("wiFiNetworkManagement").combineCommands(source.get("wiFiNetworkManagement"));
     destination.get("threadBorderRouterManagement").combineCommands(source.get("threadBorderRouterManagement"));
     destination.get("threadNetworkDirectory").combineCommands(source.get("threadNetworkDirectory"));
@@ -30840,6 +30971,10 @@ public class ClusterInfoMapping {
     Map<String, InteractionInfo> radonConcentrationMeasurementClusterInteractionInfoMap = new LinkedHashMap<>();
 
     commandMap.put("radonConcentrationMeasurement", radonConcentrationMeasurementClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> soilMeasurementClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    commandMap.put("soilMeasurement", soilMeasurementClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> wiFiNetworkManagementClusterInteractionInfoMap = new LinkedHashMap<>();
 

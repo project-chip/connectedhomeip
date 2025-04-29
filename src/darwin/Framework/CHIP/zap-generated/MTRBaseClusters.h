@@ -12742,6 +12742,73 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @end
 
 /**
+ * Cluster Soil Measurement
+ *
+ * This cluster provides an interface to soil measurement functionality, including configuration and provision of notifications of soil measurements.
+ */
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRBaseClusterSoilMeasurement : MTRGenericBaseCluster
+
+- (void)readAttributeSoilMoistureMeasurementLimitsWithCompletion:(void (^)(MTRDataTypeMeasurementAccuracyStruct * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeSoilMoistureMeasurementLimitsWithParams:(MTRSubscribeParams *)params
+                                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                                    reportHandler:(void (^)(MTRDataTypeMeasurementAccuracyStruct * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeSoilMoistureMeasurementLimitsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(MTRDataTypeMeasurementAccuracyStruct * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeSoilMoistureMeasuredValueWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeSoilMoistureMeasuredValueWithParams:(MTRSubscribeParams *)params
+                                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeSoilMoistureMeasuredValueWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
+                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                           reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeGeneratedCommandListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
+                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                          reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeAcceptedCommandListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
+                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                    reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeAttributeListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
+                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeFeatureMapWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
+                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeClusterRevisionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+@end
+
+@interface MTRBaseClusterSoilMeasurement (Availability)
+
+/**
+ * For all instance methods (reads, writes, commands) that take a completion,
+ * the completion will be called on the provided queue.
+ */
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                              endpointID:(NSNumber *)endpointID
+                                   queue:(dispatch_queue_t)queue MTR_PROVISIONALLY_AVAILABLE;
+
+@end
+
+/**
  * Cluster Wi-Fi Network Management
  *
  * Functionality to retrieve operational information about a managed Wi-Fi network.
@@ -17377,6 +17444,27 @@ typedef NS_ENUM(uint8_t, MTRDataTypeLocationTag) {
     MTRDataTypeLocationTagOutdoor MTR_PROVISIONALLY_AVAILABLE = 0x01,
     MTRDataTypeLocationTagInside MTR_PROVISIONALLY_AVAILABLE = 0x02,
     MTRDataTypeLocationTagOutside MTR_PROVISIONALLY_AVAILABLE = 0x03,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint16_t, MTRDataTypeMeasurementTypeEnum) {
+    MTRDataTypeMeasurementTypeEnumUnspecified MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeMeasurementTypeEnumVoltage MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeMeasurementTypeEnumActiveCurrent MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeMeasurementTypeEnumReactiveCurrent MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeMeasurementTypeEnumApparentCurrent MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRDataTypeMeasurementTypeEnumActivePower MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRDataTypeMeasurementTypeEnumReactivePower MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRDataTypeMeasurementTypeEnumApparentPower MTR_PROVISIONALLY_AVAILABLE = 0x07,
+    MTRDataTypeMeasurementTypeEnumRMSVoltage MTR_PROVISIONALLY_AVAILABLE = 0x08,
+    MTRDataTypeMeasurementTypeEnumRMSCurrent MTR_PROVISIONALLY_AVAILABLE = 0x09,
+    MTRDataTypeMeasurementTypeEnumRMSPower MTR_PROVISIONALLY_AVAILABLE = 0x0A,
+    MTRDataTypeMeasurementTypeEnumFrequency MTR_PROVISIONALLY_AVAILABLE = 0x0B,
+    MTRDataTypeMeasurementTypeEnumPowerFactor MTR_PROVISIONALLY_AVAILABLE = 0x0C,
+    MTRDataTypeMeasurementTypeEnumNeutralCurrent MTR_PROVISIONALLY_AVAILABLE = 0x0D,
+    MTRDataTypeMeasurementTypeEnumElectricalEnergy MTR_PROVISIONALLY_AVAILABLE = 0x0E,
+    MTRDataTypeMeasurementTypeEnumReactiveEnergy MTR_PROVISIONALLY_AVAILABLE = 0x0F,
+    MTRDataTypeMeasurementTypeEnumApparentEnergy MTR_PROVISIONALLY_AVAILABLE = 0x10,
+    MTRDataTypeMeasurementTypeEnumSoilMoisture MTR_PROVISIONALLY_AVAILABLE = 0x11,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDataTypePositionTag) {
