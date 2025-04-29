@@ -53,8 +53,8 @@ static constexpr uint32_t kMinBitRateBps             = 10000;   // 10 kbps
 static constexpr uint32_t kMaxBitRateBps             = 2000000; // 2 mbps
 static constexpr uint32_t kMinFragLenMsec            = 1000;    // 1 sec
 static constexpr uint32_t kMaxFragLenMsec            = 10000;   // 10 sec
-static constexpr uint16_t kVideoSensorWidthPixels    = 854;     // 640X480 resolution
-static constexpr uint16_t kVideoSensorHeightPixels   = 480;     // 640X480 resolution
+static constexpr uint16_t kVideoSensorWidthPixels    = 1920;    // 1080p resolution
+static constexpr uint16_t kVideoSensorHeightPixels   = 1080;    // 1080p resolution
 
 #define INVALID_SPKR_LEVEL (0)
 
