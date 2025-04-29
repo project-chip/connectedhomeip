@@ -19,7 +19,7 @@ action("build_libdatachannel") {
   args = [
     "--target_cpu_type=$current_cpu",
     "--host_cpu_type=$host_cpu",
-    "--host_os_type=$host_os"
+    "--host_os_type=$host_os",
   ]
 }
 
