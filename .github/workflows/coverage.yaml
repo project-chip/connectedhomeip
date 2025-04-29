@@ -79,9 +79,3 @@ jobs:
               uses: codecov/codecov-action@v5
               env:
                 CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-            - name: clean output
-              shell: bash
-              run: |
-                rm -rf out pyenv
-                rm src/controller/python/test/unit_tests/coverage.xml
-                rm -rf src/controller/python/test/unit_tests/.coverage
