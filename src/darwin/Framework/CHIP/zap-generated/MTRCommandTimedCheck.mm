@@ -608,15 +608,6 @@ static BOOL CommandNeedsTimedInvokeInCommodityPriceCluster(AttributeId aAttribut
     }
     }
 }
-static BOOL CommandNeedsTimedInvokeInDemandResponseLoadControlCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::DemandResponseLoadControl;
-    switch (aAttributeId) {
-    default: {
-        return NO;
-    }
-    }
-}
 static BOOL CommandNeedsTimedInvokeInMessagesCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::Messages;
@@ -1514,9 +1505,6 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::CommodityPrice::Id: {
         return CommandNeedsTimedInvokeInCommodityPriceCluster(commandID);
-    }
-    case Clusters::DemandResponseLoadControl::Id: {
-        return CommandNeedsTimedInvokeInDemandResponseLoadControlCluster(commandID);
     }
     case Clusters::Messages::Id: {
         return CommandNeedsTimedInvokeInMessagesCluster(commandID);

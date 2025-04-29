@@ -49,7 +49,6 @@
 #include <clusters/ContentAppObserver/CommandIds.h>
 #include <clusters/ContentControl/CommandIds.h>
 #include <clusters/ContentLauncher/CommandIds.h>
-#include <clusters/DemandResponseLoadControl/CommandIds.h>
 #include <clusters/Descriptor/CommandIds.h>
 #include <clusters/DeviceEnergyManagement/CommandIds.h>
 #include <clusters/DeviceEnergyManagementMode/CommandIds.h>
