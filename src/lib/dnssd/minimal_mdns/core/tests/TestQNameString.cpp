@@ -34,7 +34,7 @@
      static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
  };
  
- TEST_F(TestHeapQName, Construction)
+ TEST_F(TestQNameString, Construction)
  {
      {
          const testing::TestQName<2> kShort({ "some", "test" });
