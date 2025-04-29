@@ -47,6 +47,9 @@ CHIP_ERROR Instance::Init()
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
 
+    // Ensure mPriceForecast is initialised as an empty list
+    mPriceForecast= DataModel::List<Structs::CommodityPriceStruct::Type>(Span<Structs::CommodityPriceStruct::Type>());
+
     return CHIP_NO_ERROR;
 }
 
