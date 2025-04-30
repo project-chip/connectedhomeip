@@ -159,7 +159,7 @@ CHIP_ERROR ClusterLogic::SetCountdownTime(const DataModel::Nullable<ElapsedS> & 
     auto now       = System::SystemClock().GetMonotonicTimestamp();
     bool markDirty = false;
 
-   // TODO: Delegate specific handling logic will be added if needed after after spec issue resolution.
+    // TODO: Delegate specific handling logic will be added if needed after after spec issue resolution.
 
     auto predicate = [](const decltype(mState.mCountdownTime)::SufficientChangePredicateCandidate &) -> bool { return true; };
     markDirty      = (mState.mCountdownTime.SetValue(countdownTime, now, predicate) == AttributeDirtyState::kMustReport);
