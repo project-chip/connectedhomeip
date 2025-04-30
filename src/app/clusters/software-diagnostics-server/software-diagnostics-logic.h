@@ -83,7 +83,7 @@ protected:
     }
 };
 
-/// Minimal class that uses an injected diagnistics provider
+/// Minimal class that uses an injected diagnostics provider (i.e. uses RAM but is unit testable)
 class InjectedDiagnosticsSoftwareDiagnosticsLogic : public SoftwareDiagnosticsLogic
 {
 public:
