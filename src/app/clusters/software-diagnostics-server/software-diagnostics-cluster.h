@@ -1,0 +1,105 @@
+/*
+ *    Copyright (c) 2025 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+#pragma once
+
+#include "clusters/SoftwareDiagnostics/AttributeIds.h"
+#include "lib/support/CodeUtils.h"
+#include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
+
+#include <app/server-cluster/DefaultServerCluster.h>
+#include <clusters/SoftwareDiagnostics/ClusterId.h>
+#include <clusters/SoftwareDiagnostics/Commands.h>
+#include <clusters/SoftwareDiagnostics/Metadata.h>
+#include <lib/support/Span.h>
+#include <protocols/interaction_model/StatusCode.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+
+/// Integration of Software diagnostics logic within the matter data model
+///
+/// Translates between matter calls and OTA logic
+template <typename LOGIC>
+class SoftwareDiagnosticsServer : public DefaultServerCluster, private LOGIC
+{
+public:
+    template <typename... Args>
+    SoftwareDiagnosticsServer(EndpointId endpointId, Args &&... args) :
+        DefaultServerCluster({ endpointId, OtaSoftwareUpdateProvider::Id }), LOGIC(std::forward<Args>(args)...)
+    {}
+
+    // Server cluster implementation
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override
+    {
+        switch (request.path.mAttributeId)
+        {
+        case SoftwareDiagnostics::Attributes::CurrentHeapFree::Id: {
+            uint64_t value;
+            ReturnErrorOnFailure(LOGIC::GetCurrentHeapFree(value));
+            return encoder.Encode(value);
+        }
+        case SoftwareDiagnostics::Attributes::CurrentHeapUsed::Id: {
+            uint64_t value;
+            ReturnErrorOnFailure(LOGIC::GetCurrentHeapUsed(value));
+            return encoder.Encode(value);
+        }
+        case SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id: {
+            uint64_t value;
+            ReturnErrorOnFailure(LOGIC::GetCurrentHighWatermark(value));
+            return encoder.Encode(value);
+        }
+        case SoftwareDiagnostics::Attributes::ThreadMetrics::Id:
+            return LOGIC::ReadThreadMetrics(encoder);
+        case Globals::Attributes::FeatureMap::Id:
+            return encoder.Encode(LOGIC::GetFeatureMap());
+        case Globals::Attributes::ClusterRevision::Id:
+            return encoder.Encode(SoftwareDiagnostics::kRevision);
+        default:
+            return Protocols::InteractionModel::Status::UnsupportedAttribute;
+        }
+    }
+
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               chip::TLV::TLVReader & input_arguments,
+                                                               CommandHandler * handler) override
+    {
+        switch (request.path.mCommandId)
+        {
+        case SoftwareDiagnostics::Commands::ResetWatermarks::Id:
+            return LOGIC::ResetWatermarks();
+        default:
+            return Protocols::InteractionModel::Status::UnsupportedCommand;
+        }
+    }
+
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override
+    {
+        return LOGIC::AcceptedCommands(builder);
+    }
+
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override
+    {
+        return LOGIC::Attributes(builder);
+    }
+};
+
+} // namespace Clusters
+} // namespace app
+} // namespace chip

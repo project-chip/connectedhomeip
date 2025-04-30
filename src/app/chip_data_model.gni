@@ -517,6 +517,13 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/${cluster}.h",
         ]
+      } else if (cluster == "software-diagnostics-server") {
+        deps += [ "${_app_root}/clusters/${cluster}" ]
+
+        # FIXME: fix up this legacy bit ...
+        # sources += [ "${_app_root}/clusters/${cluster}/CodegenIntegration.cpp" ]
+
+        sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
       }
