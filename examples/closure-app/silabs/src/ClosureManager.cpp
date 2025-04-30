@@ -74,7 +74,7 @@ void ClosureManager::Init()
 {
     DeviceLayer::PlatformMgr().LockChipStack();
 
-    // Closure endpoints initilization
+    // Closure endpoints initialization
     ep1.Init();
     ep2.Init();
     ep3.Init();
