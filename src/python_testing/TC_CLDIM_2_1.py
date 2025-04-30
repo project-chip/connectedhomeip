@@ -38,6 +38,7 @@ from chip.clusters.Types import NullValue
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
+
 class TC_CLDIM_2_1(MatterBaseTest):
     async def read_cldim_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ClosureDimension
@@ -89,11 +90,11 @@ class TC_CLDIM_2_1(MatterBaseTest):
         is_positioning_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kPositioning
         is_latching_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching
         is_speed_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kSpeed
-        
+
         # STEP 2b: Read attribute list to determine supported attributes
         self.step("2b")
         attribute_list = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
-    
+
         # STEP 3: Read CurrentState attribute
         self.step(3)
         if attributes.CurrentState.attribute_id in attribute_list:
@@ -152,8 +153,8 @@ class TC_CLDIM_2_1(MatterBaseTest):
         if attributes.UnitRange.attribute_id in attribute_list:
             unit_range = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.UnitRange)
             if unit_range is not NullValue:
-                asserts.assert_true(-32768 <= unit_range.Min <= unit_range.Max -1, "UnitRange.Min is not in the expected range")
-                asserts.assert_true(unit_range.Min +1  <= unit_range.Max <= 32767, "UnitRange.Max is not in the expected range")
+                asserts.assert_true(-32768 <= unit_range.Min <= unit_range.Max - 1, "UnitRange.Min is not in the expected range")
+                asserts.assert_true(unit_range.Min + 1 <= unit_range.Max <= 32767, "UnitRange.Max is not in the expected range")
         else:
             logging.info("Test step skipped")
 
@@ -199,6 +200,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
             asserts.assert_true(0 <= modulation_type <= 4, "ModulationType is not in the expected range")
         else:
             logging.info("Test step skipped")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
