@@ -292,16 +292,25 @@ namespace DeviceLayer {
 // All our callback dispatch must happen on _chipWorkQueue
 - (void)dispatchConnectionError:(CHIP_ERROR)error
 {
-    if (self.onConnectionError != nullptr) {
-        self.onConnectionError(self.appState, error);
+    if (_onConnectionError != nullptr) {
+        _onConnectionError(_appState, error);
     }
+    [self clearConnectionCallbacks];
 }
 
 - (void)dispatchConnectionComplete:(CBPeripheral *)peripheral
 {
-    if (self.onConnectionComplete != nullptr) {
-        self.onConnectionComplete(self.appState, BleConnObjectFromCBPeripheral(peripheral));
+    if (_onConnectionComplete != nullptr) {
+        _onConnectionComplete(self.appState, BleConnObjectFromCBPeripheral(peripheral));
     }
+    [self clearConnectionCallbacks];
+}
+
+- (void)clearConnectionCallbacks
+{
+    _onConnectionComplete = nullptr;
+    _onConnectionError = nullptr;
+    _appState = nullptr;
 }
 
 // Start CBCentralManagerDelegate
