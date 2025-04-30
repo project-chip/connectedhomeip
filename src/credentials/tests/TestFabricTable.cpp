@@ -1131,7 +1131,7 @@ TEST_F(TestFabricTable, TestBasicAddNocUpdateNocFlow)
             EXPECT_EQ(nextFabricIndex, 3);
         }
 
-        // Validate contents of Fabric Index 2 is still OK
+        // Validate contents of Fabric Index 2 is still OK.
         const auto * fabricInfo = fabricTable.FindFabricWithIndex(2);
         ASSERT_NE(fabricInfo, nullptr);
         EXPECT_EQ(fabricInfo->GetFabricIndex(), 2);
