@@ -39,9 +39,9 @@ endif()
 
 if (NOT CMAKE_BUILD_EARLY_EXPANSION)
     if (CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_DISABLE)
-        set(is_debug TRUE)
-    else()
         set(is_debug FALSE)
+    else()
+        set(is_debug TRUE)
     endif()
 endif()
 
