@@ -350,11 +350,13 @@ void emberAfCameraAvStreamManagementClusterInitCallback(EndpointId endpoint)
     std::vector<SnapshotCapabilitiesStruct> snapshotCapabilities = {};
     uint32_t maxNetworkBandwidth                                 = 64;
     std::vector<StreamUsageEnum> supportedStreamUsages           = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
+    std::vector<StreamUsageEnum> rankedStreamPriorities          = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
 
     sCameraAVStreamMgmtClusterServerInstance = std::make_unique<CameraAVStreamMgmtServer>(
         *sCameraAVStreamMgrInstance.get(), endpoint, features, optionalAttrs, maxConcurrentVideoEncoders, maxEncodedPixelRate,
         sensorParams, nightVisionCapable, minViewport, rateDistortionTradeOffPoints, maxContentBufferSize, micCapabilities,
-        spkrCapabilities, twowayTalkSupport, snapshotCapabilities, maxNetworkBandwidth, supportedStreamUsages);
+        spkrCapabilities, twowayTalkSupport, snapshotCapabilities, maxNetworkBandwidth, supportedStreamUsages,
+        rankedStreamPriorities);
     sCameraAVStreamMgmtClusterServerInstance->Init();
 }
 
