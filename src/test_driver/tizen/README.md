@@ -81,7 +81,7 @@ provided.
 -   Create sysroot directory
 -   Mount `/opt/tizen-sdk/iot-rootfs.img`
 -   Copy `/usr` from the mounted image to your sysroot directory
--   Fix potentially broken symlinks in the libs as needed
+-   Fix potentially broken symlinks in the libraries as needed
 
 Core dumps are generated in the `dump` directory as a zip archive file. After
 extracting it the core dump should be extracted from tar archive file.
