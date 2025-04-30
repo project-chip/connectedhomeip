@@ -3386,7 +3386,7 @@ TEST_F(TestFabricTable, UpdateNocWithIcacFailsWithVvscSucceedsWithout)
           FabricId fabricId = 44;
           NodeId nodeId     = 33;
 
-          ASSERT_EQ(fabricTable.AllocatePendingOperationalKey(MakeOptional(existingFabricIndex), csrSpan), CHIP_NO_ERROR);  
+          ASSERT_EQ(fabricTable.AllocatePendingOperationalKey(MakeOptional(existingFabricIndex), csrSpan), CHIP_NO_ERROR);
           EXPECT_EQ(fabric44CertAuthority.SetIncludeIcac(false).GenerateNocChain(fabricId, nodeId, csrSpan).GetStatus(),
                     CHIP_NO_ERROR);
           ByteSpan noc  = fabric44CertAuthority.GetNoc();
@@ -3423,7 +3423,7 @@ TEST_F(TestFabricTable, UpdateNocWithIcacFailsWithVvscSucceedsWithout)
           NodeId nodeId     = 66;
 
           csrSpan = MutableByteSpan{ csrBuf };
-          ASSERT_EQ(fabricTable.AllocatePendingOperationalKey(MakeOptional(existingFabricIndex), csrSpan), CHIP_NO_ERROR);  
+          ASSERT_EQ(fabricTable.AllocatePendingOperationalKey(MakeOptional(existingFabricIndex), csrSpan), CHIP_NO_ERROR);
           EXPECT_EQ(fabric44CertAuthority.SetIncludeIcac(true).GenerateNocChain(fabricId, nodeId, csrSpan).GetStatus(),
                     CHIP_NO_ERROR);
           ByteSpan icac = fabric44CertAuthority.GetIcac();
@@ -3444,7 +3444,7 @@ TEST_F(TestFabricTable, UpdateNocWithIcacFailsWithVvscSucceedsWithout)
           NodeId nodeId     = 88;
 
           csrSpan = MutableByteSpan{ csrBuf };
-          ASSERT_EQ(fabricTable.AllocatePendingOperationalKey(MakeOptional(existingFabricIndex), csrSpan), CHIP_NO_ERROR);  
+          ASSERT_EQ(fabricTable.AllocatePendingOperationalKey(MakeOptional(existingFabricIndex), csrSpan), CHIP_NO_ERROR);
           EXPECT_EQ(fabric44CertAuthority.SetIncludeIcac(false).GenerateNocChain(fabricId, nodeId, csrSpan).GetStatus(),
                     CHIP_NO_ERROR);
           ByteSpan noc  = fabric44CertAuthority.GetNoc();
@@ -3486,7 +3486,7 @@ TEST_F(TestFabricTable, UpdateNocWithIcacFailsWithVvscSucceedsWithout)
 
           // Revert state, expect previous fabric data, and empty VVSC/VVS again.
           fabricTable.RevertPendingFabricData();
-          
+
           EXPECT_EQ(fabricTable.FabricCount(), 1);
           ASSERT_NE(fabricTable.FindFabricWithIndex(newFabricIndex), nullptr);
           EXPECT_EQ(fabricTable.FindFabricWithIndex(newFabricIndex)->GetFabricId(), 44u);
@@ -3522,7 +3522,7 @@ TEST_F(TestFabricTable, UpdateNocWithIcacFailsWithVvscSucceedsWithout)
         FabricIndex existingFabricIndex = 1u;
 
         MutableByteSpan csrSpan{ csrBuf };
-        ASSERT_EQ(fabricTable.AllocatePendingOperationalKey(MakeOptional(existingFabricIndex), csrSpan), CHIP_NO_ERROR);  
+        ASSERT_EQ(fabricTable.AllocatePendingOperationalKey(MakeOptional(existingFabricIndex), csrSpan), CHIP_NO_ERROR);
         EXPECT_EQ(fabric44CertAuthority.SetIncludeIcac(false).GenerateNocChain(fabricId, nodeId, csrSpan).GetStatus(),
                 CHIP_NO_ERROR);
         ByteSpan noc  = fabric44CertAuthority.GetNoc();
