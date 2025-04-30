@@ -14,12 +14,15 @@
  *    limitations under the License.
  */
 
+#include <cmath>
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/software-diagnostics-server/software-diagnostics-cluster.h>
 #include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <clusters/SoftwareDiagnostics/Enums.h>
+#include <clusters/SoftwareDiagnostics/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/ReadOnlyBuffer.h>
@@ -69,6 +72,23 @@ bool EqualAttributeSets(Span<const AttributeEntry> a, Span<const AttributeEntry>
     if (entriesA.size() != entriesB.size())
     {
         ChipLogError(Test, "Sets of different sizes.");
+
+        for (const auto it : entriesA)
+        {
+            if (entriesB.find(it.first) == entriesB.end())
+            {
+                ChipLogError(Test, "Attribute 0x%08X missing in B", static_cast<int>(it.first));
+            }
+        }
+
+        for (const auto it : entriesB)
+        {
+            if (entriesA.find(it.first) == entriesA.end())
+            {
+                ChipLogError(Test, "Attribute 0x%08X missing in A", static_cast<int>(it.first));
+            }
+        }
+
         return false;
     }
 
@@ -125,12 +145,114 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
         ASSERT_EQ(diag.AcceptedCommands(commandsBuilder), CHIP_NO_ERROR);
         ASSERT_EQ(commandsBuilder.TakeBuffer().size(), 0u);
 
+        ASSERT_EQ(diag.GetFeatureMap(), BitFlags<SoftwareDiagnostics::Feature>{});
+
         // Everything is unimplemented, so attributes are just the global ones.
         // This is really not a useful cluster, but possible...
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
         ASSERT_EQ(diag.Attributes(attributesBuilder), CHIP_NO_ERROR);
 
         ASSERT_TRUE(EqualAttributeSets(attributesBuilder.TakeBuffer(), DefaultServerCluster::GlobalAttributes()));
+    }
+
+    {
+        // everything returns empty here ..
+        class WatermarksProvider : public DeviceLayer::DiagnosticDataProvider
+        {
+        public:
+            bool SupportsWatermarks() override { return true; }
+        };
+
+        WatermarksProvider watermarksProvider;
+        InjectedDiagnosticsSoftwareDiagnosticsLogic diag(watermarksProvider);
+
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
+        ASSERT_EQ(diag.AcceptedCommands(commandsBuilder), CHIP_NO_ERROR);
+
+        ReadOnlyBuffer<DataModel::AcceptedCommandEntry> commands = commandsBuilder.TakeBuffer();
+        ASSERT_EQ(commands.size(), 1u);
+        ASSERT_EQ(commands[0].commandId, SoftwareDiagnostics::Commands::ResetWatermarks::Id);
+        ASSERT_EQ(commands[0].invokePrivilege, SoftwareDiagnostics::Commands::ResetWatermarks::kMetadataEntry.invokePrivilege);
+
+        ASSERT_EQ(diag.GetFeatureMap(), BitFlags<SoftwareDiagnostics::Feature>{ SoftwareDiagnostics::Feature::kWatermarks });
+
+        // Everything is unimplemented, so attributes are just the global ones.
+        // This is really not a useful cluster, but possible...
+        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
+        ASSERT_EQ(diag.Attributes(attributesBuilder), CHIP_NO_ERROR);
+
+        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedBuilder;
+        ASSERT_EQ(expectedBuilder.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
+        ASSERT_EQ(expectedBuilder.AppendElements({ SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::kMetadataEntry }),
+                  CHIP_NO_ERROR);
+
+        ASSERT_TRUE(EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+    }
+
+    {
+        // everything returns empty here ..
+        class AllProvider : public DeviceLayer::DiagnosticDataProvider
+        {
+        public:
+            bool SupportsWatermarks() override { return true; }
+
+            CHIP_ERROR GetCurrentHeapFree(uint64_t & v) override
+            {
+                v = 123;
+                return CHIP_NO_ERROR;
+            }
+            CHIP_ERROR GetCurrentHeapUsed(uint64_t & v) override
+            {
+                v = 234;
+                return CHIP_NO_ERROR;
+            }
+            CHIP_ERROR GetCurrentHeapHighWatermark(uint64_t & v) override
+            {
+                v = 456;
+                return CHIP_NO_ERROR;
+            }
+        };
+
+        AllProvider allProvider;
+        InjectedDiagnosticsSoftwareDiagnosticsLogic diag(allProvider);
+
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
+        ASSERT_EQ(diag.AcceptedCommands(commandsBuilder), CHIP_NO_ERROR);
+
+        ReadOnlyBuffer<DataModel::AcceptedCommandEntry> commands = commandsBuilder.TakeBuffer();
+        ASSERT_EQ(commands.size(), 1u);
+        ASSERT_EQ(commands[0].commandId, SoftwareDiagnostics::Commands::ResetWatermarks::Id);
+        ASSERT_EQ(commands[0].invokePrivilege, SoftwareDiagnostics::Commands::ResetWatermarks::kMetadataEntry.invokePrivilege);
+
+        ASSERT_EQ(diag.GetFeatureMap(), BitFlags<SoftwareDiagnostics::Feature>{ SoftwareDiagnostics::Feature::kWatermarks });
+
+        // Everything is unimplemented, so attributes are just the global ones.
+        // This is really not a useful cluster, but possible...
+        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
+        ASSERT_EQ(diag.Attributes(attributesBuilder), CHIP_NO_ERROR);
+
+        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedBuilder;
+        ASSERT_EQ(expectedBuilder.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
+        ASSERT_EQ(expectedBuilder.AppendElements({
+                      SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::kMetadataEntry,
+                      SoftwareDiagnostics::Attributes::CurrentHeapFree::kMetadataEntry,
+                      SoftwareDiagnostics::Attributes::CurrentHeapUsed::kMetadataEntry,
+                  }),
+                  CHIP_NO_ERROR);
+
+        ASSERT_TRUE(EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+
+        // assert values are read correctly
+        uint64_t value = 0;
+
+        EXPECT_EQ(diag.GetCurrentHeapFree(value), CHIP_NO_ERROR);
+        EXPECT_EQ(value, 123u);
+
+        EXPECT_EQ(diag.GetCurrentHeapUsed(value), CHIP_NO_ERROR);
+        EXPECT_EQ(value, 234u);
+
+        EXPECT_EQ(diag.GetCurrentHighWatermark(value), CHIP_NO_ERROR);
+        EXPECT_EQ(value, 456u);
     }
 }
 

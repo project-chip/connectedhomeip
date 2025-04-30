@@ -50,9 +50,9 @@ public:
     CHIP_ERROR ReadThreadMetrics(AttributeValueEncoder & encoder) const;
 
     /// Determines the feature map based on the DiagnosticsProvider support.
-    BitMask<SoftwareDiagnostics::Feature> GetFeatureMap() const
+    BitFlags<SoftwareDiagnostics::Feature> GetFeatureMap() const
     {
-        return BitMask<SoftwareDiagnostics::Feature>().Set(SoftwareDiagnostics::Feature::kWatermarks,
+        return BitFlags<SoftwareDiagnostics::Feature>().Set(SoftwareDiagnostics::Feature::kWatermarks,
                                                            GetDiagnosticDataProvider().SupportsWatermarks());
     }
 
