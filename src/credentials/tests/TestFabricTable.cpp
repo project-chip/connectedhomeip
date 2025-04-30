@@ -807,7 +807,7 @@ TEST_F(TestFabricTable, TestBasicAddNocUpdateNocFlow)
                                                                     fabricTableWasChanged),
                     CHIP_NO_ERROR);
         EXPECT_EQ(fabricTableWasChanged, true);
-        
+
         EXPECT_EQ(storage.GetNumKeys(), numStorageAfterFirstAdd + 2); // VVSC and VVS added.
 
         // Make sure VVSC was stored.
