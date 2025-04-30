@@ -53,7 +53,7 @@ public:
     BitFlags<SoftwareDiagnostics::Feature> GetFeatureMap() const
     {
         return BitFlags<SoftwareDiagnostics::Feature>().Set(SoftwareDiagnostics::Feature::kWatermarks,
-                                                           GetDiagnosticDataProvider().SupportsWatermarks());
+                                                            GetDiagnosticDataProvider().SupportsWatermarks());
     }
 
     CHIP_ERROR ResetWatermarks() { return GetDiagnosticDataProvider().ResetWatermarks(); }
