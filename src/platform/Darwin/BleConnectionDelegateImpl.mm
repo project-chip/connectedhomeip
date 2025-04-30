@@ -50,8 +50,7 @@ constexpr uint64_t kCachePeripheralTimeoutInSeconds
     = static_cast<uint64_t>(CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX / 1000.0 * 8.0 * 0.625);
 
 typedef NS_ENUM(uint8_t, BleConnectionMode) {
-    kUndefined = 0,
-    kScanning,
+    kScanning = 1,
     kScanningWithTimeout,
     kConnecting,
 };
@@ -61,8 +60,8 @@ typedef NS_ENUM(uint8_t, BleConnectionMode) {
 @property (strong, nonatomic) dispatch_queue_t workQueue; // the CHIP work queue
 @property (strong, nonatomic) CBCentralManager * centralManager;
 @property (strong, nonatomic) CBPeripheral * peripheral;
-@property (nonatomic, readonly, nullable) dispatch_source_t timer;
-@property (nonatomic, readonly) BleConnectionMode currentMode;
+@property (strong, nonatomic, readonly, nullable) dispatch_source_t timer;
+@property (assign, nonatomic, readonly) BleConnectionMode currentMode;
 @property (strong, nonatomic) NSMutableDictionary<CBPeripheral *, NSDictionary *> * cachedPeripherals;
 @property (assign, nonatomic) bool found;
 @property (assign, nonatomic) chip::SetupDiscriminator deviceDiscriminator;
@@ -70,12 +69,11 @@ typedef NS_ENUM(uint8_t, BleConnectionMode) {
 @property (assign, nonatomic) BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete;
 @property (assign, nonatomic) BleConnectionDelegate::OnConnectionErrorFunct onConnectionError;
 @property (assign, nonatomic) chip::DeviceLayer::BleScannerDelegate * scannerDelegate;
-@property (assign, nonatomic) chip::Ble::BleLayer * mBleLayer;
+@property (assign, nonatomic) chip::Ble::BleLayer * bleLayer;
 
 - (instancetype)initWithDelegate:(chip::DeviceLayer::BleScannerDelegate *)delegate prewarm:(bool)prewarm;
 - (instancetype)initWithDiscriminator:(const chip::SetupDiscriminator &)deviceDiscriminator;
 
-- (void)setBleLayer:(chip::Ble::BleLayer *)bleLayer;
 - (void)start;
 - (void)stop;
 - (void)updateWithDelegate:(chip::DeviceLayer::BleScannerDelegate *)delegate prewarm:(bool)prewarm;
@@ -94,22 +92,20 @@ namespace DeviceLayer {
         MTRBleConnection * ble;
 
         void BleConnectionDelegateImpl::NewConnection(
-            Ble::BleLayer * bleLayer, void * appState, const SetupDiscriminator & inDeviceDiscriminator)
+            Ble::BleLayer * bleLayer, void * appState, const SetupDiscriminator & deviceDiscriminator)
         {
             assertChipStackLockedByCurrentThread();
 
-            // Make a copy of the device discriminator for the block to capture.
-            SetupDiscriminator deviceDiscriminator = inDeviceDiscriminator;
-
-            if (inDeviceDiscriminator.IsShortDiscriminator()) {
-                ChipLogProgress(Ble, "ConnectionDelegate NewConnection with short discriminator %d (0x%x)", inDeviceDiscriminator.GetShortValue(), inDeviceDiscriminator.GetShortValue());
+            if (deviceDiscriminator.IsShortDiscriminator()) {
+                ChipLogProgress(Ble, "ConnectionDelegate NewConnection with short discriminator %d (0x%x)", deviceDiscriminator.GetShortValue(), deviceDiscriminator.GetShortValue());
             } else {
-                ChipLogProgress(Ble, "ConnectionDelegate NewConnection with long discriminator %d (0x%x)", inDeviceDiscriminator.GetLongValue(), inDeviceDiscriminator.GetLongValue());
+                ChipLogProgress(Ble, "ConnectionDelegate NewConnection with long discriminator %d (0x%x)", deviceDiscriminator.GetLongValue(), deviceDiscriminator.GetLongValue());
             }
+
             // If the previous connection delegate was not a try to connect to something, just reuse it instead of
             // creating a brand new connection but update the discriminator and the ble layer members.
             if (ble and ![ble isConnecting]) {
-                [ble setBleLayer:bleLayer];
+                ble.bleLayer = bleLayer;
                 ble.appState = appState;
                 ble.onConnectionComplete = OnConnectionComplete;
                 ble.onConnectionError = OnConnectionError;
@@ -119,7 +115,7 @@ namespace DeviceLayer {
 
             [ble stop];
             ble = [[MTRBleConnection alloc] initWithDiscriminator:deviceDiscriminator];
-            [ble setBleLayer:bleLayer];
+            ble.bleLayer = bleLayer;
             ble.appState = appState;
             ble.onConnectionComplete = OnConnectionComplete;
             ble.onConnectionError = OnConnectionError;
@@ -145,7 +141,7 @@ namespace DeviceLayer {
                 return;
             }
 
-            [ble setBleLayer:bleLayer];
+            ble.bleLayer = bleLayer;
             ble.appState = appState;
             ble.onConnectionComplete = OnConnectionComplete;
             ble.onConnectionError = OnConnectionError;
@@ -229,7 +225,6 @@ namespace DeviceLayer {
         _centralManager = [CBCentralManager alloc];
         _found = false;
         _cachedPeripherals = [[NSMutableDictionary alloc] init];
-        _currentMode = kUndefined;
         [self _resetCounters];
     }
 
@@ -296,14 +291,14 @@ namespace DeviceLayer {
 // All our callback dispatch must happen on _chipWorkQueue
 - (void)dispatchConnectionError:(CHIP_ERROR)error
 {
-    if (self.onConnectionError != nil) {
+    if (self.onConnectionError != nullptr) {
         self.onConnectionError(self.appState, error);
     }
 }
 
 - (void)dispatchConnectionComplete:(CBPeripheral *)peripheral
 {
-    if (self.onConnectionComplete != nil) {
+    if (self.onConnectionComplete != nullptr) {
         self.onConnectionComplete(self.appState, BleConnObjectFromCBPeripheral(peripheral));
     }
 }
@@ -429,8 +424,8 @@ namespace DeviceLayer {
 {
     assertChipStackLockedByCurrentThread();
 
-    if (nil != error) {
-        ChipLogError(Ble, "BLE:Error finding Chip Service in the device: [%s]", [error.localizedDescription UTF8String]);
+    if (error != nil) {
+        ChipLogError(Ble, "Failed to discover services: %@", error);
     }
 
     MATTER_LOG_METRIC_END(kMetricBLEDiscoveredServices, CHIP_ERROR(chip::ChipError::Range::kOS, static_cast<uint32_t>(error.code)));
@@ -445,7 +440,7 @@ namespace DeviceLayer {
     }
 
     if (!self.found || error != nil) {
-        ChipLogError(Ble, "Service not found on the device.");
+        ChipLogError(Ble, "Matter Service not found on the device");
         MATTER_LOG_METRIC(kMetricBLEDiscoveredServices, CHIP_ERROR_INCORRECT_STATE);
         [self dispatchConnectionError:CHIP_ERROR_INCORRECT_STATE];
     }
@@ -456,9 +451,8 @@ namespace DeviceLayer {
     assertChipStackLockedByCurrentThread();
     MATTER_LOG_METRIC_END(kMetricBLEDiscoveredCharacteristics, CHIP_ERROR(chip::ChipError::Range::kOS, static_cast<uint32_t>(error.code)));
 
-    if (nil != error) {
-        ChipLogError(
-            Ble, "BLE:Error finding Characteristics in Chip service on the device: [%s]", [error.localizedDescription UTF8String]);
+    if (error != nil) {
+        ChipLogError(Ble, "Failed to discover characterstics: %@", error);
     }
 
     // XXX error ?
@@ -474,12 +468,11 @@ namespace DeviceLayer {
     if (nil == error) {
         ChipBleUUID svcId = BleUUIDFromCBUUD(characteristic.service.UUID);
         ChipBleUUID charId = BleUUIDFromCBUUD(characteristic.UUID);
-        _mBleLayer->HandleWriteConfirmation(BleConnObjectFromCBPeripheral(peripheral), &svcId, &charId);
+        _bleLayer->HandleWriteConfirmation(BleConnObjectFromCBPeripheral(peripheral), &svcId, &charId);
     } else {
-        ChipLogError(
-            Ble, "BLE:Error writing Characteristics in Chip service on the device: [%s]", [error.localizedDescription UTF8String]);
+        ChipLogError(Ble, "Failed to write characteristic: %@", error);
         MATTER_LOG_METRIC(kMetricBLEWriteChrValueFailed, BLE_ERROR_GATT_WRITE_FAILED);
-        _mBleLayer->HandleConnectionError(BleConnObjectFromCBPeripheral(peripheral), BLE_ERROR_GATT_WRITE_FAILED);
+        _bleLayer->HandleConnectionError(BleConnObjectFromCBPeripheral(peripheral), BLE_ERROR_GATT_WRITE_FAILED);
     }
 }
 
@@ -495,9 +488,9 @@ namespace DeviceLayer {
         ChipBleUUID svcId = BleUUIDFromCBUUD(characteristic.service.UUID);
         ChipBleUUID charId = BleUUIDFromCBUUD(characteristic.UUID);
         if (isNotifying) {
-            _mBleLayer->HandleSubscribeComplete(BleConnObjectFromCBPeripheral(peripheral), &svcId, &charId);
+            _bleLayer->HandleSubscribeComplete(BleConnObjectFromCBPeripheral(peripheral), &svcId, &charId);
         } else {
-            _mBleLayer->HandleUnsubscribeComplete(BleConnObjectFromCBPeripheral(peripheral), &svcId, &charId);
+            _bleLayer->HandleUnsubscribeComplete(BleConnObjectFromCBPeripheral(peripheral), &svcId, &charId);
         }
     } else {
         ChipLogError(Ble, "BLE:Error subscribing/unsubcribing some characteristic on the device: [%s]",
@@ -506,11 +499,11 @@ namespace DeviceLayer {
         if (isNotifying) {
             MATTER_LOG_METRIC(kMetricBLEUpdateNotificationStateForChrFailed, BLE_ERROR_GATT_WRITE_FAILED);
             // we're still notifying, so we must failed the unsubscription
-            _mBleLayer->HandleConnectionError(BleConnObjectFromCBPeripheral(peripheral), BLE_ERROR_GATT_UNSUBSCRIBE_FAILED);
+            _bleLayer->HandleConnectionError(BleConnObjectFromCBPeripheral(peripheral), BLE_ERROR_GATT_UNSUBSCRIBE_FAILED);
         } else {
             // we're not notifying, so we must failed the subscription
             MATTER_LOG_METRIC(kMetricBLEUpdateNotificationStateForChrFailed, BLE_ERROR_GATT_SUBSCRIBE_FAILED);
-            _mBleLayer->HandleConnectionError(BleConnObjectFromCBPeripheral(peripheral), BLE_ERROR_GATT_SUBSCRIBE_FAILED);
+            _bleLayer->HandleConnectionError(BleConnObjectFromCBPeripheral(peripheral), BLE_ERROR_GATT_SUBSCRIBE_FAILED);
         }
     }
 }
@@ -530,20 +523,19 @@ namespace DeviceLayer {
         auto msgBuf = chip::System::PacketBufferHandle::NewWithData(value.bytes, value.length);
 
         if (msgBuf.IsNull()) {
-            ChipLogError(Ble, "Failed at allocating buffer for incoming BLE data");
+            ChipLogError(Ble, "Failed to allocate buffer for incoming BLE data");
             MATTER_LOG_METRIC(kMetricBLEUpdateValueForChrFailed, CHIP_ERROR_NO_MEMORY);
-            _mBleLayer->HandleConnectionError(BleConnObjectFromCBPeripheral(peripheral), CHIP_ERROR_NO_MEMORY);
-        } else if (!_mBleLayer->HandleIndicationReceived(BleConnObjectFromCBPeripheral(peripheral), &svcId, &charId, std::move(msgBuf))) {
+            _bleLayer->HandleConnectionError(BleConnObjectFromCBPeripheral(peripheral), CHIP_ERROR_NO_MEMORY);
+        } else if (!_bleLayer->HandleIndicationReceived(BleConnObjectFromCBPeripheral(peripheral), &svcId, &charId, std::move(msgBuf))) {
             // since this error comes from device manager core
             // we assume it would do the right thing, like closing the connection
-            ChipLogError(Ble, "Failed at handling incoming BLE data");
+            ChipLogError(Ble, "Failed to handle incoming BLE data");
             MATTER_LOG_METRIC(kMetricBLEUpdateValueForChrFailed, CHIP_ERROR_INCORRECT_STATE);
         }
     } else {
-        ChipLogError(
-            Ble, "BLE:Error receiving indication of Characteristics on the device: [%s]", [error.localizedDescription UTF8String]);
+        ChipLogError(Ble, "Failed to receive characteristic indication: %@", error);
         MATTER_LOG_METRIC(kMetricBLEUpdateValueForChrFailed, BLE_ERROR_GATT_INDICATE_FAILED);
-        _mBleLayer->HandleConnectionError(BleConnObjectFromCBPeripheral(peripheral), BLE_ERROR_GATT_INDICATE_FAILED);
+        _bleLayer->HandleConnectionError(BleConnObjectFromCBPeripheral(peripheral), BLE_ERROR_GATT_INDICATE_FAILED);
     }
 }
 
@@ -570,7 +562,11 @@ namespace DeviceLayer {
 
     if (_peripheral) {
         // Close all BLE connections before we release CB objects
-        _mBleLayer->CloseAllBleConnections();
+        // TODO: It's not clear that calling back into BLELayer is right here, since this method is
+        // called indirectly by BLELayer::CancelBleIncompleteConnection. There don't seem to be any
+        // other instances of platform delegates making this upwards call. It was introduced here:
+        // https://github.com/project-chip/connectedhomeip/pull/20299/files
+        _bleLayer->CloseAllBleConnections();
         _peripheral = nil;
     }
 
@@ -781,9 +777,10 @@ namespace DeviceLayer {
     }
 }
 
-- (void)setBleLayer:(chip::Ble::BleLayer *)bleLayer
+- (NSString *)description
 {
-    _mBleLayer = bleLayer;
+    return [NSString stringWithFormat:@"<%@ %p mode=%d cbstate=%p peripheral=%@>",
+                     self.class, self, _currentMode, _appState, _peripheral];
 }
 
 @end
