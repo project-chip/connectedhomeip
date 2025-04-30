@@ -20,8 +20,8 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/minimal_mdns/Query.h>
 #include <lib/dnssd/minimal_mdns/QueryBuilder.h>
-#include <lib/dnssd/minimal_mdns/tests/CheckOnlyServer.h>
 #include <lib/dnssd/minimal_mdns/core/tests/QNameStrings.h>
+#include <lib/dnssd/minimal_mdns/tests/CheckOnlyServer.h>
 
 namespace {
 
