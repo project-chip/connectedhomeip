@@ -28,11 +28,6 @@ namespace app {
 namespace Clusters {
 
 /// Type-safe implementation for callbacks for the OTA Provider server
-///
-/// TODO:
-///   - optional attributes: there is NO storage requirement
-///   - how do I determine what "features" are supported ? It seems we want uint64_t ...
-///   - How can I make "use global and use something else as well class?"
 class SoftwareDiagnosticsLogic
 {
 public:
