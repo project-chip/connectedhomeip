@@ -17,7 +17,15 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/software-diagnostics-server/software-diagnostics-cluster.h>
+#include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
+#include <app/data-model-provider/MetadataTypes.h>
+#include <app/server-cluster/DefaultServerCluster.h>
+#include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/ReadOnlyBuffer.h>
+#include <platform/DiagnosticDataProvider.h>
+
+#include <map>
 
 namespace {
 
@@ -28,13 +36,102 @@ using namespace chip::app::DataModel;
 
 static constexpr chip::EndpointId kRootEndpointId = 0;
 
-TEST(TestSoftwareDiagnosticsCluster, CompileTest)
+bool EqualAttributeEntries(const AttributeEntry & a, const AttributeEntry & b)
+{
+    return (a.attributeId == b.attributeId) && (a.flags == b.flags) && (a.readPrivilege == b.readPrivilege) &&
+        (a.writePrivilege == b.writePrivilege);
+}
+// Comparse two attribute entries as "sets of attributes" and ensures that the content is identical
+bool EqualAttributeSets(Span<const AttributeEntry> a, Span<const AttributeEntry> b)
+{
+
+    std::map<AttributeId, const AttributeEntry *> entriesA;
+    std::map<AttributeId, const AttributeEntry *> entriesB;
+
+    for (const AttributeEntry & entry : a)
+    {
+        if (!entriesA.emplace(entry.attributeId, &entry).second)
+        {
+            ChipLogError(Test, "Duplicate attribute ID in span A: 0x%08X", static_cast<int>(entry.attributeId));
+            return false;
+        }
+    }
+
+    for (const AttributeEntry & entry : b)
+    {
+        if (!entriesB.emplace(entry.attributeId, &entry).second)
+        {
+            ChipLogError(Test, "Duplicate attribute ID in span B: 0x%08X", static_cast<int>(entry.attributeId));
+            return false;
+        }
+    }
+
+    if (entriesA.size() != entriesB.size())
+    {
+        ChipLogError(Test, "Sets of different sizes.");
+        return false;
+    }
+
+    for (const auto it : entriesA)
+    {
+        const auto other = entriesB.find(it.first);
+        if (other == entriesB.end())
+        {
+
+            ChipLogError(Test, "Missing entry: 0x%08X", static_cast<int>(it.first));
+            return false;
+        }
+
+        if (!EqualAttributeEntries(*it.second, *other->second))
+        {
+
+            ChipLogError(Test, "Different content (different flags?): 0x%08X", static_cast<int>(it.first));
+            return false;
+        }
+    }
+    // set sizes are the same and all entreisA have a corresponding entriesB, so sets should match
+    return true;
+}
+
+// initialize memory as ReadOnlyBufferBuilder may allocate
+struct TestSoftwareDiagnosticsCluster : public ::testing::Test
+{
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+};
+
+TEST_F(TestSoftwareDiagnosticsCluster, CompileTest)
 {
     // The cluster should compile for any logic
     SoftwareDiagnosticsServer<DeviceLayerSoftwareDiagnosticsLogic> cluster(kRootEndpointId);
 
     // Essentially say "code executes"
-    ASSERT_EQ(cluster.GetClusterFlags({kRootEndpointId, SoftwareDiagnostics::Id}), BitFlags<ClusterQualityFlags>());
+    ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, SoftwareDiagnostics::Id }), BitFlags<ClusterQualityFlags>());
+}
+
+TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
+{
+    {
+        // everything returns empty here ..
+        class NullProvider : public DeviceLayer::DiagnosticDataProvider
+        {
+        };
+
+        NullProvider nullProvider;
+        InjectedDiagnosticsSoftwareDiagnosticsLogic diag(nullProvider);
+
+        // without watermarks, no commands are accepted
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
+        ASSERT_EQ(diag.AcceptedCommands(commandsBuilder), CHIP_NO_ERROR);
+        ASSERT_EQ(commandsBuilder.TakeBuffer().size(), 0u);
+
+        // Everything is unimplemented, so attributes are just the global ones.
+        // This is really not a useful cluster, but possible...
+        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
+        ASSERT_EQ(diag.Attributes(attributesBuilder), CHIP_NO_ERROR);
+
+        ASSERT_TRUE(EqualAttributeSets(attributesBuilder.TakeBuffer(), DefaultServerCluster::GlobalAttributes()));
+    }
 }
 
 } // namespace
