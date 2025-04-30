@@ -361,22 +361,18 @@ private:
     bool IsSupportedOverallTargetPositioning(TargetPositionEnum positioning) const;
 
     /**
-     * @brief Update the stored countdown time
-     *        When the attribute should be marked dirty changes based on wether the change is from the delegate or the internal
-     *        cluster processing.
+     * @brief Updates the countdown time based on the Quiet reporting conditions of the attribute.
      *
-     *        If countdown time is changed due to the internal cluster logic, the attribute will be marked dirty,
-     *        otherwise, configured quiet reporting rules apply
-     *
-     *        See Set function comment above for common behavior
-     *
-     * @param fromDelegate true if the coutdown time is being configured by the delegate, false otherwise
+     * @param fromDelegate true if the countdown time is being configured by the delegate, false otherwise
      */
     CHIP_ERROR SetCountdownTime(const DataModel::Nullable<ElapsedS> & countdownTime, bool fromDelegate);
 
     /**
-     * @brief Triggers an update to report a new countdown time from cluster logic.
-     *        This method should be called whenever the cluster logic needs to update the countdown time.
+     * @brief Updates the countdown time from cluster logic.
+     *        This method should be invoked whenever the cluster logic needs to update the countdown time.
+     *        This includes:
+     *         - When the tracked operation changes due to an update in the MainState attribute, or
+     *         - When there is any adjustment in the estimated time remaining due to the server's control logic insights
      *
      * @param[in] countdownTime - Updated countdown time to be reported.
      *
