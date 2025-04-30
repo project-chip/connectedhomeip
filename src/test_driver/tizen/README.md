@@ -77,19 +77,21 @@ run the test manually by typing `/mnt/chip/runner.sh`.
 
 In order for GDB to work correctly, same sysroot as is present on QEMU must be
 provided.
-- Create sysroot directory
-- Mount `/opt/tizen-sdk/iot-rootfs.img`
-- Copy `/usr` from the mounted image to your sysroot directory
-- Fix potentially broken symlinks in the libs as needed
 
-Coredumps are generated in the `dump` directory as a zip archive file.
-After extracting it the coredump should be extracted from tar archive file.
+-   Create sysroot directory
+-   Mount `/opt/tizen-sdk/iot-rootfs.img`
+-   Copy `/usr` from the mounted image to your sysroot directory
+-   Fix potentially broken symlinks in the libs as needed
+
+Coredumps are generated in the `dump` directory as a zip archive file. After
+extracting it the coredump should be extracted from tar archive file.
 
 Set GDB config
+
 ```
 set auto-load safe-path /
 set sysroot /path/to/sysroot/
 ```
 
-And then run `gdb-multiarch` specifying `.coredump` file extracted before,
-your GDB config file if present and lastly the executable.
+And then run `gdb-multiarch` specifying `.coredump` file extracted before, your
+GDB config file if present and lastly the executable.
