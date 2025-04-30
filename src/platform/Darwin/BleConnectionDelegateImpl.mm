@@ -186,21 +186,22 @@ namespace DeviceLayer {
 
         void BleConnectionDelegateImpl::StopScan()
         {
+            assertChipStackLockedByCurrentThread();
             ChipLogProgress(Ble, "ConnectionDelegate StopScan");
-            DoCancel();
+            if (ble && !ble.isConnecting) {
+                [ble stop];
+                ble = nil;
+            }
         }
 
         CHIP_ERROR BleConnectionDelegateImpl::CancelConnection()
         {
-            ChipLogProgress(Ble, "ConnectionDelegate CancelConnection");
-            return DoCancel();
-        }
-
-        CHIP_ERROR BleConnectionDelegateImpl::DoCancel()
-        {
             assertChipStackLockedByCurrentThread();
-            [ble stop];
-            ble = nil;
+            ChipLogProgress(Ble, "ConnectionDelegate CancelConnection");
+            if (ble && ble.isConnecting) {
+                [ble stop];
+                ble = nil;
+            }
             return CHIP_NO_ERROR;
         }
     } // namespace Internal
