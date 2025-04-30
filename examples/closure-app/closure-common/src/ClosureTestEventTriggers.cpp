@@ -77,7 +77,7 @@
         SetTestEventTrigger_MainStateIsDisengaged();
         ChipLogProgress(Support, "[MainState-Test-Event] => Simulate that the device is in Disengaged state");
         break;
-        case ClosureControlTrigger::kEventClearErrors:
+        case ClosureControlTrigger::kClearErrors:
         SetTestEventTrigger_ClearErrors();
         ChipLogProgress(Support, "[MainState-Test-Event] => Simulate that the device to clear all errors");
         break;

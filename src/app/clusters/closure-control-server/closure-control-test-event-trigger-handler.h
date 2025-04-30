@@ -52,8 +52,8 @@ namespace chip {
     // MainState is Disengaged(6) Test Event | Simulate that the device is in disengaged state
     kMainStateIsDisengaged = 0x0104000000000002,
     
-    // MainState Test Event Clear 
-    kEventClear = 0x0104000000000003,
+    // MainState Test Event Clear Errors
+    kClearErrors = 0x0104000000000003,
     
     //MainState is Error(3) Test Event | Simulate that the device is in error state, add at least one element to the CurrentErrorList attribute
     kMainStateIsError = 0x0104000000000004,
