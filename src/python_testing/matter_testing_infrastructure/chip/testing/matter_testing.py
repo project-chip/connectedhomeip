@@ -642,7 +642,7 @@ class ClusterAttributeChangeAccumulator:
 
             # Determine if all were met
             if all(last_report_matches.values()):
-                logging.info(f"[FC] Found all expected reports were true.")
+                logging.info("[FC] Found all expected reports were true.")
                 return tuple(values)
 
             elapsed = time.time() - start_time
