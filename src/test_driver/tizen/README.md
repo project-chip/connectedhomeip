@@ -73,7 +73,7 @@ passed to QEMU (the string after the `-append` option). This will run QEMU, but
 instead of running the test, it will drop you to the shell. From there, you can
 run the test manually by typing `/mnt/chip/runner.sh`.
 
-## Analyzing coredumps
+## Analyzing core dumps
 
 In order for GDB to work correctly, same sysroot as is present on QEMU must be
 provided.
@@ -83,8 +83,8 @@ provided.
 -   Copy `/usr` from the mounted image to your sysroot directory
 -   Fix potentially broken symlinks in the libs as needed
 
-Coredumps are generated in the `dump` directory as a zip archive file. After
-extracting it the coredump should be extracted from tar archive file.
+Core dumps are generated in the `dump` directory as a zip archive file. After
+extracting it the core dump should be extracted from tar archive file.
 
 Set GDB config
 
