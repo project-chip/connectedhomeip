@@ -177,14 +177,14 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace GetTariffComponent {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CommodityTariff::Commands::GetTariffComponent::Id,
+    .commandId       = GetTariffComponent::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace GetTariffComponent
 namespace GetDayEntry {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CommodityTariff::Commands::GetDayEntry::Id,
+    .commandId       = GetDayEntry::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

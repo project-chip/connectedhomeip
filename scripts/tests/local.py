@@ -141,6 +141,13 @@ def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
     )
     targets.append(
         ApplicationTarget(
+            key="ENERGY_GATEWAY_APP",
+            target=f"{target_prefix}-energy-gateway-{suffix}",
+            binary="chip-energy-gateway-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
             key="ENERGY_MANAGEMENT_APP",
             target=f"{target_prefix}-energy-management-{suffix}",
             binary="chip-energy-management-app",

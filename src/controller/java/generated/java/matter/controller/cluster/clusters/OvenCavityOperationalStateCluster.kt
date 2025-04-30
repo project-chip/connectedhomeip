@@ -142,48 +142,6 @@ class OvenCavityOperationalStateCluster(
     object SubscriptionEstablished : AttributeListAttributeSubscriptionState()
   }
 
-  suspend fun pause(timedInvokeTimeout: Duration? = null): OperationalCommandResponse {
-    val commandId: UInt = 0u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.startStructure(AnonymousTag)
-    tlvWriter.endStructure()
-
-    val request: InvokeRequest =
-      InvokeRequest(
-        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
-        tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
-      )
-
-    val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
-
-    val tlvReader = TlvReader(response.payload)
-    tlvReader.enterStructure(AnonymousTag)
-    val TAG_COMMAND_RESPONSE_STATE: Int = 0
-    var commandResponseState_decoded: OvenCavityOperationalStateClusterErrorStateStruct? = null
-
-    while (!tlvReader.isEndOfContainer()) {
-      val tag = tlvReader.peekElement().tag
-
-      if (tag == ContextSpecificTag(TAG_COMMAND_RESPONSE_STATE)) {
-        commandResponseState_decoded =
-          OvenCavityOperationalStateClusterErrorStateStruct.fromTlv(tag, tlvReader)
-      } else {
-        tlvReader.skipElement()
-      }
-    }
-
-    if (commandResponseState_decoded == null) {
-      throw IllegalStateException("commandResponseState not found in TLV")
-    }
-
-    tlvReader.exitContainer()
-
-    return OperationalCommandResponse(commandResponseState_decoded)
-  }
-
   suspend fun stop(timedInvokeTimeout: Duration? = null): OperationalCommandResponse {
     val commandId: UInt = 1u
 
@@ -228,48 +186,6 @@ class OvenCavityOperationalStateCluster(
 
   suspend fun start(timedInvokeTimeout: Duration? = null): OperationalCommandResponse {
     val commandId: UInt = 2u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.startStructure(AnonymousTag)
-    tlvWriter.endStructure()
-
-    val request: InvokeRequest =
-      InvokeRequest(
-        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
-        tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
-      )
-
-    val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
-
-    val tlvReader = TlvReader(response.payload)
-    tlvReader.enterStructure(AnonymousTag)
-    val TAG_COMMAND_RESPONSE_STATE: Int = 0
-    var commandResponseState_decoded: OvenCavityOperationalStateClusterErrorStateStruct? = null
-
-    while (!tlvReader.isEndOfContainer()) {
-      val tag = tlvReader.peekElement().tag
-
-      if (tag == ContextSpecificTag(TAG_COMMAND_RESPONSE_STATE)) {
-        commandResponseState_decoded =
-          OvenCavityOperationalStateClusterErrorStateStruct.fromTlv(tag, tlvReader)
-      } else {
-        tlvReader.skipElement()
-      }
-    }
-
-    if (commandResponseState_decoded == null) {
-      throw IllegalStateException("commandResponseState not found in TLV")
-    }
-
-    tlvReader.exitContainer()
-
-    return OperationalCommandResponse(commandResponseState_decoded)
-  }
-
-  suspend fun resume(timedInvokeTimeout: Duration? = null): OperationalCommandResponse {
-    val commandId: UInt = 3u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
