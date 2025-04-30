@@ -802,10 +802,9 @@ TEST_F(TestFabricTable, TestBasicAddNocUpdateNocFlow)
 
         // Set new VVS, VVSC. Applies immediately due to no intermediate NOC update flow present.
         bool fabricTableWasChanged = false;
-        EXPECT_EQ(fabricTable.SetVIDVerificationStatementElements(kFirstFabricIndex, NullOptional,
-                                                                    MakeOptional(vvsSpan), MakeOptional(vvscSpan),
-                                                                    fabricTableWasChanged),
-                    CHIP_NO_ERROR);
+        EXPECT_EQ(fabricTable.SetVIDVerificationStatementElements(kFirstFabricIndex, NullOptional, MakeOptional(vvsSpan),
+                                                                  MakeOptional(vvscSpan), fabricTableWasChanged),
+                  CHIP_NO_ERROR);
         EXPECT_EQ(fabricTableWasChanged, true);
 
         EXPECT_EQ(storage.GetNumKeys(), numStorageAfterFirstAdd + 2); // VVSC and VVS added.
@@ -817,8 +816,8 @@ TEST_F(TestFabricTable, TestBasicAddNocUpdateNocFlow)
             MutableByteSpan readBackVvscSpan{ readBackVvscBuf };
 
             EXPECT_EQ(fabricTableHolder.GetOpCertStore().GetVidVerificationElement(
-                            kFirstFabricIndex, OperationalCertificateStore::VidVerificationElement::kVvsc, readBackVvscSpan),
-                        CHIP_NO_ERROR);
+                          kFirstFabricIndex, OperationalCertificateStore::VidVerificationElement::kVvsc, readBackVvscSpan),
+                      CHIP_NO_ERROR);
             EXPECT_TRUE(readBackVvscSpan.data_equal(vvscSpan));
         }
 
@@ -829,9 +828,9 @@ TEST_F(TestFabricTable, TestBasicAddNocUpdateNocFlow)
             MutableByteSpan readBackVvsSpan{ readBackVvsBuf };
 
             EXPECT_EQ(fabricTableHolder.GetOpCertStore().GetVidVerificationElement(
-                            kFirstFabricIndex, OperationalCertificateStore::VidVerificationElement::kVidVerificationStatement,
-                            readBackVvsSpan),
-                        CHIP_NO_ERROR);
+                          kFirstFabricIndex, OperationalCertificateStore::VidVerificationElement::kVidVerificationStatement,
+                          readBackVvsSpan),
+                      CHIP_NO_ERROR);
             EXPECT_TRUE(readBackVvsSpan.data_equal(vvsSpan));
         }
     }
