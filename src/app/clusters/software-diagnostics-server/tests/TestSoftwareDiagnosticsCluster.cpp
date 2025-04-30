@@ -37,8 +37,6 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
 
-static constexpr chip::EndpointId kRootEndpointId = 0;
-
 bool EqualAttributeEntries(const AttributeEntry & a, const AttributeEntry & b)
 {
     return (a.attributeId == b.attributeId) && (a.flags == b.flags) && (a.readPrivilege == b.readPrivilege) &&
@@ -123,7 +121,7 @@ struct TestSoftwareDiagnosticsCluster : public ::testing::Test
 TEST_F(TestSoftwareDiagnosticsCluster, CompileTest)
 {
     // The cluster should compile for any logic
-    SoftwareDiagnosticsServerCluster<DeviceLayerSoftwareDiagnosticsLogic> cluster(kRootEndpointId);
+    SoftwareDiagnosticsServerCluster<DeviceLayerSoftwareDiagnosticsLogic> cluster;
 
     // Essentially say "code executes"
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, SoftwareDiagnostics::Id }), BitFlags<ClusterQualityFlags>());
