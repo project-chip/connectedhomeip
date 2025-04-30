@@ -206,7 +206,7 @@ public:
      * order to preserve the ability to instantiate this class in test code. This is meant to be
      * temporary until we find a better solution.
      */
-    EventManagement() = default;
+    constexpr EventManagement() = default;
 
     /**
      * Initialize the EventManagement with an array of LogStorageResources and
