@@ -98,9 +98,8 @@ CHIP_ERROR UnitLocalizationServer::Write(const ConcreteDataAttributePath & aPath
         ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(aPath, to_underlying(mTemperatureUnit)));
         return CHIP_NO_ERROR;
     }
-    default: {
+    default:
         break;
-    }
     }
 
     return CHIP_NO_ERROR;
@@ -124,9 +123,8 @@ CHIP_ERROR UnitLocalizationServer::Read(const ConcreteReadAttributePath & aPath,
     case ClusterRevision::Id: {
         return aEncoder.Encode(kClusterRevision);
     }
-    default: {
+    default:
         break;
-    }
     }
     return CHIP_NO_ERROR;
 }
