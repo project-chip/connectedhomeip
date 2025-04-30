@@ -21,9 +21,7 @@ config("include-config") {
 }
 
 source_set("software-diagnostics") {
-  sources = [
-    "SoftwareDiagnosticsTestEventTriggerHandler.h",
-  ]
+  sources = [ "SoftwareDiagnosticsTestEventTriggerHandler.h" ]
   public_deps = [
     "${chip_root}/src/app:generic-test-event-trigger-handler",
     "${chip_root}/src/lib/core:error",
