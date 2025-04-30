@@ -1493,7 +1493,7 @@ class ChipDeviceControllerBase():
                              attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor]],
                              timedRequestTimeoutMs: typing.Optional[int] = None,
                              interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
-                             payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
+                             payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD, forceLegacyListEncoding typing.Optional[bool]=None):
         '''
         Write a list of attributes on a target node.
 
@@ -1531,7 +1531,7 @@ class ChipDeviceControllerBase():
 
         ClusterAttribute.WriteAttributes(
             future, eventLoop, device.deviceProxy, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs,
-            interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs).raise_on_error()
+            interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, forceLegacyListEncoding=forceLegacyListEncoding).raise_on_error()
         return await future
 
     def WriteGroupAttribute(
