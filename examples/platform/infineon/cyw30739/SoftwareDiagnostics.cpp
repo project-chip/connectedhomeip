@@ -18,7 +18,7 @@
 
 #include "SoftwareDiagnostics.h"
 
-#include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
+#include <app/clusters/software-diagnostics-server/CodegenIntegration.h>
 #include <app/util/config.h>
 #include <platform/CHIPDeviceLayer.h>
 
