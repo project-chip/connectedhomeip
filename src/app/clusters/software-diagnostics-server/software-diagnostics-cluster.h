@@ -21,7 +21,9 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/SoftwareDiagnostics/ClusterId.h>
 #include <clusters/SoftwareDiagnostics/Commands.h>
+#include <clusters/SoftwareDiagnostics/Events.h>
 #include <clusters/SoftwareDiagnostics/Metadata.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -32,13 +34,15 @@ namespace Clusters {
 /// Integration of Software diagnostics logic within the matter data model
 ///
 /// Translates between matter calls and OTA logic
+///
+/// This cluster is expected to only ever exist on endpoint 0 as it is a singleton cluster.
 template <typename LOGIC>
 class SoftwareDiagnosticsServerCluster : public DefaultServerCluster, private LOGIC
 {
 public:
     template <typename... Args>
-    SoftwareDiagnosticsServerCluster(EndpointId endpointId, Args &&... args) :
-        DefaultServerCluster({ endpointId, OtaSoftwareUpdateProvider::Id }), LOGIC(std::forward<Args>(args)...)
+    SoftwareDiagnosticsServerCluster(Args &&... args) :
+        DefaultServerCluster({ kRootEndpointId, OtaSoftwareUpdateProvider::Id }), LOGIC(std::forward<Args>(args)...)
     {}
 
     // Server cluster implementation
@@ -95,6 +99,13 @@ public:
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override
     {
         return LOGIC::Attributes(builder);
+    }
+
+    /// Returns true if the event was successfully generated
+    bool Emit(const chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::Type & softwareFault)
+    {
+        VerifyOrReturnError(mContext != nullptr, false);
+        return mContext->interactionContext->eventsGenerator->GenerateEvent(softwareFault, kRootEndpointId).has_value();
     }
 };
 

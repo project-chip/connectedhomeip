@@ -29,14 +29,12 @@ using namespace chip::app::Clusters::SoftwareDiagnostics;
 // this file is ever only included IF software diagnostics is enabled and that MUST happen only on endpoint 0
 static_assert(SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size() == 1,
               "Exactly one softare diagnistics provider may exist on Endpoint 0");
-static_assert(SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == 0,
+static_assert(SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId,
               "Exactly one softare diagnistics provider may exist on Endpoint 0");
 
 namespace {
 
-static constexpr EndpointId kRootEndpointId = 0;
-
-RegisteredServerCluster<SoftwareDiagnosticsServerCluster<DeviceLayerSoftwareDiagnosticsLogic>> gServer(kRootEndpointId);
+RegisteredServerCluster<SoftwareDiagnosticsServerCluster<DeviceLayerSoftwareDiagnosticsLogic>> gServer;
 
 } // namespace
 
@@ -54,26 +52,13 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-// TODO: these should be implemented
 void SoftwareDiagnosticsServer::OnSoftwareFaultDetect(const SoftwareDiagnostics::Events::SoftwareFault::Type & softwareFault)
 {
     ChipLogDetail(Zcl, "SoftwareDiagnosticsDelegate: OnSoftwareFaultDetected");
-
-    // there is ONLY ONE software diagnostics available.
-    // TODO: log event somehow
-
-    /*
-    for (auto endpoint : EnabledEndpointsWithServerCluster(SoftwareDiagnostics::Id))
+    if (!gServer.Cluster().Emit(softwareFault))
     {
-        // If Software Diagnostics cluster is implemented on this endpoint
-        EventNumber eventNumber;
-
-        if (CHIP_NO_ERROR != LogEvent(softwareFault, endpoint, eventNumber))
-        {
-            ChipLogError(Zcl, "SoftwareDiagnosticsDelegate: Failed to record SoftwareFault event");
-        }
+        ChipLogError(Zcl, "SoftwareDiagnosticsDelegate: Failed to record SoftwareFault event");
     }
-    */
 }
 
 } // namespace Clusters
