@@ -257,8 +257,12 @@ public:
      *
      * Note: When encoding lists with this function, you may receive more than one write status for a single list. You can refer
      * to ChunkedWriteCallback.h for a high level API which will merge status codes for chunked write requests.
+     *
+     * Note: forceLegacyListEncoding is used by Test Harness and Python Tests to test backward compatibility and ensure end devices
+     * support legacy WriteClients
      */
-    CHIP_ERROR PutPreencodedAttribute(const ConcreteDataAttributePath & attributePath, const TLV::TLVReader & data);
+    CHIP_ERROR PutPreencodedAttribute(const ConcreteDataAttributePath & attributePath, const TLV::TLVReader & data,
+                                      bool forceLegacyListEncoding = false);
 
     /**
      *  Once SendWriteRequest returns successfully, the WriteClient will
