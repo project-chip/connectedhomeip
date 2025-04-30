@@ -159,19 +159,10 @@ CHIP_ERROR ClusterLogic::SetCountdownTime(const DataModel::Nullable<ElapsedS> & 
     auto now       = System::SystemClock().GetMonotonicTimestamp();
     bool markDirty = false;
 
-    if (fromDelegate)
-    {
-        // Updates from delegate are reduce-reported to every 1s max (choice of this implementation), in addition
-        // to default change-from-null, change-from-zero and increment policy.
-        System::Clock::Milliseconds64 reportInterval = System::Clock::Milliseconds64(1000);
-        auto predicate = mState.mCountdownTime.GetPredicateForSufficientTimeSinceLastDirty(reportInterval);
-        markDirty      = (mState.mCountdownTime.SetValue(countdownTime, now, predicate) == AttributeDirtyState::kMustReport);
-    }
-    else
-    {
-        auto predicate = [](const decltype(mState.mCountdownTime)::SufficientChangePredicateCandidate &) -> bool { return true; };
-        markDirty      = (mState.mCountdownTime.SetValue(countdownTime, now, predicate) == AttributeDirtyState::kMustReport);
-    }
+   // TODO: Delegate specific handling logic will be added if needed after after spec issue resolution.
+    
+    auto predicate = [](const decltype(mState.mCountdownTime)::SufficientChangePredicateCandidate &) -> bool { return true; };
+    markDirty      = (mState.mCountdownTime.SetValue(countdownTime, now, predicate) == AttributeDirtyState::kMustReport);
 
     if (markDirty)
     {
