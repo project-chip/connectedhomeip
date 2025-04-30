@@ -292,7 +292,8 @@ class TC_ACL_2_3(MatterBaseTest):
         extensions_list11 = [extension11, extension12]
         result11 = await self.th1.WriteAttribute(
             self.dut_node_id,
-            [(0, ac_extension_attr(value=extensions_list11))]
+            [(0, ac_extension_attr(value=extensions_list11))],
+            forceLegacyListEncoding=True
         )
         logging.info(f"Write result: {str(result11)}")
         asserts.assert_equal(
@@ -306,7 +307,7 @@ class TC_ACL_2_3(MatterBaseTest):
         logging.info(f"AccessControlExtension: {str(ac_extension_value4)}")
         asserts.assert_equal(
             ac_extension_value4[0].data,
-            D_OK_FULL,
+            D_OK_EMPTY,
             "AccessControlExtension is D_OK_FULL from test step 8 as last successfully written extension")
 
         self.step(19)
