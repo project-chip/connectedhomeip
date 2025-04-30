@@ -20,8 +20,9 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/IntrusiveList.h>
 #include <lib/support/Span.h>
-#include <stddef.h>
-#include <stdint.h>
+
+#include <cstddef>
+#include <cstdint>
 
 namespace chip {
 

@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
+#include <clusters/SoftwareDiagnostics/Events.h>
 #include <app/TestEventTriggerDelegate.h>
 
 /**
@@ -50,7 +50,7 @@ enum class SoftwareDiagnosticsTrigger : uint64_t
 class SoftwareDiagnosticsTestEventTriggerHandler : public TestEventTriggerHandler
 {
 public:
-    explicit SoftwareDiagnosticsTestEventTriggerHandler() {}
+    explicit SoftwareDiagnosticsTestEventTriggerHandler() = default;
 
     /** This function must return True if the eventTrigger is recognised and handled
      *  It must return False to allow a higher level TestEvent handler to check other

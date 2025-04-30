@@ -16,7 +16,7 @@
  */
 
 #include <app/clusters/software-diagnostics-server/CodegenIntegration.h>
-#include <app/clusters/software-diagnostics-server/SoftwareDiagnosticsTestEventTriggerHandler.h>
+#include <event-triggers/SoftwareDiagnosticsTestEventTriggerHandler.h>
 #include <lib/support/CHIPMemString.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DiagnosticDataProvider.h>
