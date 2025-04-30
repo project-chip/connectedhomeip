@@ -47,38 +47,50 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-async def connect_host_wifi(ssid, passphrase):
-    try:
-        subprocess.run([
-            "networksetup",
-            "-setairportnetwork", "en0", ssid, passphrase
-        ], check=True, capture_output=True)
-        logger.info(f" --- connect_host_wifi: Connected to {ssid}")
-    except subprocess.CalledProcessError as e:
-        logger.error(f" --- connect_host_wifi: Error connecting to networksetup: {e.stderr.decode()}")
-    time.sleep(10)
+def connect_host_wifi(ssid, passphrase, max_retries):
+    # We try to connect the TH to the second network a few times, to avoid network unstability
+    retry = 1
+    while retry <= max_retries:
+        logger.info(f" --- connect_host_wifi: Trying to connect to {ssid} - {retry}/{max_retries}")
+        try:
+            conn = subprocess.run([
+                "networksetup",
+                "-setairportnetwork", "en0", ssid, passphrase
+            ], check=True, capture_output=True)
+            logger.info(f" --- connect_host_wifi: networksetup return_code: {conn.returncode}")
+            if conn.returncode == 0:
+                logger.info(f" --- connect_host_wifi: Connected to {ssid}")
+                break
+        except subprocess.CalledProcessError as e:
+            logger.info(f" --- connect_host_wifi: networksetup return_code: {conn.returncode} / stderr: {conn.stderr}")
+            logger.error(f" --- connect_host_wifi: Error connecting to networksetup: {e.stderr.decode()}")
+        finally:
+            retry += 1
+    # time.sleep(5)
 
 
 async def change_networks(object, cluster, ssid, passphrase, breadcrumb):
+    # ConnectNetwork tells the DUT to change to the second Wi-Fi network, while TH stays in the first one
+    # so they loose connection between each other. Thus, ConnectNetwork throws an exception
     try:
+        Clusters.NetworkCommissioning.Attributes.ConnectMaxTimeSeconds.value = 60
         await object.send_single_cmd(
             cmd=cluster.Commands.ConnectNetwork(
                 networkID=ssid,
                 breadcrumb=breadcrumb
-            ),
-            timedRequestTimeoutMs=5000
+            )
         )
     except Exception as e:
         logger.error(f" --- change_networks: Exception in ConnectNetwork: {e}")
-        await connect_host_wifi(ssid=ssid, passphrase=passphrase)
+        # After telling the DUT to change networks, we must change TH to the second network, so it can find the DUT
+        connect_host_wifi(ssid=ssid, passphrase=passphrase, max_retries=4)
+        # This time ConnectNetwork will return normally
         await object.send_single_cmd(
             cmd=cluster.Commands.ConnectNetwork(
                 networkID=ssid,
                 breadcrumb=breadcrumb
-            ),
-            timedRequestTimeoutMs=5000
+            )
         )
-    # asyncio.sleep(5)
 
 
 class TC_CNET_4_11(MatterBaseTest):
@@ -298,29 +310,24 @@ class TC_CNET_4_11(MatterBaseTest):
         # How does it change? is it automatic or need to use ConnectNetwork? if so, look at step 7
         self.step(12)
 
-        await connect_host_wifi(wifi_1st_ap_ssid, wifi_1st_ap_credentials)
+        connect_host_wifi(wifi_1st_ap_ssid, wifi_1st_ap_credentials, max_retries=4)
 
         # TH discovers and connects to DUT on the PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID operational network
         self.step(13)
 
-        # try:
-        #     networks = await self.read_single_attribute_check_success(
-        #         cluster=cnet,
-        #         attribute=cnet.Attributes.Networks
-        #     )
-        # except Exception as e:
-        #     logger.error(f" --- Step 13: Exception reading networks: {e}")
-        #     logger.info(f" --- Step 13: Connecting host back to: {wifi_1st_ap_ssid}")
-        #     await connect_host_wifi(wifi_1st_ap_ssid, wifi_1st_ap_credentials)
-        #     networks = await self.read_single_attribute_check_success(
-        #         cluster=cnet,
-        #         attribute=cnet.Attributes.Networks
-        #     )
-
-        networks = await self.read_single_attribute_check_success(
-            cluster=cnet,
-            attribute=cnet.Attributes.Networks
-        )
+        try:
+            networks = await self.read_single_attribute_check_success(
+                cluster=cnet,
+                attribute=cnet.Attributes.Networks
+            )
+        except Exception as e:
+            logger.error(f" --- Step 13: Exception reading networks: {e}")
+            logger.info(f" --- Step 13: Connecting host back to: {wifi_1st_ap_ssid}")
+            connect_host_wifi(wifi_1st_ap_ssid, wifi_1st_ap_credentials, max_retries=4)
+            networks = await self.read_single_attribute_check_success(
+                cluster=cnet,
+                attribute=cnet.Attributes.Networks
+            )
 
         logger.info(f" --- Step 13: networks: {networks}")
         # Verify that the TH successfully connects to the DUT
@@ -395,24 +402,19 @@ class TC_CNET_4_11(MatterBaseTest):
 
         # Verify that the TH successfully connects to the DUT
 
-        # try:
-        #     networks = await self.read_single_attribute_check_success(
-        #         cluster=cnet,
-        #         attribute=cnet.Attributes.Networks
-        #     )
-        # except Exception as e:
-        #     logger.error(f" --- Step 19: Exception reading networks: {e}")
-        #     logger.info(f" --- Step 19: Connecting host back to: {wifi_2nd_ap_ssid}")
-        #     await connect_host_wifi(wifi_2nd_ap_ssid, wifi_2nd_ap_credentials)
-        #     networks = await self.read_single_attribute_check_success(
-        #         cluster=cnet,
-        #         attribute=cnet.Attributes.Networks
-        #     )
-
-        networks = await self.read_single_attribute_check_success(
-            cluster=cnet,
-            attribute=cnet.Attributes.Networks
-        )
+        try:
+            networks = await self.read_single_attribute_check_success(
+                cluster=cnet,
+                attribute=cnet.Attributes.Networks
+            )
+        except Exception as e:
+            logger.error(f" --- Step 19: Exception reading networks: {e}")
+            logger.info(f" --- Step 19: Connecting host back to: {wifi_2nd_ap_ssid}")
+            connect_host_wifi(wifi_2nd_ap_ssid, wifi_2nd_ap_credentials, max_retries=4)
+            networks = await self.read_single_attribute_check_success(
+                cluster=cnet,
+                attribute=cnet.Attributes.Networks
+            )
 
         logger.info(f" --- Step 19: networks: {networks}")
         for idx, network in enumerate(networks):
