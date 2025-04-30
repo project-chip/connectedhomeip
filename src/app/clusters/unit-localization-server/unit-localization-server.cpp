@@ -50,7 +50,7 @@ CHIP_ERROR UnitLocalizationServer::Init()
     }
     else
     {
-        ChipLogDetail(Zcl, "UnitLocalization ep0 set default TemperatureUnit: %u", mTemperatureUnit);
+        ChipLogDetail(Zcl, "UnitLocalization ep0 set default TemperatureUnit: %u", to_underlying(mTemperatureUnit));
     }
     return err;
 }
