@@ -1797,15 +1797,17 @@ CHIP_ERROR FabricTable::UpdatePendingFabricCommon(FabricIndex fabricIndex, const
     if (!icac.empty())
     {
         uint8_t vvscBuffer[kMaxCHIPCertLength];
-        MutableByteSpan vvscSpan{vvscBuffer};
+        MutableByteSpan vvscSpan{ vvscBuffer };
 
-        CHIP_ERROR err = mOpCertStore->GetVidVerificationElement(fabricIndex, OperationalCertificateStore::VidVerificationElement::kVvsc, vvscSpan);
+        CHIP_ERROR err = mOpCertStore->GetVidVerificationElement(
+            fabricIndex, OperationalCertificateStore::VidVerificationElement::kVvsc, vvscSpan);
         if (err == CHIP_NO_ERROR)
         {
             if (!vvscSpan.empty())
             {
-                ChipLogError(FabricProvisioning,
-                            "Received an UpdateNOC storage request with ICAC when VVSC already present. VVSC must be removed first.");
+                ChipLogError(
+                    FabricProvisioning,
+                    "Received an UpdateNOC storage request with ICAC when VVSC already present. VVSC must be removed first.");
                 return CHIP_ERROR_INCORRECT_STATE;
             }
         }
@@ -2287,7 +2289,8 @@ CHIP_ERROR FabricTable::SetVIDVerificationStatementElements(FabricIndex fabricIn
         if (mOpCertStore->HasCertificateForFabric(fabricIndex, OperationalCertificateStore::CertChainElement::kIcac))
         {
             ChipLogError(FabricProvisioning,
-                "Received SetVIDVerificationStatement storage request with VVSC when ICAC already present. ICAC must be removed first.");
+                         "Received SetVIDVerificationStatement storage request with VVSC when ICAC already present. ICAC must be "
+                         "removed first.");
             return CHIP_ERROR_INCORRECT_STATE;
         }
 
