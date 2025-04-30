@@ -56,7 +56,7 @@ typedef NS_ENUM(uint8_t, BleConnectionMode) {
     kConnecting,
 };
 
-@interface BleConnection : NSObject <CBCentralManagerDelegate, CBPeripheralDelegate>
+@interface MTRBleConnection : NSObject <CBCentralManagerDelegate, CBPeripheralDelegate>
 
 @property (strong, nonatomic) dispatch_queue_t workQueue; // the CHIP work queue
 @property (strong, nonatomic) CBCentralManager * centralManager;
@@ -91,7 +91,7 @@ typedef NS_ENUM(uint8_t, BleConnectionMode) {
 namespace chip {
 namespace DeviceLayer {
     namespace Internal {
-        BleConnection * ble;
+        MTRBleConnection * ble;
 
         void BleConnectionDelegateImpl::NewConnection(
             Ble::BleLayer * bleLayer, void * appState, const SetupDiscriminator & inDeviceDiscriminator)
@@ -118,7 +118,7 @@ namespace DeviceLayer {
             }
 
             [ble stop];
-            ble = [[BleConnection alloc] initWithDiscriminator:deviceDiscriminator];
+            ble = [[MTRBleConnection alloc] initWithDiscriminator:deviceDiscriminator];
             [ble setBleLayer:bleLayer];
             ble.appState = appState;
             ble.onConnectionComplete = OnConnectionComplete;
@@ -180,7 +180,7 @@ namespace DeviceLayer {
             }
 
             [ble stop];
-            ble = [[BleConnection alloc] initWithDelegate:delegate prewarm:prewarm];
+            ble = [[MTRBleConnection alloc] initWithDelegate:delegate prewarm:prewarm];
             // Do _not_ set onConnectionComplete and onConnectionError
             // here.  The connection callbacks we have expect an appState
             // that we do not have here, and in any case connection
@@ -211,12 +211,12 @@ namespace DeviceLayer {
 } // namespace DeviceLayer
 } // namespace chip
 
-@interface BleConnection ()
+@interface MTRBleConnection ()
 @property (nonatomic, readonly) int32_t totalDevicesAdded;
 @property (nonatomic, readonly) int32_t totalDevicesRemoved;
 @end
 
-@implementation BleConnection {
+@implementation MTRBleConnection {
     CBUUID * _chipServiceUUID;
 }
 
