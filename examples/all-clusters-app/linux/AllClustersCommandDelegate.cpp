@@ -31,6 +31,7 @@
 #include <platform/PlatformManager.h>
 
 #include "ButtonEventsSimulator.h"
+#include "meter-identification-instance.h"
 #include <air-quality-instance.h>
 #include <dishwasher-mode.h>
 #include <laundry-washer-mode.h>
