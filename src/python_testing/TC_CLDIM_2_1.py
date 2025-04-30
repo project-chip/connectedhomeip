@@ -79,6 +79,9 @@ class TC_CLDIM_2_1(MatterBaseTest):
         self.step(1)
         attributes = Clusters.ClosureDimension.Attributes
 
+        # Default values
+        resolution = 1
+
         # STEP 2a: Read feature map and determine supported features
         self.step("2a")
         feature_map = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
