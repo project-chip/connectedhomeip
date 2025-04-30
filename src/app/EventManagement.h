@@ -90,7 +90,7 @@ public:
      * @brief
      *   A constructor for the CircularEventBuffer (internal API).
      */
-    CircularEventBuffer() : TLVCircularBuffer(nullptr, 0){};
+    CircularEventBuffer() : TLVCircularBuffer(nullptr, 0) {};
 
     /**
      * @brief
@@ -155,7 +155,7 @@ class CircularEventReader;
 class CircularEventBufferWrapper : public TLV::TLVCircularBuffer
 {
 public:
-    CircularEventBufferWrapper() : TLVCircularBuffer(nullptr, 0), mpCurrent(nullptr){};
+    CircularEventBufferWrapper() : TLVCircularBuffer(nullptr, 0), mpCurrent(nullptr) {};
     CircularEventBuffer * mpCurrent;
 
 private:
@@ -201,6 +201,13 @@ struct LogStorageResources
 class EventManagement : public DataModel::EventsGenerator
 {
 public:
+    /**
+     * Note: Even though this class is used as a singleton, the default constructor is public in
+     * order to preserve the ability to instantiate this class in test code. This is meant to be
+     * temporary until we find a better solution.
+     */
+    EventManagement() = default;
+
     /**
      * Initialize the EventManagement with an array of LogStorageResources and
      * an equal-length array of CircularEventBuffers that correspond to those
@@ -390,9 +397,6 @@ public:
                              EventNumber & generatedEventNumber) override;
 
 private:
-    // The EventManagement() constructor was made private in pull/38447 but we want the ability to
-    // instantiate this class in test code. Make it public for now until we find a cleaner solution.
-    // constexpr EventManagement() = default;
     static EventManagement sInstance;
 
     class InternalEventOptions : public EventOptions
