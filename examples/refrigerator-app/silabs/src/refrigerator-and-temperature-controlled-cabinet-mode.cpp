@@ -20,10 +20,11 @@
 
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode;
-using chip::Protocols::InteractionModel::Status;
+
 template <typename T>
 using List              = chip::app::DataModel::List<T>;
 using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
+using chip::Protocols::InteractionModel::Status;
 
 static RefrigeratorAndTemperatureControlledCabinetModeDelegate * gRefrigeratorAndTemperatureControlledCabinetModeDelegate = nullptr;
 static ModeBase::Instance * gRefrigeratorAndTemperatureControlledCabinetModeInstance                                      = nullptr;
@@ -106,6 +107,6 @@ void emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(c
         new RefrigeratorAndTemperatureControlledCabinetMode::RefrigeratorAndTemperatureControlledCabinetModeDelegate;
     gRefrigeratorAndTemperatureControlledCabinetModeInstance =
         new ModeBase::Instance(gRefrigeratorAndTemperatureControlledCabinetModeDelegate, 0x1,
-                               RefrigeratorAndTemperatureControlledCabinetMode::Id, chip::to_underlying(Feature::kOnOff));
+                               RefrigeratorAndTemperatureControlledCabinetMode::Id, chip::to_underlying(ModeBase::Feature::kOnOff));
     gRefrigeratorAndTemperatureControlledCabinetModeInstance->Init();
 }
