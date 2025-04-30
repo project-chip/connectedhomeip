@@ -379,6 +379,34 @@ enum class LocationTag : uint8_t
     kUnknownEnumValue = 4,
 };
 
+// Enum for MeasurementTypeEnum
+enum class MeasurementTypeEnum : uint16_t
+{
+    kUnspecified      = 0x00,
+    kVoltage          = 0x01,
+    kActiveCurrent    = 0x02,
+    kReactiveCurrent  = 0x03,
+    kApparentCurrent  = 0x04,
+    kActivePower      = 0x05,
+    kReactivePower    = 0x06,
+    kApparentPower    = 0x07,
+    kRMSVoltage       = 0x08,
+    kRMSCurrent       = 0x09,
+    kRMSPower         = 0x0A,
+    kFrequency        = 0x0B,
+    kPowerFactor      = 0x0C,
+    kNeutralCurrent   = 0x0D,
+    kElectricalEnergy = 0x0E,
+    kReactiveEnergy   = 0x0F,
+    kApparentEnergy   = 0x10,
+    kSoilMoisture     = 0x11,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 18,
+};
+
 // Enum for PositionTag
 enum class PositionTag : uint8_t
 {

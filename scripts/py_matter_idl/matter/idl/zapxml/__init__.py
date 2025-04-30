@@ -91,7 +91,7 @@ class ParseHandler(xml.sax.handler.ContentHandler):
 
 @dataclass
 class ParseSource:
-    """Represents an input sopurce for ParseXmls.
+    """Represents an input source for ParseXmls.
 
     Allows for named data sources to be parsed.
     """

@@ -31,6 +31,7 @@
 #include "laundry-dryer-controls-delegate-impl.h"
 #include "laundry-washer-controls-delegate-impl.h"
 #include "laundry-washer-mode.h"
+#include "meter-identification-instance.h"
 #include "microwave-oven-mode.h"
 #include "operational-state-delegate-impl.h"
 #include "oven-modes.h"
@@ -290,6 +291,7 @@ void ApplicationShutdown()
     Clusters::OvenMode::Shutdown();
     Clusters::OvenCavityOperationalState::Shutdown();
 
+    Clusters::MeterIdentification::Shutdown();
     Clusters::DeviceEnergyManagementMode::Shutdown();
     Clusters::EnergyEvseMode::Shutdown();
     Clusters::WaterHeaterMode::Shutdown();

@@ -49,7 +49,6 @@
 #include <clusters/ContentAppObserver/AttributeIds.h>
 #include <clusters/ContentControl/AttributeIds.h>
 #include <clusters/ContentLauncher/AttributeIds.h>
-#include <clusters/DemandResponseLoadControl/AttributeIds.h>
 #include <clusters/Descriptor/AttributeIds.h>
 #include <clusters/DeviceEnergyManagement/AttributeIds.h>
 #include <clusters/DeviceEnergyManagementMode/AttributeIds.h>
@@ -128,6 +127,7 @@
 #include <clusters/ServiceArea/AttributeIds.h>
 #include <clusters/SmokeCoAlarm/AttributeIds.h>
 #include <clusters/SoftwareDiagnostics/AttributeIds.h>
+#include <clusters/SoilMeasurement/AttributeIds.h>
 #include <clusters/Switch/AttributeIds.h>
 #include <clusters/TargetNavigator/AttributeIds.h>
 #include <clusters/TemperatureControl/AttributeIds.h>
