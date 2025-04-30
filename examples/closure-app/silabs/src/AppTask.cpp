@@ -49,7 +49,7 @@
 #include <setup_payload/SetupPayload.h>
 
 #define APP_FUNCTION_BUTTON 0
-#define APP_ClOSURE_BUTTON 1
+#define APP_CLOSURE_BUTTON 1
 
 using namespace chip;
 using namespace chip::app;
