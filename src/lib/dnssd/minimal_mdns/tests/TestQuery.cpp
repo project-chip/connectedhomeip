@@ -20,8 +20,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/minimal_mdns/Query.h>
 #include <lib/dnssd/minimal_mdns/QueryBuilder.h>
-#include <lib/dnssd/minimal_mdns/QueryReplyFilter.h>
-#include <lib/dnssd/minimal_mdns/core/QName.h>
+#include <lib/dnssd/minimal_mdns/tests/CheckOnlyServer.h>
 #include <lib/dnssd/minimal_mdns/core/tests/QNameStrings.h>
 
 namespace {
@@ -31,16 +30,27 @@ using namespace mdns::Minimal;
 
 const auto kTestOperationalName = testing::TestQName<4>({ "1234567898765432-ABCDEFEDCBAABCDE", "_matter", "_tcp", "local" });
 
-TEST(TestQuery, DefinitionAndRename)
+class TestQuery : public ::testing::Test
+{
+public:
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+};
+
+TEST_F(TestQuery, DefinitionAndRename)
 {
     mdns::Minimal::Query query(kTestOperationalName.Full());
 
     EXPECT_EQ(query.GetClass(), QClass::IN);
     EXPECT_EQ(query.GetType(), QType::ANY);
-    EXPECT_EQ(query.IsAnswerViaUnicast(), true);
+    EXPECT_TRUE(query.IsAnswerViaUnicast());
 
-    EXPECT_EQ(query.SetClass(QClass::ANY).GetClass(), QClass::ANY);
-    EXPECT_EQ(query.SetType(QType::AAAA).GetType(), QType::AAAA);
-    EXPECT_EQ(query.SetAnswerViaUnicast(false).IsAnswerViaUnicast(), false);
+    query.SetClass(QClass::ANY);
+    query.SetType(QType::AAAA);
+    query.SetAnswerViaUnicast(false);
+
+    EXPECT_EQ(query.GetClass(), QClass::ANY);
+    EXPECT_EQ(query.GetType(), QType::AAAA);
+    EXPECT_FALSE(query.IsAnswerViaUnicast());
 }
 } // namespace
