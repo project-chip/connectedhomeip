@@ -37,53 +37,8 @@
 
 using namespace chip::Inet::Darwin;
 
-namespace {
 constexpr uint64_t kSendTimeoutInSeconds = 10 * NSEC_PER_SEC;
-constexpr uint64_t kConnectTimeoutInSeconds = 10 * NSEC_PER_SEC;
-constexpr uint64_t kConnectionAliveTimeoutInSeconds = 60 * NSEC_PER_SEC;
-
-class WorkFlag {
-public:
-    void MarkDead() { mAlive = false; }
-    bool IsAlive() const { return mAlive; }
-
-private:
-    std::atomic<bool> mAlive { true };
-};
-
-class ConnectionWrapper {
-public:
-    nw_connection_t connection = nullptr;
-    dispatch_source_t timer = nullptr;
-
-    bool Matches(const chip::Inet::IPPacketInfo & pktInfo) const
-    {
-        __auto_type path = nw_connection_copy_current_path(connection);
-        VerifyOrReturnValue(nullptr != path, false);
-
-        __auto_type remoteEndpoint = nw_path_copy_effective_remote_endpoint(path);
-        VerifyOrReturnValue(nullptr != remoteEndpoint, false);
-
-        chip::Inet::IPAddress remoteAddress;
-        chip::Inet::IPAddress::GetIPAddressFromSockAddr(*nw_endpoint_get_address(remoteEndpoint), remoteAddress);
-        const uint16_t remotePort = nw_endpoint_get_port(remoteEndpoint);
-
-        return pktInfo.DestAddress == remoteAddress && pktInfo.DestPort == remotePort;
-    }
-};
-
-static void ReleaseConnectionWrapperCallback(CFAllocatorRef allocator, const void * value)
-{
-    __auto_type * wrapper = static_cast<ConnectionWrapper *>(const_cast<void *>(value));
-    if (wrapper->timer) {
-        dispatch_source_cancel(wrapper->timer);
-        wrapper->timer = nullptr;
-    }
-    wrapper->connection = nullptr;
-    delete wrapper;
-}
-
-}
+constexpr const char * kSendCleaningQueueName = "inet_send_cleaning";
 
 namespace chip {
 namespace Inet {
@@ -92,33 +47,31 @@ namespace Inet {
         InterfaceId intfId)
     {
         __auto_type configure_tls = NW_PARAMETERS_DISABLE_PROTOCOL;
-        mParameters = nw_parameters_create_secure_udp(configure_tls, NW_PARAMETERS_DEFAULT_CONFIGURATION);
-        VerifyOrReturnError(nullptr != mParameters, CHIP_ERROR_INVALID_ARGUMENT, ReleaseAll());
+        __auto_type parameters = nw_parameters_create_secure_udp(configure_tls, NW_PARAMETERS_DEFAULT_CONFIGURATION);
+        VerifyOrReturnError(nullptr != parameters, CHIP_ERROR_INVALID_ARGUMENT, ReleaseAll());
 
-        nw_parameters_set_reuse_local_address(mParameters, true);
+        nw_parameters_set_reuse_local_address(parameters, true);
 
         // Note: The ConfigureProtocol function uses nw_ip_options_set_version to set the IP version for this endpoint.
         //
         // This works as expected when the IPAddress is specified. However, when using a wildcard address (chip::Inet::IPAddressType::kAny)
         //  for an IPv6 socket, the specified IP version (nw_ip_version_6) may be ignored, allowing both IPv4 and IPv6 connections.
-        CHIP_ERROR err = ConfigureProtocol(addressType, mParameters);
+        CHIP_ERROR err = ConfigureProtocol(addressType, parameters);
         VerifyOrReturnError(CHIP_NO_ERROR == err, err, ReleaseAll());
 
-        mConnectionQueue = dispatch_queue_create("inet_dispatch_global", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
-        VerifyOrReturnError(nullptr != mConnectionQueue, CHIP_ERROR_NO_MEMORY, ReleaseAll());
-
-        mSystemQueue = static_cast<System::LayerDispatch &>(GetSystemLayer()).GetDispatchQueue();
         mAddrType = addressType;
         mWorkFlagStrong = Platform::MakeShared<WorkFlag>();
         mWorkFlagWeak = mWorkFlagStrong;
 
-        err = UDPEndPointImplNetworkFrameworkListener::Configure(mParameters, addressType, address, port, intfId);
+        err = UDPEndPointImplNetworkFrameworkListener::Configure(parameters, addressType, address, port, intfId);
         VerifyOrReturnError(CHIP_NO_ERROR == err, err, ReleaseAll());
 
-        err = UDPEndPointImplNetworkFrameworkListenerGroup::Configure(mParameters);
+        err = UDPEndPointImplNetworkFrameworkListenerGroup::Configure(parameters);
         VerifyOrReturnError(CHIP_NO_ERROR == err, err, ReleaseAll());
 
-        PrepareConnections();
+        err = UDPEndPointImplNetworkFrameworkConnection::Configure(parameters, addressType);
+        VerifyOrReturnError(CHIP_NO_ERROR == err, err, ReleaseAll());
+
         return CHIP_NO_ERROR;
     }
 
@@ -144,28 +97,27 @@ namespace Inet {
         // Ensure we have an actual message to send.
         VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
 
-        // Ensure the destination address type is compatible with the endpoint address type.
-        VerifyOrReturnError(mAddrType == pktInfo->DestAddress.Type(), CHIP_ERROR_INVALID_ARGUMENT);
-
         // For now the entire message must fit within a single buffer.
         VerifyOrReturnError(msg->Next() == nullptr, CHIP_ERROR_MESSAGE_TOO_LONG);
 
-        nw_connection_t connection = FindConnection(*pktInfo);
-        if (!connection) {
-            ReturnErrorOnFailure(GetConnection(pktInfo));
-            connection = FindConnection(*pktInfo);
-            VerifyOrReturnError(nullptr != connection, CHIP_ERROR_INCORRECT_STATE);
-        }
+        __auto_type cleaningQueue = dispatch_queue_create(kSendCleaningQueueName, DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        VerifyOrReturnError(nullptr != cleaningQueue, CHIP_ERROR_INCORRECT_STATE);
+
+        nw_connection_t connection = RetrieveOrStartConnection(*pktInfo);
+        VerifyOrReturnError(nullptr != connection, CHIP_ERROR_INCORRECT_STATE);
+        HandleDataReceived(connection);
 
         // Wrap the PacketBufferHandle in a shared_ptr so we can capture it by value
         __auto_type retainedHandle = std::make_shared<System::PacketBufferHandle>(std::move(msg));
         __auto_type content = dispatch_data_create(
             retainedHandle->operator->()->Start(),
             retainedHandle->operator->()->DataLength(),
-            mSystemQueue,
+            cleaningQueue,
             ^{
-                // Keep retainedHandle alive until the dispatch_data is released
-                [[maybe_unused]] auto cleanup = retainedHandle;
+                static_cast<System::LayerDispatch &>(GetSystemLayer()).ScheduleWorkWithBlock(^{
+                    // Keep retainedHandle alive until the dispatch_data is released
+                    [[maybe_unused]] auto cleanup = retainedHandle;
+                });
             });
 
         // Send a message, and wait for it to be dispatched.
@@ -204,19 +156,12 @@ namespace Inet {
 
     void UDPEndPointImplNetworkFramework::ReleaseAll()
     {
-
         OnMessageReceived = nullptr;
         OnReceiveError = nullptr;
 
-        ReleaseConnections();
+        UDPEndPointImplNetworkFrameworkConnection::StopAll();
         UDPEndPointImplNetworkFrameworkListener::Unlisten();
         UDPEndPointImplNetworkFrameworkListenerGroup::Unlisten();
-
-        mParameters = nullptr;
-
-        mConnectionQueue = nullptr;
-
-        mSystemQueue = nullptr;
     }
 
     void UDPEndPointImplNetworkFramework::Free()
@@ -311,126 +256,16 @@ namespace Inet {
         return endpoint;
     }
 
-    CHIP_ERROR UDPEndPointImplNetworkFramework::GetConnection(const IPPacketInfo * aPktInfo)
-    {
-        VerifyOrReturnError(nullptr != mParameters, CHIP_ERROR_INCORRECT_STATE);
-
-        __auto_type endpoint = GetEndPoint(mAddrType, aPktInfo->DestAddress, aPktInfo->DestPort, aPktInfo->Interface);
-        VerifyOrReturnError(nullptr != endpoint, CHIP_ERROR_INCORRECT_STATE);
-
-        __auto_type parameters = nw_parameters_copy(mParameters);
-        VerifyOrReturnError(parameters != nullptr, CHIP_ERROR_NO_MEMORY);
-
-        __auto_type localEndpoint = GetEndPoint(mAddrType, aPktInfo->SrcAddress, aPktInfo->SrcPort, aPktInfo->Interface);
-        nw_parameters_set_local_endpoint(parameters, localEndpoint);
-        __auto_type connection = nw_connection_create(endpoint, parameters); // Let system pick ephemeral port
-        VerifyOrReturnError(nullptr != connection, CHIP_ERROR_INCORRECT_STATE);
-
-        return StartConnection(connection);
-    }
-
     void UDPEndPointImplNetworkFramework::StartConnectionFromListener(nw_connection_t connection)
     {
         static_cast<System::LayerDispatch &>(GetSystemLayer()).ScheduleWorkWithBlock(^{
-            LogErrorOnFailure(StartConnection(connection));
-        });
-        /*
-                    DebugPrintConnection(connection);
+            CHIP_ERROR error = StartConnection(connection);
+            LogErrorOnFailure(error);
 
-                    VerifyOrReturn(CreateConnectionWrapper(connection));
-                    nw_connection_set_queue(connection, mConnectionQueue);
-                    nw_connection_set_state_changed_handler(connection, ^(nw_connection_state_t state, nw_error_t error) {
-                        DebugPrintConnectionState(state);
-                        switch (state) {
-                        case nw_connection_state_ready:
-                            HandleDataReceived(connection);
-                            break;
-
-                        case nw_connection_state_preparing:
-                            // Nothing to do.
-                            break;
-
-                        case nw_connection_state_invalid:
-                        case nw_connection_state_waiting:
-                            nw_connection_cancel(connection);
-                            break;
-
-                        case nw_connection_state_failed: {
-                            CHIP_ERROR err = CHIP_ERROR_POSIX(nw_error_get_error_code(error));
-                            ChipLogError(Inet, "Error: %s", chip::ErrorStr(err));
-                            break;
-                        }
-
-                        case nw_connection_state_cancelled:
-                            static_cast<System::LayerDispatch &>(GetSystemLayer()).ScheduleWorkWithBlock(^{
-                                ClearConnectionWrapper(connection);
-                            });
-                            break;
-                        }
-                    });
-
-                    nw_connection_start(connection);
-                });
-                return CHIP_NO_ERROR;
-        */
-    }
-
-    CHIP_ERROR UDPEndPointImplNetworkFramework::StartConnection(nw_connection_t connection)
-    {
-        __auto_type semaphore = dispatch_semaphore_create(0);
-        VerifyOrReturnError(nullptr != semaphore, CHIP_ERROR_NO_MEMORY);
-
-        VerifyOrReturnError(CreateConnectionWrapper(connection), CHIP_ERROR_NO_MEMORY);
-        nw_connection_set_queue(connection, mConnectionQueue);
-
-        __block CHIP_ERROR err = CHIP_NO_ERROR;
-        nw_connection_set_state_changed_handler(connection, ^(nw_connection_state_t state, nw_error_t error) {
-            DebugPrintConnectionState(state);
-
-            switch (state) {
-            case nw_connection_state_invalid:
-                err = CHIP_ERROR_INCORRECT_STATE;
-                nw_connection_cancel(connection);
-                break;
-
-            case nw_connection_state_preparing:
-                err = CHIP_ERROR_INCORRECT_STATE;
-                break;
-
-            case nw_connection_state_waiting:
-                nw_connection_cancel(connection);
-                break;
-
-            case nw_connection_state_failed:
-                err = CHIP_ERROR_POSIX(nw_error_get_error_code(error));
-                break;
-
-            case nw_connection_state_ready:
-                err = CHIP_NO_ERROR;
-                dispatch_semaphore_signal(semaphore);
-                break;
-
-            case nw_connection_state_cancelled:
-                if (err == CHIP_NO_ERROR) {
-                    err = CHIP_ERROR_CONNECTION_ABORTED;
-                }
-                dispatch_semaphore_signal(semaphore);
-                break;
+            if (CHIP_NO_ERROR == error) {
+                HandleDataReceived(connection);
             }
         });
-
-        nw_connection_start(connection);
-        __auto_type timeout = dispatch_time(DISPATCH_TIME_NOW, kConnectTimeoutInSeconds);
-        dispatch_semaphore_wait(semaphore, timeout); // NOLINT(clang-analyzer-optin.performance.GCDAntipattern)
-
-        if (err != CHIP_NO_ERROR) {
-            ClearConnectionWrapper(connection);
-            return err;
-        }
-
-        DebugPrintConnection(connection);
-        HandleDataReceived(connection);
-        return err;
     }
 
     void UDPEndPointImplNetworkFramework::HandleDataReceived(nw_connection_t aConnection)
@@ -484,115 +319,6 @@ namespace Inet {
         };
 
         nw_connection_receive_message(aConnection, handler);
-    }
-
-    void UDPEndPointImplNetworkFramework::PrepareConnections()
-    {
-        CFDictionaryValueCallBacks valueCallbacks = {
-            0, // version
-            nullptr, // retain callback
-            ReleaseConnectionWrapperCallback,
-            nullptr, // copyDescription callback
-            nullptr // equal callback
-        };
-
-        mConnections = CFDictionaryCreateMutable(
-            kCFAllocatorDefault,
-            0,
-            &kCFTypeDictionaryKeyCallBacks,
-            &valueCallbacks);
-    }
-
-    CHIP_ERROR UDPEndPointImplNetworkFramework::ReleaseConnections()
-    {
-        VerifyOrReturnError(nullptr != mConnectionQueue, CHIP_ERROR_INCORRECT_STATE);
-        VerifyOrReturnError(nullptr != mConnections, CHIP_NO_ERROR);
-
-        CFIndex count = CFDictionaryGetCount(mConnections);
-        const void ** keys = static_cast<const void **>(malloc(sizeof(void *) * static_cast<size_t>(count)));
-        CFDictionaryGetKeysAndValues(mConnections, keys, nullptr);
-
-        __auto_type group = dispatch_group_create();
-
-        for (CFIndex i = 0; i < count; ++i) {
-            __auto_type connection = (__bridge nw_connection_t)(const_cast<void *>(keys[i]));
-
-            dispatch_group_enter(group);
-            nw_connection_set_state_changed_handler(connection, ^(nw_connection_state_t state, nw_error_t error) {
-                if (state == nw_connection_state_cancelled) {
-                    dispatch_group_leave(group);
-                }
-            });
-
-            nw_connection_cancel(connection);
-        }
-
-        free(keys);
-        dispatch_group_wait(group, DISPATCH_TIME_FOREVER); // NOLINT(clang-analyzer-optin.performance.GCDAntipattern)
-        CFRelease(mConnections);
-        mConnections = nullptr;
-
-        return CHIP_NO_ERROR;
-    }
-
-    bool UDPEndPointImplNetworkFramework::RefreshConnectionTimeout(nw_connection_t connection)
-    {
-        __auto_type wrapper = const_cast<ConnectionWrapper *>(static_cast<const ConnectionWrapper *>(CFDictionaryGetValue(mConnections, (__bridge const void *) connection)));
-        if (nullptr == wrapper) {
-            wrapper = new ConnectionWrapper;
-        }
-        VerifyOrReturnValue(nullptr != wrapper, false);
-
-        __auto_type timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, mSystemQueue);
-        dispatch_source_set_event_handler(timer, ^{
-            ClearConnectionWrapper(connection);
-        });
-
-        __auto_type timeout = dispatch_time(DISPATCH_TIME_NOW, kConnectionAliveTimeoutInSeconds);
-        uint64_t interval = DISPATCH_TIME_FOREVER;
-        uint64_t leeway = 1 * NSEC_PER_SEC;
-        dispatch_source_set_timer(timer, timeout, interval, leeway);
-
-        if (nullptr == wrapper->connection) {
-            wrapper->connection = connection;
-            wrapper->timer = timer;
-            CFDictionarySetValue(mConnections, (__bridge const void *) connection, wrapper);
-        } else {
-            wrapper->timer = timer;
-        }
-        dispatch_resume(timer);
-
-        return true;
-    }
-
-    bool UDPEndPointImplNetworkFramework::CreateConnectionWrapper(nw_connection_t connection)
-    {
-        return RefreshConnectionTimeout(connection);
-    }
-
-    bool UDPEndPointImplNetworkFramework::ClearConnectionWrapper(nw_connection_t connection)
-    {
-        CFDictionaryRemoveValue(mConnections, (__bridge const void *) connection);
-        return true;
-    }
-
-    nw_connection_t UDPEndPointImplNetworkFramework::FindConnection(const IPPacketInfo & pktInfo)
-    {
-        CFIndex count = CFDictionaryGetCount(mConnections);
-        __auto_type ** keys = static_cast<const void **>(malloc(sizeof(void *) * static_cast<size_t>(count)));
-        CFDictionaryGetKeysAndValues(mConnections, keys, nullptr);
-
-        nw_connection_t match = nullptr;
-        for (CFIndex i = 0; i < count; ++i) {
-            __auto_type * wrapper = const_cast<ConnectionWrapper *>(static_cast<const ConnectionWrapper *>(CFDictionaryGetValue(mConnections, keys[i])));
-            if (wrapper && wrapper->Matches(pktInfo)) {
-                match = wrapper->connection;
-                break;
-            }
-        }
-
-        free(keys);
-        return match;
     }
 
     CHIP_ERROR UDPEndPointImplNetworkFramework::SetMulticastLoopback(IPVersion ipVersion, bool loopback)

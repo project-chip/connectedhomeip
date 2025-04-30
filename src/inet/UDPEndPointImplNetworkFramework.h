@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <inet/Darwin/UDPEndPointImplNetworkFrameworkConnection.h>
 #include <inet/Darwin/UDPEndPointImplNetworkFrameworkListener.h>
 #include <inet/Darwin/UDPEndPointImplNetworkFrameworkListenerGroup.h>
 #include <inet/EndPointStateNetworkFramework.h>
@@ -32,6 +33,7 @@ namespace Inet {
 
 class UDPEndPointImplNetworkFramework : public UDPEndPoint,
                                         public EndPointStateNetworkFramework,
+                                        public Darwin::UDPEndPointImplNetworkFrameworkConnection,
                                         public Darwin::UDPEndPointImplNetworkFrameworkListener,
                                         public Darwin::UDPEndPointImplNetworkFrameworkListenerGroup
 {
@@ -56,9 +58,6 @@ private:
     CHIP_ERROR SendMsgImpl(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle && msg) override;
     void CloseImpl() override;
 
-    dispatch_queue_t mConnectionQueue = nullptr;
-    dispatch_queue_t mSystemQueue     = nullptr;
-
     class WorkFlag
     {
     public:
@@ -77,18 +76,8 @@ private:
                               InterfaceId interfaceIndex = InterfaceId::Null()) override;
     CHIP_ERROR GetPacketInfo(const nw_connection_t & aConnection, IPPacketInfo & aPacketInfo);
     void HandleDataReceived(nw_connection_t aConnection);
-    void ReleaseAll();
-
-    CFMutableDictionaryRef mConnections = nullptr;
-    CHIP_ERROR GetConnection(const IPPacketInfo * aPktInfo);
-    CHIP_ERROR StartConnection(nw_connection_t aConnection);
     void StartConnectionFromListener(nw_connection_t connection) override;
-    void PrepareConnections();
-    CHIP_ERROR ReleaseConnections();
-    bool RefreshConnectionTimeout(nw_connection_t connection);
-    bool CreateConnectionWrapper(nw_connection_t connection);
-    bool ClearConnectionWrapper(nw_connection_t connection);
-    nw_connection_t FindConnection(const IPPacketInfo & pktInfo);
+    void ReleaseAll();
 };
 
 using UDPEndPointImpl = UDPEndPointImplNetworkFramework;
