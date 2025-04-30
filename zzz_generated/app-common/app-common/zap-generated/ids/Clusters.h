@@ -49,7 +49,6 @@
 #include <clusters/ContentAppObserver/ClusterId.h>
 #include <clusters/ContentControl/ClusterId.h>
 #include <clusters/ContentLauncher/ClusterId.h>
-#include <clusters/DemandResponseLoadControl/ClusterId.h>
 #include <clusters/Descriptor/ClusterId.h>
 #include <clusters/DeviceEnergyManagement/ClusterId.h>
 #include <clusters/DeviceEnergyManagementMode/ClusterId.h>

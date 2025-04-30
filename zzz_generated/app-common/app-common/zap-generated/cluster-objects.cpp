@@ -146,10 +146,6 @@
 #include <clusters/ContentLauncher/Commands.ipp>
 #include <clusters/ContentLauncher/Events.ipp>
 #include <clusters/ContentLauncher/Structs.ipp>
-#include <clusters/DemandResponseLoadControl/Attributes.ipp>
-#include <clusters/DemandResponseLoadControl/Commands.ipp>
-#include <clusters/DemandResponseLoadControl/Events.ipp>
-#include <clusters/DemandResponseLoadControl/Structs.ipp>
 #include <clusters/Descriptor/Attributes.ipp>
 #include <clusters/Descriptor/Commands.ipp>
 #include <clusters/Descriptor/Events.ipp>
@@ -1037,13 +1033,6 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         }
     }
     case Clusters::CommodityPrice::Id: {
-        switch (aCommand)
-        {
-        default:
-            return false;
-        }
-    }
-    case Clusters::DemandResponseLoadControl::Id: {
         switch (aCommand)
         {
         default:
