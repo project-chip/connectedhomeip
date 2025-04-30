@@ -24,6 +24,7 @@
 #pragma once
 
 #include <inet/Darwin/UDPEndPointImplNetworkFrameworkListener.h>
+#include <inet/Darwin/UDPEndPointImplNetworkFrameworkListenerGroup.h>
 #include <inet/EndPointStateNetworkFramework.h>
 
 namespace chip {
@@ -31,7 +32,8 @@ namespace Inet {
 
 class UDPEndPointImplNetworkFramework : public UDPEndPoint,
                                         public EndPointStateNetworkFramework,
-                                        public Darwin::UDPEndPointImplNetworkFrameworkListener
+                                        public Darwin::UDPEndPointImplNetworkFrameworkListener,
+                                        public Darwin::UDPEndPointImplNetworkFrameworkListenerGroup
 {
 public:
     UDPEndPointImplNetworkFramework(EndPointManager<UDPEndPoint> & endPointManager) : UDPEndPoint(endPointManager) {}
@@ -54,11 +56,8 @@ private:
     CHIP_ERROR SendMsgImpl(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle && msg) override;
     void CloseImpl() override;
 
-    dispatch_queue_t mConnectionQueue              = nullptr;
-    dispatch_queue_t mSystemQueue                  = nullptr;
-    nw_connection_group_t mConnectionGroup         = nullptr;
-    dispatch_semaphore_t mConnectionGroupSemaphore = nullptr;
-    dispatch_queue_t mConnectionGroupQueue         = nullptr;
+    dispatch_queue_t mConnectionQueue = nullptr;
+    dispatch_queue_t mSystemQueue     = nullptr;
 
     class WorkFlag
     {
@@ -79,10 +78,6 @@ private:
     CHIP_ERROR GetPacketInfo(const nw_connection_t & aConnection, IPPacketInfo & aPacketInfo);
     void HandleDataReceived(nw_connection_t aConnection);
     void ReleaseAll();
-
-    CHIP_ERROR StartConnectionGroup(nw_group_descriptor_t groupDescriptor);
-    CHIP_ERROR ReleaseConnectionGroup();
-    CHIP_ERROR IPAnyJoinLeaveMulticastGroup(nw_endpoint_t endpoint, bool join);
 
     CFMutableDictionaryRef mConnections = nullptr;
     CHIP_ERROR GetConnection(const IPPacketInfo * aPktInfo);
