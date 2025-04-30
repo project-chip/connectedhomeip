@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -81,11 +81,15 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="Data" type="string">
         <mandatoryConform/>
-        <constraint type="maxLength" value="500"/>
+        <constraint>
+          <maxLength value="500"/>
+        </constraint>
       </field>
       <field id="1" name="EncodingHint" type="string">
         <optionalConform/>
-        <constraint type="maxLength" value="100"/>
+        <constraint>
+          <maxLength value="100"/>
+        </constraint>
       </field>
     </command>
     <command id="0x01" name="ContentAppMessageResponse" direction="responseFromServer">
@@ -95,11 +99,15 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="Data" type="string">
         <optionalConform/>
-        <constraint type="maxLength" value="500"/>
+        <constraint>
+          <maxLength value="500"/>
+        </constraint>
       </field>
       <field id="2" name="EncodingHint" type="string">
         <optionalConform/>
-        <constraint type="maxLength" value="100"/>
+        <constraint>
+          <maxLength value="100"/>
+        </constraint>
       </field>
     </command>
   </commands>
