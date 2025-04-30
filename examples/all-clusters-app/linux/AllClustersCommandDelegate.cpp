@@ -24,7 +24,7 @@
 #include <app/clusters/occupancy-sensor-server/occupancy-sensor-server.h>
 #include <app/clusters/refrigerator-alarm-server/refrigerator-alarm-server.h>
 #include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
-#include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
+#include <app/clusters/software-diagnostics-server/CodegenIntegration.h>
 #include <app/clusters/switch-server/switch-server.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>

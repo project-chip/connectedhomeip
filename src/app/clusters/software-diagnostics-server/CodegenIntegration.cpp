@@ -14,20 +14,68 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/clusters/software-diagnostics-server/software-diagnostics-cluster.h>
-#include <app/static-cluster-config/SoftwareDiagnostics.h>
+#include <app/clusters/software-diagnostics-server/CodegenIntegration.h>
 
+#include <app/clusters/software-diagnostics-server/software-diagnostics-cluster.h>
+#include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
+#include <app/static-cluster-config/SoftwareDiagnostics.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
+
+using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::SoftwareDiagnostics;
 
-
 // this file is ever only included IF software diagnostics is enabled and that MUST happen only on endpoint 0
-static_assert(SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size() == 1, "Exactly one softare diagnistics provider may exist on Endpoint 0");
-static_assert(SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == 0, "Exactly one softare diagnistics provider may exist on Endpoint 0");
+static_assert(SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size() == 1,
+              "Exactly one softare diagnistics provider may exist on Endpoint 0");
+static_assert(SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == 0,
+              "Exactly one softare diagnistics provider may exist on Endpoint 0");
 
-// FIXME: implement the integration!!!
+namespace {
 
-// LOGIC: SoftwareDiagnosticsServer is a SINGLETON !!!
-//   - has OnSoftwareFaultDetect(...) that emits events
-//   - Init/Shutdown will register/unregister the handlers
+static constexpr EndpointId kRootEndpointId = 0;
+
+RegisteredServerCluster<SoftwareDiagnosticsServerCluster<DeviceLayerSoftwareDiagnosticsLogic>> gServer(kRootEndpointId);
+
+} // namespace
+
+void MatterSoftwareDiagnosticsPluginServerInitCallback()
+{
+    // We know Endpoint 0 contains this cluster
+    LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration()));
+}
+void MatterSoftwareDiagnosticsPluginServerShutdownCallback()
+{
+    LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster()));
+}
+
+namespace chip {
+namespace app {
+namespace Clusters {
+
+// TODO: these should be implemented
+void SoftwareDiagnosticsServer::OnSoftwareFaultDetect(const SoftwareDiagnostics::Events::SoftwareFault::Type & softwareFault)
+{
+    ChipLogDetail(Zcl, "SoftwareDiagnosticsDelegate: OnSoftwareFaultDetected");
+
+    // there is ONLY ONE software diagnostics available.
+    // TODO: log event somehow
+
+    /*
+    for (auto endpoint : EnabledEndpointsWithServerCluster(SoftwareDiagnostics::Id))
+    {
+        // If Software Diagnostics cluster is implemented on this endpoint
+        EventNumber eventNumber;
+
+        if (CHIP_NO_ERROR != LogEvent(softwareFault, endpoint, eventNumber))
+        {
+            ChipLogError(Zcl, "SoftwareDiagnosticsDelegate: Failed to record SoftwareFault event");
+        }
+    }
+    */
+}
+
+} // namespace Clusters
+} // namespace app
+} // namespace chip

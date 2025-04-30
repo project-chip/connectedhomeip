@@ -16,8 +16,6 @@
  */
 #pragma once
 
-#include "clusters/SoftwareDiagnostics/AttributeIds.h"
-#include "lib/support/CodeUtils.h"
 #include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
 
 #include <app/server-cluster/DefaultServerCluster.h>
@@ -35,11 +33,11 @@ namespace Clusters {
 ///
 /// Translates between matter calls and OTA logic
 template <typename LOGIC>
-class SoftwareDiagnosticsServer : public DefaultServerCluster, private LOGIC
+class SoftwareDiagnosticsServerCluster : public DefaultServerCluster, private LOGIC
 {
 public:
     template <typename... Args>
-    SoftwareDiagnosticsServer(EndpointId endpointId, Args &&... args) :
+    SoftwareDiagnosticsServerCluster(EndpointId endpointId, Args &&... args) :
         DefaultServerCluster({ endpointId, OtaSoftwareUpdateProvider::Id }), LOGIC(std::forward<Args>(args)...)
     {}
 

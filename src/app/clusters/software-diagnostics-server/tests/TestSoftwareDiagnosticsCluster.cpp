@@ -123,7 +123,7 @@ struct TestSoftwareDiagnosticsCluster : public ::testing::Test
 TEST_F(TestSoftwareDiagnosticsCluster, CompileTest)
 {
     // The cluster should compile for any logic
-    SoftwareDiagnosticsServer<DeviceLayerSoftwareDiagnosticsLogic> cluster(kRootEndpointId);
+    SoftwareDiagnosticsServerCluster<DeviceLayerSoftwareDiagnosticsLogic> cluster(kRootEndpointId);
 
     // Essentially say "code executes"
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, SoftwareDiagnostics::Id }), BitFlags<ClusterQualityFlags>());

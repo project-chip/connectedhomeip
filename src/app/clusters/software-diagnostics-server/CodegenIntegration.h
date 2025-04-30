@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,30 +18,21 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/CommandResponseHelper.h>
-#include <platform/GeneralFaults.h>
+#include <clusters/SoftwareDiagnostics/Events.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 
-/**
- * @brief software-diagnostics-server class
- */
 class SoftwareDiagnosticsServer
 {
 public:
-    static SoftwareDiagnosticsServer & Instance();
-
-    /**
-     * @brief
-     *   Called when a software fault that has taken place on the Node.
-     */
+    static SoftwareDiagnosticsServer & Instance()
+    {
+        static SoftwareDiagnosticsServer instance;
+        return instance;
+    }
     void OnSoftwareFaultDetect(const chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::Type & softwareFault);
-
-private:
-    static SoftwareDiagnosticsServer instance;
 };
 
 } // namespace Clusters

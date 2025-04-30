@@ -520,9 +520,6 @@ template("chip_data_model") {
       } else if (cluster == "software-diagnostics-server") {
         deps += [ "${_app_root}/clusters/${cluster}" ]
         sources += [ "${_app_root}/clusters/${cluster}/CodegenIntegration.cpp" ]
-
-        # FIXME: legacy bit should go away!
-        sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
       }
