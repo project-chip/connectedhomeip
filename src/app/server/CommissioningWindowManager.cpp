@@ -73,7 +73,7 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         mServer->GetBleLayerObject()->CloseAllBleConnections();
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-        if (mIsWiFiPAF)
+        if (mAdvertisingOverWiFiPAF)
         {
             ChipLogProgress(AppServer, "Cancel Wi-Fi PAF publish");
             DeviceLayer::ConnectivityMgr().SetWiFiPAFAdvertisingEnabled(false);
@@ -332,9 +332,9 @@ CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(Seconds32 co
     SetBLE(false);
 #endif // CONFIG_NETWORK_LAYER_BLE
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    SetWiFiPAF(advertisementMode == chip::CommissioningWindowAdvertisement::kAllSupported);
+    SetAdvertisingOverWiFiPAF(advertisementMode == chip::CommissioningWindowAdvertisement::kAllSupported);
 #else
-    SetWiFiPAF(false);
+    SetAdvertisingOverWiFiPAF(false);
 #endif
     mFailedCommissioningAttempts = 0;
 
@@ -487,7 +487,7 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
     }
 #endif // CONFIG_NETWORK_LAYER_BLE
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    if (mIsWiFiPAF)
+    if (mAdvertisingOverWiFiPAF)
     {
         ChipLogProgress(AppServer, "Starting Wi-Fi PAF publish");
         DeviceLayer::ConnectivityMgr().SetWiFiPAFAdvertisingEnabled(true);

@@ -218,8 +218,8 @@ public:
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
         if ((mode == PairingMode::WiFiPAF) || (mode == PairingMode::Code))
         {
-            AddArgument("freq", 0, UINT16_MAX, &mApFreq,
-                        "Frequency of the connected AP. It's required if AP is not at chnl#6 of 2.4G");
+            AddArgument("freq", 0, UINT16_MAX, &mPafSubscribeFreq,
+                        "The frequency commissioner will use for PAF commissioning. It's required if it is not at chnl#6 of 2.4G");
         }
 #endif
 
@@ -291,7 +291,7 @@ private:
     TypedComplexArgument<chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>>
         mComplex_DSTOffsets;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    chip::Optional<uint16_t> mApFreq;
+    chip::Optional<uint16_t> mPafSubscribeFreq;
 #endif
     uint16_t mRemotePort = 0;
     // mDiscriminator is only used for some situations, but in those situations

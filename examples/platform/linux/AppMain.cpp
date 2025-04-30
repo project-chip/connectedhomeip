@@ -557,7 +557,7 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
             err = WiFiPAFGet_FreqList(LinuxDeviceOptions::GetInstance().mWiFiPAFExtCmds, knownFreqListBuilder);
             SuccessOrExit(err);
             ReadOnlyBuffer<uint16_t> freq_list = knownFreqListBuilder.TakeBuffer();
-            DeviceLayer::ConnectivityMgr().SetWiFiPAFPublishParam(std::move(freq_list));
+            DeviceLayer::ConnectivityMgr().SetWiFiPAFPublishFrequencies(std::move(freq_list));
         }
     }
 

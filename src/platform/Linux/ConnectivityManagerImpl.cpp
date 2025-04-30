@@ -1568,8 +1568,8 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSubscribe(const uint16_t & connDiscr
     enum nan_service_protocol_type srv_proto_type = nan_service_protocol_type::NAN_SRV_PROTO_CSA_MATTER;
     uint8_t is_active                             = 1;
     unsigned int ttl                              = CHIP_DEVICE_CONFIG_WIFIPAF_DISCOVERY_TIMEOUT_SECS;
-    unsigned int freq                             = (mApFreq == 0) ? CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAULT_CHNL : mApFreq;
-    unsigned int ssi_len                          = sizeof(struct PAFPublishSSI);
+    unsigned int freq    = (mPafSubscribeFreq == 0) ? CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAULT_CHNL : mPafSubscribeFreq;
+    unsigned int ssi_len = sizeof(struct PAFPublishSSI);
     struct PAFPublishSSI PafPublish_ssi;
 
     mAppState                = appState;

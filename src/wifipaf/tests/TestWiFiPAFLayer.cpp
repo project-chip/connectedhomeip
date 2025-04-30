@@ -171,10 +171,11 @@ TEST_F(TestWiFiPAFLayer, CheckPafSession)
     // Remove the session
     sessionInfo.id = 0x1;
     EXPECT_EQ(RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
-    sessionInfo.id = 0x2;
-    EXPECT_EQ(RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
+    sessionInfo.nodeId        = 0x2;
+    sessionInfo.discriminator = 0xF02;
+    EXPECT_EQ(RmPafSession(PafInfoAccess::kAccNodeInfo, sessionInfo), CHIP_NO_ERROR);
 
-    EXPECT_EQ(RmPafSession(PafInfoAccess::kAccNodeInfo, sessionInfo), CHIP_ERROR_NOT_IMPLEMENTED);
+    EXPECT_EQ(RmPafSession(PafInfoAccess::kAccNodeInfo, sessionInfo), CHIP_ERROR_NOT_FOUND);
     EXPECT_EQ(RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_ERROR_NOT_FOUND);
 }
 

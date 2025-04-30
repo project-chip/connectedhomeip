@@ -863,18 +863,21 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
                                                     .nodeId        = nodeId,
                                                     .discriminator = discriminator };
             ReturnErrorOnFailure(pafLayer.AddPafSession(WiFiPAF::PafInfoAccess::kAccNodeInfo, sessionInfo));
-            ReturnErrorOnFailure(DeviceLayer::ConnectivityMgr().WiFiPAFSubscribe(
-                discriminator, reinterpret_cast<void *>(this), OnWiFiPAFSubscribeComplete, OnWiFiPAFSubscribeError));
-            WiFiPAF::WiFiPAFSession * pSession = pafLayer.GetPAFInfo(WiFiPAF::PafInfoAccess::kAccNodeId, sessionInfo);
-            if (pSession != nullptr)
+            err = DeviceLayer::ConnectivityMgr().WiFiPAFSubscribe(discriminator, reinterpret_cast<void *>(this),
+                                                                  OnWiFiPAFSubscribeComplete, OnWiFiPAFSubscribeError);
+            if (err != CHIP_NO_ERROR)
             {
-                for (WiFiPAF::PafSessionId_t & pafSessionId : mPafSessionIds)
+                pafLayer.RmPafSession(WiFiPAF::PafInfoAccess::kAccNodeInfo, sessionInfo);
+                return err;
+            }
+            // Save the subscribe_id to mPafSessionIds[]
+            WiFiPAF::WiFiPAFSession * pSession = pafLayer.GetPAFInfo(WiFiPAF::PafInfoAccess::kAccNodeId, sessionInfo);
+            for (WiFiPAF::PafSessionId_t & pafSessionId : mPafSessionIds)
+            {
+                if (pafSessionId == WiFiPAF::kUndefinedWiFiPafSessionId)
                 {
-                    if (pafSessionId == WiFiPAF::kUndefinedWiFiPafSessionId)
-                    {
-                        pafSessionId = pSession->id;
-                        break;
-                    }
+                    pafSessionId = pSession->id;
+                    break;
                 }
             }
             ExitNow(CHIP_NO_ERROR);

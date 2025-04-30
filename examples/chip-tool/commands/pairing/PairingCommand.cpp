@@ -70,7 +70,7 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
         break;
     case PairingMode::Code:
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-        chip::DeviceLayer::ConnectivityMgr().WiFiPafSetApFreq(mApFreq.ValueOr(CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAULT_CHNL));
+        chip::DeviceLayer::ConnectivityMgr().WiFiPafSetFreq(mPafSubscribeFreq.ValueOr(CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAULT_CHNL));
 #endif
         err = PairWithCode(remoteId);
         break;
@@ -88,7 +88,7 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
         break;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     case PairingMode::WiFiPAF:
-        chip::DeviceLayer::ConnectivityMgr().WiFiPafSetApFreq(mApFreq.ValueOr(CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAULT_CHNL));
+        chip::DeviceLayer::ConnectivityMgr().WiFiPafSetFreq(mPafSubscribeFreq.ValueOr(CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAULT_CHNL));
         err = Pair(remoteId, PeerAddress::WiFiPAF(remoteId));
         break;
 #endif

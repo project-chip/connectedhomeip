@@ -403,7 +403,7 @@ void WiFiPAFLayer::CleanPafInfo(WiFiPAFSession & SessionInfo)
     return;
 }
 
-CHIP_ERROR WiFiPAFLayer::AddPafSession(PafInfoAccess accType, WiFiPAFSession & SessionInfo)
+CHIP_ERROR WiFiPAFLayer::AddPafSession(PafInfoAccess accType, const WiFiPAFSession & SessionInfo)
 {
     uint8_t i;
     uint8_t eSlotId              = kInvalidActiveWiFiPafSessionId;
@@ -464,12 +464,22 @@ CHIP_ERROR WiFiPAFLayer::AddPafSession(PafInfoAccess accType, WiFiPAFSession & S
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 
-CHIP_ERROR WiFiPAFLayer::RmPafSession(PafInfoAccess accType, WiFiPAFSession & SessionInfo)
+CHIP_ERROR WiFiPAFLayer::RmPafSession(PafInfoAccess accType, const WiFiPAFSession & SessionInfo)
 {
     for (WiFiPAFSession & pafSession : mPafInfoVect)
     {
         switch (accType)
         {
+        case PafInfoAccess::kAccNodeInfo:
+            if ((pafSession.nodeId == SessionInfo.nodeId) && (pafSession.discriminator == SessionInfo.discriminator))
+            {
+                ChipLogProgress(WiFiPAF, "Removing session with nodeId: %lu, disc: %x", pafSession.nodeId,
+                                pafSession.discriminator);
+                // Clear the slot
+                CleanPafInfo(pafSession);
+                return CHIP_NO_ERROR;
+            }
+            break;
         case PafInfoAccess::kAccSessionId:
             if (pafSession.id == SessionInfo.id)
             {
@@ -487,7 +497,7 @@ CHIP_ERROR WiFiPAFLayer::RmPafSession(PafInfoAccess accType, WiFiPAFSession & Se
     return CHIP_ERROR_NOT_FOUND;
 }
 
-WiFiPAFSession * WiFiPAFLayer::GetPAFInfo(PafInfoAccess accType, WiFiPAFSession & SessionInfo)
+WiFiPAFSession * WiFiPAFLayer::GetPAFInfo(PafInfoAccess accType, const WiFiPAFSession & SessionInfo)
 {
     for (WiFiPAFSession & pafSession : mPafInfoVect)
     {

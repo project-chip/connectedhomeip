@@ -180,9 +180,9 @@ public:
     static WiFiPAFTransportProtocolVersion
     GetHighestSupportedProtocolVersion(const PAFTransportCapabilitiesRequestMessage & reqMsg);
 
-    CHIP_ERROR AddPafSession(PafInfoAccess accType, WiFiPAFSession & SessionInfo);
-    CHIP_ERROR RmPafSession(PafInfoAccess accType, WiFiPAFSession & SessionInfo);
-    WiFiPAFSession * GetPAFInfo(PafInfoAccess accType, WiFiPAFSession & SessionInfo);
+    CHIP_ERROR AddPafSession(PafInfoAccess accType, const WiFiPAFSession & SessionInfo);
+    CHIP_ERROR RmPafSession(PafInfoAccess accType, const WiFiPAFSession & SessionInfo);
+    WiFiPAFSession * GetPAFInfo(PafInfoAccess accType, const WiFiPAFSession & SessionInfo);
 
 private:
     void InitialPafInfo();

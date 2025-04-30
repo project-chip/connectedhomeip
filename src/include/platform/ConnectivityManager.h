@@ -180,15 +180,20 @@ public:
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     struct WiFiPAFAdvertiseParams
     {
-        /* Frequency list */
+        /* The list of the frequencies to advertise on. Each element (uint16_t) is the channel frequency
+           For example:
+           2.4G band:
+               chnl#1: 2412, chnl#6: 2437, chnl#11: 2462
+           5G band:
+               chnl#44: 5220, chnl#149: 5745
+        */
         ReadOnlyBuffer<uint16_t> freq_list;
         /* publish_id */
         uint32_t publish_id;
     };
 
-    WiFiPAFAdvertiseParams mPafAdverParam;
     CHIP_ERROR SetWiFiPAFAdvertisingEnabled(bool val);
-    CHIP_ERROR SetWiFiPAFPublishParam(ReadOnlyBuffer<uint16_t> && freq_list);
+    CHIP_ERROR SetWiFiPAFPublishFrequencies(ReadOnlyBuffer<uint16_t> && freq_list);
     CHIP_ERROR WiFiPAFPublish(WiFiPAFAdvertiseParams & args);
     CHIP_ERROR WiFiPAFCancelPublish(uint32_t PublishId);
     typedef void (*OnConnectionCompleteFunct)(void * appState);
@@ -197,7 +202,7 @@ public:
                                 OnConnectionErrorFunct onError);
     CHIP_ERROR WiFiPAFCancelSubscribe(uint32_t SubscribeId);
     CHIP_ERROR WiFiPAFSend(const WiFiPAF::WiFiPAFSession & TxInfo, System::PacketBufferHandle && msgBuf);
-    void WiFiPafSetApFreq(const uint16_t freq);
+    void WiFiPafSetFreq(const uint16_t freq);
     CHIP_ERROR WiFiPAFShutdown(WiFiPAF::PafSessionId_t id, WiFiPAF::WiFiPafRole role);
 #endif
 
@@ -254,6 +259,10 @@ public:
     static const char * CHIPoBLEServiceModeToStr(CHIPoBLEServiceMode mode);
 
 private:
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    WiFiPAFAdvertiseParams mPafAdverParam;
+#endif
+
     ConnectivityManagerDelegate * mDelegate = nullptr;
 
     // ===== Members for internal use by the following friends.
@@ -448,7 +457,7 @@ inline CHIP_ERROR ConnectivityManager::SetWiFiPAFAdvertisingEnabled(bool val)
     return WiFiPAFCancelPublish(mPafAdverParam.publish_id);
 }
 
-inline CHIP_ERROR ConnectivityManager::SetWiFiPAFPublishParam(ReadOnlyBuffer<uint16_t> && freq_list)
+inline CHIP_ERROR ConnectivityManager::SetWiFiPAFPublishFrequencies(ReadOnlyBuffer<uint16_t> && freq_list)
 {
     mPafAdverParam.freq_list = std::move(freq_list);
     return CHIP_NO_ERROR;
@@ -532,9 +541,9 @@ inline void ConnectivityManager::ResetThreadNetworkDiagnosticsCounts()
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-inline void ConnectivityManager::WiFiPafSetApFreq(const uint16_t freq)
+inline void ConnectivityManager::WiFiPafSetFreq(const uint16_t freq)
 {
-    static_cast<ImplClass *>(this)->_WiFiPafSetApFreq(freq);
+    static_cast<ImplClass *>(this)->_WiFiPafSetFreq(freq);
 }
 #endif
 

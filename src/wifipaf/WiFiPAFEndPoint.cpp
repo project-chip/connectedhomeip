@@ -789,14 +789,12 @@ SequenceNumber_t WiFiPAFEndPoint::AdjustRemoteReceiveWindow(SequenceNumber_t las
     return static_cast<uint8_t>(newRemoteWindowBoundary - newestUnackedSentSeqNum);
 }
 
-CHIP_ERROR WiFiPAFEndPoint::GetPktSn(Encoding::LittleEndian::Reader reader, SequenceNumber_t & seqNum)
+CHIP_ERROR WiFiPAFEndPoint::GetPktSn(Encoding::LittleEndian::Reader && reader, SequenceNumber_t & seqNum)
 {
-    CHIP_ERROR err;
     BitFlags<WiFiPAFTP::HeaderFlags> rxFlags;
     size_t SkipOffset = 0;
 
-    err = reader.Read8(rxFlags.RawStorage()).StatusCode();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(reader.Read8(rxFlags.RawStorage()).StatusCode());
     if (rxFlags.Has(WiFiPAFTP::HeaderFlags::kHandshake))
     {
         // Handshake message => No ack/sn
@@ -811,20 +809,18 @@ CHIP_ERROR WiFiPAFEndPoint::GetPktSn(Encoding::LittleEndian::Reader reader, Sequ
     {
         SkipOffset += kTransferProtocolAckSize;
     }
-    err = static_cast<Encoding::LittleEndian::Reader &>(reader.Skip(SkipOffset)).Read8(&seqNum).StatusCode();
-    SuccessOrExit(err);
-exit:
-    return err;
+    reader.Skip(SkipOffset);
+    ReturnErrorOnFailure(reader.Read8(&seqNum).StatusCode());
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WiFiPAFEndPoint::DebugPktAckSn(const PktDirect_t pktDirect, Encoding::LittleEndian::Reader reader)
+CHIP_ERROR WiFiPAFEndPoint::DebugPktAckSn(const PktDirect_t pktDirect, Encoding::LittleEndian::Reader && reader)
 {
 #ifdef CHIP_WIFIPAF_END_POINT_DEBUG_LOGGING_ENABLED
     BitFlags<WiFiPAFTP::HeaderFlags> rxFlags;
     CHIP_ERROR err;
     bool hasAck = false;
     SequenceNumber_t ackNum, snNum;
-    size_t skipOffset = 0;
 
     err = reader.Read8(rxFlags.RawStorage()).StatusCode();
     ReturnErrorOnFailure(err);
@@ -836,17 +832,14 @@ CHIP_ERROR WiFiPAFEndPoint::DebugPktAckSn(const PktDirect_t pktDirect, Encoding:
 
     if (rxFlags.Has(WiFiPAFTP::HeaderFlags::kManagementOpcode))
     {
-        SkipOffset += kTransferProtocolMgmtOpSize;
+        reader.Skip(kTransferProtocolMgmtOpSize);
     }
     if (rxFlags.Has(WiFiPAFTP::HeaderFlags::kFragmentAck))
     {
-        err = static_cast<Encoding::LittleEndian::Reader &>(reader.Skip(SkipOffset)).Read8(&ackNum).StatusCode();
-        ReturnErrorOnFailure(err);
-        SkipOffset = 0;
-        hasAck     = true;
+        ReturnErrorOnFailure(reader.Read8(&ackNum).StatusCode());
+        hasAck = true;
     }
-    err = static_cast<Encoding::LittleEndian::Reader &>(reader.Skip(SkipOffset)).Read8(&snNum).StatusCode();
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(reader.Read8(&snNum).StatusCode());
 
     StringBuilder<4> AckBuff;
     if (hasAck == false)
@@ -875,10 +868,9 @@ CHIP_ERROR WiFiPAFEndPoint::Receive(PacketBufferHandle && data)
 {
     SequenceNumber_t ExpRxNextSeqNum = mPafTP.GetRxNextSeqNum();
     SequenceNumber_t seqNum;
-    Encoding::LittleEndian::Reader reader(data->Start(), data->DataLength());
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    err = GetPktSn(reader, seqNum);
+    err = GetPktSn(Encoding::LittleEndian::Reader(data->Start(), data->DataLength()), seqNum);
     if (err != CHIP_NO_ERROR)
     {
         // Failed to get SeqNum. => Pass down to PAFTP engine directly
@@ -955,7 +947,7 @@ CHIP_ERROR WiFiPAFEndPoint::RxPacketProcess(PacketBufferHandle && data)
     bool didReceiveAck           = false;
     BitFlags<WiFiPAFTP::HeaderFlags> rx_flags;
     Encoding::LittleEndian::Reader reader(data->Start(), data->DataLength());
-    DebugPktAckSn(PktDirect_t::kRx, reader);
+    DebugPktAckSn(PktDirect_t::kRx, Encoding::LittleEndian::Reader(data->Start(), data->DataLength()));
 
     { // This is a special handling on the first CHIPoPAF data packet, the CapabilitiesRequest.
         // If we're receiving the first inbound packet of a PAF transport connection handshake...
@@ -1114,8 +1106,7 @@ CHIP_ERROR WiFiPAFEndPoint::SendWrite(PacketBufferHandle && buf)
     mConnStateFlags.Set(ConnectionStateFlag::kOperationInFlight);
 
     ChipLogDebugBufferWiFiPAFEndPoint(WiFiPAF, buf);
-    Encoding::LittleEndian::Reader reader(buf->Start(), buf->DataLength());
-    DebugPktAckSn(PktDirect_t::kTx, reader);
+    DebugPktAckSn(PktDirect_t::kTx, Encoding::LittleEndian::Reader(buf->Start(), buf->DataLength()));
     mWiFiPafLayer->mWiFiPAFTransport->WiFiPAFMessageSend(mSessionInfo, std::move(buf));
 
     return CHIP_NO_ERROR;

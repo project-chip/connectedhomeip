@@ -192,8 +192,8 @@ private:
     bool mIsBLE = true;
 
     PASESession mPairingSession;
-    void SetWiFiPAF(bool isPaf) { mIsWiFiPAF = isPaf; }
-    bool mIsWiFiPAF = true;
+    void SetAdvertisingOverWiFiPAF(bool isPaf) { mAdvertisingOverWiFiPAF = isPaf; }
+    bool mAdvertisingOverWiFiPAF = true;
 
     uint8_t mFailedCommissioningAttempts = 0;
 
