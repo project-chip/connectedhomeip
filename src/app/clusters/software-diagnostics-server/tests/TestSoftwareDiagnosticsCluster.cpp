@@ -154,7 +154,6 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
     }
 
     {
-        // everything returns empty here ..
         class WatermarksProvider : public DeviceLayer::DiagnosticDataProvider
         {
         public:
@@ -188,7 +187,6 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
     }
 
     {
-        // everything returns empty here ..
         class AllProvider : public DeviceLayer::DiagnosticDataProvider
         {
         public:
