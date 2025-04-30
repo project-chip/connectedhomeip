@@ -137,7 +137,8 @@ class TC_FAN_3_5(MatterBaseTest):
 
     async def send_step_command(self, step: Clusters.Objects.FanControl.Commands.Step) -> None:
         try:
-            logger.info(f"[FC] Sending Step command - direction: {step.direction.name}, wrap: {step.wrap}, lowestOff: {step.lowestOff}")
+            logger.info(
+                f"[FC] Sending Step command - direction: {step.direction.name}, wrap: {step.wrap}, lowestOff: {step.lowestOff}")
             await self.send_single_cmd(step, endpoint=self.endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, f"[FC] Unexpected error returned ({e})")
