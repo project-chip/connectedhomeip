@@ -150,6 +150,7 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-x64-chip-tool-ipv6only-platform-mdns \
     --target linux-x64-shell-ipv6only-platform-mdns \
     --target linux-x64-chip-cert-ipv6only-platform-mdns \
+    --target linux-x64-air-purifier-ipv6only \
     --target linux-x64-all-clusters-ipv6only \
     --target linux-x64-all-clusters-ipv6only-nlfaultinject \
     --target linux-x64-all-clusters-minimal-ipv6only \
@@ -176,6 +177,7 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-x64-chip-tool-ipv6only-platform-mdns/chip-tool out/chip-tool \
     && mv out/linux-x64-shell-ipv6only-platform-mdns/chip-shell out/chip-shell \
     && mv out/linux-x64-chip-cert-ipv6only-platform-mdns/chip-cert out/chip-cert \
+    && mv out/linux-x64-air-purifier-ipv6only/chip-air-purifier-app out/chip-air-purifier-app \
     && mv out/linux-x64-all-clusters-ipv6only/chip-all-clusters-app out/chip-all-clusters-app \
     && mv out/linux-x64-all-clusters-ipv6only-nlfaultinject/chip-all-clusters-app out/chip-all-clusters-app-nlfaultinject \
     && mv out/linux-x64-all-clusters-minimal-ipv6only/chip-all-clusters-minimal-app out/chip-all-clusters-minimal-app \
@@ -206,6 +208,7 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-arm64-chip-tool-ipv6only-platform-mdns \
     --target linux-arm64-shell-ipv6only-platform-mdns \
     --target linux-arm64-chip-cert-ipv6only-platform-mdns \
+    --target linux-arm64-air-purifier-ipv6only \
     --target linux-arm64-all-clusters-ipv6only \
     --target linux-arm64-all-clusters-ipv6only-nlfaultinject \
     --target linux-arm64-all-clusters-minimal-ipv6only \
@@ -232,6 +235,7 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-arm64-chip-tool-ipv6only-platform-mdns/chip-tool out/chip-tool \
     && mv out/linux-arm64-shell-ipv6only-platform-mdns/chip-shell out/chip-shell \
     && mv out/linux-arm64-chip-cert-ipv6only-platform-mdns/chip-cert out/chip-cert \
+    && mv out/linux-arm64-air-purifier-ipv6only/chip-air-purifier-app out/chip-air-purifier-app \
     && mv out/linux-arm64-all-clusters-ipv6only/chip-all-clusters-app out/chip-all-clusters-app \
     && mv out/linux-arm64-all-clusters-ipv6only-nlfaultinject/chip-all-clusters-app out/chip-all-clusters-app-nlfaultinject \
     && mv out/linux-arm64-all-clusters-minimal-ipv6only/chip-all-clusters-minimal-app out/chip-all-clusters-minimal-app \
@@ -272,6 +276,7 @@ RUN mkdir apps
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-tool apps/chip-tool
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-shell apps/chip-shell
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-cert apps/chip-cert
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-air-purifier-app apps/chip-air-purifier-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-all-clusters-app apps/chip-all-clusters-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-all-clusters-app-nlfaultinject apps/chip-all-clusters-app-nlfaultinject
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-all-clusters-minimal-app apps/chip-all-clusters-minimal-app
