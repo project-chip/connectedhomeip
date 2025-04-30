@@ -786,7 +786,59 @@ TEST_F(TestFabricTable, TestBasicAddNocUpdateNocFlow)
 
     size_t numStorageAfterFirstAdd = storage.GetNumKeys();
 
-    // Sequence 2: Add node ID 999 on fabric 44, using operational keystore and ICAC --> Yield fabricIndex 2
+    // Sequence 2: Add VVS and VVSC (VVSC possible since fabric 11 doesn't have ICAC). Make sure additional storage is present.
+    {
+        constexpr FabricIndex kFirstFabricIndex = 1u;
+
+        // VVSC contents is not checked, so can be just zero bytes.
+        uint8_t vvsc[kMaxCHIPCertLength];
+        memset(&vvsc[0], 0x00, sizeof(vvsc));
+        ByteSpan vvscSpan{ vvsc };
+
+        // VVS contents is not checked, except first by that must be 0x01.
+        uint8_t vvs[Crypto::kVendorIdVerificationStatementV1Size];
+        memset(&vvs[0], 0x01, sizeof(vvs));
+        ByteSpan vvsSpan{ vvs };
+
+        // Set new VVS, VVSC. Applies immediately due to no intermediate NOC update flow present.
+        bool fabricTableWasChanged = false;
+        EXPECT_EQ(fabricTable.SetVIDVerificationStatementElements(kFirstFabricIndex, NullOptional,
+                                                                    MakeOptional(vvsSpan), MakeOptional(vvscSpan),
+                                                                    fabricTableWasChanged),
+                    CHIP_NO_ERROR);
+        EXPECT_EQ(fabricTableWasChanged, true);
+        
+        EXPECT_EQ(storage.GetNumKeys(), numStorageAfterFirstAdd + 2); // VVSC and VVS added.
+
+        // Make sure VVSC was stored.
+        {
+            uint8_t readBackVvscBuf[kMaxCHIPCertLength];
+            memset(&readBackVvscBuf[0], 0x11, sizeof(readBackVvscBuf));
+            MutableByteSpan readBackVvscSpan{ readBackVvscBuf };
+
+            EXPECT_EQ(fabricTableHolder.GetOpCertStore().GetVidVerificationElement(
+                            kFirstFabricIndex, OperationalCertificateStore::VidVerificationElement::kVvsc, readBackVvscSpan),
+                        CHIP_NO_ERROR);
+            EXPECT_TRUE(readBackVvscSpan.data_equal(vvscSpan));
+        }
+
+        // Make sure VVS was also set pending
+        {
+            uint8_t readBackVvsBuf[Crypto::kVendorIdVerificationStatementV1Size];
+            memset(&readBackVvsBuf[0], 0x00, sizeof(readBackVvsBuf));
+            MutableByteSpan readBackVvsSpan{ readBackVvsBuf };
+
+            EXPECT_EQ(fabricTableHolder.GetOpCertStore().GetVidVerificationElement(
+                            kFirstFabricIndex, OperationalCertificateStore::VidVerificationElement::kVidVerificationStatement,
+                            readBackVvsSpan),
+                        CHIP_NO_ERROR);
+            EXPECT_TRUE(readBackVvsSpan.data_equal(vvsSpan));
+        }
+    }
+
+    numStorageAfterFirstAdd = storage.GetNumKeys(); // Accounts now for VVSC + VVS
+
+    // Sequence 3: Add node ID 999 on fabric 44, using operational keystore and ICAC --> Yield fabricIndex 2
     {
         FabricId fabricId = 44;
         NodeId nodeId     = 999;
@@ -906,7 +958,7 @@ TEST_F(TestFabricTable, TestBasicAddNocUpdateNocFlow)
 
     size_t numStorageAfterSecondAdd = storage.GetNumKeys();
 
-    // Sequence 3: Update node ID 999 to 1000 on fabric 44, using operational keystore and no ICAC --> Stays fabricIndex 2
+    // Sequence 4: Update node ID 999 to 1000 on fabric 44, using operational keystore and no ICAC --> Stays fabricIndex 2
     {
         FabricId fabricId       = 44;
         NodeId nodeId           = 1000;
@@ -1034,7 +1086,7 @@ TEST_F(TestFabricTable, TestBasicAddNocUpdateNocFlow)
 
     size_t numStorageAfterUpdate = storage.GetNumKeys();
 
-    // Sequence 4: Rename fabric index 2, applies immediately when nothing pending
+    // Sequence 5: Rename fabric index 2, applies immediately when nothing pending
     {
         EXPECT_EQ(fabricTable.FabricCount(), 2);
         EXPECT_EQ(fabricTable.SetFabricLabel(2, "roboto"_span), CHIP_NO_ERROR);
@@ -1061,7 +1113,7 @@ TEST_F(TestFabricTable, TestBasicAddNocUpdateNocFlow)
         }
     }
 
-    // Sequence 5: Remove FabricIndex 1 (FabricId 11, NodeId 55), make sure FabricIndex 2 (FabricId 44, NodeId 1000) still exists
+    // Sequence 6: Remove FabricIndex 1 (FabricId 11, NodeId 55), make sure FabricIndex 2 (FabricId 44, NodeId 1000) still exists
     {
         // Remove the fabric: no commit needed
         {
@@ -1069,7 +1121,7 @@ TEST_F(TestFabricTable, TestBasicAddNocUpdateNocFlow)
             EXPECT_EQ(fabricTable.Delete(1), CHIP_NO_ERROR);
             EXPECT_EQ(fabricTable.FabricCount(), 1);
 
-            EXPECT_EQ(storage.GetNumKeys(), (numStorageAfterUpdate - 3)); // Deleted NOC, RCAC, Metadata
+            EXPECT_EQ(storage.GetNumKeys(), (numStorageAfterUpdate - 5)); // Deleted NOC, RCAC, Metadata, VVS, VVSC
         }
 
         // Next fabric index has stayed the same.
