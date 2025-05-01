@@ -173,7 +173,7 @@ static MTRMockCB * sMockCB;
         XCTAssertTrue([factory startControllerFactory:factoryParams error:nil]);
         sControllerFactoryScope = scope;
     } else if (sControllerFactoryScope == MTRTestScopeTestCase && scope == MTRTestScopeSuite) {
-        sControllerFactoryScope = MTRTestScopeSuite; // extend factory life time
+        sControllerFactoryScope = MTRTestScopeSuite; // extend factory lifetime
     }
 
     __auto_type * testKeys = [[MTRTestKeys alloc] init];

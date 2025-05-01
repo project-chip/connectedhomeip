@@ -216,7 +216,7 @@ NS_ASSUME_NONNULL_BEGIN
     [_controller shutdown];
     _controller = nil;
 
-    // Now trigger a CBCentraslManager state update, attempting to provoke a UAF.
+    // Now trigger a CBCentralManager state update, attempting to provoke a UAF.
     self.class.mockCoreBluetooth.state = CBManagerStatePoweredOff;
 }
 
