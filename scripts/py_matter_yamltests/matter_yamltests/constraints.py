@@ -771,8 +771,6 @@ class _ConstraintIsSetOfValues(BaseConstraint):
     def _get_missing_extra(self, value):
         expected_but_missing_idx = set(range(len(self._expected)))
         values_not_expected_idx = set(range(len(value)))
-        # expected - list of stuff
-        # value - list of the other stuff
         for expected_idx, expected_element in enumerate(self._expected):
             for value_idx, value_element in enumerate(value):
                 if _values_match(expected_element, value_element):
@@ -780,13 +778,6 @@ class _ConstraintIsSetOfValues(BaseConstraint):
                     values_not_expected_idx.remove(value_idx)
 
         return [self._expected[i] for i in expected_but_missing_idx], [value[i] for i in values_not_expected_idx]
-
-        # for expected_value in self._excludes:
-        #     for received_value in value:
-        #         if _values_match(expected_value, received_value):
-        #             return False
-        # FIXME:
-        return ([], [])
 
     def check_response(self, value, value_type_name) -> bool:
         missing, extra = self._get_missing_extra(value)
@@ -904,8 +895,7 @@ class _ConstraintPython(BaseConstraint):
 
     def validate(self, value, value_type_name, runtime_variables):
         # Build a global scope that includes all runtime variables
-        scope = {name: fix_typed_yaml_value(
-            value) for name, value in runtime_variables.items()}
+        scope = {name: fix_typed_yaml_value(value) for name, value in runtime_variables.items()}
         scope['__builtins__'] = self.BUILTINS
         # Execute the module AST and extract the defined function
         exec(compile(self._ast, '<string>', 'exec'), scope)
@@ -916,8 +906,7 @@ class _ConstraintPython(BaseConstraint):
         except Exception as ex:
             self._raise_error(f'Python constraint {type(ex).__name__}: {ex}')
         if type(valid) is not bool:
-            self._raise_error(
-                "Python constraint TypeError: must return a bool")
+            self._raise_error("Python constraint TypeError: must return a bool")
         if not valid:
             self._raise_error(f'The response value "{value}" is not valid')
 
