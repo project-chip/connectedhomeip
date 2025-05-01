@@ -55,7 +55,7 @@ YAML schema
 |&emsp; &emsp; &emsp; endsWith |str||
 |&emsp; &emsp; &emsp; isUpperCase |bool||
 |&emsp; &emsp; &emsp; isLowerCase |bool||
-|&emsp; &emsp; &emsp; isSetOfValues |bool||
+|&emsp; &emsp; &emsp; isSetOfValues |list||
 |&emsp; &emsp; &emsp; minValue |int,float|Y|
 |&emsp; &emsp; &emsp; maxValue |int,float|Y|
 |&emsp; &emsp; &emsp; contains |list||

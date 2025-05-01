@@ -895,8 +895,7 @@ class _ConstraintPython(BaseConstraint):
 
     def validate(self, value, value_type_name, runtime_variables):
         # Build a global scope that includes all runtime variables
-        scope = {name: fix_typed_yaml_value(
-            value) for name, value in runtime_variables.items()}
+        scope = {name: fix_typed_yaml_value(value) for name, value in runtime_variables.items()}
         scope['__builtins__'] = self.BUILTINS
         # Execute the module AST and extract the defined function
         exec(compile(self._ast, '<string>', 'exec'), scope)
@@ -907,8 +906,7 @@ class _ConstraintPython(BaseConstraint):
         except Exception as ex:
             self._raise_error(f'Python constraint {type(ex).__name__}: {ex}')
         if type(valid) is not bool:
-            self._raise_error(
-                "Python constraint TypeError: must return a bool")
+            self._raise_error("Python constraint TypeError: must return a bool")
         if not valid:
             self._raise_error(f'The response value "{value}" is not valid')
 
