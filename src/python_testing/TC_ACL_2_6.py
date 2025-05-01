@@ -31,9 +31,9 @@
 #       --endpoint 0
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 import random
-import asyncio
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
