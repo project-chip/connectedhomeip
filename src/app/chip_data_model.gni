@@ -261,13 +261,18 @@ template("chip_data_model") {
       "ota-provider",
     ]
 
-    foreach(cluster, _cluster_sources) {
-      # is code backed means that $cluster will be included in the list of code backed names
-      _is_code_backed = filter_include(_code_backed_clusters, [ cluster ])
-      if (_is_code_backed != []) {
-        deps += [ "${_app_root}/clusters/${cluster}" ]
-        sources += [ "${_app_root}/clusters/${cluster}/CodegenIntegration.cpp" ]
-      } else if (cluster == "door-lock-server") {
+    _code_backed_cluster_sources =
+        filter_include(_cluster_sources, _code_backed_clusters)
+    _monolith_cluster_sources =
+        filter_exclude(_cluster_sources, _code_backed_clusters)
+
+    foreach(cluster, _code_backed_cluster_sources) {
+      deps += [ "${_app_root}/clusters/${cluster}" ]
+      sources += [ "${_app_root}/clusters/${cluster}/CodegenIntegration.cpp" ]
+    }
+
+    foreach(cluster, _monolith_cluster_sources) {
+      if (cluster == "door-lock-server") {
         sources += [
           "${_app_root}/clusters/${cluster}/door-lock-server-callback.cpp",
           "${_app_root}/clusters/${cluster}/door-lock-server.cpp",
