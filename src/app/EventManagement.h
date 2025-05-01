@@ -202,6 +202,13 @@ class EventManagement : public DataModel::EventsGenerator
 {
 public:
     /**
+     * Note: Even though this class is used as a singleton, the default constructor is public in
+     * order to preserve the ability to instantiate this class in test code. This is meant to be
+     * temporary until we find a better solution.
+     */
+    constexpr EventManagement() = default;
+
+    /**
      * Initialize the EventManagement with an array of LogStorageResources and
      * an equal-length array of CircularEventBuffers that correspond to those
      * LogStorageResources. The array of LogStorageResources must provide a
@@ -390,7 +397,6 @@ public:
                              EventNumber & generatedEventNumber) override;
 
 private:
-    constexpr EventManagement() = default;
     static EventManagement sInstance;
 
     class InternalEventOptions : public EventOptions
