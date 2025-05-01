@@ -1793,7 +1793,7 @@ CHIP_ERROR FabricTable::UpdatePendingFabricCommon(FabricIndex fabricIndex, const
     const auto * fabricInfo = FindFabricWithIndex(fabricIndex);
     VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
 
-    // Cannot have a VVSC already if NOC is provided.
+    // Cannot have a VVSC already if ICAC is provided.
     if (!icac.empty())
     {
         uint8_t vvscBuffer[kMaxCHIPCertLength];
