@@ -249,7 +249,7 @@ CHIP_ERROR WriteClient::PutSinglePreencodedAttributeWritePayload(const chip::app
 
 // TODO #38287 Add Unit Tests for PutPreencodedAttribute and for TryPutPreencodedAttributeWritePayloadIntoList.
 CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath & attributePath, const TLV::TLVReader & data,
-                                               bool forceLegacyListEncoding)
+                                               TestListEncodingOverride testListEncodingOverride)
 {
     ReturnErrorOnFailure(EnsureMessage());
 
@@ -271,7 +271,8 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
         // list operation.
         // TODO (#38270): Generalize this behavior; send a non-empty ReplaceAll list for all clusters in a later Matter version and
         // enforce all clusters to support it in testing and in certification.
-        bool encodeEmptyListAsReplaceAll = !(path.mClusterId == Clusters::AccessControl::Id) || forceLegacyListEncoding;
+        bool encodeEmptyListAsReplaceAll = !(path.mClusterId == Clusters::AccessControl::Id) ||
+            (testListEncodingOverride == TestListEncodingOverride::kForceLegacyEncoding);
 
         if (encodeEmptyListAsReplaceAll)
         {

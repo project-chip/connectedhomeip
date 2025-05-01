@@ -377,9 +377,13 @@ PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * 
         {
             dataVersion.SetValue(path.dataVersion);
         }
+
+        auto listEncodingOverride = forceLegacyListEncoding ? WriteClient::TestListEncodingOverride::kForceLegacyEncoding
+                                                            : WriteClient::TestListEncodingOverride::kNotApplicable;
+
         SuccessOrExit(err = client->PutPreencodedAttribute(
                           chip::app::ConcreteDataAttributePath(path.endpointId, path.clusterId, path.attributeId, dataVersion),
-                          reader, forceLegacyListEncoding));
+                          reader, listEncodingOverride));
     }
 
     SuccessOrExit(err = client->SendWriteRequest(device->GetSecureSession().Value(),

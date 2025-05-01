@@ -251,6 +251,12 @@ public:
         return EncodeAttribute(attributePath, value.Value(), aDataVersion);
     }
 
+    enum class TestListEncodingOverride
+    {
+        kNotApplicable,
+        kForceLegacyEncoding
+    };
+
     /**
      * Encode an attribute value which is already encoded into a TLV. The TLVReader is expected to be initialized and the read head
      * is expected to point to the element to be encoded.
@@ -262,7 +268,7 @@ public:
      * support legacy WriteClients
      */
     CHIP_ERROR PutPreencodedAttribute(const ConcreteDataAttributePath & attributePath, const TLV::TLVReader & data,
-                                      bool forceLegacyListEncoding = false);
+                                      TestListEncodingOverride encodingBehavior = TestListEncodingOverride::kNotApplicable);
 
     /**
      *  Once SendWriteRequest returns successfully, the WriteClient will
