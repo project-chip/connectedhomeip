@@ -165,6 +165,7 @@ SilabsLCD slLCD;
 Clusters::Identify::EffectIdentifierEnum sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
 
 ObjectPool<Identify, MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT> IdentifyPool;
+EndpointId latest_active_endpoint;
 
 #endif // MATTER_DM_PLUGIN_IDENTIFY_SERVER
 
@@ -445,6 +446,7 @@ bool BaseApplication::ActivateStatusLedPatterns()
             }
             isPatternSet = true;
         }
+        break;
     }
 #endif // MATTER_DM_PLUGIN_IDENTIFY_SERVER
 
@@ -698,15 +700,29 @@ void BaseApplication::StopStatusLEDTimer()
 #ifdef MATTER_DM_PLUGIN_IDENTIFY_SERVER
 void BaseApplication::OnIdentifyStart(Identify * identify)
 {
+    if (identify == nullptr) // Check if the pointer is null
+    {
+        ChipLogError(Zcl, "Identify pointer is null");
+        return;
+    }
+
+    latest_active_endpoint = identify->mEndpoint;
     ChipLogProgress(Zcl, "onIdentifyStart");
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     StartStatusLEDTimer();
 #endif
 }
+}
 
 void BaseApplication::OnIdentifyStop(Identify * identify)
 {
+    if (identify == nullptr) // Check if the pointer is null
+    {
+        ChipLogError(Zcl, "Identify pointer is null");
+        return;
+    }
+    latest_active_endpoint = identify->mEndpoint;
     ChipLogProgress(Zcl, "onIdentifyStop");
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -726,6 +742,11 @@ void BaseApplication::OnTriggerIdentifyEffectCompleted(chip::System::Layer * sys
 
 void BaseApplication::OnTriggerIdentifyEffect(Identify * identify)
 {
+    if (identify == nullptr) // Check if the pointer is null
+    {
+        ChipLogError(Zcl, "Identify pointer is null");
+        return;
+    }
     sIdentifyEffect = identify->mCurrentEffectIdentifier;
 
     if (identify->mEffectVariant != Clusters::Identify::EffectVariantEnum::kDefault)
@@ -995,6 +1016,7 @@ bool BaseApplication::GetProvisionStatus()
 }
 void emberAfIdentifyClusterInitCallback(chip::EndpointId endpoint)
 {
+    latest_active_endpoint = endpoint;
     IdentifyPool.CreateObject(endpoint, BaseApplication::OnIdentifyStart, BaseApplication::OnIdentifyStop,
                               Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator, BaseApplication::OnTriggerIdentifyEffect);
 }
