@@ -76,47 +76,47 @@ class TC_FAN_3_5(MatterBaseTest):
 
                 TestStep("5", "[FC] TH writes to the DUT the PercentSetting attribute with value 50.",
                          "- Verify that the PercentStting and PercentCurrent attributes are both set to 50."),
-                TestStep("5a", "[FC] TH sends command Step command with: Direction = Increase, Wrap = False, LowestOff = True.",
+                TestStep("5a", "[FC] TH sends command Step with: Direction = Increase, Wrap = False, LowestOff = True.",
                          "Verify that the PercentStting and PercentCurrent attributes are both greater than 50."),
 
                 TestStep("6", "[FC] TH writes to the DUT the PercentSetting attribute with value 50.",
                          "- Verify that the PercentStting and PercentCurrent attributes are both set to 50."),
-                TestStep("6a", "[FC] TH sends command Step command with: Direction = Decrease, Wrap = False, LowestOff = True.",
+                TestStep("6a", "[FC] TH sends command Step with: Direction = Decrease, Wrap = False, LowestOff = True.",
                          "Verify that the PercentStting and PercentCurrent attributes are both less than 50."),
 
                 TestStep("7", "[FC] TH writes to the DUT the SpeedSetting attribute with value 0.",
                          "- Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0."),
-                TestStep("7a", "[FC] TH sends command Step command with: Direction = Decrease, Wrap = False, LowestOff = True.",
+                TestStep("7a", "[FC] TH sends command Step with: Direction = Decrease, Wrap = False, LowestOff = True.",
                          "- Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0. - Verify that the PercentStting and PercentCurrent attributes are both set to 0. - Verify that the FanMode attribute is set to Off (0)."),
 
                 TestStep("8", "[FC] TH writes to the DUT the SpeedSetting attribute with value 0.",
                          "- Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0."),
-                TestStep("8a", "[FC] TH sends command Step command with: Direction = Decrease, Wrap = True, LowestOff = True.",
+                TestStep("8a", "[FC] TH sends command Step with: Direction = Decrease, Wrap = True, LowestOff = True.",
                          "- Verify that the SpeedSetting and SpeedCurrent attributes are both set to SpeedMax. - Verify that the PercentStting and PercentCurrent attributes are both set to the corresponding values as per the percent formula: percent=floor(speed/SpeedMax*100). - Verify that the FanMode attribute is set to High (3)."),
 
                 TestStep("9", "[FC] TH writes to the DUT the SpeedSetting attribute with value 1.",
                          "- Verify that the SpeedSetting and SpeedCurrent attributes are both set to 1."),
-                TestStep("9a", "[FC] TH sends command Step command with: Direction = Decrease, Wrap = False, LowestOff = False.",
+                TestStep("9a", "[FC] TH sends command Step with: Direction = Decrease, Wrap = False, LowestOff = False.",
                          "- Verify that the SpeedSetting and SpeedCurrent attributes are both set to 1. - Verify that the PercentStting and PercentCurrent attributes are both set to the corresponding values as per the percent formula: percent=floor(speed/SpeedMax*100). - Verify that the FanMode attribute is set to Low (1)."),
 
                 TestStep("10", "[FC] TH writes to the DUT the SpeedSetting attribute with value 1.",
                          "- Verify that the SpeedSetting and SpeedCurrent attributes are both set to 1."),
-                TestStep("10a", "[FC] TH sends command Step command with: Direction = Decrease, Wrap = False, LowestOff = True.",
+                TestStep("10a", "[FC] TH sends command Step with: Direction = Decrease, Wrap = False, LowestOff = True.",
                          "- Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0. - Verify that the PercentStting and PercentCurrent attributes are both set to 0. - Verify that the FanMode attribute is set to Off (0)."),
 
                 TestStep("11", "[FC] TH writes to the DUT the SpeedSetting attribute with value 1.",
                          "- Verify that the SpeedSetting and SpeedCurrent attributes are both set to 1."),
-                TestStep("11a", "[FC] TH sends command Step command with: Direction = Decrease, Wrap = True, LowestOff = False.",
+                TestStep("11a", "[FC] TH sends command Step with: Direction = Decrease, Wrap = True, LowestOff = False.",
                          "- Verify that the SpeedSetting and SpeedCurrent attributes are both set to SpeedMax. - Verify that the PercentStting and PercentCurrent attributes are both set to the corresponding values as per the percent formula: percent=floor(speed/SpeedMax*100). - Verify that the FanMode attribute is set to High (3)."),
 
                 TestStep("12", "[FC] TH writes to the DUT the SpeedSetting attribute with value SpeedMax.",
                          "- Verify that the SpeedSetting and SpeedCurrent attributes are both set to SpeedMax."),
-                TestStep("12a", "[FC] TH sends command Step command with: Direction = Increase, Wrap = False, LowestOff = True.",
+                TestStep("12a", "[FC] TH sends command Step with: Direction = Increase, Wrap = False, LowestOff = True.",
                          "- Verify that the SpeedSetting and SpeedCurrent attributes are both set to SpeedMax. - Verify that the PercentStting and PercentCurrent attributes are both set to the corresponding values as per the percent formula: percent=floor(speed/SpeedMax*100). - Verify that the FanMode attribute is set to High (3)."),
 
                 TestStep("13", "[FC] TH writes to the DUT the SpeedSetting attribute with value SpeedMax.",
                          "- Verify that the SpeedSetting and SpeedCurrent attributes are both set to SpeedMax."),
-                TestStep("13a", "[FC] TH sends command Step command with: Direction = Increase, Wrap = True, LowestOff = True.",
+                TestStep("13a", "[FC] TH sends command Step with: Direction = Increase, Wrap = True, LowestOff = True.",
                          "- Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0. - Verify that the PercentStting and PercentCurrent attributes are both set to 0. - Verify that the FanMode attribute is set to Off (0)."),
                 ]
 
@@ -270,7 +270,7 @@ class TC_FAN_3_5(MatterBaseTest):
         await self.update_and_verify_attribute_values(update, expect_updates=True, expected_attributes=write_expect)
 
         # *** STEP 5a ***
-        # TH sends command Step command with: Direction = Increase, Wrap = False, LowestOff = True
+        # TH sends command Step with: Direction = Increase, Wrap = False, LowestOff = True
         #  - Verify that the PercentStting and PercentCurrent attributes are both greater than 50
         self.step("5a")
         step = cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=True)
@@ -294,7 +294,7 @@ class TC_FAN_3_5(MatterBaseTest):
         await self.update_and_verify_attribute_values(update, expect_updates=True, expected_attributes=write_expect)
 
         # *** STEP 6a ***
-        # TH sends command Step command with: Direction = Decrease, Wrap = False, LowestOff = True
+        # TH sends command Step with: Direction = Decrease, Wrap = False, LowestOff = True
         #  - Verify that the PercentStting and PercentCurrent attributes are both less than 50
         self.step("6a")
         step = cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=True)
@@ -318,7 +318,7 @@ class TC_FAN_3_5(MatterBaseTest):
         await self.update_and_verify_attribute_values(update, expect_updates=True, expected_attributes=write_expect)
 
         # *** STEP 7a ***
-        # TH sends command Step command with: Direction = Decrease, Wrap = False, LowestOff = True
+        # TH sends command Step with: Direction = Decrease, Wrap = False, LowestOff = True
         #  - Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0
         #  - Verify that the PercentStting and PercentCurrent attributes are both set to 0
         #  - Verify that the FanMode attribute is set to Off (0)
@@ -350,7 +350,7 @@ class TC_FAN_3_5(MatterBaseTest):
         await self.update_and_verify_attribute_values(update, expect_updates=False, expected_attributes=write_expect)
 
         # *** STEP 8a ***
-        # TH sends command Step command with: Direction = Decrease, Wrap = True, LowestOff = True
+        # TH sends command Step with: Direction = Decrease, Wrap = True, LowestOff = True
         #  - Verify that the SpeedSetting and SpeedCurrent attributes are both set to SpeedMax
         #  - Verify that the PercentStting and PercentCurrent attributes are both set to the
         #    corresponding values as per the percent formula: percent=floor(speed/SpeedMax*100)
@@ -383,7 +383,7 @@ class TC_FAN_3_5(MatterBaseTest):
         await self.update_and_verify_attribute_values(update, expect_updates=True, expected_attributes=write_expect)
 
         # *** STEP 9a ***
-        # TH sends command Step command with: Direction = Decrease, Wrap = False, LowestOff = False
+        # TH sends command Step with: Direction = Decrease, Wrap = False, LowestOff = False
         #  - Verify that the SpeedSetting and SpeedCurrent attributes are both set to 1
         #  - Verify that the PercentStting and PercentCurrent attributes are both set to the
         #    corresponding values as per the percent formula: percent=floor(speed/SpeedMax*100)
@@ -416,7 +416,7 @@ class TC_FAN_3_5(MatterBaseTest):
         await self.update_and_verify_attribute_values(update, expect_updates=False, expected_attributes=write_expect)
 
         # *** STEP "10a" ***
-        # TH sends command Step command with: Direction = Decrease, Wrap = False, LowestOff = True
+        # TH sends command Step with: Direction = Decrease, Wrap = False, LowestOff = True
         #  - Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0
         #  - Verify that the PercentStting and PercentCurrent attributes are both set to 0
         #  - Verify that the FanMode attribute is set to Off (0)
@@ -448,7 +448,7 @@ class TC_FAN_3_5(MatterBaseTest):
         await self.update_and_verify_attribute_values(update, expect_updates=True, expected_attributes=write_expect)
 
         # *** STEP 11a ***
-        # TH sends command Step command with: Direction = Decrease, Wrap = True, LowestOff = False
+        # TH sends command Step with: Direction = Decrease, Wrap = True, LowestOff = False
         #  - Verify that the SpeedSetting and SpeedCurrent attributes are both set to SpeedMax
         #  - Verify that the PercentStting and PercentCurrent attributes are both set to the
         #    corresponding values as per the percent formula: percent=floor(speed/SpeedMax*100)
@@ -481,7 +481,7 @@ class TC_FAN_3_5(MatterBaseTest):
         await self.update_and_verify_attribute_values(update, expect_updates=False, expected_attributes=write_expect)
 
         # *** STEP 12a ***
-        # TH sends command Step command with: Direction = Increase, Wrap = False, LowestOff = True
+        # TH sends command Step with: Direction = Increase, Wrap = False, LowestOff = True
         #  - Verify that the SpeedSetting and SpeedCurrent attributes are both set to SpeedMax
         #  - Verify that the PercentStting and PercentCurrent attributes are both set to the
         #    corresponding values as per the percent formula: percent=floor(speed/SpeedMax*100)
@@ -514,7 +514,7 @@ class TC_FAN_3_5(MatterBaseTest):
         await self.update_and_verify_attribute_values(update, expect_updates=False, expected_attributes=write_expect)
 
         # *** STEP "13a" ***
-        # TH sends command Step command with: Direction = Increase, Wrap = True, LowestOff = True
+        # TH sends command Step with: Direction = Increase, Wrap = True, LowestOff = True
         #  - Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0
         #  - Verify that the PercentStting and PercentCurrent attributes are both set to 0
         #  - Verify that the FanMode attribute is set to Off (0)
