@@ -292,18 +292,22 @@ namespace DeviceLayer {
 // All our callback dispatch must happen on _chipWorkQueue
 - (void)dispatchConnectionError:(CHIP_ERROR)error
 {
-    if (_onConnectionError != nullptr) {
-        _onConnectionError(_appState, error);
-    }
+    auto * onConnectionError = _onConnectionError;
+    auto * appState = _appState;
     [self clearConnectionCallbacks];
+    if (onConnectionError != nullptr) {
+        onConnectionError(appState, error);
+    }
 }
 
 - (void)dispatchConnectionComplete:(CBPeripheral *)peripheral
 {
-    if (_onConnectionComplete != nullptr) {
-        _onConnectionComplete(self.appState, BleConnObjectFromCBPeripheral(peripheral));
-    }
+    auto * onConnectionComplete = _onConnectionComplete;
+    auto * appState = _appState;
     [self clearConnectionCallbacks];
+    if (onConnectionComplete != nullptr) {
+        onConnectionComplete(appState, BleConnObjectFromCBPeripheral(peripheral));
+    }
 }
 
 - (void)clearConnectionCallbacks
