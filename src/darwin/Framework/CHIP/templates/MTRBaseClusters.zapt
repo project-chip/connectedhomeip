@@ -57,7 +57,7 @@ NS_ASSUME_NONNULL_BEGIN
 {{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
 - (void)read{{>attribute}}With
-{{~#if_is_fabric_scoped_struct type~}}
+{{~#if_is_fabric_scoped_struct type cluster=../name~}}
   Params:(MTRReadParams * _Nullable)params completion:
 {{~else~}}
   Completion:
@@ -211,7 +211,7 @@ typedef NS_OPTIONS({{asUnderlyingZclType name}}, {{objCEnumName clusterName bitm
            (isSupported (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name)))}}
 {{#*inline "attribute"}}Attribute{{compatAttributeNameRemapping parent.name name}}{{/inline}}
 - (void)read{{>attribute}}With
-{{~#if_is_fabric_scoped_struct type~}}
+{{~#if_is_fabric_scoped_struct type cluster=../name~}}
   Params:(MTRReadParams * _Nullable)params completionHandler:
 {{~else~}}
   CompletionHandler:

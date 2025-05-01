@@ -51,7 +51,6 @@
 #include <clusters/ContentAppObserver/Enums.h>
 #include <clusters/ContentControl/Enums.h>
 #include <clusters/ContentLauncher/Enums.h>
-#include <clusters/DemandResponseLoadControl/Enums.h>
 #include <clusters/Descriptor/Enums.h>
 #include <clusters/DeviceEnergyManagement/Enums.h>
 #include <clusters/DeviceEnergyManagementMode/Enums.h>
@@ -130,6 +129,7 @@
 #include <clusters/ServiceArea/Enums.h>
 #include <clusters/SmokeCoAlarm/Enums.h>
 #include <clusters/SoftwareDiagnostics/Enums.h>
+#include <clusters/SoilMeasurement/Enums.h>
 #include <clusters/Switch/Enums.h>
 #include <clusters/TargetNavigator/Enums.h>
 #include <clusters/TemperatureControl/Enums.h>

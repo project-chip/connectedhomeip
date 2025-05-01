@@ -26,7 +26,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WebRTCTransportRequestor;
 
-CHIP_ERROR WebRTCRequestorDelegate::HandleOffer(uint16_t sessionId, const OfferArgs & args, WebRTCSessionTypeStruct & outSession)
+CHIP_ERROR WebRTCRequestorDelegate::HandleOffer(uint16_t sessionId, const OfferArgs & args)
 {
     ChipLogProgress(Camera, "WebRTCRequestorDelegate::HandleOffer");
     return CHIP_NO_ERROR;

@@ -318,6 +318,8 @@ public:
      * @param aSnapshotCapabilities             Indicates the set of supported snapshot capabilities by the device, e.g., the image
      *                                          codec, the resolution and the maximum frame rate.
      * @param aMaxNetworkBandwidth              Indicates the maximum network bandwidth (in mbps) that the device would consume
+     * @param aSupportedStreamUsages            Indicates the possible stream types available
+     * @param aRankedStreamPriorities           Indicates the priority ranking of the available streams
      * for the transmission of its media streams.
      *
      */
@@ -329,7 +331,8 @@ public:
                              uint32_t aMaxContentBufferSize, const AudioCapabilitiesStruct & aMicrophoneCapabilities,
                              const AudioCapabilitiesStruct & aSpkrCapabilities, TwoWayTalkSupportTypeEnum aTwoWayTalkSupport,
                              const std::vector<SnapshotCapabilitiesStruct> & aSnapshotCapabilities, uint32_t aMaxNetworkBandwidth,
-                             const std::vector<StreamUsageEnum> & aSupportedStreamUsages);
+                             const std::vector<StreamUsageEnum> & aSupportedStreamUsages,
+                             const std::vector<StreamUsageEnum> & aRankedStreamPriorities);
 
     ~CameraAVStreamMgmtServer() override;
 
