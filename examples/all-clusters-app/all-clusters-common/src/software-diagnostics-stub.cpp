@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/software-diagnostics-server/CodegenIntegration.h>
+#include <app/clusters/software-diagnostics-server/software-fault-listener.h>
 #include <event-triggers/SoftwareDiagnosticsTestEventTriggerHandler.h>
 #include <lib/support/CHIPMemString.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -45,7 +45,7 @@ void SetTestEventTrigger_SoftwareFaultOccurred()
         softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(timeChar), strlen(timeChar)));
     }
 
-    Clusters::SoftwareDiagnosticsServer::Instance().OnSoftwareFaultDetect(softwareFault);
+    Clusters::SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(softwareFault);
 }
 
 } // namespace

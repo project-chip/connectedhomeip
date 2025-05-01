@@ -16,23 +16,27 @@
  */
 #pragma once
 
-#include <clusters/SoftwareDiagnostics/Events.h>
+#include <app/clusters/software-diagnostics-server/software-fault-listener.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
+namespace SoftwareDiagnostics {
+namespace {
+SoftwareFaultListener * gListener = nullptr;
+} // namespace
 
-class SoftwareDiagnosticsServer
+SoftwareFaultListener * GetGlobalListener()
 {
-public:
-    static SoftwareDiagnosticsServer & Instance()
-    {
-        static SoftwareDiagnosticsServer instance;
-        return instance;
-    }
-    void OnSoftwareFaultDetect(const chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::Type & softwareFault);
-};
+    return gListener;
+}
 
+void SoftwareFaultListener::SetGlobalListener(SoftwareFaultListener * newValue)
+{
+    gListener = newValue;
+}
+
+} // namespace SoftwareDiagnostics
 } // namespace Clusters
 } // namespace app
 } // namespace chip

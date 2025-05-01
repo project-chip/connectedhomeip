@@ -248,8 +248,26 @@ template("chip_data_model") {
       defines = []
     }
 
+    # A list of clusters that have a standardized layout. Specifically:
+    #   - "src/app/clusters/${cluster}/BUILD.gn" exists with a ${cluster} (i.e. default) target
+    #   - code generation integration resides in "src/app/clusters/${cluster}/CodegenIntegration.cpp" ]
+    #
+    # In these cases the data model will:
+    #   - add dependency on the cluster (i.e. let BUILD.gn manage source files)
+    #   - directly include "CodegenIntegration.cpp" to have access to application-specific
+    #     code generated data
+    _code_backed_clusters = [
+      "software-diagnostics-server",
+      "ota-provider",
+    ]
+
     foreach(cluster, _cluster_sources) {
-      if (cluster == "door-lock-server") {
+      # is code backed means that $cluster will be included in the list of code backed names
+      _is_code_backed = filter_include(_code_backed_clusters, [ cluster ])
+      if (_is_code_backed != []) {
+        deps += [ "${_app_root}/clusters/${cluster}" ]
+        sources += [ "${_app_root}/clusters/${cluster}/CodegenIntegration.cpp" ]
+      } else if (cluster == "door-lock-server") {
         sources += [
           "${_app_root}/clusters/${cluster}/door-lock-server-callback.cpp",
           "${_app_root}/clusters/${cluster}/door-lock-server.cpp",
@@ -280,9 +298,6 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
         ]
         deps += [ "${chip_root}/src/controller" ]
-      } else if (cluster == "ota-provider") {
-        deps += [ "${_app_root}/clusters/${cluster}" ]
-        sources += [ "${_app_root}/clusters/${cluster}/CodegenIntegration.cpp" ]
       } else if (cluster == "ota-requestor") {
         sources += [
           # TODO - align name of folder ?
@@ -517,9 +532,6 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/${cluster}.h",
         ]
-      } else if (cluster == "software-diagnostics-server") {
-        deps += [ "${_app_root}/clusters/${cluster}" ]
-        sources += [ "${_app_root}/clusters/${cluster}/CodegenIntegration.cpp" ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
       }

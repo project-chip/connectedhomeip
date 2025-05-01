@@ -14,8 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/clusters/software-diagnostics-server/CodegenIntegration.h>
-
 #include <app/clusters/software-diagnostics-server/software-diagnostics-cluster.h>
 #include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
 #include <app/static-cluster-config/SoftwareDiagnostics.h>
@@ -47,20 +45,3 @@ void MatterSoftwareDiagnosticsPluginServerShutdownCallback()
 {
     LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster()));
 }
-
-namespace chip {
-namespace app {
-namespace Clusters {
-
-void SoftwareDiagnosticsServer::OnSoftwareFaultDetect(const SoftwareDiagnostics::Events::SoftwareFault::Type & softwareFault)
-{
-    ChipLogDetail(Zcl, "SoftwareDiagnosticsDelegate: OnSoftwareFaultDetected");
-    if (!gServer.Cluster().Emit(softwareFault))
-    {
-        ChipLogError(Zcl, "SoftwareDiagnosticsDelegate: Failed to record SoftwareFault event");
-    }
-}
-
-} // namespace Clusters
-} // namespace app
-} // namespace chip
