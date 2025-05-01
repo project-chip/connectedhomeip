@@ -4000,7 +4000,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     os_unfair_lock_assert_owner(&self->_lock);
 
     if (dataVersion == nil || clusterPath == nil) {
-        MTR_LOG_ERROR("%@ Attempted to update data version with a nil value. ClusterPath: %@, NewVersion: %@", self, clusterPath, newVersion);
+        MTR_LOG_ERROR("%@ Attempted to update data version with a nil value. clusterPath: %@, dataVersion: %@", self, clusterPath, dataVersion);
         return;
     }
 
