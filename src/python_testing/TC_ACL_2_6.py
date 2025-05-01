@@ -187,7 +187,7 @@ class TC_ACL_2_6(MatterBaseTest):
                     if event_data.latestValue == acl_entry:
                         found = True
                         break
-                asserts.assert_true(found, f"Event data doesn't match any expected ACL entry")
+                asserts.assert_true(found, "Event data doesn't match any expected ACL entry")
 
         # Log events for debugging
         logging.info("Most recent subscription events:")
