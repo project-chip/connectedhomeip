@@ -44,8 +44,18 @@ Status PrintOnlyDelegate::HandleStep(const StepDirectionEnum & direction, const 
 
 CHIP_ERROR ClosureDimensionEndpoint::Init()
 {
-    ClusterConformance conformance = { .featureMap = 255, .supportsOverflow = true };
-    ReturnErrorOnFailure(mLogic.Init(conformance));
+    ClusterConformance conformance;
+    conformance.FeatureMap()
+        .Set(Feature::kPositioning)
+        .Set(Feature::kMotionLatching)
+        .Set(Feature::kUnit)
+        .Set(Feature::kLimitation)
+        .Set(Feature::kSpeed);
+    conformance.OptionalAttributes().Set(OptionalAttributeEnum::kOverflow);
+
+    ClusterInitParameters clusterInitParameters;
+
+    ReturnErrorOnFailure(mLogic.Init(conformance, clusterInitParameters));
     ReturnErrorOnFailure(mInterface.Init());
     return CHIP_NO_ERROR;
 }
