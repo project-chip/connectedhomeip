@@ -25,7 +25,9 @@
 #include "DeviceCallbacks.h"
 #include "AppTask.h"
 #include "Globals.h"
-
+#if DLPS_EN
+#include "matter_gpio.h"
+#endif
 #include "BindingHandler.h"
 #include "CHIPDeviceManager.h"
 #include "app/clusters/bindings/BindingManager.h"
@@ -155,6 +157,10 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
         break;
 
     case DeviceEventType::kServerReady: {
+#if DLPS_EN
+        matter_gpio_allow_to_enter_dlps();
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
         if (!isOTAInitialized)
         {
