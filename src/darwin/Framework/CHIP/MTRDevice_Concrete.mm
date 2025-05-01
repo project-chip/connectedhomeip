@@ -3999,6 +3999,11 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
+    if (dataVersion == nil || clusterPath == nil) {
+        MTR_LOG_ERROR("%@ Attempted to update data version with a nil value. ClusterPath: %@, NewVersion: %@", self, clusterPath, newVersion);
+        return;
+    }
+
     BOOL dataVersionChanged = NO;
     // Update data version used for subscription filtering
     MTRDeviceClusterData * clusterData = [self _clusterDataForPath:clusterPath];
