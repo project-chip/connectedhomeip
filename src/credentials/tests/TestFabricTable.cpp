@@ -3340,8 +3340,8 @@ TEST_F(TestFabricTable, SettingVvscFailsWithIcacAndSucceedWithout)
     {
         bool fabricTableWasChanged = false;
         EXPECT_EQ(fabricTable.SetVIDVerificationStatementElements(/* fabricIndex = */ 1, /* vendorId = */ chip::NullOptional,
-                                                                  NullOptional,
-                                                                  chip::MakeOptional<>(vvscSpan), fabricTableWasChanged),
+                                                                  NullOptional, chip::MakeOptional<>(vvscSpan),
+                                                                  fabricTableWasChanged),
                   CHIP_ERROR_INCORRECT_STATE);
         EXPECT_EQ(fabricTableWasChanged, false);
     }
@@ -3350,8 +3350,8 @@ TEST_F(TestFabricTable, SettingVvscFailsWithIcacAndSucceedWithout)
     {
         bool fabricTableWasChanged = false;
         EXPECT_EQ(fabricTable.SetVIDVerificationStatementElements(/* fabricIndex = */ 2, /* vendorId = */ chip::NullOptional,
-                                                                  NullOptional,
-                                                                  chip::MakeOptional<>(vvscSpan), fabricTableWasChanged),
+                                                                  NullOptional, chip::MakeOptional<>(vvscSpan),
+                                                                  fabricTableWasChanged),
                   CHIP_NO_ERROR);
         EXPECT_EQ(fabricTableWasChanged, false);
 
@@ -3359,34 +3359,34 @@ TEST_F(TestFabricTable, SettingVvscFailsWithIcacAndSucceedWithout)
         vvsc[1]               = 0x00;
         fabricTableWasChanged = false;
         EXPECT_EQ(fabricTable.SetVIDVerificationStatementElements(/* fabricIndex = */ 2, /* vendorId = */ chip::NullOptional,
-                                                                  NullOptional,
-                                                                  chip::MakeOptional<>(vvscSpan), fabricTableWasChanged),
+                                                                  NullOptional, chip::MakeOptional<>(vvscSpan),
+                                                                  fabricTableWasChanged),
                   CHIP_NO_ERROR);
         EXPECT_EQ(fabricTableWasChanged, false);
 
         // The VVSC should match by the end.
         uint8_t actualVvsc[kMaxCHIPCertLength];
         MutableByteSpan actualVvscSpan{ actualVvsc };
-        EXPECT_EQ(fabricTableHolder.GetOpCertStore().GetVidVerificationElement(
-                      /* fabricIndex = */ 2,
-                      Credentials::OperationalCertificateStore::VidVerificationElement::kVvsc, actualVvscSpan),
-                  CHIP_NO_ERROR);
+        EXPECT_EQ(
+            fabricTableHolder.GetOpCertStore().GetVidVerificationElement(
+                /* fabricIndex = */ 2, Credentials::OperationalCertificateStore::VidVerificationElement::kVvsc, actualVvscSpan),
+            CHIP_NO_ERROR);
         EXPECT_TRUE(actualVvscSpan.data_equal(vvscSpan));
 
         // Erase VVSC with empty span.
         fabricTableWasChanged = false;
         EXPECT_EQ(fabricTable.SetVIDVerificationStatementElements(/* fabricIndex = */ 2, /* vendorId = */ chip::NullOptional,
-                                                                  NullOptional,
-                                                                  chip::MakeOptional<>(emptyVvscSpan), fabricTableWasChanged),
+                                                                  NullOptional, chip::MakeOptional<>(emptyVvscSpan),
+                                                                  fabricTableWasChanged),
                   CHIP_NO_ERROR);
         EXPECT_EQ(fabricTableWasChanged, false);
 
         // The VVSC should be empty now.
         actualVvscSpan = MutableByteSpan{ actualVvsc };
-        EXPECT_EQ(fabricTableHolder.GetOpCertStore().GetVidVerificationElement(
-                      /* fabricIndex = */ 2,
-                      Credentials::OperationalCertificateStore::VidVerificationElement::kVvsc, actualVvscSpan),
-                  CHIP_NO_ERROR);
+        EXPECT_EQ(
+            fabricTableHolder.GetOpCertStore().GetVidVerificationElement(
+                /* fabricIndex = */ 2, Credentials::OperationalCertificateStore::VidVerificationElement::kVvsc, actualVvscSpan),
+            CHIP_NO_ERROR);
         EXPECT_TRUE(actualVvscSpan.empty());
     }
 
@@ -3394,16 +3394,16 @@ TEST_F(TestFabricTable, SettingVvscFailsWithIcacAndSucceedWithout)
     {
         bool fabricTableWasChanged = false;
         EXPECT_EQ(fabricTable.SetVIDVerificationStatementElements(/* fabricIndex = */ 2, /* vendorId = */ chip::NullOptional,
-                                                                  chip::MakeOptional<>(vvsSpan),
-                                                                  NullOptional, fabricTableWasChanged),
+                                                                  chip::MakeOptional<>(vvsSpan), NullOptional,
+                                                                  fabricTableWasChanged),
                   CHIP_NO_ERROR);
         EXPECT_EQ(fabricTableWasChanged, true);
 
         // Re-set VVS, should succeed again, but no fabric table changes seen.
         fabricTableWasChanged = false;
         EXPECT_EQ(fabricTable.SetVIDVerificationStatementElements(/* fabricIndex = */ 2, /* vendorId = */ chip::NullOptional,
-                                                                  chip::MakeOptional<>(vvsSpan),
-                                                                  NullOptional, fabricTableWasChanged),
+                                                                  chip::MakeOptional<>(vvsSpan), NullOptional,
+                                                                  fabricTableWasChanged),
                   CHIP_NO_ERROR);
         EXPECT_EQ(fabricTableWasChanged, false);
 
@@ -3411,8 +3411,8 @@ TEST_F(TestFabricTable, SettingVvscFailsWithIcacAndSucceedWithout)
         vvs[1]                = 0x02;
         fabricTableWasChanged = false;
         EXPECT_EQ(fabricTable.SetVIDVerificationStatementElements(/* fabricIndex = */ 2, /* vendorId = */ chip::NullOptional,
-                                                                  chip::MakeOptional<>(vvsSpan),
-                                                                  NullOptional, fabricTableWasChanged),
+                                                                  chip::MakeOptional<>(vvsSpan), NullOptional,
+                                                                  fabricTableWasChanged),
                   CHIP_NO_ERROR);
         EXPECT_EQ(fabricTableWasChanged, true);
 
