@@ -323,11 +323,17 @@ class TC_ACL_2_3(MatterBaseTest):
         # Read AccessControlExtension attribute for TH1 value is D_OK_FULL
         ac_extension_value4 = await self.read_single_attribute_check_success(endpoint=0, cluster=ac_cluster, attribute=ac_extension_attr)
         logging.info(f"AccessControlExtension: {str(ac_extension_value4)}")
-        asserts.assert_equal(
-            ac_extension_value4[0].data,
-            D_OK_EMPTY,
-            "AccessControlExtension is D_OK_FULL from test step 8 as last successfully written extension")
-
+        if force_legacy_encoding:
+            asserts.assert_equal(
+                ac_extension_value4[0].data,
+                D_OK_EMPTY,
+                "AccessControlExtension is D_OK_EMPTY from test step 17 as last successfully written extension if older list method")
+        else:
+            asserts.assert_equal(
+                ac_extension_value4[0].data,
+                D_OK_FULL,
+                "AccessControlExtension is D_OK_FULL from test step 8 as last successfully written extension if new list method")
+        
         self.step(19)
         # Write AccessControlExtension attribute for TH1 value is an empty list
         extensions_list12 = []
