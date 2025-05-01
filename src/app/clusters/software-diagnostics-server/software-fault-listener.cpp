@@ -24,7 +24,7 @@ namespace {
 SoftwareFaultListener * gListener = nullptr;
 } // namespace
 
-SoftwareFaultListener * GetGlobalListener()
+SoftwareFaultListener * SoftwareFaultListener::GetGlobalListener()
 {
     return gListener;
 }
