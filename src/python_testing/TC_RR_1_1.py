@@ -203,7 +203,8 @@ class TC_RR_1_1(MatterBaseTest):
         vid_verification_statement = generate_vid_verification_statement(current_fabric_index)
         await self.send_single_cmd(cmd=Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement(VIDVerificationStatement=vid_verification_statement))
 
-        fabric_table_entries_to_check[fabric_index] = FabricTableEntryToCheck(fabric_id=dev_ctrl.fabricId, node_id=self.dut_node_id, vid_verifification_statement=vid_verification_statement, root_public_key=dev_ctrl.rootPublicKeyBytes)
+        fabric_table_entries_to_check[fabric_index] = FabricTableEntryToCheck(
+            fabric_id=dev_ctrl.fabricId, node_id=self.dut_node_id, vid_verifification_statement=vid_verification_statement, root_public_key=dev_ctrl.rootPublicKeyBytes)
 
         # Step 1d - Ensure there are no leftover fabrics from another process.
         logging.info("Step 1d: Remove all other fabrics other than the main one used for the test")
@@ -212,7 +213,8 @@ class TC_RR_1_1(MatterBaseTest):
                 dev_ctrl, node_id=self.dut_node_id, endpoint=0,
                 attribute=Clusters.OperationalCredentials.Attributes.Fabrics, fabricFiltered=False)
             for fabric in fabrics:
-                logging.info(f"-> Fabric at FabricIndex={fabric.fabricIndex}, FabricID: {fabric.fabricID}, NodeID: {fabric.nodeID}, Root Public key: {base64.b64encode(fabric.rootPublicKey)}")
+                logging.info(
+                    f"-> Fabric at FabricIndex={fabric.fabricIndex}, FabricID: {fabric.fabricID}, NodeID: {fabric.nodeID}, Root Public key: {base64.b64encode(fabric.rootPublicKey)}")
                 if fabric.fabricIndex == current_fabric_index:
                     continue
 
@@ -247,7 +249,8 @@ class TC_RR_1_1(MatterBaseTest):
             vid_verification_statement = generate_vid_verification_statement(fabric_index)
             await self.send_single_cmd(dev_ctrl=new_admin_ctrl, node_id=new_node_id, cmd=Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement(VIDVerificationStatement=vid_verification_statement))
 
-            fabric_table_entries_to_check[fabric_index] = FabricTableEntryToCheck(fabric_id=new_admin_ctrl.fabricId, node_id=new_node_id, vid_verifification_statement=vid_verification_statement, root_public_key=new_admin_ctrl.rootPublicKeyBytes)
+            fabric_table_entries_to_check[fabric_index] = FabricTableEntryToCheck(
+                fabric_id=new_admin_ctrl.fabricId, node_id=new_node_id, vid_verifification_statement=vid_verification_statement, root_public_key=new_admin_ctrl.rootPublicKeyBytes)
 
             new_admin_ctrl.name = generate_controller_name(fabric_index, 0)
             client_list.append(new_admin_ctrl)
@@ -280,17 +283,23 @@ class TC_RR_1_1(MatterBaseTest):
             endpoint=0, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, fabricFiltered=False)
 
         for fabric in fabric_table:
-            logging.info(f"-> Fabric at FabricIndex={fabric.fabricIndex}, FabricID: {fabric.fabricID}, NodeID: {fabric.nodeID}, Root Public key: {base64.b64encode(fabric.rootPublicKey)}")
+            logging.info(
+                f"-> Fabric at FabricIndex={fabric.fabricIndex}, FabricID: {fabric.fabricID}, NodeID: {fabric.nodeID}, Root Public key: {base64.b64encode(fabric.rootPublicKey)}")
 
-        asserts.assert_equal(set([f.fabricIndex for f in fabric_table]), set(fabric_table_entries_to_check.keys()), "Fabric table read did not have matching fabricIndex entries compared to expected fabrics configured!")
+        asserts.assert_equal(set([f.fabricIndex for f in fabric_table]), set(fabric_table_entries_to_check.keys(
+        )), "Fabric table read did not have matching fabricIndex entries compared to expected fabrics configured!")
 
         for fabric in fabric_table:
             expected_entry = fabric_table_entries_to_check[fabric.fabricIndex]
 
-            asserts.assert_equal(fabric.VIDVerificationStatement, expected_entry.vid_verifification_statement, f"VID Verification statement for FabricIndex {fabric.fabricIndex} must be correct")
-            asserts.assert_equal(fabric.nodeID, expected_entry.node_id, f"Node ID for FabricIndex {fabric.fabricIndex} must be correct")
-            asserts.assert_equal(fabric.fabricID, expected_entry.fabric_id, f"Fabric ID for FabricIndex {fabric.fabricIndex} must be correct")
-            asserts.assert_equal(fabric.rootPublicKey, expected_entry.root_public_key, f"Root Public Key for FabricIndex {fabric.fabricIndex} must be correct")
+            asserts.assert_equal(fabric.VIDVerificationStatement, expected_entry.vid_verifification_statement,
+                                 f"VID Verification statement for FabricIndex {fabric.fabricIndex} must be correct")
+            asserts.assert_equal(fabric.nodeID, expected_entry.node_id,
+                                 f"Node ID for FabricIndex {fabric.fabricIndex} must be correct")
+            asserts.assert_equal(fabric.fabricID, expected_entry.fabric_id,
+                                 f"Fabric ID for FabricIndex {fabric.fabricIndex} must be correct")
+            asserts.assert_equal(fabric.rootPublicKey, expected_entry.root_public_key,
+                                 f"Root Public Key for FabricIndex {fabric.fabricIndex} must be correct")
 
         client_by_name = {client.name: client for client in client_list}
         local_session_id_by_client_name = {client.name: client.GetConnectedDeviceSync(
