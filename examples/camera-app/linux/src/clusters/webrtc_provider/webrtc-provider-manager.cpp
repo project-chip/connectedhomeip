@@ -290,6 +290,7 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideAnswer(uint16_t sessionId, const 
 
     mPeerConnection->setRemoteDescription(sdpAnswer);
 
+    MoveToState(State::SendingICECandidates);
     ScheduleICECandidatesSend();
 
     return CHIP_NO_ERROR;
@@ -397,8 +398,6 @@ void WebRTCProviderManager::ScheduleOfferSend()
         caseSessionMgr->FindOrEstablishSession(mPeerId, &mOnConnectedCallback, &mOnConnectionFailureCallback,
                                                TransportPayloadCapability::kLargePayload);
     });
-
-    MoveToState(State::Idle);
 }
 
 void WebRTCProviderManager::ScheduleAnswerSend()
@@ -416,8 +415,6 @@ void WebRTCProviderManager::ScheduleAnswerSend()
         caseSessionMgr->FindOrEstablishSession(mPeerId, &mOnConnectedCallback, &mOnConnectionFailureCallback,
                                                TransportPayloadCapability::kLargePayload);
     });
-
-    MoveToState(State::Idle);
 }
 
 void WebRTCProviderManager::ScheduleICECandidatesSend()
@@ -435,8 +432,6 @@ void WebRTCProviderManager::ScheduleICECandidatesSend()
         caseSessionMgr->FindOrEstablishSession(mPeerId, &mOnConnectedCallback, &mOnConnectionFailureCallback,
                                                TransportPayloadCapability::kLargePayload);
     });
-
-    MoveToState(State::Idle);
 }
 
 void WebRTCProviderManager::OnDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
@@ -454,14 +449,17 @@ void WebRTCProviderManager::OnDeviceConnected(void * context, Messaging::Exchang
     {
     case CommandType::kOffer:
         err = self->SendOfferCommand(exchangeMgr, sessionHandle);
+        self->MoveToState(State::Idle);
         break;
 
     case CommandType::kAnswer:
         err = self->SendAnswerCommand(exchangeMgr, sessionHandle);
+        self->MoveToState(State::Idle);
         break;
 
     case CommandType::kICECandidates:
         err = self->SendICECandidatesCommand(exchangeMgr, sessionHandle);
+        self->MoveToState(State::Idle);
         break;
 
     default:

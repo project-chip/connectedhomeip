@@ -116,6 +116,9 @@ private:
 
     uint16_t mCurrentSessionId = 0;
     std::string mLocalSdp;
+
+    // Each string in this vector represents a local ICE candidate used to facilitate the negotiation
+    // of peer-to-peer connections through NATs (Network Address Translators) and firewalls.
     std::vector<std::string> mLocalCandidates;
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnConnectedCallback;
