@@ -36,9 +36,9 @@
 
 import logging
 import math
-from dataclasses import dataclass, field
-from typing import Any, List
+from dataclasses import dataclass
 from enum import Enum
+from typing import Any
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
@@ -184,7 +184,7 @@ class TC_FAN_3_5(MatterBaseTest):
         else:
             asserts.fail(f"The {attribute.__name__} attribute was not found in the attribute reports")
 
-    async def verify_write_attribute_values(self, update: Update, expect_updates: bool, expected_attributes = None) -> None:
+    async def verify_write_attribute_values(self, update: Update, expect_updates: bool, expected_attributes=None) -> None:
         if expect_updates:
             self.attribute_subscription.reset()
 
@@ -357,7 +357,7 @@ class TC_FAN_3_5(MatterBaseTest):
         #  - Verify that the FanMode attribute is set to High (3)
         self.step("8a")
         step = cmd.Step(direction=sd_enum.kDecrease, wrap=True, lowestOff=True)
-        update = Update(step=step, action=ActionEnum.Command)        
+        update = Update(step=step, action=ActionEnum.Command)
         speed_setting_expected = self.speed_max
         percent_setting_expected = self.compute_percent_setting(speed_setting_expected)
         fan_mode_expected = fm_enum.kHigh
