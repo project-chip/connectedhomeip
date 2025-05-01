@@ -263,8 +263,6 @@ Global<DescriptorAttrAccess> gAttrAccess;
 
 CHIP_ERROR DescriptorAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    VerifyOrDie(aPath.mClusterId == Descriptor::Id);
-
     switch (aPath.mAttributeId)
     {
     case DeviceTypeList::Id: {
@@ -283,7 +281,7 @@ CHIP_ERROR DescriptorAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
         return ReadTagListAttribute(aPath.mEndpointId, aEncoder);
     }
     case ClusterRevision::Id: {
-        return ReadClusterRevision(aPath.mEndpointId, aEncoder);
+        return aEncoder.Encode(kClusterRevision);
     }
     case FeatureMap::Id: {
         return ReadFeatureMap(aPath.mEndpointId, aEncoder);

@@ -19,12 +19,15 @@
 #include "basic-information.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
 #include <app/SpecificationDefinedRevisions.h>
 #include <app/util/attribute-storage.h>
+#include <clusters/BasicInformation/Attributes.h>
+#include <clusters/BasicInformation/Events.h>
+#include <clusters/BasicInformation/Metadata.h>
+#include <clusters/BasicInformation/Structs.h>
 #include <lib/core/CHIPConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
@@ -89,8 +92,12 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
 
     switch (aPath.mAttributeId)
     {
+    case ClusterRevision::Id:
+        status = aEncoder.Encode(kRevision);
+        break;
+        
     case DataModelRevision::Id:
-        status = ReadDataModelRevision(aEncoder);
+        status = aEncoder.Encode(Revision::kDataModelRevision);
         break;
 
     case Location::Id:
@@ -321,12 +328,6 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
     }
 
     return status;
-}
-
-CHIP_ERROR BasicAttrAccess::ReadDataModelRevision(AttributeValueEncoder & aEncoder)
-{
-    uint16_t revision = Revision::kDataModelRevision;
-    return aEncoder.Encode(revision);
 }
 
 CHIP_ERROR BasicAttrAccess::ReadLocation(AttributeValueEncoder & aEncoder)
