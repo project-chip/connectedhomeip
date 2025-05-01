@@ -66,7 +66,6 @@ class TC_ACL_2_3(MatterBaseTest):
         current_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
         return current_fabric_index
 
-
     async def internal_test_TC_ACL_2_3(self, force_legacy_encoding: bool):
         self.step(1)
         self.th1 = self.default_controller
@@ -338,6 +337,7 @@ class TC_ACL_2_3(MatterBaseTest):
         await self.internal_test_TC_ACL_2_3(force_legacy_encoding=True)
         self.current_step_index = 0
         await self.internal_test_TC_ACL_2_3(force_legacy_encoding=False)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
