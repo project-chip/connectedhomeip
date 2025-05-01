@@ -203,7 +203,7 @@ class TC_RR_1_1(MatterBaseTest):
         vid_verification_statement = generate_vid_verification_statement(current_fabric_index)
         await self.send_single_cmd(cmd=Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement(VIDVerificationStatement=vid_verification_statement))
 
-        fabric_table_entries_to_check[fabric_index] = FabricTableEntryToCheck(
+        fabric_table_entries_to_check[current_fabric_index] = FabricTableEntryToCheck(
             fabric_id=dev_ctrl.fabricId, node_id=self.dut_node_id, vid_verifification_statement=vid_verification_statement, root_public_key=dev_ctrl.rootPublicKeyBytes)
 
         # Step 1d - Ensure there are no leftover fabrics from another process.
