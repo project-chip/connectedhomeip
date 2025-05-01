@@ -788,7 +788,7 @@ void CameraDevice::InitializeSnapshotStreams()
                                         ImageCodecEnum::kJpeg,
                                         kSnapshotStreamFrameRate /* FrameRate */,
                                         { kMinResolutionWidth, kMinResolutionHeight } /* MinResolution*/,
-                                        { kMinResolutionWidth, kMinResolutionHeight } /* MaxResolution */,
+                                        { kMaxResolutionWidth, kMaxResolutionHeight } /* MaxResolution */,
                                         90 /* Quality */,
                                         0 /* RefCount */ },
                                       false,

@@ -229,9 +229,9 @@ CHIP_ERROR CameraAVStreamMgmtServer::ReadAndEncodeAllocatedAudioStreams(const At
 
 CHIP_ERROR CameraAVStreamMgmtServer::ReadAndEncodeAllocatedSnapshotStreams(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
-    for (const auto & audioStream : mAllocatedAudioStreams)
+    for (const auto & snapshotStream : mAllocatedSnapshotStreams)
     {
-        ReturnErrorOnFailure(encoder.Encode(audioStream));
+        ReturnErrorOnFailure(encoder.Encode(snapshotStream));
     }
 
     return CHIP_NO_ERROR;
