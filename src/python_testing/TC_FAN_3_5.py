@@ -184,7 +184,7 @@ class TC_FAN_3_5(MatterBaseTest):
         else:
             asserts.fail(f"The {attribute.__name__} attribute was not found in the attribute reports")
 
-    async def verify_write_attribute_values(self, update: Update, expect_updates: bool, expected_attributes=None) -> None:
+    async def update_and_verify_attribute_values(self, update: Update, expect_updates: bool, expected_attributes=None) -> None:
         if expect_updates:
             self.attribute_subscription.reset()
 
@@ -267,7 +267,7 @@ class TC_FAN_3_5(MatterBaseTest):
             AttributeValueExpected(self.endpoint, attr.PercentSetting, ComparisonEnum.Equal, percent_setting),
             AttributeValueExpected(self.endpoint, attr.PercentCurrent, ComparisonEnum.Equal, percent_setting),
         ]
-        await self.verify_write_attribute_values(update, expect_updates=True, expected_attributes=write_expect)
+        await self.update_and_verify_attribute_values(update, expect_updates=True, expected_attributes=write_expect)
 
         # *** STEP 5a ***
         # TH sends command Step command with: Direction = Increase, Wrap = False, LowestOff = True
@@ -279,7 +279,7 @@ class TC_FAN_3_5(MatterBaseTest):
             AttributeValueExpected(self.endpoint, attr.PercentSetting, ComparisonEnum.GreaterThan, percent_setting),
             AttributeValueExpected(self.endpoint, attr.PercentCurrent, ComparisonEnum.GreaterThan, percent_setting),
         ]
-        await self.verify_write_attribute_values(update, expect_updates=True, expected_attributes=command_expect)
+        await self.update_and_verify_attribute_values(update, expect_updates=True, expected_attributes=command_expect)
 
         # *** STEP 6 ***
         # TH writes to the DUT the PercentSetting attribute with value 50
@@ -291,7 +291,7 @@ class TC_FAN_3_5(MatterBaseTest):
             AttributeValueExpected(self.endpoint, attr.PercentSetting, ComparisonEnum.Equal, percent_setting),
             AttributeValueExpected(self.endpoint, attr.PercentCurrent, ComparisonEnum.Equal, percent_setting),
         ]
-        await self.verify_write_attribute_values(update, expect_updates=True, expected_attributes=write_expect)
+        await self.update_and_verify_attribute_values(update, expect_updates=True, expected_attributes=write_expect)
 
         # *** STEP 6a ***
         # TH sends command Step command with: Direction = Decrease, Wrap = False, LowestOff = True
@@ -303,7 +303,7 @@ class TC_FAN_3_5(MatterBaseTest):
             AttributeValueExpected(self.endpoint, attr.PercentSetting, ComparisonEnum.LessThan, percent_setting),
             AttributeValueExpected(self.endpoint, attr.PercentCurrent, ComparisonEnum.LessThan, percent_setting),
         ]
-        await self.verify_write_attribute_values(update, expect_updates=True, expected_attributes=command_expect)
+        await self.update_and_verify_attribute_values(update, expect_updates=True, expected_attributes=command_expect)
 
         # *** STEP 7 ***
         # TH writes to the DUT the SpeedSetting attribute with value 0
@@ -315,7 +315,7 @@ class TC_FAN_3_5(MatterBaseTest):
             AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting),
             AttributeValueExpected(self.endpoint, attr.SpeedCurrent, ComparisonEnum.Equal, speed_setting),
         ]
-        await self.verify_write_attribute_values(update, expect_updates=True, expected_attributes=write_expect)
+        await self.update_and_verify_attribute_values(update, expect_updates=True, expected_attributes=write_expect)
 
         # *** STEP 7a ***
         # TH sends command Step command with: Direction = Decrease, Wrap = False, LowestOff = True
@@ -335,7 +335,7 @@ class TC_FAN_3_5(MatterBaseTest):
             AttributeValueExpected(self.endpoint, attr.PercentCurrent, ComparisonEnum.Equal, percent_setting_expected),
             AttributeValueExpected(self.endpoint, attr.FanMode, ComparisonEnum.Equal, fan_mode_expected),
         ]
-        await self.verify_write_attribute_values(update, expect_updates=False, expected_attributes=command_expect)
+        await self.update_and_verify_attribute_values(update, expect_updates=False, expected_attributes=command_expect)
 
         # *** STEP 8 ***
         # TH writes to the DUT the SpeedSetting attribute with value 0
@@ -347,7 +347,7 @@ class TC_FAN_3_5(MatterBaseTest):
             AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting),
             AttributeValueExpected(self.endpoint, attr.SpeedCurrent, ComparisonEnum.Equal, speed_setting),
         ]
-        await self.verify_write_attribute_values(update, expect_updates=False, expected_attributes=write_expect)
+        await self.update_and_verify_attribute_values(update, expect_updates=False, expected_attributes=write_expect)
 
         # *** STEP 8a ***
         # TH sends command Step command with: Direction = Decrease, Wrap = True, LowestOff = True
@@ -368,7 +368,7 @@ class TC_FAN_3_5(MatterBaseTest):
             AttributeValueExpected(self.endpoint, attr.PercentCurrent, ComparisonEnum.Equal, percent_setting_expected),
             AttributeValueExpected(self.endpoint, attr.FanMode, ComparisonEnum.Equal, fan_mode_expected),
         ]
-        await self.verify_write_attribute_values(update, expect_updates=True, expected_attributes=command_expect)
+        await self.update_and_verify_attribute_values(update, expect_updates=True, expected_attributes=command_expect)
 
         # *** STEP 9 ***
         # TH writes to the DUT the SpeedSetting attribute with value 1
@@ -380,7 +380,7 @@ class TC_FAN_3_5(MatterBaseTest):
             AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting),
             AttributeValueExpected(self.endpoint, attr.SpeedCurrent, ComparisonEnum.Equal, speed_setting),
         ]
-        await self.verify_write_attribute_values(update, expect_updates=True, expected_attributes=write_expect)
+        await self.update_and_verify_attribute_values(update, expect_updates=True, expected_attributes=write_expect)
 
         # *** STEP 9a ***
         # TH sends command Step command with: Direction = Decrease, Wrap = False, LowestOff = False
@@ -401,7 +401,7 @@ class TC_FAN_3_5(MatterBaseTest):
             AttributeValueExpected(self.endpoint, attr.PercentCurrent, ComparisonEnum.Equal, percent_setting_expected),
             AttributeValueExpected(self.endpoint, attr.FanMode, ComparisonEnum.Equal, fan_mode_expected),
         ]
-        await self.verify_write_attribute_values(update, expect_updates=False, expected_attributes=command_expect)
+        await self.update_and_verify_attribute_values(update, expect_updates=False, expected_attributes=command_expect)
 
         # *** STEP 10 ***
         # TH writes to the DUT the SpeedSetting attribute with value 1
@@ -413,7 +413,7 @@ class TC_FAN_3_5(MatterBaseTest):
             AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting),
             AttributeValueExpected(self.endpoint, attr.SpeedCurrent, ComparisonEnum.Equal, speed_setting),
         ]
-        await self.verify_write_attribute_values(update, expect_updates=False, expected_attributes=write_expect)
+        await self.update_and_verify_attribute_values(update, expect_updates=False, expected_attributes=write_expect)
 
         # *** STEP "10a" ***
         # TH sends command Step command with: Direction = Decrease, Wrap = False, LowestOff = True
@@ -433,7 +433,7 @@ class TC_FAN_3_5(MatterBaseTest):
             AttributeValueExpected(self.endpoint, attr.PercentCurrent, ComparisonEnum.Equal, percent_setting_expected),
             AttributeValueExpected(self.endpoint, attr.FanMode, ComparisonEnum.Equal, fan_mode_expected),
         ]
-        await self.verify_write_attribute_values(update, expect_updates=True, expected_attributes=command_expect)
+        await self.update_and_verify_attribute_values(update, expect_updates=True, expected_attributes=command_expect)
 
         # *** STEP 11 ***
         # TH writes to the DUT the SpeedSetting attribute with value 1
@@ -445,7 +445,7 @@ class TC_FAN_3_5(MatterBaseTest):
             AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting),
             AttributeValueExpected(self.endpoint, attr.SpeedCurrent, ComparisonEnum.Equal, speed_setting),
         ]
-        await self.verify_write_attribute_values(update, expect_updates=True, expected_attributes=write_expect)
+        await self.update_and_verify_attribute_values(update, expect_updates=True, expected_attributes=write_expect)
 
         # *** STEP 11a ***
         # TH sends command Step command with: Direction = Decrease, Wrap = True, LowestOff = False
@@ -466,7 +466,7 @@ class TC_FAN_3_5(MatterBaseTest):
             AttributeValueExpected(self.endpoint, attr.PercentCurrent, ComparisonEnum.Equal, percent_setting_expected),
             AttributeValueExpected(self.endpoint, attr.FanMode, ComparisonEnum.Equal, fan_mode_expected),
         ]
-        await self.verify_write_attribute_values(update, expect_updates=True, expected_attributes=command_expect)
+        await self.update_and_verify_attribute_values(update, expect_updates=True, expected_attributes=command_expect)
 
         # *** STEP 12 ***
         # TH writes to the DUT the SpeedSetting attribute with value SpeedMax
@@ -478,7 +478,7 @@ class TC_FAN_3_5(MatterBaseTest):
             AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting),
             AttributeValueExpected(self.endpoint, attr.SpeedCurrent, ComparisonEnum.Equal, speed_setting),
         ]
-        await self.verify_write_attribute_values(update, expect_updates=False, expected_attributes=write_expect)
+        await self.update_and_verify_attribute_values(update, expect_updates=False, expected_attributes=write_expect)
 
         # *** STEP 12a ***
         # TH sends command Step command with: Direction = Increase, Wrap = False, LowestOff = True
@@ -499,7 +499,7 @@ class TC_FAN_3_5(MatterBaseTest):
             AttributeValueExpected(self.endpoint, attr.PercentCurrent, ComparisonEnum.Equal, percent_setting_expected),
             AttributeValueExpected(self.endpoint, attr.FanMode, ComparisonEnum.Equal, fan_mode_expected),
         ]
-        await self.verify_write_attribute_values(update, expect_updates=False, expected_attributes=command_expect)
+        await self.update_and_verify_attribute_values(update, expect_updates=False, expected_attributes=command_expect)
 
         # *** STEP 13 ***
         # TH writes to the DUT the SpeedSetting attribute with value SpeedMax
@@ -511,7 +511,7 @@ class TC_FAN_3_5(MatterBaseTest):
             AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting),
             AttributeValueExpected(self.endpoint, attr.SpeedCurrent, ComparisonEnum.Equal, speed_setting),
         ]
-        await self.verify_write_attribute_values(update, expect_updates=False, expected_attributes=write_expect)
+        await self.update_and_verify_attribute_values(update, expect_updates=False, expected_attributes=write_expect)
 
         # *** STEP "13a" ***
         # TH sends command Step command with: Direction = Increase, Wrap = True, LowestOff = True
@@ -531,7 +531,7 @@ class TC_FAN_3_5(MatterBaseTest):
             AttributeValueExpected(self.endpoint, attr.PercentCurrent, ComparisonEnum.Equal, percent_setting_expected),
             AttributeValueExpected(self.endpoint, attr.FanMode, ComparisonEnum.Equal, fan_mode_expected),
         ]
-        await self.verify_write_attribute_values(update, expect_updates=True, expected_attributes=command_expect)
+        await self.update_and_verify_attribute_values(update, expect_updates=True, expected_attributes=command_expect)
 
 
 if __name__ == "__main__":
