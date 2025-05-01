@@ -139,7 +139,7 @@ class TC_ACL_2_5(MatterBaseTest):
             fabricFiltered=True,
             eventNumberFilter=latest_event_num
         )
-        
+
         # There should be exactly one event
         asserts.assert_equal(len(direct_events), 1, "Expected exactly one event from direct read")
         direct_event = direct_events[0]
@@ -155,8 +155,8 @@ class TC_ACL_2_5(MatterBaseTest):
 
         # Verify the actual values
         asserts.assert_equal(subscription_event.changeType,
-                           Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
-                           "Expected Added change type")
+                             Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
+                             "Expected Added change type")
         asserts.assert_in('chip.clusters.Types.Nullable', str(type(subscription_event.adminPasscodeID)),
                           "AdminPasscodeID should be Null")
         asserts.assert_equal(subscription_event.adminNodeID,
