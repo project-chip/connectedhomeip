@@ -73,6 +73,7 @@ typedef enum
     kFault_CHIPOBLESend, /**< Inject a GATT error when sending the first fragment of a chip message over BLE */
 #endif
     kFault_CASEServerBusy, /**< Respond to CASE_Sigma1 with a BUSY status */
+    kFault_ModifyWebRTCAnswerSessionId, /**< Change the session ID in the outgoing WebRTC Answer command */
     kFault_NumItems,
 } Id;
 
