@@ -713,7 +713,6 @@ void BaseApplication::OnIdentifyStart(Identify * identify)
     StartStatusLEDTimer();
 #endif
 }
-}
 
 void BaseApplication::OnIdentifyStop(Identify * identify)
 {
