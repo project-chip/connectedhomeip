@@ -133,7 +133,7 @@ class TC_ACL_2_3(MatterBaseTest):
     async def test_TC_ACL_2_3(self):
         # Get the force_legacy_encoding parameter from global test params, default to True if not specified
         force_legacy_encoding = self.user_params.get('force_legacy_encoding', True)
-    
+
         self.step(1)
         self.th1 = self.default_controller
         self.discriminator = random.randint(0, 4095)
@@ -333,7 +333,7 @@ class TC_ACL_2_3(MatterBaseTest):
                 ac_extension_value4[0].data,
                 D_OK_FULL,
                 "AccessControlExtension is D_OK_FULL from test step 8 as last successfully written extension if new list method")
-        
+
         self.step(19)
         # Write AccessControlExtension attribute for TH1 value is an empty list
         extensions_list12 = []
