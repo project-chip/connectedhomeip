@@ -159,24 +159,24 @@ class TC_ACL_2_6(MatterBaseTest):
                 self.dut_node_id,
                 events=[(0, acec_event)],
                 fabricFiltered=True
-            )   
+            )
             logging.info(f"Read events response (attempt {attempt + 1}): {events_response}")
-            
+
             if events_response:
                 # Get the most recent events from the read response
-                read_events = sorted([e.Data for e in events_response], 
-                                  key=lambda x: next(e.Header.EventNumber for e in events_response if e.Data == x),
-                                  reverse=True)[:2]
+                read_events = sorted([e.Data for e in events_response],
+                                     key=lambda x: next(e.Header.EventNumber for e in events_response if e.Data == x),
+                                     reverse=True)[:2]
                 if len(read_events) >= 2:
                     break
-            
+
             if attempt < max_retries - 1:
                 logging.info(f"Retrying event read in 1 second... (attempt {attempt + 1})")
                 await asyncio.sleep(1)
 
         # Verify we got the expected number of events
-        asserts.assert_true(len(read_events) >= 2, 
-                          f"Expected at least 2 events from read, but got {len(read_events)}")
+        asserts.assert_true(len(read_events) >= 2,
+                            f"Expected at least 2 events from read, but got {len(read_events)}")
 
         # Verify both read and subscription events match our expectations
         for event_source in [received_subscription_events, read_events]:
@@ -193,7 +193,7 @@ class TC_ACL_2_6(MatterBaseTest):
         logging.info("Most recent subscription events:")
         for event in received_subscription_events:
             logging.info(f"  {event}")
-        
+
         logging.info("Most recent read events:")
         for event in read_events:
             logging.info(f"  {event}")
@@ -226,8 +226,8 @@ class TC_ACL_2_6(MatterBaseTest):
                 for event in read_only:
                     logging.error(f"  {event}")
 
-        asserts.assert_equal(subscription_event_set, read_event_set, 
-                           "Most recent subscription events should match most recent read events (comparing relevant fields)")
+        asserts.assert_equal(subscription_event_set, read_event_set,
+                             "Most recent subscription events should match most recent read events (comparing relevant fields)")
 
         self.step(6)
         # Write invalid ACL attribute
@@ -257,9 +257,9 @@ class TC_ACL_2_6(MatterBaseTest):
         try:
             event_data = events_callback.wait_for_event_report(acec_event, timeout_sec=5)
             # Check if this event corresponds to the invalid entry
-            invalid_entry = invalid_acl_entries[1] 
-            if (event_data.latestValue.authMode == invalid_entry.authMode and 
-                event_data.latestValue.subjects == invalid_entry.subjects):
+            invalid_entry = invalid_acl_entries[1]
+            if (event_data.latestValue.authMode == invalid_entry.authMode and
+                    event_data.latestValue.subjects == invalid_entry.subjects):
                 asserts.fail(f"Received event for invalid entry after failed write: {event_data}")
             else:
                 logging.info(f"Received event but it's not for the invalid entry: {event_data}")
@@ -272,17 +272,18 @@ class TC_ACL_2_6(MatterBaseTest):
             self.dut_node_id,
             events=[(0, acec_event)],
             fabricFiltered=True,
-            eventNumberFilter=latest_event_num + 1  
+            eventNumberFilter=latest_event_num + 1
         )
-        
+
         # Check if any of the read events correspond to the invalid entry
-        invalid_entry = invalid_acl_entries[1] 
+        invalid_entry = invalid_acl_entries[1]
         for event in events_response:
-            if (event.Data.latestValue.authMode == invalid_entry.authMode and 
-                event.Data.latestValue.subjects == invalid_entry.subjects):
+            if (event.Data.latestValue.authMode == invalid_entry.authMode and
+                    event.Data.latestValue.subjects == invalid_entry.subjects):
                 asserts.fail(f"Found event for invalid entry in read response: {event.Data}")
 
         logging.info("No events found for invalid entry, as expected")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
