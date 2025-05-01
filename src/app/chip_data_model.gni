@@ -257,8 +257,8 @@ template("chip_data_model") {
     #   - directly include "CodegenIntegration.cpp" to have access to application-specific
     #     code generated data
     _code_backed_clusters = [
-      "software-diagnostics-server",
       "ota-provider",
+      "software-diagnostics-server",
     ]
 
     _code_backed_cluster_sources =
