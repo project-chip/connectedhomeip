@@ -45873,7 +45873,7 @@ class CameraAvStreamManagement(Cluster):
                 ClusterObjectFieldDescriptor(Label="maxConcurrentEncoders", Tag=0x00000000, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="maxEncodedPixelRate", Tag=0x00000001, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="videoSensorParams", Tag=0x00000002, Type=typing.Optional[CameraAvStreamManagement.Structs.VideoSensorParamsStruct]),
-                ClusterObjectFieldDescriptor(Label="nightVisionCapable", Tag=0x00000003, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="nightVisionUsesInfrared", Tag=0x00000003, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="minViewport", Tag=0x00000004, Type=typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct]),
                 ClusterObjectFieldDescriptor(Label="rateDistortionTradeOffPoints", Tag=0x00000005, Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.RateDistortionTradeOffPointsStruct]]),
                 ClusterObjectFieldDescriptor(Label="maxContentBufferSize", Tag=0x00000006, Type=uint),
@@ -45921,7 +45921,7 @@ class CameraAvStreamManagement(Cluster):
     maxConcurrentEncoders: typing.Optional[uint] = None
     maxEncodedPixelRate: typing.Optional[uint] = None
     videoSensorParams: typing.Optional[CameraAvStreamManagement.Structs.VideoSensorParamsStruct] = None
-    nightVisionCapable: typing.Optional[bool] = None
+    nightVisionUsesInfrared: typing.Optional[bool] = None
     minViewport: typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct] = None
     rateDistortionTradeOffPoints: typing.Optional[typing.List[CameraAvStreamManagement.Structs.RateDistortionTradeOffPointsStruct]] = None
     maxContentBufferSize: uint = 0
@@ -46037,6 +46037,7 @@ class CameraAvStreamManagement(Cluster):
             kOnScreenDisplay = 0x80
             kLocalStorage = 0x100
             kHighDynamicRange = 0x200
+            kNightVision = 0x400
 
     class Structs:
         @dataclass
@@ -46104,6 +46105,8 @@ class CameraAvStreamManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="referenceCount", Tag=6, Type=uint),
                         ClusterObjectFieldDescriptor(Label="encodedPixels", Tag=7, Type=bool),
                         ClusterObjectFieldDescriptor(Label="hardwareEncoder", Tag=8, Type=bool),
+                        ClusterObjectFieldDescriptor(Label="watermarkEnabled", Tag=9, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="OSDEnabled", Tag=10, Type=typing.Optional[bool]),
                     ])
 
             snapshotStreamID: 'uint' = 0
@@ -46115,6 +46118,8 @@ class CameraAvStreamManagement(Cluster):
             referenceCount: 'uint' = 0
             encodedPixels: 'bool' = False
             hardwareEncoder: 'bool' = False
+            watermarkEnabled: 'typing.Optional[bool]' = None
+            OSDEnabled: 'typing.Optional[bool]' = None
 
         @dataclass
         class SnapshotCapabilitiesStruct(ClusterObject):
@@ -46559,7 +46564,7 @@ class CameraAvStreamManagement(Cluster):
             value: typing.Optional[CameraAvStreamManagement.Structs.VideoSensorParamsStruct] = None
 
         @dataclass
-        class NightVisionCapable(ClusterAttributeDescriptor):
+        class NightVisionUsesInfrared(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000551

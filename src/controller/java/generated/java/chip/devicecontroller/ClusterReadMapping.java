@@ -18642,17 +18642,17 @@ public class ClusterReadMapping {
           readCameraAvStreamManagementMaxEncodedPixelRateCommandParams
         );
         result.put("readMaxEncodedPixelRateAttribute", readCameraAvStreamManagementMaxEncodedPixelRateAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readCameraAvStreamManagementNightVisionCapableCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readCameraAvStreamManagementNightVisionCapableAttributeInteractionInfo = new InteractionInfo(
+     Map<String, CommandParameterInfo> readCameraAvStreamManagementNightVisionUsesInfraredCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCameraAvStreamManagementNightVisionUsesInfraredAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.CameraAvStreamManagementCluster) cluster).readNightVisionCapableAttribute(
+            ((ChipClusters.CameraAvStreamManagementCluster) cluster).readNightVisionUsesInfraredAttribute(
               (ChipClusters.BooleanAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
-          readCameraAvStreamManagementNightVisionCapableCommandParams
+          readCameraAvStreamManagementNightVisionUsesInfraredCommandParams
         );
-        result.put("readNightVisionCapableAttribute", readCameraAvStreamManagementNightVisionCapableAttributeInteractionInfo);
+        result.put("readNightVisionUsesInfraredAttribute", readCameraAvStreamManagementNightVisionUsesInfraredAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readCameraAvStreamManagementRateDistortionTradeOffPointsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readCameraAvStreamManagementRateDistortionTradeOffPointsAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

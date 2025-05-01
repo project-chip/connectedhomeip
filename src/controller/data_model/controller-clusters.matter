@@ -9813,6 +9813,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
     kOnScreenDisplay = 0x80;
     kLocalStorage = 0x100;
     kHighDynamicRange = 0x200;
+    kNightVision = 0x400;
   }
 
   struct VideoResolutionStruct {
@@ -9847,6 +9848,8 @@ provisional cluster CameraAvStreamManagement = 1361 {
     int8u referenceCount = 6;
     boolean encodedPixels = 7;
     boolean hardwareEncoder = 8;
+    optional boolean watermarkEnabled = 9;
+    optional boolean OSDEnabled = 10;
   }
 
   struct SnapshotCapabilitiesStruct {
@@ -9898,7 +9901,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
   readonly attribute optional int8u maxConcurrentEncoders = 0;
   readonly attribute optional int32u maxEncodedPixelRate = 1;
   readonly attribute optional VideoSensorParamsStruct videoSensorParams = 2;
-  readonly attribute optional boolean nightVisionCapable = 3;
+  readonly attribute optional boolean nightVisionUsesInfrared = 3;
   readonly attribute optional VideoResolutionStruct minViewport = 4;
   readonly attribute optional RateDistortionTradeOffPointsStruct rateDistortionTradeOffPoints[] = 5;
   readonly attribute int32u maxContentBufferSize = 6;

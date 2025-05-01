@@ -12756,7 +12756,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000003: {
-                "attributeName": "NightVisionCapable",
+                "attributeName": "NightVisionUsesInfrared",
                 "attributeId": 0x00000003,
                 "type": "bool",
                 "reportable": True,

@@ -13824,6 +13824,8 @@ public static class CameraAvStreamManagementClusterSnapshotStreamStruct {
   public Integer referenceCount;
   public Boolean encodedPixels;
   public Boolean hardwareEncoder;
+  public Optional<Boolean> watermarkEnabled;
+  public Optional<Boolean> OSDEnabled;
   private static final long SNAPSHOT_STREAM_ID_ID = 0L;
   private static final long IMAGE_CODEC_ID = 1L;
   private static final long FRAME_RATE_ID = 2L;
@@ -13833,6 +13835,8 @@ public static class CameraAvStreamManagementClusterSnapshotStreamStruct {
   private static final long REFERENCE_COUNT_ID = 6L;
   private static final long ENCODED_PIXELS_ID = 7L;
   private static final long HARDWARE_ENCODER_ID = 8L;
+  private static final long WATERMARK_ENABLED_ID = 9L;
+  private static final long OSD_ENABLED_ID = 10L;
 
   public CameraAvStreamManagementClusterSnapshotStreamStruct(
     Integer snapshotStreamID,
@@ -13843,7 +13847,9 @@ public static class CameraAvStreamManagementClusterSnapshotStreamStruct {
     Integer quality,
     Integer referenceCount,
     Boolean encodedPixels,
-    Boolean hardwareEncoder
+    Boolean hardwareEncoder,
+    Optional<Boolean> watermarkEnabled,
+    Optional<Boolean> OSDEnabled
   ) {
     this.snapshotStreamID = snapshotStreamID;
     this.imageCodec = imageCodec;
@@ -13854,6 +13860,8 @@ public static class CameraAvStreamManagementClusterSnapshotStreamStruct {
     this.referenceCount = referenceCount;
     this.encodedPixels = encodedPixels;
     this.hardwareEncoder = hardwareEncoder;
+    this.watermarkEnabled = watermarkEnabled;
+    this.OSDEnabled = OSDEnabled;
   }
 
   public StructType encodeTlv() {
@@ -13867,6 +13875,8 @@ public static class CameraAvStreamManagementClusterSnapshotStreamStruct {
     values.add(new StructElement(REFERENCE_COUNT_ID, new UIntType(referenceCount)));
     values.add(new StructElement(ENCODED_PIXELS_ID, new BooleanType(encodedPixels)));
     values.add(new StructElement(HARDWARE_ENCODER_ID, new BooleanType(hardwareEncoder)));
+    values.add(new StructElement(WATERMARK_ENABLED_ID, watermarkEnabled.<BaseTLVType>map((nonOptionalwatermarkEnabled) -> new BooleanType(nonOptionalwatermarkEnabled)).orElse(new EmptyType())));
+    values.add(new StructElement(OSD_ENABLED_ID, OSDEnabled.<BaseTLVType>map((nonOptionalOSDEnabled) -> new BooleanType(nonOptionalOSDEnabled)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -13884,6 +13894,8 @@ public static class CameraAvStreamManagementClusterSnapshotStreamStruct {
     Integer referenceCount = null;
     Boolean encodedPixels = null;
     Boolean hardwareEncoder = null;
+    Optional<Boolean> watermarkEnabled = Optional.empty();
+    Optional<Boolean> OSDEnabled = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == SNAPSHOT_STREAM_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -13930,6 +13942,16 @@ public static class CameraAvStreamManagementClusterSnapshotStreamStruct {
           BooleanType castingValue = element.value(BooleanType.class);
           hardwareEncoder = castingValue.value(Boolean.class);
         }
+      } else if (element.contextTagNum() == WATERMARK_ENABLED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          watermarkEnabled = Optional.of(castingValue.value(Boolean.class));
+        }
+      } else if (element.contextTagNum() == OSD_ENABLED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          OSDEnabled = Optional.of(castingValue.value(Boolean.class));
+        }
       }
     }
     return new CameraAvStreamManagementClusterSnapshotStreamStruct(
@@ -13941,7 +13963,9 @@ public static class CameraAvStreamManagementClusterSnapshotStreamStruct {
       quality,
       referenceCount,
       encodedPixels,
-      hardwareEncoder
+      hardwareEncoder,
+      watermarkEnabled,
+      OSDEnabled
     );
   }
 
@@ -13975,6 +13999,12 @@ public static class CameraAvStreamManagementClusterSnapshotStreamStruct {
     output.append("\n");
     output.append("\thardwareEncoder: ");
     output.append(hardwareEncoder);
+    output.append("\n");
+    output.append("\twatermarkEnabled: ");
+    output.append(watermarkEnabled);
+    output.append("\n");
+    output.append("\tOSDEnabled: ");
+    output.append(OSDEnabled);
     output.append("\n");
     output.append("}\n");
     return output.toString();

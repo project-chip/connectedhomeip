@@ -4293,8 +4293,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "MaxEncodedPixelRate";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::VideoSensorParams::Id:
             return "VideoSensorParams";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::NightVisionCapable::Id:
-            return "NightVisionCapable";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::NightVisionUsesInfrared::Id:
+            return "NightVisionUsesInfrared";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::MinViewport::Id:
             return "MinViewport";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::RateDistortionTradeOffPoints::Id:

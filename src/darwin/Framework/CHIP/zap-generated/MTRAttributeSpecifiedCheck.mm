@@ -5861,7 +5861,7 @@ static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aA
     case Attributes::VideoSensorParams::Id: {
         return YES;
     }
-    case Attributes::NightVisionCapable::Id: {
+    case Attributes::NightVisionUsesInfrared::Id: {
         return YES;
     }
     case Attributes::MinViewport::Id: {

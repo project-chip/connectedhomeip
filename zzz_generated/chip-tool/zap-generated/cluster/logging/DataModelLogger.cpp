@@ -5798,6 +5798,22 @@ DataModelLogger::LogValue(const char * label, size_t indent,
             return err;
         }
     }
+    {
+        CHIP_ERROR err = LogValue("WatermarkEnabled", indent + 1, value.watermarkEnabled);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'WatermarkEnabled'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("OSDEnabled", indent + 1, value.OSDEnabled);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'OSDEnabled'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -19862,10 +19878,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("VideoSensorParams", 1, value);
         }
-        case CameraAvStreamManagement::Attributes::NightVisionCapable::Id: {
+        case CameraAvStreamManagement::Attributes::NightVisionUsesInfrared::Id: {
             bool value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("NightVisionCapable", 1, value);
+            return DataModelLogger::LogValue("NightVisionUsesInfrared", 1, value);
         }
         case CameraAvStreamManagement::Attributes::MinViewport::Id: {
             chip::app::Clusters::CameraAvStreamManagement::Structs::VideoResolutionStruct::DecodableType value;

@@ -17581,7 +17581,7 @@ public class ClusterIDMapping {
             MaxConcurrentEncoders(0L),
             MaxEncodedPixelRate(1L),
             VideoSensorParams(2L),
-            NightVisionCapable(3L),
+            NightVisionUsesInfrared(3L),
             MinViewport(4L),
             RateDistortionTradeOffPoints(5L),
             MaxContentBufferSize(6L),

@@ -6507,6 +6507,20 @@ ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.hardwareEncoder, value["hardwareEncoder"]));
     valueCopy.removeMember("hardwareEncoder");
 
+    if (value.isMember("watermarkEnabled"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "watermarkEnabled");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.watermarkEnabled, value["watermarkEnabled"]));
+    }
+    valueCopy.removeMember("watermarkEnabled");
+
+    if (value.isMember("OSDEnabled"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "OSDEnabled");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.OSDEnabled, value["OSDEnabled"]));
+    }
+    valueCopy.removeMember("OSDEnabled");
+
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -6521,6 +6535,8 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::CameraAvStreamManageme
     ComplexArgumentParser::Finalize(request.referenceCount);
     ComplexArgumentParser::Finalize(request.encodedPixels);
     ComplexArgumentParser::Finalize(request.hardwareEncoder);
+    ComplexArgumentParser::Finalize(request.watermarkEnabled);
+    ComplexArgumentParser::Finalize(request.OSDEnabled);
 }
 
 CHIP_ERROR

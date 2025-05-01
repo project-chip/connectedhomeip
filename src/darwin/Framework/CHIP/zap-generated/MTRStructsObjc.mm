@@ -9416,6 +9416,10 @@ NS_ASSUME_NONNULL_BEGIN
         _encodedPixels = @(0);
 
         _hardwareEncoder = @(0);
+
+        _watermarkEnabled = nil;
+
+        _osdEnabled = nil;
     }
     return self;
 }
@@ -9433,13 +9437,15 @@ NS_ASSUME_NONNULL_BEGIN
     other.referenceCount = self.referenceCount;
     other.encodedPixels = self.encodedPixels;
     other.hardwareEncoder = self.hardwareEncoder;
+    other.watermarkEnabled = self.watermarkEnabled;
+    other.osdEnabled = self.osdEnabled;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: snapshotStreamID:%@; imageCodec:%@; frameRate:%@; minResolution:%@; maxResolution:%@; quality:%@; referenceCount:%@; encodedPixels:%@; hardwareEncoder:%@; >", NSStringFromClass([self class]), _snapshotStreamID, _imageCodec, _frameRate, _minResolution, _maxResolution, _quality, _referenceCount, _encodedPixels, _hardwareEncoder];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: snapshotStreamID:%@; imageCodec:%@; frameRate:%@; minResolution:%@; maxResolution:%@; quality:%@; referenceCount:%@; encodedPixels:%@; hardwareEncoder:%@; watermarkEnabled:%@; osdEnabled:%@; >", NSStringFromClass([self class]), _snapshotStreamID, _imageCodec, _frameRate, _minResolution, _maxResolution, _quality, _referenceCount, _encodedPixels, _hardwareEncoder, _watermarkEnabled, _osdEnabled];
     return descriptionString;
 }
 

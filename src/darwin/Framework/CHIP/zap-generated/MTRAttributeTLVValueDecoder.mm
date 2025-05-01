@@ -17382,8 +17382,8 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
         }
         return value;
     }
-    case Attributes::NightVisionCapable::Id: {
-        using TypeInfo = Attributes::NightVisionCapable::TypeInfo;
+    case Attributes::NightVisionUsesInfrared::Id: {
+        using TypeInfo = Attributes::NightVisionUsesInfrared::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -17789,6 +17789,16 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
                 newElement_0.referenceCount = [NSNumber numberWithUnsignedChar:entry_0.referenceCount];
                 newElement_0.encodedPixels = [NSNumber numberWithBool:entry_0.encodedPixels];
                 newElement_0.hardwareEncoder = [NSNumber numberWithBool:entry_0.hardwareEncoder];
+                if (entry_0.watermarkEnabled.HasValue()) {
+                    newElement_0.watermarkEnabled = [NSNumber numberWithBool:entry_0.watermarkEnabled.Value()];
+                } else {
+                    newElement_0.watermarkEnabled = nil;
+                }
+                if (entry_0.OSDEnabled.HasValue()) {
+                    newElement_0.osdEnabled = [NSNumber numberWithBool:entry_0.OSDEnabled.Value()];
+                } else {
+                    newElement_0.osdEnabled = nil;
+                }
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();

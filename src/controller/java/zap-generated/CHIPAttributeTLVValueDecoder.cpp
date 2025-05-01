@@ -40708,8 +40708,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::NightVisionCapable::Id: {
-            using TypeInfo = Attributes::NightVisionCapable::TypeInfo;
+        case Attributes::NightVisionUsesInfrared::Id: {
+            using TypeInfo = Attributes::NightVisionUsesInfrared::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -41799,6 +41799,43 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
                     newElement_0_hardwareEncoderClassName.c_str(), newElement_0_hardwareEncoderCtorSignature.c_str(),
                     jninewElement_0_hardwareEncoder, newElement_0_hardwareEncoder);
+                jobject newElement_0_watermarkEnabled;
+                if (!entry_0.watermarkEnabled.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_watermarkEnabled);
+                }
+                else
+                {
+                    jobject newElement_0_watermarkEnabledInsideOptional;
+                    std::string newElement_0_watermarkEnabledInsideOptionalClassName     = "java/lang/Boolean";
+                    std::string newElement_0_watermarkEnabledInsideOptionalCtorSignature = "(Z)V";
+                    jboolean jninewElement_0_watermarkEnabledInsideOptional =
+                        static_cast<jboolean>(entry_0.watermarkEnabled.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
+                        newElement_0_watermarkEnabledInsideOptionalClassName.c_str(),
+                        newElement_0_watermarkEnabledInsideOptionalCtorSignature.c_str(),
+                        jninewElement_0_watermarkEnabledInsideOptional, newElement_0_watermarkEnabledInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_watermarkEnabledInsideOptional,
+                                                                      newElement_0_watermarkEnabled);
+                }
+                jobject newElement_0_OSDEnabled;
+                if (!entry_0.OSDEnabled.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_OSDEnabled);
+                }
+                else
+                {
+                    jobject newElement_0_OSDEnabledInsideOptional;
+                    std::string newElement_0_OSDEnabledInsideOptionalClassName     = "java/lang/Boolean";
+                    std::string newElement_0_OSDEnabledInsideOptionalCtorSignature = "(Z)V";
+                    jboolean jninewElement_0_OSDEnabledInsideOptional = static_cast<jboolean>(entry_0.OSDEnabled.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
+                        newElement_0_OSDEnabledInsideOptionalClassName.c_str(),
+                        newElement_0_OSDEnabledInsideOptionalCtorSignature.c_str(), jninewElement_0_OSDEnabledInsideOptional,
+                        newElement_0_OSDEnabledInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_OSDEnabledInsideOptional,
+                                                                      newElement_0_OSDEnabled);
+                }
 
                 {
                     jclass snapshotStreamStructStructClass_1;
@@ -41817,7 +41854,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Lchip/devicecontroller/"
                         "ChipStructs$CameraAvStreamManagementClusterVideoResolutionStruct;Lchip/devicecontroller/"
                         "ChipStructs$CameraAvStreamManagementClusterVideoResolutionStruct;Ljava/lang/Integer;Ljava/lang/"
-                        "Integer;Ljava/lang/Boolean;Ljava/lang/Boolean;)V",
+                        "Integer;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/util/Optional;Ljava/util/Optional;)V",
                         &snapshotStreamStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || snapshotStreamStructStructCtor_1 == nullptr)
                     {
@@ -41826,11 +41863,11 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         return nullptr;
                     }
 
-                    newElement_0 =
-                        env->NewObject(snapshotStreamStructStructClass_1, snapshotStreamStructStructCtor_1,
-                                       newElement_0_snapshotStreamID, newElement_0_imageCodec, newElement_0_frameRate,
-                                       newElement_0_minResolution, newElement_0_maxResolution, newElement_0_quality,
-                                       newElement_0_referenceCount, newElement_0_encodedPixels, newElement_0_hardwareEncoder);
+                    newElement_0 = env->NewObject(
+                        snapshotStreamStructStructClass_1, snapshotStreamStructStructCtor_1, newElement_0_snapshotStreamID,
+                        newElement_0_imageCodec, newElement_0_frameRate, newElement_0_minResolution, newElement_0_maxResolution,
+                        newElement_0_quality, newElement_0_referenceCount, newElement_0_encodedPixels, newElement_0_hardwareEncoder,
+                        newElement_0_watermarkEnabled, newElement_0_OSDEnabled);
                 }
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }

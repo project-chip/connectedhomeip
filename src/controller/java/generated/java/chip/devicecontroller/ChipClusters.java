@@ -60940,7 +60940,7 @@ public class ChipClusters {
     private static final long MAX_CONCURRENT_ENCODERS_ATTRIBUTE_ID = 0L;
     private static final long MAX_ENCODED_PIXEL_RATE_ATTRIBUTE_ID = 1L;
     private static final long VIDEO_SENSOR_PARAMS_ATTRIBUTE_ID = 2L;
-    private static final long NIGHT_VISION_CAPABLE_ATTRIBUTE_ID = 3L;
+    private static final long NIGHT_VISION_USES_INFRARED_ATTRIBUTE_ID = 3L;
     private static final long MIN_VIEWPORT_ATTRIBUTE_ID = 4L;
     private static final long RATE_DISTORTION_TRADE_OFF_POINTS_ATTRIBUTE_ID = 5L;
     private static final long MAX_CONTENT_BUFFER_SIZE_ATTRIBUTE_ID = 6L;
@@ -61515,9 +61515,9 @@ public class ChipClusters {
         }, VIDEO_SENSOR_PARAMS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readNightVisionCapableAttribute(
+    public void readNightVisionUsesInfraredAttribute(
         BooleanAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NIGHT_VISION_CAPABLE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NIGHT_VISION_USES_INFRARED_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -61525,12 +61525,12 @@ public class ChipClusters {
             Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, NIGHT_VISION_CAPABLE_ATTRIBUTE_ID, true);
+        }, NIGHT_VISION_USES_INFRARED_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeNightVisionCapableAttribute(
+    public void subscribeNightVisionUsesInfraredAttribute(
         BooleanAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NIGHT_VISION_CAPABLE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NIGHT_VISION_USES_INFRARED_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -61538,7 +61538,7 @@ public class ChipClusters {
             Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, NIGHT_VISION_CAPABLE_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, NIGHT_VISION_USES_INFRARED_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readMinViewportAttribute(
