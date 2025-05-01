@@ -34,7 +34,7 @@ namespace Clusters {
 
 /// Integration of Software diagnostics logic within the matter data model
 ///
-/// Translates between matter calls and OTA logic
+/// Translates between matter calls and Software Diagnostics logic
 ///
 /// This cluster is expected to only ever exist on endpoint 0 as it is a singleton cluster.
 template <typename LOGIC>
@@ -45,7 +45,7 @@ class SoftwareDiagnosticsServerCluster : public DefaultServerCluster,
 public:
     template <typename... Args>
     SoftwareDiagnosticsServerCluster(Args &&... args) :
-        DefaultServerCluster({ kRootEndpointId, OtaSoftwareUpdateProvider::Id }), LOGIC(std::forward<Args>(args)...)
+        DefaultServerCluster({ kRootEndpointId, SoftwareDiagnostics::Id }), LOGIC(std::forward<Args>(args)...)
     {}
 
     // software fault listener
