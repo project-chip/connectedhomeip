@@ -225,7 +225,7 @@ CHIP_ERROR AppTask::AppInit()
         GetLCD().ShowQRCode(true);
     }
 #endif // QR_CODE_ENABLED
-#endif
+#endif // DISPLAY_ENABLED
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
 

@@ -26,6 +26,11 @@
 #endif // QR_CODE_ENABLED
 
 #include "demo-ui.h"
+#ifdef SL_ENABLE_ICD_LCD
+#include <sl_sleeptimer.h>
+#endif // SL_ENABLE_ICD_LCD
+
+#include <lib/core/CHIPError.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
 class SilabsLCD
@@ -58,6 +63,12 @@ public:
         ICDMode_e icdMode                                                 = NotICD;
     } DisplayStatus_t;
 
+#ifdef SL_ENABLE_ICD_LCD
+    static const uint32_t kDefaultLCDTimeout   = 3000;
+    static const uint32_t kActivityLCDTimeout  = 5000;
+    static const uint32_t kQRCodeScreenTimeout = 10000;
+#endif // SL_ENABLE_ICD_LCD
+
     typedef void (*customUICB)(GLIB_Context_t * context);
     CHIP_ERROR Init(uint8_t * name = nullptr, bool initialState = false);
     void * Context();
@@ -73,6 +84,12 @@ public:
     void CycleScreens(void);
     void SetStatus(DisplayStatus_t & status);
     void WriteStatus();
+
+    CHIP_ERROR TurnOn(void);
+    CHIP_ERROR TurnOff(void);
+#ifdef SL_ENABLE_ICD_LCD
+    CHIP_ERROR TurnOff(uint32_t delayInMs);
+#endif // SL_ENABLE_ICD_LCD
 
 #ifdef QR_CODE_ENABLED
     void SetQRCode(uint8_t * str, uint32_t size);
@@ -95,13 +112,18 @@ private:
     GLIB_Context_t glibContext;
 
 #ifdef SL_DEMO_NAME
-    uint8_t mName[] = SL_DEMO_NAME
+    uint8_t mName[] = SL_DEMO_NAME;
 #else
     uint8_t mName[APP_NAME_MAX_LENGTH + 1];
 #endif
-        customUICB customUI = nullptr;
+    customUICB customUI = nullptr;
     DemoState_t dState;
 
     DisplayStatus_t mStatus;
     uint8_t mCurrentScreen = DemoScreen;
+
+#ifdef SL_ENABLE_ICD_LCD
+    sl_sleeptimer_timer_handle_t lcdTimerHandle;
+    static void LcdTimeoutCallback(sl_sleeptimer_timer_handle_t * handle, void * data);
+#endif // SL_ENABLE_ICD_LCD
 };
