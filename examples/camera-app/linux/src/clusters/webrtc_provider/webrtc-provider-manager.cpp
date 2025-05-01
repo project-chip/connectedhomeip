@@ -21,8 +21,8 @@
 #include <Options.h>
 #include <app/server/Server.h>
 #include <controller/InvokeInteraction.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <lib/support/CHIPFaultInjection.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <iostream>
 
@@ -328,8 +328,8 @@ CHIP_ERROR WebRTCProviderManager::SendAnswerCommand(Messaging::ExchangeManager &
 
     auto onFailure = [](CHIP_ERROR error) { ChipLogError(Camera, "Answer command failed: %" CHIP_ERROR_FORMAT, error.Format()); };
 
-    uint16_t sessionId = mCurrentSessionId; 
-    CHIP_FAULT_INJECT(FaultInjection::kFault_ModifyWebRTCAnswerSessionId, sessionId++);
+    uint16_t sessionId = mCurrentSessionId;
+    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_ModifyWebRTCAnswerSessionId, sessionId++);
 
     // Build the command
     WebRTCTransportRequestor::Commands::Answer::Type command;
