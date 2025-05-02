@@ -40,6 +40,8 @@
 #include <app/util/attribute-metadata.h>
 #include <app/util/attribute-storage.h>
 
+#include <zzz_generated/app-common/clusters/Descriptor/Metadata.h>
+
 using namespace chip;
 using namespace chip::app;
 
@@ -125,7 +127,7 @@ MTR_DIRECT_MEMBERS
 
 + (MTRServerCluster *)newDescriptorCluster
 {
-    return [[MTRServerCluster alloc] initInternalWithClusterID:@(MTRClusterIDTypeDescriptorID) revision:@(Clusters::Descriptor::kClusterRevision) accessGrants:[NSSet set] attributes:@[]];
+    return [[MTRServerCluster alloc] initInternalWithClusterID:@(MTRClusterIDTypeDescriptorID) revision:@(Clusters::Descriptor::kRevision) accessGrants:[NSSet set] attributes:@[]];
 }
 
 - (instancetype)initInternalWithClusterID:(NSNumber *)clusterID revision:(NSNumber *)revision accessGrants:(NSSet *)accessGrants attributes:(NSArray *)attributes
