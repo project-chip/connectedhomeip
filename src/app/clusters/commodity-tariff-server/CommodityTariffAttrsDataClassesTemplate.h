@@ -72,16 +72,32 @@ private:
     // Type extraction utilities (as shown previously)
     template<typename U>
     struct ExtractWrappedType { using type = U; };
+
     template<typename U>
     struct ExtractWrappedType<DataModel::Nullable<U>> { 
         using type = typename ExtractWrappedType<U>::type; 
     };
-    template<typename U>
-    struct ExtractWrappedType<DataModel::List<U>> { 
-        using type = typename ExtractWrappedType<U>::type; 
-    };
+
     template<typename U>
     using ExtractWrappedType_t = typename ExtractWrappedType<U>::type;
+
+    template<typename U>
+    struct ExtractPayloadType {
+        using type = U; // Base case - not a wrapper
+    };
+    
+    template<typename U>
+    struct ExtractPayloadType<DataModel::Nullable<U>> {
+        using type = typename ExtractPayloadType<U>::type;
+    };
+    
+    template<typename U>
+    struct ExtractPayloadType<DataModel::List<U>> {
+        using type = typename ExtractPayloadType<U>::type;
+    };
+
+    template<typename U>
+    using ExtractPayloadType_t = typename ExtractPayloadType<U>::type;
 
     // Helper to recursively unwrap values
     template<typename U>
@@ -99,21 +115,6 @@ private:
         if (value.empty()) return ExtractWrappedType_t<U>{};
         return unwrapValue(value.front()); // For lists, return the type of the first element
     }
-
-    template<typename U>
-    struct ExtractPayloadType {
-        using type = U; // Base case - not a wrapper
-    };
-    
-    template<typename U>
-    struct ExtractPayloadType<DataModel::Nullable<U>> {
-        using type = typename ExtractPayloadType<U>::type;
-    };
-    
-    template<typename U>
-    struct ExtractPayloadType<DataModel::List<U>> {
-        using type = typename ExtractPayloadType<U>::type;
-    };
     
     // Type categorization traits
     template<typename U>
@@ -130,20 +131,19 @@ private:
         !std::is_pointer<U>::value> {};
 public:
     using ValueType = T;
-    using WrappedType = ExtractWrappedType_t<T>;
-    using PayloadType = typename ExtractPayloadType<T>::type;
-
-    /// @brief Check if 
-    static constexpr bool IsValueNullable() {
-        return IsNullable<T>::value;
-    }
-
-    static constexpr bool IsValueList() {
-        return IsList<T>::value;
-    }
+    using WrappedType = ExtractWrappedType_t<ValueType>;
+    using PayloadType = ExtractPayloadType_t<WrappedType>;
 
     static constexpr bool IsValueNullableList() {
         return IsNullable<T>::value && IsList<WrappedType>::value;
+    }
+    
+    static constexpr bool IsValueNullable() {
+        return IsNullable<T>::value && !IsList<WrappedType>::value;
+    }
+    
+    static constexpr bool IsValueList() {
+        return IsList<T>::value;
     }
 
     /// @brief Check if the final payload is a struct
@@ -165,6 +165,18 @@ public:
     static const char* PayloadTypeName() {
         return typeid(PayloadType).name();
     }
+
+    // Compile-time type check method
+    void InspectTypes() {
+        // This will force a compile error showing the types
+        static_assert(sizeof(ValueType) == -1, 
+            "ValueType inspection");
+        static_assert(sizeof(WrappedType) == -1, 
+            "WrappedType inspection");
+        static_assert(sizeof(PayloadType) == -1, 
+            "PayloadType inspection");
+    }
+
     /**
      * @brief Construct a new data class instance
      * @param aValueStorage Reference to external value storage
@@ -220,43 +232,62 @@ public:
      * 
      * Checks HasChanged() before applying the update
      */
-    bool Update(const T& aValue) {
-        if ( !HasChanged(aValue) )
-        {
+     bool Update(const T& aValue) {
+        if (!HasChanged(aValue)) {
             return false;
         }
     
-        CleanupValue();
-
-        if constexpr ( IsValueList() )
-        {
-            if ( !aValue.empty() )
-            {
-                UpdateList(aValue);
+        CHIP_ERROR err = CHIP_NO_ERROR;
+    
+        if constexpr (IsValueNullableList()) {
+            // Explicit handling for Nullable<List<Struct>>
+            //InspectTypes();
+            if (!aValue.IsNull()) {
+                DataModel::List<PayloadType> newList;
+                err = UpdateList(aValue.Value(), newList);
+                if (err == CHIP_NO_ERROR) {
+                    mValue.SetNonNull(newList);
+                }
+            } else {
+                mValue.SetNull();
             }
         }
-        else if constexpr ( IsValueNullable() )
-        {
-            if ( !aValue.IsNull() )
-            {
-                if constexpr (IsList<WrappedType>::value)
-                {
-                    UpdateList(aValue.Value());
+        else if constexpr (IsValueNullable()) {
+            //InspectTypes();
+            // Handling for other Nullable types (Struct, numeric, enum)
+            if (!aValue.IsNull()) {
+                if constexpr (IsStruct<WrappedType>::value) {
+                    WrappedType tempValue;
+                    err = UpdateStructValue(aValue.Value(), tempValue);
+                    if (err == CHIP_NO_ERROR) {
+                        mValue.SetNonNull(tempValue);
+                    }
                 }
-                else if constexpr (IsStruct<WrappedType>::value)
-                {
-                    UpdateStructValue(unwrapValue(aValue.Value()));
-                }
-                else if constexpr ( (IsNumeric<WrappedType>::value) || (IsEnum<WrappedType>::value) ){
+                else if constexpr (IsNumeric<WrappedType>::value || IsEnum<WrappedType>::value) {
                     mValue.SetNonNull(aValue.Value());
                 }
                 else {
-                    static_assert(false, "Unexpected type");
+                    static_assert(false, "Unexpected Nullable wrapped type");
                 }
+            } else {
+                mValue.SetNull();
             }
         }
-
-        return false;
+        else if constexpr (IsValueList()) {
+            //InspectTypes();
+            // Handling for plain List<Struct>
+            DataModel::List<PayloadType> newList;
+            err = UpdateList(aValue, newList);
+            if (err == CHIP_NO_ERROR) {
+                mValue = newList;
+            }
+        }
+        else {
+            // Direct assignment for non-wrapper types
+            mValue = aValue;
+        }
+    
+        return err == CHIP_NO_ERROR;
     };
 
     /**
@@ -339,16 +370,38 @@ protected:
         return true;
     }
     
-    virtual CHIP_ERROR UpdateStructValue(const PayloadType& aValue) {
+    virtual CHIP_ERROR UpdateStructValue(const PayloadType& source, PayloadType& destination)
+    {
         //mValue = aValue;
+        memcpy(&destination, &source, sizeof(PayloadType));
         return CHIP_NO_ERROR;
     }
 
-    template<typename U>
-    void UpdateList(const DataModel::List<U>& list) {
-       for (const auto& item : list) {
-            UpdateStructValue(item);
-       }
+    CHIP_ERROR UpdateList(const DataModel::List<PayloadType>& source, DataModel::List<PayloadType>& destination)
+    {
+        auto* buffer = static_cast<PayloadType*>(
+            chip::Platform::MemoryCalloc(source.size(), sizeof(PayloadType))
+        );
+    
+        if (!buffer) {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+    
+        for (size_t i = 0; i < source.size(); i++) {
+            new (&buffer[i]) PayloadType();
+            if (CHIP_NO_ERROR != UpdateStructValue(source[i], buffer[i]) )
+            {
+                for (size_t j = 0; j < i; j++)
+                {
+                    CleanupStructValue(buffer[i]);
+                }
+                return CHIP_ERROR_NO_MEMORY;
+            }
+        }
+
+        destination = DataModel::List<PayloadType>(chip::Span<PayloadType>(buffer, source.size()));
+
+        return CHIP_NO_ERROR;
    }
 
     /**
