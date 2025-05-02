@@ -112,13 +112,16 @@ public:
         // callback. If we do, that's a bug.
         //
         VerifyOrDie(!aPath.IsListItemOperation());
-        size_t bufferLen                  = (apData == nullptr ? 0 : apData->GetRemainingLength() + apData->GetLengthRead());
-        std::unique_ptr<uint8_t[]> buffer = std::unique_ptr<uint8_t[]>(apData == nullptr ? nullptr : new uint8_t[bufferLen]);
-        size_t size                       = 0;
+        size_t bufferLen = 0;
+        std::unique_ptr<uint8_t[]> buffer;
+        size_t size = 0;
         // When the apData is nullptr, means we did not receive a valid attribute data from server, status will be some error
         // status.
         if (apData != nullptr)
         {
+            bufferLen = apData->GetRemainingLength() + apData->GetLengthRead();
+            buffer    = std::make_unique<uint8_t[]>(bufferLen);
+
             // The TLVReader's read head is not pointing to the first element in the container instead of the container itself, use
             // a TLVWriter to get a TLV with a normalized TLV buffer (Wrapped with a anonymous tag, no extra "end of container" tag
             // at the end.)
@@ -522,9 +525,9 @@ PyChipError pychip_ReadClient_Read(void * appContext, ReadClient ** pReadClient,
 
     std::unique_ptr<ReadClientCallback> callback = std::make_unique<ReadClientCallback>(appContext);
 
-    std::unique_ptr<AttributePathParams[]> attributePaths(new AttributePathParams[numAttributePaths]);
-    std::unique_ptr<chip::app::DataVersionFilter[]> dataVersionFilters(new chip::app::DataVersionFilter[numDataversionFilters]);
-    std::unique_ptr<EventPathParams[]> eventPaths(new EventPathParams[numEventPaths]);
+    auto attributePaths     = std::make_unique<AttributePathParams[]>(numAttributePaths);
+    auto dataVersionFilters = std::make_unique<chip::app::DataVersionFilter[]>(numDataversionFilters);
+    auto eventPaths         = std::make_unique<EventPathParams[]>(numEventPaths);
     std::unique_ptr<ReadClient> readClient;
 
     for (size_t i = 0; i < numAttributePaths; i++)
