@@ -27,7 +27,7 @@ using namespace chip::app::Clusters::ClosureControl;
 using Protocols::InteractionModel::Status;
 
 namespace {
-    constexpr ElapsedS kDefaultCountdownTime = 30;
+constexpr ElapsedS kDefaultCountdownTime = 30;
 } // namespace
 
 Status PrintOnlyDelegate::HandleCalibrateCommand()
@@ -37,8 +37,7 @@ Status PrintOnlyDelegate::HandleCalibrateCommand()
     return Status::Success;
 }
 
-Status PrintOnlyDelegate::HandleMoveToCommand(const Optional<TargetPositionEnum> & position,
-                                              const Optional<bool> & latch,
+Status PrintOnlyDelegate::HandleMoveToCommand(const Optional<TargetPositionEnum> & position, const Optional<bool> & latch,
                                               const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
     ChipLogProgress(AppServer, "HandleMoveToCommand");
@@ -60,7 +59,6 @@ CHIP_ERROR PrintOnlyDelegate::GetCurrentErrorAtIndex(size_t index, ClosureErrorE
     closureError = ClosureErrorEnum::kUnknownEnumValue;
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
-
 
 bool PrintOnlyDelegate::IsReadyToMove()
 {
