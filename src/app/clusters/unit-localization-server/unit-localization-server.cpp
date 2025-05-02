@@ -40,8 +40,10 @@ UnitLocalizationServer & UnitLocalizationServer::Instance()
 
 CHIP_ERROR UnitLocalizationServer::Init()
 {
-    uint8_t storedTempUnit;
-    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
+    CHIP_ERROR err         = CHIP_NO_ERROR;
+    uint8_t storedTempUnit = 0;
+
+    err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
         ConcreteAttributePath(0, UnitLocalization::Id, TemperatureUnit::Id), storedTempUnit);
     if (err == CHIP_NO_ERROR)
     {
