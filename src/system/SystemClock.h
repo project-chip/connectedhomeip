@@ -377,14 +377,8 @@ public:
 #endif // CHIP_DEVICE_LAYER_USE_ATOMICS_FOR_CLOCK
     }
 
-    void AdvanceMonotonic(Milliseconds64 increment)
-    {
-        mSystemTime += increment;
-    }
-    void AdvanceRealTime(Milliseconds64 increment)
-    {
-        mRealTime += increment;
-    }
+    void AdvanceMonotonic(Milliseconds64 increment) { mSystemTime += increment; }
+    void AdvanceRealTime(Milliseconds64 increment) { mRealTime += increment; }
 
     Microseconds64 mSystemTime = Clock::kZero;
     Microseconds64 mRealTime   = Clock::kZero;
