@@ -1,0 +1,5 @@
+[
+  "commodity-price-server.cpp",
+  "commodity-price-server.h",
+  "CommodityPriceTestEventTriggerHandler.h"
+]

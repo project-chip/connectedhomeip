@@ -1,0 +1,7 @@
+[
+  "ThreadNetworkDirectoryStorage.h",
+  "DefaultThreadNetworkDirectoryStorage.h",
+  "thread-network-directory-server.h",
+  "DefaultThreadNetworkDirectoryStorage.cpp",
+  "thread-network-directory-server.cpp"
+]

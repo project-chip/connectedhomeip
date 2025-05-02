@@ -1,0 +1,5 @@
+[
+  "GenericFaultTestEventTriggerHandler.h",
+  "general-diagnostics-server.cpp",
+  "GenericFaultTestEventTriggerHandler.cpp"
+]

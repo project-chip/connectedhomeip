@@ -1,0 +1,5 @@
+[
+  "content-control-server.h",
+  "content-control-delegate.h",
+  "content-control-server.cpp"
+]

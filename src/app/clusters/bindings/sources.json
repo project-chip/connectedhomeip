@@ -1,0 +1,8 @@
+[
+  "bindings.cpp",
+  "PendingNotificationMap.h",
+  "BindingManager.h",
+  "BindingManager.cpp",
+  "PendingNotificationMap.cpp",
+  "bindings.h"
+]

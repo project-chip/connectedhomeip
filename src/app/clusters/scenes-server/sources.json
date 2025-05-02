@@ -1,0 +1,12 @@
+[
+  "scenes-server.h",
+  "SceneTableImpl.h",
+  "ExtensionFieldSets.h",
+  "ExtensionFieldSetsImpl.cpp",
+  "SceneHandlerImpl.cpp",
+  "scenes-server.cpp",
+  "SceneTable.h",
+  "SceneTableImpl.cpp",
+  "ExtensionFieldSetsImpl.h",
+  "SceneHandlerImpl.h"
+]

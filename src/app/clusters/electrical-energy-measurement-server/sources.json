@@ -1,0 +1,5 @@
+[
+  "electrical-energy-measurement-server.h",
+  "electrical-energy-measurement-server.cpp",
+  "EnergyReportingTestEventTriggerHandler.h"
+]
