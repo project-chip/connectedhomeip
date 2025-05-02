@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,15 +41,15 @@ uint8_t flag = RPS_HEADER;
 namespace chip {
 
 // Define static memebers
-bool OTAWiFiFirmwareProcessor::mReset = false;
+// bool OTAWiFiFirmwareProcessor::mReset = false;
 
 CHIP_ERROR OTAWiFiFirmwareProcessor::Init()
 {
     VerifyOrReturnError(mCallbackProcessDescriptor != nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
     mAccumulator.Init(sizeof(Descriptor));
-#if OTA_ENCRYPTION_ENABLE
+#if SL_MATTER_ENABLE_OTA_ENCRYPTION
     mUnalignmentNum = 0;
-#endif // OTA_ENCRYPTION_ENABLE
+#endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
 
     return CHIP_NO_ERROR;
 }
@@ -59,9 +59,9 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::Clear()
     OTATlvProcessor::ClearInternal();
     mAccumulator.Clear();
     mDescriptorProcessed = false;
-#if OTA_ENCRYPTION_ENABLE
+#if SL_MATTER_ENABLE_OTA_ENCRYPTION
     mUnalignmentNum = 0;
-#endif // OTA_ENCRYPTION_ENABLE
+#endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
 
     return CHIP_NO_ERROR;
 }
@@ -78,13 +78,13 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessInternal(ByteSpan & block)
     if (!mDescriptorProcessed)
     {
         ReturnErrorOnFailure(ProcessDescriptor(block));
-#if OTA_ENCRYPTION_ENABLE
+#if SL_MATTER_ENABLE_OTA_ENCRYPTION
         /* 16 bytes to used to store undecrypted data because of unalignment */
         mAccumulator.Init(requestedOtaMaxBlockSize + 16);
-#endif // OTA_ENCRYPTION_ENABLE
+#endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
     }
 
-#if OTA_ENCRYPTION_ENABLE
+#if SL_MATTER_ENABLE_OTA_ENCRYPTION
     MutableByteSpan mBlock = MutableByteSpan(mAccumulator.data(), mAccumulator.GetThreshold());
     memcpy(&mBlock[0], &mBlock[requestedOtaMaxBlockSize], mUnalignmentNum);
     memcpy(&mBlock[mUnalignmentNum], block.data(), block.size());
@@ -105,7 +105,7 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessInternal(ByteSpan & block)
 
     OTATlvProcessor::vOtaProcessInternalEncryption(mBlock);
     block = mBlock;
-#endif // OTA_ENCRYPTION_ENABLE
+#endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
 
     if (flag == RPS_HEADER)
     {
@@ -153,6 +153,10 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessDescriptor(ByteSpan & block)
 
 CHIP_ERROR OTAWiFiFirmwareProcessor::ApplyAction()
 {
+    ChipLogProgress(SoftwareUpdate, "OTAWiFiFirmwareProcessor::ApplyAction called");
+    mReset = true;
+    ChipLogProgress(SoftwareUpdate, "mReset set to: %d", mReset);
+#if 0                          // Bhavani: commenting because reset should move to handleApply after all TLVs are processed
     // This reboots the device
     if (mReset)
     {
@@ -164,6 +168,7 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ApplyAction()
         sl_si91x_soc_nvic_reset();
 #endif
     }
+#endif
     return CHIP_NO_ERROR;
 }
 

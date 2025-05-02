@@ -52,6 +52,7 @@ from custom import CertDeclaration, DacCert, DacPKey, PaiCert  # noqa: E402 isor
 from default import InputArgument  # noqa: E402 isort:skip
 
 OTA_APP_TLV_TEMP = os.path.join(os.path.dirname(__file__), "ota_temp_app_tlv.bin")
+OTA_WIFI_TA_TLV_TEMP = os.path.join(os.path.dirname(__file__), "ota_temp_wifi_ta_tlv.bin")
 OTA_BOOTLOADER_TLV_TEMP = os.path.join(os.path.dirname(__file__), "ota_temp_ssbl_tlv.bin")
 OTA_FACTORY_TLV_TEMP = os.path.join(os.path.dirname(__file__), "ota_temp_factory_tlv.bin")
 
@@ -62,7 +63,7 @@ class TAG:
     APPLICATION = 1
     BOOTLOADER = 2
     FACTORY_DATA = 3
-    WIFI_917_TA_M4 = 4
+    WIFI_TA = 4
 
 
 def set_logger():
@@ -166,22 +167,22 @@ def generate_app(args: object):
 
 def generate_wifi_image(args: object):
     """
-    Generate app payload with descriptor. If a certain option is not specified, use the default values.
+    Generate WiFi TA image payload with descriptor. If a certain option is not specified, use the default values.
     """
-    logging.info("App descriptor information:")
+    logging.info("WiFi TA descriptor information:")
 
-    descriptor = generate_descriptor(args.app_version, args.app_version_str, args.app_build_date)
-    logging.info(f"App encryption enable: {args.enc_enable}")
+    descriptor = generate_descriptor(args.wifi_ta_version, args.wifi_ta_version_str, args.wifi_ta_build_date)
+    logging.info(f"WiFi TA encryption enable: {args.enc_enable}")
     if args.enc_enable:
         inputFile = open(args.wifi_input_file, "rb")
         enc_file = crypto_utils.encryptData(inputFile.read(), args.input_ota_key, INITIALIZATION_VECTOR)
         enc_file1 = bytes([ord(x) for x in enc_file])
         file_size = len(enc_file1)
-        payload = generate_header(TAG.WIFI_917_TA_M4, len(descriptor) + file_size) + descriptor + enc_file1
+        payload = generate_header(TAG.WIFI_TA, len(descriptor) + file_size) + descriptor + enc_file1
     else:
         file_size = os.path.getsize(args.wifi_input_file)
         logging.info(f"file size: {file_size}")
-        payload = generate_header(TAG.WIFI_917_TA_M4, len(descriptor) + file_size) + descriptor
+        payload = generate_header(TAG.WIFI_TA, len(descriptor) + file_size) + descriptor
 
     write_to_temp(OTA_APP_TLV_TEMP, payload)
     if args.enc_enable:
