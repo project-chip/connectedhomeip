@@ -38,10 +38,11 @@ RegisteredServerCluster<SoftwareDiagnosticsServerCluster<DeviceLayerSoftwareDiag
 
 void MatterSoftwareDiagnosticsPluginServerInitCallback()
 {
-    // We know Endpoint 0 contains this cluster
-    LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration()));
+    // NOTE: we assume code-generation logic is always correct here (we assert at least kFixedClusterConfig settings)
+    //       so no error checks are done.
+    (void) CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration());
 }
 void MatterSoftwareDiagnosticsPluginServerShutdownCallback()
 {
-    LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster()));
+    (void) CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
 }
