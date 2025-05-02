@@ -33,7 +33,7 @@ public:
     SoftwareFaultListener()          = default;
     virtual ~SoftwareFaultListener() = default;
 
-    /// Called by various layers to
+    /// Called by various layers to report software faults
     virtual void
     OnSoftwareFaultDetect(const chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::Type & softwareFault) = 0;
 
