@@ -99,9 +99,6 @@ jobs:
             - name: Build example All Clusters Server
               run: |
                   scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/all-clusters-app chip_config_network_layer_ble=false
-            - name: Build example OTA Provider
-              run: |
-                  scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug/ota-provider-app chip_config_network_layer_ble=false
             - name: Build example OTA Requestor
               run: |
                   scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug/ota-requestor-app chip_config_network_layer_ble=false non_spec_compliant_ota_action_delay_floor=0
