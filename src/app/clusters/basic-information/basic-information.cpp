@@ -315,7 +315,7 @@ CHIP_ERROR BasicAttrAccess::ReadLocation(AttributeValueEncoder & aEncoder)
     CHIP_ERROR err = ConfigurationMgr().GetCountryCode(location, sizeof(location), codeLen);
     if ((err != CHIP_NO_ERROR) || (codeLen != kExpectedFixedLocationLength))
     {
-        countryCodeSpan = CharSpan::fromCharString("XX");
+        countryCodeSpan = "XX"_span;
         err             = CHIP_NO_ERROR;
     }
     else
