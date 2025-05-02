@@ -13410,20 +13410,14 @@ class ChipClusters:
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "SupportedContainerFormats",
+                "attributeName": "SupportedFormats",
                 "attributeId": 0x00000000,
-                "type": "int",
+                "type": "",
                 "reportable": True,
             },
             0x00000001: {
-                "attributeName": "SupportedIngestMethods",
-                "attributeId": 0x00000001,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000002: {
                 "attributeName": "CurrentConnections",
-                "attributeId": 0x00000002,
+                "attributeId": 0x00000001,
                 "type": "",
                 "reportable": True,
             },

@@ -4459,10 +4459,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
     case chip::app::Clusters::PushAvStreamTransport::Id: {
         switch (id)
         {
-        case chip::app::Clusters::PushAvStreamTransport::Attributes::SupportedContainerFormats::Id:
-            return "SupportedContainerFormats";
-        case chip::app::Clusters::PushAvStreamTransport::Attributes::SupportedIngestMethods::Id:
-            return "SupportedIngestMethods";
+        case chip::app::Clusters::PushAvStreamTransport::Attributes::SupportedFormats::Id:
+            return "SupportedFormats";
         case chip::app::Clusters::PushAvStreamTransport::Attributes::CurrentConnections::Id:
             return "CurrentConnections";
         case chip::app::Clusters::PushAvStreamTransport::Attributes::GeneratedCommandList::Id:

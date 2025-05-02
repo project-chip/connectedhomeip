@@ -10376,8 +10376,7 @@ provisional cluster PushAvStreamTransport = 1365 {
     kInvalidStream = 3;
     kInvalidURL = 4;
     kInvalidZone = 5;
-    kUnsupportedContainerFormat = 6;
-    kUnsupportedIngestMethod = 7;
+    kInvalidCombination = 6;
     kInvalidTriggerType = 8;
     kInvalidTransportStatus = 9;
   }
@@ -10411,14 +10410,6 @@ provisional cluster PushAvStreamTransport = 1365 {
     kMetadata = 0x2;
   }
 
-  bitmap SupportedContainerFormatsBitmap : bitmap8 {
-    kCMAF = 0x1;
-  }
-
-  bitmap SupportedIngestMethodsBitmap : bitmap8 {
-    kCMAFIngest = 0x1;
-  }
-
   struct TransportMotionTriggerTimeControlStruct {
     int16u initialDuration = 0;
     int16u augmentationDuration = 1;
@@ -10443,6 +10434,7 @@ provisional cluster PushAvStreamTransport = 1365 {
     int16u chunkDuration = 0;
     optional octet_string<16> CENCKey = 1;
     optional boolean metadataEnabled = 2;
+    optional octet_string<16> CENCKeyID = 3;
   }
 
   struct ContainerOptionsStruct {
@@ -10458,15 +10450,19 @@ provisional cluster PushAvStreamTransport = 1365 {
     long_char_string<2000> url = 4;
     TransportTriggerOptionsStruct triggerOptions = 5;
     IngestMethodsEnum ingestMethod = 6;
-    ContainerFormatEnum containerFormat = 7;
-    ContainerOptionsStruct containerOptions = 8;
-    optional epoch_s expiryTime = 9;
+    ContainerOptionsStruct containerOptions = 7;
+    optional epoch_s expiryTime = 8;
   }
 
   struct TransportConfigurationStruct {
     int16u connectionID = 0;
     TransportStatusEnum transportStatus = 1;
     optional TransportOptionsStruct transportOptions = 2;
+  }
+
+  struct SupportedFormatStruct {
+    ContainerFormatEnum containerFormat = 0;
+    IngestMethodsEnum ingestMethod = 1;
   }
 
   info event PushTransportBegin = 0 {
@@ -10481,9 +10477,8 @@ provisional cluster PushAvStreamTransport = 1365 {
     optional TriggerActivationReasonEnum activationReason = 2;
   }
 
-  readonly attribute SupportedContainerFormatsBitmap supportedContainerFormats = 0;
-  readonly attribute SupportedIngestMethodsBitmap supportedIngestMethods = 1;
-  readonly attribute TransportConfigurationStruct currentConnections[] = 2;
+  readonly attribute SupportedFormatStruct supportedFormats[] = 0;
+  readonly attribute TransportConfigurationStruct currentConnections[] = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;

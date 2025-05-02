@@ -48344,9 +48344,8 @@ class PushAvStreamTransport(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="supportedContainerFormats", Tag=0x00000000, Type=uint),
-                ClusterObjectFieldDescriptor(Label="supportedIngestMethods", Tag=0x00000001, Type=uint),
-                ClusterObjectFieldDescriptor(Label="currentConnections", Tag=0x00000002, Type=typing.List[PushAvStreamTransport.Structs.TransportConfigurationStruct]),
+                ClusterObjectFieldDescriptor(Label="supportedFormats", Tag=0x00000000, Type=typing.List[PushAvStreamTransport.Structs.SupportedFormatStruct]),
+                ClusterObjectFieldDescriptor(Label="currentConnections", Tag=0x00000001, Type=typing.List[PushAvStreamTransport.Structs.TransportConfigurationStruct]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -48354,8 +48353,7 @@ class PushAvStreamTransport(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    supportedContainerFormats: uint = 0
-    supportedIngestMethods: uint = 0
+    supportedFormats: typing.List[PushAvStreamTransport.Structs.SupportedFormatStruct] = field(default_factory=lambda: [])
     currentConnections: typing.List[PushAvStreamTransport.Structs.TransportConfigurationStruct] = field(default_factory=lambda: [])
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
@@ -48385,8 +48383,7 @@ class PushAvStreamTransport(Cluster):
             kInvalidStream = 0x03
             kInvalidURL = 0x04
             kInvalidZone = 0x05
-            kUnsupportedContainerFormat = 0x06
-            kUnsupportedIngestMethod = 0x07
+            kInvalidCombination = 0x06
             kInvalidTriggerType = 0x08
             kInvalidTransportStatus = 0x09
             # All received enum values that are not listed above will be mapped
@@ -48439,12 +48436,6 @@ class PushAvStreamTransport(Cluster):
         class Feature(IntFlag):
             kPerZoneSensitivity = 0x1
             kMetadata = 0x2
-
-        class SupportedContainerFormatsBitmap(IntFlag):
-            kCmaf = 0x1
-
-        class SupportedIngestMethodsBitmap(IntFlag):
-            kCMAFIngest = 0x1
 
     class Structs:
         @dataclass
@@ -48505,11 +48496,13 @@ class PushAvStreamTransport(Cluster):
                         ClusterObjectFieldDescriptor(Label="chunkDuration", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="CENCKey", Tag=1, Type=typing.Optional[bytes]),
                         ClusterObjectFieldDescriptor(Label="metadataEnabled", Tag=2, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="CENCKeyID", Tag=3, Type=typing.Optional[bytes]),
                     ])
 
             chunkDuration: 'uint' = 0
             CENCKey: 'typing.Optional[bytes]' = None
             metadataEnabled: 'typing.Optional[bool]' = None
+            CENCKeyID: 'typing.Optional[bytes]' = None
 
         @dataclass
         class ContainerOptionsStruct(ClusterObject):
@@ -48537,9 +48530,8 @@ class PushAvStreamTransport(Cluster):
                         ClusterObjectFieldDescriptor(Label="url", Tag=4, Type=str),
                         ClusterObjectFieldDescriptor(Label="triggerOptions", Tag=5, Type=PushAvStreamTransport.Structs.TransportTriggerOptionsStruct),
                         ClusterObjectFieldDescriptor(Label="ingestMethod", Tag=6, Type=PushAvStreamTransport.Enums.IngestMethodsEnum),
-                        ClusterObjectFieldDescriptor(Label="containerFormat", Tag=7, Type=PushAvStreamTransport.Enums.ContainerFormatEnum),
-                        ClusterObjectFieldDescriptor(Label="containerOptions", Tag=8, Type=PushAvStreamTransport.Structs.ContainerOptionsStruct),
-                        ClusterObjectFieldDescriptor(Label="expiryTime", Tag=9, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="containerOptions", Tag=7, Type=PushAvStreamTransport.Structs.ContainerOptionsStruct),
+                        ClusterObjectFieldDescriptor(Label="expiryTime", Tag=8, Type=typing.Optional[uint]),
                     ])
 
             streamUsage: 'PushAvStreamTransport.Enums.StreamUsageEnum' = 0
@@ -48549,7 +48541,6 @@ class PushAvStreamTransport(Cluster):
             url: 'str' = ""
             triggerOptions: 'PushAvStreamTransport.Structs.TransportTriggerOptionsStruct' = field(default_factory=lambda: PushAvStreamTransport.Structs.TransportTriggerOptionsStruct())
             ingestMethod: 'PushAvStreamTransport.Enums.IngestMethodsEnum' = 0
-            containerFormat: 'PushAvStreamTransport.Enums.ContainerFormatEnum' = 0
             containerOptions: 'PushAvStreamTransport.Structs.ContainerOptionsStruct' = field(default_factory=lambda: PushAvStreamTransport.Structs.ContainerOptionsStruct())
             expiryTime: 'typing.Optional[uint]' = None
 
@@ -48567,6 +48558,19 @@ class PushAvStreamTransport(Cluster):
             connectionID: 'uint' = 0
             transportStatus: 'PushAvStreamTransport.Enums.TransportStatusEnum' = 0
             transportOptions: 'typing.Optional[PushAvStreamTransport.Structs.TransportOptionsStruct]' = None
+
+        @dataclass
+        class SupportedFormatStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="containerFormat", Tag=0, Type=PushAvStreamTransport.Enums.ContainerFormatEnum),
+                        ClusterObjectFieldDescriptor(Label="ingestMethod", Tag=1, Type=PushAvStreamTransport.Enums.IngestMethodsEnum),
+                    ])
+
+            containerFormat: 'PushAvStreamTransport.Enums.ContainerFormatEnum' = 0
+            ingestMethod: 'PushAvStreamTransport.Enums.IngestMethodsEnum' = 0
 
     class Commands:
         @dataclass
@@ -48707,7 +48711,7 @@ class PushAvStreamTransport(Cluster):
 
     class Attributes:
         @dataclass
-        class SupportedContainerFormats(ClusterAttributeDescriptor):
+        class SupportedFormats(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000555
@@ -48718,25 +48722,9 @@ class PushAvStreamTransport(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.List[PushAvStreamTransport.Structs.SupportedFormatStruct])
 
-            value: uint = 0
-
-        @dataclass
-        class SupportedIngestMethods(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000555
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000001
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
-
-            value: uint = 0
+            value: typing.List[PushAvStreamTransport.Structs.SupportedFormatStruct] = field(default_factory=lambda: [])
 
         @dataclass
         class CurrentConnections(ClusterAttributeDescriptor):
@@ -48746,7 +48734,7 @@ class PushAvStreamTransport(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x00000002
+                return 0x00000001
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:

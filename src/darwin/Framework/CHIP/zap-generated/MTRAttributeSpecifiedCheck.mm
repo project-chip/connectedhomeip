@@ -6108,10 +6108,7 @@ static BOOL AttributeIsSpecifiedInPushAVStreamTransportCluster(AttributeId aAttr
 {
     using namespace Clusters::PushAvStreamTransport;
     switch (aAttributeId) {
-    case Attributes::SupportedContainerFormats::Id: {
-        return YES;
-    }
-    case Attributes::SupportedIngestMethods::Id: {
+    case Attributes::SupportedFormats::Id: {
         return YES;
     }
     case Attributes::CurrentConnections::Id: {

@@ -19406,28 +19406,17 @@ public class ClusterReadMapping {
        return result;
     }
     private static Map<String, InteractionInfo> readPushAvStreamTransportInteractionInfo() {
-       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readPushAvStreamTransportSupportedContainerFormatsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readPushAvStreamTransportSupportedContainerFormatsAttributeInteractionInfo = new InteractionInfo(
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readPushAvStreamTransportSupportedFormatsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readPushAvStreamTransportSupportedFormatsAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.PushAvStreamTransportCluster) cluster).readSupportedContainerFormatsAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
+            ((ChipClusters.PushAvStreamTransportCluster) cluster).readSupportedFormatsAttribute(
+              (ChipClusters.PushAvStreamTransportCluster.SupportedFormatsAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readPushAvStreamTransportSupportedContainerFormatsCommandParams
+          () -> new ClusterInfoMapping.DelegatedPushAvStreamTransportClusterSupportedFormatsAttributeCallback(),
+          readPushAvStreamTransportSupportedFormatsCommandParams
         );
-        result.put("readSupportedContainerFormatsAttribute", readPushAvStreamTransportSupportedContainerFormatsAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readPushAvStreamTransportSupportedIngestMethodsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readPushAvStreamTransportSupportedIngestMethodsAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.PushAvStreamTransportCluster) cluster).readSupportedIngestMethodsAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readPushAvStreamTransportSupportedIngestMethodsCommandParams
-        );
-        result.put("readSupportedIngestMethodsAttribute", readPushAvStreamTransportSupportedIngestMethodsAttributeInteractionInfo);
+        result.put("readSupportedFormatsAttribute", readPushAvStreamTransportSupportedFormatsAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readPushAvStreamTransportCurrentConnectionsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readPushAvStreamTransportCurrentConnectionsAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

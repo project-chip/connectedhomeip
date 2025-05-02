@@ -8395,12 +8395,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         switch (attributeID) {
 
             // Cluster PushAVStreamTransport attributes
-        case MTRAttributeIDTypeClusterPushAVStreamTransportAttributeSupportedContainerFormatsID:
-            result = @"SupportedContainerFormats";
-            break;
-
-        case MTRAttributeIDTypeClusterPushAVStreamTransportAttributeSupportedIngestMethodsID:
-            result = @"SupportedIngestMethods";
+        case MTRAttributeIDTypeClusterPushAVStreamTransportAttributeSupportedFormatsID:
+            result = @"SupportedFormats";
             break;
 
         case MTRAttributeIDTypeClusterPushAVStreamTransportAttributeCurrentConnectionsID:

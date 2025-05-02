@@ -821,6 +821,12 @@ static CHIP_ERROR Setup(const char * label,
 
 static void Finalize(chip::app::Clusters::PushAvStreamTransport::Structs::TransportConfigurationStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::PushAvStreamTransport::Structs::SupportedFormatStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::PushAvStreamTransport::Structs::SupportedFormatStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Chime::Structs::ChimeSoundStruct::Type & request,
                         Json::Value & value);
 

@@ -18385,26 +18385,32 @@ static id _Nullable DecodeAttributeValueForPushAVStreamTransportCluster(Attribut
 {
     using namespace Clusters::PushAvStreamTransport;
     switch (aAttributeId) {
-    case Attributes::SupportedContainerFormats::Id: {
-        using TypeInfo = Attributes::SupportedContainerFormats::TypeInfo;
+    case Attributes::SupportedFormats::Id: {
+        using TypeInfo = Attributes::SupportedFormats::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
-        return value;
-    }
-    case Attributes::SupportedIngestMethods::Id: {
-        using TypeInfo = Attributes::SupportedIngestMethods::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRPushAVStreamTransportClusterSupportedFormatStruct * newElement_0;
+                newElement_0 = [MTRPushAVStreamTransportClusterSupportedFormatStruct new];
+                newElement_0.containerFormat = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.containerFormat)];
+                newElement_0.ingestMethod = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.ingestMethod)];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
         }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
         return value;
     }
     case Attributes::CurrentConnections::Id: {
@@ -18512,7 +18518,6 @@ static id _Nullable DecodeAttributeValueForPushAVStreamTransportCluster(Attribut
                         newElement_0.transportOptions.triggerOptions.maxPreRollLen = nil;
                     }
                     newElement_0.transportOptions.ingestMethod = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.Value().ingestMethod)];
-                    newElement_0.transportOptions.containerFormat = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.Value().containerFormat)];
                     newElement_0.transportOptions.containerOptions = [MTRPushAVStreamTransportClusterContainerOptionsStruct new];
                     newElement_0.transportOptions.containerOptions.containerType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.Value().containerOptions.containerType)];
                     if (entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.HasValue()) {
@@ -18527,6 +18532,11 @@ static id _Nullable DecodeAttributeValueForPushAVStreamTransportCluster(Attribut
                             newElement_0.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled = [NSNumber numberWithBool:entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().metadataEnabled.Value()];
                         } else {
                             newElement_0.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled = nil;
+                        }
+                        if (entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CENCKeyID.HasValue()) {
+                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.cencKeyID = AsData(entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CENCKeyID.Value());
+                        } else {
+                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.cencKeyID = nil;
                         }
                     } else {
                         newElement_0.transportOptions.containerOptions.cmafContainerOptions = nil;

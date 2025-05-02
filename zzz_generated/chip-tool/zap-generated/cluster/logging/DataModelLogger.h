@@ -504,6 +504,9 @@ LogValue(const char * label, size_t indent,
          const chip::app::Clusters::PushAvStreamTransport::Structs::TransportConfigurationStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::PushAvStreamTransport::Structs::SupportedFormatStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Chime::Structs::ChimeSoundStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
