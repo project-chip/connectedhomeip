@@ -1,16 +1,16 @@
 # CHIP Linux Closure Example App
 
 An example showing the use of Matter on the Linux. The document will describe
-how to build and run Matter Linux Closure Example on Raspberry Pi. This doc
-is tested on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu
+how to build and run Matter Linux Closure Example on Raspberry Pi. This doc is
+tested on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu
 for Raspberry Pi Desktop 20.10 (aarch64)**
 
 <hr>
 
-- [CHIP Linux Closure Example App](#chip-linux-closure-example-app)
-  - [Building](#building)
-  - [Commandline arguments](#commandline-arguments)
-  - [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
+-   [CHIP Linux Closure Example App](#chip-linux-closure-example-app)
+    -   [Building](#building)
+    -   [Commandline arguments](#commandline-arguments)
+    -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
 
 <hr>
 
@@ -59,4 +59,5 @@ for Raspberry Pi Desktop 20.10 (aarch64)**
     [Linux BLE Settings](/platforms/linux/ble_settings.md).
 
 ## Running the Complete Example on Raspberry Pi 4
+
 TBD
