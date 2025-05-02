@@ -73,6 +73,7 @@ public:
         {
             SoftwareDiagnostics::SoftwareFaultListener::SetGlobalListener(nullptr);
         }
+        DefaultServerCluster::Shutdown();
     }
 
     // Server cluster implementation
