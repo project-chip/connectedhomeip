@@ -152,7 +152,7 @@ ALLOW: Dict[str, Set[str]] = {
     'src/setup_payload/ManualSetupPayloadGenerator.h': {'string'},
     'src/setup_payload/ManualSetupPayloadParser.cpp': {'string', 'vector'},
     'src/setup_payload/ManualSetupPayloadParser.h': {'string'},
-    'src/setup_payload/QRCodeSetupPayloadParser.cpp': {'vector'},
+    'src/setup_payload/QRCodeSetupPayloadParser.cpp': {'vector', 'sstream'},
     'src/setup_payload/QRCodeSetupPayloadParser.h': {'string'},
     'src/setup_payload/QRCodeSetupPayloadGenerator.cpp': {'string'},
     'src/setup_payload/QRCodeSetupPayloadGenerator.h': {'string'},
