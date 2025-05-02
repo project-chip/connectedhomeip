@@ -22,6 +22,7 @@
 #include <app/server/Server.h>
 #include <controller/InvokeInteraction.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <webrtc-transport.h>
 
 #include <iostream>
 
@@ -52,9 +53,13 @@ void WebRTCProviderManager::Init()
         ChipLogProgress(Camera, "%s", std::string(candidate).c_str());
     });
 
-    mPeerConnection->onStateChange([](rtc::PeerConnection::State state) {
+    mPeerConnection->onStateChange([this](rtc::PeerConnection::State state) {
         // Convert the enum to an integer or string as needed
         ChipLogProgress(Camera, "[State: %u]", static_cast<unsigned>(state));
+        if (state == rtc::PeerConnection::State::Connected)
+        {
+            RegisterWebrtcTransport(mCurrentSessionId);
+        }
     });
 
     mPeerConnection->onGatheringStateChange([](rtc::PeerConnection::GatheringState state) {
@@ -78,6 +83,9 @@ void WebRTCProviderManager::Init()
 
 void WebRTCProviderManager::CloseConnection()
 {
+    // Clean up all the Webrtc Transports
+    mWebrtcTransportMap.clear();
+
     // Close the data channel and peer connection if they exist
     if (mDataChannel)
     {
@@ -90,6 +98,11 @@ void WebRTCProviderManager::CloseConnection()
         mPeerConnection->close();
         mPeerConnection.reset();
     }
+}
+
+void WebRTCProviderManager::SetMediaController(MediaController * mediaController)
+{
+    mMediaController = mediaController;
 }
 
 CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & args, WebRTCSessionStruct & outSession,
@@ -149,6 +162,21 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
     return CHIP_NO_ERROR;
 }
 
+void WebRTCProviderManager::RegisterWebrtcTransport(uint16_t sessionId)
+{
+    if (mWebrtcTransportMap.find(sessionId) == mWebrtcTransportMap.end())
+    {
+        return;
+    }
+
+    if (mMediaController == nullptr)
+    {
+        ChipLogProgress(Camera, "mMediaController is null. Failed to Register WebRTC Transport");
+        return;
+    }
+    mMediaController->RegisterTransport(mWebrtcTransportMap[sessionId].get(), mVideoStreamID, mAudioStreamID);
+}
+
 CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession)
 {
     // Initialize a new WebRTC session from the SolicitOfferRequestArgs
@@ -171,6 +199,7 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
         else
         {
             outSession.videoStreamID = args.videoStreamId.Value();
+            mVideoStreamID           = args.videoStreamId.Value().Value();
         }
     }
     else
@@ -189,6 +218,7 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
         else
         {
             outSession.audioStreamID = args.audioStreamId.Value();
+            mAudioStreamID           = args.audioStreamId.Value().Value();
         }
     }
     else
@@ -200,6 +230,12 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     mPeerId                = ScopedNodeId(args.peerNodeId, args.fabricIndex);
     mOriginatingEndpointId = args.originatingEndpointId;
     mCurrentSessionId      = args.sessionId;
+
+    if (mWebrtcTransportMap.find(args.sessionId) == mWebrtcTransportMap.end())
+    {
+        mWebrtcTransportMap[args.sessionId] =
+            std::unique_ptr<WebrtcTransport>(new WebrtcTransport(args.sessionId, mPeerId.GetNodeId(), mPeerConnection));
+    }
 
     mPeerConnection->setRemoteDescription(args.sdp);
 
@@ -247,6 +283,12 @@ CHIP_ERROR WebRTCProviderManager::HandleEndSession(uint16_t sessionId, WebRTCEnd
                                                    DataModel::Nullable<uint16_t> videoStreamID,
                                                    DataModel::Nullable<uint16_t> audioStreamID)
 {
+    if (mWebrtcTransportMap.find(sessionId) != mWebrtcTransportMap.end())
+    {
+        ChipLogProgress(Camera, "Delete Webrtc Transport for the session: %u", sessionId);
+        mWebrtcTransportMap.erase(sessionId);
+    }
+
     if (mCurrentSessionId == sessionId)
     {
         mCurrentSessionId      = 0;

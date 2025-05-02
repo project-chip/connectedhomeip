@@ -18,10 +18,15 @@
 
 #pragma once
 
+#include "camera-device-interface.h"
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/CASESessionManager.h>
 #include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
+#include <media-controller.h>
 #include <rtc/rtc.hpp>
+#include <webrtc-transport.h>
+
+#include <unordered_map>
 
 namespace Camera {
 
@@ -37,6 +42,8 @@ public:
     void Init();
 
     void CloseConnection();
+
+    void SetMediaController(MediaController * mediaController);
 
     CHIP_ERROR HandleSolicitOffer(const OfferRequestArgs & args,
                                   chip::app::Clusters::WebRTCTransportProvider::WebRTCSessionStruct & outSession,
@@ -67,6 +74,8 @@ private:
 
     void ScheduleAnswerSend();
 
+    void RegisterWebrtcTransport(uint16_t sessionId);
+
     CHIP_ERROR SendAnswerCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle);
 
     static void OnDeviceConnected(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
@@ -87,6 +96,13 @@ private:
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnConnectionFailureCallback;
+
+    std::unordered_map<uint16_t, std::unique_ptr<WebrtcTransport>> mWebrtcTransportMap;
+
+    uint16_t mVideoStreamID;
+    uint16_t mAudioStreamID;
+
+    MediaController * mMediaController = nullptr;
 };
 
 } // namespace Camera
