@@ -382,7 +382,7 @@ class DeviceProxyWrapper():
             lambda: self._dmLib.pychip_GetAttestationChallenge(self._deviceProxy, buf, ctypes.byref(csize))
         ).raise_on_error()
 
-        return bytes(buf[:csize])
+        return bytes(buf[:csize.value])
 
     @property
     def sessionAllowsLargePayload(self) -> bool:
