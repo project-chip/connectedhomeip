@@ -1,10 +1,10 @@
 [
-  "closure-dimension-cluster-logic.cpp",
-  "closure-dimension-cluster-logic.h",
-  "closure-dimension-cluster-objects.h",
-  "closure-dimension-delegate.h",
-  "closure-dimension-matter-context.cpp",
-  "closure-dimension-matter-context.h",
-  "closure-dimension-server.cpp",
-  "closure-dimension-server.h"
+    "closure-dimension-cluster-logic.cpp",
+    "closure-dimension-cluster-logic.h",
+    "closure-dimension-cluster-objects.h",
+    "closure-dimension-delegate.h",
+    "closure-dimension-matter-context.cpp",
+    "closure-dimension-matter-context.h",
+    "closure-dimension-server.cpp",
+    "closure-dimension-server.h"
 ]

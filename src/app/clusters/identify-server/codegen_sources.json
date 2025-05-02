@@ -1,4 +1,1 @@
-[
-  "identify-server.cpp",
-  "identify-server.h"
-]
+["identify-server.cpp", "identify-server.h"]

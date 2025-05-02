@@ -1,8 +1,8 @@
 [
-  "BindingManager.cpp",
-  "BindingManager.h",
-  "PendingNotificationMap.cpp",
-  "PendingNotificationMap.h",
-  "bindings.cpp",
-  "bindings.h"
+    "BindingManager.cpp",
+    "BindingManager.h",
+    "PendingNotificationMap.cpp",
+    "PendingNotificationMap.h",
+    "bindings.cpp",
+    "bindings.h"
 ]

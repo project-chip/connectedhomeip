@@ -1,4 +1,1 @@
-[
-  "mode-select-server.cpp",
-  "supported-modes-manager.h"
-]
+["mode-select-server.cpp", "supported-modes-manager.h"]

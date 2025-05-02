@@ -1,7 +1,7 @@
 [
-  "replacement-product-list-manager.h",
-  "resource-monitoring-cluster-objects.cpp",
-  "resource-monitoring-cluster-objects.h",
-  "resource-monitoring-server.cpp",
-  "resource-monitoring-server.h"
+    "replacement-product-list-manager.h",
+    "resource-monitoring-cluster-objects.cpp",
+    "resource-monitoring-cluster-objects.h",
+    "resource-monitoring-server.cpp",
+    "resource-monitoring-server.h"
 ]

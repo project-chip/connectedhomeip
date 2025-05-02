@@ -1,9 +1,9 @@
 [
-  "PresetStructWithOwnedMembers.cpp",
-  "PresetStructWithOwnedMembers.h",
-  "thermostat-delegate.h",
-  "thermostat-server-atomic.cpp",
-  "thermostat-server-presets.cpp",
-  "thermostat-server.cpp",
-  "thermostat-server.h"
+    "PresetStructWithOwnedMembers.cpp",
+    "PresetStructWithOwnedMembers.h",
+    "thermostat-delegate.h",
+    "thermostat-server-atomic.cpp",
+    "thermostat-server-presets.cpp",
+    "thermostat-server.cpp",
+    "thermostat-server.h"
 ]

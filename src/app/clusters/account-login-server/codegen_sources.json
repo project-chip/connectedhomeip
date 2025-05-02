@@ -1,5 +1,5 @@
 [
-  "account-login-delegate.h",
-  "account-login-server.cpp",
-  "account-login-server.h"
+    "account-login-delegate.h",
+    "account-login-server.cpp",
+    "account-login-server.h"
 ]

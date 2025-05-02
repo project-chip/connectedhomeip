@@ -1,5 +1,5 @@
 [
-  "WaterHeaterManagementTestEventTriggerHandler.h",
-  "water-heater-management-server.cpp",
-  "water-heater-management-server.h"
+    "WaterHeaterManagementTestEventTriggerHandler.h",
+    "water-heater-management-server.cpp",
+    "water-heater-management-server.h"
 ]

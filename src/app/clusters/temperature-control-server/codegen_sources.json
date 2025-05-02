@@ -1,4 +1,1 @@
-[
-  "supported-temperature-levels-manager.h",
-  "temperature-control-server.cpp"
-]
+["supported-temperature-levels-manager.h", "temperature-control-server.cpp"]

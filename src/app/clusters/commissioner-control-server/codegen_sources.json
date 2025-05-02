@@ -1,4 +1,1 @@
-[
-  "commissioner-control-server.cpp",
-  "commissioner-control-server.h"
-]
+["commissioner-control-server.cpp", "commissioner-control-server.h"]

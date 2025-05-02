@@ -1,5 +1,1 @@
-[
-  "keypad-input-delegate.h",
-  "keypad-input-server.cpp",
-  "keypad-input-server.h"
-]
+["keypad-input-delegate.h", "keypad-input-server.cpp", "keypad-input-server.h"]
