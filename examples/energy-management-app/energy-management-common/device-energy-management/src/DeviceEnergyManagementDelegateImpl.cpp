@@ -21,6 +21,7 @@
 #include "EnergyTimeUtils.h"
 #include <app/EventLogging.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <system/SystemClock.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -100,7 +101,7 @@ Status DeviceEnergyManagementDelegate::PowerAdjustRequest(const int64_t powerMw,
         generateEvent = true;
 
         // Record when this PowerAdjustment starts. Note if we do not set this value if a PowerAdjustment is in progress
-        CHIP_ERROR err = GetEpochTS(mPowerAdjustmentStartTimeUtc);
+        CHIP_ERROR err = System::SystemClock().GetClock_EpochTS(mPowerAdjustmentStartTimeUtc);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "Unable to get time: %" CHIP_ERROR_FORMAT, err.Format());
@@ -295,7 +296,7 @@ CHIP_ERROR DeviceEnergyManagementDelegate::GeneratePowerAdjustEndEvent(CauseEnum
     event.cause = cause;
 
     uint32_t timeNowUtc;
-    CHIP_ERROR err = GetEpochTS(timeNowUtc);
+    CHIP_ERROR err = System::SystemClock().GetClock_EpochTS(timeNowUtc);
     if (err == CHIP_NO_ERROR)
     {
         event.duration = timeNowUtc - mPowerAdjustmentStartTimeUtc;

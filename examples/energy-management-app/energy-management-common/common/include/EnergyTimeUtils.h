@@ -32,13 +32,6 @@ namespace Clusters {
 namespace DeviceEnergyManagement {
 
 /**
- * @brief   Helper function to get current timestamp in Epoch format
- *
- * @param   chipEpoch reference to hold return timestamp
- */
-CHIP_ERROR GetEpochTS(uint32_t & chipEpoch);
-
-/**
  * @brief   Helper function to get current timestamp and work out the day of week
  *
  * NOTE that the time_t is converted using localtime to provide the timestamp

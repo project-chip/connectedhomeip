@@ -39,7 +39,7 @@ void SetTestEventTrigger_PriceUpdate()
     DataModel::Nullable<Structs::CommodityPriceStruct::Type> newPrice;
     uint32_t chipEpoch = 0;
 
-    CHIP_ERROR err = GetEpochTS(chipEpoch);
+    CHIP_ERROR err = System::SystemClock().GetClock_EpochTS(chipEpoch);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Support, "SetTestEventTrigger_PriceUpdate() could not get time");
@@ -86,7 +86,7 @@ void SetTestEventTrigger_ForecastUpdate()
     }
 
     uint32_t chipEpoch = 0;
-    if (GetEpochTS(chipEpoch) != CHIP_NO_ERROR)
+    if (System::SystemClock().GetClock_EpochTS(chipEpoch) != CHIP_NO_ERROR)
     {
         ChipLogError(Support, "SetTestEventTrigger_ForecastUpdate() could not get time");
         return;

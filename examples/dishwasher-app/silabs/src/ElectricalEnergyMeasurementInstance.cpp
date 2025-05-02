@@ -96,7 +96,7 @@ CHIP_ERROR ElectricalEnergyMeasurementInstance::Init()
     CHIP_ERROR err;
 
     uint32_t currentTimestamp;
-    ReturnErrorOnFailure(GetEpochTS(currentTimestamp));
+    ReturnErrorOnFailure(System::SystemClock().GetClock_EpochTS(currentTimestamp));
 
     sCumulativeImported.startTimestamp.SetValue(currentTimestamp);
     sCumulativeImported.startSystime.SetValue(System::SystemClock().GetMonotonicTimestamp().count());
@@ -177,7 +177,7 @@ void ElectricalEnergyMeasurementInstance::UpdateEnergyAttributesAndNotify(AppEve
     sCumulativeImported.energy = mWms_TO_mWh(sCumulativeActivePower * kTimerPeriodms);
 
     uint32_t currentTimestamp;
-    if (GetEpochTS(currentTimestamp) == CHIP_NO_ERROR)
+    if (System::SystemClock().GetClock_EpochTS(currentTimestamp) == CHIP_NO_ERROR)
     {
         // Use EpochTS
         sCumulativeImported.endTimestamp.SetValue(currentTimestamp);

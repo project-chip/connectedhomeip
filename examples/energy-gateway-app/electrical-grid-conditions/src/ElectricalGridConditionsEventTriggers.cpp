@@ -36,7 +36,7 @@ void SetTestEventTrigger_CurrentConditionsUpdate()
     DataModel::Nullable<Structs::ElectricalGridConditionsStruct::Type> newConditions;
     uint32_t chipEpoch = 0;
 
-    if (GetEpochTS(chipEpoch) != CHIP_NO_ERROR)
+    if (System::SystemClock().GetClock_EpochTS(chipEpoch) != CHIP_NO_ERROR)
     {
         ChipLogError(Support, "SetTestEventTrigger_CurrentConditionsUpdate() could not get time");
     }
@@ -70,7 +70,7 @@ void SetTestEventTrigger_ForecastConditionsUpdate()
     }
 
     uint32_t chipEpoch = 0;
-    if (GetEpochTS(chipEpoch) != CHIP_NO_ERROR)
+    if (System::SystemClock().GetClock_EpochTS(chipEpoch) != CHIP_NO_ERROR)
     {
         ChipLogError(Support, "SetTestEventTrigger_ForecastConditionsUpdate() could not get time");
         return;

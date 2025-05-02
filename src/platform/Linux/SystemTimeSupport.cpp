@@ -78,6 +78,31 @@ CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Milliseconds64 & aCurTime)
     return err;
 }
 
+CHIP_ERROR ClockImpl::GetClock_EpochTS(uint32_t & chipEpoch)
+{
+    chipEpoch = 0;
+
+    System::Clock::Milliseconds64 cTMs;
+    CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(cTMs);
+
+    VerifyOrDie(err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Unable to get current time - err:%" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
+
+    auto unixEpoch = std::chrono::duration_cast<System::Clock::Seconds32>(cTMs).count();
+    if (!UnixEpochToChipEpochTime(unixEpoch, chipEpoch))
+    {
+        ChipLogError(Zcl, "Unable to convert Unix Epoch time to Matter Epoch Time");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ClockImpl::SetClock_RealTime(Microseconds64 aNewCurTime)
 {
     struct timeval tv;

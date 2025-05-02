@@ -48,7 +48,7 @@ CHIP_ERROR ConfigureForecast(uint16_t numSlots)
 {
     uint32_t chipEpoch = 0;
 
-    CHIP_ERROR err = GetEpochTS(chipEpoch);
+    CHIP_ERROR err = System::SystemClock().GetClock_EpochTS(chipEpoch);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Support, "ConfigureForecast could not get time");
@@ -183,7 +183,7 @@ void SetTestEventTrigger_StartTimeAdjustment()
 
     uint32_t chipEpoch = 0;
 
-    CHIP_ERROR err = GetEpochTS(chipEpoch);
+    CHIP_ERROR err = System::SystemClock().GetClock_EpochTS(chipEpoch);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Support, "ConfigureForecast_EarliestStartLatestEndTimes could not get time");
