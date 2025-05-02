@@ -30,8 +30,8 @@ namespace {
 constexpr chip::Percent100ths kLimitRangeMin = 0;
 constexpr chip::Percent100ths kLimitRangeMax = 10000;
 constexpr chip::Percent100ths kStep          = 1000;
-const uint32_t kExampleMotionCountDown       = 5;
-const uint32_t kExampleStepCountDown         = 3000;
+constexpr uint32_t kExampleMotionCountDown   = 5;
+constexpr uint32_t kExampleStepCountDown     = 3000;
 } // namespace
 
 using namespace chip;

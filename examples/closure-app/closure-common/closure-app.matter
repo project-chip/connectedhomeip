@@ -158,12 +158,15 @@ enum LandmarkTag : enum8 {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
 >>>>>>> eb52279043 (Updated Closure control app and dimension app business logic and server logic)
 >>>>>>> bf3d80f04c (Updated Closure control app and dimension app business logic and server logic)
+=======
+>>>>>>> 30979fee8d (Rebase with latest skeleton code)
 enum LocationTag : enum8 {
   kIndoor = 0;
   kOutdoor = 1;
@@ -171,7 +174,6 @@ enum LocationTag : enum8 {
   kOutside = 3;
 }
 
-<<<<<<< HEAD
 enum MeasurementTypeEnum : enum16 {
   kUnspecified = 0;
   kVoltage = 1;
@@ -194,12 +196,15 @@ enum MeasurementTypeEnum : enum16 {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> 2f1934c3f5 (Closure app changes)
 =======
 >>>>>>> eb52279043 (Updated Closure control app and dimension app business logic and server logic)
 >>>>>>> bf3d80f04c (Updated Closure control app and dimension app business logic and server logic)
+=======
+>>>>>>> 30979fee8d (Rebase with latest skeleton code)
 enum PositionTag : enum8 {
   kLeft = 0;
   kRight = 1;
@@ -290,6 +295,7 @@ struct AtomicAttributeStatusStruct {
   attrib_id attributeID = 0;
   status statusCode = 1;
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 struct PowerThresholdStruct {
@@ -309,6 +315,8 @@ struct TestGlobalStruct {
   optional nullable TestGlobalEnum myEnum = 2;
 >>>>>>> 2f1934c3f5 (Closure app changes)
 >>>>>>> bf3d80f04c (Updated Closure control app and dimension app business logic and server logic)
+=======
+>>>>>>> 30979fee8d (Rebase with latest skeleton code)
 }
 
 struct LocationDescriptorStruct {
@@ -318,10 +326,13 @@ struct LocationDescriptorStruct {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> bf3d80f04c (Updated Closure control app and dimension app business logic and server logic)
+=======
+>>>>>>> 30979fee8d (Rebase with latest skeleton code)
 struct PowerThresholdStruct {
   optional power_mw powerThreshold = 0;
   optional power_mva apparentPowerThreshold = 1;
@@ -332,6 +343,7 @@ struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
   optional nullable TestGlobalEnum myEnum = 2;
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 =======
@@ -347,6 +359,8 @@ struct AtomicAttributeStatusStruct {
   status statusCode = 1;
 >>>>>>> 2f1934c3f5 (Closure app changes)
 >>>>>>> bf3d80f04c (Updated Closure control app and dimension app business logic and server logic)
+=======
+>>>>>>> 30979fee8d (Rebase with latest skeleton code)
 }
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
@@ -396,6 +410,83 @@ cluster Identify = 3 {
   command access(invoke: manage) Identify(IdentifyRequest): DefaultSuccess = 0;
   /** Command description for TriggerEffect */
   command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
+}
+
+/** Attributes and commands for group configuration and manipulation. */
+cluster Groups = 4 {
+  revision 4;
+
+  bitmap Feature : bitmap32 {
+    kGroupNames = 0x1;
+  }
+
+  bitmap NameSupportBitmap : bitmap8 {
+    kGroupNames = 0x80;
+  }
+
+  readonly attribute NameSupportBitmap nameSupport = 0;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct AddGroupRequest {
+    group_id groupID = 0;
+    char_string<16> groupName = 1;
+  }
+
+  response struct AddGroupResponse = 0 {
+    enum8 status = 0;
+    group_id groupID = 1;
+  }
+
+  request struct ViewGroupRequest {
+    group_id groupID = 0;
+  }
+
+  response struct ViewGroupResponse = 1 {
+    enum8 status = 0;
+    group_id groupID = 1;
+    char_string<16> groupName = 2;
+  }
+
+  request struct GetGroupMembershipRequest {
+    group_id groupList[] = 0;
+  }
+
+  response struct GetGroupMembershipResponse = 2 {
+    nullable int8u capacity = 0;
+    group_id groupList[] = 1;
+  }
+
+  request struct RemoveGroupRequest {
+    group_id groupID = 0;
+  }
+
+  response struct RemoveGroupResponse = 3 {
+    enum8 status = 0;
+    group_id groupID = 1;
+  }
+
+  request struct AddGroupIfIdentifyingRequest {
+    group_id groupID = 0;
+    char_string<16> groupName = 1;
+  }
+
+  /** Command description for AddGroup */
+  fabric command access(invoke: manage) AddGroup(AddGroupRequest): AddGroupResponse = 0;
+  /** Command description for ViewGroup */
+  fabric command ViewGroup(ViewGroupRequest): ViewGroupResponse = 1;
+  /** Command description for GetGroupMembership */
+  fabric command GetGroupMembership(GetGroupMembershipRequest): GetGroupMembershipResponse = 2;
+  /** Command description for RemoveGroup */
+  fabric command access(invoke: manage) RemoveGroup(RemoveGroupRequest): RemoveGroupResponse = 3;
+  /** Command description for RemoveAllGroups */
+  fabric command access(invoke: manage) RemoveAllGroups(): DefaultSuccess = 4;
+  /** Command description for AddGroupIfIdentifying */
+  fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
 }
 
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
@@ -2830,6 +2921,7 @@ endpoint 1 {
     ram      attribute featureMap default = 0;
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     ram      attribute clusterRevision default = 0x0005;
 =======
 =======
@@ -2838,8 +2930,9 @@ endpoint 1 {
 =======
     ram      attribute clusterRevision default = 4;
 =======
+=======
+>>>>>>> 30979fee8d (Rebase with latest skeleton code)
     ram      attribute clusterRevision default = 6;
->>>>>>> eb52279043 (Updated Closure control app and dimension app business logic and server logic)
 
     handle command Identify;
     handle command TriggerEffect;
@@ -2851,11 +2944,19 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
->>>>>>> 2f1934c3f5 (Closure app changes)
     ram      attribute clusterRevision default = 4;
 >>>>>>> 0cc5cc838d (Closure app changes)
 
-    handle command Identify;
+    handle command AddGroupResponse;
+    handle command AddGroup;
+    handle command ViewGroupResponse;
+    handle command ViewGroup;
+    handle command GetGroupMembershipResponse;
+    handle command GetGroupMembership;
+    handle command RemoveGroup;
+    handle command RemoveGroupResponse;
+    handle command RemoveAllGroups;
+    handle command AddGroupIfIdentifying;
   }
 
   server cluster Descriptor {
