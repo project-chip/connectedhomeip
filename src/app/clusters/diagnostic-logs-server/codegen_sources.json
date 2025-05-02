@@ -1,0 +1,7 @@
+[
+  "BDXDiagnosticLogsProvider.cpp",
+  "BDXDiagnosticLogsProvider.h",
+  "DiagnosticLogsProviderDelegate.h",
+  "diagnostic-logs-server.cpp",
+  "diagnostic-logs-server.h"
+]

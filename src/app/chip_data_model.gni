@@ -249,30 +249,20 @@ template("chip_data_model") {
     }
 
     # Clusters are expected to have the following format:
-    #   Code-generation dependent clusters:
-    #     - placed in `src/app/clusters/<NAME>/`
-    #     - a file named "sources.json" to contain the list of source files that comprise the cluster
-    #       when built as part of of a data-model monolith
-    #   Clusters that are code-backed (i.e. provide a BUILD.gn target):
-    #     - `BUILD.gn` path exists, default target (i.e. folder name) is added to the dependency
-    #     - a `CodegenIntegration.cpp` file exists that is auto-added to the monolith
+    #   - (optional) a `BUILD.gn` file that defines generic targets. A dependency
+    #     will be added on this default target
+    #   - codegen_sources.json - required sources for code generation integration
 
     foreach(cluster, _cluster_sources) {
       if (path_exists("${_app_root}/clusters/${cluster}/BUILD.gn")) {
         deps += [ "${_app_root}/clusters/${cluster}" ]
       }
 
-      if (path_exists("${_app_root}/clusters/${cluster}/sources.json")) {
-        # This case contains a list of sources to be added directly into the build
-        foreach(file_name,
-                read_file("${_app_root}/clusters/${cluster}/sources.json",
-                          "json")) {
-          sources += [ "${_app_root}/clusters/${cluster}/${file_name}" ]
-        }
-      } else {
-        # This is a code-backed cluster: it has a buildable target and only `CodegenIntegration.cpp` assumes
-        # application specific settings.
-        sources += [ "${_app_root}/clusters/${cluster}/CodegenIntegration.cpp" ]
+      # This case contains a list of sources to be added directly into the build
+      foreach(file_name,
+              read_file("${_app_root}/clusters/${cluster}/codegen_sources.json",
+                        "json")) {
+        sources += [ "${_app_root}/clusters/${cluster}/${file_name}" ]
       }
     }
 

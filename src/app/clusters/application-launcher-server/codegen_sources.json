@@ -1,0 +1,5 @@
+[
+  "application-launcher-delegate.h",
+  "application-launcher-server.cpp",
+  "application-launcher-server.h"
+]

@@ -1,9 +1,0 @@
-[
-    "thermostat-server.h",
-    "thermostat-delegate.h",
-    "thermostat-server.cpp",
-    "PresetStructWithOwnedMembers.h",
-    "thermostat-server-atomic.cpp",
-    "PresetStructWithOwnedMembers.cpp",
-    "thermostat-server-presets.cpp"
-]

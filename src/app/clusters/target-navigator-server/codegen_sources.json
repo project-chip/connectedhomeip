@@ -1,0 +1,5 @@
+[
+  "target-navigator-delegate.h",
+  "target-navigator-server.cpp",
+  "target-navigator-server.h"
+]

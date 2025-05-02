@@ -1,7 +1,0 @@
-[
-    "resource-monitoring-cluster-objects.h",
-    "resource-monitoring-cluster-objects.cpp",
-    "replacement-product-list-manager.h",
-    "resource-monitoring-server.cpp",
-    "resource-monitoring-server.h"
-]

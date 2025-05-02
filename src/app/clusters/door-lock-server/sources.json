@@ -1,6 +1,0 @@
-[
-    "door-lock-server.h",
-    "door-lock-server.cpp",
-    "door-lock-delegate.h",
-    "door-lock-server-callback.cpp"
-]
