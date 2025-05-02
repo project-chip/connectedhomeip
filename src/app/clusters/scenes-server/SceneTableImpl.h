@@ -46,7 +46,7 @@ static constexpr uint16_t kMaxScenesPerFabric = (kMaxScenesPerEndpoint - 1) / 2;
  * @brief Implementation of a storage in nonvolatile storage of the scene table.
  *
  * DefaultSceneTableImpl is an implementation that allows to store scenes using PersistentStorageDelegate.
- * It handles the storage of scenes by their ID, GroupID and EnpointID over multiple fabrics.
+ * It handles the storage of scenes by their ID, GroupId and EnpointId over multiple fabrics.
  * It is meant to be used exclusively when the scene cluster is enable for at least one endpoint
  * on the device.
  */

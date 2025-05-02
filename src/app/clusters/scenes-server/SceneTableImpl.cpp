@@ -76,18 +76,18 @@ constexpr size_t Serializer::kFabricMaxBytes()
     return 128;
 }
 
-#include <app/storage/FabricTableImpl.hpp>
+#include <app/storage/FabricTableImpl.ipp>
 
 namespace {
 /// @brief Tags Used to serialize Scenes so they can be stored in flash memory.
-/// kGroupID: Tag for GroupID if the Scene is a Group Scene
-/// kSceneID: Tag for the scene ID together with kGroupID, forms the SceneStorageID
+/// kGroupId: Tag for GroupID if the Scene is a Group Scene
+/// kSceneId: Tag for the scene ID. Together with kGroupId, forms the SceneStorageId
 /// kName: Tag for the name of the scene
 /// kTransitionTime: Tag for the transition time of the scene in miliseconds
 enum class TagScene : uint8_t
 {
-    kGroupID = static_cast<uint8_t>(TagEntry::kNextFabricTableTag),
-    kSceneID,
+    kGroupId = static_cast<uint8_t>(TagEntry::kFabricTableFirstSpecializationReservedTag),
+    kSceneId,
     kName,
     kTransitionTimeMs,
 };
@@ -340,8 +340,8 @@ static DefaultSceneTableImpl gSceneTableImpl;
 template <>
 CHIP_ERROR Serializer::SerializeId(TLV::TLVWriter & writer, const SceneStorageId & id)
 {
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagScene::kGroupID), id.mGroupId));
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagScene::kSceneID), id.mSceneId));
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagScene::kGroupId), id.mGroupId));
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagScene::kSceneId), id.mSceneId));
     return CHIP_NO_ERROR;
 }
 
@@ -349,9 +349,9 @@ template <>
 CHIP_ERROR Serializer::DeserializeId(TLV::TLVReader & reader, SceneStorageId & id)
 {
     // Scene ID
-    ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kGroupID)));
+    ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kGroupId)));
     ReturnErrorOnFailure(reader.Get(id.mGroupId));
-    ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kSceneID)));
+    ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kSceneId)));
     ReturnErrorOnFailure(reader.Get(id.mSceneId));
     return CHIP_NO_ERROR;
 }

@@ -22,7 +22,7 @@ config("includes") {
 source_set("fabric-table") {
   sources = [
     "FabricTableImpl.h",
-    "FabricTableImpl.hpp",
+    "FabricTableImpl.ipp",
     "TableEntry.h",
   ]
 

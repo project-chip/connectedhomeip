@@ -30,17 +30,18 @@ namespace Storage {
 using EntryIndex = Data::EntryIndex;
 
 /// @brief Tags Used to serialize entries so they can be stored in flash memory.
+/// kEndpointEntryCount: Number of entries in an endpoint
 /// kEntryCount: Number of entries in a Fabric
-/// kStorageIdArray: Array of StorageID struct
-/// kEndpointID: Tag for the Endpoint ID to that this entry applies to
+/// kStorageIdArray: Array of StorageId struct
 enum class TagEntry : uint8_t
 {
     kEndpointEntryCount = 1,
     kEntryCount,
     kStorageIdArray,
-    kNextFabricTableTag
-    // NOTICE: Take great care adding more, as specializations have their own
-    // serialization indices
+    kFabricTableFirstSpecializationReservedTag,
+    kFabricTableLastSpecializationReservedTag = 127,
+    // Add new entries here; kFabricTableFirstSpecializationReservedTag through
+    // kFabricTableLastSpecializationReservedTag are reserved for specializations
 };
 
 // Currently takes 5 Bytes to serialize Container and value in a TLV: 1 byte start struct, 2 bytes control + tag for the value, 1

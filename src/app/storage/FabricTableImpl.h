@@ -29,7 +29,7 @@ namespace Storage {
  *        reading entries from the storage pointed to by calling SetEndpoint.
  *
  * FabricTableImpl is an implementation that allows to store arbitrary entities using PersistentStorageDelegate.
- * It handles the storage of entities by their StorageId and EnpointID over multiple fabrics.
+ * It handles the storage of entities by their StorageId and EnpointId over multiple fabrics.
  */
 template <class StorageId, class StorageData, size_t kIteratorsMax>
 class FabricTableImpl
@@ -53,7 +53,7 @@ public:
     CHIP_ERROR GetEndpointEntryCount(uint8_t & entry_count);
 
     /**
-     * @brief Get the total number of stored entries for the specified fabric
+     * @brief Get the total number of stored entries for the specified fabric on the currently selected endpoint.
      * @param fabric_index the fabric to get the count for
      * @param entry_count[out] the count of entries
      * @return CHIP_ERROR, CHIP_NO_ERROR if successful or if the Fabric was not found, specific CHIP_ERROR otherwise
