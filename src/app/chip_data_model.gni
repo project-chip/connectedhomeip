@@ -249,14 +249,13 @@ template("chip_data_model") {
     }
 
     # Clusters are expected to have the following format:
-    #   - (optional) a `BUILD.gn` file that defines generic targets. A dependency
-    #     will be added on this default target
+    #   - A `BUILD.gn` file that defines generic targets. A dependency
+    #     will be added on this default target. An empty group will be created
+    #     if no special build rules exist
     #   - codegen_sources.json - required sources for code generation integration
 
     foreach(cluster, _cluster_sources) {
-      if (path_exists("${_app_root}/clusters/${cluster}/BUILD.gn")) {
-        deps += [ "${_app_root}/clusters/${cluster}" ]
-      }
+      deps += [ "${_app_root}/clusters/${cluster}" ]
 
       # This case contains a list of sources to be added directly into the build
       foreach(file_name,
