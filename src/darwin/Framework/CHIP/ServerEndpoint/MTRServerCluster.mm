@@ -27,7 +27,6 @@
 #import <Matter/MTRServerCluster.h>
 
 #include <app/AttributeAccessInterface.h>
-#include <app/clusters/descriptor/descriptor.h>
 #include <app/data-model/PreEncodedValue.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
