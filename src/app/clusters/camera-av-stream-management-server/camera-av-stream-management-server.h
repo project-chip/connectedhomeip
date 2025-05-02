@@ -274,15 +274,15 @@ protected:
 
 enum class OptionalAttribute : uint32_t
 {
-    kHardPrivacyModeOn       = 0x0001,
-    kNightVision             = 0x0002,
-    kNightVisionIllum        = 0x0004,
-    kMicrophoneAGCEnabled    = 0x0008,
-    kImageRotation           = 0x0010,
-    kImageFlipHorizontal     = 0x0020,
-    kImageFlipVertical       = 0x0040,
-    kStatusLightEnabled      = 0x0080,
-    kStatusLightBrightness   = 0x0100,
+    kHardPrivacyModeOn     = 0x0001,
+    kNightVision           = 0x0002,
+    kNightVisionIllum      = 0x0004,
+    kMicrophoneAGCEnabled  = 0x0008,
+    kImageRotation         = 0x0010,
+    kImageFlipHorizontal   = 0x0020,
+    kImageFlipVertical     = 0x0040,
+    kStatusLightEnabled    = 0x0080,
+    kStatusLightBrightness = 0x0100,
 };
 
 class CameraAVStreamMgmtServer : public CommandHandlerInterface, public AttributeAccessInterface
