@@ -183,7 +183,7 @@ properties:
 | isLowerCase   | Validates if the char_string is lower case.                 | No (If other provided) |
 | isUpperCase   | Validates if the char_string is upper case.                 | No (If other provided) |
 | isHexString   | Checks whether the char_string is a hex string.             | No (If other provided) |
-| isSetOfValues | Uses a order-independent on the list contents.              | No (If other provided) |
+| isSetOfValues | Uses a order-independent compare on the list contents.      | No (If other provided) |
 
 Note: The hasValue constraint is only applied to optional fields. The other
 constraints are ignored for optional fields that do not have a value.
