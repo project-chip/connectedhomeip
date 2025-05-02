@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Project CHIP Authors
+# Copyright (c) 2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,28 +13,8 @@
 # limitations under the License.
 import("//build_overrides/chip.gni")
 
-static_library("scenes") {
-  output_name = "libCHIPScenes"
-
-  sources = [
-    "ExtensionFieldSets.h",
-    "ExtensionFieldSetsImpl.cpp",
-    "ExtensionFieldSetsImpl.h",
-    "SceneHandlerImpl.cpp",
-    "SceneHandlerImpl.h",
-    "SceneTable.h",
-    "SceneTableImpl.cpp",
-    "SceneTableImpl.h",
-  ]
-
-  deps = [ "${chip_root}/src/app" ]
-
-  cflags = [
-    "-Wconversion",
-    "-Wshadow",
-  ]
-}
-
-# Empty default target, so that data_model.gni can properly depend on this
-group("scenes-server") {
+# transitional dependencies so that chip_data_model sets
+# the right dependencies
+group("application-launcher-server") {
+  public_deps = [ "${chip_root}/src/controller" ]
 }

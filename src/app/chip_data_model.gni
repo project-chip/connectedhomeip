@@ -258,6 +258,10 @@ template("chip_data_model") {
     #     - a `CodegenIntegration.cpp` file exists that is auto-added to the monolith
 
     foreach(cluster, _cluster_sources) {
+      if (path_exists("${_app_root}/clusters/${cluster}/BUILD.gn")) {
+        deps += [ "${_app_root}/clusters/${cluster}" ]
+      }
+
       if (path_exists("${_app_root}/clusters/${cluster}/sources.json")) {
         # This case contains a list of sources to be added directly into the build
         foreach(file_name,
@@ -268,31 +272,7 @@ template("chip_data_model") {
       } else {
         # This is a code-backed cluster: it has a buildable target and only `CodegenIntegration.cpp` assumes
         # application specific settings.
-        deps += [ "${_app_root}/clusters/${cluster}" ]
         sources += [ "${_app_root}/clusters/${cluster}/CodegenIntegration.cpp" ]
-      }
-
-      # NOTE: additional dependencies. This is awkward and likely
-      #       should be figured out somehow ...
-      if (cluster == "application-launcher-server") {
-        deps += [ "${chip_root}/src/controller" ]
-      } else if (cluster == "ota-requestor") {
-        # TODO: DefaultOTARequestor depends on controller, however the cluster server itself does not.
-        # Maybe DefaultOTARequestor and related code should have its own source set.
-        deps += [ "${chip_root}/src/controller:interactions" ]
-      } else if (cluster == "icd-management-server") {
-        deps += [
-          "${chip_root}/src/app/icd/server:configuration-data",
-          "${chip_root}/src/app/icd/server:icd-server-config",
-        ]
-        if (chip_enable_icd_server) {
-          deps += [ "${chip_root}/src/app/icd/server:notifier" ]
-          if (chip_enable_icd_checkin) {
-            deps += [ "${chip_root}/src/app/icd/server:monitoring-table" ]
-          }
-        }
-      } else if (cluster == "operational-credentials-server") {
-        deps += [ "${chip_root}/zzz_generated/app-common/clusters/OperationalCredentials:metadata" ]
       }
     }
 
