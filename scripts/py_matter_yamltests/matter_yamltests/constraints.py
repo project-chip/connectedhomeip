@@ -769,6 +769,7 @@ class _ConstraintIsSetOfValues(BaseConstraint):
         self._expected = expected
 
     def _get_missing_extra(self, value):
+        # Start with sets containing every element index. We will remove elements as they match.
         expected_but_missing_idx = set(range(len(self._expected)))
         values_not_expected_idx = set(range(len(value)))
         for expected_idx, expected_element in enumerate(self._expected):
