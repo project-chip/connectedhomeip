@@ -153,7 +153,11 @@ class TC_AVSM_2_5(MatterBaseTest):
                 bitRate=1024,
                 bitDepth=aMicrophoneCapabilities.supportedBitDepths[0],
             )
-            await self.send_single_cmd(endpoint=endpoint, cmd=adoStreamAllocateCmd)
+            audioStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=adoStreamAllocateCmd)
+            logger.info(f"Rx'd AudioStreamAllocateResponse: {audioStreamAllocateResponse}")
+            asserts.assert_is_not_none(
+                audioStreamAllocateResponse.audioStreamID, "AudioStreamAllocateResponse does not contain StreamID"
+            )
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass

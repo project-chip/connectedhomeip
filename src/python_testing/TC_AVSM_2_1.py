@@ -412,7 +412,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             logger.info(f"Rx'd LocalVideoRecordingEnabled: {value}")
 
         self.step(40)
-        if self.pics_guard(self.check_pics("AVSM.S.A002")):
+        if self.pics_guard(self.check_pics("AVSM.S.A0026")):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.LocalSnapshotRecordingEnabled
             )

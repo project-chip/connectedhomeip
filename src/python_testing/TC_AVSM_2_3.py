@@ -80,6 +80,10 @@ class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
 
     @run_if_endpoint_matches(
         has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kSnapshot)
+        and (
+            has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kWatermark)
+            or has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kOnScreenDisplay)
+        )
     )
     async def test_TC_AVSM_2_3(self):
         endpoint = self.get_endpoint(default=1)

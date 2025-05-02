@@ -132,7 +132,11 @@ class TC_AVSM_2_2(MatterBaseTest):
                 maxResolution=aSnapshotCapabilities[0].resolution,
                 quality=90,
             )
-            await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
+            snpStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
+            logger.info(f"Rx'd SnapshotStreamAllocateResponse: {snpStreamAllocateResponse}")
+            asserts.assert_is_not_none(
+                snpStreamAllocateResponse.snapshotStreamID, "SnapshotStreamAllocateResponse does not contain StreamID"
+            )
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass

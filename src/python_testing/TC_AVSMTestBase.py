@@ -60,7 +60,11 @@ class AVSMTestBase:
                 maxResolution=aSnapshotCapabilities[0].resolution,
                 quality=90,
             )
-            await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
+            snpStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
+            logger.info(f"Rx'd SnapshotStreamAllocateResponse: {snpStreamAllocateResponse}")
+            asserts.assert_is_not_none(
+                snpStreamAllocateResponse.snapshotStreamID, "SnapshotStreamAllocateResponse does not contain StreamID"
+            )
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass
@@ -105,7 +109,11 @@ class AVSMTestBase:
                 bitRate=1024,
                 bitDepth=aMicrophoneCapabilities.supportedBitDepths[0],
             )
-            await self.send_single_cmd(endpoint=endpoint, cmd=adoStreamAllocateCmd)
+            audioStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=adoStreamAllocateCmd)
+            logger.info(f"Rx'd AudioStreamAllocateResponse: {audioStreamAllocateResponse}")
+            asserts.assert_is_not_none(
+                audioStreamAllocateResponse.audioStreamID, "AudioStreamAllocateResponse does not contain StreamID"
+            )
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass
@@ -158,16 +166,22 @@ class AVSMTestBase:
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=aRankedStreamPriorities[0],
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=aVideoSensorParams.maxFPS,
+                minFrameRate=15,  # An acceptable value for min frame rate
                 maxFrameRate=aVideoSensorParams.maxFPS,
-                minResolution=aRateDistortionTradeOffPoints[0].resolution,
-                maxResolution=aRateDistortionTradeOffPoints[0].resolution,
+                minResolution=aMinViewport,
+                maxResolution=cluster.Structs.VideoResolutionStruct(
+                    width=aVideoSensorParams.sensorWidth, height=aVideoSensorParams.sensorHeight
+                ),
                 minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 minFragmentLen=4000,
                 maxFragmentLen=4000,
             )
-            await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
+            videoStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
+            logger.info(f"Rx'd VideoStreamAllocateResponse: {videoStreamAllocateResponse}")
+            asserts.assert_is_not_none(
+                videoStreamAllocateResponse.videoStreamID, "VideoStreamAllocateResponse does not contain StreamID"
+            )
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass
