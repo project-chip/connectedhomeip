@@ -54,6 +54,30 @@ public:
               chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorServer * requestorServer);
 
     /**
+     * @brief Sends a SolicitOffer command to the remote device.
+     *
+     * This method populates the SolicitOffer command parameters, requests that the Provider initiates
+     * a new session with the Offer / Answer flow.
+     *
+     * @param streamUsage            An enum value describing how the stream is intended to be used.
+     * @param originatingEndpointId  The endpoint ID that initiates the offer.
+     * @param videoStreamId          Optional Video stream ID if relevant.
+     * @param audioStreamId          Optional Audio stream ID if relevant.
+     * @param ICEServers             Optional list of ICE server structures, if using custom STUN/TURN servers.
+     * @param ICETransportPolicy     Optional policy for ICE transport (e.g., 'all', 'relay', etc.).
+     *
+     * @return CHIP_NO_ERROR on success, or an appropriate CHIP_ERROR on failure.
+     */
+    CHIP_ERROR
+    SolicitOffer(chip::app::Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage, chip::EndpointId originatingEndpointId,
+                 chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId,
+                 chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId,
+                 chip::Optional<
+                     chip::app::DataModel::List<const chip::app::Clusters::WebRTCTransportProvider::Structs::ICEServerStruct::Type>>
+                     ICEServers,
+                 chip::Optional<chip::CharSpan> ICETransportPolicy);
+
+    /**
      * @brief Sends a ProvideOffer command to the remote device.
      *
      * This method populates the ProvideOffer command parameters, buffers the SDP locally to ensure
@@ -82,6 +106,18 @@ public:
                  chip::Optional<chip::CharSpan> ICETransportPolicy);
 
     /**
+     * @brief Sends a ProvideAnswer command to the remote device.
+     *
+     * Invoke this after you have received an *Offer* and generated the local SDP answer for the same WebRTC session.
+     *
+     * @param webRTCSessionId   The unique identifier for the established WebRTC session negotiated in the earlier *Offer*.
+     * @param sdp               The raw SDP (Session Description Protocol) data as a standard string.
+     *
+     * @return CHIP_NO_ERROR on success, or an appropriate CHIP_ERROR on failure.
+     */
+    CHIP_ERROR ProvideAnswer(uint16_t webRTCSessionId, const std::string & sdp);
+
+    /**
      * @brief Sends a ProvideICECandidates command to the remote device.
      *
      * This method populates the ProvideICECandidates command parameters, packages the provided ICE
@@ -97,6 +133,16 @@ public:
      * @return CHIP_NO_ERROR on success, or an appropriate CHIP_ERROR on failure.
      */
     CHIP_ERROR ProvideICECandidates(uint16_t webRTCSessionId, chip::app::DataModel::List<const chip::CharSpan> ICECandidates);
+
+    /**
+     * @brief Notify WebRTCProviderClient that the Offer command has been received.
+     *
+     * Hanlde the stream requestor with WebRTC session details. It is sent following the receipt of a SolicitOffer
+     * command or a re-Offer initiated by the Provider.
+     *
+     * @param webRTCSessionId   The unique identifier for the WebRTC session.
+     */
+    void HandleOfferReceived(uint16_t webRTCSessionId);
 
     /**
      * @brief Notify WebRTCProviderClient that the Answer command has been received.
@@ -170,6 +216,8 @@ private:
 
     static void OnSessionEstablishTimeout(chip::System::Layer * systemLayer, void * appState);
 
+    void HandleSolicitOfferResponse(chip::TLV::TLVReader & data);
+
     void HandleProvideOfferResponse(chip::TLV::TLVReader & data);
 
     // Private data members
@@ -184,7 +232,9 @@ private:
     chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorServer * mRequestorServer = nullptr;
 
     // Data needed to send the WebRTCTransportProvider commands
+    chip::app::Clusters::WebRTCTransportProvider::Commands::SolicitOffer::Type mSolicitOfferData;
     chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Type mProvideOfferData;
+    chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideAnswer::Type mProvideAnswerData;
     chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::Type mProvideICECandidatesData;
     chip::app::Clusters::WebRTCTransportProvider::StreamUsageEnum mCurrentStreamUsage =
         chip::app::Clusters::WebRTCTransportProvider::StreamUsageEnum::kUnknownEnumValue;
