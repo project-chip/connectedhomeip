@@ -23,22 +23,28 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
-
-using namespace chip::DeviceLayer;
-using namespace ::chip::DeviceLayer::Internal;
-
-static chip::OTAMultiImageProcessorImpl gImageProcessor;
-
+#include <platform/silabs/multi-ota/SiWx917/OTAWiFiFirmwareProcessor.h>
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+#ifdef __cplusplus
 extern "C" {
-#if SL_BTLCTRL_MUX
-#include "btl_interface.h"
-#include "sl_core.h"
-#endif                          // SL_BTLCTRL_MUX
+#endif
+#include "sl_si91x_driver.h"
+#ifdef SLI_SI91X_MCU_INTERFACE
+#include "sl_si91x_hal_soc_soft_reset.h"
+#endif
+#ifdef __cplusplus
+}
+#endif
+extern "C" {
 #include "em_bus.h"             // For CORE_CRITICAL_SECTION
 #ifndef SLI_SI91X_MCU_INTERFACE // This is not needed for the 917 SoC; it is required for EFR host applications
 #include "btl_interface.h"
 #endif // SLI_SI91X_MCU_INTERFACE
 }
+using namespace chip::DeviceLayer;
+using namespace ::chip::DeviceLayer::Internal;
+
+static chip::OTAMultiImageProcessorImpl gImageProcessor;
 
 namespace chip {
 
@@ -197,6 +203,8 @@ CHIP_ERROR OTAMultiImageProcessorImpl::SelectProcessor(ByteSpan & block)
     ChipLogDetail(SoftwareUpdate, "Selected processor with tag: %lu", pair->first);
     mCurrentProcessor = pair->second;
     mCurrentProcessor->SetLength(header.length);
+    ChipLogDetail(SoftwareUpdate, "Processor length*********: %lu", header.length);
+    ChipLogProgress(SoftwareUpdate, "mCurrentProcessor set to: %p", mCurrentProcessor);
     mCurrentProcessor->SetWasSelected(true);
 
     return CHIP_NO_ERROR;
@@ -415,6 +423,8 @@ void OTAMultiImageProcessorImpl::HandleApply(intptr_t context)
         }
     }
 
+    // ChipLogProgress(SoftwareUpdate, "Selected processor in handleApply******: %p, RequiresReset: %d",
+    //               imageProcessor->mCurrentProcessor, imageProcessor->mCurrentProcessor->RequiresReset());
     for (auto const & pair : imageProcessor->mProcessorMap)
     {
         pair.second->Clear();
@@ -426,7 +436,21 @@ void OTAMultiImageProcessorImpl::HandleApply(intptr_t context)
     ChipLogProgress(SoftwareUpdate, "HandleApply: Finished");
     // This reboots the device
     // TODO: check where to put this
-#ifndef SLI_SI91X_MCU_INTERFACE // This is not needed for the 917 SoC; it is required for EFR host applications
+#ifdef SLI_SI91X_MCU_INTERFACE
+    ChipLogProgress(SoftwareUpdate, "917 SoC Handle Apply *******************");
+    ChipLogProgress(SoftwareUpdate, "Selected processor: %p, RequiresReset: %d", imageProcessor->mCurrentProcessor,
+                    imageProcessor->mCurrentProcessor ? imageProcessor->mCurrentProcessor->RequiresReset() : 0);
+    if (imageProcessor->mCurrentProcessor && imageProcessor->mCurrentProcessor->RequiresReset())
+    {
+        // Handle reset logic
+        ChipLogProgress(SoftwareUpdate, "M4 Firmware update complete");
+        // send system reset request to reset the MCU and upgrade the m4 image
+        ChipLogProgress(SoftwareUpdate, "SoC Soft Reset initiated!");
+        // Reboots the device
+        sl_si91x_soc_nvic_reset();
+        // chip::DeviceLayer::Silabs::GetPlatform().SoftwareReset();
+    }
+#else // EFR reboot
     CORE_CRITICAL_SECTION(bootloader_rebootAndInstall();)
 #endif
     // ConfigurationManagerImpl().StoreSoftwareUpdateCompleted();

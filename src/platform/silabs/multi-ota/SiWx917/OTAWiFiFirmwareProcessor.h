@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,6 +25,9 @@ namespace chip {
 
 class OTAWiFiFirmwareProcessor : public OTATlvProcessor
 {
+protected:
+    bool mReset = false;
+
 public:
     struct Descriptor
     {
@@ -37,8 +40,8 @@ public:
     CHIP_ERROR Clear() override;
     CHIP_ERROR ApplyAction() override;
     CHIP_ERROR FinalizeAction() override;
-    static bool mReset;
     static constexpr size_t kAlignmentBytes = 64;
+    bool RequiresReset() const override { return mReset; }
 
 private:
     CHIP_ERROR ProcessInternal(ByteSpan & block) override;
@@ -46,6 +49,7 @@ private:
 
     OTADataAccumulator mAccumulator;
     bool mDescriptorProcessed = false;
+
 #if OTA_ENCRYPTION_ENABLE
     uint32_t mUnalignmentNum;
 #endif // OTA_ENCRYPTION_ENABLE

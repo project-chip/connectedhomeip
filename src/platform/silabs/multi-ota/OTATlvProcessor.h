@@ -68,7 +68,7 @@ enum class OTAProcessorTag
     kApplicationProcessor = 1,
     kBootloaderProcessor  = 2,
     kFactoryDataProcessor = 3,
-    kWiFiProcessor        = 4,
+    kWiFiTAProcessor      = 4,
     kCustomProcessor1     = 8,
     kCustomProcessor2     = 9,
     kCustomProcessor3     = 10,
@@ -103,6 +103,9 @@ public:
     void SetLength(uint32_t length) { mLength = length; }
     void SetWasSelected(bool selected) { mWasSelected = selected; }
     bool WasSelected() { return mWasSelected; }
+
+    virtual bool RequiresReset() const { return false; }
+
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
     CHIP_ERROR vOtaProcessInternalEncryption(MutableByteSpan & block);
 #endif
