@@ -528,25 +528,6 @@ TEST_F(TestClosureControlClusterLogic, SetCountdownTimeFromDelegate_ValidChange)
 
     EXPECT_EQ(logic->GetCountdownTime(readValue), CHIP_NO_ERROR);
     EXPECT_EQ(readValue.Value(), 2u);
-
-    // // validate Decrease - not reportable
-    // countdownTime.SetNonNull(1);
-    // EXPECT_EQ(logic->SetCountdownTimeFromDelegate(countdownTime), CHIP_NO_ERROR);
-
-    // EXPECT_FALSE(mockContext.HasBeenMarkedDirty());
-
-    // EXPECT_EQ(logic->GetCountdownTime(readValue), CHIP_NO_ERROR);
-    // EXPECT_EQ(readValue.Value(), 1u);
-
-    // // Reportable after the 1s time since last report
-    // gSystemLayerAndClock.AdvanceMonotonic(500_ms64);
-    // EXPECT_EQ(logic->SetCountdownTimeFromDelegate(countdownTime), CHIP_NO_ERROR);
-    // EXPECT_FALSE(mockContext.HasBeenMarkedDirty());
-
-    // gSystemLayerAndClock.AdvanceMonotonic(1000_ms64);
-    // EXPECT_EQ(logic->SetCountdownTimeFromDelegate(countdownTime), CHIP_NO_ERROR);
-
-    // EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
 }
 
 TEST_F(TestClosureControlClusterLogic, SetOverallState_ValidPositioningOnly)
