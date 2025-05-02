@@ -326,8 +326,9 @@ public:
      */
     CameraAVStreamMgmtServer(CameraAVStreamMgmtDelegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
                              const BitFlags<OptionalAttribute> aOptionalAttrs, uint8_t aMaxConcurrentEncoders,
-                             uint32_t aMaxEncodedPixelRate, const VideoSensorParamsStruct & aVideoSensorParams, bool aNightVisionUsesInfrared,
-                             const VideoResolutionStruct & aMinViewPort, const std::vector<RateDistortionTradeOffStruct> & aRateDistortionTradeOffPoints,
+                             uint32_t aMaxEncodedPixelRate, const VideoSensorParamsStruct & aVideoSensorParams,
+                             bool aNightVisionUsesInfrared, const VideoResolutionStruct & aMinViewPort,
+                             const std::vector<RateDistortionTradeOffStruct> & aRateDistortionTradeOffPoints,
                              uint32_t aMaxContentBufferSize, const AudioCapabilitiesStruct & aMicrophoneCapabilities,
                              const AudioCapabilitiesStruct & aSpkrCapabilities, TwoWayTalkSupportTypeEnum aTwoWayTalkSupport,
                              const std::vector<SnapshotCapabilitiesStruct> & aSnapshotCapabilities, uint32_t aMaxNetworkBandwidth,
