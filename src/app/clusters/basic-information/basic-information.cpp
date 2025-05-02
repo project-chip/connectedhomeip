@@ -53,7 +53,7 @@ constexpr size_t kExpectedFixedLocationLength = 2;
 static_assert(kExpectedFixedLocationLength == DeviceLayer::ConfigurationManager::kMaxLocationLength,
               "Fixed location storage must be of size 2");
 
-CHIP_ERROR ClearNullTerminatedStringWhenUnimplemented(CHIP_ERROR status, char *strBuf)
+CHIP_ERROR ClearNullTerminatedStringWhenUnimplemented(CHIP_ERROR status, char * strBuf)
 {
     if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
     {
@@ -93,9 +93,9 @@ CHIP_ERROR EncodeStringOnSuccess(CHIP_ERROR status, AttributeValueEncoder & enco
 
 CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    CHIP_ERROR status = CHIP_NO_ERROR;
+    CHIP_ERROR status         = CHIP_NO_ERROR;
     auto * deviceInfoProvider = GetDeviceInstanceInfoProvider();
-    auto & configManager = ConfigurationMgr();
+    auto & configManager      = ConfigurationMgr();
 
     switch (aPath.mAttributeId)
     {
@@ -189,8 +189,7 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
         uint16_t manufacturingYear;
         uint8_t manufacturingMonth;
         uint8_t manufacturingDayOfMonth;
-        status =
-            deviceInfoProvider->GetManufacturingDate(manufacturingYear, manufacturingMonth, manufacturingDayOfMonth);
+        status = deviceInfoProvider->GetManufacturingDate(manufacturingYear, manufacturingMonth, manufacturingDayOfMonth);
 
         // TODO: Remove defaulting once proper runtime defaulting of unimplemented factory data is done
         if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
@@ -310,18 +309,18 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
 CHIP_ERROR BasicAttrAccess::ReadLocation(AttributeValueEncoder & aEncoder)
 {
     char location[kExpectedFixedLocationLength + 1] = { 0 };
-    size_t codeLen             = 0;
+    size_t codeLen                                  = 0;
     CharSpan countryCodeSpan;
 
     CHIP_ERROR err = ConfigurationMgr().GetCountryCode(location, sizeof(location), codeLen);
     if ((err != CHIP_NO_ERROR) || (codeLen != kExpectedFixedLocationLength))
     {
         countryCodeSpan = CharSpan::fromCharString("XX");
-        err     = CHIP_NO_ERROR;
+        err             = CHIP_NO_ERROR;
     }
     else
     {
-        countryCodeSpan = CharSpan{location, codeLen};
+        countryCodeSpan = CharSpan{ location, codeLen };
     }
     return aEncoder.Encode(countryCodeSpan);
 }
