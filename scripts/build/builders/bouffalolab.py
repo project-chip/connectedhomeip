@@ -199,7 +199,7 @@ class BouffalolabBuilder(GnBuilder):
 
         if enable_thread:
 
-            self.argsOpt.append('chip_system_config_use_open_thread_inet_endpoints=true')
+            self.argsOpt.append('chip_system_config_use_openthread_inet_endpoints=true')
             self.argsOpt.append('chip_with_lwip=false')
             self.argsOpt.append(f'openthread_project_core_config_file="{bouffalo_chip}-openthread-core-bl-config.h"')
             self.argsOpt.append(f'openthread_package_version="7e32165be"')
@@ -285,16 +285,14 @@ class BouffalolabBuilder(GnBuilder):
 
     def PostBuildCommand(self):
 
-        bouffalo_sdk_chips = ["bl616"]
-        abs_path_fw = os.path.join(self.output_dir, self.app.AppNamePrefix(self.chip_name) + ".bin")
-
-        if self.chip_name not in bouffalo_sdk_chips:
-            abs_path_fw_raw = os.path.join(self.output_dir, self.app.AppNamePrefix(self.chip_name) + ".raw")
+        if self.chip_name in ["bl616"]:
+            abs_path_fw = os.path.join(self.output_dir, self.app.AppNamePrefix(self.chip_name) + ".raw")
+        else:
+            abs_path_fw = os.path.join(self.output_dir, self.app.AppNamePrefix(self.chip_name) + ".bin")
 
         if os.path.isfile(abs_path_fw):
             target_dir = self.output_dir.replace(self.chip_dir, "").strip("/")
 
-            abs_path_fw_bin = os.path.join(self.output_dir, self.app.AppNamePrefix(self.chip_name) + ".bin")
             path_fw = os.path.join(target_dir, self.app.AppNamePrefix(self.chip_name) + ".bin")
             path_flash_script = os.path.join(target_dir, self.app.AppNamePrefix(self.chip_name) + ".flash.py")
 

@@ -21,40 +21,26 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifndef WF200_WIFI
-#include "FreeRTOS.h"
-#include "event_groups.h"
-#include "task.h"
-#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
-#ifdef __cplusplus
-extern "C" {
-#endif
-#include "cmsis_os2.h"
-#include "sl_net.h"
-#include "sl_si91x_driver.h"
-#include "sl_si91x_host_interface.h"
-#include "sl_si91x_types.h"
-#include "sl_wifi.h"
-#include "sl_wifi_callback_framework.h"
-#include "sl_wifi_constants.h"
-#include "sl_wifi_types.h"
-#ifdef __cplusplus
-}
-#endif
-#endif // (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
-#endif // WF200_WIFI
-
-#include <platform/silabs/wifi/WifiInterface.h>
-#ifdef WF200_WIFI
-#include "sl_wfx.h"
-#endif
-/* LwIP includes. */
-#include "ethernetif.h"
+// LwIP includes - Includes must be before the rsi headers due to redefination errors
 #include "lwip/ethip6.h"
 #include "lwip/timeouts.h"
 #include "netif/etharp.h"
 
+#ifdef RS911X_WIFI
+extern "C" {
+#include "rsi_driver.h"
+#include "rsi_pkt_mgmt.h"
+}
+#endif // RS911X_WIFI
+
+#ifdef WF200_WIFI
+#include "sl_wfx.h"
+#endif
+
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/silabs/wifi/WifiInterface.h>
+#include <platform/silabs/wifi/lwip-support/ethernetif.h>
+#include <platform/silabs/wifi/lwip-support/lwip_netif.h>
 
 StaticSemaphore_t xEthernetIfSemaBuffer;
 
@@ -89,7 +75,7 @@ static void low_level_init(struct netif * netif)
 
     /* Set netif MAC hardware address */
     chip::MutableByteSpan byteSpan(netif->hwaddr, ETH_HWADDR_LEN);
-    GetMacAddress(SL_WFX_STA_INTERFACE, byteSpan);
+    chip::DeviceLayer::Silabs::WifiInterface::GetInstance().GetMacAddress(SL_WFX_STA_INTERFACE, byteSpan);
 
     /* Set netif maximum transfer unit */
     netif->mtu = 1500;
@@ -286,7 +272,7 @@ void sl_wfx_host_received_frame_callback(sl_wfx_received_ind_t * rx_buffer)
     {
 
         /* Send received frame to station interface */
-        if ((netif = wfx_get_netif(SL_WFX_STA_INTERFACE)) != NULL)
+        if ((netif = chip::DeviceLayer::Silabs::Lwip::GetNetworkInterface(SL_WFX_STA_INTERFACE)) != NULL)
         {
             uint8_t * buffer;
             uint16_t len;
@@ -316,7 +302,92 @@ void sl_wfx_host_received_frame_callback(sl_wfx_received_ind_t * rx_buffer)
 }
 
 #else /* For RS911x - using LWIP */
+
 static SemaphoreHandle_t ethout_sem;
+
+/**
+ * @brief Allocates packets for the data about to be sent
+ *
+ * TODO: Validate if this warning still applied and fix the associated code
+ * WARNING - Taken from RSI and broken up
+ * This is my own RSI stuff for not copying code and allocating an extra
+ * level of indirection - when using LWIP buffers
+ * see also: int32_t rsi_wlan_send_data_xx(uint8_t *buffer, uint32_t length)
+ *
+ * @return void* pointer to the allocated packet buffer
+ */
+static void * wfx_rsi_alloc_pkt(void)
+{
+    rsi_pkt_t * pkt;
+
+    // Allocate packet to send data
+    if ((pkt = rsi_pkt_alloc(&rsi_driver_cb->wlan_cb->wlan_tx_pool)) == NULL)
+    {
+        return (void *) 0;
+    }
+
+    return (void *) pkt;
+}
+
+/**
+ * @brief Adds the buffer data to the allocated packet.
+ *        the packet must be allocated before adding data to it.
+ *
+ * @param[in,out] p pointer to the allocated packet
+ * @param[in] buf pointer to the data buffer to copy to the packet
+ * @param[in] len length of the data buffer
+ * @param[in] off the offset at which to put the data in the packet
+ */
+void wfx_rsi_pkt_add_data(void * p, uint8_t * buf, uint16_t len, uint16_t off)
+{
+    rsi_pkt_t * pkt;
+
+    pkt = (rsi_pkt_t *) p;
+    memcpy(((char *) pkt->data) + off, buf, len);
+}
+
+/**
+ * @brief Triggers the packet to sent on the wire
+ *
+ * @param p pointer to the packet to send
+ * @param len length of the packet to send
+ *
+ * @return int32_t RSI_ERROR_NONE, if the packet was succesfully sent out
+ *                 RSI_ERROR_RESPONSE_TIMEOUT, if we are unable to acquire the semaphore of the status
+ *                 other error (< 0) if we were unable to send out the the packet
+ */
+int32_t wfx_rsi_send_data(void * p, uint16_t len)
+{
+    int32_t status;
+    uint8_t * host_desc;
+    rsi_pkt_t * pkt;
+
+    pkt       = (rsi_pkt_t *) p;
+    host_desc = pkt->desc;
+    memset(host_desc, 0, RSI_HOST_DESC_LENGTH);
+    rsi_uint16_to_2bytes(host_desc, (len & 0xFFF));
+
+    // Fill packet type
+    host_desc[1] |= (RSI_WLAN_DATA_Q << 4);
+    host_desc[2] |= 0x01;
+
+    rsi_enqueue_pkt(&rsi_driver_cb->wlan_tx_q, pkt);
+
+#ifndef RSI_SEND_SEM_BITMAP
+    rsi_driver_cb_non_rom->send_wait_bitmap |= BIT(0);
+#endif
+    // Set TX packet pending event
+    rsi_set_event(RSI_TX_EVENT);
+
+    if (rsi_wait_on_wlan_semaphore(&rsi_driver_cb_non_rom->send_data_sem, RSI_SEND_DATA_RESPONSE_WAIT_TIME) != RSI_ERROR_NONE)
+    {
+        return RSI_ERROR_RESPONSE_TIMEOUT;
+    }
+    status = rsi_wlan_get_status();
+
+    return status;
+}
+
 /*****************************************************************************
  *  @fn  static err_t low_level_output(struct netif *netif, struct pbuf *p)
  *  @brief
@@ -441,7 +512,7 @@ sl_status_t sl_si91x_host_process_data_frame(sl_wifi_interface_t interface, sl_w
     /* get the network interface for STATION interface,
      * and forward the received frame buffer to LWIP
      */
-    if ((ifp = wfx_get_netif(SL_WFX_STA_INTERFACE)) != (struct netif *) 0)
+    if ((ifp = GetNetworkInterface(SL_WFX_STA_INTERFACE)) != (struct netif *) 0)
     {
         low_level_input(ifp, rsi_pkt->data, rsi_pkt->length);
     }
@@ -465,7 +536,7 @@ void wfx_host_received_sta_frame_cb(uint8_t * buf, int len)
     /* get the network interface for STATION interface,
      * and forward the received frame buffer to LWIP
      */
-    if ((ifp = wfx_get_netif(SL_WFX_STA_INTERFACE)) != (struct netif *) 0)
+    if ((ifp = chip::DeviceLayer::Silabs::Lwip::GetNetworkInterface(SL_WFX_STA_INTERFACE)) != (struct netif *) 0)
     {
         low_level_input(ifp, buf, len);
     }

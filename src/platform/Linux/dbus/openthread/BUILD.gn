@@ -17,9 +17,10 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/linux/gdbus_library.gni")
 
 gdbus_library("openthread") {
-  sources = [ "introspect.xml" ]
+  sources = [ "DBusOpenthread.xml" ]
 
   c_namespace = "Openthread"
+  interface_prefix = "io.openthread"
   c_generate_object_manager = false
   dbus_out_dir = "platform/Linux/dbus/openthread"
 }

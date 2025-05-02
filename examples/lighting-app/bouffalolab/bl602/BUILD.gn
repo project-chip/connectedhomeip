@@ -76,7 +76,6 @@ bl_iot_sdk("sdk") {
     "OTA_AUTO_REBOOT_DELAY=${ota_auto_reboot_delay_seconds}",
     "CHIP_UART_BAUDRATE=${baudrate}",
     "SYS_AOS_LOOP_ENABLE",
-    "CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE=48",
   ]
 
   defines += [ "PW_RPC_ENABLED=${chip_enable_pw_rpc}" ]
@@ -97,7 +96,7 @@ bouffalolab_executable("lighting_app") {
   output_name = "chip-bl602-lighting-example.out"
 
   defines = [
-    "APP_TASK_STACK_SIZE=2044",
+    "APP_TASK_STACK_SIZE=4096",
     "CHIP_UART_BAUDRATE=${baudrate}",
     "START_ENTRY=bfl_main",
     "SYS_AOS_LOOP_ENABLE",
@@ -109,6 +108,10 @@ bouffalolab_executable("lighting_app") {
 
   defines +=
       [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE=${chip_enable_factory_data}" ]
+
+  if (enable_lwip_pbuf_ram) {
+    defines += [ "CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM=1" ]
+  }
 
   bl_plat_name = "bl602"
   sources = [
@@ -228,6 +231,10 @@ bouffalolab_executable("lighting_app") {
   inputs = [ ldscript ]
 
   if (chip_print_memory_usage) {
+    if (enable_lwip_pbuf_ram) {
+      ldflags += [ "-Wl,--defsym=__RAM_PBUF_POOL=0" ]
+    }
+
     ldflags += [
       "-Wl,--print-memory-usage",
       "-fstack-usage",

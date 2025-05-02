@@ -1,0 +1,131 @@
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!--
+This file is constructed based on the OpenThread D-Bus API exposed by the
+OpenThread Border Router. The list of methods and properties is available
+at: https://github.com/openthread/ot-br-posix/blob/main/src/dbus/common/constants.hpp
+
+Please note that this file is not a complete representation of the OpenThread
+D-Bus API, but only includes the methods and properties that are relevant for
+the OpenThread integration with the Matter SDK.
+-->
+
+<!DOCTYPE node PUBLIC
+  "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+  "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+
+<node>
+  <interface name="io.openthread.BorderRouter">
+
+    <!-- Scan: Perform a Thread network scan.
+      @scan_result: array of scan results.
+
+      The result structure definition is:
+      <literallayout>
+        struct {
+          uint64 ext_address
+          string network_name
+          uint64 ext_panid
+          uint8[] steering_data
+          uint16 panid
+          uint16 joiner_udp_port
+          uint8 channel
+          int16 rssi
+          uint8 lqi
+          uint8 version
+          bool is_native
+          bool is_joinable
+        }
+      </literallayout>
+    -->
+    <method name="Scan">
+      <arg name="scan_result" type="a(tstayqqynyybb)" direction="out"/>
+    </method>
+
+    <!--
+    Attach the current device to the Thread network using
+    the current active network dataset.
+    -->
+    <method name="Attach" />
+
+    <!--
+    Perform a reset, will try to resume the network after reset.
+    -->
+    <method name="Reset" />
+
+    <!--
+    The current link mode.
+
+    This property is a struct with the following fields:
+      bool rx_on_when_idle    // whether the radio receiving is on when idle
+      bool device_type        // ftd or mtd
+      bool network_data       // full or stable
+    -->
+    <property name="LinkMode" type="(bbb)" access="readwrite">
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
+    </property>
+
+    <!--
+    The current device role.
+
+    Possible values are:
+      - disabled
+      - detached
+      - child
+      - router
+      - leader
+    -->
+    <property name="DeviceRole" type="s" access="read">
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
+    </property>
+
+    <!--
+    The 64-bit extended address.
+    -->
+    <property name="ExtendedAddress" type="t" access="read">
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
+    </property>
+
+    <!--
+    The list of current external route rules.
+
+    The structure definition for a single route rule:
+      struct {
+        struct {
+          uint8[] prefix_bytes
+          uint8 prefix_length
+        }
+        uint16 rloc
+        uint8 preference
+        bool stable
+        bool next_hop_is_self
+      }
+    -->
+    <property name="ExternalRoutes" type="a((ayy)qybb)" access="read">
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
+    </property>
+
+    <!--
+    The Thread active dataset TLV in binary form.
+    -->
+    <property name="ActiveDatasetTlvs" type="ay" access="readwrite">
+      <annotation name="org.gtk.GDBus.C.ForceGVariant" value="true"/>
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
+    </property>
+
+  </interface>
+</node>

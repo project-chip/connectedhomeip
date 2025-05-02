@@ -1,0 +1,42 @@
+{
+    "routes": [
+        {
+            "method": "GET",
+            "path": "/dcl/model/models/65522/32769",
+            "response": {
+                "status": 200,
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "body": {
+                    "model": {
+                        "vid": 65522,
+                        "pid": 32769,
+                        "deviceTypeId": 259,
+                        "productName": "TEST_PRODUCT",
+                        "productLabel": "Terms and Conditions App",
+                        "partNumber": "",
+                        "commissioningCustomFlow": 2,
+                        "commissioningCustomFlowUrl": "",
+                        "commissioningModeInitialStepsHint": 0,
+                        "commissioningModeInitialStepsInstruction": "",
+                        "commissioningModeSecondaryStepsHint": 0,
+                        "commissioningModeSecondaryStepsInstruction": "",
+                        "creator": "chip project",
+                        "lsfRevision": 0,
+                        "lsfUrl": "",
+                        "productUrl": "https://github.com/project-chip/connectedhomeip/tree/master/examples/terms-and-conditions-app",
+                        "supportUrl": "https://github.com/project-chip/connectedhomeip/",
+                        "userManualUrl": "",
+                        "enhancedSetupFlowOptions": 1,
+                        "enhancedSetupFlowTCUrl": "https://localhost:44538/tc/65522/32769",
+                        "enhancedSetupFlowTCRevision": 1,
+                        "enhancedSetupFlowTCDigest": "fcqhuEAkq6nNQARcqrGGMcZc4KCFZCfJmrmK6ysd7zo=",
+                        "enhancedSetupFlowTCFileSize": 279,
+                        "enhancedSetupFlowMaintenanceUrl": ""
+                    }
+                }
+            }
+        }
+    ]
+}

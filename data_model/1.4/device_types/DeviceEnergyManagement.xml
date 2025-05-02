@@ -80,7 +80,7 @@ Davis, CA 95616, USA
     <cluster id="0x009F" name="Device Energy Management Mode" side="server">
       <otherwiseConform>
         <mandatoryConform>
-          <attribute name="ControllableESA"/>
+          <condition name="ControllableESA"/>
         </mandatoryConform>
         <optionalConform/>
       </otherwiseConform>

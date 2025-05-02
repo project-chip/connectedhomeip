@@ -32,6 +32,7 @@
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
+#include <lib/support/TypeTraits.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -919,6 +920,65 @@ CHIP_ERROR DeriveGroupOperationalCredentials(const ByteSpan & epoch_key, const B
     ReturnErrorOnFailure(Crypto::DeriveGroupSessionId(encryption_key, operational_credentials.hash));
     ReturnErrorOnFailure(Crypto::DeriveGroupPrivacyKey(encryption_key, privacy_key));
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GenerateVendorFabricBindingMessage(FabricBindingVersion fabricBindingVersion, const P256PublicKey & rootPublicKey,
+                                              FabricId fabricId, uint16_t vendorId, MutableByteSpan & outputSpan)
+{
+    // Only V1 supported yet.
+    switch (fabricBindingVersion)
+    {
+    case FabricBindingVersion::kVersion1:
+        break;
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    Encoding::BigEndian::BufferWriter writer(outputSpan);
+
+    // vendor_fabric_binding_message := fabric_binding_version (1 byte) || root_public_key || fabric_id || vendor_id
+    writer.Put8(to_underlying(fabricBindingVersion))
+        .Put(rootPublicKey.ConstBytes(), rootPublicKey.Length())
+        .Put64(fabricId)
+        .Put16(vendorId);
+
+    size_t actuallyWritten = 0;
+    VerifyOrReturnError(writer.Fit(actuallyWritten), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    outputSpan.reduce_size(actuallyWritten);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GenerateVendorIdVerificationToBeSigned(FabricIndex fabricIndex, const ByteSpan & clientChallenge,
+                                                  const ByteSpan & attestationChallenge,
+                                                  const ByteSpan & vendorFabricBindingMessage,
+                                                  const ByteSpan & vidVerificationStatement, MutableByteSpan & outputSpan)
+{
+    VerifyOrReturnError((clientChallenge.size() == kVendorIdVerificationClientChallengeSize) &&
+                            (attestationChallenge.size() == CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES) &&
+                            !vendorFabricBindingMessage.empty(),
+                        CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Extract binding version from vendorFabricBindingMessage. Only V1 supported yet.
+    uint8_t fabricBindingVersion = vendorFabricBindingMessage[0];
+    VerifyOrReturnError(fabricBindingVersion == to_underlying(FabricBindingVersion::kVersion1), CHIP_ERROR_INVALID_ARGUMENT);
+
+    Encoding::BigEndian::BufferWriter writer(outputSpan);
+
+    // vendor_id_verification_tbs := fabric_binding_version || client_challenge || attestation_challenge || fabric_index ||
+    // vendor_fabric_binding_message || <vid_verification_statement>
+    writer.Put8(fabricBindingVersion)
+        .Put(clientChallenge.data(), clientChallenge.size())
+        .Put(attestationChallenge.data(), attestationChallenge.size())
+        .Put8(fabricIndex)
+        .Put(vendorFabricBindingMessage.data(), vendorFabricBindingMessage.size())
+        .Put(vidVerificationStatement.data(), vidVerificationStatement.size());
+
+    size_t actuallyWritten = 0;
+    VerifyOrReturnError(writer.Fit(actuallyWritten), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    outputSpan.reduce_size(actuallyWritten);
     return CHIP_NO_ERROR;
 }
 

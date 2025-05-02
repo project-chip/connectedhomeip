@@ -39,7 +39,7 @@ TEST(TestDefaultSessionResumptionStorage, TestSave)
     } vectors[CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE + 1];
 
     // Populate test vectors.
-    for (size_t i = 0; i < ArraySize(vectors); ++i)
+    for (size_t i = 0; i < MATTER_ARRAY_SIZE(vectors); ++i)
     {
         EXPECT_EQ(chip::Crypto::DRBG_get_bytes(vectors[i].resumptionId.data(), vectors[i].resumptionId.size()), CHIP_NO_ERROR);
         *vectors[i].resumptionId.data() =
@@ -65,7 +65,7 @@ TEST(TestDefaultSessionResumptionStorage, TestSave)
     // If more sophisticated LRU behavior is implemented, this test
     // case should be modified to match.
     {
-        size_t last = ArraySize(vectors) - 1;
+        size_t last = MATTER_ARRAY_SIZE(vectors) - 1;
         EXPECT_EQ(
             sessionStorage.Save(vectors[last].node, vectors[last].resumptionId, vectors[last].sharedSecret, vectors[last].cats),
             CHIP_NO_ERROR);
@@ -119,9 +119,9 @@ TEST(TestDefaultSessionResumptionStorage, TestInPlaceSave)
     // Construct only a few unique node identities to simulate talking to a
     // couple peers.
     chip::ScopedNodeId nodes[3];
-    static_assert(ArraySize(nodes) < CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE,
+    static_assert(MATTER_ARRAY_SIZE(nodes) < CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE,
                   "must have fewer nodes than slots in session resumption storage");
-    for (size_t i = 0; i < ArraySize(nodes); ++i)
+    for (size_t i = 0; i < MATTER_ARRAY_SIZE(nodes); ++i)
     {
         do
         {
@@ -130,28 +130,28 @@ TEST(TestDefaultSessionResumptionStorage, TestInPlaceSave)
     }
 
     // Populate test vectors.
-    for (size_t i = 0; i < ArraySize(vectors); ++i)
+    for (size_t i = 0; i < MATTER_ARRAY_SIZE(vectors); ++i)
     {
         EXPECT_EQ(chip::Crypto::DRBG_get_bytes(vectors[i].resumptionId.data(), vectors[i].resumptionId.size()), CHIP_NO_ERROR);
         *vectors[i].resumptionId.data() =
             static_cast<uint8_t>(i); // set first byte to our index to ensure uniqueness for the FindByResumptionId call
         vectors[i].sharedSecret.SetLength(vectors[i].sharedSecret.Capacity());
         EXPECT_EQ(chip::Crypto::DRBG_get_bytes(vectors[i].sharedSecret.Bytes(), vectors[i].sharedSecret.Length()), CHIP_NO_ERROR);
-        vectors[i].node           = nodes[i % ArraySize(nodes)];
+        vectors[i].node           = nodes[i % MATTER_ARRAY_SIZE(nodes)];
         vectors[i].cats.values[0] = static_cast<chip::CASEAuthTag>(rand());
         vectors[i].cats.values[1] = static_cast<chip::CASEAuthTag>(rand());
         vectors[i].cats.values[2] = static_cast<chip::CASEAuthTag>(rand());
     }
 
     // Add one entry for each node.
-    for (size_t i = 0; i < ArraySize(nodes); ++i)
+    for (size_t i = 0; i < MATTER_ARRAY_SIZE(nodes); ++i)
     {
         EXPECT_EQ(sessionStorage.Save(vectors[i].node, vectors[i].resumptionId, vectors[i].sharedSecret, vectors[i].cats),
                   CHIP_NO_ERROR);
     }
 
     // Read back and verify values.
-    for (size_t i = 0; i < ArraySize(nodes); ++i)
+    for (size_t i = 0; i < MATTER_ARRAY_SIZE(nodes); ++i)
     {
         chip::ScopedNodeId outNode;
         chip::SessionResumptionStorage::ResumptionIdStorage outResumptionId;
@@ -183,7 +183,7 @@ TEST(TestDefaultSessionResumptionStorage, TestInPlaceSave)
     }
 
     // Read back and verify that only the last record for each node was retained.
-    for (size_t i = ArraySize(vectors) - ArraySize(nodes); i < ArraySize(vectors); ++i)
+    for (size_t i = MATTER_ARRAY_SIZE(vectors) - MATTER_ARRAY_SIZE(nodes); i < MATTER_ARRAY_SIZE(vectors); ++i)
     {
         chip::ScopedNodeId outNode;
         chip::SessionResumptionStorage::ResumptionIdStorage outResumptionId;
@@ -264,7 +264,7 @@ TEST(TestDefaultSessionResumptionStorage, TestDelete)
     EXPECT_EQ(chip::Crypto::DRBG_get_bytes(sharedSecret.Bytes(), sharedSecret.Length()), CHIP_NO_ERROR);
 
     // Populate test vectors.
-    for (size_t i = 0; i < ArraySize(vectors); ++i)
+    for (size_t i = 0; i < MATTER_ARRAY_SIZE(vectors); ++i)
     {
         EXPECT_EQ(chip::Crypto::DRBG_get_bytes(vectors[i].resumptionId.data(), vectors[i].resumptionId.size()), CHIP_NO_ERROR);
         *vectors[i].resumptionId.data() =

@@ -1216,9 +1216,3 @@ void Engine::MarkDirty(const AttributePathParams & path)
 } // namespace reporting
 } // namespace app
 } // namespace chip
-
-// TODO: MatterReportingAttributeChangeCallback should just live in libCHIP, It does not depend on any
-// app-specific generated bits.
-void __attribute__((weak))
-MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
-{}

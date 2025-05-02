@@ -126,6 +126,13 @@
     }
 }
 
+- (void)unitTestSubscriptionResetForDevice:(MTRDevice *)device
+{
+    if (self.onSubscriptionReset != nil) {
+        self.onSubscriptionReset();
+    }
+}
+
 @end
 
 @implementation MTRDeviceTestDelegateWithSubscriptionSetupOverride

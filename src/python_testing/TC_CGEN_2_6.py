@@ -29,7 +29,7 @@
 #           --in-test-commissioning-method on-network
 #           --qr-code MT:-24J0AFN00KA0648G00
 #           --trace-to json:log
-#       factoryreset: True
+#       factory-reset: true
 #       quiet: True
 # === END CI TEST ARGUMENTS ===
 
@@ -50,8 +50,7 @@ class TC_CGEN_2_6(MatterBaseTest):
 
     def steps_TC_CGEN_2_6(self) -> list[TestStep]:
         return [
-            TestStep(0, description="", expectation="", is_commissioning=False),
-            TestStep(1, "TH starts commissioning the DUT. It performs all commissioning steps from 'Device discovery and establish commissioning channel' to 'Security setup using CASE', except for TC configuration with SetTCAcknowledgements."),
+            TestStep(1, "TH starts commissioning the DUT. It performs all commissioning steps from 'Device discovery and establish commissioning channel' to 'Security setup using CASE', except for TC configuration with SetTCAcknowledgements.", is_commissioning=False),
             TestStep(2, "TH sends CommissioningComplete to DUT."),
         ]
 
@@ -59,7 +58,6 @@ class TC_CGEN_2_6(MatterBaseTest):
     async def test_TC_CGEN_2_6(self):
         commissioner: ChipDeviceCtrl.ChipDeviceController = self.default_controller
 
-        self.step(0)
         if not self.check_pics("CGEN.S.F00"):
             asserts.skip('Root endpoint does not support the [commissioning] feature under test')
             return

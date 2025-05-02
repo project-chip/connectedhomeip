@@ -152,3 +152,4 @@ void SwitchServer::OnMultiPressComplete(EndpointId endpoint, uint8_t previousPos
 } // namespace chip
 
 void MatterSwitchPluginServerInitCallback() {}
+void MatterSwitchPluginServerShutdownCallback() {}

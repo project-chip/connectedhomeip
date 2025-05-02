@@ -40,6 +40,8 @@ public:
         MATTER_DM_SCENES_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
     static_assert(kScenesServerMaxEndpointCount <= kEmberInvalidEndpointIndex, "Scenes endpoint count error");
     static constexpr uint8_t kScenesServerMaxFabricCount = CHIP_CONFIG_MAX_FABRICS;
+    static constexpr SceneId kGlobalSceneId              = 0x00;
+    static constexpr GroupId kGlobalSceneGroupId         = 0x0000;
 
     // FabricSceneInfo
     class FabricSceneInfo

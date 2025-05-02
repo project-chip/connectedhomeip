@@ -9,5 +9,5 @@ chip-repl/index
 chip-tool/index
 ```
 
--   [chip-tool](./chip-tool)
--   [chip-repl](./chip-repl)
+-   [chip-tool](./chip-tool/index.md)
+-   [chip-repl](./chip-repl/index.md)

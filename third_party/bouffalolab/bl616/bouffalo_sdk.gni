@@ -21,6 +21,7 @@ declare_args() {
   # Location of the bl616 SDK.
   bouffalo_sdk_root = "${chip_root}/third_party/bouffalolab/bouffalo_sdk"
 
+  enable_lwip_pbuf_ram = false
   enable_debug_coredump = false
   coredump_binary_id = 0
   bouffalo_sdk_coredump_version = 1
@@ -71,6 +72,10 @@ template("bouffalo_sdk") {
 
     if (defined(invoker.defines)) {
       defines += invoker.defines
+    }
+
+    if (defined(invoker.enable_lwip_pbuf_ram) && invoker.enable_lwip_pbuf_ram) {
+      defines += [ "CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM=1" ]
     }
   }
 
@@ -412,6 +417,7 @@ template("bouffalo_sdk") {
     include_dirs = [ "${bouffalo_sdk_root}/components/libc" ]
 
     sources = [
+      "${bouffalo_sdk_root}/components/libc/assert.c",
       "${bouffalo_sdk_root}/components/libc/newlib/port_init_fini.c",
       "${bouffalo_sdk_root}/components/libc/newlib/port_memory.c",
       "${bouffalo_sdk_root}/components/libc/newlib/syscalls_nosys.c",
@@ -895,6 +901,10 @@ template("bouffalo_sdk") {
     include_dirs +=
         [ "${bouffalo_sdk_root}/components/net/lwip/lwip/src/apps/dhcpd" ]
 
+    if (defined(invoker.enable_lwip_pbuf_ram) && invoker.enable_lwip_pbuf_ram) {
+      include_dirs += [ "${bouffalolab_iot_sdk_build_root}/patches/lwip" ]
+    }
+
     defines = [
       "CONFIG_LWIP",
       "CONFIG_MAC_TXQ_DEPTH=8",
@@ -937,7 +947,6 @@ template("bouffalo_sdk") {
       "${bouffalo_sdk_root}/components/net/lwip/lwip/src/core/ipv6/ip6_frag.c",
       "${bouffalo_sdk_root}/components/net/lwip/lwip/src/core/ipv6/mld6.c",
       "${bouffalo_sdk_root}/components/net/lwip/lwip/src/core/ipv6/nd6.c",
-      "${bouffalo_sdk_root}/components/net/lwip/lwip/src/core/mem.c",
       "${bouffalo_sdk_root}/components/net/lwip/lwip/src/core/memp.c",
       "${bouffalo_sdk_root}/components/net/lwip/lwip/src/core/netif.c",
       "${bouffalo_sdk_root}/components/net/lwip/lwip/src/core/pbuf.c",
@@ -951,6 +960,13 @@ template("bouffalo_sdk") {
       "${bouffalo_sdk_root}/components/net/lwip/lwip/src/core/udp.c",
       "${bouffalo_sdk_root}/components/net/lwip/lwip/src/netif/ethernet.c",
     ]
+
+    if (defined(invoker.enable_lwip_pbuf_ram) && invoker.enable_lwip_pbuf_ram) {
+      sources += [ "${bouffalolab_iot_sdk_build_root}/patches/lwip/mem.c" ]
+    } else {
+      sources +=
+          [ "${bouffalo_sdk_root}/components/net/lwip/lwip/src/core/mem.c" ]
+    }
 
     sources += [
       "${bouffalo_sdk_root}/components/net/lwip/lwip/src/apps/dhcpd/dhcp_server_raw.c",

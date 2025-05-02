@@ -32,7 +32,7 @@
 #include <inet/InetError.h>
 #include <lib/support/DLLUtil.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 #include <lwip/netif.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
@@ -49,7 +49,7 @@ struct net_if_ipv4;
 struct net_if_ipv6;
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
 
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 struct otIp6AddressInfo;
 #endif
 
@@ -80,7 +80,7 @@ enum class InterfaceType
 class InterfaceId
 {
 public:
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT && !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     using PlatformType                       = struct netif *;
     static constexpr size_t kMaxIfNameLength = 13; // Names are formatted as %c%c%d
 #endif                                             // CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -95,7 +95,7 @@ public:
     static constexpr size_t kMaxIfNameLength = Z_DEVICE_MAX_NAME_LEN;
 #endif
 
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     using PlatformType                       = unsigned int;
     static constexpr size_t kMaxIfNameLength = 6;
 #endif
@@ -193,7 +193,7 @@ public:
     CHIP_ERROR GetLinkLocalAddr(IPAddress * llAddr) const;
 
 private:
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     static constexpr PlatformType kPlatformNull = nullptr;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
@@ -205,7 +205,7 @@ private:
     static constexpr PlatformType kPlatformNull = 0;
 #endif
 
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     static constexpr PlatformType kPlatformNull = 0;
 #endif
 
@@ -351,7 +351,7 @@ public:
     CHIP_ERROR GetHardwareAddress(uint8_t * addressBuffer, uint8_t & addressSize, uint8_t addressBufferSize);
 
 protected:
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     struct netif * mCurNetif;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
@@ -368,7 +368,7 @@ protected:
     InterfaceId::PlatformType mCurrentId = 1;
     net_if * mCurrentInterface           = nullptr;
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     struct otIp6AddressInfo * mCurNetif;
 #endif
 };
@@ -537,7 +537,7 @@ public:
     bool HasBroadcastAddress();
 
 private:
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     enum
     {
         kBeforeStartIndex = -1
@@ -557,13 +557,13 @@ private:
     net_if_ipv6 * mIpv6 = nullptr;
     int mCurAddrIndex   = -1;
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     const otNetifAddress * mNetifAddrList;
     const otNetifAddress * mCurAddr;
-#endif // #if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#endif // #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 };
 
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 inline InterfaceIterator::InterfaceIterator(void) {}
 inline InterfaceIterator::~InterfaceIterator()               = default;
 inline InterfaceAddressIterator::~InterfaceAddressIterator() = default;
@@ -573,7 +573,7 @@ inline bool InterfaceIterator::HasCurrent(void)
 }
 #endif
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 
 inline InterfaceIterator::InterfaceIterator(void)
 {

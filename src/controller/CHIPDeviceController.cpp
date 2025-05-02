@@ -476,13 +476,6 @@ DeviceCommissioner::DeviceCommissioner() :
     mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this), mSetUpCodePairer(this)
 {}
 
-DeviceCommissioner::~DeviceCommissioner()
-{
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    DeviceLayer::ConnectivityMgr().WiFiPAFCancelConnect();
-#endif
-}
-
 CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
 {
     VerifyOrReturnError(params.operationalCredentialsDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -578,6 +571,10 @@ void DeviceCommissioner::Shutdown()
         mUdcServer = nullptr;
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown(
+        [](uint32_t id, WiFiPAF::WiFiPafRole role) { DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(id, role); });
+#endif
 
     // Release everything from the commissionee device pool here.
     // Make sure to use ReleaseCommissioneeDevice so we don't keep dangling
@@ -831,17 +828,28 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     if (params.GetPeerAddress().GetTransportType() == Transport::Type::kWiFiPAF)
     {
-        if (DeviceLayer::ConnectivityMgr().GetWiFiPAF()->GetWiFiPAFState() != Transport::WiFiPAFBase::State::kConnected)
+        if (DeviceLayer::ConnectivityMgr().GetWiFiPAF()->GetWiFiPAFState() != WiFiPAF::State::kConnected)
         {
-            ChipLogProgress(Controller, "WiFi-PAF: Subscribing the NAN-USD devices");
+            ChipLogProgress(Controller, "WiFi-PAF: Subscribing to the NAN-USD devices, nodeId: %lu",
+                            params.GetPeerAddress().GetRemoteId());
             if (!DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
             {
-                ChipLogError(Controller, "Wi-Fi Management should have be started now.");
+                ChipLogError(Controller, "Wi-Fi Management should have been started now.");
                 ExitNow(CHIP_ERROR_INTERNAL);
             }
             mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = params;
-            DeviceLayer::ConnectivityMgr().WiFiPAFConnect(params.GetSetupDiscriminator().value(), (void *) this,
-                                                          OnWiFiPAFSubscribeComplete, OnWiFiPAFSubscribeError);
+            auto nodeId                                         = params.GetPeerAddress().GetRemoteId();
+            const SetupDiscriminator connDiscriminator(params.GetSetupDiscriminator().value());
+            VerifyOrReturnValue(!connDiscriminator.IsShortDiscriminator(), CHIP_ERROR_INVALID_ARGUMENT,
+                                ChipLogError(Controller, "Error, Long discriminator is required"));
+            uint16_t discriminator              = connDiscriminator.GetLongValue();
+            WiFiPAF::WiFiPAFSession sessionInfo = { .role          = WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber,
+                                                    .nodeId        = nodeId,
+                                                    .discriminator = discriminator };
+            ReturnErrorOnFailure(
+                DeviceLayer::ConnectivityMgr().GetWiFiPAF()->AddPafSession(WiFiPAF::PafInfoAccess::kAccNodeInfo, sessionInfo));
+            DeviceLayer::ConnectivityMgr().WiFiPAFSubscribe(discriminator, reinterpret_cast<void *>(this),
+                                                            OnWiFiPAFSubscribeComplete, OnWiFiPAFSubscribeError);
             ExitNow(CHIP_NO_ERROR);
         }
     }
@@ -916,7 +924,7 @@ void DeviceCommissioner::OnDiscoveredDeviceOverBleError(void * appState, CHIP_ER
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 void DeviceCommissioner::OnWiFiPAFSubscribeComplete(void * appState)
 {
-    auto self   = (DeviceCommissioner *) appState;
+    auto self   = reinterpret_cast<DeviceCommissioner *>(appState);
     auto device = self->mDeviceInPASEEstablishment;
 
     if (nullptr != device && device->GetDeviceTransportType() == Transport::Type::kWiFiPAF)

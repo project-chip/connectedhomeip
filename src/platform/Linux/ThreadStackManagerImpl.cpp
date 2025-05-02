@@ -51,7 +51,7 @@ namespace {
 
 struct SetActiveDatasetContext
 {
-    OpenthreadIoOpenthreadBorderRouter * proxy;
+    OpenthreadBorderRouter * proxy;
     ByteSpan netInfo;
 };
 
@@ -67,7 +67,7 @@ CHIP_ERROR GLibMatterContextSetActiveDataset(SetActiveDatasetContext * context)
     GAutoPtr<GVariant> value(g_variant_new_from_bytes(G_VARIANT_TYPE_BYTESTRING, bytes.release(), true));
     if (!value)
         return CHIP_ERROR_NO_MEMORY;
-    openthread_io_openthread_border_router_set_active_dataset_tlvs(context->proxy, value.release());
+    openthread_border_router_set_active_dataset_tlvs(context->proxy, value.release());
     return CHIP_NO_ERROR;
 }
 
@@ -82,9 +82,9 @@ CHIP_ERROR ThreadStackManagerImpl::GLibMatterContextInitThreadStack(ThreadStackM
     VerifyOrDie(g_main_context_get_thread_default() != nullptr);
 
     GAutoPtr<GError> err;
-    self->mProxy.reset(openthread_io_openthread_border_router_proxy_new_for_bus_sync(
-        G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kDBusOpenThreadService, kDBusOpenThreadObjectPath, nullptr,
-        &err.GetReceiver()));
+    self->mProxy.reset(openthread_border_router_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE,
+                                                                       kDBusOpenThreadService, kDBusOpenThreadObjectPath, nullptr,
+                                                                       &err.GetReceiver()));
     VerifyOrReturnError(
         self->mProxy != nullptr, CHIP_ERROR_INTERNAL,
         ChipLogError(DeviceLayer, "openthread: failed to create openthread dbus proxy %s", err ? err->message : "unknown error"));
@@ -103,7 +103,7 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 
     // If get property is called inside dbus thread (we are going to make it so), XXX_get_XXX can be used instead of XXX_dup_XXX
     // which is a little bit faster and the returned object doesn't need to be freed. Same for all following get properties.
-    GAutoPtr<char> role(openthread_io_openthread_border_router_dup_device_role(mProxy.get()));
+    GAutoPtr<char> role(openthread_border_router_dup_device_role(mProxy.get()));
     if (role)
     {
         ThreadDeviceRoleChangedHandler(role.get());
@@ -112,7 +112,7 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
     return CHIP_NO_ERROR;
 }
 
-void ThreadStackManagerImpl::OnDbusPropertiesChanged(OpenthreadIoOpenthreadBorderRouter * proxy, GVariant * changed_properties,
+void ThreadStackManagerImpl::OnDbusPropertiesChanged(OpenthreadBorderRouter * proxy, GVariant * changed_properties,
                                                      const gchar * const * invalidated_properties, gpointer user_data)
 {
     ThreadStackManagerImpl * me = reinterpret_cast<ThreadStackManagerImpl *>(user_data);
@@ -182,7 +182,7 @@ bool ThreadStackManagerImpl::_HaveRouteToAddress(const Inet::IPAddress & destAdd
         return true;
     }
 
-    GAutoPtr<GVariant> routes(openthread_io_openthread_border_router_dup_external_routes(mProxy.get()));
+    GAutoPtr<GVariant> routes(openthread_border_router_dup_external_routes(mProxy.get()));
     if (!routes)
         return false;
 
@@ -368,7 +368,7 @@ bool ThreadStackManagerImpl::_IsThreadAttached() const
 CHIP_ERROR ThreadStackManagerImpl::GLibMatterContextCallAttach(ThreadStackManagerImpl * self)
 {
     VerifyOrDie(g_main_context_get_thread_default() != nullptr);
-    openthread_io_openthread_border_router_call_attach(self->mProxy.get(), nullptr, _OnThreadBrAttachFinished, self);
+    openthread_border_router_call_attach(self->mProxy.get(), nullptr, _OnThreadBrAttachFinished, self);
     return CHIP_NO_ERROR;
 }
 
@@ -383,7 +383,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
     else
     {
         GAutoPtr<GError> err;
-        gboolean result = openthread_io_openthread_border_router_call_reset_sync(mProxy.get(), nullptr, &err.GetReceiver());
+        gboolean result = openthread_border_router_call_reset_sync(mProxy.get(), nullptr, &err.GetReceiver());
         if (err)
         {
             ChipLogError(DeviceLayer, "openthread: _SetThreadEnabled calling %s failed: %s", "Reset", err->message);
@@ -405,7 +405,7 @@ void ThreadStackManagerImpl::_OnThreadBrAttachFinished(GObject * source_object, 
     GAutoPtr<GVariant> attachRes;
     GAutoPtr<GError> err;
     {
-        gboolean result = openthread_io_openthread_border_router_call_attach_finish(this_->mProxy.get(), res, &err.GetReceiver());
+        gboolean result = openthread_border_router_call_attach_finish(this_->mProxy.get(), res, &err.GetReceiver());
         if (!result)
         {
             ChipLogError(DeviceLayer, "Failed to perform finish Thread network scan: %s",
@@ -442,7 +442,7 @@ ConnectivityManager::ThreadDeviceType ThreadStackManagerImpl::_GetThreadDeviceTy
         return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
     }
 
-    GAutoPtr<char> role(openthread_io_openthread_border_router_dup_device_role(mProxy.get()));
+    GAutoPtr<char> role(openthread_border_router_dup_device_role(mProxy.get()));
     if (!role)
         return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
     if (strcmp(role.get(), kOpenthreadDeviceRoleDetached) == 0 || strcmp(role.get(), kOpenthreadDeviceRoleDisabled) == 0)
@@ -451,7 +451,7 @@ ConnectivityManager::ThreadDeviceType ThreadStackManagerImpl::_GetThreadDeviceTy
     }
     if (strcmp(role.get(), kOpenthreadDeviceRoleChild) == 0)
     {
-        GAutoPtr<GVariant> linkMode(openthread_io_openthread_border_router_dup_link_mode(mProxy.get()));
+        GAutoPtr<GVariant> linkMode(openthread_border_router_dup_link_mode(mProxy.get()));
         if (!linkMode)
             return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
         gboolean rx_on_when_idle;
@@ -499,7 +499,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadDeviceType(ConnectivityManager::Thr
         GAutoPtr<GVariant> linkMode(g_variant_new("(bbb)", rx_on_when_idle, device_type, network_data));
         if (!linkMode)
             return CHIP_ERROR_NO_MEMORY;
-        openthread_io_openthread_border_router_set_link_mode(mProxy.get(), linkMode.release());
+        openthread_border_router_set_link_mode(mProxy.get(), linkMode.release());
     }
 
     return CHIP_NO_ERROR;
@@ -546,7 +546,7 @@ CHIP_ERROR ThreadStackManagerImpl::_GetAndLogThreadTopologyFull()
 CHIP_ERROR ThreadStackManagerImpl::_GetPrimary802154MACAddress(uint8_t * buf)
 {
     VerifyOrReturnError(mProxy, CHIP_ERROR_INCORRECT_STATE);
-    guint64 extAddr = openthread_io_openthread_border_router_get_extended_address(mProxy.get());
+    guint64 extAddr = openthread_border_router_get_extended_address(mProxy.get());
 
     for (size_t i = 0; i < sizeof(extAddr); i++)
     {
@@ -579,7 +579,7 @@ CHIP_ERROR ThreadStackManagerImpl::_GetPollPeriod(uint32_t & buf)
 CHIP_ERROR ThreadStackManagerImpl::GLibMatterContextCallScan(ThreadStackManagerImpl * self)
 {
     VerifyOrDie(g_main_context_get_thread_default() != nullptr);
-    openthread_io_openthread_border_router_call_scan(self->mProxy.get(), nullptr, _OnNetworkScanFinished, self);
+    openthread_border_router_call_scan(self->mProxy.get(), nullptr, _OnNetworkScanFinished, self);
     return CHIP_NO_ERROR;
 }
 
@@ -604,8 +604,8 @@ void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
     GAutoPtr<GVariant> scan_result;
     GAutoPtr<GError> err;
     {
-        gboolean result = openthread_io_openthread_border_router_call_scan_finish(mProxy.get(), &scan_result.GetReceiver(), res,
-                                                                                  &err.GetReceiver());
+        gboolean result =
+            openthread_border_router_call_scan_finish(mProxy.get(), &scan_result.GetReceiver(), res, &err.GetReceiver());
         if (!result)
         {
             ChipLogError(DeviceLayer, "Failed to perform finish Thread network scan: %s",

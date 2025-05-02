@@ -38,8 +38,12 @@ pw_python_package("chip-testing-module") {
     "chip/testing/apps.py",
     "chip/testing/basic_composition.py",
     "chip/testing/choice_conformance.py",
+    "chip/testing/commissioning.py",
     "chip/testing/conformance.py",
+    "chip/testing/conversions.py",
+    "chip/testing/decorators.py",
     "chip/testing/global_attribute_ids.py",
+    "chip/testing/matchers.py",
     "chip/testing/matter_asserts.py",
     "chip/testing/matter_testing.py",
     "chip/testing/metadata.py",
@@ -48,6 +52,7 @@ pw_python_package("chip-testing-module") {
     "chip/testing/spec_parsing.py",
     "chip/testing/taglist_and_topology_test.py",
     "chip/testing/tasks.py",
+    "chip/testing/timeoperations.py",
   ]
   tests = [
     "chip/testing/test_metadata.py",
@@ -83,13 +88,14 @@ pw_zip("data_model_zip_1_4_1") {
   output = "${root_out_dir}/data_model/zip_1_4_1.zip"
 }
 
-pw_zip("data_model_zip_master") {
+pw_zip("data_model_zip_1_5") {
   inputs = []
-  foreach(file, data_model_XMLS_master) {
-    zip_path = rebase_path(file, "${chip_root}/data_model/master/", "/")
+  foreach(file, data_model_XMLS_1_5_in_progress) {
+    zip_path =
+        rebase_path(file, "${chip_root}/data_model/1.5_in_progress/", "/")
     inputs += [ "${file} > /${zip_path}" ]
   }
-  output = "${root_out_dir}/data_model/zip_master.zip"
+  output = "${root_out_dir}/data_model/zip_1_5.zip"
 }
 
 pw_python_distribution("chip-testing") {
@@ -106,13 +112,13 @@ pw_python_distribution("chip-testing") {
     ":data_model_zip_1_3",
     ":data_model_zip_1_4",
     ":data_model_zip_1_4_1",
-    ":data_model_zip_master",
+    ":data_model_zip_1_5",
   ]
 
   extra_files = [
     "${root_out_dir}/data_model/zip_1_3.zip > chip/testing/data_model/1.3/allfiles.zip",
     "${root_out_dir}/data_model/zip_1_4.zip > chip/testing/data_model/1.4/allfiles.zip",
     "${root_out_dir}/data_model/zip_1_4_1.zip > chip/testing/data_model/1.4.1/allfiles.zip",
-    "${root_out_dir}/data_model/zip_master.zip > chip/testing/data_model/master/allfiles.zip",
+    "${root_out_dir}/data_model/zip_1_5.zip > chip/testing/data_model/1.5_in_progress/allfiles.zip",
   ]
 }

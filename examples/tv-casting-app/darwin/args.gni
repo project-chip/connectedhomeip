@@ -17,6 +17,7 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/config/darwin/args.gni")
 
 chip_device_project_config_include = "<CHIPProjectAppConfig.h>"
+chip_project_config_include = "<CHIPProjectAppConfig.h>"
 
 chip_project_config_include_dirs = [
   "${chip_root}/examples/tv-casting-app/tv-casting-common/include",

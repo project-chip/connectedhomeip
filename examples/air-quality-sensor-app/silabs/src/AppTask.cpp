@@ -68,21 +68,14 @@ using namespace chip::app::Clusters;
 
 AppTask AppTask::sAppTask;
 
-CHIP_ERROR AppTask::Init()
+CHIP_ERROR AppTask::AppInit()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
 #ifdef DISPLAY_ENABLED
-    GetLCD().Init((uint8_t *) "Air-Quality-Sensor");
     GetLCD().SetCustomUI(AirQualitySensorUI::DrawUI);
 #endif
 
-    err = BaseApplication::Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogDetail(AppServer, "BaseApplication::Init() failed");
-        appError(err);
-    }
     err = SensorManager::SensorMgr().Init();
     if (err != CHIP_NO_ERROR)
     {

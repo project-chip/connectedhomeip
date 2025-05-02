@@ -61,6 +61,10 @@ declare_args() {
   # Defaults configs for pie.
   default_configs_pie = [ "${build_root}/config/compiler:pie_default" ]
 
+  # Default configs for GNU ld --as-needed
+  default_configs_link_as_needed =
+      [ "${build_root}/config/compiler:link_as_needed" ]
+
   # Defaults configs for warnings.
   default_configs_warnings =
       [ "${build_root}/config/compiler:warnings_default" ]
@@ -124,3 +128,4 @@ default_configs += default_configs_extra
 
 executable_default_configs = []
 executable_default_configs += default_configs_pie
+executable_default_configs += default_configs_link_as_needed

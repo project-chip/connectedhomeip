@@ -18,8 +18,11 @@ import("//build_overrides/googletest.gni")
 import("//build_overrides/pigweed.gni")
 
 import("${chip_root}/build/chip/tests.gni")
+import("${dir_pw_build}/python.gni")
 import("${dir_pw_unit_test}/test.gni")
 
+# Need access to build options (specifically build_coverage)
+import("${build_root}/config/compiler/compiler.gni")
 assert(chip_build_tests)
 
 declare_args() {
@@ -112,6 +115,26 @@ template("chip_test_suite") {
           _test_output_dir = invoker.output_dir
         }
 
+        if (use_coverage && is_clang) {
+          # Generates clang coverage to "<TestName>.profraw" instead of "deafault.profraw"
+          _clang_coverage_setup = "${root_build_dir}/clang_static_coverage_config/${_test_name}ClangCoverageConfig.cpp"
+          pw_python_action("${_test_name}-clang-coverage") {
+            script = "${chip_root}/scripts/build/clang_coverage_wrapper.py"
+            outputs = [ _clang_coverage_setup ]
+            args = [
+              "--output",
+              rebase_path(_clang_coverage_setup),
+              "--raw-profile-filename",
+              "coverage/${_test_name}.profraw",
+            ]
+          }
+
+          source_set("${_test_name}-clang-coverage-src") {
+            sources = [ _clang_coverage_setup ]
+            deps = [ ":${_test_name}-clang-coverage" ]
+          }
+        }
+
         pw_test(_test_name) {
           # Forward certain variables from the invoker.
           forward_variables_from(invoker,
@@ -124,6 +147,10 @@ template("chip_test_suite") {
 
           # Link to the common lib for this suite so we get its `sources`.
           public_deps += [ ":${_suite_name}.lib" ]
+
+          if (use_coverage && is_clang) {
+            public_deps += [ ":${_test_name}-clang-coverage-src" ]
+          }
 
           if (pw_unit_test_BACKEND == "$dir_pw_unit_test:googletest") {
             test_main = "$dir_pigweed/third_party/googletest:gmock_main"

@@ -70,6 +70,9 @@ Davis, CA 95616, USA
     <feature bit="0" code="TC" name="TermsAndConditions" summary="Supports Terms &amp; Conditions acknowledgement">
       <provisionalConform/>
     </feature>
+    <feature bit="1" code="NR" name="NetworkRecovery" summary="Supports Network Recovery">
+      <provisionalConform/>
+    </feature>
   </features>
   <dataTypes>
     <enum name="CommissioningErrorEnum">
@@ -93,7 +96,7 @@ Davis, CA 95616, USA
           <feature name="TC"/>
         </mandatoryConform>
       </item>
-      <item value="6" name="TCAcknowledgementsNotReceived" summary="TCAcknowledgementsNotReceived No acknowledgements from the user for the TC features were received.">
+      <item value="6" name="TCAcknowledgementsNotReceived" summary="TCAcknowledgementsNotReceived No or insufficient acknowledgements from the user for the TC features were received.">
         <mandatoryConform>
           <feature name="TC"/>
         </mandatoryConform>
@@ -108,16 +111,10 @@ Davis, CA 95616, USA
       <item value="0" name="Unspecified" summary="Unspecified / unknown reason of network failure">
         <mandatoryConform/>
       </item>
-      <item value="1" name="Route" summary="Device is unable to route to the required resources, e.g. a Thread device is unable to reach a border router or a Wi-Fi device is unable to reach the public Internet which it requires for operation.">
+      <item value="1" name="Auth" summary="Credentials for the configured operational network are not valid">
         <mandatoryConform/>
       </item>
-      <item value="2" name="ICD" summary="ICD-related network failure, e.g. persistent failure to have an ICD checkin to result in a subscription">
-        <mandatoryConform/>
-      </item>
-      <item value="3" name="Auth" summary="Credentials for the configured operational network are not valid">
-        <mandatoryConform/>
-      </item>
-      <item value="4" name="Visibility" summary="Configured network cannot be found (e.g. the device cannot see the configured Wi-Fi SSID, Thread end-node is unable to find a parent router on the PAN)">
+      <item value="2" name="Visibility" summary="Configured network cannot be found (e.g. the device cannot see the configured Wi-Fi SSID, Thread end-node is unable to find a parent router on the PAN)">
         <mandatoryConform/>
       </item>
     </enum>
@@ -158,12 +155,16 @@ Davis, CA 95616, USA
       </constraint>
     </attribute>
     <attribute id="0x0002" name="RegulatoryConfig" type="RegulatoryLocationTypeEnum">
-      <attribute name="LocationCapability"/>
+      <default>
+        <attribute name="LocationCapability"/>
+      </default>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0003" name="LocationCapability" type="RegulatoryLocationTypeEnum">
-      <enum default="IndoorOutdoor"/>
+      <default>
+        <enum default="IndoorOutdoor"/>
+      </default>
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
@@ -235,6 +236,29 @@ Davis, CA 95616, USA
       <constraint>
         <desc/>
       </constraint>
+    </attribute>
+    <attribute id="0x000B" name="RecoveryIdentifier" type="octstr" default="0">
+      <access read="true" readPrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="NR"/>
+        </mandatoryConform>
+      </otherwiseConform>
+      <constraint>
+        <allowed value="8"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x000C" name="NetworkRecoveryReason" type="NetworkRecoveryReasonEnum" default="null">
+      <access read="true" readPrivilege="manage"/>
+      <quality nullable="true"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="NR"/>
+        </mandatoryConform>
+      </otherwiseConform>
     </attribute>
   </attributes>
   <commands>

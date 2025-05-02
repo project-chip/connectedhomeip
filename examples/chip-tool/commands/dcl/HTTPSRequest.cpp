@@ -64,7 +64,7 @@ namespace {
 class HTTPSSessionHolder
 {
 public:
-    CHIP_ERROR Init(std::string & hostname, uint16_t port) { return LogNotImplementedError(); }
+    CHIP_ERROR Init(std::string & hostname, uint16_t port, HttpsSecurityMode securityMode) { return LogNotImplementedError(); }
 
     CHIP_ERROR SendRequest(std::string & request) { return LogNotImplementedError(); }
 
@@ -152,9 +152,10 @@ public:
 #endif
     }
 
-    CHIP_ERROR Init(std::string & hostname, uint16_t port)
+    CHIP_ERROR Init(std::string & hostname, uint16_t port, HttpsSecurityMode securityMode)
     {
         int sock;
+        VerifyOrReturnError(securityMode == HttpsSecurityMode::kDefault, CHIP_ERROR_NOT_IMPLEMENTED);
         ReturnErrorOnFailure(InitSocket(hostname, port, sock));
         ReturnErrorOnFailure(InitSSL(sock));
         return CHIP_NO_ERROR;
@@ -363,17 +364,18 @@ CHIP_ERROR ExtractHostNamePortPath(std::string url, std::string & outHostName, u
 } // namespace
 
 CHIP_ERROR Request(std::string url, Json::Value & jsonResponse, const Optional<uint32_t> & optionalExpectedSize,
-                   const Optional<const char *> & optionalExpectedDigest)
+                   const Optional<const char *> & optionalExpectedDigest, HttpsSecurityMode securityMode)
 {
     std::string hostname;
     uint16_t port;
     std::string path;
     ReturnErrorOnFailure(ExtractHostNamePortPath(url, hostname, port, path));
-    return Request(hostname, port, path, jsonResponse, optionalExpectedSize, optionalExpectedDigest);
+    return Request(hostname, port, path, jsonResponse, optionalExpectedSize, optionalExpectedDigest, securityMode);
 }
 
 CHIP_ERROR Request(std::string hostname, uint16_t port, std::string path, Json::Value & jsonResponse,
-                   const Optional<uint32_t> & optionalExpectedSize, const Optional<const char *> & optionalExpectedDigest)
+                   const Optional<uint32_t> & optionalExpectedSize, const Optional<const char *> & optionalExpectedDigest,
+                   HttpsSecurityMode securityMode)
 {
     VerifyOrDo(port != 0, port = kHttpsPort);
 
@@ -383,7 +385,7 @@ CHIP_ERROR Request(std::string hostname, uint16_t port, std::string path, Json::
     std::string response;
 
     HTTPSSessionHolder session;
-    ReturnErrorOnFailure(session.Init(hostname, port));
+    ReturnErrorOnFailure(session.Init(hostname, port, securityMode));
     ReturnErrorOnFailure(session.SendRequest(request));
     ReturnErrorOnFailure(session.ReceiveResponse(response));
     ReturnErrorOnFailure(RemoveHeader(response));

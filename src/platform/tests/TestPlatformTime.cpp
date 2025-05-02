@@ -42,7 +42,12 @@ using namespace chip::Logging;
 using namespace chip::System;
 using namespace chip::System::Clock::Literals;
 
+#ifdef CONFIG_WIDER_SLEEP_MARGIN
+// SleepMillis can undersleep by as much as 10ms on esp32-qemu.
+constexpr Clock::Milliseconds64 kTestTimeMarginMs = 10_ms64;
+#else
 constexpr Clock::Milliseconds64 kTestTimeMarginMs = 2_ms64;
+#endif
 constexpr Clock::Microseconds64 kTestTimeMarginUs = 500_us64;
 
 // =================================

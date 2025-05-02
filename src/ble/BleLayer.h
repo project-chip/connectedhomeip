@@ -223,7 +223,7 @@ public:
         kState_NotInitialized = 0,
         kState_Initialized    = 1,
         kState_Disconnecting  = 2
-    } mState; ///< [READ-ONLY] Current state
+    } mState; ///< [READ-ONLY] external access is deprecated, use IsInitialized() / IsBleClosing()
 
     // This app state is not used by ble transport etc, it will be used by external ble implementation like Android
     void * mAppState                 = nullptr;
@@ -236,7 +236,9 @@ public:
                     chip::System::Layer * systemLayer);
     CHIP_ERROR Init(BlePlatformDelegate * platformDelegate, BleConnectionDelegate * connDelegate,
                     BleApplicationDelegate * appDelegate, chip::System::Layer * systemLayer);
+    bool IsInitialized() { return mState != kState_NotInitialized; }
     void IndicateBleClosing();
+    bool IsBleClosing() { return mState == kState_Disconnecting; }
     void Shutdown();
 
     CHIP_ERROR CancelBleIncompleteConnection();

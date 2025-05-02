@@ -152,14 +152,16 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
             f">>> pairing onnetwork 111 {setup_params.passcode}")
 
     def steps_TC_MCORE_FS_1_2(self) -> list[TestStep]:
-        steps = [TestStep(1, "TH subscribes to PartsList attribute of the Descriptor cluster of DUT_FSA endpoint 0."),
-                 TestStep(2, "Follow manufacturer provided instructions to have DUT_FSA commission TH_SERVER"),
-                 TestStep(3, "TH waits up to 30 seconds for subscription report from the PartsList attribute of the Descriptor to contain new endpoint"),
-                 TestStep(4, "TH uses DUT to open commissioning window to TH_SERVER"),
-                 TestStep(5, "TH commissions TH_SERVER"),
-                 TestStep(6, "TH reads all attributes in Basic Information cluster from TH_SERVER directly"),
-                 TestStep(7, "TH reads all attributes in the Bridged Device Basic Information cluster on new endpoint identified in step 3 from the DUT_FSA")]
-        return steps
+        return [
+            TestStep(0, "Commission DUT if not done", is_commissioning=True),
+            TestStep(1, "TH subscribes to PartsList attribute of the Descriptor cluster of DUT_FSA endpoint 0."),
+            TestStep(2, "Follow manufacturer provided instructions to have DUT_FSA commission TH_SERVER"),
+            TestStep(3, "TH waits up to 30 seconds for subscription report from the PartsList attribute of the Descriptor to contain new endpoint"),
+            TestStep(4, "TH uses DUT to open commissioning window to TH_SERVER"),
+            TestStep(5, "TH commissions TH_SERVER"),
+            TestStep(6, "TH reads all attributes in Basic Information cluster from TH_SERVER directly"),
+            TestStep(7, "TH reads all attributes in the Bridged Device Basic Information cluster on new endpoint identified in step 3 from the DUT_FSA"),
+        ]
 
     # This test has some manual steps, so we need a longer timeout. Test typically runs under 1 mins so 3 mins should
     # be enough time for test to run
@@ -169,6 +171,9 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
 
     @async_test_body
     async def test_TC_MCORE_FS_1_2(self):
+
+        # Commissioning - done
+        self.step(0)
 
         min_report_interval_sec = self.user_params.get("min_report_interval_sec", 0)
         max_report_interval_sec = self.user_params.get("max_report_interval_sec", 30)

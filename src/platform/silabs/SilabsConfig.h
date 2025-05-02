@@ -120,6 +120,7 @@ public:
     static constexpr Key kConfigKey_hostname               = SilabsConfigKey(kMatterFactory_KeyBase, 0x15);
     static constexpr Key kConfigKey_clientid               = SilabsConfigKey(kMatterFactory_KeyBase, 0x16);
     static constexpr Key kConfigKey_Test_Event_Trigger_Key = SilabsConfigKey(kMatterFactory_KeyBase, 0x17);
+    static constexpr Key kConfigKey_HardwareVersion        = SilabsConfigKey(kMatterFactory_KeyBase, 0x18);
     // kConfigKey_PersistentUniqueId is the inputkey in the generating of the Rotating Device ID
     // SHALL NOT be the same as the UniqueID attribute exposed in the Basic Information cluster.
     static constexpr Key kConfigKey_PersistentUniqueId = SilabsConfigKey(kMatterFactory_KeyBase, 0x1F);
@@ -142,7 +143,6 @@ public:
     static constexpr Key kConfigKey_LastUsedEpochKeyId = SilabsConfigKey(kMatterConfig_KeyBase, 0x05);
     static constexpr Key kConfigKey_FailSafeArmed      = SilabsConfigKey(kMatterConfig_KeyBase, 0x06);
     static constexpr Key kConfigKey_GroupKey           = SilabsConfigKey(kMatterConfig_KeyBase, 0x07);
-    static constexpr Key kConfigKey_HardwareVersion    = SilabsConfigKey(kMatterConfig_KeyBase, 0x08);
     static constexpr Key kConfigKey_RegulatoryLocation = SilabsConfigKey(kMatterConfig_KeyBase, 0x09);
     static constexpr Key kConfigKey_CountryCode        = SilabsConfigKey(kMatterConfig_KeyBase, 0x0A);
     static constexpr Key kConfigKey_WiFiSSID           = SilabsConfigKey(kMatterConfig_KeyBase, 0x0C);

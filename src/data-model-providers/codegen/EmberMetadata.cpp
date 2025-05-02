@@ -42,7 +42,7 @@ FindAttributeMetadata(const ConcreteAttributePath & aPath)
             return Status::UnsupportedEndpoint;
         }
 
-        const EmberAfCluster * cluster = emberAfFindClusterInType(type, aPath.mClusterId, CLUSTER_MASK_SERVER);
+        const EmberAfCluster * cluster = emberAfFindClusterInType(type, aPath.mClusterId, MATTER_CLUSTER_FLAG_SERVER);
         if (cluster == nullptr)
         {
             return Status::UnsupportedCluster;

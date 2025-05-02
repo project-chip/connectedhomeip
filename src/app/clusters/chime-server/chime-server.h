@@ -53,11 +53,11 @@ public:
 
     // Attribute Setters
     /**
-     * Sets the ActiveChimeID attribute. Note, this also handles writing the new value into non-volatile storage.
-     * @param chimeSoundID The value to which the ActiveChimeID  is to be set.
+     * Sets the SelectedChime attribute. Note, this also handles writing the new value into non-volatile storage.
+     * @param chimeSoundID The value to which the SelectedChime  is to be set.
      * @return Returns a ConstraintError if the chimeSoundID value is not valid. Returns Success otherwise.
      */
-    Protocols::InteractionModel::Status SetActiveChimeID(uint8_t chimeSoundID);
+    Protocols::InteractionModel::Status SetSelectedChime(uint8_t chimeSoundID);
 
     /**
      * Sets the Enabled attribute. Note, this also handles writing the new value into non-volatile storage.
@@ -67,9 +67,9 @@ public:
 
     // Attribute Getters
     /**
-     * @return The Current ActiveChimeID.
+     * @return The Current SelectedChime.
      */
-    uint8_t GetActiveChimeID() const;
+    uint8_t GetSelectedChime() const;
 
     /**
      * @return The Enabled attribute..
@@ -95,7 +95,7 @@ private:
     ChimeDelegate & mDelegate;
 
     // Attribute local storage
-    uint8_t mActiveChimeID;
+    uint8_t mSelectedChime;
     bool mEnabled;
 
     // AttributeAccessInterface

@@ -96,9 +96,6 @@ bl_iot_sdk("sdk") {
   }
 
   defines += [ "CHIP_DEVICE_CONFIG_ENABLE_ETHERNET=${chip_enable_ethernet}" ]
-  if (chip_enable_ethernet) {
-    defines += [ "CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE=48" ]
-  }
 
   if (enable_psram) {
     defines += [ "CFG_USE_PSRAM=1" ]
@@ -129,7 +126,7 @@ bouffalolab_executable("lighting_app") {
   bl_plat_name = "bl702"
 
   defines = [
-    "APP_TASK_STACK_SIZE=2048",
+    "APP_TASK_STACK_SIZE=4096",
     "CHIP_UART_BAUDRATE=${baudrate}",
     "START_ENTRY=bl702_main",
   ]

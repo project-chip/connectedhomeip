@@ -2,7 +2,7 @@
  *
  *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
- *    Copyright 2023 NXP
+ *    Copyright 2023, 2025 NXP
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +27,6 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include "DiagnosticDataProviderImpl.h"
-#include "fsl_adapter_rng.h"
 #include "fsl_os_abstraction.h"
 #include "fwk_platform_coex.h"
 #include <crypto/CHIPCryptoPAL.h>
@@ -53,6 +52,10 @@ extern "C" void BOARD_InitHardware(void);
 extern "C" void otPlatSetResetFunction(void (*fp)(void));
 extern "C" void initiateResetInIdle(void);
 
+extern "C" {
+#include "osa.h"
+}
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 
 #include "wlan_bt_fw.h"
@@ -75,13 +78,6 @@ extern "C" void vApplicationMallocFailedHook(void)
 {
     ChipLogError(DeviceLayer, "Malloc Failure");
 }
-
-#if !CHIP_DEVICE_CONFIG_ENABLE_WPA
-extern "C" void vApplicationIdleHook(void)
-{
-    chip::DeviceLayer::PlatformManagerImpl::IdleHook();
-}
-#endif
 
 extern "C" void __wrap_exit(int __status)
 {
@@ -207,7 +203,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     otPlatRandomInit();
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
     osError = OSA_SetupIdleFunction(chip::DeviceLayer::PlatformManagerImpl::IdleHook);
     if (osError != WM_SUCCESS)
     {
@@ -216,6 +211,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
         goto exit;
     }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
     err = WiFiInterfaceInit();
 
     if (err != CHIP_NO_ERROR)

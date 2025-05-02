@@ -188,6 +188,28 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nod
     }
 }
 
+void MTRDeviceControllerDelegateBridge::OnCommissioningStatusUpdate(chip::PeerId peerId, chip::Controller::CommissioningStage stageCompleted, CHIP_ERROR error)
+{
+    using namespace chip::Controller;
+
+    MTRDeviceController * strongController = mController;
+
+    MTR_LOG("%@ DeviceControllerDelegate stage %s completed for nodeID 0x%016llx with status %s", strongController, StageToString(stageCompleted), peerId.GetNodeId(), error.AsString());
+
+    id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
+
+    if (strongDelegate && mQueue && strongController && error == CHIP_NO_ERROR && (stageCompleted == CommissioningStage::kFailsafeBeforeWiFiEnable || stageCompleted == CommissioningStage::kFailsafeBeforeThreadEnable)) {
+        // We're about to send the ConnectNetwork command.  Let our delegate
+        // know that the other side now has network credentials.
+        NSNumber * nodeID = @(peerId.GetNodeId());
+        if ([strongDelegate respondsToSelector:@selector(controller:commissioneeHasReceivedNetworkCredentials:)]) {
+            dispatch_async(mQueue, ^{
+                [strongDelegate controller:strongController commissioneeHasReceivedNetworkCredentials:nodeID];
+            });
+        }
+    }
+}
+
 void MTRDeviceControllerDelegateBridge::SetDeviceNodeID(chip::NodeId deviceNodeId)
 {
     mDeviceNodeId = deviceNodeId;

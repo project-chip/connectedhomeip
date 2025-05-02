@@ -20,6 +20,7 @@ import("${chip_root}/src/lib/lib.gni")
 declare_args() {
   bl_iot_sdk_root = "${chip_root}/third_party/bouffalolab/repo"
 
+  enable_lwip_pbuf_ram = false
   enable_debug_coredump = false
   coredump_binary_id = 0
 }
@@ -63,6 +64,10 @@ template("bl_iot_sdk") {
       "-include",
       rebase_path("${invoker.freertos_config}", root_build_dir),
     ]
+
+    if (defined(invoker.enable_lwip_pbuf_ram) && invoker.enable_lwip_pbuf_ram) {
+      defines += [ "CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM=1" ]
+    }
   }
 
   source_set("${sdk_target_name}_soc") {
@@ -906,6 +911,10 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/lwip_dhcpd",
     ]
 
+    if (defined(invoker.enable_lwip_pbuf_ram) && invoker.enable_lwip_pbuf_ram) {
+      include_dirs += [ "${bouffalolab_iot_sdk_build_root}/patches/lwip" ]
+    }
+
     defines = [ "LWIP_IPV6=1" ]
   }
 
@@ -927,7 +936,6 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/lwip/src/core/inet_chksum.c",
       "${bl_iot_sdk_root}/components/network/lwip/src/core/init.c",
       "${bl_iot_sdk_root}/components/network/lwip/src/core/ip.c",
-      "${bl_iot_sdk_root}/components/network/lwip/src/core/mem.c",
       "${bl_iot_sdk_root}/components/network/lwip/src/core/memp.c",
       "${bl_iot_sdk_root}/components/network/lwip/src/core/netif.c",
       "${bl_iot_sdk_root}/components/network/lwip/src/core/pbuf.c",
@@ -940,6 +948,12 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/lwip/src/core/timeouts.c",
       "${bl_iot_sdk_root}/components/network/lwip/src/core/udp.c",
     ]
+
+    if (defined(invoker.enable_lwip_pbuf_ram) && invoker.enable_lwip_pbuf_ram) {
+      sources += [ "${bouffalolab_iot_sdk_build_root}/patches/lwip/mem.c" ]
+    } else {
+      sources += [ "${bl_iot_sdk_root}/components/network/lwip/src/core/mem.c" ]
+    }
 
     sources += [
       "${bl_iot_sdk_root}/components/network/lwip/src/core/ipv4/autoip.c",

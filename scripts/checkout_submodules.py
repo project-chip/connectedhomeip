@@ -43,6 +43,7 @@ ALL_PLATFORMS = set([
     'nrfconnect',
     'nuttx',
     'qpg',
+    'realtek_bee',
     'stm32',
     'telink',
     'tizen',
@@ -51,6 +52,7 @@ ALL_PLATFORMS = set([
     'genio',
     'openiotsdk',
     'silabs_docker',
+    'unit_tests'
 ])
 
 Module = namedtuple('Module', 'name path platforms recursive')
