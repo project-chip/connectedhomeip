@@ -51154,7 +51154,7 @@ class CommodityMetering(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="meteredQuantity", Tag=0x00000000, Type=typing.Union[Nullable, typing.List[CommodityMetering.Structs.MeteredQuantityStruct]]),
                 ClusterObjectFieldDescriptor(Label="meteredQuantityTimestamp", Tag=0x00000001, Type=typing.Union[Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="measurementType", Tag=0x00000002, Type=typing.Union[Nullable, CommodityMetering.Enums.MeasurementTypeEnum]),
+                ClusterObjectFieldDescriptor(Label="tariffUnit", Tag=0x00000002, Type=typing.Union[Nullable, Globals.Enums.TariffUnitEnum]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -51164,37 +51164,12 @@ class CommodityMetering(Cluster):
 
     meteredQuantity: typing.Union[Nullable, typing.List[CommodityMetering.Structs.MeteredQuantityStruct]] = NullValue
     meteredQuantityTimestamp: typing.Union[Nullable, uint] = NullValue
-    measurementType: typing.Union[Nullable, CommodityMetering.Enums.MeasurementTypeEnum] = NullValue
+    tariffUnit: typing.Union[Nullable, Globals.Enums.TariffUnitEnum] = NullValue
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
     featureMap: uint = 0
     clusterRevision: uint = 0
-
-    class Enums:
-        class MeasurementTypeEnum(MatterIntEnum):
-            kUnspecified = 0x00
-            kVoltage = 0x01
-            kActiveCurrent = 0x02
-            kReactiveCurrent = 0x03
-            kApparentCurrent = 0x04
-            kActivePower = 0x05
-            kReactivePower = 0x06
-            kApparentPower = 0x07
-            kRMSVoltage = 0x08
-            kRMSCurrent = 0x09
-            kRMSPower = 0x0A
-            kFrequency = 0x0B
-            kPowerFactor = 0x0C
-            kNeutralCurrent = 0x0D
-            kElectricalEnergy = 0x0E
-            kReactiveEnergy = 0x0F
-            kApparentEnergy = 0x10
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 17
 
     class Structs:
         @dataclass
@@ -51244,7 +51219,7 @@ class CommodityMetering(Cluster):
             value: typing.Union[Nullable, uint] = NullValue
 
         @dataclass
-        class MeasurementType(ClusterAttributeDescriptor):
+        class TariffUnit(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000B07
@@ -51255,9 +51230,9 @@ class CommodityMetering(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, CommodityMetering.Enums.MeasurementTypeEnum])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, Globals.Enums.TariffUnitEnum])
 
-            value: typing.Union[Nullable, CommodityMetering.Enums.MeasurementTypeEnum] = NullValue
+            value: typing.Union[Nullable, Globals.Enums.TariffUnitEnum] = NullValue
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

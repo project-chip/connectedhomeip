@@ -16019,11 +16019,11 @@ MTR_PROVISIONALLY_AVAILABLE
                                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeMeteredQuantityTimestampWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeMeasurementTypeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeMeasurementTypeWithParams:(MTRSubscribeParams *)params
-                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeMeasurementTypeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeTariffUnitWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeTariffUnitWithParams:(MTRSubscribeParams *)params
+                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeTariffUnitWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
@@ -21517,26 +21517,6 @@ typedef NS_ENUM(uint8_t, MTRMeterIdentificationMeterType) {
 
 typedef NS_OPTIONS(uint32_t, MTRMeterIdentificationFeature) {
     MTRMeterIdentificationFeaturePowerThreshold MTR_PROVISIONALLY_AVAILABLE = 0x1,
-} MTR_PROVISIONALLY_AVAILABLE;
-
-typedef NS_ENUM(uint16_t, MTRCommodityMeteringMeasurementType) {
-    MTRCommodityMeteringMeasurementTypeUnspecified MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRCommodityMeteringMeasurementTypeVoltage MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRCommodityMeteringMeasurementTypeActiveCurrent MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTRCommodityMeteringMeasurementTypeReactiveCurrent MTR_PROVISIONALLY_AVAILABLE = 0x03,
-    MTRCommodityMeteringMeasurementTypeApparentCurrent MTR_PROVISIONALLY_AVAILABLE = 0x04,
-    MTRCommodityMeteringMeasurementTypeActivePower MTR_PROVISIONALLY_AVAILABLE = 0x05,
-    MTRCommodityMeteringMeasurementTypeReactivePower MTR_PROVISIONALLY_AVAILABLE = 0x06,
-    MTRCommodityMeteringMeasurementTypeApparentPower MTR_PROVISIONALLY_AVAILABLE = 0x07,
-    MTRCommodityMeteringMeasurementTypeRMSVoltage MTR_PROVISIONALLY_AVAILABLE = 0x08,
-    MTRCommodityMeteringMeasurementTypeRMSCurrent MTR_PROVISIONALLY_AVAILABLE = 0x09,
-    MTRCommodityMeteringMeasurementTypeRMSPower MTR_PROVISIONALLY_AVAILABLE = 0x0A,
-    MTRCommodityMeteringMeasurementTypeFrequency MTR_PROVISIONALLY_AVAILABLE = 0x0B,
-    MTRCommodityMeteringMeasurementTypePowerFactor MTR_PROVISIONALLY_AVAILABLE = 0x0C,
-    MTRCommodityMeteringMeasurementTypeNeutralCurrent MTR_PROVISIONALLY_AVAILABLE = 0x0D,
-    MTRCommodityMeteringMeasurementTypeElectricalEnergy MTR_PROVISIONALLY_AVAILABLE = 0x0E,
-    MTRCommodityMeteringMeasurementTypeReactiveEnergy MTR_PROVISIONALLY_AVAILABLE = 0x0F,
-    MTRCommodityMeteringMeasurementTypeApparentEnergy MTR_PROVISIONALLY_AVAILABLE = 0x10,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRUnitTestingSimple) {

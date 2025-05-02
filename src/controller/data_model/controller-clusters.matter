@@ -11017,28 +11017,8 @@ provisional cluster MeterIdentification = 2822 {
 }
 
 /** The Commodity Metering Cluster provides the mechanism for communicating commodity consumption information within a premises. */
-cluster CommodityMetering = 2823 {
+provisional cluster CommodityMetering = 2823 {
   revision 1;
-
-  shared enum MeasurementTypeEnum : enum16 {
-    kUnspecified = 0;
-    kVoltage = 1;
-    kActiveCurrent = 2;
-    kReactiveCurrent = 3;
-    kApparentCurrent = 4;
-    kActivePower = 5;
-    kReactivePower = 6;
-    kApparentPower = 7;
-    kRMSVoltage = 8;
-    kRMSCurrent = 9;
-    kRMSPower = 10;
-    kFrequency = 11;
-    kPowerFactor = 12;
-    kNeutralCurrent = 13;
-    kElectricalEnergy = 14;
-    kReactiveEnergy = 15;
-    kApparentEnergy = 16;
-  }
 
   struct MeteredQuantityStruct {
     int32u tariffComponentIDs[] = 0;
@@ -11047,7 +11027,7 @@ cluster CommodityMetering = 2823 {
 
   readonly attribute nullable MeteredQuantityStruct meteredQuantity[] = 0;
   readonly attribute nullable epoch_s meteredQuantityTimestamp = 1;
-  readonly attribute nullable MeasurementTypeEnum measurementType = 2;
+  readonly attribute nullable TariffUnitEnum tariffUnit = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
