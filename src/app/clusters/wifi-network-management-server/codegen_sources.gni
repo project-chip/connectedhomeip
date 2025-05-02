@@ -1,0 +1,1 @@
+codegen_sources = ["wifi-network-management-server.cpp", "wifi-network-management-server.h"]

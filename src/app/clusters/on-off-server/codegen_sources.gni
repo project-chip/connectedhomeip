@@ -1,0 +1,1 @@
+codegen_sources = ["on-off-server.cpp", "on-off-server.h"]

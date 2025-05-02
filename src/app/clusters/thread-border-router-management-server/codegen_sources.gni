@@ -1,0 +1,5 @@
+codegen_sources = [
+    "thread-border-router-management-server.cpp",
+    "thread-border-router-management-server.h",
+    "thread-br-delegate.h"
+]

@@ -1,0 +1,1 @@
+codegen_sources = ["wake-on-lan-delegate.h", "wake-on-lan-server.cpp", "wake-on-lan-server.h"]

@@ -1,7 +1,0 @@
-[
-    "BooleanStateConfigurationTestEventTriggerHandler.cpp",
-    "BooleanStateConfigurationTestEventTriggerHandler.h",
-    "boolean-state-configuration-delegate.h",
-    "boolean-state-configuration-server.cpp",
-    "boolean-state-configuration-server.h"
-]

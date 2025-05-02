@@ -1,0 +1,4 @@
+codegen_sources = [
+    "electrical-power-measurement-server.cpp",
+    "electrical-power-measurement-server.h"
+]

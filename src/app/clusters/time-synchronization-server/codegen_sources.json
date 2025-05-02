@@ -1,8 +1,0 @@
-[
-    "DefaultTimeSyncDelegate.cpp",
-    "DefaultTimeSyncDelegate.h",
-    "TimeSyncDataProvider.cpp",
-    "time-synchronization-delegate.h",
-    "time-synchronization-server.cpp",
-    "time-synchronization-server.h"
-]

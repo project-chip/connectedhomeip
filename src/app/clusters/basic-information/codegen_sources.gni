@@ -1,0 +1,1 @@
+codegen_sources = ["basic-information.cpp", "basic-information.h"]

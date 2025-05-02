@@ -1,0 +1,1 @@
+codegen_sources = ["fan-control-delegate.h", "fan-control-server.cpp", "fan-control-server.h"]

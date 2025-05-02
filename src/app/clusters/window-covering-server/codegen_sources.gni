@@ -1,0 +1,5 @@
+codegen_sources = [
+    "window-covering-delegate.h",
+    "window-covering-server.cpp",
+    "window-covering-server.h"
+]

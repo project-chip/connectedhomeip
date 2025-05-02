@@ -252,17 +252,23 @@ template("chip_data_model") {
     #   - A `BUILD.gn` file that defines generic targets. A dependency
     #     will be added on this default target. An empty group will be created
     #     if no special build rules exist
-    #   - codegen_sources.json - required sources for code generation integration
+    #   - codegen_sources.gni - required sources for code generation integration
+    #     MUST define a variable named `codegen_sources`
 
+    _codegen_sources = []
     foreach(cluster, _cluster_sources) {
       deps += [ "${_app_root}/clusters/${cluster}" ]
 
-      # This case contains a list of sources to be added directly into the build
-      foreach(file_name,
-              read_file("${_app_root}/clusters/${cluster}/codegen_sources.json",
-                        "json")) {
-        sources += [ "${_app_root}/clusters/${cluster}/${file_name}" ]
-      }
+      # codegen_sources paths are relative to the target
+      # accumulate them here so that we can "rebase_path" later on
+      _codegen_sources += [{
+         cluster = cluster
+         import("${_app_root}/clusters/${cluster}/codegen_sources.gni")
+      }]
+    }
+
+    foreach(cluster_entry, _codegen_sources) {
+      sources += rebase_path(cluster_entry.codegen_sources, "", "${_app_root}/clusters/${cluster_entry.cluster}")
     }
 
     deps += [ "${chip_root}/src/app:attribute-persistence" ]

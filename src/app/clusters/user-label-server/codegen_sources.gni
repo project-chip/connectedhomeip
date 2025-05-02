@@ -1,0 +1,1 @@
+codegen_sources = ["user-label-server.cpp"]

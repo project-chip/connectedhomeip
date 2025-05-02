@@ -1,0 +1,4 @@
+codegen_sources = [
+    "camera-av-stream-management-server.cpp",
+    "camera-av-stream-management-server.h"
+]

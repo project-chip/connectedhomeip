@@ -1,0 +1,5 @@
+codegen_sources = [
+    "content-app-observer-delegate.h",
+    "content-app-observer.cpp",
+    "content-app-observer.h"
+]

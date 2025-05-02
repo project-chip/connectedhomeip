@@ -1,0 +1,1 @@
+codegen_sources = ["supported-temperature-levels-manager.h", "temperature-control-server.cpp"]

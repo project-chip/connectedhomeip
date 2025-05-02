@@ -1,0 +1,1 @@
+codegen_sources = ["power-source-server.cpp"]

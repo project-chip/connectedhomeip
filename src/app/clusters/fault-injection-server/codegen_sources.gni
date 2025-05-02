@@ -1,0 +1,1 @@
+codegen_sources = ["fault-injection-server.cpp"]

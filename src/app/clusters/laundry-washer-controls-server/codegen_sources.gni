@@ -1,0 +1,5 @@
+codegen_sources = [
+    "laundry-washer-controls-delegate.h",
+    "laundry-washer-controls-server.cpp",
+    "laundry-washer-controls-server.h"
+]

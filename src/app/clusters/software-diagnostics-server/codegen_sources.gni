@@ -1,0 +1,5 @@
+codegen_sources = [
+    "SoftwareDiagnosticsTestEventTriggerHandler.h",
+    "software-diagnostics-server.cpp",
+    "software-diagnostics-server.h"
+]

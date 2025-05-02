@@ -1,0 +1,5 @@
+codegen_sources = [
+    "CommodityPriceTestEventTriggerHandler.h",
+    "commodity-price-server.cpp",
+    "commodity-price-server.h"
+]
