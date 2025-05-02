@@ -55,6 +55,11 @@ CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Milliseconds64 & aCurTime)
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
+CHIP_ERROR ClockImpl::GetClock_EpochTS(uint32_t & chipEpoch)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
 CHIP_ERROR ClockImpl::SetClock_RealTime(Microseconds64 aNewCurTime)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
