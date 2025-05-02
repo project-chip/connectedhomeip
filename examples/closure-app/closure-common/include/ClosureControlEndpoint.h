@@ -86,7 +86,7 @@ public:
      *
      * @return ElapsedS - Remaining time in seconds
      *         DataModel::NullNullable if countdown timer is not set
-    */
+     */
     DataModel::Nullable<ElapsedS> GetRemainingTime();
 
     /**
