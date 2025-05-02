@@ -24,6 +24,8 @@
 #include "QRCodeSetupPayloadParser.h"
 #include "Base38Decode.h"
 
+#include <algorithm>
+#include <sstream>
 #include <string.h>
 #include <vector>
 
@@ -380,24 +382,26 @@ CHIP_ERROR QRCodeSetupPayloadParser::populatePayloadFromBase38Data(std::string p
 
 std::variant<CHIP_ERROR, std::vector<SetupPayload>> QRCodeSetupPayloadParser::Parse()
 {
+    constexpr char kPayloadDelimiter = '*';
+
     std::string payload = ExtractPayload(mBase38Representation);
     VerifyOrReturnError(payload.length() != 0, CHIP_ERROR_INVALID_ARGUMENT);
 
-    auto chunkCount = std::count(payload.begin(), payload.end(), '*') + 1;
+    auto chunkCount = std::count(payload.begin(), payload.end(), kPayloadDelimiter) + 1;
 
-    std::vector<SetupPayload> retval;
-    retval.reserve(static_cast<decltype(retval)::size_type>(chunkCount));
+    std::vector<SetupPayload> payloads;
+    payloads.reserve(static_cast<decltype(payloads)::size_type>(chunkCount));
 
     std::stringstream chunkStream(payload);
     std::string chunk;
 
-    while (std::getline(chunkStream, chunk, '*'))
+    while (std::getline(chunkStream, chunk, kPayloadDelimiter))
     {
-        auto & nextItem = retval.emplace_back();
+        auto & nextItem = payloads.emplace_back();
         ReturnErrorOnFailure(populatePayloadFromBase38Data(chunk, nextItem));
     }
 
-    return retval;
+    return payloads;
 }
 
 } // namespace chip

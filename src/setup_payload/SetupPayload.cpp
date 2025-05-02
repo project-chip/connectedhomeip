@@ -346,24 +346,24 @@ std::variant<CHIP_ERROR, std::vector<SetupPayload>> SetupPayload::FromStringRepr
     bool isQRCode = (stringRepresentation.rfind(kQRCodePrefix, 0) == 0);
     if (!isQRCode)
     {
-        std::vector<SetupPayload> retval;
-        auto & payload = retval.emplace_back();
+        std::vector<SetupPayload> payloads;
+        auto & payload = payloads.emplace_back();
         ReturnErrorOnFailure(ManualSetupPayloadParser(stringRepresentation).populatePayload(payload));
         VerifyOrReturnError(payload.isValidManualCode(), CHIP_ERROR_INVALID_ARGUMENT);
-        return retval;
+        return payloads;
     }
 
-    auto retval = QRCodeSetupPayloadParser(stringRepresentation).Parse();
-    if (!std::holds_alternative<std::vector<SetupPayload>>(retval))
+    auto payloads = QRCodeSetupPayloadParser(stringRepresentation).Parse();
+    if (!std::holds_alternative<std::vector<SetupPayload>>(payloads))
     {
-        return retval;
+        return payloads;
     }
 
-    for (auto & entry : std::get<std::vector<SetupPayload>>(retval))
+    for (auto & entry : std::get<std::vector<SetupPayload>>(payloads))
     {
         VerifyOrReturnError(entry.isValidQRCodePayload(), CHIP_ERROR_INVALID_ARGUMENT);
     }
-    return retval;
+    return payloads;
 }
 
 } // namespace chip
