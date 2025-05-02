@@ -179,6 +179,7 @@
             "AdminVendorId"
         ],
         "Basic Information": [
+            "ClusterRevision",
             "DataModelRevision",
             "VendorName",
             "VendorID",
