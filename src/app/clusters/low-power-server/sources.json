@@ -1,5 +1,1 @@
-[
-  "low-power-server.h",
-  "low-power-server.cpp",
-  "low-power-delegate.h"
-]
+["low-power-server.h", "low-power-server.cpp", "low-power-delegate.h"]

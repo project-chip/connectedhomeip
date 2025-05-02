@@ -1,5 +1,5 @@
 [
-  "window-covering-delegate.h",
-  "window-covering-server.h",
-  "window-covering-server.cpp"
+    "window-covering-delegate.h",
+    "window-covering-server.h",
+    "window-covering-server.cpp"
 ]

@@ -1,5 +1,5 @@
 [
-  "content-app-observer.cpp",
-  "content-app-observer-delegate.h",
-  "content-app-observer.h"
+    "content-app-observer.cpp",
+    "content-app-observer-delegate.h",
+    "content-app-observer.h"
 ]

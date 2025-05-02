@@ -1,5 +1,1 @@
-[
-  "ArlEncoder.h",
-  "ArlEncoder.cpp",
-  "access-control-server.cpp"
-]
+["ArlEncoder.h", "ArlEncoder.cpp", "access-control-server.cpp"]

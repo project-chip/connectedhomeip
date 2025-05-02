@@ -1,4 +1,1 @@
-[
-  "power-topology-server.h",
-  "power-topology-server.cpp"
-]
+["power-topology-server.h", "power-topology-server.cpp"]

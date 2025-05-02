@@ -1,5 +1,1 @@
-[
-  "channel-server.h",
-  "channel-server.cpp",
-  "channel-delegate.h"
-]
+["channel-server.h", "channel-server.cpp", "channel-delegate.h"]

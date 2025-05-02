@@ -1,6 +1,6 @@
 [
-  "mode-base-server.cpp",
-  "mode-base-server.h",
-  "mode-base-cluster-objects.h",
-  "mode-base-cluster-objects.cpp"
+    "mode-base-server.cpp",
+    "mode-base-server.h",
+    "mode-base-cluster-objects.h",
+    "mode-base-cluster-objects.cpp"
 ]

@@ -18,13 +18,13 @@ import("${chip_root}/src/app/icd/icd.gni")
 # the right dependencies
 group("icd-management-server") {
   public_deps = [
-          "${chip_root}/src/app/icd/server:configuration-data",
-          "${chip_root}/src/app/icd/server:icd-server-config",
-        ]
-        if (chip_enable_icd_server) {
-          public_deps += [ "${chip_root}/src/app/icd/server:notifier" ]
-          if (chip_enable_icd_checkin) {
-            public_deps += [ "${chip_root}/src/app/icd/server:monitoring-table" ]
-          }
-        }
+    "${chip_root}/src/app/icd/server:configuration-data",
+    "${chip_root}/src/app/icd/server:icd-server-config",
+  ]
+  if (chip_enable_icd_server) {
+    public_deps += [ "${chip_root}/src/app/icd/server:notifier" ]
+    if (chip_enable_icd_checkin) {
+      public_deps += [ "${chip_root}/src/app/icd/server:monitoring-table" ]
+    }
+  }
 }

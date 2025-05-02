@@ -1,5 +1,1 @@
-[
-  "wake-on-lan-server.h",
-  "wake-on-lan-delegate.h",
-  "wake-on-lan-server.cpp"
-]
+["wake-on-lan-server.h", "wake-on-lan-delegate.h", "wake-on-lan-server.cpp"]

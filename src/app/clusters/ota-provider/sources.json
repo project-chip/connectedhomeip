@@ -1,9 +1,9 @@
 [
-  "ota-provider-delegate.h",
-  "CodegenIntegration.h",
-  "CodegenIntegration.cpp",
-  "ota-provider-cluster.h",
-  "DefaultOTAProviderUserConsent.h",
-  "ota-provider-cluster.cpp",
-  "OTAProviderUserConsentDelegate.h"
+    "ota-provider-delegate.h",
+    "CodegenIntegration.h",
+    "CodegenIntegration.cpp",
+    "ota-provider-cluster.h",
+    "DefaultOTAProviderUserConsent.h",
+    "ota-provider-cluster.cpp",
+    "OTAProviderUserConsentDelegate.h"
 ]

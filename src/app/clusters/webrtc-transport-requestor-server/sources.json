@@ -1,4 +1,1 @@
-[
-  "webrtc-transport-requestor-server.cpp",
-  "webrtc-transport-requestor-server.h"
-]
+["webrtc-transport-requestor-server.cpp", "webrtc-transport-requestor-server.h"]

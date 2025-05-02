@@ -1,5 +1,5 @@
 [
-  "ElectricalGridConditionsTestEventTriggerHandler.h",
-  "electrical-grid-conditions-server.cpp",
-  "electrical-grid-conditions-server.h"
+    "ElectricalGridConditionsTestEventTriggerHandler.h",
+    "electrical-grid-conditions-server.cpp",
+    "electrical-grid-conditions-server.h"
 ]

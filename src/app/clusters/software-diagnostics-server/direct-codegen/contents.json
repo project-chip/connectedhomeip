@@ -1,4 +1,1 @@
-[
-  "software-diagnostics-server.cpp",
-  "software-diagnostics-server.h"
-]
+["software-diagnostics-server.cpp", "software-diagnostics-server.h"]
