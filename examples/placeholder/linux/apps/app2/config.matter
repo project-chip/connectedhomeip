@@ -8704,7 +8704,7 @@ endpoint 0 {
   }
 
   server cluster UnitLocalization {
-    ram      attribute temperatureUnit;
+    callback attribute temperatureUnit;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
