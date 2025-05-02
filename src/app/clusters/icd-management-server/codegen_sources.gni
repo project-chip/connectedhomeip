@@ -1,1 +1,4 @@
-codegen_sources = ["icd-management-server.cpp", "icd-management-server.h"]
+codegen_sources = [
+  "icd-management-server.cpp",
+  "icd-management-server.h",
+]

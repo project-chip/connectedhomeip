@@ -1,1 +1,4 @@
-codegen_sources = ["switch-server.cpp", "switch-server.h"]
+codegen_sources = [
+  "switch-server.cpp",
+  "switch-server.h",
+]

@@ -1,1 +1,1 @@
-codegen_sources = ["group-key-mgmt-server.cpp"]
+codegen_sources = [ "group-key-mgmt-server.cpp" ]

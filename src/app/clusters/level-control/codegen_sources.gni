@@ -1,1 +1,4 @@
-codegen_sources = ["level-control.cpp", "level-control.h"]
+codegen_sources = [
+  "level-control.cpp",
+  "level-control.h",
+]

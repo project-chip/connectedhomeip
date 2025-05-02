@@ -1,6 +1,6 @@
 codegen_sources = [
-    "mode-base-cluster-objects.cpp",
-    "mode-base-cluster-objects.h",
-    "mode-base-server.cpp",
-    "mode-base-server.h"
+  "mode-base-cluster-objects.cpp",
+  "mode-base-cluster-objects.h",
+  "mode-base-server.cpp",
+  "mode-base-server.h",
 ]

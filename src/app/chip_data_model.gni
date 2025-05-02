@@ -261,14 +261,18 @@ template("chip_data_model") {
 
       # codegen_sources paths are relative to the target
       # accumulate them here so that we can "rebase_path" later on
-      _codegen_sources += [{
-         cluster = cluster
-         import("${_app_root}/clusters/${cluster}/codegen_sources.gni")
-      }]
+      _codegen_sources += [
+        {
+          cluster = cluster
+          import("${_app_root}/clusters/${cluster}/codegen_sources.gni")
+        },
+      ]
     }
 
     foreach(cluster_entry, _codegen_sources) {
-      sources += rebase_path(cluster_entry.codegen_sources, "", "${_app_root}/clusters/${cluster_entry.cluster}")
+      sources += rebase_path(cluster_entry.codegen_sources,
+                             "",
+                             "${_app_root}/clusters/${cluster_entry.cluster}")
     }
 
     deps += [ "${chip_root}/src/app:attribute-persistence" ]

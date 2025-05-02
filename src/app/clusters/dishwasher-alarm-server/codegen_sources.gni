@@ -1,5 +1,5 @@
 codegen_sources = [
-    "dishwasher-alarm-delegate.h",
-    "dishwasher-alarm-server.cpp",
-    "dishwasher-alarm-server.h"
+  "dishwasher-alarm-delegate.h",
+  "dishwasher-alarm-server.cpp",
+  "dishwasher-alarm-server.h",
 ]

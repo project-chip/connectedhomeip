@@ -1,1 +1,5 @@
-codegen_sources = ["media-input-delegate.h", "media-input-server.cpp", "media-input-server.h"]
+codegen_sources = [
+  "media-input-delegate.h",
+  "media-input-server.cpp",
+  "media-input-server.h",
+]

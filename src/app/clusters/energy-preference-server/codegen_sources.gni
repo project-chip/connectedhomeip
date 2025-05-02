@@ -1,1 +1,4 @@
-codegen_sources = ["energy-preference-server.cpp", "energy-preference-server.h"]
+codegen_sources = [
+  "energy-preference-server.cpp",
+  "energy-preference-server.h",
+]

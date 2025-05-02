@@ -1,5 +1,5 @@
 codegen_sources = [
-    "EnergyEvseTestEventTriggerHandler.h",
-    "energy-evse-server.cpp",
-    "energy-evse-server.h"
+  "EnergyEvseTestEventTriggerHandler.h",
+  "energy-evse-server.cpp",
+  "energy-evse-server.h",
 ]

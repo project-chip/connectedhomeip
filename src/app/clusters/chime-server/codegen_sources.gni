@@ -1,1 +1,4 @@
-codegen_sources = ["chime-server.cpp", "chime-server.h"]
+codegen_sources = [
+  "chime-server.cpp",
+  "chime-server.h",
+]

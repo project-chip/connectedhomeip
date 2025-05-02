@@ -1,1 +1,5 @@
-codegen_sources = ["messages-delegate.h", "messages-server.cpp", "messages-server.h"]
+codegen_sources = [
+  "messages-delegate.h",
+  "messages-server.cpp",
+  "messages-server.h",
+]

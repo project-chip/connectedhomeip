@@ -1,1 +1,1 @@
-codegen_sources = ["fixed-label-server.cpp"]
+codegen_sources = [ "fixed-label-server.cpp" ]

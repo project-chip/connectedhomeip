@@ -1,5 +1,5 @@
 codegen_sources = [
-    "application-basic-delegate.h",
-    "application-basic-server.cpp",
-    "application-basic-server.h"
+  "application-basic-delegate.h",
+  "application-basic-server.cpp",
+  "application-basic-server.h",
 ]

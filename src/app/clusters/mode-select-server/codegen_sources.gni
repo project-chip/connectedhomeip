@@ -1,1 +1,4 @@
-codegen_sources = ["mode-select-server.cpp", "supported-modes-manager.h"]
+codegen_sources = [
+  "mode-select-server.cpp",
+  "supported-modes-manager.h",
+]

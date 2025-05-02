@@ -1,5 +1,5 @@
 codegen_sources = [
-    "DeviceEnergyManagementTestEventTriggerHandler.h",
-    "device-energy-management-server.cpp",
-    "device-energy-management-server.h"
+  "DeviceEnergyManagementTestEventTriggerHandler.h",
+  "device-energy-management-server.cpp",
+  "device-energy-management-server.h",
 ]

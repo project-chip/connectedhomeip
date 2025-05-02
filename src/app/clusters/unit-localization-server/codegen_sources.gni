@@ -1,1 +1,4 @@
-codegen_sources = ["unit-localization-server.cpp", "unit-localization-server.h"]
+codegen_sources = [
+  "unit-localization-server.cpp",
+  "unit-localization-server.h",
+]

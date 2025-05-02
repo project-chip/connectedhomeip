@@ -1,1 +1,1 @@
-codegen_sources = ["network-commissioning.cpp"]
+codegen_sources = [ "network-commissioning.cpp" ]

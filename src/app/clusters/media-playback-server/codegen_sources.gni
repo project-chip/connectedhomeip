@@ -1,5 +1,5 @@
 codegen_sources = [
-    "media-playback-delegate.h",
-    "media-playback-server.cpp",
-    "media-playback-server.h"
+  "media-playback-delegate.h",
+  "media-playback-server.cpp",
+  "media-playback-server.h",
 ]

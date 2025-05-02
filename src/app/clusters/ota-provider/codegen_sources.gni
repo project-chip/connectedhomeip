@@ -1,1 +1,4 @@
-codegen_sources = ["CodegenIntegration.cpp", "CodegenIntegration.h"]
+codegen_sources = [
+  "CodegenIntegration.cpp",
+  "CodegenIntegration.h",
+]

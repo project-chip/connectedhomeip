@@ -1,4 +1,4 @@
 codegen_sources = [
-    "camera-av-settings-user-level-management-server.cpp",
-    "camera-av-settings-user-level-management-server.h"
+  "camera-av-settings-user-level-management-server.cpp",
+  "camera-av-settings-user-level-management-server.h",
 ]

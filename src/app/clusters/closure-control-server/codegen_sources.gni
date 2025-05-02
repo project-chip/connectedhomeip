@@ -1,9 +1,9 @@
 codegen_sources = [
-    "closure-control-cluster-delegate.h",
-    "closure-control-cluster-logic.cpp",
-    "closure-control-cluster-logic.h",
-    "closure-control-cluster-matter-context.h",
-    "closure-control-cluster-objects.h",
-    "closure-control-server.cpp",
-    "closure-control-server.h"
+  "closure-control-cluster-delegate.h",
+  "closure-control-cluster-logic.cpp",
+  "closure-control-cluster-logic.h",
+  "closure-control-cluster-matter-context.h",
+  "closure-control-cluster-objects.h",
+  "closure-control-server.cpp",
+  "closure-control-server.h",
 ]

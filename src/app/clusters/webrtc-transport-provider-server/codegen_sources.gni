@@ -1,1 +1,4 @@
-codegen_sources = ["webrtc-transport-provider-server.cpp", "webrtc-transport-provider-server.h"]
+codegen_sources = [
+  "webrtc-transport-provider-server.cpp",
+  "webrtc-transport-provider-server.h",
+]

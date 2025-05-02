@@ -1,1 +1,4 @@
-codegen_sources = ["descriptor.cpp", "descriptor.h"]
+codegen_sources = [
+  "descriptor.cpp",
+  "descriptor.h",
+]

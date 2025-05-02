@@ -1,1 +1,1 @@
-codegen_sources = ["user-label-server.cpp"]
+codegen_sources = [ "user-label-server.cpp" ]

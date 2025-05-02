@@ -1,9 +1,9 @@
 codegen_sources = [
-    "application-launcher-delegate.h",
-    "application-launcher-server.cpp",
-    "application-launcher-server.h",
-    "../../app-platform/ContentApp.cpp",
-    "../../app-platform/ContentApp.h",
-    "../../app-platform/ContentAppPlatform.cpp",
-    "../../app-platform/ContentAppPlatform.h"
+  "../../app-platform/ContentApp.cpp",
+  "../../app-platform/ContentApp.h",
+  "../../app-platform/ContentAppPlatform.cpp",
+  "../../app-platform/ContentAppPlatform.h",
+  "application-launcher-delegate.h",
+  "application-launcher-server.cpp",
+  "application-launcher-server.h",
 ]

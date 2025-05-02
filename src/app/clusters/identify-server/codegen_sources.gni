@@ -1,1 +1,4 @@
-codegen_sources = ["identify-server.cpp", "identify-server.h"]
+codegen_sources = [
+  "identify-server.cpp",
+  "identify-server.h",
+]

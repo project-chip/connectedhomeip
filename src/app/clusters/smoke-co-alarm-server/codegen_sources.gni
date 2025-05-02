@@ -1,5 +1,5 @@
 codegen_sources = [
-    "SmokeCOTestEventTriggerHandler.h",
-    "smoke-co-alarm-server.cpp",
-    "smoke-co-alarm-server.h"
+  "SmokeCOTestEventTriggerHandler.h",
+  "smoke-co-alarm-server.cpp",
+  "smoke-co-alarm-server.h",
 ]

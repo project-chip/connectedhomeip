@@ -1,1 +1,4 @@
-codegen_sources = ["door-lock-server-callback.cpp", "door-lock-server.cpp"]
+codegen_sources = [
+  "door-lock-server-callback.cpp",
+  "door-lock-server.cpp",
+]

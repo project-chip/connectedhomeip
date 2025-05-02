@@ -1,1 +1,1 @@
-codegen_sources = ["operational-credentials-server.cpp"]
+codegen_sources = [ "operational-credentials-server.cpp" ]

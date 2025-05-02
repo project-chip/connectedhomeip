@@ -1,1 +1,1 @@
-codegen_sources = ["bridged-device-basic-information-server.cpp"]
+codegen_sources = [ "bridged-device-basic-information-server.cpp" ]

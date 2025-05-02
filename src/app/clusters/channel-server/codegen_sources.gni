@@ -1,1 +1,5 @@
-codegen_sources = ["channel-delegate.h", "channel-server.cpp", "channel-server.h"]
+codegen_sources = [
+  "channel-delegate.h",
+  "channel-server.cpp",
+  "channel-server.h",
+]

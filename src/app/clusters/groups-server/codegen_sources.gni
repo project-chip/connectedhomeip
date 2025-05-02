@@ -1,1 +1,4 @@
-codegen_sources = ["groups-server.cpp", "groups-server.h"]
+codegen_sources = [
+  "groups-server.cpp",
+  "groups-server.h",
+]

@@ -1,1 +1,4 @@
-codegen_sources = ["refrigerator-alarm-server.cpp", "refrigerator-alarm-server.h"]
+codegen_sources = [
+  "refrigerator-alarm-server.cpp",
+  "refrigerator-alarm-server.h",
+]

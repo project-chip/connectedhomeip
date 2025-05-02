@@ -1,1 +1,4 @@
-codegen_sources = ["commissioner-control-server.cpp", "commissioner-control-server.h"]
+codegen_sources = [
+  "commissioner-control-server.cpp",
+  "commissioner-control-server.h",
+]

@@ -1,1 +1,4 @@
-codegen_sources = ["ecosystem-information-server.cpp", "ecosystem-information-server.h"]
+codegen_sources = [
+  "ecosystem-information-server.cpp",
+  "ecosystem-information-server.h",
+]

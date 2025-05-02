@@ -1,7 +1,7 @@
 codegen_sources = [
-    "BDXDiagnosticLogsProvider.cpp",
-    "BDXDiagnosticLogsProvider.h",
-    "DiagnosticLogsProviderDelegate.h",
-    "diagnostic-logs-server.cpp",
-    "diagnostic-logs-server.h"
+  "BDXDiagnosticLogsProvider.cpp",
+  "BDXDiagnosticLogsProvider.h",
+  "DiagnosticLogsProviderDelegate.h",
+  "diagnostic-logs-server.cpp",
+  "diagnostic-logs-server.h",
 ]
