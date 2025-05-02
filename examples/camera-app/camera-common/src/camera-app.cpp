@@ -53,8 +53,13 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     features.Set(CameraAvStreamManagement::Feature::kHighDynamicRange);
 
     BitFlags<OptionalAttribute> optionalAttrs;
-    optionalAttrs.Set(OptionalAttribute::kNightVision);
-    optionalAttrs.Set(OptionalAttribute::kNightVisionIllum);
+
+    if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsNightVision())
+    {
+        features.Set(CameraAvStreamManagement::Feature::kNightVision);
+        optionalAttrs.Set(OptionalAttribute::kNightVision);
+        optionalAttrs.Set(OptionalAttribute::kNightVisionIllum);
+    }
 
     uint32_t maxConcurrentVideoEncoders  = mCameraDevice->GetCameraHALInterface().GetMaxConcurrentEncoders();
     uint32_t maxEncodedPixelRate         = mCameraDevice->GetCameraHALInterface().GetMaxEncodedPixelRate();

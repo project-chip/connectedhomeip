@@ -333,8 +333,10 @@ void emberAfCameraAvStreamManagementClusterInitCallback(EndpointId endpoint)
 
     BitFlags<Feature> features;
     features.Set(Feature::kSnapshot);
+    features.Set(Feature::kNightVision);
 
     BitFlags<OptionalAttribute> optionalAttrs;
+    optionalAttrs.Set(OptionalAttribute::kNightVisionUsesInfrared);
     optionalAttrs.Set(OptionalAttribute::kNightVision);
     optionalAttrs.Set(OptionalAttribute::kNightVisionIllum);
     uint32_t maxConcurrentVideoEncoders  = 1;

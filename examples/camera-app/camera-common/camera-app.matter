@@ -3260,6 +3260,7 @@ endpoint 1 {
     callback attribute rankedVideoStreamPrioritiesList;
     callback attribute softLivestreamPrivacyModeEnabled;
     callback attribute nightVision;
+    callback attribute nightVisionIllum;
     callback attribute viewport;
     callback attribute microphoneMuted;
     callback attribute microphoneVolumeLevel;

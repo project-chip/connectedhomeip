@@ -113,13 +113,13 @@ CHIP_ERROR CameraAVStreamMgmtServer::Init()
                                          mEndpointId));
     }
 
-    // Ensure Optional attribute bits have been correctly passed.
+    // Ensure Optional attribute bits have been correctly passed and have supporting feature bits set.
     if (SupportsOptAttr(OptionalAttribute::kNightVision) || SupportsOptAttr(OptionalAttribute::kNightVisionIllum))
     {
-        VerifyOrReturnError(HasFeature(Feature::kVideo) || HasFeature(Feature::kSnapshot), CHIP_ERROR_INVALID_ARGUMENT,
+        VerifyOrReturnError(HasFeature(Feature::kNightVision), CHIP_ERROR_INVALID_ARGUMENT,
                             ChipLogError(Zcl,
                                          "CameraAVStreamMgmt[ep=%d]: Feature configuration error. if NIghtVision is enabled, then "
-                                         "Video|Snapshot feature required",
+                                         "NightVision feature required",
                                          mEndpointId));
     }
 
@@ -490,14 +490,14 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
         break;
     case NightVision::Id:
         VerifyOrReturnError(
-            HasFeature(Feature::kNightVision), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get NightVision, feature is not supported", mEndpointId));
+            SupportsOptAttr(OptionalAttribute::kNightVision), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get NightVision, attribute is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mNightVision));
         break;
     case NightVisionIllum::Id:
-        VerifyOrReturnError(HasFeature(Feature::kNightVision), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kNightVisionIllum), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl,
-                                         "CameraAVStreamMgmt[ep=%d]: can not get NightVisionIllumination, feature is not supported",
+                                         "CameraAVStreamMgmt[ep=%d]: can not get NightVisionIllumination, attribute is not supported",
                                          mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mNightVisionIllum));
         break;

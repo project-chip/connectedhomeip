@@ -274,15 +274,16 @@ protected:
 
 enum class OptionalAttribute : uint32_t
 {
-    kHardPrivacyModeOn     = 0x0001,
-    kNightVision           = 0x0002,
-    kNightVisionIllum      = 0x0004,
-    kMicrophoneAGCEnabled  = 0x0008,
-    kImageRotation         = 0x0010,
-    kImageFlipHorizontal   = 0x0020,
-    kImageFlipVertical     = 0x0040,
-    kStatusLightEnabled    = 0x0080,
-    kStatusLightBrightness = 0x0100,
+    kHardPrivacyModeOn       = 0x0001,
+    kNightVisionUsesInfrared = 0x0002,
+    kNightVision             = 0x0004,
+    kNightVisionIllum        = 0x0008,
+    kMicrophoneAGCEnabled    = 0x0010,
+    kImageRotation           = 0x0020,
+    kImageFlipHorizontal     = 0x0040,
+    kImageFlipVertical       = 0x0080,
+    kStatusLightEnabled      = 0x0100,
+    kStatusLightBrightness   = 0x0200,
 };
 
 class CameraAVStreamMgmtServer : public CommandHandlerInterface, public AttributeAccessInterface
@@ -303,7 +304,7 @@ public:
      * @param aMaxConcurrentEncoders            The maximum number of video encoders supported by camera.
      * @param aMaxEncodedPixelRate              The maximum data rate (encoded pixels/sec) supported by camera.
      * @param aVideoSensorParams                The set of video sensor parameters for the camera.
-     * @param aNightVisionUsesInfrared          Indicates whether the camera supports night vision using infrared.
+     * @param aNightVisionUsesInfrared          Indicates whether nightvision mode does or does not use infrared
      * @param aMinViewPort                      Indicates minimum resolution (width/height) in pixels allowed for camera viewport.
      * @param aRateDistortionTradeOffPoints     Indicates the list of rate distortion trade-off points for supported hardware
      *                                          encoders.
@@ -325,9 +326,8 @@ public:
      */
     CameraAVStreamMgmtServer(CameraAVStreamMgmtDelegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
                              const BitFlags<OptionalAttribute> aOptionalAttrs, uint8_t aMaxConcurrentEncoders,
-                             uint32_t aMaxEncodedPixelRate, const VideoSensorParamsStruct & aVideoSensorParams,
-                             bool aNightVisionUsesInfrared, const VideoResolutionStruct & aMinViewPort,
-                             const std::vector<RateDistortionTradeOffStruct> & aRateDistortionTradeOffPoints,
+                             uint32_t aMaxEncodedPixelRate, const VideoSensorParamsStruct & aVideoSensorParams, bool aNightVisionUsesInfrared,
+                             const VideoResolutionStruct & aMinViewPort, const std::vector<RateDistortionTradeOffStruct> & aRateDistortionTradeOffPoints,
                              uint32_t aMaxContentBufferSize, const AudioCapabilitiesStruct & aMicrophoneCapabilities,
                              const AudioCapabilitiesStruct & aSpkrCapabilities, TwoWayTalkSupportTypeEnum aTwoWayTalkSupport,
                              const std::vector<SnapshotCapabilitiesStruct> & aSnapshotCapabilities, uint32_t aMaxNetworkBandwidth,
@@ -361,6 +361,8 @@ public:
     CHIP_ERROR SetSoftLivestreamPrivacyModeEnabled(bool aSoftLivestreamPrivacyModeEnabled);
 
     CHIP_ERROR SetHardPrivacyModeOn(bool aHardPrivacyModeOn);
+
+    CHIP_ERROR SetNightVisionUsesInfrared(bool aNightVisionUsesInfrared);
 
     CHIP_ERROR SetNightVision(TriStateAutoEnum aNightVision);
 
