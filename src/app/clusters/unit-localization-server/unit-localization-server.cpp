@@ -83,8 +83,8 @@ CHIP_ERROR UnitLocalizationServer::Write(const ConcreteDataAttributePath & aPath
     switch (aPath.mAttributeId)
     {
     case TemperatureUnit::Id: {
-        TempUnitEnum newTempUnit;
-        bool isValid = false;
+        TempUnitEnum newTempUnit = TempUnitEnum::kCelsius;
+        bool isValid             = false;
         ReturnErrorOnFailure(aDecoder.Decode(newTempUnit));
         const auto & units = GetSupportedTemperatureUnits();
         for (auto const & unit : units)
