@@ -25,11 +25,9 @@
 #include <app/clusters/closure-control-server/closure-control-server.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <cmsis_os2.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <protocols/interaction_model/StatusCode.h>
-#include <unordered_set>
 
 namespace chip {
 namespace app {
@@ -51,6 +49,11 @@ public:
 
     virtual ~ClosureControlDelegate() = default;
 
+    uint32_t mMovingTime                         = 0;
+    uint32_t mCalibratingTime                    = 0;
+    uint32_t mWaitingTime                        = 0;
+    DataModel::Nullable<ElapsedS> mCountDownTime = DataModel::NullNullable;
+
     // Override for the DelegateBase Virtual functions
 
     Protocols::InteractionModel::Status HandleStopCommand() override;
@@ -68,16 +71,23 @@ public:
 
     // Delegate specific functions and variables
 
+    /**
+     * @brief Function to set the logic object
+     */
     void SetLogic(ClusterLogic * logic) { mLogic = logic; }
 
+    /**
+     * @brief Function to get the logic object
+     */
     ClusterLogic * GetLogic() const { return mLogic; }
 
+    /**
+     * @brief Function to get the remaining time of the countdown timer
+     *
+     * @return ElapsedS - Remaining time in seconds
+     *         DataModel::NullNullable if countdown timer is not set
+    */
     DataModel::Nullable<ElapsedS> GetRemainingTime();
-
-    uint32_t mMovingTime                         = 0;
-    uint32_t mCalibratingTime                    = 0;
-    uint32_t mWaitingTime                        = 0;
-    DataModel::Nullable<ElapsedS> mCountDownTime = DataModel::NullNullable;
 
     /**
      * @brief Handles the countdown timer expiration event

@@ -53,5 +53,4 @@ private:
     chip::app::Clusters::ClosureControl::ClosureControlEndpoint ep1{ kClosureEndpoint };
     chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint ep2{ kClosurePanel1Endpoint };
     chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint ep3{ kClosurePanel2Endpoint };
-
 };

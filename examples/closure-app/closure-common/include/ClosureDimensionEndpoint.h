@@ -67,12 +67,24 @@ public:
      */
     CHIP_ERROR Init();
 
+    /**
+     * @brief Function to set the current state of the cluster.
+     */
     void SetLogic(ClusterLogic * logic) { mLogic = logic; }
 
+    /**
+     * @brief Function to get the current state of the cluster.
+     */
     ClusterLogic * GetLogic() const { return mLogic; }
 
+    /**
+     * @brief Function to get the target direction of the cluster.
+     */
     StepDirectionEnum GetTargetDirection() const { return mTargetDirection; }
 
+    /**
+     * @brief Function to set the target direction of the cluster.
+     */
     void SetTargetDirection(StepDirectionEnum direction) { mTargetDirection = direction; }
 
 private:
