@@ -21,14 +21,12 @@
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
 
-//#include <json/json.h>
+#include <type_traits>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace CommodityTariff {
-
-static constexpr size_t kDefaultStringValuesMaxBufLength = 128u;
 
 #define LOG_VAR_CH(changed) ChipLogProgress(NotSpecified, "EGW-CTC: Attr value %s", changed ? "changed": "not changed" )
 
@@ -56,7 +54,117 @@ static constexpr size_t kDefaultStringValuesMaxBufLength = 128u;
  */
 template <typename T>
 class CTC_BaseDataClass {
+private:
+    /// @brief Type trait for nullable types
+    template <typename U>
+    struct IsNullable : std::false_type {};
+
+    template <typename U>
+    struct IsNullable<DataModel::Nullable<U>> : std::true_type {};
+
+    /// @brief Type trait for list types
+    template <typename U>
+    struct IsList : std::false_type {};
+
+    template <typename U>
+    struct IsList<DataModel::List<U>> : std::true_type {};
+
+    // Type extraction utilities (as shown previously)
+    template<typename U>
+    struct ExtractWrappedType { using type = U; };
+    template<typename U>
+    struct ExtractWrappedType<DataModel::Nullable<U>> { 
+        using type = typename ExtractWrappedType<U>::type; 
+    };
+    template<typename U>
+    struct ExtractWrappedType<DataModel::List<U>> { 
+        using type = typename ExtractWrappedType<U>::type; 
+    };
+    template<typename U>
+    using ExtractWrappedType_t = typename ExtractWrappedType<U>::type;
+
+    // Helper to recursively unwrap values
+    template<typename U>
+    static auto unwrapValue(const U& value) -> typename std::enable_if<!IsNullable<U>::value && !IsList<U>::value, U>::type {
+        return value; // Base case - not a wrapper
+    }
+
+    template<typename U>
+    static auto unwrapValue(const U& value) -> typename std::enable_if<IsNullable<U>::value, ExtractWrappedType_t<U>>::type {
+        return value.HasValue() ? unwrapValue(value.Value()) : ExtractWrappedType_t<U>{};
+    }
+
+    template<typename U>
+    static auto unwrapValue(const U& value) -> typename std::enable_if<IsList<U>::value, ExtractWrappedType_t<U>>::type {
+        if (value.empty()) return ExtractWrappedType_t<U>{};
+        return unwrapValue(value.front()); // For lists, return the type of the first element
+    }
+
+    template<typename U>
+    struct ExtractPayloadType {
+        using type = U; // Base case - not a wrapper
+    };
+    
+    template<typename U>
+    struct ExtractPayloadType<DataModel::Nullable<U>> {
+        using type = typename ExtractPayloadType<U>::type;
+    };
+    
+    template<typename U>
+    struct ExtractPayloadType<DataModel::List<U>> {
+        using type = typename ExtractPayloadType<U>::type;
+    };
+    
+    // Type categorization traits
+    template<typename U>
+    struct IsNumeric : std::integral_constant<bool, 
+        std::is_integral<U>::value || std::is_floating_point<U>::value> {};
+    
+    template<typename U>
+    struct IsEnum : std::is_enum<U> {};
+    
+    template<typename U>
+    struct IsStruct : std::integral_constant<bool,
+        !IsNumeric<U>::value && 
+        !IsEnum<U>::value && 
+        !std::is_pointer<U>::value> {};
 public:
+    using ValueType = T;
+    using WrappedType = ExtractWrappedType_t<T>;
+    using PayloadType = typename ExtractPayloadType<T>::type;
+
+    /// @brief Check if 
+    static constexpr bool IsValueNullable() {
+        return IsNullable<T>::value;
+    }
+
+    static constexpr bool IsValueList() {
+        return IsList<T>::value;
+    }
+
+    static constexpr bool IsValueNullableList() {
+        return IsNullable<T>::value && IsList<WrappedType>::value;
+    }
+
+    /// @brief Check if the final payload is a struct
+    static constexpr bool IsPayloadStruct() {
+        return IsStruct<PayloadType>::value;
+    }
+    
+    /// @brief Check if the final payload is numeric
+    static constexpr bool IsPayloadNumeric() {
+        return IsNumeric<PayloadType>::value;
+    }
+    
+    /// @brief Check if the final payload is an enum
+    static constexpr bool IsPayloadEnum() {
+        return IsEnum<PayloadType>::value;
+    }
+    
+    /// @brief Get the name of the payload type
+    static const char* PayloadTypeName() {
+        return typeid(PayloadType).name();
+    }
     /**
      * @brief Construct a new data class instance
      * @param aValueStorage Reference to external value storage
@@ -67,15 +175,17 @@ public:
      * - Others: left uninitialized
      */
     explicit CTC_BaseDataClass(T& aValueStorage) : mValue(aValueStorage) {
-        if constexpr (is_nullable<T>::value) {
+        if constexpr ( IsValueNullable() ) {
             mValue.SetNull();
-        } else if constexpr (is_list<T>::value) {
-            mValue = T();
-        } 
+        }
+        else if constexpr ( IsValueList() )
+        {
+            mValue = ValueType();
+        }
     }
 
     /// @brief Virtual destructor for proper cleanup
-    virtual ~CTC_BaseDataClass() = default;
+    virtual ~CTC_BaseDataClass() { CleanupValue(); };
 
     /**
      * @enum Error
@@ -101,6 +211,8 @@ public:
      */
     const T& GetValue() const { return mValue; };
 
+    WrappedType GetPayload() const { return unwrapValue(mValue); }
+
     /**
      * @brief Update the stored value if it has changed
      * @param aValue New value to store
@@ -109,23 +221,79 @@ public:
      * Checks HasChanged() before applying the update
      */
     bool Update(const T& aValue) {
-        if ( HasChanged(aValue) && (UpdateValue(aValue) == CHIP_NO_ERROR) )
+        if ( !HasChanged(aValue) )
         {
-            return true;
+            return false;
         }
+    
+        CleanupValue();
+
+        if constexpr ( IsValueList() )
+        {
+            if ( !aValue.empty() )
+            {
+                UpdateList(aValue);
+            }
+        }
+        else if constexpr ( IsValueNullable() )
+        {
+            if ( !aValue.IsNull() )
+            {
+                if constexpr (IsList<WrappedType>::value)
+                {
+                    UpdateList(aValue.Value());
+                }
+                else if constexpr (IsStruct<WrappedType>::value)
+                {
+                    UpdateStructValue(unwrapValue(aValue.Value()));
+                }
+                else if constexpr ( (IsNumeric<WrappedType>::value) || (IsEnum<WrappedType>::value) ){
+                    mValue.SetNonNull(aValue.Value());
+                }
+                else {
+                    static_assert(false, "Unexpected type");
+                }
+            }
+        }
+
         return false;
     };
 
     /**
+     * @brief Update the stored value
+     * @param aValue New value to store
+     * @return CHIP_NO_ERROR on success, error code otherwise
+     * 
+     * @note Derived classes can override for custom update logic
+     */
+     //virtual CHIP_ERROR UpdateValue(const T& aValue)
+
+    /**
      * @brief Clean up the current value based on type
      */
-     void CleanupValue() {
-        if constexpr (is_nullable<T>::value) {
-            CleanupNullable(mValue);
+    void CleanupValue()
+    {
+        if constexpr ( IsValueNullableList() ) {
+            if (!mValue.IsNull()) {
+                CleanupList(mValue.Value());
+            }
             mValue.SetNull();
-        } else if constexpr (is_list<T>::value) {
+        }
+        else if constexpr ( IsValueNullable() )
+        {
+            if (!mValue.IsNull()) {
+                // For Nullable<Struct>, clean up the struct if needed
+                if constexpr (IsStruct<WrappedType>::value)
+                {
+                    CleanupStructValue(unwrapValue(mValue.Value()));
+                }
+            }
+            mValue.SetNull();
+        }
+        else if constexpr ( IsValueList() )
+        {
             CleanupList(mValue);
-            mValue = T();
+            mValue=ValueType();
         }
     }
 protected:
@@ -168,25 +336,20 @@ protected:
      * - Others: always returns true (assume changed)
      */
     bool HasChanged(const T& newValue) const {
-        if constexpr (is_nullable<T>::value) {
-            return NullableNotEqual(mValue, newValue);
-        } else if constexpr (is_list<T>::value) {
-            return mValue.size() != newValue.size();
-        }
         return true;
     }
     
-    /**
-     * @brief Update the stored value
-     * @param aValue New value to store
-     * @return CHIP_NO_ERROR on success, error code otherwise
-     * 
-     * @note Derived classes can override for custom update logic
-     */
-    virtual CHIP_ERROR UpdateValue(const T& aValue) {
-        mValue = aValue;
+    virtual CHIP_ERROR UpdateStructValue(const PayloadType& aValue) {
+        //mValue = aValue;
         return CHIP_NO_ERROR;
     }
+
+    template<typename U>
+    void UpdateList(const DataModel::List<U>& list) {
+       for (const auto& item : list) {
+            UpdateStructValue(item);
+       }
+   }
 
     /**
      * @brief Clean up nullable value resources
@@ -204,9 +367,10 @@ protected:
      * 
      * Calls CleanupListItem for each element and frees the list memory
      */
-     void CleanupList(const DataModel::List<T>& list) {
+     template<typename U>
+     void CleanupList(DataModel::List<U>& list) {
         for (const auto& item : list) {
-            CleanupListItem(&item);
+            CleanupStructValue(item);
         }
         if (list.data()) {
             chip::Platform::MemoryFree(list.data());
@@ -219,24 +383,9 @@ protected:
      * 
      * @note Derived classes should override for complex list items
      */
-    virtual void CleanupListItem(const void * item) {
-        (void) item;
+    virtual void CleanupStructValue(const PayloadType& aValue) {
+        (void)aValue;
     }
-
-private:
-    /// @brief Type trait for nullable types
-    template <typename U>
-    struct is_nullable : std::false_type {};
-
-    template <typename U>
-    struct is_nullable<DataModel::Nullable<U>> : std::true_type {};
-
-    /// @brief Type trait for list types
-    template <typename U>
-    struct is_list : std::false_type {};
-
-    template <typename U>
-    struct is_list<DataModel::List<U>> : std::true_type {};
 };
 
 } // namespace CommodityTariff

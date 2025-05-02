@@ -59,12 +59,12 @@ typedef uint32_t epoch_s;
     X(StartDate,                    DataModel::Nullable<uint32_t>) \
     X(DefaultRandomizationOffset,   DataModel::Nullable<int16_t>) \
     X(DefaultRandomizationType,     DataModel::Nullable<DayEntryRandomizationTypeEnum>) \
-    X(CalendarPeriods,              DataModel::List<Structs::CalendarPeriodStruct::Type>) \
-    X(DayPatterns,                  DataModel::List<Structs::DayPatternStruct::Type>) \
-    X(IndividualDays,               DataModel::List<Structs::DayStruct::Type>) \
-    X(DayEntries,                   DataModel::List<Structs::DayEntryStruct::Type>) \
+    X(DayEntries,                   DataModel::List<Structs::DayEntryStruct::Type>)  \
+    X(TariffComponents,             DataModel::List<Structs::TariffComponentStruct::Type>) \
     X(TariffPeriods,                DataModel::List<Structs::TariffPeriodStruct::Type>) \
-    X(TariffComponents,             DataModel::List<Structs::TariffComponentStruct::Type>)
+    X(DayPatterns,                  DataModel::List<Structs::DayPatternStruct::Type>) \
+    X(IndividualDays,               DataModel::Nullable<DataModel::List<Structs::DayStruct::Type>>) \
+    X(CalendarPeriods,              DataModel::Nullable<DataModel::List<Structs::CalendarPeriodStruct::Type>>)
 
 /**
  * @def COMMODITY_TARIFF_CURRENT_ATTRIBUTES
@@ -91,7 +91,7 @@ typedef uint32_t epoch_s;
     X(CurrentDayEntryDate,          DataModel::Nullable<uint32_t>) \
     X(NextDayEntryDate,             DataModel::Nullable<uint32_t>) \
     X(CurrentTariffComponents,      DataModel::List<Structs::TariffComponentStruct::Type>) \
-    X(NextTariffComponents,         DataModel::List<Structs::TariffComponentStruct::Type>)
+    X(NextTariffComponents,         DataModel::Nullable<DataModel::List<Structs::TariffComponentStruct::Type>>)
 
 /**
  * @def X(attrName, attrType)
@@ -119,7 +119,6 @@ class attrName##DataClass : public CTC_BaseDataClass<attrType> { \
 public: \
     attrName##DataClass(attrType& aValueStorage) \
         : CTC_BaseDataClass<attrType>(aValueStorage) {} \
-    ~attrName##DataClass() override {} \
 };
 COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
