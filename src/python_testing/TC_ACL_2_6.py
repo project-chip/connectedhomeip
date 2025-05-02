@@ -253,19 +253,6 @@ class TC_ACL_2_6(MatterBaseTest):
         asserts.assert_equal(result[0].Status, Status.ConstraintError, "Write should have failed with CONSTRAINT_ERROR")
 
         self.step(7)
-        # Since the write failed, we shouldn't receive any events related to the invalid entry
-        try:
-            event_data = events_callback.wait_for_event_report(acec_event, timeout_sec=5)
-            # Check if this event corresponds to the invalid entry
-            invalid_entry = invalid_acl_entries[1]
-            if (event_data.latestValue.authMode == invalid_entry.authMode and
-                    event_data.latestValue.subjects == invalid_entry.subjects):
-                asserts.fail(f"Received event for invalid entry after failed write: {event_data}")
-            else:
-                logging.info(f"Received event but it's not for the invalid entry: {event_data}")
-        except TimeoutError:
-            logging.info("No events received after failed write")
-
         # Verify no events for invalid entry via read as well
         latest_event_num = await self.get_latest_event_number(acec_event)
         events_response = await self.th1.ReadEvent(
