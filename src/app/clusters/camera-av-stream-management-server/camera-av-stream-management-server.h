@@ -303,7 +303,7 @@ public:
      * @param aMaxConcurrentEncoders            The maximum number of video encoders supported by camera.
      * @param aMaxEncodedPixelRate              The maximum data rate (encoded pixels/sec) supported by camera.
      * @param aVideoSensorParams                The set of video sensor parameters for the camera.
-     * @param aNightVisionCapable               Indicates whether the camera supports night vision.
+     * @param aNightVisionUsesInfrared          Indicates whether the camera supports night vision using infrared.
      * @param aMinViewPort                      Indicates minimum resolution (width/height) in pixels allowed for camera viewport.
      * @param aRateDistortionTradeOffPoints     Indicates the list of rate distortion trade-off points for supported hardware
      *                                          encoders.
@@ -326,7 +326,7 @@ public:
     CameraAVStreamMgmtServer(CameraAVStreamMgmtDelegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
                              const BitFlags<OptionalAttribute> aOptionalAttrs, uint8_t aMaxConcurrentEncoders,
                              uint32_t aMaxEncodedPixelRate, const VideoSensorParamsStruct & aVideoSensorParams,
-                             bool aNightVisionCapable, const VideoResolutionStruct & aMinViewPort,
+                             bool aNightVisionUsesInfrared, const VideoResolutionStruct & aMinViewPort,
                              const std::vector<RateDistortionTradeOffStruct> & aRateDistortionTradeOffPoints,
                              uint32_t aMaxContentBufferSize, const AudioCapabilitiesStruct & aMicrophoneCapabilities,
                              const AudioCapabilitiesStruct & aSpkrCapabilities, TwoWayTalkSupportTypeEnum aTwoWayTalkSupport,
@@ -407,7 +407,7 @@ public:
 
     const VideoSensorParamsStruct & GetVideoSensorParams() const { return mVideoSensorParams; }
 
-    bool GetNightVisionCapable() const { return mNightVisionCapable; }
+    bool GetNightVisionUsesInfrared() const { return mNightVisionUsesInfrared; }
 
     const VideoResolutionStruct & GetMinViewport() const { return mMinViewPort; }
 
@@ -514,7 +514,7 @@ private:
     const uint8_t mMaxConcurrentEncoders;
     const uint32_t mMaxEncodedPixelRate;
     const VideoSensorParamsStruct mVideoSensorParams;
-    const bool mNightVisionCapable;
+    const bool mNightVisionUsesInfrared;
     const VideoResolutionStruct mMinViewPort;
     const std::vector<RateDistortionTradeOffStruct> mRateDistortionTradeOffPointsList;
     const uint32_t mMaxContentBufferSize;

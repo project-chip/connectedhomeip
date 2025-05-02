@@ -595,7 +595,7 @@ VideoSensorParamsStruct & CameraDevice::GetVideoSensorParams()
     return videoSensorParams;
 }
 
-bool CameraDevice::GetNightVisionCapable()
+bool CameraDevice::GetNightVisionUsesInfrared()
 {
     return false;
 }
