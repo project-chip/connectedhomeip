@@ -30,6 +30,8 @@
 #include <lib/core/TLVData.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CodeUtils.h>
+#include <setup_payload/ManualSetupPayloadParser.h>
+#include <setup_payload/QRCodeSetupPayloadParser.h>
 #include <utility>
 
 namespace chip {
@@ -332,6 +334,36 @@ bool SetupPayload::operator==(const SetupPayload & input) const
     }
 
     return true;
+}
+
+std::variant<CHIP_ERROR, std::vector<SetupPayload>> SetupPayload::FromStringRepresentation(std::string stringRepresentation)
+{
+    // We're going to assume that in practice all these allocations are small
+    // enough that allocation failure will not happen.  If that ever turns out
+    // to not be the case, we may need to figure out how to handle that.
+
+    // std::string::starts_with is C++20, sadly.
+    bool isQRCode = (stringRepresentation.rfind(kQRCodePrefix, 0) == 0);
+    if (!isQRCode)
+    {
+        std::vector<SetupPayload> retval;
+        auto & payload = retval.emplace_back();
+        ReturnErrorOnFailure(ManualSetupPayloadParser(stringRepresentation).populatePayload(payload));
+        VerifyOrReturnError(payload.isValidManualCode(), CHIP_ERROR_INVALID_ARGUMENT);
+        return retval;
+    }
+
+    auto retval = QRCodeSetupPayloadParser(stringRepresentation).Parse();
+    if (!std::holds_alternative<std::vector<SetupPayload>>(retval))
+    {
+        return retval;
+    }
+
+    for (auto & entry : std::get<std::vector<SetupPayload>>(retval))
+    {
+        VerifyOrReturnError(entry.isValidQRCodePayload(), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    return retval;
 }
 
 } // namespace chip

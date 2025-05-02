@@ -28,8 +28,12 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLV.h>
 
+#include <algorithm>
+#include <sstream>
 #include <string>
 #include <utility>
+#include <variant>
+#include <vector>
 
 namespace chip {
 
@@ -43,14 +47,26 @@ private:
     std::string mBase38Representation;
 
 public:
+    /**
+     * base38Representation is expected to start with the "MT:" prefix, in general.
+     */
     QRCodeSetupPayloadParser(std::string base38Representation) : mBase38Representation(std::move(base38Representation)) {}
     CHIP_ERROR populatePayload(SetupPayload & outPayload);
     static std::string ExtractPayload(std::string inString);
+
+    /**
+     * Parse the provided representation into a vector of payloads, to handle concatenated payloads.
+     *
+     * Returns error if there are errors, else the resulting vector.
+     */
+    std::variant<CHIP_ERROR, std::vector<SetupPayload>> Parse();
 
 private:
     CHIP_ERROR retrieveOptionalInfos(SetupPayload & outPayload, TLV::ContiguousBufferTLVReader & reader);
     CHIP_ERROR populateTLV(SetupPayload & outPayload, const std::vector<uint8_t> & buf, size_t & index);
     CHIP_ERROR parseTLVFields(chip::SetupPayload & outPayload, uint8_t * tlvDataStart, size_t tlvDataLengthInBytes);
+
+    CHIP_ERROR populatePayloadFromBase38Data(std::string payload, SetupPayload & outPayload);
 };
 
 } // namespace chip

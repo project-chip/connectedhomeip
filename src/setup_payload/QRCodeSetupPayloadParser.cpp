@@ -323,12 +323,17 @@ std::string QRCodeSetupPayloadParser::ExtractPayload(std::string inString)
 
 CHIP_ERROR QRCodeSetupPayloadParser::populatePayload(SetupPayload & outPayload)
 {
+    std::string payload = ExtractPayload(mBase38Representation);
+    VerifyOrReturnError(payload.length() != 0, CHIP_ERROR_INVALID_ARGUMENT);
+
+    return populatePayloadFromBase38Data(std::move(payload), outPayload);
+}
+
+CHIP_ERROR QRCodeSetupPayloadParser::populatePayloadFromBase38Data(std::string payload, SetupPayload & outPayload)
+{
     std::vector<uint8_t> buf;
     size_t indexToReadFrom = 0;
     uint64_t dest;
-
-    std::string payload = ExtractPayload(mBase38Representation);
-    VerifyOrReturnError(payload.length() != 0, CHIP_ERROR_INVALID_ARGUMENT);
 
     ReturnErrorOnFailure(base38Decode(payload, buf));
 
@@ -371,6 +376,28 @@ CHIP_ERROR QRCodeSetupPayloadParser::populatePayload(SetupPayload & outPayload)
     }
 
     return populateTLV(outPayload, buf, indexToReadFrom);
+}
+
+std::variant<CHIP_ERROR, std::vector<SetupPayload>> QRCodeSetupPayloadParser::Parse()
+{
+    std::string payload = ExtractPayload(mBase38Representation);
+    VerifyOrReturnError(payload.length() != 0, CHIP_ERROR_INVALID_ARGUMENT);
+
+    auto chunkCount = std::count(payload.begin(), payload.end(), '*') + 1;
+
+    std::vector<SetupPayload> retval;
+    retval.reserve(static_cast<decltype(retval)::size_type>(chunkCount));
+
+    std::stringstream chunkStream(payload);
+    std::string chunk;
+
+    while (std::getline(chunkStream, chunk, '*'))
+    {
+        auto & nextItem = retval.emplace_back();
+        ReturnErrorOnFailure(populatePayloadFromBase38Data(chunk, nextItem));
+    }
+
+    return retval;
 }
 
 } // namespace chip

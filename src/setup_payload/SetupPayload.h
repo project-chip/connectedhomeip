@@ -26,6 +26,7 @@
 #include <cstdint>
 #include <map>
 #include <string>
+#include <variant>
 #include <vector>
 
 #include <lib/core/CHIPError.h>
@@ -269,6 +270,17 @@ public:
      * CHIP_NO_ERROR otherwise
      **/
     static CHIP_ERROR generateRandomSetupPin(uint32_t & setupPINCode);
+
+    /**
+     * @brief Get a list of setup payloads from a string representation.
+     *
+     * @param[in] stringRepresentation The string representing the payloads.
+     *
+     * @return a CHIP_ERROR on failure, a vector of setup payloads on success.  The vector may
+     *         contain only one payload, or may contain multiple payloads if concatenated QR codes
+     *         are used.
+     */
+    static std::variant<CHIP_ERROR, std::vector<SetupPayload>> FromStringRepresentation(std::string stringRepresentation);
 
 private:
     std::map<uint8_t, OptionalQRCodeInfo> optionalVendorData;
