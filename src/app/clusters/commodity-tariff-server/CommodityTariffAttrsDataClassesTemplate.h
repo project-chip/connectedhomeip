@@ -134,12 +134,12 @@ public:
     using WrappedType = ExtractWrappedType_t<ValueType>;
     using PayloadType = ExtractPayloadType_t<WrappedType>;
 
-    static constexpr bool IsValueNullableList() {
+    /*static constexpr bool IsValueNullableList() {
         return IsNullable<T>::value && IsList<WrappedType>::value;
-    }
+    }*/
     
     static constexpr bool IsValueNullable() {
-        return IsNullable<T>::value && !IsList<WrappedType>::value;
+        return IsNullable<T>::value; //&& !IsList<WrappedType>::value;
     }
     
     static constexpr bool IsValueList() {
@@ -226,6 +226,25 @@ public:
     WrappedType GetPayload() const { return unwrapValue(mValue); }
 
     /**
+     * @brief Check if value has changed
+     * @param newValue The new value to compare against
+     * @return true if value has changed
+     * 
+     * Special handling for:
+     * - Nullable types: checks null state and value
+     * - List types: compares sizes
+     * - Others: always returns true (assume changed)
+     */
+     bool HasChanged(const T& newValue) {
+        if constexpr (IsValueNullable()) {
+            return NullableNotEqual(newValue, mValue);
+        }
+        else if constexpr (IsValueList()) {
+            return ListsNotEqual(newValue, mValue);
+        }
+    }
+
+    /**
      * @brief Update the stored value if it has changed
      * @param aValue New value to store
      * @return true if value was updated, false if no change needed
@@ -239,27 +258,26 @@ public:
     
         CHIP_ERROR err = CHIP_NO_ERROR;
     
-        if constexpr (IsValueNullableList()) {
-            // Explicit handling for Nullable<List<Struct>>
-            //InspectTypes();
-            if (!aValue.IsNull()) {
-                DataModel::List<PayloadType> newList;
-                err = UpdateList(aValue.Value(), newList);
-                if (err == CHIP_NO_ERROR) {
-                    mValue.SetNonNull(newList);
-                }
-            } else {
-                mValue.SetNull();
-            }
-        }
-        else if constexpr (IsValueNullable()) {
+        if constexpr (IsValueNullable()) {
             //InspectTypes();
             // Handling for other Nullable types (Struct, numeric, enum)
             if (!aValue.IsNull()) {
-                if constexpr (IsStruct<WrappedType>::value) {
+                if constexpr (IsList<WrappedType>::value)
+                {
+                    DataModel::List<PayloadType> newList;
+                    err = UpdateList(aValue.Value(), newList);
+                    if (err == CHIP_NO_ERROR)
+                    {
+                        CleanupValue();
+                        mValue.SetNonNull(newList);
+                    }
+                }
+                else if constexpr (IsStruct<WrappedType>::value) {
                     WrappedType tempValue;
                     err = UpdateStructValue(aValue.Value(), tempValue);
-                    if (err == CHIP_NO_ERROR) {
+                    if (err == CHIP_NO_ERROR)
+                    {
+                        CleanupValue();
                         mValue.SetNonNull(tempValue);
                     }
                 }
@@ -278,13 +296,15 @@ public:
             // Handling for plain List<Struct>
             DataModel::List<PayloadType> newList;
             err = UpdateList(aValue, newList);
-            if (err == CHIP_NO_ERROR) {
+            if (err == CHIP_NO_ERROR)
+            {
+                CleanupValue();
                 mValue = newList;
             }
         }
         else {
-            // Direct assignment for non-wrapper types
-            mValue = aValue;
+            InspectTypes();
+            static_assert(false, "Unexpected type");
         }
     
         return err == CHIP_NO_ERROR;
@@ -304,17 +324,15 @@ public:
      */
     void CleanupValue()
     {
-        if constexpr ( IsValueNullableList() ) {
-            if (!mValue.IsNull()) {
-                CleanupList(mValue.Value());
-            }
-            mValue.SetNull();
-        }
-        else if constexpr ( IsValueNullable() )
+        if constexpr ( IsValueNullable() )
         {
             if (!mValue.IsNull()) {
                 // For Nullable<Struct>, clean up the struct if needed
-                if constexpr (IsStruct<WrappedType>::value)
+                if constexpr (IsList<WrappedType>::value)
+                {
+                    CleanupList(mValue.Value());
+                }
+                else if constexpr (IsStruct<WrappedType>::value)
                 {
                     CleanupStructValue(unwrapValue(mValue.Value()));
                 }
@@ -337,8 +355,31 @@ protected:
      * 
      * @note Derived classes should override for custom validation
      */
-    bool IsValid(const T& newValue) const {
+    virtual bool IsValid(const T& newValue) const {
         return true;
+    }
+
+
+    virtual bool CompareStructValue(const PayloadType& source, const PayloadType& destination) const 
+    {
+        return memcmp(&destination, &source, sizeof(PayloadType));
+    }
+
+    bool ListsNotEqual(const DataModel::List<PayloadType>& source,const DataModel::List<PayloadType>& destination)
+    {
+        if (source.size() != destination.size())
+        {
+            return true;
+        }
+
+        for (size_t i = 0; i < source.size(); i++) {
+            if ( CompareStructValue(source[i], destination[i]) )
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -347,29 +388,34 @@ protected:
      * @param b Second value to compare
      * @return true if values are not equal (including null state)
      */
-    static bool NullableNotEqual(const T& a, const T& b) {
+    bool NullableNotEqual(const T& a, const T& b) {
         bool is_neq = false;
         if (a.IsNull() || b.IsNull()) {
             is_neq = a.IsNull() != b.IsNull();
         }
+
+        if (is_neq)
+        {
+            if constexpr (IsList<WrappedType>::value)
+            {
+                is_neq = ListsNotEqual(a.Value(), b.Value());
+            }
+            else if constexpr (IsStruct<WrappedType>::value) {
+                is_neq = CompareStructValue(a.Value(), b.Value());
+            }
+            else if constexpr (IsNumeric<WrappedType>::value || IsEnum<WrappedType>::value)
+            {
+                is_neq = ( a.Value() == b.Value());
+            }
+            else {
+                static_assert(false, "Unexpected Nullable wrapped type");
+            }
+        }
+
         LOG_VAR_CH(is_neq);
         return is_neq;
     }
 
-    /**
-     * @brief Check if value has changed
-     * @param newValue The new value to compare against
-     * @return true if value has changed
-     * 
-     * Special handling for:
-     * - Nullable types: checks null state and value
-     * - List types: compares sizes
-     * - Others: always returns true (assume changed)
-     */
-    bool HasChanged(const T& newValue) const {
-        return true;
-    }
-    
     virtual CHIP_ERROR UpdateStructValue(const PayloadType& source, PayloadType& destination)
     {
         //mValue = aValue;
@@ -405,23 +451,12 @@ protected:
    }
 
     /**
-     * @brief Clean up nullable value resources
-     * @param aValue The value to clean up
-     * 
-     * @note Derived classes should override for complex nullable types
-     */
-    virtual void CleanupNullable(const T& aValue) {
-        (void) aValue;
-    }
-
-    /**
      * @brief Clean up list memory
      * @param list The list to clean up
      * 
      * Calls CleanupListItem for each element and frees the list memory
      */
-     template<typename U>
-     void CleanupList(DataModel::List<U>& list) {
+    void CleanupList(DataModel::List<PayloadType>& list) {
         for (const auto& item : list) {
             CleanupStructValue(item);
         }
@@ -431,7 +466,7 @@ protected:
     }
 
     /**
-     * @brief Clean up list item resources
+     * @brief Clean up struct item resources
      * @param item Pointer to the item to clean up
      * 
      * @note Derived classes should override for complex list items
