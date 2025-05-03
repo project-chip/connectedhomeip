@@ -69,7 +69,14 @@
      /* Manufacturer may optionally not support all features, commands & attributes */
      gCommodityTariffInstance =
          std::make_unique<CommodityTariffInstance>(EndpointId(endpointId), *gCommodityTariffDelegate,
-                                                  BitMask<CommodityTariff::Feature, uint32_t>(CommodityTariff::Feature::kRandomization));
+                                                  BitMask<CommodityTariff::Feature, uint32_t>(
+                                                    CommodityTariff::Feature::kPricing,
+                                                    CommodityTariff::Feature::kFriendlyCredit,
+                                                    CommodityTariff::Feature::kAuxiliaryLoad,
+                                                    CommodityTariff::Feature::kPeakPeriod,
+                                                    CommodityTariff::Feature::kPowerThreshold,
+                                                    CommodityTariff::Feature::kRandomization)
+                                                );
  
      if (!gCommodityTariffInstance)
      {
