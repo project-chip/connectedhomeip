@@ -50,12 +50,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{
 };
 } // namespace TagList
 namespace EndpointUniqueID {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = EndpointUniqueID::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry{ EndpointUniqueID::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+                                                           Access::Privilege::kView, std::nullopt };
 } // namespace EndpointUniqueID
 
 } // namespace Attributes

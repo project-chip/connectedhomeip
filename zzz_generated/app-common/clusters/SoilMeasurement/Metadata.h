@@ -20,20 +20,14 @@ inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 namespace SoilMoistureMeasurementLimits {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = SoilMoistureMeasurementLimits::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry{ SoilMoistureMeasurementLimits::Id,
+                                                           BitFlags<DataModel::AttributeQualityFlags>{}, Access::Privilege::kView,
+                                                           std::nullopt };
 } // namespace SoilMoistureMeasurementLimits
 namespace SoilMoistureMeasuredValue {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = SoilMoistureMeasuredValue::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry{ SoilMoistureMeasuredValue::Id,
+                                                           BitFlags<DataModel::AttributeQualityFlags>{}, Access::Privilege::kView,
+                                                           std::nullopt };
 } // namespace SoilMoistureMeasuredValue
 
 } // namespace Attributes
