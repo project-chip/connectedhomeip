@@ -212,18 +212,18 @@ class TestRunnerHooks():
         """
         pass
 
-    async def step_manual(self):
+    async def step_manual(self, request: Optional[TestStep] = None):
         """
         This method is called when the step is executed manually.
         """
         pass
 
-    def show_prompt(self,
-                    msg: str,
-                    placeholder: Optional[str] = None,
-                    default_value: Optional[str] = None,
-                    endpoint_id: Optional[int] = None,
-                    ) -> None:
+    async def show_prompt(self,
+                          msg: str,
+                          placeholder: Optional[str] = None,
+                          default_value: Optional[str] = None,
+                          endpoint_id: Optional[int] = None,
+                          ) -> str | None:
         """
         This method is called when the step needs to ask the user to perform some action or provide some value.
         """

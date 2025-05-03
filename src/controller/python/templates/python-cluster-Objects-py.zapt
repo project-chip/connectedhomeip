@@ -66,18 +66,18 @@ class {{asUpperCamelCase name}}(Cluster):
             Fields=[
 {{#zcl_attributes_server}}
             {{#if entryType}}
-                ClusterObjectFieldDescriptor(Label="{{ asLowerCamelCase label }}", Tag={{asMEI manufacturerCode code}}, Type={{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name)}}),
+                ClusterObjectFieldDescriptor(Label="{{ asLowerCamelCase label }}", Tag={{asMEI manufacturerCode code}}, Type={{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name) cluster=parent.name}}),
             {{else}}
-                ClusterObjectFieldDescriptor(Label="{{ asLowerCamelCase label }}", Tag={{asMEI manufacturerCode code}}, Type={{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name)}}),
+                ClusterObjectFieldDescriptor(Label="{{ asLowerCamelCase label }}", Tag={{asMEI manufacturerCode code}}, Type={{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name) cluster=parent.name}}),
             {{/if}}
 {{/zcl_attributes_server}}
             ])
 
 {{#zcl_attributes_server}}
 {{#if entryType}}
-    {{ asLowerCamelCase label }}: {{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name)}} = {{getPythonFieldDefault entryType ns=(asUpperCamelCase parent.name)}}
+    {{ asLowerCamelCase label }}: {{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name) cluster=parent.name}} = {{getPythonFieldDefault entryType ns=(asUpperCamelCase parent.name) cluster=parent.name}}
 {{else}}
-    {{ asLowerCamelCase label }}: {{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name)}} = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.name)}}
+    {{ asLowerCamelCase label }}: {{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name) cluster=parent.name}} = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.name) cluster=parent.name}}
 {{/if}}
 {{/zcl_attributes_server}}
 
@@ -101,7 +101,7 @@ class {{asUpperCamelCase name}}(Cluster):
 {{#first}}
     class Structs:
 {{/first}}
-{{> struct_def cluster=(asUpperCamelCase parent.name) }}
+{{> struct_def cluster=parent.name }}
 
 {{/zcl_structs}}
 {{#zcl_commands}}
@@ -128,7 +128,7 @@ class {{asUpperCamelCase name}}(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                     {{#zcl_command_arguments}}
-                        ClusterObjectFieldDescriptor(Label="{{ asLowerCamelCase label }}", Tag={{ index }}, Type={{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}),
+                        ClusterObjectFieldDescriptor(Label="{{ asLowerCamelCase label }}", Tag={{ index }}, Type={{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name) cluster=parent.parent.name}}),
                     {{/zcl_command_arguments}}
                     ])
             {{#if mustUseTimedInvoke}}
@@ -141,7 +141,7 @@ class {{asUpperCamelCase name}}(Cluster):
             {{#first}}
 
             {{/first}}
-            {{ asLowerCamelCase label }}: {{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}} = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.parent.name)}}
+            {{ asLowerCamelCase label }}: {{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name) cluster=parent.parent.name}} = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.parent.name) cluster=parent.parent.name}}
             {{/zcl_command_arguments}}
 
 {{/zcl_commands}}
@@ -168,15 +168,15 @@ class {{asUpperCamelCase name}}(Cluster):
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
             {{#if entryType}}
-                return ClusterObjectFieldDescriptor(Type={{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name)}})
+                return ClusterObjectFieldDescriptor(Type={{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name) cluster=parent.name}})
             {{else}}
-                return ClusterObjectFieldDescriptor(Type={{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name)}})
+                return ClusterObjectFieldDescriptor(Type={{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name) cluster=parent.name}})
             {{/if}}
 
             {{#if entryType}}
-            value: {{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name)}} = {{getPythonFieldDefault entryType ns=(asUpperCamelCase parent.name)}}
+            value: {{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name) cluster=parent.name}} = {{getPythonFieldDefault entryType ns=(asUpperCamelCase parent.name) cluster=parent.name}}
             {{else}}
-            value: {{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name)}} = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.name)}}
+            value: {{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name) cluster=parent.name}} = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.name) cluster=parent.name}}
             {{/if}}
 
 {{/zcl_attributes_server}}
@@ -199,14 +199,14 @@ class {{asUpperCamelCase name}}(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                     {{#zcl_event_fields}}
-                        ClusterObjectFieldDescriptor(Label="{{ asLowerCamelCase name }}", Tag={{ fieldIdentifier }}, Type={{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}),
+                        ClusterObjectFieldDescriptor(Label="{{ asLowerCamelCase name }}", Tag={{ fieldIdentifier }}, Type={{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name) cluster=parent.parent.name}}),
                     {{/zcl_event_fields}}
                     ])
             {{#zcl_event_fields}}
             {{#first}}
 
             {{/first}}
-            {{ asLowerCamelCase name }}: {{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}} = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.parent.name)}}
+            {{ asLowerCamelCase name }}: {{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name) cluster=parent.parent.name}} = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.parent.name) cluster=parent.parent.name}}
             {{/zcl_event_fields}}
 
 {{/zcl_events}}

@@ -11,7 +11,7 @@ source_set("ids") {
     "EventIds.h",
     "Ids.h",
   ]
-  deps = [
+  public_deps = [
     "${chip_root}/src/app/common:global-ids",
     "${chip_root}/src/lib/core:types",
   ]
@@ -22,7 +22,7 @@ source_set("enums") {
     "Enums.h",
     "EnumsCheck.h",
   ]
-  deps = [
+  public_deps = [
     "${chip_root}/zzz_generated/app-common/clusters/shared:enums",
   ]
 }
@@ -34,12 +34,14 @@ source_set("headers") {
     "Events.h",
     "Structs.h",
   ]
-  deps = [
+  public_deps = [
     ":enums",
     ":ids",
+    "${chip_root}/src/app:events",
     "${chip_root}/src/app/common:global-ids",
     "${chip_root}/zzz_generated/app-common/clusters/shared:headers",
   ]
+
 
   public_configs = [ "${chip_root}/src/app/common:includes" ]
 
@@ -57,8 +59,7 @@ source_set("elements") {
   public_deps = [
     ":headers",
     ":ids",
-  ]
-  deps = [
+
     # NOTE: awkward dependency because cluster-objects contains ALL the cluster
     #       .cpp files as one compile unit to optimize for flash size during
     #       compilation.
@@ -74,11 +75,11 @@ source_set("elements") {
 
 source_set("metadata") {
   sources = [ "Metadata.h" ]
-  deps = [
+  public_deps = [
+    ":ids",
     "${chip_root}/src/app/data-model-provider:metadata",
     "${chip_root}/src/lib/core:types",
   ]
-  public_deps = [ ":ids" ]
 }
 
 source_set("ClosureDimension") {

@@ -16,7 +16,7 @@ namespace app {
 namespace Clusters {
 namespace Descriptor {
 
-inline constexpr uint32_t kRevision = 2;
+inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
 namespace DeviceTypeList {
@@ -49,6 +49,14 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry{
     Access::Privilege::kView, std::nullopt
 };
 } // namespace TagList
+namespace EndpointUniqueID {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
+    .attributeId    = EndpointUniqueID::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+} // namespace EndpointUniqueID
 
 } // namespace Attributes
 
