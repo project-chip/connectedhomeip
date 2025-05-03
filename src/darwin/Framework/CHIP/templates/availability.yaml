@@ -11626,13 +11626,27 @@
           - CommodityMetering
           - CommodityPrice
           - CommodityTariff
+          - ElectricalGridConditions
           - MeterIdentification
+          - SoilMeasurement
           - TLSClientManagement
       attributes:
+          BasicInformation:
+              # In-progress for maybe Matter 1.5
+              - ConfigurationVersion
+          BridgedDeviceBasicInformation:
+              # In-progress for maybe Matter 1.5
+              - ConfigurationVersion
+          Descriptor:
+              # In-progress for maybe Matter 1.5
+              - EndpointUniqueID
           ThreadNetworkDiagnostics:
               # In-progress for maybe Matter 1.5
               - ExtAddress
               - Rloc16
+          UnitLocalization:
+              # In-progress for maybe Matter 1.5
+              - SupportedTemperatureUnits
       commands:
           OperationalCredentials:
               # In-progress for Matter 1.5: VID Verification feature
@@ -11643,6 +11657,8 @@
           Globals:
               # In-progress for maybe Matter 1.5
               - CurrencyStruct
+              - MeasurementAccuracyStruct
+              - MeasurementAccuracyRangeStruct
               - PowerThresholdStruct
               - PriceStruct
       struct fields:
@@ -11652,9 +11668,17 @@
                   - vidVerificationStatement
               NOCStruct:
                   - vvsc
+      event fields:
+          AccountLogin:
+              LoggedOut:
+                  # In-progress for maybe Matter 1.5
+                  - fabricIndex
       enums:
           Globals:
               # In-progress for maybe Matter 1.5
+              - LocationTag
+              - MeasurementAccuracyStruct
+              - MeasurementTypeEnum
               - PowerThresholdSourceEnum
               - TariffPriceTypeEnum
               - TariffUnitEnum
@@ -11691,25 +11715,14 @@
                   - UpdatingMaps
       device types:
           # In-progress for maybe Matter 1.5
-          - Awning
-          - Barrier
-          - Cabinet
           - Camera
-          - Door
-          - Blind
-          - ClosureBase
-          - Curtain
+          - Closure
+          - ClosureController
+          - ClosurePanel
           - ElectricalEnergyTariff
           - ElectricalMeter
           - ElectricalUtilityMeter
-          - GarageDoor
-          - Gate
           - MeterReferencePoint
           - MountedDimmableLoadControl
           - MountedOnOffControl
-          - Pergola
-          - Screen
-          - Shade
-          - Shutter
           - ThermostatController
-          - Window
