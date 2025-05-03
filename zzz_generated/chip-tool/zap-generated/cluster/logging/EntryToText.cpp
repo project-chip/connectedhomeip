@@ -6481,6 +6481,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Matter Color Temperature Light";
     case 0x0000010D:
         return "Matter Extended Color Light";
+    case 0x0000010F:
+        return "Mounted On/Off Control";
     case 0x00000202:
         return "Matter Window Covering";
     case 0x00000203:
