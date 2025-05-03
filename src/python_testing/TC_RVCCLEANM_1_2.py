@@ -61,7 +61,7 @@ class TC_RVCCLEANM_1_2(MatterBaseTest):
         self.supported_modes_dut = []
 
     async def read_mod_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.RvcCleanMode
+        cluster = Clusters.RvcCleanMode
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
     def pics_TC_RVCCLEANM_1_2(self) -> list[str]:
@@ -71,60 +71,60 @@ class TC_RVCCLEANM_1_2(MatterBaseTest):
     async def test_TC_RVCCLEANM_1_2(self):
         self.endpoint = self.get_endpoint()
 
-        attributes = Clusters.RvcCleanMode.Attributes
+        RVCClean_cluster = Clusters.RvcCleanMode
+        attributes = RVCClean_cluster.Attributes
 
         self.print_step(1, "Commissioning, already done")
 
-        if self.check_pics("RVCCLEANM.S.A0000"):
-            self.print_step(2, "Read SupportedModes attribute")
-            supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
+        self.print_step(2, "Read SupportedModes attribute")
+        supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
 
-            logging.info("SupportedModes: %s" % (supported_modes))
+        logging.info("SupportedModes: %s" % (supported_modes))
 
-            # Verify that the list has at least 2 and at most 255 entries
-            asserts.assert_greater_equal(len(supported_modes), 2, "SupportedModes must have at least 2 entries!")
-            asserts.assert_less_equal(len(supported_modes), 255, "SupportedModes must have at most 255 entries!")
+        # Verify that the list has at least 2 and at most 255 entries
+        asserts.assert_greater_equal(len(supported_modes), 2, "SupportedModes must have at least 2 entries!")
+        asserts.assert_less_equal(len(supported_modes), 255, "SupportedModes must have at most 255 entries!")
 
-            # Verify that each ModeOptionsStruct entry has a unique Mode field value
-            for m in supported_modes:
-                if m.mode in self.supported_modes_dut:
-                    asserts.fail("SupportedModes must have unique mode values!")
-                else:
-                    self.supported_modes_dut.append(m.mode)
+        # Verify that each ModeOptionsStruct entry has a unique Mode field value
+        for m in supported_modes:
+            if m.mode in self.supported_modes_dut:
+                asserts.fail("SupportedModes must have unique mode values!")
+            else:
+                self.supported_modes_dut.append(m.mode)
 
-            # Verify that each ModeOptionsStruct entry has a unique Label field value
-            labels = []
-            for m in supported_modes:
-                if m.label in labels:
-                    asserts.fail("SupportedModes must have unique mode label values!")
-                else:
-                    labels.append(m.label)
+        # Verify that each ModeOptionsStruct entry has a unique Label field value
+        labels = []
+        for m in supported_modes:
+            if m.label in labels:
+                asserts.fail("SupportedModes must have unique mode label values!")
+            else:
+                labels.append(m.label)
 
-            # Verify that each ModeOptionsStruct entry's ModeTags field has:
-            for m in supported_modes:
-                # * at least one entry
-                if len(m.modeTags) == 0:
-                    asserts.fail("SupportedModes must have at least one mode tag!")
+        # Verify that each ModeOptionsStruct entry's ModeTags field has:
+        for m in supported_modes:
+            # * at least one entry
+            if len(m.modeTags) == 0:
+                asserts.fail("SupportedModes must have at least one mode tag!")
 
-                at_least_one_common_or_clean_tag = False
-                for t in m.modeTags:
-                    # * the values of the Value fields that are not larger than 16 bits
-                    if t.value > 0xFFFF or t.value < 0:
-                        asserts.fail("Mode tag values must not be larger than 16 bits!")
+            at_least_one_common_or_clean_tag = False
+            for t in m.modeTags:
+                # * the values of the Value fields that are not larger than 16 bits
+                if t.value > 0xFFFF or t.value < 0:
+                    asserts.fail("Mode tag values must not be larger than 16 bits!")
 
-                    # * for each Value field: {isCommonOrDerivedOrMfgTagsVal}
-                    is_mfg = (0x8000 <= t.value <= 0xBFFF)
-                    if (t.value not in self.commonTags and
-                            t.value not in self.cleanTags and
-                            not is_mfg):
-                        asserts.fail("Mode tag value is not a common tag, clean tag or vendor tag!")
+                # * for each Value field: {isCommonOrDerivedOrMfgTagsVal}
+                is_mfg = (0x8000 <= t.value <= 0xBFFF)
+                if (t.value not in self.commonTags and
+                        t.value not in self.cleanTags and
+                        not is_mfg):
+                    asserts.fail("Mode tag value is not a common tag, clean tag or vendor tag!")
 
-                    # * for at least one Value field: {isCommonOrDerivedTagsVal}
-                    if not is_mfg:
-                        at_least_one_common_or_clean_tag = True
+                # * for at least one Value field: {isCommonOrDerivedTagsVal}
+                if not is_mfg:
+                    at_least_one_common_or_clean_tag = True
 
-                if not at_least_one_common_or_clean_tag:
-                    asserts.fail("At least one mode tag must be a common tag or clean tag!")
+            if not at_least_one_common_or_clean_tag:
+                asserts.fail("At least one mode tag must be a common tag or clean tag!")
 
             # Verify that at least one ModeOptionsStruct entry includes either the
             # Vacuum(0x4001) mode tag or the Mop(0x4002)mode tag in the ModeTags field
@@ -138,12 +138,11 @@ class TC_RVCCLEANM_1_2(MatterBaseTest):
             asserts.assert_true(has_vacuum_or_mop_mode_tag,
                                 "At least one ModeOptionsStruct entry must include either the Vacuum or Mop mode tag")
 
-        if self.check_pics("RVCCLEANM.S.A0001"):
-            self.print_step(3, "Read CurrentMode attribute")
-            current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+        self.print_step(3, "Read CurrentMode attribute")
+        current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-            logging.info("CurrentMode: %s" % (current_mode))
-            asserts.assert_true(current_mode in self.supported_modes_dut, "CurrentMode is not a supported mode!")
+        logging.info("CurrentMode: %s" % (current_mode))
+        asserts.assert_true(current_mode in self.supported_modes_dut, "CurrentMode is not a supported mode!")
 
 
 if __name__ == "__main__":
