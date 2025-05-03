@@ -117,8 +117,7 @@ struct AttributeEntry
 
     _StartBitFieldInit; // Disabling '-Wconversion' & '-Wnarrowing'
     constexpr AttributeEntry(AttributeId id, BitMask<AttributeQualityFlags> attrQualityFlags,
-                             std::optional<Access::Privilege> readPriv,
-                             std::optional<Access::Privilege> writePriv) :
+                             std::optional<Access::Privilege> readPriv, std::optional<Access::Privilege> writePriv) :
         attributeId{ id },
         mask{
             .flags          = attrQualityFlags.Raw() & kAttrQualityMask,
