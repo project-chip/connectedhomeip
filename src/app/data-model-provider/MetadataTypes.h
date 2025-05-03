@@ -115,11 +115,10 @@ struct AttributeEntry
 
     // Constructor
 
-    _StartBitFieldInit; // Disabling '-Wconversion' & '-Wconversion'
-
-    constexpr AttributeEntry(AttributeId id = 0, BitMask<AttributeQualityFlags> attrQualityFlags = BitMask<AttributeQualityFlags>(),
-                             std::optional<Access::Privilege> readPriv  = std::nullopt,
-                             std::optional<Access::Privilege> writePriv = std::nullopt) :
+    _StartBitFieldInit; // Disabling '-Wconversion' & '-Wnarrowing'
+    constexpr AttributeEntry(AttributeId id, BitMask<AttributeQualityFlags> attrQualityFlags,
+                             std::optional<Access::Privilege> readPriv,
+                             std::optional<Access::Privilege> writePriv) :
         attributeId{ id },
         mask{
             .flags          = attrQualityFlags.Raw() & kAttrQualityMask,
@@ -128,9 +127,9 @@ struct AttributeEntry
         }
     {}
 
-    _EndBitFieldInit; // Enabling '-Wconversion' & '-Wconversion'
+    _EndBitFieldInit; // Enabling '-Wconversion' & '-Wnarrowing'
 
-    // Getter for mask.readPrivilege
+    // Getter for the read privilege for this attribute. std::nullopt means the attribute is not readable.
     [[nodiscard]] constexpr std::optional<Access::Privilege> GetReadPrivilege() const
     {
         if (mask.readPrivilege != 0)
@@ -140,7 +139,7 @@ struct AttributeEntry
         return std::nullopt;
     }
 
-    // Getter for mask.writePrivilege
+    // Getter for the write privilege for this attribute. std::nullopt means the attribute is not writable.
     [[nodiscard]] constexpr std::optional<Access::Privilege> GetWritePrivilege() const
     {
         if (mask.writePrivilege != 0)
@@ -150,7 +149,7 @@ struct AttributeEntry
         return std::nullopt;
     }
 
-    [[nodiscard]] constexpr bool HasFlags(AttributeQualityFlags f) const { return (mask.flags & chip::to_underlying(f)) != 0; }
+    [[nodiscard]] constexpr bool HasFlags(AttributeQualityFlags f) const { return (mask.flags & to_underlying(f)) != 0; }
 
 private:
     struct attribute_entry_mask_t
@@ -182,7 +181,8 @@ private:
         std::underlying_type_t<Access::Privilege> writePrivilege : kPrivilegeBits;
     };
 
-    // Static ASSERT to check size of mask type "attribute_entry_mask_t"
+    // Make sure that our various flags storage is never larger than 32 bits,
+    // because we expect these fields to pack together.
     static_assert(sizeof(attribute_entry_mask_t) <= 4, "Size of attribute_entry_mask_t is not as expected.");
 
     attribute_entry_mask_t mask;
@@ -207,7 +207,7 @@ struct AcceptedCommandEntry
 
     // Constructor
 
-    _StartBitFieldInit; // Disabling '-Wconversion' & '-Wconversion'
+    _StartBitFieldInit; // Disabling '-Wconversion' & '-Wnarrowing'
 
     constexpr AcceptedCommandEntry(CommandId id = 0, BitMask<CommandQualityFlags> cmdQualityFlags = BitMask<CommandQualityFlags>(),
                                    Access::Privilege invokePriv = Access::Privilege::kOperate) :
@@ -218,15 +218,15 @@ struct AcceptedCommandEntry
         }
     {}
 
-    _EndBitFieldInit; // Enabling '-Wconversion' & '-Wconversion'
+    _EndBitFieldInit; // Enabling '-Wconversion' & '-Wnarrowing'
 
-    // Getter for mask.invokePrivilege
+    // Getter for the invoke privilege for this command.
     [[nodiscard]] constexpr Access::Privilege GetInvokePrivilege() const
     {
         return static_cast<Access::Privilege>(mask.invokePrivilege);
     }
 
-    [[nodiscard]] constexpr bool HasFlags(CommandQualityFlags f) const { return (mask.flags & chip::to_underlying(f)) != 0; }
+    [[nodiscard]] constexpr bool HasFlags(CommandQualityFlags f) const { return (mask.flags & to_underlying(f)) != 0; }
 
 private:
     struct accepted_command_entry_mask_t
@@ -238,11 +238,15 @@ private:
         std::underlying_type_t<Access::Privilege> invokePrivilege : 5;
     };
 
-    // Static ASSERT to check size of mask type "accepted_command_entry_mask_t"
+    // Make sure that our various flags storage is never larger than 32 bits,
+    // because we expect these fields to pack together.
     static_assert(sizeof(accepted_command_entry_mask_t) <= 4, "Size of accepted_command_entry_mask_t is not as expected.");
 
     accepted_command_entry_mask_t mask;
 };
+
+// Static ASSERT to check size of AcceptedCommandEntry
+static_assert(sizeof(AcceptedCommandEntry) <= 8, "Size of AcceptedCommandEntry is not as expected.");
 
 /// Represents a device type that resides on an endpoint
 struct DeviceTypeEntry
