@@ -25,7 +25,6 @@
 #include "Base38Decode.h"
 
 #include <algorithm>
-#include <sstream>
 #include <string.h>
 #include <vector>
 
@@ -392,14 +391,28 @@ std::variant<CHIP_ERROR, std::vector<SetupPayload>> QRCodeSetupPayloadParser::Pa
     std::vector<SetupPayload> payloads;
     payloads.reserve(static_cast<decltype(payloads)::size_type>(chunkCount));
 
-    std::stringstream chunkStream(payload);
-    std::string chunk;
-
-    while (std::getline(chunkStream, chunk, kPayloadDelimiter))
+    std::string::size_type chunkStart = 0;
+    do
     {
+        auto chunkEnd = payload.find(kPayloadDelimiter, chunkStart);
+        std::string chunk;
+        if (chunkEnd == std::string::npos)
+        {
+            chunk      = payload.substr(chunkStart);
+            chunkStart = std::string::npos;
+        }
+        else
+        {
+            chunk = payload.substr(chunkStart, chunkEnd - chunkStart);
+
+            // Next chunk will start after the delimiter.
+            chunkStart = chunkEnd + 1;
+        }
+
         auto & nextItem = payloads.emplace_back();
         ReturnErrorOnFailure(populatePayloadFromBase38Data(chunk, nextItem));
-    }
+
+    } while (chunkStart != std::string::npos);
 
     return payloads;
 }

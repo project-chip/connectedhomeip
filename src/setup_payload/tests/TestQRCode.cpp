@@ -534,12 +534,11 @@ TEST(TestQRCode, TestParseMultiplePayloads)
     auto & payloads = std::get<std::vector<SetupPayload>>(parseResult);
     ASSERT_EQ(payloads.size(), 4u);
 
-    // uint16_t so we can add it to discriminator easily.
-    for (uint16_t idx = 0; idx < payloads.size(); ++idx)
+    for (size_t idx = 0; idx < payloads.size(); ++idx)
     {
         auto comparisonPayload = GetDefaultPayload();
-        comparisonPayload.discriminator.SetLongValue(comparisonPayload.discriminator.GetLongValue() + idx);
-        comparisonPayload.setUpPINCode += idx;
+        comparisonPayload.discriminator.SetLongValue(comparisonPayload.discriminator.GetLongValue() + static_cast<uint16_t>(idx));
+        comparisonPayload.setUpPINCode += static_cast<uint32_t>(idx);
 
         ASSERT_EQ(payloads[idx], comparisonPayload);
     }
