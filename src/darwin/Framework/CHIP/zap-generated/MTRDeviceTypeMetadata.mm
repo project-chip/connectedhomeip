@@ -85,6 +85,8 @@ constexpr DeviceTypeData knownDeviceTypes[] = {
     { 0x0000010B, DeviceTypeClass::Simple, "Matter Dimmable Plug-in Unit" },
     { 0x0000010C, DeviceTypeClass::Simple, "Matter Color Temperature Light" },
     { 0x0000010D, DeviceTypeClass::Simple, "Matter Extended Color Light" },
+    { 0x0000010F, DeviceTypeClass::Simple, "Mounted On/Off Control" },
+    { 0x00000110, DeviceTypeClass::Simple, "Mounted Dimmable Load Control" },
     { 0x00000202, DeviceTypeClass::Simple, "Matter Window Covering" },
     { 0x00000203, DeviceTypeClass::Simple, "Matter Window Covering Controller" },
     { 0x00000300, DeviceTypeClass::Simple, "Matter Heating/Cooling Unit" },
