@@ -49,7 +49,6 @@
 #include <clusters/ContentAppObserver/EventIds.h>
 #include <clusters/ContentControl/EventIds.h>
 #include <clusters/ContentLauncher/EventIds.h>
-#include <clusters/DemandResponseLoadControl/EventIds.h>
 #include <clusters/Descriptor/EventIds.h>
 #include <clusters/DeviceEnergyManagement/EventIds.h>
 #include <clusters/DeviceEnergyManagementMode/EventIds.h>
@@ -128,6 +127,7 @@
 #include <clusters/ServiceArea/EventIds.h>
 #include <clusters/SmokeCoAlarm/EventIds.h>
 #include <clusters/SoftwareDiagnostics/EventIds.h>
+#include <clusters/SoilMeasurement/EventIds.h>
 #include <clusters/Switch/EventIds.h>
 #include <clusters/TargetNavigator/EventIds.h>
 #include <clusters/TemperatureControl/EventIds.h>

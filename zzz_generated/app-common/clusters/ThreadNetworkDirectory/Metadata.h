@@ -49,21 +49,21 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace AddNetwork {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ThreadNetworkDirectory::Commands::AddNetwork::Id,
+    .commandId       = AddNetwork::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace AddNetwork
 namespace RemoveNetwork {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ThreadNetworkDirectory::Commands::RemoveNetwork::Id,
+    .commandId       = RemoveNetwork::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace RemoveNetwork
 namespace GetOperationalDataset {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ThreadNetworkDirectory::Commands::GetOperationalDataset::Id,
+    .commandId       = GetOperationalDataset::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

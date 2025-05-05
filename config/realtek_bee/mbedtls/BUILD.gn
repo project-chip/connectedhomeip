@@ -17,6 +17,6 @@
 
 import("//build_overrides/chip.gni")
 
-# Ameba has its own mbedtls, so nothing to do, just provide a target
+# Realtek has its own mbedtls, so nothing to do, just provide a target
 group("mbedtls") {
 }

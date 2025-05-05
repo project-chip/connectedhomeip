@@ -15,10 +15,6 @@ namespace PriceChange {
 inline constexpr EventId Id = 0x00000000;
 } // namespace PriceChange
 
-namespace ForecastChange {
-inline constexpr EventId Id = 0x00000001;
-} // namespace ForecastChange
-
 } // namespace Events
 } // namespace CommodityPrice
 } // namespace Clusters

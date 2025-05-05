@@ -20,6 +20,7 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "AppTask.h"
+#include "util/RealtekObserver.h"
 
 #include "LEDWidget.h"
 #include "Server.h"
@@ -44,6 +45,7 @@
 
 #include "matter_gpio.h"
 #include <os_mem.h>
+#include <os_task.h>
 
 #if CONFIG_ENABLE_CHIP_SHELL
 #include <lib/shell/Engine.h>
@@ -62,6 +64,11 @@ using namespace ::chip::System;
 #define APP_TASK_STACK_SIZE (4 * 1024)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
+
+#if DLPS_EN
+extern "C" bool zbmac_pm_check_inactive(void);
+extern "C" void zbmac_pm_initiate_wakeup(void);
+#endif
 
 TaskHandle_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
@@ -147,6 +154,9 @@ CHIP_ERROR AppTask::StartAppTask()
 
 void AppTask::AppTaskMain(void * pvParameter)
 {
+#if defined(FEATURE_TRUSTZONE_ENABLE) && (FEATURE_TRUSTZONE_ENABLE == 1)
+    os_alloc_secure_ctx(1024);
+#endif
     AppEvent event;
 
     sAppTask.Init();
@@ -156,6 +166,12 @@ void AppTask::AppTaskMain(void * pvParameter)
         /* Task pend until we have stuff to do */
         if (xQueueReceive(sAppEventQueue, &event, portMAX_DELAY) == pdTRUE)
         {
+#if DLPS_EN
+            if (zbmac_pm_check_inactive())
+            {
+                zbmac_pm_initiate_wakeup();
+            }
+#endif
             sAppTask.DispatchEvent(&event);
         }
     }
@@ -185,6 +201,9 @@ void AppTask::InitServer(intptr_t context)
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
     chip::Server::GetInstance().Init(initParams);
+
+    static RealtekObserver sRealtekObserver;
+    chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sRealtekObserver);
 
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kBLE));

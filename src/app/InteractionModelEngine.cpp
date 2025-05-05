@@ -1929,6 +1929,9 @@ void InteractionModelEngine::OnTimedInvoke(TimedHandler * apTimedHandler, Messag
     VerifyOrDie(aPayloadHeader.HasMessageType(MsgType::InvokeCommandRequest));
     VerifyOrDie(!apExchangeContext->IsGroupExchangeContext());
 
+    // Ensure that DataModel::Provider has access to the exchange the message was received on.
+    CurrentExchangeValueScope scopedExchangeContext(*this, apExchangeContext);
+
     Status status = OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), /* aIsTimedInvoke = */ true);
     if (status != Status::Success)
     {
@@ -1948,6 +1951,9 @@ void InteractionModelEngine::OnTimedWrite(TimedHandler * apTimedHandler, Messagi
 
     VerifyOrDie(aPayloadHeader.HasMessageType(MsgType::WriteRequest));
     VerifyOrDie(!apExchangeContext->IsGroupExchangeContext());
+
+    // Ensure that DataModel::Provider has access to the exchange the message was received on.
+    CurrentExchangeValueScope scopedExchangeContext(*this, apExchangeContext);
 
     Status status = OnWriteRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), /* aIsTimedWrite = */ true);
     if (status != Status::Success)
