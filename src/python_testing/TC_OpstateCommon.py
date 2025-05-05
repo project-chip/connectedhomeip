@@ -51,7 +51,7 @@ class TestInfo:
 class EventSpecificChangeCallback:
     def __init__(self, expected_event: ClusterObjects.ClusterEvent):
         """This class creates a queue to store received event callbacks, that can be checked by the test script
-           expected_event: is the expected event.
+           expected_event: is the expected event
         """
         self._q = queue.Queue()
         self._expected_cluster_id = expected_event.cluster_id
