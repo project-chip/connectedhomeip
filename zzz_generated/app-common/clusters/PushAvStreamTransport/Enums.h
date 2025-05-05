@@ -56,8 +56,8 @@ enum class StatusCodeEnum : uint8_t
     kInvalidURL             = 0x04,
     kInvalidZone            = 0x05,
     kInvalidCombination     = 0x06,
-    kInvalidTriggerType     = 0x08,
-    kInvalidTransportStatus = 0x09,
+    kInvalidTriggerType     = 0x07,
+    kInvalidTransportStatus = 0x08,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown

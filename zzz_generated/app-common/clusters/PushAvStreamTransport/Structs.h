@@ -65,8 +65,8 @@ using DecodableType = Type;
 namespace TransportZoneOptionsStruct {
 enum class Fields : uint8_t
 {
-    kZone        = 1,
-    kSensitivity = 2,
+    kZone        = 0,
+    kSensitivity = 1,
 };
 
 struct Type
