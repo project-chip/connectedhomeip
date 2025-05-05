@@ -606,6 +606,17 @@ public:
         return *this;
     }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    // Execute Joint Commissioning Method
+    Optional<bool> GetExecuteJCM() const { return mExecuteJCM; }
+
+    CommissioningParameters & SetExecuteJCM(bool executeJCM)
+    {
+        mExecuteJCM = MakeOptional(executeJCM);
+        return *this;
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+
     // Clear all members that depend on some sort of external buffer.  Can be
     // used to make sure that we are not holding any dangling pointers.
     void ClearExternalBufferDependentValues()
@@ -679,6 +690,11 @@ private:
     ICDRegistrationStrategy mICDRegistrationStrategy = ICDRegistrationStrategy::kIgnore;
     bool mCheckForMatchingFabric                     = false;
     Span<const app::AttributePathParams> mExtraReadPaths;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    Optional<bool> mExecuteJCM;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+
 };
 
 struct RequestedCertificate
