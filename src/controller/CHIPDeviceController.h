@@ -1068,6 +1068,10 @@ private:
     CHIP_ERROR ParseTimeSyncInfo(ReadCommissioningInfo & info);
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
+#if (CHIP_CONFIG_ENABLE_READ_CLIENT && CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC)
+    CHIP_ERROR ParseJFAdministratorInfo(ReadCommissioningInfo & info);
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT && CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+
     static CHIP_ERROR
     ConvertFromOperationalCertStatus(chip::app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum err);
 
