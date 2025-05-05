@@ -66,8 +66,8 @@ private:
     // Adjust the failsafe timer if CommissioningDelegate GetCASEFailsafeTimerSeconds is set
     void SetCASEFailsafeTimerIfNeeded();
 
-    CHIP_ERROR SaveCertificate(ByteSpan inCertSpan, uint8_t **outCert, uint16_t *outCertSize);
-    void ReleaseCertificate(uint8_t **cert, uint16_t *certSize);
+    CHIP_ERROR SaveCertificate(ByteSpan inCertSpan, uint8_t ** outCert, uint16_t * outCertSize);
+    void ReleaseCertificate(uint8_t ** cert, uint16_t * certSize);
 
     ByteSpan GetDAC() const { return ByteSpan(mDAC, mDACLen); }
     ByteSpan GetPAI() const { return ByteSpan(mPAI, mPAILen); }

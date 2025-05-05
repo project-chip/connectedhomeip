@@ -387,14 +387,17 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         return CommissioningStage::kAttestationRevocationCheck;
     case CommissioningStage::kAttestationRevocationCheck:
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-        if (mParams.GetExecuteJCM().ValueOr(false)) {
-            return CommissioningStage::kSendVIDVerificationRequest;
+        if (mParams.GetExecuteJCM().ValueOr(false))
+        {
+            return CommissioningStage::kJFValidateNOC;
         }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
         return CommissioningStage::kSendOpCertSigningRequest;
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-      case CommissioningStage::kSendVIDVerificationRequest:
-          return CommissioningStage::kSendOpCertSigningRequest;
+    case CommissioningStage::kJFValidateNOC:
+        return CommissioningStage::kSendVIDVerificationRequest;
+    case CommissioningStage::kSendVIDVerificationRequest:
+        return CommissioningStage::kSendOpCertSigningRequest;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     case CommissioningStage::kSendOpCertSigningRequest:
         return CommissioningStage::kValidateCSR;
@@ -789,7 +792,8 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
             if (mParams.GetExecuteJCM().ValueOr(false) &&
-                (mDeviceCommissioningInfo.JFAdministratorFabricIndex != kUndefinedFabricIndex)) {
+                (mDeviceCommissioningInfo.JFAdministratorFabricIndex != kUndefinedFabricIndex))
+            {
                 SaveCertificate(mDeviceCommissioningInfo.JFAdminNOC, &mJFAdminNOC, &mJFAdminNOCLen);
                 SaveCertificate(mDeviceCommissioningInfo.JFAdminICAC, &mJFAdminICAC, &mJFAdminICACLen);
                 SaveCertificate(mDeviceCommissioningInfo.JFAdminRCAC, &mJFAdminRCAC, &mJFAdminRCACLen);
@@ -971,7 +975,7 @@ CHIP_ERROR AutoCommissioner::PerformStep(CommissioningStage nextStage)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AutoCommissioner::SaveCertificate(ByteSpan inCertSpan, uint8_t **outCert, uint16_t *outCertSize)
+CHIP_ERROR AutoCommissioner::SaveCertificate(ByteSpan inCertSpan, uint8_t ** outCert, uint16_t * outCertSize)
 {
     if ((inCertSpan.size() > Credentials::kMaxDERCertLength) || !(CanCastTo<uint16_t>(inCertSpan.size())))
     {
@@ -996,7 +1000,7 @@ CHIP_ERROR AutoCommissioner::SaveCertificate(ByteSpan inCertSpan, uint8_t **outC
     return CHIP_NO_ERROR;
 }
 
-void AutoCommissioner::ReleaseCertificate(uint8_t **cert, uint16_t *certSize)
+void AutoCommissioner::ReleaseCertificate(uint8_t ** cert, uint16_t * certSize)
 {
     if (*cert != nullptr)
     {
@@ -1004,7 +1008,7 @@ void AutoCommissioner::ReleaseCertificate(uint8_t **cert, uint16_t *certSize)
     }
 
     *certSize = 0;
-    *cert = nullptr;
+    *cert     = nullptr;
 }
 
 } // namespace Controller
