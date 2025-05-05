@@ -2339,7 +2339,8 @@ void DeviceCommissioner::ContinueReadingCommissioningInfo(const CommissioningPar
                                                 Clusters::IcdManagement::Attributes::ActiveModeThreshold::Id));
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-        if (params.GetExecuteJCM().ValueOr(false)) {
+        if (params.GetExecuteJCM().ValueOr(false))
+        {
             VerifyOrReturn(builder.AddAttributePath(Clusters::JointFabricAdministrator::Id,
                                                     Clusters::JointFabricAdministrator::Attributes::AdministratorFabricIndex::Id));
             VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::OperationalCredentials::Id,
@@ -2813,7 +2814,7 @@ CHIP_ERROR DeviceCommissioner::ParseJFAdministratorInfo(ReadCommissioningInfo & 
         {
             ChipLogProgress(Controller, "JCM: AdministratorFabricIndex: %d", administratorFabricIndex.Value());
             info.JFAdministratorFabricIndex = administratorFabricIndex.Value();
-            info.JFAdminEndpointId = path.mEndpointId;
+            info.JFAdminEndpointId          = path.mEndpointId;
         }
         else
         {
@@ -2828,11 +2829,12 @@ CHIP_ERROR DeviceCommissioner::ParseJFAdministratorInfo(ReadCommissioningInfo & 
         return err;
     }
 
-    err = mAttributeCache->ForEachAttribute(OperationalCredentials::Id, [this, &info, &rootKeySpan](const ConcreteAttributePath & path) {
-        using namespace chip::app::Clusters::OperationalCredentials::Attributes;
+    err = mAttributeCache->ForEachAttribute(
+        OperationalCredentials::Id, [this, &info, &rootKeySpan](const ConcreteAttributePath & path) {
+            using namespace chip::app::Clusters::OperationalCredentials::Attributes;
 
-        switch (path.mAttributeId)
-        {
+            switch (path.mAttributeId)
+            {
             case Fabrics::Id: {
                 Fabrics::TypeInfo::DecodableType fabrics;
                 ReturnErrorOnFailure(this->mAttributeCache->Get<Fabrics::TypeInfo>(path, fabrics));
@@ -2845,10 +2847,11 @@ CHIP_ERROR DeviceCommissioner::ParseJFAdministratorInfo(ReadCommissioningInfo & 
                     {
                         if (fabricDescriptor.rootPublicKey.size() != Crypto::kP256_PublicKey_Length)
                         {
-                            ChipLogError(Controller, "JCM: DeviceCommissioner::ParseJFAdministratorInfo - fabric root key size mismatch");
+                            ChipLogError(Controller,
+                                         "JCM: DeviceCommissioner::ParseJFAdministratorInfo - fabric root key size mismatch");
                             return CHIP_ERROR_KEY_NOT_FOUND;
                         }
-                        rootKeySpan = fabricDescriptor.rootPublicKey;
+                        rootKeySpan                      = fabricDescriptor.rootPublicKey;
                         info.JFAdminFabricTable.vendorId = fabricDescriptor.vendorID;
                         info.JFAdminFabricTable.fabricId = fabricDescriptor.fabricID;
 
@@ -2893,10 +2896,10 @@ CHIP_ERROR DeviceCommissioner::ParseJFAdministratorInfo(ReadCommissioningInfo & 
             }
             default:
                 return CHIP_NO_ERROR;
-        }
+            }
 
-        return CHIP_NO_ERROR;
-    });
+            return CHIP_NO_ERROR;
+        });
 
     if (err != CHIP_NO_ERROR)
     {
@@ -2904,48 +2907,49 @@ CHIP_ERROR DeviceCommissioner::ParseJFAdministratorInfo(ReadCommissioningInfo & 
         return err;
     }
 
-    err = mAttributeCache->ForEachAttribute(OperationalCredentials::Id, [this, &info, &rootKeySpan](const ConcreteAttributePath & path) {
-        using namespace chip::app::Clusters::OperationalCredentials::Attributes;
-        bool foundMatchingRcac = false;
+    err = mAttributeCache->ForEachAttribute(
+        OperationalCredentials::Id, [this, &info, &rootKeySpan](const ConcreteAttributePath & path) {
+            using namespace chip::app::Clusters::OperationalCredentials::Attributes;
+            bool foundMatchingRcac = false;
 
-        switch (path.mAttributeId)
-        {
+            switch (path.mAttributeId)
+            {
             case TrustedRootCertificates::Id: {
                 TrustedRootCertificates::TypeInfo::DecodableType trustedCAs;
                 ReturnErrorOnFailure(this->mAttributeCache->Get<TrustedRootCertificates::TypeInfo>(path, trustedCAs));
 
-                   auto iter = trustedCAs.begin();
-                   while (iter.Next())
-                   {
-                       auto & trustedCA = iter.GetValue();
-                       P256PublicKeySpan trustedCAPublicKeySpan;
+                auto iter = trustedCAs.begin();
+                while (iter.Next())
+                {
+                    auto & trustedCA = iter.GetValue();
+                    P256PublicKeySpan trustedCAPublicKeySpan;
 
-                       ReturnErrorOnFailure(ExtractPublicKeyFromChipCert(trustedCA, trustedCAPublicKeySpan));
-                       Crypto::P256PublicKey trustedCAPublicKey{ trustedCAPublicKeySpan };
+                    ReturnErrorOnFailure(ExtractPublicKeyFromChipCert(trustedCA, trustedCAPublicKeySpan));
+                    Crypto::P256PublicKey trustedCAPublicKey{ trustedCAPublicKeySpan };
 
-                       P256PublicKeySpan rootPubKeySpan(rootKeySpan.data());
-                       Crypto::P256PublicKey fabricTableRootPublicKey{ rootPubKeySpan };
+                    P256PublicKeySpan rootPubKeySpan(rootKeySpan.data());
+                    Crypto::P256PublicKey fabricTableRootPublicKey{ rootPubKeySpan };
 
-                       if (trustedCAPublicKey.Matches(fabricTableRootPublicKey))
-                       {
-                           info.JFAdminRCAC = trustedCA;
-                           ChipLogProgress(Controller, "JCM: Successfully parsed the Administrator RCAC");
-                           foundMatchingRcac = true;
-                           break;
-                       }
-                   }
-                   if (!foundMatchingRcac)
-                   {
-                       ChipLogError(Controller, "JCM: Cannot found a matching RCAC!");
-                       return CHIP_ERROR_CERT_NOT_FOUND;
-                   }
-                   return CHIP_NO_ERROR;
-               }
-               default:
-                   return CHIP_NO_ERROR;
-           }
-           return CHIP_NO_ERROR;
-    });
+                    if (trustedCAPublicKey.Matches(fabricTableRootPublicKey))
+                    {
+                        info.JFAdminRCAC = trustedCA;
+                        ChipLogProgress(Controller, "JCM: Successfully parsed the Administrator RCAC");
+                        foundMatchingRcac = true;
+                        break;
+                    }
+                }
+                if (!foundMatchingRcac)
+                {
+                    ChipLogError(Controller, "JCM: Cannot found a matching RCAC!");
+                    return CHIP_ERROR_CERT_NOT_FOUND;
+                }
+                return CHIP_NO_ERROR;
+            }
+            default:
+                return CHIP_NO_ERROR;
+            }
+            return CHIP_NO_ERROR;
+        });
 
     if (err != CHIP_NO_ERROR)
     {
@@ -2953,6 +2957,20 @@ CHIP_ERROR DeviceCommissioner::ParseJFAdministratorInfo(ReadCommissioningInfo & 
     }
 
     return err;
+}
+
+CHIP_ERROR DeviceCommissioner::ValidateJFAdminNOC(const ByteSpan & adminNOC)
+{
+    CATValues cats;
+
+    ExtractCATsFromOpCert(adminNOC, cats);
+
+    if (!cats.ContainsIdentifier(kAdminCATIdentifier))
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
@@ -3535,12 +3553,34 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    case CommissioningStage::kJFValidateNOC: {
+        if (!params.GetJFAdministratorFabricIndex().HasValue() || !params.GetJFAdminNOC().HasValue() ||
+            params.GetJFAdministratorFabricIndex().Value() == kUndefinedFabricIndex)
+        {
+            ChipLogError(Controller, "No JF Admin Values found");
+            CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
+            return;
+        }
+
+        CHIP_ERROR err = ValidateJFAdminNOC(params.GetJFAdminNOC().Value());
+
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Cannot validate JF AdminNOC");
+        }
+
+        CommissioningStageComplete(err);
+
+        break;
+    }
+
     case CommissioningStage::kSendVIDVerificationRequest: {
         /* TODO: send SignVidVerificationRequest */
         CommissioningStageComplete(CHIP_NO_ERROR);
         break;
     }
 #endif
+
     case CommissioningStage::kSendOpCertSigningRequest: {
         if (!params.GetCSRNonce().HasValue())
         {

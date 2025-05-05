@@ -52,8 +52,9 @@ enum CommissioningStage : uint8_t
     kAttestationVerification,    ///< Verify AttestationResponse (0x3E:1) validity
     kAttestationRevocationCheck, ///< Verify Revocation Status of device's DAC chain
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    kJFValidateNOC,              ///< Verify Admin NOC contains an Administrator CAT
     kSendVIDVerificationRequest, ///< Send SignVIDVerificationRequest command to the device
-#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+#endif                           // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     kSendOpCertSigningRequest,   ///< Send CSRRequest (0x3E:4) command to the device
     kValidateCSR,                ///< Verify CSRResponse (0x3E:5) validity
     kGenerateNOCChain,           ///< TLV encode Node Operational Credentials (NOC) chain certs
@@ -774,7 +775,6 @@ private:
     Optional<ByteSpan> mJFAdminRCAC;
     Optional<uint16_t> mJFAdminRCACLen;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-
 };
 
 struct RequestedCertificate
@@ -876,7 +876,7 @@ struct ICDManagementClusterInfo
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 struct JFFabricTableInfo
 {
-    VendorId vendorId  = VendorId::Common;
+    VendorId vendorId = VendorId::Common;
     FabricId fabricId = kUndefinedFabricId;
 };
 
@@ -901,7 +901,7 @@ struct ReadCommissioningInfo
     ICDManagementClusterInfo icd;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-    EndpointId JFAdminEndpointId = kInvalidEndpointId;
+    EndpointId JFAdminEndpointId           = kInvalidEndpointId;
     FabricIndex JFAdministratorFabricIndex = kUndefinedFabricIndex;
 
     JFFabricTableInfo JFAdminFabricTable;

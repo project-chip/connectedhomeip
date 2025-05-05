@@ -1070,6 +1070,7 @@ private:
 
 #if (CHIP_CONFIG_ENABLE_READ_CLIENT && CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC)
     CHIP_ERROR ParseJFAdministratorInfo(ReadCommissioningInfo & info);
+    CHIP_ERROR ValidateJFAdminNOC(const ByteSpan & adminNOC);
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT && CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
     static CHIP_ERROR
