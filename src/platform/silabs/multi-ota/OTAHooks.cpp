@@ -51,18 +51,19 @@ CHIP_ERROR chip::OTAMultiImageProcessorImpl::ProcessDescriptor(void * descriptor
 
 CHIP_ERROR chip::OTAMultiImageProcessorImpl::OtaHookInit()
 {
-    // static chip::OTAFactoryDataProcessor sFactoryDataProcessor;
+    static chip::OTAFactoryDataProcessor sFactoryDataProcessor;
 
     auto & imageProcessor = chip::OTAMultiImageProcessorImpl::GetDefaultInstance();
-//    sFactoryDataProcessor.RegisterDescriptorCallback(ProcessDescriptor);
+    sFactoryDataProcessor.RegisterDescriptorCallback(ProcessDescriptor);
+    ReturnErrorOnFailure(
+        imageProcessor.RegisterProcessor(static_cast<uint32_t>(OTAProcessorTag::kFactoryDataProcessor), &sFactoryDataProcessor));
+
 #ifndef SLI_SI91X_MCU_INTERFACE
     static chip::OTAFirmwareProcessor sApplicationProcessor;
     sApplicationProcessor.RegisterDescriptorCallback(ProcessDescriptor);
     ReturnErrorOnFailure(
         imageProcessor.RegisterProcessor(static_cast<uint32_t>(OTAProcessorTag::kApplicationProcessor), &sApplicationProcessor));
 #endif
-    //   ReturnErrorOnFailure(
-    //     imageProcessor.RegisterProcessor(static_cast<uint32_t>(OTAProcessorTag::kFactoryDataProcessor), &sFactoryDataProcessor));
 
 #if OTA_TEST_CUSTOM_TLVS
     static chip::OTACustomProcessor customProcessor1;
@@ -82,11 +83,12 @@ CHIP_ERROR chip::OTAMultiImageProcessorImpl::OtaHookInit()
 #endif
 
 #ifdef SL_WIFI
+#ifdef SLI_SI91X_MCU_INTERFACE
     static chip::OTAWiFiFirmwareProcessor sWifiFirmwareProcessor;
     sWifiFirmwareProcessor.RegisterDescriptorCallback(ProcessDescriptor);
     ReturnErrorOnFailure(
         imageProcessor.RegisterProcessor(static_cast<uint32_t>(OTAProcessorTag::kApplicationProcessor), &sWifiFirmwareProcessor));
-#ifndef SLI_SI91X_MCU_INTERFACE
+#else  // 917 NCP
     static chip::OTAWiFiFirmwareProcessor sWifiFirmwareProcessor;
     sWifiFirmwareProcessor.RegisterDescriptorCallback(ProcessDescriptor);
     ReturnErrorOnFailure(

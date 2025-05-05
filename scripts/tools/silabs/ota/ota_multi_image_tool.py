@@ -165,7 +165,7 @@ def generate_app(args: object):
         return [OTA_APP_TLV_TEMP, args.app_input_file]
 
 
-def generate_wifi_image(args: object):
+def generate_wifi_ta_image(args: object):
     """
     Generate WiFi TA image payload with descriptor. If a certain option is not specified, use the default values.
     """
@@ -174,13 +174,13 @@ def generate_wifi_image(args: object):
     descriptor = generate_descriptor(args.wifi_ta_version, args.wifi_ta_version_str, args.wifi_ta_build_date)
     logging.info(f"WiFi TA encryption enable: {args.enc_enable}")
     if args.enc_enable:
-        inputFile = open(args.wifi_input_file, "rb")
+        inputFile = open(args.wifi_ta_input_file, "rb")
         enc_file = crypto_utils.encryptData(inputFile.read(), args.input_ota_key, INITIALIZATION_VECTOR)
         enc_file1 = bytes([ord(x) for x in enc_file])
         file_size = len(enc_file1)
         payload = generate_header(TAG.WIFI_TA, len(descriptor) + file_size) + descriptor + enc_file1
     else:
-        file_size = os.path.getsize(args.wifi_input_file)
+        file_size = os.path.getsize(args.wifi_ta_input_file)
         logging.info(f"file size: {file_size}")
         payload = generate_header(TAG.WIFI_TA, len(descriptor) + file_size) + descriptor
 
@@ -188,7 +188,7 @@ def generate_wifi_image(args: object):
     if args.enc_enable:
         return [OTA_APP_TLV_TEMP]
     else:
-        return [OTA_APP_TLV_TEMP, args.wifi_input_file]
+        return [OTA_APP_TLV_TEMP, args.wifi_ta_input_file]
 
 
 def generate_bootloader(args: object):
@@ -287,8 +287,8 @@ def create_image(args: object):
     if args.app_input_file:
         input_files += generate_app(args)
 
-    if args.wifi_input_file:
-        input_files += generate_wifi_image(args)
+    if args.wifi_ta_input_file:
+        input_files += generate_wifi_ta_image(args)
 
     if len(input_files) == 0:
         print("Please specify an input option.")

@@ -42,29 +42,6 @@ uint32_t OTAFirmwareProcessor::mWriteOffset                                     
 uint16_t OTAFirmwareProcessor::writeBufOffset                                          = 0;
 uint8_t OTAFirmwareProcessor::writeBuffer[kAlignmentBytes] __attribute__((aligned(4))) = { 0 };
 
-CHIP_ERROR OTAFirmwareProcessor::Init()
-{
-    VerifyOrReturnError(mCallbackProcessDescriptor != nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
-    mAccumulator.Init(sizeof(Descriptor));
-#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
-    mUnalignmentNum = 0;
-#endif
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR OTAFirmwareProcessor::Clear()
-{
-    OTATlvProcessor::ClearInternal();
-    mAccumulator.Clear();
-    mDescriptorProcessed = false;
-#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
-    mUnalignmentNum = 0;
-#endif
-
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
 {
     uint32_t err = SL_BOOTLOADER_OK;

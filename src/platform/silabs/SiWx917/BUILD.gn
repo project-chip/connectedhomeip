@@ -75,23 +75,6 @@ static_library("SiWx917") {
     "SiWxPlatformInterface.h",
   ]
 
-  if (chip_enable_multi_ota_requestor) {
-    sources += [
-      "${silabs_platform_dir}/multi-ota/OTAHooks.cpp",
-      "${silabs_platform_dir}/multi-ota/OTAMultiImageProcessorImpl.cpp",
-      "${silabs_platform_dir}/multi-ota/OTAMultiImageProcessorImpl.h",
-      "${silabs_platform_dir}/multi-ota/OTATlvProcessor.cpp",
-      "${silabs_platform_dir}/multi-ota/OTATlvProcessor.h",
-      "${silabs_platform_dir}/multi-ota/SiWx917/OTAWiFiFirmwareProcessor.cpp",
-      "${silabs_platform_dir}/multi-ota/SiWx917/OTAWiFiFirmwareProcessor.h",
-    ]
-  } else if (chip_enable_ota_requestor) {
-    sources += [
-      "${silabs_platform_dir}/OTAImageProcessorImpl.h",
-      "OTAImageProcessorImpl.cpp",
-    ]
-  }
-
   public_deps = [
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/platform:platform_base",
@@ -101,6 +84,15 @@ static_library("SiWx917") {
     "${chip_root}/src/platform/logging:headers",
     "${sl_provision_root}:headers",
   ]
+
+  if (chip_enable_multi_ota_requestor) {
+    deps += [ "${silabs_platform_dir}/multi-ota:multi-ota" ]
+  } else if (chip_enable_ota_requestor) {
+    sources += [
+      "${silabs_platform_dir}/OTAImageProcessorImpl.cpp",
+      "${silabs_platform_dir}/OTAImageProcessorImpl.h",
+    ]
+  }
 
   # Add platform crypto implementation
   if (chip_crypto == "platform") {

@@ -28,8 +28,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "sl_si91x_driver.h"
 #ifdef SLI_SI91X_MCU_INTERFACE
+#include "sl_si91x_driver.h"
 #include "sl_si91x_hal_soc_soft_reset.h"
 #endif
 #ifdef __cplusplus
@@ -203,8 +203,6 @@ CHIP_ERROR OTAMultiImageProcessorImpl::SelectProcessor(ByteSpan & block)
     ChipLogDetail(SoftwareUpdate, "Selected processor with tag: %lu", pair->first);
     mCurrentProcessor = pair->second;
     mCurrentProcessor->SetLength(header.length);
-    ChipLogDetail(SoftwareUpdate, "Processor length*********: %lu", header.length);
-    ChipLogProgress(SoftwareUpdate, "mCurrentProcessor set to: %p", mCurrentProcessor);
     mCurrentProcessor->SetWasSelected(true);
 
     return CHIP_NO_ERROR;
@@ -212,8 +210,12 @@ CHIP_ERROR OTAMultiImageProcessorImpl::SelectProcessor(ByteSpan & block)
 
 CHIP_ERROR OTAMultiImageProcessorImpl::RegisterProcessor(uint32_t tag, OTATlvProcessor * processor)
 {
-
-    ChipLogDetail(SoftwareUpdate, "RegisterProcessor with tag: %ld", tag);
+    ChipLogDetail(SoftwareUpdate, "RegisterProcessor with tag: %lu", tag);
+    if (!OTATlvProcessor::IsValidTag(tag))
+    {
+        ChipLogError(SoftwareUpdate, "Invalid processor tag: %lu", tag);
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
     auto pair = mProcessorMap.find(tag);
     if (pair != mProcessorMap.end())
     {
@@ -437,7 +439,6 @@ void OTAMultiImageProcessorImpl::HandleApply(intptr_t context)
     // This reboots the device
     // TODO: check where to put this
 #ifdef SLI_SI91X_MCU_INTERFACE
-    ChipLogProgress(SoftwareUpdate, "917 SoC Handle Apply *******************");
     ChipLogProgress(SoftwareUpdate, "Selected processor: %p, RequiresReset: %d", imageProcessor->mCurrentProcessor,
                     imageProcessor->mCurrentProcessor ? imageProcessor->mCurrentProcessor->RequiresReset() : 0);
     if (imageProcessor->mCurrentProcessor && imageProcessor->mCurrentProcessor->RequiresReset())

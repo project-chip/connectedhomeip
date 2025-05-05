@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -72,6 +72,7 @@ enum class OTAProcessorTag
     kCustomProcessor1     = 8,
     kCustomProcessor2     = 9,
     kCustomProcessor3     = 10,
+    kMaxValue             = 11,
 };
 
 /**
@@ -87,13 +88,40 @@ enum class OTAProcessorTag
  * Applications should use OTAMultiImageProcessorImpl::RegisterProcessor
  * to register additional processors.
  */
+/**
+ * This class can be used to accumulate data until a given threshold.
+ * Should be used by OTATlvProcessor derived classes if they need
+ * metadata accumulation (e.g. for custom header decoding).
+ */
+class OTADataAccumulator
+{
+public:
+    void Init(uint32_t threshold);
+    void Clear();
+    CHIP_ERROR Accumulate(ByteSpan & block);
+
+    inline uint8_t * data() { return mBuffer.Get(); }
+    inline uint32_t GetThreshold() { return mThreshold; }
+
+private:
+    uint32_t mThreshold;
+    uint32_t mBufferOffset;
+    Platform::ScopedMemoryBuffer<uint8_t> mBuffer;
+};
 class OTATlvProcessor
 {
 public:
+    struct Descriptor
+    {
+        uint32_t version;
+        char versionString[kVersionStringSize];
+        char buildDate[kBuildDateSize];
+    };
+
     virtual ~OTATlvProcessor() {}
 
-    virtual CHIP_ERROR Init()           = 0;
-    virtual CHIP_ERROR Clear()          = 0;
+    virtual CHIP_ERROR Init();
+    CHIP_ERROR Clear();
     virtual CHIP_ERROR ApplyAction()    = 0;
     virtual CHIP_ERROR FinalizeAction() = 0;
     virtual CHIP_ERROR ExitAction() { return CHIP_NO_ERROR; }
@@ -103,7 +131,7 @@ public:
     void SetLength(uint32_t length) { mLength = length; }
     void SetWasSelected(bool selected) { mWasSelected = selected; }
     bool WasSelected() { return mWasSelected; }
-
+    static bool IsValidTag(uint32_t tag);
     virtual bool RequiresReset() const { return false; }
 
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
@@ -134,6 +162,7 @@ protected:
      * @retval Error code                       Something went wrong. Current OTA process will be
      *                                          canceled.
      */
+    //   CHIP_ERROR InitAccumulator(uint32_t threshold);
     virtual CHIP_ERROR ProcessInternal(ByteSpan & block) = 0;
 
     void ClearInternal();
@@ -150,27 +179,9 @@ protected:
     uint32_t mProcessedLength                    = 0;
     bool mWasSelected                            = false;
     ProcessDescriptor mCallbackProcessDescriptor = nullptr;
-};
 
-/**
- * This class can be used to accumulate data until a given threshold.
- * Should be used by OTATlvProcessor derived classes if they need
- * metadata accumulation (e.g. for custom header decoding).
- */
-class OTADataAccumulator
-{
-public:
-    void Init(uint32_t threshold);
-    void Clear();
-    CHIP_ERROR Accumulate(ByteSpan & block);
-
-    inline uint8_t * data() { return mBuffer.Get(); }
-    inline uint32_t GetThreshold() { return mThreshold; }
-
-private:
-    uint32_t mThreshold;
-    uint32_t mBufferOffset;
-    Platform::ScopedMemoryBuffer<uint8_t> mBuffer;
+    OTADataAccumulator mAccumulator;
+    bool mDescriptorProcessed = false;
 };
 
 } // namespace chip

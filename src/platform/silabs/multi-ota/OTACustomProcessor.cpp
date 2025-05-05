@@ -42,23 +42,6 @@ uint32_t OTACustomProcessor::mWriteOffset                                       
 uint16_t OTACustomProcessor::writeBufOffset                                          = 0;
 uint8_t OTACustomProcessor::writeBuffer[kAlignmentBytes] __attribute__((aligned(4))) = { 0 };
 
-CHIP_ERROR OTACustomProcessor::Init()
-{
-    VerifyOrReturnError(mCallbackProcessDescriptor != nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
-    mAccumulator.Init(sizeof(Descriptor));
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR OTACustomProcessor::Clear()
-{
-    OTATlvProcessor::ClearInternal();
-    mAccumulator.Clear();
-    mDescriptorProcessed = false;
-
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR OTACustomProcessor::ProcessInternal(ByteSpan & block)
 {
     if (!mDescriptorProcessed)
