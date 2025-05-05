@@ -719,6 +719,8 @@ class MatterTestConfig:
     # path to device attestation revocation set json file
     dac_revocation_set_path: Optional[pathlib.Path] = None
 
+    legacy: bool = False
+
 
 class ClusterMapper:
     """Describe clusters/attributes using schema names."""
@@ -1199,6 +1201,27 @@ class MatterBaseTest(base_test.BaseTestClass):
     def is_pics_sdk_ci_only(self) -> bool:
         return self.check_pics('PICS_SDK_CI_ONLY')
 
+    def _update_legacy_test_event_triggers(self, eventTrigger: int) -> int:
+        """ This function updates eventTriged if legacy flag is activated. """
+        target_endpoint = 0
+
+        if self.matter_test_config.legacy:
+            logger.info("Legacy test event trigger activated")
+        else:
+            logger.info("Legacy test event trigger deactivated")
+            target_endpoint = self.get_endpoint()
+
+        if not (0 <= target_endpoint <= 0xFFFF):
+            raise ValueError("Target endpoint should be between 0 and 0xFFFF")
+
+        # Clean endpoint target
+        eventTrigger = eventTrigger & ~ (0xFFFF << 32)
+
+        # Sets endpoint in eventTrigger
+        eventTrigger |= (target_endpoint & 0xFFFF) << 32
+
+        return eventTrigger
+
     async def commission_devices(self) -> bool:
         dev_ctrl: ChipDeviceCtrl.ChipDeviceController = self.default_controller
         dut_node_ids: List[int] = self.matter_test_config.dut_node_ids
@@ -1367,13 +1390,11 @@ class MatterBaseTest(base_test.BaseTestClass):
             else:
                 enableKey = self.matter_test_config.global_test_params['enableKey']
 
+        eventTrigger = self._update_legacy_test_event_triggers(eventTrigger)
+
         try:
             # GeneralDiagnostics cluster is meant to be on Endpoint 0 (Root)
-            await self.send_single_cmd(endpoint=0,
-                                       cmd=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(
-                                           enableKey,
-                                           eventTrigger)
-                                       )
+            await self.send_single_cmd(endpoint=0, cmd=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey, eventTrigger))
 
         except InteractionModelError as e:
             asserts.fail(
@@ -2009,6 +2030,8 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.app_pipe_prefix = args.app_pipe_prefix
     config.fail_on_skipped_tests = args.fail_on_skipped
 
+    config.legacy = args.use_legacy_test_event_triggers
+
     config.controller_node_id = args.controller_node_id
     config.trace_to = args.trace_to
 
@@ -2069,6 +2092,9 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                              help="The path prefix of the app to send an out-of-band command")
     basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
     basic_group.add_argument("--PICS", help="PICS file path", type=str)
+
+    basic_group.add_argument("--use-legacy-test-event-triggers", action="store_true", default=False,
+                             help="Send test event triggers with endpoint 0 for older devices")
 
     commission_group = parser.add_argument_group(title="Commissioning", description="Arguments to commission a node")
 
