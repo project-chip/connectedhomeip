@@ -33,8 +33,8 @@ public:
         char buildDate[kBuildDateSize];
     };
 
-    CHIP_ERROR Init() override;
-    CHIP_ERROR Clear() override;
+    CHIP_ERROR Init();
+    CHIP_ERROR Clear();
     CHIP_ERROR ApplyAction() override;
     CHIP_ERROR FinalizeAction() override;
 

@@ -62,10 +62,9 @@ enum class FactoryTags
 class OTAFactoryDataProcessor : public OTATlvProcessor
 {
 public:
-    CHIP_ERROR Init() override;
-    CHIP_ERROR Clear() override;
     CHIP_ERROR ApplyAction() override;
     CHIP_ERROR FinalizeAction() override;
+    CHIP_ERROR Init() override;
 
 private:
     CHIP_ERROR ProcessInternal(ByteSpan & block) override;

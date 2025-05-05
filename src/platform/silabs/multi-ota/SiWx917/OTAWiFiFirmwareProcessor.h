@@ -21,6 +21,9 @@
 #include <lib/support/Span.h>
 #include <platform/silabs/multi-ota/OTATlvProcessor.h>
 
+#define RPS_HEADER 0
+#define RPS_DATA 1
+
 namespace chip {
 
 class OTAWiFiFirmwareProcessor : public OTATlvProcessor
@@ -36,19 +39,15 @@ public:
         char buildDate[kBuildDateSize];
     };
 
-    CHIP_ERROR Init() override;
-    CHIP_ERROR Clear() override;
     CHIP_ERROR ApplyAction() override;
     CHIP_ERROR FinalizeAction() override;
     static constexpr size_t kAlignmentBytes = 64;
     bool RequiresReset() const override { return mReset; }
 
 private:
+    uint8_t mFWchunktype;
     CHIP_ERROR ProcessInternal(ByteSpan & block) override;
     CHIP_ERROR ProcessDescriptor(ByteSpan & block);
-
-    OTADataAccumulator mAccumulator;
-    bool mDescriptorProcessed = false;
 
 #if OTA_ENCRYPTION_ENABLE
     uint32_t mUnalignmentNum;
