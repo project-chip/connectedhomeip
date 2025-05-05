@@ -29,6 +29,8 @@ static_library("scenes") {
 
   deps = [ "${chip_root}/src/app" ]
 
+  public_deps = [ "${chip_root}/src/app/storage:fabric-table" ]
+
   cflags = [
     "-Wconversion",
     "-Wshadow",
