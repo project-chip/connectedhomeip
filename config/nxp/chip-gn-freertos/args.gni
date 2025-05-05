@@ -28,3 +28,5 @@ chip_ble_project_config_include = ""
 
 # mbedtls is built as part of the NXP SDK build process
 mbedtls_target = "${nxp_sdk_build_root}:nxp_mbedtls"
+
+custom_toolchain = "${chip_root}/config/nxp/chip-gn-freertos/toolchain:nxpFreeRTOS"
