@@ -783,6 +783,51 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
     }
 }
 
+void CameraAVStreamMgmtServer::ModifyVideoStream(const uint16_t streamID, const Optional<bool> waterMarkEnabled,
+                                                 const Optional<bool> osdEnabled)
+{
+    for (VideoStreamStruct & stream : mAllocatedVideoStreams)
+    {
+        if (stream.videoStreamID == streamID)
+        {
+            if (waterMarkEnabled.HasValue())
+            {
+                stream.watermarkEnabled = waterMarkEnabled;
+            }
+            if (osdEnabled.HasValue())
+            {
+                stream.OSDEnabled = osdEnabled;
+            }
+            ChipLogError(Camera, "Modified video stream with ID: %d", streamID);
+            return;
+        }
+    }
+}
+
+void CameraAVStreamMgmtServer::ModifySnapshotStream(const uint16_t streamID, const Optional<bool> waterMarkEnabled,
+                                                    const Optional<bool> osdEnabled)
+{
+#if 0 // TODO: Enable modify logic after WMark and OSD inserted in
+      // SnapshotStreamStruct. PR#38716
+    for (SnapshotStreamStruct & stream : mAllocatedSnapshotStreams)
+    {
+        if (stream.snapshotStreamID == streamID)
+        {
+            if (waterMarkEnabled.HasValue())
+            {
+                stream.watermarkEnabled = waterMarkEnabled;
+            }
+            if (osdEnabled.HasValue())
+            {
+                stream.OSDEnabled = osdEnabled;
+            }
+            ChipLogError(Camera, "Modified snapshot stream with ID: %d", streamID);
+            return;
+        }
+    }
+#endif
+}
+
 CHIP_ERROR CameraAVStreamMgmtServer::SetCurrentFrameRate(uint16_t aCurrentFrameRate)
 {
     return SetAttributeIfDifferent(mCurrentFrameRate, aCurrentFrameRate, Attributes::CurrentFrameRate::Id,
@@ -1552,6 +1597,13 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
     });
 
+    bool streamUsageSupported = std::find_if(mRankedVideoStreamPriorities.begin(), mRankedVideoStreamPriorities.end(),
+                                             [&commandData](const StreamUsageEnum & entry) {
+                                                 return entry == commandData.streamUsage;
+                                             }) != mRankedVideoStreamPriorities.end();
+
+    VerifyOrReturn(streamUsageSupported, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState));
+
     VerifyOrReturn(commandData.minFrameRate >= 1 && commandData.minFrameRate <= commandData.maxFrameRate &&
                        commandData.maxFrameRate >= 1,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
@@ -1622,6 +1674,8 @@ void CameraAVStreamMgmtServer::HandleVideoStreamModify(HandlerContext & ctx,
     // not have the param.
     VerifyOrReturn((HasFeature(Feature::kOnScreenDisplay) == commandData.OSDEnabled.HasValue()),
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
+
+    ModifyVideoStream(videoStreamID, isWaterMarkEnabled, isOSDEnabled);
 
     // Call the delegate
     status = mDelegate.VideoStreamModify(videoStreamID, isWaterMarkEnabled, isOSDEnabled);
@@ -1801,6 +1855,8 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamModify(HandlerContext & ctx,
     // not have the param.
     VerifyOrReturn((HasFeature(Feature::kOnScreenDisplay) == commandData.OSDEnabled.HasValue()),
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
+
+    ModifySnapshotStream(snapshotStreamID, isWaterMarkEnabled, isOSDEnabled);
 
     // Call the delegate
     status = mDelegate.SnapshotStreamModify(snapshotStreamID, isWaterMarkEnabled, isOSDEnabled);
