@@ -22,7 +22,7 @@ namespace Attributes {} // namespace Attributes
 
 namespace Commands {
 namespace RetrieveLogsRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(RetrieveLogsRequest::Id, BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(RetrieveLogsRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
 } // namespace RetrieveLogsRequest
 

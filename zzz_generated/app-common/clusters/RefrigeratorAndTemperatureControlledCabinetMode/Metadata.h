@@ -20,13 +20,12 @@ inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
 namespace SupportedModes {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(SupportedModes::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>{
-                                                              DataModel::AttributeQualityFlags::kListAttribute },
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(SupportedModes::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace SupportedModes
 namespace CurrentMode {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentMode::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentMode::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace CurrentMode
 
@@ -34,7 +33,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentMode::Id, BitFl
 
 namespace Commands {
 namespace ChangeToMode {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ChangeToMode::Id, BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ChangeToMode::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
 } // namespace ChangeToMode
 

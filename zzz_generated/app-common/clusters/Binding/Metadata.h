@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace Binding {
 inline constexpr DataModel::AttributeEntry
-    kMetadataEntry(Binding::Id, BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    kMetadataEntry(Binding::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, Access::Privilege::kManage);
 } // namespace Binding
 

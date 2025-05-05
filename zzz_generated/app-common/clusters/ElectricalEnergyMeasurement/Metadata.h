@@ -20,29 +20,29 @@ inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 namespace Accuracy {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Accuracy::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(Accuracy::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace Accuracy
 namespace CumulativeEnergyImported {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(CumulativeEnergyImported::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>{}, Access::Privilege::kView,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           std::nullopt);
 } // namespace CumulativeEnergyImported
 namespace CumulativeEnergyExported {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(CumulativeEnergyExported::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>{}, Access::Privilege::kView,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           std::nullopt);
 } // namespace CumulativeEnergyExported
 namespace PeriodicEnergyImported {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(PeriodicEnergyImported::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(PeriodicEnergyImported::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace PeriodicEnergyImported
 namespace PeriodicEnergyExported {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(PeriodicEnergyExported::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(PeriodicEnergyExported::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace PeriodicEnergyExported
 namespace CumulativeEnergyReset {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(CumulativeEnergyReset::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(CumulativeEnergyReset::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace CumulativeEnergyReset
 

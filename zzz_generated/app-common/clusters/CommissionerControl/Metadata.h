@@ -21,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace SupportedDeviceCategories {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(SupportedDeviceCategories::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>{}, Access::Privilege::kManage,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kManage,
                                                           std::nullopt);
 } // namespace SupportedDeviceCategories
 
@@ -30,10 +30,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(SupportedDeviceCategor
 namespace Commands {
 namespace RequestCommissioningApproval {
 inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(RequestCommissioningApproval::Id, BitFlags<DataModel::CommandQualityFlags>{}, Access::Privilege::kManage);
+    kMetadataEntry(RequestCommissioningApproval::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kManage);
 } // namespace RequestCommissioningApproval
 namespace CommissionNode {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(CommissionNode::Id, BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(CommissionNode::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kManage);
 } // namespace CommissionNode
 

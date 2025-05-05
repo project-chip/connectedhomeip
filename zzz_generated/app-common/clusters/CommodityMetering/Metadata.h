@@ -20,18 +20,18 @@ inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 namespace MeteredQuantity {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MeteredQuantity::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>{
-                                                              DataModel::AttributeQualityFlags::kListAttribute },
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MeteredQuantity::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MeteredQuantity
 namespace MeteredQuantityTimestamp {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MeteredQuantityTimestamp::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>{}, Access::Privilege::kView,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           std::nullopt);
 } // namespace MeteredQuantityTimestamp
 namespace MeasurementType {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MeasurementType::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(MeasurementType::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace MeasurementType
 

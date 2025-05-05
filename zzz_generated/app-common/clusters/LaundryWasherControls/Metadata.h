@@ -21,22 +21,22 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace SpinSpeeds {
 inline constexpr DataModel::AttributeEntry
-    kMetadataEntry(SpinSpeeds::Id, BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    kMetadataEntry(SpinSpeeds::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace SpinSpeeds
 namespace SpinSpeedCurrent {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(SpinSpeedCurrent::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(SpinSpeedCurrent::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace SpinSpeedCurrent
 namespace NumberOfRinses {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfRinses::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfRinses::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace NumberOfRinses
 namespace SupportedRinses {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(SupportedRinses::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>{
-                                                              DataModel::AttributeQualityFlags::kListAttribute },
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(SupportedRinses::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace SupportedRinses
 
 } // namespace Attributes

@@ -20,38 +20,38 @@ inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 namespace VendorName {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(VendorName::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(VendorName::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace VendorName
 namespace VendorID {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(VendorID::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(VendorID::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace VendorID
 namespace ApplicationName {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(ApplicationName::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(ApplicationName::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace ApplicationName
 namespace ProductID {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(ProductID::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(ProductID::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace ProductID
 namespace Application {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Application::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(Application::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace Application
 namespace Status {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Status::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(Status::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace Status
 namespace ApplicationVersion {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(ApplicationVersion::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(ApplicationVersion::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace ApplicationVersion
 namespace AllowedVendorList {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(AllowedVendorList::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>{
-                                                              DataModel::AttributeQualityFlags::kListAttribute },
-                                                          Access::Privilege::kAdminister, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(AllowedVendorList::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kAdminister, std::nullopt);
 } // namespace AllowedVendorList
 
 } // namespace Attributes

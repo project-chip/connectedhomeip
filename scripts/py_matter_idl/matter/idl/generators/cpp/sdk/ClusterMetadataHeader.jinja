@@ -23,7 +23,7 @@ namespace Attributes {
 namespace {{attribute.definition.name | upfirst}} {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(
     {{attribute.definition.name | upfirst}}::Id,
-    BitFlags<DataModel::AttributeQualityFlags>{ {{ attribute | extract_attribute_quality_flags | join(", ") }} },
+    BitFlags<DataModel::AttributeQualityFlags>( {{ attribute | extract_attribute_quality_flags | join(", ") }} ),
     {% if attribute.is_readable -%}
         {{attribute.readacl | as_privilege}}
       {%- else -%}
@@ -46,7 +46,7 @@ namespace Commands {
 namespace {{command.name | upfirst}} {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(
     {{command.name | upfirst}}::Id,
-    BitFlags<DataModel::CommandQualityFlags>{ {{ command | extract_command_quality_flags | join(", ") }} },
+    BitFlags<DataModel::CommandQualityFlags>( {{ command | extract_command_quality_flags | join(", ") }} ),
     {{ command.invokeacl | as_privilege}}
 );
 } // namespace {{command.name | upfirst}}

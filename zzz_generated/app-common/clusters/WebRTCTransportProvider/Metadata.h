@@ -20,10 +20,10 @@ inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 namespace CurrentSessions {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentSessions::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>{
-                                                              DataModel::AttributeQualityFlags::kListAttribute },
-                                                          Access::Privilege::kManage, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(CurrentSessions::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kManage, std::nullopt);
 } // namespace CurrentSessions
 
 } // namespace Attributes
@@ -31,28 +31,28 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentSessions::Id,
 namespace Commands {
 namespace SolicitOffer {
 inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(SolicitOffer::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    kMetadataEntry(SolicitOffer::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
                    Access::Privilege::kOperate);
 } // namespace SolicitOffer
 namespace ProvideOffer {
 inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(ProvideOffer::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    kMetadataEntry(ProvideOffer::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
                    Access::Privilege::kOperate);
 } // namespace ProvideOffer
 namespace ProvideAnswer {
 inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(ProvideAnswer::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    kMetadataEntry(ProvideAnswer::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
                    Access::Privilege::kOperate);
 } // namespace ProvideAnswer
 namespace ProvideICECandidates {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ProvideICECandidates::Id,
-                                                                BitFlags<DataModel::CommandQualityFlags>{
-                                                                    DataModel::CommandQualityFlags::kFabricScoped },
-                                                                Access::Privilege::kOperate);
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(ProvideICECandidates::Id,
+                   BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
+                   Access::Privilege::kOperate);
 } // namespace ProvideICECandidates
 namespace EndSession {
 inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(EndSession::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    kMetadataEntry(EndSession::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
                    Access::Privilege::kOperate);
 } // namespace EndSession
 

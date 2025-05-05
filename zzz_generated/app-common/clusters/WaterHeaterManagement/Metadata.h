@@ -20,27 +20,27 @@ inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
 namespace HeaterTypes {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(HeaterTypes::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(HeaterTypes::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace HeaterTypes
 namespace HeatDemand {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(HeatDemand::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(HeatDemand::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace HeatDemand
 namespace TankVolume {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(TankVolume::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(TankVolume::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace TankVolume
 namespace EstimatedHeatRequired {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(EstimatedHeatRequired::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(EstimatedHeatRequired::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace EstimatedHeatRequired
 namespace TankPercentage {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(TankPercentage::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(TankPercentage::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace TankPercentage
 namespace BoostState {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(BoostState::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(BoostState::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace BoostState
 
@@ -48,11 +48,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(BoostState::Id, BitFla
 
 namespace Commands {
 namespace Boost {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Boost::Id, BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Boost::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kManage);
 } // namespace Boost
 namespace CancelBoost {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(CancelBoost::Id, BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(CancelBoost::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kManage);
 } // namespace CancelBoost
 

@@ -20,29 +20,29 @@ inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 namespace CurrentSessions {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentSessions::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>{
-                                                              DataModel::AttributeQualityFlags::kListAttribute },
-                                                          Access::Privilege::kAdminister, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(CurrentSessions::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kAdminister, std::nullopt);
 } // namespace CurrentSessions
 
 } // namespace Attributes
 
 namespace Commands {
 namespace Offer {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Offer::Id, BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Offer::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
 } // namespace Offer
 namespace Answer {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Answer::Id, BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Answer::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
 } // namespace Answer
 namespace ICECandidates {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ICECandidates::Id, BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ICECandidates::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
 } // namespace ICECandidates
 namespace End {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(End::Id, BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(End::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
 } // namespace End
 

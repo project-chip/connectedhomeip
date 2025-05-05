@@ -20,17 +20,17 @@ inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 namespace InstalledChimeSounds {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(InstalledChimeSounds::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>{
-                                                              DataModel::AttributeQualityFlags::kListAttribute },
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(InstalledChimeSounds::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace InstalledChimeSounds
 namespace SelectedChime {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(SelectedChime::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(SelectedChime::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace SelectedChime
 namespace Enabled {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Enabled::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(Enabled::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace Enabled
 
@@ -38,7 +38,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(Enabled::Id, BitFlags<
 
 namespace Commands {
 namespace PlayChimeSound {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(PlayChimeSound::Id, BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(PlayChimeSound::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
 } // namespace PlayChimeSound
 

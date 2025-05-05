@@ -20,7 +20,7 @@ inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 namespace FlipFlop {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(FlipFlop::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(FlipFlop::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace FlipFlop
 
@@ -28,11 +28,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(FlipFlop::Id, BitFlags
 
 namespace Commands {
 namespace Ping {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Ping::Id, BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Ping::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
 } // namespace Ping
 namespace AddArguments {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AddArguments::Id, BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AddArguments::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
 } // namespace AddArguments
 

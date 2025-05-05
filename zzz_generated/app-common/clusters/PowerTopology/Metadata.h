@@ -20,16 +20,16 @@ inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 namespace AvailableEndpoints {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(AvailableEndpoints::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>{
-                                                              DataModel::AttributeQualityFlags::kListAttribute },
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(AvailableEndpoints::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace AvailableEndpoints
 namespace ActiveEndpoints {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(ActiveEndpoints::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>{
-                                                              DataModel::AttributeQualityFlags::kListAttribute },
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(ActiveEndpoints::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace ActiveEndpoints
 
 } // namespace Attributes

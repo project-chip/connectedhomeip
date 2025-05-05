@@ -21,11 +21,11 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace OutputList {
 inline constexpr DataModel::AttributeEntry
-    kMetadataEntry(OutputList::Id, BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    kMetadataEntry(OutputList::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace OutputList
 namespace CurrentOutput {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentOutput::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentOutput::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace CurrentOutput
 
@@ -33,11 +33,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentOutput::Id, Bit
 
 namespace Commands {
 namespace SelectOutput {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SelectOutput::Id, BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SelectOutput::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
 } // namespace SelectOutput
 namespace RenameOutput {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(RenameOutput::Id, BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(RenameOutput::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kManage);
 } // namespace RenameOutput
 

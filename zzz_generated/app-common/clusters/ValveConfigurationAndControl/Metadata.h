@@ -20,47 +20,47 @@ inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 namespace OpenDuration {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(OpenDuration::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(OpenDuration::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace OpenDuration
 namespace DefaultOpenDuration {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(DefaultOpenDuration::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(DefaultOpenDuration::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace DefaultOpenDuration
 namespace AutoCloseTime {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(AutoCloseTime::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(AutoCloseTime::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace AutoCloseTime
 namespace RemainingDuration {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(RemainingDuration::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(RemainingDuration::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace RemainingDuration
 namespace CurrentState {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentState::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentState::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace CurrentState
 namespace TargetState {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(TargetState::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(TargetState::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace TargetState
 namespace CurrentLevel {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentLevel::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentLevel::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace CurrentLevel
 namespace TargetLevel {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(TargetLevel::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(TargetLevel::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace TargetLevel
 namespace DefaultOpenLevel {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(DefaultOpenLevel::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(DefaultOpenLevel::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace DefaultOpenLevel
 namespace ValveFault {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(ValveFault::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(ValveFault::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace ValveFault
 namespace LevelStep {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(LevelStep::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(LevelStep::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace LevelStep
 
@@ -68,11 +68,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(LevelStep::Id, BitFlag
 
 namespace Commands {
 namespace Open {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Open::Id, BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Open::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
 } // namespace Open
 namespace Close {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Close::Id, BitFlags<DataModel::CommandQualityFlags>{},
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Close::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
 } // namespace Close
 

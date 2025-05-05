@@ -20,16 +20,16 @@ inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
 namespace TemperatureDisplayMode {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(TemperatureDisplayMode::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(TemperatureDisplayMode::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace TemperatureDisplayMode
 namespace KeypadLockout {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(KeypadLockout::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(KeypadLockout::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kManage);
 } // namespace KeypadLockout
 namespace ScheduleProgrammingVisibility {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ScheduleProgrammingVisibility::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>{}, Access::Privilege::kView,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           Access::Privilege::kManage);
 } // namespace ScheduleProgrammingVisibility
 

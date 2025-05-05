@@ -20,7 +20,7 @@ inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 namespace StateValue {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(StateValue::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+inline constexpr DataModel::AttributeEntry kMetadataEntry(StateValue::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace StateValue
 
