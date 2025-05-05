@@ -59,7 +59,7 @@ class TC_CNET_4_22(MatterBaseTest):
         return '[TC-CNET-4.22] [Thread] Verification for ScanNetworks command [DUT-Server]'
 
     def pics_TC_CNET_4_22(self):
-        return ['CNET.S']
+        return ['CNET.S.F01']
 
     def scan_network_response_thread_scan_results(self, thread_interfaces: list[str]):
 
