@@ -48,6 +48,17 @@ class TC_ACL_2_6(MatterBaseTest):
         events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
         return max([e.Header.EventNumber for e in events])
 
+    # Compare events by their relevant fields instead of string representation
+    def event_key(self, event):
+        # Extract only the fields we care about for comparison
+        return (
+            str(event.latestValue.privilege),
+            str(event.latestValue.authMode),
+            str(sorted(event.latestValue.subjects)),
+            str(event.latestValue.targets),
+            str(event.latestValue.fabricIndex)
+        )
+
     def desc_TC_ACL_2_6(self) -> str:
         return "[TC-ACL-2.6] AccessControlEntryChanged event"
 
@@ -146,33 +157,24 @@ class TC_ACL_2_6(MatterBaseTest):
         self.step(5)
         # Wait for subscription events
         received_subscription_events = []
-        for _ in range(2):  # Expect 2 events
+        for _ in range(2):
             event_data = events_callback.wait_for_event_report(acec_event, timeout_sec=15)
             logging.info(f"Received subscription event: {event_data}")
             received_subscription_events.append(event_data)
 
         # Read events with retries
-        max_retries = 3
-        read_events = []
-        for attempt in range(max_retries):
-            events_response = await self.th1.ReadEvent(
-                self.dut_node_id,
-                events=[(0, acec_event)],
-                fabricFiltered=True
-            )
-            logging.info(f"Read events response (attempt {attempt + 1}): {events_response}")
+        events_response = await self.th1.ReadEvent(
+            self.dut_node_id,
+            events=[(0, acec_event)],
+            fabricFiltered=True
+        )
+        logging.info(f"Read events response: {events_response}")
 
-            if events_response:
-                # Get the most recent events from the read response
-                read_events = sorted([e.Data for e in events_response],
-                                     key=lambda x: next(e.Header.EventNumber for e in events_response if e.Data == x),
-                                     reverse=True)[:2]
-                if len(read_events) >= 2:
-                    break
-
-            if attempt < max_retries - 1:
-                logging.info(f"Retrying event read in 1 second... (attempt {attempt + 1})")
-                await asyncio.sleep(1)
+        if events_response:
+            # Get the most recent events from the read response
+            read_events = sorted([e.Data for e in events_response],
+                                    key=lambda x: next(e.Header.EventNumber for e in events_response if e.Data == x),
+                                    reverse=True)[:2]
 
         # Verify we got the expected number of events
         asserts.assert_true(len(read_events) >= 2,
@@ -181,7 +183,6 @@ class TC_ACL_2_6(MatterBaseTest):
         # Verify both read and subscription events match our expectations
         for event_source in [received_subscription_events, read_events]:
             for event_data in event_source:
-                # Verify the event matches one of our ACL entries
                 found = False
                 for acl_entry in acl_entries:
                     if event_data.latestValue == acl_entry:
@@ -198,19 +199,8 @@ class TC_ACL_2_6(MatterBaseTest):
         for event in read_events:
             logging.info(f"  {event}")
 
-        # Compare events by their relevant fields instead of string representation
-        def event_key(event):
-            # Extract only the fields we care about for comparison
-            return (
-                str(event.latestValue.privilege),
-                str(event.latestValue.authMode),
-                str(sorted(event.latestValue.subjects)),
-                str(event.latestValue.targets),
-                str(event.latestValue.fabricIndex)
-            )
-
-        subscription_event_set = set(event_key(e) for e in received_subscription_events)
-        read_event_set = set(event_key(e) for e in read_events)
+        subscription_event_set = set(self.event_key(e) for e in received_subscription_events)
+        read_event_set = set(self.event_key(e) for e in read_events)
 
         # If sets don't match, log the differences
         if subscription_event_set != read_event_set:
