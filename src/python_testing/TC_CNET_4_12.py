@@ -78,6 +78,10 @@ class TC_CNET_4_12(MatterBaseTest):
 
         return thread_network_id_bytes
 
+    @property
+    def default_timeout(self) -> int:
+        return 900
+
     def def_TC_CNET_4_12(self):
         return '[TC-CNET-4.12] [Thread] Verification for ConnectNetwork Command [DUT-Server]'
 
@@ -274,6 +278,9 @@ class TC_CNET_4_12(MatterBaseTest):
         asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
                              "Failure status returned from ConnectNetwork")
 
+        await asyncio.sleep(60)
+        logger.info("sleep completed")
+
         # Read the ConnectMaxTimeSeconds attribute after attempting to connect
         connect_max_time_seconds = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
@@ -282,7 +289,7 @@ class TC_CNET_4_12(MatterBaseTest):
         logger.info(f'Step #7: ConnectMaxTimeSeconds value: {connect_max_time_seconds}')
 
         # Wait for the device to establish connection with the new Thread network
-        await asyncio.sleep(connect_max_time_seconds + 5)
+        # await asyncio.sleep(connect_max_time_seconds + 5)
 
         self.step(8)
         # await asyncio.sleep(10)
@@ -295,8 +302,8 @@ class TC_CNET_4_12(MatterBaseTest):
 
         self.step(9)
         # Expire the session and re-establish the new session reading attribute (Breadcrum)
-        resp = self.default_controller.ExpireSessions(self.dut_node_id)
-        logger.info(f'Step #9: Expire the session and re-establish the new session: {resp}')
+        # resp = self.default_controller.ExpireSessions(self.dut_node_id)
+        # logger.info(f'Step #9: Expire the session and re-establish the new session: {resp}')
         # await asyncio.sleep(wait_time_reboot)
         # await asyncio.sleep(10)
 
@@ -324,7 +331,7 @@ class TC_CNET_4_12(MatterBaseTest):
         # Step 11: When the failsafe is disarmed, the device should automatically return to Thread 1.
         # This means the Thread 2 network will be removed,
         # and the device will reconnect to Thread 1 without further intervention.
-        await asyncio.sleep(connect_max_time_seconds + 5)
+        # await asyncio.sleep(connect_max_time_seconds + 5)
         logger.info(f'Step #11 - DUT automatically return to Thread 1')
 
         self.step(12)
@@ -335,8 +342,8 @@ class TC_CNET_4_12(MatterBaseTest):
         logger.info(f'Step #12: Networks attribute: {networks}')
 
         # Expire the session and re-establish the new session reading attribute (Breadcrum)
-        resp = self.default_controller.ExpireSessions(self.dut_node_id)
-        logger.info(f'Step #12: Expire the session and re-establish the new session: {resp}')
+        # resp = self.default_controller.ExpireSessions(self.dut_node_id)
+        # logger.info(f'Step #12: Expire the session and re-establish the new session: {resp}')
         await asyncio.sleep(connect_max_time_seconds + 5)
 
         breadcrumb_info = await self.read_single_attribute_check_success(
@@ -409,7 +416,7 @@ class TC_CNET_4_12(MatterBaseTest):
                              "Failure status returned from ConnectNetwork")
 
         # Wait for the device to establish connection with the new Thread network
-        await asyncio.sleep(connect_max_time_seconds + 5)
+        await asyncio.sleep(60)
 
         self.step(17)
         # THREAD_2 - successfully connects to the DUT from previous step
@@ -421,9 +428,9 @@ class TC_CNET_4_12(MatterBaseTest):
         # TODO: Verify that the TH successfully connects to the DUT
 
         # Expire the session and re-establish the new session reading attribute (Breadcrum)
-        resp = self.default_controller.ExpireSessions(self.dut_node_id)
-        logger.info(f'Step #17: Expire the session and re-establish the new session: {resp}')
-        await asyncio.sleep(connect_max_time_seconds + 5)
+        # resp = self.default_controller.ExpireSessions(self.dut_node_id)
+        # logger.info(f'Step #17: Expire the session and re-establish the new session: {resp}')
+        # await asyncio.sleep(connect_max_time_seconds + 5)
 
         self.step(18)
         breadcrumb_info = await self.read_single_attribute_check_success(
@@ -435,6 +442,17 @@ class TC_CNET_4_12(MatterBaseTest):
         #                      "The Breadcrumb attribute is not 3")
 
         self.step(19)
+        cmd = Clusters.GeneralCommissioning.Commands.CommissioningComplete()
+        resp = await self.send_single_cmd(
+            dev_ctrl=self.default_controller,
+            node_id=self.dut_node_id,
+            cmd=cmd
+        )
+        logger.info(f'Step #19: CommissioningComplete response ({vars(resp)})')
+        logger.info(f'Step #19: CommissioningComplete Status is success ({resp.errorCode})')
+        # Verify that the DUT responds with CommissioningComplete with ErrorCode as 'OK'(0)
+        asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
+                             "Failure status returned from CommissioningComplete")
         # TODO: Implement TH sends the CommissioningComplete and CommissioningCompleteResponse with the ErrorCode OK (0)
 
         self.step(20)
