@@ -264,7 +264,8 @@ template("chip_data_model") {
       _codegen_dependent_sources += [
         {
           cluster = cluster
-          import("${_app_root}/clusters/${cluster}/codegen_dependent_sources.gni")
+          import(
+              "${_app_root}/clusters/${cluster}/codegen_dependent_sources.gni")
         },
       ]
     }
