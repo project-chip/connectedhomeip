@@ -12,11 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# These are otherwise part of BUILD.gn
+# This is the equivalent ot codegen_sources.gni
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/ota-provider-cluster.cpp"
-    "${CLUSTER_DIR}/ota-provider-cluster.h"
-    "${CLUSTER_DIR}/ota-provider-delegate.h"
+    "${CLUSTER_DIR}/power-topology-server.cpp"
+    "${CLUSTER_DIR}/power-topology-server.h"
 )

@@ -27,31 +27,7 @@ include("${CHIP_ROOT}/src/data-model-providers/codegen/model.cmake")
 #
 function(chip_configure_cluster APP_TARGET CLUSTER)
     SET(CLUSTER_DIR "${CHIP_APP_BASE_DIR}/clusters/${CLUSTER}")
-
-    # Clusters contain a "codegen_sources.gni" file that describes files
-    # required by a code-generated bundle. These files are a subset of python
-    # so this executes it and prints out `codegen_sources`.
-    #
-    # This is not completely sane (a gni can have gn-specific bits)
-    # however it works for now as we plan to keep the gni very simple.
-    execute_process(
-      COMMAND python
-        "-c"
-        "exec(open('${CLUSTER_DIR}/codegen_sources.gni').read()); print(';'.join(codegen_sources))"
-        OUTPUT_VARIABLE CLUSTER_SOURCES
-    )
-
-    # there is an extra newline from the print. Remove it
-    string(STRIP "${CLUSTER_SOURCES}" CLUSTER_SOURCES)
-    foreach(SOURCE IN LISTS CLUSTER_SOURCES)
-      target_sources(${APP_TARGET} PRIVATE "${CLUSTER_DIR}/${SOURCE}")
-    endforeach()
-
-    # Custom code for cmake-integration. These are extra dependencies that would be included in BUILD.gn
-    # that are not visible to cmake
-    if (EXISTS "${CLUSTER_DIR}/codegen_integration.cmake")
-      include("${CLUSTER_DIR}/codegen_integration.cmake")
-    endif()
+    include("${CLUSTER_DIR}/codegen_sources.cmake")
 endfunction()
 
 #

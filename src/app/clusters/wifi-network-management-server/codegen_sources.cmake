@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# TODO(#32321): Remove after issue is resolved
-# Add ICDConfigurationData when ICD management server cluster is included,
-# but ICD support is disabled, e.g. lock-app on some platforms
-if(NOT CONFIG_CHIP_ENABLE_ICD_SUPPORT)
-   target_sources(${APP_TARGET} PRIVATE ${CHIP_APP_BASE_DIR}/icd/server/ICDConfigurationData.cpp)
-endif()
+# This is the equivalent ot codegen_sources.gni
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/wifi-network-management-server.cpp"
+    "${CLUSTER_DIR}/wifi-network-management-server.h"
+)
