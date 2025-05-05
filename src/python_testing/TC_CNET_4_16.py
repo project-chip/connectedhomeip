@@ -14,20 +14,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-#   run:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 3840 --passcode 20202021 --KVS kvs1
-#     script-args: >
-#       --commissioning-method ble-thread
-#       --discriminator 3840
-#       --passcode 20202021
-#       --thread-dataset-hex <THREAD_DATASET_HEX>
-#       --endpoint <ENDPOINT>
-#       --storage-path admin_storage.json
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factory-reset: false
-#     quiet: true
 
 import logging
 
