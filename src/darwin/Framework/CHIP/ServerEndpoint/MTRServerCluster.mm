@@ -28,6 +28,7 @@
 
 #include <app/AttributeAccessInterface.h>
 #include <app/data-model/PreEncodedValue.h>
+#include <clusters/Descriptor/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
@@ -39,8 +40,6 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/attribute-storage.h>
-
-#include <zzz_generated/app-common/clusters/Descriptor/Metadata.h>
 
 using namespace chip;
 using namespace chip::app;
