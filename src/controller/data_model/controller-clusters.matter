@@ -10377,8 +10377,8 @@ provisional cluster PushAvStreamTransport = 1365 {
     kInvalidURL = 4;
     kInvalidZone = 5;
     kInvalidCombination = 6;
-    kInvalidTriggerType = 8;
-    kInvalidTransportStatus = 9;
+    kInvalidTriggerType = 7;
+    kInvalidTransportStatus = 8;
   }
 
   shared enum StreamUsageEnum : enum8 {
@@ -10418,8 +10418,8 @@ provisional cluster PushAvStreamTransport = 1365 {
   }
 
   struct TransportZoneOptionsStruct {
-    nullable int16u zone = 1;
-    optional int8u sensitivity = 2;
+    nullable int16u zone = 0;
+    optional int8u sensitivity = 1;
   }
 
   struct TransportTriggerOptionsStruct {

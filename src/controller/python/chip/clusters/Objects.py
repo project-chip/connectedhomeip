@@ -48384,8 +48384,8 @@ class PushAvStreamTransport(Cluster):
             kInvalidURL = 0x04
             kInvalidZone = 0x05
             kInvalidCombination = 0x06
-            kInvalidTriggerType = 0x08
-            kInvalidTransportStatus = 0x09
+            kInvalidTriggerType = 0x07
+            kInvalidTransportStatus = 0x08
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
@@ -48461,8 +48461,8 @@ class PushAvStreamTransport(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="zone", Tag=1, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="sensitivity", Tag=2, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="zone", Tag=0, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="sensitivity", Tag=1, Type=typing.Optional[uint]),
                     ])
 
             zone: 'typing.Union[Nullable, uint]' = NullValue

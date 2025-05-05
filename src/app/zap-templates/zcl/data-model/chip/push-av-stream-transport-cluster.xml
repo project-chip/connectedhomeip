@@ -39,8 +39,8 @@ Git: 0.7-summer-2025-ncr-195-gdc1151679
     <item name="InvalidURL" value="0x04"/>
     <item name="InvalidZone" value="0x05"/>
     <item name="InvalidCombination" value="0x06"/>
-    <item name="InvalidTriggerType" value="0x08"/>
-    <item name="InvalidTransportStatus" value="0x09"/>
+    <item name="InvalidTriggerType" value="0x07"/>
+    <item name="InvalidTransportStatus" value="0x08"/>
   </enum>
 
   <enum name="TransportStatusEnum" type="enum8">
@@ -122,8 +122,8 @@ Git: 0.7-summer-2025-ncr-195-gdc1151679
 
   <struct name="TransportZoneOptionsStruct" apiMaturity="provisional">
     <cluster code="0x0555"/>
-    <item fieldId="1" name="Zone" type="int16u" isNullable="true"/>
-    <item fieldId="2" name="Sensitivity" type="int8u" optional="true" default="5" min="1" max="10"/>
+    <item fieldId="0" name="Zone" type="int16u" isNullable="true"/>
+    <item fieldId="1" name="Sensitivity" type="int8u" optional="true" default="5" min="1" max="10"/>
   </struct>
 
   <cluster apiMaturity="provisional">

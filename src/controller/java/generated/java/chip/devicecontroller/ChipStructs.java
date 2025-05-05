@@ -15437,8 +15437,8 @@ public static class PushAvStreamTransportClusterTransportMotionTriggerTimeContro
 public static class PushAvStreamTransportClusterTransportZoneOptionsStruct {
   public @Nullable Integer zone;
   public Optional<Integer> sensitivity;
-  private static final long ZONE_ID = 1L;
-  private static final long SENSITIVITY_ID = 2L;
+  private static final long ZONE_ID = 0L;
+  private static final long SENSITIVITY_ID = 1L;
 
   public PushAvStreamTransportClusterTransportZoneOptionsStruct(
     @Nullable Integer zone,
