@@ -229,7 +229,6 @@ class TC_OPSTATE_BASE():
         cluster = self.test_info.cluster
         attributes = cluster.Attributes
         commands = cluster.Commands
-        events = cluster.Events
 
         self.init_test()
 
