@@ -41,8 +41,8 @@ AutoCommissioner::AutoCommissioner()
 
 AutoCommissioner::~AutoCommissioner()
 {
-    ReleaseDAC();
-    ReleasePAI();
+    ReleaseCertificate(&mPAI, &mPAILen);
+    ReleaseCertificate(&mDAC, &mDACLen);
 }
 
 void AutoCommissioner::SetOperationalCredentialsDelegate(OperationalCredentialsDelegate * operationalCredentialsDelegate)
@@ -783,10 +783,18 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             mNeedsDST = report.Get<TimeZoneResponseInfo>().requiresDSTOffsets;
             break;
         case CommissioningStage::kSendPAICertificateRequest:
-            SetPAI(report.Get<RequestedCertificate>().certificate);
+            SaveCertificate(report.Get<RequestedCertificate>().certificate, &mPAI, &mPAILen);
+            if (mPAI != nullptr)
+            {
+                mParams.SetPAI(ByteSpan(mPAI, mPAILen));
+            }
             break;
         case CommissioningStage::kSendDACCertificateRequest:
-            SetDAC(report.Get<RequestedCertificate>().certificate);
+            SaveCertificate(report.Get<RequestedCertificate>().certificate, &mDAC, &mDACLen);
+            if (mDAC != nullptr)
+            {
+                mParams.SetDAC(ByteSpan(mDAC, mDACLen));
+            }
             break;
         case CommissioningStage::kSendAttestationRequest: {
             auto & elements  = report.Get<AttestationResponse>().attestationElements;
@@ -853,8 +861,8 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             {
                 ResetTryingSecondaryNetwork();
             }
-            ReleasePAI();
-            ReleaseDAC();
+            ReleaseCertificate(&mPAI, &mPAILen);
+            ReleaseCertificate(&mDAC, &mDACLen);
             mCommissioneeDeviceProxy = nullptr;
             mOperationalDeviceProxy  = OperationalDeviceProxy();
             mDeviceCommissioningInfo = ReadCommissioningInfo();
@@ -927,78 +935,40 @@ CHIP_ERROR AutoCommissioner::PerformStep(CommissioningStage nextStage)
     return CHIP_NO_ERROR;
 }
 
-void AutoCommissioner::ReleaseDAC()
+CHIP_ERROR AutoCommissioner::SaveCertificate(ByteSpan inCertSpan, uint8_t **outCert, uint16_t *outCertSize)
 {
-    if (mDAC != nullptr)
+    if ((inCertSpan.size() > Credentials::kMaxDERCertLength) || !(CanCastTo<uint16_t>(inCertSpan.size())))
     {
-        Platform::MemoryFree(mDAC);
-    }
-    mDACLen = 0;
-    mDAC    = nullptr;
-}
-
-CHIP_ERROR AutoCommissioner::SetDAC(const ByteSpan & dac)
-{
-    if (dac.size() == 0)
-    {
-        ReleaseDAC();
-        return CHIP_NO_ERROR;
+        return CHIP_ERROR_INTERNAL;
     }
 
-    VerifyOrReturnError(dac.size() <= Credentials::kMaxDERCertLength, CHIP_ERROR_INVALID_ARGUMENT);
-    if (mDACLen != 0)
+    if (*outCertSize > 0)
     {
-        ReleaseDAC();
+        Platform::MemoryFree(*outCert);
+        *outCertSize = 0;
     }
 
-    VerifyOrReturnError(CanCastTo<uint16_t>(dac.size()), CHIP_ERROR_INVALID_ARGUMENT);
-    if (mDAC == nullptr)
+    *outCert = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(inCertSpan.size()));
+    if (!(*outCert))
     {
-        mDAC = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(dac.size()));
+        return CHIP_ERROR_INTERNAL;
     }
-    VerifyOrReturnError(mDAC != nullptr, CHIP_ERROR_NO_MEMORY);
-    mDACLen = static_cast<uint16_t>(dac.size());
-    memcpy(mDAC, dac.data(), mDACLen);
-    mParams.SetDAC(ByteSpan(mDAC, mDACLen));
+
+    *outCertSize = static_cast<uint16_t>(inCertSpan.size());
+    memcpy(*outCert, inCertSpan.data(), inCertSpan.size());
 
     return CHIP_NO_ERROR;
 }
 
-void AutoCommissioner::ReleasePAI()
+void AutoCommissioner::ReleaseCertificate(uint8_t **cert, uint16_t *certSize)
 {
-    if (mPAI != nullptr)
+    if (*cert != nullptr)
     {
-        chip::Platform::MemoryFree(mPAI);
-    }
-    mPAILen = 0;
-    mPAI    = nullptr;
-}
-
-CHIP_ERROR AutoCommissioner::SetPAI(const chip::ByteSpan & pai)
-{
-    if (pai.size() == 0)
-    {
-        ReleasePAI();
-        return CHIP_NO_ERROR;
+        chip::Platform::MemoryFree(*cert);
     }
 
-    VerifyOrReturnError(pai.size() <= Credentials::kMaxDERCertLength, CHIP_ERROR_INVALID_ARGUMENT);
-    if (mPAILen != 0)
-    {
-        ReleasePAI();
-    }
-
-    VerifyOrReturnError(CanCastTo<uint16_t>(pai.size()), CHIP_ERROR_INVALID_ARGUMENT);
-    if (mPAI == nullptr)
-    {
-        mPAI = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(pai.size()));
-    }
-    VerifyOrReturnError(mPAI != nullptr, CHIP_ERROR_NO_MEMORY);
-    mPAILen = static_cast<uint16_t>(pai.size());
-    memcpy(mPAI, pai.data(), mPAILen);
-    mParams.SetPAI(ByteSpan(mPAI, mPAILen));
-
-    return CHIP_NO_ERROR;
+    *certSize = 0;
+    *cert = nullptr;
 }
 
 } // namespace Controller
