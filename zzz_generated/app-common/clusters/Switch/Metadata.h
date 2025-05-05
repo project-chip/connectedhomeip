@@ -20,16 +20,16 @@ inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
 namespace NumberOfPositions {
-inline constexpr DataModel::AttributeEntry kMetadataEntry{ NumberOfPositions::Id, BitFlags<DataModel::AttributeQualityFlags>{},
-                                                           Access::Privilege::kView, std::nullopt };
+inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfPositions::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace NumberOfPositions
 namespace CurrentPosition {
-inline constexpr DataModel::AttributeEntry kMetadataEntry{ CurrentPosition::Id, BitFlags<DataModel::AttributeQualityFlags>{},
-                                                           Access::Privilege::kView, std::nullopt };
+inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentPosition::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace CurrentPosition
 namespace MultiPressMax {
-inline constexpr DataModel::AttributeEntry kMetadataEntry{ MultiPressMax::Id, BitFlags<DataModel::AttributeQualityFlags>{},
-                                                           Access::Privilege::kView, std::nullopt };
+inline constexpr DataModel::AttributeEntry kMetadataEntry(MultiPressMax::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace MultiPressMax
 
 } // namespace Attributes

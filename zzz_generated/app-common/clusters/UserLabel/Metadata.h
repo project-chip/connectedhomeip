@@ -20,10 +20,9 @@ inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 namespace LabelList {
-inline constexpr DataModel::AttributeEntry kMetadataEntry{
-    LabelList::Id, BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    Access::Privilege::kView, Access::Privilege::kManage
-};
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(LabelList::Id, BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+                   Access::Privilege::kView, Access::Privilege::kManage);
 } // namespace LabelList
 
 } // namespace Attributes

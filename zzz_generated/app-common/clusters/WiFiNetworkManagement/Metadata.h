@@ -20,21 +20,20 @@ inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 namespace Ssid {
-inline constexpr DataModel::AttributeEntry kMetadataEntry{ Ssid::Id, BitFlags<DataModel::AttributeQualityFlags>{},
-                                                           Access::Privilege::kView, std::nullopt };
+inline constexpr DataModel::AttributeEntry kMetadataEntry(Ssid::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace Ssid
 namespace PassphraseSurrogate {
-inline constexpr DataModel::AttributeEntry kMetadataEntry{ PassphraseSurrogate::Id, BitFlags<DataModel::AttributeQualityFlags>{},
-                                                           Access::Privilege::kManage, std::nullopt };
+inline constexpr DataModel::AttributeEntry kMetadataEntry(PassphraseSurrogate::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+                                                          Access::Privilege::kManage, std::nullopt);
 } // namespace PassphraseSurrogate
 
 } // namespace Attributes
 
 namespace Commands {
 namespace NetworkPassphraseRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ NetworkPassphraseRequest::Id,
-                                                                 BitFlags<DataModel::CommandQualityFlags>{},
-                                                                 Access::Privilege::kManage };
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(NetworkPassphraseRequest::Id, BitFlags<DataModel::CommandQualityFlags>{}, Access::Privilege::kManage);
 } // namespace NetworkPassphraseRequest
 
 } // namespace Commands

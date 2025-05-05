@@ -20,24 +20,24 @@ inline constexpr uint32_t kRevision = 4;
 
 namespace Attributes {
 namespace IdentifyTime {
-inline constexpr DataModel::AttributeEntry kMetadataEntry{ IdentifyTime::Id, BitFlags<DataModel::AttributeQualityFlags>{},
-                                                           Access::Privilege::kView, Access::Privilege::kOperate };
+inline constexpr DataModel::AttributeEntry kMetadataEntry(IdentifyTime::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+                                                          Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace IdentifyTime
 namespace IdentifyType {
-inline constexpr DataModel::AttributeEntry kMetadataEntry{ IdentifyType::Id, BitFlags<DataModel::AttributeQualityFlags>{},
-                                                           Access::Privilege::kView, std::nullopt };
+inline constexpr DataModel::AttributeEntry kMetadataEntry(IdentifyType::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace IdentifyType
 
 } // namespace Attributes
 
 namespace Commands {
 namespace Identify {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ Identify::Id, BitFlags<DataModel::CommandQualityFlags>{},
-                                                                 Access::Privilege::kManage };
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Identify::Id, BitFlags<DataModel::CommandQualityFlags>{},
+                                                                Access::Privilege::kManage);
 } // namespace Identify
 namespace TriggerEffect {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ TriggerEffect::Id, BitFlags<DataModel::CommandQualityFlags>{},
-                                                                 Access::Privilege::kManage };
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(TriggerEffect::Id, BitFlags<DataModel::CommandQualityFlags>{},
+                                                                Access::Privilege::kManage);
 } // namespace TriggerEffect
 
 } // namespace Commands

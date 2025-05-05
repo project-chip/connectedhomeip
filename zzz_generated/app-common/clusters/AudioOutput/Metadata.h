@@ -20,26 +20,25 @@ inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 namespace OutputList {
-inline constexpr DataModel::AttributeEntry kMetadataEntry{
-    OutputList::Id, BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    Access::Privilege::kView, std::nullopt
-};
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(OutputList::Id, BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+                   Access::Privilege::kView, std::nullopt);
 } // namespace OutputList
 namespace CurrentOutput {
-inline constexpr DataModel::AttributeEntry kMetadataEntry{ CurrentOutput::Id, BitFlags<DataModel::AttributeQualityFlags>{},
-                                                           Access::Privilege::kView, std::nullopt };
+inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentOutput::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace CurrentOutput
 
 } // namespace Attributes
 
 namespace Commands {
 namespace SelectOutput {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ SelectOutput::Id, BitFlags<DataModel::CommandQualityFlags>{},
-                                                                 Access::Privilege::kOperate };
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SelectOutput::Id, BitFlags<DataModel::CommandQualityFlags>{},
+                                                                Access::Privilege::kOperate);
 } // namespace SelectOutput
 namespace RenameOutput {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{ RenameOutput::Id, BitFlags<DataModel::CommandQualityFlags>{},
-                                                                 Access::Privilege::kManage };
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(RenameOutput::Id, BitFlags<DataModel::CommandQualityFlags>{},
+                                                                Access::Privilege::kManage);
 } // namespace RenameOutput
 
 } // namespace Commands

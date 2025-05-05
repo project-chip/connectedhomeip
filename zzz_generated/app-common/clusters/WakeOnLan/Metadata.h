@@ -20,12 +20,12 @@ inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 namespace MACAddress {
-inline constexpr DataModel::AttributeEntry kMetadataEntry{ MACAddress::Id, BitFlags<DataModel::AttributeQualityFlags>{},
-                                                           Access::Privilege::kView, std::nullopt };
+inline constexpr DataModel::AttributeEntry kMetadataEntry(MACAddress::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace MACAddress
 namespace LinkLocalAddress {
-inline constexpr DataModel::AttributeEntry kMetadataEntry{ LinkLocalAddress::Id, BitFlags<DataModel::AttributeQualityFlags>{},
-                                                           Access::Privilege::kView, std::nullopt };
+inline constexpr DataModel::AttributeEntry kMetadataEntry(LinkLocalAddress::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace LinkLocalAddress
 
 } // namespace Attributes

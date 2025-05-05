@@ -20,16 +20,16 @@ inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 namespace DeviceDirectory {
-inline constexpr DataModel::AttributeEntry kMetadataEntry{
-    DeviceDirectory::Id, BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    Access::Privilege::kManage, std::nullopt
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(DeviceDirectory::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>{
+                                                              DataModel::AttributeQualityFlags::kListAttribute },
+                                                          Access::Privilege::kManage, std::nullopt);
 } // namespace DeviceDirectory
 namespace LocationDirectory {
-inline constexpr DataModel::AttributeEntry kMetadataEntry{
-    LocationDirectory::Id, BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    Access::Privilege::kManage, std::nullopt
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(LocationDirectory::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>{
+                                                              DataModel::AttributeQualityFlags::kListAttribute },
+                                                          Access::Privilege::kManage, std::nullopt);
 } // namespace LocationDirectory
 
 } // namespace Attributes

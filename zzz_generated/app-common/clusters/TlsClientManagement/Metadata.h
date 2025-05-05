@@ -20,36 +20,33 @@ inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 namespace MaxProvisioned {
-inline constexpr DataModel::AttributeEntry kMetadataEntry{ MaxProvisioned::Id, BitFlags<DataModel::AttributeQualityFlags>{},
-                                                           Access::Privilege::kView, std::nullopt };
+inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxProvisioned::Id, BitFlags<DataModel::AttributeQualityFlags>{},
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace MaxProvisioned
 namespace ProvisionedEndpoints {
-inline constexpr DataModel::AttributeEntry kMetadataEntry{
-    ProvisionedEndpoints::Id, BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    Access::Privilege::kView, std::nullopt
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(ProvisionedEndpoints::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>{
+                                                              DataModel::AttributeQualityFlags::kListAttribute },
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace ProvisionedEndpoints
 
 } // namespace Attributes
 
 namespace Commands {
 namespace ProvisionEndpoint {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    ProvisionEndpoint::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    Access::Privilege::kAdminister
-};
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(ProvisionEndpoint::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+                   Access::Privilege::kAdminister);
 } // namespace ProvisionEndpoint
 namespace FindEndpoint {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    FindEndpoint::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    Access::Privilege::kOperate
-};
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(FindEndpoint::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+                   Access::Privilege::kOperate);
 } // namespace FindEndpoint
 namespace RemoveEndpoint {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry{
-    RemoveEndpoint::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    Access::Privilege::kAdminister
-};
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(RemoveEndpoint::Id, BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+                   Access::Privilege::kAdminister);
 } // namespace RemoveEndpoint
 
 } // namespace Commands
