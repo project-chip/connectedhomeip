@@ -110,69 +110,6 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         }
     }
 #endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
-#if 0
-                        // WIP Apply attribute change to Light
-#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
-        EndpointId endpoint = attributePath.mEndpointId;
-        RGBLEDWidget::ColorData_t colorData;
-        /* XY color space */
-        if (attributeId == ColorControl::Attributes::CurrentX::Id || attributeId == ColorControl::Attributes::CurrentY::Id)
-        {
-            colorData.xy = {};
-            if (size != sizeof(uint16_t))
-            {
-                ChipLogError(Zcl, "Wrong length for ColorControl value: %d", size);
-                return;
-            }
-            Protocols::InteractionModel::Status status_x = ColorControl::Attributes::CurrentY::Get(endpoint, &colorData.xy.y);
-            VerifyOrReturn(Protocols::InteractionModel::Status::Success == status_x,
-                           ChipLogError(NotSpecified, "Failed to get CurrentX attribute"));
-
-            Protocols::InteractionModel::Status status_y = ColorControl::Attributes::CurrentX::Get(endpoint, &colorData.xy.x);
-            VerifyOrReturn(Protocols::InteractionModel::Status::Success == status_y,
-                           ChipLogError(NotSpecified, "Failed to get CurrentY attribute"));
-
-            ChipLogProgress(Zcl, "New XY color: %u|%u", colorData.xy.x, colorData.xy.y);
-            LightMgr().InitiateLightAction(AppEvent::kEventType_Light, LightingManager::COLOR_ACTION_XY, sizeof(colorData),
-                                           (RGBLEDWidget::ColorData_t *) &colorData);
-        }
-        /* HSV color space */
-        else if (attributeId == ColorControl::Attributes::CurrentHue::Id ||
-                 attributeId == ColorControl::Attributes::CurrentSaturation::Id)
-        {
-            colorData.hsv                                 = {};
-            Protocols::InteractionModel::Status statusHue = ColorControl::Attributes::CurrentHue::Get(endpoint, &colorData.hsv.h);
-            VerifyOrReturn(Protocols::InteractionModel::Status::Success == statusHue,
-                           ChipLogError(NotSpecified, "Failed to get CurrentHue attribute"));
-
-            Protocols::InteractionModel::Status statusSat =
-                ColorControl::Attributes::CurrentSaturation::Get(endpoint, &colorData.hsv.s);
-            VerifyOrReturn(Protocols::InteractionModel::Status::Success == statusSat,
-                           ChipLogError(NotSpecified, "Failed to get CurrentSaturation attribute"));
-
-            ChipLogProgress(Zcl, "New HSV color: %u|%u", colorData.hsv.h, colorData.hsv.s);
-
-            LightMgr().InitiateLightAction(AppEvent::kEventType_Light, LightingManager::COLOR_ACTION_HSV, sizeof(colorData),
-                                           (RGBLEDWidget::ColorData_t *) &colorData);
-        }
-
-        else if (attributeId == ColorControl::Attributes::ColorTemperatureMireds::Id)
-        {
-            if (size != sizeof(uint16_t))
-            {
-                ChipLogError(Zcl, "Wrong length for ColorControl value: %d", size);
-                return;
-            }
-            colorData.ct.ctMireds = *(uint16_t *) value;
-
-            ChipLogProgress(Zcl, "New ColorTemperatureMireds: %u", colorData.ct.ctMireds);
-            LightMgr().InitiateLightAction(AppEvent::kEventType_Light, LightingManager::COLOR_ACTION_CT, sizeof(colorData),
-                                           (RGBLEDWidget::ColorData_t *) &colorData);
-        }
-
-#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
-    }
-#endif
     else if (clusterId == Identify::Id)
     {
         ChipLogProgress(Zcl, "Identify attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",

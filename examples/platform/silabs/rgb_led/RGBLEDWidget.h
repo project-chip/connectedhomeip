@@ -18,7 +18,7 @@
  */
 
 #pragma once
-// #include "ColorFormat.h"
+
 #include "LEDWidget.h"
 #include <stdint.h>
 
@@ -63,7 +63,6 @@ private:
     uint8_t red;
     uint8_t green;
     uint8_t blue;
-    uint8_t level; // Brightness level (0-255)
 
     // Helper functions for color conversion
     RgbColor_t HsvToRgb(HsvColor_t hsv);

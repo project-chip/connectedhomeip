@@ -65,14 +65,16 @@ CHIP_ERROR LightingManager::Init()
     }
 
     bool currentLedState;
-    uint16_t currentx, currenty, currentctmireds;
-    uint8_t currenthue, currentsaturation;
-    Protocols::InteractionModel::Status status;
+
     // read current on/off value on endpoint one.
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     OnOffServer::Instance().getOnOffValue(1, &currentLedState);
 
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
     app::DataModel::Nullable<uint8_t> brightness;
+    uint16_t currentx, currenty, currentctmireds;
+    uint8_t currenthue, currentsaturation;
+    Protocols::InteractionModel::Status status;
 
     // Read brightness value
     status = Clusters::LevelControl::Attributes::CurrentLevel::Get(1, brightness);
@@ -93,18 +95,20 @@ CHIP_ERROR LightingManager::Init()
     status = Clusters::ColorControl::Attributes::CurrentHue::Get(1, &currenthue);
     if (status == Protocols::InteractionModel::Status::Success)
     {
-        mCurrentHue = currentx;
+        mCurrentHue = currenthue;
     }
     status = Clusters::ColorControl::Attributes::CurrentSaturation::Get(1, &currentsaturation);
     if (status == Protocols::InteractionModel::Status::Success)
     {
-        mCurrentSaturation = currenty;
+        mCurrentSaturation = currentsaturation;
     }
     status = Clusters::ColorControl::Attributes::ColorTemperatureMireds::Get(1, &currentctmireds);
     if (status == Protocols::InteractionModel::Status::Success)
     {
         mCurrentCTMireds = currentctmireds;
     }
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     mState                 = currentLedState ? kState_OnCompleted : kState_OffCompleted;
@@ -425,13 +429,6 @@ bool LightingManager::InitiateLightctrlAction(int32_t aActor, Action_t aAction, 
         break;
     }
     AppTask::GetAppTask().PostLightControlActionRequest(aActor, aAction, (RGBLEDWidget::ColorData_t *) &colorData);
-    return action_initiated;
-}
-bool LightingManager::InitiateLightAction(int32_t aActor, Action_t aAction, uint16_t size, RGBLEDWidget::ColorData_t * aValue)
-{
-    bool action_initiated = false;
-    VerifyOrReturnError(aAction == COLOR_ACTION_XY || aAction == COLOR_ACTION_HSV || aAction == COLOR_ACTION_CT, action_initiated);
-    AppTask::GetAppTask().PostLightControlActionRequest(aActor, aAction, aValue);
     return action_initiated;
 }
 #endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)

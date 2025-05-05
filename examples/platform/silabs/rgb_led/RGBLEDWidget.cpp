@@ -23,8 +23,16 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
+/*Delay for PWM simulation*/
+#ifndef TICK_DELAY
+#define TICK_DELAY 2
+#endif
+
 using namespace ::chip::System;
 using namespace chip::DeviceLayer::Silabs;
+
+using RgbColor_t = RGBLEDWidget::RgbColor_t;
+using HsvColor_t = RGBLEDWidget::HsvColor_t;
 
 void RGBLEDWidget::SetColor(uint8_t red, uint8_t green, uint8_t blue)
 {
@@ -37,7 +45,16 @@ void RGBLEDWidget::SetColor(uint8_t red, uint8_t green, uint8_t blue)
 
 void RGBLEDWidget::GetColor(uint16_t & r, uint16_t & g, uint16_t & b)
 {
-    GetPlatform().GetLedColor(GetLED(), r, g, b);
+    uint16_t rawR, rawG, rawB;
+    GetPlatform().GetLedColor(GetLED(), rawR, rawG, rawB);
+
+    // Scale down PWM values by TICK_DELAY to bring them back to the expected range
+    // Clamp to 8-bit range (0-255)
+    r = static_cast<uint16_t>((rawR / TICK_DELAY) & 0xFF);
+    g = static_cast<uint16_t>((rawG / TICK_DELAY) & 0xFF);
+    b = static_cast<uint16_t>((rawB / TICK_DELAY) & 0xFF);
+
+    ChipLogProgress(Zcl, "RGB Values: R=%u G=%u B=%u", r, g, b);
 }
 
 void RGBLEDWidget::SetColorFromHSV(uint8_t hue, uint8_t saturation)
@@ -80,7 +97,7 @@ constexpr float kHueScaleFactor     = 6.0f;
 constexpr uint8_t kMaxColorValue    = 255;
 
 // to the specified range given as min and max
-RGBLEDWidget::RgbColor_t RGBLEDWidget::RgbClamp(RgbColor_t rgb, uint8_t min, uint8_t max)
+RgbColor_t RGBLEDWidget::RgbClamp(RgbColor_t rgb, uint8_t min, uint8_t max)
 {
     rgb.r = static_cast<uint8_t>(clamp(rgb.r, min, max));
     rgb.g = static_cast<uint8_t>(clamp(rgb.g, min, max));
@@ -149,13 +166,12 @@ float RGBLEDWidget::CalculateBlue(float ctCentiKelvin)
 // Apply gamma correction to the given value
 float RGBLEDWidget::ApplyGammaCorrection(float value)
 {
-    // If the values are below a certain threshold (0.00304), the correction is simple (12.92 * value), otherwise, the gamma curve
-    // is applied
-    // This step ensures that the colors look good when displayed on typical RGB devices
+    // If the values are below a certain threshold (0.00304), the correction is simple (12.92 * value), otherwise, the gamma
+    // curve is applied This step ensures that the colors look good when displayed on typical RGB devices
     return (value <= kGammaThreshold) ? kGammaMultiplier * value : (1.055f * std::pow(value, kGammaExponent)) - kGammaOffset;
 }
 
-RGBLEDWidget::RgbColor_t RGBLEDWidget::NormalizeRgb(float r, float g, float b)
+RgbColor_t RGBLEDWidget::NormalizeRgb(float r, float g, float b)
 {
     RgbColor_t rgb;
     rgb.r = static_cast<uint8_t>(r * kMaxColorValue);
@@ -165,7 +181,7 @@ RGBLEDWidget::RgbColor_t RGBLEDWidget::NormalizeRgb(float r, float g, float b)
 }
 
 // Convert XYZ color space to RGB color space
-RGBLEDWidget::RgbColor_t RGBLEDWidget::ConvertXYZToRGB(float X, float Y, float Z)
+RgbColor_t RGBLEDWidget::ConvertXYZToRGB(float X, float Y, float Z)
 {
     // X, Y and Z input refer to a D65/2° standard illuminant.
     // The XYZ values are then converted to RGB values using a standard transformation matrix for the sRGB color space (D65
@@ -227,7 +243,7 @@ uint8_t RGBLEDWidget::CalculateT(uint8_t v, uint8_t s, uint32_t remainder)
 }
 
 // Set RGB values based on the region for HSV to RGB conversion
-void RGBLEDWidget::SetRgbByRegion(uint8_t region, uint8_t v, uint8_t p, uint8_t q, uint8_t t, RGBLEDWidget::RgbColor_t & rgb)
+void RGBLEDWidget::SetRgbByRegion(uint8_t region, uint8_t v, uint8_t p, uint8_t q, uint8_t t, RgbColor_t & rgb)
 {
     switch (region)
     {
@@ -253,7 +269,7 @@ void RGBLEDWidget::SetRgbByRegion(uint8_t region, uint8_t v, uint8_t p, uint8_t 
 }
 
 // Convert color temperature to RGB color space
-RGBLEDWidget::RgbColor_t RGBLEDWidget::CTToRgb(uint16_t ctMireds)
+RgbColor_t RGBLEDWidget::CTToRgb(uint16_t ctMireds)
 {
     RgbColor_t rgb;
     float ctCentiKelvin = 10000 / static_cast<float>(ctMireds);
@@ -268,7 +284,7 @@ RGBLEDWidget::RgbColor_t RGBLEDWidget::CTToRgb(uint16_t ctMireds)
 }
 
 // Convert HSV color space to RGB color space
-RGBLEDWidget::RgbColor_t RGBLEDWidget::HsvToRgb(RGBLEDWidget::HsvColor_t hsv)
+RgbColor_t RGBLEDWidget::HsvToRgb(HsvColor_t hsv)
 {
     RgbColor_t rgb;
 
@@ -281,13 +297,13 @@ RGBLEDWidget::RgbColor_t RGBLEDWidget::HsvToRgb(RGBLEDWidget::HsvColor_t hsv)
     }
     else
     {
-        // region variable is calculated by dividing the hue value by 43 (since the hue value ranges from 0 to 255, and there are 6
-        // regions, each region spans approximately 43 units)
-        region = hsv.h / 43;
+        // region variable is calculated by dividing the hue value by 43 (since the hue value ranges from 0 to 255, and there
+        // are 6 regions, each region spans approximately 43 units)
+        region = hsv.h / kHueRegionDivider;
 
         // Calculates the position of h within the current region.Multiplying by 6 scales this position to a range of 0 to 255,
         // which is used to calculate intermediate RGB values.
-        remainder = (hsv.h - (region * 43)) * 6;
+        remainder = (hsv.h - (region * kHueRegionDivider)) * 6;
 
         // p,q and t intermediate values used to calculate the final RGB values
         p = CalculateP(hsv.v, hsv.s);
@@ -301,7 +317,7 @@ RGBLEDWidget::RgbColor_t RGBLEDWidget::HsvToRgb(RGBLEDWidget::HsvColor_t hsv)
 }
 
 // Convert XY color space to RGB color space
-RGBLEDWidget::RgbColor_t RGBLEDWidget::XYToRgb(uint8_t Level, uint16_t currentX, uint16_t currentY)
+RgbColor_t RGBLEDWidget::XYToRgb(uint8_t Level, uint16_t currentX, uint16_t currentY)
 {
     // convert xyY color space to RGB
 

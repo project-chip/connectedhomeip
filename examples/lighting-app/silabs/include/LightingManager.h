@@ -58,7 +58,6 @@ public:
     bool IsActionInProgress();
     bool InitiateAction(int32_t aActor, Action_t aAction, uint8_t * aValue);
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
-    bool InitiateLightAction(int32_t aActor, Action_t aAction, uint16_t size, RGBLEDWidget::ColorData_t * value);
     bool InitiateLightctrlAction(int32_t aActor, Action_t aAction, uint16_t size, uint32_t aAttributeId, uint8_t * value);
 #endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)
     typedef void (*Callback_fn_initiated)(Action_t, int32_t aActor);
@@ -71,12 +70,14 @@ private:
     friend LightingManager & LightMgr(void);
     State_t mState;
 
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
     uint8_t mCurrentLevel      = 254; // 0xFE = default
     uint8_t mCurrentHue        = 0;
     uint8_t mCurrentSaturation = 0;
     uint16_t mCurrentX         = 0;
     uint16_t mCurrentY         = 0;
     uint16_t mCurrentCTMireds  = 250;
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
 
     Callback_fn_initiated mActionInitiated_CB;
     Callback_fn_completed mActionCompleted_CB;
