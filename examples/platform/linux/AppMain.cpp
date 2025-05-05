@@ -46,8 +46,8 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/RuntimeOptionsProvider.h>
 
-#include <DeviceInfoProviderImpl.h>
 #include <AllClustersExampleDeviceInfoProviderImpl.h>
+#include <DeviceInfoProviderImpl.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 #include "CommissionerMain.h"
@@ -428,7 +428,7 @@ static uint16_t WiFiPAFGet_FreqList(const char * args, std::unique_ptr<uint16_t[
 int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
                      const Optional<EndpointId> secondaryNetworkCommissioningEndpoint)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err            = CHIP_NO_ERROR;
     bool isAllClustersVariant = (std::string(argv[0]).find("all-clusters") != std::string::npos);
 
 #if CONFIG_NETWORK_LAYER_BLE

@@ -192,8 +192,7 @@ size_t DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Count()
 bool DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Next(CharSpan & output)
 {
     // Hardcoded list of locales
-    static const char* kAllSupportedLocales[kNumSupportedLocales] =
-      { "en-US" };
+    static const char * kAllSupportedLocales[kNumSupportedLocales] = { "en-US" };
 
     VerifyOrReturnError(mIndex < kNumSupportedLocales, false);
     output = CharSpan::fromCharString(kAllSupportedLocales[mIndex]);
@@ -217,8 +216,9 @@ size_t DeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Count()
 
 bool DeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Next(CalendarType & output)
 {
-    static const CalendarType kAllSupportedCalendarTypes[kNumSupportedCalendarTypes] =
-        { app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kGregorian };
+    static const CalendarType kAllSupportedCalendarTypes[kNumSupportedCalendarTypes] = {
+        app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kGregorian
+    };
 
     VerifyOrReturnError(mIndex < kNumSupportedCalendarTypes, false);
     output = kAllSupportedCalendarTypes[mIndex];

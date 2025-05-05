@@ -111,7 +111,8 @@ CHIP_ERROR AllClustersExampleDeviceInfoProviderImpl::GetUserLabelLength(Endpoint
     return mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::UserLabelLengthKey(endpoint).KeyName(), &val, len);
 }
 
-CHIP_ERROR AllClustersExampleDeviceInfoProviderImpl::SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel)
+CHIP_ERROR AllClustersExampleDeviceInfoProviderImpl::SetUserLabelAt(EndpointId endpoint, size_t index,
+                                                                    const UserLabelType & userLabel)
 {
     VerifyOrReturnError(CanCastTo<uint32_t>(index), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -141,8 +142,10 @@ DeviceInfoProvider::UserLabelIterator * AllClustersExampleDeviceInfoProviderImpl
     return chip::Platform::New<UserLabelIteratorImpl>(*this, endpoint);
 }
 
-AllClustersExampleDeviceInfoProviderImpl::UserLabelIteratorImpl::UserLabelIteratorImpl(AllClustersExampleDeviceInfoProviderImpl & provider, EndpointId endpoint) :
-    mProvider(provider), mEndpoint(endpoint)
+AllClustersExampleDeviceInfoProviderImpl::UserLabelIteratorImpl::UserLabelIteratorImpl(
+    AllClustersExampleDeviceInfoProviderImpl & provider, EndpointId endpoint) :
+    mProvider(provider),
+    mEndpoint(endpoint)
 {
     size_t total = 0;
 
@@ -212,8 +215,8 @@ size_t AllClustersExampleDeviceInfoProviderImpl::SupportedLocalesIteratorImpl::C
 bool AllClustersExampleDeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Next(CharSpan & output)
 {
     // Hardcoded list of locales
-    static const char* kAllSupportedLocales[kNumSupportedLocales] =
-      { "en-US", "de-DE", "fr-FR", "en-GB", "es-ES", "zh-CN", "it-IT", "ja-JP" };
+    static const char * kAllSupportedLocales[kNumSupportedLocales] = { "en-US", "de-DE", "fr-FR", "en-GB",
+                                                                       "es-ES", "zh-CN", "it-IT", "ja-JP" };
 
     VerifyOrReturnError(mIndex < kNumSupportedLocales, false);
     output = CharSpan::fromCharString(kAllSupportedLocales[mIndex]);
@@ -237,8 +240,9 @@ size_t AllClustersExampleDeviceInfoProviderImpl::SupportedCalendarTypesIteratorI
 
 bool AllClustersExampleDeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Next(CalendarType & output)
 {
-    static const CalendarType kAllSupportedCalendarTypes[kNumSupportedCalendarTypes] =
-        { app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kGregorian };
+    static const CalendarType kAllSupportedCalendarTypes[kNumSupportedCalendarTypes] = {
+        app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kGregorian
+    };
 
     VerifyOrReturnError(mIndex < kNumSupportedCalendarTypes, false);
     output = kAllSupportedCalendarTypes[mIndex];

@@ -48,8 +48,8 @@ protected:
 
     private:
         static constexpr size_t kNumSupportedFixedLabels = 1;
-        EndpointId mEndpoint = 0;
-        size_t mIndex        = 0;
+        EndpointId mEndpoint                             = 0;
+        size_t mIndex                                    = 0;
     };
 
     class UserLabelIteratorImpl : public UserLabelIterator
@@ -79,7 +79,7 @@ protected:
 
     private:
         static constexpr size_t kNumSupportedLocales = 8;
-        size_t mIndex = 0;
+        size_t mIndex                                = 0;
     };
 
     class SupportedCalendarTypesIteratorImpl : public SupportedCalendarTypesIterator
@@ -92,7 +92,7 @@ protected:
 
     private:
         static constexpr size_t kNumSupportedCalendarTypes = 1;
-        size_t mIndex = 0;
+        size_t mIndex                                      = 0;
     };
 
     CHIP_ERROR SetUserLabelLength(EndpointId endpoint, size_t val) override;
