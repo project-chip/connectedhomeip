@@ -391,21 +391,21 @@ class NxpBuilder(GnBuilder):
         thread_type = "mtd" if self.enable_mtd else "ftd"
 
         components = [
-        "prj",
-        f"thread_{thread_type}" if self.enable_thread else None,
-        "wifi" if self.enable_wifi else None,
-        "br" if self.enable_wifi and self.enable_thread else None,
-        "ota" if self.enable_ota else None,
-        "fdata" if self.enable_factory_data else None,
-        "onnetwork" if self.disable_ble else None
+            "prj",
+            f"thread_{thread_type}" if self.enable_thread else None,
+            "wifi" if self.enable_wifi else None,
+            "br" if self.enable_wifi and self.enable_thread else None,
+            "ota" if self.enable_ota else None,
+            "fdata" if self.enable_factory_data else None,
+            "onnetwork" if self.disable_ble else None
         ]
 
         prj_file = "_".join(filter(None, components)) + ".conf"
-        prj_file_abs_path = os.path.dirname(os.path.realpath(__file__))+ "/../../../examples/platform/nxp/config/" + prj_file
+        prj_file_abs_path = os.path.dirname(os.path.realpath(__file__)) + "/../../../examples/platform/nxp/config/" + prj_file
         if os.path.isfile(prj_file_abs_path):
             return prj_file
         else:
-            raise Exception("Configuration not supported, no conf file available: %s" %prj_file_abs_path )
+            raise Exception("Configuration not supported, no conf file available: %s" % prj_file_abs_path)
 
     def generate(self):
         if self.build_system is NxpBuildSystem.CMAKE:
