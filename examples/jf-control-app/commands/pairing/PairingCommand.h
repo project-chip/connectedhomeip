@@ -106,6 +106,7 @@ public:
             break;
         case PairingMode::Code:
             AddArgument("anchor", 0, 1, &mAnchor);
+            AddArgument("execute-jcm", 0, 1, &mExecuteJCM);
             AddArgument("dcl-hostname", &mDCLHostName,
                         "Hostname of the DCL server to fetch information from. Defaults to 'on.dcl.csa-iot.org'.");
             AddArgument("dcl-port", 0, UINT16_MAX, &mDCLPort, "Port number for connecting to the DCL server. Defaults to '443'.");
@@ -118,16 +119,19 @@ public:
             break;
         case PairingMode::Ble:
             AddArgument("anchor", 0, 1, &mAnchor);
+            AddArgument("execute-jcm", 0, 1, &mExecuteJCM);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
             break;
         case PairingMode::OnNetwork:
             AddArgument("anchor", 0, 1, &mAnchor);
+            AddArgument("execute-jcm", 0, 1, &mExecuteJCM);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("pase-only", 0, 1, &mPaseOnly);
             break;
         case PairingMode::SoftAP:
             AddArgument("anchor", 0, 1, &mAnchor);
+            AddArgument("execute-jcm", 0, 1, &mExecuteJCM);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
             AddArgument("device-remote-ip", &mRemoteAddr);
@@ -137,12 +141,14 @@ public:
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
         case PairingMode::WiFiPAF:
             AddArgument("anchor", 0, 1, &mAnchor);
+            AddArgument("execute-jcm", 0, 1, &mExecuteJCM);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
             break;
 #endif
         case PairingMode::AlreadyDiscovered:
             AddArgument("anchor", 0, 1, &mAnchor);
+            AddArgument("execute-jcm", 0, 1, &mExecuteJCM);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("device-remote-ip", &mRemoteAddr);
             AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
@@ -150,12 +156,14 @@ public:
             break;
         case PairingMode::AlreadyDiscoveredByIndex:
             AddArgument("anchor", 0, 1, &mAnchor);
+            AddArgument("execute-jcm", 0, 1, &mExecuteJCM);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("index", 0, UINT16_MAX, &mIndex);
             AddArgument("pase-only", 0, 1, &mPaseOnly);
             break;
         case PairingMode::AlreadyDiscoveredByIndexWithCode:
             AddArgument("anchor", 0, 1, &mAnchor);
+            AddArgument("execute-jcm", 0, 1, &mExecuteJCM);
             AddArgument("payload", &mOnboardingPayload);
             AddArgument("index", 0, UINT16_MAX, &mIndex);
             AddArgument("pase-only", 0, 1, &mPaseOnly);
@@ -313,6 +321,8 @@ private:
 
     bool mDeviceIsICD = false;
     uint8_t mRandomGeneratedICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
+
+    chip::Optional<bool> mExecuteJCM;
 
     // For unpair
     chip::Platform::UniquePtr<chip::Controller::CurrentFabricRemover> mCurrentFabricRemover;
