@@ -497,7 +497,7 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
     err = GetPayloadContents(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
     SuccessOrExit(err);
 
-    // We need to set DeviceInfoProvider before Server::Init to setup the storage of DeviceInfoProvider properly.
+    // We need to set DeviceInfoProvider before Server::Init to set up the storage of DeviceInfoProvider properly.
     if (isAllClustersVariant)
     {
         DeviceLayer::SetDeviceInfoProvider(&gAllClustersExampleDeviceInfoProvider);
