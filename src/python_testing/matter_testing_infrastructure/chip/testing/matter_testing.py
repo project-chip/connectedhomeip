@@ -26,6 +26,7 @@ import pathlib
 import queue
 import random
 import re
+import shlex
 import sys
 import textwrap
 import threading
@@ -667,6 +668,7 @@ class MatterTestConfig:
     timeout: typing.Union[int, None] = None
     endpoint: typing.Union[int, None] = 0
     app_pid: int = 0
+    pipe_name: typing.Union[str, None] = None
     fail_on_skipped_tests: bool = False
 
     commissioning_method: Optional[str] = None
@@ -974,8 +976,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         # List of accumulated problems across all tests
         self.problems = []
         self.is_commissioning = False
-        # The named pipe name must be set in the derived classes
-        self.app_pipe = None
         self.cached_steps: dict[str, list[TestStep]] = {}
 
     def get_test_steps(self, test: str) -> list[TestStep]:
@@ -1045,51 +1045,63 @@ class MatterBaseTest(base_test.BaseTestClass):
         except AttributeError:
             return test
 
-    def get_default_app_pipe_name(self) -> str:
-        return self.app_pipe
-
-    def write_to_app_pipe(self, command_dict: dict, app_pipe_name: Optional[str] = None):
+    def write_to_app_pipe(self, command_dict: dict, app_pipe_prefix: Optional[str] = None, app_pid: Optional[int] = None):
         """
-        Sends an out-of-band command to a Matter app.
+        Send an out-of-band command to a Matter app.
+        Args:
+            command_dict (dict): dictionary with the command and data
+            app_pipe_prefix (Optional[str], optional): Name of the cluster pipe file prefix (i.e. /tmp/chip_all_clusters_fifo_ or /tmp/chip_rvc_fifo_). If None
+            takes the value from the CI argument --app-pipe-prefix.
+            app_pid (Optional[uint], optional): pid of the process for app_pipe_name. If None takes the value from the CI
+            argument --app-pid.
 
-        Use the following environment variables:
+        This method uses the following environment variables:
 
          - LINUX_DUT_IP
             * if not provided, the Matter app is assumed to run on the same machine as the test,
               such as during CI, and the commands are sent to it using a local named pipe
             * if provided, the commands for writing to the named pipe are forwarded to the DUT
         - LINUX_DUT_USER
-
             * if LINUX_DUT_IP is provided, use this for the DUT user name
             * If a remote password is needed, set up ssh keys to ensure that this script can log in to the DUT without a password:
                  + Step 1: If you do not have a key, create one using ssh-keygen
                  + Step 2: Authorize this key on the remote host: run ssh-copy-id user@ip once, using your password
                  + Step 3: From now on ssh user@ip will no longer ask for your password
+
         """
 
-        if app_pipe_name is None:
-            app_pipe_name = self.get_default_app_pipe_name()
+        if app_pipe_prefix is None:
+            app_pipe_prefix = self.matter_test_config.app_pipe_prefix
+        if app_pid is None:
+            app_pid = self.matter_test_config.app_pid
 
-        if not isinstance(app_pipe_name, str):
-            raise TypeError("the named pipe must be provided as a string value")
+        if not isinstance(app_pipe_prefix, str):
+            raise TypeError("The named pipe must be provided as a string value")
 
         if not isinstance(command_dict, dict):
-            raise TypeError("the command must be passed as a dictionary value")
+            raise TypeError("The command must be passed as a dictionary value")
 
-        import json
         command = json.dumps(command_dict)
-
-        import os
         dut_ip = os.getenv('LINUX_DUT_IP')
+
+        # Checks for concatenate app_pipe and app_pid
+        if not isinstance(app_pid, int):
+            raise TypeError("The --app-pid flag is not instance of int")
+        # Verify we have a valid app-id
+        if app_pid == 0:
+            asserts.fail("app_pid is 0 , is the flag --app-pid set?. app-id flag must be set in order to write to pipe.")
+        app_pipe_name = app_pipe_prefix + str(app_pid)
 
         if dut_ip is None:
             if not os.path.exists(app_pipe_name):
                 # Named pipes are unique, so we MUST have consistent PID/paths
-                # set up for them to work.
+                # Set up for them to work.
                 logging.error("Named pipe %r does NOT exist" % app_pipe_name)
                 raise FileNotFoundError("CANNOT FIND %r" % app_pipe_name)
             with open(app_pipe_name, "w") as app_pipe:
-                app_pipe.write(command + "\n")
+                logger.info(f"Sending out-of-band command: {command} to file: {app_pipe_name}")
+                app_pipe.write(json.dumps(command_dict) + "\n")
+
             # TODO(#31239): remove the need for sleep
             sleep(0.001)
         else:
@@ -1097,10 +1109,8 @@ class MatterBaseTest(base_test.BaseTestClass):
 
             dut_uname = os.getenv('LINUX_DUT_USER')
             asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
-
             logging.info(f"Using DUT user name: {dut_uname}")
-
-            command_fixed = command.replace('\"', '\\"')
+            command_fixed = shlex.quote(json.dumps(command_dict))
             cmd = "echo \"%s\" | ssh %s@%s \'cat > %s\'" % (command_fixed, dut_uname, dut_ip, app_pipe_name)
             os.system(cmd)
 
@@ -1995,6 +2005,8 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
     config.app_pid = 0 if args.app_pid is None else args.app_pid
+    config.app_pipe = args.app_pipe
+    config.app_pipe_prefix = args.app_pipe_prefix
     config.fail_on_skipped_tests = args.fail_on_skipped
 
     config.controller_node_id = args.controller_node_id
@@ -2052,6 +2064,9 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                              'and NodeID to assign if commissioning (default: %d)' % _DEFAULT_DUT_NODE_ID, nargs="+")
     basic_group.add_argument('--endpoint', type=int, default=None, help="Endpoint under test")
     basic_group.add_argument('--app-pid', type=int, default=0, help="The PID of the app against which the test is going to run")
+    basic_group.add_argument('--app-pipe', type=str, default=None, help="The path of the app to send an out-of-band command")
+    basic_group.add_argument('--app-pipe_prefix', type=str, default=None,
+                             help="The path prefix of the app to send an out-of-band command")
     basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
     basic_group.add_argument("--PICS", help="PICS file path", type=str)
 
