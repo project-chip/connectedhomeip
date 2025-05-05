@@ -30,7 +30,10 @@ function(chip_configure_cluster APP_TARGET CLUSTER)
 
     # Clusters contain a "codegen_sources.gni" file that describes files
     # required by a code-generated bundle. These files are a subset of python
-    # so this executes it (in an awkward manner ...)
+    # so this executes it and prints out `codegen_sources`.
+    #
+    # This is not completely sane (a gni can have gn-specific bits)
+    # however it works for now as we plan to keep the gni very simple.
     execute_process(
       COMMAND python
         "-c"
