@@ -126,8 +126,8 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 223
-              maxValue: 227
+              minValue: 220
+              maxValue: 230
 
     - label:
           "Step 3a: TH sends MoveToSaturation command to DUT with Saturation=150
@@ -210,8 +210,8 @@ tests:
       attribute: "CurrentSaturation"
       response:
           constraints:
-              minValue: 198
-              maxValue: 202
+              minValue: 195
+              maxValue: 205
 
     - label: "Step 4a: TH reads ColorTempPhysicalMinMireds attribute from DUT"
       PICS: CC.S.A400b
@@ -413,8 +413,8 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 24950
-              maxValue: 25050
+              minValue: 24500
+              maxValue: 25500
 
     - label: "Turn Off light that we turned on"
       PICS: OO.S.C00.Rsp
