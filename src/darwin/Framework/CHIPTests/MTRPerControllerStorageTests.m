@@ -1608,6 +1608,11 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     // And that the device cache is not primed.
     XCTAssertFalse(device.deviceCachePrimed);
 
+    // And that there is no highest observed event number so far and we have
+    // seen no events.
+    XCTAssertNil(device.highestObservedEventNumber);
+    XCTAssertEqual(device.unitTestEventsReportedSinceLastCheck, 0);
+
     [device setDelegate:delegate queue:queue];
 
     [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
@@ -1626,6 +1631,10 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
             XCTAssertTrue([device _attributeDataValue:dataValue isEqualToDataValue:dataValueFromMTRDevice]);
         }
     }
+
+    // Must have seen at least one event.
+    XCTAssertNotNil(device.highestObservedEventNumber);
+    XCTAssertGreaterThan(device.unitTestEventsReportedSinceLastCheck, 0);
 
     // Now force the removal of the object from controller to test reloading read cache from storage
     [controller removeDevice:device];
@@ -1649,15 +1658,24 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     double storedAttributeDifferFromMTRDevicePercentage = storedAttributeDifferFromMTRDeviceCount * 100.0 / dataStoreValuesCount;
     XCTAssertTrue(storedAttributeDifferFromMTRDevicePercentage < 10.0);
 
-    // Check that the new device has an estimated subscription latency.
-    XCTAssertNotNil(device.estimatedSubscriptionLatency);
+    // Check that the new device is already primed.
+    XCTAssertTrue(newDevice.deviceCachePrimed);
 
-    // And that it's already primed.
-    XCTAssertTrue(device.deviceCachePrimed);
+    // Check that the new device has an estimated subscription latency.
+    XCTAssertNotNil(newDevice.estimatedSubscriptionLatency);
 
     // Check that this estimate is positive, since subscribing must have taken
     // some time.
-    XCTAssertGreaterThan(device.estimatedSubscriptionLatency.doubleValue, 0);
+    XCTAssertGreaterThan(newDevice.estimatedSubscriptionLatency.doubleValue, 0);
+
+    // Check that the highest observed event number is also not nil.  This value
+    // might be zero if there was an event but it was the first one the server ever
+    // generated.
+    NSNumber * oldHighestObservedEventNumber = newDevice.highestObservedEventNumber;
+    XCTAssertNotNil(oldHighestObservedEventNumber);
+
+    // Check that we have had no events reported so far: this is a new device.
+    XCTAssertEqual(newDevice.unitTestEventsReportedSinceLastCheck, 0);
 
     // Now set up new delegate for the new device and verify that once subscription reestablishes, the data version filter loaded from storage will work
     __auto_type * newDelegate = [[MTRDeviceTestDelegate alloc] init];
@@ -1693,10 +1711,18 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
     // 1) MTRDevice actually gets some attributes reported more than once
     // 2) Some attributes do change on resubscribe
-    //   * With all-clusts-app as of 2024-02-10, out of 1287 persisted attributes, still 450 attributes were reported with filter
+    //   * With all-clusters-app as of 2024-02-10, out of 1287 persisted attributes, still 450 attributes were reported with filter
     // And so conservatively, assert that data version filters save at least 300 entries.
-    NSUInteger storedAttributeCountDifferenceFromMTRDeviceReport = dataStoreValuesCount - [device unitTestAttributesReportedSinceLastCheck];
+    NSUInteger storedAttributeCountDifferenceFromMTRDeviceReport = dataStoreValuesCount - [newDevice unitTestAttributesReportedSinceLastCheck];
     XCTAssertTrue(storedAttributeCountDifferenceFromMTRDeviceReport > 300);
+
+    NSNumber * newHighestObservedEventNumber = newDevice.highestObservedEventNumber;
+    XCTAssertNotNil(newHighestObservedEventNumber);
+
+    // In theory we could have missed some events, but in practice that's not
+    // likely to happen in this context.
+    XCTAssertEqual(newHighestObservedEventNumber.unsignedIntValue - oldHighestObservedEventNumber.unsignedIntValue,
+        newDevice.unitTestEventsReportedSinceLastCheck);
 
     // Reset our commissionee.
     __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];

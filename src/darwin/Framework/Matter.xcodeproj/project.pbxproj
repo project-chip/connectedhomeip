@@ -912,9 +912,9 @@
 		7567A20B2DA5ABCE00D91529 /* DefaultServerCluster.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DefaultServerCluster.cpp; sourceTree = "<group>"; };
 		7567A20C2DA5ABCE00D91529 /* ServerClusterInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerClusterInterface.h; sourceTree = "<group>"; };
 		7567A20D2DA5ABCE00D91529 /* ServerClusterInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ServerClusterInterface.cpp; sourceTree = "<group>"; };
-		757DA30D2DB0369100E4AD75 /* ota-provider-cluster.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "ota-provider-cluster.h"; path = "ota-provider-cluster.h"; sourceTree = "<group>"; };
-		757DA30E2DB0369100E4AD75 /* ota-provider-cluster.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "ota-provider-cluster.cpp"; path = "ota-provider-cluster.cpp"; sourceTree = "<group>"; };
-		757DA30F2DB0369100E4AD75 /* ota-provider-delegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "ota-provider-delegate.h"; path = "ota-provider-delegate.h"; sourceTree = "<group>"; };
+		757DA30D2DB0369100E4AD75 /* ota-provider-cluster.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ota-provider-cluster.h"; sourceTree = "<group>"; };
+		757DA30E2DB0369100E4AD75 /* ota-provider-cluster.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "ota-provider-cluster.cpp"; sourceTree = "<group>"; };
+		757DA30F2DB0369100E4AD75 /* ota-provider-delegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ota-provider-delegate.h"; sourceTree = "<group>"; };
 		7592BCEB2CBEE98C00EB74A0 /* CodegenDataModelProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CodegenDataModelProvider.h; sourceTree = "<group>"; };
 		7592BCEC2CBEE98C00EB74A0 /* CodegenDataModelProvider.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CodegenDataModelProvider.cpp; sourceTree = "<group>"; };
 		7592BCED2CBEE98C00EB74A0 /* CodegenDataModelProvider_Read.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CodegenDataModelProvider_Read.cpp; sourceTree = "<group>"; };
@@ -1349,7 +1349,7 @@
 		1E857311265519DE0050A4D9 /* app */ = {
 			isa = PBXGroup;
 			children = (
-				757DA30C2DB0362400E4AD75 /* ota-provider */,
+				757DA30C2DB0362400E4AD75 /* clusters/ota-provider */,
 				7567A2082DA5ABA500D91529 /* server-cluster */,
 				7534D1822CF8CE2C00F64654 /* persistence */,
 				7521D2932CBECE3F00218E16 /* codegen-data-model-provider */,
@@ -1641,7 +1641,7 @@
 			path = "server-cluster";
 			sourceTree = "<group>";
 		};
-		757DA30C2DB0362400E4AD75 /* ota-provider */ = {
+		757DA30C2DB0362400E4AD75 /* clusters/ota-provider */ = {
 			isa = PBXGroup;
 			children = (
 				757DA30D2DB0369100E4AD75 /* ota-provider-cluster.h */,
@@ -2352,6 +2352,7 @@
 				B20252922459E34F00F97062 /* Sources */,
 				B20252932459E34F00F97062 /* Frameworks */,
 				B20252942459E34F00F97062 /* Resources */,
+				51EBB35B2DC3F2DF00221AA1 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -2441,6 +2442,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "./chip_xcode_build_connector.sh\n";
+		};
+		51EBB35B2DC3F2DF00221AA1 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\n\n# The project dir is src/darwin/Framework\ncd ${PROJECT_DIR}/../../..\n\nscripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/all-clusters-app\nscripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug/ota-requestor-app non_spec_compliant_ota_action_delay_floor=0\n";
 		};
 		9B7838562CFE3AE600FB04C4 /* Acquire git revision info */ = {
 			isa = PBXShellScriptBuildPhase;

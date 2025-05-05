@@ -344,83 +344,6 @@ cluster Identify = 3 {
   command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
 
-/** Attributes and commands for group configuration and manipulation. */
-cluster Groups = 4 {
-  revision 4;
-
-  bitmap Feature : bitmap32 {
-    kGroupNames = 0x1;
-  }
-
-  bitmap NameSupportBitmap : bitmap8 {
-    kGroupNames = 0x80;
-  }
-
-  readonly attribute NameSupportBitmap nameSupport = 0;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct AddGroupRequest {
-    group_id groupID = 0;
-    char_string<16> groupName = 1;
-  }
-
-  response struct AddGroupResponse = 0 {
-    enum8 status = 0;
-    group_id groupID = 1;
-  }
-
-  request struct ViewGroupRequest {
-    group_id groupID = 0;
-  }
-
-  response struct ViewGroupResponse = 1 {
-    enum8 status = 0;
-    group_id groupID = 1;
-    char_string<16> groupName = 2;
-  }
-
-  request struct GetGroupMembershipRequest {
-    group_id groupList[] = 0;
-  }
-
-  response struct GetGroupMembershipResponse = 2 {
-    nullable int8u capacity = 0;
-    group_id groupList[] = 1;
-  }
-
-  request struct RemoveGroupRequest {
-    group_id groupID = 0;
-  }
-
-  response struct RemoveGroupResponse = 3 {
-    enum8 status = 0;
-    group_id groupID = 1;
-  }
-
-  request struct AddGroupIfIdentifyingRequest {
-    group_id groupID = 0;
-    char_string<16> groupName = 1;
-  }
-
-  /** Command description for AddGroup */
-  fabric command access(invoke: manage) AddGroup(AddGroupRequest): AddGroupResponse = 0;
-  /** Command description for ViewGroup */
-  fabric command ViewGroup(ViewGroupRequest): ViewGroupResponse = 1;
-  /** Command description for GetGroupMembership */
-  fabric command GetGroupMembership(GetGroupMembershipRequest): GetGroupMembershipResponse = 2;
-  /** Command description for RemoveGroup */
-  fabric command access(invoke: manage) RemoveGroup(RemoveGroupRequest): RemoveGroupResponse = 3;
-  /** Command description for RemoveAllGroups */
-  fabric command access(invoke: manage) RemoveAllGroups(): DefaultSuccess = 4;
-  /** Command description for AddGroupIfIdentifying */
-  fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
-}
-
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 cluster Descriptor = 29 {
   revision 3;
@@ -429,7 +352,7 @@ cluster Descriptor = 29 {
     kTagList = 0x1;
   }
 
-  shared struct DeviceTypeStruct {
+  struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
   }
@@ -2380,6 +2303,144 @@ provisional cluster ClosureControl = 260 {
   command access(invoke: manage) Calibrate(): DefaultSuccess = 2;
 }
 
+/** Ceiling values are dedicated for closures that close a ceiling, such as horizontal awnings, pergolas, etc. */
+provisional cluster ClosureDimension = 261 {
+  revision 1;
+
+  enum ClosureUnitEnum : enum8 {
+    kMillimeter = 0;
+    kDegree = 1;
+  }
+
+  enum ModulationTypeEnum : enum8 {
+    kSlatsOrientation = 0;
+    kSlatsOpenwork = 1;
+    kStripesAlignment = 2;
+    kOpacity = 3;
+    kVentilation = 4;
+  }
+
+  enum OverflowEnum : enum8 {
+    kNoOverflow = 0;
+    kInside = 1;
+    kOutside = 2;
+    kTopInside = 3;
+    kTopOutside = 4;
+    kBottomInside = 5;
+    kBottomOutside = 6;
+    kLeftInside = 7;
+    kLeftOutside = 8;
+    kRightInside = 9;
+    kRightOutside = 10;
+  }
+
+  enum RotationAxisEnum : enum8 {
+    kLeft = 0;
+    kCenteredVertical = 1;
+    kLeftAndRight = 2;
+    kRight = 3;
+    kTop = 4;
+    kCenteredHorizontal = 5;
+    kTopAndBottom = 6;
+    kBottom = 7;
+    kLeftBarrier = 8;
+    kLeftAndRightBarriers = 9;
+    kRightBarrier = 10;
+  }
+
+  enum StepDirectionEnum : enum8 {
+    kDecrease = 0;
+    kIncrease = 1;
+  }
+
+  enum TranslationDirectionEnum : enum8 {
+    kDownward = 0;
+    kUpward = 1;
+    kVerticalMask = 2;
+    kVerticalSymmetry = 3;
+    kLeftward = 4;
+    kRightward = 5;
+    kHorizontalMask = 6;
+    kHorizontalSymmetry = 7;
+    kForward = 8;
+    kBackward = 9;
+    kDepthMask = 10;
+    kDepthSymmetry = 11;
+    kCeilingSimple = 12;
+    kCeilingMask = 13;
+    kCeilingSidedSymmetry = 14;
+    kCeilingCenteredSymmetry = 15;
+  }
+
+  bitmap Feature : bitmap32 {
+    kPositioning = 0x1;
+    kMotionLatching = 0x2;
+    kUnit = 0x4;
+    kLimitation = 0x8;
+    kSpeed = 0x10;
+    kTranslation = 0x20;
+    kRotation = 0x40;
+    kModulation = 0x80;
+  }
+
+  struct CurrentStateStruct {
+    optional percent100ths position = 0;
+    optional boolean latch = 1;
+    optional ThreeLevelAutoEnum speed = 2;
+  }
+
+  struct RangePercent100thsStruct {
+    percent100ths min = 0;
+    percent100ths max = 1;
+  }
+
+  struct TargetStruct {
+    optional percent100ths position = 0;
+    optional boolean latch = 1;
+    optional ThreeLevelAutoEnum speed = 2;
+  }
+
+  struct UnitRangeStruct {
+    int16s min = 0;
+    int16s max = 1;
+  }
+
+  readonly attribute nullable CurrentStateStruct currentState = 0;
+  readonly attribute nullable TargetStruct target = 1;
+  readonly attribute optional percent100ths resolution = 2;
+  readonly attribute optional percent100ths stepValue = 3;
+  readonly attribute optional ClosureUnitEnum unit = 4;
+  readonly attribute optional nullable UnitRangeStruct unitRange = 5;
+  readonly attribute optional RangePercent100thsStruct limitRange = 6;
+  readonly attribute optional TranslationDirectionEnum translationDirection = 7;
+  readonly attribute optional RotationAxisEnum rotationAxis = 8;
+  readonly attribute optional OverflowEnum overflow = 9;
+  readonly attribute optional ModulationTypeEnum modulationType = 10;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct SetTargetRequest {
+    optional percent100ths position = 0;
+    optional boolean latch = 1;
+    optional ThreeLevelAutoEnum speed = 2;
+  }
+
+  request struct StepRequest {
+    StepDirectionEnum direction = 0;
+    int16u numberOfSteps = 1;
+    optional ThreeLevelAutoEnum speed = 2;
+  }
+
+  /** This command is used to move a dimension of the device to a target position. */
+  command SetTarget(SetTargetRequest): DefaultSuccess = 0;
+  /** This command is used to move a dimension of the device to a target position by a number of steps. */
+  command Step(StepRequest): DefaultSuccess = 1;
+}
+
 endpoint 0 {
   device type ma_rootdevice = 22, version 1;
 
@@ -2778,30 +2839,9 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 6;
-
-    handle command Identify;
-    handle command TriggerEffect;
-  }
-
-  server cluster Groups {
-    ram      attribute nameSupport;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
 
-    handle command AddGroupResponse;
-    handle command AddGroup;
-    handle command ViewGroupResponse;
-    handle command ViewGroup;
-    handle command GetGroupMembershipResponse;
-    handle command GetGroupMembership;
-    handle command RemoveGroup;
-    handle command RemoveGroupResponse;
-    handle command RemoveAllGroups;
-    handle command AddGroupIfIdentifying;
+    handle command Identify;
   }
 
   server cluster Descriptor {
@@ -2809,6 +2849,7 @@ endpoint 1 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute tagList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2817,6 +2858,10 @@ endpoint 1 {
   }
 
   server cluster ClosureControl {
+    emits event OperationalError;
+    emits event MovementCompleted;
+    emits event EngageStateChanged;
+    emits event SecureStateChanged;
     callback attribute countdownTime;
     ram      attribute mainState;
     callback attribute currentErrorList;
@@ -2831,6 +2876,84 @@ endpoint 1 {
     handle command Stop;
     handle command MoveTo;
     handle command Calibrate;
+  }
+}
+endpoint 2 {
+  device type ma_closure_panel = 561, version 1;
+
+
+  server cluster Descriptor {
+    callback attribute deviceTypeList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    callback attribute tagList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+  }
+
+  server cluster ClosureDimension {
+    callback attribute currentState;
+    callback attribute target;
+    ram      attribute resolution;
+    ram      attribute stepValue;
+    ram      attribute unit;
+    callback attribute unitRange;
+    callback attribute limitRange;
+    ram      attribute translationDirection;
+    ram      attribute rotationAxis;
+    ram      attribute overflow;
+    ram      attribute modulationType;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command SetTarget;
+    handle command Step;
+  }
+}
+endpoint 3 {
+  device type ma_closure_panel = 561, version 1;
+
+
+  server cluster Descriptor {
+    callback attribute deviceTypeList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    callback attribute tagList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+  }
+
+  server cluster ClosureDimension {
+    callback attribute currentState;
+    callback attribute target;
+    ram      attribute resolution;
+    ram      attribute stepValue;
+    ram      attribute unit;
+    callback attribute unitRange;
+    callback attribute limitRange;
+    ram      attribute translationDirection;
+    ram      attribute rotationAxis;
+    ram      attribute overflow;
+    ram      attribute modulationType;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command SetTarget;
+    handle command Step;
   }
 }
 
