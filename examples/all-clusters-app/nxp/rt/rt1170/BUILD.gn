@@ -115,7 +115,6 @@ rt_executable("all_cluster_app") {
 
   sources = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
-    "${chip_root}/examples/providers/DeviceInfoProviderImpl.cpp",
     "../../common/main/AppTask.cpp",
     "../../common/main/DeviceCallbacks.cpp",
     "../../common/main/ZclCallbacks.cpp",
@@ -155,6 +154,7 @@ rt_executable("all_cluster_app") {
     "${chip_root}/examples/${app_common_folder}/src/bridged-actions-stub.cpp",
     "${chip_root}/examples/${app_common_folder}/src/smco-stub.cpp",
     "${chip_root}/examples/${app_common_folder}/src/static-supported-modes-manager.cpp",
+    "${chip_root}/examples/providers:all_clusters_device_info_provider",
   ]
 
   if (nxp_enable_matter_cli) {

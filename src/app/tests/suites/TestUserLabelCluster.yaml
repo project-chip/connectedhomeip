@@ -70,9 +70,6 @@ tests:
       arguments:
           value:
               [
-                  { Label: "room", Value: "bedroom 2" },
-                  { Label: "orientation", Value: "North" },
-                  { Label: "floor", Value: "5" },
                   { Label: "direction", Value: "up" },
               ]
 
@@ -94,8 +91,5 @@ tests:
       response:
           value:
               [
-                  { Label: "room", Value: "bedroom 2" },
-                  { Label: "orientation", Value: "North" },
-                  { Label: "floor", Value: "5" },
                   { Label: "direction", Value: "up" },
               ]
