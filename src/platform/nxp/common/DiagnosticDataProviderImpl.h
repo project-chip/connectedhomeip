@@ -69,14 +69,6 @@ public:
     CHIP_ERROR ResetWiFiNetworkDiagnosticsCounts() override;
     CHIP_ERROR GetWiFiOverrunCount(uint64_t & overrunCount) override;
     CHIP_ERROR GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastTxCount) override;
-
-    uint32_t mBeaconRxCount          = 0;
-    uint32_t mBeaconLostCount        = 0;
-    uint32_t mPacketMulticastRxCount = 0;
-    uint32_t mPacketMulticastTxCount = 0;
-    uint32_t mPacketUnicastTxCount   = 0;
-    uint32_t mPacketUnicastRxCount   = 0;
-    uint64_t mOverrunCount           = 0;
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
 };
 

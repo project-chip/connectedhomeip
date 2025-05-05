@@ -55,7 +55,7 @@ class OperationalCredentialsCluster(
 
   class NOCResponse(val statusCode: UByte, val fabricIndex: UByte?, val debugText: String?)
 
-  class SignVidVerificationResponse(
+  class SignVIDVerificationResponse(
     val fabricIndex: UByte,
     val fabricBindingVersion: UByte,
     val signature: ByteArray,
@@ -666,9 +666,9 @@ class OperationalCredentialsCluster(
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun setVidVerificationStatement(
+  suspend fun setVIDVerificationStatement(
     vendorID: UShort?,
-    vidVerificationStatement: ByteArray?,
+    VIDVerificationStatement: ByteArray?,
     vvsc: ByteArray?,
     timedInvokeTimeout: Duration? = null,
   ) {
@@ -681,10 +681,10 @@ class OperationalCredentialsCluster(
     vendorID?.let { tlvWriter.put(ContextSpecificTag(TAG_VENDOR_ID_REQ), vendorID) }
 
     val TAG_VID_VERIFICATION_STATEMENT_REQ: Int = 1
-    vidVerificationStatement?.let {
+    VIDVerificationStatement?.let {
       tlvWriter.put(
         ContextSpecificTag(TAG_VID_VERIFICATION_STATEMENT_REQ),
-        vidVerificationStatement,
+        VIDVerificationStatement,
       )
     }
 
@@ -703,11 +703,11 @@ class OperationalCredentialsCluster(
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun signVidVerificationRequest(
+  suspend fun signVIDVerificationRequest(
     fabricIndex: UByte,
     clientChallenge: ByteArray,
     timedInvokeTimeout: Duration? = null,
-  ): SignVidVerificationResponse {
+  ): SignVIDVerificationResponse {
     val commandId: UInt = 13u
 
     val tlvWriter = TlvWriter()
@@ -773,7 +773,7 @@ class OperationalCredentialsCluster(
 
     tlvReader.exitContainer()
 
-    return SignVidVerificationResponse(
+    return SignVIDVerificationResponse(
       fabricIndex_decoded,
       fabricBindingVersion_decoded,
       signature_decoded,

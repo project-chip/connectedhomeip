@@ -17,6 +17,7 @@
 #import "MTRTestCase.h"
 
 #import "MTRMockCB.h"
+#import "MTRTestDeclarations.h"
 #import "MTRTestKeys.h"
 #import "MTRTestStorage.h"
 
@@ -37,12 +38,39 @@ static void ClearTaskSet(NSMutableSet<NSTask *> * __strong & tasks)
 }
 #endif // HAVE_NSTASK
 
+// Controllers are managed in a weak NSHashTable to allow tests
+// to manually shutdown and free controllers where necessary.
+// Additionally we need to keep track of when to shut down
+// the controller factory.
+typedef NS_ENUM(NSInteger, MTRTestScope) {
+    MTRTestScopeNone = 0,
+    MTRTestScopeSuite,
+    MTRTestScopeTestCase,
+};
+static MTRTestScope sControllerFactoryScope;
+static NSHashTable<MTRDeviceController *> * sStartedControllers;
+
+static void ClearControllerSet(NSHashTable<MTRDeviceController *> * __strong & controllers, MTRTestScope scope)
+{
+    for (MTRDeviceController * controller in controllers) {
+        [controller shutdown];
+        XCTAssertFalse([controller isRunning]);
+    }
+    controllers = nil;
+
+    if (sControllerFactoryScope == scope) {
+        [MTRDeviceControllerFactory.sharedInstance stopControllerFactory];
+        sControllerFactoryScope = MTRTestScopeNone;
+    }
+}
+
 static MTRMockCB * sMockCB;
 
 @implementation MTRTestCase {
 #if HAVE_NSTASK
     NSMutableSet<NSTask *> * _runningTasks;
 #endif // NSTask
+    NSHashTable<MTRDeviceController *> * _startedControllers;
 }
 
 + (void)setUp
@@ -50,6 +78,15 @@ static MTRMockCB * sMockCB;
     [super setUp];
 
     sMockCB = [[MTRMockCB alloc] init];
+
+    sControllerFactoryScope = MTRTestScopeNone;
+    sStartedControllers = [NSHashTable weakObjectsHashTable];
+
+#ifdef DEBUG
+    // Force our controllers to only advertise on localhost, to avoid DNS-SD
+    // crosstalk.
+    [MTRDeviceController forceLocalhostAdvertisingOnly];
+#endif // DEBUG
 
 #if HAVE_NSTASK
     sRunningCrossTestTasks = [[NSMutableSet alloc] init];
@@ -61,6 +98,8 @@ static MTRMockCB * sMockCB;
 #if HAVE_NSTASK
     ClearTaskSet(sRunningCrossTestTasks);
 #endif // HAVE_NSTASK
+
+    ClearControllerSet(sStartedControllers, MTRTestScopeSuite);
 
     [sMockCB stopMocking];
     sMockCB = nil;
@@ -76,6 +115,7 @@ static MTRMockCB * sMockCB;
 #if HAVE_NSTASK
     _runningTasks = [[NSMutableSet alloc] init];
 #endif // HAVE_NSTASK
+    _startedControllers = [NSHashTable weakObjectsHashTable];
 }
 
 - (void)tearDown
@@ -119,15 +159,22 @@ static MTRMockCB * sMockCB;
     ClearTaskSet(_runningTasks);
 #endif // HAVE_NSTASK
 
+    ClearControllerSet(_startedControllers, MTRTestScopeTestCase);
+
     [super tearDown];
 }
 
-+ (id)createControllerOnTestFabric
++ (MTRDeviceController *)_createControllerOnTestFabricWithFactoryScope:(MTRTestScope)scope
 {
-    __auto_type * storage = [[MTRTestStorage alloc] init];
-    __auto_type * factoryParams = [[MTRDeviceControllerFactoryParams alloc] initWithStorage:storage];
     __auto_type * factory = MTRDeviceControllerFactory.sharedInstance;
-    XCTAssertTrue([factory startControllerFactory:factoryParams error:nil]);
+    if (sControllerFactoryScope == MTRTestScopeNone) {
+        __auto_type * storage = [[MTRTestStorage alloc] init];
+        __auto_type * factoryParams = [[MTRDeviceControllerFactoryParams alloc] initWithStorage:storage];
+        XCTAssertTrue([factory startControllerFactory:factoryParams error:nil]);
+        sControllerFactoryScope = scope;
+    } else if (sControllerFactoryScope == MTRTestScopeTestCase && scope == MTRTestScopeSuite) {
+        sControllerFactoryScope = MTRTestScopeSuite; // extend factory lifetime
+    }
 
     __auto_type * testKeys = [[MTRTestKeys alloc] init];
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithIPK:testKeys.ipk fabricID:@1 nocSigner:testKeys];
@@ -135,6 +182,20 @@ static MTRMockCB * sMockCB;
     MTRDeviceController * controller = [factory createControllerOnNewFabric:params error:nil];
     XCTAssertNotNil(controller);
 
+    return controller;
+}
+
++ (MTRDeviceController *)createControllerOnTestFabric
+{
+    MTRDeviceController * controller = [self _createControllerOnTestFabricWithFactoryScope:MTRTestScopeSuite];
+    [sStartedControllers addObject:controller];
+    return controller;
+}
+
+- (MTRDeviceController *)createControllerOnTestFabric
+{
+    MTRDeviceController * controller = [self.class _createControllerOnTestFabricWithFactoryScope:MTRTestScopeTestCase];
+    [_startedControllers addObject:controller];
     return controller;
 }
 

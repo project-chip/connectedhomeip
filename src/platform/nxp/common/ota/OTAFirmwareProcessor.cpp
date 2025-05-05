@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023, 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,7 +29,19 @@ CHIP_ERROR OTAFirmwareProcessor::Init()
     VerifyOrReturnError(mCallbackProcessDescriptor != nullptr, CHIP_ERROR_OTA_PROCESSOR_CB_NOT_REGISTERED);
     mAccumulator.Init(sizeof(Descriptor));
 
+#if OTA_ENCRYPTION_ENABLE
+    mUnalignmentNum = 0;
+#endif
+
     VerifyOrReturnError(gOtaSuccess_c == OTA_SelectExternalStoragePartition(), CHIP_ERROR_OTA_PROCESSOR_EXTERNAL_STORAGE);
+
+#if CONFIG_CHIP_OTA_POSTED_OPERATIONS_IN_IDLE
+    /* Resume flash write/erase transactions only in the idle task */
+    ota_config_t OTAconfig;
+    OTA_GetDefaultConfig(&OTAconfig);
+    OTAconfig.PostedOpInIdleTask = true;
+    OTA_SetConfig(&OTAconfig);
+#endif // CHIP_OTA_POSTED_OPERATIONS_IN_IDLE
 
     otaResult_t ota_status;
     ota_status = OTA_ServiceInit(&mPostedOperationsStorage[0], NB_PENDING_TRANSACTIONS * TRANSACTION_SZ);
@@ -46,6 +58,10 @@ CHIP_ERROR OTAFirmwareProcessor::Clear()
     mAccumulator.Clear();
     mDescriptorProcessed = false;
 
+#if OTA_ENCRYPTION_ENABLE
+    mUnalignmentNum = 0;
+#endif
+
     return CHIP_NO_ERROR;
 }
 
@@ -58,7 +74,33 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
     if (!mDescriptorProcessed)
     {
         ReturnErrorOnFailure(ProcessDescriptor(block));
+#if OTA_ENCRYPTION_ENABLE
+        /* 16 bytes to used to store undecrypted data because of unalignment */
+        mAccumulator.Init(requestedOtaMaxBlockSize + 16);
+#endif
     }
+
+#if OTA_ENCRYPTION_ENABLE
+    MutableByteSpan mBlock = MutableByteSpan(mAccumulator.data(), mAccumulator.GetThreshold());
+    memcpy(&mBlock[0], &mBlock[requestedOtaMaxBlockSize], mUnalignmentNum);
+    memcpy(&mBlock[mUnalignmentNum], block.data(), block.size());
+
+    if (mUnalignmentNum + block.size() < requestedOtaMaxBlockSize)
+    {
+        uint32_t mAlignmentNum = (mUnalignmentNum + block.size()) / 16;
+        mAlignmentNum          = mAlignmentNum * 16;
+        mUnalignmentNum        = (mUnalignmentNum + block.size()) % 16;
+        memcpy(&mBlock[requestedOtaMaxBlockSize], &mBlock[mAlignmentNum], mUnalignmentNum);
+        mBlock.reduce_size(mAlignmentNum);
+    }
+    else
+    {
+        mUnalignmentNum = mUnalignmentNum + block.size() - requestedOtaMaxBlockSize;
+        mBlock.reduce_size(requestedOtaMaxBlockSize);
+    }
+
+    OTATlvProcessor::vOtaProcessInternalEncryption(mBlock);
+#endif
 
     ulCrtAddr += block.size();
 
@@ -78,7 +120,11 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
         OTAImageProcessorImpl::FetchNextData(0);
     }
 
+#if OTA_ENCRYPTION_ENABLE
+    status = OTA_PushImageChunk((uint8_t *) mBlock.data(), (uint16_t) mBlock.size(), NULL, NULL);
+#else
     status = OTA_PushImageChunk((uint8_t *) block.data(), (uint16_t) block.size(), NULL, NULL);
+#endif
     if (gOtaSuccess_c != status)
     {
         ChipLogError(SoftwareUpdate, "Failed to write image block. Status: %d", status);
@@ -107,6 +153,8 @@ CHIP_ERROR OTAFirmwareProcessor::ApplyAction()
 CHIP_ERROR OTAFirmwareProcessor::AbortAction()
 {
     OTA_CancelImage();
+    OTA_ServiceDeInit();
+
     Clear();
 
     return CHIP_NO_ERROR;
@@ -114,12 +162,10 @@ CHIP_ERROR OTAFirmwareProcessor::AbortAction()
 
 CHIP_ERROR OTAFirmwareProcessor::ExitAction()
 {
-    if (OTA_CommitImage(NULL) != gOtaSuccess_c)
-    {
-        ChipLogError(SoftwareUpdate, "Failed to commit firmware image.");
-        mApplyState = ApplyState::kDoNotApply;
-        return CHIP_ERROR_OTA_PROCESSOR_IMG_COMMIT;
-    }
+    /*
+     * The image will be commited in the context of HandleApply after all ApplyAction are completed.
+     * So here, we return no error.
+     */
 
     return CHIP_NO_ERROR;
 }

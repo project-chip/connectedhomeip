@@ -70,32 +70,44 @@ Davis, CA 95616, USA
       <field id="0" name="DeviceName" type="string" default="empty">
         <access fabricSensitive="true"/>
         <optionalConform/>
-        <constraint type="maxLength" value="64"/>
+        <constraint>
+          <maxLength value="64"/>
+        </constraint>
       </field>
       <field id="1" name="DeviceNameLastEdit" type="epoch-us" default="0">
         <access fabricSensitive="true"/>
       </field>
       <field id="2" name="BridgedEndpoint" type="endpoint-no">
         <access fabricSensitive="true"/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="3" name="OriginalEndpoint" type="endpoint-no">
         <access fabricSensitive="true"/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="4" name="DeviceTypes" type="list">
         <entry type="DeviceTypeStruct"/>
         <access fabricSensitive="true"/>
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="5" name="UniqueLocationIDs" type="list">
         <entry type="string">
-          <constraint type="maxLength" value="64"/>
+          <constraint>
+            <maxLength value="64"/>
+          </constraint>
         </entry>
         <access fabricSensitive="true"/>
         <mandatoryConform/>
-        <constraint type="maxCount" value="64"/>
+        <constraint>
+          <maxCount value="64"/>
+        </constraint>
       </field>
       <field id="6" name="UniqueLocationIDsLastEdit" type="epoch-us" default="0">
         <access fabricSensitive="true"/>
@@ -107,7 +119,9 @@ Davis, CA 95616, USA
       <field id="0" name="UniqueLocationID" type="string">
         <access fabricSensitive="true"/>
         <mandatoryConform/>
-        <constraint type="maxLength" value="64"/>
+        <constraint>
+          <maxLength value="64"/>
+        </constraint>
       </field>
       <field id="1" name="LocationDescriptor" type="LocationDescriptorStruct">
         <access fabricSensitive="true"/>

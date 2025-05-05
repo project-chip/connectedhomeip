@@ -857,6 +857,7 @@ limitations under the License.
         <deviceId editable="false">0x010F</deviceId>
         <class>Simple</class>
         <scope>Endpoint</scope>
+        <superset>On/Off Plug-in Unit</superset>
         <clusters>
             <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
@@ -887,6 +888,7 @@ limitations under the License.
         <deviceId editable="false">0x0110</deviceId>
         <class>Simple</class>
         <scope>Endpoint</scope>
+        <superset>Dimmable Plug-in Unit</superset>
         <clusters>
             <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
@@ -937,283 +939,55 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
-        <name>MA-closurebase</name>
+        <name>MA-closure</name>
         <domain>CHIP</domain>
-        <typeName>ClosureBase</typeName>
+        <typeName>Closure</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0230</deviceId>
-        <class>Simple</class>
+        <class>App</class>
         <scope>Endpoint</scope>
         <clusters>
-            <include cluster="Closure 1st Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 2nd Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 3rd Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 4th Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 5th Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Closure Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="TAGLIST" name="TagList"></feature>
+                </features>
+            </include>
             <include cluster="Groups" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Scenes Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
         </clusters>
     </deviceType>
     <deviceType>
-        <name>MA-window</name>
+        <name>MA-closure-panel</name>
         <domain>CHIP</domain>
-        <typeName>Window</typeName>
+        <typeName>Closure Panel</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0231</deviceId>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters>
-            <include cluster="Closure 1st Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 2nd Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 3rd Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 4th Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 5th Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Groups" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Scenes Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Closure Dimension" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="TAGLIST" name="TagList"></feature>
+                </features>
+            </include>
         </clusters>
     </deviceType>
     <deviceType>
-        <name>MA-shutter</name>
+        <name>MA-closure-controller</name>
         <domain>CHIP</domain>
-        <typeName>Shutter</typeName>
+        <typeName>Closure Controller</typeName>
         <profileId editable="false">0x0103</profileId>
-        <deviceId editable="false">0x0232</deviceId>
+        <deviceId editable="false">0x023E</deviceId>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters>
-            <include cluster="Closure 1st Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 2nd Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 3rd Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 4th Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 5th Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Groups" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Scenes Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-        </clusters>
-    </deviceType>
-    <deviceType>
-        <name>MA-shade</name>
-        <domain>CHIP</domain>
-        <typeName>Shade</typeName>
-        <profileId editable="false">0x0103</profileId>
-        <deviceId editable="false">0x0233</deviceId>
-        <class>Simple</class>
-        <scope>Endpoint</scope>
-        <clusters>
-            <include cluster="Closure 1st Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 2nd Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 3rd Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 4th Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 5th Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Groups" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Scenes Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-        </clusters>
-    </deviceType>
-    <deviceType>
-        <name>MA-curtain</name>
-        <domain>CHIP</domain>
-        <typeName>Curtain</typeName>
-        <profileId editable="false">0x0103</profileId>
-        <deviceId editable="false">0x0234</deviceId>
-        <class>Simple</class>
-        <scope>Endpoint</scope>
-        <clusters>
-            <include cluster="Closure 1st Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 2nd Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 3rd Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 4th Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 5th Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Groups" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Scenes Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-        </clusters>
-    </deviceType>
-    <deviceType>
-        <name>MA-blind</name>
-        <domain>CHIP</domain>
-        <typeName>Blind</typeName>
-        <profileId editable="false">0x0103</profileId>
-        <deviceId editable="false">0x0235</deviceId>
-        <class>Simple</class>
-        <scope>Endpoint</scope>
-        <clusters>
-            <include cluster="Closure 1st Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 2nd Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 3rd Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 4th Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 5th Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Groups" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Scenes Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-        </clusters>
-    </deviceType>
-    <deviceType>
-        <name>MA-screen</name>
-        <domain>CHIP</domain>
-        <typeName>Screen</typeName>
-        <profileId editable="false">0x0103</profileId>
-        <deviceId editable="false">0x0236</deviceId>
-        <class>Simple</class>
-        <scope>Endpoint</scope>
-        <clusters>
-            <include cluster="Closure 1st Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 2nd Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 3rd Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 4th Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 5th Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Groups" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Scenes Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-        </clusters>
-    </deviceType>
-    <deviceType>
-        <name>MA-awning</name>
-        <domain>CHIP</domain>
-        <typeName>Awning</typeName>
-        <profileId editable="false">0x0103</profileId>
-        <deviceId editable="false">0x0237</deviceId>
-        <class>Simple</class>
-        <scope>Endpoint</scope>
-        <clusters>
-            <include cluster="Closure 1st Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 2nd Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 3rd Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 4th Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 5th Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Groups" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Scenes Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-        </clusters>
-    </deviceType>
-    <deviceType>
-        <name>MA-pergola</name>
-        <domain>CHIP</domain>
-        <typeName>Pergola</typeName>
-        <profileId editable="false">0x0103</profileId>
-        <deviceId editable="false">0x0238</deviceId>
-        <class>Simple</class>
-        <scope>Endpoint</scope>
-        <clusters>
-            <include cluster="Closure 1st Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 2nd Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 3rd Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 4th Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 5th Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Groups" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Scenes Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-        </clusters>
-    </deviceType>
-    <deviceType>
-        <name>MA-door</name>
-        <domain>CHIP</domain>
-        <typeName>Door</typeName>
-        <profileId editable="false">0x0103</profileId>
-        <deviceId editable="false">0x0239</deviceId>
-        <class>Simple</class>
-        <scope>Endpoint</scope>
-        <clusters>
-            <include cluster="Closure 1st Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 2nd Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 3rd Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 4th Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 5th Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Groups" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Scenes Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-        </clusters>
-    </deviceType>
-    <deviceType>
-        <name>MA-garagedoor</name>
-        <domain>CHIP</domain>
-        <typeName>GarageDoor</typeName>
-        <profileId editable="false">0x0103</profileId>
-        <deviceId editable="false">0x023A</deviceId>
-        <class>Simple</class>
-        <scope>Endpoint</scope>
-        <clusters>
-            <include cluster="Closure 1st Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 2nd Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 3rd Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 4th Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 5th Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Groups" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Scenes Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-        </clusters>
-    </deviceType>
-    <deviceType>
-        <name>MA-gate</name>
-        <domain>CHIP</domain>
-        <typeName>Gate</typeName>
-        <profileId editable="false">0x0103</profileId>
-        <deviceId editable="false">0x023B</deviceId>
-        <class>Simple</class>
-        <scope>Endpoint</scope>
-        <clusters>
-            <include cluster="Closure 1st Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 2nd Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 3rd Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 4th Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 5th Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Groups" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Scenes Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-        </clusters>
-    </deviceType>
-    <deviceType>
-        <name>MA-barrier</name>
-        <domain>CHIP</domain>
-        <typeName>Barrier</typeName>
-        <profileId editable="false">0x0103</profileId>
-        <deviceId editable="false">0x023C</deviceId>
-        <class>Simple</class>
-        <scope>Endpoint</scope>
-        <clusters>
-            <include cluster="Closure 1st Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 2nd Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 3rd Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 4th Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 5th Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Groups" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Scenes Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-        </clusters>
-    </deviceType>
-    <deviceType>
-        <name>MA-cabinet</name>
-        <domain>CHIP</domain>
-        <typeName>Cabinet</typeName>
-        <profileId editable="false">0x0103</profileId>
-        <deviceId editable="false">0x023D</deviceId>
-        <class>Simple</class>
-        <scope>Endpoint</scope>
-        <clusters>
-            <include cluster="Closure 1st Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 2nd Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 3rd Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 4th Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure 5th Dimension" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Closure Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Groups" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Scenes Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Binding" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Closure Control" client="true" server="false" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Closure Dimension" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Groups" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Identify" client="false" server="false" clientLocked="false" serverLocked="true"></include>
         </clusters>
     </deviceType>
     <deviceType>
@@ -1478,7 +1252,66 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
-        <name>MA-controlbridge</name>
+        <name>MA-electrical-utility-meter</name>
+        <domain>CHIP</domain>
+        <typeName>Electrical Utility Meter</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0511</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Meter Identification" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Time Synchronization" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-meter-reference-point</name>
+        <domain>CHIP</domain>
+        <typeName>Meter Reference Point</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0512</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Time Synchronization" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-electrical-energy-tariff</name>
+        <domain>CHIP</domain>
+        <typeName>Electrical Energy Tariff</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0513</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Commodity Price" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Commodity Tariff" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>TAG_LIST</requireAttribute>
+                <features>
+                    <feature code="TAGLIST" name="TagList"></feature>
+                </features>
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-electrical-meter</name>
+        <domain>CHIP</domain>
+        <typeName>Electrical Meter</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0514</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Commodity Metering" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-control-bridge</name>
         <domain>CHIP</domain>
         <typeName>Control Bridge</typeName>
         <profileId editable="false">0x0103</profileId>
@@ -2536,6 +2369,15 @@ limitations under the License.
         <deviceId editable="false">0x007B</deviceId>
         <class>Simple</class>
         <scope>Endpoint</scope>
+        <endpointComposition>
+            <compositionType>tree</compositionType>
+            <endpoint conformance="M" constraint="min 1">
+                    <deviceType>0x0071</deviceType>
+            </endpoint>
+             <endpoint conformance="O" constraint="max 1">
+                    <deviceType>0x0078</deviceType>
+            </endpoint>
+        </endpointComposition>
         <clusters lockOthers="true">
             <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>

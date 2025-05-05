@@ -1529,6 +1529,82 @@ TEST_F(TestRead, TestResubscribeAttributeTimeout)
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
+TEST_F(TestRead, TestShutdownAllSubscriptionHandlers)
+{
+    auto sessionHandle = GetSessionBobToAlice();
+
+    SetMRPMode(MessagingContext::MRPMode::kResponsive);
+
+    {
+        TestResubscriptionCallback callback;
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), callback,
+                              ReadClient::InteractionType::Subscribe);
+
+        callback.SetReadClient(&readClient);
+
+        ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+
+        // Read full wildcard paths, repeat twice to ensure chunking.
+        AttributePathParams attributePathParams[1];
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+        readPrepareParams.mAttributePathParamsListSize = MATTER_ARRAY_SIZE(attributePathParams);
+        attributePathParams[0].mEndpointId             = kTestEndpointId;
+        attributePathParams[0].mClusterId              = Clusters::UnitTesting::Id;
+        attributePathParams[0].mAttributeId            = Clusters::UnitTesting::Attributes::Boolean::Id;
+
+        constexpr uint16_t maxIntervalCeilingSeconds = 1;
+
+        readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
+
+        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        //
+        // Drive servicing IO till we have established a subscription.
+        //
+        GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                    [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
+        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
+        EXPECT_EQ(callback.mOnError, 0);
+        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 0);
+
+        ReadHandler * readHandler = InteractionModelEngine::GetInstance()->ActiveHandlerAt(0);
+
+        uint16_t minInterval;
+        uint16_t maxInterval;
+        readHandler->GetReportingIntervals(minInterval, maxInterval);
+
+        InteractionModelEngine::GetInstance()->ShutdownAllSubscriptionHandlers();
+
+        GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)),
+                                    [&]() { return callback.mOnResubscriptionsAttempted > 0; });
+
+        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
+        EXPECT_EQ(callback.mLastError, CHIP_ERROR_TIMEOUT);
+
+        GetLoopback().mNumMessagesToDrop = 0;
+        callback.ClearCounters();
+
+        //
+        // Drive servicing IO till we have established a subscription.
+        //
+        GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                    [&]() { return callback.mOnSubscriptionEstablishedCount == 1; });
+        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
+
+        //
+        // With re-sub enabled, we shouldn't have encountered any errors
+        //
+        EXPECT_EQ(callback.mOnError, 0);
+        EXPECT_EQ(callback.mOnDone, 0);
+    }
+
+    SetMRPMode(MessagingContext::MRPMode::kDefault);
+
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
 //
 // This validates a vanilla subscription with re-susbcription disabled timing out correctly on the client
 // side and triggering the OnError callback with the right error code.
@@ -2330,7 +2406,7 @@ TEST_F(TestRead, TestSubscribe_OnActiveModeNotification)
         GetLoopback().mNumMessagesToDrop = 0;
         callback.ClearCounters();
         InteractionModelEngine::GetInstance()->OnActiveModeNotification(
-            ScopedNodeId(readClient.GetPeerNodeId(), readClient.GetFabricIndex()));
+            ScopedNodeId(readClient.GetPeerNodeId(), readClient.GetFabricIndex()), static_cast<uint64_t>(0x12344321));
         EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
         EXPECT_EQ(callback.mLastError, CHIP_ERROR_TIMEOUT);
 
@@ -2344,6 +2420,138 @@ TEST_F(TestRead, TestSubscribe_OnActiveModeNotification)
         //
         // With re-sub enabled, we shouldn't have encountered any errors
         //
+        EXPECT_EQ(callback.mOnError, 0);
+        EXPECT_EQ(callback.mOnDone, 0);
+    }
+
+    SetMRPMode(MessagingContext::MRPMode::kDefault);
+
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+/**
+ * When all tracked subscriptions go away in server, check-in message is received and OnActiveModeNotification is called in client
+ * side, the tracked subscription would be torn down and a new one would be rescheduled in client side.
+ */
+TEST_F(TestRead, TestSubscribe_SubGoAwayInserverOnActiveModeNotification)
+{
+    auto sessionHandle = GetSessionBobToAlice();
+
+    SetMRPMode(MessagingContext::MRPMode::kResponsive);
+
+    {
+        TestResubscriptionCallback callback;
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), callback,
+                              ReadClient::InteractionType::Subscribe);
+
+        callback.mScheduleLITResubscribeImmediately = false;
+        callback.SetReadClient(&readClient);
+
+        ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+
+        // Read full wildcard paths, repeat twice to ensure chunking.
+        AttributePathParams attributePathParams[1];
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+        readPrepareParams.mAttributePathParamsListSize = MATTER_ARRAY_SIZE(attributePathParams);
+        attributePathParams[0].mEndpointId             = kTestEndpointId;
+        attributePathParams[0].mClusterId              = Clusters::UnitTesting::Id;
+        attributePathParams[0].mAttributeId            = Clusters::UnitTesting::Attributes::Boolean::Id;
+
+        constexpr uint16_t maxIntervalCeilingSeconds = 1;
+
+        readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
+        readPrepareParams.mIsPeerLIT                 = true;
+
+        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        //
+        // Drive servicing IO till we have established a subscription.
+        //
+        GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                    [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
+        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
+        EXPECT_EQ(callback.mOnError, 0);
+        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 0);
+
+        GetLoopback().mNumMessagesToDrop = 0;
+        callback.ClearCounters();
+        InteractionModelEngine::GetInstance()->OnActiveModeNotification(
+            ScopedNodeId(readClient.GetPeerNodeId(), readClient.GetFabricIndex()), static_cast<uint64_t>(0x12344321));
+        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
+        EXPECT_EQ(callback.mLastError, CHIP_ERROR_TIMEOUT);
+
+        //
+        // Drive servicing IO till we have established a subscription.
+        //
+        GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                    [&]() { return callback.mOnSubscriptionEstablishedCount == 1; });
+        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
+
+        //
+        // With re-sub enabled, we shouldn't have encountered any errors
+        //
+        EXPECT_EQ(callback.mOnError, 0);
+        EXPECT_EQ(callback.mOnDone, 0);
+    }
+
+    SetMRPMode(MessagingContext::MRPMode::kDefault);
+
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+/**
+ * When all tracked subscriptions go away in server, check-in message is received and OnActiveModeNotification is called in client
+ * side, the untracked subscription would be kept.
+ */
+TEST_F(TestRead, TestSubscribe_MismatchedSubGoAwayInserverOnActiveModeNotification)
+{
+    auto sessionHandle = GetSessionBobToAlice();
+
+    SetMRPMode(MessagingContext::MRPMode::kResponsive);
+
+    {
+        TestResubscriptionCallback callback;
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), callback,
+                              ReadClient::InteractionType::Subscribe);
+
+        callback.mScheduleLITResubscribeImmediately = false;
+        callback.SetReadClient(&readClient);
+
+        ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+
+        // Read full wildcard paths, repeat twice to ensure chunking.
+        AttributePathParams attributePathParams[1];
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+        readPrepareParams.mAttributePathParamsListSize = MATTER_ARRAY_SIZE(attributePathParams);
+        attributePathParams[0].mEndpointId             = kTestEndpointId;
+        attributePathParams[0].mClusterId              = Clusters::UnitTesting::Id;
+        attributePathParams[0].mAttributeId            = Clusters::UnitTesting::Attributes::Boolean::Id;
+        constexpr uint16_t maxIntervalCeilingSeconds   = 1;
+
+        readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
+        readPrepareParams.mIsPeerLIT                 = true;
+
+        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        //
+        // Drive servicing IO till we have established a subscription.
+        //
+        GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                    [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
+        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
+        EXPECT_EQ(callback.mOnError, 0);
+        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 0);
+
+        GetLoopback().mNumMessagesToDrop = 0;
+        callback.ClearCounters();
+        InteractionModelEngine::GetInstance()->OnActiveModeNotification(
+            ScopedNodeId(readClient.GetPeerNodeId(), readClient.GetFabricIndex()), static_cast<uint64_t>(0));
+        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 0);
+        EXPECT_EQ(callback.mLastError, CHIP_NO_ERROR);
         EXPECT_EQ(callback.mOnError, 0);
         EXPECT_EQ(callback.mOnDone, 0);
     }
@@ -2393,7 +2601,7 @@ TEST_F(TestRead, TestSubscribeFailed_OnActiveModeNotification)
         GetLoopback().mNumMessagesToDrop = 0;
         callback.ClearCounters();
         InteractionModelEngine::GetInstance()->OnActiveModeNotification(
-            ScopedNodeId(readClient.GetPeerNodeId(), readClient.GetFabricIndex()));
+            ScopedNodeId(readClient.GetPeerNodeId(), readClient.GetFabricIndex()), static_cast<uint64_t>(0x12344321));
         //
         // Drive servicing IO till we have established a subscription.
         //
@@ -4681,10 +4889,10 @@ System::Clock::Timeout TestRead::ComputeSubscriptionTimeout(System::Clock::Secon
     // Add 1000ms of slack to our max interval to make sure we hit the
     // subscription liveness timer.  100ms was tried in the past and is not
     // sufficient: our process can easily lose the timeslice for 100ms.
-    const auto & ourMrpConfig = GetDefaultMRPConfig();
-    auto publisherTransmissionTimeout =
-        GetRetransmissionTimeout(ourMrpConfig.mActiveRetransTimeout, ourMrpConfig.mIdleRetransTimeout,
-                                 System::SystemClock().GetMonotonicTimestamp(), ourMrpConfig.mActiveThresholdTime);
+    const auto & ourMrpConfig         = GetDefaultMRPConfig();
+    auto publisherTransmissionTimeout = GetRetransmissionTimeout(
+        ourMrpConfig.mActiveRetransTimeout, ourMrpConfig.mIdleRetransTimeout, System::SystemClock().GetMonotonicTimestamp(),
+        ourMrpConfig.mActiveThresholdTime, true /* isFirstMessageOnExchange */);
 
     return publisherTransmissionTimeout + aMaxInterval + System::Clock::Milliseconds32(1000);
 }

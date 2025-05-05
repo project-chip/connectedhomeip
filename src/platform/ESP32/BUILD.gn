@@ -68,6 +68,7 @@ static_library("ESP32") {
 
   deps = [
     "${chip_root}/src/app:app_config",
+    "${chip_root}/src/app/common:ids",
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/platform/logging:headers",
     "${chip_root}/src/setup_payload",
@@ -100,33 +101,29 @@ static_library("ESP32") {
     ]
   }
 
-  if (chip_enable_chipoble) {
-    sources += [
-      "BLEManagerImpl.h",
-      "ChipDeviceScanner.h",
-    ]
-  }
-
-  if (chip_enable_ble_controller) {
-    sources += [ "ChipDeviceScanner.h" ]
-  }
-
-  if (chip_bt_nimble_enabled) {
-    sources += [ "nimble/BLEManagerImpl.cpp" ]
+  if (chip_enable_ble) {
+    sources += [ "BLEManagerImpl.h" ]
     if (chip_enable_ble_controller) {
-      sources += [
-        "nimble/ChipDeviceScanner.cpp",
-        "nimble/blecent.h",
-        "nimble/misc.c",
-        "nimble/peer.c",
-      ]
+      sources += [ "ChipDeviceScanner.h" ]
     }
-  }
 
-  if (chip_bt_bluedroid_enabled) {
-    sources += [ "bluedroid/BLEManagerImpl.cpp" ]
-    if (chip_enable_ble_controller) {
-      sources += [ "bluedroid/ChipDeviceScanner.cpp" ]
+    if (chip_bt_nimble_enabled) {
+      sources += [ "nimble/BLEManagerImpl.cpp" ]
+      if (chip_enable_ble_controller) {
+        sources += [
+          "nimble/ChipDeviceScanner.cpp",
+          "nimble/blecent.h",
+          "nimble/misc.c",
+          "nimble/peer.c",
+        ]
+      }
+    }
+
+    if (chip_bt_bluedroid_enabled) {
+      sources += [ "bluedroid/BLEManagerImpl.cpp" ]
+      if (chip_enable_ble_controller) {
+        sources += [ "bluedroid/ChipDeviceScanner.cpp" ]
+      }
     }
   }
 

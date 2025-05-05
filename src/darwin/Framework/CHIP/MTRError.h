@@ -145,6 +145,7 @@ typedef NS_ERROR_ENUM(MTRInteractionErrorDomain, MTRInteractionErrorCode){
     MTRInteractionErrorCodeDataVersionMismatch                                                                = 0x92,
     MTRInteractionErrorCodeTimeout                                                                            = 0x94,
     MTRInteractionErrorCodeBusy                                                                               = 0x9c,
+    MTRInteractionErrorCodeAccessRestricted MTR_NEWLY_AVAILABLE                                               = 0x9d,
     MTRInteractionErrorCodeUnsupportedCluster                                                                 = 0xc3,
     MTRInteractionErrorCodeNoUpstreamSubscription                                                             = 0xc5,
     MTRInteractionErrorCodeNeedsTimedInteraction                                                              = 0xc6,
@@ -154,6 +155,7 @@ typedef NS_ERROR_ENUM(MTRInteractionErrorDomain, MTRInteractionErrorCode){
     MTRInteractionErrorCodeFailsafeRequired                                                                   = 0xca,
     MTRInteractionErrorCodeInvalidInState MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))    = 0xcb,
     MTRInteractionErrorCodeNoCommandResponse MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0xcc,
+    MTRInteractionErrorCodeInvalidTransportType MTR_NEWLY_AVAILABLE                                           = 0xd1,
 };
 
 NS_ASSUME_NONNULL_END

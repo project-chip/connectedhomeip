@@ -15,12 +15,12 @@ NS_ASSUME_NONNULL_BEGIN
 {{#zcl_command_arguments}}
 
 {{#if (isSupported ../cluster command=../command commandField=(asStructPropertyName label))}}
-{{> struct_field_decl cluster=parent.parent.name type=type label=label}} {{availability ../cluster command=../command commandField=(asStructPropertyName label) deprecationMessage=(concat "The " (asStructPropertyName label) " field will be removed")}};
+{{> struct_field_decl cluster=parent.parent.name originalCluster=parent.parent.name type=type label=label}} {{availability ../cluster command=../command commandField=(asStructPropertyName label) deprecationMessage=(concat "The " (asStructPropertyName label) " field will be removed")}};
 {{/if}}
 {{#*inline "oldNameFieldDecl"}}
 
 {{#if (isSupported ../cluster command=../command commandField=commandField)}}
-{{> struct_field_decl cluster=parent.parent.name type=type label=commandField}} {{availability ../cluster command=../command commandField=commandField deprecationMessage=(concat "Please use " (asStructPropertyName label))}};
+{{> struct_field_decl cluster=parent.parent.name originalCluster=parent.parent.name type=type label=commandField}} {{availability ../cluster command=../command commandField=commandField deprecationMessage=(concat "Please use " (asStructPropertyName label))}};
 {{/if}}
 {{/inline}}
 {{#if (and includeRenamedProperties
@@ -120,7 +120,7 @@ NS_ASSUME_NONNULL_BEGIN
 {{#zcl_command_arguments}}
 {{#*inline "oldNameFieldDecl"}}
 
-{{> struct_field_decl cluster=parent.parent.name type=type label=commandField}} {{availability ../cluster command=../command commandField=commandField deprecationMessage=(concat "Please use " (asStructPropertyName label))}};
+{{> struct_field_decl cluster=parent.parent.name originalCluster=parent.parent.name type=type label=commandField}} {{availability ../cluster command=../command commandField=commandField deprecationMessage=(concat "Please use " (asStructPropertyName label))}};
 {{/inline}}
 {{#if (hasOldName ../cluster command=../command commandField=(asStructPropertyName label))}}
 {{> oldNameFieldDecl commandField=(oldName ../cluster command=../command commandField=(asStructPropertyName label))}}

@@ -29,7 +29,7 @@ class OperationalCredentialsClusterFabricDescriptorStruct(
   val fabricID: ULong,
   val nodeID: ULong,
   val label: String,
-  val vidVerificationStatement: Optional<ByteArray>,
+  val VIDVerificationStatement: Optional<ByteArray>,
   val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
@@ -39,7 +39,7 @@ class OperationalCredentialsClusterFabricDescriptorStruct(
     append("\tfabricID : $fabricID\n")
     append("\tnodeID : $nodeID\n")
     append("\tlabel : $label\n")
-    append("\tvidVerificationStatement : $vidVerificationStatement\n")
+    append("\tVIDVerificationStatement : $VIDVerificationStatement\n")
     append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
@@ -52,9 +52,9 @@ class OperationalCredentialsClusterFabricDescriptorStruct(
       put(ContextSpecificTag(TAG_FABRIC_ID), fabricID)
       put(ContextSpecificTag(TAG_NODE_ID), nodeID)
       put(ContextSpecificTag(TAG_LABEL), label)
-      if (vidVerificationStatement.isPresent) {
-        val optvidVerificationStatement = vidVerificationStatement.get()
-        put(ContextSpecificTag(TAG_VID_VERIFICATION_STATEMENT), optvidVerificationStatement)
+      if (VIDVerificationStatement.isPresent) {
+        val optVIDVerificationStatement = VIDVerificationStatement.get()
+        put(ContextSpecificTag(TAG_VID_VERIFICATION_STATEMENT), optVIDVerificationStatement)
       }
       put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
@@ -80,7 +80,7 @@ class OperationalCredentialsClusterFabricDescriptorStruct(
       val fabricID = tlvReader.getULong(ContextSpecificTag(TAG_FABRIC_ID))
       val nodeID = tlvReader.getULong(ContextSpecificTag(TAG_NODE_ID))
       val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
-      val vidVerificationStatement =
+      val VIDVerificationStatement =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_VID_VERIFICATION_STATEMENT))) {
           Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_VID_VERIFICATION_STATEMENT)))
         } else {
@@ -96,7 +96,7 @@ class OperationalCredentialsClusterFabricDescriptorStruct(
         fabricID,
         nodeID,
         label,
-        vidVerificationStatement,
+        VIDVerificationStatement,
         fabricIndex,
       )
     }

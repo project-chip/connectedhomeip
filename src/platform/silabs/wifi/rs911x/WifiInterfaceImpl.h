@@ -43,7 +43,7 @@ public:
     CHIP_ERROR ResetCounters() override;
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     CHIP_ERROR ConfigureBroadcastFilter(bool enableBroadcastFilter) override;
-    CHIP_ERROR ConfigurePowerSave() override;
+    CHIP_ERROR ConfigurePowerSave(PowerSaveInterface::PowerSaveConfiguration configuration, uint32_t listenInterval);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     /**

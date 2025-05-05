@@ -96,7 +96,7 @@ CHIP_ERROR ClockImpl::SetClock_RealTime(Microseconds64 aNewCurTime)
         localtime_r(&timep, &calendar);
         char time_str[64];
         strftime(time_str, sizeof(time_str), "%Y-%m-%d %H:%M:%S UTC", &calendar);
-        ChipLogProgress(DeviceLayer, "Real time clock set to %lld (%s)", static_cast<long long>(tv.tv_sec), time_str);
+        ChipLogProgress(DeviceLayer, "Real time clock set to %ld (%s)", static_cast<long>(tv.tv_sec), time_str);
     }
 #endif // CHIP_PROGRESS_LOGGING
     return CHIP_NO_ERROR;

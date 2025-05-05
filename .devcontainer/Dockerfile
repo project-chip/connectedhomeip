@@ -56,23 +56,18 @@ RUN curl https://raw.githubusercontent.com/restyled-io/restyler/master/bin/resty
 
 RUN mkdir -p /opt/android/sdk \
     && chown -R $USERNAME:$USERNAME \
-    /opt/android/sdk `# NXP uses a patch_sdk script to change SDK files` \
     $ANDROID_HOME \
     $IDF_TOOLS_PATH \
-    && find $AMEBA_PATH -name "inc_lp" -print0 | xargs -0 chown -R $USERNAME:$USERNAME \
-    && find $AMEBA_PATH -name "inc_hp" -print0 | xargs -0 chown -R $USERNAME:$USERNAME \
-    && find $AMEBA_PATH -name "project_lp" -print0 | xargs -0 chown -R $USERNAME:$USERNAME \
-    && find $AMEBA_PATH -name "project_hp" -print0 | xargs -0 chown -R $USERNAME:$USERNAME \
-    && chmod -R +x \
-    $ANDROID_HOME/cmdline-tools/10.0/bin `# sdkmanager for accepting licenses`\
+    && find $AMEBA_PATH \
+    -name "inc_lp" -print0      -or \
+    -name "inc_hp" -print0      -or \
+    -name "project_lp" -print0  -or \
+    -name "project_hp" -print0 \
+    | xargs -0 -I {} sh -c 'chown -R $USERNAME:$USERNAME {}; chmod -R +w {}' \
+    && find $ANDROID_HOME/cmdline-tools/ -type d -name bin | xargs chmod -R +x `# sdkmanager for accepting licenses` \
     && chmod -R +w \
     $IDF_TOOLS_PATH \
-    && find $AMEBA_PATH -name "inc_lp" -print0 | xargs -0 chmod -R +w \
-    && find $AMEBA_PATH -name "inc_hp" -print0 | xargs -0 chmod -R +w \
-    && find $AMEBA_PATH -name "project_lp" -print0 | xargs -0 chmod -R +w \
-    && find $AMEBA_PATH -name "project_hp" -print0 | xargs -0 chmod -R +w \
-    # Safe directory is preferred over chown.
-    && git config --global --add safe.directory "*" \
+    && git config --global --add safe.directory "*" `# Safe directory is preferred over chown.` \
     && :
 
 # Fix Tizen SDK paths for new user

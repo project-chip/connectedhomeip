@@ -24,8 +24,8 @@
 #include <platform/silabs/wifi/WifiInterface.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <platform/silabs/wifi/icd/WifiSleepManager.h>
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <platform/silabs/wifi/icd/WifiSleepManager.h> // nogncheck
+#endif                                                 // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 #ifdef __cplusplus
 extern "C" {
@@ -165,7 +165,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     // Setting the device in high performance - no-sleep mode during OTA tranfer
-    DeviceLayer::Silabs::WifiSleepManager::GetInstance().RequestHighPerformance();
+    DeviceLayer::Silabs::WifiSleepManager::GetInstance().RequestHighPerformanceWithTransition();
 #endif /* CHIP_CONFIG_ENABLE_ICD_SERVER*/
 
     imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
@@ -223,7 +223,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     // Setting the device is in high performace - no-sleepy mode before soft reset as soft reset is not happening in sleep mode
-    DeviceLayer::Silabs::WifiSleepManager::GetInstance().RequestHighPerformance();
+    DeviceLayer::Silabs::WifiSleepManager::GetInstance().RequestHighPerformanceWithTransition();
 #endif /* CHIP_CONFIG_ENABLE_ICD_SERVER*/
 
     if (mReset)

@@ -55,6 +55,7 @@ extern "C" {
 WfxRsi_t wfx_rsi;
 
 using namespace chip::DeviceLayer::Silabs;
+using WiFiBandEnum = chip::app::Clusters::NetworkCommissioning::WiFiBandEnum;
 
 namespace {
 
@@ -258,7 +259,7 @@ CHIP_ERROR WifiInterfaceImpl::ResetCounters()
 }
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-CHIP_ERROR WifiInterfaceImpl::ConfigurePowerSave()
+CHIP_ERROR WifiInterfaceImpl::ConfigurePowerSave(PowerSaveInterface::PowerSaveConfiguration configuration, uint32_t listenInterval)
 {
     int32_t status = RSI_SUCCESS;
 #ifdef RSI_BLE_ENABLE
@@ -267,6 +268,7 @@ CHIP_ERROR WifiInterfaceImpl::ConfigurePowerSave()
                         ChipLogError(DeviceLayer, "BT Powersave Config Failed, Error Code : 0x%lX", status));
 #endif /* RSI_BLE_ENABLE */
 
+    // TODO: Support all power modes
     status = rsi_wlan_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
     VerifyOrReturnError(status == RSI_SUCCESS, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "WLAN Powersave Config Failed, Error Code : 0x%lX", status));
@@ -379,6 +381,8 @@ void WifiInterfaceImpl::ProcessEvent(WifiPlatformEvent event)
             chip::MutableByteSpan bssidSpan(ap.bssid, kWifiMacAddressLength);
             chip::ByteSpan scanBssidSpan(scan.bssid, kWifiMacAddressLength);
             chip::CopySpanToMutableSpan(scanBssidSpan, bssidSpan);
+            // TODO: change this when SDK provides values
+            ap.wiFiBand = WiFiBandEnum::k2g4;
 
             wfx_rsi.scan_cb(&ap);
 

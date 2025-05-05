@@ -59,3 +59,14 @@ void emberAfEnergyEvseClusterInitCallback(chip::EndpointId endpointId)
         gInstance->Init(); /* Register Attribute & Command handlers */
     }
 }
+
+void emberAfEnergyEvseClusterShutdownCallback(chip::EndpointId endpointId)
+{
+    if (gInstance)
+    {
+        gInstance->Shutdown();
+    }
+    gInstance            = nullptr;
+    gDelegate            = nullptr;
+    gEvseTargetsDelegate = nullptr;
+}

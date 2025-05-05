@@ -527,3 +527,11 @@ void MatterGeneralDiagnosticsPluginServerInitCallback()
         GeneralDiagnosticsServer::Instance().OnDeviceReboot(bootReason);
     }
 }
+
+void MatterGeneralDiagnosticsPluginServerShutdownCallback()
+{
+    ConnectivityMgr().SetDelegate(nullptr);
+
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gGeneralDiagnosticsInstance);
+    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(&gGeneralDiagnosticsInstance);
+}

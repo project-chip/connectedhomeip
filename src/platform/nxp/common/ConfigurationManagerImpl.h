@@ -79,9 +79,8 @@ private:
     // ===== Private members reserved for use by this class only.
 
     static void DoFactoryReset(intptr_t arg);
-#if CONFIG_BOOT_REASON_SDK_SUPPORT
+
     CHIP_ERROR DetermineBootReason(uint8_t rebootCause);
-#endif
 };
 
 /**

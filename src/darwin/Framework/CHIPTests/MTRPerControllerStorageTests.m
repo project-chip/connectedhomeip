@@ -29,6 +29,7 @@
 #import "MTRFabricInfoChecker.h"
 #import "MTRTestCase+ServerAppRunner.h"
 #import "MTRTestCase.h"
+#import "MTRTestControllerDelegate.h"
 #import "MTRTestDeclarations.h"
 #import "MTRTestKeys.h"
 #import "MTRTestPerControllerStorage.h"
@@ -40,44 +41,6 @@ static const uint16_t kSubscriptionTimeoutInSeconds = 60;
 static NSString * kOnboardingPayload = @"MT:-24J0AFN00KA0648G00";
 static const uint16_t kTestVendorId = 0xFFF1u;
 static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
-
-@interface MTRPerControllerStorageTestsControllerDelegate : NSObject <MTRDeviceControllerDelegate>
-@property (nonatomic, strong) XCTestExpectation * expectation;
-@property (nonatomic, strong) NSNumber * deviceID;
-@end
-
-@implementation MTRPerControllerStorageTestsControllerDelegate
-- (id)initWithExpectation:(XCTestExpectation *)expectation newNodeID:(NSNumber *)newNodeID
-{
-    self = [super init];
-    if (self) {
-        _expectation = expectation;
-        _deviceID = newNodeID;
-    }
-    return self;
-}
-
-- (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError *)error
-{
-    XCTAssertEqual(error.code, 0);
-
-    __auto_type * params = [[MTRCommissioningParameters alloc] init];
-
-    NSError * commissionError = nil;
-    [controller commissionNodeWithID:self.deviceID commissioningParams:params error:&commissionError];
-    XCTAssertNil(commissionError);
-
-    // Keep waiting for controller:commissioningComplete:
-}
-
-- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError *)error
-{
-    XCTAssertEqual(error.code, 0);
-    [_expectation fulfill];
-    _expectation = nil;
-}
-
-@end
 
 @interface MTRPerControllerStorageTestsSuspensionDelegate : NSObject <MTRDeviceControllerDelegate>
 @property (nonatomic, strong) XCTestExpectation * expectation;
@@ -334,6 +297,21 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     BOOL _localTestStorageEnabledBeforeUnitTest;
 }
 
++ (void)setUp
+{
+    // Start one instance of all-clusters-app that the various tests below can
+    // then use, so we're not doing quite as much startup logging.  Though it's
+    // not clear that the ResetCommissionee logging is really shorter, so maybe
+    // we should start these on a per-test basis, e.g. in
+    // commissionWithController:newNodeID:onboardingPayload:
+    [super setUp];
+
+    BOOL started = [self startAppWithName:@"all-clusters"
+                                arguments:@[]
+                                  payload:kOnboardingPayload];
+    XCTAssertTrue(started);
+}
+
 - (void)setUp
 {
     // Set detectLeaks true first, in case our superclass wants to do something
@@ -383,8 +361,8 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Pairing Complete"];
 
-    __auto_type * deviceControllerDelegate = [[MTRPerControllerStorageTestsControllerDelegate alloc] initWithExpectation:expectation
-                                                                                                               newNodeID:newNodeID];
+    __auto_type * deviceControllerDelegate = [[MTRTestControllerDelegate alloc] initWithExpectation:expectation
+                                                                                          newNodeID:newNodeID];
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.device_controller_delegate", DISPATCH_QUEUE_SERIAL);
 
     [controller setDeviceControllerDelegate:deviceControllerDelegate queue:callbackQueue];
@@ -1630,6 +1608,11 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     // And that the device cache is not primed.
     XCTAssertFalse(device.deviceCachePrimed);
 
+    // And that there is no highest observed event number so far and we have
+    // seen no events.
+    XCTAssertNil(device.highestObservedEventNumber);
+    XCTAssertEqual(device.unitTestEventsReportedSinceLastCheck, 0);
+
     [device setDelegate:delegate queue:queue];
 
     [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
@@ -1648,6 +1631,10 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
             XCTAssertTrue([device _attributeDataValue:dataValue isEqualToDataValue:dataValueFromMTRDevice]);
         }
     }
+
+    // Must have seen at least one event.
+    XCTAssertNotNil(device.highestObservedEventNumber);
+    XCTAssertGreaterThan(device.unitTestEventsReportedSinceLastCheck, 0);
 
     // Now force the removal of the object from controller to test reloading read cache from storage
     [controller removeDevice:device];
@@ -1671,15 +1658,24 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     double storedAttributeDifferFromMTRDevicePercentage = storedAttributeDifferFromMTRDeviceCount * 100.0 / dataStoreValuesCount;
     XCTAssertTrue(storedAttributeDifferFromMTRDevicePercentage < 10.0);
 
-    // Check that the new device has an estimated subscription latency.
-    XCTAssertNotNil(device.estimatedSubscriptionLatency);
+    // Check that the new device is already primed.
+    XCTAssertTrue(newDevice.deviceCachePrimed);
 
-    // And that it's already primed.
-    XCTAssertTrue(device.deviceCachePrimed);
+    // Check that the new device has an estimated subscription latency.
+    XCTAssertNotNil(newDevice.estimatedSubscriptionLatency);
 
     // Check that this estimate is positive, since subscribing must have taken
     // some time.
-    XCTAssertGreaterThan(device.estimatedSubscriptionLatency.doubleValue, 0);
+    XCTAssertGreaterThan(newDevice.estimatedSubscriptionLatency.doubleValue, 0);
+
+    // Check that the highest observed event number is also not nil.  This value
+    // might be zero if there was an event but it was the first one the server ever
+    // generated.
+    NSNumber * oldHighestObservedEventNumber = newDevice.highestObservedEventNumber;
+    XCTAssertNotNil(oldHighestObservedEventNumber);
+
+    // Check that we have had no events reported so far: this is a new device.
+    XCTAssertEqual(newDevice.unitTestEventsReportedSinceLastCheck, 0);
 
     // Now set up new delegate for the new device and verify that once subscription reestablishes, the data version filter loaded from storage will work
     __auto_type * newDelegate = [[MTRDeviceTestDelegate alloc] init];
@@ -1715,10 +1711,18 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
     // 1) MTRDevice actually gets some attributes reported more than once
     // 2) Some attributes do change on resubscribe
-    //   * With all-clusts-app as of 2024-02-10, out of 1287 persisted attributes, still 450 attributes were reported with filter
+    //   * With all-clusters-app as of 2024-02-10, out of 1287 persisted attributes, still 450 attributes were reported with filter
     // And so conservatively, assert that data version filters save at least 300 entries.
-    NSUInteger storedAttributeCountDifferenceFromMTRDeviceReport = dataStoreValuesCount - [device unitTestAttributesReportedSinceLastCheck];
+    NSUInteger storedAttributeCountDifferenceFromMTRDeviceReport = dataStoreValuesCount - [newDevice unitTestAttributesReportedSinceLastCheck];
     XCTAssertTrue(storedAttributeCountDifferenceFromMTRDeviceReport > 300);
+
+    NSNumber * newHighestObservedEventNumber = newDevice.highestObservedEventNumber;
+    XCTAssertNotNil(newHighestObservedEventNumber);
+
+    // In theory we could have missed some events, but in practice that's not
+    // likely to happen in this context.
+    XCTAssertEqual(newHighestObservedEventNumber.unsignedIntValue - oldHighestObservedEventNumber.unsignedIntValue,
+        newDevice.unitTestEventsReportedSinceLastCheck);
 
     // Reset our commissionee.
     __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
@@ -2119,12 +2123,6 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 // startControllerWithRootKeys into a test helper.
 - (void)testControllerServer
 {
-#ifdef DEBUG
-    // Force our controllers to only advertise on localhost, to avoid DNS-SD
-    // crosstalk.
-    [MTRDeviceController forceLocalhostAdvertisingOnly];
-#endif // DEBUG
-
     __auto_type queue = dispatch_get_main_queue();
 
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
@@ -3713,6 +3711,11 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
         XCTAssertEqual(controller.devices.count, 1);
     }
+
+    // Wait for the report processing to finish, so the MTRDevice object may dealloc
+    [controller syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
 
     // report should still be ongoing
     XCTAssertFalse(subscriptionReportEnd1);

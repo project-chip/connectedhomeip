@@ -52,6 +52,8 @@ public:
         Optional<std::string> iceTransportPolicy;
         Optional<BitMask<WebRTCMetadataOptionsBitmap>> metadataOptions;
         NodeId peerNodeId;
+        FabricIndex fabricIndex;
+        EndpointId originatingEndpointId;
     };
 
     struct ProvideOfferRequestArgs : OfferRequestArgs

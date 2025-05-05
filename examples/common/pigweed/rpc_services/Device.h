@@ -487,6 +487,7 @@ public:
 #if CHIP_CONFIG_ENABLE_ICD_CIP
         chip::DeviceLayer::PlatformMgr().ScheduleWork(
             [](intptr_t) {
+                chip::app::InteractionModelEngine::GetInstance()->ShutdownAllSubscriptionHandlers();
                 ChipLogDetail(AppServer, "Being triggerred to send ICD check-in message to subscriber");
                 chip::app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
             },

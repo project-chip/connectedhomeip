@@ -141,6 +141,13 @@ def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
     )
     targets.append(
         ApplicationTarget(
+            key="ENERGY_GATEWAY_APP",
+            target=f"{target_prefix}-energy-gateway-{suffix}",
+            binary="chip-energy-gateway-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
             key="ENERGY_MANAGEMENT_APP",
             target=f"{target_prefix}-energy-management-{suffix}",
             binary="chip-energy-management-app",
@@ -151,6 +158,13 @@ def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
             key="LIT_ICD_APP",
             target=f"{target_prefix}-lit-icd-{suffix}",
             binary="lit-icd-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            key="AIR_PURIFIER_APP",
+            target=f"{target_prefix}-air-purifier-{suffix}",
+            binary="chip-air-purifier-app",
         )
     )
     targets.append(
@@ -1086,7 +1100,7 @@ def chip_tool_tests(
     # This likely should be run in docker to not allow breaking things
     # run as:
     #
-    # docker run --rm -it -v ~/devel/connectedhomeip:/workspace --privileged ghcr.io/project-chip/chip-build-vscode:119
+    # docker run --rm -it -v ~/devel/connectedhomeip:/workspace --privileged ghcr.io/project-chip/chip-build-vscode:125
     runner = __RUNNERS__[runner]
 
     # make sure we are fully aware if running with or without coverage

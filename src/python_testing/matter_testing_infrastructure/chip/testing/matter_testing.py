@@ -37,14 +37,13 @@ from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from enum import Enum, IntFlag
-from functools import partial
 from itertools import chain
-from typing import Any, Iterable, List, Optional, Tuple
+from typing import Any, Callable, Iterable, List, Optional, Tuple
 
 import chip.testing.conversions as conversions
+import chip.testing.decorators as decorators
 import chip.testing.matchers as matchers
 import chip.testing.timeoperations as timeoperations
-from chip.tlv import uint
 
 # isort: off
 
@@ -292,6 +291,42 @@ class AttributeValue:
     timestamp_utc: Optional[datetime] = None
 
 
+class AttributeMatcher:
+    """Matcher for a self-descripbed AttributeValue matcher, to be used in `await_all_expected_report_matches` methods.
+
+    This class embodies a predicate for a condition that must be matched by an attribute report.
+
+    A match is considered as having occurred when the `matches` method returns True for an `AttributeValue` report.
+    """
+
+    def __init__(self, description: str):
+        self._description: str = description
+
+    def matches(self, report: AttributeValue) -> bool:
+        """Implementers must override this method to return True when an attribute value matches.
+
+        The condition matched should be clearly expressed by the `description` property.
+        """
+        pass
+
+    @property
+    def description(self):
+        return self._description
+
+    @staticmethod
+    def from_callable(description: str, matcher: Callable[[AttributeValue], bool]) -> "AttributeMatcher":
+        """Take a single callable and wrap it into an AttributeMatcher object. Useful to wrap closures."""
+        class AttributeMatcherFromCallable(AttributeMatcher):
+            def __init__(self, description, matcher: Callable[[AttributeValue], bool]):
+                super().__init__(description)
+                self._matcher = matcher
+
+            def matches(self, report: AttributeValue) -> bool:
+                return self._matcher(report)
+
+        return AttributeMatcherFromCallable(description, matcher)
+
+
 def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float) -> None:
     """Given a queue.Queue hooked-up to an attribute change accumulator, await a given expected sequence of attribute reports.
 
@@ -349,8 +384,21 @@ def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attri
 
 
 class ClusterAttributeChangeAccumulator:
-    def __init__(self, expected_cluster: ClusterObjects.Cluster):
+    """
+    Subscribes to a cluster or single attribute and accumulates attribute reports in a queue.
+
+    If `expected_attribute` is provided, it subscribes only to that specific attribute.
+    Otherwise, it subscribes to all attributes from the cluster.
+
+    Args:
+        expected_cluster (ClusterObjects.Cluster): The cluster to subscribe to.
+        expected_attribute (ClusterObjects.ClusterAttributeDescriptor, optional):
+            If provided, subscribes to a single attribute. Defaults to None.
+    """
+
+    def __init__(self, expected_cluster: ClusterObjects.Cluster, expected_attribute: ClusterObjects.ClusterAttributeDescriptor = None):
         self._expected_cluster = expected_cluster
+        self._expected_attribute = expected_attribute
         self._subscription = None
         self._lock = threading.Lock()
         self._q = queue.Queue()
@@ -362,7 +410,9 @@ class ClusterAttributeChangeAccumulator:
             self._attribute_report_counts = {}
             attrs = [cls for name, cls in inspect.getmembers(self._expected_cluster.Attributes) if inspect.isclass(
                 cls) and issubclass(cls, ClusterObjects.ClusterAttributeDescriptor)]
-            self._attribute_reports = {}
+            self._attribute_reports: dict[Any, AttributeValue] = {}
+            if self._expected_attribute is not None:
+                attrs = [self._expected_attribute]
             for a in attrs:
                 self._attribute_report_counts[a] = 0
                 self._attribute_reports[a] = []
@@ -371,9 +421,12 @@ class ClusterAttributeChangeAccumulator:
 
     async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 5, keepSubscriptions: bool = True) -> Any:
         """This starts a subscription for attributes on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
+        attributes = [(endpoint, self._expected_cluster)]
+        if self._expected_attribute is not None:
+            attributes = [(endpoint, self._expected_attribute)]
         self._subscription = await dev_ctrl.ReadAttribute(
             nodeid=node_id,
-            attributes=[(endpoint, self._expected_cluster)],
+            attributes=attributes,
             reportInterval=(int(min_interval_sec), int(max_interval_sec)),
             fabricFiltered=fabric_filtered,
             keepSubscriptions=keepSubscriptions
@@ -394,7 +447,14 @@ class ClusterAttributeChangeAccumulator:
     def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
         """This is the subscription callback when an attribute report is received.
            It checks the report is from the expected_cluster and then posts it into the queue for later processing."""
+        valid_report = False
         if path.ClusterType == self._expected_cluster:
+            if self._expected_attribute is not None:
+                valid_report = path.ClusterId == self._expected_attribute.cluster_id
+            else:
+                valid_report = True
+
+        if valid_report:
             data = transaction.GetAttribute(path)
             value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType,
                                    value=data, timestamp_utc=datetime.now(timezone.utc))
@@ -450,6 +510,54 @@ class ClusterAttributeChangeAccumulator:
         for expected_idx, expected_element in enumerate(expected_final_values):
             logging.info(f"  -> {expected_element} found: {last_report_matches.get(expected_idx)}")
         asserts.fail("Did not find all expected last report values before time-out")
+
+    def await_all_expected_report_matches(self, expected_matchers: Iterable[AttributeMatcher], timeout_sec: float = 1.0):
+        """Expect that every predicate in `expected_matchers`, when run against all the incoming reports, reaches true by the end, ignoring timestamps.
+
+        Waits for at least `timeout_sec` seconds.
+
+        This is a form of barrier for a set of attribute changes that should all happen together for an action.
+
+        Note that this does not check against the "last" value of every attribute, only that each expected
+        report was seen at least once.
+        """
+        start_time = time.time()
+        elapsed = 0.0
+        time_remaining = timeout_sec
+
+        report_matches: dict[int, bool] = {idx: False for idx, _ in enumerate(expected_matchers)}
+
+        for matcher in expected_matchers:
+            logging.info(
+                f"--> Matcher waiting: {matcher.description}")
+        logging.info(f"Waiting for {timeout_sec:.1f} seconds for all reports.")
+
+        while time_remaining > 0:
+            # Snapshot copy at the beginning of the loop. This is thread-safe based on the design.
+            all_reports = self._attribute_reports
+
+            # Recompute all last-value matches
+            for expected_idx, matcher in enumerate(expected_matchers):
+                for attribute, reports in all_reports.items():
+                    for report in reports:
+                        if matcher.matches(report) and not report_matches[expected_idx]:
+                            logging.info(f"  --> Found a match for: {matcher.description}")
+                            report_matches[expected_idx] = True
+
+            # Determine if all were met
+            if all(report_matches.values()):
+                logging.info("Found all expected matchers did match.")
+                return
+
+            elapsed = time.time() - start_time
+            time_remaining = timeout_sec - elapsed
+            time.sleep(0.1)
+
+        # If we reach here, there was no early return and we failed to find all the values.
+        logging.error("Reached time-out without finding all expected report values.")
+        for expected_idx, expected_matcher in enumerate(expected_matchers):
+            logging.info(f"  -> {expected_matcher.description}: {report_matches.get(expected_idx)}")
+        asserts.fail("Did not find all expected reports before time-out")
 
     def await_sequence_of_reports(self, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float) -> None:
         """Await a given expected sequence of attribute reports in the accumulator for the endpoint associated.
@@ -548,7 +656,7 @@ class MatterTestConfig:
     storage_path: pathlib.Path = pathlib.Path(".")
     logs_path: pathlib.Path = pathlib.Path(".")
     paa_trust_store_path: Optional[pathlib.Path] = None
-    ble_interface_id: Optional[int] = None
+    ble_controller: Optional[int] = None
     commission_only: bool = False
 
     admin_vendor_id: int = _DEFAULT_ADMIN_VENDOR_ID
@@ -774,7 +882,7 @@ class MatterStackState:
         self._config = config
 
         if not hasattr(builtins, "chipStack"):
-            chip.native.Init(bluetoothAdapter=config.ble_interface_id)
+            chip.native.Init(bluetoothAdapter=config.ble_controller)
             if config.storage_path is None:
                 raise ValueError("Must have configured a MatterTestConfig.storage_path")
             self._init_stack(already_initialized=False, persistentStoragePath=config.storage_path)
@@ -868,6 +976,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.is_commissioning = False
         # The named pipe name must be set in the derived classes
         self.app_pipe = None
+        self.cached_steps: dict[str, list[TestStep]] = {}
 
     def get_test_steps(self, test: str) -> list[TestStep]:
         ''' Retrieves the test step list for the given test
@@ -885,8 +994,13 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def get_defined_test_steps(self, test: str) -> Optional[list[TestStep]]:
         steps_name = f'steps_{test.removeprefix("test_")}'
+        if test in self.cached_steps:
+            return self.cached_steps[test]
+
         try:
             fn = getattr(self, steps_name)
+            steps = fn()
+            self.cached_steps[test] = steps
             return fn()
         except AttributeError:
             return None
@@ -1111,6 +1225,27 @@ class MatterBaseTest(base_test.BaseTestClass):
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabricFiltered)
         data = result[endpoint]
         return list(data.values())[0][attribute]
+
+    async def read_single_attribute_all_endpoints(
+            self, cluster: Clusters.ClusterObjects.ClusterCommand, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
+            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None):
+        """Reads a single attribute of a specified cluster across all endpoints.
+
+        Returns:
+            dict: endpoint to attribute value
+
+        """
+        if dev_ctrl is None:
+            dev_ctrl = self.default_controller
+        if node_id is None:
+            node_id = self.dut_node_id
+
+        read_response = await dev_ctrl.ReadAttribute(node_id, [(attribute)])
+        attrs = {}
+        for endpoint in read_response:
+            attr_ret = read_response[endpoint][cluster][attribute]
+            attrs[endpoint] = attr_ret
+        return attrs
 
     async def read_single_attribute_check_success(
             self, cluster: Clusters.ClusterObjects.ClusterCommand, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
@@ -1854,7 +1989,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.storage_path = pathlib.Path(_DEFAULT_STORAGE_PATH) if args.storage_path is None else args.storage_path
     config.logs_path = pathlib.Path(_DEFAULT_LOG_PATH) if args.logs_path is None else args.logs_path
     config.paa_trust_store_path = args.paa_trust_store_path
-    config.ble_interface_id = args.ble_interface_id
+    config.ble_controller = args.ble_controller
     config.pics = {} if args.PICS is None else read_pics_from_file(args.PICS)
     config.tests = list(chain.from_iterable(args.tests or []))
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
@@ -1905,8 +2040,8 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                              help="PAA trust store path (default: %s)" % str(paa_path_default))
     basic_group.add_argument('--dac-revocation-set-path', action="store", type=pathlib.Path, metavar="PATH",
                              help="Path to JSON file containing the device attestation revocation set.")
-    basic_group.add_argument('--ble-interface-id', action="store", type=int,
-                             metavar="INTERFACE_ID", help="ID of BLE adapter (from hciconfig)")
+    basic_group.add_argument('--ble-controller', action="store", type=int,
+                             metavar="CONTROLLER_ID", help="BLE controller selector, see example or platform docs for details")
     basic_group.add_argument('-N', '--controller-node-id', type=int_decimal_or_hex,
                              metavar='NODE_ID',
                              default=_DEFAULT_CONTROLLER_NODE_ID,
@@ -1924,11 +2059,11 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
 
     commission_group.add_argument('-m', '--commissioning-method', type=str,
                                   metavar='METHOD_NAME',
-                                  choices=["on-network", "ble-wifi", "ble-thread", "on-network-ip"],
+                                  choices=["on-network", "ble-wifi", "ble-thread"],
                                   help='Name of commissioning method to use')
     commission_group.add_argument('--in-test-commissioning-method', type=str,
                                   metavar='METHOD_NAME',
-                                  choices=["on-network", "ble-wifi", "ble-thread", "on-network-ip"],
+                                  choices=["on-network", "ble-wifi", "ble-thread"],
                                   help='Name of commissioning method to use, for commissioning tests')
     commission_group.add_argument('-d', '--discriminator', type=int_decimal_or_hex,
                                   metavar='LONG_DISCRIMINATOR',
@@ -1940,9 +2075,6 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                                   dest='passcodes',
                                   default=[],
                                   help='PAKE passcode to use', nargs="+")
-    commission_group.add_argument('-i', '--ip-addr', type=str,
-                                  metavar='RAW_IP_ADDRESS',
-                                  help='IP address to use (only for method "on-network-ip". ONLY FOR LOCAL TESTING!', nargs="+")
 
     commission_group.add_argument('--wifi-ssid', type=str,
                                   metavar='SSID',
@@ -2009,259 +2141,6 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
         argv = sys.argv[1:]
 
     return convert_args_to_matter_config(parser.parse_known_args(argv)[0])
-
-
-def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
-    timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
-    return self.event_loop.run_until_complete(asyncio.wait_for(body(self, *args, **kwargs), timeout=timeout))
-
-
-def async_test_body(body):
-    """Decorator required to be applied whenever a `test_*` method is `async def`.
-
-    Since Mobly doesn't support asyncio directly, and the test methods are called
-    synchronously, we need a mechanism to allow an `async def` to be converted to
-    a asyncio-run synchronous method. This decorator does the wrapping.
-    """
-
-    def async_runner(self: MatterBaseTest, *args, **kwargs):
-        return _async_runner(body, self, *args, **kwargs)
-
-    return async_runner
-
-
-EndpointCheckFunction = typing.Callable[[Clusters.Attribute.AsyncReadTransaction.ReadResponse, int], bool]
-
-
-def get_cluster_from_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> ClusterObjects.Cluster:
-    return ClusterObjects.ALL_CLUSTERS[attribute.cluster_id]
-
-
-def get_cluster_from_command(command: ClusterObjects.ClusterCommand) -> ClusterObjects.Cluster:
-    return ClusterObjects.ALL_CLUSTERS[command.cluster_id]
-
-
-def _has_cluster(wildcard, endpoint, cluster: ClusterObjects.Cluster) -> bool:
-    try:
-        return cluster in wildcard.attributes[endpoint]
-    except KeyError:
-        return False
-
-
-def has_cluster(cluster: ClusterObjects.ClusterObjectDescriptor) -> EndpointCheckFunction:
-    """ EndpointCheckFunction that can be passed as a parameter to the run_if_endpoint_matches decorator.
-
-        Use this function with the run_if_endpoint_matches decorator to run this test on all endpoints with
-        the specified cluster. For example, given a device with the following conformance
-
-        EP0: cluster A, B, C
-        EP1: cluster D, E
-        EP2, cluster D
-        EP3, cluster E
-
-        And the following test specification:
-        @run_if_endpoint_matches(has_cluster(Clusters.D))
-        test_mytest(self):
-            ...
-
-        If you run this test with --endpoint 1 or --endpoint 2, the test will be run. If you run this test
-        with any other --endpoint the run_if_endpoint_matches decorator will call the on_skip function to
-        notify the test harness that the test is not applicable to this node and the test will not be run.
-    """
-    return partial(_has_cluster, cluster=cluster)
-
-
-def _has_attribute(wildcard, endpoint, attribute: ClusterObjects.ClusterAttributeDescriptor) -> bool:
-    cluster = get_cluster_from_attribute(attribute)
-    try:
-        attr_list = wildcard.attributes[endpoint][cluster][cluster.Attributes.AttributeList]
-        if not isinstance(attr_list, list):
-            asserts.fail(
-                f"Failed to read mandatory AttributeList attribute value for cluster {cluster} on endpoint {endpoint}: {attr_list}.")
-        return attribute.attribute_id in attr_list
-    except KeyError:
-        return False
-
-
-def has_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> EndpointCheckFunction:
-    """ EndpointCheckFunction that can be passed as a parameter to the run_if_endpoint_matches decorator.
-
-        Use this function with the run_if_endpoint_matches decorator to run this test on all endpoints with
-        the specified attribute. For example, given a device with the following conformance
-
-        EP0: cluster A, B, C
-        EP1: cluster D with attribute d, E
-        EP2, cluster D with attribute d
-        EP3, cluster D without attribute d
-
-        And the following test specification:
-        @run_if_endpoint_matches(has_attribute(Clusters.D.Attributes.d))
-        test_mytest(self):
-            ...
-
-        If you run this test with --endpoint 1 or --endpoint 2, the test will be run. If you run this test
-        with any other --endpoint the run_if_endpoint_matches decorator will call the on_skip function to
-        notify the test harness that the test is not applicable to this node and the test will not be run.
-    """
-    return partial(_has_attribute, attribute=attribute)
-
-
-def _has_command(wildcard, endpoint, command: ClusterObjects.ClusterCommand) -> bool:
-    cluster = get_cluster_from_command(command)
-    try:
-        cmd_list = wildcard.attributes[endpoint][cluster][cluster.Attributes.AcceptedCommandList]
-        if not isinstance(cmd_list, list):
-            asserts.fail(
-                f"Failed to read mandatory AcceptedCommandList command value for cluster {cluster} on endpoint {endpoint}: {cmd_list}.")
-        return command.command_id in cmd_list
-    except KeyError:
-        return False
-
-
-def has_command(command: ClusterObjects.ClusterCommand) -> EndpointCheckFunction:
-    """ EndpointCheckFunction that can be passed as a parameter to the run_if_endpoint_matches decorator.
-
-        Use this function with the run_if_endpoint_matches decorator to run this test on all endpoints with
-        the specified attribute. For example, given a device with the following conformance
-
-        EP0: cluster A, B, C
-        EP1: cluster D with command d, E
-        EP2, cluster D with command d
-        EP3, cluster D without command d
-
-        And the following test specification:
-        @run_if_endpoint_matches(has_command(Clusters.D.Commands.d))
-        test_mytest(self):
-            ...
-
-        If you run this test with --endpoint 1 or --endpoint 2, the test will be run. If you run this test
-        with any other --endpoint the run_if_endpoint_matches decorator will call the on_skip function to
-        notify the test harness that the test is not applicable to this node and the test will not be run.
-    """
-    return partial(_has_command, command=command)
-
-
-def _has_feature(wildcard, endpoint: int, cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFlag) -> bool:
-    try:
-        feature_map = wildcard.attributes[endpoint][cluster][cluster.Attributes.FeatureMap]
-        if not isinstance(feature_map, int):
-            asserts.fail(
-                f"Failed to read mandatory FeatureMap attribute value for cluster {cluster} on endpoint {endpoint}: {feature_map}.")
-
-        return (feature & feature_map) != 0
-    except KeyError:
-        return False
-
-
-def has_feature(cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFlag) -> EndpointCheckFunction:
-    """ EndpointCheckFunction that can be passed as a parameter to the run_if_endpoint_matches decorator.
-
-        Use this function with the run_if_endpoint_matches decorator to run this test on all endpoints with
-        the specified feature. For example, given a device with the following conformance
-
-        EP0: cluster A, B, C
-        EP1: cluster D with feature F0
-        EP2: cluster D with feature F0
-        EP3: cluster D without feature F0
-
-        And the following test specification:
-        @run_if_endpoint_matches(has_feature(Clusters.D.Bitmaps.Feature.F0))
-        test_mytest(self):
-            ...
-
-        If you run this test with --endpoint 1 or --endpoint 2, the test will be run. If you run this test
-        with any other --endpoint the run_if_endpoint_matches decorator will call the on_skip function to
-        notify the test harness that the test is not applicable to this node and the test will not be run.
-    """
-    return partial(_has_feature, cluster=cluster, feature=feature)
-
-
-async def _get_all_matching_endpoints(self: MatterBaseTest, accept_function: EndpointCheckFunction) -> list[uint]:
-    """ Returns a list of endpoints matching the accept condition. """
-    wildcard = await self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)])
-    matching = [e for e in wildcard.attributes.keys() if accept_function(wildcard, e)]
-    return matching
-
-
-async def should_run_test_on_endpoint(self: MatterBaseTest, accept_function: EndpointCheckFunction) -> bool:
-    """ Helper function for the run_if_endpoint_matches decorator.
-
-        Returns True if self.matter_test_config.endpoint matches the accept function.
-    """
-    if self.matter_test_config.endpoint is None:
-        msg = """
-              The --endpoint flag is required for this test.
-              """
-        asserts.fail(msg)
-    matching = await (_get_all_matching_endpoints(self, accept_function))
-    return self.matter_test_config.endpoint in matching
-
-
-def run_on_singleton_matching_endpoint(accept_function: EndpointCheckFunction):
-    """ Test decorator for a test that needs to be run on the endpoint that matches the given accept function.
-
-        This decorator should be used for tests where the endpoint is not known a-priori (dynamic endpoints).
-        Note that currently this test is limited to devices with a SINGLE matching endpoint.
-    """
-    def run_on_singleton_matching_endpoint_internal(body):
-        def matching_runner(self: MatterBaseTest, *args, **kwargs):
-            runner_with_timeout = asyncio.wait_for(_get_all_matching_endpoints(self, accept_function), timeout=30)
-            matching = self.event_loop.run_until_complete(runner_with_timeout)
-            asserts.assert_less_equal(len(matching), 1, "More than one matching endpoint found for singleton test.")
-            if not matching:
-                logging.info("Test is not applicable to any endpoint - skipping test")
-                asserts.skip('No endpoint matches test requirements')
-                return
-            # Exceptions should flow through, hence no except block
-            try:
-                old_endpoint = self.matter_test_config.endpoint
-                self.matter_test_config.endpoint = matching[0]
-                logging.info(f'Running test on endpoint {self.matter_test_config.endpoint}')
-                _async_runner(body, self, *args, **kwargs)
-            finally:
-                self.matter_test_config.endpoint = old_endpoint
-        return matching_runner
-    return run_on_singleton_matching_endpoint_internal
-
-
-def run_if_endpoint_matches(accept_function: EndpointCheckFunction):
-    """ Test decorator for a test that needs to be run only if the endpoint meets the accept_function criteria.
-
-        Place this decorator above the test_ method to have the test framework run this test only if the endpoint matches.
-        This decorator takes an EndpointCheckFunction to assess whether a test needs to be run on a particular
-        endpoint.
-
-        For example, given the following device conformance:
-
-        EP0: cluster A, B, C
-        EP1: cluster D, E
-        EP2, cluster D
-        EP3, cluster E
-
-        And the following test specification:
-        @run_if_endpoint_matches(has_cluster(Clusters.D))
-        test_mytest(self):
-            ...
-
-        If you run this test with --endpoint 1 or --endpoint 2, the test will be run. If you run this test
-        with any other --endpoint the decorator will call the on_skip function to
-        notify the test harness that the test is not applicable to this node and the test will not be run.
-
-        Tests that use this decorator cannot use a pics_ method for test selection and should not reference any
-        PICS values internally.
-    """
-    def run_if_endpoint_matches_internal(body):
-        def per_endpoint_runner(self: MatterBaseTest, *args, **kwargs):
-            runner_with_timeout = asyncio.wait_for(should_run_test_on_endpoint(self, accept_function), timeout=60)
-            should_run_test = self.event_loop.run_until_complete(runner_with_timeout)
-            if not should_run_test:
-                logging.info("Test is not applicable to this endpoint - skipping test")
-                asserts.skip('Endpoint does not match test requirements')
-                return
-            logging.info(f'Running test on endpoint {self.matter_test_config.endpoint}')
-            _async_runner(body, self, *args, **kwargs)
-        return per_endpoint_runner
-    return run_if_endpoint_matches_internal
 
 
 class CommissionDeviceTest(MatterBaseTest):
@@ -2437,3 +2316,16 @@ bytes_from_hex = conversions.bytes_from_hex
 hex_from_bytes = conversions.hex_from_bytes
 id_str = conversions.format_decimal_and_hex
 cluster_id_str = conversions.cluster_id_with_name
+
+async_test_body = decorators.async_test_body
+run_if_endpoint_matches = decorators.run_if_endpoint_matches
+run_on_singleton_matching_endpoint = decorators.run_on_singleton_matching_endpoint
+has_cluster = decorators.has_cluster
+has_attribute = decorators.has_attribute
+has_command = decorators.has_command
+has_feature = decorators.has_feature
+should_run_test_on_endpoint = decorators.should_run_test_on_endpoint
+_get_all_matching_endpoints = decorators._get_all_matching_endpoints
+_has_feature = decorators._has_feature
+_has_command = decorators._has_command
+_has_attribute = decorators._has_attribute

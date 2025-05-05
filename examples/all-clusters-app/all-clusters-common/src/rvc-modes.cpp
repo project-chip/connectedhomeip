@@ -132,6 +132,15 @@ void emberAfRvcRunModeClusterInitCallback(chip::EndpointId endpointId)
     gRvcRunModeInstance->Init();
 }
 
+void emberAfRvcRunModeClusterShutdownCallback(chip::EndpointId endpointId)
+{
+    if (gRvcRunModeInstance)
+    {
+        gRvcRunModeInstance->Shutdown();
+    }
+    RvcRunMode::Shutdown();
+}
+
 // RVC Clean
 static RvcCleanModeDelegate * gRvcCleanModeDelegate = nullptr;
 static ModeBase::Instance * gRvcCleanModeInstance   = nullptr;
@@ -223,4 +232,13 @@ void emberAfRvcCleanModeClusterInitCallback(chip::EndpointId endpointId)
     gRvcCleanModeInstance = new ModeBase::Instance(gRvcCleanModeDelegate, 0x1, RvcCleanMode::Id,
                                                    chip::to_underlying(RvcCleanMode::Feature::kDirectModeChange));
     gRvcCleanModeInstance->Init();
+}
+
+void emberAfRvcCleanModeClusterShutdownCallback(chip::EndpointId endpointId)
+{
+    if (gRvcCleanModeInstance)
+    {
+        gRvcCleanModeInstance->Shutdown();
+    }
+    RvcCleanMode::Shutdown();
 }

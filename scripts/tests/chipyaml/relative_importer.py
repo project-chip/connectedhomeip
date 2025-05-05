@@ -29,7 +29,7 @@ except ModuleNotFoundError:
     sys.path.append(os.path.join(SCRIPT_PATH, 'tests'))
 
 try:
-    import matter_idl  # noqa: F401
+    import matter.idl  # noqa: F401
 except ModuleNotFoundError:
     sys.path.append(os.path.join(SCRIPT_PATH, 'py_matter_idl'))
 

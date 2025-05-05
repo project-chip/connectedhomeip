@@ -152,3 +152,4 @@ exit:
 // Plugin initialization
 
 void MatterContentAppObserverPluginServerInitCallback() {}
+void MatterContentAppObserverPluginServerShutdownCallback() {}
