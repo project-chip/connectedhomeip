@@ -26,8 +26,21 @@ include("${CHIP_ROOT}/src/data-model-providers/codegen/model.cmake")
 # Configure ${APP_TARGET} with source files associated with ${CLUSTER} cluster
 #
 function(chip_configure_cluster APP_TARGET CLUSTER)
-    file(GLOB CLUSTER_SOURCES "${CHIP_APP_BASE_DIR}/clusters/${CLUSTER}/*.cpp")
-    target_sources(${APP_TARGET} PRIVATE ${CLUSTER_SOURCES})
+    # Clusters contain a "codegen_sources.gni" file that describes files
+    # required by a code-generated bundle. These files are a subset of python
+    # so this executes it (in an awkward manner ...)
+    execute_process(
+      COMMAND python
+        "-c"
+        "exec(open('${CHIP_APP_BASE_DIR}/clusters/${CLUSTER}/codegen_sources.gni').read()); print(';'.join(codegen_sources))"
+        OUTPUT_VARIABLE CLUSTER_SOURCES
+    )
+
+    # there is an extra newline from the print. Remove it
+    string(STRIP "${CLUSTER_SOURCES}" CLUSTER_SOURCES)
+    foreach(SOURCE IN LISTS CLUSTER_SOURCES)
+      target_sources(${APP_TARGET} PRIVATE "${CHIP_APP_BASE_DIR}/clusters/${CLUSTER}/${SOURCE}")
+    endforeach()
 
     # Add clusters dependencies
     if (CLUSTER STREQUAL "icd-management-server")
