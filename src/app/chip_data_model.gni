@@ -249,7 +249,7 @@ template("chip_data_model") {
     }
 
     # Clusters are expected to have the following format:
-    #   - A `BUILD.gn` file that defines generic targets. A dependency
+    #   - A `BUILD.gn` file that defines targets that do not depend on the specific application configuration. A dependency
     #     will be added on this default target. An empty group will be created
     #     if no special build rules exist
     #   - codegen_sources.gni - required sources for code generation integration
