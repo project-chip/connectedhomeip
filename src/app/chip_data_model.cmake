@@ -26,30 +26,28 @@ include("${CHIP_ROOT}/src/data-model-providers/codegen/model.cmake")
 # Configure ${APP_TARGET} with source files associated with ${CLUSTER} cluster
 #
 function(chip_configure_cluster APP_TARGET CLUSTER)
+    SET(CLUSTER_DIR "${CHIP_APP_BASE_DIR}/clusters/${CLUSTER}")
+
     # Clusters contain a "codegen_sources.gni" file that describes files
     # required by a code-generated bundle. These files are a subset of python
     # so this executes it (in an awkward manner ...)
     execute_process(
       COMMAND python
         "-c"
-        "exec(open('${CHIP_APP_BASE_DIR}/clusters/${CLUSTER}/codegen_sources.gni').read()); print(';'.join(codegen_sources))"
+        "exec(open('${CLUSTER_DIR}/codegen_sources.gni').read()); print(';'.join(codegen_sources))"
         OUTPUT_VARIABLE CLUSTER_SOURCES
     )
 
     # there is an extra newline from the print. Remove it
     string(STRIP "${CLUSTER_SOURCES}" CLUSTER_SOURCES)
     foreach(SOURCE IN LISTS CLUSTER_SOURCES)
-      target_sources(${APP_TARGET} PRIVATE "${CHIP_APP_BASE_DIR}/clusters/${CLUSTER}/${SOURCE}")
+      target_sources(${APP_TARGET} PRIVATE "${CLUSTER_DIR}/${SOURCE}")
     endforeach()
 
-    # Add clusters dependencies
-    if (CLUSTER STREQUAL "icd-management-server")
-      # TODO(#32321): Remove after issue is resolved
-      # Add ICDConfigurationData when ICD management server cluster is included,
-      # but ICD support is disabled, e.g. lock-app on some platforms
-      if(NOT CONFIG_CHIP_ENABLE_ICD_SUPPORT)
-        target_sources(${APP_TARGET} PRIVATE ${CHIP_APP_BASE_DIR}/icd/server/ICDConfigurationData.cpp)
-      endif()
+    # Custom code for cmake-integration. These are extra dependencies that would be included in BUILD.gn
+    # that are not visible to cmake
+    if (EXISTS "${CLUSTER_DIR}/include.cmake")
+      include("${CLUSTER_DIR}/include.cmake")
     endif()
 endfunction()
 
