@@ -107,12 +107,11 @@ inline auto kPrivilegeMaskValidation = []() {
     // Array of all current values defined inside the enum class Access::Privilege.
     // For this validation to work, this array ALWAYS must match the listed contents
     // of the above mentioned enum class, as defined on <access/Privilege.h>.
-    Access::Privilege privilegeValues[] = { Access::Privilege::kView, Access::Privilege::kProxyView,
-                                            Access::Privilege::kOperate, Access::Privilege::kManage,
-                                            Access::Privilege::kAdminister
-                                          };
+    Access::Privilege privilegeValues[] = { Access::Privilege::kView, Access::Privilege::kProxyView, Access::Privilege::kOperate,
+                                            Access::Privilege::kManage, Access::Privilege::kAdminister };
 
-    for (const auto& value : privilegeValues) {
+    for (const auto & value : privilegeValues)
+    {
         mask ^= to_underlying(value);
     }
 
@@ -120,9 +119,9 @@ inline auto kPrivilegeMaskValidation = []() {
 };
 
 // Validating contents of 'kPrivilegeMask'.
-static_assert(kPrivilegeMaskValidation() == true, "\"kPrivilegeMask\" does not match all the values defined "
-                                                  "inside the enum class Access::Privilege.");
-
+static_assert(kPrivilegeMaskValidation() == true,
+              "\"kPrivilegeMask\" does not match all the values defined "
+              "inside the enum class Access::Privilege.");
 
 enum class AttributeQualityFlags : uint32_t
 {
