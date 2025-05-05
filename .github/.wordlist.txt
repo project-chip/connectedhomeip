@@ -755,10 +755,12 @@ itsfoss
 IW
 JDK
 jinja
+JCM
 JLink
 JLinkExe
 JLinkRTTClient
 JN
+jf
 jni
 jpg
 jre

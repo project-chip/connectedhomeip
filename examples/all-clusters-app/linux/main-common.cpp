@@ -31,6 +31,7 @@
 #include "laundry-dryer-controls-delegate-impl.h"
 #include "laundry-washer-controls-delegate-impl.h"
 #include "laundry-washer-mode.h"
+#include "meter-identification-instance.h"
 #include "microwave-oven-mode.h"
 #include "operational-state-delegate-impl.h"
 #include "oven-modes.h"
@@ -52,6 +53,7 @@
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/thermostat-server/thermostat-server.h>
 #include <app/clusters/time-synchronization-server/time-synchronization-server.h>
+#include <app/clusters/unit-localization-server/unit-localization-server.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -257,6 +259,11 @@ void ApplicationInit()
     Clusters::ValveConfigurationAndControl::SetDefaultDelegate(chip::EndpointId(1), &sValveDelegate);
     Clusters::TimeSynchronization::SetDefaultDelegate(&sTimeSyncDelegate);
 
+    Clusters::UnitLocalization::TempUnitEnum supportedUnits[2] = { Clusters::UnitLocalization::TempUnitEnum::kFahrenheit,
+                                                                   Clusters::UnitLocalization::TempUnitEnum::kCelsius };
+    DataModel::List<Clusters::UnitLocalization::TempUnitEnum> unitsList(supportedUnits);
+    Clusters::UnitLocalization::UnitLocalizationServer::Instance().SetSupportedTemperatureUnits(unitsList);
+
     Clusters::WaterHeaterManagement::WhmApplicationInit(chip::EndpointId(1));
 
     SetTagList(/* endpoint= */ 0, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp0TagList));
@@ -284,6 +291,7 @@ void ApplicationShutdown()
     Clusters::OvenMode::Shutdown();
     Clusters::OvenCavityOperationalState::Shutdown();
 
+    Clusters::MeterIdentification::Shutdown();
     Clusters::DeviceEnergyManagementMode::Shutdown();
     Clusters::EnergyEvseMode::Shutdown();
     Clusters::WaterHeaterMode::Shutdown();

@@ -30,8 +30,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::Current::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, current);
+    case Attributes::CurrentState::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, currentState);
     case Attributes::Target::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, target);
     case Attributes::Resolution::TypeInfo::GetAttributeId():

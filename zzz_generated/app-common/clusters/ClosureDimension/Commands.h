@@ -73,7 +73,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
 
     Optional<chip::Percent100ths> position;
-    Optional<TargetLatchEnum> latch;
+    Optional<bool> latch;
     Optional<Globals::ThreeLevelAutoEnum> speed;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -90,7 +90,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
 
     Optional<chip::Percent100ths> position;
-    Optional<TargetLatchEnum> latch;
+    Optional<bool> latch;
     Optional<Globals::ThreeLevelAutoEnum> speed;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

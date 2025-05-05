@@ -48,7 +48,7 @@ public:
      *         Error when handle SetTarget fails.
      */
     virtual Protocols::InteractionModel::Status HandleSetTarget(const Optional<Percent100ths> & position,
-                                                                const Optional<TargetLatchEnum> & latch,
+                                                                const Optional<bool> & latch,
                                                                 const Optional<Globals::ThreeLevelAutoEnum> & speed) = 0;
 
     /**
@@ -63,6 +63,14 @@ public:
      */
     virtual Protocols::InteractionModel::Status HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
                                                            const Optional<Globals::ThreeLevelAutoEnum> & speed) = 0;
+
+    /**
+     * @brief Checks whether this closurepanel needs manual latching.
+     *
+     * @return true if manual latching is needed
+     *         false if manual latching not needed
+     */
+    virtual bool IsManualLatchingNeeded() = 0;
 };
 
 } // namespace ClosureDimension

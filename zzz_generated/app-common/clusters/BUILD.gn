@@ -41,7 +41,6 @@ template("declare_all_items_target") {
       "${chip_root}/zzz_generated/app-common/clusters/ContentAppObserver" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/ContentControl" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/ContentLauncher" + invoker.target,
-      "${chip_root}/zzz_generated/app-common/clusters/DemandResponseLoadControl" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/Descriptor" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/DeviceEnergyManagement" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/DeviceEnergyManagementMode" + invoker.target,
@@ -120,6 +119,7 @@ template("declare_all_items_target") {
       "${chip_root}/zzz_generated/app-common/clusters/ServiceArea" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/SmokeCoAlarm" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/SoftwareDiagnostics" + invoker.target,
+      "${chip_root}/zzz_generated/app-common/clusters/SoilMeasurement" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/Switch" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/TargetNavigator" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/TemperatureControl" + invoker.target,
@@ -152,7 +152,9 @@ template("declare_all_items_target") {
   }
 }
 
-declare_all_items_target("all-ids") { target = ":ids" }
+declare_all_items_target("all-elements") { target = ":elements" }
 declare_all_items_target("all-enums") { target = ":enums" }
 declare_all_items_target("all-headers") { target = ":headers" }
+declare_all_items_target("all-ids") { target = ":ids" }
+declare_all_items_target("all-metadata") { target = ":metadata" }
 

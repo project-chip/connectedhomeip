@@ -17,7 +17,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const{
     TLV::TLVType outer;
     ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
     {{#zcl_event_fields}}
-    {{#if_is_fabric_scoped_struct type}}
+    {{#if_is_fabric_scoped_struct type cluster=../../name}}
     ReturnErrorOnFailure(DataModel::EncodeForRead(aWriter, TLV::ContextTag(Fields::k{{asUpperCamelCase name}}), GetFabricIndex(), {{asLowerCamelCase name}}));
     {{else}}
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::k{{asUpperCamelCase name}}), {{asLowerCamelCase name}}));

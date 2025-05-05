@@ -97,7 +97,6 @@
         "Test_TC_CNET_4_12",
         "Test_TC_CNET_4_13",
         "Test_TC_CNET_4_14",
-        "Test_TC_CNET_4_15",
         "Test_TC_CNET_4_16",
         "Test_TC_CNET_4_20",
         "Test_TC_CNET_4_21",
@@ -176,8 +175,7 @@
         "Test_TC_CADMIN_1_6",
         "Test_TC_CADMIN_1_10",
         "Test_TC_CADMIN_1_13",
-        "Test_TC_CADMIN_1_25",
-        "Test_TC_CADMIN_1_26"
+        "Test_TC_CADMIN_1_25"
     ],
     "ModeSelect": ["Test_TC_MOD_1_2", "Test_TC_MOD_1_3", "Test_TC_MOD_2_2"],
     "OTASoftwareUpdate": [

@@ -43,7 +43,7 @@ public:
     static constexpr bool kIsFabricScoped = {{isFabricSensitive}};
 
     {{#zcl_event_fields}}
-    {{zapTypeToEncodableClusterObjectType type}} {{asLowerCamelCase name}}{{> cluster_objects_field_init}};
+    {{zapTypeToEncodableClusterObjectType type cluster=../../name}} {{asLowerCamelCase name}}{{> cluster_objects_field_init cluster=../../name}};
     {{/zcl_event_fields}}
 
     {{#if isFabricSensitive}}
@@ -62,7 +62,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
 
     {{#zcl_event_fields}}
-    {{zapTypeToDecodableClusterObjectType type}} {{asLowerCamelCase name}}{{> cluster_objects_field_init}};
+    {{zapTypeToDecodableClusterObjectType type cluster=../../name}} {{asLowerCamelCase name}}{{> cluster_objects_field_init cluster=../../name}};
     {{/zcl_event_fields}}
 
     CHIP_ERROR Decode(TLV::TLVReader &reader);

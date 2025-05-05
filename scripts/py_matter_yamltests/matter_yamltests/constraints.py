@@ -110,6 +110,11 @@ class ConstraintIsLowerCaseError(ConstraintCheckError):
         super().__init__(context, 'isLowerCase', reason)
 
 
+class ConstraintIsSetOfValuesError(ConstraintCheckError):
+    def __init__(self, context, reason):
+        super().__init__(context, 'isSetOfValues', reason)
+
+
 class ConstraintMinValueError(ConstraintCheckError):
     def __init__(self, context, reason):
         super().__init__(context, 'minValue', reason)
@@ -200,6 +205,8 @@ class BaseConstraint(ABC):
             raise ConstraintIsUpperCaseError(self._context, reason)
         elif isinstance(self, _ConstraintIsLowerCase):
             raise ConstraintIsLowerCaseError(self._context, reason)
+        elif isinstance(self, _ConstraintIsSetOfValues):
+            raise ConstraintIsSetOfValuesError(self._context, reason)
         elif isinstance(self, _ConstraintMinValue):
             raise ConstraintMinValueError(self._context, reason)
         elif isinstance(self, _ConstraintMaxValue):
@@ -756,6 +763,41 @@ class _ConstraintContains(BaseConstraint):
         return f'The response ({value}) is missing {expected_values}.'
 
 
+class _ConstraintIsSetOfValues(BaseConstraint):
+    def __init__(self, context, expected):
+        super().__init__(context, types=[list])
+        self._expected = expected
+
+    def _get_missing_extra(self, value):
+        # Start with sets containing every element index. We will remove elements as they match.
+        expected_but_missing_idx = set(range(len(self._expected)))
+        values_not_expected_idx = set(range(len(value)))
+        for expected_idx, expected_element in enumerate(self._expected):
+            for value_idx, value_element in enumerate(value):
+                if _values_match(expected_element, value_element):
+                    expected_but_missing_idx.remove(expected_idx)
+                    values_not_expected_idx.remove(value_idx)
+
+        return [self._expected[i] for i in expected_but_missing_idx], [value[i] for i in values_not_expected_idx]
+
+    def check_response(self, value, value_type_name) -> bool:
+        missing, extra = self._get_missing_extra(value)
+
+        return (not missing) and (not extra)
+
+    def get_reason(self, value, value_type_name) -> str:
+        missing, extra = self._get_missing_extra(value)
+
+        errors = []
+        if missing:
+            errors.append(f'it is missing [{missing}]')
+
+        if extra:
+            errors.append(f'has extra values [{extra}]')
+
+        return f'The response ({value}) is an invalid set: ' + ' and '.join(errors)
+
+
 class _ConstraintExcludes(BaseConstraint):
     def __init__(self, context, excludes):
         super().__init__(context, types=[list])
@@ -854,7 +896,8 @@ class _ConstraintPython(BaseConstraint):
 
     def validate(self, value, value_type_name, runtime_variables):
         # Build a global scope that includes all runtime variables
-        scope = {name: fix_typed_yaml_value(value) for name, value in runtime_variables.items()}
+        scope = {name: fix_typed_yaml_value(
+            value) for name, value in runtime_variables.items()}
         scope['__builtins__'] = self.BUILTINS
         # Execute the module AST and extract the defined function
         exec(compile(self._ast, '<string>', 'exec'), scope)
@@ -865,7 +908,8 @@ class _ConstraintPython(BaseConstraint):
         except Exception as ex:
             self._raise_error(f'Python constraint {type(ex).__name__}: {ex}')
         if type(valid) is not bool:
-            self._raise_error("Python constraint TypeError: must return a bool")
+            self._raise_error(
+                "Python constraint TypeError: must return a bool")
         if not valid:
             self._raise_error(f'The response value "{value}" is not valid')
 
@@ -911,6 +955,9 @@ def get_constraints(constraints: dict) -> List[BaseConstraint]:
         elif 'isLowerCase' == constraint:
             _constraints.append(_ConstraintIsLowerCase(
                 context, constraint_value))
+        elif 'isSetOfValues' == constraint:
+            _constraints.append(_ConstraintIsSetOfValues(
+                context, constraint_value))
         elif 'minValue' == constraint:
             _constraints.append(_ConstraintMinValue(
                 context, constraint_value))
@@ -955,6 +1002,7 @@ def is_typed_constraint(constraint: str):
         'endsWith': True,
         'isUpperCase': False,
         'isLowerCase': False,
+        'isSetOfValues': True,
         'minValue': True,
         'maxValue': True,
         'contains': True,

@@ -49,21 +49,21 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace OpenCommissioningWindow {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = AdministratorCommissioning::Commands::OpenCommissioningWindow::Id,
+    .commandId       = OpenCommissioningWindow::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace OpenCommissioningWindow
 namespace OpenBasicCommissioningWindow {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id,
+    .commandId       = OpenBasicCommissioningWindow::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace OpenBasicCommissioningWindow
 namespace RevokeCommissioning {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = AdministratorCommissioning::Commands::RevokeCommissioning::Id,
+    .commandId       = RevokeCommissioning::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kAdminister,
 };

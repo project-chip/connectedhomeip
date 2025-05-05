@@ -48,7 +48,6 @@
         "microwave-oven-mode-cluster.xml",
         "meter-identification-cluster.xml",
         "door-lock-cluster.xml",
-        "drlc-cluster.xml",
         "ecosystem-information-cluster.xml",
         "electrical-energy-measurement-cluster.xml",
         "electrical-grid-conditions-cluster.xml",
@@ -114,6 +113,7 @@
         "service-area-cluster.xml",
         "smoke-co-alarm-cluster.xml",
         "software-diagnostics-cluster.xml",
+        "soil-measurement-cluster.xml",
         "switch-cluster.xml",
         "target-navigator-cluster.xml",
         "temperature-control-cluster.xml",
@@ -203,8 +203,19 @@
         "Bridged Device Basic Information": ["ProductAppearance"],
         "Chime": ["SelectedChime", "Enabled"],
         "Closure Control": ["CountdownTime", "OverallState", "OverallTarget"],
-        "Closure Dimension": ["Current", "Target", "UnitRange", "LimitRange"],
-        "Commodity Price": ["Currency", "CurrentPrice"],
+        "Closure Dimension": [
+            "CurrentState",
+            "Target",
+            "UnitRange",
+            "LimitRange"
+        ],
+        "Commodity Price": [
+            "TariffUnit",
+            "Currency",
+            "CurrentPrice",
+            "PriceForecast",
+            "FeatureMap"
+        ],
         "Commodity Tariff": [
             "TariffInfo",
             "CurrentDay",
@@ -311,7 +322,14 @@
             "OperatingMode",
             "FeatureMap"
         ],
-        "Meter Identification": ["PowerThreshold"],
+        "Meter Identification": [
+            "MeterType",
+            "PointOfDelivery",
+            "MeterSerialNumber",
+            "ProtocolVersion",
+            "PowerThreshold",
+            "FeatureMap"
+        ],
         "Occupancy Sensing": [
             "HoldTimeLimits",
             "HoldTime",
@@ -749,7 +767,9 @@
             "StatusLightBrightness",
             "FeatureMap"
         ],
-        "Camera AV Settings User Level Management": ["MPTZPosition"]
+        "Camera AV Settings User Level Management": ["MPTZPosition"],
+        "Soil Measurement": ["SoilMoistureMeasurementLimits"],
+        "Unit Localization": ["TemperatureUnit"]
     },
     "mandatoryDeviceTypes": "0x0016",
     "defaultReportingPolicy": "mandatory",

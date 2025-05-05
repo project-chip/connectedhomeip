@@ -18,6 +18,7 @@
 
 #include <commands/clusters/SubscriptionsCommands.h>
 #include <commands/common/Commands.h>
+#include <commands/delay/Commands.h>
 #include <commands/interactive/Commands.h>
 #include <commands/pairing/Commands.h>
 #include <commands/webrtc/Commands.h>
@@ -52,6 +53,7 @@ int main(int argc, char * argv[])
     registerCommandsInteractive(commands, &credIssuerCommands);
     registerCommandsPairing(commands, &credIssuerCommands);
     registerClusters(commands, &credIssuerCommands);
+    registerCommandsDelay(commands, &credIssuerCommands);
     registerCommandsSubscriptions(commands, &credIssuerCommands);
     registerCommandsWebRTC(commands, &credIssuerCommands);
 
@@ -60,6 +62,7 @@ int main(int argc, char * argv[])
     std::vector<char *> c_args;
     for (auto & arg : args)
     {
+        ChipLogError(NotSpecified, "Args: %s", arg.c_str());
         c_args.push_back(const_cast<char *>(arg.c_str()));
     }
 
