@@ -21,9 +21,8 @@
 #       --commissioning-method ble-thread
 #       --discriminator 3840
 #       --passcode 20202021
-#       --thread-dataset-hex <DATASET_HEX>
-#       --string-arg PIXIT_CNET_THREAD_2ND_OPERATIONALDATASET:"1111111122222222"
-#       -- endpoint <ENDPOINT>
+#       --thread-dataset-hex <THREAD_DATASET_HEX>
+#       --endpoint <ENDPOINT>
 #       --storage-path admin_storage.json
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -39,6 +38,8 @@ from mobly import asserts
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+
+PIXIT_CNET_THREAD_2ND_OPERATIONALDATASET = "1111111122222222"
 
 
 class TC_CNET_4_16(MatterBaseTest):
@@ -56,16 +57,10 @@ class TC_CNET_4_16(MatterBaseTest):
     @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kThreadNetworkInterface))
     async def test_TC_CNET_4_16(self):
 
-        asserts.assert_true("PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET" in self.matter_test_config.global_test_params,
-                            "PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET must be included in the command line with "
-                            "the --string-arg flag as PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET:<operational_dataset>")
-
         cnet = Clusters.NetworkCommissioning
         attr = cnet.Attributes
         thread_1st = self.matter_test_config.thread_operational_dataset
-        thread_2nd_operational_dataset = self.matter_test_config.global_test_params[
-            "PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET"]
-        thread_2nd = bytes.fromhex(thread_2nd_operational_dataset)
+        thread_2nd = bytes.fromhex(PIXIT_CNET_THREAD_2ND_OPERATIONALDATASET)
 
         # Commissioning is already done
         self.step("precondition")
