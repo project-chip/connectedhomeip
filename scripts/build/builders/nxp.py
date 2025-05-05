@@ -65,7 +65,7 @@ class NxpBoard(Enum):
             return 'rt1060'
         elif self == NxpBoard.RT1170:
             return 'rt1170'
-        elif (self == NxpBoard.RW61X):
+        elif self == NxpBoard.RW61X:
             if os_env == NxpOsUsed.ZEPHYR:
                 return 'frdm_rw612'
             else:
@@ -84,7 +84,7 @@ class NxpBoard(Enum):
             return 'rt/rt1060'
         elif self == NxpBoard.RT1170:
             return 'rt/rt1170'
-        elif (self == NxpBoard.RW61X):
+        elif self == NxpBoard.RW61X:
             if os_env == NxpOsUsed.ZEPHYR:
                 return 'zephyr'
             else:
@@ -388,32 +388,24 @@ class NxpBuilder(GnBuilder):
         return build_flags
 
     def get_conf_file(self):
-        if self.enable_wifi and self.enable_thread and self.enable_ota and self.enable_factory_data:
-            return "prj_thread_ftd_wifi_br_ota_fdata.conf"
-        elif self.enable_wifi and self.enable_thread and self.enable_ota:
-            return "prj_thread_ftd_wifi_br_ota.conf"
-        elif self.enable_wifi and self.enable_ota and self.enable_factory_data:
-            return "prj_wifi_ota_fdata.conf"
-        elif self.enable_wifi and self.enable_ota:
-            return "prj_wifi_ota.conf"
-        elif self.enable_wifi and self.enable_factory_data:
-            return "prj_wifi_fdata.conf"
-        elif self.enable_wifi and self.disable_ble:
-            return "prj_wifi_onnetwork.conf"
-        elif self.enable_wifi:
-            return "prj_wifi.conf"
-        elif self.enable_thread and self.enable_ota and self.enable_factory_data:
-            return "prj_thread_ftd_ota_fdata.conf"
-        elif self.enable_thread and self.enable_ota:
-            return "prj_thread_ftd_ota.conf"
-        elif self.enable_thread and self.enable_factory_data:
-            return "prj_thread_ftd_fdata.conf"
-        elif self.enable_thread and self.enable_mtd:
-            return "prj_thread_mtd.conf"
-        elif self.enable_thread:
-            return "prj_thread_ftd.conf"
+        thread_type = "mtd" if self.enable_mtd else "ftd"
+
+        components = [
+        "prj",
+        f"thread_{thread_type}" if self.enable_thread else None,
+        "wifi" if self.enable_wifi else None,
+        "br" if self.enable_wifi and self.enable_thread else None,
+        "ota" if self.enable_ota else None,
+        "fdata" if self.enable_factory_data else None,
+        "onnetwork" if self.disable_ble else None
+        ]
+
+        prj_file = "_".join(filter(None, components)) + ".conf"
+        prj_file_abs_path = os.path.dirname(os.path.realpath(__file__))+ "/../../../examples/platform/nxp/config/" + prj_file
+        if os.path.isfile(prj_file_abs_path):
+            return prj_file
         else:
-            raise Exception("Configuration not supported, no conf file available")
+            raise Exception("Configuration not supported, no conf file available: %s" %prj_file_abs_path )
 
     def generate(self):
         if self.build_system is NxpBuildSystem.CMAKE:
