@@ -51,6 +51,9 @@ enum CommissioningStage : uint8_t
     kSendAttestationRequest,     ///< Send AttestationRequest (0x3E:0) command to the device
     kAttestationVerification,    ///< Verify AttestationResponse (0x3E:1) validity
     kAttestationRevocationCheck, ///< Verify Revocation Status of device's DAC chain
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    kSendVIDVerificationRequest, ///< Send SignVIDVerificationRequest command to the device
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     kSendOpCertSigningRequest,   ///< Send CSRRequest (0x3E:4) command to the device
     kValidateCSR,                ///< Verify CSRResponse (0x3E:5) validity
     kGenerateNOCChain,           ///< TLV encode Node Operational Credentials (NOC) chain certs
@@ -615,6 +618,63 @@ public:
         mExecuteJCM = MakeOptional(executeJCM);
         return *this;
     }
+
+    const Optional<ByteSpan> GetJFAdminNOC() const { return mJFAdminNOC; }
+
+    CommissioningParameters & SetJFAdminNOC(const ByteSpan & JFAdminNOC)
+    {
+        mJFAdminNOC = MakeOptional(JFAdminNOC);
+        return *this;
+    }
+
+    const Optional<ByteSpan> GetJFAdminICAC() const { return mJFAdminICAC; }
+
+    CommissioningParameters & SetJFAdminICAC(const ByteSpan & JFAdminICAC)
+    {
+        mJFAdminICAC = MakeOptional(JFAdminICAC);
+        return *this;
+    }
+
+    const Optional<ByteSpan> GetJFAdminRCAC() const { return mJFAdminRCAC; }
+
+    CommissioningParameters & SetJFAdminRCAC(const ByteSpan & JFAdminRCAC)
+    {
+        mJFAdminRCAC = MakeOptional(JFAdminRCAC);
+        return *this;
+    }
+
+    const Optional<EndpointId> GetJFAdminEndpointId() const { return mJFAdminEndpointId; }
+
+    CommissioningParameters & SetJFAdminEndpointId(const EndpointId JFAdminEndpointId)
+    {
+        mJFAdminEndpointId = MakeOptional(JFAdminEndpointId);
+        return *this;
+    }
+
+    const Optional<FabricIndex> GetJFAdministratorFabricIndex() const { return mJFAdministratorFabricIndex; }
+
+    CommissioningParameters & SetJFAdministratorFabricIndex(const FabricIndex JFAdministratorFabricIndex)
+    {
+        mJFAdministratorFabricIndex = MakeOptional(JFAdministratorFabricIndex);
+        return *this;
+    }
+
+    const Optional<FabricId> GetJFAdminFabricId() const { return mJFAdminFabricId; }
+
+    CommissioningParameters & SetJFAdminFabricId(const FabricId JFAdminFabricId)
+    {
+        mJFAdminFabricId = MakeOptional(JFAdminFabricId);
+        return *this;
+    }
+
+    const Optional<VendorId> GetJFAdminVendorId() const { return mJFAdminVendorId; }
+
+    CommissioningParameters & SetJFAdminVendorId(const VendorId JFAdminVendorId)
+    {
+        mJFAdminVendorId = MakeOptional(JFAdminVendorId);
+        return *this;
+    }
+
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
     // Clear all members that depend on some sort of external buffer.  Can be
@@ -640,6 +700,11 @@ public:
         mDefaultNTP.ClearValue();
         mICDSymmetricKey.ClearValue();
         mExtraReadPaths = decltype(mExtraReadPaths)();
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+        mJFAdminNOC.ClearValue();
+        mJFAdminICAC.ClearValue();
+        mJFAdminRCAC.ClearValue();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     }
 
 private:
@@ -693,6 +758,21 @@ private:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     Optional<bool> mExecuteJCM;
+
+    Optional<EndpointId> mJFAdminEndpointId;
+    Optional<FabricIndex> mJFAdministratorFabricIndex;
+
+    Optional<FabricId> mJFAdminFabricId;
+    Optional<VendorId> mJFAdminVendorId;
+
+    Optional<ByteSpan> mJFAdminNOC;
+    Optional<uint16_t> mJFAdminNOCLen;
+
+    Optional<ByteSpan> mJFAdminICAC;
+    Optional<uint16_t> mJFAdminICACLen;
+
+    Optional<ByteSpan> mJFAdminRCAC;
+    Optional<uint16_t> mJFAdminRCACLen;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
 };
@@ -793,6 +873,15 @@ struct ICDManagementClusterInfo
     CharSpan userActiveModeTriggerInstruction;
 };
 
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+struct JFFabricTableInfo
+{
+    VendorId vendorId  = VendorId::Common;
+    FabricId fabricId = kUndefinedFabricId;
+};
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+
 struct ReadCommissioningInfo
 {
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
@@ -810,6 +899,17 @@ struct ReadCommissioningInfo
     NodeId remoteNodeId               = kUndefinedNodeId;
     bool supportsConcurrentConnection = true;
     ICDManagementClusterInfo icd;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    EndpointId JFAdminEndpointId = kInvalidEndpointId;
+    FabricIndex JFAdministratorFabricIndex = kUndefinedFabricIndex;
+
+    JFFabricTableInfo JFAdminFabricTable;
+
+    ByteSpan JFAdminNOC;
+    ByteSpan JFAdminICAC;
+    ByteSpan JFAdminRCAC;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 };
 
 struct TimeZoneResponseInfo

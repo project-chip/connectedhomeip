@@ -386,7 +386,16 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
     case CommissioningStage::kAttestationVerification:
         return CommissioningStage::kAttestationRevocationCheck;
     case CommissioningStage::kAttestationRevocationCheck:
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+        if (mParams.GetExecuteJCM().ValueOr(false)) {
+            return CommissioningStage::kSendVIDVerificationRequest;
+        }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
         return CommissioningStage::kSendOpCertSigningRequest;
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+      case CommissioningStage::kSendVIDVerificationRequest:
+          return CommissioningStage::kSendOpCertSigningRequest;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     case CommissioningStage::kSendOpCertSigningRequest:
         return CommissioningStage::kValidateCSR;
     case CommissioningStage::kValidateCSR:
@@ -777,6 +786,33 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                     mParams.ClearICDStayActiveDurationMsec();
                 }
             }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+            if (mParams.GetExecuteJCM().ValueOr(false) &&
+                (mDeviceCommissioningInfo.JFAdministratorFabricIndex != kUndefinedFabricIndex)) {
+                SaveCertificate(mDeviceCommissioningInfo.JFAdminNOC, &mJFAdminNOC, &mJFAdminNOCLen);
+                SaveCertificate(mDeviceCommissioningInfo.JFAdminICAC, &mJFAdminICAC, &mJFAdminICACLen);
+                SaveCertificate(mDeviceCommissioningInfo.JFAdminRCAC, &mJFAdminRCAC, &mJFAdminRCACLen);
+
+                if (mJFAdminNOC && mJFAdminICAC && mJFAdminRCAC)
+                {
+                    mParams.SetJFAdminNOC(ByteSpan(mJFAdminNOC, mJFAdminNOCLen));
+                    mParams.SetJFAdminICAC(ByteSpan(mJFAdminICAC, mJFAdminICACLen));
+                    mParams.SetJFAdminRCAC(ByteSpan(mJFAdminRCAC, mJFAdminRCACLen));
+                }
+                else
+                {
+                    ChipLogError(Controller, "JCM: Error allocating space for Admin Certs!");
+                    return CHIP_ERROR_NO_MEMORY;
+                }
+
+                mParams.SetJFAdminEndpointId(mDeviceCommissioningInfo.JFAdminEndpointId)
+                    .SetJFAdministratorFabricIndex(mDeviceCommissioningInfo.JFAdministratorFabricIndex)
+                    .SetJFAdminFabricId(mDeviceCommissioningInfo.JFAdminFabricTable.fabricId)
+                    .SetJFAdminVendorId(mDeviceCommissioningInfo.JFAdminFabricTable.vendorId);
+            }
+#endif
+
             break;
         }
         case CommissioningStage::kConfigureTimeZone:
