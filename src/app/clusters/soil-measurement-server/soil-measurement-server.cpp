@@ -59,6 +59,7 @@ CHIP_ERROR SoilMeasurementAttrAccess::Init()
             .accuracyRanges   = DataModel::List<const Globals::Structs::MeasurementAccuracyRangeStruct::Type>(
                 soilMoistureMeasurementLimitsAccuracyRange)
         };
+        measurement.soilMoistureMeasuredValue.SetNull();
     }
 
     return CHIP_NO_ERROR;
@@ -73,12 +74,18 @@ CHIP_ERROR SoilMeasurementAttrAccess::Read(const ConcreteReadAttributePath & aPa
 {
     VerifyOrDie(aPath.mClusterId == SoilMeasurement::Id);
 
-    MeasurementData * data = SoilMeasurementDataForEndpoint(aPath.mEndpointId);
-
     switch (aPath.mAttributeId)
     {
-    case Attributes::SoilMoistureMeasurementLimits::Id: {
+    case SoilMoistureMeasurementLimits::Id: {
+        MeasurementData * data = SoilMeasurementDataForEndpoint(aPath.mEndpointId);
         return aEncoder.Encode(data->soilMoistureMeasurementLimits);
+    }
+    case SoilMoistureMeasuredValue::Id: {
+        MeasurementData * data = SoilMeasurementDataForEndpoint(aPath.mEndpointId);
+        return aEncoder.Encode(data->soilMoistureMeasuredValue);
+    }
+    case ClusterRevision::Id: {
+        return aEncoder.Encode(kClusterRevision);
     }
     default: {
         break;
@@ -109,12 +116,31 @@ MeasurementData * SoilMeasurementDataForEndpoint(EndpointId endpointId)
 // Given the limits are fixed, it is not intended to be changes at runtime, hence why this function does not report the change.
 // The application should call this function only once during init.
 CHIP_ERROR SetSoilMeasurementAccuracy(EndpointId endpointId,
-                                      const Globals::Structs::MeasurementAccuracyStruct::Type & measurementLimits)
+                                      const Globals::Structs::MeasurementAccuracyStruct::Type & measurementLimits,
+                                      bool reportChange)
 {
     MeasurementData * data = SoilMeasurementDataForEndpoint(endpointId);
     VerifyOrReturnError(data != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     data->soilMoistureMeasurementLimits = measurementLimits;
+
+    if (reportChange)
+    {
+        MatterReportingAttributeChangeCallback(endpointId, SoilMeasurement::Id, SoilMoistureMeasurementLimits::Id);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SetSoilMeasuredValue(EndpointId endpointId,
+                                const Attributes::SoilMoistureMeasuredValue::TypeInfo::Type & soilMoistureMeasuredValue)
+{
+    MeasurementData * data = SoilMeasurementDataForEndpoint(endpointId);
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    data->soilMoistureMeasuredValue = soilMoistureMeasuredValue;
+
+    MatterReportingAttributeChangeCallback(endpointId, SoilMeasurement::Id, SoilMoistureMeasuredValue::Id);
 
     return CHIP_NO_ERROR;
 }

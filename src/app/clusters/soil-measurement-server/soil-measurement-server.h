@@ -30,9 +30,12 @@ namespace app {
 namespace Clusters {
 namespace SoilMeasurement {
 
+inline constexpr uint16_t kClusterRevision = 1;
+
 struct MeasurementData
 {
     Globals::Structs::MeasurementAccuracyStruct::Type soilMoistureMeasurementLimits;
+    Attributes::SoilMoistureMeasuredValue::TypeInfo::Type soilMoistureMeasuredValue;
 };
 
 class SoilMeasurementAttrAccess : public AttributeAccessInterface
@@ -46,11 +49,12 @@ public:
     void Shutdown();
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-
-private:
 };
 
-CHIP_ERROR SetSoilMeasurementAccuracy(EndpointId endpointId, const Globals::Structs::MeasurementAccuracyStruct::Type & accuracy);
+CHIP_ERROR SetSoilMeasurementAccuracy(EndpointId endpointId, const Globals::Structs::MeasurementAccuracyStruct::Type & accuracy,
+                                      bool reportChange);
+CHIP_ERROR SetSoilMeasuredValue(EndpointId endpointId,
+                                const Attributes::SoilMoistureMeasuredValue::TypeInfo::Type & soilMoistureMeasuredValue);
 
 MeasurementData * SoilMeasurementDataForEndpoint(EndpointId endpointId);
 

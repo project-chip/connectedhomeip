@@ -950,15 +950,14 @@ void AllClustersAppCommandHandler::OnAirQualityChange(uint32_t aNewValue)
 
 void AllClustersAppCommandHandler::OnSoilMoistureChange(EndpointId endpointId, uint8_t soilMoisture)
 {
-    Protocols::InteractionModel::Status status =
-        SoilMeasurement::Attributes::SoilMoistureMeasuredValue::Set(endpointId, soilMoisture);
-    ChipLogDetail(NotSpecified, "Set Soil Moisture value to %u", soilMoisture);
-
-    if (status != Protocols::InteractionModel::Status::Success)
+    if (soilMoisture > 100)
     {
         ChipLogDetail(NotSpecified, "Invalid value/endpoint to set.");
         return;
     }
+
+    chip::app::Clusters::SoilMeasurement::SetSoilMeasuredValue(endpointId, soilMoisture);
+    ChipLogDetail(NotSpecified, "Set Soil Moisture value to %u", soilMoisture);
 }
 
 void AllClustersAppCommandHandler::HandleSetOccupancyChange(EndpointId endpointId, uint8_t newOccupancyValue)
