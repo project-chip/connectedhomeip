@@ -170,19 +170,20 @@ properties:
 
 ##### Property: [_constraints_](../../../../src/app/tests/suites/TestConstraints.yaml)
 
-| Name        | Description                                                 | Required               |
-| ----------- | ----------------------------------------------------------- | ---------------------- |
-| hasValue    | If true, must have value. If false, must not have value.    | No (If other provided) |
-| minValue    | Minimum value to expect from the command response.          | No (If other provided) |
-| maxValue    | Maximum value to expect from the command response.          | No (If other provided) |
-| notValue    | Validate the the value is not what is provided.             | No (If other provided) |
-| minLength   | Minimum length of the response parameter.                   | No (If other provided) |
-| maxLength   | Maximum length of the string parameter.                     | No (If other provided) |
-| startsWith  | Condition is which will validate what a string starts with. | No (If other provided) |
-| endsWith    | Condition is which will validate what a string ends with.   | No (If other provided) |
-| isLowerCase | Validates if the char_string is lower case.                 | No (If other provided) |
-| isUpperCase | Validates if the char_string is upper case.                 | No (If other provided) |
-| isHexString | Checks whether the char_string is a hex string.             | No (If other provided) |
+| Name          | Description                                                 | Required               |
+| ------------- | ----------------------------------------------------------- | ---------------------- |
+| hasValue      | If true, must have value. If false, must not have value.    | No (If other provided) |
+| minValue      | Minimum value to expect from the command response.          | No (If other provided) |
+| maxValue      | Maximum value to expect from the command response.          | No (If other provided) |
+| notValue      | Validate the the value is not what is provided.             | No (If other provided) |
+| minLength     | Minimum length of the response parameter.                   | No (If other provided) |
+| maxLength     | Maximum length of the string parameter.                     | No (If other provided) |
+| startsWith    | Condition is which will validate what a string starts with. | No (If other provided) |
+| endsWith      | Condition is which will validate what a string ends with.   | No (If other provided) |
+| isLowerCase   | Validates if the char_string is lower case.                 | No (If other provided) |
+| isUpperCase   | Validates if the char_string is upper case.                 | No (If other provided) |
+| isHexString   | Checks whether the char_string is a hex string.             | No (If other provided) |
+| isSetOfValues | Uses a order-independent compare on the list contents.      | No (If other provided) |
 
 Note: The hasValue constraint is only applied to optional fields. The other
 constraints are ignored for optional fields that do not have a value.

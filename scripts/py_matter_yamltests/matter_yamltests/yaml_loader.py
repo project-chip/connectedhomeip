@@ -99,6 +99,7 @@ _TEST_STEP_RESPONSE_CONSTRAINTS_SCHEMA = {
     'endsWith': str,
     'isUpperCase': bool,
     'isLowerCase': bool,
+    'isSetOfValues': list,  # order independent set of values
     'minValue': (int, float, str),  # Can be a variable
     'maxValue': (int, float, str),  # Can be a variable
     'contains': list,

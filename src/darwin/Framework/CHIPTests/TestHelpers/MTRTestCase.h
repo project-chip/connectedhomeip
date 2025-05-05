@@ -42,13 +42,15 @@ NS_ASSUME_NONNULL_BEGIN
 // Creates a device controller on a new fabric with test keys and test storage.
 //
 // The controller will be shut down, and the controller factory stopped, at the
-// end of the current test.
+// end of the current test. Note that it is acceptable for the test itself to
+// shut down the returned controller earlier.
 - (MTRDeviceController *)createControllerOnTestFabric;
 
 // Creates a device controller on a new fabric with test keys and test storage.
 //
 // The controller will be shut down, and the controller factory stopped, at the
-// end of the test suite.
+// end of the test suite. Note that it is acceptable for the test itself to
+// shut down the returned controller earlier.
 + (MTRDeviceController *)createControllerOnTestFabric;
 
 // Provides access to the mock CoreBlueooth instance managed automatically by

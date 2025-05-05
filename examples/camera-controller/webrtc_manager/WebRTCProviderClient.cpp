@@ -41,6 +41,48 @@ void WebRTCProviderClient::Init(const ScopedNodeId & peerId, EndpointId endpoint
                     ChipLogValueX64(peerId.GetNodeId()), static_cast<unsigned>(endpointId));
 }
 
+CHIP_ERROR WebRTCProviderClient::SolicitOffer(
+    Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage, EndpointId originatingEndpointId,
+    Optional<DataModel::Nullable<uint16_t>> videoStreamId, Optional<DataModel::Nullable<uint16_t>> audioStreamId,
+    Optional<DataModel::List<const Clusters::WebRTCTransportProvider::Structs::ICEServerStruct::Type>> ICEServers,
+    Optional<chip::CharSpan> ICETransportPolicy)
+{
+    ChipLogProgress(Camera, "Sending SolicitOffer to node " ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
+
+    if (mState != State::Idle)
+    {
+        ChipLogError(Camera, "Operation NOT POSSIBLE: another sync is in progress");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    // Store the command type
+    mCommandType = CommandType::kSolicitOffer;
+
+    // Stash data in class members so the CommandSender can safely reference them async
+    mSolicitOfferData.streamUsage           = streamUsage;
+    mSolicitOfferData.originatingEndpointID = originatingEndpointId;
+    mSolicitOfferData.videoStreamID         = videoStreamId;
+    mSolicitOfferData.audioStreamID         = audioStreamId;
+    mSolicitOfferData.ICEServers            = ICEServers;
+    mSolicitOfferData.ICETransportPolicy    = ICETransportPolicy;
+
+    // Store the streamUsage from the original command so we can build the WebRTCSessionStruct when the response arrives.
+    mCurrentStreamUsage = streamUsage;
+
+    // Attempt to find or establish a CASE session to the target PeerId.
+    InteractionModelEngine * engine     = InteractionModelEngine::GetInstance();
+    CASESessionManager * caseSessionMgr = engine->GetCASESessionManager();
+    VerifyOrReturnError(caseSessionMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    MoveToState(State::Connecting);
+
+    // WebRTC ProvideOffer requires a large payload session establishment
+    caseSessionMgr->FindOrEstablishSession(mPeerId, &mOnConnectedCallback, &mOnConnectionFailureCallback,
+                                           TransportPayloadCapability::kLargePayload);
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR WebRTCProviderClient::ProvideOffer(
     DataModel::Nullable<uint16_t> webRTCSessionId, std::string sdp, Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage,
     EndpointId originatingEndpointId, Optional<DataModel::Nullable<uint16_t>> videoStreamId,
@@ -87,6 +129,38 @@ CHIP_ERROR WebRTCProviderClient::ProvideOffer(
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR WebRTCProviderClient::ProvideAnswer(uint16_t webRTCSessionId, const std::string & sdp)
+{
+    ChipLogProgress(Camera, "Sending ProvideAnswer to node " ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
+
+    if (mState != State::Idle)
+    {
+        ChipLogError(Camera, "Operation NOT POSSIBLE: another sync is in progress");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    // Store the command type
+    mCommandType = CommandType::kProvideAnswer;
+
+    // Stash data in class members so the CommandSender can safely reference them async
+    mProvideAnswerData.webRTCSessionID = webRTCSessionId;
+    mProvideAnswerData.sdp             = CharSpan::fromCharString(sdp.c_str());
+    ;
+
+    // Attempt to find or establish a CASE session to the target PeerId.
+    InteractionModelEngine * engine     = InteractionModelEngine::GetInstance();
+    CASESessionManager * caseSessionMgr = engine->GetCASESessionManager();
+    VerifyOrReturnError(caseSessionMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    MoveToState(State::Connecting);
+
+    // WebRTC ProvideOffer requires a large payload session establishment
+    caseSessionMgr->FindOrEstablishSession(mPeerId, &mOnConnectedCallback, &mOnConnectionFailureCallback,
+                                           TransportPayloadCapability::kLargePayload);
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR WebRTCProviderClient::ProvideICECandidates(uint16_t webRTCSessionId, DataModel::List<const chip::CharSpan> ICECandidates)
 {
     ChipLogProgress(Camera, "Sending ProvideICECandidates to node " ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
@@ -118,6 +192,14 @@ CHIP_ERROR WebRTCProviderClient::ProvideICECandidates(uint16_t webRTCSessionId, 
     return CHIP_NO_ERROR;
 }
 
+void WebRTCProviderClient::HandleOfferReceived(uint16_t webRTCSessionId)
+{
+    ChipLogProgress(Camera, "Offer command received for WebRTC session ID: %u", webRTCSessionId);
+
+    DeviceLayer::SystemLayer().CancelTimer(OnSessionEstablishTimeout, this);
+    MoveToState(State::Idle);
+}
+
 void WebRTCProviderClient::HandleAnswerReceived(uint16_t webRTCSessionId)
 {
     ChipLogProgress(Camera, "Answer command received for WebRTC session ID: %u", webRTCSessionId);
@@ -144,6 +226,17 @@ void WebRTCProviderClient::OnResponse(CommandSender * client, const ConcreteComm
     {
         switch (path.mCommandId)
         {
+        case Clusters::WebRTCTransportProvider::Commands::SolicitOfferResponse::Id:
+            ChipLogDetail(Camera, "Processing SolicitOfferResponse");
+            if (data == nullptr)
+            {
+                ChipLogError(Camera, "Response failure: data pointer is null");
+                return;
+            }
+
+            HandleSolicitOfferResponse(*data);
+            break;
+
         case Clusters::WebRTCTransportProvider::Commands::ProvideOfferResponse::Id:
             ChipLogDetail(Camera, "Processing ProvideOfferResponse");
             if (data == nullptr)
@@ -220,6 +313,14 @@ CHIP_ERROR WebRTCProviderClient::SendCommandForType(Messaging::ExchangeManager &
 
     switch (commandType)
     {
+    case CommandType::kSolicitOffer:
+        return SendCommand(exchangeMgr, sessionHandle, Clusters::WebRTCTransportProvider::Commands::SolicitOffer::Id,
+                           mSolicitOfferData);
+
+    case CommandType::kProvideAnswer:
+        return SendCommand(exchangeMgr, sessionHandle, Clusters::WebRTCTransportProvider::Commands::ProvideAnswer::Id,
+                           mProvideAnswerData);
+
     case CommandType::kProvideOffer:
         return SendCommand(exchangeMgr, sessionHandle, Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Id,
                            mProvideOfferData);
@@ -273,6 +374,61 @@ void WebRTCProviderClient::OnSessionEstablishTimeout(chip::System::Layer * syste
 
     ChipLogError(Camera, "WebRTC Session establishment has timed out!");
     self->MoveToState(State::Idle);
+}
+
+void WebRTCProviderClient::HandleSolicitOfferResponse(TLV::TLVReader & data)
+{
+    ChipLogProgress(Camera, "WebRTCProviderClient::HandleSolicitOfferResponse.");
+
+    Clusters::WebRTCTransportProvider::Commands::SolicitOfferResponse::DecodableType value;
+    CHIP_ERROR error = app::DataModel::Decode(data, value);
+    VerifyOrReturn(error == CHIP_NO_ERROR,
+                   ChipLogError(Camera, "Failed to decode command response value. Error: %" CHIP_ERROR_FORMAT, error.Format()));
+
+    // Create a new session record and populate fields from the decoded command response and current secure session info
+    Clusters::WebRTCTransportProvider::Structs::WebRTCSessionStruct::Type session;
+    session.id             = value.webRTCSessionID;
+    session.peerNodeID     = mPeerId.GetNodeId();
+    session.fabricIndex    = mPeerId.GetFabricIndex();
+    session.peerEndpointID = mEndpointId;
+    session.streamUsage    = mCurrentStreamUsage;
+
+    mCurrentSessionId = value.webRTCSessionID;
+
+    // Populate optional fields for video/audio stream IDs if present; set them to Null otherwise
+    session.videoStreamID = value.videoStreamID.HasValue() ? value.videoStreamID.Value() : DataModel::MakeNullable<uint16_t>();
+    session.audioStreamID = value.audioStreamID.HasValue() ? value.audioStreamID.Value() : DataModel::MakeNullable<uint16_t>();
+
+    // If DeferredOffer == FALSE these fields MUST be valid
+    if (!value.deferredOffer)
+    {
+        if (session.videoStreamID.IsNull() || session.audioStreamID.IsNull())
+        {
+            ChipLogError(Camera, "Provider reported DeferredOffer=FALSE but did not supply valid Video/Audio stream IDs");
+            return;
+        }
+    }
+
+    VerifyOrReturn(mRequestorServer != nullptr, ChipLogError(Camera, "WebRTCProviderClient is not initialized"));
+
+    // Insert or update the Requestor cluster's CurrentSessions.
+    mRequestorServer->UpsertSession(session);
+
+    if (value.deferredOffer)
+    {
+        ChipLogProgress(Camera, "DeferredOffer=TRUE -- there will be a larger than normal amount of time to receive Offer command");
+
+        // Longer timeout because the provider is in low-power standby
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kDeferredOfferTimeoutSeconds), OnSessionEstablishTimeout,
+                                              this);
+    }
+    else
+    {
+        // Normal (shorter) timeout for an imminent Offer round-trip
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kSessionTimeoutSeconds), OnSessionEstablishTimeout, this);
+    }
+
+    MoveToState(State::AwaitingOffer);
 }
 
 void WebRTCProviderClient::HandleProvideOfferResponse(TLV::TLVReader & data)

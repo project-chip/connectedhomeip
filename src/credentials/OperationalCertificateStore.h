@@ -188,8 +188,7 @@ public:
      * @retval CHIP_ERROR_INCORRECT_STATE if the certificate store is not properly initialized, if this method
      *                                    is called after `AddNewOpCertsForFabric`, if there was
      *                                    already a pending cert chain for the given `fabricIndex`, if there are
-     *                                    no associated persisted root and NOC chain for the given `fabricIndex`,
-     *                                    or if a VVSC is present and `icac` is not empty.
+     *                                    no associated persisted root and NOC chain for the given `fabricIndex`.
      * @retval other CHIP_ERROR value on internal errors
      */
     virtual CHIP_ERROR UpdateOpCertsForFabric(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac) = 0;
