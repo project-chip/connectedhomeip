@@ -20,20 +20,12 @@
 
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/minimal_mdns/core/HeapQName.h>
-#include <lib/dnssd/minimal_mdns/core/tests/QNameStrings.h>
 
 namespace {
 
 using namespace mdns::Minimal;
 
-class TestHeapQName : public ::testing::Test
-{
-public:
-    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
-};
-
-TEST_F(TestHeapQName, Construction)
+TEST(TestHeapQName, Construction)
 {
     {
 
@@ -58,7 +50,7 @@ TEST_F(TestHeapQName, Construction)
     }
 }
 
-TEST_F(TestHeapQName, Copying)
+TEST(TestHeapQName, Copying)
 {
     const testing::TestQName<2> kShort({ "some", "test" });
 
