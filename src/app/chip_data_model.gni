@@ -248,7 +248,30 @@ template("chip_data_model") {
       defines = []
     }
 
-    foreach(cluster, _cluster_sources) {
+    # A list of clusters that have a standardized layout. Specifically:
+    #   - "src/app/clusters/${cluster}/BUILD.gn" exists with a ${cluster} (i.e. default) target
+    #   - code generation integration resides in "src/app/clusters/${cluster}/CodegenIntegration.cpp" ]
+    #
+    # In these cases the data model will:
+    #   - add dependency on the cluster (i.e. let BUILD.gn manage source files)
+    #   - directly include "CodegenIntegration.cpp" to have access to application-specific
+    #     code generated data
+    _code_backed_clusters = [
+      "ota-provider",
+      "software-diagnostics-server",
+    ]
+
+    _code_backed_cluster_sources =
+        filter_include(_cluster_sources, _code_backed_clusters)
+    _monolith_cluster_sources =
+        filter_exclude(_cluster_sources, _code_backed_clusters)
+
+    foreach(cluster, _code_backed_cluster_sources) {
+      deps += [ "${_app_root}/clusters/${cluster}" ]
+      sources += [ "${_app_root}/clusters/${cluster}/CodegenIntegration.cpp" ]
+    }
+
+    foreach(cluster, _monolith_cluster_sources) {
       if (cluster == "door-lock-server") {
         sources += [
           "${_app_root}/clusters/${cluster}/door-lock-server-callback.cpp",
@@ -280,9 +303,6 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
         ]
         deps += [ "${chip_root}/src/controller" ]
-      } else if (cluster == "ota-provider") {
-        deps += [ "${_app_root}/clusters/${cluster}" ]
-        sources += [ "${_app_root}/clusters/${cluster}/CodegenIntegration.cpp" ]
       } else if (cluster == "ota-requestor") {
         sources += [
           # TODO - align name of folder ?
@@ -517,9 +537,6 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/${cluster}.h",
         ]
-      } else if (cluster == "software-diagnostics-server") {
-        deps += [ "${_app_root}/clusters/${cluster}" ]
-        sources += [ "${_app_root}/clusters/${cluster}/CodegenIntegration.cpp" ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
       }

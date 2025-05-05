@@ -27,7 +27,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-/// Type-safe implementation for callbacks for the OTA Provider server
+/// Type-safe implementation for callbacks for the SoftwareDiagnostics server
 class SoftwareDiagnosticsLogic
 {
 public:
@@ -62,7 +62,7 @@ public:
     CHIP_ERROR AcceptedCommands(ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder);
 
 protected:
-    /// OTA provider logic generally forwards all calls to a diagnostic data provider
+    /// Software Diagnostics provider logic generally forwards all calls to a diagnostic data provider
     ///
     /// To allow unit testing, we have this as a protected member so we can both
     /// use `DeviceLayer::GetDiagnosticDataProvider` and not incur RAM cost and also

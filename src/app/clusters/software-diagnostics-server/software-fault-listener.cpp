@@ -1,6 +1,5 @@
 /*
- *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,26 +14,27 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#pragma once
-
-#include <clusters/SoftwareDiagnostics/Events.h>
+#include <app/clusters/software-diagnostics-server/software-fault-listener.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
+namespace SoftwareDiagnostics {
+namespace {
+SoftwareFaultListener * gListener = nullptr;
+} // namespace
 
-class SoftwareDiagnosticsServer
+SoftwareFaultListener * SoftwareFaultListener::GetGlobalListener()
 {
-public:
-    static SoftwareDiagnosticsServer & Instance()
-    {
-        static SoftwareDiagnosticsServer instance;
-        return instance;
-    }
-    void OnSoftwareFaultDetect(const chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::Type & softwareFault);
-};
+    return gListener;
+}
 
+void SoftwareFaultListener::SetGlobalListener(SoftwareFaultListener * newValue)
+{
+    gListener = newValue;
+}
+
+} // namespace SoftwareDiagnostics
 } // namespace Clusters
 } // namespace app
 } // namespace chip

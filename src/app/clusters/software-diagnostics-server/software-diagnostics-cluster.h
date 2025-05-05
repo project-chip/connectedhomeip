@@ -18,6 +18,7 @@
 
 #include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
 
+#include <app/clusters/software-diagnostics-server/software-fault-listener.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/SoftwareDiagnostics/ClusterId.h>
 #include <clusters/SoftwareDiagnostics/Commands.h>
@@ -33,17 +34,47 @@ namespace Clusters {
 
 /// Integration of Software diagnostics logic within the matter data model
 ///
-/// Translates between matter calls and OTA logic
+/// Translates between matter calls and Software Diagnostics logic
 ///
 /// This cluster is expected to only ever exist on endpoint 0 as it is a singleton cluster.
 template <typename LOGIC>
-class SoftwareDiagnosticsServerCluster : public DefaultServerCluster, private LOGIC
+class SoftwareDiagnosticsServerCluster : public DefaultServerCluster,
+                                         public SoftwareDiagnostics::SoftwareFaultListener,
+                                         private LOGIC
 {
 public:
     template <typename... Args>
     SoftwareDiagnosticsServerCluster(Args &&... args) :
-        DefaultServerCluster({ kRootEndpointId, OtaSoftwareUpdateProvider::Id }), LOGIC(std::forward<Args>(args)...)
+        DefaultServerCluster({ kRootEndpointId, SoftwareDiagnostics::Id }), LOGIC(std::forward<Args>(args)...)
     {}
+
+    // software fault listener
+    void OnSoftwareFaultDetect(const chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::Type & softwareFault) override
+    {
+        VerifyOrReturn(mContext != nullptr);
+        (void) mContext->interactionContext->eventsGenerator->GenerateEvent(softwareFault, kRootEndpointId);
+    }
+
+    CHIP_ERROR Startup(ServerClusterContext & context) override
+    {
+        ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+
+        if (SoftwareDiagnostics::SoftwareFaultListener::GetGlobalListener() == nullptr)
+        {
+            SoftwareDiagnostics::SoftwareFaultListener::SetGlobalListener(this);
+        }
+
+        return CHIP_NO_ERROR;
+    }
+
+    void Shutdown() override
+    {
+        if (SoftwareDiagnostics::SoftwareFaultListener::GetGlobalListener() == this)
+        {
+            SoftwareDiagnostics::SoftwareFaultListener::SetGlobalListener(nullptr);
+        }
+        DefaultServerCluster::Shutdown();
+    }
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -99,13 +130,6 @@ public:
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override
     {
         return LOGIC::Attributes(builder);
-    }
-
-    /// Returns true if the event was successfully generated
-    bool Emit(const chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::Type & softwareFault)
-    {
-        VerifyOrReturnError(mContext != nullptr, false);
-        return mContext->interactionContext->eventsGenerator->GenerateEvent(softwareFault, kRootEndpointId).has_value();
     }
 };
 

@@ -52,7 +52,6 @@ public:
 
 private:
     DeviceLayer::ThreadMetrics * mMetrics = nullptr;
-    ;
     DeviceLayer::DiagnosticDataProvider & mProvider;
 };
 
