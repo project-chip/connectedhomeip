@@ -173,8 +173,8 @@ class TC_ACL_2_6(MatterBaseTest):
         if events_response:
             # Get the most recent events from the read response
             read_events = sorted([e.Data for e in events_response],
-                                    key=lambda x: next(e.Header.EventNumber for e in events_response if e.Data == x),
-                                    reverse=True)[:2]
+                                 key=lambda x: next(e.Header.EventNumber for e in events_response if e.Data == x),
+                                 reverse=True)[:2]
 
         # Verify we got the expected number of events
         asserts.assert_true(len(read_events) >= 2,
