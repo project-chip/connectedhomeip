@@ -92,7 +92,8 @@ CHIP_ERROR WebRTCManager::HandleAnswer(uint16_t sessionId, const std::string & s
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    mPeerConnection->setRemoteDescription(sdp);
+    rtc::Description answerDesc(sdp, rtc::Description::Type::Answer);
+    mPeerConnection->setRemoteDescription(answerDesc);
 
     // Schedule the ProvideICECandidates() call to run asynchronously.
     DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() { ProvideICECandidates(sessionId); });
