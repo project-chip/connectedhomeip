@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This is the equivalent ot codegen_sources.gni
+# This is the equivalent to codegen_sources.gni
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
