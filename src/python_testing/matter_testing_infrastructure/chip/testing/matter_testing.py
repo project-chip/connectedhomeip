@@ -1029,6 +1029,11 @@ class MatterBaseTest(base_test.BaseTestClass):
         return self.matter_test_config.endpoint if self.matter_test_config.endpoint is not None else default
 
     def get_wifi_ssid(self, default: Optional[str] = 0) -> str:
+        ''' Get WiFi SSID
+
+            Get the WiFi networks name provided with flags
+
+        '''
         return self.matter_test_config.wifi_ssid if self.matter_test_config.wifi_ssid is not None else default
 
     def get_credentials(self, default: Optional[str] = 0) -> str:
