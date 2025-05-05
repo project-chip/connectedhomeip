@@ -958,7 +958,7 @@ CHIP_ERROR IndividualDaysDataClass::LoadFromJson(const Json::Value& json) {
 }
 
 void IndividualDaysDataClass::CleanupValue() {
-
+    mValue.SetNull();
 }
 
 //DayPatternsDataClass
@@ -984,7 +984,7 @@ CHIP_ERROR CalendarPeriodsDataClass::LoadFromJson(const Json::Value& json) {
 }
 
 void CalendarPeriodsDataClass::CleanupValue() {
-
+    mValue.SetNull();
 }
 /** -------------------Current attrs data--------------------- **/
 

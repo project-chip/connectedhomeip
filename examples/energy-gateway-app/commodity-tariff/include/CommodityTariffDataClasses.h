@@ -325,7 +325,7 @@ public:
     bool IsValid(const DayStructType& component) const override;
 };
 
-using DayStructsListType = DataModel::List<Structs::DayStruct::Type>;
+using DayStructsListType = DataModel::Nullable<DataModel::List<DayStructType>>;
 class IndividualDaysDataClass : public CTC_BaseDataClass<DayStructsListType> {
 public:
     IndividualDaysDataClass(DayStructsListType& aValueStorage)
@@ -385,7 +385,7 @@ public:
     bool IsValid(const CalendarPeriodStructType& component) const override;
 };
 
-using CalendarPeriodsListType = DataModel::List<CalendarPeriodStructType>;
+using CalendarPeriodsListType = DataModel::Nullable<DataModel::List<CalendarPeriodStructType>>;
 class CalendarPeriodsDataClass : public CTC_BaseDataClass<CalendarPeriodsListType> {
 public:
     CalendarPeriodsDataClass(CalendarPeriodsListType& aValueStorage)

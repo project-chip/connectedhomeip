@@ -48,12 +48,12 @@ namespace CommodityTariff {
 
 #define COMMODITY_TARIFF_PRIMARY_ATTRIBUTES_DEV \
     X(TariffInfo,                   DataModel::Nullable<Structs::TariffInformationStruct::Type>) \
-    X(TariffPeriods,                DataModel::List<Structs::TariffPeriodStruct::Type>) \
-    X(DayEntries,                   DataModel::List<Structs::DayEntryStruct::Type>) \
+    X(DayEntries,                   DataModel::List<Structs::DayEntryStruct::Type>)  \
     X(TariffComponents,             DataModel::List<Structs::TariffComponentStruct::Type>) \
-    X(IndividualDays,               DataModel::List<Structs::DayStruct::Type>) \
+    X(TariffPeriods,                DataModel::List<Structs::TariffPeriodStruct::Type>) \
     X(DayPatterns,                  DataModel::List<Structs::DayPatternStruct::Type>) \
-    X(CalendarPeriods,              DataModel::List<Structs::CalendarPeriodStruct::Type>)
+    X(IndividualDays,               DataModel::Nullable<DataModel::List<Structs::DayStruct::Type>>) \
+    X(CalendarPeriods,              DataModel::Nullable<DataModel::List<Structs::CalendarPeriodStruct::Type>>)
 
 #define COMMODITY_TARIFF_PRIMARY_ATTRIBUTES \
     COMMODITY_TARIFF_PRIMARY_ATTRIBUTES_STUBS \
