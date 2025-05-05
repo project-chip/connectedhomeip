@@ -46,8 +46,8 @@ function(chip_configure_cluster APP_TARGET CLUSTER)
 
     # Custom code for cmake-integration. These are extra dependencies that would be included in BUILD.gn
     # that are not visible to cmake
-    if (EXISTS "${CLUSTER_DIR}/include.cmake")
-      include("${CLUSTER_DIR}/include.cmake")
+    if (EXISTS "${CLUSTER_DIR}/codegen_integration.cmake")
+      include("${CLUSTER_DIR}/codegen_integration.cmake")
     endif()
 endfunction()
 
