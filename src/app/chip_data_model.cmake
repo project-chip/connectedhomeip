@@ -27,7 +27,7 @@ include("${CHIP_ROOT}/src/data-model-providers/codegen/model.cmake")
 #
 function(chip_configure_cluster APP_TARGET CLUSTER)
     SET(CLUSTER_DIR "${CHIP_APP_BASE_DIR}/clusters/${CLUSTER}")
-    include("${CLUSTER_DIR}/codegen_sources.cmake")
+    include("${CLUSTER_DIR}/codegen_dependent_sources.cmake")
 endfunction()
 
 #
