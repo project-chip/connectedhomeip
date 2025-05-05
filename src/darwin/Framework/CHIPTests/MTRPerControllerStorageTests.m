@@ -2673,7 +2673,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     // Now that we have a wildcard subscription to our server, try to add another
     // endpoint to test what happens when an endpoint is added while a
     // ReadHandler that cares about it is live.  We should not end up with any
-    // crashed or anything like that.
+    // crashes or anything like that.
     __auto_type * endpoint6 = [[MTRServerEndpoint alloc] initWithEndpointID:endpointId4 deviceTypes:@[ deviceType1 ]];
     XCTAssertNotNil(endpoint6);
     XCTAssertTrue([controllerServer addServerEndpoint:endpoint6]);
