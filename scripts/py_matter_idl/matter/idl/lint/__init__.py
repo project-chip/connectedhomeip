@@ -13,8 +13,12 @@
 # limitations under the License.
 
 import logging
+import sys
 
 import click
+import coloredlogs
+
+from matter.idl import matter_idl_parser
 
 from .lint_rules_parser import CreateParser
 
@@ -32,15 +36,64 @@ __LOG_LEVELS__ = {
 
 @click.command()
 @click.option(
+    "--log-level",
+    default="INFO",
+    type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
+    help="Determines the verbosity of script output.",
+    show_default=True,
+)
+@click.option(
+    "--rules",
+    default=".matterlint",
+    type=click.Path(exists=True, dir_okay=False),
+    help="Matter lint rules file to use.",
+    show_default=True,
+)
+@click.argument("idl_path", type=click.Path(exists=True, dir_okay=False))
+def main(log_level, rules, idl_path):
+    """
+    Lints MATTER IDL files (.matter) using given RULES
+    """
+    coloredlogs.install(
+        level=__LOG_LEVELS__[log_level],
+        fmt="%(asctime)s %(levelname)-7s %(message)s",
+    )
+
+    lint_rules = []
+    logging.info("Loading rules from %s" % rules)
+    lint_rules.extend(CreateParser(rules).parse())
+
+    logging.info("Parsing idl from %s" % idl_path)
+    idl_tree = matter_idl_parser.CreateParser().parse(
+        open(idl_path, "rt").read(), file_name=idl_path)
+
+    logging.info("Running %d lint rules" % len(lint_rules))
+
+    errors = []
+    for rule in lint_rules:
+        logging.info("   Running %s" % rule.name)
+        errors.extend(rule.LintIdl(idl_tree))
+    logging.info("Done")
+
+    for e in errors:
+        logging.error("ERROR: %s" % e)
+
+    if errors:
+        logging.error("Found %d lint errors" % len(errors))
+        sys.exit(1)
+
+
+@click.command()
+@click.option(
     '--log-level',
     default='INFO',
-    type=click.Choice(list(__LOG_LEVELS__.keys()), case_sensitive=False),
+    type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
     help='Determines the verbosity of script output.')
-@click.argument('filename')
-def main(log_level, filename=None):
-    # The IDL lint parser is generally not intended to be run as a stand-alone binary.
-    # The ability to run is for debug and to print out the parsed AST.
-
+@click.argument("filename", type=click.Path(exists=True, dir_okay=False))
+def parser(log_level, filename=None):
+    """
+    Parse Matter IDL linter RULES file.
+    """
     logging.basicConfig(
         level=__LOG_LEVELS__[log_level],
         format='%(asctime)s %(levelname)-7s %(message)s',

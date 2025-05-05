@@ -41,7 +41,7 @@ from typing import Any
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.matter_asserts import assert_valid_uint8
+from chip.testing.matter_asserts import assert_valid_map8
 from matter_testing_infrastructure.chip.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main,
                                                                        has_feature, run_if_endpoint_matches)
 from mobly import asserts
@@ -56,9 +56,9 @@ class TC_FAN_2_3(MatterBaseTest):
     def steps_TC_FAN_2_3(self):
         return [TestStep(1, "[FC] Commissioning already done.", is_commissioning=True),
                 TestStep(2, "[FC] TH reads from the DUT the RockSupport attribute.",
-                         "Verify that the RockSupport attribute value is of uint8 type. Verify that the RockSupport attribute's value is between 1 and 3 inclusive."),
+                         "Verify that the RockSupport attribute value is a map8 bitmap. Verify that the RockSupport attribute's value is between 1 and 3 inclusive."),
                 TestStep(3, "[FC] TH reads from the DUT the RockSetting attribute.",
-                         "Verify that the RockSetting attribute value is of uint8 type. Verify that the RockSetting attribute's value is between 0 and 3 inclusive"),
+                         "Verify that the RockSetting attribute value is a map8 bitmap. Verify that the RockSetting attribute's value is between 0 and 3 inclusive"),
                 TestStep(4, "[FC] TH checks that RockSetting is conformant with RockSupport.",
                          "Verify that all bits set in RockSetting are also set in RockSupport."),
                 TestStep(5, "[FC] TH writes a valid bit from RockSupport to RockSetting.",
@@ -120,8 +120,8 @@ class TC_FAN_2_3(MatterBaseTest):
         self.step(2)
         rock_support = await self.read_setting(attr.RockSupport)
 
-        # Verify that the RockSupport attribute value is of uint8 type
-        assert_valid_uint8(rock_support, "RockSupport")
+        # Verify that the RockSupport attribute value is a map8 bitmap
+        assert_valid_map8(rock_support, "RockSupport")
 
         # Verify that the RockSupport attribute's value is between 1 and 7 inclusive
         asserts.assert_in(rock_support, valid_rock_support_range,
@@ -132,8 +132,8 @@ class TC_FAN_2_3(MatterBaseTest):
         self.step(3)
         rock_setting = await self.read_setting(attr.RockSetting)
 
-        # Verify that the RockSetting attribute value is of uint8 type
-        assert_valid_uint8(rock_setting, "RockSetting")
+        # Verify that the RockSetting attribute value is a map8 bitmap
+        assert_valid_map8(rock_setting, "RockSetting")
 
         # Verify that the RockSetting attribute's value is between 0 and 7 inclusive
         asserts.assert_in(rock_setting, valid_rock_setting_range,

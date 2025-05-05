@@ -32,6 +32,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     {
     case Attributes::TemperatureUnit::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, temperatureUnit);
+    case Attributes::SupportedTemperatureUnits::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, supportedTemperatureUnits);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
