@@ -29,7 +29,8 @@ declare_args() {
   chip_enable_wifi_diagnostics_trigger = false
   chip_enable_smoke_co_trigger = false
   chip_enable_boolean_state_configuration_trigger = false
-  chip_enable_commodity_tariff_trigger = true
+  chip_enable_commodity_price_trigger = false
+  chip_enable_commodity_tariff_trigger = false
   chip_enable_energy_evse_trigger = false
   chip_enable_electrical_grid_conditions_trigger = false
   chip_enable_energy_reporting_trigger = false
