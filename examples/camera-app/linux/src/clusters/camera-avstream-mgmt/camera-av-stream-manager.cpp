@@ -49,14 +49,14 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(c
 
     for (VideoStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableVideoStreams())
     {
-        if (!stream.isAllocated)
+        if (stream.IsCompatible(allocateArgs))
         {
             foundAvailableStream = true;
 
-            if (stream.IsCompatible(allocateArgs))
+            outStreamID = stream.videoStreamParams.videoStreamID;
+            if (!stream.isAllocated)
             {
                 stream.isAllocated = true;
-                outStreamID        = stream.videoStreamParams.videoStreamID;
 
                 // Start the video stream from HAL for serving.
                 mCameraDeviceHAL->GetCameraHALInterface().StartVideoStream(outStreamID);
@@ -70,6 +70,11 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(c
 
                 return Status::Success;
             }
+            else
+            {
+                ChipLogProgress(Camera, "Matching pre-allocated stream with ID: %d exists", outStreamID);
+            }
+            return Status::Success;
         }
     }
 
@@ -134,20 +139,25 @@ Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamAllocate(c
 
     for (AudioStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableAudioStreams())
     {
-        if (!stream.isAllocated)
+        if (stream.IsCompatible(allocateArgs))
         {
             foundAvailableStream = true;
 
-            if (stream.IsCompatible(allocateArgs))
+            outStreamID = stream.audioStreamParams.audioStreamID;
+            if (!stream.isAllocated)
             {
                 stream.isAllocated = true;
-                outStreamID        = stream.audioStreamParams.audioStreamID;
 
                 // Start the audio stream from HAL for serving.
                 mCameraDeviceHAL->GetCameraHALInterface().StartAudioStream(outStreamID);
 
                 return Status::Success;
             }
+            else
+            {
+                ChipLogProgress(Camera, "Matching pre-allocated stream with ID: %d exists", outStreamID);
+            }
+            return Status::Success;
         }
     }
 
@@ -184,20 +194,25 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocat
 
     for (SnapshotStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableSnapshotStreams())
     {
-        if (!stream.isAllocated)
+        if (stream.IsCompatible(allocateArgs))
         {
             foundAvailableStream = true;
 
-            if (stream.IsCompatible(allocateArgs))
+            outStreamID = stream.snapshotStreamParams.snapshotStreamID;
+            if (!stream.isAllocated)
             {
                 stream.isAllocated = true;
-                outStreamID        = stream.snapshotStreamParams.snapshotStreamID;
 
                 // Start the snapshot stream for serving.
                 mCameraDeviceHAL->GetCameraHALInterface().StartSnapshotStream(outStreamID);
 
                 return Status::Success;
             }
+            else
+            {
+                ChipLogProgress(Camera, "Matching pre-allocated stream with ID: %d exists", outStreamID);
+            }
+            return Status::Success;
         }
     }
 
