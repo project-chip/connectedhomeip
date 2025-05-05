@@ -89,10 +89,10 @@ struct ClusterInfo
 };
 
 // Constant used to narrow binary expressions
-constexpr uint8_t kPrivilegeBits   = 5;
+constexpr uint8_t kPrivilegeBits = 5;
 
 // Mask used in the narrowing of binary expressions
-constexpr uint8_t kPrivilegeMask   = ((1 << kPrivilegeBits) - 1);
+constexpr uint8_t kPrivilegeMask = ((1 << kPrivilegeBits) - 1);
 
 // Lambda function used to validate that 'kPrivilegeMask' contains all the values
 // defined inside the class enum Access::Privilege, and only those values.
@@ -256,10 +256,10 @@ struct AcceptedCommandEntry
 
 private:
     // Constant used to narrow binary expressions
-    static constexpr uint8_t kCmdQualityBits  = 3;
+    static constexpr uint8_t kCmdQualityBits = 3;
 
     // Mask used in the narrowing of binary expressions
-    static constexpr uint8_t kCmdQualityMask  = ((1 << kCmdQualityBits) - 1);
+    static constexpr uint8_t kCmdQualityMask = ((1 << kCmdQualityBits) - 1);
 
     struct accepted_command_entry_mask_t
     {
