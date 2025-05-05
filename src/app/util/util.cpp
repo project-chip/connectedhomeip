@@ -207,6 +207,10 @@ void MatterElectricalPowerMeasurementPluginServerShutdownCallback() {}
 void MatterServiceAreaPluginServerShutdownCallback() {}
 void MatterWaterHeaterManagementPluginServerShutdownCallback() {}
 void MatterWaterHeaterModePluginServerShutdownCallback() {}
+void MatterMeterIdentificationPluginServerShutdownCallback() {}
+void MatterClosureDimensionPluginServerShutdownCallback() {}
+void MatterElectricalGridConditionsPluginServerShutdownCallback() {}
+void MatterCommodityPricePluginServerShutdownCallback() {}
 
 bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
 {
