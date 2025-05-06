@@ -17,7 +17,6 @@
  */
 
 #include "CommodityPriceMain.h"
-#include "EnergyTimeUtils.h"
 #include <app/clusters/commodity-price-server/CommodityPriceTestEventTriggerHandler.h>
 #include <app/util/af-types.h>
 
@@ -39,7 +38,7 @@ void SetTestEventTrigger_PriceUpdate()
     DataModel::Nullable<Structs::CommodityPriceStruct::Type> newPrice;
     uint32_t chipEpoch = 0;
 
-    CHIP_ERROR err = System::SystemClock().GetClock_EpochTS(chipEpoch);
+    CHIP_ERROR err = System::Clock::GetClock_EpochTS(chipEpoch);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Support, "SetTestEventTrigger_PriceUpdate() could not get time");
@@ -86,7 +85,7 @@ void SetTestEventTrigger_ForecastUpdate()
     }
 
     uint32_t chipEpoch = 0;
-    if (System::SystemClock().GetClock_EpochTS(chipEpoch) != CHIP_NO_ERROR)
+    if (System::Clock::GetClock_EpochTS(chipEpoch) != CHIP_NO_ERROR)
     {
         ChipLogError(Support, "SetTestEventTrigger_ForecastUpdate() could not get time");
         return;

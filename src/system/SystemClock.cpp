@@ -281,6 +281,45 @@ static_assert(std::numeric_limits<Seconds64::rep>::digits >= 64, "Seconds64 must
 static_assert(std::numeric_limits<Seconds32::rep>::digits >= 32, "Seconds32 must be at least 32 bits");
 static_assert(std::numeric_limits<Seconds16::rep>::digits >= 16, "Seconds16 must be at least 16 bits");
 
+/**
+ * @brief   Helper function to get current timestamp in Matter EpochS format
+ *
+ * This function is expected to return the local platform's notion of
+ * current real time, expressed as a Matter EPOCH second timestamp (seconds
+ * since 1st Jan 2000).
+ *
+ * @param  aChipEpoch (uint32_t) reference to hold return epoch-s value
+ *
+ * @retval #CHIP_NO_ERROR      If the method succeeded.
+ * @retval #CHIP_ERROR_REAL_TIME_NOT_SYNCED
+ *                             If the platform is capable of tracking real time,
+ *                             but is currently unsynchronized.
+ * @retval #CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
+ *                             If the platform is incapable of tracking real time.
+ */
+CHIP_ERROR GetClock_EpochTS(uint32_t & chipEpoch)
+{
+    chipEpoch = 0;
+
+    Milliseconds64 cTMs;
+    CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(cTMs);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Unable to get current time - err:%" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
+
+    auto unixEpoch = std::chrono::duration_cast<Seconds32>(cTMs).count();
+    if (!UnixEpochToChipEpochTime(unixEpoch, chipEpoch))
+    {
+        ChipLogError(DeviceLayer, "Unable to convert Unix Epoch time to Matter Epoch Time");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 } // namespace Clock
 } // namespace System
 } // namespace chip

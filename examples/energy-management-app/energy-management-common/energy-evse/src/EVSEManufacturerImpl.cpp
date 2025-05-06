@@ -210,7 +210,7 @@ CHIP_ERROR EVSEManufacturer::ComputeChargingSchedule()
     ReturnErrorOnFailure(GetMinutesPastMidnight(minutesPastMidnightNow_m));
 
     uint32_t now_epoch_s = 0;
-    ReturnErrorOnFailure(System::SystemClock().GetClock_EpochTS(now_epoch_s));
+    ReturnErrorOnFailure(System::Clock::GetClock_EpochTS(now_epoch_s));
 
     DataModel::Nullable<uint32_t> startTime_epoch_s;
     DataModel::Nullable<uint32_t> targetTime_epoch_s;
@@ -448,7 +448,7 @@ CHIP_ERROR EVSEManufacturer::SendCumulativeEnergyReading(EndpointId aEndpointId,
 
     // Get current timestamp
     uint32_t currentTimestamp;
-    CHIP_ERROR err = System::SystemClock().GetClock_EpochTS(currentTimestamp);
+    CHIP_ERROR err = System::Clock::GetClock_EpochTS(currentTimestamp);
     if (err == CHIP_NO_ERROR)
     {
         // use EpochTS
@@ -521,7 +521,7 @@ CHIP_ERROR EVSEManufacturer::SendPeriodicEnergyReading(EndpointId aEndpointId, i
 
     // Get current timestamp
     uint32_t currentTimestamp;
-    CHIP_ERROR err = System::SystemClock().GetClock_EpochTS(currentTimestamp);
+    CHIP_ERROR err = System::Clock::GetClock_EpochTS(currentTimestamp);
     if (err == CHIP_NO_ERROR)
     {
         // use EpochTS

@@ -17,7 +17,6 @@
  */
 
 #include <EnergyEvseDelegateImpl.h>
-#include <EnergyTimeUtils.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/EventLogging.h>
@@ -173,7 +172,7 @@ Status EnergyEvseDelegate::ScheduleCheckOnEnabledTimeout()
         return Status::Success;
     }
 
-    CHIP_ERROR err = System::SystemClock().GetClock_EpochTS(chipEpoch);
+    CHIP_ERROR err = System::Clock::GetClock_EpochTS(chipEpoch);
     if (err == CHIP_NO_ERROR)
     {
         /* time is sync'd */
@@ -1635,7 +1634,7 @@ void EvseSession::StartSession(EndpointId endpointId, int64_t chargingMeterValue
 {
     /* Get Timestamp */
     uint32_t chipEpoch = 0;
-    CHIP_ERROR err     = System::SystemClock().GetClock_EpochTS(chipEpoch);
+    CHIP_ERROR err     = System::Clock::GetClock_EpochTS(chipEpoch);
     if (err != CHIP_NO_ERROR)
     {
         /* Note that the error will be also be logged inside GetErrorTS() -
@@ -1702,7 +1701,7 @@ void EvseSession::RecalculateSessionDuration(EndpointId endpointId)
 {
     /* Get Timestamp */
     uint32_t chipEpoch = 0;
-    CHIP_ERROR err     = System::SystemClock().GetClock_EpochTS(chipEpoch);
+    CHIP_ERROR err     = System::Clock::GetClock_EpochTS(chipEpoch);
     if (err != CHIP_NO_ERROR)
     {
         /* Note that the error will be also be logged inside GetErrorTS() -
