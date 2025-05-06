@@ -292,7 +292,7 @@ class TC_OPSTATE_BASE():
                                                   attribute=attributes.AcceptedCommandList,
                                                   expected_contains=expected_value)
 
-        # STEP 6: TH reads from the DUT the AcceptedCommandList attribute
+        # STEP 6: TH reads from the DUT the GeneratedCommandList attribute
         self.step(6)
         expected_value = []
 
