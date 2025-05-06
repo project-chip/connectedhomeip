@@ -447,7 +447,7 @@ void OTAMultiImageProcessorImpl::HandleApply(intptr_t context)
     // send system reset request to reset the MCU and upgrade the m4 image
     ChipLogProgress(SoftwareUpdate, "SoC Soft Reset initiated!");
     // Reboots the device
-    sl_si91x_soc_nvic_reset();
+    chip::DeviceLayer::Silabs::GetPlatform().SoftwareReset();
 #else // EFR reboot
     CORE_CRITICAL_SECTION(bootloader_rebootAndInstall();)
 #endif
