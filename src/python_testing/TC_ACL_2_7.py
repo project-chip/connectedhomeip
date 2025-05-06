@@ -109,8 +109,6 @@ class TC_ACL_2_7(MatterBaseTest):
         asserts.assert_true(found_valid_event, "Did not find the expected event with specified fields for TH2")
         asserts.assert_false(found_th1_event, "TH2 should not see any events from TH1's fabric when fabric filtered")
 
-
-
     def desc_TC_ACL_2_7(self) -> str:
         return "[TC-ACL-2.7] Multiple fabrics test"
 
@@ -210,7 +208,7 @@ class TC_ACL_2_7(MatterBaseTest):
 
         # Read with fabric_filtered=True
         result_filtered = await self.read_single_attribute_check_success(
-            dev_ctrl=self.th1, endpoint=0, cluster=ac_cluster, attribute=extension_attr, 
+            dev_ctrl=self.th1, endpoint=0, cluster=ac_cluster, attribute=extension_attr,
         )
         logging.info("TH1 read result (fabricFiltered=True): %s", str(result_filtered))
         asserts.assert_equal(len(result_filtered), 1, "Should have exactly one extension when fabric filtered")
@@ -219,11 +217,11 @@ class TC_ACL_2_7(MatterBaseTest):
         asserts.assert_equal(
             endpoint_data.data, D_OK_EMPTY, "Extension data should match D_OK_EMPTY")
         asserts.assert_equal(endpoint_data.fabricIndex,
-                           f1, "FabricIndex should match F1")
+                             f1, "FabricIndex should match F1")
 
         # Read with fabric_filtered=False
         result_unfiltered = await self.read_single_attribute_check_success(
-            dev_ctrl=self.th1, endpoint=0, cluster=ac_cluster, attribute=extension_attr, 
+            dev_ctrl=self.th1, endpoint=0, cluster=ac_cluster, attribute=extension_attr,
             fabric_filtered=False
         )
         logging.info("TH1 read result (fabricFiltered=False): %s", str(result_unfiltered))
@@ -296,6 +294,7 @@ class TC_ACL_2_7(MatterBaseTest):
         logging.info("RemoveFabric command result: %s", str(result))
         asserts.assert_equal(
             result.statusCode, 0, "RemoveFabric command should have succeeded")
+
 
 if __name__ == "__main__":
     default_matter_test_main()

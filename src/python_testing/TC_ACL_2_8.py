@@ -76,10 +76,10 @@ class TC_ACL_2_8(MatterBaseTest):
     def _validate_events_th1(self, events, f1, f2, is_filtered):
         """Helper method to validate events for TH1"""
         logging.info("Found %d events", len(events))
-        
+
         # For TH1, we expect to see two events with f1 as fabric index
         expected_events_count = 2
-        
+
         found_valid_events = 0
         found_th2_event = False
 
@@ -94,26 +94,26 @@ class TC_ACL_2_8(MatterBaseTest):
                         event.Data.adminPasscodeID == 0) or
                         (event.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged and
                         event.Data.adminNodeID == self.th1.nodeId and
-                        event.Data.adminPasscodeID == NullValue)):
+                            event.Data.adminPasscodeID == NullValue)):
                         found_valid_events += 1
-                
+
                 # If this is a TH2 event
                 if event.Data.fabricIndex == f2:
                     found_th2_event = True
 
-        asserts.assert_equal(found_valid_events, expected_events_count, 
-                            f"Expected {expected_events_count} valid events for TH1, found {found_valid_events}")
-        
+        asserts.assert_equal(found_valid_events, expected_events_count,
+                             f"Expected {expected_events_count} valid events for TH1, found {found_valid_events}")
+
         if is_filtered:
             asserts.assert_false(found_th2_event, "TH1 should not see any events from TH2's fabric when fabric filtered")
 
     def _validate_events_th2(self, events, f1, f2, is_filtered):
         """Helper method to validate events for TH2"""
         logging.info("Found %d events", len(events))
-        
+
         # For TH2, we expect to see two events with f2 as fabric index
         expected_events_count = 2
-        
+
         found_valid_events = 0
         found_th1_event = False
 
@@ -128,16 +128,16 @@ class TC_ACL_2_8(MatterBaseTest):
                         event.Data.adminPasscodeID == 0) or
                         (event.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged and
                         event.Data.adminNodeID == self.th2.nodeId and
-                        event.Data.adminPasscodeID == NullValue)):
+                            event.Data.adminPasscodeID == NullValue)):
                         found_valid_events += 1
-                
+
                 # If this is a TH1 event
                 if event.Data.fabricIndex == f1:
                     found_th1_event = True
 
-        asserts.assert_equal(found_valid_events, expected_events_count, 
-                            f"Expected {expected_events_count} valid events for TH2, found {found_valid_events}")
-        
+        asserts.assert_equal(found_valid_events, expected_events_count,
+                             f"Expected {expected_events_count} valid events for TH2, found {found_valid_events}")
+
         if is_filtered:
             asserts.assert_false(found_th1_event, "TH2 should not see any events from TH1's fabric when fabric filtered")
 
@@ -237,7 +237,7 @@ class TC_ACL_2_8(MatterBaseTest):
         # TH1 reads ACL attribute with fabricFiltered=True (default)
         ac_cluster = Clusters.AccessControl
         acl_attr = Clusters.AccessControl.Attributes.Acl
-        
+
         # Read with fabric_filtered=True (default)
         acl_list_filtered = await self.read_single_attribute_check_success(
             dev_ctrl=self.th1, endpoint=0, cluster=ac_cluster, attribute=acl_attr
@@ -262,7 +262,7 @@ class TC_ACL_2_8(MatterBaseTest):
         for entry in acl_list_filtered:
             asserts.assert_not_equal(
                 entry.fabricIndex, f2, "Should not contain entry with FabricIndex F2")
-        
+
         # Read with fabric_filtered=False
         acl_list_unfiltered = await self.read_single_attribute_check_success(
             dev_ctrl=self.th1, endpoint=0, cluster=ac_cluster, attribute=acl_attr,
@@ -297,7 +297,7 @@ class TC_ACL_2_8(MatterBaseTest):
         for entry in acl_list_filtered:
             asserts.assert_not_equal(
                 entry.fabricIndex, f1, "Should not contain entry with FabricIndex F1")
-        
+
         # Read with fabric_filtered=False
         acl_list_unfiltered = await self.read_single_attribute_check_success(
             dev_ctrl=self.th2, endpoint=0, cluster=ac_cluster, attribute=acl_attr,
