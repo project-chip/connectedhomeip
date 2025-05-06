@@ -75,12 +75,10 @@
 #
 # These tests run on every endpoint regardless of whether a switch is present because they are set up to auto-select.
 
-import json
 import logging
 import queue
 import time
 from datetime import datetime, timedelta
-from typing import Any
 
 import chip.clusters as Clusters
 import test_plan_support

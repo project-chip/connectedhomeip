@@ -29,7 +29,7 @@
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --app-pipe /tmp/chip_all_clusters_fifo_${ALL_CLUSTERS_APP_PID}
+#       --app-pipe /tmp/chip_all_clusters_fifo_${ALL_CLUSTERS_APP_ID}
 #       --endpoint 1
 #       --bool-arg simulate_occupancy:true
 #     factory-reset: true

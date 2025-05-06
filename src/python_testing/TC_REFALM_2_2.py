@@ -34,15 +34,13 @@
 #       --int-arg PIXIT.REFALM.AlarmThreshold:1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --app-pipe /tmp/chip_all_clusters_fifo_${ALL_CLUSTERS_APP_PID}
+#       --app-pipe /tmp/chip_all_clusters_fifo_${ALL_CLUSTERS_APP_ID}
 # === END CI TEST ARGUMENTS ===
 
-import json
 import logging
 import typing
 from dataclasses import dataclass
 from time import sleep
-from typing import Any
 
 import chip.clusters as Clusters
 from chip import ChipUtility
