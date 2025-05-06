@@ -184,11 +184,11 @@ def generate_wifi_ta_image(args: object):
         logging.info(f"file size: {file_size}")
         payload = generate_header(TAG.WIFI_TA, len(descriptor) + file_size) + descriptor
 
-    write_to_temp(OTA_APP_TLV_TEMP, payload)
+    write_to_temp(OTA_WIFI_TA_TLV_TEMP, payload)
     if args.enc_enable:
-        return [OTA_APP_TLV_TEMP]
+        return [OTA_WIFI_TA_TLV_TEMP]
     else:
-        return [OTA_APP_TLV_TEMP, args.wifi_ta_input_file]
+        return [OTA_WIFI_TA_TLV_TEMP, args.wifi_ta_input_file]
 
 
 def generate_bootloader(args: object):
@@ -343,14 +343,21 @@ def main():
 
     create_parser.add_argument('-app', "--app-input-file",
                                help='Path to application input file')
-    create_parser.add_argument('-wifi', "--wifi-input-file",
-                               help='Path to OTA image for SiWx917 (TA/M4/Combined file), 917 NCP (TA)')
     create_parser.add_argument('--app-version', type=any_base_int,
                                help='Application Software version (numeric)')
     create_parser.add_argument('--app-version-str', type=str,
                                help='Application Software version (string)')
     create_parser.add_argument('--app-build-date', type=str,
                                help='Application build date (string)')
+
+    create_parser.add_argument('-wifi', "--wifi_ta_input_file",
+                               help='Path to OTA image for SiWx917 (TA/M4/Combined file), 917 NCP (TA)')
+    create_parser.add_argument('--wifi-ta-version', type=any_base_int,
+                               help='WiFi TA Software version (numeric)')
+    create_parser.add_argument('--wifi-ta-version-str', type=str,
+                               help='WiFi TA Software version (string)')
+    create_parser.add_argument('--wifi-ta-build-date', type=str,
+                               help='WiFi TA build date (string)')
 
     create_parser.add_argument('-bl', '--bl-input-file',
                                help='Path to input bootloader image payload file')

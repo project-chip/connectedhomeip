@@ -92,7 +92,7 @@ CHIP_ERROR chip::OTAMultiImageProcessorImpl::OtaHookInit()
     static chip::OTAWiFiFirmwareProcessor sWifiFirmwareProcessor;
     sWifiFirmwareProcessor.RegisterDescriptorCallback(ProcessDescriptor);
     ReturnErrorOnFailure(
-        imageProcessor.RegisterProcessor(static_cast<uint32_t>(OTAProcessorTag::kWiFiProcessor), &sWifiFirmwareProcessor));
+        imageProcessor.RegisterProcessor(static_cast<uint32_t>(OTAProcessorTag::kWiFiTAProcessor), &sWifiFirmwareProcessor));
 #endif // SLI_SI91X_MCU_INTERFACE
 #endif // SL_WIFI
 
