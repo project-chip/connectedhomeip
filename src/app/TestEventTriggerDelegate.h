@@ -41,8 +41,8 @@ public:
 
     static constexpr uint64_t clearEndpointInEventTrigger(uint64_t eventTrigger)
     {
-        uint64_t endpointMask = 0x0000FFFF00000000;
-        return eventTrigger & ~endpointMask;
+        constexpr uint64_t kEndpointMask = 0x0000FFFF00000000;
+        return eventTrigger & ~kEndpointMask;
     }
 };
 
