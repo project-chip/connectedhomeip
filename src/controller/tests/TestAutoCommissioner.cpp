@@ -23,6 +23,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMemString.h>
 
+#include <cstring>
 #include <memory>
 
 using namespace chip;
@@ -30,6 +31,9 @@ using namespace chip::Dnssd;
 using namespace chip::Controller;
 
 namespace {
+
+constexpr uint64_t epochJanFirst2000 = 946695600; // Monday, January 1, 2000 12:00 AM
+constexpr uint64_t epochJanFirst2001 = 978318000; // Monday, January 1, 2001 12:00 AM
 
 class AutoCommissionerTest : public ::testing::Test
 {
@@ -41,6 +45,10 @@ protected:
 TEST_F(AutoCommissionerTest, DetectsThreadOperationalDatasetExceedsBuffer)
 {
     auto up = std::make_unique<uint8_t[]>(CommissioningParameters::kMaxThreadDatasetLen + 1);
+
+    ASSERT_TRUE(up);
+
+    std::memset(up.get(), 0x00, CommissioningParameters::kMaxThreadDatasetLen + 1);
 
     mParams.SetThreadOperationalDataset(ByteSpan{ up.get(), CommissioningParameters::kMaxThreadDatasetLen + 1 });
 
@@ -67,13 +75,7 @@ TEST_F(AutoCommissionerTest, DetectsWifiCredentialsExceedBuffer)
 
 TEST_F(AutoCommissionerTest, DetectsCountryCodeExceedsBuffer)
 {
-    char overflowing_src_buffer[CommissioningParameters::kMaxCountryCodeLen + 1];
-
-    overflowing_src_buffer[0] = '0';
-    overflowing_src_buffer[1] = '1';
-    overflowing_src_buffer[2] = '2';
-
-    mParams.SetCountryCode(CharSpan{ overflowing_src_buffer, 3 });
+    mParams.SetCountryCode("012"_span);
 
     auto r = mCommissioner.SetCommissioningParameters(mParams);
 
@@ -107,8 +109,8 @@ TEST_F(AutoCommissionerTest, FeaturesPassedDSTOffsetsValue)
     app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type sDSTBuf;
 
     sDSTBuf.offset        = int32_t{ 10 };
-    sDSTBuf.validStarting = uint64_t{ 1742998643 };
-    sDSTBuf.validUntil    = uint64_t{ 1842998643 };
+    sDSTBuf.validStarting = epochJanFirst2000;
+    sDSTBuf.validUntil    = epochJanFirst2001;
     app::DataModel::List<app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type> list(&sDSTBuf, 1);
 
     mParams.SetDSTOffsets(list);
@@ -121,23 +123,19 @@ TEST_F(AutoCommissionerTest, FeaturesPassedDSTOffsetsValue)
     ASSERT_TRUE(commissioning_params.GetDSTOffsets().HasValue());
     ASSERT_EQ(commissioning_params.GetDSTOffsets().Value().size(), size_t{ 1 });
     ASSERT_EQ(commissioning_params.GetDSTOffsets().Value()[0].offset, 10);
-    ASSERT_EQ(commissioning_params.GetDSTOffsets().Value()[0].validStarting, uint64_t{ 1742998643 });
-    ASSERT_EQ(commissioning_params.GetDSTOffsets().Value()[0].validUntil, uint64_t{ 1842998643 });
+    ASSERT_EQ(commissioning_params.GetDSTOffsets().Value()[0].validStarting, epochJanFirst2000);
+    ASSERT_EQ(commissioning_params.GetDSTOffsets().Value()[0].validUntil, epochJanFirst2001);
 }
 
 TEST_F(AutoCommissionerTest, FeaturesPassedTimeZoneValue)
 {
     app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type sTimeZoneBuf;
 
-    char country_name[4];
-    country_name[0] = 'A';
-    country_name[1] = 'R';
-    country_name[2] = 'G';
-    country_name[3] = 0;
+    constexpr CharSpan countryName = "ARG"_span;
 
     sTimeZoneBuf.offset  = int32_t{ 10 };
-    sTimeZoneBuf.validAt = uint64_t{ 1842998643 };
-    sTimeZoneBuf.name.SetValue(chip::CharSpan{ country_name, 4 });
+    sTimeZoneBuf.validAt = epochJanFirst2000; // Monday, January 1, 2000 12:00 AM
+    sTimeZoneBuf.name.SetValue(chip::CharSpan{ countryName });
 
     app::DataModel::List<app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type> list(&sTimeZoneBuf, 1);
     mParams.SetTimeZone(list);
@@ -150,27 +148,16 @@ TEST_F(AutoCommissionerTest, FeaturesPassedTimeZoneValue)
     ASSERT_TRUE(commissioning_params.GetTimeZone().HasValue());
     ASSERT_EQ(commissioning_params.GetTimeZone().Value().size(), size_t{ 1 });
     ASSERT_EQ(commissioning_params.GetTimeZone().Value()[0].offset, 10);
-    ASSERT_EQ(commissioning_params.GetTimeZone().Value()[0].validAt, uint64_t{ 1842998643 });
+    ASSERT_EQ(commissioning_params.GetTimeZone().Value()[0].validAt, epochJanFirst2000);
     ASSERT_TRUE(commissioning_params.GetTimeZone().Value()[0].name.HasValue());
-    ASSERT_EQ(commissioning_params.GetTimeZone().Value()[0].name.Value()[0], 'A');
-    ASSERT_EQ(commissioning_params.GetTimeZone().Value()[0].name.Value()[1], 'R');
-    ASSERT_EQ(commissioning_params.GetTimeZone().Value()[0].name.Value()[2], 'G');
-    ASSERT_EQ(commissioning_params.GetTimeZone().Value()[0].name.Value()[3], 0);
+    ASSERT_TRUE(commissioning_params.GetTimeZone().Value()[0].name.Value().data_equal("ARG"_span));
 }
 
 TEST_F(AutoCommissionerTest, FeaturesPassedNTPValue)
 {
-    char default_ntp_buffer[20];
-    default_ntp_buffer[0] = 'd';
-    default_ntp_buffer[1] = 'e';
-    default_ntp_buffer[2] = 'f';
-    default_ntp_buffer[3] = 'a';
-    default_ntp_buffer[4] = 'u';
-    default_ntp_buffer[5] = 'l';
-    default_ntp_buffer[6] = 't';
-    default_ntp_buffer[7] = 0;
+    constexpr CharSpan defaultNTPBuffer = "default"_span;
 
-    mParams.SetDefaultNTP(chip::app::DataModel::MakeNullable(CharSpan{ default_ntp_buffer, 20 }));
+    mParams.SetDefaultNTP(chip::app::DataModel::MakeNullable(defaultNTPBuffer));
 
     auto r = mCommissioner.SetCommissioningParameters(mParams);
 
@@ -178,14 +165,7 @@ TEST_F(AutoCommissionerTest, FeaturesPassedNTPValue)
 
     ASSERT_EQ(r, CHIP_NO_ERROR);
     ASSERT_TRUE(commissioning_params.GetDefaultNTP().HasValue());
-    ASSERT_EQ(commissioning_params.GetDefaultNTP().Value().Value().size(), size_t{ 20 });
-    ASSERT_EQ(commissioning_params.GetDefaultNTP().Value().Value()[0], 'd');
-    ASSERT_EQ(commissioning_params.GetDefaultNTP().Value().Value()[1], 'e');
-    ASSERT_EQ(commissioning_params.GetDefaultNTP().Value().Value()[2], 'f');
-    ASSERT_EQ(commissioning_params.GetDefaultNTP().Value().Value()[3], 'a');
-    ASSERT_EQ(commissioning_params.GetDefaultNTP().Value().Value()[4], 'u');
-    ASSERT_EQ(commissioning_params.GetDefaultNTP().Value().Value()[5], 'l');
-    ASSERT_EQ(commissioning_params.GetDefaultNTP().Value().Value()[6], 't');
+    ASSERT_TRUE(commissioning_params.GetDefaultNTP().Value().Value().data_equal("default"_span));
 }
 
 TEST_F(AutoCommissionerTest, FeaturesPassedICDRegistrationKey)
@@ -194,16 +174,7 @@ TEST_F(AutoCommissionerTest, FeaturesPassedICDRegistrationKey)
 
     uint8_t symmetric_key_buffer[Crypto::kAES_CCM128_Key_Length];
 
-    symmetric_key_buffer[0] = 0x01;
-    symmetric_key_buffer[1] = 0x02;
-    symmetric_key_buffer[2] = 0x03;
-    symmetric_key_buffer[3] = 0x04;
-    symmetric_key_buffer[4] = 0x05;
-    symmetric_key_buffer[5] = 0x10;
-    symmetric_key_buffer[6] = 0x11;
-    symmetric_key_buffer[7] = 0x12;
-    symmetric_key_buffer[8] = 0x13;
-    symmetric_key_buffer[9] = 0x14;
+    std::memset(symmetric_key_buffer, 0x00, Crypto::kAES_CCM128_Key_Length);
 
     mParams.SetICDSymmetricKey(ByteSpan{ symmetric_key_buffer, Crypto::kAES_CCM128_Key_Length });
     mParams.SetICDCheckInNodeId(NodeId{ 10000 });
@@ -219,16 +190,7 @@ TEST_F(AutoCommissionerTest, FeaturesPassedICDRegistrationKey)
     ASSERT_EQ(commissioning_params.GetICDRegistrationStrategy(), ICDRegistrationStrategy::kBeforeComplete);
     ASSERT_TRUE(commissioning_params.GetICDSymmetricKey().HasValue());
     ASSERT_EQ(commissioning_params.GetICDSymmetricKey().Value().size(), Crypto::kAES_CCM128_Key_Length);
-    ASSERT_EQ(commissioning_params.GetICDSymmetricKey().Value()[0], 0x01);
-    ASSERT_EQ(commissioning_params.GetICDSymmetricKey().Value()[1], 0x02);
-    ASSERT_EQ(commissioning_params.GetICDSymmetricKey().Value()[2], 0x03);
-    ASSERT_EQ(commissioning_params.GetICDSymmetricKey().Value()[3], 0x04);
-    ASSERT_EQ(commissioning_params.GetICDSymmetricKey().Value()[4], 0x05);
-    ASSERT_EQ(commissioning_params.GetICDSymmetricKey().Value()[5], 0x10);
-    ASSERT_EQ(commissioning_params.GetICDSymmetricKey().Value()[6], 0x11);
-    ASSERT_EQ(commissioning_params.GetICDSymmetricKey().Value()[7], 0x12);
-    ASSERT_EQ(commissioning_params.GetICDSymmetricKey().Value()[8], 0x13);
-    ASSERT_EQ(commissioning_params.GetICDSymmetricKey().Value()[9], 0x14);
+    ASSERT_TRUE(commissioning_params.GetICDSymmetricKey().Value().data_equal(ByteSpan{ symmetric_key_buffer }));
     ASSERT_TRUE(commissioning_params.GetICDCheckInNodeId().HasValue());
     ASSERT_EQ(commissioning_params.GetICDCheckInNodeId().Value(), NodeId{ 10000 });
     ASSERT_TRUE(commissioning_params.GetICDMonitoredSubject().HasValue());
@@ -241,13 +203,20 @@ TEST_F(AutoCommissionerTest, FeaturesPassedExtraReadPaths)
 {
     chip::app::AttributePathParams attributes[1];
 
-    attributes[0] = chip::app::AttributePathParams{ EndpointId{ 1 }, ClusterId{ 2 }, AttributeId{ 3 } };
+    constexpr uint32_t endpointId  = 1;
+    constexpr uint32_t clusterId   = 2;
+    constexpr uint32_t attributeId = 3;
+
+    attributes[0] = chip::app::AttributePathParams{ endpointId, clusterId, attributeId };
 
     mParams.SetExtraReadPaths(Span<const app::AttributePathParams>{ attributes, 1 });
 
-    auto params = mParams.GetExtraReadPaths();
+    auto pathParams = mParams.GetExtraReadPaths();
 
-    ASSERT_EQ(params.size(), size_t{ 1 });
+    ASSERT_EQ(pathParams.size(), size_t{ 1 });
+    ASSERT_EQ(pathParams[0].mEndpointId, endpointId);
+    ASSERT_EQ(pathParams[0].mClusterId, clusterId);
+    ASSERT_EQ(pathParams[0].mAttributeId, attributeId);
 }
 
 } // namespace
