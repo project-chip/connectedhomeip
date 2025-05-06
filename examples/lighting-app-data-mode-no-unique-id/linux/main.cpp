@@ -78,13 +78,14 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 
 void ApplicationInit()
 {
-    const char* app_id = std::getenv("CHIP_LIGHTING_NO_UNIQUE_ID_APP_ID");
-    if (app_id == nullptr) {
+    const char * app_id = std::getenv("CHIP_LIGHTING_NO_UNIQUE_ID_APP_ID");
+    if (app_id == nullptr)
+    {
         app_id = "54321";
     }
 
     std::string app_id_str = app_id;
-    std::string path = kChipEventFifoPathPrefix + app_id_str;
+    std::string path       = kChipEventFifoPathPrefix + app_id_str;
 
     if (sChipNamedPipeCommands.Start(path, &sLightingAppCommandDelegate) != CHIP_NO_ERROR)
     {

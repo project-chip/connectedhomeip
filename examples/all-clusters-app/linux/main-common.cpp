@@ -235,13 +235,14 @@ ExampleDeviceInstanceInfoProvider gExampleDeviceInstanceInfoProvider;
 
 void ApplicationInit()
 {
-    const char* app_id = std::getenv("ALL_CLUSTERS_APP_ID");
-    if (app_id == nullptr) {
+    const char * app_id = std::getenv("ALL_CLUSTERS_APP_ID");
+    if (app_id == nullptr)
+    {
         app_id = "54321";
     }
 
     std::string app_id_str = app_id;
-    std::string path = kChipEventFifoPathPrefix + app_id_str;
+    std::string path       = kChipEventFifoPathPrefix + app_id_str;
 
     if (sChipNamedPipeCommands.Start(path, &sAllClustersCommandDelegate) != CHIP_NO_ERROR)
     {
