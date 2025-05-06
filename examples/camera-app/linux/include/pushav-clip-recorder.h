@@ -48,18 +48,18 @@ public:
      * @brief Contains clip configuration and runtime state
      */
     struct ClipInfoStruct {
-        bool mHasVideo = true;                          ///< Video recording enabled flag
-        bool mHasAudio = false;                         ///< Audio recording enabled flag
-        int mclipId = 0;                                ///< Current clip identifier
-        int mMaxClipDuration = 10;                      ///< Maximum clip duration in seconds
-        int mSegDuration = 4;                           ///< Segment duration in seconds
-        std::string mRecorderId;                        ///< Unique recorder identifier
-        std::string mOutputPath;                        ///< Base output directory path
-        const std::vector<AVCodecID> mSupportedCodec = {///< Supported codecs
-            AV_CODEC_ID_OPUS,
-            AV_CODEC_ID_H264
-        };
-        AVRational mInputTb = { 1, 1000000 };           ///< Input time base (microseconds)
+        bool mHasVideo;                             ///< Video recording enabled flag
+        bool mHasAudio;                             ///< Audio recording enabled flag
+        int mClipID;                                ///< Current clip identifier
+        int mMaxClipDuration;                       ///< Maximum clip duration in seconds
+        int mChunkDuration;                         ///< Segment duration in seconds
+        std::string mRecorderID;                    ///< Unique recorder identifier
+        std::string mOutputPath;                    ///< Base output directory path
+        std::vector<AVCodecID> mSupportedCodec;
+        AVRational mInputTb;                        ///< Input time base (microseconds)
+        uint16_t mAudioStreamID;                    ///< Audio stream identifier
+        uint16_t mVideoStreamID;                    ///< Video stream identifier
+
     };
 
     /**
@@ -67,17 +67,16 @@ public:
      * @brief Audio stream configuration parameters
      */
     struct AudioInfoStruct {
-    uint64_t mChannelLayout = AV_CH_LAYOUT_STEREO;      ///< Audio channel layout
-    uint16_t mAudioStreamID = 1;                        ///< Audio stream identifier
-    int mChannels = 2;                                  ///< Number of audio channels
-    AVCodecID mAudioCodecId = AV_CODEC_ID_OPUS;         ///< Audio codec identifier
-    int mSampleRate = 48000;                            ///< Sampling rate in Hz
-    int mBitRate = 20000;                               ///< Audio bitrate in bps
-    int64_t a_pts = 0;                                  ///< Audio presentation timestamp
-    int64_t a_dts = 0;                                  ///< Audio decoding timestamp
-    int aStreamIndex = -1;                              ///< Audio stream index
-    int mAudioFrameDuration = 960;                      ///< Audio frame duration in samples
-    AVRational mAudioTb = { 1, 48000 };                 ///< Audio time base
+        uint64_t mChannelLayout;                    ///< Audio channel layout
+        int mChannels;                              ///< Number of audio channels
+        AVCodecID mAudioCodecId;                    ///< Audio codec identifier
+        int mSampleRate;                            ///< Sampling rate in Hz
+        int mBitRate;                               ///< Audio bitrate in bps
+        int64_t mAPts;                              ///< Audio presentation timestamp
+        int64_t mADts;                              ///< Audio decoding timestamp
+        int aStreamIndex;                           ///< Audio stream index
+        int mAudioFrameDuration;                    ///< Audio frame duration in samples
+        AVRational mAudioTb;                        ///< Audio time base
     };
 
     /**
@@ -85,21 +84,21 @@ public:
      * @brief Video stream configuration parameters
      */
     struct VideoInfoStruct {
-        AVCodecID mVideoCodecId = AV_CODEC_ID_H264;     ///< Video codec identifier
-        uint16_t mVideoStreamID = 0;                    ///< Video stream identifier
-        int64_t v_pts = 3000;                           ///< Video presentation timestamp
-        int64_t v_dts = 3000;                           ///< Video decoding timestamp
-        int mWidth = 320;                               ///< Video frame width
-        int mHeight = 240;                              ///< Video frame height
-        int mFrameRate = 15;                            ///< Video frame rate (fps)
-        int mVideoFrameDuration = 66667;                ///< Video frame duration (μs)
-        AVRational mVideoTb = { 1, 90000 };             ///< Video time base
-        int vStreamIndex = -1;                          ///< Video stream index
+        AVCodecID mVideoCodecId;                     ///< Video codec identifier
+        int64_t mVPts;                              ///< Video presentation timestamp
+        int64_t mVDts;                              ///< Video decoding timestamp
+        int mWidth;                                 ///< Video frame width
+        int mHeight;                                ///< Video frame height
+        int mFrameRate;                             ///< Video frame rate (fps)
+        int mVideoFrameDuration;                    ///< Video frame duration (μs)
+        AVRational mVideoTb;                        ///< Video time base
+        int vStreamIndex;                           ///< Video stream index
+        uint32_t mBitRate;                          ///< Video bitrate in bps
     };
 
     /// @name Construction/Destruction
     /// @{
-    PushAVClipRecorder();
+    PushAVClipRecorder(ClipInfoStruct & aClipInfo, AudioInfoStruct & aAudioInfo, VideoInfoStruct & aVideoInfo, std::string url);
     ~PushAVClipRecorder();
     /// @}
 
@@ -139,6 +138,7 @@ private:
     AVStream * mVideoStream     = nullptr;
     AVStream * mAudioStream     = nullptr;
     int mLastFragmentId         = 0;
+    std::string mServerUrl;
 
     int64_t mCurrentClipStartPts    = AV_NOPTS_VALUE;
     std::queue<AVPacket *> audioQueue;
@@ -186,7 +186,7 @@ private:
     /**
      * @brief Finalizes the current clip and prepares for a new one.
      */
-    void finalize_current_clip();
+    void FinalizeCurrentClip();
 };
 
 #endif // PUSHAV_CLIP_RECORDER_H

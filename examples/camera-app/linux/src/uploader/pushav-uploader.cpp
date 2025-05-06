@@ -36,12 +36,12 @@ void PushAVUploader::ProcessUploadQueue() {
                 data = av_data.front();
                 av_data.pop();
             }
-            if (!data.first.empty())
-                UploadData(data);
-            else
-            {
-                std::this_thread::sleep_for(std::chrono::milliseconds(100));
-            }
+        }
+        if (!data.first.empty())
+            UploadData(data);
+        else
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
     }
 }

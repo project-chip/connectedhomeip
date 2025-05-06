@@ -41,7 +41,7 @@ using namespace chip::app::Clusters::PushAvStreamTransport;
 class PushAVTransport : public camera::Transport
 {
 public:
-    PushAVTransport(uint16_t connectionID, TransportTriggerTypeEnum transportTriggerType);
+    PushAVTransport(uint16_t connectionID, const char * url, TransportTriggerTypeEnum transportTriggerType);
     ~PushAVTransport() override;
     // Send video data for a given stream ID
     void SendVideo(const char * data, size_t size, uint16_t videoStreamID) override;
@@ -78,7 +78,10 @@ public:
 
 
     int vid                                      = 1;
-    std::shared_ptr<PushAVClipRecorder> recorder = nullptr;
+    std::unique_ptr<PushAVClipRecorder> recorder = nullptr;
+    PushAVClipRecorder::ClipInfoStruct clipInfo;
+    PushAVClipRecorder::AudioInfoStruct audioInfo;
+    PushAVClipRecorder::VideoInfoStruct videoInfo;
 
 private:
     // Dummy implementation to indicate if video can be sent

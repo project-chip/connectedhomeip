@@ -22,24 +22,19 @@ extern "C" {
 #include <libavutil/avutil.h>
 }
 
-#define AUD_FRAME_DURATION_48000 960
-#define VID_FRAME_DURATION 66667 // Microseconds, for 30fps
-
-#define IS_H264_FRAME_NALU_HEAD(frame)                                                                                             \
-    (((frame)[0] == 0x00) && ((frame)[1] == 0x00) && (((frame)[2] == 0x01) || (((frame)[2] == 0x00) && ((frame)[3] == 0x01))))
-
-PushAVTransport::PushAVTransport(uint16_t connectionID, TransportTriggerTypeEnum transportTriggerType)
+PushAVTransport::PushAVTransport(uint16_t connectionID, const char * url, TransportTriggerTypeEnum transportTriggerType)
 {
     mConnectionID         = connectionID;
     mTransportTriggerType = transportTriggerType;
     mTransportStatus      = TransportStatusEnum::kInactive;
+    serverUrl             = url;
 }
 
 void PushAVTransport::initializeRecorder()
 {
     if (!isRecorderInitialized)
     {
-        recorder = std::make_shared<PushAVClipRecorder>();
+        recorder = std::make_unique<PushAVClipRecorder>(clipInfo, audioInfo, videoInfo, serverUrl);
         isRecorderInitialized = true;
     }
 }

@@ -25,6 +25,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <push-av-transport-manager.h>
 #include <pushav-transport.h>
+#include <pushav-clip-recorder.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -33,6 +34,63 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::PushAvStreamTransport;
 using chip::Protocols::InteractionModel::Status;
 using namespace Camera;
+
+// TODO: ConfigureRecorderSettings improvements needed
+// 1. Replace hardcoded audio/video settings with values from camera-av-stream-manager structs
+// 2. Implement proper storage path resolution instead of fixed "/workspace/"
+// 3. Calculate frame durations dynamically from stream properties
+// 4. Add safety checks before accessing Optional values
+// 5. Remove direct struct assignments - initialize fields individually
+void ConfigureRecorderSettings(PushAVTransport * transport,
+                                const TransportOptionsDecodeableStruct & transportOptions,
+                                TransportConfigurationStruct & outTransporConfiguration){
+
+    PushAVClipRecorder::ClipInfoStruct clipInfo;
+    PushAVClipRecorder::AudioInfoStruct audioInfo;
+    PushAVClipRecorder::VideoInfoStruct videoInfo;
+
+    clipInfo.mHasAudio = transport->CanSendAudio();
+    clipInfo.mHasVideo = transport->CanSendVideo();
+    clipInfo.mMaxClipDuration = outTransporConfiguration.transportOptions.triggerOptions.motionTimeControl.Value().initialDuration;
+    clipInfo.mChunkDuration = outTransporConfiguration.transportOptions.containerOptions.CMAFContainerOptions.Value().chunkDuration;
+    clipInfo.mAudioStreamID = outTransporConfiguration.transportOptions.audioStreamID.Value();
+    clipInfo.mVideoStreamID = outTransporConfiguration.transportOptions.videoStreamID.Value();
+    clipInfo.mClipID = 0;
+    clipInfo.mRecorderID = std::to_string(clipInfo.mVideoStreamID) + "-" + std::to_string(clipInfo.mAudioStreamID);
+    clipInfo.mOutputPath = "/workspace/";
+    clipInfo.mSupportedCodec = {
+            AV_CODEC_ID_OPUS,
+            AV_CODEC_ID_H264
+        };
+    clipInfo.mInputTb = { 1, 1000000 };
+
+    audioInfo.mChannelLayout = AV_CH_LAYOUT_STEREO;
+    audioInfo.mChannels = 2;
+    audioInfo.mAudioCodecId = AV_CODEC_ID_OPUS;
+    audioInfo.mSampleRate = 48000;
+    audioInfo.mBitRate = 20000;
+    audioInfo.mAPts = 0;
+    audioInfo.mADts = 0;
+    audioInfo.aStreamIndex = -1;
+    audioInfo.mAudioFrameDuration = 960;
+    audioInfo.mAudioTb = { 1, audioInfo.mSampleRate }; 
+
+    videoInfo.mVideoCodecId = AV_CODEC_ID_H264;
+    videoInfo.mVPts = 0;
+    videoInfo.mVDts = 0;
+    videoInfo.mWidth = 320;
+    videoInfo.mHeight = 240;
+    videoInfo.mFrameRate = 15;
+    videoInfo.mVideoFrameDuration = 66667;
+    videoInfo.mVideoTb = { 1, 90000 };
+    videoInfo.vStreamIndex = -1;
+    videoInfo.mBitRate = 0;
+
+    transport->clipInfo = clipInfo;
+    transport->audioInfo = audioInfo;
+    transport->videoInfo = videoInfo;
+}
+
 
 Protocols::InteractionModel::Status
 PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsDecodeableStruct & transportOptions,
@@ -45,9 +103,10 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsDecode
 
     ChipLogProgress(Camera, "PushAvStreamTransportManager, Create PushAV Transport for Connection: [%u]", connectionID);
     mTransportMap[connectionID] =
-        std::move(std::make_unique<PushAVTransport>(connectionID, transportOptions.triggerOptions.triggerType));
+        std::move(std::make_unique<PushAVTransport>(connectionID, transportOptions.url.data(), transportOptions.triggerOptions.triggerType));
 
-    mMediaController->RegisterTransport(mTransportMap[connectionID].get(), 1, 1 /*videoStreamID, audioStreamID*/);
+    mMediaController->RegisterTransport(mTransportMap[connectionID].get(), transportOptions.videoStreamID.Value(), transportOptions.audioStreamID.Value());
+    ConfigureRecorderSettings(mTransportMap[connectionID].get(), transportOptions, outTransporConfiguration);
 
     return Status::Success;
 }
