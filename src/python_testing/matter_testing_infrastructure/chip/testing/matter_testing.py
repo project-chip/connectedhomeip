@@ -1047,15 +1047,13 @@ class MatterBaseTest(base_test.BaseTestClass):
         except AttributeError:
             return test
 
-    def write_to_app_pipe(self, command_dict: dict, app_pipe_prefix: Optional[str] = None, app_pid: Optional[int] = None):
+    def write_to_app_pipe(self, command_dict: dict, app_pipe: Optional[str] = None):
         """
         Send an out-of-band command to a Matter app.
         Args:
-            command_dict (dict): dictionary with the command and data
-            app_pipe_prefix (Optional[str], optional): Name of the cluster pipe file prefix (i.e. /tmp/chip_all_clusters_fifo_ or /tmp/chip_rvc_fifo_). If None
-            takes the value from the CI argument --app-pipe-prefix.
-            app_pid (Optional[uint], optional): pid of the process for app_pipe_name. If None takes the value from the CI
-            argument --app-pid.
+            command_dict (dict): dictionary with the command and data.
+            app_pipe (Optional[str], optional): Name of the cluster pipe file  (i.e. /tmp/chip_all_clusters_fifo_55441 or /tmp/chip_rvc_fifo_11111). If None
+            takes the value from the CI argument --app-pipe. Raises FileNotFoundError if pipe file is not found.
 
         This method uses the following environment variables:
 
@@ -1072,12 +1070,10 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         """
 
-        if app_pipe_prefix is None:
-            app_pipe_prefix = self.matter_test_config.app_pipe_prefix
-        if app_pid is None:
-            app_pid = self.matter_test_config.app_pid
+        if app_pipe is None:
+            app_pipe = self.matter_test_config.app_pipe
 
-        if not isinstance(app_pipe_prefix, str):
+        if not isinstance(app_pipe, str):
             raise TypeError("The named pipe must be provided as a string value")
 
         if not isinstance(command_dict, dict):
@@ -1087,23 +1083,10 @@ class MatterBaseTest(base_test.BaseTestClass):
         dut_ip = os.getenv('LINUX_DUT_IP')
 
         # Checks for concatenate app_pipe and app_pid
-        if not isinstance(app_pid, int):
-            raise TypeError("The --app-pid flag is not instance of int")
-        # Verify we have a valid app-id
-        if app_pid == 0:
-            asserts.fail("app_pid is 0 , is the flag --app-pid set?. app-id flag must be set in order to write to pipe.")
-        app_pipe_name = app_pipe_prefix + str(app_pid)
-
         if dut_ip is None:
-            if not os.path.exists(app_pipe_name):
-                # Named pipes are unique, so we MUST have consistent PID/paths
-                # Set up for them to work.
-                logging.error("Named pipe %r does NOT exist" % app_pipe_name)
-                raise FileNotFoundError("CANNOT FIND %r" % app_pipe_name)
-            with open(app_pipe_name, "w") as app_pipe:
-                logger.info(f"Sending out-of-band command: {command} to file: {app_pipe_name}")
-                app_pipe.write(json.dumps(command_dict) + "\n")
-
+            with open(app_pipe, "w") as app_pipe_fp:
+                logger.info(f"Sending out-of-band command: {command} to file: {app_pipe}")
+                app_pipe_fp.write(json.dumps(command_dict) + "\n")
             # TODO(#31239): remove the need for sleep
             sleep(0.001)
         else:
@@ -1113,7 +1096,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
             logging.info(f"Using DUT user name: {dut_uname}")
             command_fixed = shlex.quote(json.dumps(command_dict))
-            cmd = "echo \"%s\" | ssh %s@%s \'cat > %s\'" % (command_fixed, dut_uname, dut_ip, app_pipe_name)
+            cmd = "echo \"%s\" | ssh %s@%s \'cat > %s\'" % (command_fixed, dut_uname, dut_ip, app_pipe)
             os.system(cmd)
 
     # Override this if the test requires a different default timeout.
@@ -2025,9 +2008,13 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.tests = list(chain.from_iterable(args.tests or []))
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
-    config.app_pid = 0 if args.app_pid is None else args.app_pid
     config.app_pipe = args.app_pipe
-    config.app_pipe_prefix = args.app_pipe_prefix
+    if not os.path.exists(config.app_pipe):
+        # Named pipes are unique, so we MUST have consistent paths
+        # Verify from start the named pipe exists.
+        logging.error("Named pipe %r does NOT exist" % config.app_pipe)
+        raise FileNotFoundError("CANNOT FIND %r" % config.app_pipe)
+
     config.fail_on_skipped_tests = args.fail_on_skipped
 
     config.legacy = args.use_legacy_test_event_triggers
