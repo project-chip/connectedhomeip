@@ -231,7 +231,6 @@ enum class AreaTypeTag : uint8_t
     kGardenDoor      = 0x25,
     kGuestBathroom   = 0x26,
     kGuestBedroom    = 0x27,
-    kGuestRestroom   = 0x28,
     kGuestRoom       = 0x29,
     kGym             = 0x2A,
     kHallway         = 0x2B,
@@ -239,7 +238,6 @@ enum class AreaTypeTag : uint8_t
     kKidsRoom        = 0x2D,
     kKidsBedroom     = 0x2E,
     kKitchen         = 0x2F,
-    kLarder          = 0x30,
     kLaundryRoom     = 0x31,
     kLawn            = 0x32,
     kLibrary         = 0x33,
@@ -264,7 +262,6 @@ enum class AreaTypeTag : uint8_t
     kRamp            = 0x46,
     kReceptionRoom   = 0x47,
     kRecreationRoom  = 0x48,
-    kRestroom        = 0x49,
     kRoof            = 0x4A,
     kSauna           = 0x4B,
     kScullery        = 0x4C,
@@ -286,11 +283,12 @@ enum class AreaTypeTag : uint8_t
     kUtilityRoom     = 0x5C,
     kWard            = 0x5D,
     kWorkshop        = 0x5E,
+    kToilet          = 0x5F,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 95,
+    kUnknownEnumValue = 40,
 };
 
 // Enum for AtomicRequestTypeEnum
@@ -304,40 +302,6 @@ enum class AtomicRequestTypeEnum : uint8_t
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 3,
-};
-
-// Enum for FloorSurfaceTag
-enum class FloorSurfaceTag : uint8_t
-{
-    kCarpet           = 0x00,
-    kCeramic          = 0x01,
-    kConcrete         = 0x02,
-    kCork             = 0x03,
-    kDeepCarpet       = 0x04,
-    kDirt             = 0x05,
-    kEngineeredWood   = 0x06,
-    kGlass            = 0x07,
-    kGrass            = 0x08,
-    kHardwood         = 0x09,
-    kLaminate         = 0x0A,
-    kLinoleum         = 0x0B,
-    kMat              = 0x0C,
-    kMetal            = 0x0D,
-    kPlastic          = 0x0E,
-    kPolishedConcrete = 0x0F,
-    kRubber           = 0x10,
-    kRug              = 0x11,
-    kSand             = 0x12,
-    kStone            = 0x13,
-    kTatami           = 0x14,
-    kTerrazzo         = 0x15,
-    kTile             = 0x16,
-    kVinyl            = 0x17,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 24,
 };
 
 // Enum for LandmarkTag
@@ -399,6 +363,48 @@ enum class LandmarkTag : uint8_t
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 51,
+};
+
+// Enum for LocationTag
+enum class LocationTag : uint8_t
+{
+    kIndoor  = 0x00,
+    kOutdoor = 0x01,
+    kInside  = 0x02,
+    kOutside = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
+// Enum for MeasurementTypeEnum
+enum class MeasurementTypeEnum : uint16_t
+{
+    kUnspecified      = 0x00,
+    kVoltage          = 0x01,
+    kActiveCurrent    = 0x02,
+    kReactiveCurrent  = 0x03,
+    kApparentCurrent  = 0x04,
+    kActivePower      = 0x05,
+    kReactivePower    = 0x06,
+    kApparentPower    = 0x07,
+    kRMSVoltage       = 0x08,
+    kRMSCurrent       = 0x09,
+    kRMSPower         = 0x0A,
+    kFrequency        = 0x0B,
+    kPowerFactor      = 0x0C,
+    kNeutralCurrent   = 0x0D,
+    kElectricalEnergy = 0x0E,
+    kReactiveEnergy   = 0x0F,
+    kApparentEnergy   = 0x10,
+    kSoilMoisture     = 0x11,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 18,
 };
 
 // Enum for PositionTag

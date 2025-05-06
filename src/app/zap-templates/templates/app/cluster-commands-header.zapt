@@ -59,7 +59,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
 
     {{#zcl_command_arguments}}
-    {{zapTypeToEncodableClusterObjectType type}} {{asLowerCamelCase label}}{{> cluster_objects_field_init}};
+    {{zapTypeToEncodableClusterObjectType type cluster=../../name}} {{asLowerCamelCase label}}{{> cluster_objects_field_init cluster=../../name}};
     {{/zcl_command_arguments}}
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -80,7 +80,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
 
     {{#zcl_command_arguments}}
-    {{zapTypeToDecodableClusterObjectType type}} {{asLowerCamelCase label}}{{> cluster_objects_field_init}};
+    {{zapTypeToDecodableClusterObjectType type cluster=../../name}} {{asLowerCamelCase label}}{{> cluster_objects_field_init cluster=../../name}};
     {{/zcl_command_arguments}}
     CHIP_ERROR Decode(TLV::TLVReader &reader);
 };

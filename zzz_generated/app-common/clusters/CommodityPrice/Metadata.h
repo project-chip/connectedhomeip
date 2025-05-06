@@ -57,14 +57,14 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace GetDetailedPriceRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CommodityPrice::Commands::GetDetailedPriceRequest::Id,
+    .commandId       = GetDetailedPriceRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace GetDetailedPriceRequest
 namespace GetDetailedForecastRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CommodityPrice::Commands::GetDetailedForecastRequest::Id,
+    .commandId       = GetDetailedForecastRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

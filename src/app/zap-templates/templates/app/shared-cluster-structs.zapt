@@ -24,7 +24,7 @@ namespace Structs {
 
 {{#zcl_structs}}
 {{#if has_more_than_one_cluster}}
-{{> cluster_objects_struct header=true}}
+{{> cluster_objects_struct  cluster="" header=true}}
 {{/if}}
 {{/zcl_structs}}
 } // namespace Structs

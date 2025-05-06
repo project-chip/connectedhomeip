@@ -29,7 +29,7 @@ steps:
       args:
           - >-
               perl -i -pe 's/^gdbgui==/# gdbgui==/' /opt/espressif/esp-idf/requirements.txt &&
-              ./examples/chef/chef.py --build_all --build_exclude "noip|temperaturecontrolledcabinet|icd"
+              ./examples/chef/chef.py --build_all --build_exclude "noip|icd"
       id: CompileAll
       waitFor:
           - Bootstrap
@@ -44,7 +44,7 @@ steps:
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
-          - ./examples/chef/chef.py -cbrI -d icd_rootnode_contactsensor_ed3b19ec55 -t linux
+          - ./examples/chef/chef.py --build_all --build_include linux_x86-icd
       allowFailure: true # TODO: Remove this once compilation stability is established.
       id: CompileICDLinux
       waitFor:

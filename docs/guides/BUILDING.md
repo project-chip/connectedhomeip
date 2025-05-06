@@ -131,7 +131,7 @@ Complete the following steps:
 1. Install some Raspberry Pi specific dependencies:
 
     ```
-    sudo apt-get install pi-bluetooth avahi-utils
+    sudo apt-get install bluez pi-bluetooth avahi-utils
     ```
 
 1. Reboot your Raspberry Pi after installing `pi-bluetooth`.
@@ -393,8 +393,17 @@ executed manually.
 ./scripts/build/build_examples.py --target linux-x64-tests-clang-pw-fuzztest build
 ```
 
-NOTE: `asan` is enabled by default in FuzzTest, so please do not add it in
-build_examples.py invocation.
+> [!NOTE]  
+> `asan` is enabled by default in FuzzTest, so please do not add it in
+> `build_examples.py` invocation.
+
+> [!TIP]
+>
+> -   It is possible to build `FuzzTests` with Coverage instrumentation, by
+>     appending `-coverage` to the target, e.g.
+>     `linux-x64-tests-clang-pw-fuzztest-coverage`
+> -   Details:
+>     [Coverage Report Generation](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md#coverage-report-generation)
 
 Tests will be located in:
 `out/linux-x64-tests-clang-pw-fuzztest/chip_pw_fuzztest/tests/` where
@@ -403,9 +412,9 @@ Tests will be located in:
 -   Details on How To Run Fuzz Tests in
     [Running FuzzTests](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md#running-fuzztests)
 
-FAQ: In the event of a build failure related to missing files or dependencies
-for pw_fuzzer, check the
-[FuzzTest FAQ](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md#FAQ)
+-   FAQ: In the event of a build failure related to missing files or
+    dependencies for pw_fuzzer, check the
+    [FuzzTest FAQ](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md#FAQ)
 
 ## Build custom configuration
 

@@ -111,48 +111,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
 } // namespace TransportZoneOptionsStruct
 
-namespace MetadataOptionsStruct {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kMultiplexing), multiplexing);
-    encoder.Encode(to_underlying(Fields::kIncludeMotionZones), includeMotionZones);
-    encoder.Encode(to_underlying(Fields::kEnableMetadataPrivacySensitive), enableMetadataPrivacySensitive);
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        uint8_t __context_tag = 0;
-        CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
-        ReturnErrorOnFailure(err);
-
-        if (__context_tag == to_underlying(Fields::kMultiplexing))
-        {
-            err = DataModel::Decode(reader, multiplexing);
-        }
-        else if (__context_tag == to_underlying(Fields::kIncludeMotionZones))
-        {
-            err = DataModel::Decode(reader, includeMotionZones);
-        }
-        else if (__context_tag == to_underlying(Fields::kEnableMetadataPrivacySensitive))
-        {
-            err = DataModel::Decode(reader, enableMetadataPrivacySensitive);
-        }
-        else
-        {
-        }
-
-        ReturnErrorOnFailure(err);
-    }
-}
-
-} // namespace MetadataOptionsStruct
-
 namespace TransportTriggerOptionsStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -211,6 +169,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kChunkDuration), chunkDuration);
     encoder.Encode(to_underlying(Fields::kCENCKey), CENCKey);
+    encoder.Encode(to_underlying(Fields::kMetadataEnabled), metadataEnabled);
     return encoder.Finalize();
 }
 
@@ -231,6 +190,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kCENCKey))
         {
             err = DataModel::Decode(reader, CENCKey);
+        }
+        else if (__context_tag == to_underlying(Fields::kMetadataEnabled))
+        {
+            err = DataModel::Decode(reader, metadataEnabled);
         }
         else
         {
@@ -292,7 +255,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kIngestMethod), ingestMethod);
     encoder.Encode(to_underlying(Fields::kContainerFormat), containerFormat);
     encoder.Encode(to_underlying(Fields::kContainerOptions), containerOptions);
-    encoder.Encode(to_underlying(Fields::kMetadataOptions), metadataOptions);
     encoder.Encode(to_underlying(Fields::kExpiryTime), expiryTime);
     return encoder.Finalize();
 }
@@ -342,10 +304,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kContainerOptions))
         {
             err = DataModel::Decode(reader, containerOptions);
-        }
-        else if (__context_tag == to_underlying(Fields::kMetadataOptions))
-        {
-            err = DataModel::Decode(reader, metadataOptions);
         }
         else if (__context_tag == to_underlying(Fields::kExpiryTime))
         {

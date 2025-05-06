@@ -385,147 +385,147 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace LockDoor {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DoorLock::Commands::LockDoor::Id,
+    .commandId       = LockDoor::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace LockDoor
 namespace UnlockDoor {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DoorLock::Commands::UnlockDoor::Id,
+    .commandId       = UnlockDoor::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace UnlockDoor
 namespace UnlockWithTimeout {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DoorLock::Commands::UnlockWithTimeout::Id,
+    .commandId       = UnlockWithTimeout::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace UnlockWithTimeout
 namespace SetWeekDaySchedule {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DoorLock::Commands::SetWeekDaySchedule::Id,
+    .commandId       = SetWeekDaySchedule::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace SetWeekDaySchedule
 namespace GetWeekDaySchedule {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DoorLock::Commands::GetWeekDaySchedule::Id,
+    .commandId       = GetWeekDaySchedule::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace GetWeekDaySchedule
 namespace ClearWeekDaySchedule {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DoorLock::Commands::ClearWeekDaySchedule::Id,
+    .commandId       = ClearWeekDaySchedule::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace ClearWeekDaySchedule
 namespace SetYearDaySchedule {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DoorLock::Commands::SetYearDaySchedule::Id,
+    .commandId       = SetYearDaySchedule::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace SetYearDaySchedule
 namespace GetYearDaySchedule {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DoorLock::Commands::GetYearDaySchedule::Id,
+    .commandId       = GetYearDaySchedule::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace GetYearDaySchedule
 namespace ClearYearDaySchedule {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DoorLock::Commands::ClearYearDaySchedule::Id,
+    .commandId       = ClearYearDaySchedule::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace ClearYearDaySchedule
 namespace SetHolidaySchedule {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DoorLock::Commands::SetHolidaySchedule::Id,
+    .commandId       = SetHolidaySchedule::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace SetHolidaySchedule
 namespace GetHolidaySchedule {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DoorLock::Commands::GetHolidaySchedule::Id,
+    .commandId       = GetHolidaySchedule::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace GetHolidaySchedule
 namespace ClearHolidaySchedule {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DoorLock::Commands::ClearHolidaySchedule::Id,
+    .commandId       = ClearHolidaySchedule::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace ClearHolidaySchedule
 namespace SetUser {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DoorLock::Commands::SetUser::Id,
+    .commandId       = SetUser::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace SetUser
 namespace GetUser {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DoorLock::Commands::GetUser::Id,
+    .commandId       = GetUser::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace GetUser
 namespace ClearUser {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DoorLock::Commands::ClearUser::Id,
+    .commandId       = ClearUser::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace ClearUser
 namespace SetCredential {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DoorLock::Commands::SetCredential::Id,
+    .commandId       = SetCredential::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace SetCredential
 namespace GetCredentialStatus {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DoorLock::Commands::GetCredentialStatus::Id,
+    .commandId       = GetCredentialStatus::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace GetCredentialStatus
 namespace ClearCredential {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DoorLock::Commands::ClearCredential::Id,
+    .commandId       = ClearCredential::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace ClearCredential
 namespace UnboltDoor {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DoorLock::Commands::UnboltDoor::Id,
+    .commandId       = UnboltDoor::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace UnboltDoor
 namespace SetAliroReaderConfig {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DoorLock::Commands::SetAliroReaderConfig::Id,
+    .commandId       = SetAliroReaderConfig::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace SetAliroReaderConfig
 namespace ClearAliroReaderConfig {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = DoorLock::Commands::ClearAliroReaderConfig::Id,
+    .commandId       = ClearAliroReaderConfig::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
