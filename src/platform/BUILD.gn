@@ -289,6 +289,16 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "CHIP_DEVICE_LAYER_TARGET_REALTEK_BEE=1",
         "CHIP_DEVICE_LAYER_TARGET=Realtek_bee",
       ]
+    } else if (chip_device_platform == "bee") {
+      device_layer_target_define = "BEE"
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET=realtek/BEE",
+      ]
+    } else if (chip_device_platform == "rtl8773g") {
+      device_layer_target_define = "RTL8773G"
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET=realtek/RTL8773G",
+      ]
     } else if (chip_device_platform == "cyw30739") {
       device_layer_target_define = "CYW30739"
       defines += [ "CHIP_DEVICE_LAYER_TARGET=Infineon/CYW30739" ]
@@ -366,6 +376,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "ANDROID",
       "AMEBA",
       "REALTEK_BEE",
+      "BEE",
+      "RTL8773G",
       "CYW30739",
       "WEBOS",
       "MW320",
@@ -591,6 +603,10 @@ if (chip_device_platform != "none") {
       _platform_target = "Ameba"
     } else if (chip_device_platform == "realtek_bee") {
       _platform_target = "Realtek_bee"
+    } else if (chip_device_platform == "bee") {
+      _platform_target = "realtek/BEE"
+    } else if (chip_device_platform == "rtl8773g") {
+      _platform_target = "realtek/RTL8773G"
     } else if (chip_device_platform == "webos") {
       _platform_target = "webos"
     } else if (chip_device_platform == "bl602") {

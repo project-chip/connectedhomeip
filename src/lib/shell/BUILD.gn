@@ -116,6 +116,16 @@ static_library("shell") {
       "MainLoopBee.cpp",
       "streamer_bee.cpp",
     ]
+  } else if (chip_device_platform == "bee") {
+    sources += [
+      "MainLoopBee.cpp",
+      "streamer_bee.cpp",
+    ]
+  # } else if (chip_device_platform == "rtl8773g") {
+  #   sources += [
+  #     "MainLoopBee.cpp",
+  #     "streamer_bee.cpp",
+  #   ]
   } else if (chip_device_platform == "openiotsdk") {
     sources += [
       "MainLoopDefault.cpp",
