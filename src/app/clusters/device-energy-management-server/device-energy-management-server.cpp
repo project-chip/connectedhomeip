@@ -456,8 +456,7 @@ void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx,
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "DEM: Unable to get current time - err:%" CHIP_ERROR_FORMAT, err.Format());
-            status = Status::Failure;
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
             return;
         }
 
@@ -752,8 +751,7 @@ void Instance::HandleRequestConstraintBasedForecast(HandlerContext & ctx,
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "DEM: Failed to get UTC time");
-        status = Status::Failure;
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
 
