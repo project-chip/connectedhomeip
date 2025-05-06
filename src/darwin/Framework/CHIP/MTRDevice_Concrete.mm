@@ -4512,6 +4512,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         self.highestObservedEventNumberNeedsPersisting = NO;
     }
 
+    MTR_LOG_DEBUG("%@ _storePersistedDeviceData: %@", self, data);
+
     [datastore storeDeviceData:[data copy] forNodeID:self.nodeID];
 }
 

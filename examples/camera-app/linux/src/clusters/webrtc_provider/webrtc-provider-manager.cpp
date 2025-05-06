@@ -503,9 +503,12 @@ CHIP_ERROR WebRTCProviderManager::SendOfferCommand(Messaging::ExchangeManager & 
 
     auto onFailure = [](CHIP_ERROR error) { ChipLogError(Camera, "Offer command failed: %" CHIP_ERROR_FORMAT, error.Format()); };
 
+    uint16_t sessionId = mCurrentSessionId;
+    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_ModifyWebRTCOfferSessionId, sessionId++);
+
     // Build the command
     WebRTCTransportRequestor::Commands::Offer::Type command;
-    command.webRTCSessionID = mCurrentSessionId;
+    command.webRTCSessionID = sessionId;
     command.sdp             = CharSpan::fromCharString(mLocalSdp.c_str());
 
     // Now invoke the command using the found session handle
