@@ -253,6 +253,13 @@ def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
             binary="chip-terms-and-conditions-app",
         )
     )
+    targets.append(
+        ApplicationTarget(
+            key="CAMERA_APP",
+            target=f"{target_prefix}-camera-{suffix}",
+            binary="chip-camera-app",
+        )
+    )
 
     return targets
 
