@@ -261,7 +261,7 @@ class TC_CNET_4_12(MatterBaseTest):
             attribute=Clusters.NetworkCommissioning.Attributes.Networks
         )
         logger.info(f'Step #6: Networks attribute: {networks}')
-        logger.info(f'Step #3: Networks attribute: {network.networkID}')
+        logger.info(f'Step #3: Networks attribute: {networks.networkID}')
         # Assert that the networkID matches the expected Thread network ID
         asserts.assert_equal(network.networkID, thread_network_id_bytes_th2,
                              'networkID does not match the expected Thread network ID.')
