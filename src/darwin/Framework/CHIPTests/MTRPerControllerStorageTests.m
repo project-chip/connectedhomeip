@@ -2907,7 +2907,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         // completes and hence before its subscription work item gets a chance
         // to run (in the width-1 case).
         MTRDeviceTestDelegate * delegate = deviceDelegates[fakeDeviceID];
-        // onSubscriptionPoolWorkComplete is called from dealloc
+        // onSubscriptionCallbackDelete is called from dealloc
         delegate.onSubscriptionCallbackDelete = ^{
             [fakeDeviceDeletedExpectation fulfill];
         };
