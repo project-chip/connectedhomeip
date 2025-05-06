@@ -95,14 +95,14 @@ constexpr uint8_t kPrivilegeBits = 5;
 constexpr uint8_t kPrivilegeMask = ((1 << kPrivilegeBits) - 1);
 
 // Lambda function used to validate that 'kPrivilegeMask' contains all the values
-// defined inside the class enum Access::Privilege, and only those values.
+// defined inside the enum class Access::Privilege, and only those values.
 // This function is later called inside a static_assert that expects 'true' as return value.
 inline auto kPrivilegeMaskValidation = []() {
     auto mask = kPrivilegeMask;
 
     // Array of all current values defined inside the enum class Access::Privilege.
     // For this validation to work, this array ALWAYS must match the listed contents
-    // of the above mentioned enum class, as defined on <access/Privilege.h>.
+    // of the above mentioned enum class, as defined in <access/Privilege.h>.
     Access::Privilege privilegeValues[] = { Access::Privilege::kView, Access::Privilege::kProxyView, Access::Privilege::kOperate,
                                             Access::Privilege::kManage, Access::Privilege::kAdminister };
 
