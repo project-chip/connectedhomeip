@@ -2903,7 +2903,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     [controller.concurrentSubscriptionPool enqueueWorkItem:blockingWorkItem description:@"Waiting for fake device deletion"];
 
     @autoreleasepool {
-        // Create our fake device and have it dealloc before the blockingWorkItem
+        // Create our fake device and have it dealloc before the blocking WorkItem
         // completes and hence before its subscription work item gets a chance
         // to run (in the width-1 case).
         MTRDeviceTestDelegate * delegate = deviceDelegates[fakeDeviceID];
