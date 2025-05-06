@@ -63,19 +63,13 @@ public:
      * @param originatingEndpointId  The endpoint ID that initiates the offer.
      * @param videoStreamId          Optional Video stream ID if relevant.
      * @param audioStreamId          Optional Audio stream ID if relevant.
-     * @param ICEServers             Optional list of ICE server structures, if using custom STUN/TURN servers.
-     * @param ICETransportPolicy     Optional policy for ICE transport (e.g., 'all', 'relay', etc.).
      *
      * @return CHIP_NO_ERROR on success, or an appropriate CHIP_ERROR on failure.
      */
     CHIP_ERROR
     SolicitOffer(chip::app::Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage, chip::EndpointId originatingEndpointId,
                  chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId,
-                 chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId,
-                 chip::Optional<
-                     chip::app::DataModel::List<const chip::app::Clusters::WebRTCTransportProvider::Structs::ICEServerStruct::Type>>
-                     ICEServers,
-                 chip::Optional<chip::CharSpan> ICETransportPolicy);
+                 chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId);
 
     /**
      * @brief Sends a ProvideOffer command to the remote device.
@@ -90,8 +84,6 @@ public:
      * @param originatingEndpointId  The endpoint ID that initiates the offer.
      * @param videoStreamId          Optional Video stream ID if relevant.
      * @param audioStreamId          Optional Audio stream ID if relevant.
-     * @param ICEServers             Optional list of ICE server structures, if using custom STUN/TURN servers.
-     * @param ICETransportPolicy     Optional policy for ICE transport (e.g., 'all', 'relay', etc.).
      *
      * @return CHIP_NO_ERROR on success, or an appropriate CHIP_ERROR on failure.
      */
@@ -99,11 +91,7 @@ public:
     ProvideOffer(chip::app::DataModel::Nullable<uint16_t> webRTCSessionId, std::string sdp,
                  chip::app::Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage, chip::EndpointId originatingEndpointId,
                  chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId,
-                 chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId,
-                 chip::Optional<
-                     chip::app::DataModel::List<const chip::app::Clusters::WebRTCTransportProvider::Structs::ICEServerStruct::Type>>
-                     ICEServers,
-                 chip::Optional<chip::CharSpan> ICETransportPolicy);
+                 chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId);
 
     /**
      * @brief Sends a ProvideAnswer command to the remote device.
