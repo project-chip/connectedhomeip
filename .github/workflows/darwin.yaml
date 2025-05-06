@@ -96,15 +96,6 @@ jobs:
                   platform: darwin
                   bootstrap-log-name:
                       bootstrap-logs-framework-${{ matrix.options.flavor }}
-            - name: Build example All Clusters Server
-              run: |
-                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/all-clusters-app chip_config_network_layer_ble=false
-            - name: Build example OTA Provider
-              run: |
-                  scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug/ota-provider-app chip_config_network_layer_ble=false
-            - name: Build example OTA Requestor
-              run: |
-                  scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug/ota-requestor-app chip_config_network_layer_ble=false non_spec_compliant_ota_action_delay_floor=0
             - name: Run Framework Tests
               # We want to ensure that our log upload runs on timeout, so use a timeout here shorter
               # than the 6-hour overall job timeout.  4.5 hours should be plenty.
