@@ -82,19 +82,21 @@ CHIP_ERROR ClockImpl::GetClock_EpochTS(uint32_t & chipEpoch)
 {
     chipEpoch = 0;
 
-    Milliseconds64 cTMs;
-    CHIP_ERROR err = GetClock_RealTimeMS(cTMs);
+    System::Clock::Milliseconds64 cTMs;
+    CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(cTMs);
+
+    VerifyOrDie(err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Unable to get current time - err:%" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Zcl, "Unable to get current time - err:%" CHIP_ERROR_FORMAT, err.Format());
         return err;
     }
 
-    auto unixEpoch = std::chrono::duration_cast<Seconds32>(cTMs).count();
+    auto unixEpoch = std::chrono::duration_cast<System::Clock::Seconds32>(cTMs).count();
     if (!UnixEpochToChipEpochTime(unixEpoch, chipEpoch))
     {
-        ChipLogError(DeviceLayer, "Unable to convert Unix Epoch time to Matter Epoch Time");
+        ChipLogError(Zcl, "Unable to convert Unix Epoch time to Matter Epoch Time");
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
