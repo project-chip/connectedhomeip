@@ -60,7 +60,7 @@ DeviceInfoProviderImpl & DeviceInfoProviderImpl::GetDefaultInstance()
 DeviceInfoProvider::FixedLabelIterator * DeviceInfoProviderImpl::IterateFixedLabel(EndpointId endpoint)
 {
     // We don't include fixed label data in this sample one. Returning nullptr returns empty list.
-    (void)endpoint;
+    (void) endpoint;
     return nullptr;
 }
 
