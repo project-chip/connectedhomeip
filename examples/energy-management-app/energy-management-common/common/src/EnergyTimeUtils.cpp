@@ -34,7 +34,7 @@ using chip::Protocols::InteractionModel::Status;
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace DeviceEnergyManagement {
+namespace EnergyEvse {
 
 /**
  * @brief   Helper function to get current timestamp and work out the day of week
@@ -112,7 +112,7 @@ CHIP_ERROR GetMinutesPastMidnight(uint16_t & minutesPastMidnight)
     return err;
 }
 
-} // namespace DeviceEnergyManagement
+} // namespace EnergyEvse
 } // namespace Clusters
 } // namespace app
 } // namespace chip
