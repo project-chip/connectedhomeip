@@ -2009,7 +2009,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
     config.app_pipe = args.app_pipe
-    if not os.path.exists(config.app_pipe):
+    if config.app_pipe is not None and not os.path.exists(config.app_pipe):
         # Named pipes are unique, so we MUST have consistent paths
         # Verify from start the named pipe exists.
         logging.error("Named pipe %r does NOT exist" % config.app_pipe)
