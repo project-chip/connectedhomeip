@@ -77,7 +77,7 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 }
 
 void ApplicationInit()
-{   
+{
     const char* app_id = std::getenv("CHIP_LIGHTING_APP_ID");
     if (app_id == nullptr) {
         app_id = "54321";
