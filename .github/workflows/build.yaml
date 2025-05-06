@@ -18,18 +18,21 @@ on:
     push:
         branches:
             - master
-            - 'v*-branch'
+            - "v*-branch"
     pull_request:
     merge_group:
     workflow_dispatch:
     workflow_call:
-      inputs:
-        run-codeql:
-          required: false
-          type: boolean
+        inputs:
+            run-codeql:
+                required: false
+                type: boolean
 
 concurrency:
-    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+    group:
+        ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name ==
+        'pull_request' && github.event.number) || (github.event_name ==
+        'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
 env:
@@ -47,7 +50,8 @@ jobs:
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
-            options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
+            options:
+                --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
@@ -57,11 +61,16 @@ jobs:
               run: echo "$GITHUB_CONTEXT"
             - name: Dump Concurrency context
               env:
-                  CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+                  CONCURRENCY_CONTEXT:
+                      ${{ github.ref }}-${{ github.workflow }}-${{
+                      (github.event_name == 'pull_request' &&
+                      github.event.number) || (github.event_name ==
+                      'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Try to ensure the directories for core dumping exist and we
+            - name:
+                  Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
                   mkdir /tmp/cores || true
@@ -69,7 +78,7 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                platform: linux
+                  platform: linux
             - name: Initialize CodeQL
               if: ${{ inputs.run-codeql  }}
               uses: github/codeql-action/init@v3
@@ -77,7 +86,10 @@ jobs:
                   languages: "cpp"
                   queries: security-extended, security-and-quality
             - name: Setup Build
-              run: scripts/build/gn_gen.sh --args="chip_config_memory_debug_checks=true chip_config_memory_debug_dmalloc=false"
+              run:
+                  scripts/build/gn_gen.sh
+                  --args="chip_config_memory_debug_checks=true
+                  chip_config_memory_debug_dmalloc=false"
             - name: Run Build
               run: scripts/run_in_build_env.sh "ninja -C ./out"
             - name: Run Tests
@@ -105,8 +117,14 @@ jobs:
               if: inputs.run-codeql != true
               run: rm -rf ./out
             - name: Set up Build Without Error Logging
+<<<<<<< HEAD
               if: inputs.run-codeql != true
               run: scripts/build/gn_gen.sh --args="chip_detail_logging=false chip_progress_logging=false chip_error_logging=false"
+=======
+              run:
+                  scripts/build/gn_gen.sh --args="chip_detail_logging=false
+                  chip_progress_logging=false chip_error_logging=false"
+>>>>>>> 5e892874f0 (Delete coverage workflow file and add job to build.yaml)
             - name: Run Build Without Error Logging
               if: inputs.run-codeql != true
               run: scripts/run_in_build_env.sh "ninja -C ./out"
@@ -131,7 +149,7 @@ jobs:
               if: ${{ inputs.run-codeql  }}
               uses: ./.github/actions/perform-codeql-analysis
               with:
-                language: cpp
+                  language: cpp
             # OBJDIR on linux is > 10K files and takes more than 50 minutes to upload, usually
             # having the job timeout.
             #
@@ -157,7 +175,8 @@ jobs:
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
-            options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
+            options:
+                --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
@@ -167,14 +186,19 @@ jobs:
               run: echo "$GITHUB_CONTEXT"
             - name: Dump Concurrency context
               env:
-                  CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+                  CONCURRENCY_CONTEXT:
+                      ${{ github.ref }}-${{ github.workflow }}-${{
+                      (github.event_name == 'pull_request' &&
+                      github.event.number) || (github.event_name ==
+                      'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
             - name: Checkout
               uses: actions/checkout@v4
               with:
                   fetch-depth: 2
                   persist-credentials: true
-            - name: Try to ensure the directories for core dumping exist and we
+            - name:
+                  Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
                   mkdir /tmp/cores || true
@@ -236,15 +260,16 @@ jobs:
               id: changed-files
               uses: tj-actions/changed-files@v46
               with:
-                # Exclude all files under "third_party/"
-                files-ignore: |
-                  third_party/
+                  # Exclude all files under "third_party/"
+                  files-ignore: |
+                      third_party/
 
             - name: Clang-tidy validation
               # NOTE: clang-tidy crashes on CodegenDataModel_Write due to Nullable/std::optional check.
               #       See https://github.com/llvm/llvm-project/issues/97426
               env:
-                  ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.changed_files }}
+                  ALL_CHANGED_FILES:
+                      ${{ steps.changed-files.outputs.changed_files }}
               run: |
                   touch out/changed_files.txt
                   for file in ${ALL_CHANGED_FILES}; do
@@ -269,7 +294,9 @@ jobs:
                        --target linux-x64-rpc-console \
                        build \
                     "
-            - name: Create a pre-generate directory and ensure compile-time codegen would fail
+            - name:
+                  Create a pre-generate directory and ensure compile-time
+                  codegen would fail
               run: |
                   ./scripts/run_in_build_env.sh "./scripts/codepregen.py ./zzz_pregenerated"
                   mv scripts/codegen.py scripts/codegen.py.renamed
@@ -285,7 +312,9 @@ jobs:
                        --pregen-dir ./zzz_pregenerated \
                        build \
                     "
-            - name: Undo code pre-generation changes (make compile time codegen work again)
+            - name:
+                  Undo code pre-generation changes (make compile time codegen
+                  work again)
               run: |
                   rm -rf ./zzz_pregenerated
                   mv scripts/codegen.py.renamed scripts/codegen.py
@@ -323,6 +352,83 @@ jobs:
             #       path: out/
             #       # objdirs are big; don't hold on to them too long.
             #       retention-days: 5
+    build_linux_python_lib:
+        name: Build on Linux (python_lib)
+
+        runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
+
+        container:
+            image: ghcr.io/project-chip/chip-build:125
+            volumes:
+                - "/:/runner-root-volume"
+                - "/tmp/log_output:/tmp/test_logs"
+            options:
+                --sysctl "net.ipv6.conf.all.disable_ipv6=0
+                net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
+
+        steps:
+            - name: Dump GitHub context
+              env:
+                  GITHUB_CONTEXT: ${{ toJSON(github) }}
+              run: echo "$GITHUB_CONTEXT"
+            - name: Dump Concurrency context
+              env:
+                  CONCURRENCY_CONTEXT:
+                      ${{ github.ref }}-${{ github.workflow }}-${{
+                      (github.event_name == 'pull_request' &&
+                      github.event.number) || (github.event_name ==
+                      'workflow_dispatch' && github.run_number) || github.sha }}
+              run: echo "$CONCURRENCY_CONTEXT"
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                  platform: linux
+
+            - name: Setup Build, Run Build and Run Tests
+              run: |
+                  scripts/build/gn_gen.sh --args="enable_rtti=true chip_config_memory_debug_checks=false chip_config_memory_debug_dmalloc=false chip_generate_link_map_file=false"
+                  scripts/run_in_build_env.sh "ninja -C ./out"
+                  scripts/tests/gn_tests.sh
+            - name: Setup test python environment
+              shell: bash
+              run: |
+                  scripts/run_in_build_env.sh 'virtualenv pyenv'
+                  source pyenv/bin/activate
+                  python -m ensurepip --upgrade
+                  python -m pip install coverage
+                  python -m pip install ./out/controller/python/chip_core-0.0-cp37-abi3-linux_x86_64.whl
+                  python -m pip install ./out/controller/python/chip_clusters-0.0-py3-none-any.whl
+                  python -m pip install ./out/controller/python/chip_repl-0.0-py3-none-any.whl
+
+            - name: Run Python tests
+              shell: bash
+              run: |
+                  source pyenv/bin/activate
+                  cd src/controller/python/test/unit_tests/
+                  python -m coverage run -m unittest -v
+                  coverage xml
+            - name: Clean previous outputs
+              run: rm -rf out pyenv
+            - name: Run Python Setup Payload Generator Test
+              shell: bash
+              run: |
+                  scripts/run_in_build_env.sh 'scripts/examples/gn_build_example.sh examples/chip-tool out/'
+                  scripts/run_in_build_env.sh 'virtualenv pyenv'
+                  source pyenv/bin/activate
+                  python -m ensurepip --upgrade
+                  python -m pip install -r scripts/setup/requirements.setuppayload.txt
+                  python3 src/setup_payload/tests/run_python_setup_payload_test.py out/chip-tool
+            - name: Run revocation set generation tests
+              run: |
+                  scripts/run_in_build_env.sh 'python3 -m coverage run -m unittest -v credentials/generate_revocation_set.py'
+                  coverage xml
+            - name: Upload coverage reports to Codecov with GitHub Action
+              uses: codecov/codecov-action@v5
+              env:
+                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
     build_linux_python_lib:
         name: Build on Linux (python_lib)
@@ -400,7 +506,8 @@ jobs:
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
-            options: --sysctl "net.ipv6.conf.all.disable_ipv6=0
+            options:
+                --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
@@ -410,14 +517,18 @@ jobs:
               run: echo "$GITHUB_CONTEXT"
             - name: Dump Concurrency context
               env:
-                  CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+                  CONCURRENCY_CONTEXT:
+                      ${{ github.ref }}-${{ github.workflow }}-${{
+                      (github.event_name == 'pull_request' &&
+                      github.event.number) || (github.event_name ==
+                      'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
             - name: Checkout
               uses: actions/checkout@v4
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                platform: linux
+                  platform: linux
 
             - name: Setup Build
               run: |
@@ -437,8 +548,10 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                platform: darwin
-            - name: Try to ensure the directory for diagnostic log collection exists
+                  platform: darwin
+            - name:
+                  Try to ensure the directory for diagnostic log collection
+                  exists
               run: |
                   mkdir -p ~/Library/Logs/DiagnosticReports || true
             #  Build on Darwin + CodeQL often takes 6 hours (which is more than the maximum allowed by GitHub Runners), Deactivate it until we can investigate this
@@ -478,7 +591,8 @@ jobs:
               # NOTE: clang-tidy crashes on CodegenDataModel_Write due to Nullable/std::optional check.
               #       See https://github.com/llvm/llvm-project/issues/97426
               env:
-                  ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+                  ALL_CHANGED_FILES:
+                      ${{ steps.changed-files.outputs.all_changed_files }}
               run: |
                   touch out/changed_files.txt
                   for file in ${ALL_CHANGED_FILES}; do
@@ -514,7 +628,9 @@ jobs:
         name: Build on Linux (coverage)
 
         env:
-            TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
+            TSAN_OPTIONS:
+                "halt_on_error=1
+                suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
 
         if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
         runs-on: ubuntu-latest
@@ -530,18 +646,20 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                platform: linux
-                bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  platform: linux
+                  bootstrap-log-name:
+                      bootstrap-logs-linux-${{ matrix.build_variant }}${{
+                      matrix.chip_tool }}
 
             - name: Run Build Coverage
               run: ./scripts/build_coverage.sh --yaml
 
             - name: Convert output file
               run: |
-                python -m pip install lcov-cobertura
-                lcov_cobertura out/coverage/coverage/lcov_final.info
+                  python -m pip install lcov-cobertura
+                  lcov_cobertura out/coverage/coverage/lcov_final.info
 
             - name: Upload coverage reports to Codecov with GitHub Action
               uses: codecov/codecov-action@v5
               env:
-                CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
