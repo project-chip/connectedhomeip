@@ -23,8 +23,13 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
-#include <platform/silabs/multi-ota/SiWx917/OTAWiFiFirmwareProcessor.h>
+
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+
+#ifdef SL_WIFI
+#include <platform/silabs/multi-ota/SiWx917/OTAWiFiFirmwareProcessor.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -439,18 +444,12 @@ void OTAMultiImageProcessorImpl::HandleApply(intptr_t context)
     // This reboots the device
     // TODO: check where to put this
 #ifdef SLI_SI91X_MCU_INTERFACE
-    ChipLogProgress(SoftwareUpdate, "Selected processor: %p, RequiresReset: %d", imageProcessor->mCurrentProcessor,
-                    imageProcessor->mCurrentProcessor ? imageProcessor->mCurrentProcessor->RequiresReset() : 0);
-    if (imageProcessor->mCurrentProcessor && imageProcessor->mCurrentProcessor->RequiresReset())
-    {
-        // Handle reset logic
-        ChipLogProgress(SoftwareUpdate, "M4 Firmware update complete");
-        // send system reset request to reset the MCU and upgrade the m4 image
-        ChipLogProgress(SoftwareUpdate, "SoC Soft Reset initiated!");
-        // Reboots the device
-        sl_si91x_soc_nvic_reset();
-        // chip::DeviceLayer::Silabs::GetPlatform().SoftwareReset();
-    }
+    // Handle reset logic
+    ChipLogProgress(SoftwareUpdate, "OTA Firmware update completed");
+    // send system reset request to reset the MCU and upgrade the m4 image
+    ChipLogProgress(SoftwareUpdate, "SoC Soft Reset initiated!");
+    // Reboots the device
+    sl_si91x_soc_nvic_reset();
 #else // EFR reboot
     CORE_CRITICAL_SECTION(bootloader_rebootAndInstall();)
 #endif

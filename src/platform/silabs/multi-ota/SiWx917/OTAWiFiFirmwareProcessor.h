@@ -20,9 +20,13 @@
 
 #include <lib/support/Span.h>
 #include <platform/silabs/multi-ota/OTATlvProcessor.h>
-
-#define RPS_HEADER 0
-#define RPS_DATA 1
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include "sl_si91x_protocol_types.h"
+#ifdef __cplusplus
+}
+#endif
 
 namespace chip {
 
@@ -45,7 +49,7 @@ public:
     bool RequiresReset() const override { return mReset; }
 
 private:
-    uint8_t mFWchunktype;
+    uint8_t mFWchunktype = SL_FWUP_RPS_HEADER;
     CHIP_ERROR ProcessInternal(ByteSpan & block) override;
     CHIP_ERROR ProcessDescriptor(ByteSpan & block);
 
