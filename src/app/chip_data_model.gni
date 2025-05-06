@@ -252,26 +252,26 @@ template("chip_data_model") {
     #   - A `BUILD.gn` file that defines targets that do not depend on the specific application configuration. A dependency
     #     will be added on this default target. An empty group will be created
     #     if no special build rules exist
-    #   - codegen_dependent_sources.gni - required sources for code generation integration
-    #     MUST define a variable named `codegen_dependent_sources`
+    #   - app_config_dependent_sources.gni - required sources for code generation integration
+    #     MUST define a variable named `app_config_dependent_sources`
 
-    _codegen_dependent_sources = []
+    _app_config_dependent_sources = []
     foreach(cluster, _cluster_sources) {
       deps += [ "${_app_root}/clusters/${cluster}" ]
 
-      # codegen_dependent_sources paths are relative to the target
+      # app_config_dependent_sources paths are relative to the target
       # accumulate them here so that we can "rebase_path" later on
-      _codegen_dependent_sources += [
+      _app_config_dependent_sources += [
         {
           cluster = cluster
           import(
-              "${_app_root}/clusters/${cluster}/codegen_dependent_sources.gni")
+              "${_app_root}/clusters/${cluster}/app_config_dependent_sources.gni")
         },
       ]
     }
 
-    foreach(cluster_entry, _codegen_dependent_sources) {
-      sources += rebase_path(cluster_entry.codegen_dependent_sources,
+    foreach(cluster_entry, _app_config_dependent_sources) {
+      sources += rebase_path(cluster_entry.app_config_dependent_sources,
                              "",
                              "${_app_root}/clusters/${cluster_entry.cluster}")
     }
