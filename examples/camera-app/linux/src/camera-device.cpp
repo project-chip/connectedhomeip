@@ -815,21 +815,21 @@ uint8_t CameraDevice::GetZoomMax()
 // Set the Pan level
 CameraError CameraDevice::SetPan(int16_t aPan)
 {
-    mPan = static_cast<uint16_t>(aPan);
+    mPan = aPan;
     return CameraError::SUCCESS;
 }
 
 // Set the Tilt level
 CameraError CameraDevice::SetTilt(int16_t aTilt)
 {
-    mTilt = static_cast<uint16_t>(aTilt);
+    mTilt = aTilt;
     return CameraError::SUCCESS;
 }
 
 // Set the Zoom level
 CameraError CameraDevice::SetZoom(uint8_t aZoom)
 {
-    mZoom = static_cast<int8_t>(aZoom);
+    mZoom = aZoom;
     return CameraError::SUCCESS;
 }
 
