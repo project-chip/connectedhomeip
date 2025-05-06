@@ -21,11 +21,11 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CommissionableDataProvider.h>
 
+#include "app/InteractionModelEngine.h"
 #include "app/clusters/ota-requestor/OTARequestorInterface.h"
 #include "app/icd/server/ICDNotifier.h"
 #include "app/server/CommissioningWindowManager.h"
 #include "app/server/Server.h"
-#include "app/InteractionModelEngine.h"
 #include "credentials/FabricTable.h"
 #include "device_service/device_service.rpc.pb.h"
 #include "platform/CommissionableDataProvider.h"
