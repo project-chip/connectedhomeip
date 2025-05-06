@@ -451,8 +451,8 @@ void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx,
 
     if (earliestStartTimeNullable.IsNull())
     {
-        uint32_t chipEpoch = 0;
-        CHIP_ERROR err     = System::Clock::GetClock_MatterEpochS(chipEpoch);
+        uint32_t matterEpoch = 0;
+        CHIP_ERROR err       = System::Clock::GetClock_MatterEpochS(matterEpoch);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "DEM: Unable to get current time - err:%" CHIP_ERROR_FORMAT, err.Format());
@@ -461,7 +461,7 @@ void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx,
         }
 
         /* Null means - We can start immediately */
-        earliestStartTimeEpoch = chipEpoch; /* NOW */
+        earliestStartTimeEpoch = matterEpoch; /* NOW */
     }
     else
     {

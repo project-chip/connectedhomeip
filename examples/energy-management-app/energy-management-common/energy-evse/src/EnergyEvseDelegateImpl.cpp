@@ -149,7 +149,7 @@ Status EnergyEvseDelegate::EnableDischarging(const DataModel::Nullable<uint32_t>
 Status EnergyEvseDelegate::ScheduleCheckOnEnabledTimeout()
 {
 
-    uint32_t chipEpoch = 0;
+    uint32_t matterEpoch = 0;
     DataModel::Nullable<uint32_t> enabledUntilTime;
 
     if (mSupplyState == SupplyStateEnum::kChargingEnabled)
@@ -172,11 +172,11 @@ Status EnergyEvseDelegate::ScheduleCheckOnEnabledTimeout()
         return Status::Success;
     }
 
-    CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(chipEpoch);
+    CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(matterEpoch);
     if (err == CHIP_NO_ERROR)
     {
         /* time is sync'd */
-        int32_t delta = static_cast<int32_t>(enabledUntilTime.Value() - chipEpoch);
+        int32_t delta = static_cast<int32_t>(enabledUntilTime.Value() - matterEpoch);
         if (delta > 0)
         {
             /* The timer hasn't expired yet - set a timer to check in the future */
@@ -1633,8 +1633,8 @@ bool EnergyEvseDelegate::IsEvsePluggedIn()
 void EvseSession::StartSession(EndpointId endpointId, int64_t chargingMeterValue, int64_t dischargingMeterValue)
 {
     /* Get Timestamp */
-    uint32_t chipEpoch = 0;
-    CHIP_ERROR err     = System::Clock::GetClock_MatterEpochS(chipEpoch);
+    uint32_t matterEpoch = 0;
+    CHIP_ERROR err       = System::Clock::GetClock_MatterEpochS(matterEpoch);
     if (err != CHIP_NO_ERROR)
     {
         /* Note that the error will be also be logged inside GetErrorTS() -
@@ -1642,7 +1642,7 @@ void EvseSession::StartSession(EndpointId endpointId, int64_t chargingMeterValue
         ChipLogError(AppServer, "EVSE: Unable to get current time when starting session - err:%" CHIP_ERROR_FORMAT, err.Format());
         return;
     }
-    mStartTime = chipEpoch;
+    mStartTime = matterEpoch;
 
     mSessionEnergyChargedAtStart    = chargingMeterValue;
     mSessionEnergyDischargedAtStart = dischargingMeterValue;
@@ -1700,8 +1700,8 @@ void EvseSession::StopSession(EndpointId endpointId, int64_t chargingMeterValue,
 void EvseSession::RecalculateSessionDuration(EndpointId endpointId)
 {
     /* Get Timestamp */
-    uint32_t chipEpoch = 0;
-    CHIP_ERROR err     = System::Clock::GetClock_MatterEpochS(chipEpoch);
+    uint32_t matterEpoch = 0;
+    CHIP_ERROR err       = System::Clock::GetClock_MatterEpochS(matterEpoch);
     if (err != CHIP_NO_ERROR)
     {
         /* Note that the error will be also be logged inside GetErrorTS() -
@@ -1711,7 +1711,7 @@ void EvseSession::RecalculateSessionDuration(EndpointId endpointId)
         return;
     }
 
-    uint32_t duration = chipEpoch - mStartTime;
+    uint32_t duration = matterEpoch - mStartTime;
     mSessionDuration  = MakeNullable(duration);
     MatterReportingAttributeChangeCallback(endpointId, EnergyEvse::Id, SessionDuration::Id);
 }

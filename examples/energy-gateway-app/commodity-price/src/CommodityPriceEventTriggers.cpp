@@ -36,15 +36,15 @@ void SetTestEventTrigger_PriceUpdate()
     // Change the value of CurrentPrice
     Structs::CommodityPriceStruct::Type newPriceStruct;
     DataModel::Nullable<Structs::CommodityPriceStruct::Type> newPrice;
-    uint32_t chipEpoch = 0;
+    uint32_t matterEpoch = 0;
 
-    CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(chipEpoch);
+    CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(matterEpoch);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Support, "SetTestEventTrigger_PriceUpdate() could not get time");
     }
 
-    newPriceStruct.periodStart = chipEpoch;
+    newPriceStruct.periodStart = matterEpoch;
     newPriceStruct.periodEnd.SetNonNull(newPriceStruct.periodStart + 30 * 60);
 
     Money amount = 15916; // 15.916 p/kWh
@@ -84,8 +84,8 @@ void SetTestEventTrigger_ForecastUpdate()
         return;
     }
 
-    uint32_t chipEpoch = 0;
-    if (System::Clock::GetClock_MatterEpochS(chipEpoch) != CHIP_NO_ERROR)
+    uint32_t matterEpoch = 0;
+    if (System::Clock::GetClock_MatterEpochS(matterEpoch) != CHIP_NO_ERROR)
     {
         ChipLogError(Support, "SetTestEventTrigger_ForecastUpdate() could not get time");
         return;
