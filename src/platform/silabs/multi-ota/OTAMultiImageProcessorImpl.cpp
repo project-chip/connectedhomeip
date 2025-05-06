@@ -453,7 +453,6 @@ void OTAMultiImageProcessorImpl::HandleApply(intptr_t context)
 #else // EFR reboot
     CORE_CRITICAL_SECTION(bootloader_rebootAndInstall();)
 #endif
-    // ConfigurationManagerImpl().StoreSoftwareUpdateCompleted();
 }
 
 CHIP_ERROR OTAMultiImageProcessorImpl::ReleaseBlock()
