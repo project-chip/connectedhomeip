@@ -32,7 +32,7 @@
 #       --endpoint 1
 #       --int-arg PIXIT.RVCRUNM.MODE_CHANGE_OK:0
 #       --int-arg PIXIT.RVCRUNM.MODE_CHANGE_FAIL:2
-#       --app-pipe /tmp/chip_rvc_fifo_${CHIP_LOCK_APP_PID}
+#       --app-pipe /tmp/chip_rvc_fifo_${CHIP_RVC_APP_ID}
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
