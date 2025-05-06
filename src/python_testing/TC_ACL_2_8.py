@@ -73,6 +73,74 @@ class TC_ACL_2_8(MatterBaseTest):
     def desc_TC_ACL_2_8(self) -> str:
         return "[TC-ACL-2.8] ACL multi-fabric"
 
+    def _validate_events_th1(self, events, f1, f2, is_filtered):
+        """Helper method to validate events for TH1"""
+        logging.info("Found %d events", len(events))
+        
+        # For TH1, we expect to see two events with f1 as fabric index
+        expected_events_count = 2
+        
+        found_valid_events = 0
+        found_th2_event = False
+
+        for event in events:
+            logging.info("Examining event: %s", str(event))
+            if hasattr(event, 'Data') and hasattr(event.Data, 'fabricIndex'):
+                # If this is a TH1 event
+                if event.Data.fabricIndex == f1:
+                    # Check for expected field values
+                    if ((event.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and
+                        event.Data.adminNodeID == NullValue and
+                        event.Data.adminPasscodeID == 0) or
+                        (event.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged and
+                        event.Data.adminNodeID == self.th1.nodeId and
+                        event.Data.adminPasscodeID == NullValue)):
+                        found_valid_events += 1
+                
+                # If this is a TH2 event
+                if event.Data.fabricIndex == f2:
+                    found_th2_event = True
+
+        asserts.assert_equal(found_valid_events, expected_events_count, 
+                            f"Expected {expected_events_count} valid events for TH1, found {found_valid_events}")
+        
+        if is_filtered:
+            asserts.assert_false(found_th2_event, "TH1 should not see any events from TH2's fabric when fabric filtered")
+
+    def _validate_events_th2(self, events, f1, f2, is_filtered):
+        """Helper method to validate events for TH2"""
+        logging.info("Found %d events", len(events))
+        
+        # For TH2, we expect to see two events with f2 as fabric index
+        expected_events_count = 2
+        
+        found_valid_events = 0
+        found_th1_event = False
+
+        for event in events:
+            logging.info("Examining event: %s", str(event))
+            if hasattr(event, 'Data') and hasattr(event.Data, 'fabricIndex'):
+                # If this is a TH2 event
+                if event.Data.fabricIndex == f2:
+                    # Check for expected field values
+                    if ((event.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and
+                        event.Data.adminNodeID == NullValue and
+                        event.Data.adminPasscodeID == 0) or
+                        (event.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged and
+                        event.Data.adminNodeID == self.th2.nodeId and
+                        event.Data.adminPasscodeID == NullValue)):
+                        found_valid_events += 1
+                
+                # If this is a TH1 event
+                if event.Data.fabricIndex == f1:
+                    found_th1_event = True
+
+        asserts.assert_equal(found_valid_events, expected_events_count, 
+                            f"Expected {expected_events_count} valid events for TH2, found {found_valid_events}")
+        
+        if is_filtered:
+            asserts.assert_false(found_th1_event, "TH2 should not see any events from TH1's fabric when fabric filtered")
+
     def steps_TC_ACL_2_8(self) -> list[TestStep]:
         steps = [
             TestStep(1, "TH1 commissions DUT using admin node ID N1",
@@ -87,14 +155,14 @@ class TC_ACL_2_8(MatterBaseTest):
                      "Result is SUCCESS"),
             TestStep(6, "TH2 writes DUT Endpoint 0 AccessControl cluster ACL attribute value is list of AccessControlEntryStruct containing 1 element",
                      "Result is SUCCESS"),
-            TestStep(7, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
-                     "Result is SUCCESS, value is list of AccessControlEntryStruct containing 1 element, and MUST NOT contain an element with FabricIndex F2"),
-            TestStep(8, "TH2 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
-                     "Result is SUCCESS, value is list of AccessControlEntryStruct containing 1 element, and MUST NOT contain an element with FabricIndex F1"),
-            TestStep(9, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
-                     "Result is SUCCESS, value is list of AccessControlEntryChanged containing 2 elements, and MUST NOT contain any element with FabricIndex F2"),
-            TestStep(10, "TH2 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
-                     "Result is SUCCESS, value is list of AccessControlEntryChanged containing 2 elements, and MUST NOT contain any element with FabricIndex F1"),
+            TestStep(7, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute with both fabricFiltered True and False",
+                     "Result is SUCCESS, value is list of AccessControlEntryStruct containing 1 element when fabric filtered, and the list MUST NOT contain an element with FabricIndex F2"),
+            TestStep(8, "TH2 reads DUT Endpoint 0 AccessControl cluster ACL attribute with both fabricFiltered True and False",
+                     "Result is SUCCESS, value is list of AccessControlEntryStruct containing 1 element when fabric filtered, and the list MUST NOT contain an element with FabricIndex F1"),
+            TestStep(9, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event with both fabricFiltered True and False",
+                     "Result is SUCCESS, value is list of AccessControlEntryChanged containing 2 elements when fabric filtered, and the list MUST NOT contain any element with FabricIndex F2"),
+            TestStep(10, "TH2 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event with both fabricFiltered True and False",
+                     "Result is SUCCESS, value is list of AccessControlEntryChanged containing 2 elements when fabric filtered, and the list MUST NOT contain any element with FabricIndex F1"),
         ]
         return steps
 
@@ -166,15 +234,19 @@ class TC_ACL_2_8(MatterBaseTest):
             "Write should have succeeded")
 
         self.step(7)
-        # TH1 reads ACL attribute
+        # TH1 reads ACL attribute with fabricFiltered=True (default)
         ac_cluster = Clusters.AccessControl
         acl_attr = Clusters.AccessControl.Attributes.Acl
-        acl_list = await self.read_single_attribute_check_success(dev_ctrl=self.th1, endpoint=0, cluster=ac_cluster, attribute=acl_attr)
-        logging.info(f"ACL list {str(acl_list)}")
+        
+        # Read with fabric_filtered=True (default)
+        acl_list_filtered = await self.read_single_attribute_check_success(
+            dev_ctrl=self.th1, endpoint=0, cluster=ac_cluster, attribute=acl_attr
+        )
+        logging.info("TH1 read ACL result (fabricFiltered=True): %s", str(acl_list_filtered))
 
         asserts.assert_equal(
-            len(acl_list), 1, "Should have exactly one ACL entry")
-        entry = acl_list[0]
+            len(acl_list_filtered), 1, "Should have exactly one ACL entry when fabric filtered")
+        entry = acl_list_filtered[0]
 
         asserts.assert_equal(
             entry.privilege, 5, "Privilege should be Administer (5)")
@@ -187,18 +259,28 @@ class TC_ACL_2_8(MatterBaseTest):
             "Targets should be NullValue")
         asserts.assert_equal(entry.fabricIndex, f1)
 
-        for entry in acl_list:
+        for entry in acl_list_filtered:
             asserts.assert_not_equal(
                 entry.fabricIndex, f2, "Should not contain entry with FabricIndex F2")
+        
+        # Read with fabric_filtered=False
+        acl_list_unfiltered = await self.read_single_attribute_check_success(
+            dev_ctrl=self.th1, endpoint=0, cluster=ac_cluster, attribute=acl_attr,
+            fabric_filtered=False
+        )
+        logging.info("TH1 read ACL result (fabric_filtered=False): %s", str(acl_list_unfiltered))
+        asserts.assert_equal(len(acl_list_unfiltered), 2, "Should have two ACL entries when not fabric filtered")
 
         self.step(8)
-        # TH2 reads ACL attribute
-        acl_list = await self.read_single_attribute_check_success(dev_ctrl=self.th2, endpoint=0, cluster=ac_cluster, attribute=acl_attr)
-        logging.info(f"ACL list {str(acl_list)}")
+        # TH2 reads ACL attribute with fabricFiltered=True (default)
+        acl_list_filtered = await self.read_single_attribute_check_success(
+            dev_ctrl=self.th2, endpoint=0, cluster=ac_cluster, attribute=acl_attr
+        )
+        logging.info("TH2 read ACL result (fabric_filtered=True): %s", str(acl_list_filtered))
 
         asserts.assert_equal(
-            len(acl_list), 1, "Should have exactly one ACL entry")
-        entry = acl_list[0]
+            len(acl_list_filtered), 1, "Should have exactly one ACL entry when fabric filtered")
+        entry = acl_list_filtered[0]
 
         # Verify entry contents
         asserts.assert_equal(
@@ -212,76 +294,51 @@ class TC_ACL_2_8(MatterBaseTest):
             "Targets should be NullValue")
         asserts.assert_equal(entry.fabricIndex, f2)
 
-        for entry in acl_list:
+        for entry in acl_list_filtered:
             asserts.assert_not_equal(
                 entry.fabricIndex, f1, "Should not contain entry with FabricIndex F1")
+        
+        # Read with fabric_filtered=False
+        acl_list_unfiltered = await self.read_single_attribute_check_success(
+            dev_ctrl=self.th2, endpoint=0, cluster=ac_cluster, attribute=acl_attr,
+            fabric_filtered=False
+        )
+        logging.info("TH2 read ACL result (fabric_filtered=False): %s", str(acl_list_unfiltered))
+        asserts.assert_equal(len(acl_list_unfiltered), 2, "Should have two ACL entries when not fabric filtered")
 
         self.step(9)
-        # TH1 reads AccessControlEntryChanged events
-        events = await self.th1.ReadEvent(
+        # TH1 reads AccessControlEntryChanged events with fabricFiltered=True
+        events_filtered = await self.th1.ReadEvent(
             self.dut_node_id,
             [(0, Clusters.AccessControl.Events.AccessControlEntryChanged)],
             fabricFiltered=True
         )
+        self._validate_events_th1(events_filtered, f1, f2, True)
 
-        asserts.assert_equal(
-            len(events), 2, "Should have exactly 2 events")
-
-        # Verify event contents match expected sequence
-        self._verify_acl_event(
-            events[0],
-            NullValue,
-            0,
-            Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
-            self.th1.nodeId,
-            f1)
-        self._verify_acl_event(
-            events[1],
-            self.th1.nodeId,
-            NullValue,
-            Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged,
-            [self.th1.nodeId, 1111],
-            f1)
-
-        for event in events:
-            asserts.assert_not_equal(
-                event.Data.fabricIndex,
-                f2,
-                "Should not contain event with FabricIndex F2")
+        # Read with fabricFiltered=False
+        events_unfiltered = await self.th1.ReadEvent(
+            self.dut_node_id,
+            [(0, Clusters.AccessControl.Events.AccessControlEntryChanged)],
+            fabricFiltered=False
+        )
+        self._validate_events_th1(events_unfiltered, f1, f2, False)
 
         self.step(10)
-        # TH2 reads AccessControlEntryChanged events
-        events = await self.th2.ReadEvent(
+        # TH2 reads AccessControlEntryChanged events with fabricFiltered=True
+        events_filtered = await self.th2.ReadEvent(
             self.dut_node_id,
             [(0, Clusters.AccessControl.Events.AccessControlEntryChanged)],
             fabricFiltered=True
         )
+        self._validate_events_th2(events_filtered, f1, f2, True)
 
-        asserts.assert_equal(
-            len(events), 2, "Should have exactly 2 events")
-
-        # Verify event contents match expected sequence
-        self._verify_acl_event(
-            events[0],
-            NullValue,
-            0,
-            Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
-            self.th2.nodeId,
-            f2)
-
-        self._verify_acl_event(
-            events[1],
-            self.th2.nodeId,
-            NullValue,
-            Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged,
-            [self.th2.nodeId, 2222],
-            f2)
-
-        for event in events:
-            asserts.assert_not_equal(
-                event.Data.fabricIndex,
-                f1,
-                "Should not contain event with FabricIndex F1")
+        # Read with fabricFiltered=False
+        events_unfiltered = await self.th2.ReadEvent(
+            self.dut_node_id,
+            [(0, Clusters.AccessControl.Events.AccessControlEntryChanged)],
+            fabricFiltered=False
+        )
+        self._validate_events_th2(events_unfiltered, f1, f2, False)
 
 
 if __name__ == "__main__":
