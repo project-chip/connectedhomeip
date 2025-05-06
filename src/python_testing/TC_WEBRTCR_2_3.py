@@ -21,6 +21,8 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
+#     app: ${CAMERA_CONTROLLER_APP}
+#     app-args: --start-websocket-server 1
 #     script-args: >
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --storage-path admin_storage.json
@@ -34,10 +36,14 @@
 import logging
 import os
 import tempfile
+import time
 
+import websockets
 from chip.testing.apps import AppServerSubprocess
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+SERVER_URI = "ws://localhost:9002"
 
 
 class TC_WebRTCRequestor_2_3(MatterBaseTest):
@@ -70,6 +76,7 @@ class TC_WebRTCRequestor_2_3(MatterBaseTest):
         )
 
         self.th_server.start(
+            expected_output="Server initialization complete",
             timeout=30
         )
 
@@ -101,11 +108,24 @@ class TC_WebRTCRequestor_2_3(MatterBaseTest):
     def default_timeout(self) -> int:
         return 3 * 60
 
+    async def send_command(self, command):
+        async with websockets.connect(SERVER_URI) as websocket:
+            logging.info(f"Connected to {SERVER_URI}")
+
+            # Send command
+            logging.info(f"Sending command: {command}")
+            await websocket.send(command)
+
+            # Receive response
+            response = await websocket.recv()
+            logging.info(f"Received response: {response}")
+
     @async_test_body
     async def test_TC_WebRTCRequestor_2_3(self):
         """
         Executes the test steps for the WebRTC Provider cluster scenario.
         """
+        time.sleep(3)
 
         self.step(1)
         # Prompt user with instructions
@@ -118,7 +138,7 @@ class TC_WebRTCRequestor_2_3(MatterBaseTest):
         )
 
         if self.is_pics_sdk_ci_only:
-            # TODO: send command to DUT via websocket
+            await self.send_command("pairing onnetwork 1 20202021")
             resp = 'Y'
         else:
             resp = self.wait_for_user_input(prompt_msg)
@@ -133,6 +153,7 @@ class TC_WebRTCRequestor_2_3(MatterBaseTest):
         )
 
         self.step(2)
+        time.sleep(1)
         # Prompt user with instructions
         prompt_msg = (
             "\nPlease connect the server app from DUT:\n"
@@ -140,12 +161,12 @@ class TC_WebRTCRequestor_2_3(MatterBaseTest):
         )
 
         if self.is_pics_sdk_ci_only:
-            # TODO: send command to DUT via websocket
-            pass
+            await self.send_command("webrtc connect 1 1")
         else:
             self.wait_for_user_input(prompt_msg)
 
         self.step(3)
+        time.sleep(1)
         # Prompt user with instructions
         prompt_msg = (
             "\nSend 'SolicitOffer' command to the server app from DUT:\n"
@@ -155,8 +176,17 @@ class TC_WebRTCRequestor_2_3(MatterBaseTest):
         )
 
         if self.is_pics_sdk_ci_only:
-            # TODO: send command to DUT via websocket
-            resp = 'Y'
+            self.th_server.set_output_match("Got a DataChannel with label")
+            self.th_server.event.clear()
+
+            try:
+                await self.send_command("webrtc solicit-offer 3")
+                # Wait up to 30s until the provider logs that the data‑channel opened
+                if not self.th_server.event.wait(30):
+                    raise TimeoutError("DataChannel did not open within 30s")
+                resp = 'Y'
+            except TimeoutError:
+                resp = 'N'
         else:
             resp = self.wait_for_user_input(prompt_msg)
 
