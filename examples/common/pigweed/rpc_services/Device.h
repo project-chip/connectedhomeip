@@ -18,8 +18,6 @@
 
 #pragma once
 
-#include <platform/CHIPDeviceConfig.h>
-#include <platform/CommissionableDataProvider.h>
 #include "app/clusters/ota-requestor/OTARequestorInterface.h"
 #include "app/icd/server/ICDNotifier.h"
 #include "app/server/CommissioningWindowManager.h"
@@ -32,6 +30,8 @@
 #include "platform/PlatformManager.h"
 #include "setup_payload/OnboardingCodesUtil.h"
 #include <crypto/CHIPCryptoPAL.h>
+#include <platform/CHIPDeviceConfig.h>
+#include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
