@@ -776,7 +776,8 @@
         "Camera AV Settings User Level Management": ["MPTZPosition"],
         "Soil Measurement": [
             "SoilMoistureMeasurementLimits",
-            "SoilMoistureMeasuredValue"
+            "SoilMoistureMeasuredValue",
+            "ClusterRevision"
         ],
         "Unit Localization": ["TemperatureUnit"]
     },
