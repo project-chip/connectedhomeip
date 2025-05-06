@@ -62,8 +62,8 @@ class PairOnNetworkLongImReadCommand(
       //       This should be changed to be order-independent.
       val expected =
         """{"65528:ARRAY-?":[],"0:ARRAY-STRUCT":[{"0:STRING":"direction",""" +
-        """"1:STRING":"up"}],"65531:ARRAY-UINT":[0,65532,65533,65528,65529,""" +
-        """65531],"65533:UINT":1,"65529:ARRAY-?":[],"65532:UINT":0}"""
+          """"1:STRING":"up"}],"65531:ARRAY-UINT":[0,65532,65533,65528,""" +
+          """65529,65531],"65533:UINT":1,"65529:ARRAY-?":[],"65532:UINT":0}"""
       return cluster.equals(expected)
     }
 
