@@ -25,6 +25,7 @@
 #include "app/icd/server/ICDNotifier.h"
 #include "app/server/CommissioningWindowManager.h"
 #include "app/server/Server.h"
+#include "app/InteractionModelEngine.h"
 #include "credentials/FabricTable.h"
 #include "device_service/device_service.rpc.pb.h"
 #include "platform/CommissionableDataProvider.h"
@@ -482,13 +483,23 @@ public:
         return pw::OkStatus();
     }
 
+    virtual pw::Status ShutdownAllSubscriptions(const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
+    {
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(
+            [](intptr_t) {
+                chip::app::InteractionModelEngine::GetInstance()->ShutdownAllSubscriptionHandlers();
+                ChipLogDetail(AppServer, "Being triggered to shutdown all subscriptions in server side");
+            },
+            reinterpret_cast<intptr_t>(nullptr));
+        return pw::OkStatus();
+    }
+
     virtual pw::Status TriggerIcdCheckin(const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
     {
 #if CHIP_CONFIG_ENABLE_ICD_CIP
         chip::DeviceLayer::PlatformMgr().ScheduleWork(
             [](intptr_t) {
-                chip::app::InteractionModelEngine::GetInstance()->ShutdownAllSubscriptionHandlers();
-                ChipLogDetail(AppServer, "Being triggerred to send ICD check-in message to subscriber");
+                ChipLogDetail(AppServer, "Being triggered to send ICD check-in message to subscriber");
                 chip::app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
             },
             reinterpret_cast<intptr_t>(nullptr));
