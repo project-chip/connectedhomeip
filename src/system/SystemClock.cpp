@@ -297,7 +297,8 @@ CHIP_ERROR GetClock_MatterEpochS(uint32_t & aMatterEpoch)
     auto unixEpoch = std::chrono::duration_cast<Seconds32>(cTMs).count();
     if (!UnixEpochToChipEpochTime(unixEpoch, aMatterEpoch))
     {
-        ChipLogError(DeviceLayer, "Unable to convert Unix Epoch time to Matter Epoch Time: unixEpoch (%u)", unixEpoch);
+        ChipLogError(DeviceLayer, "Unable to convert Unix Epoch time to Matter Epoch Time: unixEpoch (%u)",
+                     static_cast<unsigned int>(unixEpoch));
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
