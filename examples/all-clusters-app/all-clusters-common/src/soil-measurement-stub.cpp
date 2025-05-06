@@ -16,32 +16,45 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/soil-measurement-server/soil-measurement-server.h>
+#include <soil-measurement-stub.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::SoilMeasurement;
 
-static std::unique_ptr<SoilMeasurementAttrAccess> gAttrAccess;
+Instance * gSoilMeasurementInstance = nullptr;
+
+Instance * SoilMeasurement::GetInstance()
+{
+    return gSoilMeasurementInstance;
+}
+
+void SoilMeasurement::Shutdown()
+{
+    if (gSoilMeasurementInstance != nullptr)
+    {
+        delete gSoilMeasurementInstance;
+        gSoilMeasurementInstance = nullptr;
+    }
+}
 
 void emberAfSoilMeasurementClusterInitCallback(EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
-    VerifyOrDie(!gAttrAccess);
+    VerifyOrDie(!gSoilMeasurementInstance);
 
-    gAttrAccess = std::make_unique<SoilMeasurementAttrAccess>();
-
-    if (gAttrAccess)
+    gSoilMeasurementInstance = new Instance(endpointId);
+    if (gSoilMeasurementInstance)
     {
-        gAttrAccess->Init();
+        gSoilMeasurementInstance->Init();
     }
 }
 
 void emberAfSoilMeasurementClusterShutdownCallback(EndpointId endpointId)
 {
-    if (gAttrAccess)
+    if (gSoilMeasurementInstance)
     {
-        gAttrAccess->Shutdown();
+        SoilMeasurement::Shutdown();
     }
-    gAttrAccess = nullptr;
+    gSoilMeasurementInstance = nullptr;
 }

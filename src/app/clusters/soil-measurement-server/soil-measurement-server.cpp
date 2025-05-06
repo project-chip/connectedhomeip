@@ -27,62 +27,89 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <zap-generated/gen_config.h>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace SoilMeasurement {
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::SoilMeasurement;
 using namespace chip::app::Clusters::SoilMeasurement::Attributes;
 
-MeasurementData gMeasurements[MATTER_DM_SOIL_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
-
-Globals::Structs::MeasurementAccuracyRangeStruct::Type soilMoistureMeasurementLimitsAccuracyRange[] = {
-    { .rangeMin = 0, .rangeMax = 100, .percentMax = MakeOptional(static_cast<Percent100ths>(10)) }
+static const Globals::Structs::MeasurementAccuracyRangeStruct::Type kDefaultSoilMoistureMeasurementLimitsAccuracyRange[] = {
+    { .rangeMin = 0, .rangeMax = 100, .percentMax = MakeOptional(static_cast<chip::Percent100ths>(10)) }
 };
 
-CHIP_ERROR SoilMeasurementAttrAccess::Init()
+static const Globals::Structs::MeasurementAccuracyStruct::Type kDefaultSoilMoistureMeasurementLimits = {
+    .measurementType  = Globals::MeasurementTypeEnum::kSoilMoisture,
+    .measured         = true,
+    .minMeasuredValue = 0,
+    .maxMeasuredValue = 100,
+    .accuracyRanges   = DataModel::List<const Globals::Structs::MeasurementAccuracyRangeStruct::Type>(
+        kDefaultSoilMoistureMeasurementLimitsAccuracyRange)
+};
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace SoilMeasurement {
+
+Instance::Instance(EndpointId aEndpointId) :
+    AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id), mEndpointId(aEndpointId)
+{}
+
+Instance::~Instance()
 {
+    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
+}
+
+CHIP_ERROR Instance::Init()
+{
+    VerifyOrDie(emberAfContainsServer(mEndpointId, Id) == true);
+
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
 
     // Initialize the soil moisture measurement limits to default values
-    for (auto & measurement : gMeasurements)
+    mSoilMeasurementData.soilMoistureMeasurementLimits = kDefaultSoilMoistureMeasurementLimits;
+    mSoilMeasurementData.soilMoistureMeasuredValue.SetNull();
+
+    return CHIP_NO_ERROR;
+}
+
+// This function is intended for the application to set the soil measurement accuracy limits to the proper values during init.
+// Given the limits are fixed, it is not intended to be changes at runtime, hence why this function does not report the change.
+// The application should call this function only once during init.
+CHIP_ERROR
+Instance::SetSoilMeasurementAccuracy(const Globals::Structs::MeasurementAccuracyStruct::Type & measurementLimits, bool reportChange)
+{
+    mSoilMeasurementData.soilMoistureMeasurementLimits = measurementLimits;
+
+    if (reportChange)
     {
-        measurement.soilMoistureMeasurementLimits = {
-            .measurementType  = Globals::MeasurementTypeEnum::kSoilMoisture,
-            .measured         = true,
-            .minMeasuredValue = 0,
-            .maxMeasuredValue = 100,
-            .accuracyRanges   = DataModel::List<const Globals::Structs::MeasurementAccuracyRangeStruct::Type>(
-                soilMoistureMeasurementLimitsAccuracyRange)
-        };
-        measurement.soilMoistureMeasuredValue.SetNull();
+        MatterReportingAttributeChangeCallback(mEndpointId, SoilMeasurement::Id, SoilMoistureMeasurementLimits::Id);
     }
 
     return CHIP_NO_ERROR;
 }
 
-void SoilMeasurementAttrAccess::Shutdown()
+CHIP_ERROR
+Instance::SetSoilMeasuredValue(const Attributes::SoilMoistureMeasuredValue::TypeInfo::Type & soilMoistureMeasuredValue)
 {
-    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
+    mSoilMeasurementData.soilMoistureMeasuredValue = soilMoistureMeasuredValue;
+
+    MatterReportingAttributeChangeCallback(mEndpointId, SoilMeasurement::Id, SoilMoistureMeasuredValue::Id);
+
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SoilMeasurementAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == SoilMeasurement::Id);
 
     switch (aPath.mAttributeId)
     {
     case SoilMoistureMeasurementLimits::Id: {
-        MeasurementData * data = SoilMeasurementDataForEndpoint(aPath.mEndpointId);
-        return aEncoder.Encode(data->soilMoistureMeasurementLimits);
+        return aEncoder.Encode(mSoilMeasurementData.soilMoistureMeasurementLimits);
     }
     case SoilMoistureMeasuredValue::Id: {
-        MeasurementData * data = SoilMeasurementDataForEndpoint(aPath.mEndpointId);
-        return aEncoder.Encode(data->soilMoistureMeasuredValue);
+        return aEncoder.Encode(mSoilMeasurementData.soilMoistureMeasuredValue);
     }
     case ClusterRevision::Id: {
         return aEncoder.Encode(kClusterRevision);
@@ -91,57 +118,6 @@ CHIP_ERROR SoilMeasurementAttrAccess::Read(const ConcreteReadAttributePath & aPa
         break;
     }
     }
-    return CHIP_NO_ERROR;
-}
-
-MeasurementData * SoilMeasurementDataForEndpoint(EndpointId endpointId)
-{
-    auto index = emberAfGetClusterServerEndpointIndex(endpointId, app::Clusters::SoilMeasurement::Id,
-                                                      MATTER_DM_SOIL_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT);
-
-    if (index == kEmberInvalidEndpointIndex)
-    {
-        return nullptr;
-    }
-
-    if (index >= MATTER_ARRAY_SIZE(gMeasurements))
-    {
-        ChipLogError(NotSpecified, "Internal error: invalid/unexpected energy measurement index.");
-        return nullptr;
-    }
-    return &gMeasurements[index];
-}
-
-// This function is intended for the application to set the soil measurement accuracy limits to the proper values during init.
-// Given the limits are fixed, it is not intended to be changes at runtime, hence why this function does not report the change.
-// The application should call this function only once during init.
-CHIP_ERROR SetSoilMeasurementAccuracy(EndpointId endpointId,
-                                      const Globals::Structs::MeasurementAccuracyStruct::Type & measurementLimits,
-                                      bool reportChange)
-{
-    MeasurementData * data = SoilMeasurementDataForEndpoint(endpointId);
-    VerifyOrReturnError(data != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    data->soilMoistureMeasurementLimits = measurementLimits;
-
-    if (reportChange)
-    {
-        MatterReportingAttributeChangeCallback(endpointId, SoilMeasurement::Id, SoilMoistureMeasurementLimits::Id);
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR SetSoilMeasuredValue(EndpointId endpointId,
-                                const Attributes::SoilMoistureMeasuredValue::TypeInfo::Type & soilMoistureMeasuredValue)
-{
-    MeasurementData * data = SoilMeasurementDataForEndpoint(endpointId);
-    VerifyOrReturnError(data != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    data->soilMoistureMeasuredValue = soilMoistureMeasuredValue;
-
-    MatterReportingAttributeChangeCallback(endpointId, SoilMeasurement::Id, SoilMoistureMeasuredValue::Id);
-
     return CHIP_NO_ERROR;
 }
 
