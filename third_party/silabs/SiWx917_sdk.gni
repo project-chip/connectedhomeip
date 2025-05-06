@@ -132,7 +132,6 @@ template("siwx917_sdk") {
       "${efr32_sdk_root}/platform/service/sleeptimer/inc",
       "${efr32_sdk_root}/platform/service/sleeptimer/config",
       "${efr32_sdk_root}/platform/service/sleeptimer/src",
-      "${matter_support_root}/board-support/si91x/support/inc",
 
       "${efr32_sdk_root}/platform/service/iostream/inc",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/button/inc",
