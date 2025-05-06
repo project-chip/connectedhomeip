@@ -247,7 +247,7 @@ void WiFiPAFLayer::Shutdown(OnCancelDeviceHandle OnCancelDevice)
     for (i = 0; i < WIFIPAF_LAYER_NUM_PAF_ENDPOINTS; i++)
     {
         pPafSession = &mPafInfoVect[i];
-        if (pPafSession->id == UINT32_MAX)
+        if (pPafSession->id == kUndefinedWiFiPafSessionId)
         {
             // Unused session
             continue;

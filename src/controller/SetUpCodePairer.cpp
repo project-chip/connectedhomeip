@@ -293,6 +293,26 @@ CHIP_ERROR SetUpCodePairer::StopDiscoveryOverWiFiPAF()
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     if (mPAFSessionId != WiFiPAF::kUndefinedWiFiPafSessionId)
     {
+        WiFiPAF::WiFiPAFSession sessionInfo = { .role = WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber, .id = mPAFSessionId };
+        WiFiPAF::WiFiPAFLayer & pafLayer    = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
+        WiFiPAF::WiFiPAFSession * pSession  = pafLayer.GetPAFInfo(WiFiPAF::PafInfoAccess::kAccSessionId, sessionInfo);
+        if ((pSession != nullptr) && (pSession->peer_id == WiFiPAF::kUndefinedWiFiPafSessionId))
+        {
+            // Canceling the subscription to discover the commissionee only if commissionee has not be discovered successfully.
+            // publish_id and subscribe_id are required in the follow-up packets
+            DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(mPAFSessionId);
+            mPAFSessionId = WiFiPAF::kUndefinedWiFiPafSessionId;
+        }
+    }
+#endif
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SetUpCodePairer::StopPairWiFiPAF()
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    if (mPAFSessionId != WiFiPAF::kUndefinedWiFiPafSessionId)
+    {
         DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(mPAFSessionId);
         mPAFSessionId = WiFiPAF::kUndefinedWiFiPafSessionId;
     }
@@ -513,7 +533,7 @@ void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::CommonRe
 
 bool SetUpCodePairer::StopPairing(NodeId remoteId)
 {
-    LogErrorOnFailure(StopDiscoveryOverWiFiPAF());
+    LogErrorOnFailure(StopPairWiFiPAF());
     VerifyOrReturnValue(mRemoteId != kUndefinedNodeId, false);
     VerifyOrReturnValue(remoteId == kUndefinedNodeId || remoteId == mRemoteId, false);
 
@@ -562,6 +582,7 @@ void SetUpCodePairer::StopAllDiscoveryAttempts()
     LogErrorOnFailure(StopDiscoveryOverBLE());
     LogErrorOnFailure(StopDiscoveryOverDNSSD());
     LogErrorOnFailure(StopDiscoveryOverSoftAP());
+    LogErrorOnFailure(StopDiscoveryOverWiFiPAF());
 
     // Just in case any of those failed to reset the waiting state properly.
     for (auto & waiting : mWaitingForDiscovery)

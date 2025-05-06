@@ -1369,7 +1369,7 @@ void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
         ChipLogError(DeviceLayer, "WiFi-PAF: DiscoveryResult, no valid session with discriminator: %u", pPublishSSI->DevInfo);
         return;
     }
-    if ((pPafInfo->id == subscribe_id) && (pPafInfo->peer_id != UINT32_MAX))
+    if ((pPafInfo->id == subscribe_id) && (pPafInfo->peer_id != kUndefinedWiFiPafSessionId))
     {
         // Reentrance, depends on wpa_supplicant behaviors
         ChipLogError(DeviceLayer, "WiFi-PAF: DiscoveryResult, reentrance, subscribe_id: %u ", subscribe_id);
@@ -1602,7 +1602,6 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSubscribe(const uint16_t & connDiscr
     g_variant_builder_add(&builder, "{sv}", "ssi", ssi_array_variant);
     args = g_variant_builder_end(&builder);
     wpa_supplicant_1_interface_call_nansubscribe_sync(mWpaSupplicant.iface.get(), args, &subscribe_id, nullptr, &err.GetReceiver());
-
     ChipLogProgress(DeviceLayer, "WiFi-PAF: subscribe_id: [%u], freq: %u", subscribe_id, freq);
     mOnPafSubscribeComplete = onSuccess;
     mOnPafSubscribeError    = onError;
