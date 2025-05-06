@@ -216,10 +216,12 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
                 if (deltaX != 0)
                 {
                     // if the delta would move us out of the cartesian plane of the sensor, limit to the left hand edge
-                    int16_t x1Movement = ((deltaX < 0) && (abs(deltaX) > viewport.x1)) ? static_cast<int16_t>(-viewport.x1) : deltaX;
+                    int16_t x1Movement =
+                        ((deltaX < 0) && (abs(deltaX) > viewport.x1)) ? static_cast<int16_t>(-viewport.x1) : deltaX;
                     viewport.x1 = static_cast<uint16_t>(viewport.x1 + x1Movement);
 
-                    int16_t x2Movement = ((deltaX < 0) && (abs(deltaX) > viewport.x2)) ? static_cast<int16_t>(-viewport.x2) : deltaX;
+                    int16_t x2Movement =
+                        ((deltaX < 0) && (abs(deltaX) > viewport.x2)) ? static_cast<int16_t>(-viewport.x2) : deltaX;
                     viewport.x2 = static_cast<uint16_t>(viewport.x2 + x2Movement);
                 }
             }
