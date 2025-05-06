@@ -2153,6 +2153,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     __auto_type * endpointId1 = @(10);
     __auto_type * endpointId2 = @(20);
     __auto_type * endpointId3 = @(30);
+    __auto_type * endpointId4 = @(40);
     __auto_type * clusterId1 = @(0xFFF1FC02);
     __auto_type * clusterId2 = @(0xFFF1FC10);
     __auto_type * clusterRevision1 = @(3);
@@ -2694,6 +2695,14 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     [self waitForExpectations:@[ gotReportsExpectation ] timeout:kTimeoutInSeconds];
 
     delegate.onReportEnd = nil;
+
+    // Now that we have a wildcard subscription to our server, try to add another
+    // endpoint to test what happens when an endpoint is added while a
+    // ReadHandler that cares about it is live.  We should not end up with any
+    // crashes or anything like that.
+    __auto_type * endpoint6 = [[MTRServerEndpoint alloc] initWithEndpointID:endpointId4 deviceTypes:@[ deviceType1 ]];
+    XCTAssertNotNil(endpoint6);
+    XCTAssertTrue([controllerServer addServerEndpoint:endpoint6]);
 
     // Test read-through behavior of non-standard (as in, not present in Matter XML) attributes.
     XCTestExpectation * nonStandardReadThroughExpectation = [self expectationWithDescription:@"Read-throughs of non-standard attributes complete"];
