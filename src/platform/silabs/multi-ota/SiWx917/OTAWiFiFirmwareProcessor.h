@@ -32,8 +32,6 @@ namespace chip {
 
 class OTAWiFiFirmwareProcessor : public OTATlvProcessor
 {
-protected:
-    bool mReset = false;
 
 public:
     struct Descriptor
@@ -46,16 +44,16 @@ public:
     CHIP_ERROR ApplyAction() override;
     CHIP_ERROR FinalizeAction() override;
     static constexpr size_t kAlignmentBytes = 64;
-    bool RequiresReset() const override { return mReset; }
 
 private:
     uint8_t mFWchunktype = SL_FWUP_RPS_HEADER;
+    bool mReset          = false;
     CHIP_ERROR ProcessInternal(ByteSpan & block) override;
     CHIP_ERROR ProcessDescriptor(ByteSpan & block);
 
-#if OTA_ENCRYPTION_ENABLE
+#if SL_MATTER_ENABLE_OTA_ENCRYPTION
     uint32_t mUnalignmentNum;
-#endif // OTA_ENCRYPTION_ENABLE
+#endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
 };
 
 } // namespace chip
