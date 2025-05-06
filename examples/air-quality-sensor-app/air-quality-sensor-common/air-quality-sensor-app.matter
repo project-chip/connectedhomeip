@@ -342,6 +342,7 @@ cluster Identify = 3 {
   /** Command description for TriggerEffect */
   command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
+
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 cluster Descriptor = 29 {
   revision 3;
@@ -374,6 +375,7 @@ cluster Descriptor = 29 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
+
 /** The Access Control Cluster exposes a data model view of a
       Node's Access Control List (ACL), which codifies the rules used to manage
       and enforce Access Control for the Node's endpoints and their associated
@@ -497,6 +499,7 @@ cluster AccessControl = 31 {
   /** This command signals to the service associated with the device vendor that the fabric administrator would like a review of the current restrictions on the accessing fabric. */
   fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): ReviewFabricRestrictionsResponse = 0;
 }
+
 /** This cluster provides attributes and events for determining basic information about Nodes, which supports both
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
@@ -593,6 +596,7 @@ cluster BasicInformation = 40 {
 
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
+
 /** Provides an interface for providing OTA software updates */
 cluster OtaSoftwareUpdateProvider = 41 {
   revision 1; // NOTE: Default/not specifically set
@@ -667,6 +671,7 @@ cluster OtaSoftwareUpdateProvider = 41 {
   /** Notify OTA Provider that an update was applied */
   command NotifyUpdateApplied(NotifyUpdateAppliedRequest): DefaultSuccess = 4;
 }
+
 /** Provides an interface for downloading and applying OTA software updates */
 cluster OtaSoftwareUpdateRequestor = 42 {
   revision 1; // NOTE: Default/not specifically set
@@ -743,6 +748,7 @@ cluster OtaSoftwareUpdateRequestor = 42 {
   /** Announce the presence of an OTA Provider */
   command AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
 }
+
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 cluster GeneralCommissioning = 48 {
   revision 1; // NOTE: Default/not specifically set
@@ -833,6 +839,7 @@ cluster GeneralCommissioning = 48 {
   /** This command sets the user acknowledgements received in the Enhanced Setup Flow Terms and Conditions into the node. */
   command access(invoke: administer) SetTCAcknowledgements(SetTCAcknowledgementsRequest): SetTCAcknowledgementsResponse = 6;
 }
+
 /** Functionality to configure, enable, disable network credentials and access on a Matter device. */
 cluster NetworkCommissioning = 49 {
   revision 1; // NOTE: Default/not specifically set
@@ -1011,6 +1018,7 @@ cluster NetworkCommissioning = 49 {
   /** Retrieve details about and optionally proof of possession of a network client identity. */
   command access(invoke: administer) QueryIdentity(QueryIdentityRequest): QueryIdentityResponse = 9;
 }
+
 /** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 cluster GeneralDiagnostics = 51 {
   revision 2;
@@ -1140,6 +1148,7 @@ cluster GeneralDiagnostics = 51 {
   /** Request a variable length payload response. */
   command access(invoke: manage) PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
+
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 cluster SoftwareDiagnostics = 52 {
   revision 1; // NOTE: Default/not specifically set
@@ -1175,6 +1184,7 @@ cluster SoftwareDiagnostics = 52 {
   /** Reception of this command SHALL reset the values: The StackFreeMinimum field of the ThreadMetrics attribute, CurrentHeapHighWaterMark attribute. */
   command access(invoke: manage) ResetWatermarks(): DefaultSuccess = 0;
 }
+
 /** The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems */
 cluster ThreadNetworkDiagnostics = 53 {
   revision 3;
@@ -1341,6 +1351,7 @@ cluster ThreadNetworkDiagnostics = 53 {
   /** Reception of this command SHALL reset the following attributes to 0: */
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
 }
+
 /** The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 cluster WiFiNetworkDiagnostics = 54 {
   revision 1; // NOTE: Default/not specifically set
@@ -1416,6 +1427,7 @@ cluster WiFiNetworkDiagnostics = 54 {
   /** Reception of this command SHALL reset the Breacon and Packet related count attributes to 0 */
   command ResetCounts(): DefaultSuccess = 0;
 }
+
 /** The Ethernet Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 cluster EthernetNetworkDiagnostics = 55 {
   revision 1; // NOTE: Default/not specifically set
@@ -1456,6 +1468,7 @@ cluster EthernetNetworkDiagnostics = 55 {
   /** Reception of this command SHALL reset the attributes: PacketRxCount, PacketTxCount, TxErrCount, CollisionCount, OverrunCount to 0 */
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
 }
+
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
 cluster AdministratorCommissioning = 60 {
   revision 1; // NOTE: Default/not specifically set
@@ -1504,6 +1517,7 @@ cluster AdministratorCommissioning = 60 {
   /** This command is used by a current Administrator to instruct a Node to revoke any active Open Commissioning Window or Open Basic Commissioning Window command. */
   timed command access(invoke: administer) RevokeCommissioning(): DefaultSuccess = 2;
 }
+
 /** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 cluster OperationalCredentials = 62 {
   revision 2;
@@ -1651,6 +1665,7 @@ cluster OperationalCredentials = 62 {
   /** This command SHALL be used to request that the server authenticate the fabric associated with the FabricIndex given. */
   command access(invoke: administer) SignVIDVerificationRequest(SignVIDVerificationRequestRequest): SignVIDVerificationResponse = 13;
 }
+
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 cluster GroupKeyManagement = 63 {
   revision 1; // NOTE: Default/not specifically set
@@ -1727,6 +1742,7 @@ cluster GroupKeyManagement = 63 {
   /** Return the list of Group Key Sets associated with the accessing fabric */
   fabric command access(invoke: administer) KeySetReadAllIndices(): KeySetReadAllIndicesResponse = 4;
 }
+
 /** Attributes for reporting air quality classification */
 cluster AirQuality = 91 {
   revision 1;
@@ -1755,6 +1771,7 @@ cluster AirQuality = 91 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
+
 /** Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements. */
 cluster TemperatureMeasurement = 1026 {
   revision 4;
@@ -1769,6 +1786,7 @@ cluster TemperatureMeasurement = 1026 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
+
 /** Attributes and commands for configuring the measurement of relative humidity, and reporting relative humidity measurements. */
 cluster RelativeHumidityMeasurement = 1029 {
   revision 3;
@@ -1783,6 +1801,7 @@ cluster RelativeHumidityMeasurement = 1029 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
+
 /** Attributes for reporting carbon monoxide concentration measurements */
 cluster CarbonMonoxideConcentrationMeasurement = 1036 {
   revision 3;
@@ -1838,6 +1857,7 @@ cluster CarbonMonoxideConcentrationMeasurement = 1036 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
+
 /** Attributes for reporting carbon dioxide concentration measurements */
 cluster CarbonDioxideConcentrationMeasurement = 1037 {
   revision 3;
@@ -1893,6 +1913,7 @@ cluster CarbonDioxideConcentrationMeasurement = 1037 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
+
 /** Attributes for reporting nitrogen dioxide concentration measurements */
 cluster NitrogenDioxideConcentrationMeasurement = 1043 {
   revision 3;
@@ -1948,6 +1969,7 @@ cluster NitrogenDioxideConcentrationMeasurement = 1043 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
+
 /** Attributes for reporting ozone concentration measurements */
 cluster OzoneConcentrationMeasurement = 1045 {
   revision 3;
@@ -2003,6 +2025,7 @@ cluster OzoneConcentrationMeasurement = 1045 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
+
 /** Attributes for reporting PM2.5 concentration measurements */
 cluster Pm25ConcentrationMeasurement = 1066 {
   revision 3;
@@ -2058,6 +2081,7 @@ cluster Pm25ConcentrationMeasurement = 1066 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
+
 /** Attributes for reporting formaldehyde concentration measurements */
 cluster FormaldehydeConcentrationMeasurement = 1067 {
   revision 3;
@@ -2113,6 +2137,7 @@ cluster FormaldehydeConcentrationMeasurement = 1067 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
+
 /** Attributes for reporting PM1 concentration measurements */
 cluster Pm1ConcentrationMeasurement = 1068 {
   revision 3;
@@ -2168,6 +2193,7 @@ cluster Pm1ConcentrationMeasurement = 1068 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
+
 /** Attributes for reporting PM10 concentration measurements */
 cluster Pm10ConcentrationMeasurement = 1069 {
   revision 3;
@@ -2223,6 +2249,7 @@ cluster Pm10ConcentrationMeasurement = 1069 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
+
 /** Attributes for reporting total volatile organic compounds concentration measurements */
 cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
   revision 3;
@@ -2278,6 +2305,7 @@ cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
+
 /** Attributes for reporting radon concentration measurements */
 cluster RadonConcentrationMeasurement = 1071 {
   revision 3;
@@ -2333,6 +2361,7 @@ cluster RadonConcentrationMeasurement = 1071 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
+
 endpoint 0 {
   device type ma_rootdevice = 22, version 1;
 
