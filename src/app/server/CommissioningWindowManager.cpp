@@ -540,6 +540,20 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown)
         (void) chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
     }
 #endif // CONFIG_NETWORK_LAYER_BLE
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    if (mAdvertisingOverWiFiPAF)
+    {
+        ChipLogProgress(AppServer, "Stopping Wi-Fi PAF publish if connection has not established");
+        WiFiPAF::WiFiPAFSession sessionInfo = { .role = WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher };
+        WiFiPAF::WiFiPAFLayer & pafLayer    = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
+        WiFiPAF::WiFiPAFSession * pSession  = pafLayer.GetPAFInfo(WiFiPAF::PafInfoAccess::kAccSessionId, sessionInfo);
+        if ((pSession != nullptr) && (pSession->peer_id == WiFiPAF::kUndefinedWiFiPafSessionId))
+        {
+            // PAF session has not been established
+            DeviceLayer::ConnectivityMgr().SetWiFiPAFAdvertisingEnabled(false);
+        }
+    }
+#endif
 
     if (mAppDelegate != nullptr)
     {
