@@ -153,7 +153,7 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rt1060-freertos-thermostat-thread-wifi-matter-shell-evkc-iwx12-cmake \
+                      --target nxp-rt1060-freertos-thermostat-thread-wifi-ota-evkc-iwx12-cmake \
                       build \
                   "
 
@@ -175,7 +175,7 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rt1170-freertos-thermostat-thread-wifi-matter-shell-iwx12-cmake \
+                      --target nxp-rt1170-freertos-thermostat-thread-wifi-ota-iwx12-cmake \
                       build \
                   "
 
