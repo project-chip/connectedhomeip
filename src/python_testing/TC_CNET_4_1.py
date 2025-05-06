@@ -17,23 +17,7 @@
 
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
-#
-# === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs:
-#   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-#     script-args: >
-#       --endpoint 0
-#       --storage-path admin_storage.json
-#       --commissioning-method ble-wifi
-#       --discriminator 1234
-#       --passcode 20202021
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factory-reset: true
-#     quiet: true
-# === END CI TEST ARGUMENTS ===
+
 import logging
 
 import chip.clusters as Clusters
@@ -47,11 +31,11 @@ logger = logging.getLogger(__name__)
 
 
 class TC_CNET_4_1(MatterBaseTest):
-    """[TC-CNET-4.2] [Thread] Verification for attributes check [DUT-Server].
+    """[TC-CNET-4.1] [Wi-Fi] Verification for attributes check [DUT-Server].
 
     Example usage:
         ```bash
-        python src/python_testing/TC_CNET_4_1.py --commissioning-method ble-wifi --qr-code MT:-24J0AFN00KA0648G00 \
+        python src/python_testing/TC_CNET_4_1.py --commissioning-method ble-wifi --qr-code <qrcode> \
             --wifi-ssid <wifissid>  --wifi-passphrase <wifipasspgrase> --endpoint <endpointvalue>
         ```
         Where `<endpoint_value>` should be replaced with the actual endpoint
@@ -63,7 +47,6 @@ class TC_CNET_4_1(MatterBaseTest):
 
     def steps_TC_CNET_4_1(self) -> list[TestStep]:
         steps = [
-            TestStep(1, test_plan_support.commission_if_required(), "", is_commissioning=True),
             TestStep(2, "TH reads Descriptor Cluster from the DUT with EP0. TH reads ServerList from the DUT",
                      "Verify for the presence of an element with value 49 (0x0031) in the ServerList"),
             TestStep(3, "TH reads the MaxNetworks attribute from the DUT",
@@ -95,8 +78,6 @@ class TC_CNET_4_1(MatterBaseTest):
                                          Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
     async def test_TC_CNET_4_1(self):
         # Commissioning already done
-        self.step(1)
-
         self.step(2)
         server_list = await self.read_single_attribute_check_success(
             cluster=Clusters.Descriptor,
@@ -118,7 +99,6 @@ class TC_CNET_4_1(MatterBaseTest):
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.Networks)
         logger.info("List of network obj")
-        # logger.info(type(networks_dict.values()))
         logger.info(list(networks_dict.values()))
 
         asserts.assert_true(network, "NetworkInfoStruct list should not be empty")
@@ -194,6 +174,8 @@ class TC_CNET_4_1(MatterBaseTest):
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.SupportedWiFiBands)
         logger.info(supported_wifi_bands)
+        asserts.assert_greater_equal(len(
+            supported_wifi_bands), 1, "Verify that SupportedWiFiBands attribute value has 1 or more entries, all of which are in the range of WiFiBandEnum.")
         matter_asserts.assert_list_element_type(supported_wifi_bands, Clusters.NetworkCommissioning.Enums.WiFiBandEnum,
                                                 "Verify that SupportedWiFiBands attribute value has 1 or more entries, all of which are in the range of WiFiBandEnum.")
 
