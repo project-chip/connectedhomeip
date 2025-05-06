@@ -41,7 +41,7 @@ using namespace chip::app::Clusters::SoilMeasurement::Attributes;
 MeasurementData gMeasurements[MATTER_DM_SOIL_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
 
 Globals::Structs::MeasurementAccuracyRangeStruct::Type soilMoistureMeasurementLimitsAccuracyRange[] = {
-    { .rangeMin = 0, .rangeMax = 100, .percentMax = MakeOptional(static_cast<chip::Percent100ths>(10)) }
+    { .rangeMin = 0, .rangeMax = 100, .percentMax = MakeOptional(static_cast<Percent100ths>(10)) }
 };
 
 CHIP_ERROR SoilMeasurementAttrAccess::Init()

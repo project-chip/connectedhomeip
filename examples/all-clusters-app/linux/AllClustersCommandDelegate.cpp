@@ -956,7 +956,7 @@ void AllClustersAppCommandHandler::OnSoilMoistureChange(EndpointId endpointId, u
         return;
     }
 
-    chip::app::Clusters::SoilMeasurement::SetSoilMeasuredValue(endpointId, soilMoisture);
+    SoilMeasurement::SetSoilMeasuredValue(endpointId, soilMoisture);
     ChipLogDetail(NotSpecified, "Set Soil Moisture value to %u", soilMoisture);
 }
 

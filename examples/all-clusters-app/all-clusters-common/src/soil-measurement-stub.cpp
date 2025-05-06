@@ -24,7 +24,7 @@ using namespace chip::app::Clusters::SoilMeasurement;
 
 static std::unique_ptr<SoilMeasurementAttrAccess> gAttrAccess;
 
-void emberAfSoilMeasurementClusterInitCallback(chip::EndpointId endpointId)
+void emberAfSoilMeasurementClusterInitCallback(EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(!gAttrAccess);
@@ -37,7 +37,7 @@ void emberAfSoilMeasurementClusterInitCallback(chip::EndpointId endpointId)
     }
 }
 
-void emberAfSoilMeasurementClusterShutdownCallback(chip::EndpointId endpointId)
+void emberAfSoilMeasurementClusterShutdownCallback(EndpointId endpointId)
 {
     if (gAttrAccess)
     {
