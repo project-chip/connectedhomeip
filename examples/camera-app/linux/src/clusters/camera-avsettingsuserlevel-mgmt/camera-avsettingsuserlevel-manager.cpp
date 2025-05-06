@@ -217,11 +217,13 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
                 {
                     // if the delta would move us out of the cartesian plane of the sensor, limit to the left hand edge
                     //
-                    uint16_t x1Movement = ((deltaX < 0) && (abs(deltaX) > viewport.x1)) ? -viewport.x1 : static_cast<uint16_t>(deltaX);
-                    viewport.x1         = static_cast<uint16_t>(viewport.x1 + x1Movement);
+                    uint16_t x1Movement =
+                        ((deltaX < 0) && (abs(deltaX) > viewport.x1)) ? -viewport.x1 : static_cast<uint16_t>(deltaX);
+                    viewport.x1 = static_cast<uint16_t>(viewport.x1 + x1Movement);
 
-                    uint16_t x2Movement = ((deltaX < 0) && (abs(deltaX) > viewport.x2)) ? -viewport.x2 : static_cast<uint16_t>(deltaX);
-                    viewport.x2         = static_cast<uint16_t>(viewport.x2 + x2Movement);
+                    uint16_t x2Movement =
+                        ((deltaX < 0) && (abs(deltaX) > viewport.x2)) ? -viewport.x2 : static_cast<uint16_t>(deltaX);
+                    viewport.x2 = static_cast<uint16_t>(viewport.x2 + x2Movement);
                 }
             }
 
@@ -232,11 +234,13 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
                 {
                     // if the delta would move us out of the cartesian plane of the sensor, limit to the top hand edge
                     //
-                    uint16_t y1Movement = ((deltaY < 0) && (abs(deltaY) > viewport.y1)) ? -viewport.y1 : static_cast<uint16_t>(deltaY);
-                    viewport.y1         = static_cast<uint16_t>(viewport.y1 + y1Movement);
+                    uint16_t y1Movement =
+                        ((deltaY < 0) && (abs(deltaY) > viewport.y1)) ? -viewport.y1 : static_cast<uint16_t>(deltaY);
+                    viewport.y1 = static_cast<uint16_t>(viewport.y1 + y1Movement);
 
-                    uint16_t y2Movement = ((deltaY < 0) && (abs(deltaY) > viewport.y2)) ? -viewport.y2 : static_cast<uint16_t>(deltaY);
-                    viewport.y2         = static_cast<uint16_t>(viewport.y2 + y2Movement);
+                    uint16_t y2Movement =
+                        ((deltaY < 0) && (abs(deltaY) > viewport.y2)) ? -viewport.y2 : static_cast<uint16_t>(deltaY);
+                    viewport.y2 = static_cast<uint16_t>(viewport.y2 + y2Movement);
                 }
             }
 

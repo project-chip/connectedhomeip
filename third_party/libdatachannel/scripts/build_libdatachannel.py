@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
+
 import os
 import subprocess
-import sys
+
+import click
 
 
-def main():
-    # Get the script directory
+@click.command()
+@click.option('--clang', is_flag=True, default=False)
+def main(clang: bool):
+    # figure out paths for building
     script_dir = os.path.dirname(os.path.abspath(__file__))
-
-    # Set the repo directory
     repo_dir = os.path.join(script_dir, "..", "repo")
-
-    # Change to the repo directory
-    os.chdir(repo_dir)
-    print(f"Changed directory to: {repo_dir}")
+    compiler_subdir = "clang" if clang else "gcc"
+    build_dir = os.path.join(repo_dir, "build", compiler_subdir)
 
     # Generate build files in ./build
     cmake_cmd = [
         "cmake",
-        "-B", "build",
+        "-B", f"build/{compiler_subdir}",
         "-DUSE_GNUTLS=0",
         "-DUSE_NICE=0",
         "-DCMAKE_BUILD_TYPE=Release",
@@ -26,24 +26,28 @@ def main():
         "-DBUILD_SHARED_LIBS=OFF"
     ]
 
-    print(f"Running: {' '.join(cmake_cmd)}")
-    result = subprocess.run(cmake_cmd, check=True)
+    if clang:
+        cmake_cmd.extend([
+            "-DCMAKE_C_COMPILER=clang",
+            "-DCMAKE_CXX_COMPILER=clang++",
+        ])
+    else:
+        cmake_cmd.extend([
+            "-DCMAKE_C_COMPILER=gcc",
+            "-DCMAKE_CXX_COMPILER=g++",
+        ])
 
-    # Change to build directory
-    build_dir = os.path.join(repo_dir, "build")
-    os.chdir(build_dir)
-    print(f"Changed directory to: {build_dir}")
+    print(f"Running: {' '.join(cmake_cmd)}")
+    subprocess.run(cmake_cmd, cwd=repo_dir, check=True)
 
     # Build with Make
-    make_cmd = ["make", "-j2"]
+    make_cmd = ["make", "-j%d" % os.cpu_count()]
     print(f"Running: {' '.join(make_cmd)}")
-    result = subprocess.run(make_cmd, check=True)
+    subprocess.run(make_cmd, cwd=build_dir,  check=True)
 
     print("libdatachannel build complete.")
     print(f"Artifacts are located in: {build_dir}")
 
-    return 0
-
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()
