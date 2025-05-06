@@ -82,3 +82,4 @@ cluster {{asUpperCamelCase name}} = {{!}}
     {{~>idl_command_request_response}}{{~new_line 1~}}
   {{/zcl_commands_source_client}}
 }
+
