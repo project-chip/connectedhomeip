@@ -40,7 +40,6 @@ private:
     CHIP_ERROR ProcessInternal(ByteSpan & block) override;
     CHIP_ERROR ProcessDescriptor(ByteSpan & block);
 
-    //  OTADataAccumulator mAccumulator;
     bool mDescriptorProcessed = false;
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
     uint32_t mUnalignmentNum;

@@ -88,7 +88,7 @@ CHIP_ERROR chip::OTAMultiImageProcessorImpl::OtaHookInit()
     sWifiFirmwareProcessor.RegisterDescriptorCallback(ProcessDescriptor);
     ReturnErrorOnFailure(
         imageProcessor.RegisterProcessor(static_cast<uint32_t>(OTAProcessorTag::kApplicationProcessor), &sWifiFirmwareProcessor));
-#else  // 917 NCP
+#else  // 917 NCP TA
     static chip::OTAWiFiFirmwareProcessor sWifiFirmwareProcessor;
     sWifiFirmwareProcessor.RegisterDescriptorCallback(ProcessDescriptor);
     ReturnErrorOnFailure(

@@ -50,6 +50,7 @@ private:
     bool mReset          = false;
     CHIP_ERROR ProcessInternal(ByteSpan & block) override;
     CHIP_ERROR ProcessDescriptor(ByteSpan & block);
+    bool mDescriptorProcessed = false;
 
 #if SL_MATTER_ENABLE_OTA_ENCRYPTION
     uint32_t mUnalignmentNum;
