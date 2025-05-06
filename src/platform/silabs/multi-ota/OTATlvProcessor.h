@@ -76,19 +76,6 @@ enum class OTAProcessorTag
 };
 
 /**
- * This class defines an interface for a Matter TLV processor.
- * Instances of derived classes can be registered as processors
- * in OTAMultiImageProcessorImpl. Based on the TLV type, a certain
- * processor is used to process subsequent blocks until the number
- * of bytes found in the metadata is processed. In case a block contains
- * data from two different TLVs, the processor should ensure the remaining
- * data is returned in the block passed as input.
- * The default processors: application, SSBL and factory data are registered
- * in OTAMultiImageProcessorImpl::Init through OtaHookInit.
- * Applications should use OTAMultiImageProcessorImpl::RegisterProcessor
- * to register additional processors.
- */
-/**
  * This class can be used to accumulate data until a given threshold.
  * Should be used by OTATlvProcessor derived classes if they need
  * metadata accumulation (e.g. for custom header decoding).
@@ -108,6 +95,20 @@ private:
     uint32_t mBufferOffset;
     Platform::ScopedMemoryBuffer<uint8_t> mBuffer;
 };
+
+/**
+ * This class defines an interface for a Matter TLV processor.
+ * Instances of derived classes can be registered as processors
+ * in OTAMultiImageProcessorImpl. Based on the TLV type, a certain
+ * processor is used to process subsequent blocks until the number
+ * of bytes found in the metadata is processed. In case a block contains
+ * data from two different TLVs, the processor should ensure the remaining
+ * data is returned in the block passed as input.
+ * The default processors: application, SSBL and factory data are registered
+ * in OTAMultiImageProcessorImpl::Init through OtaHookInit.
+ * Applications should use OTAMultiImageProcessorImpl::RegisterProcessor
+ * to register additional processors.
+ */
 class OTATlvProcessor
 {
 public:
@@ -117,7 +118,6 @@ public:
         char versionString[kVersionStringSize];
         char buildDate[kBuildDateSize];
     };
-
     virtual ~OTATlvProcessor() {}
 
     virtual CHIP_ERROR Init();
@@ -161,7 +161,6 @@ protected:
      * @retval Error code                       Something went wrong. Current OTA process will be
      *                                          canceled.
      */
-    //   CHIP_ERROR InitAccumulator(uint32_t threshold);
     virtual CHIP_ERROR ProcessInternal(ByteSpan & block) = 0;
 
     void ClearInternal();
@@ -178,7 +177,6 @@ protected:
     uint32_t mProcessedLength                    = 0;
     bool mWasSelected                            = false;
     ProcessDescriptor mCallbackProcessDescriptor = nullptr;
-
     OTADataAccumulator mAccumulator;
     bool mDescriptorProcessed = false;
 };

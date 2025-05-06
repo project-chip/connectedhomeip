@@ -430,8 +430,6 @@ void OTAMultiImageProcessorImpl::HandleApply(intptr_t context)
         }
     }
 
-    // ChipLogProgress(SoftwareUpdate, "Selected processor in handleApply******: %p, RequiresReset: %d",
-    //               imageProcessor->mCurrentProcessor, imageProcessor->mCurrentProcessor->RequiresReset());
     for (auto const & pair : imageProcessor->mProcessorMap)
     {
         pair.second->Clear();
@@ -441,8 +439,8 @@ void OTAMultiImageProcessorImpl::HandleApply(intptr_t context)
     imageProcessor->mAccumulator.Clear();
 
     ChipLogProgress(SoftwareUpdate, "HandleApply: Finished");
+
     // This reboots the device
-    // TODO: check where to put this
 #ifdef SLI_SI91X_MCU_INTERFACE
     // Handle reset logic
     ChipLogProgress(SoftwareUpdate, "OTA Firmware update completed");
