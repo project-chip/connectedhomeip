@@ -2073,10 +2073,7 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                              help='Node ID for primary DUT communication, '
                              'and NodeID to assign if commissioning (default: %d)' % _DEFAULT_DUT_NODE_ID, nargs="+")
     basic_group.add_argument('--endpoint', type=int, default=None, help="Endpoint under test")
-    basic_group.add_argument('--app-pid', type=int, default=0, help="The PID of the app against which the test is going to run")
-    basic_group.add_argument('--app-pipe', type=str, default=None, help="The path of the app to send an out-of-band command")
-    basic_group.add_argument('--app-pipe_prefix', type=str, default=None,
-                             help="The path prefix of the app to send an out-of-band command")
+    basic_group.add_argument('--app-pipe', type=str, default=None, help="The full path of the app to send an out-of-band command")
     basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
     basic_group.add_argument("--PICS", help="PICS file path", type=str)
 
