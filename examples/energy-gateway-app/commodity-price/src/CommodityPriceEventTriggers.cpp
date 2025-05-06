@@ -100,7 +100,7 @@ void SetTestEventTrigger_ForecastUpdate()
     static Structs::CommodityPriceStruct::Type sForecastEntries[kForecastSize];
     static Structs::CommodityPriceComponentStruct::Type sComponentBuffers[kForecastSize][2]; // Per-entry
 
-    uint32_t currentStart = chipEpoch;
+    uint32_t currentStart = matterEpoch;
 
     for (size_t i = 0; i < kForecastSize; ++i)
     {
