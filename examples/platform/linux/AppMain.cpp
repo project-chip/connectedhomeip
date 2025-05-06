@@ -378,6 +378,7 @@ class SampleTestEventTriggerHandler : public TestEventTriggerHandler
 public:
     CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override
     {
+        eventTrigger = clearEndpointInEventTrigger(eventTrigger);
         ChipLogProgress(Support, "Saw TestEventTrigger: " ChipLogFormatX64, ChipLogValueX64(eventTrigger));
 
         if (eventTrigger == kSampleTestEventTriggerAlwaysSuccess)
