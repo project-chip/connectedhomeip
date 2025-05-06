@@ -40,7 +40,9 @@ using namespace Camera;
 // Using Gstreamer video test source's ball animation pattern for the live streaming visual verification.
 // Refer https://gstreamer.freedesktop.org/documentation/videotestsrc/index.html?gi-language=c#GstVideoTestSrcPattern
 
+#ifdef AV_STREAM_GST_USE_TEST_SRC
 const int kBallAnimationPattern = 18;
+#endif
 
 CameraDevice::CameraDevice()
 {
@@ -508,7 +510,7 @@ CameraError CameraDevice::StartAudioStream(uint16_t streamID)
     }
 
     int channels   = it->audioStreamParams.channelCount;
-    int sampleRate = it->audioStreamParams.sampleRate;
+    int sampleRate = static_cast<int>(it->audioStreamParams.sampleRate);
 
     // Create Gstreamer video pipeline
     CameraError error          = CameraError::SUCCESS;
@@ -813,21 +815,21 @@ uint8_t CameraDevice::GetZoomMax()
 // Set the Pan level
 CameraError CameraDevice::SetPan(int16_t aPan)
 {
-    mPan = aPan;
+    mPan = static_cast<uint16_t>(aPan);
     return CameraError::SUCCESS;
 }
 
 // Set the Tilt level
 CameraError CameraDevice::SetTilt(int16_t aTilt)
 {
-    mTilt = aTilt;
+    mTilt = static_cast<uint16_t>(aTilt);
     return CameraError::SUCCESS;
 }
 
 // Set the Zoom level
 CameraError CameraDevice::SetZoom(uint8_t aZoom)
 {
-    mZoom = aZoom;
+    mZoom = static_cast<int8_t>(aZoom);
     return CameraError::SUCCESS;
 }
 

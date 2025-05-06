@@ -217,10 +217,10 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
                 {
                     // if the delta would move us out of the cartesian plane of the sensor, limit to the left hand edge
                     //
-                    uint16_t x1Movement = ((deltaX < 0) && (abs(deltaX) > viewport.x1)) ? -viewport.x1 : deltaX;
+                    uint16_t x1Movement = ((deltaX < 0) && (abs(deltaX) > viewport.x1)) ? -viewport.x1 : static_cast<uint16_t>(deltaX);
                     viewport.x1         = static_cast<uint16_t>(viewport.x1 + x1Movement);
 
-                    uint16_t x2Movement = ((deltaX < 0) && (abs(deltaX) > viewport.x2)) ? -viewport.x2 : deltaX;
+                    uint16_t x2Movement = ((deltaX < 0) && (abs(deltaX) > viewport.x2)) ? -viewport.x2 : static_cast<uint16_t>(deltaX);
                     viewport.x2         = static_cast<uint16_t>(viewport.x2 + x2Movement);
                 }
             }
@@ -232,10 +232,10 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
                 {
                     // if the delta would move us out of the cartesian plane of the sensor, limit to the top hand edge
                     //
-                    uint16_t y1Movement = ((deltaY < 0) && (abs(deltaY) > viewport.y1)) ? -viewport.y1 : deltaY;
+                    uint16_t y1Movement = ((deltaY < 0) && (abs(deltaY) > viewport.y1)) ? -viewport.y1 : static_cast<uint16_t>(deltaY);
                     viewport.y1         = static_cast<uint16_t>(viewport.y1 + y1Movement);
 
-                    uint16_t y2Movement = ((deltaY < 0) && (abs(deltaY) > viewport.y2)) ? -viewport.y2 : deltaY;
+                    uint16_t y2Movement = ((deltaY < 0) && (abs(deltaY) > viewport.y2)) ? -viewport.y2 : static_cast<uint16_t>(deltaY);
                     viewport.y2         = static_cast<uint16_t>(viewport.y2 + y2Movement);
                 }
             }
@@ -250,7 +250,7 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
                     uint16_t originalWidth     = viewport.x2 - viewport.x1;
                     uint16_t originalHeight    = viewport.y2 - viewport.y1;
                     uint32_t originalSize      = originalWidth * originalHeight;
-                    uint32_t zoomDeltaInPixels = static_cast<uint32_t>(originalSize * abs(zoomDelta) / 100);
+                    uint32_t zoomDeltaInPixels = originalSize * static_cast<uint32_t>(abs(zoomDelta)) / 100;
                     uint32_t newSize = (zoomDelta < 0) ? originalSize - zoomDeltaInPixels : originalSize + zoomDeltaInPixels;
 
                     // If the new viewport after zoom would be less than the min, scale it to the min
