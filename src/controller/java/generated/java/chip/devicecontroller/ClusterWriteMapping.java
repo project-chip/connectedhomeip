@@ -3610,6 +3610,10 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("ecosystemInformation", writeEcosystemInformationInteractionInfo);
     Map<String, InteractionInfo> writeCommissionerControlInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("commissionerControl", writeCommissionerControlInteractionInfo);
+    Map<String, InteractionInfo> writeJointFabricDatastoreInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("jointFabricDatastore", writeJointFabricDatastoreInteractionInfo);
+    Map<String, InteractionInfo> writeJointFabricAdministratorInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("jointFabricAdministrator", writeJointFabricAdministratorInteractionInfo);
     Map<String, InteractionInfo> writeTlsCertificateManagementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("tlsCertificateManagement", writeTlsCertificateManagementInteractionInfo);
     Map<String, InteractionInfo> writeTlsClientManagementInteractionInfo = new LinkedHashMap<>();
