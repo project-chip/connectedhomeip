@@ -30,6 +30,7 @@ class TestEventTriggerHandler : public IntrusiveListNodeBase<IntrusiveMode::Auto
 {
 public:
     virtual ~TestEventTriggerHandler() = default;
+
     /**
      * Handles the test event trigger based on `eventTrigger` provided.
      *
