@@ -131,7 +131,7 @@ Complete the following steps:
 1. Install some Raspberry Pi specific dependencies:
 
     ```
-    sudo apt-get install pi-bluetooth avahi-utils
+    sudo apt-get install bluez pi-bluetooth avahi-utils
     ```
 
 1. Reboot your Raspberry Pi after installing `pi-bluetooth`.
