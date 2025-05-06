@@ -698,7 +698,7 @@ cluster Descriptor = 29 {
     kTagList = 0x1;
   }
 
-  shared struct DeviceTypeStruct {
+  struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
   }
@@ -726,7 +726,7 @@ cluster Descriptor = 29 {
 
 /** The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table. */
 cluster Binding = 30 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   fabric_scoped struct TargetStruct {
     optional node_id node = 1;
@@ -8178,7 +8178,7 @@ endpoint 0 {
   }
 
   server cluster UnitLocalization {
-    persist  attribute temperatureUnit default = 0;
+    callback attribute temperatureUnit;
     callback attribute supportedTemperatureUnits;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
@@ -9460,7 +9460,7 @@ endpoint 1 {
     ram      attribute colorCapabilities default = 0x1F;
     ram      attribute colorTempPhysicalMinMireds default = 0x009A;
     ram      attribute colorTempPhysicalMaxMireds default = 0x01C6;
-    ram      attribute coupleColorTempToLevelMinMireds;
+    ram      attribute coupleColorTempToLevelMinMireds default = 0x009A;
     persist  attribute startUpColorTemperatureMireds default = 0x00FA;
     ram      attribute featureMap default = 0x1F;
     ram      attribute clusterRevision default = 7;
