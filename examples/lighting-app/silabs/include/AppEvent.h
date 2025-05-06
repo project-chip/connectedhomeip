@@ -53,6 +53,7 @@ struct AppEvent
             int32_t Actor;
             uint8_t Value;
         } LightEvent;
+
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
         struct
         {

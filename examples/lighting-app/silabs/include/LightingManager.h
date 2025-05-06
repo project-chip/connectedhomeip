@@ -69,9 +69,9 @@ public:
 private:
     friend LightingManager & LightMgr(void);
     State_t mState;
+    uint8_t mCurrentLevel = 254; // 0xFE = default
 
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
-    uint8_t mCurrentLevel      = 254; // 0xFE = default
     uint8_t mCurrentHue        = 0;
     uint8_t mCurrentSaturation = 0;
     uint16_t mCurrentX         = 0;
