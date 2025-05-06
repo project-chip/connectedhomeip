@@ -78,7 +78,17 @@ bool AllClustersExampleDeviceInfoProviderImpl::FixedLabelIteratorImpl::Next(Fixe
     {
     case 0:
         output.label = "direction"_span;
-        output.value = "up"_span;
+        // Values likely should differ by endpoint. Consider adding storage
+        // for the spans to point to correct buffer+size elements in case
+        // you dynamically generate these instead of using fixed const char*-backed CharSpans.
+        if (mEndpoint == 1)
+        {
+            output.value = "up"_span;
+        }
+        else
+        {
+            output.value = "down"_span;
+        }
         break;
     default:
         err = CHIP_ERROR_INTERNAL;

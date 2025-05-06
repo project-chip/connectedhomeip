@@ -51,20 +51,6 @@ public:
     static DeviceInfoProviderImpl & GetDefaultInstance();
 
 protected:
-    class FixedLabelIteratorImpl : public FixedLabelIterator
-    {
-    public:
-        FixedLabelIteratorImpl(EndpointId endpoint);
-        size_t Count() override;
-        bool Next(FixedLabelType & output) override;
-        void Release() override { chip::Platform::Delete(this); }
-
-    private:
-        static constexpr size_t kNumSupportedFixedLabels = 0;
-        EndpointId mEndpoint                             = 0;
-        size_t mIndex                                    = 0;
-    };
-
     class UserLabelIteratorImpl : public UserLabelIterator
     {
     public:

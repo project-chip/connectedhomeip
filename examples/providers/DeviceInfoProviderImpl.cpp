@@ -59,23 +59,9 @@ DeviceInfoProviderImpl & DeviceInfoProviderImpl::GetDefaultInstance()
 
 DeviceInfoProvider::FixedLabelIterator * DeviceInfoProviderImpl::IterateFixedLabel(EndpointId endpoint)
 {
-    // Will cause empty list.
+    // We don't include fixed label data in this sample one. Returning nullptr returns empty list.
+    (void)endpoint;
     return nullptr;
-}
-
-DeviceInfoProviderImpl::FixedLabelIteratorImpl::FixedLabelIteratorImpl(EndpointId endpoint) : mEndpoint(endpoint)
-{
-    mIndex = 0;
-}
-
-size_t DeviceInfoProviderImpl::FixedLabelIteratorImpl::Count()
-{
-    return kNumSupportedFixedLabels;
-}
-
-bool DeviceInfoProviderImpl::FixedLabelIteratorImpl::Next(FixedLabelType & output)
-{
-    return false;
 }
 
 CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelLength(EndpointId endpoint, size_t val)
