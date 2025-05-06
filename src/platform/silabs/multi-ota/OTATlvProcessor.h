@@ -132,7 +132,6 @@ public:
     void SetWasSelected(bool selected) { mWasSelected = selected; }
     bool WasSelected() { return mWasSelected; }
     static bool IsValidTag(uint32_t tag);
-    virtual bool RequiresReset() const { return false; }
 
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
     CHIP_ERROR vOtaProcessInternalEncryption(MutableByteSpan & block);
