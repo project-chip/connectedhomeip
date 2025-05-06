@@ -20,8 +20,6 @@
 
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CommissionableDataProvider.h>
-
-#include "app/InteractionModelEngine.h"
 #include "app/clusters/ota-requestor/OTARequestorInterface.h"
 #include "app/icd/server/ICDNotifier.h"
 #include "app/server/CommissioningWindowManager.h"
@@ -485,6 +483,7 @@ public:
 
     virtual pw::Status ShutdownAllSubscriptions(const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
     {
+#if CHIP_CONFIG_ENABLE_ICD_CIP
         chip::DeviceLayer::PlatformMgr().ScheduleWork(
             [](intptr_t) {
                 chip::app::InteractionModelEngine::GetInstance()->ShutdownAllSubscriptionHandlers();
@@ -492,6 +491,10 @@ public:
             },
             reinterpret_cast<intptr_t>(nullptr));
         return pw::OkStatus();
+#else  // CHIP_CONFIG_ENABLE_ICD_CIP
+        ChipLogError(AppServer, "ShutdownAllSubscriptions is not supported");
+        return pw::Status::Unimplemented();
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
     }
 
     virtual pw::Status TriggerIcdCheckin(const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
