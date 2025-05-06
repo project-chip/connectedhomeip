@@ -32,31 +32,41 @@ namespace SoilMeasurement {
 
 inline constexpr uint16_t kClusterRevision = 1;
 
-struct MeasurementData
-{
-    Globals::Structs::MeasurementAccuracyStruct::Type soilMoistureMeasurementLimits;
-    Attributes::SoilMoistureMeasuredValue::TypeInfo::Type soilMoistureMeasuredValue;
-};
-
-class SoilMeasurementAttrAccess : public AttributeAccessInterface
+class Instance : public AttributeAccessInterface
 {
 public:
-    // Register for the SoilMeasurement on all endpoints.
-    SoilMeasurementAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), Clusters::SoilMeasurement::Id) {}
-    ~SoilMeasurementAttrAccess() { Shutdown(); }
+    /**
+     * Creates a soil measurement cluster instance. The Init() function needs to be called for this instance to be registered and
+     * called by the interaction model at the appropriate times.
+     * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
+     */
+    Instance(EndpointId aEndpointId);
 
+    ~Instance() override;
+
+    /**
+     * Initialises the soil measurement cluster instance
+     * @return Returns an error if an soil measurement cluster has not been enabled in zap for the given endpoint ID or
+     * if the AttributeHandler registration fails.
+     */
     CHIP_ERROR Init();
-    void Shutdown();
+
+    CHIP_ERROR SetSoilMeasurementAccuracy(const Globals::Structs::MeasurementAccuracyStruct::Type & accuracy, bool reportChange);
+
+    CHIP_ERROR SetSoilMeasuredValue(const Attributes::SoilMoistureMeasuredValue::TypeInfo::Type & soilMoistureMeasuredValue);
+
+private:
+    struct MeasurementData
+    {
+        Globals::Structs::MeasurementAccuracyStruct::Type soilMoistureMeasurementLimits;
+        Attributes::SoilMoistureMeasuredValue::TypeInfo::Type soilMoistureMeasuredValue;
+    };
+
+    EndpointId mEndpointId = 1;
+    MeasurementData mSoilMeasurementData;
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 };
-
-CHIP_ERROR SetSoilMeasurementAccuracy(EndpointId endpointId, const Globals::Structs::MeasurementAccuracyStruct::Type & accuracy,
-                                      bool reportChange);
-CHIP_ERROR SetSoilMeasuredValue(EndpointId endpointId,
-                                const Attributes::SoilMoistureMeasuredValue::TypeInfo::Type & soilMoistureMeasuredValue);
-
-MeasurementData * SoilMeasurementDataForEndpoint(EndpointId endpointId);
 
 } // namespace SoilMeasurement
 } // namespace Clusters

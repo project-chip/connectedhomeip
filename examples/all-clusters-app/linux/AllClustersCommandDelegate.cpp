@@ -25,7 +25,6 @@
 #include <app/clusters/refrigerator-alarm-server/refrigerator-alarm-server.h>
 #include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
 #include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
-#include <app/clusters/soil-measurement-server/soil-measurement-server.h>
 #include <app/clusters/switch-server/switch-server.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -40,6 +39,7 @@
 #include <oven-modes.h>
 #include <oven-operational-state-delegate.h>
 #include <rvc-modes.h>
+#include <soil-measurement-stub.h>
 
 #include <memory>
 #include <string>
@@ -956,7 +956,8 @@ void AllClustersAppCommandHandler::OnSoilMoistureChange(EndpointId endpointId, u
         return;
     }
 
-    SoilMeasurement::SetSoilMeasuredValue(endpointId, soilMoisture);
+    SoilMeasurement::Instance * soilMeasurementInstance = SoilMeasurement::GetInstance();
+    soilMeasurementInstance->SetSoilMeasuredValue(soilMoisture);
     ChipLogDetail(NotSpecified, "Set Soil Moisture value to %u", soilMoisture);
 }
 
