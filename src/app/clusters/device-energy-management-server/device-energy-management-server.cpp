@@ -452,7 +452,7 @@ void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx,
     if (earliestStartTimeNullable.IsNull())
     {
         uint32_t chipEpoch = 0;
-        CHIP_ERROR err     = System::Clock::GetClock_EpochTS(chipEpoch);
+        CHIP_ERROR err     = System::Clock::GetClock_MatterEpochS(chipEpoch);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "DEM: Unable to get current time - err:%" CHIP_ERROR_FORMAT, err.Format());
@@ -747,7 +747,7 @@ void Instance::HandleRequestConstraintBasedForecast(HandlerContext & ctx,
     }
 
     uint32_t currentUtcTime = 0;
-    CHIP_ERROR err          = System::Clock::GetClock_EpochTS(currentUtcTime);
+    CHIP_ERROR err          = System::Clock::GetClock_MatterEpochS(currentUtcTime);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "DEM: Failed to get UTC time");
