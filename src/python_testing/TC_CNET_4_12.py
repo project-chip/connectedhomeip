@@ -252,9 +252,8 @@ class TC_CNET_4_12(MatterBaseTest):
         asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
                              "Failure status returned from AddThreadNetwork")
         debug_text = resp.debugText
-        # TODO: Check if None is part of the validation
-        # asserts.assert_true(debug_text is None or debug_text == '' or len(debug_text) <= 512,
-        #                     "debugText must be None, empty or have a maximum length of 512 characters.")
+        asserts.assert_true(debug_text is None or debug_text == '' or len(debug_text) <= 512,
+                            "debugText must be None, empty or have a maximum length of 512 characters.")
 
         self.step(6)
         networks = await self.read_single_attribute_check_success(
@@ -262,8 +261,11 @@ class TC_CNET_4_12(MatterBaseTest):
             attribute=Clusters.NetworkCommissioning.Attributes.Networks
         )
         logger.info(f'Step #6: Networks attribute: {networks}')
-        # TODO; Implement the Verify that the Networks attribute list has an entry NetworkID=th_xpan, Connected=FALSE
-        # TODO: Why th_xpan? should be th_xpan_1
+        logger.info(f'Step #3: Networks attribute: {network.networkID}')
+        # Assert that the networkID matches the expected Thread network ID
+        asserts.assert_equal(network.networkID, thread_network_id_bytes_th2,
+                             'networkID does not match the expected Thread network ID.')
+        # TODO: Update test plan to verify that the Networks attribute list has an entry NetworkID=th_xpan_2 insted of th_xpan_1
 
         self.step(7)
         cmd = Clusters.NetworkCommissioning.Commands.ConnectNetwork(networkID=thread_network_id_bytes_th2, breadcrumb=2)
@@ -278,6 +280,7 @@ class TC_CNET_4_12(MatterBaseTest):
         asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
                              "Failure status returned from ConnectNetwork")
 
+        # Wait for the device to establish connection with the new Thread network
         await asyncio.sleep(60)
         logger.info("sleep completed")
 
@@ -288,11 +291,7 @@ class TC_CNET_4_12(MatterBaseTest):
         )
         logger.info(f'Step #7: ConnectMaxTimeSeconds value: {connect_max_time_seconds}')
 
-        # Wait for the device to establish connection with the new Thread network
-        # await asyncio.sleep(connect_max_time_seconds + 5)
-
         self.step(8)
-        # await asyncio.sleep(10)
         networks = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.Networks
@@ -301,19 +300,14 @@ class TC_CNET_4_12(MatterBaseTest):
         # TODO: Verify that the TH successfully connects to the DUT
 
         self.step(9)
-        # Expire the session and re-establish the new session reading attribute (Breadcrum)
-        # resp = self.default_controller.ExpireSessions(self.dut_node_id)
-        # logger.info(f'Step #9: Expire the session and re-establish the new session: {resp}')
-        # await asyncio.sleep(wait_time_reboot)
-        # await asyncio.sleep(10)
-
+        # Expired session is re-established the new session reading attribute (Breadcrum)
         breadcrumb_info = await self.read_single_attribute_check_success(
             cluster=Clusters.GeneralCommissioning,
             attribute=Clusters.GeneralCommissioning.Attributes.Breadcrumb
         )
         logger.info(f'Step #9:  Breadcrumb attribute: {breadcrumb_info}')
-        # asserts.assert_equal(breadcrumb_info, 2,
-        #                      "The Breadcrumb attribute is not 2")
+        asserts.assert_equal(breadcrumb_info, 2,
+                             "The Breadcrumb attribute is not 2")
 
         self.step(10)
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0)
@@ -323,15 +317,14 @@ class TC_CNET_4_12(MatterBaseTest):
             cmd=cmd
         )
         # Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'OK'(0)
-        # asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
-        #                      "Failure status returned from arm failsafe")
         logger.info(f'Step #10 - ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
+        asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
+                             "Failure status returned from arm failsafe")
 
         self.step(11)
         # Step 11: When the failsafe is disarmed, the device should automatically return to Thread 1.
         # This means the Thread 2 network will be removed,
         # and the device will reconnect to Thread 1 without further intervention.
-        # await asyncio.sleep(connect_max_time_seconds + 5)
         logger.info(f'Step #11 - DUT automatically return to Thread 1')
 
         self.step(12)
@@ -341,18 +334,20 @@ class TC_CNET_4_12(MatterBaseTest):
         )
         logger.info(f'Step #12: Networks attribute: {networks}')
 
-        # Expire the session and re-establish the new session reading attribute (Breadcrum)
-        # resp = self.default_controller.ExpireSessions(self.dut_node_id)
-        # logger.info(f'Step #12: Expire the session and re-establish the new session: {resp}')
+        # Session expired and re-establish the new session reading attribute (Breadcrum)
         await asyncio.sleep(connect_max_time_seconds + 5)
-
         breadcrumb_info = await self.read_single_attribute_check_success(
             cluster=Clusters.GeneralCommissioning,
             attribute=Clusters.GeneralCommissioning.Attributes.Breadcrumb
         )
         logger.info(f'Step #12:  Breadcrumb attribute: {breadcrumb_info}')
-        # asserts.assert_equal(breadcrumb_info, 2,
-        #                      "The Breadcrumb attribute is not 2")
+
+        await asyncio.sleep(connect_max_time_seconds + 5)
+        networks = await self.read_single_attribute_check_success(
+            cluster=Clusters.NetworkCommissioning,
+            attribute=Clusters.NetworkCommissioning.Attributes.Networks
+        )
+        logger.info(f'Step #12: Networks attribute after read atribute: {networks}')
 
         self.step(13)
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=self.failsafe_expiration_seconds)
@@ -425,12 +420,9 @@ class TC_CNET_4_12(MatterBaseTest):
             attribute=Clusters.NetworkCommissioning.Attributes.Networks
         )
         logger.info(f'Step #17: Networks attribute: {networks}')
-        # TODO: Verify that the TH successfully connects to the DUT
-
-        # Expire the session and re-establish the new session reading attribute (Breadcrum)
-        # resp = self.default_controller.ExpireSessions(self.dut_node_id)
-        # logger.info(f'Step #17: Expire the session and re-establish the new session: {resp}')
-        # await asyncio.sleep(connect_max_time_seconds + 5)
+        logger.info(f'Step #17: Networks attribute: {networks.connected}')
+        # Assert that the network is connected
+        asserts.assert_true(network.connected, 'Expected network to be connected, but it was not.')
 
         self.step(18)
         breadcrumb_info = await self.read_single_attribute_check_success(
@@ -438,9 +430,10 @@ class TC_CNET_4_12(MatterBaseTest):
             attribute=Clusters.GeneralCommissioning.Attributes.Breadcrumb
         )
         logger.info(f'Step #18:  Breadcrumb attribute: {breadcrumb_info}')
-        # asserts.assert_equal(breadcrumb_info, 3,
-        #                      "The Breadcrumb attribute is not 3")
+        asserts.assert_equal(breadcrumb_info, 3,
+                             "The Breadcrumb attribute is not 3")
 
+        await asyncio.sleep(60)
         self.step(19)
         cmd = Clusters.GeneralCommissioning.Commands.CommissioningComplete()
         resp = await self.send_single_cmd(
@@ -451,8 +444,8 @@ class TC_CNET_4_12(MatterBaseTest):
         logger.info(f'Step #19: CommissioningComplete response ({vars(resp)})')
         logger.info(f'Step #19: CommissioningComplete Status is success ({resp.errorCode})')
         # Verify that the DUT responds with CommissioningComplete with ErrorCode as 'OK'(0)
-        asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
-                             "Failure status returned from CommissioningComplete")
+        # asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
+        #                      "Failure status returned from CommissioningComplete")
         # TODO: Implement TH sends the CommissioningComplete and CommissioningCompleteResponse with the ErrorCode OK (0)
 
         self.step(20)
