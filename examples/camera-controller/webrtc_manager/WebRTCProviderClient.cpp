@@ -41,11 +41,10 @@ void WebRTCProviderClient::Init(const ScopedNodeId & peerId, EndpointId endpoint
                     ChipLogValueX64(peerId.GetNodeId()), static_cast<unsigned>(endpointId));
 }
 
-CHIP_ERROR WebRTCProviderClient::SolicitOffer(
-    Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage, EndpointId originatingEndpointId,
-    Optional<DataModel::Nullable<uint16_t>> videoStreamId, Optional<DataModel::Nullable<uint16_t>> audioStreamId,
-    Optional<DataModel::List<const Clusters::WebRTCTransportProvider::Structs::ICEServerStruct::Type>> ICEServers,
-    Optional<chip::CharSpan> ICETransportPolicy)
+CHIP_ERROR WebRTCProviderClient::SolicitOffer(Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage,
+                                              EndpointId originatingEndpointId,
+                                              Optional<DataModel::Nullable<uint16_t>> videoStreamId,
+                                              Optional<DataModel::Nullable<uint16_t>> audioStreamId)
 {
     ChipLogProgress(Camera, "Sending SolicitOffer to node " ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
 
@@ -63,8 +62,10 @@ CHIP_ERROR WebRTCProviderClient::SolicitOffer(
     mSolicitOfferData.originatingEndpointID = originatingEndpointId;
     mSolicitOfferData.videoStreamID         = videoStreamId;
     mSolicitOfferData.audioStreamID         = audioStreamId;
-    mSolicitOfferData.ICEServers            = ICEServers;
-    mSolicitOfferData.ICETransportPolicy    = ICETransportPolicy;
+
+    // ICE info are sent during the ICE candidate exchange phase of this flow.
+    mSolicitOfferData.ICEServers         = NullOptional;
+    mSolicitOfferData.ICETransportPolicy = NullOptional;
 
     // Store the streamUsage from the original command so we can build the WebRTCSessionStruct when the response arrives.
     mCurrentStreamUsage = streamUsage;
@@ -83,12 +84,11 @@ CHIP_ERROR WebRTCProviderClient::SolicitOffer(
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WebRTCProviderClient::ProvideOffer(
-    DataModel::Nullable<uint16_t> webRTCSessionId, std::string sdp, Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage,
-    EndpointId originatingEndpointId, Optional<DataModel::Nullable<uint16_t>> videoStreamId,
-    Optional<DataModel::Nullable<uint16_t>> audioStreamId,
-    Optional<DataModel::List<const Clusters::WebRTCTransportProvider::Structs::ICEServerStruct::Type>> ICEServers,
-    Optional<chip::CharSpan> ICETransportPolicy)
+CHIP_ERROR WebRTCProviderClient::ProvideOffer(DataModel::Nullable<uint16_t> webRTCSessionId, std::string sdp,
+                                              Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage,
+                                              EndpointId originatingEndpointId,
+                                              Optional<DataModel::Nullable<uint16_t>> videoStreamId,
+                                              Optional<DataModel::Nullable<uint16_t>> audioStreamId)
 {
     ChipLogProgress(Camera, "Sending ProvideOffer to node " ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
 
@@ -109,8 +109,10 @@ CHIP_ERROR WebRTCProviderClient::ProvideOffer(
     mProvideOfferData.originatingEndpointID = originatingEndpointId;
     mProvideOfferData.videoStreamID         = videoStreamId;
     mProvideOfferData.audioStreamID         = audioStreamId;
-    mProvideOfferData.ICEServers            = ICEServers;
-    mProvideOfferData.ICETransportPolicy    = ICETransportPolicy;
+
+    // ICE info are sent during the ICE candidate exchange phase of this flow.
+    mProvideOfferData.ICEServers         = NullOptional;
+    mProvideOfferData.ICETransportPolicy = NullOptional;
 
     // Store the streamUsage from the original command so we can build the WebRTCSessionStruct when the response arrives.
     mCurrentStreamUsage = streamUsage;
