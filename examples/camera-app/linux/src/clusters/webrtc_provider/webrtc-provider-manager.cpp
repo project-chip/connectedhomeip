@@ -41,8 +41,13 @@ void WebRTCProviderManager::Init()
 
     mPeerConnection = std::make_shared<rtc::PeerConnection>(config);
 
-    mPeerConnection->onLocalDescription([this](rtc::Description description) {
-        mLocalSdp = std::string(description);
+    mPeerConnection->onLocalDescription([this](rtc::Description desc) {
+        if (mState == State::SendingAnswer && desc.type() != rtc::Description::Type::Answer)
+        {
+            return;
+        }
+
+        mLocalSdp = std::string(desc);
         ChipLogProgress(Camera, "Local Description:");
         ChipLogProgress(Camera, "%s", mLocalSdp.c_str());
 
@@ -201,6 +206,8 @@ void WebRTCProviderManager::RegisterWebrtcTransport(uint16_t sessionId)
 
 CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession)
 {
+    ChipLogProgress(Camera, "HandleProvideOffer called");
+
     // Initialize a new WebRTC session from the SolicitOfferRequestArgs
     outSession.id          = args.sessionId;
     outSession.peerNodeID  = args.peerNodeId;
@@ -260,7 +267,9 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     }
 
     MoveToState(State::SendingAnswer);
-    mPeerConnection->setRemoteDescription(args.sdp);
+    rtc::Description remoteOffer(args.sdp, rtc::Description::Type::Offer);
+    mPeerConnection->setRemoteDescription(remoteOffer);
+    mPeerConnection->createAnswer();
 
     return CHIP_NO_ERROR;
 }
@@ -385,6 +394,8 @@ const char * WebRTCProviderManager::GetStateStr() const
 
 void WebRTCProviderManager::ScheduleOfferSend()
 {
+    ChipLogProgress(Camera, "ScheduleOfferSend called.");
+
     DeviceLayer::SystemLayer().ScheduleLambda([this]() {
         ChipLogProgress(Camera, "Sending Offer command to node " ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
 
@@ -402,6 +413,8 @@ void WebRTCProviderManager::ScheduleOfferSend()
 
 void WebRTCProviderManager::ScheduleAnswerSend()
 {
+    ChipLogProgress(Camera, "ScheduleAnswerSend called.");
+
     DeviceLayer::SystemLayer().ScheduleLambda([this]() {
         ChipLogProgress(Camera, "Sending Answer command to node " ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
 
@@ -419,6 +432,8 @@ void WebRTCProviderManager::ScheduleAnswerSend()
 
 void WebRTCProviderManager::ScheduleICECandidatesSend()
 {
+    ChipLogProgress(Camera, "ScheduleICECandidatesSend called.");
+
     DeviceLayer::SystemLayer().ScheduleLambda([this]() {
         ChipLogProgress(Camera, "Sending ICECandidates command to node " ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
 
@@ -488,9 +503,12 @@ CHIP_ERROR WebRTCProviderManager::SendOfferCommand(Messaging::ExchangeManager & 
 
     auto onFailure = [](CHIP_ERROR error) { ChipLogError(Camera, "Offer command failed: %" CHIP_ERROR_FORMAT, error.Format()); };
 
+    uint16_t sessionId = mCurrentSessionId;
+    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_ModifyWebRTCOfferSessionId, sessionId++);
+
     // Build the command
     WebRTCTransportRequestor::Commands::Offer::Type command;
-    command.webRTCSessionID = mCurrentSessionId;
+    command.webRTCSessionID = sessionId;
     command.sdp             = CharSpan::fromCharString(mLocalSdp.c_str());
 
     // Now invoke the command using the found session handle

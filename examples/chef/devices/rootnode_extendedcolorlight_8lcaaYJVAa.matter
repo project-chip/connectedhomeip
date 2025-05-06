@@ -654,7 +654,7 @@ cluster Descriptor = 29 {
 
 /** The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table. */
 cluster Binding = 30 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   fabric_scoped struct TargetStruct {
     optional node_id node = 1;
@@ -2481,7 +2481,7 @@ endpoint 1 {
     ram      attribute colorTempPhysicalMinMireds default = 0x009A;
     ram      attribute colorTempPhysicalMaxMireds default = 0x01C6;
     ram      attribute coupleColorTempToLevelMinMireds default = 0x0000;
-    persist  attribute startUpColorTemperatureMireds default = 0x00FA;
+    persist  attribute startUpColorTemperatureMireds;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
