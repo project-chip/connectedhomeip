@@ -51,7 +51,7 @@ tests:
           constraints:
               type: temperature
 
-    - label: "Step 4: TH reads from the DUT the Step attribute"
+    - label: "Step 4: TH reads from the DUT the Step attribute and validates constraints"
       PICS: TCTL.S.A0003
       command: "readAttribute"
       attribute: "Step"
