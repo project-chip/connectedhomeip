@@ -99,6 +99,12 @@ class CustomCommissioningParameters:
     randomDiscriminator: int
 
 class PairingStatus:
+    """
+    This class is used to store the pairing status of a commissioning process with a device.
+    if the commissioning Process is successful then we set the success parameter to bool true else set the
+    success parameter to False and store the exception raised during commissioning process in exception parameter.
+    """
+
     def __init__(self, success: bool, exception: Optional[Exception] = None):
         self.success = success
         self.exception = exception
@@ -125,8 +131,9 @@ async def commission_device(
         commissioning_info: Specifies the type of commissioning method to use.
 
     Returns:
-        True if the commissioning process completes successfully. False otherwise,
-        except in case of an error which logs the exception details.
+        PairingStatus object which can evaluated in conditional statements
+        if the commissioning process completes successfully PairingStatus parameter is set to True else False along
+        with storing the reason for pairing failure by storing the exception raised during commissioning process.
     """
 
     if commissioning_info.tc_version_to_simulate is not None and commissioning_info.tc_user_response_to_simulate is not None:
