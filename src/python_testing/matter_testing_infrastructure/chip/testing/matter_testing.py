@@ -2196,6 +2196,72 @@ class CommissionDeviceTest(MatterBaseTest):
             raise signals.TestAbortAll("Failed to commission node(s)")
 
 
+async def run_with_error_check(coroutine_func, *args, exception_type=Exception, assert_func=None, error_msg="Unexpected success", **kwargs):
+    '''
+    Explanation:
+
+    The idea of this helper function is to apply the pattern (1) and avoid (2):
+
+    (1) GOOD PRACTICE:
+        try:
+            do command
+            assert.fail('unexpected success')
+        except ChipStackError as e:
+            check expected error
+
+    (2) BAD PRACTICE:
+        try:
+            do command
+        except ChipStackError as e:
+            check expected error
+
+    Helper function:
+
+        await run_with_error_check(coroutine_func, *args, exception_type=Exception, assert_func=None, error_msg="Unexpected success", **kwargs)
+
+        - coroutine_func: Is the function you want to run in the try block (e.g self.TH2.ReadAttribute)
+        - *args: Captures positional arguments (e.g self.dut_node_id)
+        - **kwargs: Captures named arguments (e.g nodeid=self.dut_node_id. In this case the argument is named with nodeid)
+        - expection_type: Name of the exception (e.g ChipStackError)
+        - assert_func: Assertion function (e.g assert_func=lambda e: asserts.assert_equal(e.err, 0x580, "Incorrect error message received from subscription with no permission"))
+        - error_msg: Error message
+
+    Example usage:
+
+    If you want to use this helper function you can change your code from (3) to (4):
+
+    (3) BEFORE:
+        try:
+            await self.TH2.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.AccessControl.Attributes.Acl)], reportInterval=(1, 5), fabricFiltered=False, keepSubscriptions=False, autoResubscribe=False)
+            asserts.fail("Incorrectly subscribed to attribute with invalid permissions")
+        except ChipStackError as e:
+            asserts.assert_equal(e.err, 0x580, "Incorrect error message received from subscription with no permission")
+
+    (4) AFTER:
+        await run_with_error_check(
+            self.TH2.ReadAttribute,                                                                     # Name of the function you want to execute
+            nodeid=self.dut_node_id,                                                                    # Function's parameter
+            attributes=[(0, Clusters.AccessControl.Attributes.Acl)],                                    # Function's parameter
+            reportInterval=(1, 5),                                                                      # Function's parameter
+            fabricFiltered=False,                                                                       # Function's parameter
+            keepSubscriptions=False,                                                                    # Function's parameter
+            autoResubscribe=False,                                                                      # Function's parameter
+            exception_type=ChipStackError,                                                              # Exception type
+            assert_func=lambda e: asserts.assert_equal(                                                 # Assertion function
+                e.err, 0x580, "Incorrect error message received from subscription with no permission"
+            ),
+            error_msg="Incorrectly subscribed to attribute with invalid permissions"                    # Error message
+        )
+
+    '''
+    try:
+        await coroutine_func(*args, **kwargs)
+        asserts.fail(error_msg)
+    except exception_type as e:
+        if assert_func:
+            assert_func(e)
+
+
 def default_matter_test_main():
     """Execute the test class in a test module.
     This is the default entry point for running a test script file directly.

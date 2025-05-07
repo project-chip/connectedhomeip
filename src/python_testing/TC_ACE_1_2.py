@@ -42,7 +42,7 @@ from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, run_with_error_check
 from mobly import asserts
 
 
@@ -128,11 +128,26 @@ class TC_ACE_1_2(MatterBaseTest):
     async def steps_admin_subscription_error(self, print_steps: bool):
         if print_steps:
             self.print_step(13, "Subscribe to the ACL attribute, expect INVALID_ACTION")
-        try:
-            await self.TH2.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.AccessControl.Attributes.Acl)], reportInterval=(1, 5), fabricFiltered=False, keepSubscriptions=False, autoResubscribe=False)
-            asserts.fail("Incorrectly subscribed to attribute with invalid permissions")
-        except ChipStackError as e:
-            asserts.assert_equal(e.err, 0x580, "Incorrect error message received from subscription with no permission")
+        # try:
+        #    await self.TH2.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.AccessControl.Attributes.Acl)], reportInterval=(1, 5), fabricFiltered=False, keepSubscriptions=False, autoResubscribe=False)
+        #    asserts.fail("Incorrectly subscribed to attribute with invalid permissions")
+        # except ChipStackError as e:
+        #    asserts.assert_equal(e.err, 0x580, "Incorrect error message received from subscription with no permission")
+
+        await run_with_error_check(
+            self.TH2.ReadAttribute,
+            nodeid=self.dut_node_id,
+            attributes=[(0, Clusters.AccessControl.Attributes.Acl)],
+            reportInterval=(1, 5),
+            fabricFiltered=False,
+            keepSubscriptions=False,
+            autoResubscribe=False,
+            exception_type=ChipStackError,
+            assert_func=lambda e: asserts.assert_equal(
+                e.err, 0x580, "Incorrect error message received from subscription with no permission"
+            ),
+            error_msg="Incorrectly subscribed to attribute with invalid permissions"
+        )
 
         if print_steps:
             self.print_step(14, "Subscribe to the AccessControlEntryChanged event, expect INVALID_ACTION")
