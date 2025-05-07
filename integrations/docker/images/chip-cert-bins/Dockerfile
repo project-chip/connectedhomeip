@@ -68,6 +68,7 @@ RUN set -x \
     libnspr4-dev \
     libpango1.0-dev \
     libpixman-1-dev \
+    libpcsclite1 \
     libreadline-dev \
     libssl-dev \
     libtool \
@@ -80,6 +81,7 @@ RUN set -x \
     ninja-build \
     openjdk-8-jdk \
     pkg-config \
+    pcscd \
     python3 \
     python3-dev \
     python3-pip \
@@ -148,6 +150,7 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-x64-chip-tool-ipv6only-platform-mdns \
     --target linux-x64-shell-ipv6only-platform-mdns \
     --target linux-x64-chip-cert-ipv6only-platform-mdns \
+    --target linux-x64-air-purifier-ipv6only \
     --target linux-x64-all-clusters-ipv6only \
     --target linux-x64-all-clusters-ipv6only-nlfaultinject \
     --target linux-x64-all-clusters-minimal-ipv6only \
@@ -161,6 +164,7 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-x64-lock-ipv6only \
     --target linux-x64-simulated-app1-ipv6only \
     --target linux-x64-lit-icd-ipv6only \
+    --target linux-x64-energy-gateway-ipv6only \
     --target linux-x64-energy-management-ipv6only \
     --target linux-x64-microwave-oven-ipv6only \
     --target linux-x64-rvc-ipv6only \
@@ -173,6 +177,7 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-x64-chip-tool-ipv6only-platform-mdns/chip-tool out/chip-tool \
     && mv out/linux-x64-shell-ipv6only-platform-mdns/chip-shell out/chip-shell \
     && mv out/linux-x64-chip-cert-ipv6only-platform-mdns/chip-cert out/chip-cert \
+    && mv out/linux-x64-air-purifier-ipv6only/chip-air-purifier-app out/chip-air-purifier-app \
     && mv out/linux-x64-all-clusters-ipv6only/chip-all-clusters-app out/chip-all-clusters-app \
     && mv out/linux-x64-all-clusters-ipv6only-nlfaultinject/chip-all-clusters-app out/chip-all-clusters-app-nlfaultinject \
     && mv out/linux-x64-all-clusters-minimal-ipv6only/chip-all-clusters-minimal-app out/chip-all-clusters-minimal-app \
@@ -186,6 +191,7 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-x64-lock-ipv6only/chip-lock-app out/chip-lock-app \
     && mv out/linux-x64-simulated-app1-ipv6only/chip-app1 out/chip-app1 \
     && mv out/linux-x64-lit-icd-ipv6only/lit-icd-app out/lit-icd-app \
+    && mv out/linux-x64-energy-gateway-ipv6only/chip-energy-gateway-app out/chip-energy-gateway-app \
     && mv out/linux-x64-energy-management-ipv6only/chip-energy-management-app out/chip-energy-management-app \
     && mv out/linux-x64-microwave-oven-ipv6only/chip-microwave-oven-app out/chip-microwave-oven-app \
     && mv out/linux-x64-rvc-ipv6only/chip-rvc-app out/chip-rvc-app \
@@ -202,6 +208,7 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-arm64-chip-tool-ipv6only-platform-mdns \
     --target linux-arm64-shell-ipv6only-platform-mdns \
     --target linux-arm64-chip-cert-ipv6only-platform-mdns \
+    --target linux-arm64-air-purifier-ipv6only \
     --target linux-arm64-all-clusters-ipv6only \
     --target linux-arm64-all-clusters-ipv6only-nlfaultinject \
     --target linux-arm64-all-clusters-minimal-ipv6only \
@@ -215,6 +222,7 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-arm64-lock-ipv6only \
     --target linux-arm64-simulated-app1-ipv6only \
     --target linux-arm64-lit-icd-ipv6only \
+    --target linux-arm64-energy-gateway-ipv6only \
     --target linux-arm64-energy-management-ipv6only \
     --target linux-arm64-microwave-oven-ipv6only \
     --target linux-arm64-rvc-ipv6only \
@@ -227,6 +235,7 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-arm64-chip-tool-ipv6only-platform-mdns/chip-tool out/chip-tool \
     && mv out/linux-arm64-shell-ipv6only-platform-mdns/chip-shell out/chip-shell \
     && mv out/linux-arm64-chip-cert-ipv6only-platform-mdns/chip-cert out/chip-cert \
+    && mv out/linux-arm64-air-purifier-ipv6only/chip-air-purifier-app out/chip-air-purifier-app \
     && mv out/linux-arm64-all-clusters-ipv6only/chip-all-clusters-app out/chip-all-clusters-app \
     && mv out/linux-arm64-all-clusters-ipv6only-nlfaultinject/chip-all-clusters-app out/chip-all-clusters-app-nlfaultinject \
     && mv out/linux-arm64-all-clusters-minimal-ipv6only/chip-all-clusters-minimal-app out/chip-all-clusters-minimal-app \
@@ -240,6 +249,7 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-arm64-lock-ipv6only/chip-lock-app out/chip-lock-app \
     && mv out/linux-arm64-simulated-app1-ipv6only/chip-app1 out/chip-app1 \
     && mv out/linux-arm64-lit-icd-ipv6only/lit-icd-app out/lit-icd-app \
+    && mv out/linux-arm64-energy-gateway-ipv6only/chip-energy-gateway-app out/chip-energy-gateway-app \
     && mv out/linux-arm64-energy-management-ipv6only/chip-energy-management-app out/chip-energy-management-app \
     && mv out/linux-arm64-microwave-oven-ipv6only/chip-microwave-oven-app out/chip-microwave-oven-app \
     && mv out/linux-arm64-rvc-ipv6only/chip-rvc-app out/chip-rvc-app \
@@ -266,6 +276,7 @@ RUN mkdir apps
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-tool apps/chip-tool
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-shell apps/chip-shell
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-cert apps/chip-cert
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-air-purifier-app apps/chip-air-purifier-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-all-clusters-app apps/chip-all-clusters-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-all-clusters-app-nlfaultinject apps/chip-all-clusters-app-nlfaultinject
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-all-clusters-minimal-app apps/chip-all-clusters-minimal-app
@@ -279,6 +290,7 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-ota-requestor-ap
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-lock-app apps/chip-lock-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-app1 apps/chip-app1
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/lit-icd-app apps/lit-icd-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-energy-gateway-app apps/chip-energy-gateway-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-energy-management-app apps/chip-energy-management-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-microwave-oven-app apps/chip-microwave-oven-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-rvc-app apps/chip-rvc-app
@@ -323,3 +335,8 @@ RUN apt-get remove -y python3-gi
 RUN pip install --break-system-packages --no-cache-dir \
     python_lib/obj/src/python_testing/matter_testing_infrastructure/chip-testing._build_wheel/chip_testing-*.whl \
     python_lib/controller/python/chip*.whl
+
+# Copy device attestation revocation set and device attestation test vectors
+RUN mkdir -p credentials/test/revoked-attestation-certificates
+COPY --from=chip-build-cert-bins /root/connectedhomeip/credentials/test/revoked-attestation-certificates/dac-provider-test-vectors credentials/test/revoked-attestation-certificates/dac-provider-test-vectors
+COPY --from=chip-build-cert-bins /root/connectedhomeip/credentials/test/revoked-attestation-certificates/revocation-sets credentials/test/revoked-attestation-certificates/revocation-sets

@@ -238,15 +238,12 @@ void WebRTCTransportRequestorServer::HandleOffer(HandlerContext & ctx, const Com
     WebRTCSessionTypeStruct outSession;
     // Delegate processing: handle the SDP offer, gather ICE candidates, SDP answer, etc.
     Protocols::InteractionModel::ClusterStatusCode delegateStatus =
-        Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleOffer(sessionId, args, outSession));
+        Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleOffer(sessionId, args));
     if (!delegateStatus.IsSuccess())
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, delegateStatus);
         return;
     }
-
-    // Store the new WebRTCSessionTypeStruct in CurrentSessions.
-    UpsertSession(outSession);
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, delegateStatus);
 }

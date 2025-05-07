@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <platform/nxp/common/factory_data/FactoryDataProvider.h>
+#include <platform/nxp/common/factory_data/legacy/FactoryDataProvider.h>
 
 #define FACTORY_DATA_MAX_SIZE 4096
 
@@ -39,48 +39,27 @@ class FactoryDataProviderImpl : public FactoryDataProvider
 public:
     static FactoryDataProviderImpl sInstance;
 
-    CHIP_ERROR Init(void);
     CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length,
                            uint32_t * contentAddr = NULL);
-    CHIP_ERROR SignWithDacKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer);
 
-    CHIP_ERROR SetAes128Key(const uint8_t * keyAes128);
+    ~FactoryDataProviderImpl(){};
+
+    CHIP_ERROR Init(void);
+    CHIP_ERROR SignWithDacKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer);
     CHIP_ERROR SetEncryptionMode(EncryptionMode mode);
 
 private:
-    struct Header
-    {
-        uint32_t hashId;
-        uint32_t size;
-        uint8_t hash[4];
-    };
     uint8_t factoryDataRamBuffer[FACTORY_DATA_MAX_SIZE];
-    Header mHeader;
-
-    const uint8_t * pAesKey    = nullptr;
-    EncryptionMode encryptMode = encrypt_ecb;
-
-    /* TLV offset */
-    static constexpr uint32_t kLengthOffset = 1;
-    static constexpr uint32_t kValueOffset  = 3;
 
     CHIP_ERROR ReplaceWithBlob(uint8_t * data, uint8_t * blob, size_t blobLen, uint32_t offset);
     CHIP_ERROR ELS_ExportBlob(uint8_t * data, size_t * dataLen, uint32_t & offset);
     CHIP_ERROR ELS_ConvertDacKey();
-    CHIP_ERROR DecryptAes128Ecb(uint8_t * dest, uint8_t * source, const uint8_t * aes128Key);
+    CHIP_ERROR DecryptAesEcb(uint8_t * dest, uint8_t * source);
 
     CHIP_ERROR ReadAndCheckFactoryDataInFlash(void);
 };
 
-inline FactoryDataProvider & FactoryDataPrvd()
-{
-    return FactoryDataProviderImpl::sInstance;
-}
-
-inline FactoryDataProviderImpl & FactoryDataPrvdImpl()
-{
-    return FactoryDataProviderImpl::sInstance;
-}
+FactoryDataProvider & FactoryDataPrvdImpl();
 
 } // namespace DeviceLayer
 } // namespace chip

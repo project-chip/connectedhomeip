@@ -18,10 +18,15 @@
 
 #pragma once
 
+#include "camera-device-interface.h"
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/CASESessionManager.h>
 #include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
+#include <media-controller.h>
 #include <rtc/rtc.hpp>
+#include <webrtc-transport.h>
+
+#include <unordered_map>
 
 namespace Camera {
 
@@ -34,7 +39,11 @@ public:
 
     ~WebRTCProviderManager() { CloseConnection(); };
 
+    void Init();
+
     void CloseConnection();
+
+    void SetMediaController(MediaController * mediaController);
 
     CHIP_ERROR HandleSolicitOffer(const OfferRequestArgs & args,
                                   chip::app::Clusters::WebRTCTransportProvider::WebRTCSessionStruct & outSession,
@@ -42,8 +51,7 @@ public:
 
     CHIP_ERROR
     HandleProvideOffer(const ProvideOfferRequestArgs & args,
-                       chip::app::Clusters::WebRTCTransportProvider::WebRTCSessionStruct & outSession,
-                       const chip::ScopedNodeId & peerId, chip::EndpointId originatingEndpointId) override;
+                       chip::app::Clusters::WebRTCTransportProvider::WebRTCSessionStruct & outSession) override;
 
     CHIP_ERROR HandleProvideAnswer(uint16_t sessionId, const std::string & sdpAnswer) override;
 
@@ -60,13 +68,36 @@ public:
 private:
     enum class CommandType : uint8_t
     {
-        kUndefined = 0,
-        kAnswer    = 1,
+        kUndefined     = 0,
+        kOffer         = 1,
+        kAnswer        = 2,
+        kICECandidates = 3,
     };
+
+    enum class State : uint8_t
+    {
+        Idle,                 ///< Default state, no communication initiated yet
+        SendingOffer,         ///< Sending Offer command from camera
+        SendingAnswer,        ///< Sending Answer command from camera
+        SendingICECandidates, ///< Sending ICECandidates command from camera
+    };
+
+    void MoveToState(const State targetState);
+    const char * GetStateStr() const;
+
+    void ScheduleOfferSend();
+
+    void ScheduleICECandidatesSend();
 
     void ScheduleAnswerSend();
 
+    void RegisterWebrtcTransport(uint16_t sessionId);
+
+    CHIP_ERROR SendOfferCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle);
+
     CHIP_ERROR SendAnswerCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle);
+
+    CHIP_ERROR SendICECandidatesCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle);
 
     static void OnDeviceConnected(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
                                   const chip::SessionHandle & sessionHandle);
@@ -81,11 +112,24 @@ private:
 
     CommandType mCommandType = CommandType::kUndefined;
 
+    State mState = State::Idle;
+
     uint16_t mCurrentSessionId = 0;
-    std::string mSdpAnswer;
+    std::string mLocalSdp;
+
+    // Each string in this vector represents a local ICE candidate used to facilitate the negotiation
+    // of peer-to-peer connections through NATs (Network Address Translators) and firewalls.
+    std::vector<std::string> mLocalCandidates;
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnConnectionFailureCallback;
+
+    std::unordered_map<uint16_t, std::unique_ptr<WebrtcTransport>> mWebrtcTransportMap;
+
+    uint16_t mVideoStreamID;
+    uint16_t mAudioStreamID;
+
+    MediaController * mMediaController = nullptr;
 };
 
 } // namespace Camera

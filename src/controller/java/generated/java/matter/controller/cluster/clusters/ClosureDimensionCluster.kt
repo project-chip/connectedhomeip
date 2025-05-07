@@ -44,15 +44,15 @@ class ClosureDimensionCluster(
   private val controller: MatterController,
   private val endpointId: UShort,
 ) {
-  class CurrentAttribute(val value: ClosureDimensionClusterCurrentStruct?)
+  class CurrentStateAttribute(val value: ClosureDimensionClusterCurrentStateStruct?)
 
-  sealed class CurrentAttributeSubscriptionState {
-    data class Success(val value: ClosureDimensionClusterCurrentStruct?) :
-      CurrentAttributeSubscriptionState()
+  sealed class CurrentStateAttributeSubscriptionState {
+    data class Success(val value: ClosureDimensionClusterCurrentStateStruct?) :
+      CurrentStateAttributeSubscriptionState()
 
-    data class Error(val exception: Exception) : CurrentAttributeSubscriptionState()
+    data class Error(val exception: Exception) : CurrentStateAttributeSubscriptionState()
 
-    object SubscriptionEstablished : CurrentAttributeSubscriptionState()
+    object SubscriptionEstablished : CurrentStateAttributeSubscriptionState()
   }
 
   class TargetAttribute(val value: ClosureDimensionClusterTargetStruct?)
@@ -130,7 +130,7 @@ class ClosureDimensionCluster(
 
   suspend fun setTarget(
     position: UShort?,
-    latch: UByte?,
+    latch: Boolean?,
     speed: UByte?,
     timedInvokeTimeout: Duration? = null,
   ) {
@@ -192,7 +192,7 @@ class ClosureDimensionCluster(
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun readCurrentAttribute(): CurrentAttribute {
+  suspend fun readCurrentStateAttribute(): CurrentStateAttribute {
     val ATTRIBUTE_ID: UInt = 0u
 
     val attributePath =
@@ -214,25 +214,25 @@ class ClosureDimensionCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Current attribute not found in response" }
+    requireNotNull(attributeData) { "Currentstate attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: ClosureDimensionClusterCurrentStruct? =
+    val decodedValue: ClosureDimensionClusterCurrentStateStruct? =
       if (!tlvReader.isNull()) {
-        ClosureDimensionClusterCurrentStruct.fromTlv(AnonymousTag, tlvReader)
+        ClosureDimensionClusterCurrentStateStruct.fromTlv(AnonymousTag, tlvReader)
       } else {
         tlvReader.getNull(AnonymousTag)
         null
       }
 
-    return CurrentAttribute(decodedValue)
+    return CurrentStateAttribute(decodedValue)
   }
 
-  suspend fun subscribeCurrentAttribute(
+  suspend fun subscribeCurrentStateAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<CurrentAttributeSubscriptionState> {
+  ): Flow<CurrentStateAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
       listOf(
@@ -251,7 +251,7 @@ class ClosureDimensionCluster(
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            CurrentAttributeSubscriptionState.Error(
+            CurrentStateAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -264,22 +264,22 @@ class ClosureDimensionCluster(
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { "Current attribute not found in Node State update" }
+          requireNotNull(attributeData) { "Currentstate attribute not found in Node State update" }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: ClosureDimensionClusterCurrentStruct? =
+          val decodedValue: ClosureDimensionClusterCurrentStateStruct? =
             if (!tlvReader.isNull()) {
-              ClosureDimensionClusterCurrentStruct.fromTlv(AnonymousTag, tlvReader)
+              ClosureDimensionClusterCurrentStateStruct.fromTlv(AnonymousTag, tlvReader)
             } else {
               tlvReader.getNull(AnonymousTag)
               null
             }
 
-          decodedValue?.let { emit(CurrentAttributeSubscriptionState.Success(it)) }
+          decodedValue?.let { emit(CurrentStateAttributeSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(CurrentAttributeSubscriptionState.SubscriptionEstablished)
+          emit(CurrentStateAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

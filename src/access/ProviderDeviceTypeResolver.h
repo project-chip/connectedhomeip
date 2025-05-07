@@ -16,9 +16,9 @@
 #pragma once
 
 #include <access/AccessControl.h>
-#include <app/data-model-provider/MetadataList.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/Provider.h>
+#include <lib/support/ReadOnlyBuffer.h>
 
 namespace chip {
 namespace Access {
@@ -33,7 +33,7 @@ public:
 
     bool IsDeviceTypeOnEndpoint(chip::DeviceTypeId deviceType, chip::EndpointId endpoint) override
     {
-        app::DataModel::ListBuilder<app::DataModel::DeviceTypeEntry> builder;
+        ReadOnlyBufferBuilder<app::DataModel::DeviceTypeEntry> builder;
         (void) mModelGetter()->DeviceTypes(endpoint, builder);
         for (auto & type : builder.TakeBuffer())
         {
