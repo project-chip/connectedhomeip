@@ -1104,8 +1104,8 @@ class MatterBaseTest(base_test.BaseTestClass):
                 logger.info(f"Sending out-of-band command: {command} to file: {app_pipe_name}")
                 app_pipe.write(json.dumps(command_dict) + "\n")
 
-            # TODO(#31239): remove the need for sleep, till then let's wait 50ms
-            sleep(0.05)
+            # TODO(#31239): remove the need for sleep, till then let's wait 100ms
+            sleep(0.1)
         else:
             logging.info(f"Using DUT IP address: {dut_ip}")
 
