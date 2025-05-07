@@ -152,7 +152,7 @@ async def commission_device(
             return PairingStatus(success=True)
         except ChipStackError as e:
             logging.error("Commissioning failed: %s" % e)
-            return PairingStatus(success=True, exception=e)
+            return PairingStatus(success=False, exception=e)
     elif commissioning_info.commissioning_method == "ble-wifi":
         try:
             await dev_ctrl.CommissionWiFi(
@@ -166,7 +166,7 @@ async def commission_device(
             return PairingStatus(success=True)
         except ChipStackError as e:
             logging.error("Commissioning failed: %s" % e)
-            return PairingStatus(success=True, exception=e)
+            return PairingStatus(success=False, exception=e)
     elif commissioning_info.commissioning_method == "ble-thread":
         try:
             await dev_ctrl.CommissionThread(
@@ -179,7 +179,7 @@ async def commission_device(
             return PairingStatus(success=True)
         except ChipStackError as e:
             logging.error("Commissioning failed: %s" % e)
-            return PairingStatus(success=True, exception=e)
+            return PairingStatus(success=False, exception=e)
     else:
         raise ValueError("Invalid commissioning method %s!" % commissioning_info.commissioning_method)
 
