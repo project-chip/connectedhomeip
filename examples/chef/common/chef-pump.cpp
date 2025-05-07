@@ -170,12 +170,12 @@ void Init()
         {
             VerifyOrDieWithMsg(FlowMeasurement::Attributes::MeasuredValue::SetNull(endpointId) == Status::Success, DeviceLayer,
                                "Failed to initialize Flow Measured Value to NULL for Endpoint: %d", endpointId);
-            if (FlowMeasurement::Attributes::MinMeasuredValue::Get(endpointId, PressureRangeMin[epIndex]) != Status::Success ||
+            if (FlowMeasurement::Attributes::MinMeasuredValue::Get(endpointId, FlowRangeMin[epIndex]) != Status::Success ||
                 FlowRangeMin[epIndex].IsNull())
             {
                 FlowRangeMin[epIndex].SetNonNull(30);
             }
-            if (FlowMeasurement::Attributes::MaxMeasuredValue::Get(endpointId, PressureRangeMax[epIndex]) != Status::Success ||
+            if (FlowMeasurement::Attributes::MaxMeasuredValue::Get(endpointId, FlowRangeMax[epIndex]) != Status::Success ||
                 FlowRangeMax[epIndex].IsNull())
             {
                 FlowRangeMax[epIndex].SetNonNull(10000);
