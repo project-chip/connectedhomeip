@@ -59,6 +59,7 @@ tests:
           saveAs: StepValue
           constraints:
               type: temperature
+              minValue: 1
               maxValue: MaxTemperatureValue - MinTemperatureValue
 
     - label:
