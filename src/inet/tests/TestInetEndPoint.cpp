@@ -43,6 +43,8 @@
 #include "TestInetCommon.h"
 #include "TestSetupSignalling.h"
 #include "inet/InetConfig.h"
+#include "inet/UDPEndPoint.h"
+#include "lib/support/logging/TextOnlyLogging.h"
 
 using namespace chip;
 using namespace chip::Inet;
@@ -387,6 +389,13 @@ TEST_F(TestInetEndPoint, TestInetEndPointLimit)
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    // we assume NO open endpoints
+    gUDP.ForEachEndPoint([](UDPEndPoint * ep) {
+        ChipLogError(Test, "NOTE: Unexpected UDP endpoint in use. Will free it");
+        ep->Free();
+        return Loop::Continue;
+    });
+
     int udpCount = 0;
     SYSTEM_STATS_RESET(System::Stats::kInetLayer_NumUDPEps);
     for (int i = INET_CONFIG_NUM_UDP_ENDPOINTS; i >= 0; --i)
@@ -413,11 +422,18 @@ TEST_F(TestInetEndPoint, TestInetEndPointLimit)
     EXPECT_TRUE(SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumUDPEps, udpHighWaterMark));
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    // we assume NO open endpoints
+    gTCP.ForEachEndPoint([](TCPEndPoint * ep) {
+        ChipLogError(Test, "NOTE: Unexpected UDP endpoint in use. Will free it");
+        ep->Free();
+        return Loop::Continue;
+    });
+
     int tcpCount = 0;
     SYSTEM_STATS_RESET(System::Stats::kInetLayer_NumTCPEps);
     for (int i = INET_CONFIG_NUM_TCP_ENDPOINTS; i >= 0; --i)
     {
-        err = gTCP.NewEndPoint(&testTCPEP[i]);
+        err                       = gTCP.NewEndPoint(&testTCPEP[i]);
         CHIP_ERROR expected_error = (i ? CHIP_NO_ERROR : CHIP_ERROR_ENDPOINT_POOL_FULL);
         if (err != expected_error)
         {
