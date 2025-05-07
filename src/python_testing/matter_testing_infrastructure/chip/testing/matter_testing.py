@@ -2212,6 +2212,25 @@ class CommissionDeviceTest(MatterBaseTest):
             raise signals.TestAbortAll("Failed to commission node(s)")
 
 
+# Questions:
+#
+#   1) Does this only have to work for ChipStackError?
+#   2) Do I have to edit from all python tests?
+#
+
+def expect_command_failure(command_fn, expected_error_type=ChipStackError, check_fn=lambda e: None, error_msg='Unexpected success'):
+    '''
+        Example usage:
+
+
+    '''
+    try:
+        command_fn()
+        asserts.fail(error_msg)
+    except expected_error_type as e:
+        check_fn(e)
+
+
 def default_matter_test_main():
     """Execute the test class in a test module.
     This is the default entry point for running a test script file directly.
