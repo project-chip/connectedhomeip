@@ -3818,6 +3818,10 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test034_TestMTRDeviceHistoricalEvents
 {
+    // TODO:  find source of flakiness; re-enable test once that's fixed.
+    // (passes locally as of c91562)
+    XCTSkip("Skipping due to flakyness/failing. See https://github.com/project-chip/connectedhomeip/issues/38793");
+
     dispatch_queue_t queue = dispatch_get_main_queue();
 
     NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
