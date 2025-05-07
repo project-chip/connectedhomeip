@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2023 Project CHIP Authors
+ *    Copyright (c) 2021-2023, 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -60,9 +60,6 @@ public:
 
 private:
     static BLEManagerImpl sInstance;
-
-    static CHIP_ERROR blekw_host_init(void);
-    static void Host_Task(osaTaskParam_t argument);
 
     BleLayer * _GetBleLayer(void);
 

@@ -608,15 +608,6 @@ static BOOL CommandNeedsTimedInvokeInCommodityPriceCluster(AttributeId aAttribut
     }
     }
 }
-static BOOL CommandNeedsTimedInvokeInDemandResponseLoadControlCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::DemandResponseLoadControl;
-    switch (aAttributeId) {
-    default: {
-        return NO;
-    }
-    }
-}
 static BOOL CommandNeedsTimedInvokeInMessagesCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::Messages;
@@ -704,6 +695,15 @@ static BOOL CommandNeedsTimedInvokeInWaterHeaterModeCluster(AttributeId aAttribu
 static BOOL CommandNeedsTimedInvokeInDeviceEnergyManagementModeCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::DeviceEnergyManagementMode;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInElectricalGridConditionsCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ElectricalGridConditions;
     switch (aAttributeId) {
     default: {
         return NO;
@@ -977,6 +977,15 @@ static BOOL CommandNeedsTimedInvokeInTotalVolatileOrganicCompoundsConcentrationM
 static BOOL CommandNeedsTimedInvokeInRadonConcentrationMeasurementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::RadonConcentrationMeasurement;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInSoilMeasurementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::SoilMeasurement;
     switch (aAttributeId) {
     default: {
         return NO;
@@ -1497,9 +1506,6 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::CommodityPrice::Id: {
         return CommandNeedsTimedInvokeInCommodityPriceCluster(commandID);
     }
-    case Clusters::DemandResponseLoadControl::Id: {
-        return CommandNeedsTimedInvokeInDemandResponseLoadControlCluster(commandID);
-    }
     case Clusters::Messages::Id: {
         return CommandNeedsTimedInvokeInMessagesCluster(commandID);
     }
@@ -1523,6 +1529,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::DeviceEnergyManagementMode::Id: {
         return CommandNeedsTimedInvokeInDeviceEnergyManagementModeCluster(commandID);
+    }
+    case Clusters::ElectricalGridConditions::Id: {
+        return CommandNeedsTimedInvokeInElectricalGridConditionsCluster(commandID);
     }
     case Clusters::DoorLock::Id: {
         return CommandNeedsTimedInvokeInDoorLockCluster(commandID);
@@ -1604,6 +1613,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::RadonConcentrationMeasurement::Id: {
         return CommandNeedsTimedInvokeInRadonConcentrationMeasurementCluster(commandID);
+    }
+    case Clusters::SoilMeasurement::Id: {
+        return CommandNeedsTimedInvokeInSoilMeasurementCluster(commandID);
     }
     case Clusters::WiFiNetworkManagement::Id: {
         return CommandNeedsTimedInvokeInWiFiNetworkManagementCluster(commandID);

@@ -26,6 +26,7 @@ import pathlib
 import queue
 import random
 import re
+import shlex
 import sys
 import textwrap
 import threading
@@ -38,7 +39,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from enum import Enum, IntFlag
 from itertools import chain
-from typing import Any, Iterable, List, Optional, Tuple
+from typing import Any, Callable, Iterable, List, Optional, Tuple
 
 import chip.testing.conversions as conversions
 import chip.testing.decorators as decorators
@@ -291,6 +292,42 @@ class AttributeValue:
     timestamp_utc: Optional[datetime] = None
 
 
+class AttributeMatcher:
+    """Matcher for a self-descripbed AttributeValue matcher, to be used in `await_all_expected_report_matches` methods.
+
+    This class embodies a predicate for a condition that must be matched by an attribute report.
+
+    A match is considered as having occurred when the `matches` method returns True for an `AttributeValue` report.
+    """
+
+    def __init__(self, description: str):
+        self._description: str = description
+
+    def matches(self, report: AttributeValue) -> bool:
+        """Implementers must override this method to return True when an attribute value matches.
+
+        The condition matched should be clearly expressed by the `description` property.
+        """
+        pass
+
+    @property
+    def description(self):
+        return self._description
+
+    @staticmethod
+    def from_callable(description: str, matcher: Callable[[AttributeValue], bool]) -> "AttributeMatcher":
+        """Take a single callable and wrap it into an AttributeMatcher object. Useful to wrap closures."""
+        class AttributeMatcherFromCallable(AttributeMatcher):
+            def __init__(self, description, matcher: Callable[[AttributeValue], bool]):
+                super().__init__(description)
+                self._matcher = matcher
+
+            def matches(self, report: AttributeValue) -> bool:
+                return self._matcher(report)
+
+        return AttributeMatcherFromCallable(description, matcher)
+
+
 def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float) -> None:
     """Given a queue.Queue hooked-up to an attribute change accumulator, await a given expected sequence of attribute reports.
 
@@ -348,8 +385,21 @@ def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attri
 
 
 class ClusterAttributeChangeAccumulator:
-    def __init__(self, expected_cluster: ClusterObjects.Cluster):
+    """
+    Subscribes to a cluster or single attribute and accumulates attribute reports in a queue.
+
+    If `expected_attribute` is provided, it subscribes only to that specific attribute.
+    Otherwise, it subscribes to all attributes from the cluster.
+
+    Args:
+        expected_cluster (ClusterObjects.Cluster): The cluster to subscribe to.
+        expected_attribute (ClusterObjects.ClusterAttributeDescriptor, optional):
+            If provided, subscribes to a single attribute. Defaults to None.
+    """
+
+    def __init__(self, expected_cluster: ClusterObjects.Cluster, expected_attribute: ClusterObjects.ClusterAttributeDescriptor = None):
         self._expected_cluster = expected_cluster
+        self._expected_attribute = expected_attribute
         self._subscription = None
         self._lock = threading.Lock()
         self._q = queue.Queue()
@@ -361,7 +411,9 @@ class ClusterAttributeChangeAccumulator:
             self._attribute_report_counts = {}
             attrs = [cls for name, cls in inspect.getmembers(self._expected_cluster.Attributes) if inspect.isclass(
                 cls) and issubclass(cls, ClusterObjects.ClusterAttributeDescriptor)]
-            self._attribute_reports = {}
+            self._attribute_reports: dict[Any, AttributeValue] = {}
+            if self._expected_attribute is not None:
+                attrs = [self._expected_attribute]
             for a in attrs:
                 self._attribute_report_counts[a] = 0
                 self._attribute_reports[a] = []
@@ -370,9 +422,12 @@ class ClusterAttributeChangeAccumulator:
 
     async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 5, keepSubscriptions: bool = True) -> Any:
         """This starts a subscription for attributes on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
+        attributes = [(endpoint, self._expected_cluster)]
+        if self._expected_attribute is not None:
+            attributes = [(endpoint, self._expected_attribute)]
         self._subscription = await dev_ctrl.ReadAttribute(
             nodeid=node_id,
-            attributes=[(endpoint, self._expected_cluster)],
+            attributes=attributes,
             reportInterval=(int(min_interval_sec), int(max_interval_sec)),
             fabricFiltered=fabric_filtered,
             keepSubscriptions=keepSubscriptions
@@ -393,7 +448,14 @@ class ClusterAttributeChangeAccumulator:
     def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
         """This is the subscription callback when an attribute report is received.
            It checks the report is from the expected_cluster and then posts it into the queue for later processing."""
+        valid_report = False
         if path.ClusterType == self._expected_cluster:
+            if self._expected_attribute is not None:
+                valid_report = path.ClusterId == self._expected_attribute.cluster_id
+            else:
+                valid_report = True
+
+        if valid_report:
             data = transaction.GetAttribute(path)
             value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType,
                                    value=data, timestamp_utc=datetime.now(timezone.utc))
@@ -449,6 +511,54 @@ class ClusterAttributeChangeAccumulator:
         for expected_idx, expected_element in enumerate(expected_final_values):
             logging.info(f"  -> {expected_element} found: {last_report_matches.get(expected_idx)}")
         asserts.fail("Did not find all expected last report values before time-out")
+
+    def await_all_expected_report_matches(self, expected_matchers: Iterable[AttributeMatcher], timeout_sec: float = 1.0):
+        """Expect that every predicate in `expected_matchers`, when run against all the incoming reports, reaches true by the end, ignoring timestamps.
+
+        Waits for at least `timeout_sec` seconds.
+
+        This is a form of barrier for a set of attribute changes that should all happen together for an action.
+
+        Note that this does not check against the "last" value of every attribute, only that each expected
+        report was seen at least once.
+        """
+        start_time = time.time()
+        elapsed = 0.0
+        time_remaining = timeout_sec
+
+        report_matches: dict[int, bool] = {idx: False for idx, _ in enumerate(expected_matchers)}
+
+        for matcher in expected_matchers:
+            logging.info(
+                f"--> Matcher waiting: {matcher.description}")
+        logging.info(f"Waiting for {timeout_sec:.1f} seconds for all reports.")
+
+        while time_remaining > 0:
+            # Snapshot copy at the beginning of the loop. This is thread-safe based on the design.
+            all_reports = self._attribute_reports
+
+            # Recompute all last-value matches
+            for expected_idx, matcher in enumerate(expected_matchers):
+                for attribute, reports in all_reports.items():
+                    for report in reports:
+                        if matcher.matches(report) and not report_matches[expected_idx]:
+                            logging.info(f"  --> Found a match for: {matcher.description}")
+                            report_matches[expected_idx] = True
+
+            # Determine if all were met
+            if all(report_matches.values()):
+                logging.info("Found all expected matchers did match.")
+                return
+
+            elapsed = time.time() - start_time
+            time_remaining = timeout_sec - elapsed
+            time.sleep(0.1)
+
+        # If we reach here, there was no early return and we failed to find all the values.
+        logging.error("Reached time-out without finding all expected report values.")
+        for expected_idx, expected_matcher in enumerate(expected_matchers):
+            logging.info(f"  -> {expected_matcher.description}: {report_matches.get(expected_idx)}")
+        asserts.fail("Did not find all expected reports before time-out")
 
     def await_sequence_of_reports(self, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float) -> None:
         """Await a given expected sequence of attribute reports in the accumulator for the endpoint associated.
@@ -558,6 +668,7 @@ class MatterTestConfig:
     timeout: typing.Union[int, None] = None
     endpoint: typing.Union[int, None] = 0
     app_pid: int = 0
+    pipe_name: typing.Union[str, None] = None
     fail_on_skipped_tests: bool = False
 
     commissioning_method: Optional[str] = None
@@ -607,6 +718,8 @@ class MatterTestConfig:
     tc_user_response_to_simulate: int = None
     # path to device attestation revocation set json file
     dac_revocation_set_path: Optional[pathlib.Path] = None
+
+    legacy: bool = False
 
 
 class ClusterMapper:
@@ -865,8 +978,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         # List of accumulated problems across all tests
         self.problems = []
         self.is_commissioning = False
-        # The named pipe name must be set in the derived classes
-        self.app_pipe = None
+        self.cached_steps: dict[str, list[TestStep]] = {}
 
     def get_test_steps(self, test: str) -> list[TestStep]:
         ''' Retrieves the test step list for the given test
@@ -884,8 +996,13 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def get_defined_test_steps(self, test: str) -> Optional[list[TestStep]]:
         steps_name = f'steps_{test.removeprefix("test_")}'
+        if test in self.cached_steps:
+            return self.cached_steps[test]
+
         try:
             fn = getattr(self, steps_name)
+            steps = fn()
+            self.cached_steps[test] = steps
             return fn()
         except AttributeError:
             return None
@@ -930,51 +1047,63 @@ class MatterBaseTest(base_test.BaseTestClass):
         except AttributeError:
             return test
 
-    def get_default_app_pipe_name(self) -> str:
-        return self.app_pipe
-
-    def write_to_app_pipe(self, command_dict: dict, app_pipe_name: Optional[str] = None):
+    def write_to_app_pipe(self, command_dict: dict, app_pipe_prefix: Optional[str] = None, app_pid: Optional[int] = None):
         """
-        Sends an out-of-band command to a Matter app.
+        Send an out-of-band command to a Matter app.
+        Args:
+            command_dict (dict): dictionary with the command and data
+            app_pipe_prefix (Optional[str], optional): Name of the cluster pipe file prefix (i.e. /tmp/chip_all_clusters_fifo_ or /tmp/chip_rvc_fifo_). If None
+            takes the value from the CI argument --app-pipe-prefix.
+            app_pid (Optional[uint], optional): pid of the process for app_pipe_name. If None takes the value from the CI
+            argument --app-pid.
 
-        Use the following environment variables:
+        This method uses the following environment variables:
 
          - LINUX_DUT_IP
             * if not provided, the Matter app is assumed to run on the same machine as the test,
               such as during CI, and the commands are sent to it using a local named pipe
             * if provided, the commands for writing to the named pipe are forwarded to the DUT
         - LINUX_DUT_USER
-
             * if LINUX_DUT_IP is provided, use this for the DUT user name
             * If a remote password is needed, set up ssh keys to ensure that this script can log in to the DUT without a password:
                  + Step 1: If you do not have a key, create one using ssh-keygen
                  + Step 2: Authorize this key on the remote host: run ssh-copy-id user@ip once, using your password
                  + Step 3: From now on ssh user@ip will no longer ask for your password
+
         """
 
-        if app_pipe_name is None:
-            app_pipe_name = self.get_default_app_pipe_name()
+        if app_pipe_prefix is None:
+            app_pipe_prefix = self.matter_test_config.app_pipe_prefix
+        if app_pid is None:
+            app_pid = self.matter_test_config.app_pid
 
-        if not isinstance(app_pipe_name, str):
-            raise TypeError("the named pipe must be provided as a string value")
+        if not isinstance(app_pipe_prefix, str):
+            raise TypeError("The named pipe must be provided as a string value")
 
         if not isinstance(command_dict, dict):
-            raise TypeError("the command must be passed as a dictionary value")
+            raise TypeError("The command must be passed as a dictionary value")
 
-        import json
         command = json.dumps(command_dict)
-
-        import os
         dut_ip = os.getenv('LINUX_DUT_IP')
+
+        # Checks for concatenate app_pipe and app_pid
+        if not isinstance(app_pid, int):
+            raise TypeError("The --app-pid flag is not instance of int")
+        # Verify we have a valid app-id
+        if app_pid == 0:
+            asserts.fail("app_pid is 0 , is the flag --app-pid set?. app-id flag must be set in order to write to pipe.")
+        app_pipe_name = app_pipe_prefix + str(app_pid)
 
         if dut_ip is None:
             if not os.path.exists(app_pipe_name):
                 # Named pipes are unique, so we MUST have consistent PID/paths
-                # set up for them to work.
+                # Set up for them to work.
                 logging.error("Named pipe %r does NOT exist" % app_pipe_name)
                 raise FileNotFoundError("CANNOT FIND %r" % app_pipe_name)
             with open(app_pipe_name, "w") as app_pipe:
-                app_pipe.write(command + "\n")
+                logger.info(f"Sending out-of-band command: {command} to file: {app_pipe_name}")
+                app_pipe.write(json.dumps(command_dict) + "\n")
+
             # TODO(#31239): remove the need for sleep
             sleep(0.001)
         else:
@@ -982,10 +1111,8 @@ class MatterBaseTest(base_test.BaseTestClass):
 
             dut_uname = os.getenv('LINUX_DUT_USER')
             asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
-
             logging.info(f"Using DUT user name: {dut_uname}")
-
-            command_fixed = command.replace('\"', '\\"')
+            command_fixed = shlex.quote(json.dumps(command_dict))
             cmd = "echo \"%s\" | ssh %s@%s \'cat > %s\'" % (command_fixed, dut_uname, dut_ip, app_pipe_name)
             os.system(cmd)
 
@@ -1073,6 +1200,27 @@ class MatterBaseTest(base_test.BaseTestClass):
     @property
     def is_pics_sdk_ci_only(self) -> bool:
         return self.check_pics('PICS_SDK_CI_ONLY')
+
+    def _update_legacy_test_event_triggers(self, eventTrigger: int) -> int:
+        """ This function updates eventTriged if legacy flag is activated. """
+        target_endpoint = 0
+
+        if self.matter_test_config.legacy:
+            logger.info("Legacy test event trigger activated")
+        else:
+            logger.info("Legacy test event trigger deactivated")
+            target_endpoint = self.get_endpoint()
+
+        if not (0 <= target_endpoint <= 0xFFFF):
+            raise ValueError("Target endpoint should be between 0 and 0xFFFF")
+
+        # Clean endpoint target
+        eventTrigger = eventTrigger & ~ (0xFFFF << 32)
+
+        # Sets endpoint in eventTrigger
+        eventTrigger |= (target_endpoint & 0xFFFF) << 32
+
+        return eventTrigger
 
     async def commission_devices(self) -> bool:
         dev_ctrl: ChipDeviceCtrl.ChipDeviceController = self.default_controller
@@ -1242,13 +1390,11 @@ class MatterBaseTest(base_test.BaseTestClass):
             else:
                 enableKey = self.matter_test_config.global_test_params['enableKey']
 
+        eventTrigger = self._update_legacy_test_event_triggers(eventTrigger)
+
         try:
             # GeneralDiagnostics cluster is meant to be on Endpoint 0 (Root)
-            await self.send_single_cmd(endpoint=0,
-                                       cmd=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(
-                                           enableKey,
-                                           eventTrigger)
-                                       )
+            await self.send_single_cmd(endpoint=0, cmd=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey, eventTrigger))
 
         except InteractionModelError as e:
             asserts.fail(
@@ -1880,7 +2026,11 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
     config.app_pid = 0 if args.app_pid is None else args.app_pid
+    config.app_pipe = args.app_pipe
+    config.app_pipe_prefix = args.app_pipe_prefix
     config.fail_on_skipped_tests = args.fail_on_skipped
+
+    config.legacy = args.use_legacy_test_event_triggers
 
     config.controller_node_id = args.controller_node_id
     config.trace_to = args.trace_to
@@ -1937,8 +2087,14 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                              'and NodeID to assign if commissioning (default: %d)' % _DEFAULT_DUT_NODE_ID, nargs="+")
     basic_group.add_argument('--endpoint', type=int, default=None, help="Endpoint under test")
     basic_group.add_argument('--app-pid', type=int, default=0, help="The PID of the app against which the test is going to run")
+    basic_group.add_argument('--app-pipe', type=str, default=None, help="The path of the app to send an out-of-band command")
+    basic_group.add_argument('--app-pipe_prefix', type=str, default=None,
+                             help="The path prefix of the app to send an out-of-band command")
     basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
     basic_group.add_argument("--PICS", help="PICS file path", type=str)
+
+    basic_group.add_argument("--use-legacy-test-event-triggers", action="store_true", default=False,
+                             help="Send test event triggers with endpoint 0 for older devices")
 
     commission_group = parser.add_argument_group(title="Commissioning", description="Arguments to commission a node")
 

@@ -136,6 +136,7 @@ source_set("scenes-table-test-srcs") {
   public_deps = [
     "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/storage:fabric-table",
     "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
@@ -175,6 +176,26 @@ source_set("ecosystem-information-test-srcs") {
     "${chip_root}/src/app:interaction-model",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/lib/core",
+  ]
+}
+
+source_set("closure-dimension-test-srcs") {
+  sources = [
+    "${chip_root}/src/app/clusters/closure-dimension-server/closure-dimension-cluster-logic.cpp",
+    "${chip_root}/src/app/clusters/closure-dimension-server/closure-dimension-cluster-logic.h",
+    "${chip_root}/src/app/clusters/closure-dimension-server/closure-dimension-cluster-objects.h",
+    "${chip_root}/src/app/clusters/closure-dimension-server/closure-dimension-delegate.h",
+    "${chip_root}/src/app/clusters/closure-dimension-server/closure-dimension-matter-context.cpp",
+    "${chip_root}/src/app/clusters/closure-dimension-server/closure-dimension-matter-context.h",
+    "${chip_root}/src/app/clusters/closure-dimension-server/closure-dimension-server.cpp",
+    "${chip_root}/src/app/clusters/closure-dimension-server/closure-dimension-server.h",
+  ]
+  public_deps = [
+    "${chip_root}/src/app:interaction-model",
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
   ]
 }
 
@@ -235,6 +256,8 @@ chip_test_suite("tests") {
     "TestCheckInHandler.cpp",
     "TestClosureControlClusterLogic.cpp",
     "TestClosureControlConformance.cpp",
+    "TestClosureDimensionCluster.cpp",
+    "TestClosureDimensionClusterObjects.cpp",
     "TestCommandHandlerInterfaceRegistry.cpp",
     "TestCommandInteraction.cpp",
     "TestCommandPathParams.cpp",
@@ -274,6 +297,7 @@ chip_test_suite("tests") {
     ":app-test-stubs",
     ":binding-test-srcs",
     ":closure-control-test-srcs",
+    ":closure-dimension-test-srcs",
     ":ecosystem-information-test-srcs",
     ":operational-state-test-srcs",
     ":ota-requestor-test-srcs",

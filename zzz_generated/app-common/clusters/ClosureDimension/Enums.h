@@ -38,19 +38,6 @@ enum class ClosureUnitEnum : uint8_t
     kUnknownEnumValue = 2,
 };
 
-// Enum for LatchingEnum
-enum class LatchingEnum : uint8_t
-{
-    kLatchedAndSecured    = 0x00,
-    kLatchedButNotSecured = 0x01,
-    kNotLatched           = 0x02,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 3,
-};
-
 // Enum for ModulationTypeEnum
 enum class ModulationTypeEnum : uint8_t
 {
@@ -113,18 +100,6 @@ enum class StepDirectionEnum : uint8_t
 {
     kDecrease = 0x00,
     kIncrease = 0x01,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 2,
-};
-
-// Enum for TargetLatchEnum
-enum class TargetLatchEnum : uint8_t
-{
-    kLatch   = 0x00,
-    kUnlatch = 0x01,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown

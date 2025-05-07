@@ -52,7 +52,6 @@
 #include <clusters/ContentAppObserver/EnumsCheck.h>
 #include <clusters/ContentControl/EnumsCheck.h>
 #include <clusters/ContentLauncher/EnumsCheck.h>
-#include <clusters/DemandResponseLoadControl/EnumsCheck.h>
 #include <clusters/Descriptor/EnumsCheck.h>
 #include <clusters/DeviceEnergyManagement/EnumsCheck.h>
 #include <clusters/DeviceEnergyManagementMode/EnumsCheck.h>
@@ -62,6 +61,7 @@
 #include <clusters/DoorLock/EnumsCheck.h>
 #include <clusters/EcosystemInformation/EnumsCheck.h>
 #include <clusters/ElectricalEnergyMeasurement/EnumsCheck.h>
+#include <clusters/ElectricalGridConditions/EnumsCheck.h>
 #include <clusters/ElectricalPowerMeasurement/EnumsCheck.h>
 #include <clusters/EnergyEvse/EnumsCheck.h>
 #include <clusters/EnergyEvseMode/EnumsCheck.h>
@@ -130,6 +130,7 @@
 #include <clusters/ServiceArea/EnumsCheck.h>
 #include <clusters/SmokeCoAlarm/EnumsCheck.h>
 #include <clusters/SoftwareDiagnostics/EnumsCheck.h>
+#include <clusters/SoilMeasurement/EnumsCheck.h>
 #include <clusters/Switch/EnumsCheck.h>
 #include <clusters/TargetNavigator/EnumsCheck.h>
 #include <clusters/TemperatureControl/EnumsCheck.h>

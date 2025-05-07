@@ -79,7 +79,6 @@ Generally regenerate using one of:
 |        145 |       0x91 | ElectricalEnergyMeasurement                             |
 |        148 |       0x94 | WaterHeaterManagement                                   |
 |        149 |       0x95 | CommodityPrice                                          |
-|        150 |       0x96 | DemandResponseLoadControl                               |
 |        151 |       0x97 | Messages                                                |
 |        152 |       0x98 | DeviceEnergyManagement                                  |
 |        153 |       0x99 | EnergyEvse                                              |
@@ -88,6 +87,7 @@ Generally regenerate using one of:
 |        157 |       0x9D | EnergyEvseMode                                          |
 |        158 |       0x9E | WaterHeaterMode                                         |
 |        159 |       0x9F | DeviceEnergyManagementMode                              |
+|        160 |       0xA0 | ElectricalGridConditions                                |
 |        257 |      0x101 | DoorLock                                                |
 |        258 |      0x102 | WindowCovering                                          |
 |        260 |      0x104 | ClosureControl                                          |
@@ -115,6 +115,7 @@ Generally regenerate using one of:
 |       1069 |      0x42D | Pm10ConcentrationMeasurement                            |
 |       1070 |      0x42E | TotalVolatileOrganicCompoundsConcentrationMeasurement   |
 |       1071 |      0x42F | RadonConcentrationMeasurement                           |
+|       1072 |      0x430 | SoilMeasurement                                         |
 |       1105 |      0x451 | WiFiNetworkManagement                                   |
 |       1106 |      0x452 | ThreadBorderRouterManagement                            |
 |       1107 |      0x453 | ThreadNetworkDirectory                                  |

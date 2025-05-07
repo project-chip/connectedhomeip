@@ -105,21 +105,21 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace RegisterClient {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = IcdManagement::Commands::RegisterClient::Id,
+    .commandId       = RegisterClient::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace RegisterClient
 namespace UnregisterClient {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = IcdManagement::Commands::UnregisterClient::Id,
+    .commandId       = UnregisterClient::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace UnregisterClient
 namespace StayActiveRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = IcdManagement::Commands::StayActiveRequest::Id,
+    .commandId       = StayActiveRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };

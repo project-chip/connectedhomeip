@@ -169,29 +169,6 @@ public:
 };
 
 } // namespace MeasurementAccuracyStruct
-namespace DeviceTypeStruct {
-enum class Fields : uint8_t
-{
-    kDeviceType = 0,
-    kRevision   = 1,
-};
-
-struct Type
-{
-public:
-    chip::DeviceTypeId deviceType = static_cast<chip::DeviceTypeId>(0);
-    uint16_t revision             = static_cast<uint16_t>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace DeviceTypeStruct
 namespace ApplicationStruct {
 enum class Fields : uint8_t
 {
@@ -423,6 +400,156 @@ using DecodableType = Type;
 
 } // namespace CurrencyStruct
 
+namespace PriceStruct {
+enum class Fields : uint8_t
+{
+    kAmount   = 0,
+    kCurrency = 1,
+};
+
+struct Type
+{
+public:
+    int64_t amount = static_cast<int64_t>(0);
+    Globals::Structs::CurrencyStruct::Type currency;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace PriceStruct
+
+namespace MeasurementAccuracyRangeStruct {
+enum class Fields : uint8_t
+{
+    kRangeMin       = 0,
+    kRangeMax       = 1,
+    kPercentMax     = 2,
+    kPercentMin     = 3,
+    kPercentTypical = 4,
+    kFixedMax       = 5,
+    kFixedMin       = 6,
+    kFixedTypical   = 7,
+};
+
+struct Type
+{
+public:
+    int64_t rangeMin = static_cast<int64_t>(0);
+    int64_t rangeMax = static_cast<int64_t>(0);
+    Optional<chip::Percent100ths> percentMax;
+    Optional<chip::Percent100ths> percentMin;
+    Optional<chip::Percent100ths> percentTypical;
+    Optional<uint64_t> fixedMax;
+    Optional<uint64_t> fixedMin;
+    Optional<uint64_t> fixedTypical;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace MeasurementAccuracyRangeStruct
+
+namespace MeasurementAccuracyStruct {
+enum class Fields : uint8_t
+{
+    kMeasurementType  = 0,
+    kMeasured         = 1,
+    kMinMeasuredValue = 2,
+    kMaxMeasuredValue = 3,
+    kAccuracyRanges   = 4,
+};
+
+struct Type
+{
+public:
+    Globals::MeasurementTypeEnum measurementType = static_cast<Globals::MeasurementTypeEnum>(0);
+    bool measured                                = static_cast<bool>(0);
+    int64_t minMeasuredValue                     = static_cast<int64_t>(0);
+    int64_t maxMeasuredValue                     = static_cast<int64_t>(0);
+    DataModel::List<const Globals::Structs::MeasurementAccuracyRangeStruct::Type> accuracyRanges;
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    Globals::MeasurementTypeEnum measurementType = static_cast<Globals::MeasurementTypeEnum>(0);
+    bool measured                                = static_cast<bool>(0);
+    int64_t minMeasuredValue                     = static_cast<int64_t>(0);
+    int64_t maxMeasuredValue                     = static_cast<int64_t>(0);
+    DataModel::DecodableList<Globals::Structs::MeasurementAccuracyRangeStruct::DecodableType> accuracyRanges;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
+
+} // namespace MeasurementAccuracyStruct
+
+namespace AtomicAttributeStatusStruct {
+enum class Fields : uint8_t
+{
+    kAttributeID = 0,
+    kStatusCode  = 1,
+};
+
+struct Type
+{
+public:
+    chip::AttributeId attributeID = static_cast<chip::AttributeId>(0);
+    uint8_t statusCode            = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace AtomicAttributeStatusStruct
+
+namespace LocationDescriptorStruct {
+enum class Fields : uint8_t
+{
+    kLocationName = 0,
+    kFloorNumber  = 1,
+    kAreaType     = 2,
+};
+
+struct Type
+{
+public:
+    chip::CharSpan locationName;
+    DataModel::Nullable<int16_t> floorNumber;
+    DataModel::Nullable<Globals::AreaTypeTag> areaType;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace LocationDescriptorStruct
+
 namespace PowerThresholdStruct {
 enum class Fields : uint8_t
 {
@@ -474,80 +601,6 @@ public:
 using DecodableType = Type;
 
 } // namespace TestGlobalStruct
-
-namespace LocationDescriptorStruct {
-enum class Fields : uint8_t
-{
-    kLocationName = 0,
-    kFloorNumber  = 1,
-    kAreaType     = 2,
-};
-
-struct Type
-{
-public:
-    chip::CharSpan locationName;
-    DataModel::Nullable<int16_t> floorNumber;
-    DataModel::Nullable<Globals::AreaTypeTag> areaType;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace LocationDescriptorStruct
-
-namespace PriceStruct {
-enum class Fields : uint8_t
-{
-    kAmount   = 0,
-    kCurrency = 1,
-};
-
-struct Type
-{
-public:
-    int64_t amount = static_cast<int64_t>(0);
-    Globals::Structs::CurrencyStruct::Type currency;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace PriceStruct
-
-namespace AtomicAttributeStatusStruct {
-enum class Fields : uint8_t
-{
-    kAttributeID = 0,
-    kStatusCode  = 1,
-};
-
-struct Type
-{
-public:
-    chip::AttributeId attributeID = static_cast<chip::AttributeId>(0);
-    uint8_t statusCode            = static_cast<uint8_t>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace AtomicAttributeStatusStruct
 
 } // namespace Structs
 } // namespace Globals

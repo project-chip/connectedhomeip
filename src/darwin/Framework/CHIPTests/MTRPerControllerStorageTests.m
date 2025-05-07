@@ -1608,6 +1608,11 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     // And that the device cache is not primed.
     XCTAssertFalse(device.deviceCachePrimed);
 
+    // And that there is no highest observed event number so far and we have
+    // seen no events.
+    XCTAssertNil(device.highestObservedEventNumber);
+    XCTAssertEqual(device.unitTestEventsReportedSinceLastCheck, 0);
+
     [device setDelegate:delegate queue:queue];
 
     [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
@@ -1626,6 +1631,10 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
             XCTAssertTrue([device _attributeDataValue:dataValue isEqualToDataValue:dataValueFromMTRDevice]);
         }
     }
+
+    // Must have seen at least one event.
+    XCTAssertNotNil(device.highestObservedEventNumber);
+    XCTAssertGreaterThan(device.unitTestEventsReportedSinceLastCheck, 0);
 
     // Now force the removal of the object from controller to test reloading read cache from storage
     [controller removeDevice:device];
@@ -1649,15 +1658,24 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     double storedAttributeDifferFromMTRDevicePercentage = storedAttributeDifferFromMTRDeviceCount * 100.0 / dataStoreValuesCount;
     XCTAssertTrue(storedAttributeDifferFromMTRDevicePercentage < 10.0);
 
-    // Check that the new device has an estimated subscription latency.
-    XCTAssertNotNil(device.estimatedSubscriptionLatency);
+    // Check that the new device is already primed.
+    XCTAssertTrue(newDevice.deviceCachePrimed);
 
-    // And that it's already primed.
-    XCTAssertTrue(device.deviceCachePrimed);
+    // Check that the new device has an estimated subscription latency.
+    XCTAssertNotNil(newDevice.estimatedSubscriptionLatency);
 
     // Check that this estimate is positive, since subscribing must have taken
     // some time.
-    XCTAssertGreaterThan(device.estimatedSubscriptionLatency.doubleValue, 0);
+    XCTAssertGreaterThan(newDevice.estimatedSubscriptionLatency.doubleValue, 0);
+
+    // Check that the highest observed event number is also not nil.  This value
+    // might be zero if there was an event but it was the first one the server ever
+    // generated.
+    NSNumber * oldHighestObservedEventNumber = newDevice.highestObservedEventNumber;
+    XCTAssertNotNil(oldHighestObservedEventNumber);
+
+    // Check that we have had no events reported so far: this is a new device.
+    XCTAssertEqual(newDevice.unitTestEventsReportedSinceLastCheck, 0);
 
     // Now set up new delegate for the new device and verify that once subscription reestablishes, the data version filter loaded from storage will work
     __auto_type * newDelegate = [[MTRDeviceTestDelegate alloc] init];
@@ -1693,10 +1711,18 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
     // 1) MTRDevice actually gets some attributes reported more than once
     // 2) Some attributes do change on resubscribe
-    //   * With all-clusts-app as of 2024-02-10, out of 1287 persisted attributes, still 450 attributes were reported with filter
+    //   * With all-clusters-app as of 2024-02-10, out of 1287 persisted attributes, still 450 attributes were reported with filter
     // And so conservatively, assert that data version filters save at least 300 entries.
-    NSUInteger storedAttributeCountDifferenceFromMTRDeviceReport = dataStoreValuesCount - [device unitTestAttributesReportedSinceLastCheck];
+    NSUInteger storedAttributeCountDifferenceFromMTRDeviceReport = dataStoreValuesCount - [newDevice unitTestAttributesReportedSinceLastCheck];
     XCTAssertTrue(storedAttributeCountDifferenceFromMTRDeviceReport > 300);
+
+    NSNumber * newHighestObservedEventNumber = newDevice.highestObservedEventNumber;
+    XCTAssertNotNil(newHighestObservedEventNumber);
+
+    // In theory we could have missed some events, but in practice that's not
+    // likely to happen in this context.
+    XCTAssertEqual(newHighestObservedEventNumber.unsignedIntValue - oldHighestObservedEventNumber.unsignedIntValue,
+        newDevice.unitTestEventsReportedSinceLastCheck);
 
     // Reset our commissionee.
     __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
@@ -2097,12 +2123,6 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 // startControllerWithRootKeys into a test helper.
 - (void)testControllerServer
 {
-#ifdef DEBUG
-    // Force our controllers to only advertise on localhost, to avoid DNS-SD
-    // crosstalk.
-    [MTRDeviceController forceLocalhostAdvertisingOnly];
-#endif // DEBUG
-
     __auto_type queue = dispatch_get_main_queue();
 
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
@@ -2133,6 +2153,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     __auto_type * endpointId1 = @(10);
     __auto_type * endpointId2 = @(20);
     __auto_type * endpointId3 = @(30);
+    __auto_type * endpointId4 = @(40);
     __auto_type * clusterId1 = @(0xFFF1FC02);
     __auto_type * clusterId2 = @(0xFFF1FC10);
     __auto_type * clusterRevision1 = @(3);
@@ -2675,6 +2696,14 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
     delegate.onReportEnd = nil;
 
+    // Now that we have a wildcard subscription to our server, try to add another
+    // endpoint to test what happens when an endpoint is added while a
+    // ReadHandler that cares about it is live.  We should not end up with any
+    // crashes or anything like that.
+    __auto_type * endpoint6 = [[MTRServerEndpoint alloc] initWithEndpointID:endpointId4 deviceTypes:@[ deviceType1 ]];
+    XCTAssertNotNil(endpoint6);
+    XCTAssertTrue([controllerServer addServerEndpoint:endpoint6]);
+
     // Test read-through behavior of non-standard (as in, not present in Matter XML) attributes.
     XCTestExpectation * nonStandardReadThroughExpectation = [self expectationWithDescription:@"Read-throughs of non-standard attributes complete"];
 
@@ -2782,6 +2811,13 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
     NSArray<NSNumber *> * orderedDeviceIDs = [deviceOnboardingPayloads allKeys];
 
+    // We have one fake device, which we use an invalid node ID for, that we use
+    // to test what happens if a device is deallocated while its subscription
+    // work item is queued.
+    NSMutableArray<NSNumber *> * orderedDeviceIDsIncludingFake = [orderedDeviceIDs mutableCopy];
+    NSNumber * fakeDeviceID = @(0xFFFFFFFFFFFFFFFF);
+    [orderedDeviceIDsIncludingFake insertObject:fakeDeviceID atIndex:0];
+
     // Commission 5 devices
     for (NSNumber * deviceID in orderedDeviceIDs) {
         certificateIssuer.nextNodeID = deviceID;
@@ -2815,7 +2851,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     }
 
     NSMutableDictionary<NSNumber *, MTRDeviceTestDelegate *> * deviceDelegates = [NSMutableDictionary dictionary];
-    for (NSNumber * deviceID in orderedDeviceIDs) {
+    for (NSNumber * deviceID in orderedDeviceIDsIncludingFake) {
         deviceDelegates[deviceID] = [[MTRDeviceTestDelegate alloc] init];
     }
 
@@ -2825,7 +2861,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     __block NSUInteger subscriptionDequeueCount = 0;
     __block BOOL baseDeviceReadCompleted = NO;
 
-    for (NSNumber * deviceID in orderedDeviceIDs) {
+    for (NSNumber * deviceID in orderedDeviceIDsIncludingFake) {
         MTRDeviceTestDelegate * delegate = deviceDelegates[deviceID];
         delegate.pretendThreadEnabled = YES;
 
@@ -2854,11 +2890,39 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         };
         __weak __auto_type weakDelegate = delegate;
         delegate.onReportEnd = ^{
-            [subscriptionExpectations[deviceID] fulfill];
+            // We don't have a subscriptionExpectation for the fake device.
+            XCTestExpectation * subscriptionExpectation = subscriptionExpectations[deviceID];
+            if (subscriptionExpectation) {
+                [subscriptionExpectation fulfill];
+            }
             // reset callback so expectation not fulfilled twice, given the run time of this can be long due to subscription pool
             __strong __auto_type strongDelegate = weakDelegate;
             strongDelegate.onReportEnd = nil;
         };
+    }
+
+    // Schedule a job in the controller's pool that will not complete until the
+    // fake device is deallocated.
+    __auto_type * fakeDeviceDeletedExpectation = [self expectationWithDescription:@"Fake device deleted"];
+    MTRAsyncWorkItem * blockingWorkItem = [[MTRAsyncWorkItem alloc] initWithQueue:queue];
+    [blockingWorkItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull completion) {
+        [self waitForExpectations:@[ fakeDeviceDeletedExpectation ] timeout:kTimeoutInSeconds];
+        completion(MTRAsyncWorkComplete);
+    }];
+    [controller.concurrentSubscriptionPool enqueueWorkItem:blockingWorkItem description:@"Waiting for fake device deletion"];
+
+    @autoreleasepool {
+        // Create our fake device and have it dealloc before the blocking WorkItem
+        // completes and hence before its subscription work item gets a chance
+        // to run (in the width-1 case).
+        MTRDeviceTestDelegate * delegate = deviceDelegates[fakeDeviceID];
+        // onSubscriptionCallbackDelete is called from dealloc
+        delegate.onSubscriptionCallbackDelete = ^{
+            [fakeDeviceDeletedExpectation fulfill];
+        };
+
+        __auto_type * device = [MTRDevice deviceWithNodeID:fakeDeviceID controller:controller];
+        [device setDelegate:delegate queue:queue];
     }
 
     for (NSNumber * deviceID in orderedDeviceIDs) {
@@ -3691,6 +3755,11 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
         XCTAssertEqual(controller.devices.count, 1);
     }
+
+    // Wait for the report processing to finish, so the MTRDevice object may dealloc
+    [controller syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
 
     // report should still be ongoing
     XCTAssertFalse(subscriptionReportEnd1);

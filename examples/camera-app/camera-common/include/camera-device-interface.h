@@ -23,9 +23,13 @@
 #include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
 #include <media-controller.h>
 
+using chip::app::Clusters::CameraAvStreamManagement::AudioCapabilitiesStruct;
 using chip::app::Clusters::CameraAvStreamManagement::AudioStreamStruct;
 using chip::app::Clusters::CameraAvStreamManagement::ImageSnapshot;
+using chip::app::Clusters::CameraAvStreamManagement::RateDistortionTradeOffStruct;
+using chip::app::Clusters::CameraAvStreamManagement::SnapshotCapabilitiesStruct;
 using chip::app::Clusters::CameraAvStreamManagement::SnapshotStreamStruct;
+using chip::app::Clusters::CameraAvStreamManagement::StreamUsageEnum;
 using chip::app::Clusters::CameraAvStreamManagement::VideoResolutionStruct;
 using chip::app::Clusters::CameraAvStreamManagement::VideoSensorParamsStruct;
 using chip::app::Clusters::CameraAvStreamManagement::VideoStreamStruct;
@@ -34,9 +38,10 @@ using chip::app::Clusters::CameraAvStreamManagement::ViewportStruct;
 struct VideoStream
 {
     VideoStreamStruct videoStreamParams;
-    bool isAllocated;    // Flag to indicate if the stream is allocated.
-    void * videoContext; // Platform-specific context object associated with
-                         // video stream;
+    bool isAllocated;        // Flag to indicate if the stream is allocated.
+    ViewportStruct viewport; // Stream specific viewport, defaults to the camera viewport
+    void * videoContext;     // Platform-specific context object associated with
+                             // video stream;
 
     bool IsCompatible(const VideoStreamStruct & inputParams) const
     {
@@ -164,7 +169,7 @@ public:
         virtual CameraError StopSnapshotStream(uint16_t streamID) = 0;
 
         // Get the maximum number of concurrent encoders supported by camera.
-        virtual uint8_t GetMaxConcurrentVideoEncoders() = 0;
+        virtual uint8_t GetMaxConcurrentEncoders() = 0;
 
         // Get the maximum data rate in encoded pixels per second that the
         // camera can produce given the hardware encoders it has.
@@ -174,16 +179,31 @@ public:
         // capabilities)
         virtual VideoSensorParamsStruct & GetVideoSensorParams() = 0;
 
-        // Get indication whether camera supports night vision mode
-        virtual bool GetNightVisionCapable() = 0;
+        // Get indication whether camera supports night vision
+        virtual bool GetCameraSupportsNightVision() = 0;
+
+        // Get indication whether camera night vision using infrared
+        virtual bool GetNightVisionUsesInfrared() = 0;
 
         // Get indication of the min resolution(pixels) that camera allows for
         // its viewport.
         virtual VideoResolutionStruct & GetMinViewport() = 0;
 
+        // Get the rate distortion tradeoff points(min bitrate for resolutions) for video codecs.
+        virtual std::vector<RateDistortionTradeOffStruct> & GetRateDistortionTradeOffPoints() = 0;
+
         // Get the maximum size of content buffer in bytes. This buffer holds
         // compressed and/or raw audio/video content.
         virtual uint32_t GetMaxContentBufferSize() = 0;
+
+        // Get microphone capabilities.
+        virtual AudioCapabilitiesStruct & GetMicrophoneCapabilities() = 0;
+
+        // Get speaker capabilities.
+        virtual AudioCapabilitiesStruct & GetSpeakerCapabilities() = 0;
+
+        // Get snapshot capabilities
+        virtual std::vector<SnapshotCapabilitiesStruct> & GetSnapshotCapabilities() = 0;
 
         // Get the maximum network bandwidth(mbps) that the camera would consume
         // for transmission of its media streams.
@@ -198,6 +218,14 @@ public:
         // Get the current camera HDR mode.
         virtual bool GetHDRMode() = 0;
 
+        // Get Supported Stream usages; Typically set by manudacturer.
+        // This also sets the default priority of the stream usages.
+        virtual std::vector<StreamUsageEnum> & GetSupportedStreamUsages() = 0;
+
+        // Get Ranked stream priorities as an ordered list. This is expected to
+        // be a subset of the SupportedStreamUsages.
+        virtual std::vector<StreamUsageEnum> & GetRankedStreamPriorities() = 0;
+
         // Does camera have a speaker
         virtual bool HasSpeaker() = 0;
 
@@ -206,6 +234,9 @@ public:
 
         // Get the current camera viewport.
         virtual const ViewportStruct & GetViewport() = 0;
+
+        // Set the viewport for a specific stream
+        virtual CameraError SetViewport(VideoStream & stream, const ViewportStruct & viewPort) = 0;
 
         // Mute/Unmute speaker.
         virtual CameraError SetSpeakerMuted(bool muteSpeaker) = 0;
@@ -232,14 +263,16 @@ public:
         virtual uint8_t GetMicrophoneMaxLevel() = 0;
         virtual uint8_t GetMicrophoneMinLevel() = 0;
 
-        virtual int16_t GetPanMin() = 0;
+        // Set Pan, Tilt, and Zoom
+        virtual CameraError SetPan(int16_t aPan)   = 0;
+        virtual CameraError SetTilt(int16_t aTilt) = 0;
+        virtual CameraError SetZoom(uint8_t aZoom) = 0;
 
-        virtual int16_t GetPanMax() = 0;
-
+        // Get device defined limits for Pan, Tilt, and Zoom
+        virtual int16_t GetPanMin()  = 0;
+        virtual int16_t GetPanMax()  = 0;
         virtual int16_t GetTiltMin() = 0;
-
         virtual int16_t GetTiltMax() = 0;
-
         virtual uint8_t GetZoomMax() = 0;
     };
 

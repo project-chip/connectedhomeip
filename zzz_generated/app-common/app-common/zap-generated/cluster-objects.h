@@ -146,10 +146,6 @@
 #include <clusters/ContentLauncher/Commands.h>
 #include <clusters/ContentLauncher/Events.h>
 #include <clusters/ContentLauncher/Structs.h>
-#include <clusters/DemandResponseLoadControl/Attributes.h>
-#include <clusters/DemandResponseLoadControl/Commands.h>
-#include <clusters/DemandResponseLoadControl/Events.h>
-#include <clusters/DemandResponseLoadControl/Structs.h>
 #include <clusters/Descriptor/Attributes.h>
 #include <clusters/Descriptor/Commands.h>
 #include <clusters/Descriptor/Events.h>
@@ -186,6 +182,10 @@
 #include <clusters/ElectricalEnergyMeasurement/Commands.h>
 #include <clusters/ElectricalEnergyMeasurement/Events.h>
 #include <clusters/ElectricalEnergyMeasurement/Structs.h>
+#include <clusters/ElectricalGridConditions/Attributes.h>
+#include <clusters/ElectricalGridConditions/Commands.h>
+#include <clusters/ElectricalGridConditions/Events.h>
+#include <clusters/ElectricalGridConditions/Structs.h>
 #include <clusters/ElectricalPowerMeasurement/Attributes.h>
 #include <clusters/ElectricalPowerMeasurement/Commands.h>
 #include <clusters/ElectricalPowerMeasurement/Events.h>
@@ -458,6 +458,10 @@
 #include <clusters/SoftwareDiagnostics/Commands.h>
 #include <clusters/SoftwareDiagnostics/Events.h>
 #include <clusters/SoftwareDiagnostics/Structs.h>
+#include <clusters/SoilMeasurement/Attributes.h>
+#include <clusters/SoilMeasurement/Commands.h>
+#include <clusters/SoilMeasurement/Events.h>
+#include <clusters/SoilMeasurement/Structs.h>
 #include <clusters/Switch/Attributes.h>
 #include <clusters/Switch/Commands.h>
 #include <clusters/Switch/Events.h>

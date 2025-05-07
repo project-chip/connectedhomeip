@@ -41,14 +41,17 @@ static chip::ArgParser::OptionSet sCmdLineOptions = { EnergyGatewayAppOptionHand
 void ApplicationInit()
 {
     ChipLogDetail(AppServer, "Energy Gateway App: ApplicationInit()");
-    ElectricalPriceApplicationInit();
+
+    // If we are emulating Electrical Energy Tariff device type then call this
+    // TODO consider how other clusters / endpoints should be used in this example app
+    ElectricalEnergyTariffInit();
 }
 
 void ApplicationShutdown()
 {
     ChipLogDetail(AppServer, "Energy Gateway App: ApplicationShutdown()");
 
-    ElectricalPriceApplicationShutdown();
+    ElectricalEnergyTariffShutdown();
 }
 
 static bool EnergyGatewayAppOptionHandler(const char * aProgram, chip::ArgParser::OptionSet * aOptions, int aIdentifier,

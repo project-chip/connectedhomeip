@@ -24,8 +24,8 @@
 #include <platform/DeviceInstanceInfoProvider.h>
 
 #if CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
-#include "FactoryDataDriver.h"
-#include "FactoryDataProvider.h"
+#include "platform/nxp/common/factory_data/legacy/FactoryDataDriver.h"
+#include "platform/nxp/common/factory_data/legacy/FactoryDataProvider.h"
 #else
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #endif

@@ -74,39 +74,6 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 } // namespace PriceChange
-namespace ForecastChange {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-
-enum class Fields : uint8_t
-{
-    kPriceForecast = 0,
-};
-
-struct Type
-{
-public:
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::ForecastChange::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
-    static constexpr bool kIsFabricScoped = false;
-
-    DataModel::Nullable<DataModel::List<const Structs::CommodityPriceStruct::Type>> priceForecast;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::ForecastChange::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
-
-    DataModel::Nullable<DataModel::DecodableList<Structs::CommodityPriceStruct::DecodableType>> priceForecast;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-} // namespace ForecastChange
 } // namespace Events
 } // namespace CommodityPrice
 } // namespace Clusters
