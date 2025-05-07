@@ -19,6 +19,7 @@
 #include "chef-pump.h"
 #include "DeviceTypes.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -67,7 +68,7 @@ uint16_t getIndexFlowMeasurement(EndpointId endpointId)
 /**
  * @brief Sets all setpoints to Max if state is On else NULL.
  */
-void updateSetPointsOnOff(bool onOff)
+void updateSetPointsOnOff(EndpointId endpointId, bool onOff)
 {
     uint16_t epIndex;
 
@@ -75,7 +76,7 @@ void updateSetPointsOnOff(bool onOff)
     epIndex = getIndexTemperatureMeasurement(endpointId);
     if (epIndex < kTemperatureMeasurementCount)
     {
-        auto updatedTemperature = value ? TemperatureRangeMax[epIndex] : DataModel::NullNullable;
+        auto updatedTemperature = onOff ? TemperatureRangeMax[epIndex] : DataModel::NullNullable;
         TemperatureMeasurement::Attributes::MeasuredValue::Set(endpoint, updatedTemperature);
         MatterReportingAttributeChangeCallback(endpointId, TemperatureMeasurement::Id,
                                                TemperatureMeasurement::Attributes::MeasuredValue::Id);
@@ -86,7 +87,7 @@ void updateSetPointsOnOff(bool onOff)
     epIndex = getIndexPressureMeasurement(endpointId);
     if (epIndex < kPressureMeasurementCount)
     {
-        auto updatedPressure = value ? PressureRangeMax[epIndex] : DataModel::NullNullable;
+        auto updatedPressure = onOff ? PressureRangeMax[epIndex] : DataModel::NullNullable;
         PressureMeasurement::Attributes::MeasuredValue::Set(endpoint, updatedPressure);
         MatterReportingAttributeChangeCallback(endpointId, PressureMeasurement::Id,
                                                PressureMeasurement::Attributes::MeasuredValue::Id);
@@ -97,7 +98,7 @@ void updateSetPointsOnOff(bool onOff)
     epIndex = getIndexFlowMeasurement(endpointId);
     if (epIndex < kFlowMeasurementCount)
     {
-        auto updatedFlow = value ? FlowRangeMax[epIndex] : DataModel::NullNullable;
+        auto updatedFlow = onOff ? FlowRangeMax[epIndex] : DataModel::NullNullable;
         FlowMeasurement::Attributes::MeasuredValue::Set(endpoint, updatedFlow);
         MatterReportingAttributeChangeCallback(endpointId, FlowMeasurement::Id, FlowMeasurement::Attributes::MeasuredValue::Id);
     }
@@ -154,10 +155,10 @@ void handleOnOff(EndpointId endpoint, bool value)
     }
     else
     {
-        updateSetPointsOnOff(value);
+        updateSetPointsOnOff(endpoint, value);
     }
 #else
-    updateSetPointsOnOff(value);
+    updateSetPointsOnOff(endpoint, value);
 #endif // MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
 }
 
