@@ -16,6 +16,7 @@
  */
 
 #include <Network/Network.h>
+#include <inet/Darwin/InterfacesMonitor.h>
 #include <inet/InetConfig.h>
 
 #include <inet/IANAConstants.h>
@@ -25,12 +26,12 @@
 namespace chip {
 namespace Inet {
 namespace Darwin {
-class UDPEndPointImplNetworkFrameworkListenerGroup
+class UDPEndPointImplNetworkFrameworkListenerGroup : public InterfacesMonitor
 {
 public:
     virtual ~UDPEndPointImplNetworkFrameworkListenerGroup() = default;
 
-    CHIP_ERROR Configure(nw_parameters_t parameters);
+    CHIP_ERROR Configure(nw_parameters_t parameters, const IPAddressType addressType, InterfaceId interfaceId);
     void Unlisten();
 
     CHIP_ERROR SetMulticastLoopback(IPVersion ipVersion, bool loopback) { return CHIP_ERROR_NOT_IMPLEMENTED; }
@@ -47,20 +48,28 @@ public:
                                       InterfaceId interfaceId = InterfaceId::Null()) = 0;
 
 private:
-    void StopListeners();
-    CHIP_ERROR StartListeners(nw_group_descriptor_t groupDescriptor);
-    CHIP_ERROR JoinLeaveMulticastGroup(nw_endpoint_t endpoint, bool join);
-    CHIP_ERROR JoinMulticastGroup(nw_endpoint_t endpoint);
-    CHIP_ERROR LeaveMulticastGroup(nw_endpoint_t endpoint);
+    struct InterfaceGroup
+    {
+        nw_interface_t interface;
+        nw_connection_group_t connectionGroup;
+        dispatch_semaphore_t cancelSemaphore;
+    };
+    CFMutableDictionaryRef mInterfaceGroups;
+    static void ReleaseInterfaceGroupCallback(CFAllocatorRef allocator, const void * value);
+
+    void StopListeners(InterfaceGroup * group = nullptr);
+    CHIP_ERROR StartListeners(InterfaceGroup * group, nw_group_descriptor_t groupDescriptor);
+    CHIP_ERROR JoinLeaveMulticastGroup(InterfaceId interfaceId, nw_endpoint_t endpoint, bool join);
+    CHIP_ERROR JoinMulticastGroup(nw_interface_t interface, nw_endpoint_t endpoint);
+    CHIP_ERROR LeaveMulticastGroup(nw_interface_t interface, nw_endpoint_t endpoint);
     bool IsSameEndPoints(nw_endpoint_t a, nw_endpoint_t b);
 
-    CHIP_ERROR WaitForConnectionGroupReadyState(nw_connection_group_t connectionGroup);
-    CHIP_ERROR WaitForConnectionGroupCancelledState(nw_connection_group_t connectionGroup);
+    CHIP_ERROR WaitForConnectionGroupReadyState(InterfaceGroup * group, nw_connection_group_t connectionGroup);
+    CHIP_ERROR WaitForConnectionGroupCancelledState(InterfaceGroup * group);
 
-    nw_connection_group_t mConnectionGroup   = nullptr;
-    dispatch_queue_t mConnectionGroupQueue   = nullptr;
-    dispatch_semaphore_t mCancelledSemaphore = nullptr;
-    nw_parameters_t mLocalParameters         = nullptr;
+    dispatch_queue_t mConnectionGroupQueue = nullptr;
+    nw_parameters_t mLocalParameters       = nullptr;
+    nw_path_t mLastPath                    = nullptr;
 };
 
 } // namespace Darwin

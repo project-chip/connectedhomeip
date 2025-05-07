@@ -66,7 +66,7 @@ namespace Inet {
         err = UDPEndPointImplNetworkFrameworkListener::Configure(parameters, addressType, address, port, intfId);
         VerifyOrReturnError(CHIP_NO_ERROR == err, err, ReleaseAll());
 
-        err = UDPEndPointImplNetworkFrameworkListenerGroup::Configure(parameters);
+        err = UDPEndPointImplNetworkFrameworkListenerGroup::Configure(parameters, addressType, intfId);
         VerifyOrReturnError(CHIP_NO_ERROR == err, err, ReleaseAll());
 
         err = UDPEndPointImplNetworkFrameworkConnection::Configure(parameters, addressType);
