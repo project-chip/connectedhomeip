@@ -64,6 +64,46 @@ uint16_t getIndexFlowMeasurement(EndpointId endpointId)
 }
 // #endif // MATTER_DM_PLUGIN_FLOW_MEASUREMENT_SERVER
 
+/**
+ * @brief Sets all setpoints to Max if state is On else NULL.
+ */
+void updateSetPointsOnOff(bool onOff)
+{
+    uint16_t epIndex;
+
+    // #ifdef MATTER_DM_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER
+    epIndex = getIndexTemperatureMeasurement(endpointId);
+    if (epIndex < kTemperatureMeasurementCount)
+    {
+        auto updatedTemperature = value ? TemperatureRangeMax[epIndex] : DataModel::NullNullable;
+        TemperatureMeasurement::Attributes::MeasuredValue::Set(endpoint, updatedTemperature);
+        MatterReportingAttributeChangeCallback(endpointId, TemperatureMeasurement::Id,
+                                               TemperatureMeasurement::Attributes::MeasuredValue::Id);
+    }
+    // #endif // MATTER_DM_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER
+
+    // #ifdef MATTER_DM_PLUGIN_PRESSURE_MEASUREMENT_SERVER
+    epIndex = getIndexPressureMeasurement(endpointId);
+    if (epIndex < kPressureMeasurementCount)
+    {
+        auto updatedPressure = value ? PressureRangeMax[epIndex] : DataModel::NullNullable;
+        PressureMeasurement::Attributes::MeasuredValue::Set(endpoint, updatedPressure);
+        MatterReportingAttributeChangeCallback(endpointId, PressureMeasurement::Id,
+                                               PressureMeasurement::Attributes::MeasuredValue::Id);
+    }
+    // #endif // MATTER_DM_PLUGIN_PRESSURE_MEASUREMENT_SERVER
+
+    // #ifdef MATTER_DM_PLUGIN_FLOW_MEASUREMENT_SERVER
+    epIndex = getIndexFlowMeasurement(endpointId);
+    if (epIndex < kFlowMeasurementCount)
+    {
+        auto updatedFlow = value ? FlowRangeMax[epIndex] : DataModel::NullNullable;
+        FlowMeasurement::Attributes::MeasuredValue::Set(endpoint, updatedFlow);
+        MatterReportingAttributeChangeCallback(endpointId, FlowMeasurement::Id, FlowMeasurement::Attributes::MeasuredValue::Id);
+    }
+    // #endif // MATTER_DM_PLUGIN_FLOW_MEASUREMENT_SERVER
+}
+
 #ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
 constexpr size_t kLevelControlCount = MATTER_DM_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT;
 std::unique_ptr<DataModel::Nullable<uint8_t>> gLevel[kLevelControlCount];
@@ -92,16 +132,33 @@ void handleMoveToLevel(EndpointId endpoint, uint8_t level)
 #endif // MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
 
 /**
- * @brief Handler when OnOff value has changed.
+ * @brief Handler when OnOff value has changed. Updates setpoints if LevelControl is disabled for endpoint. If LevelControl is
+ * enabled, only level is updated, handleMoveToLevel should be called to update setponts.
  */
 void handleOnOff(EndpointId endpoint, bool value)
 {
     ChipLogDetail(DeviceLayer, "[chef-pump] Inside handleOnOff");
-    if (value) // Pump has been turned On.
-    {
 #ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
-#endif // MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
+    uint16_t epIndex = getIndexLevelControl(endpointId);
+    if (epIndex < kLevelControlCount)
+    {
+        if (value)
+        {
+            LevelControl::Attributes::CurrentLevel::Set(endpointId, gLevel[epIndex]);
+        }
+        else
+        {
+            LevelControl::Attributes::CurrentLevel::SetNull(endpointId);
+        }
+        MatterReportingAttributeChangeCallback(endpointId, OnOff::Id, OnOff::Attributes::OnOff::Id);
     }
+    else
+    {
+        updateSetPointsOnOff(value);
+    }
+#else
+    updateSetPointsOnOff(value);
+#endif // MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
 }
 
 void Init()
