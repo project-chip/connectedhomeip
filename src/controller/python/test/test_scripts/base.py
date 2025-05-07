@@ -211,7 +211,7 @@ class BaseTestHelper:
         return ctypes.string_at(addrStrStorage).decode("utf-8")
 
     async def TestDiscovery(self, discriminator: int):
-        DISCOVERY_TIMEOUT_SECONDS=10
+        DISCOVERY_TIMEOUT_SECONDS = 10
         self.logger.info(
             f"Discovering commissionable nodes with discriminator {discriminator} a with {DISCOVERY_TIMEOUT_SECONDS} timeout.")
         res = await self.devCtrl.DiscoverCommissionableNodes(
