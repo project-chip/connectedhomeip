@@ -351,7 +351,7 @@ def main():
                                help='Application build date (string)')
 
     create_parser.add_argument('-wifi', "--wifi_ta_input_file",
-                               help='Path to OTA image for SiWx917 (TA/M4/Combined file), 917 NCP (TA)')
+                               help='Path to OTA image for 917 wifi TA')
     create_parser.add_argument('--wifi-ta-version', type=any_base_int,
                                help='WiFi TA Software version (numeric)')
     create_parser.add_argument('--wifi-ta-version-str', type=str,

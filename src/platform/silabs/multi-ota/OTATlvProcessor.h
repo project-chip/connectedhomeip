@@ -115,13 +115,13 @@ public:
     struct Descriptor
     {
         uint32_t version;
-        char versionString[kVersionStringSize];
+        char versionString[kVersionStringSize] = { 0 };
         char buildDate[kBuildDateSize];
     };
     virtual ~OTATlvProcessor() {}
 
     virtual CHIP_ERROR Init();
-    CHIP_ERROR Clear();
+    virtual CHIP_ERROR Clear();
     virtual CHIP_ERROR ApplyAction()    = 0;
     virtual CHIP_ERROR FinalizeAction() = 0;
     virtual CHIP_ERROR ExitAction() { return CHIP_NO_ERROR; }

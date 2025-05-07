@@ -78,7 +78,6 @@ static_library("efr32") {
   } else {
     sources += [ "BLEManagerImpl.cpp" ]
   }
-
   if (chip_enable_multi_ota_requestor) {
     if (chip_enable_multi_ota_encryption) {
       sources += [
@@ -105,7 +104,8 @@ static_library("efr32") {
       "${silabs_platform_dir}/multi-ota/OTATlvProcessor.h",
     ]
 
-    if (chip_enable_wifi) {
+    #For SiWx917 family
+    if (chip_enable_wifi && use_SiWx917) {
       sources += [
         "${silabs_platform_dir}/multi-ota/SiWx917/OTAWiFiFirmwareProcessor.cpp",
         "${silabs_platform_dir}/multi-ota/SiWx917/OTAWiFiFirmwareProcessor.h",
