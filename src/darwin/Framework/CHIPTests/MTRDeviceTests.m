@@ -3825,14 +3825,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Set up our MTRDevice and do a subscribe.  Make sure all the events we
     // get are marked "historical".
-    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
-    XCTestExpectation * secondSubscriptionExpectation = [self expectationWithDescription:@"Second subscription established"];
-    XCTestExpectation * gotFirstReportsExpectation = [self expectationWithDescription:@"First Attribute and Event reports have been received"];
-
     __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
-    delegate.onReachable = ^() {
-        [secondSubscriptionExpectation fulfill];
-    };
 
     __block unsigned eventReportsReceived = 0;
     delegate.onEventDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * eventReport) {
@@ -3843,20 +3836,35 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         }
     };
 
-    delegate.onReportEnd = ^() {
-        [gotFirstReportsExpectation fulfill];
-    };
+    XCTestExpectation * firstDeviceDeallocExpectation = [self expectationWithDescription:@"First device deallocated"];
+    @autoreleasepool {
+        __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
+        XCTestExpectation * firstSubscriptionExpectation = [self expectationWithDescription:@"First subscription established"];
+        XCTestExpectation * gotFirstReportsExpectation = [self expectationWithDescription:@"First Attribute and Event reports have been received"];
 
-    [device setDelegate:delegate queue:queue];
+        delegate.onReachable = ^() {
+            [firstSubscriptionExpectation fulfill];
+        };
 
-    [self waitForExpectations:@[ secondSubscriptionExpectation, gotFirstReportsExpectation ] timeout:60];
+        delegate.onReportEnd = ^() {
+            [gotFirstReportsExpectation fulfill];
+        };
 
-    // Must have gotten some events (at least StartUp!)
-    XCTAssertTrue(eventReportsReceived > 0);
+        delegate.onSubscriptionCallbackDelete = ^{
+            [firstDeviceDeallocExpectation fulfill];
+        };
 
-    // Remove the device, then try again, now with us having stored cluster
-    // data.  All the events should still be reported as historical.
-    [sController removeDevice:device];
+        [device setDelegate:delegate queue:queue];
+
+        [self waitForExpectations:@[ firstSubscriptionExpectation, gotFirstReportsExpectation ] timeout:60];
+
+        // Must have gotten some events (at least StartUp!)
+        XCTAssertTrue(eventReportsReceived > 0);
+    }
+
+    // Wait for the device to dealloc before we clear storage, since it might
+    // write to storage as it shuts down.
+    [self waitForExpectations:@[ firstDeviceDeallocExpectation ] timeout:kTimeoutInSeconds];
 
     // Clear out our device data, so we don't have a stored max event number
     // that filters everything out.
@@ -3864,21 +3872,23 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     eventReportsReceived = 0;
 
-    device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
-    XCTestExpectation * thirdSubscriptionExpectation = [self expectationWithDescription:@"Third subscription established"];
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
+    XCTestExpectation * secondSubscriptionExpectation = [self expectationWithDescription:@"Second subscription established"];
     XCTestExpectation * gotSecondReportsExpectation = [self expectationWithDescription:@"Second Attribute and Event reports have been received"];
 
     delegate.onReachable = ^() {
-        [thirdSubscriptionExpectation fulfill];
+        [secondSubscriptionExpectation fulfill];
     };
 
     delegate.onReportEnd = ^() {
         [gotSecondReportsExpectation fulfill];
     };
 
+    delegate.onSubscriptionCallbackDelete = nil;
+
     [device setDelegate:delegate queue:queue];
 
-    [self waitForExpectations:@[ thirdSubscriptionExpectation, gotSecondReportsExpectation ] timeout:60];
+    [self waitForExpectations:@[ secondSubscriptionExpectation, gotSecondReportsExpectation ] timeout:60];
 
     // Must have gotten some events (at least StartUp!)
     XCTAssertTrue(eventReportsReceived > 0);
