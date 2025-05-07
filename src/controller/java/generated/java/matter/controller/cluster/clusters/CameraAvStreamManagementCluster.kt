@@ -1005,7 +1005,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readNightVisionCapableAttribute(): Boolean? {
+  suspend fun readNightVisionUsesInfraredAttribute(): Boolean? {
     val ATTRIBUTE_ID: UInt = 3u
 
     val attributePath =
@@ -1027,7 +1027,7 @@ class CameraAvStreamManagementCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Nightvisioncapable attribute not found in response" }
+    requireNotNull(attributeData) { "Nightvisionusesinfrared attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
@@ -1041,7 +1041,7 @@ class CameraAvStreamManagementCluster(
     return decodedValue
   }
 
-  suspend fun subscribeNightVisionCapableAttribute(
+  suspend fun subscribeNightVisionUsesInfraredAttribute(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
@@ -1077,7 +1077,7 @@ class CameraAvStreamManagementCluster(
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
-            "Nightvisioncapable attribute not found in Node State update"
+            "Nightvisionusesinfrared attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type
