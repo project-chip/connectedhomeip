@@ -3820,6 +3820,10 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 {
     // TODO:  find source of flakiness; re-enable test once that's fixed.
     // (passes locally as of c91562)
+    // failure exemplars:
+    // - https://github.com/project-chip/connectedhomeip/actions/runs/14883729641
+    // - https://github.com/project-chip/connectedhomeip/actions/runs/14883635292
+
     XCTSkip("Skipping due to flakyness/failing. See https://github.com/project-chip/connectedhomeip/issues/38793");
 
     dispatch_queue_t queue = dispatch_get_main_queue();
