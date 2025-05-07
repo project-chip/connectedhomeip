@@ -133,8 +133,6 @@ class TC_CNET_4_12(MatterBaseTest):
     @async_test_body
     async def test_TC_CNET_4_12(self):
 
-        # wait_time_reboot = 10
-
         # Pre-Conditions
         self.step('precondition-1')
         logger.info('Precondition 1: DUT supports CNET.S.F01(TH)')
@@ -158,7 +156,6 @@ class TC_CNET_4_12(MatterBaseTest):
                     f'PIXIT.CNET.ENDPOINT_THREAD = {endpoint}, '
                     f'PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET = {thread_dataset_1}, '
                     f'PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET = {thread_dataset_2}')
-
         thread_dataset_1_bytes = bytes.fromhex(thread_dataset_1)
         thread_dataset_2_bytes = bytes.fromhex(thread_dataset_2)
 
@@ -180,9 +177,8 @@ class TC_CNET_4_12(MatterBaseTest):
         feature_map = await self.read_single_attribute_check_success(
             cluster=self.CLUSTER_CNET,
             attribute=self.CLUSTER_CNET.Attributes.FeatureMap)
-        asserts.assert_true(feature_map == 2,
-                            msg="Verify that feature_map is equal to 1")
         logger.info(f'Pre-Conditions #3: The FeatureMap attribute value is: {feature_map}')
+        asserts.assert_true(feature_map == 2, msg="Verify that feature_map is equal to 1")
 
         # Steps
         self.step(1)
@@ -193,16 +189,15 @@ class TC_CNET_4_12(MatterBaseTest):
             cmd=cmd
         )
         # Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'OK'(0)
+        logger.info(f'Step #1 - ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
         asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                              "Failure status returned from arm failsafe")
-        logger.info(f'Step #1 - ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
 
         self.step(2)
         networks = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.Networks
         )
-
         logger.info(f'Step #2: Networks attribute: {networks}')
 
         num_networks = len(networks)
@@ -240,7 +235,9 @@ class TC_CNET_4_12(MatterBaseTest):
 
         self.step(5)
         cmd = Clusters.NetworkCommissioning.Commands.AddOrUpdateThreadNetwork(
-            operationalDataset=thread_dataset_2_bytes, breadcrumb=1)
+            operationalDataset=thread_dataset_2_bytes,
+            breadcrumb=1
+        )
         resp = await self.send_single_cmd(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
@@ -292,12 +289,12 @@ class TC_CNET_4_12(MatterBaseTest):
         logger.info(f'Step #7: ConnectMaxTimeSeconds value: {connect_max_time_seconds}')
 
         self.step(8)
+        # Verify that the TH successfully connects to the DUT
         networks = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.Networks
         )
         logger.info(f'Step #8: Networks attribute: {networks}')
-        # TODO: Verify that the TH successfully connects to the DUT
 
         self.step(9)
         # Expired session is re-established the new session reading attribute (Breadcrum)
@@ -350,16 +347,18 @@ class TC_CNET_4_12(MatterBaseTest):
         logger.info(f'Step #12: Networks attribute after read atribute: {networks}')
 
         self.step(13)
-        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=self.failsafe_expiration_seconds)
+        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(
+            expiryLengthSeconds=self.failsafe_expiration_seconds
+        )
         resp = await self.send_single_cmd(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
             cmd=cmd
         )
         # Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'OK'(0)
+        logger.info(f'Step #13 - ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
         asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                              "Failure status returned from arm failsafe")
-        logger.info(f'Step #13 - ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
 
         self.step(14)
         cmd = Clusters.NetworkCommissioning.Commands.RemoveNetwork(networkID=thread_network_id_bytes_th1, breadcrumb=1)
@@ -379,7 +378,9 @@ class TC_CNET_4_12(MatterBaseTest):
 
         self.step(15)
         cmd = Clusters.NetworkCommissioning.Commands.AddOrUpdateThreadNetwork(
-            operationalDataset=thread_dataset_2_bytes, breadcrumb=1)
+            operationalDataset=thread_dataset_2_bytes,
+            breadcrumb=1
+        )
         resp = await self.send_single_cmd(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
@@ -421,8 +422,8 @@ class TC_CNET_4_12(MatterBaseTest):
         )
         logger.info(f'Step #17: Networks attribute: {networks}')
         logger.info(f'Step #17: Networks attribute: {networks.connected}')
-        # Assert that the network is connected
-        asserts.assert_true(network.connected, 'Expected network to be connected, but it was not.')
+        # Verify that the Thread 2nd is connected
+        asserts.assert_true(network.connected, 'Thread 2nd expected network to be connected, but the connection was not established.')
 
         self.step(18)
         breadcrumb_info = await self.read_single_attribute_check_success(
