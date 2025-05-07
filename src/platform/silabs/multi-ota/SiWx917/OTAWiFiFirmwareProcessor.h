@@ -34,13 +34,6 @@ class OTAWiFiFirmwareProcessor : public OTATlvProcessor
 {
 
 public:
-    struct Descriptor
-    {
-        uint32_t version;
-        char versionString[kVersionStringSize];
-        char buildDate[kBuildDateSize];
-    };
-
     CHIP_ERROR ApplyAction() override;
     CHIP_ERROR FinalizeAction() override;
     static constexpr size_t kAlignmentBytes = 64;
