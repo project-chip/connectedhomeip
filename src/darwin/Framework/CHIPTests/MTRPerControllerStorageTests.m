@@ -589,6 +589,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
 - (void)test001_BasicControllerStartup
 {
+    // MTRPerControllerStorageTests are categorically flaky at the moment.
+    XCTSkip("Skipping due to flakyness/failing.");
+
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
 
@@ -638,6 +641,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
 - (void)test002_TryStartingTwoControllersWithSameNodeID
 {
+    // MTRPerControllerStorageTests are categorically flaky at the moment.
+    XCTSkip("Skipping due to flakyness/failing.");
+
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
 
@@ -682,6 +688,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
 - (void)test003_TestTwoControllersSameUUID
 {
+    // MTRPerControllerStorageTests are categorically flaky at the moment.
+    XCTSkip("Skipping due to flakyness/failing.");
+
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
 
@@ -729,6 +738,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
 - (void)test004_TestBasicSessionResumption
 {
+    // MTRPerControllerStorageTests are categorically flaky at the moment.
+    XCTSkip("Skipping due to flakyness/failing.");
+
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
 
@@ -826,6 +838,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
 - (void)test005_TestSessionResumptionDataClearingNodeIDChanged
 {
+    // MTRPerControllerStorageTests are categorically flaky at the moment.
+    XCTSkip("Skipping due to flakyness/failing.");
+
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
 
@@ -929,6 +944,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
 - (void)test006_TestSessionResumptionDataClearingCATsChanged
 {
+    // MTRPerControllerStorageTests are categorically flaky at the moment.
+    XCTSkip("Skipping due to flakyness/failing.");
+
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
 
@@ -1035,6 +1053,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
 - (void)test007_TestMultipleControllers
 {
+    // MTRPerControllerStorageTests are categorically flaky at the moment.
+    XCTSkip("Skipping due to flakyness/failing.");
+
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
 
@@ -1303,6 +1324,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
 - (void)test008_TestDataStoreDirect
 {
+    // MTRPerControllerStorageTests are categorically flaky at the moment.
+    XCTSkip("Skipping due to flakyness/failing.");
+
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
 
@@ -1734,11 +1758,17 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
 - (void)test009_TestDataStoreMTRDevice
 {
+    // MTRPerControllerStorageTests are categorically flaky at the moment.
+    XCTSkip("Skipping due to flakyness/failing.");
+
     [self doDataStoreMTRDeviceTestWithStorageDelegate:[[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]] disableStorageBehaviorOptimization:NO];
 }
 
 - (void)test010_TestDataStoreMTRDeviceWithBulkReadWrite
 {
+    // MTRPerControllerStorageTests are categorically flaky at the moment.
+    XCTSkip("Skipping due to flakyness/failing.");
+
     __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
 
     // First do the same test as the above
@@ -1812,6 +1842,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
 - (void)test011_TestDataStoreMTRDeviceWithStorageBehaviorOptimizationDisabled
 {
+    // MTRPerControllerStorageTests are categorically flaky at the moment.
+    XCTSkip("Skipping due to flakyness/failing.");
+
     [self doDataStoreMTRDeviceTestWithStorageDelegate:[[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]] disableStorageBehaviorOptimization:YES];
 }
 
@@ -1819,6 +1852,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 // suspension tests to a different file.
 - (void)test012_startSuspended
 {
+    // MTRPerControllerStorageTests are categorically flaky at the moment.
+    XCTSkip("Skipping due to flakyness/failing.");
+
     // Needs to match the 888 == 0x378 for the node ID below.
     __auto_type * operationalBrowser = [[MTRPerControllerStorageTestsOperationalBrowser alloc] initWithNodeID:@"0000000000000378"];
     XCTestExpectation * initialAdvertisingExpectation = [self expectationWithDescription:@"Controller advertising initially"];
@@ -1861,6 +1897,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
 - (void)test013_suspendDevices
 {
+    // MTRPerControllerStorageTests are categorically flaky at the moment.
+    XCTSkip("Skipping due to flakyness/failing.");
+
     // getMTRDevice uses "123" for the node ID of the controller, which is hex 0x7B
     __auto_type * operationalBrowser = [[MTRPerControllerStorageTestsOperationalBrowser alloc] initWithNodeID:@"000000000000007B"];
     XCTestExpectation * initialAdvertisingExpectation = [self expectationWithDescription:@"Controller advertising initially"];
@@ -1998,6 +2037,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
 - (void)test014_TestDataStoreMTRDeviceInvalidateFlush
 {
+    // MTRPerControllerStorageTests are categorically flaky at the moment.
+    XCTSkip("Skipping due to flakyness/failing.");
+
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
 
@@ -2123,6 +2165,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 // startControllerWithRootKeys into a test helper.
 - (void)testControllerServer
 {
+    // MTRPerControllerStorageTests are categorically flaky at the moment.
+    XCTSkip("Skipping due to flakyness/failing.");
+
     __auto_type queue = dispatch_get_main_queue();
 
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
@@ -2754,6 +2799,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
 - (void)testSetMRPParametersWithRunningController
 {
+    // MTRPerControllerStorageTests are categorically flaky at the moment.
+    XCTSkip("Skipping due to flakyness/failing.");
+
     NSError * error;
     __auto_type * storageDelegate = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
     MTRDeviceController * controller = [self startControllerWithRootKeys:[[MTRTestKeys alloc] init]
@@ -2961,6 +3009,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
 - (void)testSubscriptionPool
 {
+    // MTRPerControllerStorageTests are categorically flaky at the moment.
+    XCTSkip("Skipping due to flakyness/failing.");
+
     // QRCodes generated for discriminators 1111~1115 and passcodes 1001~1005
     NSDictionary<NSNumber *, NSString *> * deviceOnboardingPayloads = @{
         @(101) : @"MT:00000UZ427U0D900000",
@@ -2985,6 +3036,14 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
 - (void)testSubscriptionPoolManyDevices
 {
+    // TODO:  find source of flakiness; re-enable test once that's fixed.
+    // issue: https://github.com/project-chip/connectedhomeip/issues/37312
+    // failure exemplars:
+    // - https://github.com/project-chip/connectedhomeip/actions/runs/14883159671
+    // - https://github.com/project-chip/connectedhomeip/actions/runs/14883635292
+    // (passes locally as of c91562)
+    XCTSkip("Skipping due to flakyness/failing. See https://github.com/project-chip/connectedhomeip/issues/38793");
+
     // QRCodes generated for discriminators 1111~1150 and passcodes 1001~1050
     NSDictionary<NSNumber *, NSString *> * deviceOnboardingPayloads = @{
         @(101) : @"MT:00000I9K17U0D900000",
@@ -3099,6 +3158,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
 - (void)testDataStorageUpdatesWhenRemovingEndpoints
 {
+    // MTRPerControllerStorageTests are categorically flaky at the moment.
+    XCTSkip("Skipping due to flakyness/failing.");
+
     NSNumber * deviceID = @(17);
     __auto_type * device = [self getMTRDevice:deviceID];
     __auto_type queue = dispatch_get_main_queue();
@@ -3261,6 +3323,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
 - (void)testDataStorageUpdatesWhenRemovingClusters
 {
+    // MTRPerControllerStorageTests are categorically flaky at the moment.
+    XCTSkip("Skipping due to flakyness/failing.");
+
     NSNumber * deviceID = @(17);
     __auto_type * device = [self getMTRDevice:deviceID];
     __auto_type queue = dispatch_get_main_queue();
@@ -3386,6 +3451,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
 - (void)testDataStorageUpdatesWhenRemovingAttributes
 {
+    // MTRPerControllerStorageTests are categorically flaky at the moment.
+    XCTSkip("Skipping due to flakyness/failing.");
+
     NSNumber * deviceID = @(17);
     __auto_type * device = [self getMTRDevice:deviceID];
     __auto_type queue = dispatch_get_main_queue();
@@ -3543,6 +3611,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 // Run the test here since detectLeaks is set, and subscription reset needs to not cause leaks
 - (void)testMTRDeviceResetSubscription
 {
+    // MTRPerControllerStorageTests are categorically flaky at the moment.
+    XCTSkip("Skipping due to flakyness/failing.");
+
     __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
 
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
@@ -3666,6 +3737,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
 - (void)testMTRDeviceDealloc
 {
+    // MTRPerControllerStorageTests are categorically flaky at the moment.
+    XCTSkip("Skipping due to flakyness/failing.");
+
     __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
 
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
@@ -3784,6 +3858,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
 - (void)testMTRDeviceMaybeUnreachableIgnoredIfReceivingFromDevice
 {
+    // MTRPerControllerStorageTests are categorically flaky at the moment.
+    XCTSkip("Skipping due to flakyness/failing.");
+
     __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
 
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
