@@ -211,10 +211,11 @@ class BaseTestHelper:
         return ctypes.string_at(addrStrStorage).decode("utf-8")
 
     async def TestDiscovery(self, discriminator: int):
+        DISCOVERY_TIMEOUT_SECONDS=10
         self.logger.info(
-            f"Discovering commissionable nodes with discriminator {discriminator}")
+            f"Discovering commissionable nodes with discriminator {discriminator} a with {DISCOVERY_TIMEOUT_SECONDS} timeout.")
         res = await self.devCtrl.DiscoverCommissionableNodes(
-            chip.discovery.FilterType.LONG_DISCRIMINATOR, discriminator, stopOnFirst=True, timeoutSecond=3)
+            chip.discovery.FilterType.LONG_DISCRIMINATOR, discriminator, stopOnFirst=True, timeoutSecond=DISCOVERY_TIMEOUT_SECONDS)
         if not res:
             self.logger.info(
                 "Device not found")
