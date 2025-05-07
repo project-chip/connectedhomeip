@@ -17,15 +17,10 @@
  */
 
 #include "soil-measurement-server.h"
-
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
-#include <zap-generated/gen_config.h>
+#include <clusters/SoilMeasurement/Metadata.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -114,7 +109,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         return aEncoder.Encode(mSoilMeasurementData.soilMoistureMeasuredValue);
     }
     case ClusterRevision::Id: {
-        return aEncoder.Encode(kClusterRevision);
+        return aEncoder.Encode(kRevision);
     }
     default: {
         break;
