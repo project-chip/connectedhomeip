@@ -49,7 +49,7 @@ std::unique_ptr<DataModel::Nullable<int16_t>> gPressure[MATTER_DM_PRESSURE_MEASU
 #endif // MATTER_DM_PLUGIN_PRESSURE_MEASUREMENT_SERVER
 
 #ifdef MATTER_DM_PLUGIN_FLOW_MEASUREMENT_SERVER
-std::unique_ptr<DataModel::Nullable<int16_t>> gPressure[MATTER_DM_FLOW_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT];
+std::unique_ptr<DataModel::Nullable<int16_t>> gFlow[MATTER_DM_FLOW_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT];
 #endif // MATTER_DM_PLUGIN_FLOW_MEASUREMENT_SERVER
 
 void handleOnOff(EndpointId endpoint, bool value)
