@@ -15,9 +15,6 @@
 #    limitations under the License.
 #
 
-# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
-# for details about the block below.
-
 import logging
 
 import chip.clusters as Clusters
