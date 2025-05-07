@@ -44,6 +44,7 @@ namespace Inet {
             bool IsLocalOnly() const { return mInterfaceId == kDNSServiceInterfaceIndexLocalOnly; };
 
             CHIP_ERROR StartMonitorInterfaces(OnInterfaceChanges interfaceChangesBlock);
+            CHIP_ERROR StartMonitorPath(OnPathChange pathChangeBlock);
             void StopMonitorInterfaces();
 
         private:
