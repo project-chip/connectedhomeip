@@ -642,6 +642,7 @@ void WifiInterfaceImpl::ProcessEvent(WiseconnectWifiInterface::WifiPlatformEvent
             {
                 ChipLogError(DeviceLayer, "InitiateScan failed: 0x%lx", static_cast<uint32_t>(status));
             }
+
             status = JoinWifiNetwork();
             if(SL_STATUS_OK != status)
             {
