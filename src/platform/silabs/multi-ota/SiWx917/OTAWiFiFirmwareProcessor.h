@@ -44,6 +44,7 @@ public:
     CHIP_ERROR ApplyAction() override;
     CHIP_ERROR FinalizeAction() override;
     static constexpr size_t kAlignmentBytes = 64;
+    static constexpr size_t kBlockSize      = 1024;
 
 private:
     uint8_t mFWchunktype = SL_FWUP_RPS_HEADER;
