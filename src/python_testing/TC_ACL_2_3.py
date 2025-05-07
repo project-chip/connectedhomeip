@@ -324,7 +324,7 @@ class TC_ACL_2_3(MatterBaseTest):
             TestStep(17, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 2 elements struct data field: D_OK_EMPTY, D_OK_SINGLE",
                      "Result is CONSTRAINT_ERROR (0x87) for the entire list, even the first valid struct should be rejected"),
             TestStep(18, "TH1 reads DUT Endpoint 0 AccessControl cluster Extension attribute",
-                     "Result is Success, AccessControlExtensionStruct containing 1 element; which is the last successfully written extension from Test Step 8; value is struct with data field: D_OK_FULL, fabric index is F1"),
+                     "Result is Success, AccessControlExtensionStruct containing 1 element. When using legacy encoding, value is struct with data field: D_OK_EMPTY from test step 17. When using new list method, value is struct with data field: D_OK_FULL from test step 8, as the last successfully written extension."),
             TestStep(19, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is an empty list",
                      "Result is SUCCESS"),
             TestStep(20, "TH1 reads DUT Endpoint 0 AccessControl cluster Extension attribute",
