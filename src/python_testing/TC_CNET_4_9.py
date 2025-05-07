@@ -92,6 +92,8 @@ class TC_CNET_4_9(MatterBaseTest):
             TestStep(21, "TH sends the AddOrUpdateWiFiNetwork command to the DUT",
                      "Verify that DUT sends the NetworkConfigResponse to each command with the following fields: "
                      "NetworkingStatus is success which is 0"),
+            TestStep(22, "TH sends the CommissioningComplete command to the DUT",
+                     "Verify that DUT sends CommissioningCompleteResponse with the ErrorCode field set to OK (0)")
         ]
 
     def def_TC_CNET_4_9(self):
@@ -344,6 +346,15 @@ class TC_CNET_4_9(MatterBaseTest):
         # Verify that DUT sends the NetworkConfigResponse to each command with the following fields: NetworkingStatus is success which is 0
         asserts.assert_equal(result.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
                              "Should have received network ok status")
+
+        # TH sends the CommissioningComplete command to the DUT
+        self.step(22)
+        cmd = Clusters.GeneralCommissioning.Commands.CommissioningComplete()
+        result = await self.send_single_cmd(cmd=cmd)
+
+        # Verify that DUT sends CommissioningCompleteResponse with the ErrorCode field set to OK (0)
+        asserts.assert_equal(result.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
+                             "CommissioningCompleteResponse was not OK")
 
 
 if __name__ == "__main__":
