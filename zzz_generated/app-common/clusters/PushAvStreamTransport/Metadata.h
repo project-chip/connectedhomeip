@@ -19,22 +19,14 @@ namespace PushAvStreamTransport {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-namespace SupportedContainerFormats {
+namespace SupportedFormats {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = SupportedContainerFormats::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .attributeId    = SupportedFormats::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-} // namespace SupportedContainerFormats
-namespace SupportedIngestMethods {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = SupportedIngestMethods::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-} // namespace SupportedIngestMethods
+} // namespace SupportedFormats
 namespace CurrentConnections {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = CurrentConnections::Id,

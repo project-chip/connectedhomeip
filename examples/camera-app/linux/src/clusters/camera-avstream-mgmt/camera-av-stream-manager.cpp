@@ -204,11 +204,18 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamModify(
                                                                                 const chip::Optional<bool> waterMarkEnabled,
                                                                                 const chip::Optional<bool> osdEnabled)
 {
-    // TODO: Change this after SnapshotStreamStruct gets WMark and OSD
     for (SnapshotStream & stream : mCameraDeviceHAL->GetAvailableSnapshotStreams())
     {
         if (stream.snapshotStreamParams.snapshotStreamID == streamID && stream.isAllocated)
         {
+            if (waterMarkEnabled.HasValue())
+            {
+                stream.snapshotStreamParams.watermarkEnabled = waterMarkEnabled;
+            }
+            if (osdEnabled.HasValue())
+            {
+                stream.snapshotStreamParams.OSDEnabled = osdEnabled;
+            }
             ChipLogError(Camera, "Modified snapshot stream with ID: %d", streamID);
             return Status::Success;
         }
