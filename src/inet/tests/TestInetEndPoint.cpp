@@ -33,7 +33,9 @@
 
 #include <CHIPVersion.h>
 #include <inet/IPPrefix.h>
+#include <inet/InetConfig.h>
 #include <inet/InetError.h>
+#include <inet/UDPEndPoint.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
@@ -42,9 +44,6 @@
 
 #include "TestInetCommon.h"
 #include "TestSetupSignalling.h"
-#include "inet/InetConfig.h"
-#include "inet/UDPEndPoint.h"
-#include "lib/support/logging/TextOnlyLogging.h"
 
 using namespace chip;
 using namespace chip::Inet;
