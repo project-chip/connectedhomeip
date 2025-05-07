@@ -1104,7 +1104,8 @@ class MatterBaseTest(base_test.BaseTestClass):
                 logger.info(f"Sending out-of-band command: {command} to file: {app_pipe_name}")
                 app_pipe.write(json.dumps(command_dict) + "\n")
 
-            # TODO(#31239): remove the need for sleep, till then let's wait 20ms
+            # TODO(#31239): remove the need for sleep
+            # 20ms was tested with matter.js as being reliable enough
             sleep(0.02)
         else:
             logging.info(f"Using DUT IP address: {dut_ip}")
