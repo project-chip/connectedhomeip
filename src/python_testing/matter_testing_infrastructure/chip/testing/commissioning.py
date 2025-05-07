@@ -98,6 +98,7 @@ class CustomCommissioningParameters:
     commissioningParameters: CommissioningParameters
     randomDiscriminator: int
 
+
 class PairingStatus:
     """
     This class is used to store the pairing status of a commissioning process with a device.
@@ -114,6 +115,7 @@ class PairingStatus:
 
     def __str__(self):
         return self.exception.__str__() if self.exception else ""
+
 
 async def commission_device(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, info: SetupPayloadInfo, commissioning_info: CommissioningInfo
