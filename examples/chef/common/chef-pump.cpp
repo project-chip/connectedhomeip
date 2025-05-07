@@ -77,7 +77,7 @@ void updateSetPointsOnOff(EndpointId endpointId, bool onOff)
     if (epIndex < kTemperatureMeasurementCount)
     {
         auto updatedTemperature = onOff ? TemperatureRangeMax[epIndex] : DataModel::NullNullable;
-        TemperatureMeasurement::Attributes::MeasuredValue::Set(endpoint, updatedTemperature);
+        TemperatureMeasurement::Attributes::MeasuredValue::Set(endpointId, updatedTemperature);
         MatterReportingAttributeChangeCallback(endpointId, TemperatureMeasurement::Id,
                                                TemperatureMeasurement::Attributes::MeasuredValue::Id);
     }
@@ -88,7 +88,7 @@ void updateSetPointsOnOff(EndpointId endpointId, bool onOff)
     if (epIndex < kPressureMeasurementCount)
     {
         auto updatedPressure = onOff ? PressureRangeMax[epIndex] : DataModel::NullNullable;
-        PressureMeasurement::Attributes::MeasuredValue::Set(endpoint, updatedPressure);
+        PressureMeasurement::Attributes::MeasuredValue::Set(endpointId, updatedPressure);
         MatterReportingAttributeChangeCallback(endpointId, PressureMeasurement::Id,
                                                PressureMeasurement::Attributes::MeasuredValue::Id);
     }
@@ -99,7 +99,7 @@ void updateSetPointsOnOff(EndpointId endpointId, bool onOff)
     if (epIndex < kFlowMeasurementCount)
     {
         auto updatedFlow = onOff ? FlowRangeMax[epIndex] : DataModel::NullNullable;
-        FlowMeasurement::Attributes::MeasuredValue::Set(endpoint, updatedFlow);
+        FlowMeasurement::Attributes::MeasuredValue::Set(endpointId, updatedFlow);
         MatterReportingAttributeChangeCallback(endpointId, FlowMeasurement::Id, FlowMeasurement::Attributes::MeasuredValue::Id);
     }
     // #endif // MATTER_DM_PLUGIN_FLOW_MEASUREMENT_SERVER
