@@ -53,7 +53,7 @@ class TC_ACL_2_6(MatterBaseTest):
         return (
             str(event.latestValue.privilege),
             str(event.latestValue.authMode),
-            str(sorted(event.latestValue.subjects)),
+            str(event.latestValue.subjects),
             str(event.latestValue.targets),
             str(event.latestValue.fabricIndex)
         )
@@ -138,9 +138,9 @@ class TC_ACL_2_6(MatterBaseTest):
                 fabricIndex=f1
             ),
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
-                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
-                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                subjects=[self.th1.nodeId],
+                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
+                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kGroup,
+                subjects=NullValue,
                 targets=NullValue,
                 fabricIndex=f1
             )
@@ -228,7 +228,7 @@ class TC_ACL_2_6(MatterBaseTest):
                 targets=NullValue,
             ),
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
-                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
                 authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kGroup,
                 subjects=[0],
                 targets=NullValue,
