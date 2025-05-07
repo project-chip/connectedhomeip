@@ -203,12 +203,12 @@ namespace Inet {
 
                 switch (state) {
                 case nw_connection_state_invalid:
+                case nw_connection_state_waiting:
                     err = CHIP_ERROR_INCORRECT_STATE;
                     nw_connection_cancel(connection);
                     break;
 
                 case nw_connection_state_preparing:
-                case nw_connection_state_waiting:
                     // Nothing to do.
                     break;
 
