@@ -16,21 +16,14 @@
  *    limitations under the License.
  */
 
-#include <app-common/zap-generated/cluster-enums.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
-#include <app/data-model/List.h>
-#include <cstdint>
+#include <clusters/SoilMeasurement/Attributes.h>
 #include <lib/core/CHIPError.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace SoilMeasurement {
-
-inline constexpr uint16_t kClusterRevision = 1;
 
 class Instance : public AttributeAccessInterface
 {
