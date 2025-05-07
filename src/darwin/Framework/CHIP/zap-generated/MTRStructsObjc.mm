@@ -9416,6 +9416,10 @@ NS_ASSUME_NONNULL_BEGIN
         _encodedPixels = @(0);
 
         _hardwareEncoder = @(0);
+
+        _watermarkEnabled = nil;
+
+        _osdEnabled = nil;
     }
     return self;
 }
@@ -9433,13 +9437,15 @@ NS_ASSUME_NONNULL_BEGIN
     other.referenceCount = self.referenceCount;
     other.encodedPixels = self.encodedPixels;
     other.hardwareEncoder = self.hardwareEncoder;
+    other.watermarkEnabled = self.watermarkEnabled;
+    other.osdEnabled = self.osdEnabled;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: snapshotStreamID:%@; imageCodec:%@; frameRate:%@; minResolution:%@; maxResolution:%@; quality:%@; referenceCount:%@; encodedPixels:%@; hardwareEncoder:%@; >", NSStringFromClass([self class]), _snapshotStreamID, _imageCodec, _frameRate, _minResolution, _maxResolution, _quality, _referenceCount, _encodedPixels, _hardwareEncoder];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: snapshotStreamID:%@; imageCodec:%@; frameRate:%@; minResolution:%@; maxResolution:%@; quality:%@; referenceCount:%@; encodedPixels:%@; hardwareEncoder:%@; watermarkEnabled:%@; osdEnabled:%@; >", NSStringFromClass([self class]), _snapshotStreamID, _imageCodec, _frameRate, _minResolution, _maxResolution, _quality, _referenceCount, _encodedPixels, _hardwareEncoder, _watermarkEnabled, _osdEnabled];
     return descriptionString;
 }
 
@@ -10058,6 +10064,8 @@ NS_ASSUME_NONNULL_BEGIN
         _cencKey = nil;
 
         _metadataEnabled = nil;
+
+        _cencKeyID = nil;
     }
     return self;
 }
@@ -10069,13 +10077,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.chunkDuration = self.chunkDuration;
     other.cencKey = self.cencKey;
     other.metadataEnabled = self.metadataEnabled;
+    other.cencKeyID = self.cencKeyID;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: chunkDuration:%@; cencKey:%@; metadataEnabled:%@; >", NSStringFromClass([self class]), _chunkDuration, [_cencKey base64EncodedStringWithOptions:0], _metadataEnabled];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: chunkDuration:%@; cencKey:%@; metadataEnabled:%@; cencKeyID:%@; >", NSStringFromClass([self class]), _chunkDuration, [_cencKey base64EncodedStringWithOptions:0], _metadataEnabled, [_cencKeyID base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -10130,8 +10139,6 @@ NS_ASSUME_NONNULL_BEGIN
 
         _ingestMethod = @(0);
 
-        _containerFormat = @(0);
-
         _containerOptions = [MTRPushAVStreamTransportClusterContainerOptionsStruct new];
 
         _expiryTime = nil;
@@ -10150,7 +10157,6 @@ NS_ASSUME_NONNULL_BEGIN
     other.url = self.url;
     other.triggerOptions = self.triggerOptions;
     other.ingestMethod = self.ingestMethod;
-    other.containerFormat = self.containerFormat;
     other.containerOptions = self.containerOptions;
     other.expiryTime = self.expiryTime;
 
@@ -10159,7 +10165,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; videoStreamID:%@; audioStreamID:%@; endpointID:%@; url:%@; triggerOptions:%@; ingestMethod:%@; containerFormat:%@; containerOptions:%@; expiryTime:%@; >", NSStringFromClass([self class]), _streamUsage, _videoStreamID, _audioStreamID, _endpointID, _url, _triggerOptions, _ingestMethod, _containerFormat, _containerOptions, _expiryTime];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; videoStreamID:%@; audioStreamID:%@; endpointID:%@; url:%@; triggerOptions:%@; ingestMethod:%@; containerOptions:%@; expiryTime:%@; >", NSStringFromClass([self class]), _streamUsage, _videoStreamID, _audioStreamID, _endpointID, _url, _triggerOptions, _ingestMethod, _containerOptions, _expiryTime];
     return descriptionString;
 }
 
@@ -10193,6 +10199,36 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: connectionID:%@; transportStatus:%@; transportOptions:%@; >", NSStringFromClass([self class]), _connectionID, _transportStatus, _transportOptions];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRPushAVStreamTransportClusterSupportedFormatStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _containerFormat = @(0);
+
+        _ingestMethod = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRPushAVStreamTransportClusterSupportedFormatStruct alloc] init];
+
+    other.containerFormat = self.containerFormat;
+    other.ingestMethod = self.ingestMethod;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: containerFormat:%@; ingestMethod:%@; >", NSStringFromClass([self class]), _containerFormat, _ingestMethod];
     return descriptionString;
 }
 
