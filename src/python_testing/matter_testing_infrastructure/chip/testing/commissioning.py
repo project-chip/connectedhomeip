@@ -98,10 +98,20 @@ class CustomCommissioningParameters:
     commissioningParameters: CommissioningParameters
     randomDiscriminator: int
 
+class PairingStatus:
+    def __init__(self, success: bool, exception: Optional[Exception] = None):
+        self.success = success
+        self.exception = exception
+
+    def __bool__(self):
+        return self.success
+
+    def __str__(self):
+        return self.exception.__str__() if self.exception else ""
 
 async def commission_device(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, info: SetupPayloadInfo, commissioning_info: CommissioningInfo
-) -> bool:
+) -> PairingStatus:
     """
     Starts the commissioning process of a chip device.
 
@@ -130,10 +140,10 @@ async def commission_device(
             await dev_ctrl.CommissionOnNetwork(
                 nodeId=node_id, setupPinCode=info.passcode, filterType=info.filter_type, filter=info.filter_value
             )
-            return True
+            return PairingStatus(success=True)
         except ChipStackError as e:
             logging.error("Commissioning failed: %s" % e)
-            return False
+            return PairingStatus(success=True, exception=e)
     elif commissioning_info.commissioning_method == "ble-wifi":
         try:
             await dev_ctrl.CommissionWiFi(
@@ -144,10 +154,10 @@ async def commission_device(
                 commissioning_info.wifi_passphrase,
                 isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR),
             )
-            return True
+            return PairingStatus(success=True)
         except ChipStackError as e:
             logging.error("Commissioning failed: %s" % e)
-            return False
+            return PairingStatus(success=True, exception=e)
     elif commissioning_info.commissioning_method == "ble-thread":
         try:
             await dev_ctrl.CommissionThread(
@@ -157,10 +167,10 @@ async def commission_device(
                 commissioning_info.thread_operational_dataset,
                 isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR),
             )
-            return True
+            return PairingStatus(success=True)
         except ChipStackError as e:
             logging.error("Commissioning failed: %s" % e)
-            return False
+            return PairingStatus(success=True, exception=e)
     else:
         raise ValueError("Invalid commissioning method %s!" % commissioning_info.commissioning_method)
 
