@@ -726,7 +726,7 @@ cluster Descriptor = 29 {
 
 /** The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table. */
 cluster Binding = 30 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   fabric_scoped struct TargetStruct {
     optional node_id node = 1;
@@ -7108,6 +7108,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
     kOnScreenDisplay = 0x80;
     kLocalStorage = 0x100;
     kHighDynamicRange = 0x200;
+    kNightVision = 0x400;
   }
 
   struct VideoResolutionStruct {
@@ -7142,6 +7143,8 @@ provisional cluster CameraAvStreamManagement = 1361 {
     int8u referenceCount = 6;
     boolean encodedPixels = 7;
     boolean hardwareEncoder = 8;
+    optional boolean watermarkEnabled = 9;
+    optional boolean OSDEnabled = 10;
   }
 
   struct SnapshotCapabilitiesStruct {
@@ -7193,7 +7196,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
   readonly attribute optional int8u maxConcurrentEncoders = 0;
   readonly attribute optional int32u maxEncodedPixelRate = 1;
   readonly attribute optional VideoSensorParamsStruct videoSensorParams = 2;
-  readonly attribute optional boolean nightVisionCapable = 3;
+  readonly attribute optional boolean nightVisionUsesInfrared = 3;
   readonly attribute optional VideoResolutionStruct minViewport = 4;
   readonly attribute optional RateDistortionTradeOffPointsStruct rateDistortionTradeOffPoints[] = 5;
   readonly attribute int32u maxContentBufferSize = 6;
@@ -9460,7 +9463,7 @@ endpoint 1 {
     ram      attribute colorCapabilities default = 0x1F;
     ram      attribute colorTempPhysicalMinMireds default = 0x009A;
     ram      attribute colorTempPhysicalMaxMireds default = 0x01C6;
-    ram      attribute coupleColorTempToLevelMinMireds;
+    ram      attribute coupleColorTempToLevelMinMireds default = 0x009A;
     persist  attribute startUpColorTemperatureMireds default = 0x00FA;
     ram      attribute featureMap default = 0x1F;
     ram      attribute clusterRevision default = 7;

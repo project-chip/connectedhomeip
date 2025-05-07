@@ -179,8 +179,11 @@ public:
         // capabilities)
         virtual VideoSensorParamsStruct & GetVideoSensorParams() = 0;
 
-        // Get indication whether camera supports night vision mode
-        virtual bool GetNightVisionCapable() = 0;
+        // Get indication whether camera supports night vision
+        virtual bool GetCameraSupportsNightVision() = 0;
+
+        // Get indication whether camera night vision using infrared
+        virtual bool GetNightVisionUsesInfrared() = 0;
 
         // Get indication of the min resolution(pixels) that camera allows for
         // its viewport.

@@ -2153,6 +2153,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     __auto_type * endpointId1 = @(10);
     __auto_type * endpointId2 = @(20);
     __auto_type * endpointId3 = @(30);
+    __auto_type * endpointId4 = @(40);
     __auto_type * clusterId1 = @(0xFFF1FC02);
     __auto_type * clusterId2 = @(0xFFF1FC10);
     __auto_type * clusterRevision1 = @(3);
@@ -2695,6 +2696,14 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
     delegate.onReportEnd = nil;
 
+    // Now that we have a wildcard subscription to our server, try to add another
+    // endpoint to test what happens when an endpoint is added while a
+    // ReadHandler that cares about it is live.  We should not end up with any
+    // crashes or anything like that.
+    __auto_type * endpoint6 = [[MTRServerEndpoint alloc] initWithEndpointID:endpointId4 deviceTypes:@[ deviceType1 ]];
+    XCTAssertNotNil(endpoint6);
+    XCTAssertTrue([controllerServer addServerEndpoint:endpoint6]);
+
     // Test read-through behavior of non-standard (as in, not present in Matter XML) attributes.
     XCTestExpectation * nonStandardReadThroughExpectation = [self expectationWithDescription:@"Read-throughs of non-standard attributes complete"];
 
@@ -2802,6 +2811,13 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
     NSArray<NSNumber *> * orderedDeviceIDs = [deviceOnboardingPayloads allKeys];
 
+    // We have one fake device, which we use an invalid node ID for, that we use
+    // to test what happens if a device is deallocated while its subscription
+    // work item is queued.
+    NSMutableArray<NSNumber *> * orderedDeviceIDsIncludingFake = [orderedDeviceIDs mutableCopy];
+    NSNumber * fakeDeviceID = @(0xFFFFFFFFFFFFFFFF);
+    [orderedDeviceIDsIncludingFake insertObject:fakeDeviceID atIndex:0];
+
     // Commission 5 devices
     for (NSNumber * deviceID in orderedDeviceIDs) {
         certificateIssuer.nextNodeID = deviceID;
@@ -2835,7 +2851,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     }
 
     NSMutableDictionary<NSNumber *, MTRDeviceTestDelegate *> * deviceDelegates = [NSMutableDictionary dictionary];
-    for (NSNumber * deviceID in orderedDeviceIDs) {
+    for (NSNumber * deviceID in orderedDeviceIDsIncludingFake) {
         deviceDelegates[deviceID] = [[MTRDeviceTestDelegate alloc] init];
     }
 
@@ -2845,7 +2861,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     __block NSUInteger subscriptionDequeueCount = 0;
     __block BOOL baseDeviceReadCompleted = NO;
 
-    for (NSNumber * deviceID in orderedDeviceIDs) {
+    for (NSNumber * deviceID in orderedDeviceIDsIncludingFake) {
         MTRDeviceTestDelegate * delegate = deviceDelegates[deviceID];
         delegate.pretendThreadEnabled = YES;
 
@@ -2874,11 +2890,39 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         };
         __weak __auto_type weakDelegate = delegate;
         delegate.onReportEnd = ^{
-            [subscriptionExpectations[deviceID] fulfill];
+            // We don't have a subscriptionExpectation for the fake device.
+            XCTestExpectation * subscriptionExpectation = subscriptionExpectations[deviceID];
+            if (subscriptionExpectation) {
+                [subscriptionExpectation fulfill];
+            }
             // reset callback so expectation not fulfilled twice, given the run time of this can be long due to subscription pool
             __strong __auto_type strongDelegate = weakDelegate;
             strongDelegate.onReportEnd = nil;
         };
+    }
+
+    // Schedule a job in the controller's pool that will not complete until the
+    // fake device is deallocated.
+    __auto_type * fakeDeviceDeletedExpectation = [self expectationWithDescription:@"Fake device deleted"];
+    MTRAsyncWorkItem * blockingWorkItem = [[MTRAsyncWorkItem alloc] initWithQueue:queue];
+    [blockingWorkItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull completion) {
+        [self waitForExpectations:@[ fakeDeviceDeletedExpectation ] timeout:kTimeoutInSeconds];
+        completion(MTRAsyncWorkComplete);
+    }];
+    [controller.concurrentSubscriptionPool enqueueWorkItem:blockingWorkItem description:@"Waiting for fake device deletion"];
+
+    @autoreleasepool {
+        // Create our fake device and have it dealloc before the blocking WorkItem
+        // completes and hence before its subscription work item gets a chance
+        // to run (in the width-1 case).
+        MTRDeviceTestDelegate * delegate = deviceDelegates[fakeDeviceID];
+        // onSubscriptionCallbackDelete is called from dealloc
+        delegate.onSubscriptionCallbackDelete = ^{
+            [fakeDeviceDeletedExpectation fulfill];
+        };
+
+        __auto_type * device = [MTRDevice deviceWithNodeID:fakeDeviceID controller:controller];
+        [device setDelegate:delegate queue:queue];
     }
 
     for (NSNumber * deviceID in orderedDeviceIDs) {
