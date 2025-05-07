@@ -24,7 +24,6 @@ Git: 0.7-summer-2025-596-gf0e61cb16
   <domain name="CHIP"/>
   <struct name="DeviceTypeStruct">
     <cluster code="0x001d"/>
-    <cluster code="0x0750"/>
     <item fieldId="0" name="DeviceType" type="devtype_id"/>
     <item fieldId="1" name="Revision" type="int16u" min="1"/>
   </struct>

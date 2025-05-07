@@ -92,7 +92,8 @@ CHIP_ERROR WebRTCManager::HandleAnswer(uint16_t sessionId, const std::string & s
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    mPeerConnection->setRemoteDescription(sdp);
+    rtc::Description answerDesc(sdp, rtc::Description::Type::Answer);
+    mPeerConnection->setRemoteDescription(answerDesc);
 
     // Schedule the ProvideICECandidates() call to run asynchronously.
     DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() { ProvideICECandidates(sessionId); });
@@ -198,9 +199,7 @@ CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> sessionId,
     CHIP_ERROR err =
         mWebRTCProviderClient.ProvideOffer(sessionId, mLocalDescription, streamUsage, kWebRTCRequesterDynamicEndpointId,
                                            MakeOptional(DataModel::NullNullable), // "Null" for video
-                                           MakeOptional(DataModel::NullNullable), // "Null" for audio
-                                           NullOptional,                          // Omit ICEServers (Optional not present)
-                                           NullOptional                           // Omit ICETransportPolicy (Optional not present)
+                                           MakeOptional(DataModel::NullNullable)  // "Null" for audio
         );
 
     if (err != CHIP_NO_ERROR)
@@ -217,9 +216,7 @@ CHIP_ERROR WebRTCManager::SolicitOffer(Clusters::WebRTCTransportProvider::Stream
 
     CHIP_ERROR err = mWebRTCProviderClient.SolicitOffer(streamUsage, kWebRTCRequesterDynamicEndpointId,
                                                         MakeOptional(DataModel::NullNullable), // "Null" for video
-                                                        MakeOptional(DataModel::NullNullable), // "Null" for audio
-                                                        NullOptional, // Omit ICEServers (Optional not present)
-                                                        NullOptional  // Omit ICETransportPolicy (Optional not present)
+                                                        MakeOptional(DataModel::NullNullable)  // "Null" for audio
     );
 
     if (err != CHIP_NO_ERROR)
