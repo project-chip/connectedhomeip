@@ -35,6 +35,12 @@ namespace NightVisionCapable {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(NightVisionCapable::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace NightVisionCapable
+
+namespace NightVisionUsesInfrared {
+inline constexpr DataModel::AttributeEntry kMetadataEntry =
+    (NightVisionUsesInfrared::Id, BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView, std::nullopt);
+} // namespace NightVisionUsesInfrared
+
 namespace MinViewport {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MinViewport::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
