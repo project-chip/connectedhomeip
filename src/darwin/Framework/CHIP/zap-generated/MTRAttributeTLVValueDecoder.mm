@@ -17382,8 +17382,8 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
         }
         return value;
     }
-    case Attributes::NightVisionCapable::Id: {
-        using TypeInfo = Attributes::NightVisionCapable::TypeInfo;
+    case Attributes::NightVisionUsesInfrared::Id: {
+        using TypeInfo = Attributes::NightVisionUsesInfrared::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -17789,6 +17789,16 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
                 newElement_0.referenceCount = [NSNumber numberWithUnsignedChar:entry_0.referenceCount];
                 newElement_0.encodedPixels = [NSNumber numberWithBool:entry_0.encodedPixels];
                 newElement_0.hardwareEncoder = [NSNumber numberWithBool:entry_0.hardwareEncoder];
+                if (entry_0.watermarkEnabled.HasValue()) {
+                    newElement_0.watermarkEnabled = [NSNumber numberWithBool:entry_0.watermarkEnabled.Value()];
+                } else {
+                    newElement_0.watermarkEnabled = nil;
+                }
+                if (entry_0.OSDEnabled.HasValue()) {
+                    newElement_0.osdEnabled = [NSNumber numberWithBool:entry_0.OSDEnabled.Value()];
+                } else {
+                    newElement_0.osdEnabled = nil;
+                }
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -18375,26 +18385,32 @@ static id _Nullable DecodeAttributeValueForPushAVStreamTransportCluster(Attribut
 {
     using namespace Clusters::PushAvStreamTransport;
     switch (aAttributeId) {
-    case Attributes::SupportedContainerFormats::Id: {
-        using TypeInfo = Attributes::SupportedContainerFormats::TypeInfo;
+    case Attributes::SupportedFormats::Id: {
+        using TypeInfo = Attributes::SupportedFormats::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
-        return value;
-    }
-    case Attributes::SupportedIngestMethods::Id: {
-        using TypeInfo = Attributes::SupportedIngestMethods::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRPushAVStreamTransportClusterSupportedFormatStruct * newElement_0;
+                newElement_0 = [MTRPushAVStreamTransportClusterSupportedFormatStruct new];
+                newElement_0.containerFormat = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.containerFormat)];
+                newElement_0.ingestMethod = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.ingestMethod)];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
         }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
         return value;
     }
     case Attributes::CurrentConnections::Id: {
@@ -18502,7 +18518,6 @@ static id _Nullable DecodeAttributeValueForPushAVStreamTransportCluster(Attribut
                         newElement_0.transportOptions.triggerOptions.maxPreRollLen = nil;
                     }
                     newElement_0.transportOptions.ingestMethod = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.Value().ingestMethod)];
-                    newElement_0.transportOptions.containerFormat = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.Value().containerFormat)];
                     newElement_0.transportOptions.containerOptions = [MTRPushAVStreamTransportClusterContainerOptionsStruct new];
                     newElement_0.transportOptions.containerOptions.containerType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.Value().containerOptions.containerType)];
                     if (entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.HasValue()) {
@@ -18517,6 +18532,11 @@ static id _Nullable DecodeAttributeValueForPushAVStreamTransportCluster(Attribut
                             newElement_0.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled = [NSNumber numberWithBool:entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().metadataEnabled.Value()];
                         } else {
                             newElement_0.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled = nil;
+                        }
+                        if (entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CENCKeyID.HasValue()) {
+                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.cencKeyID = AsData(entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CENCKeyID.Value());
+                        } else {
+                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.cencKeyID = nil;
                         }
                     } else {
                         newElement_0.transportOptions.containerOptions.cmafContainerOptions = nil;
