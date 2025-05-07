@@ -423,7 +423,7 @@ TEST_F(TestInetEndPoint, TestInetEndPointLimit)
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     // we assume NO open endpoints
     gTCP.ForEachEndPoint([](TCPEndPoint * ep) {
-        ChipLogError(Test, "NOTE: Unexpected UDP endpoint in use. Will free it");
+        ChipLogError(Test, "NOTE: Unexpected TCP endpoint in use. Will free it");
         ep->Free();
         return Loop::Continue;
     });
