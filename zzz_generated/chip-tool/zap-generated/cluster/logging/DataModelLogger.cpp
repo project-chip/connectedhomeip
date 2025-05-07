@@ -5798,6 +5798,22 @@ DataModelLogger::LogValue(const char * label, size_t indent,
             return err;
         }
     }
+    {
+        CHIP_ERROR err = LogValue("WatermarkEnabled", indent + 1, value.watermarkEnabled);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'WatermarkEnabled'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("OSDEnabled", indent + 1, value.OSDEnabled);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'OSDEnabled'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -6260,6 +6276,14 @@ CHIP_ERROR DataModelLogger::LogValue(
             return err;
         }
     }
+    {
+        CHIP_ERROR err = LogValue("CENCKeyID", indent + 1, value.CENCKeyID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CENCKeyID'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -6353,14 +6377,6 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("ContainerFormat", indent + 1, value.containerFormat);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ContainerFormat'");
-            return err;
-        }
-    }
-    {
         CHIP_ERROR err = LogValue("ContainerOptions", indent + 1, value.containerOptions);
         if (err != CHIP_NO_ERROR)
         {
@@ -6407,6 +6423,32 @@ CHIP_ERROR DataModelLogger::LogValue(
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TransportOptions'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::PushAvStreamTransport::Structs::SupportedFormatStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("ContainerFormat", indent + 1, value.containerFormat);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ContainerFormat'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("IngestMethod", indent + 1, value.ingestMethod);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'IngestMethod'");
             return err;
         }
     }
@@ -19884,10 +19926,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("VideoSensorParams", 1, value);
         }
-        case CameraAvStreamManagement::Attributes::NightVisionCapable::Id: {
+        case CameraAvStreamManagement::Attributes::NightVisionUsesInfrared::Id: {
             bool value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("NightVisionCapable", 1, value);
+            return DataModelLogger::LogValue("NightVisionUsesInfrared", 1, value);
         }
         case CameraAvStreamManagement::Attributes::MinViewport::Id: {
             chip::app::Clusters::CameraAvStreamManagement::Structs::VideoResolutionStruct::DecodableType value;
@@ -20270,15 +20312,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case PushAvStreamTransport::Id: {
         switch (path.mAttributeId)
         {
-        case PushAvStreamTransport::Attributes::SupportedContainerFormats::Id: {
-            chip::BitMask<chip::app::Clusters::PushAvStreamTransport::SupportedContainerFormatsBitmap> value;
+        case PushAvStreamTransport::Attributes::SupportedFormats::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::PushAvStreamTransport::Structs::SupportedFormatStruct::DecodableType>
+                value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("SupportedContainerFormats", 1, value);
-        }
-        case PushAvStreamTransport::Attributes::SupportedIngestMethods::Id: {
-            chip::BitMask<chip::app::Clusters::PushAvStreamTransport::SupportedIngestMethodsBitmap> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("SupportedIngestMethods", 1, value);
+            return DataModelLogger::LogValue("SupportedFormats", 1, value);
         }
         case PushAvStreamTransport::Attributes::CurrentConnections::Id: {
             chip::app::DataModel::DecodableList<

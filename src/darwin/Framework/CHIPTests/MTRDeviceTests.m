@@ -3823,27 +3823,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
     XCTAssertEqual(storedClusterDataAfterClear.count, 0);
 
-    // Set up a subscription via mConnectedDevice that will send us continuous
-    // reports.
-    XCTestExpectation * firstSubscriptionExpectation = [self expectationWithDescription:@"First subscription established"];
-
-    MTRSubscribeParams * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(0) maxInterval:@(0)];
-    params.resubscribeAutomatically = NO;
-
-    [mConnectedDevice subscribeToAttributesWithEndpointID:@(0)
-        clusterID:@(MTRClusterIDTypeBasicInformationID)
-        attributeID:@(0)
-        params:params
-        queue:queue
-        reportHandler:^(id _Nullable values, NSError * _Nullable error) {
-        }
-        subscriptionEstablished:^() {
-            [firstSubscriptionExpectation fulfill];
-        }];
-
-    [self waitForExpectations:@[ firstSubscriptionExpectation ] timeout:kTimeoutInSeconds];
-
-    // Now set up our MTRDevice and do a subscribe.  Make sure all the events we
+    // Set up our MTRDevice and do a subscribe.  Make sure all the events we
     // get are marked "historical".
     __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
     XCTestExpectation * secondSubscriptionExpectation = [self expectationWithDescription:@"Second subscription established"];
