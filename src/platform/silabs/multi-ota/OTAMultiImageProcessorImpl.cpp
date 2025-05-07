@@ -26,10 +26,6 @@
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
-#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
-#include <platform/silabs/multi-ota/SiWx917/OTAWiFiFirmwareProcessor.h>
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
