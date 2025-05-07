@@ -40,15 +40,16 @@ private:
     CHIP_ERROR ListenLoopback();
     CHIP_ERROR ListenAddress();
     CHIP_ERROR ListenAddress(const IPAddress & address, InterfaceId intfId = InterfaceId::Null());
+    CHIP_ERROR ListenAddress(const IPAddress & address, nw_interface_t interface);
     CHIP_ERROR ListenInterfaces();
     template <typename InterfaceVec>
     void ListenInterfaces(const InterfaceVec & interfaces)
     {
         for (const auto & iface : interfaces)
         {
-            InterfaceId interfaceId = static_cast<chip::Inet::InterfaceId>(iface.first);
+            nw_interface_t interface = iface.first;
             IPAddress address(iface.second);
-            LogErrorOnFailure(ListenAddress(address, interfaceId));
+            LogErrorOnFailure(ListenAddress(address, interface));
         }
     }
 

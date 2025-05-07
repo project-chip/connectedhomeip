@@ -126,6 +126,32 @@ namespace Inet {
             return CHIP_NO_ERROR;
         }
 
+        CHIP_ERROR UDPEndPointImplNetworkFrameworkListener::ListenAddress(const IPAddress & address, nw_interface_t interface)
+        {
+            __auto_type parameters = nw_parameters_copy(mLocalParameters);
+            VerifyOrReturnError(nullptr != parameters, CHIP_ERROR_NO_MEMORY);
+
+            __auto_type intfId = static_cast<chip::Inet::InterfaceId>(nw_interface_get_index(interface));
+            __auto_type endpoint = GetEndPoint(address.Type(), address, GetBoundPort(), intfId);
+            VerifyOrReturnError(nullptr != endpoint, CHIP_ERROR_INVALID_ARGUMENT);
+
+            nw_parameters_set_local_endpoint(parameters, endpoint);
+            nw_parameters_require_interface(parameters, interface);
+
+            __auto_type listener = nw_listener_create(parameters);
+            VerifyOrReturnError(nullptr != listener, CHIP_ERROR_INTERNAL);
+
+            nw_listener_set_queue(listener, mListenerQueue);
+            nw_listener_set_new_connection_handler(listener, ^(nw_connection_t connection) {
+                StartConnectionFromListener(connection);
+            });
+
+            ReturnErrorOnFailure(WaitForListenerReadyState(listener));
+
+            CFArrayAppendValue(mListeners, (__bridge const void *) listener);
+            return CHIP_NO_ERROR;
+        }
+
         CHIP_ERROR UDPEndPointImplNetworkFrameworkListener::ListenInterfaces()
         {
             __auto_type semaphore = dispatch_semaphore_create(0);
