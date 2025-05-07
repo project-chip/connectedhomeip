@@ -109,13 +109,12 @@ class PairingStatus:
 
     def __init__(self, exception: Optional[Exception] = None):
         self.exception = exception
-        self.success = exception is None
 
     def __bool__(self):
-        return self.success
+        return self.exception is None
 
     def __str__(self):
-        return str(self.exception) if self.exception else ""
+        return str(self.exception) if self.exception else "Pairing Successful"
 
 
 async def commission_device(
