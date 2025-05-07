@@ -525,9 +525,9 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
             asserts.assert_equal(exception_context.exception.status, Status.InvalidCommand,
                                  "Expected INVALID_COMMAND for SetVIDVerificationStatement with no arguments present")
 
-        with test_step(7, description="Invoke SetVIDVerificationStatement with VVSC field set to a size > 400 bytes, outside fail-safe. Expect CONSTRAINT_ERROR"):
+        with test_step(7, description="Invoke SetVIDVerificationStatement using TH2's fabric (no ICAC present) with VVSC field set to a size > 400 bytes, outside fail-safe. Expect CONSTRAINT_ERROR"):
             with asserts.assert_raises(InteractionModelError) as exception_context:
-                await self.send_single_cmd(cmd=opcreds.Commands.SetVIDVerificationStatement(vvsc=(b"\x01" * 401)))
+                await self.send_single_cmd(dev_ctrl=th2_dev_ctrl, node_id=th2_dut_node_id, cmd=opcreds.Commands.SetVIDVerificationStatement(vvsc=(b"\x01" * 401)))
             asserts.assert_equal(exception_context.exception.status, Status.ConstraintError,
                                  "Expected CONSTRAINT_ERROR for SetVIDVerificationStatement with VVSC too large")
 
