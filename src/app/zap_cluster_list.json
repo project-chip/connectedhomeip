@@ -243,8 +243,10 @@
         "ICD_MANAGEMENT_CLUSTER": ["icd-management-server"],
         "IDENTIFY_CLUSTER": ["identify-server"],
         "ILLUMINANCE_MEASUREMENT_CLUSTER": [],
-        "JOINT_FABRIC_DATASTORE_CLUSTER": [],
-        "JOINT_FABRIC_ADMINISTRATOR_CLUSTER": [],
+        "JOINT_FABRIC_DATASTORE_CLUSTER": ["joint-fabric-datastore-server"],
+        "JOINT_FABRIC_ADMINISTRATOR_CLUSTER": [
+            "joint-fabric-administrator-server"
+        ],
         "KEYPAD_INPUT_CLUSTER": ["keypad-input-server"],
         "LAUNDRY_WASHER_MODE_CLUSTER": ["mode-base-server"],
         "LEVEL_CONTROL_CLUSTER": ["level-control"],
