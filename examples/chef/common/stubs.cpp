@@ -40,6 +40,8 @@ using namespace chip::app::Clusters;
 #include "refrigerator-and-temperature-controlled-cabinet-mode/tcc-mode.h"
 #endif // MATTER_DM_PLUGIN_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SERVER
 
+#include "chef-pump.h"
+
 namespace {
 
 // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
@@ -278,6 +280,11 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         HandleOnOffAttributeChangeForFan(attributePath.mEndpointId, bool(*value));
 #endif // MATTER_DM_PLUGIN_ON_OFF_SERVER
 #endif // MATTER_DM_PLUGIN_FAN_CONTROL_SERVER
+
+        if (chef::DeviceTypes::EndpointHasDeviceType(attributePath.mEndpointId, chef::DeviceTypes::kPumpDeviceId))
+        {
+            chef::pump::handleOnOff(attributePath.mEndpointId, bool(*value));
+        }
     }
     else if (clusterId == LevelControl::Id)
     {

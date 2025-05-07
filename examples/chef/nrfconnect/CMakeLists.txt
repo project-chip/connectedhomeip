@@ -87,6 +87,7 @@ target_sources(app PRIVATE
     ${CHEF}/common/chef-dishwasher-alarm-delegate-impl.cpp
     ${CHEF}/common/chef-dishwasher-mode-delegate-impl.cpp
     ${CHEF}/common/chef-operational-state-delegate-impl.cpp
+    ${CHEF}/common/chef-pump.cpp
     ${CHEF}/common/chef-rvc-mode-delegate.cpp
     ${CHEF}/common/chef-rvc-operational-state-delegate.cpp
     ${CHEF}/common/clusters/audio-output/AudioOutputManager.cpp
