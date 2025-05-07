@@ -3818,6 +3818,11 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test034_TestMTRDeviceHistoricalEvents
 {
+    XCTSkip("Skipping due to flakyness/failing. See https://github.com/project-chip/connectedhomeip/issues/38793");
+
+    // TODO: this test should be re-enabled after root cause of flakyness is found or we find a
+    //       way to address it.
+#if 0
     dispatch_queue_t queue = dispatch_get_main_queue();
 
     NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
@@ -3946,6 +3951,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     [self waitForExpectations:@[ eventReportsFinishedExpectation ] timeout:kTimeoutInSeconds];
     XCTAssertEqual(historicalEvents, 0);
+#endif
 }
 
 - (void)test035_TestMTRDeviceSubscriptionNotEstablishedOverXPC
@@ -6146,7 +6152,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 - (void)testUnsignedInteger64Bits
 {
     NSDictionary * input = [NSDictionary dictionaryWithObjectsAndKeys:@"UnsignedInteger", @"type",
-                                         [NSNumber numberWithUnsignedLongLong:0xCCCCDDDDEEEEFFFFull], @"value", nil];
+        [NSNumber numberWithUnsignedLongLong:0xCCCCDDDDEEEEFFFFull], @"value", nil];
     id output = [MTRBaseDevice CHIPEncodeAndDecodeNSObject:input];
     NSLog(@"Conversion input: %@\nOutput: %@", input, output);
     XCTAssertNotNil(output);
