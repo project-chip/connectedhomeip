@@ -483,6 +483,7 @@ void ApplicationInit()
 
     RefrigeratorTemperatureControlledCabinetInit();
     OvenTemperatureControlledCabinetCooktopCookSurfaceInit();
+    chef::pump::Init();
 
 #ifdef MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER
     ChipLogProgress(NotSpecified, "Initializing WindowCovering cluster delegate.");
