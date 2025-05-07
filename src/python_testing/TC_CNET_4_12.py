@@ -444,9 +444,8 @@ class TC_CNET_4_12(MatterBaseTest):
         logger.info(f'Step #19: CommissioningComplete response ({vars(resp)})')
         logger.info(f'Step #19: CommissioningComplete Status is success ({resp.errorCode})')
         # Verify that the DUT responds with CommissioningComplete with ErrorCode as 'OK'(0)
-        # asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
-        #                      "Failure status returned from CommissioningComplete")
-        # TODO: Implement TH sends the CommissioningComplete and CommissioningCompleteResponse with the ErrorCode OK (0)
+        asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
+                             "Failure status returned from CommissioningComplete")
 
         self.step(20)
         networks = await self.read_single_attribute_check_success(
