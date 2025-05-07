@@ -34,6 +34,8 @@ void handleMoveToLevel(chip::EndpointId endpoint, uint8_t level);
 
 void handleOnOff(chip::EndpointId endpoint, bool value);
 
+void Init();
+
 } // namespace pump
 } // namespace chef
 
