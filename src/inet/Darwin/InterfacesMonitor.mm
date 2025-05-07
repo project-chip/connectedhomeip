@@ -94,7 +94,7 @@ namespace Inet {
             void LogDetails(uint32_t interfaceId, InetInterfacesVector inetInterfaces, Inet6InterfacesVector inet6Interfaces)
             {
                 for (auto & inetInterface : inetInterfaces) {
-                    if (interfaceId == inetInterface.first) {
+                    if (interfaceId == nw_interface_get_index(inetInterface.first)) {
                         char addr[INET_ADDRSTRLEN] = {};
                         inet_ntop(AF_INET, &inetInterface.second, addr, sizeof(addr));
                         ChipLogProgress(Inet, "\t\t* ipv4: %s", addr);
@@ -102,7 +102,7 @@ namespace Inet {
                 }
 
                 for (auto & inet6Interface : inet6Interfaces) {
-                    if (interfaceId == inet6Interface.first) {
+                    if (interfaceId == nw_interface_get_index(inet6Interface.first)) {
                         char addr[INET6_ADDRSTRLEN] = {};
                         inet_ntop(AF_INET6, &inet6Interface.second, addr, sizeof(addr));
                         ChipLogProgress(Inet, "\t\t* ipv6: %s", addr);
@@ -118,18 +118,18 @@ namespace Inet {
 
             void LogDetails(InetInterfacesVector inetInterfaces, Inet6InterfacesVector inet6Interfaces)
             {
-                std::set<uint32_t> interfaceIds;
+                std::set<nw_interface_t> interfaces;
                 for (auto & inetInterface : inetInterfaces) {
-                    interfaceIds.insert(inetInterface.first);
+                    interfaces.insert(inetInterface.first);
                 }
 
                 for (auto & inet6Interface : inet6Interfaces) {
-                    interfaceIds.insert(inet6Interface.first);
+                    interfaces.insert(inet6Interface.first);
                 }
 
-                for (auto interfaceId : interfaceIds) {
-                    char interfaceName[Inet::InterfaceId::kMaxIfNameLength] = {};
-                    if_indextoname(interfaceId, interfaceName);
+                for (auto interface : interfaces) {
+                    const char * interfaceName = nw_interface_get_name(interface);
+                    uint32_t interfaceId = nw_interface_get_index(interface);
                     ChipLogProgress(Inet, "\t%s (%u)", interfaceName, interfaceId);
                     LogDetails(interfaceId, inetInterfaces, inet6Interfaces);
                 }
@@ -175,7 +175,7 @@ namespace Inet {
                 shouldUseIPv6 = addressType == Inet::IPAddressType::kIPv6 || addressType == Inet::IPAddressType::kAny;
             }
 
-            void GetInterfaceAddresses(uint32_t interfaceId, chip::Inet::IPAddressType addressType, InetInterfacesVector & inetInterfaces,
+            void GetInterfaceAddresses(nw_interface_t interface, chip::Inet::IPAddressType addressType, InetInterfacesVector & inetInterfaces,
                 Inet6InterfacesVector & inet6Interfaces, bool searchLoopbackOnly = false)
             {
                 bool shouldUseIPv4, shouldUseIPv6;
@@ -184,6 +184,7 @@ namespace Inet {
                 ifaddrs * ifap;
                 VerifyOrReturn(getifaddrs(&ifap) >= 0);
 
+                uint32_t interfaceId = nw_interface_get_index(interface);
                 for (struct ifaddrs * ifa = ifap; ifa != nullptr; ifa = ifa->ifa_next) {
                     auto interfaceAddress = ifa->ifa_addr;
                     if (interfaceAddress == nullptr) {
@@ -195,16 +196,16 @@ namespace Inet {
                     }
 
                     auto currentInterfaceId = if_nametoindex(ifa->ifa_name);
-                    if (interfaceId != kDNSServiceInterfaceIndexAny && interfaceId != currentInterfaceId) {
+                    if (interfaceId != currentInterfaceId) {
                         continue;
                     }
 
                     if (shouldUseIPv4 && (AF_INET == interfaceAddress->sa_family)) {
                         auto inetAddress = reinterpret_cast<struct sockaddr_in *>(interfaceAddress)->sin_addr;
-                        inetInterfaces.push_back(Inet::Darwin::InetInterface(currentInterfaceId, inetAddress));
+                        inetInterfaces.push_back(Inet::Darwin::InetInterface(interface, inetAddress));
                     } else if (shouldUseIPv6 && (AF_INET6 == interfaceAddress->sa_family)) {
                         auto inet6Address = reinterpret_cast<struct sockaddr_in6 *>(interfaceAddress)->sin6_addr;
-                        inet6Interfaces.push_back(Inet::Darwin::Inet6Interface(currentInterfaceId, inet6Address));
+                        inet6Interfaces.push_back(Inet::Darwin::Inet6Interface(interface, inet6Address));
                     }
                 }
 
@@ -241,6 +242,9 @@ namespace Inet {
 
             nw_path_monitor_set_queue(mInterfaceMonitor, mWorkQueue);
 
+            __block InetInterfacesVector inetLoopback;
+            __block Inet6InterfacesVector inet6Loopback;
+
             // Our update handler closes over "this", but can't keep us alive (because we
             // are not refcounted).  Make sure it closes over a shared ref to our
             // liveness tracker, which it _can_ keep alive, so it can bail out if we
@@ -256,16 +260,8 @@ namespace Inet {
                 LogDetails(path);
 #endif // CHIP_PROGRESS_LOGGING
 
-                __block InetInterfacesVector inet;
-                __block Inet6InterfacesVector inet6;
-
-                // The loopback interfaces needs to be manually added. While lo0 is usually 1, this is not guaranteed. So search for a
-                // loopback interface with the specified interface id. If the specified interface id is kDNSServiceInterfaceIndexAny, it
-                // will look for all available loopback interfaces.
-                GetInterfaceAddresses(mInterfaceId, mAddressType, inet, inet6, true /* searchLoopbackOnly */);
-#if CHIP_PROGRESS_LOGGING
-                LogDetails(inet, inet6);
-#endif // CHIP_PROGRESS_LOGGING
+                __block InetInterfacesVector inet = inetLoopback;
+                __block Inet6InterfacesVector inet6 = inet6Loopback;
 
                 auto status = nw_path_get_status(path);
                 if (status == nw_path_status_satisfied) {
@@ -273,8 +269,8 @@ namespace Inet {
                         VerifyOrReturnValue(HasValidNetworkType(interface), true);
                         VerifyOrReturnValue(IsValidInterfaceId(mInterfaceId, interface), true);
 
-                        auto targetInterfaceId = nw_interface_get_index(interface);
-                        GetInterfaceAddresses(targetInterfaceId, mAddressType, inet, inet6);
+                        // auto targetInterfaceId = nw_interface_get_index(interface);
+                        GetInterfaceAddresses(interface, mAddressType, inet, inet6);
 #if CHIP_PROGRESS_LOGGING
                         LogDetails(interface, inet, inet6);
 #endif // CHIP_PROGRESS_LOGGING
@@ -285,7 +281,32 @@ namespace Inet {
                 interfaceChangesBlock(inet, inet6);
             });
 
-            nw_path_monitor_start(mInterfaceMonitor);
+            __auto_type loopbackMonitor = nw_path_monitor_create_with_type(nw_interface_type_loopback);
+            nw_path_monitor_set_queue(loopbackMonitor, mWorkQueue);
+            nw_path_monitor_set_update_handler(loopbackMonitor, ^(nw_path_t path) {
+                if (!*livenessTracker) {
+                    // The InterfacesMonitor has been destroyed; just bail out.
+                    return;
+                }
+
+                // The loopback interfaces needs to be manually added. While lo0 is usually 1, this is not guaranteed. So search for a
+                // loopback interface with the specified interface id. If the specified interface id is kDNSServiceInterfaceIndexAny, it
+                // will look for all available loopback interfaces.
+                nw_path_enumerate_interfaces(path, ^(nw_interface_t interface) {
+                    uint32_t interfaceId = nw_interface_get_index(interface);
+                    if (mInterfaceId == kDNSServiceInterfaceIndexAny || mInterfaceId == interfaceId) {
+                        GetInterfaceAddresses(interface, mAddressType, inetLoopback, inet6Loopback, true /* searchLoopbackOnly */);
+                    }
+                    return true;
+                });
+#if CHIP_PROGRESS_LOGGING
+                LogDetails(inetLoopback, inet6Loopback);
+#endif // CHIP_PROGRESS_LOGGING
+
+                nw_path_monitor_cancel(loopbackMonitor);
+                nw_path_monitor_start(mInterfaceMonitor);
+            });
+            nw_path_monitor_start(loopbackMonitor);
 
             return CHIP_NO_ERROR;
         }
