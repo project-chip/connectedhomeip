@@ -6152,7 +6152,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 - (void)testUnsignedInteger64Bits
 {
     NSDictionary * input = [NSDictionary dictionaryWithObjectsAndKeys:@"UnsignedInteger", @"type",
-        [NSNumber numberWithUnsignedLongLong:0xCCCCDDDDEEEEFFFFull], @"value", nil];
+                                         [NSNumber numberWithUnsignedLongLong:0xCCCCDDDDEEEEFFFFull], @"value", nil];
     id output = [MTRBaseDevice CHIPEncodeAndDecodeNSObject:input];
     NSLog(@"Conversion input: %@\nOutput: %@", input, output);
     XCTAssertNotNil(output);
