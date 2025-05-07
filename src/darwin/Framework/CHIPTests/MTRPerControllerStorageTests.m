@@ -3737,8 +3737,8 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
 - (void)testMTRDeviceDealloc
 {
-    // MTRPerControllerStorageTests are categorically flaky at the moment.
-    XCTSkip("Skipping due to flakyness/failing.");
+    // disabled:  see https://github.com/project-chip/connectedhomeip/issues/38715
+    XCTSkip("Skipping due to flakyness/failing.  (https://github.com/project-chip/connectedhomeip/issues/38715)");
 
     __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
 
