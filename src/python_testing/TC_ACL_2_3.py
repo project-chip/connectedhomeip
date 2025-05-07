@@ -284,6 +284,11 @@ class TC_ACL_2_3(MatterBaseTest):
         logging.info(f"AccessControlExtension: {str(ac_extension_value5)}")
         asserts.assert_equal(ac_extension_value5, [], "AccessControlExtension is empty list")
 
+        self.step(21)
+        # Rerunning test with new list method
+        if force_legacy_encoding:
+            logging.info("Rerunning test with new list method")
+
     def desc_TC_ACL_2_3(self) -> str:
         return "[TC-ACL-2.3] Multiple fabrics test"
 
@@ -329,6 +334,8 @@ class TC_ACL_2_3(MatterBaseTest):
                      "Result is SUCCESS"),
             TestStep(20, "TH1 reads DUT Endpoint 0 AccessControl cluster Extension attribute",
                      "Result is Success, value is an empty list"),
+            TestStep(21, "Rerunning test with new list method",
+                     "Rerunning test with new list method"),
         ]
         return steps
 
