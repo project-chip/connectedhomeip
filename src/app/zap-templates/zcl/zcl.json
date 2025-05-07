@@ -731,7 +731,7 @@
             "Viewport",
             "MaxConcurrentEncoders",
             "MaxEncodedPixelRate",
-            "NightVisionCapable",
+            "NightVisionUsesInfrared",
             "RateDistortionTradeOffPoints",
             "MaxContentBufferSize",
             "TwoWayTalkSupport",
@@ -769,7 +769,8 @@
         ],
         "Camera AV Settings User Level Management": ["MPTZPosition"],
         "Push AV Stream Transport": ["CurrentConnections"],
-        "Soil Measurement": ["SoilMoistureMeasurementLimits"]
+        "Soil Measurement": ["SoilMoistureMeasurementLimits"],
+        "Unit Localization": ["TemperatureUnit"]
     },
     "mandatoryDeviceTypes": "0x0016",
     "defaultReportingPolicy": "mandatory",
