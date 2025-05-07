@@ -51,6 +51,7 @@ namespace Inet {
             InterfaceId GetInterfaceId() const { return InterfaceId(static_cast<InterfaceId::PlatformType>(mInterfaceId)); };
 
             CHIP_ERROR StartMonitorInterfaces(OnInterfaceChanges interfaceChangesBlock);
+            CHIP_ERROR StartMonitorPath(OnPathChange pathChangeBlock);
             void StopMonitorInterfaces();
 
         private:

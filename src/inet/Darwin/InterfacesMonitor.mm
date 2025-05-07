@@ -235,6 +235,36 @@ namespace Inet {
             return CHIP_NO_ERROR;
         }
 
+        CHIP_ERROR InterfacesMonitor::StartMonitorPath(OnPathChange pathChangeBlock)
+        {
+            mInterfaceMonitor = nw_path_monitor_create();
+            VerifyOrReturnError(mInterfaceMonitor != nullptr, CHIP_ERROR_NO_MEMORY);
+
+            nw_path_monitor_set_queue(mInterfaceMonitor, mWorkQueue);
+
+            // Our update handler closes over "this", but can't keep us alive (because we
+            // are not refcounted).  Make sure it closes over a shared ref to our
+            // liveness tracker, which it _can_ keep alive, so it can bail out if we
+            // have been destroyed between when the task was queued and when it ran.
+            std::shared_ptr<bool> livenessTracker = mLivenessTracker;
+            nw_path_monitor_set_update_handler(mInterfaceMonitor, ^(nw_path_t path) {
+                if (!*livenessTracker) {
+                    // The InterfacesMonitor has been destroyed; just bail out.
+                    return;
+                }
+
+#if CHIP_PROGRESS_LOGGING
+                LogDetails(path);
+#endif // CHIP_PROGRESS_LOGGING
+
+                pathChangeBlock(path);
+            });
+
+            nw_path_monitor_start(mInterfaceMonitor);
+
+            return CHIP_NO_ERROR;
+        }
+
         CHIP_ERROR InterfacesMonitor::StartMonitorInterfaces(OnInterfaceChanges interfaceChangesBlock)
         {
             mInterfaceMonitor = nw_path_monitor_create();
