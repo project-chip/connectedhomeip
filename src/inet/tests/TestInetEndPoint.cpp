@@ -42,6 +42,7 @@
 
 #include "TestInetCommon.h"
 #include "TestSetupSignalling.h"
+#include "inet/InetConfig.h"
 
 using namespace chip;
 using namespace chip::Inet;
@@ -391,7 +392,17 @@ TEST_F(TestInetEndPoint, TestInetEndPointLimit)
     for (int i = INET_CONFIG_NUM_UDP_ENDPOINTS; i >= 0; --i)
     {
         err = gUDP.NewEndPoint(&testUDPEP[i]);
-        EXPECT_EQ(err, (i ? CHIP_NO_ERROR : CHIP_ERROR_ENDPOINT_POOL_FULL));
+
+        CHIP_ERROR expected_error = (i ? CHIP_NO_ERROR : CHIP_ERROR_ENDPOINT_POOL_FULL);
+        if (err != expected_error)
+        {
+            // have a log to debug things
+            ChipLogError(Test, "UDP: Failure on index %d: (out of %d)", i, INET_CONFIG_NUM_UDP_ENDPOINTS);
+
+            // this will fail after the above log
+            EXPECT_EQ(err, expected_error);
+        }
+
         if (err == CHIP_NO_ERROR)
         {
             ++udpCount;
@@ -407,7 +418,15 @@ TEST_F(TestInetEndPoint, TestInetEndPointLimit)
     for (int i = INET_CONFIG_NUM_TCP_ENDPOINTS; i >= 0; --i)
     {
         err = gTCP.NewEndPoint(&testTCPEP[i]);
-        EXPECT_EQ(err, (i ? CHIP_NO_ERROR : CHIP_ERROR_ENDPOINT_POOL_FULL));
+        CHIP_ERROR expected_error = (i ? CHIP_NO_ERROR : CHIP_ERROR_ENDPOINT_POOL_FULL);
+        if (err != expected_error)
+        {
+            // have a log to debug things
+            ChipLogError(Test, "TCP: Failure on index %d: (out of %d)", i, INET_CONFIG_NUM_TCP_ENDPOINTS);
+
+            // this will fail after the above log
+            EXPECT_EQ(err, expected_error);
+        }
         if (err == CHIP_NO_ERROR)
         {
             ++tcpCount;
