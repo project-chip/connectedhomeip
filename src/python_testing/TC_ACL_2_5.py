@@ -126,27 +126,49 @@ class TC_ACL_2_5(MatterBaseTest):
             result[0].Status, Status.Success, "Write should have succeeded")
 
         self.step(5)
-        # Wait for and verify the event
-        logging.info("Waiting for AccessControlExtensionChanged event...")
-        event_data = events_callback.wait_for_event_report(acec_event, timeout_sec=15)
+        # Wait for and verify the event from subscription
+        logging.info("Waiting for AccessControlExtensionChanged event from subscription...")
+        subscription_event = events_callback.wait_for_event_report(acec_event, timeout_sec=15)
 
-        # Verify event data
-        # Created new follow-up task here: https://github.com/project-chip/matter-test-scripts/issues/547
-        asserts.assert_equal(event_data.changeType,
+        # Read the event directly
+        logging.info("Reading event directly...")
+        latest_event_num = await self.get_latest_event_number(acec_event)
+        direct_events = await self.default_controller.ReadEvent(
+            self.dut_node_id,
+            events=[(0, acec_event)],
+            fabricFiltered=True,
+            eventNumberFilter=latest_event_num
+        )
+
+        # There should be exactly one event
+        asserts.assert_equal(len(direct_events), 1, "Expected exactly one event from direct read")
+        direct_event = direct_events[0]
+
+        # Log the event structures to help debug
+        logging.info(f"direct event: {direct_event}")
+        logging.info(f"Direct event structure: {dir(direct_event)}")
+        logging.info(f"Subscription event structure: {dir(subscription_event)}")
+
+        # Verify both methods return the same event data
+        logging.info(f"Comparing subscription event: {subscription_event} with direct event: {direct_event}")
+        asserts.assert_equal(subscription_event, direct_event.Data, "Subscription event should be in direct event")
+
+        # Verify the actual values
+        asserts.assert_equal(subscription_event.changeType,
                              Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
                              "Expected Added change type")
-        asserts.assert_in('chip.clusters.Types.Nullable', str(type(event_data.adminPasscodeID)),
+        asserts.assert_in('chip.clusters.Types.Nullable', str(type(subscription_event.adminPasscodeID)),
                           "AdminPasscodeID should be Null")
-        asserts.assert_equal(event_data.adminNodeID,
+        asserts.assert_equal(subscription_event.adminNodeID,
                              self.default_controller.nodeId,
                              "AdminNodeID should be the controller node ID")
-        asserts.assert_equal(event_data.latestValue.data,
+        asserts.assert_equal(subscription_event.latestValue.data,
                              b'\x17\x18',
                              "LatestValue.Data should be 1718")
-        asserts.assert_equal(event_data.latestValue.fabricIndex,
+        asserts.assert_equal(subscription_event.latestValue.fabricIndex,
                              f1,
                              "LatestValue.FabricIndex should be the current fabric index")
-        asserts.assert_equal(event_data.fabricIndex,
+        asserts.assert_equal(subscription_event.fabricIndex,
                              f1,
                              "FabricIndex should be the current fabric index")
 

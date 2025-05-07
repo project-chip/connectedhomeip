@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#pragma once
+
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {

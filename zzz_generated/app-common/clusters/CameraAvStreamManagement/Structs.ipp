@@ -174,6 +174,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kReferenceCount), referenceCount);
     encoder.Encode(to_underlying(Fields::kEncodedPixels), encodedPixels);
     encoder.Encode(to_underlying(Fields::kHardwareEncoder), hardwareEncoder);
+    encoder.Encode(to_underlying(Fields::kWatermarkEnabled), watermarkEnabled);
+    encoder.Encode(to_underlying(Fields::kOSDEnabled), OSDEnabled);
     return encoder.Finalize();
 }
 
@@ -222,6 +224,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kHardwareEncoder))
         {
             err = DataModel::Decode(reader, hardwareEncoder);
+        }
+        else if (__context_tag == to_underlying(Fields::kWatermarkEnabled))
+        {
+            err = DataModel::Decode(reader, watermarkEnabled);
+        }
+        else if (__context_tag == to_underlying(Fields::kOSDEnabled))
+        {
+            err = DataModel::Decode(reader, OSDEnabled);
         }
         else
         {

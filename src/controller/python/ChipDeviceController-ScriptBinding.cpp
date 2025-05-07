@@ -137,6 +137,8 @@ PyChipError pychip_DeviceController_GetAddressAndPort(chip::Controller::DeviceCo
                                                       char * outAddress, uint64_t maxAddressLen, uint16_t * outPort);
 PyChipError pychip_DeviceController_GetCompressedFabricId(chip::Controller::DeviceCommissioner * devCtrl, uint64_t * outFabricId);
 PyChipError pychip_DeviceController_GetFabricId(chip::Controller::DeviceCommissioner * devCtrl, uint64_t * outFabricId);
+PyChipError pychip_DeviceController_GetRootPublicKeyBytes(chip::Controller::DeviceCommissioner * devCtrl, uint8_t * buf,
+                                                          size_t * size);
 PyChipError pychip_DeviceController_GetFabricIndex(chip::Controller::DeviceCommissioner * devCtrl, uint8_t * outFabricIndex);
 PyChipError pychip_DeviceController_GetNodeId(chip::Controller::DeviceCommissioner * devCtrl, uint64_t * outNodeId);
 
@@ -384,6 +386,24 @@ const char * pychip_DeviceController_StatusReportToString(uint32_t profileId, ui
 {
     // return chip::StatusReportStr(profileId, statusCode);
     return nullptr;
+}
+
+PyChipError pychip_DeviceController_GetRootPublicKeyBytes(chip::Controller::DeviceCommissioner * devCtrl, uint8_t * buf,
+                                                          size_t * size)
+{
+    chip::Crypto::P256PublicKey rootPublicKey;
+    VerifyOrReturnError(*size >= rootPublicKey.Length(), ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    CHIP_ERROR err = devCtrl->GetRootPublicKey(rootPublicKey);
+    if (err != CHIP_NO_ERROR)
+    {
+        return ToPyChipError(err);
+    }
+
+    memcpy(buf, rootPublicKey.ConstBytes(), rootPublicKey.Length());
+    *size = rootPublicKey.Length();
+
+    return ToPyChipError(CHIP_NO_ERROR);
 }
 
 PyChipError pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommissioner * devCtrl, uint16_t discriminator,

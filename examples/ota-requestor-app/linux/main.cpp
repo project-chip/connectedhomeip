@@ -24,6 +24,8 @@
 #include <app/clusters/ota-requestor/ExtendedOTARequestorDriver.h>
 #include <platform/Linux/OTAImageProcessorImpl.h>
 
+#include <optional>
+
 using chip::BDXDownloader;
 using chip::ByteSpan;
 using chip::CharSpan;
@@ -74,6 +76,7 @@ constexpr uint16_t kOptionAutoApplyImage       = 'a';
 constexpr uint16_t kOptionRequestorCanConsent  = 'c';
 constexpr uint16_t kOptionDisableNotify        = 'd';
 constexpr uint16_t kOptionOtaDownloadPath      = 'f';
+constexpr uint16_t kOptionMaxBDXBlockSize      = 'm';
 constexpr uint16_t kOptionPeriodicQueryTimeout = 'p';
 constexpr uint16_t kOptionUserConsentState     = 'u';
 constexpr uint16_t kOptionWatchdogTimeout      = 'w';
@@ -83,10 +86,11 @@ constexpr size_t kMaxFilePathSize              = 256;
 uint32_t gPeriodicQueryTimeoutSec = 0;
 uint32_t gWatchdogTimeoutSec      = 0;
 chip::Optional<bool> gRequestorCanConsent;
-static char gOtaDownloadPath[kMaxFilePathSize] = "/tmp/test.bin";
-bool gAutoApplyImage                           = false;
-bool gSendNotifyUpdateApplied                  = true;
-bool gSkipExecImageFile                        = false;
+static char gOtaDownloadPath[kMaxFilePathSize]  = "/tmp/test.bin";
+bool gAutoApplyImage                            = false;
+bool gSendNotifyUpdateApplied                   = true;
+bool gSkipExecImageFile                         = false;
+static std::optional<uint16_t> gMaxBDXBlockSize = std::nullopt;
 
 OptionDef cmdLineOptionsDef[] = {
     { "autoApplyImage", chip::ArgParser::kNoArgument, kOptionAutoApplyImage },
@@ -97,6 +101,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "userConsentState", chip::ArgParser::kArgumentRequired, kOptionUserConsentState },
     { "watchdogTimeout", chip::ArgParser::kArgumentRequired, kOptionWatchdogTimeout },
     { "skipExecImageFile", chip::ArgParser::kNoArgument, kSkipExecImageFile },
+    { "maxBDXBlockSize", chip::ArgParser::kArgumentRequired, kOptionMaxBDXBlockSize },
     {},
 };
 
@@ -115,6 +120,9 @@ OptionSet cmdLineOptions = {
     "  -f, --otaDownloadPath <file path>\n"
     "       If supplied, the OTA image is downloaded to the given fully-qualified file-path.\n"
     "       Otherwise, the default location for the downloaded image is at /tmp/test.bin\n"
+    "  -m, --maxBDXBlockSize <size>\n"
+    "        Value for the maximum BDX block size to use for the transfer.\n"
+    "        If none is supplied, a default value will be used.\n"
     "  -p, --periodicQueryTimeout <time in seconds>\n"
     "       The periodic time interval to wait before attempting to query a provider from the default OTA provider list.\n"
     "       If none or zero is supplied, the timeout is determined by the driver.\n"
@@ -223,6 +231,11 @@ static void InitOTARequestor(void)
         gUserConsentProvider.SetUserConsentState(gUserConsentState);
         gRequestorUser.SetUserConsentDelegate(&gUserConsentProvider);
     }
+
+    if (gMaxBDXBlockSize)
+    {
+        gRequestorUser.SetMaxDownloadBlockSize(*gMaxBDXBlockSize);
+    }
 }
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
@@ -284,6 +297,19 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
     case kSkipExecImageFile:
         gSkipExecImageFile = true;
         break;
+    case kOptionMaxBDXBlockSize: {
+        auto blockSize = static_cast<uint16_t>(strtoul(aValue, NULL, 0));
+        if (blockSize == 0)
+        {
+            PrintArgError("%s: ERROR: Invalid maxBDXBlockSize parameter: %s\n", aProgram, aValue);
+            retval = false;
+        }
+        else
+        {
+            gMaxBDXBlockSize = blockSize;
+        }
+        break;
+    }
     default:
         ChipLogError(SoftwareUpdate, "%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;

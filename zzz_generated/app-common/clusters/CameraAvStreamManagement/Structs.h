@@ -117,6 +117,8 @@ enum class Fields : uint8_t
     kReferenceCount   = 6,
     kEncodedPixels    = 7,
     kHardwareEncoder  = 8,
+    kWatermarkEnabled = 9,
+    kOSDEnabled       = 10,
 };
 
 struct Type
@@ -131,6 +133,8 @@ public:
     uint8_t referenceCount = static_cast<uint8_t>(0);
     bool encodedPixels     = static_cast<bool>(0);
     bool hardwareEncoder   = static_cast<bool>(0);
+    Optional<bool> watermarkEnabled;
+    Optional<bool> OSDEnabled;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

@@ -65,8 +65,8 @@ using DecodableType = Type;
 namespace TransportZoneOptionsStruct {
 enum class Fields : uint8_t
 {
-    kZone        = 1,
-    kSensitivity = 2,
+    kZone        = 0,
+    kSensitivity = 1,
 };
 
 struct Type
@@ -130,6 +130,7 @@ enum class Fields : uint8_t
     kChunkDuration   = 0,
     kCENCKey         = 1,
     kMetadataEnabled = 2,
+    kCENCKeyID       = 3,
 };
 
 struct Type
@@ -138,6 +139,7 @@ public:
     uint16_t chunkDuration = static_cast<uint16_t>(0);
     Optional<chip::ByteSpan> CENCKey;
     Optional<bool> metadataEnabled;
+    Optional<chip::ByteSpan> CENCKeyID;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -182,9 +184,8 @@ enum class Fields : uint8_t
     kUrl              = 4,
     kTriggerOptions   = 5,
     kIngestMethod     = 6,
-    kContainerFormat  = 7,
-    kContainerOptions = 8,
-    kExpiryTime       = 9,
+    kContainerOptions = 7,
+    kExpiryTime       = 8,
 };
 
 struct Type
@@ -196,8 +197,7 @@ public:
     uint16_t endpointID = static_cast<uint16_t>(0);
     chip::CharSpan url;
     Structs::TransportTriggerOptionsStruct::Type triggerOptions;
-    IngestMethodsEnum ingestMethod      = static_cast<IngestMethodsEnum>(0);
-    ContainerFormatEnum containerFormat = static_cast<ContainerFormatEnum>(0);
+    IngestMethodsEnum ingestMethod = static_cast<IngestMethodsEnum>(0);
     Structs::ContainerOptionsStruct::Type containerOptions;
     Optional<uint32_t> expiryTime;
 
@@ -215,8 +215,7 @@ public:
     uint16_t endpointID = static_cast<uint16_t>(0);
     chip::CharSpan url;
     Structs::TransportTriggerOptionsStruct::DecodableType triggerOptions;
-    IngestMethodsEnum ingestMethod      = static_cast<IngestMethodsEnum>(0);
-    ContainerFormatEnum containerFormat = static_cast<ContainerFormatEnum>(0);
+    IngestMethodsEnum ingestMethod = static_cast<IngestMethodsEnum>(0);
     Structs::ContainerOptionsStruct::DecodableType containerOptions;
     Optional<uint32_t> expiryTime;
 
@@ -259,6 +258,29 @@ public:
 };
 
 } // namespace TransportConfigurationStruct
+namespace SupportedFormatStruct {
+enum class Fields : uint8_t
+{
+    kContainerFormat = 0,
+    kIngestMethod    = 1,
+};
+
+struct Type
+{
+public:
+    ContainerFormatEnum containerFormat = static_cast<ContainerFormatEnum>(0);
+    IngestMethodsEnum ingestMethod      = static_cast<IngestMethodsEnum>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace SupportedFormatStruct
 } // namespace Structs
 } // namespace PushAvStreamTransport
 } // namespace Clusters

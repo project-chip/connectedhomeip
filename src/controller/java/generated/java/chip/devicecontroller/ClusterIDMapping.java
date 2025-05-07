@@ -17581,7 +17581,7 @@ public class ClusterIDMapping {
             MaxConcurrentEncoders(0L),
             MaxEncodedPixelRate(1L),
             VideoSensorParams(2L),
-            NightVisionCapable(3L),
+            NightVisionUsesInfrared(3L),
             MinViewport(4L),
             RateDistortionTradeOffPoints(5L),
             MaxContentBufferSize(6L),
@@ -18498,9 +18498,8 @@ public class ClusterIDMapping {
         }
 
         public enum Attribute {
-            SupportedContainerFormats(0L),
-            SupportedIngestMethods(1L),
-            CurrentConnections(2L),
+            SupportedFormats(0L),
+            CurrentConnections(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),

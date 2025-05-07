@@ -31,7 +31,6 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
   val url: String,
   val triggerOptions: PushAvStreamTransportClusterTransportTriggerOptionsStruct,
   val ingestMethod: UByte,
-  val containerFormat: UByte,
   val containerOptions: PushAvStreamTransportClusterContainerOptionsStruct,
   val expiryTime: Optional<UInt>,
 ) {
@@ -44,7 +43,6 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
     append("\turl : $url\n")
     append("\ttriggerOptions : $triggerOptions\n")
     append("\tingestMethod : $ingestMethod\n")
-    append("\tcontainerFormat : $containerFormat\n")
     append("\tcontainerOptions : $containerOptions\n")
     append("\texpiryTime : $expiryTime\n")
     append("}\n")
@@ -74,7 +72,6 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
       put(ContextSpecificTag(TAG_URL), url)
       triggerOptions.toTlv(ContextSpecificTag(TAG_TRIGGER_OPTIONS), this)
       put(ContextSpecificTag(TAG_INGEST_METHOD), ingestMethod)
-      put(ContextSpecificTag(TAG_CONTAINER_FORMAT), containerFormat)
       containerOptions.toTlv(ContextSpecificTag(TAG_CONTAINER_OPTIONS), this)
       if (expiryTime.isPresent) {
         val optexpiryTime = expiryTime.get()
@@ -92,9 +89,8 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
     private const val TAG_URL = 4
     private const val TAG_TRIGGER_OPTIONS = 5
     private const val TAG_INGEST_METHOD = 6
-    private const val TAG_CONTAINER_FORMAT = 7
-    private const val TAG_CONTAINER_OPTIONS = 8
-    private const val TAG_EXPIRY_TIME = 9
+    private const val TAG_CONTAINER_OPTIONS = 7
+    private const val TAG_EXPIRY_TIME = 8
 
     fun fromTlv(
       tlvTag: Tag,
@@ -132,7 +128,6 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
           tlvReader,
         )
       val ingestMethod = tlvReader.getUByte(ContextSpecificTag(TAG_INGEST_METHOD))
-      val containerFormat = tlvReader.getUByte(ContextSpecificTag(TAG_CONTAINER_FORMAT))
       val containerOptions =
         PushAvStreamTransportClusterContainerOptionsStruct.fromTlv(
           ContextSpecificTag(TAG_CONTAINER_OPTIONS),
@@ -155,7 +150,6 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
         url,
         triggerOptions,
         ingestMethod,
-        containerFormat,
         containerOptions,
         expiryTime,
       )

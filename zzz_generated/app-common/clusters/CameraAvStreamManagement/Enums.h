@@ -104,6 +104,7 @@ enum class Feature : uint32_t
     kOnScreenDisplay  = 0x80,
     kLocalStorage     = 0x100,
     kHighDynamicRange = 0x200,
+    kNightVision      = 0x400,
 };
 } // namespace CameraAvStreamManagement
 } // namespace Clusters

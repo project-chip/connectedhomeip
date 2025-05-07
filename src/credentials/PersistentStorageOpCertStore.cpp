@@ -27,7 +27,6 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
-#include <lib/support/logging/CHIPLogging.h>
 
 #include <credentials/CHIPCert.h>
 
@@ -339,13 +338,6 @@ CHIP_ERROR PersistentStorageOpCertStore::UpdateOpCertsForFabric(FabricIndex fabr
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
     VerifyOrReturnError(!noc.empty() && (noc.size() <= Credentials::kMaxCHIPCertLength), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(icac.size() <= Credentials::kMaxCHIPCertLength, CHIP_ERROR_INVALID_ARGUMENT);
-    // Can't set an ICAC if we have installed a VVSC, until the VVSC is gone.
-    if (HasVvscForFabric(fabricIndex))
-    {
-        ChipLogError(FabricProvisioning,
-                     "Received an UpdateNOC storage request with ICAC when VVSC already present. VVSC must be removed first.");
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
 
     // Can't have called AddNewOpCertsForFabric first, and should never get here after AddNewTrustedRootCertForFabric.
     VerifyOrReturnError(!mStateFlags.HasAny(StateFlags::kAddNewOpCertsCalled, StateFlags::kAddNewTrustedRootCalled),
@@ -400,10 +392,6 @@ CHIP_ERROR PersistentStorageOpCertStore::UpdateVidVerificationSignerCertForFabri
 {
     ReturnErrorOnFailure(BasicVidVerificationAssumptionsAreMet(fabricIndex));
     VerifyOrReturnError(vvsc.empty() || vvsc.size() <= Credentials::kMaxCHIPCertLength, CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Can't try to set a VVSC if ICAC present.
-    bool legalVvscSetting = vvsc.empty() || !HasCertificateForFabric(fabricIndex, CertChainElement::kIcac);
-    VerifyOrReturnError(legalVvscSetting, CHIP_ERROR_INCORRECT_STATE);
 
     CHIP_ERROR vvscErr = CHIP_NO_ERROR;
 
@@ -561,23 +549,6 @@ bool PersistentStorageOpCertStore::HasAnyCertificateForFabric(FabricIndex fabric
     }
 
     return true;
-}
-
-bool PersistentStorageOpCertStore::HasVvscForFabric(FabricIndex fabricIndex) const
-{
-    VerifyOrReturnError(IsValidFabricIndex(fabricIndex), false);
-
-    if (fabricIndex == mPendingFabricIndex)
-    {
-        return mPendingVvsc.AllocatedSize() != 0;
-    }
-
-    uint8_t placeHolderCertBuffer[kMaxCHIPCertLength];
-    uint16_t bufSize = sizeof(placeHolderCertBuffer);
-    CHIP_ERROR err   = mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::FabricVVSC(fabricIndex).KeyName(),
-                                                 &placeHolderCertBuffer[0], bufSize);
-
-    return (err == CHIP_NO_ERROR);
 }
 
 CHIP_ERROR PersistentStorageOpCertStore::RemoveOpCertsForFabric(FabricIndex fabricIndex)

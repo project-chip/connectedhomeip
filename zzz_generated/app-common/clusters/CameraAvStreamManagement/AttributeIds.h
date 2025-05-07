@@ -24,9 +24,9 @@ namespace VideoSensorParams {
 inline constexpr AttributeId Id = 0x00000002;
 } // namespace VideoSensorParams
 
-namespace NightVisionCapable {
+namespace NightVisionUsesInfrared {
 inline constexpr AttributeId Id = 0x00000003;
-} // namespace NightVisionCapable
+} // namespace NightVisionUsesInfrared
 
 namespace MinViewport {
 inline constexpr AttributeId Id = 0x00000004;

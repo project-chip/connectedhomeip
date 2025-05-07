@@ -169,29 +169,6 @@ public:
 };
 
 } // namespace MeasurementAccuracyStruct
-namespace DeviceTypeStruct {
-enum class Fields : uint8_t
-{
-    kDeviceType = 0,
-    kRevision   = 1,
-};
-
-struct Type
-{
-public:
-    chip::DeviceTypeId deviceType = static_cast<chip::DeviceTypeId>(0);
-    uint16_t revision             = static_cast<uint16_t>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace DeviceTypeStruct
 namespace ApplicationStruct {
 enum class Fields : uint8_t
 {
@@ -496,10 +473,10 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    MeasurementTypeEnum measurementType = static_cast<MeasurementTypeEnum>(0);
-    bool measured                       = static_cast<bool>(0);
-    int64_t minMeasuredValue            = static_cast<int64_t>(0);
-    int64_t maxMeasuredValue            = static_cast<int64_t>(0);
+    Globals::MeasurementTypeEnum measurementType = static_cast<Globals::MeasurementTypeEnum>(0);
+    bool measured                                = static_cast<bool>(0);
+    int64_t minMeasuredValue                     = static_cast<int64_t>(0);
+    int64_t maxMeasuredValue                     = static_cast<int64_t>(0);
     DataModel::List<const Globals::Structs::MeasurementAccuracyRangeStruct::Type> accuracyRanges;
 
     static constexpr bool kIsFabricScoped = false;
@@ -510,10 +487,10 @@ public:
 struct DecodableType
 {
 public:
-    MeasurementTypeEnum measurementType = static_cast<MeasurementTypeEnum>(0);
-    bool measured                       = static_cast<bool>(0);
-    int64_t minMeasuredValue            = static_cast<int64_t>(0);
-    int64_t maxMeasuredValue            = static_cast<int64_t>(0);
+    Globals::MeasurementTypeEnum measurementType = static_cast<Globals::MeasurementTypeEnum>(0);
+    bool measured                                = static_cast<bool>(0);
+    int64_t minMeasuredValue                     = static_cast<int64_t>(0);
+    int64_t maxMeasuredValue                     = static_cast<int64_t>(0);
     DataModel::DecodableList<Globals::Structs::MeasurementAccuracyRangeStruct::DecodableType> accuracyRanges;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);

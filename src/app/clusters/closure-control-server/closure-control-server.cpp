@@ -116,7 +116,7 @@ void Interface::InvokeCommand(HandlerContext & handlerContext)
     switch (handlerContext.mRequestPath.mCommandId)
     {
     case Commands::Stop::Id:
-        HandleCommand<Commands::SetTarget::DecodableType>(
+        HandleCommand<Commands::Stop::DecodableType>(
             handlerContext, [&logic = mClusterLogic](HandlerContext & ctx, const auto & commandData) {
                 // TODO: Call cluster logic
                 ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::UnsupportedCommand);
@@ -124,14 +124,14 @@ void Interface::InvokeCommand(HandlerContext & handlerContext)
         return;
 
     case Commands::MoveTo::Id:
-        HandleCommand<Commands::Step::DecodableType>(
+        HandleCommand<Commands::MoveTo::DecodableType>(
             handlerContext, [&logic = mClusterLogic](HandlerContext & ctx, const auto & commandData) {
                 // TODO: Call cluster logic
                 ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::UnsupportedCommand);
             });
         return;
     case Commands::Calibrate::Id:
-        HandleCommand<Commands::Step::DecodableType>(
+        HandleCommand<Commands::Calibrate::DecodableType>(
             handlerContext, [&logic = mClusterLogic](HandlerContext & ctx, const auto & commandData) {
                 // TODO: Call cluster logic
                 ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::UnsupportedCommand);

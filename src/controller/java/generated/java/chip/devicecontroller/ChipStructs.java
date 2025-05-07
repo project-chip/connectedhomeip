@@ -13824,6 +13824,8 @@ public static class CameraAvStreamManagementClusterSnapshotStreamStruct {
   public Integer referenceCount;
   public Boolean encodedPixels;
   public Boolean hardwareEncoder;
+  public Optional<Boolean> watermarkEnabled;
+  public Optional<Boolean> OSDEnabled;
   private static final long SNAPSHOT_STREAM_ID_ID = 0L;
   private static final long IMAGE_CODEC_ID = 1L;
   private static final long FRAME_RATE_ID = 2L;
@@ -13833,6 +13835,8 @@ public static class CameraAvStreamManagementClusterSnapshotStreamStruct {
   private static final long REFERENCE_COUNT_ID = 6L;
   private static final long ENCODED_PIXELS_ID = 7L;
   private static final long HARDWARE_ENCODER_ID = 8L;
+  private static final long WATERMARK_ENABLED_ID = 9L;
+  private static final long OSD_ENABLED_ID = 10L;
 
   public CameraAvStreamManagementClusterSnapshotStreamStruct(
     Integer snapshotStreamID,
@@ -13843,7 +13847,9 @@ public static class CameraAvStreamManagementClusterSnapshotStreamStruct {
     Integer quality,
     Integer referenceCount,
     Boolean encodedPixels,
-    Boolean hardwareEncoder
+    Boolean hardwareEncoder,
+    Optional<Boolean> watermarkEnabled,
+    Optional<Boolean> OSDEnabled
   ) {
     this.snapshotStreamID = snapshotStreamID;
     this.imageCodec = imageCodec;
@@ -13854,6 +13860,8 @@ public static class CameraAvStreamManagementClusterSnapshotStreamStruct {
     this.referenceCount = referenceCount;
     this.encodedPixels = encodedPixels;
     this.hardwareEncoder = hardwareEncoder;
+    this.watermarkEnabled = watermarkEnabled;
+    this.OSDEnabled = OSDEnabled;
   }
 
   public StructType encodeTlv() {
@@ -13867,6 +13875,8 @@ public static class CameraAvStreamManagementClusterSnapshotStreamStruct {
     values.add(new StructElement(REFERENCE_COUNT_ID, new UIntType(referenceCount)));
     values.add(new StructElement(ENCODED_PIXELS_ID, new BooleanType(encodedPixels)));
     values.add(new StructElement(HARDWARE_ENCODER_ID, new BooleanType(hardwareEncoder)));
+    values.add(new StructElement(WATERMARK_ENABLED_ID, watermarkEnabled.<BaseTLVType>map((nonOptionalwatermarkEnabled) -> new BooleanType(nonOptionalwatermarkEnabled)).orElse(new EmptyType())));
+    values.add(new StructElement(OSD_ENABLED_ID, OSDEnabled.<BaseTLVType>map((nonOptionalOSDEnabled) -> new BooleanType(nonOptionalOSDEnabled)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -13884,6 +13894,8 @@ public static class CameraAvStreamManagementClusterSnapshotStreamStruct {
     Integer referenceCount = null;
     Boolean encodedPixels = null;
     Boolean hardwareEncoder = null;
+    Optional<Boolean> watermarkEnabled = Optional.empty();
+    Optional<Boolean> OSDEnabled = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == SNAPSHOT_STREAM_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -13930,6 +13942,16 @@ public static class CameraAvStreamManagementClusterSnapshotStreamStruct {
           BooleanType castingValue = element.value(BooleanType.class);
           hardwareEncoder = castingValue.value(Boolean.class);
         }
+      } else if (element.contextTagNum() == WATERMARK_ENABLED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          watermarkEnabled = Optional.of(castingValue.value(Boolean.class));
+        }
+      } else if (element.contextTagNum() == OSD_ENABLED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          OSDEnabled = Optional.of(castingValue.value(Boolean.class));
+        }
       }
     }
     return new CameraAvStreamManagementClusterSnapshotStreamStruct(
@@ -13941,7 +13963,9 @@ public static class CameraAvStreamManagementClusterSnapshotStreamStruct {
       quality,
       referenceCount,
       encodedPixels,
-      hardwareEncoder
+      hardwareEncoder,
+      watermarkEnabled,
+      OSDEnabled
     );
   }
 
@@ -13975,6 +13999,12 @@ public static class CameraAvStreamManagementClusterSnapshotStreamStruct {
     output.append("\n");
     output.append("\thardwareEncoder: ");
     output.append(hardwareEncoder);
+    output.append("\n");
+    output.append("\twatermarkEnabled: ");
+    output.append(watermarkEnabled);
+    output.append("\n");
+    output.append("\tOSDEnabled: ");
+    output.append(OSDEnabled);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -15407,8 +15437,8 @@ public static class PushAvStreamTransportClusterTransportMotionTriggerTimeContro
 public static class PushAvStreamTransportClusterTransportZoneOptionsStruct {
   public @Nullable Integer zone;
   public Optional<Integer> sensitivity;
-  private static final long ZONE_ID = 1L;
-  private static final long SENSITIVITY_ID = 2L;
+  private static final long ZONE_ID = 0L;
+  private static final long SENSITIVITY_ID = 1L;
 
   public PushAvStreamTransportClusterTransportZoneOptionsStruct(
     @Nullable Integer zone,
@@ -15575,18 +15605,22 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
   public Integer chunkDuration;
   public Optional<byte[]> CENCKey;
   public Optional<Boolean> metadataEnabled;
+  public Optional<byte[]> CENCKeyID;
   private static final long CHUNK_DURATION_ID = 0L;
   private static final long CENC_KEY_ID = 1L;
   private static final long METADATA_ENABLED_ID = 2L;
+  private static final long CENC_KEY_ID_ID = 3L;
 
   public PushAvStreamTransportClusterCMAFContainerOptionsStruct(
     Integer chunkDuration,
     Optional<byte[]> CENCKey,
-    Optional<Boolean> metadataEnabled
+    Optional<Boolean> metadataEnabled,
+    Optional<byte[]> CENCKeyID
   ) {
     this.chunkDuration = chunkDuration;
     this.CENCKey = CENCKey;
     this.metadataEnabled = metadataEnabled;
+    this.CENCKeyID = CENCKeyID;
   }
 
   public StructType encodeTlv() {
@@ -15594,6 +15628,7 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
     values.add(new StructElement(CHUNK_DURATION_ID, new UIntType(chunkDuration)));
     values.add(new StructElement(CENC_KEY_ID, CENCKey.<BaseTLVType>map((nonOptionalCENCKey) -> new ByteArrayType(nonOptionalCENCKey)).orElse(new EmptyType())));
     values.add(new StructElement(METADATA_ENABLED_ID, metadataEnabled.<BaseTLVType>map((nonOptionalmetadataEnabled) -> new BooleanType(nonOptionalmetadataEnabled)).orElse(new EmptyType())));
+    values.add(new StructElement(CENC_KEY_ID_ID, CENCKeyID.<BaseTLVType>map((nonOptionalCENCKeyID) -> new ByteArrayType(nonOptionalCENCKeyID)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -15605,6 +15640,7 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
     Integer chunkDuration = null;
     Optional<byte[]> CENCKey = Optional.empty();
     Optional<Boolean> metadataEnabled = Optional.empty();
+    Optional<byte[]> CENCKeyID = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CHUNK_DURATION_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -15621,12 +15657,18 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
           BooleanType castingValue = element.value(BooleanType.class);
           metadataEnabled = Optional.of(castingValue.value(Boolean.class));
         }
+      } else if (element.contextTagNum() == CENC_KEY_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          CENCKeyID = Optional.of(castingValue.value(byte[].class));
+        }
       }
     }
     return new PushAvStreamTransportClusterCMAFContainerOptionsStruct(
       chunkDuration,
       CENCKey,
-      metadataEnabled
+      metadataEnabled,
+      CENCKeyID
     );
   }
 
@@ -15642,6 +15684,9 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
     output.append("\n");
     output.append("\tmetadataEnabled: ");
     output.append(metadataEnabled);
+    output.append("\n");
+    output.append("\tCENCKeyID: ");
+    output.append(CENCKeyID.isPresent() ? Arrays.toString(CENCKeyID.get()) : "");
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -15716,7 +15761,6 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
   public String url;
   public ChipStructs.PushAvStreamTransportClusterTransportTriggerOptionsStruct triggerOptions;
   public Integer ingestMethod;
-  public Integer containerFormat;
   public ChipStructs.PushAvStreamTransportClusterContainerOptionsStruct containerOptions;
   public Optional<Long> expiryTime;
   private static final long STREAM_USAGE_ID = 0L;
@@ -15726,9 +15770,8 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
   private static final long URL_ID = 4L;
   private static final long TRIGGER_OPTIONS_ID = 5L;
   private static final long INGEST_METHOD_ID = 6L;
-  private static final long CONTAINER_FORMAT_ID = 7L;
-  private static final long CONTAINER_OPTIONS_ID = 8L;
-  private static final long EXPIRY_TIME_ID = 9L;
+  private static final long CONTAINER_OPTIONS_ID = 7L;
+  private static final long EXPIRY_TIME_ID = 8L;
 
   public PushAvStreamTransportClusterTransportOptionsStruct(
     Integer streamUsage,
@@ -15738,7 +15781,6 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
     String url,
     ChipStructs.PushAvStreamTransportClusterTransportTriggerOptionsStruct triggerOptions,
     Integer ingestMethod,
-    Integer containerFormat,
     ChipStructs.PushAvStreamTransportClusterContainerOptionsStruct containerOptions,
     Optional<Long> expiryTime
   ) {
@@ -15749,7 +15791,6 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
     this.url = url;
     this.triggerOptions = triggerOptions;
     this.ingestMethod = ingestMethod;
-    this.containerFormat = containerFormat;
     this.containerOptions = containerOptions;
     this.expiryTime = expiryTime;
   }
@@ -15763,7 +15804,6 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
     values.add(new StructElement(URL_ID, new StringType(url)));
     values.add(new StructElement(TRIGGER_OPTIONS_ID, triggerOptions.encodeTlv()));
     values.add(new StructElement(INGEST_METHOD_ID, new UIntType(ingestMethod)));
-    values.add(new StructElement(CONTAINER_FORMAT_ID, new UIntType(containerFormat)));
     values.add(new StructElement(CONTAINER_OPTIONS_ID, containerOptions.encodeTlv()));
     values.add(new StructElement(EXPIRY_TIME_ID, expiryTime.<BaseTLVType>map((nonOptionalexpiryTime) -> new UIntType(nonOptionalexpiryTime)).orElse(new EmptyType())));
 
@@ -15781,7 +15821,6 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
     String url = null;
     ChipStructs.PushAvStreamTransportClusterTransportTriggerOptionsStruct triggerOptions = null;
     Integer ingestMethod = null;
-    Integer containerFormat = null;
     ChipStructs.PushAvStreamTransportClusterContainerOptionsStruct containerOptions = null;
     Optional<Long> expiryTime = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
@@ -15820,11 +15859,6 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
           UIntType castingValue = element.value(UIntType.class);
           ingestMethod = castingValue.value(Integer.class);
         }
-      } else if (element.contextTagNum() == CONTAINER_FORMAT_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          containerFormat = castingValue.value(Integer.class);
-        }
       } else if (element.contextTagNum() == CONTAINER_OPTIONS_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
           StructType castingValue = element.value(StructType.class);
@@ -15845,7 +15879,6 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
       url,
       triggerOptions,
       ingestMethod,
-      containerFormat,
       containerOptions,
       expiryTime
     );
@@ -15875,9 +15908,6 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
     output.append("\n");
     output.append("\tingestMethod: ");
     output.append(ingestMethod);
-    output.append("\n");
-    output.append("\tcontainerFormat: ");
-    output.append(containerFormat);
     output.append("\n");
     output.append("\tcontainerOptions: ");
     output.append(containerOptions);
@@ -15960,6 +15990,67 @@ public static class PushAvStreamTransportClusterTransportConfigurationStruct {
     output.append("\n");
     output.append("\ttransportOptions: ");
     output.append(transportOptions);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class PushAvStreamTransportClusterSupportedFormatStruct {
+  public Integer containerFormat;
+  public Integer ingestMethod;
+  private static final long CONTAINER_FORMAT_ID = 0L;
+  private static final long INGEST_METHOD_ID = 1L;
+
+  public PushAvStreamTransportClusterSupportedFormatStruct(
+    Integer containerFormat,
+    Integer ingestMethod
+  ) {
+    this.containerFormat = containerFormat;
+    this.ingestMethod = ingestMethod;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CONTAINER_FORMAT_ID, new UIntType(containerFormat)));
+    values.add(new StructElement(INGEST_METHOD_ID, new UIntType(ingestMethod)));
+
+    return new StructType(values);
+  }
+
+  public static PushAvStreamTransportClusterSupportedFormatStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer containerFormat = null;
+    Integer ingestMethod = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CONTAINER_FORMAT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          containerFormat = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == INGEST_METHOD_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          ingestMethod = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new PushAvStreamTransportClusterSupportedFormatStruct(
+      containerFormat,
+      ingestMethod
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PushAvStreamTransportClusterSupportedFormatStruct {\n");
+    output.append("\tcontainerFormat: ");
+    output.append(containerFormat);
+    output.append("\n");
+    output.append("\tingestMethod: ");
+    output.append(ingestMethod);
     output.append("\n");
     output.append("}\n");
     return output.toString();

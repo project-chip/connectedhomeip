@@ -77,7 +77,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace VideoSensorParams
-namespace NightVisionCapable {
+namespace NightVisionUsesInfrared {
 struct TypeInfo
 {
     using Type             = bool;
@@ -85,10 +85,10 @@ struct TypeInfo
     using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::NightVisionCapable::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NightVisionUsesInfrared::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace NightVisionCapable
+} // namespace NightVisionUsesInfrared
 namespace MinViewport {
 struct TypeInfo
 {
@@ -590,7 +590,7 @@ struct TypeInfo
         Attributes::MaxConcurrentEncoders::TypeInfo::DecodableType maxConcurrentEncoders = static_cast<uint8_t>(0);
         Attributes::MaxEncodedPixelRate::TypeInfo::DecodableType maxEncodedPixelRate     = static_cast<uint32_t>(0);
         Attributes::VideoSensorParams::TypeInfo::DecodableType videoSensorParams;
-        Attributes::NightVisionCapable::TypeInfo::DecodableType nightVisionCapable = static_cast<bool>(0);
+        Attributes::NightVisionUsesInfrared::TypeInfo::DecodableType nightVisionUsesInfrared = static_cast<bool>(0);
         Attributes::MinViewport::TypeInfo::DecodableType minViewport;
         Attributes::RateDistortionTradeOffPoints::TypeInfo::DecodableType rateDistortionTradeOffPoints;
         Attributes::MaxContentBufferSize::TypeInfo::DecodableType maxContentBufferSize = static_cast<uint32_t>(0);

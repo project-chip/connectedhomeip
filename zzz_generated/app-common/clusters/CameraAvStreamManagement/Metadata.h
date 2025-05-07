@@ -43,14 +43,14 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .writePrivilege = std::nullopt,
 };
 } // namespace VideoSensorParams
-namespace NightVisionCapable {
+namespace NightVisionUsesInfrared {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = NightVisionCapable::Id,
+    .attributeId    = NightVisionUsesInfrared::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-} // namespace NightVisionCapable
+} // namespace NightVisionUsesInfrared
 namespace MinViewport {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = MinViewport::Id,

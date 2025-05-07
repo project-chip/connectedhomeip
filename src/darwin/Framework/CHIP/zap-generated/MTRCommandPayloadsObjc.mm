@@ -35910,7 +35910,6 @@ NS_ASSUME_NONNULL_BEGIN
             definedValue_2 = self.transportOptions.triggerOptions.maxPreRollLen.unsignedShortValue;
         }
         encodableStruct.transportOptions.ingestMethod = static_cast<std::remove_reference_t<decltype(encodableStruct.transportOptions.ingestMethod)>>(self.transportOptions.ingestMethod.unsignedCharValue);
-        encodableStruct.transportOptions.containerFormat = static_cast<std::remove_reference_t<decltype(encodableStruct.transportOptions.containerFormat)>>(self.transportOptions.containerFormat.unsignedCharValue);
         encodableStruct.transportOptions.containerOptions.containerType = static_cast<std::remove_reference_t<decltype(encodableStruct.transportOptions.containerOptions.containerType)>>(self.transportOptions.containerOptions.containerType.unsignedCharValue);
         if (self.transportOptions.containerOptions.cmafContainerOptions != nil) {
             auto & definedValue_2 = encodableStruct.transportOptions.containerOptions.CMAFContainerOptions.Emplace();
@@ -35922,6 +35921,10 @@ NS_ASSUME_NONNULL_BEGIN
             if (self.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled != nil) {
                 auto & definedValue_4 = definedValue_2.metadataEnabled.Emplace();
                 definedValue_4 = self.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled.boolValue;
+            }
+            if (self.transportOptions.containerOptions.cmafContainerOptions.cencKeyID != nil) {
+                auto & definedValue_4 = definedValue_2.CENCKeyID.Emplace();
+                definedValue_4 = AsByteSpan(self.transportOptions.containerOptions.cmafContainerOptions.cencKeyID);
             }
         }
         if (self.transportOptions.expiryTime != nil) {
@@ -36129,7 +36132,6 @@ NS_ASSUME_NONNULL_BEGIN
                 self.transportConfiguration.transportOptions.triggerOptions.maxPreRollLen = nil;
             }
             self.transportConfiguration.transportOptions.ingestMethod = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.transportConfiguration.transportOptions.Value().ingestMethod)];
-            self.transportConfiguration.transportOptions.containerFormat = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.transportConfiguration.transportOptions.Value().containerFormat)];
             self.transportConfiguration.transportOptions.containerOptions = [MTRPushAVStreamTransportClusterContainerOptionsStruct new];
             self.transportConfiguration.transportOptions.containerOptions.containerType = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.containerType)];
             if (decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.HasValue()) {
@@ -36144,6 +36146,11 @@ NS_ASSUME_NONNULL_BEGIN
                     self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled = [NSNumber numberWithBool:decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().metadataEnabled.Value()];
                 } else {
                     self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled = nil;
+                }
+                if (decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CENCKeyID.HasValue()) {
+                    self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.cencKeyID = AsData(decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CENCKeyID.Value());
+                } else {
+                    self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.cencKeyID = nil;
                 }
             } else {
                 self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions = nil;
@@ -36368,7 +36375,6 @@ NS_ASSUME_NONNULL_BEGIN
             definedValue_2 = self.transportOptions.triggerOptions.maxPreRollLen.unsignedShortValue;
         }
         encodableStruct.transportOptions.ingestMethod = static_cast<std::remove_reference_t<decltype(encodableStruct.transportOptions.ingestMethod)>>(self.transportOptions.ingestMethod.unsignedCharValue);
-        encodableStruct.transportOptions.containerFormat = static_cast<std::remove_reference_t<decltype(encodableStruct.transportOptions.containerFormat)>>(self.transportOptions.containerFormat.unsignedCharValue);
         encodableStruct.transportOptions.containerOptions.containerType = static_cast<std::remove_reference_t<decltype(encodableStruct.transportOptions.containerOptions.containerType)>>(self.transportOptions.containerOptions.containerType.unsignedCharValue);
         if (self.transportOptions.containerOptions.cmafContainerOptions != nil) {
             auto & definedValue_2 = encodableStruct.transportOptions.containerOptions.CMAFContainerOptions.Emplace();
@@ -36380,6 +36386,10 @@ NS_ASSUME_NONNULL_BEGIN
             if (self.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled != nil) {
                 auto & definedValue_4 = definedValue_2.metadataEnabled.Emplace();
                 definedValue_4 = self.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled.boolValue;
+            }
+            if (self.transportOptions.containerOptions.cmafContainerOptions.cencKeyID != nil) {
+                auto & definedValue_4 = definedValue_2.CENCKeyID.Emplace();
+                definedValue_4 = AsByteSpan(self.transportOptions.containerOptions.cmafContainerOptions.cencKeyID);
             }
         }
         if (self.transportOptions.expiryTime != nil) {
@@ -36867,7 +36877,6 @@ NS_ASSUME_NONNULL_BEGIN
                         newElement_0.transportOptions.triggerOptions.maxPreRollLen = nil;
                     }
                     newElement_0.transportOptions.ingestMethod = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.Value().ingestMethod)];
-                    newElement_0.transportOptions.containerFormat = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.Value().containerFormat)];
                     newElement_0.transportOptions.containerOptions = [MTRPushAVStreamTransportClusterContainerOptionsStruct new];
                     newElement_0.transportOptions.containerOptions.containerType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.Value().containerOptions.containerType)];
                     if (entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.HasValue()) {
@@ -36882,6 +36891,11 @@ NS_ASSUME_NONNULL_BEGIN
                             newElement_0.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled = [NSNumber numberWithBool:entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().metadataEnabled.Value()];
                         } else {
                             newElement_0.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled = nil;
+                        }
+                        if (entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CENCKeyID.HasValue()) {
+                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.cencKeyID = AsData(entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CENCKeyID.Value());
+                        } else {
+                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.cencKeyID = nil;
                         }
                     } else {
                         newElement_0.transportOptions.containerOptions.cmafContainerOptions = nil;

@@ -89,6 +89,8 @@ public:
             mPollInterval = interval;
     }
 
+    void SetMaxBDXBlockSize(uint16_t blockSize) { mMaxBDXBlockSize = blockSize; }
+
 private:
     bool SelectOTACandidate(const uint16_t requestorVendorID, const uint16_t requestorProductID,
                             const uint32_t requestorSoftwareVersion,
@@ -123,4 +125,5 @@ private:
     uint32_t mSoftwareVersion;
     char mSoftwareVersionString[SW_VER_STR_MAX_LEN];
     uint32_t mPollInterval;
+    uint16_t mMaxBDXBlockSize;
 };
