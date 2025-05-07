@@ -203,9 +203,11 @@ CHIP_ERROR NXPWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen,
 
 void NXPWiFiDriver::OnConnectWiFiNetwork(Status commissioningError, CharSpan debugText, int32_t connectStatus)
 {
-    /* Commit wifi network credentials in flash only if the connexion succeeded */
+    /* Commit wifi network credentials in flash only if the connection succeeded */
     if (commissioningError == NetworkCommissioning::Status::kSuccess)
+    {
         CommitConfiguration();
+    }
 
     if (mpConnectCallback != nullptr)
     {
