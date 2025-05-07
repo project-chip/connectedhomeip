@@ -64,6 +64,7 @@ private:
     CHIP_ERROR GetConnection(const IPPacketInfo & pktInfo);
     void PrepareConnections();
     void ReleaseConnections();
+    void SetConnectionInterface(nw_parameters_t parameters, InterfaceId interfaceId);
 
     bool HasConnection(nw_connection_t connection);
     nw_connection_t FindConnection(const IPPacketInfo & pktInfo);

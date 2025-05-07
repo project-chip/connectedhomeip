@@ -29,6 +29,7 @@ constexpr uint64_t kConnectTimeoutInSeconds = 10 * NSEC_PER_SEC;
 constexpr uint64_t kConnectionCancelledTimeoutInSeconds = 10 * NSEC_PER_SEC;
 constexpr uint64_t kAllConnectionCancelledTimeoutInSeconds = 30 * NSEC_PER_SEC;
 constexpr uint64_t kConnectionAliveTimeoutInSeconds = 60 * NSEC_PER_SEC;
+constexpr uint64_t kSetInterfaceTimeoutInSeconds = 5 * NSEC_PER_SEC;
 constexpr const char * kConnectionQueueName = "inet_connection";
 
 namespace chip {
@@ -112,6 +113,8 @@ namespace Inet {
 
             __auto_type localEndpoint = GetEndPoint(mAddressType, pktInfo.SrcAddress, pktInfo.SrcPort, pktInfo.Interface);
             nw_parameters_set_local_endpoint(parameters, localEndpoint);
+            SetConnectionInterface(parameters, pktInfo.Interface);
+
             __auto_type connection = nw_connection_create(endpoint, parameters); // Let system pick ephemeral port
             VerifyOrReturnError(nullptr != connection, CHIP_ERROR_INCORRECT_STATE);
 
@@ -285,6 +288,34 @@ namespace Inet {
             dispatch_group_wait(group, timeout); // NOLINT(clang-analyzer-optin.performance.GCDAntipattern)
 
             return CHIP_NO_ERROR;
+        }
+
+        void UDPEndPointImplNetworkFrameworkConnection::SetConnectionInterface(nw_parameters_t parameters, InterfaceId interfaceId)
+        {
+            VerifyOrReturn(InterfaceId::Null() != interfaceId);
+
+            __auto_type workQueue = dispatch_queue_create(kConnectionQueueName, DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+            __auto_type monitor = nw_path_monitor_create();
+            nw_path_monitor_set_queue(monitor, workQueue);
+
+            __auto_type semaphore = dispatch_semaphore_create(0);
+
+            uint32_t interfaceIndex = interfaceId.GetPlatformInterface();
+            nw_path_monitor_set_update_handler(monitor, ^(nw_path_t path) {
+                nw_path_enumerate_interfaces(path, ^(nw_interface_t interface) {
+                    if (interfaceIndex == nw_interface_get_index(interface)) {
+                        nw_parameters_require_interface(parameters, interface);
+                        return false;
+                    }
+                    return true;
+                });
+                nw_path_monitor_cancel(monitor);
+                dispatch_semaphore_signal(semaphore);
+            });
+
+            nw_path_monitor_start(monitor);
+            __auto_type timeout = dispatch_time(DISPATCH_TIME_NOW, kSetInterfaceTimeoutInSeconds);
+            dispatch_semaphore_wait(semaphore, timeout); // NOLINT(clang-analyzer-optin.performance.GCDAntipattern)
         }
 
         UDPEndPointImplNetworkFrameworkConnection::ConnectionWrapper::ConnectionWrapper(nw_connection_t connection, dispatch_queue_t timeoutQueue, dispatch_block_t onTimeout)
