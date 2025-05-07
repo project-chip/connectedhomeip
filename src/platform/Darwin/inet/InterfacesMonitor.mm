@@ -211,7 +211,7 @@ namespace Inet {
             mInterfaceId = interfaceId;
             mAddressType = addressType;
             mWorkQueue = workQueue;
-            mInterfaceMonitor = nullptr;
+            mMonitor = nullptr;
 
             mLivenessTracker = std::make_shared<bool>(true);
             if (mLivenessTracker == nullptr) {
@@ -263,14 +263,31 @@ namespace Inet {
             });
         }
 
+        CHIP_ERROR InterfacesMonitor::StartMonitorPaths(OnPathChange pathChangeBlock)
+        {
+            VerifyOrReturnError(nullptr == mMonitor, CHIP_ERROR_INCORRECT_STATE);
+
+            __auto_type pathMonitorHandler = ^(nw_path_t path) {
+                pathChangeBlock(path);
+            };
+
+            mMonitor = CreatePathMonitor(nw_interface_type_other, pathMonitorHandler, false /* once */);
+            VerifyOrReturnError(nullptr != mMonitor, CHIP_ERROR_NO_MEMORY);
+
+            nw_path_monitor_start(mMonitor);
+            return CHIP_NO_ERROR;
+        }
+
         CHIP_ERROR InterfacesMonitor::StartMonitorInterfaces(OnInterfaceChanges interfaceChangesBlock)
         {
+            VerifyOrReturnError(nullptr == mMonitor, CHIP_ERROR_INCORRECT_STATE);
+
             __block InetInterfacesVector inetLoopback;
             __block Inet6InterfacesVector inet6Loopback;
 
             __auto_type loopbackMonitorHandler = ^(nw_path_t path) {
                 EnumeratePathInterfaces(path, inetLoopback, inet6Loopback, true /* searchLoopbackOnly */);
-                nw_path_monitor_start(mInterfaceMonitor);
+                nw_path_monitor_start(mMonitor);
             };
 
             __auto_type otherMonitorHandler = ^(nw_path_t path) {
@@ -283,18 +300,18 @@ namespace Inet {
             __auto_type loopbackMonitor = CreatePathMonitor(nw_interface_type_loopback, loopbackMonitorHandler, true /* once */);
             VerifyOrReturnError(nullptr != loopbackMonitor, CHIP_ERROR_NO_MEMORY);
 
-            mInterfaceMonitor = CreatePathMonitor(nw_interface_type_other, otherMonitorHandler, false /* once */);
-            VerifyOrReturnError(nullptr != mInterfaceMonitor, CHIP_ERROR_NO_MEMORY);
+            mMonitor = CreatePathMonitor(nw_interface_type_other, otherMonitorHandler, false /* once */);
+            VerifyOrReturnError(nullptr != mMonitor, CHIP_ERROR_NO_MEMORY);
 
             nw_path_monitor_start(loopbackMonitor);
             return CHIP_NO_ERROR;
         }
 
-        void InterfacesMonitor::StopMonitorInterfaces()
+        void InterfacesMonitor::Stop()
         {
-            if (mInterfaceMonitor != nullptr) {
-                nw_path_monitor_cancel(mInterfaceMonitor);
-                mInterfaceMonitor = nullptr;
+            if (mMonitor != nullptr) {
+                nw_path_monitor_cancel(mMonitor);
+                mMonitor = nullptr;
             }
         }
 

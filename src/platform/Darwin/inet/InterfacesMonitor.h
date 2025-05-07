@@ -44,13 +44,14 @@ namespace Inet {
             bool IsLocalOnly() const { return mInterfaceId == kDNSServiceInterfaceIndexLocalOnly; };
 
             CHIP_ERROR StartMonitorInterfaces(OnInterfaceChanges interfaceChangesBlock);
-            void StopMonitorInterfaces();
+            CHIP_ERROR StartMonitorPaths(OnPathChange pathChangeBlock);
+            void Stop();
 
         private:
             nw_path_monitor_t CreatePathMonitor(nw_interface_type_t type, nw_path_monitor_update_handler_t handler, bool once);
             void EnumeratePathInterfaces(nw_path_t path, InetInterfacesVector & out4, Inet6InterfacesVector & out6, bool searchLoopBackOnly);
 
-            nw_path_monitor_t mInterfaceMonitor = nullptr;
+            nw_path_monitor_t mMonitor = nullptr;
 
             // Default to kDNSServiceInterfaceIndexLocalOnly so we don't mess around
             // with un-registration if we never get Init() called.

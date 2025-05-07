@@ -99,7 +99,7 @@ namespace Dnssd {
     void HostNameRegistrar::Unregister()
     {
         if (!IsLocalOnly()) {
-            StopMonitorInterfaces();
+            InterfacesMonitor::Stop();
         }
         StopSharedConnection();
     }
