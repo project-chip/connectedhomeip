@@ -176,6 +176,7 @@ class TC_ACL_2_6(MatterBaseTest):
                                  reverse=True)[:2]
 
         # Verify we got the expected number of events
+        asserts.assert_true(events_response, "Did not receive a response when calling ReadEvents")
         asserts.assert_true(len(read_events) >= 2,
                             f"Expected at least 2 events from read, but got {len(read_events)}")
 
