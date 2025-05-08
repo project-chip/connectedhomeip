@@ -373,6 +373,8 @@ class HostBuilder(GnBuilder):
         self.build_env = {}
         self.fuzzing_type = fuzzing_type
 
+        self.extra_gn_options.append('chip_minmdns_high_verbosity=true')
+
         if enable_rpcs:
             self.extra_gn_options.append('import("//with_pw_rpc.gni")')
 
