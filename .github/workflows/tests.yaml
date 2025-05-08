@@ -489,6 +489,32 @@ jobs:
                   sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
                   mkdir objdir-clone || true
 
+            - name: Faster basic test
+              # builds minimal environment to run the mobile device test for debugging
+              run: |
+                  scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
+                  ./scripts/run_in_build_env.sh \
+                   "./scripts/build/build_examples.py \
+                      --target linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test \
+                      --target linux-x64-python-bindings \
+                      build \
+                      --copy-artifacts-to objdir-clone \
+                   "
+
+                  # new test environment
+                  echo -n "" >/tmp/test_env.yaml
+                  echo "ALL_CLUSTERS_APP: out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app" >> /tmp/test_env.yaml
+                  echo "TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
+                  echo "TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
+                  echo "TRACE_TEST_PERFETTO: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
+
+                  mkdir -p out/trace_data
+                  scripts/run_in_python_env.sh out/venv 'scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/controller/python/test/test_scripts/mobile-device-test.py'
+
+            - name: Verify Testing Support
+              run: |
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_IDM_10_4.py'
+
             - name: Build Python REPL and example apps
               # NOTE: the data-mode-check + check-failure-die is not 100% perfect as different
               #       encoding sizes for data that keeps changing may alter over time (e.g. anything relating to time
