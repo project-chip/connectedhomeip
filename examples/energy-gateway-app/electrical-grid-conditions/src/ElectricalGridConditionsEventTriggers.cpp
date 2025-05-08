@@ -17,7 +17,6 @@
  */
 
 #include "ElectricalGridConditionsMain.h"
-#include "EnergyTimeUtils.h"
 #include <app/clusters/electrical-grid-conditions-server/ElectricalGridConditionsTestEventTriggerHandler.h>
 #include <app/util/af-types.h>
 
@@ -34,14 +33,14 @@ void SetTestEventTrigger_CurrentConditionsUpdate()
     // Change the value of CurrentConditions
     Structs::ElectricalGridConditionsStruct::Type newConditionsStruct;
     DataModel::Nullable<Structs::ElectricalGridConditionsStruct::Type> newConditions;
-    uint32_t chipEpoch = 0;
+    uint32_t matterEpoch = 0;
 
-    if (GetEpochTS(chipEpoch) != CHIP_NO_ERROR)
+    if (System::Clock::GetClock_MatterEpochS(matterEpoch) != CHIP_NO_ERROR)
     {
         ChipLogError(Support, "SetTestEventTrigger_CurrentConditionsUpdate() could not get time");
     }
 
-    newConditionsStruct.periodStart = chipEpoch;
+    newConditionsStruct.periodStart = matterEpoch;
     newConditionsStruct.periodEnd.SetNonNull(newConditionsStruct.periodStart + 30 * 60);
 
     newConditionsStruct.gridCarbonIntensity  = 230; // grammes per kWh
@@ -69,8 +68,8 @@ void SetTestEventTrigger_ForecastConditionsUpdate()
         return;
     }
 
-    uint32_t chipEpoch = 0;
-    if (GetEpochTS(chipEpoch) != CHIP_NO_ERROR)
+    uint32_t matterEpoch = 0;
+    if (System::Clock::GetClock_MatterEpochS(matterEpoch) != CHIP_NO_ERROR)
     {
         ChipLogError(Support, "SetTestEventTrigger_ForecastConditionsUpdate() could not get time");
         return;
@@ -84,7 +83,7 @@ void SetTestEventTrigger_ForecastConditionsUpdate()
 
     static Structs::ElectricalGridConditionsStruct::Type sForecastEntries[kForecastSize];
 
-    uint32_t currentStart = chipEpoch;
+    uint32_t currentStart = matterEpoch;
 
     for (size_t i = 0; i < kForecastSize; ++i)
     {
