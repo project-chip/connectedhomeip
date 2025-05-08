@@ -55,7 +55,7 @@ class TC_CNET_4_1(MatterBaseTest):
                       Verify that the number of entries in the Networks attribute is less than or equal to 'MaxNetworksValue'"),
             TestStep(5, "TH reads ScanMaxTimeSeconds attribute from the DUT",
                      "Verify that ScanMaxTimeSeconds attribute value is within the range of 1 to 255 seconds"),
-            TestStep(6, "TH reads ConnectMaxTimeSeconds Attribute from the DUT",
+            TestStep(6, "TH reads ConnectMaxTimeSeconds attribute from the DUT",
                      "Verify that ConnectMaxTimeSeconds attribute value is within the range of 1 to 255 seconds"),
             TestStep(7, "TH reads InterfaceEnabled attribute from the DUT", "Verify that InterfaceEnabled attribute value is true"),
             TestStep(8, "TH reads LastNetworkingStatus attribute from the DUT",
