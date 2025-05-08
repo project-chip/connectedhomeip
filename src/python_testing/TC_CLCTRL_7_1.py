@@ -42,6 +42,7 @@ from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
+
 class TC_CLCTRL_7_1(MatterBaseTest):
     async def read_clctrl_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ClosureControl
@@ -82,24 +83,24 @@ class TC_CLCTRL_7_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_CLCTRL_7_1(self):
-        
+
         asserts.assert_true('PIXIT.CLCTRL.FullMotionDuration' in self.matter_test_config.global_test_params,
-                    "PIXIT.CLCTRL.FullMotionDuration must be included on the command line in "
-                    "the --int-arg flag as PIXIT.CLCTRL.FullMotionDuration:<duration>")
+                            "PIXIT.CLCTRL.FullMotionDuration must be included on the command line in "
+                            "the --int-arg flag as PIXIT.CLCTRL.FullMotionDuration:<duration>")
         asserts.assert_true('PIXIT.CLCTRL.LatchingDuration' in self.matter_test_config.global_test_params,
-                    "PIXIT.CLCTRL.LatchingDuration must be included on the command line in "
-                    "the --int-arg flag as PIXIT.CLCTRL.LatchingDuration:<duration>")
-        
+                            "PIXIT.CLCTRL.LatchingDuration must be included on the command line in "
+                            "the --int-arg flag as PIXIT.CLCTRL.LatchingDuration:<duration>")
+
         full_motion_duration = self.matter_test_config.global_test_params['PIXIT.CLCTRL.FullMotionDuration']
         latching_duration = self.matter_test_config.global_test_params['PIXIT.CLCTRL.LatchingDuration']
-        
+
         is_manual_latching = True if self.check_pics('CLCTRL.S.M.ManualLatching') is not None else False
-        
+
         endpoint = self.get_endpoint(default=1)
-        
+
         # STEP 1: Commissioning
         self.step(1)
-        
+
         # STEP 2
         self.step("2a")
         attributes = Clusters.ClosureControl.Attributes
@@ -109,7 +110,7 @@ class TC_CLCTRL_7_1(MatterBaseTest):
         is_latching_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kMotionLatching
         is_positioning_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kPositioning
         is_speed_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kSpeed
-        
+
         if not is_latching_feature_supported or not is_positioning_supported:
             logging.info("LT (MotionLatching) or PS (Positioning) feature not supported, skipping test case")
             self.skip_all_remaining_steps("2c")
@@ -120,27 +121,31 @@ class TC_CLCTRL_7_1(MatterBaseTest):
 
         # STEP 3
         self.step("3a")
-        cmd = Clusters.Objects.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kCloseInFull)
+        cmd = Clusters.Objects.ClosureControl.Commands.MoveTo(
+            position=Clusters.ClosureControl.Enums.TargetPositionEnum.kCloseInFull)
         await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
-        
+
         self.step("3b")
         logging.info(f"Waiting for {full_motion_duration} seconds to complete movement")
         time.sleep(full_motion_duration)
-        
+
         self.step("3c")
         overall_state = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallState)
-        
+
         # Verify device is fully closed
         asserts.assert_true(hasattr(overall_state, "positioning"), "OverallState.Positioning field missing")
-        asserts.assert_equal(overall_state.positioning, Clusters.ClosureControl.Enums.PositioningEnum.kFullyClosed, "OverallState.Positioning is not FullyClosed(0)")
-        
+        asserts.assert_equal(overall_state.positioning, Clusters.ClosureControl.Enums.PositioningEnum.kFullyClosed,
+                             "OverallState.Positioning is not FullyClosed(0)")
+
         asserts.assert_true(hasattr(overall_state, "latch"), "OverallState.Latch field missing")
         asserts.assert_false(overall_state.latch, "OverallState.Latch is not False")
-        
+
         if is_speed_supported:
-            asserts.assert_greater_equal(overall_state.speed, Clusters.Globals.ThreeLevelAutoEnum.kAuto, "OverallState.Speed is not greater than 0")
-            asserts.assert_less_equal(overall_state.speed, Clusters.Globals.ThreeLevelAutoEnum.kHigh, "OverallState.Speed is not in range [0, 3]")
-        
+            asserts.assert_greater_equal(overall_state.speed, Clusters.Globals.ThreeLevelAutoEnum.kAuto,
+                                         "OverallState.Speed is not greater than 0")
+            asserts.assert_less_equal(overall_state.speed, Clusters.Globals.ThreeLevelAutoEnum.kHigh,
+                                      "OverallState.Speed is not in range [0, 3]")
+
         # Check SecureState if it exists
         if hasattr(overall_state, "secureState"):
             asserts.assert_false(overall_state.secureState, "OverallState.SecureState is not False")
@@ -161,7 +166,7 @@ class TC_CLCTRL_7_1(MatterBaseTest):
                 asserts.fail("Expected InvalidAction error but received Success")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.InvalidAction, f"Unexpected error returned: {e.status}")
-            
+
             self.step("4c")
             test_step = "Manual latch the device"
             self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when ready.")
@@ -180,19 +185,21 @@ class TC_CLCTRL_7_1(MatterBaseTest):
             self.step("5b")
             cmd = Clusters.Objects.ClosureControl.Commands.MoveTo(latch=True)
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
-            
+
             self.step("5c")
             overall_target = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallTarget)
-            
+
             # Verify OverallTarget fields
             asserts.assert_true(hasattr(overall_target, "latch"), "OverallTarget.Latch field missing")
             asserts.assert_true(overall_target.latch, "OverallTarget.Latch is not True")
-            
-            asserts.assert_equal(overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum.kCloseInFull, "OverallTarget.Position is not CloseInFull(0)")
-            
+
+            asserts.assert_equal(overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum.kCloseInFull,
+                                 "OverallTarget.Position is not CloseInFull(0)")
+
             if is_speed_supported:
-                asserts.assert_true(Clusters.Globals.ThreeLevelAutoEnum.kAuto <= overall_target.speed <= Clusters.Globals.ThreeLevelAutoEnum.kHigh, f"OverallTarget.Speed out of range: {overall_target.speed}")
-            
+                asserts.assert_true(Clusters.Globals.ThreeLevelAutoEnum.kAuto <= overall_target.speed <=
+                                    Clusters.Globals.ThreeLevelAutoEnum.kHigh, f"OverallTarget.Speed out of range: {overall_target.speed}")
+
             self.step("5d")
             logging.info(f"Waiting for {latching_duration} seconds to complete latching")
             time.sleep(latching_duration)
@@ -200,22 +207,26 @@ class TC_CLCTRL_7_1(MatterBaseTest):
         # STEP 6
         self.step(6)
         overall_state = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallState)
-        
+
         # Verify OverallState fields
-        asserts.assert_equal(overall_state.positioning, Clusters.ClosureControl.Enums.PositioningEnum.kFullyClosed, "OverallState.Positioning is not FullyClosed(0)")
+        asserts.assert_equal(overall_state.positioning, Clusters.ClosureControl.Enums.PositioningEnum.kFullyClosed,
+                             "OverallState.Positioning is not FullyClosed(0)")
         asserts.assert_true(overall_state.latch, "OverallState.Latch is not True")
-        
+
         if is_speed_supported:
-            asserts.assert_greater_equal(overall_state.speed, Clusters.Globals.ThreeLevelAutoEnum.kAuto, "OverallState.Speed is not greater than 0")
-            asserts.assert_less_equal(overall_state.speed, Clusters.Globals.ThreeLevelAutoEnum.kHigh, "OverallState.Speed is not in range [0, 3]")    
-    
+            asserts.assert_greater_equal(overall_state.speed, Clusters.Globals.ThreeLevelAutoEnum.kAuto,
+                                         "OverallState.Speed is not greater than 0")
+            asserts.assert_less_equal(overall_state.speed, Clusters.Globals.ThreeLevelAutoEnum.kHigh,
+                                      "OverallState.Speed is not in range [0, 3]")
+
         if hasattr(overall_state, "secureState"):
             asserts.assert_true(overall_state.secureState, "OverallState.SecureState is not True")
 
         # STEP 7
         self.step(7)
         try:
-            cmd = Clusters.Objects.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kOpenInFull)
+            cmd = Clusters.Objects.ClosureControl.Commands.MoveTo(
+                position=Clusters.ClosureControl.Enums.TargetPositionEnum.kOpenInFull)
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
             asserts.fail("Expected InvalidAction error but received Success")
         except InteractionModelError as e:
@@ -225,24 +236,28 @@ class TC_CLCTRL_7_1(MatterBaseTest):
         self.step("8a")
         cmd = Clusters.Objects.ClosureControl.Commands.MoveTo(latch=False)
         await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
-        
+
         self.step("8b")
         logging.info(f"Waiting for {latching_duration} seconds to complete unlatching")
         time.sleep(latching_duration)
-        
+
         self.step("8c")
         overall_state = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallState)
-        
+
         # Verify OverallState fields after unlatching
-        asserts.assert_equal(overall_state.positioning, Clusters.ClosureControl.Enums.PositioningEnum.kFullyClosed, "OverallState.Positioning is not FullyClosed(0)")
+        asserts.assert_equal(overall_state.positioning, Clusters.ClosureControl.Enums.PositioningEnum.kFullyClosed,
+                             "OverallState.Positioning is not FullyClosed(0)")
         asserts.assert_false(overall_state.latch, "OverallState.Latch is not False")
-        
+
         if is_speed_supported:
-            asserts.assert_greater_equal(overall_state.speed, Clusters.Globals.ThreeLevelAutoEnum.kAuto, "OverallState.Speed is not greater than 0")
-            asserts.assert_less_equal(overall_state.speed, Clusters.Globals.ThreeLevelAutoEnum.kHigh, "OverallState.Speed is not in range [0, 3]") 
-        
+            asserts.assert_greater_equal(overall_state.speed, Clusters.Globals.ThreeLevelAutoEnum.kAuto,
+                                         "OverallState.Speed is not greater than 0")
+            asserts.assert_less_equal(overall_state.speed, Clusters.Globals.ThreeLevelAutoEnum.kHigh,
+                                      "OverallState.Speed is not in range [0, 3]")
+
         if hasattr(overall_state, "secureState"):
             asserts.assert_false(overall_state.secureState, "OverallState.SecureState is not False")
+
 
 if __name__ == "__main__":
     default_matter_test_main()

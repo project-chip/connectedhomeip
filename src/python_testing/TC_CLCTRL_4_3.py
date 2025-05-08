@@ -38,6 +38,7 @@ from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
+
 class TC_CLCTRL_4_3(MatterBaseTest):
     async def read_clctrl_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ClosureControl
@@ -69,13 +70,13 @@ class TC_CLCTRL_4_3(MatterBaseTest):
 
     @async_test_body
     async def test_TC_CLCTRL_4_3(self):
-        
+
         endpoint = self.get_endpoint(default=1)
-        
+
         # STEP 1: Commission DUT to TH
         self.step(1)
         cluster = Clusters.Objects.ClosureControl
-        
+
         # Read the feature map
         feature_map = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=Clusters.ClosureControl.Attributes.FeatureMap)
         logging.info(f"FeatureMap: {feature_map}")
@@ -83,7 +84,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
         is_ps_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kPositioning
         is_lt_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kMotionLatching
         is_sp_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kSpeed
-        
+
         # STEP 2: Send MoveTo command with no fields
         self.step(2)
         try:
@@ -92,9 +93,9 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             asserts.assert_true(False, "MoveTo command with no fields should have failed but succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.InvalidCommand, "Expected InvalidCommand error")
-            
+
         # STEP 3
-        self.step("3a")        
+        self.step("3a")
         # Test Latch field if Latching feature is not supported
         if not is_lt_feature_supported:
             try:
@@ -102,27 +103,32 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                 logging.info("MoveTo command with Latch field when feature not supported was accepted")
             except InteractionModelError as e:
                 logging.error(f"MoveTo with Latch when feature not supported failed: {e}")
-                asserts.assert_equal(e.status, Status.Success, "Expected Success status for MoveTo with Latch when feature not supported")
-        
+                asserts.assert_equal(e.status, Status.Success,
+                                     "Expected Success status for MoveTo with Latch when feature not supported")
+
         self.step("3b")
         # Test Speed field if Speed feature is not supported
         if not is_sp_feature_supported:
             try:
-                await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"speed": Clusters.Globals.ThreeLevelAutoEnum.kLow}))  # Low speed
+                # Low speed
+                await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"speed": Clusters.Globals.ThreeLevelAutoEnum.kLow}))
                 logging.info("MoveTo command with Speed field when feature not supported was accepted")
             except InteractionModelError as e:
                 logging.error(f"MoveTo with Speed when feature not supported failed: {e}")
-                asserts.assert_equal(e.status, Status.Success, "Expected Success status for MoveTo with Speed when feature not supported")
-        
+                asserts.assert_equal(e.status, Status.Success,
+                                     "Expected Success status for MoveTo with Speed when feature not supported")
+
         self.step("3c")
         # Test Position field if Positioning feature is not supported
         if not is_ps_feature_supported:
             try:
-                await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"position": Clusters.ClosureControl.Enums.TargetPositionEnum.kCloseInFull}))  # CloseInFull
+                # CloseInFull
+                await self.send_single_cmd(endpoint=endpoint, cluster=cluster, command=cluster.Commands.MoveTo({"position": Clusters.ClosureControl.Enums.TargetPositionEnum.kCloseInFull}))
                 logging.info("MoveTo command with Position field when feature not supported was accepted")
             except InteractionModelError as e:
                 logging.error(f"MoveTo with Position when feature not supported failed: {e}")
-                asserts.assert_equal(e.status, Status.Success, "Expected Success status for MoveTo with Position when feature not supported")
+                asserts.assert_equal(e.status, Status.Success,
+                                     "Expected Success status for MoveTo with Position when feature not supported")
 
         # STEP 4
         self.step("4a")
@@ -134,8 +140,9 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                 asserts.assert_true(False, "MoveTo command with invalid Position should have failed but succeeded")
             except InteractionModelError as e:
                 logging.info(f"Expected exception caught for invalid Position: {e}")
-                asserts.assert_equal(e.status, Status.ConstraintError, f"Expected CONSTRAINT_ERROR for invalid Position but got: {e}")
-                
+                asserts.assert_equal(e.status, Status.ConstraintError,
+                                     f"Expected CONSTRAINT_ERROR for invalid Position but got: {e}")
+
         self.step("4b")
         # Test invalid Speed value
         if is_ps_feature_supported and is_sp_feature_supported:
@@ -146,7 +153,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             except InteractionModelError as e:
                 logging.info(f"Expected exception caught for invalid Position: {e}")
                 asserts.assert_equal(e.status, Status.ConstraintError, f"Expected CONSTRAINT_ERROR for invalid Speed but got: {e}")
-                
+
         self.step("4c")
         # Test invalid Position and valid Speed
         if is_ps_feature_supported and is_sp_feature_supported:
@@ -156,8 +163,9 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                 asserts.assert_true(False, "MoveTo command with invalid Position and valid Speed should have failed but succeeded")
             except InteractionModelError as e:
                 logging.info(f"Expected exception caught for invalid Position and valid Speed: {e}")
-                asserts.assert_equal(e.status, Status.ConstraintError, f"Expected CONSTRAINT_ERROR for invalid Position and valid Speed but got: {e}")
-        
+                asserts.assert_equal(e.status, Status.ConstraintError,
+                                     f"Expected CONSTRAINT_ERROR for invalid Position and valid Speed but got: {e}")
+
         self.step("4d")
         # Test valid Position and invalid Speed
         if is_ps_feature_supported and is_sp_feature_supported:
@@ -167,7 +175,9 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                 asserts.assert_true(False, "MoveTo command with valid Position and invalid Speed should have failed but succeeded")
             except InteractionModelError as e:
                 logging.info(f"Expected exception caught for valid Position and invalid Speed: {e}")
-                asserts.assert_equal(e.status, Status.ConstraintError, f"Expected CONSTRAINT_ERROR for valid Position and invalid Speed but got: {e}")
+                asserts.assert_equal(e.status, Status.ConstraintError,
+                                     f"Expected CONSTRAINT_ERROR for valid Position and invalid Speed but got: {e}")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
